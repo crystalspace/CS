@@ -9,10 +9,10 @@
     <WidgetLook name="ice/SettingComboBox">
       <PropertyLinkDefinition name="Name" widget="__auto_name__" targetProperty="Text" />
 
-      <PropertyLinkDefinition name="DontUse1" widget="__auto_name__" targetProperty="FrameEnabled" initialValue="False"/>
-      <PropertyLinkDefinition name="DontUse2" widget="__auto_combobox__" targetProperty="ClippedByParent" initialValue="False"/>
-      <PropertyLinkDefinition name="DontUse3" widget="__auto_name__" targetProperty="BackgroundEnabled" initialValue="False"/>
+      <PropertyLinkDefinition name="LabelTextColour" widget="__auto_name__" targetProperty="TextColours" />
       <Child type="ice/StaticText" nameSuffix="__auto_name__">
+        <Property name="FrameEnabled" value="False" />
+        <Property name="BackgroundEnabled" value="False" />
         <Area>
           <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
           <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
@@ -21,6 +21,7 @@
         </Area>
       </Child>
       <Child type="ice/Combobox" nameSuffix="__auto_combobox__">
+        <Property name="ClippedByParent" value="False" />
         <Area>
           <Dim type="LeftEdge" ><UnifiedDim scale="0.6" offset="2" type="LeftEdge" /></Dim>
           <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
@@ -54,11 +55,12 @@
       <PropertyLinkDefinition name="MaximumValue" widget="__auto_slider__" targetProperty="MaximumValue" />
       <PropertyLinkDefinition name="ClickStepSize" widget="__auto_slider__" targetProperty="ClickStepSize" />
 
-      <PropertyLinkDefinition name="DontUse1" widget="__auto_name__" targetProperty="FrameEnabled" initialValue="False"/>
-      <PropertyLinkDefinition name="DontUse2" widget="__auto_value__" targetProperty="FrameEnabled" initialValue="False"/>
-      <PropertyLinkDefinition name="DontUse3" widget="__auto_name__" targetProperty="BackgroundEnabled" initialValue="False"/>
-      <PropertyLinkDefinition name="DontUse4" widget="__auto_value__" targetProperty="BackgroundEnabled" initialValue="False"/>
+      <PropertyLinkDefinition name="LabelTextColour" widget="__auto_name__" targetProperty="TextColours" />
+      <PropertyLinkDefinition name="ValueTextColour" widget="__auto_value__" targetProperty="TextColours" />
       <Child type="ice/StaticText" nameSuffix="__auto_name__">
+        <Property name="FrameEnabled" value="False" />
+        <Property name="BackgroundEnabled" value="False" />
+        <Property name="TextColours" value="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" />
         <Area>
           <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
           <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
@@ -75,6 +77,8 @@
         </Area>
       </Child>
       <Child type="ice/StaticText" nameSuffix="__auto_value__">
+        <Property name="FrameEnabled" value="False" />
+        <Property name="BackgroundEnabled" value="False" />
         <Area>
           <Dim type="LeftEdge" ><UnifiedDim scale="1" offset="-48" type="LeftEdge" /></Dim>
           <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>

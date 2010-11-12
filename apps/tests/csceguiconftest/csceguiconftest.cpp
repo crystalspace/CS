@@ -122,26 +122,13 @@ bool CSCEGUIConfTest::OnInitialize(int argc, char* argv [])
 {
 
   // Default behavior from DemoApplication
-  //if (!DemoApplication::OnInitialize (argc, argv))
-  //  return false;
+  if (!DemoApplication::OnInitialize (argc, argv))
+    return false;
 
   if (!csInitializer::RequestPlugins(GetObjectRegistry(),
-    CS_REQUEST_VFS,
-    CS_REQUEST_OPENGL3D,
-    CS_REQUEST_ENGINE,
-    CS_REQUEST_FONTSERVER,
-    CS_REQUEST_IMAGELOADER,
-    CS_REQUEST_LEVELLOADER,
-    CS_REQUEST_REPORTER,
-    CS_REQUEST_REPORTERLISTENER,
     CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
     CS_REQUEST_END))
     return ReportError("Failed to initialize plugins!");
-
-  csBaseEventHandler::Initialize(GetObjectRegistry());
-
-  if (!RegisterQueue(GetObjectRegistry(), csevAllEvents(GetObjectRegistry())))
-    return ReportError("Failed to set up event handler!");
 
   return true;
 }
