@@ -17,12 +17,12 @@
     <material name='marschner_material'>
       <shader type='standard'>fur_cg</shader>
 	  <shadervar type="int" name="diffuse type">1</shadervar>
-	  <!-- fur color used if texture map and color map or diffuse map not specify>
-	  <shadervar type="vector3" name="fur color">0.51, 0.34, 0.25</shadervar -->
+	  <!-- fur color used if texture map and color map or diffuse map not specify -->
+	  <shadervar type="vector4" name="fur color">0.51, 0.34, 0.25, 0.1</shadervar>
 	  <shadervar type="texture" name="texture map">krystal_skull_texturemap</shadervar>
 	  <shadervar type="texture" name="color map">krystal_skull_colormap</shadervar> 
 	  <shadervar type="float" name="Ks">0.2</shadervar>
-	  <shadervar type="int" name="kajiya kay no" /> 
+	  <shadervar type="int" name="kajiya kay" /> 
     </material>
   </materials>
   <sounds/>

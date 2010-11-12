@@ -154,13 +154,13 @@ bool HairTest::OnEventThumbTrackEndedR (const CEGUI::EventArgs&)
 {
   CS::ShaderVarName objColor (svStrings, "fur color");	
   
-  csVector3 color; 
+  csVector4 color; 
   avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
     GetVariableAdd(objColor)->GetValue(color);
   
   avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
     GetVariableAdd(objColor)->
-    SetValue(csVector3( sliderR->getScrollPosition(), color.y, color.z ) );
+    SetValue(csVector4( sliderR->getScrollPosition(), color.y, color.z, color.w ) );
 
   return true;
 }
@@ -169,13 +169,13 @@ bool HairTest::OnEventThumbTrackEndedG (const CEGUI::EventArgs&)
 {
   CS::ShaderVarName objColor (svStrings, "fur color");	
 
-  csVector3 color; 
+  csVector4 color; 
   avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
     GetVariableAdd(objColor)->GetValue(color);
 
   avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
     GetVariableAdd(objColor)->
-    SetValue(csVector3( color.x, sliderG->getScrollPosition(), color.z ) );
+    SetValue(csVector4( color.x, sliderG->getScrollPosition(), color.z, color.w ) );
 
   return true;
 }
@@ -184,13 +184,28 @@ bool HairTest::OnEventThumbTrackEndedB (const CEGUI::EventArgs&)
 {
   CS::ShaderVarName objColor (svStrings, "fur color");	
 
-  csVector3 color; 
+  csVector4 color; 
   avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
     GetVariableAdd(objColor)->GetValue(color);
 
   avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
     GetVariableAdd(objColor)->
-    SetValue(csVector3( color.x, color.y , sliderB->getScrollPosition()) );
+    SetValue(csVector4( color.x, color.y , sliderB->getScrollPosition(), color.w) );
+
+  return true;
+}
+
+bool HairTest::OnEventThumbTrackEndedA (const CEGUI::EventArgs&)
+{
+  CS::ShaderVarName objColor (svStrings, "fur color");	
+
+  csVector4 color; 
+  avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
+    GetVariableAdd(objColor)->GetValue(color);
+
+  avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
+    GetVariableAdd(objColor)->
+    SetValue(csVector4( color.x, color.y , color.z, sliderA->getScrollPosition()) );
 
   return true;
 }
@@ -1080,13 +1095,20 @@ bool HairTest::Application ()
       subscribeEvent(CEGUI::PushButton::EventClicked,
       CEGUI::Event::Subscriber(&HairTest::UnloadDiffuseMap, this));    
 
-
     // RGB hair color
+    CS::ShaderVarName objColor (svStrings, "fur color");	
+
+    csVector4 color; 
+    avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
+      GetVariableAdd(objColor)->GetValue(color);
+
     sliderR = (CEGUI::Scrollbar*)winMgr->
       getWindow("HairTest/MainWindow/Tab/Page3/Slider1");
 
     sliderR->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
       CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedR, this));  
+
+    sliderR->setScrollPosition(color.x);
 
     sliderG = (CEGUI::Scrollbar*)winMgr->
       getWindow("HairTest/MainWindow/Tab/Page3/Slider2");
@@ -1094,11 +1116,23 @@ bool HairTest::Application ()
     sliderG->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
       CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedG, this));  
 
+    sliderG->setScrollPosition(color.y);
+
     sliderB = (CEGUI::Scrollbar*)winMgr->
       getWindow("HairTest/MainWindow/Tab/Page3/Slider3");
 
     sliderB->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
       CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedB, this));  
+
+    sliderB->setScrollPosition(color.z);
+
+    sliderA = (CEGUI::Scrollbar*)winMgr->
+      getWindow("HairTest/MainWindow/Tab/Page3/Slider4");
+
+    sliderA->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
+      CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedA, this));  
+
+    sliderA->setScrollPosition(color.w);
 
     sliderPointiness = (CEGUI::Scrollbar*)winMgr->
       getWindow("HairTest/MainWindow/Tab/Page1/Slider1");

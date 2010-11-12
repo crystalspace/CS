@@ -26,7 +26,7 @@
 #define CAMERA_HIPS_DISTANCE 3.0f
 
 KrystalScene::KrystalScene (HairTest* hairTest)
-: hairTest (hairTest), hairPhysicsEnabled(false), isDead(false)
+: hairTest (hairTest), hairPhysicsEnabled(true), isDead(false)
 {
   // Define the available keys
   hairTest->hudHelper.keyDescriptions.DeleteAll ();
@@ -403,7 +403,7 @@ bool KrystalScene::CreateAvatar ()
   furMesh->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
   furMesh->GenerateGeometry(hairTest->view, hairTest->room);
 
-  furMesh->SetAnimationControl(animationPhysicsControl);
+  furMesh->SetAnimationControl(hairPhysicsControl);
   furMesh->StartAnimationControl();
 
   furMesh->SetGuideLOD(0);

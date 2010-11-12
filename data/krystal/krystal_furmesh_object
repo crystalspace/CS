@@ -17,9 +17,9 @@
 			<controlpointsdeviation>0.015</controlpointsdeviation>
 			<growtangents/>
 			<mixmode>
-				<copy />
+				<alpha/>
 			</mixmode>			
-			<priority>object</priority>			
+			<priority>alpha</priority>			
 		</params>
 	</meshobj>
 </library>

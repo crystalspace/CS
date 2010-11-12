@@ -104,6 +104,7 @@ private:
   CEGUI::Scrollbar* sliderR;
   CEGUI::Scrollbar* sliderG;
   CEGUI::Scrollbar* sliderB;
+  CEGUI::Scrollbar* sliderA;
   CEGUI::Scrollbar* sliderPointiness;
   CEGUI::Scrollbar* sliderStrandWidth;
   CEGUI::Scrollbar* sliderControlPointsDeviation;
@@ -165,6 +166,7 @@ public:
   bool OnEventThumbTrackEndedR (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedG (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedB (const CEGUI::EventArgs& e);
+  bool OnEventThumbTrackEndedA (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedPointiness (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedStrandWidth (const CEGUI::EventArgs& e);
   bool OnEventThumbTrackEndedControlPointsDeviation(const CEGUI::EventArgs& e);
