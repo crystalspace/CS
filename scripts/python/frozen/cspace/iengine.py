@@ -1174,6 +1174,8 @@ class iVisibilityCullerListener(core.iBase):
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def ObjectVisible(*args): return _iengine.iVisibilityCullerListener_ObjectVisible(*args)
+    def GetVisibleMeshes(*args): return _iengine.iVisibilityCullerListener_GetVisibleMeshes(*args)
+    def MarkVisible(*args): return _iengine.iVisibilityCullerListener_MarkVisible(*args)
     __swig_destroy__ = _iengine.delete_iVisibilityCullerListener
     __del__ = lambda self : None;
 iVisibilityCullerListener_swigregister = _iengine.iVisibilityCullerListener_swigregister
@@ -1191,6 +1193,7 @@ class iVisibilityCuller(core.iBase):
     def IntersectSegmentSloppy(*args): return _iengine.iVisibilityCuller_IntersectSegmentSloppy(*args)
     def IntersectSegment(*args): return _iengine.iVisibilityCuller_IntersectSegment(*args)
     def ParseCullerParameters(*args): return _iengine.iVisibilityCuller_ParseCullerParameters(*args)
+    def RenderViscull(*args): return _iengine.iVisibilityCuller_RenderViscull(*args)
     scfGetVersion = staticmethod(_iengine.iVisibilityCuller_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iVisibilityCuller
     __del__ = lambda self : None;
@@ -1208,6 +1211,7 @@ class iVisibilityObject(core.iBase):
     def GetMeshWrapper(*args): return _iengine.iVisibilityObject_GetMeshWrapper(*args)
     def GetObjectModel(*args): return _iengine.iVisibilityObject_GetObjectModel(*args)
     def GetCullerFlags(*args): return _iengine.iVisibilityObject_GetCullerFlags(*args)
+    def GetBBox(*args): return _iengine.iVisibilityObject_GetBBox(*args)
     __swig_destroy__ = _iengine.delete_iVisibilityObject
     __del__ = lambda self : None;
 iVisibilityObject_swigregister = _iengine.iVisibilityObject_swigregister
@@ -1389,6 +1393,16 @@ class iRenderManagerPostEffects(core.iBase):
 iRenderManagerPostEffects_swigregister = _iengine.iRenderManagerPostEffects_swigregister
 iRenderManagerPostEffects_swigregister(iRenderManagerPostEffects)
 iRenderManagerPostEffects_scfGetVersion = _iengine.iRenderManagerPostEffects_scfGetVersion
+
+class iRenderManagerVisCull(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetVisCuller(*args): return _iengine.iRenderManagerVisCull_GetVisCuller(*args)
+    __swig_destroy__ = _iengine.delete_iRenderManagerVisCull
+    __del__ = lambda self : None;
+iRenderManagerVisCull_swigregister = _iengine.iRenderManagerVisCull_swigregister
+iRenderManagerVisCull_swigregister(iRenderManagerVisCull)
 
 class iSwigCollectionArray(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')

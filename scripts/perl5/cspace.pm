@@ -10151,6 +10151,13 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetTextureComparisonModes = *cspacec::iGraphics3D_SetTextureComparisonModes;
 *CopyFromRenderTargets = *cspacec::iGraphics3D_CopyFromRenderTargets;
 *DrawSimpleMeshes = *cspacec::iGraphics3D_DrawSimpleMeshes;
+*OQInitQueries = *cspacec::iGraphics3D_OQInitQueries;
+*OQDelQueries = *cspacec::iGraphics3D_OQDelQueries;
+*OQueryFinished = *cspacec::iGraphics3D_OQueryFinished;
+*OQIsVisible = *cspacec::iGraphics3D_OQIsVisible;
+*OQBeginQuery = *cspacec::iGraphics3D_OQBeginQuery;
+*OQEndQuery = *cspacec::iGraphics3D_OQEndQuery;
+*DrawMeshBasic = *cspacec::iGraphics3D_DrawMeshBasic;
 *scfGetVersion = *cspacec::iGraphics3D_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -20450,6 +20457,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *ObjectVisible = *cspacec::iVisibilityCullerListener_ObjectVisible;
+*GetVisibleMeshes = *cspacec::iVisibilityCullerListener_GetVisibleMeshes;
+*MarkVisible = *cspacec::iVisibilityCullerListener_MarkVisible;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -20489,6 +20498,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *IntersectSegmentSloppy = *cspacec::iVisibilityCuller_IntersectSegmentSloppy;
 *IntersectSegment = *cspacec::iVisibilityCuller_IntersectSegment;
 *ParseCullerParameters = *cspacec::iVisibilityCuller_ParseCullerParameters;
+*RenderViscull = *cspacec::iVisibilityCuller_RenderViscull;
 *scfGetVersion = *cspacec::iVisibilityCuller_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -20525,6 +20535,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetMeshWrapper = *cspacec::iVisibilityObject_GetMeshWrapper;
 *GetObjectModel = *cspacec::iVisibilityObject_GetObjectModel;
 *GetCullerFlags = *cspacec::iVisibilityObject_GetCullerFlags;
+*GetBBox = *cspacec::iVisibilityObject_GetBBox;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -20890,6 +20901,38 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_iRenderManagerPostEffects($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iRenderManagerVisCull ##############
+
+package cspace::iRenderManagerVisCull;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetVisCuller = *cspacec::iRenderManagerVisCull_GetVisCuller;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iRenderManagerVisCull($self);
         delete $OWNER{$self};
     }
 }

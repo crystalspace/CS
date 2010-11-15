@@ -429,6 +429,13 @@ class iGraphics3D(core.iBase):
     def SetTextureComparisonModes(*args): return _ivideo.iGraphics3D_SetTextureComparisonModes(*args)
     def CopyFromRenderTargets(*args): return _ivideo.iGraphics3D_CopyFromRenderTargets(*args)
     def DrawSimpleMeshes(*args): return _ivideo.iGraphics3D_DrawSimpleMeshes(*args)
+    def OQInitQueries(*args): return _ivideo.iGraphics3D_OQInitQueries(*args)
+    def OQDelQueries(*args): return _ivideo.iGraphics3D_OQDelQueries(*args)
+    def OQueryFinished(*args): return _ivideo.iGraphics3D_OQueryFinished(*args)
+    def OQIsVisible(*args): return _ivideo.iGraphics3D_OQIsVisible(*args)
+    def OQBeginQuery(*args): return _ivideo.iGraphics3D_OQBeginQuery(*args)
+    def OQEndQuery(*args): return _ivideo.iGraphics3D_OQEndQuery(*args)
+    def DrawMeshBasic(*args): return _ivideo.iGraphics3D_DrawMeshBasic(*args)
     scfGetVersion = staticmethod(_ivideo.iGraphics3D_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iGraphics3D
     __del__ = lambda self : None;
