@@ -150,6 +150,11 @@ class csReversibleTransform;
  */
 #define CS_ENTITY_LIMITEDSHADOWCAST 2048
 
+/**
+ * Mark as mesh as always visible for occlusion culling purposes.
+ */
+#define CS_ENTITY_ALWAYSVISIBLE 4096
+
 /** @} */
 
 /**

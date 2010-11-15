@@ -201,13 +201,15 @@ namespace CS
             csRef<NodeMeshList> meshes = visobjMeshHash.Get (csPtrKey<iVisibilityObject> (visobj), csRef<NodeMeshList> ());
             if (!meshes.IsValid ())
             {
-              meshes.AttachNew (new NodeMeshList (node, numMeshes, sectorMeshList, engine->GetCurrentFrameNumber ()));
+              meshes.AttachNew (new NodeMeshList (node, numMeshes, sectorMeshList,
+                engine->GetCurrentFrameNumber (), visobj->GetMeshWrapper ()->GetFlags ().Check (CS_ENTITY_ALWAYSVISIBLE)));
               visobjMeshHash.Put (visobj, meshes);
             }
             else
             {
               meshes->node = node;
               meshes->numMeshes = numMeshes;
+              meshes->alwaysVisible = visobj->GetMeshWrapper ()->GetFlags ().Check (CS_ENTITY_ALWAYSVISIBLE);
               meshes->framePassed = engine->GetCurrentFrameNumber ();
 
               delete[] meshes->meshList;
@@ -477,8 +479,8 @@ namespace CS
         if (nodeMeshList->framePassed == engine->GetCurrentFrameNumber ())
         {
           // If occlusion checks passed...
-          OcclusionVisibility eOccVis = GetNodeVisibility (nodeMeshList->node, rview);
-          if (eOccVis == VISIBLE)
+          if (nodeMeshList->alwaysVisible ||
+              GetNodeVisibility (nodeMeshList->node, rview) == VISIBLE)
           {
             // mark the mesh visible.
             iMeshWrapper* mw = nodeMeshList->node->GetLeafData (0)->GetMeshWrapper ();

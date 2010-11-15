@@ -182,8 +182,10 @@ namespace CS
       struct NodeMeshList : public csRefCount
       {
         NodeMeshList (AABBVisTreeNode*& node, const int& numMeshes,
-          csSectorVisibleRenderMeshes*& mL, uint framePassed)
-          : node (node), numMeshes(numMeshes), framePassed(framePassed)
+                      csSectorVisibleRenderMeshes*& mL, uint framePassed,
+                      bool alwaysVisible)
+          : numMeshes(numMeshes), framePassed(framePassed),
+            alwaysVisible (alwaysVisible), node (node)
         {
           meshList = new csSectorVisibleRenderMeshes[numMeshes];
 
@@ -198,9 +200,10 @@ namespace CS
           delete[] meshList;
         }
 
-        AABBVisTreeNode* node;
         int numMeshes;
         uint framePassed;
+        bool alwaysVisible;
+        AABBVisTreeNode* node;
         csSectorVisibleRenderMeshes* meshList;
       };
 
