@@ -308,9 +308,6 @@ namespace RenderManager
 
       BeginFinishDrawScope bd (g3d, drawFlags);
 
-      // Do any rendering required for visculling.
-      rview->GetThisSector ()->GetVisibilityCuller ()->RenderViscull (rview);
-
       /* Different contexts may have different numbers of layers,
        * so determine the upper layer number */
       size_t maxLayer = 0;
@@ -333,6 +330,13 @@ namespace RenderManager
           if (layer >= context->svArrays.GetNumLayers()) continue;
 
           g3d->SetWorldToCamera (context->cameraTransform.GetInverse ());
+
+          // Do any rendering required for visculling in the first layer.
+          if (layer == 0)
+          {
+            context->sector->GetVisibilityCuller ()->RenderViscull (rview);
+          }
+
           ForEachMeshNode (*context, meshRender);
         }
       }

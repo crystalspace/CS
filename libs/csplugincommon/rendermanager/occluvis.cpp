@@ -98,7 +98,6 @@ namespace CS
             allPortalVerts3d.SetSize (rm->portal->GetTotalVertexCount () * 3);
             allPortalVertsNums.SetSize (rm->portal->GetPortalCount ());
 
-            //csVector2* portalVerts2d = allPortalVerts2d.GetArray ();
             csVector3* portalVerts3d = allPortalVerts3d.GetArray ();
             rm->portal->ComputeScreenPolygons (rview, allPortalVerts2d.GetArray (),
               allPortalVerts3d.GetArray (), rm->portal->GetTotalVertexCount () * 3,
@@ -130,7 +129,7 @@ namespace CS
               csRenderMesh* pViscullRM = rmHolder.GetUnusedMesh (meshCreated, rview->GetCurrentFrameNumber());
               pViscullRM->meshtype = CS_MESHTYPE_TRIANGLEFAN;
               pViscullRM->buffers = &holder;
-              pViscullRM->z_buf_mode = CS_ZBUF_USE;
+              pViscullRM->z_buf_mode = CS_ZBUF_TEST;
               pViscullRM->object2world = rview->GetCamera()->GetTransform();
               pViscullRM->indexstart = 0;
               pViscullRM->indexend = uint (count);
@@ -140,6 +139,8 @@ namespace CS
               g3d->ActivateBuffers (&vA, &rB, 1);
               g3d->DrawMeshBasic (pViscullRM, *pViscullRM);
               g3d->DeactivateBuffers (&vA, 1);
+
+              portalVerts3d += count;
             }
           }
         }
@@ -197,8 +198,8 @@ namespace CS
 
           if (hasMeshes)
           {
-            csRef<NodeMeshList> meshes = visobjMeshHash.Get (csPtrKey<iVisibilityObject> (visobj), nullptr);
-            if (meshes == nullptr)
+            csRef<NodeMeshList> meshes = visobjMeshHash.Get (csPtrKey<iVisibilityObject> (visobj), csRef<NodeMeshList> ());
+            if (!meshes.IsValid ())
             {
               meshes.AttachNew (new NodeMeshList (node, numMeshes, sectorMeshList, engine->GetCurrentFrameNumber ()));
               visobjMeshHash.Put (visobj, meshes);
@@ -344,21 +345,17 @@ namespace CS
         }
       }
 
-      visobjMeshHash.DeleteAll (csPtrKey<iVisibilityObject> (visobj));
-
-      /*csArray<csRefArray<NodeMeshList>*> nodeMeshLists = nodeMeshHash.GetAll ();
-      for (size_t i = 0; i < nodeMeshLists.GetSize (); ++i)
+      csArray<csRefArray<NodeMeshList>*> nodeMeshLists = nodeMeshHash.GetAll ();
+      csArray<NodeMeshList*> meshLists = visobjMeshHash.GetAll(csPtrKey<iVisibilityObject> (visobj));
+      for(size_t i = 0; i < nodeMeshLists.GetSize(); ++i)
       {
-        for (size_t j = 0; j < nodeMeshLists[i]->GetSize (); ++j)
+        for(size_t j = 0; j < meshLists.GetSize(); ++j)
         {
-          CS_ASSERT(nodeMeshLists[i]->Get (j)->node->IsLeaf());
-          if (nodeMeshLists[i]->Get (j)->node->GetLeafData(0) == visobj)
-          {
-            nodeMeshLists[i]->DeleteIndexFast (j);
-            break;
-          }
+          nodeMeshLists[i]->Delete(meshLists[j]);
         }
-      }      */
+      }
+
+      visobjMeshHash.DeleteAll (csPtrKey<iVisibilityObject> (visobj));
 
       RemoveObject (visobj);
     }
@@ -512,7 +509,6 @@ namespace CS
       }
 
       // Set up g3d for rendering a z-only pass.
-      g3d->SetWorldToCamera (rview->GetCamera()->GetTransform ().GetInverse ());
       g3d->SetWriteMask (false, false, false, false);
 
       /**
@@ -523,7 +519,7 @@ namespace CS
       for(size_t n = 0; n < nodeMeshLists.GetSize (); ++n)
       {
         NodeMeshList*& nodeMeshList = nodeMeshLists[n];
-        
+       
         // If frustum checks passed...
         if (nodeMeshList->framePassed == engine->GetCurrentFrameNumber ())
         {
