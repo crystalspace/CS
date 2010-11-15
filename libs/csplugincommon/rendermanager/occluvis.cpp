@@ -325,6 +325,8 @@ namespace CS
 
     void csOccluvis::UnregisterVisObject (iVisibilityObject* visobj)
     {
+      CS_ASSERT(visobj);
+
       for (size_t i = 0 ; i < visObjects.GetSize () ; i++)
       {
         csVisibilityObjectWrapper* visobj_wrap = visObjects[i];
@@ -344,18 +346,19 @@ namespace CS
 
       visobjMeshHash.DeleteAll (csPtrKey<iVisibilityObject> (visobj));
 
-      csArray<csRefArray<NodeMeshList>*> nodeMeshLists = nodeMeshHash.GetAll ();
+      /*csArray<csRefArray<NodeMeshList>*> nodeMeshLists = nodeMeshHash.GetAll ();
       for (size_t i = 0; i < nodeMeshLists.GetSize (); ++i)
       {
         for (size_t j = 0; j < nodeMeshLists[i]->GetSize (); ++j)
         {
+          CS_ASSERT(nodeMeshLists[i]->Get (j)->node->IsLeaf());
           if (nodeMeshLists[i]->Get (j)->node->GetLeafData(0) == visobj)
           {
             nodeMeshLists[i]->DeleteIndexFast (j);
             break;
           }
         }
-      }      
+      }      */
 
       RemoveObject (visobj);
     }
