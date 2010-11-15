@@ -473,11 +473,7 @@ namespace CS
 	      csRef<CS::RenderManager::RenderView> reflView;
 	      csRef<iCamera> newCam (cam->Clone());
 	      iCamera* inewcam = newCam;
-      #include "csutil/custom_new_disable.h"
-	      reflView.AttachNew (
-		new (renderTree.GetPersistentData().renderViewPool) RenderView (
-		  *rview));
-      #include "csutil/custom_new_enable.h"
+        reflView = renderTree.GetPersistentData().renderViews.CreateRenderView (rview);
 	      reflView->SetCamera (inewcam);
 	      CS::Utility::MeshFilter meshFilter;
 	      meshFilter.AddFilterMesh (mesh.meshWrapper);
@@ -589,12 +585,8 @@ namespace CS
 	      
 	      // Create a new view
 	      csRef<CS::RenderManager::RenderView> refrView;
-      #include "csutil/custom_new_disable.h"
 	      /* Keep old camera to allow shadow map caching  */
-	      refrView.AttachNew (
-		new (renderTree.GetPersistentData().renderViewPool) RenderView (
-		  *rview, true));
-      #include "csutil/custom_new_enable.h"
+	      refrView = renderTree.GetPersistentData().renderViews.CreateRenderView (rview, true);
 	      
 	      csRef<iTextureHandle> tex;
 	      csRef<iTextureHandle> texDepth;

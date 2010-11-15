@@ -1220,10 +1220,10 @@ void csPortalContainer::ComputeScreenPolygons (iRenderView* rview,
                                                int viewWidth, int viewHeight)
 {
   Prepare ();
-  
+
   csSphere world_sphere, cam_sphere;
   GetBoundingSpheres (rview, 0, 0, world_sphere, cam_sphere);
-  
+
   if (!CS::RenderViewClipper::CullBSphere (rview->GetRenderContext (),
     cam_sphere, world_sphere, clip_portal, clip_plane, clip_z_plane))
   {
@@ -1261,21 +1261,21 @@ void csPortalContainer::ComputeScreenPolygons (iRenderView* rview,
       csVector3 *verts;
       int num_verts;
       if (ClipToPlane ((int)i, pportal_plane, camtrans.GetOrigin (),
-	  verts, num_verts)
-	// The far plane is defined negative. So if the portal is entirely
-	// in front of the far plane it is not visible. Otherwise we will render
-	// it.
+        verts, num_verts)
+        // The far plane is defined negative. So if the portal is entirely
+        // in front of the far plane it is not visible. Otherwise we will render
+        // it.
         && (!farplane ||
-	  csPoly3D::Classify (*farplane, verts, num_verts) != CS_POL_FRONT)
+        csPoly3D::Classify (*farplane, verts, num_verts) != CS_POL_FRONT)
         && DoPerspective (outlet, verts, num_verts, mirrored,
-	  camera_planes[i]) 
-	&& (poly2D.GetSignedArea() < 0)
+        camera_planes[i]) 
+        && (poly2D.GetSignedArea() < 0)
         && outlet.ClipAgainst (rview->GetClipper ()))
       {
         outHelper.AddPoly (poly2D, poly3D);
       }
       else
-	outHelper.AddEmpty ();
+        outHelper.AddEmpty ();
     }
   }
   else
@@ -1288,11 +1288,11 @@ void csPortalContainer::ComputeScreenPolygons (iRenderView* rview,
       int num_vertices = (int)vt.GetSize ();
       int j;
       for (j = 0 ; j < num_vertices ; j++)
-	outlet.Add (camera_vertices[vt[j]]);
+        outlet.Add (camera_vertices[vt[j]]);
       if (poly2D.GetSignedArea() < 0)
-	outHelper.AddPoly (poly2D, poly3D);
+        outHelper.AddPoly (poly2D, poly3D);
       else
-	outHelper.AddEmpty ();
+        outHelper.AddEmpty ();
     }
   }
 }

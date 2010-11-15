@@ -763,6 +763,8 @@
       <arg name="pname" type="GLenum" const="false" pointer="false" />
       <arg name="params" type="GLuint" const="false" pointer="true" />
     </function>
+    <!-- Promoted: ARB_occlusion_query2 -->
+    <token name="GL_ANY_SAMPLES_PASSED" value="0x8C2F" />
     <!-- Promoted: EXT_shadow_funcs -->
     <!-- Renamed tokens -->
     <token name="GL_FOG_COORD_SOURCE" value="GL_FOG_COORDINATE_SOURCE" />
@@ -7385,6 +7387,46 @@
   <extension name="GL_ARB_occlusion_query" type="GL">
     <depends ext="Queries" />
     <token name="GL_SAMPLES_PASSED_ARB" value="0x8914" />
+    <token name="GL_QUERY_COUNTER_BITS_ARB" value="0x8864" />
+    <token name="GL_CURRENT_QUERY_ARB" value="0x8865" />
+    <token name="GL_QUERY_RESULT_ARB" value="0x8866" />
+    <token name="GL_QUERY_RESULT_AVAILABLE_ARB" value="0x8867" />
+    <function name="glGenQueriesARB" return="GLvoid" pointer="false">
+      <arg name="n" type="GLsizei" const="false" pointer="false" />
+      <arg name="ids" type="GLuint" const="false" pointer="true" />
+    </function>
+    <function name="glDeleteQueriesARB" return="GLvoid" pointer="false">
+      <arg name="n" type="GLsizei" const="false" pointer="false" />
+      <arg name="ids" type="GLuint" const="false" pointer="true" />
+    </function>
+    <function name="glIsQueryARB" return="GLboolean" pointer="false">
+      <arg name="id" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glBeginQueryARB" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="id" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glEndQueryARB" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+    </function>
+    <function name="glGetQueryivARB" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="params" type="GLint" const="false" pointer="true" />
+    </function>
+    <function name="glGetQueryObjectivARB" return="GLvoid" pointer="false">
+      <arg name="id" type="GLuint" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="params" type="GLint" const="false" pointer="true" />
+    </function>
+    <function name="glGetQueryObjectuivARB" return="GLvoid" pointer="false">
+      <arg name="id" type="GLuint" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="params" type="GLuint" const="false" pointer="true" />
+    </function>
+  </extension>
+  <extension name="GL_ARB_occlusion_query2" type="GL">
+    <token name="GL_ANY_SAMPLES_PASSED_ARB" value="0x8C2F" />
   </extension>
   <extension name="GL_ARB_draw_buffers" type="GL">
     <token name="GL_MAX_DRAW_BUFFERS_ARB" value="0x8824" />

@@ -22,6 +22,7 @@
 #include "csplugincommon/rendermanager/dependenttarget.h"
 #include "csplugincommon/rendermanager/hdrhelper.h"
 #include "csplugincommon/rendermanager/lightsetup.h"
+#include "csplugincommon/rendermanager/occluvis.h"
 #include "csplugincommon/rendermanager/operations.h"
 #include "csplugincommon/rendermanager/portalsetup.h"
 #include "csplugincommon/rendermanager/posteffects.h"
@@ -49,20 +50,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 {
 
 SCF_IMPLEMENT_FACTORY(RMDeferred);
-
-/**
- * Allocates a RenderView using placement new with the given memory pool.
- */
-CS::RenderManager::RenderView *CreateNewRenderView(CS::RenderManager::RenderView::Pool &pool, iView *view)
-{
-  #include "csutil/custom_new_disable.h"
-
-  RenderView *rview = new(pool) CS::RenderManager::RenderView (view);
-
-  #include "csutil/custom_new_enable.h"
-
-  return rview;
-}
 
 /**
  * Draws the given texture over the contents of the entire screen.
@@ -351,7 +338,7 @@ bool RMDeferred::RenderView(iView *view)
 
   // Setup renderview
   csRef<CS::RenderManager::RenderView> rview;
-  rview.AttachNew (CreateNewRenderView (treePersistent.renderViewPool, view));
+  rview = treePersistent.renderViews.GetRenderView (view);
 
   // Computes the left, right, top, and bottom of the view frustum.
   iPerspectiveCamera *camera = view->GetPerspectiveCamera ();
@@ -557,6 +544,14 @@ bool RMDeferred::DebugCommand(const char *cmd)
   }
 
   return false;
+}
+
+//----------------------------------------------------------------------
+csPtr<iVisibilityCuller> RMDeferred::GetVisCuller ()
+{
+  csRef<iVisibilityCuller> psVisCuller;
+  psVisCuller.AttachNew (new csOccluvis (objRegistry));
+  return csPtr<iVisibilityCuller> (psVisCuller);
 }
 
 }

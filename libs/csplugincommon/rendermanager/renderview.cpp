@@ -45,29 +45,26 @@ RenderView::RenderView () :
 
 RenderView::RenderView (iCamera *c) :
   scfPooledImplementationType (this),
+  ctxt (nullptr),
   engine(0),
   g3d(0),
   g2d(0),
-  original_camera(c),
   viewWidth (0), viewHeight (0)
 {
-  ctxt = new csRenderContext ();
-  memset (ctxt, 0, sizeof (csRenderContext));
-  ctxt->icamera = c;
-  context_id = 0;
+  InitialiseFromCamera (c);
 }
 
-RenderView::RenderView (iCamera *c, iClipper2D *v, iGraphics3D *ig3d, iGraphics2D *ig2d) :
+RenderView::RenderView (iCamera *c, iClipper2D *v, iGraphics3D *ig3d) :
   scfPooledImplementationType (this),
+  ctxt (nullptr),
   engine(0),
   g3d(ig3d),
-  g2d(ig2d),
-  original_camera(c)
+  g2d(g3d->GetDriver2D ())
 {
-  ctxt = new csRenderContext ();
-  memset (ctxt, 0, sizeof (csRenderContext));
-  ctxt->icamera = c;
+  InitialiseFromCamera (c);
+
   ctxt->iview = v;
+
   if (g3d)
   {
     viewWidth = g3d->GetWidth(); viewHeight = g3d->GetHeight();
@@ -76,38 +73,18 @@ RenderView::RenderView (iCamera *c, iClipper2D *v, iGraphics3D *ig3d, iGraphics2
   {
     viewWidth = 0; viewHeight = 0;
   }
+
   if (v)
   {
     UpdateFrustum ();
   }
-
-  context_id = 0;
 }
 
-RenderView::RenderView (iView* v) : 
-  scfPooledImplementationType (this), meshFilter (v->GetMeshFilter ())
+RenderView::RenderView (iView* v)
+: scfPooledImplementationType (this), ctxt (nullptr),
+  meshFilter (v->GetMeshFilter ())
 {
-  engine = v->GetEngine ();
-  g3d = v->GetContext ();
-  g2d = g3d->GetDriver2D ();
-  original_camera = v->GetCamera ();
-
-  viewWidth = v->GetWidth();
-  viewHeight = v->GetHeight();
- 
-  iClipper2D* clipper = v->GetClipper ();
-
-  ctxt = new csRenderContext ();
-  memset (ctxt, 0, sizeof (csRenderContext));
-  ctxt->icamera = v->GetCamera ();
-  ctxt->this_sector = v->GetCamera ()->GetSector ();
-  ctxt->iview = clipper;
-  if (clipper)
-  {
-    UpdateFrustum ();
-  }
-
-  context_id = 0;
+  InitialiseFromView (v);
 }
 
 RenderView::RenderView (const RenderView& other) :
@@ -187,6 +164,42 @@ RenderView::RenderView (const RenderView& other, bool keepCamera) :
 RenderView::~RenderView ()
 {
   delete ctxt;
+}
+
+void RenderView::InitialiseFromView (iView* v)
+{
+  engine = v->GetEngine ();
+  g3d = v->GetContext ();
+  g2d = g3d->GetDriver2D ();
+  original_camera = v->GetCamera ();
+
+  viewWidth = v->GetWidth();
+  viewHeight = v->GetHeight();
+
+  iClipper2D* clipper = v->GetClipper ();
+
+  if (ctxt) delete ctxt;
+  ctxt = new csRenderContext ();
+  memset (ctxt, 0, sizeof (csRenderContext));
+  ctxt->icamera = v->GetCamera ();
+  ctxt->this_sector = v->GetCamera ()->GetSector ();
+  ctxt->iview = clipper;
+  if (clipper)
+  {
+    UpdateFrustum ();
+  }
+
+  context_id = 0;
+}
+
+void RenderView::InitialiseFromCamera (iCamera* camera)
+{
+  original_camera = camera;
+  if (ctxt) delete ctxt;
+  ctxt = new csRenderContext ();
+  memset (ctxt, 0, sizeof (csRenderContext));
+  ctxt->icamera = camera;
+  context_id = 0;
 }
 
 void RenderView::SetCamera (iCamera *icam)
@@ -354,4 +367,106 @@ void RenderView::SetMeshFilter (const CS::Utility::MeshFilter& filter)
 {
   // NB: If that assignment becomes a problem COW-wrap meshFilter.
   meshFilter = filter;
+}
+
+RenderView* RenderViewCache::GetRenderView (iView* view)
+{
+  csRef<RenderView> rview;
+  for (size_t i = 0; i < iView2RenderViews.GetSize (); ++i)
+  {
+    if (!iView2RenderViews[i]->view.IsValid ())
+    {
+      iView2RenderViews.DeleteIndex (i);
+      continue;
+    }
+
+    if (iView2RenderViews[i]->view == view)
+    {
+      rview = iView2RenderViews[i]->rview;
+    }
+  }
+
+  if (!rview.IsValid ())
+  {
+#include "csutil/custom_new_disable.h"
+    rview.AttachNew (new (renderViewPool) RenderView(view));
+#include "csutil/custom_new_enable.h"
+
+    csRef<View2RenderView> psTemp;
+    psTemp.AttachNew (new View2RenderView (view, rview));
+    iView2RenderViews.Push (psTemp);
+  }
+  else
+  {
+    // Re-construct the RenderView in the existing memory.
+    rview->InitialiseFromView (view);
+  }
+
+  return rview;
+}
+
+RenderView* RenderViewCache::GetRenderView (RenderView* view, iPortal* portal, iCamera* camera)
+{
+  csRef<RenderView> rview;
+  for (size_t i = 0; i < rViewPortal2RenderViews.GetSize (); ++i)
+  {
+    if (!rViewPortal2RenderViews[i]->view.IsValid () ||
+        !rViewPortal2RenderViews[i]->portal.IsValid ())
+    {
+      rViewPortal2RenderViews.DeleteIndex (i);
+      continue;
+    }
+
+    if (rViewPortal2RenderViews[i]->view == view &&
+        rViewPortal2RenderViews[i]->portal == portal)
+    {
+      rview = rViewPortal2RenderViews[i]->rview;
+      break;
+    }
+  }
+
+  if (!rview.IsValid ())
+  {
+#include "csutil/custom_new_disable.h"
+    rview.AttachNew (new (renderViewPool) RenderView(camera, 0, view->GetGraphics3D ()));
+#include "csutil/custom_new_enable.h"
+
+    csRef<RViewPortal2RenderView> psTemp;
+    psTemp.AttachNew (new RViewPortal2RenderView (view, portal, rview));
+    rViewPortal2RenderViews.Push (psTemp);
+  }
+  else
+  {
+    // Re-construct the RenderView in the existing memory.
+    rview->InitialiseFromCamera (camera);
+  }
+
+  return rview;
+}
+
+csPtr<RenderView> RenderViewCache::CreateRenderView ()
+{
+  csRef<RenderView> rview;
+#include "csutil/custom_new_disable.h"
+  rview.AttachNew (new (renderViewPool) RenderView ());
+#include "csutil/custom_new_enable.h"
+  return csPtr<RenderView> (rview);
+}
+
+csPtr<RenderView> RenderViewCache::CreateRenderView (RenderView* view)
+{
+  csRef<RenderView> rview;
+#include "csutil/custom_new_disable.h"
+  rview.AttachNew (new (renderViewPool) RenderView (*view));
+#include "csutil/custom_new_enable.h"
+  return csPtr<RenderView> (rview);
+}
+
+csPtr<RenderView> RenderViewCache::CreateRenderView (RenderView* view, bool keepCamera)
+{
+  csRef<RenderView> rview;
+#include "csutil/custom_new_disable.h"
+  rview.AttachNew (new (renderViewPool) RenderView (*view, keepCamera));
+#include "csutil/custom_new_enable.h"
+  return csPtr<RenderView> (rview);
 }

@@ -27,10 +27,12 @@
 #include "csutil/pooledscfclass.h"
 #include "csutil/scf_implementation.h"
 #include "iengine/engine.h"
+#include "iengine/portal.h"
 #include "iengine/rview.h"
 #include "ivaria/view.h"
 #include "cstool/rviewclipper.h"
-
+#include "csutil/refcount.h"
+#include "csutil/weakref.h"
 
 namespace CS
 {
@@ -90,8 +92,7 @@ namespace RenderManager
     /// Construct.
     RenderView (iCamera* c);
     /// Construct.
-    RenderView (iCamera* c, iClipper2D* v, iGraphics3D* ig3d,
-      iGraphics2D* ig2d);
+    RenderView (iCamera* c, iClipper2D* v, iGraphics3D* ig3d);
     /// Construct.
     RenderView (iView* v);
     /// Copy constructor.
@@ -100,6 +101,12 @@ namespace RenderManager
     RenderView (const RenderView& other, bool keepCamera);
 
     virtual ~RenderView ();
+
+    /// Initialise the RenderView from an iView.
+    void InitialiseFromView (iView* view);
+
+    /// Initialise the RenderView from an iCamera.
+    void InitialiseFromCamera (iCamera* camera);
 
     /// Set the engine.
     void SetEngine (iEngine* engine);
@@ -291,6 +298,57 @@ namespace RenderManager
 
     /// Set the mesh filter for this view.
     void SetMeshFilter (const CS::Utility::MeshFilter& filter);
+  };
+
+  /**
+   * Stores a cache of RenderView objects, mapped by iView objects.
+   */
+  class CS_CRYSTALSPACE_EXPORT RenderViewCache
+  {
+  public:
+    /// Returns a render view for the given view.
+    RenderView* GetRenderView (iView* view);
+
+    /// Returns a render view for the given RenderView and portal.
+    RenderView* GetRenderView (RenderView* view, iPortal* portal, iCamera* camera);
+
+    /// Creates a new RenderView.
+    csPtr<RenderView> CreateRenderView ();
+
+    /// Creates a new RenderView from the given RenderView.
+    csPtr<RenderView> CreateRenderView (RenderView* view);
+
+    /// Creates a new RenderView from the given RenderView and optionally keeps the camera.
+    csPtr<RenderView> CreateRenderView (RenderView* view, bool keepCamera);
+
+  private:
+    /// Render view allocation pool.
+    RenderView::Pool renderViewPool;
+
+    struct View2RenderView : public csRefCount
+    {
+      csWeakRef<iView> view;
+      csRef<RenderView> rview;
+
+      View2RenderView (iView* view, CS::RenderManager::RenderView* rview)
+        : view (view), rview (rview) {}
+    };
+
+    /// Mapping of iView to RenderView
+    csRefArray<View2RenderView> iView2RenderViews;
+
+    struct RViewPortal2RenderView : public csRefCount
+    {
+      csWeakRef<RenderView> view;
+      csWeakRef<iPortal> portal;
+      csRef<RenderView> rview;
+
+      RViewPortal2RenderView (RenderView* view, iPortal* portal, CS::RenderManager::RenderView* rview)
+        : view (view), portal (portal), rview (rview) {}
+    };
+
+    /// Mapping of RenderView && iPortal to RenderView
+    csRefArray<RViewPortal2RenderView> rViewPortal2RenderViews;
   };
 
 }

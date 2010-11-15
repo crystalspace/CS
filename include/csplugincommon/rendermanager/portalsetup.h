@@ -471,10 +471,7 @@ namespace RenderManager
       csRef<CS::RenderManager::RenderView> newRenderView;
       csRef<iCustomMatrixCamera> newCam (rview->GetEngine()->CreateCustomMatrixCamera (cam));
       iCamera* inewcam = newCam->GetCamera();
-#include "csutil/custom_new_disable.h"
-      newRenderView.AttachNew (new (renderTree.GetPersistentData().renderViewPool) RenderView (
-		  inewcam, 0, rview->GetGraphics3D(), rview->GetGraphics2D()));
-#include "csutil/custom_new_enable.h"
+      newRenderView = renderTree.GetPersistentData().renderViews.GetRenderView (rview, portal, inewcam);
       newRenderView->SetEngine (rview->GetEngine ());
 	
       if (portalFlags.Check (CS_PORTAL_WARP))

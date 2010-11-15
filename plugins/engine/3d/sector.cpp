@@ -332,8 +332,7 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
   culler->Setup (cachename);
 
   // Loop through all meshes and register them to the visibility culler.
-  int i;
-  for (i = 0; i < meshes.GetCount (); i++)
+  for (int i = 0; i < meshes.GetCount (); i++)
   {
     iMeshWrapper* m = meshes.Get (i);
     m->GetMovable ()->UpdateMove ();
@@ -345,7 +344,29 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
 
 iVisibilityCuller* csSector::GetVisibilityCuller ()
 {
-  if (!culler) SetVisibilityCullerPlugin ("crystalspace.culling.frustvis");
+  if (!culler)
+  {
+    // Check for a culler in the RM.
+    csRef<iRenderManagerVisCull> rmVC = scfQueryInterfaceSafe<iRenderManagerVisCull> (engine->renderManager);
+
+    if (rmVC)
+    {
+      culler = rmVC->GetVisCuller ();
+
+      // Loop through all meshes and register them to the visibility culler.
+      for (int i = 0; i < meshes.GetCount (); i++)
+      {
+        iMeshWrapper* m = meshes.Get (i);
+        m->GetMovable ()->UpdateMove ();
+        RegisterEntireMeshToCuller (m);
+      }
+    }
+    else // Else try to load frustvis.
+    {
+      SetVisibilityCullerPlugin ("crystalspace.culling.frustvis");
+    }
+  }
+
   CS_ASSERT (culler != 0);
   return culler;
 }
@@ -479,6 +500,15 @@ public:
         csector->FireLightVisibleCallbacks (light);
       }
     }
+  }
+
+  virtual int GetVisibleMeshes(iMeshWrapper *,uint32,csSectorVisibleRenderMeshes *&)
+  {
+    return 0;
+  }
+
+  virtual void MarkVisible(iMeshWrapper *,int,csSectorVisibleRenderMeshes *&)
+  {
   }
 
 private:

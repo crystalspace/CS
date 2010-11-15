@@ -62,52 +62,109 @@ namespace RenderManager
 
       virtual void ObjectVisible (iVisibilityObject *visobject, 
         iMeshWrapper *imesh, uint32 frustum_mask)
-      {
+	  {
         if (!(filter && filter->IsMeshFiltered (imesh)))
         {
           // Get the meshes
           int numMeshes;
           csSectorVisibleRenderMeshes* meshList = sector->GetVisibleRenderMeshes (
-	    numMeshes,
-	    imesh, currentRenderView, frustum_mask);
+	            numMeshes,
+	            imesh, currentRenderView, frustum_mask);
 
           for (int m = 0; m < numMeshes; ++m)
           {
-	    // Todo: Handle static lod & draw distance
-	    csZBufMode zmode = meshList[m].imesh->GetZBufMode ();
-	    CS::Graphics::RenderPriority renderPrio =
-	      meshList[m].imesh->GetRenderPriority ();
+	          // Todo: Handle static lod & draw distance
+	          csZBufMode zmode = meshList[m].imesh->GetZBufMode ();
+	          CS::Graphics::RenderPriority renderPrio =
+	            meshList[m].imesh->GetRenderPriority ();
   
-  #ifdef CS_DEBUG
-	    const char* const db_mesh_name = meshList[m].imesh->QueryObject()->GetName();
-  #endif
-	    typename RenderTreeType::MeshNode::SingleMesh sm;
-	    sm.meshWrapper = meshList[m].imesh;
-	    sm.meshObjSVs = meshList[m].imesh->GetSVContext();
-	    sm.zmode = zmode;
-	    sm.meshFlags = meshList[m].imesh->GetFlags();
+        #ifdef CS_DEBUG
+	          const char* const db_mesh_name = meshList[m].imesh->QueryObject()->GetName();
+        #endif
+	          typename RenderTreeType::MeshNode::SingleMesh sm;
+	          sm.meshWrapper = meshList[m].imesh;
+	          sm.meshObjSVs = meshList[m].imesh->GetSVContext();
+	          sm.zmode = zmode;
+	          sm.meshFlags = meshList[m].imesh->GetFlags();
 	    
-	    // Add it to the appropriate meshnode
-	    for (int i = 0; i < meshList[m].num; ++i)
-	    {
-	      csRenderMesh* rm = meshList[m].rmeshes[i];
+	          // Add it to the appropriate meshnode
+	          for (int i = 0; i < meshList[m].num; ++i)
+	          {
+	            csRenderMesh* rm = meshList[m].rmeshes[i];
   
-	      if (rm->portal)
-	      {
-  #ifdef CS_DEBUG
-		typename ContextNodeType::PortalHolder h = {db_mesh_name, rm->portal, imesh};
-  #else
-		typename ContextNodeType::PortalHolder h = {rm->portal, imesh};
-  #endif
-		context.allPortals.Push (h);              
+	            if (rm->portal)
+	            {
+              #ifdef CS_DEBUG
+		            typename ContextNodeType::PortalHolder h = {db_mesh_name, rm->portal, imesh};
+              #else
+		            typename ContextNodeType::PortalHolder h = {rm->portal, imesh};
+              #endif
+		            context.allPortals.Push (h);              
+	            }
+	            else
+	            {
+		            context.AddRenderMesh (rm, renderPrio, sm);
+	            }
+	          }
+	        }
 	      }
-	      else
-	      {
-		context.AddRenderMesh (rm, renderPrio, sm);
-	      }
-	    }
-	  }
-	}
+      } // end objectvisible
+
+      virtual int GetVisibleMeshes (iMeshWrapper* mw, uint32 frustum_mask, csSectorVisibleRenderMeshes*& meshList)
+      {
+        if (filter && filter->IsMeshFiltered (mw))
+        {
+          // Return 0 visible meshes if filtered.
+          return 0;
+        }
+
+        // Get the meshes
+        int numMeshes;
+        meshList = sector->GetVisibleRenderMeshes (numMeshes, mw, currentRenderView, frustum_mask);
+        return numMeshes;
+      }
+
+
+      virtual void MarkVisible (iMeshWrapper *mw, int numMeshes, csSectorVisibleRenderMeshes*& meshList)
+      {
+        for (int m = 0; m < numMeshes; ++m)
+        {
+          csZBufMode zmode = meshList[m].imesh->GetZBufMode ();
+          CS::Graphics::RenderPriority renderPrio =
+            meshList[m].imesh->GetRenderPriority ();
+
+#ifdef CS_DEBUG
+          const char* const db_mesh_name = meshList[m].imesh->QueryObject()->GetName();
+#endif
+
+          typename RenderTreeType::MeshNode::SingleMesh sm;
+          sm.meshWrapper = meshList[m].imesh;
+          sm.meshObjSVs = meshList[m].imesh->GetSVContext();
+          sm.zmode = zmode;
+          sm.meshFlags = meshList[m].imesh->GetFlags();
+
+          // Add it to the appropriate meshnode
+          for (int i = 0; i < meshList[m].num; ++i)
+          {
+            csRenderMesh* rm = meshList[m].rmeshes[i];
+
+            if (rm->portal)
+            {
+
+#ifdef CS_DEBUG
+              typename ContextNodeType::PortalHolder h = {db_mesh_name, rm->portal, mw};
+#else
+              typename ContextNodeType::PortalHolder h = {rm->portal, mw};
+#endif
+
+              context.allPortals.Push (h);              
+            }
+            else
+            {
+              context.AddRenderMesh (rm, renderPrio, sm);
+            }
+          }
+        }
       }
 
     private:      

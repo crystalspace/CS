@@ -1149,6 +1149,10 @@ typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3SV) (const GLshort* p);
 #define GL_QUERY_RESULT_AVAILABLE                                    0x8867
 #endif
 
+#ifndef GL_ANY_SAMPLES_PASSED
+#define GL_ANY_SAMPLES_PASSED                                        0x8C2F
+#endif
+
 #ifndef GL_FOG_COORD_SOURCE
 #define GL_FOG_COORD_SOURCE                                          GL_FOG_COORDINATE_SOURCE
 #endif
@@ -10832,11 +10836,42 @@ typedef GLvoid (csAPIENTRY* csGLSTRINGMARKERGREMEDY) (GLsizei len, const GLvoid*
 #define GL_SAMPLES_PASSED_ARB                                        0x8914
 #endif
 
+#ifndef GL_QUERY_COUNTER_BITS_ARB
+#define GL_QUERY_COUNTER_BITS_ARB                                    0x8864
+#endif
+
+#ifndef GL_CURRENT_QUERY_ARB
+#define GL_CURRENT_QUERY_ARB                                         0x8865
+#endif
+
+#ifndef GL_QUERY_RESULT_ARB
+#define GL_QUERY_RESULT_ARB                                          0x8866
+#endif
+
+#ifndef GL_QUERY_RESULT_AVAILABLE_ARB
+#define GL_QUERY_RESULT_AVAILABLE_ARB                                0x8867
+#endif
+
 
 /** @} */
 
 /**\name GL_ARB_occlusion_query functions
  * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/occlusion_query.txt">http://www.opengl.org/registry/specs/ARB/occlusion_query.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ARB_occlusion_query2 constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/occlusion_query2.txt">http://www.opengl.org/registry/specs/ARB/occlusion_query2.txt</a>.
+ * @{ */
+#ifndef GL_ANY_SAMPLES_PASSED_ARB
+#define GL_ANY_SAMPLES_PASSED_ARB                                    0x8C2F
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_occlusion_query2 functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/occlusion_query2.txt">http://www.opengl.org/registry/specs/ARB/occlusion_query2.txt</a>.
  * @{ */
 
 /** @} */
@@ -17327,6 +17362,11 @@ public:
    * @{ */
 
   /** @} */
+  /**\name GL_ARB_occlusion_query2 functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/occlusion_query2.txt">http://www.opengl.org/registry/specs/ARB/occlusion_query2.txt</a>.
+   * @{ */
+
+  /** @} */
   /**\name GL_ARB_draw_buffers functions
    * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/draw_buffers.txt">http://www.opengl.org/registry/specs/ARB/draw_buffers.txt</a>.
    * @{ */
@@ -18095,6 +18135,9 @@ public:
   /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/occlusion_query.txt">GL_ARB_occlusion_query</a> extension was found. 
    * Set by csGLExtensionManager::InitGL_ARB_occlusion_query(). */
   bool CS_GL_ARB_occlusion_query;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/occlusion_query2.txt">GL_ARB_occlusion_query2</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_occlusion_query2(). */
+  bool CS_GL_ARB_occlusion_query2;
   /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/draw_buffers.txt">GL_ARB_draw_buffers</a> extension was found. 
    * Set by csGLExtensionManager::InitGL_ARB_draw_buffers(). */
   bool CS_GL_ARB_draw_buffers;
@@ -18333,6 +18376,7 @@ protected:
   bool tested_CS_GL_GREMEDY_string_marker;
   bool tested_CS_GL_EXT_texture_rectangle;
   bool tested_CS_GL_ARB_occlusion_query;
+  bool tested_CS_GL_ARB_occlusion_query2;
   bool tested_CS_GL_ARB_draw_buffers;
   bool tested_CS_GL_EXT_blend_equation_separate;
   bool tested_CS_GL_EXT_texture_sRGB;
@@ -24570,8 +24614,45 @@ public:
     allclear = true;
     if (init)	// Don't check the functions if ext isn't reported anyway
     {
+      EXTMGR_FUNC_INIT(glGenQueriesARB, GLGENQUERIESARB);
+      EXTMGR_FUNC_INIT(glDeleteQueriesARB, GLDELETEQUERIESARB);
+      EXTMGR_FUNC_INIT(glIsQueryARB, GLISQUERYARB);
+      EXTMGR_FUNC_INIT(glBeginQueryARB, GLBEGINQUERYARB);
+      EXTMGR_FUNC_INIT(glEndQueryARB, GLENDQUERYARB);
+      EXTMGR_FUNC_INIT(glGetQueryivARB, GLGETQUERYIVARB);
+      EXTMGR_FUNC_INIT(glGetQueryObjectivARB, GLGETQUERYOBJECTIVARB);
+      EXTMGR_FUNC_INIT(glGetQueryObjectuivARB, GLGETQUERYOBJECTUIVARB);
 
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_occlusion_query)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/occlusion_query2.txt">GL_ARB_occlusion_query2</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_occlusion_query2. */
+  void InitGL_ARB_occlusion_query2 ()
+  {
+    if (tested_CS_GL_ARB_occlusion_query2) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_occlusion_query2 = true;
+    const char* ext = "GL_ARB_occlusion_query2";
+
+    char cfgkey[26 + 23 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_occlusion_query2 = CheckExtension (extstrGL, ext);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_occlusion_query2;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_occlusion_query2)
     }
     else
     {

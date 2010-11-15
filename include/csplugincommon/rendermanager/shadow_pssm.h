@@ -569,11 +569,8 @@ namespace RenderManager
 	    bool noCasters = (castersBox.Empty());
 	    
 	    CS::RenderManager::RenderView* rview = context.renderView;
-	  #include "csutil/custom_new_disable.h"
-	    csRef<CS::RenderManager::RenderView> newRenderView;
-	    newRenderView.AttachNew (new (
-	      renderTree.GetPersistentData().renderViewPool) RenderView);
-	  #include "csutil/custom_new_enable.h"
+      csRef<CS::RenderManager::RenderView> newRenderView;
+      newRenderView = renderTree.GetPersistentData().renderViews.CreateRenderView ();
 	    newRenderView->SetEngine (rview->GetEngine ());
 	    newRenderView->SetThisSector (rview->GetThisSector ());
 	    
@@ -775,11 +772,8 @@ namespace RenderManager
 	if (persist.emptySMs.GetSize() == 0)
 	{
 	  CS::RenderManager::RenderView* rview = context.renderView;
-	#include "csutil/custom_new_disable.h"
-	  csRef<CS::RenderManager::RenderView> newRenderView;
-	  newRenderView.AttachNew (new (
-	    context.owner.GetPersistentData().renderViewPool) RenderView);
-	#include "csutil/custom_new_enable.h"
+    csRef<CS::RenderManager::RenderView> newRenderView;
+    newRenderView = context.owner.GetPersistentData().renderViews.CreateRenderView ();
 	  newRenderView->SetEngine (rview->GetEngine ());
 	  newRenderView->SetViewDimensions (1, 1);
 	  

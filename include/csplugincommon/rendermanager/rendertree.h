@@ -284,7 +284,7 @@ namespace RenderManager
       CS::ShaderVarStringID svObjectToWorldInvName;
       CS::ShaderVarStringID svFogplaneName;
     
-      RenderView::Pool renderViewPool;
+      CS::RenderManager::RenderViewCache renderViews;
       csRenderMeshHolder rmHolder;
       
       DebugPersistent debugPersist;

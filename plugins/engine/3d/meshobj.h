@@ -352,6 +352,9 @@ public:
   // For iVisibilityObject:
   virtual csFlags& GetCullerFlags () { return culler_flags; }
 
+  // For iVisibilityObject:
+  virtual const csBox3& GetBBox () const { return wor_bbox; }
+
   /**
    * Get the movable instance for this object.
    * It is very important to call GetMovable().UpdateMove()

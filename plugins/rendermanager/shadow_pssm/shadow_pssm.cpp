@@ -22,6 +22,7 @@
 #include "csplugincommon/rendermanager/dependenttarget.h"
 #include "csplugincommon/rendermanager/hdrhelper.h"
 #include "csplugincommon/rendermanager/lightsetup.h"
+#include "csplugincommon/rendermanager/occluvis.h"
 #include "csplugincommon/rendermanager/operations.h"
 #include "csplugincommon/rendermanager/portalsetup.h"
 #include "csplugincommon/rendermanager/posteffects.h"
@@ -319,10 +320,7 @@ bool RMShadowedPSSM::RenderView (iView* view)
   // Setup a rendering view
   view->UpdateClipper ();
   csRef<CS::RenderManager::RenderView> rview;
-#include "csutil/custom_new_disable.h"
-  rview.AttachNew (new (treePersistent.renderViewPool) 
-    CS::RenderManager::RenderView(view));
-#include "csutil/custom_new_enable.h"
+  rview = treePersistent.renderViews.GetRenderView (view);
   iPerspectiveCamera* c = view->GetPerspectiveCamera ();
   iGraphics3D* G3D = rview->GetGraphics3D ();
   int frameWidth = G3D->GetWidth ();
@@ -419,10 +417,7 @@ bool RMShadowedPSSM::HandleTarget (RenderTreeType& renderTree,
 {
   // Prepare
   csRef<CS::RenderManager::RenderView> rview;
-#include "csutil/custom_new_disable.h"
-  rview.AttachNew (new (treePersistent.renderViewPool) 
-    CS::RenderManager::RenderView(settings.view));
-#include "csutil/custom_new_enable.h"
+  rview = treePersistent.renderViews.GetRenderView (settings.view);
 
   iSector* startSector = rview->GetThisSector ();
 
@@ -555,6 +550,13 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
     refrRefrShadows |= rrShadowRefract;
   
   return true;
+}
+
+csPtr<iVisibilityCuller> RMShadowedPSSM::GetVisCuller ()
+{
+  csRef<iVisibilityCuller> psVisCuller;
+  psVisCuller.AttachNew (new csOccluvis (objectReg));
+  return csPtr<iVisibilityCuller> (psVisCuller);
 }
 
 }

@@ -169,6 +169,7 @@ public:
     iMeshWrapper** p_mesh = 0, int* poly_idx = 0,
     bool accurate = true);
   virtual const char* ParseCullerParameters (iDocumentNode*) { return 0; }
+  virtual void RenderViscull (iRenderView* rview) {}
 
   bool HandleEvent (iEvent& ev);
 

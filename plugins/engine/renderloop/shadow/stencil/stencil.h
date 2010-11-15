@@ -170,6 +170,15 @@ public:
 
   virtual void ObjectVisible (iVisibilityObject *visobject, 
     iMeshWrapper *mesh, uint32 frustum_mask);
+
+  virtual int GetVisibleMeshes(iMeshWrapper *,uint32,csSectorVisibleRenderMeshes *&)
+  {
+    return 0;
+  }
+
+  virtual void MarkVisible(iMeshWrapper *,int,csSectorVisibleRenderMeshes *&)
+  {
+  }
 };
 
 class csStencilShadowFactory :

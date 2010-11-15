@@ -43,9 +43,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
   
   typedef CS::RenderManager::RenderTree<RenderTreeTraits> RenderTreeType;
 
-  class RMShadowedPSSM : public scfImplementation5<RMShadowedPSSM, 
+  class RMShadowedPSSM : public scfImplementation6<RMShadowedPSSM, 
                                                  iRenderManager, 
                                                  iRenderManagerTargets,
+                                                 iRenderManagerVisCull,
                                                  scfFakeInterface<iRenderManagerPostEffects>,
                                                  iComponent,
                                                  scfFakeInterface<iDebugHelper> >,
@@ -74,6 +75,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
     {
       targets.MarkAsUsed (target);
     }
+
+    //---- iRenderManagerVisCull ----
+    virtual csPtr<iVisibilityCuller> GetVisCuller ();
 
     //---- iComponent ----
     virtual bool Initialize (iObjectRegistry*);

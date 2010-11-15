@@ -1107,7 +1107,7 @@ void csEngine::PrecacheMesh (iMeshWrapper* s)
   view.AttachNew (new csBoxClipper (0.0, 0.0, float (G3D->GetWidth ()),
     float (G3D->GetHeight ())));
 
-  CS::RenderManager::RenderView rview (c, view, G3D, G2D);
+  CS::RenderManager::RenderView rview (c, view, G3D);
   StartDraw (c, view, rview);
   PrecacheMesh (s, &rview);
 }
@@ -1138,7 +1138,7 @@ void csEngine::PrecacheDraw (iCollection* collection)
   view.AttachNew (new csBoxClipper (0.0, 0.0, float (G3D->GetWidth ()),
     float (G3D->GetHeight ())));
 
-  CS::RenderManager::RenderView rview (c, view, G3D, G2D);
+  CS::RenderManager::RenderView rview (c, view, G3D);
   StartDraw (c, view, rview);
 
   int sn;
@@ -1196,7 +1196,7 @@ void csEngine::Draw (iCamera *c, iClipper2D *view, iMeshWrapper* mesh)
   ControlMeshes ();
   csRef<CS::RenderManager::RenderView> rview;
   rview.AttachNew (new (rviewPool) CS::RenderManager::RenderView (c, view,
-    G3D, G2D));
+    G3D));
   StartDraw (c, view, *rview);
 
   // First initialize G3D with the right clipper.

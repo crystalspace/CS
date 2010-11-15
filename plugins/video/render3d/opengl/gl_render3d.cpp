@@ -902,6 +902,7 @@ bool csGLGraphics3D::Open ()
   ext->InitGL_EXT_secondary_color ();
   ext->InitGL_EXT_blend_func_separate ();
   ext->InitGL_ARB_occlusion_query ();
+  ext->InitGL_ARB_occlusion_query2 ();
   ext->InitGL_GREMEDY_string_marker ();
   ext->InitGL_ARB_seamless_cube_map ();
   ext->InitGL_AMD_seamless_cubemap_per_texture ();
@@ -3768,6 +3769,69 @@ bool csGLGraphics3D::PerformExtension (char const* command, ...)
   return rc;
 }
 
+void csGLGraphics3D::OQInitQueries(unsigned int* queries,int num_queries)
+{
+  if (num_queries != 0)
+  {
+    ext->glGenQueriesARB((GLsizei)num_queries, (GLuint*)queries);
+  }
+}
+
+void csGLGraphics3D::OQDelQueries(unsigned int* queries, int num_queries)
+{
+  if(num_queries != 0 && queries != 0)
+  {
+    ext->glDeleteQueriesARB(num_queries, (GLuint*)queries);
+  }
+}
+
+bool csGLGraphics3D::OQueryFinished(unsigned int occlusion_query)
+{
+  GLint available;
+  ext->glGetQueryObjectivARB((GLuint)occlusion_query, GL_QUERY_RESULT_AVAILABLE_ARB, &available);
+  return (available != 0);
+}
+
+bool csGLGraphics3D::OQIsVisible(unsigned int occlusion_query, unsigned int sampleLimit)
+{
+  if (ext->CS_GL_ARB_occlusion_query2)
+  {
+    GLuint sampleBoolean;
+    ext->glGetQueryObjectuivARB((GLuint)occlusion_query, GL_QUERY_RESULT_ARB, &sampleBoolean);
+    return (sampleBoolean != 0);
+  }
+  else
+  {
+    GLuint sampleCount;
+    ext->glGetQueryObjectuivARB((GLuint)occlusion_query, GL_QUERY_RESULT_ARB, &sampleCount);
+    return (sampleCount > (GLuint)sampleLimit);
+  }
+}
+
+void csGLGraphics3D::OQBeginQuery (unsigned int occlusion_query)
+{
+  if (ext->CS_GL_ARB_occlusion_query2)
+  {
+    ext->glBeginQueryARB(GL_ANY_SAMPLES_PASSED_ARB, (GLuint)occlusion_query);
+  }
+  else
+  {
+    ext->glBeginQueryARB(GL_SAMPLES_PASSED_ARB, (GLuint)occlusion_query);
+  }
+}
+
+void csGLGraphics3D::OQEndQuery ()
+{
+  if (ext->CS_GL_ARB_occlusion_query2)
+  {
+    ext->glEndQueryARB(GL_ANY_SAMPLES_PASSED_ARB);
+  }
+  else
+  {
+    ext->glEndQueryARB(GL_SAMPLES_PASSED_ARB);
+  }
+}
+
 csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB,
   unsigned char *iAlpha, int iWidth, int iHeight, csGLGraphics3D* iG3D) :
   scfImplementationType(this), R(iR), G(iG), B(iB)
@@ -4290,5 +4354,248 @@ int csGLGraphics3D::GetCurrentDrawFlags () const
   return current_drawflags;
 }
 
+void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
+    const csRenderMeshModes& modes)
+{
+	if (cliptype == CS_CLIPPER_EMPTY) 
+    return;
+
+  CS_PROFILER_ZONE(csGLGraphics3D_DrawMesh);
+
+  GLRENDER3D_OUTPUT_STRING_MARKER(("%p ('%s')", mymesh, mymesh->db_mesh_name));
+  SwapIfNeeded();
+
+  SetupProjection ();
+
+  SetupClipper (mymesh->clip_portal, 
+                mymesh->clip_plane, 
+                mymesh->clip_z_plane,
+		(mymesh->indexend-mymesh->indexstart)/3);
+  if (debug_inhibit_draw) 
+    return;
+
+  const csReversibleTransform& o2w = mymesh->object2world;
+
+  bool needMatrix = !o2w.IsIdentity();
+  if (needMatrix)
+  {
+    float matrix[16];
+    makeGLMatrix (o2w, matrix);
+    statecache->SetMatrixMode (GL_MODELVIEW);
+    glPushMatrix ();
+    glMultMatrixf (matrix);
+  }
+
+  ApplyBufferChanges();
+
+  iRenderBuffer* iIndexbuf = (modes.buffers
+  	? modes.buffers->GetRenderBuffer(CS_BUFFER_INDEX)
+	: 0);
+
+  /*if (!iIndexbuf)
+  {
+    csShaderVariable* indexBufSV = csGetShaderVariableFromStack (stacks, string_indices);
+    CS_ASSERT (indexBufSV);
+    indexBufSV->GetValue (iIndexbuf);
+    CS_ASSERT(iIndexbuf);
+  }*/
+  
+  const size_t indexCompsBytes = 
+    csRenderBufferComponentSizes[iIndexbuf->GetComponentType()];
+  CS_ASSERT_MSG("Expecting index buffers to have only 1 component",
+    (iIndexbuf->GetComponentCount() == 1));
+  if (!(mymesh->multiRanges && mymesh->rangesNum))
+  {
+    CS_ASSERT((indexCompsBytes * mymesh->indexstart) <= iIndexbuf->GetSize());
+    CS_ASSERT((indexCompsBytes * mymesh->indexend) <= iIndexbuf->GetSize());
+  }
+
+  GLenum primitivetype = GL_TRIANGLES;
+  int primNum_divider = 1, primNum_sub = 0;
+  switch (mymesh->meshtype)
+  {
+    case CS_MESHTYPE_QUADS:
+      primNum_divider = 2;
+      primitivetype = GL_QUADS;
+      break;
+    case CS_MESHTYPE_TRIANGLESTRIP:
+      primNum_sub = 2;
+      primitivetype = GL_TRIANGLE_STRIP;
+      break;
+    case CS_MESHTYPE_TRIANGLEFAN:
+      primNum_sub = 2;
+      primitivetype = GL_TRIANGLE_FAN;
+      break;
+    case CS_MESHTYPE_POINTS:
+      primitivetype = GL_POINTS;
+      break;
+    case CS_MESHTYPE_POINT_SPRITES:
+    {
+      if(!(ext->CS_GL_ARB_point_sprite && ext->CS_GL_ARB_point_parameters))
+      {
+        break;
+      }
+      primitivetype = GL_POINTS;
+      break;
+    }
+    case CS_MESHTYPE_LINES:
+      primNum_divider = 2;
+      primitivetype = GL_LINES;
+      break;
+    case CS_MESHTYPE_LINESTRIP:
+      primNum_sub = 1;
+      primitivetype = GL_LINE_STRIP;
+      break;
+    case CS_MESHTYPE_TRIANGLES:
+    default:
+      primNum_divider = 3;
+      primitivetype = GL_TRIANGLES;
+      break;
+  }
+  if (ext->CS_GL_ARB_point_sprite)
+  {
+    if (primitivetype == GL_POINTS)
+      statecache->Enable_GL_POINT_SPRITE_ARB();
+    else
+      statecache->Disable_GL_POINT_SPRITE_ARB();
+  }
+
+  // Based on the kind of clipping we need we set or clip mask.
+  int clip_mask, clip_value;
+  if (clipportal_floating)
+  {
+    clip_mask = stencil_clip_mask;
+    clip_value = stencil_clip_value;
+  }
+  else if (clipping_stencil_enabled)
+  {
+    clip_mask = stencil_clip_mask;
+    clip_value = 0;
+  }
+  else
+  {
+    clip_mask = 0;
+    clip_value = 0;
+  }
+    
+  GLenum cullFace;
+  statecache->GetCullFace (cullFace);
+    
+  CS::Graphics::MeshCullMode cullMode = modes.cullMode;
+  // Flip face culling if we do mirroring
+  //if (mirrorflag)
+  //  cullMode = CS::Graphics::GetFlippedCullMode (cullMode);
+  
+  if (cullMode == CS::Graphics::cullDisabled)
+  {
+    statecache->Disable_GL_CULL_FACE ();
+  }
+  else
+  {
+    statecache->Enable_GL_CULL_FACE ();
+    
+    // Flip culling if shader wants it
+    if (cullMode == CS::Graphics::cullFlipped)
+      statecache->SetCullFace ((cullFace == GL_FRONT) ? GL_BACK : GL_FRONT);
+  }
+
+  const uint mixmode = modes.mixmode;
+  statecache->SetShadeModel ((mixmode & CS_FX_FLAT) ? GL_FLAT : GL_SMOOTH);
+
+  if (modes.zoffset)
+    statecache->Enable_GL_POLYGON_OFFSET_FILL ();
+  else
+    statecache->Disable_GL_POLYGON_OFFSET_FILL ();
+
+  glColor3f(1.0f,1.0f,1.0f);
+
+  GLenum compType = compGLtypes[iIndexbuf->GetComponentType()];
+  void* bufData =
+    RenderLock (iIndexbuf, CS_GLBUF_RENDERLOCK_ELEMENTS);
+  statecache->ApplyBufferBinding (csGLStateCacheContext::boIndexArray);
+  if (bufData != (void*)-1)
+  {
+    SetMixMode (mixmode, modes.alphaType, modes.alphaTest);
+
+    if ((current_zmode == CS_ZBUF_MESH) || (current_zmode == CS_ZBUF_MESH2))
+    {
+      CS_ASSERT_MSG ("Meshes can't have zmesh zmode. You deserve some spanking", 
+        (modes.z_buf_mode != CS_ZBUF_MESH) && 
+        (modes.z_buf_mode != CS_ZBUF_MESH2));
+      SetZModeInternal ((current_zmode == CS_ZBUF_MESH2) ? 
+        GetZModePass2 (modes.z_buf_mode) : modes.z_buf_mode);
+      /*if (current_zmode == CS_ZBUF_MESH2)
+      {
+      glPolygonOffset (0.15f, 6.0f); 
+      statecache->Enable_GL_POLYGON_OFFSET_FILL ();
+      }*/
+    }
+
+    {
+      CS_PROFILER_ZONE(csGLGraphics3D_DrawMesh_DrawElements);
+      if (mymesh->multiRanges && mymesh->rangesNum)
+      {
+        size_t num_tri = 0;
+        for (size_t r = 0; r < mymesh->rangesNum; r++)
+        {
+          CS::Graphics::RenderMeshIndexRange range = mymesh->multiRanges[r];
+          if (bugplug) num_tri += (range.end-range.start)/primNum_divider - primNum_sub;
+          glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
+            (GLuint)iIndexbuf->GetRangeEnd(), range.end - range.start,
+            compType, 
+            ((uint8*)bufData) + (indexCompsBytes * range.start));
+        }
+        if (bugplug)
+        {
+          bugplug->AddCounter ("Basic Triangle Count", (int)num_tri);
+          bugplug->AddCounter ("Basic Mesh Count", 1);
+        }
+      }
+      else
+      {
+        if (bugplug)
+        {
+          size_t num_tri = (mymesh->indexend-mymesh->indexstart)/primNum_divider - primNum_sub;
+          bugplug->AddCounter ("Basic Triangle Count", (int)num_tri);
+          bugplug->AddCounter ("Basic Mesh Count", 1);
+        }
+
+        if (modes.doInstancing)
+        {
+          const size_t instParamNum = modes.instParamNum;
+          const csVertexAttrib* const instParamsTargets = modes.instParamsTargets;
+          for (size_t n = 0; n < modes.instanceNum; n++)
+          {
+            SetupInstance (instParamNum, instParamsTargets, modes.instParams[n]);
+            glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
+              (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
+              compType, 
+              ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
+            TeardownInstance (instParamNum, instParamsTargets);
+          }
+        }
+        else
+        {
+          // @@@ Temporary comment. If runnung Ubuntu 8.04 on a machine with Intel
+          // hardware and you get an error that traces back to the function below.
+          // Please see: http://trac.crystalspace3d.org/trac/CS/ticket/551 in the
+          // first instance.
+          glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
+            (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
+            compType, 
+            ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
+        }
+      }
+    }
+  }
+
+  if (needMatrix)
+    glPopMatrix ();
+  //indexbuf->RenderRelease ();
+  RenderRelease (iIndexbuf);
+  // Restore cull mode
+  //if (cullMode == CS::Graphics::cullFlipped) statecache->SetCullFace (cullFace);
+  //statecache->Disable_GL_POLYGON_OFFSET_FILL ();
+}
 }
 CS_PLUGIN_NAMESPACE_END(gl3d)

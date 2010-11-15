@@ -45,8 +45,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
   template<typename RenderTreeType, typename LayerConfigType>
   class StandardContextSetup;
 
-  class RMDeferred : public scfImplementation4<RMDeferred, 
+  class RMDeferred : public scfImplementation5<RMDeferred, 
                                                iRenderManager,
+                                               iRenderManagerVisCull,
                                                iComponent,
                                                scfFakeInterface<iRenderManagerPostEffects>,
                                                scfFakeInterface<iDebugHelper> >,
@@ -57,6 +58,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
     /// Constructor.
     RMDeferred(iBase *parent);
+
+    //---- iRenderManagerVisCull Interface ----
+    virtual csPtr<iVisibilityCuller> GetVisCuller ();
 
     //---- iComponent Interface ----
     virtual bool Initialize(iObjectRegistry *registry);

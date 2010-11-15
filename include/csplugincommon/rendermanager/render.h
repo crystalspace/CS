@@ -285,7 +285,7 @@ namespace RenderManager
       RenderView* rview = context->renderView;
 
       int drawFlags = rview->GetEngine ()->GetBeginDrawFlags ();
-      drawFlags |= CSDRAW_3DGRAPHICS /*| CSDRAW_CLEARSCREEN*/;
+      drawFlags |= CSDRAW_3DGRAPHICS;
       drawFlags |= context->drawFlags;
 
       iCamera* cam = rview->GetCamera ();
@@ -305,6 +305,9 @@ namespace RenderManager
       g3d->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
 
       BeginFinishDrawScope bd (g3d, drawFlags);
+
+      // Do any rendering required for visculling.
+      rview->GetThisSector ()->GetVisibilityCuller ()->RenderViscull (rview);
 
       /* Different contexts may have different numbers of layers,
        * so determine the upper layer number */

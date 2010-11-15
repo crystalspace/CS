@@ -36,9 +36,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
   template<typename RenderTreeType, typename LayerConfigType>
   class StandardContextSetup;
 
-  class RMUnshadowed : public scfImplementation5<RMUnshadowed, 
+  class RMUnshadowed : public scfImplementation6<RMUnshadowed, 
                                                  iRenderManager, 
                                                  iRenderManagerTargets,
+                                                 iRenderManagerVisCull,
                                                  scfFakeInterface<iRenderManagerPostEffects>,
                                                  iComponent,
                                                  scfFakeInterface<iDebugHelper> >,
@@ -66,6 +67,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
     {
       targets.MarkAsUsed (target);
     }
+
+    //---- iRenderManagerVisCull ----
+    virtual csPtr<iVisibilityCuller> GetVisCuller ();
   
     //---- iComponent ----
     virtual bool Initialize (iObjectRegistry*);
