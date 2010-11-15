@@ -27,8 +27,10 @@
 #include "csplugincommon/rendermanager/operations.h"
 #include "csplugincommon/rendermanager/rendertree.h"
 #include "csplugincommon/rendermanager/svarrayholder.h"
+#include "csplugincommon/rendermanager/occluvis.h"
 
 #include "ivideo/graph2d.h"
+#include "iengine/sector.h"
 
 namespace CS
 {

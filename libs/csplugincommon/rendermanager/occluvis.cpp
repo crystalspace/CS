@@ -98,7 +98,7 @@ namespace CS
             allPortalVerts3d.SetSize (rm->portal->GetTotalVertexCount () * 3);
             allPortalVertsNums.SetSize (rm->portal->GetPortalCount ());
 
-            csVector2* portalVerts2d = allPortalVerts2d.GetArray ();
+            //csVector2* portalVerts2d = allPortalVerts2d.GetArray ();
             csVector3* portalVerts3d = allPortalVerts3d.GetArray ();
             rm->portal->ComputeScreenPolygons (rview, allPortalVerts2d.GetArray (),
               allPortalVerts3d.GetArray (), rm->portal->GetTotalVertexCount () * 3,
@@ -290,7 +290,7 @@ namespace CS
     }
 
     csOccluvis::csOccluvis (iObjectRegistry* object_reg)
-      : object_reg (object_reg), scfImplementationType (this)
+      : scfImplementationType (this), object_reg (object_reg)
     {
       g3d = csQueryRegistry<iGraphics3D> (object_reg);
       engine = csQueryRegistry<iEngine> (object_reg);
@@ -448,7 +448,7 @@ namespace CS
        * Create a new one if needed.
        */
       csRefArray<NodeMeshList>* nodeMeshListsPtr = nodeMeshHash.Get (csPtrKey<iRenderView> (rview), nullptr);
-      if (nodeMeshListsPtr == nullptr)
+      if (nodeMeshListsPtr == static_cast<csRefArray<NodeMeshList>*>(nullptr))
       {
         nodeMeshListsPtr = new csRefArray<NodeMeshList> ();
         nodeMeshHash.Put (csPtrKey<iRenderView> (rview), nodeMeshListsPtr);
@@ -502,7 +502,7 @@ namespace CS
        * Create a new one if needed.
        */
       csRefArray<NodeMeshList>* nodeMeshListsPtr = nodeMeshHash.Get (csPtrKey<iRenderView> (rview), nullptr);
-      if (nodeMeshListsPtr == nullptr)
+      if (nodeMeshListsPtr == static_cast<csRefArray<NodeMeshList>*>(nullptr))
       {
         nodeMeshListsPtr = new csRefArray<NodeMeshList> ();
         nodeMeshHash.Put (csPtrKey<iRenderView> (rview), nodeMeshListsPtr);
