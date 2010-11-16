@@ -40498,6 +40498,7 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CS_ENTITY_STATICLIT",SWIG_From_int(static_cast< int >(512)));
   SWIG_Python_SetConstant(d, "CS_ENTITY_NOSHADOWRECEIVE",SWIG_From_int(static_cast< int >(1024)));
   SWIG_Python_SetConstant(d, "CS_ENTITY_LIMITEDSHADOWCAST",SWIG_From_int(static_cast< int >(2048)));
+  SWIG_Python_SetConstant(d, "CS_ENTITY_ALWAYSVISIBLE",SWIG_From_int(static_cast< int >(4096)));
   SWIG_Python_SetConstant(d, "CS_CULLER_HINT_GOODOCCLUDER",SWIG_From_int(static_cast< int >(4)));
   SWIG_Python_SetConstant(d, "CS_CULLER_HINT_BADOCCLUDER",SWIG_From_int(static_cast< int >(8)));
   SWIG_Python_SetConstant(d, "CS_PORTAL_CLIPDEST",SWIG_From_int(static_cast< int >(0x00000001)));

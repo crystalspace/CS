@@ -881,6 +881,7 @@ CS_ENTITY_NODECAL = _iengine.CS_ENTITY_NODECAL
 CS_ENTITY_STATICLIT = _iengine.CS_ENTITY_STATICLIT
 CS_ENTITY_NOSHADOWRECEIVE = _iengine.CS_ENTITY_NOSHADOWRECEIVE
 CS_ENTITY_LIMITEDSHADOWCAST = _iengine.CS_ENTITY_LIMITEDSHADOWCAST
+CS_ENTITY_ALWAYSVISIBLE = _iengine.CS_ENTITY_ALWAYSVISIBLE
 class iMeshDrawCallback(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
