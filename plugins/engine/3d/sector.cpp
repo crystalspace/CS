@@ -305,7 +305,14 @@ void csSector::PrecacheDraw ()
 bool csSector::SetVisibilityCullerPlugin (const char *plugname,
 	iDocumentNode* culler_params)
 {
-
+  // Loop through all meshes and unregister them from the old visibility culler.
+  if (culler.IsValid())
+  {
+    for (int i = 0; i < meshes.GetCount (); i++)
+    {
+      UnregisterMeshToCuller(meshes.Get(i));
+    }
+  }
   culler = 0;
 
   // Load the culler plugin.
