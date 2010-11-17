@@ -293,7 +293,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 
   SubMesh* SubMeshesContainer::FindSubMesh (const char* name) const
   {
-    size_t idx = subMeshes.FindSortedKey (
+    size_t idx = subMeshes.FindKey (
       csArrayCmp<SubMesh*, const char*> (name, &SubmeshStringCompare));
     if (idx == csArrayItemNotFound) return 0;
     return subMeshes[idx];
@@ -415,7 +415,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 
   SubMeshProxy* SubMeshProxiesContainer::FindSubMesh (const char* name) const
   {
-    size_t idx = subMeshes.FindSortedKey (
+    size_t idx = subMeshes.FindKey (
       csArrayCmp<SubMeshProxy*, const char*> (name, &SubmeshProxyStringCompare));
     if (idx == csArrayItemNotFound) return 0;
     return subMeshes[idx];
