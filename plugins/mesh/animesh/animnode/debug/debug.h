@@ -23,6 +23,7 @@
 
 #include "csutil/scf_implementation.h"
 #include "iutil/comp.h"
+#include "csutil/bitarray.h"
 #include "csutil/leakguard.h"
 #include "csutil/weakref.h"
 #include "csutil/refarr.h"
@@ -75,6 +76,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     virtual void SetDebugModes (CS::Animation::SkeletonDebugMode modes);
     virtual void SetDebugImage (csPixmap* image);
     virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* factory);
+    virtual void AddChainMask (CS::Animation::iBodyChain* chain);
+    virtual void RemoveChainMask (CS::Animation::iBodyChain* chain);
+    virtual void SetLeafBonesDisplayed (bool displayed);
 
     //-- CS::Animation::iSkeletonAnimNodeFactory
     virtual csPtr<CS::Animation::iSkeletonAnimNode> CreateInstance (
@@ -83,11 +87,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     virtual CS::Animation::iSkeletonAnimNodeFactory* FindNode (const char* name);
 
   private:
+    void ResetChainMask ();
+    void ResetChainMaskNode (CS::Animation::iBodyChainNode* node);
+
     DebugNodeManager* manager;
     csString name;
     CS::Animation::SkeletonDebugMode modes;
     csPixmap* image;
     csRef<CS::Animation::iSkeletonAnimNodeFactory> subFactory;
+    csRefArray<CS::Animation::iBodyChain> chains;
+    csBitArray chainMask;
+    bool leafBonesDisplayed;
 
     friend class DebugNode;
   };

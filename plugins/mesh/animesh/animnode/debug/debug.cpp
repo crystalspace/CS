@@ -103,7 +103,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
 
   DebugNodeFactory::DebugNodeFactory (DebugNodeManager* manager, const char *name)
     : scfImplementationType (this), manager (manager), name (name),
-    modes (CS::Animation::DEBUG_SQUARES), image (nullptr)
+    modes (CS::Animation::DEBUG_SQUARES), image (nullptr), leafBonesDisplayed (true)
   {
   }
 
@@ -120,6 +120,44 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
   void DebugNodeFactory::SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* factory)
   {
     subFactory = factory;
+  }
+
+  void DebugNodeFactory::AddChainMask (CS::Animation::iBodyChain* chain)
+  {
+    chains.Push (chain);
+    ResetChainMask ();
+  }
+
+  void DebugNodeFactory::RemoveChainMask (CS::Animation::iBodyChain* chain)
+  {
+    chains.Delete (chain);
+    ResetChainMask ();
+  }
+
+  void DebugNodeFactory::ResetChainMask ()
+  {
+    chainMask.Clear ();
+    for (csRefArray<CS::Animation::iBodyChain>::Iterator it = chains.GetIterator (); it.HasNext (); )
+    {
+      CS::Animation::iBodyChain*& chain = it.Next ();
+      ResetChainMaskNode (chain->GetRootNode ());
+    }
+  }
+
+  void DebugNodeFactory::ResetChainMaskNode (CS::Animation::iBodyChainNode* node)
+  {
+    CS::Animation::BoneID boneID = node->GetAnimeshBone ();
+    if (boneID >= chainMask.GetSize ())
+      chainMask.SetSize (boneID + 1);
+    chainMask.SetBit (boneID);
+
+    for (size_t i = 0; i < node->GetChildCount (); i++)
+      ResetChainMaskNode (node->GetChild (i));
+  }
+
+  void DebugNodeFactory::SetLeafBonesDisplayed (bool displayed)
+  {
+    leafBonesDisplayed = displayed;
   }
 
   csPtr<CS::Animation::iSkeletonAnimNode> DebugNodeFactory::CreateInstance
@@ -181,7 +219,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     csReversibleTransform tr_o2c =
       camera->GetTransform () / skeleton->GetSceneNode ()->GetMovable ()->GetFullTransform ();
 
-    // Setup the "end" positions of all bones
+    // Setup the "end" positions and child count of all bones
     const CS::Animation::BoneID lastId = fact->GetTopBoneID ();
     csArray<csVector3> childPos;
     csArray<int> numChild;
@@ -207,9 +245,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     }
 
     // Now draw the bones
-    for (CS::Animation::BoneID i = 0; i < lastId + 1; ++i)
+    for (CS::Animation::BoneID i = 0; i <= lastId; i++)
     {
-      if (!fact->HasBone (i))
+      if (!fact->HasBone (i)
+	  || (factory->chains.GetSize ()
+	      && (factory->chainMask.GetSize () <= i
+		  || !factory->chainMask.IsBitSet (i)))
+	  || (!factory->leafBonesDisplayed && numChild[i] == 0))
 	continue;
 
       csQuaternion rotation;
@@ -218,15 +260,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
 
       csVector3 bonePosition = tr_o2c * position;
 
-      if (factory->modes & CS::Animation::DEBUG_IMAGES && factory->image)
+      if (factory->modes & CS::Animation::DEBUG_IMAGES
+	  && factory->image)
       {
 	float x1 = bonePosition.x, y1 = bonePosition.y, z1 = bonePosition.z;
 	float iz1 = fov / z1;
 	int px1 = csQint (x1 * iz1 + (g2d->GetWidth ()  / 2));
 	int py1 = g2d->GetHeight () - 1 - csQint (y1 * iz1 + (g2d->GetHeight () / 2));
  
-	factory->image->Draw (g3d, px1 - factory->image->Width () / 2,
-			      py1 - factory->image->Height () / 2);
+	// TODO: images are not drawn correctly
+	if (iz1 > 0.0f)
+	  factory->image->Draw (g3d, px1 - factory->image->Width () / 2,
+				py1 - factory->image->Height () / 2);
       }
 
       if (factory->modes & CS::Animation::DEBUG_2DLINES)
@@ -263,12 +308,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
 	int px1 = csQint (x1 * iz1 + (g2d->GetWidth ()  / 2));
 	int py1 = g2d->GetHeight () - 1 - csQint (y1 * iz1 + (g2d->GetHeight () / 2));
  
-	size_t size = 5;
-	for (size_t i = 0; i < size; i++)
-	  for (size_t j = 0; j < size; j++)
-	    g3d->GetDriver2D ()->DrawPixel (px1 - size / 2 + i,
-					    py1 - size / 2 + j,
-					    colorI);
+	if (iz1 > 0.0f)
+	{
+	  size_t size = 5;
+	  for (size_t i = 0; i < size; i++)
+	    for (size_t j = 0; j < size; j++)
+	      g3d->GetDriver2D ()->DrawPixel (px1 - size / 2 + i,
+					      py1 - size / 2 + j,
+					      colorI);
+	}
       }
     }
   }

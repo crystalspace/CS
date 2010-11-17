@@ -22,7 +22,7 @@
 #define __CS_IMESH_ANIMNODE_DEBUG_H__
 
 /**\file
- * Debug animation nodes for an animated mesh.
+ * Debug animation node for an animated mesh.
  */
 
 #include "csutil/scf_interface.h"
@@ -42,6 +42,7 @@ namespace Animation {
 
 struct iSkeletonDebugNodeFactory;
 struct iBodySkeleton;
+struct iBodyChain;
 
 /**
  * A class to manage the creation and deletion of debug animation 
@@ -77,7 +78,7 @@ enum SkeletonDebugMode
   DEBUG_NONE = 0,             /*!< No debug shapes are displayed. */
   DEBUG_2DLINES = 1 << 1,     /*!< The debug shapes displayed are 2D lines between the bones. */
   DEBUG_SQUARES = 1 << 2,     /*!< The debug shapes displayed are 2D squares at the bone positions. */
-  DEBUG_IMAGES = 1 << 3,      /*!< The debug shapes displayed are images at the bone positions. */
+  DEBUG_IMAGES = 1 << 3       /*!< The debug shapes displayed are images at the bone positions. */
 };
 
 /**
@@ -102,6 +103,23 @@ struct iSkeletonDebugNodeFactory : public iSkeletonAnimNodeFactory
    * Set the child animation node of this node.
    */
   virtual void SetChildNode (iSkeletonAnimNodeFactory* factory) = 0;
+
+  /**
+   * Add a bone chain mask. If there is any chain mask, then only the bones from these chain
+   * masks will be displayed.
+   */
+  virtual void AddChainMask (iBodyChain* chain) = 0;
+
+  /**
+   * Remove the given bone chain mask. If there is any chain mask, then only the bones from
+   * these chain masks will be displayed.
+   */
+  virtual void RemoveChainMask (iBodyChain* chain) = 0;
+
+  /**
+   * Set whether or not the leaf bones of the skeleton are displayed.
+   */
+  virtual void SetLeafBonesDisplayed (bool displayed) = 0;
 };
 
 /**
