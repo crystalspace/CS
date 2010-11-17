@@ -508,7 +508,7 @@ public:
     return GetSize() == 0;
   }
 
-  /// An iterator class for the hash.
+  /// An iterator class for the csHash class.
   class Iterator
   {
   private:
@@ -574,7 +574,7 @@ public:
   };
   friend class Iterator;
 
-  /// An iterator class for the hash.
+  /// An iterator class for the csHash class.
   class GlobalIterator
   {
   private:
@@ -688,7 +688,7 @@ public:
   };
   friend class GlobalIterator;
 
-  /// An const iterator class for the hash.
+  /// An const iterator class for the csHash class.
   class ConstIterator
   {
   private:
@@ -754,7 +754,7 @@ public:
   };
   friend class ConstIterator;
 
-  /// An const iterator class for the hash.
+  /// An const iterator class for the csHash class.
   class ConstGlobalIterator
   {
   private:

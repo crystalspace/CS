@@ -131,8 +131,9 @@ public:
    */
   virtual const char* GetAppPath ();
 
+  /// Query a specific commandline option name by index
   virtual const char* GetOptionName (size_t iIndex) const;
-  /// Query specific commandline option by index
+  /// Query a specific commandline option value by index
   virtual const char *GetOption (size_t iIndex = 0) const;
 };
 

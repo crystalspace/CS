@@ -35,6 +35,7 @@ struct iPluginConfig;
  * To do that it will look at all plugins and see if they implement iConfig.
  * This class requires the iPluginManager and iCommandLineParser to be
  * in the object registry (or else you give it as a parameter).
+ * \sa CS::Demo::CommandLineHelper
  */
 class CS_CRYSTALSPACE_EXPORT csCommandLineHelper
 {
