@@ -448,29 +448,28 @@ struct iSkeletonAnimNode : public virtual iBase
   SCF_INTERFACE(CS::Animation::iSkeletonAnimNode, 1, 0, 0);
 
   /**
-   * Start playing the node. 
-   * Exactly what this results in depends on the specific node type.
+   * Start playing the node, it will therefore start modifying the state of the skeleton.
    */
   virtual void Play () = 0;
 
   /**
-   * Stop playing the node (deactivate it).
+   * Stop playing the node, it will no longer modify the state of the skeleton.
    */
   virtual void Stop () = 0;
 
   /**
-   * Set the current playback position. If set beyond the end of the
-   * animation it will be capped.
+   * Set the current playback position, in seconds. If time is set beyond the end of the
+   * animation then it will be capped.
    */
   virtual void SetPlaybackPosition (float time) = 0;
 
   /**
-   * Get the current playback position (time).
+   * Get the current playback position, in seconds (ie a time value between 0 and GetDuration()).
    */
   virtual float GetPlaybackPosition () const = 0;
 
   /**
-   * Get the length of the node
+   * Get the time length of this node, in seconds
    */
   virtual float GetDuration () const = 0;
 
@@ -480,48 +479,48 @@ struct iSkeletonAnimNode : public virtual iBase
   virtual void SetPlaybackSpeed (float speed) = 0;
 
   /**
-   * Get the playback speed.
+   * Get the playback speed. The default value is 1.0.
    */
   virtual float GetPlaybackSpeed () const = 0;
 
   /**
-   * Blend the state of this node into the global state.
+   * Blend the state of this node into the global skeleton state.
    *
    * \param state The global blend state to blend into
-   * \param baseWeight Global weight for this node
+   * \param baseWeight Global weight for the blending of this node
    */
   virtual void BlendState (csSkeletalState* state, float baseWeight = 1.0f) = 0;
 
   /**
-   * Update the animation state
+   * Update the state of the animation
    * \param dt Time since last update
    */
   virtual void TickAnimation (float dt) = 0;
 
   /**
-   * Is this or any sub-node active and needs any blending.
+   * Return whether or not this node is currently playing and needs any blending.
    */
   virtual bool IsActive () const = 0;
 
   /**
-   * Get the node factory
+   * Get the factory of this node
    */
   virtual iSkeletonAnimNodeFactory* GetFactory () const = 0;
 
   /**
-   * Find a sub-node with given name
+   * Find a sub-node with the given name
    */
   virtual iSkeletonAnimNode* FindNode (const char* name) = 0;
 
   /**
-   * Add a new animation callback to a node
-   * \param callback the callback object
+   * Add a new animation callback to this node
+   * \param callback The callback object
    */
   virtual void AddAnimationCallback (iSkeletonAnimCallback* callback) = 0;
 
   /**
-   * Remove a animation callback from a node
-   * \param callback the callback object
+   * Remove the given animation callback from this node
+   * \param callback The callback object
    */
   virtual void RemoveAnimationCallback (iSkeletonAnimCallback* callback) = 0;
 };

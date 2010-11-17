@@ -169,7 +169,10 @@ public:
  * @{ */
 
 /**
- * State of an animated mesh object factory
+ * State of an animated mesh object factory.
+ *
+ * These meshes are animated by the skeletal animation system (see
+ * CS::Animation::iSkeletonFactory) and by morphing (see CS::Mesh::iAnimatedMeshMorphTarget).
  */
 struct iAnimatedMeshFactory : public virtual iBase
 {
@@ -506,6 +509,9 @@ struct iAnimatedMeshSubMeshFactory : public virtual iBase
 
 /**
  * State and setting for an instance of an animated mesh
+ *
+ * These meshes are animated by the skeletal animation system (see
+ * CS::Animation::iSkeleton) and by morphing (see CS::Mesh::iAnimatedMeshMorphTarget).
  */
 struct iAnimatedMesh : public virtual iBase
 {
@@ -535,12 +541,12 @@ struct iAnimatedMesh : public virtual iBase
   virtual size_t GetSubMeshCount () const = 0;
 
   /**
-   * Set the weight for blending of a given morph target
+   * Set the weight for the blending of a given morph target
    */
   virtual void SetMorphTargetWeight (uint target, float weight) = 0;
 
   /**
-   * Get the weight for blending of a given morph target
+   * Get the weight for the blending of a given morph target
    */
   virtual float GetMorphTargetWeight (uint target) const = 0;
 
@@ -548,7 +554,7 @@ struct iAnimatedMesh : public virtual iBase
   * @{ */
 
   /**
-   * Get the number of sockets in factory
+   * Get the number of sockets in the factory
    */
   virtual size_t GetSocketCount () const = 0;
 

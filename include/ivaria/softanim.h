@@ -21,6 +21,10 @@
 #ifndef __CS_IVARIA_SOFTBODYANIM_H__
 #define __CS_IVARIA_SOFTBODYANIM_H__
 
+/**\file
+ * Animation of a genmesh based on soft body physical simulation
+ */
+
 #include "csutil/scf_interface.h"
 #include "imesh/genmesh.h"
 

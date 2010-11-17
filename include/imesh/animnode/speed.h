@@ -22,7 +22,7 @@
 #define __CS_IMESH_ANIMNODE_SPEED_H__
 
 /**\file
- * Speed animation nodes for an animated mesh.
+ * Speed animation node for an animated mesh.
  */
 
 #include "csutil/scf_interface.h"
@@ -31,10 +31,8 @@
 /**\addtogroup meshplugins
  * @{ */
 
-namespace CS
-{
-namespace Animation
-{
+namespace CS {
+namespace Animation {
 
 struct iSkeletonSpeedNodeFactory;
 
