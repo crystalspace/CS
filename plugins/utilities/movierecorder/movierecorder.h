@@ -87,7 +87,9 @@ private:
 
   /// format of the movie filename (e.g. "/this/cryst%03d.nuv")
   CS::NumberedFilenameHelper captureFormat;
+  csString filenameFormat;
   csString movieFileName;
+  csString recordingFile;
 
   /// Capture settings
   float frameRate, rtjQuality;
@@ -140,6 +142,8 @@ public:
   virtual void Pause(void);
   virtual void UnPause(void);
   virtual bool IsPaused(void) const;
+  virtual void SetRecordingFile (const char* filename);
+  virtual void SetFilenameFormat (const char* format);
 
   /**
    * Embedded iEventHandler interface that handles keyboard events

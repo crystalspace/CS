@@ -31,9 +31,13 @@
 #include "csutil/scf.h"
 
 /**
- * Using this interface you can communicate with the MovieRecorder plugin.
- * This allows changing or disabling the hotkey bindings, changing the
- * video parameters, and programmatically starting and stopping the recorder.
+ * Using this interface you can communicate with the MovieRecorder plugin and programmatically
+ * start, pause and stop the recorder. This plugin uses a configuration file (by default in
+ * "data/config-plugin/movierecorder.cfg") to setup the various parameters of the recording sessions.
+ *
+ * The easiest way to use this plugin is to load it at application launch time by adding the option
+ * "-plugin=movierecorder" on the command line, then the keys to start, stop and pause the recording
+ * are by default "ALT-r" and "ALT-p".
  * \remarks The plugin is GPL, not LGPL.
  */
 struct iMovieRecorder : public virtual iBase
@@ -46,7 +50,7 @@ struct iMovieRecorder : public virtual iBase
   /// Stop recording if a recording is in progress
   virtual void Stop(void) = 0;
 
-  /// Are we recording?
+  /// Return whether or not a movie is currently recorded
   virtual bool IsRecording(void) const = 0;
 
   /// Pause an in-progress recording
@@ -55,8 +59,24 @@ struct iMovieRecorder : public virtual iBase
   /// Resume an in-progress recording
   virtual void UnPause(void) = 0;
 
-  /// Is the recording paused?
+  /// Return whether or not a movie recording is currently paused
   virtual bool IsPaused(void) const = 0;
+
+  /**
+   * Set the VFS file that will be used to record the movie. If the file already exists
+   * then it will be overwritten. Using this method also overwrite the behavior defined
+   * by the filename format (see eg SetFilenameFormat()).
+   */
+  virtual void SetRecordingFile (const char* filename) = 0;
+
+  /**
+   * Set the format of the filename to be used to record movie. The rightmost string of
+   * digits in this format will be automatically replaced with a number (eg with a format
+   * "/this/crystal000.nuv" the movie files created in the current directory will be called
+   * "crystal001.nuv", "crystal002.nuv" and so on). Using this method will overwrite the
+   * value defined in the configuration file.
+   */
+  virtual void SetFilenameFormat (const char* format) = 0;
 };
 
 #endif // __CS_IVARIA_MOVIERECORDER_H__

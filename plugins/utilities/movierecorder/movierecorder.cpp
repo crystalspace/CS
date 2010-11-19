@@ -201,8 +201,9 @@ void csMovieRecorder::SetupPlugin()
   GetKeyCode(config->GetStr("MovieRecorder.Keys.Record", "alt-r"), keyRecord);
   GetKeyCode(config->GetStr("MovieRecorder.Keys.Pause", "alt-p"), keyPause);
 
-  captureFormat.SetMask (config->GetStr ("MovieRecorder.Capture.FilenameFormat",
-    "/tmp/crystal000.nuv"));
+  captureFormat.SetMask (filenameFormat != "" ? filenameFormat.GetData () :
+			 config->GetStr ("MovieRecorder.Capture.FilenameFormat",
+					 "/tmp/crystal000.nuv"));
 
   initialized = true;
 }
@@ -297,6 +298,8 @@ bool csMovieRecorder::IsRecording(void) const
 
 void csMovieRecorder::Start(void) 
 {
+  SetupPlugin();
+
   if (IsPaused()) {
     UnPause();
     return;
@@ -304,7 +307,7 @@ void csMovieRecorder::Start(void)
   if (IsRecording())
     Stop();
 
-  movieFileName = captureFormat.FindNextFilename (VFS);
+  movieFileName = recordingFile != "" ? recordingFile : captureFormat.FindNextFilename (VFS);
 
   // If the config specified 0x0, that means we use the current resolution unscaled
   int w = recordWidth  ? recordWidth  : G2D->GetWidth();
@@ -397,6 +400,16 @@ void csMovieRecorder::UnPause(void)
   ffakeClockTicks = fakeClockTicks;
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Video recorder unpaused - %s", 
     movieFileName.GetData());
+}
+
+void csMovieRecorder::SetRecordingFile (const char* filename)
+{
+  recordingFile = filename;
+}
+
+void csMovieRecorder::SetFilenameFormat (const char* format)
+{
+  filenameFormat = format;
 }
 
 void csMovieRecorder::WriterCallback(const void *data, long bytes, void *extra)
