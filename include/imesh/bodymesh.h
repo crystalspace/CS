@@ -225,6 +225,11 @@ struct iBodyChain : public virtual iBase
    * \return True upon success, false otherwise (this should never happen although)
    */
   virtual bool AddAllSubChains () = 0;
+
+  /**
+   * Print the hierarchical structure of this bone chain to the standard output.
+   */
+  virtual void DebugPrint () const = 0;
 };
 
 /**
@@ -233,7 +238,7 @@ struct iBodyChain : public virtual iBase
  */
 struct iBodyChainNode : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iBodyChainNode, 2, 0, 0);
+  SCF_INTERFACE(CS::Animation::iBodyChainNode, 2, 0, 1);
 
   /**
    * Return the ID of the bone of the animated mesh associated with this node.
@@ -261,6 +266,11 @@ struct iBodyChainNode : public virtual iBase
    * Return 0 if the given bone was not found.
    */
   virtual iBodyChainNode* FindSubChild (CS::Animation::BoneID child) const = 0;
+
+  /**
+   * Print the hierarchical structure of this node and its children to the standard output.
+   */
+  virtual void DebugPrint () const = 0;
 };
 
 /**

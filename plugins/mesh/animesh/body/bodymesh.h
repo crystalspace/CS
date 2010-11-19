@@ -264,7 +264,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     virtual bool AddSubChain (CS::Animation::BoneID subBone);
     virtual bool AddAllSubChains ();
 
+    virtual void DebugPrint () const;
+
   private:
+    void Print (BodyChainNode* node, size_t level = 0) const;
+
     csString name;
     csRef<BodySkeleton> bodySkeleton;
     csRef<BodyChainNode> rootNode;
@@ -287,17 +291,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
 
     void AddChild (BodyChainNode* node);
 
-    void Print (size_t level = 0)
-    {
-      for (size_t i = 0; i < level; i++)
-	printf (" ");
-      printf ("+ node %i\n", boneID);
-
-      for (csRefArray<BodyChainNode>::Iterator it = children.GetIterator (); it.HasNext (); )
-	it.Next ()->Print (level + 1); 
-    }
+    virtual void DebugPrint () const;
 
   private:
+    void Print (size_t level = 0) const;
+
     CS::Animation::BoneID boneID;
     csWeakRef<BodyChainNode> parent;
     csRefArray<BodyChainNode> children;

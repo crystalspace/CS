@@ -420,6 +420,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     return true;
   }
 
+  void BodyChain::DebugPrint () const
+  {
+    printf ("Bone chain %s:\n", name.GetData ());
+    Print (rootNode);
+  }
+
+  void BodyChain::Print (BodyChainNode* node, size_t level) const
+  {
+    for (size_t i = 0; i < level; i++)
+      printf (" ");
+    printf ("+ node %i: %s\n", node->boneID, bodySkeleton->skeletonFactory->GetBoneName (node->boneID));
+
+    for (csRefArray<BodyChainNode>::Iterator it = node->children.GetIterator (); it.HasNext (); )
+    {
+      BodyChainNode*& node = it.Next ();
+      Print (node, level + 1);
+    }
+  }
+
   /********************
    *  BodyChainNode
    ********************/
@@ -471,6 +490,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
     }
 
     return nullptr;
+  }
+
+  void BodyChainNode::DebugPrint () const
+  {
+    Print ();
+  }
+
+  void BodyChainNode::Print (size_t level) const
+  {
+    for (size_t i = 0; i < level; i++)
+      printf (" ");
+    printf ("+ node %i\n", boneID);
+
+    for (csRefArray<BodyChainNode>::ConstIterator it = children.GetIterator (); it.HasNext (); )
+      it.Next ()->Print (level + 1);
   }
 
   /********************
