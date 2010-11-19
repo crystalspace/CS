@@ -25,6 +25,7 @@
 #include "csutil/leakguard.h"
 #include "csutil/refarr.h"
 #include "csutil/csstring.h"
+#include "csutil/weakrefarr.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 {
@@ -82,7 +83,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       callbacks.Delete (callback);
     }    
     
-    csRefArray<CS::Animation::iSkeletonAnimCallback> callbacks;
+    csWeakRefArray<CS::Animation::iSkeletonAnimCallback> callbacks;
     CS::Animation::iSkeletonAnimNode* owner;
   };
 
