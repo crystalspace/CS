@@ -320,6 +320,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     }
   }
 
+  const csArray<CS::Animation::BoneID>& SkeletonFactory::GetBoneOrderList ()
+  {
+    UpdateOrderList ();
+    return boneOrderList;
+  }
+
   void SkeletonFactory::UpdateCachedTransforms ()
   {
     if (!cachedTransformsDirty)
@@ -367,7 +373,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       {
 	CS::Utility::GraphEdge edge (allBones[i].parent, i);
         graph.Push (edge);
-      }      
+      }
     }
 
     boneOrderList = CS::Utility::TopologicalSort (graph);
@@ -677,7 +683,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
           else
             boneRef.boneRotation = q * skeletonRotation;
-           
+
           boneRef.boneOffset = finalState->GetVector (i) + skeletonOffset;
 
           cachedTransformsDirty = true;
@@ -737,7 +743,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     factory->UpdateCachedTransforms ();
 
     // Update our own transforms
-    const csArray<size_t>& orderList = factory->GetOrderList ();
+    const csArray<CS::Animation::BoneID>& orderList = factory->GetBoneOrderList ();
     for (size_t i = 0; i < orderList.GetSize (); ++i)
     {
       Bone& boneRef = allBones[orderList[i]];

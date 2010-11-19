@@ -102,12 +102,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     virtual csString Description () const;
 
-    //-- "Private"
-    inline const csArray<size_t>& GetOrderList () const
-    {
-      return boneOrderList;
-    }
+    virtual const csArray<CS::Animation::BoneID>& GetBoneOrderList ();
 
+    //-- "Private"
     void UpdateCachedTransforms ();
     void UpdateOrderList ();
 
@@ -136,7 +133,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     csArray<Bone> allBones;
     csSafeCopyArray<csString> boneNames;
 
-    csArray<size_t> boneOrderList;
+    csArray<CS::Animation::BoneID> boneOrderList;
     csRef<CS::Animation::iSkeletonAnimPacketFactory> animationPacket;    
 
     bool autostart;
