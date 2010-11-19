@@ -98,16 +98,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(VisualDebug)
       TransformData& transform = it.Next ();
 
       csVector3 origin = transform.transform.GetOrigin ();
-      csVector3 end = origin + transform.transform.This2OtherRelative
-	(csVector3 (transform.size, 0.0f, 0.0f));
+      csVector3 end = transform.transform.This2Other (csVector3 (transform.size, 0.0f, 0.0f));
       int color = g2d->FindRGB (255, 0, 0);
       g3d->DrawLine (tr_w2c * origin, tr_w2c * end, fov, color);
 
-      end = origin + transform.transform.This2OtherRelative (csVector3 (0.0f, transform.size, 0.0f));
+      end = transform.transform.This2Other (csVector3 (0.0f, transform.size, 0.0f));
       color = g2d->FindRGB (0, 255, 0);
       g3d->DrawLine (tr_w2c * origin, tr_w2c * end, fov, color);
 
-      end = origin + transform.transform.This2OtherRelative (csVector3 (0.0f, 0.0f, transform.size));
+      end = transform.transform.This2Other (csVector3 (0.0f, 0.0f, transform.size));
       color = g2d->FindRGB (0, 0, 255);
       g3d->DrawLine (tr_w2c * origin, tr_w2c * end, fov, color);
 
@@ -133,11 +132,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(VisualDebug)
       int px1 = csQint (x1 * iz1 + (g2d->GetWidth ()  / 2));
       int py1 = g2d->GetHeight () - 1 - csQint (y1 * iz1 + (g2d->GetHeight () / 2));
  
-      for (size_t i = 0; i < positionData.size; i++)
-	for (size_t j = 0; j < positionData.size; j++)
-	  g3d->GetDriver2D ()->DrawPixel (px1 - positionData.size / 2 + i,
-					  py1 - positionData.size / 2 + j,
-					  color);
+      if (iz1 > 0.0f)
+	for (size_t i = 0; i < positionData.size; i++)
+	  for (size_t j = 0; j < positionData.size; j++)
+	    g3d->GetDriver2D ()->DrawPixel (px1 - positionData.size / 2 + i,
+					    py1 - positionData.size / 2 + j,
+					    color);
 
       if (!positionData.persist)
 	positions.DeleteIndex (index);

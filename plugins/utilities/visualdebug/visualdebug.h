@@ -44,16 +44,16 @@ class VisualDebugger : public scfImplementation2<VisualDebugger,
 
   //-- CS::Debug::iVisualDebugger
   virtual void DebugTransform (const csReversibleTransform& transform,
-			       bool persist = false,
-			       float size = 1.0f);
+			       bool persist,
+			       float size);
   virtual void DebugPosition (const csVector3& position,
-			      bool persist = false,
-			      csColor color = csColor (0.0f, 1.0f, 0.0f),
-			      size_t size = 3);
+			      bool persist,
+			      csColor color,
+			      size_t size);
   virtual void DebugVector (const csReversibleTransform& transform,
 			    const csVector3& vector,
-			    bool persist = false,
-			    csColor color = csColor (0.0f, 1.0f, 0.0f));
+			    bool persist,
+			    csColor color);
   virtual void Display (iView* view);
 
  private:
