@@ -53,7 +53,7 @@ namespace Utility
    * \param inputGraph the edges defining the graph
    */
   CS_CRYSTALSPACE_EXPORT
-  csArray<size_t> TopologicalSort (csArray<GraphEdge> inputGraph);
+  csArray<size_t> TopologicalSort (csArray<GraphEdge>& inputGraph);
 
 }
 }

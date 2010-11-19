@@ -28,7 +28,7 @@ namespace CS
 namespace Utility
 {
 
-  csArray<size_t> TopologicalSort (csArray<GraphEdge> inputGraph)
+  csArray<size_t> TopologicalSort (csArray<GraphEdge>& inputGraph)
   {    
     csArray<size_t> result;
 
