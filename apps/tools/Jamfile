@@ -10,6 +10,7 @@ SubInclude TOP apps tools heightmapproc ;
 SubInclude TOP apps tools imagetool ;
 SubInclude TOP apps tools levtool ;
 SubInclude TOP apps tools lighter2 ;
+SubInclude TOP apps tools mocapviewer ;
 SubInclude TOP apps tools lod ;
 SubInclude TOP apps tools optimisedata ;
 SubInclude TOP apps tools partconv ;
