@@ -630,7 +630,8 @@ namespace CS
         // If frustum checks passed...
         if (nodeMeshList->framePassed == engine->GetCurrentFrameNumber ())
         {
-          if (CheckNodeVisibility (nodeMeshList->node, rview))
+          if (!nodeMeshList->alwaysVisible &&
+              CheckNodeVisibility (nodeMeshList->node, rview))
           {
             // Render with occlusion queries.
             RenderMeshes<true> (nodeMeshList->node, rview, nodeMeshList);
