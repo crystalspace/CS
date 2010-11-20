@@ -33438,6 +33438,72 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iMovieRecorder_SetRecordingFile(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iMovieRecorder *arg1 = (iMovieRecorder *) 0 ;
+  char *arg2 = (char *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iMovieRecorder_SetRecordingFile",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMovieRecorder, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMovieRecorder_SetRecordingFile" "', argument " "1"" of type '" "iMovieRecorder *""'"); 
+  }
+  arg1 = reinterpret_cast< iMovieRecorder * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iMovieRecorder_SetRecordingFile" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  (arg1)->SetRecordingFile((char const *)arg2);
+  resultobj = SWIG_Py_Void();
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iMovieRecorder_SetFilenameFormat(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iMovieRecorder *arg1 = (iMovieRecorder *) 0 ;
+  char *arg2 = (char *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iMovieRecorder_SetFilenameFormat",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMovieRecorder, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMovieRecorder_SetFilenameFormat" "', argument " "1"" of type '" "iMovieRecorder *""'"); 
+  }
+  arg1 = reinterpret_cast< iMovieRecorder * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iMovieRecorder_SetFilenameFormat" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  (arg1)->SetFilenameFormat((char const *)arg2);
+  resultobj = SWIG_Py_Void();
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iMovieRecorder_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -41285,6 +41351,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iMovieRecorder_Pause", _wrap_iMovieRecorder_Pause, METH_VARARGS, NULL},
 	 { (char *)"iMovieRecorder_UnPause", _wrap_iMovieRecorder_UnPause, METH_VARARGS, NULL},
 	 { (char *)"iMovieRecorder_IsPaused", _wrap_iMovieRecorder_IsPaused, METH_VARARGS, NULL},
+	 { (char *)"iMovieRecorder_SetRecordingFile", _wrap_iMovieRecorder_SetRecordingFile, METH_VARARGS, NULL},
+	 { (char *)"iMovieRecorder_SetFilenameFormat", _wrap_iMovieRecorder_SetFilenameFormat, METH_VARARGS, NULL},
 	 { (char *)"iMovieRecorder_scfGetVersion", _wrap_iMovieRecorder_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iMovieRecorder", _wrap_delete_iMovieRecorder, METH_VARARGS, NULL},
 	 { (char *)"iMovieRecorder_swigregister", iMovieRecorder_swigregister, METH_VARARGS, NULL},

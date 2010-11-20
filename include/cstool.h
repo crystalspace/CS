@@ -44,6 +44,7 @@
 #include "cstool/materialbuilder.h"
 #include "cstool/meshfilter.h"
 #include "cstool/meshobjtmpl.h"
+#include "cstool/mocapparser.h"
 #include "cstool/normalcalc.h"
 #include "cstool/numberedfilenamehelper.h"
 #include "cstool/objmodel.h"

@@ -1182,6 +1182,8 @@ class iMovieRecorder(core.iBase):
     def Pause(*args): return _ivaria.iMovieRecorder_Pause(*args)
     def UnPause(*args): return _ivaria.iMovieRecorder_UnPause(*args)
     def IsPaused(*args): return _ivaria.iMovieRecorder_IsPaused(*args)
+    def SetRecordingFile(*args): return _ivaria.iMovieRecorder_SetRecordingFile(*args)
+    def SetFilenameFormat(*args): return _ivaria.iMovieRecorder_SetFilenameFormat(*args)
     scfGetVersion = staticmethod(_ivaria.iMovieRecorder_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iMovieRecorder
     __del__ = lambda self : None;

@@ -8340,6 +8340,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *Pause = *cspacec::iMovieRecorder_Pause;
 *UnPause = *cspacec::iMovieRecorder_UnPause;
 *IsPaused = *cspacec::iMovieRecorder_IsPaused;
+*SetRecordingFile = *cspacec::iMovieRecorder_SetRecordingFile;
+*SetFilenameFormat = *cspacec::iMovieRecorder_SetFilenameFormat;
 *scfGetVersion = *cspacec::iMovieRecorder_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

@@ -107,6 +107,7 @@ class iSkeletonFactory(core.iBase):
     def SetAutoStart(*args): return _animation.iSkeletonFactory_SetAutoStart(*args)
     def GetAutoStart(*args): return _animation.iSkeletonFactory_GetAutoStart(*args)
     def Description(*args): return _animation.iSkeletonFactory_Description(*args)
+    def GetBoneOrderList(*args): return _animation.iSkeletonFactory_GetBoneOrderList(*args)
     scfGetVersion = staticmethod(_animation.iSkeletonFactory_scfGetVersion)
     __swig_destroy__ = _animation.delete_iSkeletonFactory
     __del__ = lambda self : None;
@@ -224,6 +225,7 @@ class iBodyChain(core.iBase):
     def GetRootNode(*args): return _animation.iBodyChain_GetRootNode(*args)
     def AddSubChain(*args): return _animation.iBodyChain_AddSubChain(*args)
     def AddAllSubChains(*args): return _animation.iBodyChain_AddAllSubChains(*args)
+    def DebugPrint(*args): return _animation.iBodyChain_DebugPrint(*args)
     scfGetVersion = staticmethod(_animation.iBodyChain_scfGetVersion)
     __swig_destroy__ = _animation.delete_iBodyChain
     __del__ = lambda self : None;
@@ -240,6 +242,7 @@ class iBodyChainNode(core.iBase):
     def GetChild(*args): return _animation.iBodyChainNode_GetChild(*args)
     def GetParent(*args): return _animation.iBodyChainNode_GetParent(*args)
     def FindSubChild(*args): return _animation.iBodyChainNode_FindSubChild(*args)
+    def DebugPrint(*args): return _animation.iBodyChainNode_DebugPrint(*args)
     scfGetVersion = staticmethod(_animation.iBodyChainNode_scfGetVersion)
     __swig_destroy__ = _animation.delete_iBodyChainNode
     __del__ = lambda self : None;
