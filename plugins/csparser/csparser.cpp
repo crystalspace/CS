@@ -199,9 +199,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     float camera_tolerance = node->GetAttributeValueAsFloat("camera_tolerance");
     imposter->SetCameraRotationTolerance(camera_tolerance);
 
-    imposter->SetShader(node->GetAttributeValue("shader"));
-
     imposter->SetRenderReal(node->GetAttributeValueAsBool("render_real"));
+
+    csRef<iDocumentNodeIterator> shaders = node->GetNodes ("shader");
+    while (shaders->HasNext ())
+    {
+      csRef<iDocumentNode> shader = shaders->Next ();
+      imposter->SetShader(node->GetAttributeValue("type"),
+                          node->GetAttributeValue("name"));
+    }
 
     return true;
   }

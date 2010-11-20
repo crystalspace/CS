@@ -35,9 +35,10 @@
 
 csImposterMesh::csImposterMesh (csEngine* engine, iImposterFactory* fact,
                                 iMeshWrapper* pmesh, iRenderView* rview,
-                                const char* shader) :
-scfImplementationType(this), fact(fact), shader(shader), materialUpdateNeeded(false),
-lastDistance(FLT_MAX), isUpdating(false), rendered(false)
+                                csArray<ImposterShader>& shaders) :
+scfImplementationType (this), fact (fact), shaders (shaders),
+materialUpdateNeeded (false), lastDistance (FLT_MAX), isUpdating (false),
+rendered (false)
 {
   // Misc inits.
   vertices.SetVertexCount (4);
@@ -203,6 +204,7 @@ engine(engine), sector(sector), meshDirty(true), currentMesh(0)
   mesh->GetMovable()->SetSector(sector);
   mesh->GetMovable()->UpdateMove();
 
+  mesh->SetZBufMode (CS_ZBUF_TEST);
   mesh->GetFlags().Set(CS_ENTITY_NOLIGHTING | CS_ENTITY_NOSHADOWS | CS_ENTITY_NOSHADOWRECEIVE);
   flags.Set(CS_ENTITY_NOLIGHTING | CS_ENTITY_NOSHADOWS | CS_ENTITY_NOSHADOWRECEIVE);
 
@@ -277,7 +279,7 @@ void csBatchedImposterMesh::SetupRenderMeshes(csRenderMesh*& mesh, bool rmCreate
     mesh->object2world = csReversibleTransform ();
     mesh->worldspace_origin = csVector3 (0,0,0);
     mesh->mixmode = CS_FX_COPY;
-    mesh->alphaType = csAlphaMode::alphaBinary;
+    mesh->alphaType = csAlphaMode::alphaSmooth;
     mesh->z_buf_mode = CS_ZBUF_TEST;
     mesh->renderPrio = engine->GetRenderPriority("alpha");
     mesh->material = 0;

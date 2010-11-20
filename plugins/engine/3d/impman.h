@@ -104,7 +104,7 @@ private:
 
     TextureSpace* allocatedSpace;
 
-    csString shader;
+    csArray<ImposterShader> shaders;
 
     ImposterMat(iImposterMesh* imesh)
       : init(false), update(false),

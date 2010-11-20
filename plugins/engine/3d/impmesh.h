@@ -20,17 +20,18 @@
 #ifndef __CS_IMPMESH_H__
 #define __CS_IMPMESH_H__
 
-#include "cstool/objmodel.h"
-#include "csutil/nobjvec.h"
-#include "iengine/camera.h"
-#include "iengine/impman.h"
-#include "iengine/movable.h"
-#include "iengine/sector.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/box.h"
-#include "ivideo/rendermesh.h"
+#include "cstool/objmodel.h"
 #include "cstool/rendermeshholder.h"
+#include "csutil/nobjvec.h"
+#include "csutil/stringarray.h"
+#include "iengine/camera.h"
+#include "iengine/impman.h"
 #include "iengine/mesh.h"
+#include "iengine/movable.h"
+#include "iengine/sector.h"
+#include "ivideo/rendermesh.h"
 
 class csVector3;
 class csMatrix3;
@@ -63,8 +64,8 @@ private:
   // Sector that the imposter is in.
   iSector* sector;
 
-  // Shader to use on the imposter material.
-  csString shader;
+  // Shaders to use on the imposter material.
+  csArray<ImposterShader>& shaders;
 
   // Indicates whether we need a material update.
   bool materialUpdateNeeded;
@@ -117,7 +118,7 @@ private:
 
 public:
   csImposterMesh (csEngine* engine, iImposterFactory* fact,
-    iMeshWrapper* mesh, iRenderView* rview, const char* shader);
+    iMeshWrapper* mesh, iRenderView* rview, csArray<ImposterShader>& shaders);
   virtual ~csImposterMesh () {};
 
   ///////////////////// iImposterMesh /////////////////////

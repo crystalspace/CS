@@ -284,14 +284,18 @@ iMaterialWrapper* csImposterManager::AllocateTexture(ImposterMat* imposter,
   csRef<iMaterialWrapper> material = engine->CreateMaterial("impostermat", tex);
 
   // If a shader was specified, use it.
-  if (!imposter->shader.IsEmpty())
+  if (!imposter->shaders.IsEmpty())
   {
+    csRef<iShaderManager> shman = csQueryRegistry<iShaderManager>(engine->objectRegistry);
     csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet>(
       engine->GetObjectRegistry(), "crystalspace.shared.stringset");
-    csStringID shadertype = strings->Request("base");
-    csRef<iShaderManager> shman = csQueryRegistry<iShaderManager>(engine->objectRegistry);
-    iShader* shader = shman->GetShader(imposter->shader);
-    material->GetMaterial()->SetShader(shadertype, shader);
+
+    for (size_t s = 0; s < imposter->shaders.GetSize (); ++s)
+    {
+      iShader* shader = shman->GetShader(imposter->shaders[s].name);
+      csStringID shadertype = strings->Request(imposter->shaders[s].type);
+      material->GetMaterial()->SetShader(shadertype, shader);
+    }
   }
 
   // Create new texture space.
@@ -313,7 +317,7 @@ bool csImposterManager::InitialiseImposter(ImposterMat* imposter)
     return false;
 
   // Set material shader.
-  imposter->shader = csIMesh->shader;
+  imposter->shaders = csIMesh->shaders;
 
   // Set up camera.
   csRef<iCustomMatrixCamera> newCamera = engine->CreateCustomMatrixCamera(csIMesh->camera);

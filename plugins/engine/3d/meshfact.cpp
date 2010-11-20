@@ -251,7 +251,7 @@ void csMeshFactoryWrapper::AddImposter(iMeshWrapper* mesh, iRenderView* rview)
 {
   // Create a new imposter mesh.
   csRef<iImposterMesh> imposter = csPtr<iImposterMesh>(new csImposterMesh(engine,
-    this, mesh, rview, imposter_shader));
+    this, mesh, rview, imposter_shaders));
   imposters.Put(csPtrKey<iMeshWrapper>(mesh), imposter);
 }
 

@@ -38,7 +38,7 @@ struct iSharedVariable;
  */
 struct iImposterFactory : public virtual iBase
 {
-  SCF_INTERFACE(iImposterFactory, 1, 3, 0);
+  SCF_INTERFACE(iImposterFactory, 1, 4, 0);
 
  /**
   * Given a mesh, activate its imposter.
@@ -95,7 +95,7 @@ struct iImposterFactory : public virtual iBase
   /**
    * Sets the shader to be used by the imposters.
    */
-  virtual void SetShader(const char* shader) = 0;
+  virtual void SetShader(const char* type, const char* shader) = 0;
 
   /**
   * Sets whether to render the real mesh while waiting for the imposter to init.
@@ -116,6 +116,17 @@ struct iImposterMesh : public virtual iBase
    * Query whether the r2t has been performed for this imposter.
    */
   virtual bool Rendered() const = 0;
+};
+
+struct ImposterShader
+{
+  csString type;
+  csString name;
+
+  ImposterShader (const char* type, const char* name)
+    : type (type), name (name)
+  {
+  }
 };
 
 /** @} */

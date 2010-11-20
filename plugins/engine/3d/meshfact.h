@@ -183,7 +183,8 @@ private:
   float imposter_rotation_tolerance;
   float imposter_camera_rotation_tolerance;
 
-  csString imposter_shader;
+  // Array of shaders that are applied to the imposter material.
+  csArray<ImposterShader> imposter_shaders;
 
   // Whether to render the 'real' mesh while waiting for the imposter to init.
   bool imposter_renderReal;
@@ -395,9 +396,9 @@ public:
  /**
   * Sets the shader to be used by the imposters.
   */
-  virtual void SetShader(const char* shader)
+  virtual void SetShader(const char* type, const char* name)
   {
-    imposter_shader = shader;
+    imposter_shaders.Push (ImposterShader (type, name));
   }
 
   /**
