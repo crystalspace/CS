@@ -492,7 +492,7 @@ bool CS::Animation::BVHMocapParser::ParseAnimationFrame (iFile* file)
   CS_ALLOC_STACK_ARRAY (char, buf, bufSize);
   csString buffer;
 
-  if (!ParseLine (file, buf, bufSize - 1))
+  if (!ParseLine (file, buf, (int)bufSize - 1))
     return true;
 
   // Check if we have to add this frame

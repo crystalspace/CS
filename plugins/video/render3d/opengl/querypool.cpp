@@ -47,7 +47,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
   {
     if (queries.GetSize() > 0)
     {
-      csGLGraphics3D::ext->glDeleteQueriesARB (queries.GetSize(), queries.GetArray());
+      csGLGraphics3D::ext->glDeleteQueriesARB ((GLsizei)queries.GetSize(), queries.GetArray());
       queries.DeleteAll ();
     }
   }

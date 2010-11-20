@@ -350,7 +350,7 @@ namespace CS
 
       if (queryData->eResult == VISIBLE)
       {
-        queryData->uNextCheck += visibilityFrameSkip * nodeMeshHash.GetSize ();
+        queryData->uNextCheck += visibilityFrameSkip * (uint32)nodeMeshHash.GetSize ();
       }
 
       return queryData->eResult;
