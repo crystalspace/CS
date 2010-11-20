@@ -3494,6 +3494,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         if (!LoadAddOn (ldr_context, child, mesh, false, ssource))
           return false;
       break;
+    case XMLTOKEN_ALWAYSVISIBLE:
+      TEST_MISSING_MESH
+        if (recursive)
+          mesh->SetFlagsRecursive (CS_ENTITY_ALWAYSVISIBLE, CS_ENTITY_ALWAYSVISIBLE);
+        else
+          mesh->GetFlags ().Set (CS_ENTITY_ALWAYSVISIBLE, CS_ENTITY_ALWAYSVISIBLE);
+      break;
     case XMLTOKEN_META:
       TEST_MISSING_MESH
         if (!LoadAddOn (ldr_context, child, mesh, true, ssource))
