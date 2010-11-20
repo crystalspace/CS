@@ -43,6 +43,9 @@ using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
 // ---------------------------------------------------------------------------
 // csMeshWrapper
 // ---------------------------------------------------------------------------
+csBox3 csMeshWrapper::infBBox (-CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE,
+                               -CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE,
+                               CS_BOUNDINGBOX_MAXVALUE,CS_BOUNDINGBOX_MAXVALUE);
 
 csMeshWrapper::csMeshWrapper (csEngine* engine, iMeshObject *meshobj) 
   : scfImplementationType (this), instancing (0),

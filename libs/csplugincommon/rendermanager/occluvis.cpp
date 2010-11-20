@@ -32,27 +32,73 @@
 #include "iutil/object.h"
 #include "iengine/rview.h"
 #include "iutil/objreg.h"
+#include "ivideo/material.h"
 
 namespace CS
 {
   namespace RenderManager
   {
+    csOccluvis::NodeMeshList::NodeMeshList (AABBVisTreeNode*& node, const int& numMeshes,
+      csSectorVisibleRenderMeshes*& mL, uint framePassed,
+      bool alwaysVisible, csStringID depthWriteID)
+      : numMeshes(numMeshes), framePassed(framePassed),
+      alwaysVisible (alwaysVisible), node (node)
+    {
+      neverDraw = new bool[numMeshes];
+      meshList = new csSectorVisibleRenderMeshes[numMeshes];
+
+      for (int m = 0; m < numMeshes; ++m)
+      {
+        meshList[m] = mL[m];
+
+        // Check for 'always visible' and 'never draw' states.
+        bool bNeverDraw = false;
+        iMeshWrapper* mw = meshList[m].imesh;
+        if (mw->GetMeshObject ()->GetMaterialWrapper ())
+        {
+          iMaterial* mat = mw->GetMeshObject ()->GetMaterialWrapper ()->GetMaterial ();
+          iShader* depthShader = mat->GetShader (depthWriteID);
+          if (depthShader && !strcmp(depthShader->QueryObject ()->GetName (), "*null"))
+          {
+            bNeverDraw = true;
+
+            // If any rmesh is visible, they all are as we occlude at a greater granularity.
+            alwaysVisible = true;
+          }
+        }
+
+        neverDraw[m] = bNeverDraw;
+      }
+    }
+
     csOccluvis::csVisibilityObjectWrapper::csVisibilityObjectWrapper (csOccluvis* culler, iVisibilityObject* vis_obj)
       : scfImplementationType (this), culler (culler), vis_obj (vis_obj)
     {
-      oldBBox = vis_obj->GetMeshWrapper ()->GetWorldBoundingBox ();
+      // Recalculate the world bounding box.
+      vis_obj->GetMeshWrapper ()->GetWorldBoundingBox ();
+
+      // Get the current culling bbox.
+      oldBBox = vis_obj->GetBBox ();
     }
 
     void csOccluvis::csVisibilityObjectWrapper::ObjectModelChanged (iObjectModel* model)
     {
-      const csBox3& newBBox = vis_obj->GetMeshWrapper ()->GetWorldBoundingBox ();
+      // Recalculate the world bounding box.
+      vis_obj->GetMeshWrapper ()->GetWorldBoundingBox ();
+
+      // Get the current culling bbox.
+      const csBox3& newBBox = vis_obj->GetBBox ();
       culler->MoveObject (vis_obj, oldBBox);
       oldBBox = newBBox;
     }
 
     void csOccluvis::csVisibilityObjectWrapper::MovableChanged (iMovable* movable)
     {
-      const csBox3& newBBox = vis_obj->GetMeshWrapper ()->GetWorldBoundingBox ();
+      // Recalculate the world bounding box.
+      vis_obj->GetMeshWrapper ()->GetWorldBoundingBox ();
+
+      // Get the current culling bbox.
+      const csBox3& newBBox = vis_obj->GetBBox ();
       culler->MoveObject (vis_obj, oldBBox);
       oldBBox = newBBox;
     }
@@ -71,19 +117,56 @@ namespace CS
 
       for (int m = 0; m < nodeMeshList->numMeshes; ++m)
       {
+        // Check whether to render this RM.
+        if (nodeMeshList->neverDraw[m])
+          continue;
+
+        // Get the meshwrapper and set the zmode.
         iMeshWrapper* mw = nodeMeshList->meshList[m].imesh;
         g3d->SetZMode (mw->GetZBufMode ());
+
+        // Check for a depth shader to execute.
+        iShader* depthShader = nullptr;
+        if (mw->GetMeshObject ()->GetMaterialWrapper ())
+        {
+          iMaterial* mat = mw->GetMeshObject ()->GetMaterialWrapper ()->GetMaterial ();
+          depthShader = mat->GetShader (depthwriteID);
+        }
 
         for (int i = 0; i < nodeMeshList->meshList[m].num; ++i)
         {
           csRenderMesh* rm = nodeMeshList->meshList[m].rmeshes[i];
           if(!rm->portal)
           {
-            csVertexAttrib vA = CS_VATTRIB_POSITION;
-            iRenderBuffer *rB = rm->buffers->GetRenderBuffer (CS_BUFFER_POSITION);
-            g3d->ActivateBuffers (&vA, &rB, 1);
-            g3d->DrawMeshBasic (rm, *rm);
-            g3d->DeactivateBuffers (&vA, 1);
+            if (!depthShader)
+            {
+              // Render 'unshaded'.
+              csVertexAttrib vA = CS_VATTRIB_POSITION;
+              iRenderBuffer *rB = rm->buffers->GetRenderBuffer (CS_BUFFER_POSITION);
+              g3d->ActivateBuffers (&vA, &rB, 1);
+              g3d->DrawMeshBasic (rm, *rm);
+              g3d->DeactivateBuffers (&vA, 1);
+            }
+            else
+            {
+              // Render with a depthwrite shader.
+              csShaderVariableStack& svStack = shaderMgr->GetShaderVariableStack ();
+              size_t ticket = depthShader->GetTicket (*rm, svStack);
+
+              const size_t numPasses = depthShader->GetNumberOfPasses (ticket);
+              for (size_t p = 0; p < numPasses; ++p)
+              {
+                if (!depthShader->ActivatePass (ticket, p)) continue;
+
+                csRenderMeshModes modes (*rm);
+                if (!depthShader->SetupPass (ticket, rm, modes, svStack)) continue;
+
+                g3d->DrawMesh (rm, modes, svStack);
+
+                depthShader->TeardownPass (ticket);
+                depthShader->DeactivatePass (ticket);
+              }
+            }
           }
           else
           {
@@ -202,7 +285,8 @@ namespace CS
             if (!meshes.IsValid ())
             {
               meshes.AttachNew (new NodeMeshList (node, numMeshes, sectorMeshList,
-                engine->GetCurrentFrameNumber (), visobj->GetMeshWrapper ()->GetFlags ().Check (CS_ENTITY_ALWAYSVISIBLE)));
+                engine->GetCurrentFrameNumber (), visobj->GetMeshWrapper ()->GetFlags ().Check (CS_ENTITY_ALWAYSVISIBLE),
+                depthwriteID));
               visobjMeshHash.Put (visobj, meshes);
             }
             else
@@ -218,6 +302,21 @@ namespace CS
               for (int m = 0; m < numMeshes; ++m)
               {
                 meshes->meshList[m] = sectorMeshList[m];
+
+                // Check for 'always visible' and 'never draw' states.
+                iMeshWrapper* mw = meshes->meshList[m].imesh;
+                if (mw->GetMeshObject ()->GetMaterialWrapper ())
+                {
+                  iMaterial* mat = mw->GetMeshObject ()->GetMaterialWrapper ()->GetMaterial ();
+                  iShader* depthShader = mat->GetShader (depthwriteID);
+                  if (depthShader && !strcmp(depthShader->QueryObject ()->GetName (), "*null"))
+                  {
+                    meshes->neverDraw[m] = true;
+
+                    // If any rmesh is visible, they all are as we occlude at a greater granularity.
+                    meshes->alwaysVisible = true;
+                  }
+                }
               }
             }
 
@@ -297,6 +396,9 @@ namespace CS
     {
       g3d = csQueryRegistry<iGraphics3D> (object_reg);
       engine = csQueryRegistry<iEngine> (object_reg);
+      shaderMgr = csQueryRegistry<iShaderManager> (object_reg);
+      stringSet = csQueryRegistryTagInterface<iStringSet> (
+        object_reg, "crystalspace.shared.stringset");
 
       bAllVisible = false;
     }
@@ -433,6 +535,9 @@ namespace CS
       f2bData.viscallback = viscallback;
       f2bData.frustum = ctxt->clip_planes;
       f2bData.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
+
+      // Doing this in the ctor doesn't work for some reason.
+      depthwriteID = stringSet->Request ("depthwrite");
 
       /**
        * If the 'all visible' flag is set, render everything without any culling.

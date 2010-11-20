@@ -232,6 +232,9 @@ private:
   iCamera* last_camera;
   uint last_frame_number;
 
+  // An infinite bounding box.
+  static csBox3 infBBox;
+
   // Data used when instancing is used on this mesh
   struct InstancingData
   {
@@ -353,7 +356,14 @@ public:
   virtual csFlags& GetCullerFlags () { return culler_flags; }
 
   // For iVisibilityObject:
-  virtual const csBox3& GetBBox () const { return wor_bbox; }
+  virtual const csBox3& GetBBox () const
+  {
+    // 'Always visible' mesh objects have an infinite bounding box.
+    if (flags.Check (CS_ENTITY_ALWAYSVISIBLE))
+      return infBBox;
+
+    return wor_bbox;
+  }
 
   /**
    * Get the movable instance for this object.

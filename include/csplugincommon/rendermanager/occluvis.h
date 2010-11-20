@@ -169,6 +169,8 @@ namespace CS
       iObjectRegistry *object_reg;
       csRef<iGraphics3D> g3d;
       csRef<iEngine> engine;
+      csRef<iShaderManager> shaderMgr;
+      csRef<iStringSet> stringSet;
 
       // Structure of common f2b data.
       struct Front2BackData
@@ -183,25 +185,17 @@ namespace CS
       {
         NodeMeshList (AABBVisTreeNode*& node, const int& numMeshes,
                       csSectorVisibleRenderMeshes*& mL, uint framePassed,
-                      bool alwaysVisible)
-          : numMeshes(numMeshes), framePassed(framePassed),
-            alwaysVisible (alwaysVisible), node (node)
-        {
-          meshList = new csSectorVisibleRenderMeshes[numMeshes];
-
-          for (int m = 0; m < numMeshes; ++m)
-          {
-            meshList[m] = mL[m];
-          }
-        }
+                      bool alwaysVisible, csStringID depthWriteID);
 
         ~NodeMeshList ()
         {
           delete[] meshList;
+          delete[] neverDraw;
         }
 
         int numMeshes;
         uint framePassed;
+        bool* neverDraw;
         bool alwaysVisible;
         AABBVisTreeNode* node;
         csSectorVisibleRenderMeshes* meshList;
@@ -251,6 +245,9 @@ namespace CS
       // Vector of vistest objects (used in the box/sphere/etc. tests).
       VistestObjectsArray vistest_objects;
       bool vistest_objects_inuse;
+
+      // Depthwrite shader type ID.
+      csStringID depthwriteID;
 
       friend class F2BSorter;
 
