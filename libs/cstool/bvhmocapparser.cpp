@@ -489,7 +489,7 @@ bool CS::Animation::BVHMocapParser::ParseAnimationFrame (iFile* file)
   const float degree2radian = 3.1415927f / 180.0f;
 
   size_t bufSize = totalChannelCount * 20;
-  char buf[bufSize];
+  CS_ALLOC_STACK_ARRAY (char, buf, bufSize);
   csString buffer;
 
   if (!ParseLine (file, buf, bufSize - 1))
