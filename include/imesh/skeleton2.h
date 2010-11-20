@@ -61,7 +61,7 @@ struct iSkeletonAnimPacket;
 
 
 /// Identifier for single bone data
-typedef unsigned int BoneID;
+typedef size_t BoneID;
 
 /// ID for an invalid bone
 static const BoneID InvalidBoneID = (BoneID)~0;
