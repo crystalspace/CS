@@ -240,6 +240,8 @@ namespace lighter
     // Name
     csString meshName;
 
+    csString materialName;
+
     /// Whether to light mesh per vertex
     bool lightPerVertex;
     

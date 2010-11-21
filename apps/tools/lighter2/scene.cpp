@@ -25,12 +25,23 @@
 #include "object_genmesh.h"
 #include "object_terrain2.h"
 
+#include "photonmap.h"
+#include "irradiancecache.h"
+
 #include <functional>
 
 using namespace CS;
 
 namespace lighter
 {
+  Sector::~Sector()
+  {
+    delete kdTree;
+    if (photonMap != NULL)
+    {
+      delete photonMap;
+    }
+  }
 
   void Sector::Initialize (Statistics::Progress& progress)
   {
@@ -92,6 +103,167 @@ namespace lighter
     ObjectHash::GlobalIterator objIt = allObjects.GetIterator ();
     KDTreeBuilder builder;
     kdTree = builder.BuildTree (objIt, progress);
+  }
+
+  void Sector::InitPhotonMap()
+  { 
+    if(photonMap == NULL)
+    {
+      photonMap = new PhotonMap(
+        2 * globalConfig.GetIndirectProperties ().numPhotons);
+    }
+  }
+
+  void Sector::InitCausticPhotonMap()
+  { 
+    if(causticPhotonMap == NULL)
+    {
+      causticPhotonMap = new PhotonMap(
+        2 * globalConfig.GetIndirectProperties().numCausticPhotons);
+    }
+  }
+
+  void Sector::AddPhoton(const csColor power, const csVector3 pos,
+    const csVector3 dir )
+  {
+    if(photonMap == NULL)
+    {
+      photonMap = new PhotonMap(
+        2 * globalConfig.GetIndirectProperties ().numPhotons);
+    }
+
+    const float fPower[3] = { power.red, power.green, power.blue };
+    const float fPos[3] = { pos.x, pos.y, pos.z };
+    const float fDir[3] = { dir.x, dir.y, dir.z };
+
+    photonMap->Store(fPower, fPos, fDir);
+  }
+
+  void Sector::AddCausticPhoton(const csColor power, const csVector3 pos,
+    const csVector3 dir )
+  {
+    if(causticPhotonMap == NULL)
+    {
+      causticPhotonMap = new PhotonMap(
+        2 * globalConfig.GetIndirectProperties ().numCausticPhotons);
+    }
+
+    const float fPower[3] = { power.red, power.green, power.blue };
+    const float fPos[3] = { pos.x, pos.y, pos.z };
+    const float fDir[3] = { dir.x, dir.y, dir.z };
+
+    causticPhotonMap->Store(fPower, fPos, fDir);
+  }
+
+  void Sector::ScalePhotons(const float scale)
+  {
+    if(photonMap != NULL) photonMap->ScalePhotonPower(scale);
+  }
+
+  void Sector::ScaleCausticPhotons(const float scale)
+  {
+    if(causticPhotonMap != NULL) causticPhotonMap->ScalePhotonPower(scale);
+  }
+
+  size_t Sector::GetPhotonCount()
+  {
+	size_t photonCount = 0;
+    if(photonMap != NULL) photonCount += photonMap->GetPhotonCount();
+	if(causticPhotonMap != NULL) photonCount += causticPhotonMap->GetPhotonCount();
+    return photonCount;
+  }
+
+  void Sector::BalancePhotons(Statistics::ProgressState& prog)
+  {
+    if(photonMap != NULL)
+    {
+      // First, initialize the irradiance cache
+      if(irradianceCache != NULL) delete irradianceCache;
+      irradianceCache = new IrradianceCache(
+        photonMap->GetBBoxMin(), photonMap->GetBBoxMax(), 1000);
+
+      // Balance the photons
+      photonMap->Balance(prog);
+    }
+    if(causticPhotonMap != NULL)
+    {
+      causticPhotonMap->Balance(prog);
+    }    
+  }
+
+  bool Sector::SampleIRCache(const csVector3 point, const csVector3 normal,
+                    csColor &irrad)
+  {
+    if(irradianceCache == NULL) return false;
+
+    // Check cache to see if we can reuse old results
+    float* result = new float[3];
+    float fPos[3] = { point.x, point.y, point.z };
+    float fNorm[3] = { normal.x, normal.y, normal.z };
+    
+    if(irradianceCache->EstimateIrradiance(fPos, fNorm, result))
+    {
+      irrad.Set(result[0], result[1], result[2]);
+      delete [] result;
+      return true;
+    }
+
+    return false;
+  }
+
+  csColor Sector::SamplePhoton(const csVector3 point, const csVector3 normal,
+                    const float searchRad)
+  {
+    if(photonMap == NULL) return csColor(0, 0, 0);
+
+    // Local copy of the global options
+    const static size_t densitySamples =
+      globalConfig.GetIndirectProperties ().maxDensitySamples;
+
+    // Sample the photon map
+    float result[3] = {0, 0, 0};
+    float fPos[3] = { point.x, point.y, point.z };
+    float fNorm[3] = { normal.x, normal.y, normal.z };
+    photonMap->IrradianceEstimate(result, fPos, fNorm, searchRad, densitySamples);
+    
+    if (causticPhotonMap != NULL)
+    {
+      float causticIrradiance[3] = {0,0,0};
+      causticPhotonMap->IrradianceEstimate(causticIrradiance,fPos,fNorm,searchRad,densitySamples);
+      result [0] += causticIrradiance[0];
+      result [1] += causticIrradiance[1];
+      result [2] += causticIrradiance[2];
+    }
+    
+    // Return result as a csColor
+    return csColor(result[0], result[1], result[2]);
+  }
+
+  void Sector::AddToIRCache(const csVector3 point, const csVector3 normal,
+                      const csColor irrad, const float mean)
+  {
+    float fPow[3] = { irrad.red, irrad.green, irrad.blue };
+    float fPos[3] = { point.x, point.y, point.z };
+    float fNorm[3] = { normal.x, normal.y, normal.z };
+
+    // Add sample to the irradiance cache for reuse
+    if(irradianceCache == NULL)
+    {
+      irradianceCache = new IrradianceCache(
+        photonMap->GetBBoxMin(), photonMap->GetBBoxMax(), 1000);
+    }
+
+    irradianceCache->Store(fPos, fNorm, fPow, mean);
+  }
+
+  void Sector::SavePhotonMap(const char* filename)
+  {
+    if(photonMap != NULL) photonMap->SaveToFile(filename);
+  }
+
+  void Sector::SaveCausticPhotonMap(const char* filename)
+  {
+    if(causticPhotonMap != NULL) causticPhotonMap->SaveToFile(filename);
   }
 
   //-------------------------------------------------------------------------
@@ -741,6 +913,8 @@ namespace lighter
     csRef<iDocumentNode> worldNode = 
       fileInfo->GetDocument()->GetRoot()->GetNode ("world");
 
+    globalStats.scene.numSectors = sectorList->GetCount ();
+
     if (worldNode.IsValid ())
     {
       csRef<iDocumentNodeIterator> sectorNodeIt = 
@@ -852,6 +1026,7 @@ namespace lighter
 
     // Parse all meshes (should have selector later!)
     iMeshList *meshList = sector->GetMeshes ();
+    globalStats.scene.numObjects += meshList->GetCount ();
 
     u = updateFreq = progress.GetUpdateFrequency (meshList->GetCount ());
     progressStep = updateFreq * (1.0f / meshList->GetCount ());
@@ -880,6 +1055,8 @@ namespace lighter
     csSet<csString> lightNames;
     // Parse all lights (should have selector later!)
     iLightList *lightList = sector->GetLights ();
+    globalStats.scene.numLights = lightList->GetCount ();
+
     for (int i = lightList->GetCount (); i-- > 0;)
     {
       iLight *light = lightList->Get (i);
@@ -901,6 +1078,19 @@ namespace lighter
       lightNames.AddNoTest (lightName);
 
       bool isPD = light->GetDynamicType() == CS_LIGHT_DYNAMICTYPE_PSEUDO;
+
+      // Force to realistic attenuation if requested
+      if(globalConfig.GetLighterProperties ().forceRealistic)
+      {
+        light->SetAttenuationMode( CS_ATTN_REALISTIC );
+      }
+
+      // Scale light power to help avoid dark scenes when forcing realistic att
+      if(globalConfig.GetLighterProperties ().lightPowerScale != 1.0)
+      {
+        light->SetColor( light->GetColor()*
+          globalConfig.GetLighterProperties ().lightPowerScale);
+      }
 
       // IneQuation was here
       csRef<Light> intLight;
@@ -960,6 +1150,7 @@ namespace lighter
 
       intLight->SetAttenuation (light->GetAttenuationMode (),
         light->GetAttenuationConstants ());
+
       intLight->SetPDLight (isPD);
       intLight->SetLightID (light->GetLightID());
       intLight->SetName (lightName);
@@ -1134,6 +1325,11 @@ namespace lighter
     obj->ParseMesh (mesh);
     obj->StripLightmaps (fileInfo->texturesToClean);
 
+    // Save material name in Object
+    iMeshObject * meshObject = mesh->GetMeshObject();
+    iMaterialWrapper * material = meshObject->GetMaterialWrapper();
+    obj->materialName = material->QueryObject()->GetName();
+
     // Save it
     sector->allObjects.Put (obj->meshName, obj);
 
@@ -1186,8 +1382,9 @@ namespace lighter
   {
     RadMaterial radMat;
     
-    // No material properties from key-value-pairs yet
-#if 0
+    // Material properties from key-value-pairs
+    // Right now the only key value pair used is for caustics
+
     csRef<iObjectIterator> objiter = 
       material->QueryObject ()->GetIterator();
     while (objiter->HasNext())
@@ -1197,14 +1394,29 @@ namespace lighter
         scfQueryInterface<iKeyValuePair> (obj);
       if (kvp.IsValid() && (strcmp (kvp->GetKey(), "lighter2") == 0))
       {
+        if(strcmp (kvp->GetValue(),"produce caustic")==0)
+        {
+          radMat.produceCaustic=true;
+        }
       }
     }
-#endif
+
     
     csRef<iShaderVariableContext> matSVC = 
       scfQueryInterface<iShaderVariableContext> (material->GetMaterial());
     csRef<csShaderVariable> svTex =
       matSVC->GetVariable (globalLighter->svStrings->Request ("tex diffuse"));
+    
+    //Try to extract refractive index of the material if given used for caustics in photon mapping
+    csRef<csShaderVariable> svRefrIndex =
+      matSVC->GetVariable (globalLighter->svStrings->Request ("refractive index"));
+    //If it is present store it in the radMat structure so that it can be used later
+    if(svRefrIndex.IsValid())
+    {
+      float refrIndex = 0.0f;
+      svRefrIndex->GetValue(refrIndex);
+      radMat.SetRefractiveIndex(refrIndex);
+    }
     if (svTex.IsValid())
     {
       iTextureWrapper* texwrap = 0;
@@ -1212,15 +1424,16 @@ namespace lighter
       if (texwrap != 0)
       {
         iImage* teximg = texwrap->GetImageFile ();
+        radMat.SetTextureImage(teximg);
         if (teximg != 0)
         {
           if (teximg->GetFormat() & CS_IMGFMT_ALPHA)
-            radMat.ComputeFilterImage (teximg);
+			radMat.ComputeFilterImage (teximg);
         }
       }
     }
-    
-    radMaterials.Put (material->QueryObject()->GetName(), radMat);
+    const char * objName = material->QueryObject()->GetName();
+    radMaterials.Put (objName, radMat);
     return true;
   }
 
@@ -2450,7 +2663,8 @@ namespace lighter
   
   void Scene::LightingPostProcessor::ApplyAmbient (Lightmap* lightmap)
   {
-    //if (!<indirect lighting enabled>)
+    if (globalConfig.GetLighterProperties ().indirectLightEngine == LIGHT_ENGINE_NONE &&
+        globalConfig.GetLighterProperties ().globalAmbient)
     {
       csColor amb;
       globalLighter->engine->GetAmbientLight (amb);
@@ -2460,7 +2674,8 @@ namespace lighter
 
   void Scene::LightingPostProcessor::ApplyAmbient (csColor* colors, size_t numColors)
   {
-    //if (!<indirect lighting enabled>)
+    if (globalConfig.GetLighterProperties ().indirectLightEngine == LIGHT_ENGINE_NONE &&
+        globalConfig.GetLighterProperties ().globalAmbient)
     {
       csColor amb;
       globalLighter->engine->GetAmbientLight (amb);
