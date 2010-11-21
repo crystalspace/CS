@@ -133,7 +133,9 @@ Condition="'$(Configuration)|$(Platform)'=='[% build.name %][% mutator.namesuffi
     <IgnoreImportLibrary [% condition_build_mutator_platform %]>true</IgnoreImportLibrary>
 [% END %]
 [% MACRO PropertiesDirsAndIncremental_dll BLOCK -%]
-[% PropertiesDirsAndIncremental_target_default -%]
+    <TargetName [% condition_build_mutator_platform %]>[% my.doc.target.0.split('\.').0 %]</TargetName>
+    <TargetExt [% condition_build_mutator_platform %]>.[% my.doc.target.0.split('\.').1 %]</TargetExt>
+    <IgnoreImportLibrary [% condition_build_mutator_platform %]>true</IgnoreImportLibrary>
 [% END %]
 
 
