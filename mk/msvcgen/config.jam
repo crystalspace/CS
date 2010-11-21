@@ -36,6 +36,8 @@
 3DS.DEFINES = LIB3DS_GENERIC_DATA_IO_CALLBACKS ;
 3DS.LIBS = lib3ds.lib ;
 BULLET.AVAILABLE = yes ;
+BULLET.CFLAGS.X86 = [ FIncludes "../../winlibs/x86/include/bullet" ] ;
+BULLET.CFLAGS.X64 = [ FIncludes "../../winlibs/x64/include/bullet" ] ;
 BULLET.LIBS.8 = bulletsoftbody-vc8.lib bulletcollision-vc8.lib bulletdynamics-vc8.lib bulletmath-vc8.lib ;
 BULLET.LIBS.DEBUG.8 = bulletsoftbody-vc8_d.lib bulletcollision-vc8_d.lib bulletdynamics-vc8_d.lib bulletmath-vc8_d.lib ;
 BULLET.LIBS.9 = bulletsoftbody-vc9.lib bulletcollision-vc9.lib bulletdynamics-vc9.lib bulletmath-vc9.lib ;
