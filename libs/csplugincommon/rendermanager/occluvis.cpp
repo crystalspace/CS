@@ -29,8 +29,8 @@
 #include "iengine/mesh.h"
 #include "iengine/portal.h"
 #include "iengine/portalcontainer.h"
-#include "iutil/object.h"
 #include "iengine/rview.h"
+#include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "ivideo/material.h"
 
@@ -136,6 +136,12 @@ namespace CS
         for (int i = 0; i < nodeMeshList->meshList[m].num; ++i)
         {
           csRenderMesh* rm = nodeMeshList->meshList[m].rmeshes[i];
+
+          // Disable the alpha test.
+          CS::Graphics::RenderMeshModes modes (*rm);
+          modes.mixmode &= ~CS_MIXMODE_ALPHATEST_MASK;
+          modes.mixmode |= CS_MIXMODE_ALPHATEST_DISABLE;
+
           if(!rm->portal)
           {
             if (!depthShader)
@@ -144,21 +150,19 @@ namespace CS
               csVertexAttrib vA = CS_VATTRIB_POSITION;
               iRenderBuffer *rB = rm->buffers->GetRenderBuffer (CS_BUFFER_POSITION);
               g3d->ActivateBuffers (&vA, &rB, 1);
-              g3d->DrawMeshBasic (rm, *rm);
+              g3d->DrawMeshBasic (rm, modes);
               g3d->DeactivateBuffers (&vA, 1);
             }
             else
             {
               // Render with a depthwrite shader.
               csShaderVariableStack& svStack = shaderMgr->GetShaderVariableStack ();
-              size_t ticket = depthShader->GetTicket (*rm, svStack);
+              size_t ticket = depthShader->GetTicket (modes, svStack);
 
               const size_t numPasses = depthShader->GetNumberOfPasses (ticket);
               for (size_t p = 0; p < numPasses; ++p)
               {
                 if (!depthShader->ActivatePass (ticket, p)) continue;
-
-                csRenderMeshModes modes (*rm);
                 if (!depthShader->SetupPass (ticket, rm, modes, svStack)) continue;
 
                 g3d->DrawMesh (rm, modes, svStack);
@@ -216,6 +220,8 @@ namespace CS
               pViscullRM->object2world = rview->GetCamera()->GetTransform();
               pViscullRM->indexstart = 0;
               pViscullRM->indexend = uint (count);
+              pViscullRM->mixmode &= ~CS_MIXMODE_ALPHATEST_MASK;
+              pViscullRM->mixmode |= CS_MIXMODE_ALPHATEST_DISABLE;
 
               csVertexAttrib vA = CS_VATTRIB_POSITION;
               iRenderBuffer *rB = pViscullRM->buffers->GetRenderBuffer (CS_BUFFER_POSITION);
