@@ -2586,7 +2586,7 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_char swig_types[63]
 #define SWIGTYPE_p_csArrayCapacityFixedGrowT_16_t swig_types[64]
 #define SWIGTYPE_p_csArrayCapacityVariableGrow swig_types[65]
-#define SWIGTYPE_p_csArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t swig_types[66]
+#define SWIGTYPE_p_csArrayT_size_t_csArrayElementHandlerT_size_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t swig_types[66]
 #define SWIGTYPE_p_csColliderGeometryType swig_types[67]
 #define SWIGTYPE_p_csConfigFile swig_types[68]
 #define SWIGTYPE_p_csMatrix3 swig_types[69]
@@ -2676,15 +2676,16 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_scfImplementation1T_csConfigFile_iConfigFile_t swig_types[153]
 #define SWIGTYPE_p_scfImplementation1T_csObject_iObject_t swig_types[154]
 #define SWIGTYPE_p_scfImplementationExt1T_csPath_csObject_iPath_t swig_types[155]
-#define SWIGTYPE_p_uint16_t swig_types[156]
-#define SWIGTYPE_p_uint32_t swig_types[157]
-#define SWIGTYPE_p_uint64_t swig_types[158]
-#define SWIGTYPE_p_uint8_t swig_types[159]
-#define SWIGTYPE_p_unsigned_int swig_types[160]
-#define SWIGTYPE_p_unsigned_long swig_types[161]
-#define SWIGTYPE_p_unsigned_long_long swig_types[162]
-static swig_type_info *swig_types[164];
-static swig_module_info swig_module = {swig_types, 163, 0, 0, 0, 0};
+#define SWIGTYPE_p_size_t swig_types[156]
+#define SWIGTYPE_p_uint16_t swig_types[157]
+#define SWIGTYPE_p_uint32_t swig_types[158]
+#define SWIGTYPE_p_uint64_t swig_types[159]
+#define SWIGTYPE_p_uint8_t swig_types[160]
+#define SWIGTYPE_p_unsigned_int swig_types[161]
+#define SWIGTYPE_p_unsigned_long swig_types[162]
+#define SWIGTYPE_p_unsigned_long_long swig_types[163]
+static swig_type_info *swig_types[165];
+static swig_module_info swig_module = {swig_types, 164, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -2838,9 +2839,9 @@ SWIG_From_unsigned_SS_long  (unsigned long value)
 
 
 SWIGINTERNINLINE PyObject *
-SWIG_From_unsigned_SS_int  (unsigned int value)
+SWIG_From_size_t  (size_t value)
 {    
-  return SWIG_From_unsigned_SS_long  (value);
+  return SWIG_From_unsigned_SS_long  (static_cast< unsigned long >(value));
 }
 
 
@@ -2920,16 +2921,6 @@ SWIG_From_int  (int value)
 }
 
 SWIGINTERN void delete_CS_Animation_iSkeletonManager(CS::Animation::iSkeletonManager *self){ if (self) self->DecRef (); }
-
-#include <limits.h>
-#if !defined(SWIG_NO_LLONG_MAX)
-# if !defined(LLONG_MAX) && defined(__GNUC__) && defined (__LONG_LONG_MAX__)
-#   define LLONG_MAX __LONG_LONG_MAX__
-#   define LLONG_MIN (-LLONG_MAX - 1LL)
-#   define ULLONG_MAX (LLONG_MAX * 2ULL + 1ULL)
-# endif
-#endif
-
 
 SWIGINTERN int
 SWIG_AsVal_double (PyObject *obj, double *val)
@@ -3055,18 +3046,12 @@ SWIG_AsVal_unsigned_SS_long (PyObject *obj, unsigned long *val)
 }
 
 
-SWIGINTERN int
-SWIG_AsVal_unsigned_SS_int (PyObject * obj, unsigned int *val)
+SWIGINTERNINLINE int
+SWIG_AsVal_size_t (PyObject * obj, size_t *val)
 {
   unsigned long v;
-  int res = SWIG_AsVal_unsigned_SS_long (obj, &v);
-  if (SWIG_IsOK(res)) {
-    if ((v > UINT_MAX)) {
-      return SWIG_OverflowError;
-    } else {
-      if (val) *val = static_cast< unsigned int >(v);
-    }
-  }  
+  int res = SWIG_AsVal_unsigned_SS_long (obj, val ? &v : 0);
+  if (SWIG_IsOK(res) && val) *val = static_cast< size_t >(v);
   return res;
 }
 
@@ -3169,25 +3154,15 @@ SWIG_AsVal_float (PyObject * obj, float *val)
   return res;
 }
 
-SWIGINTERN int CS_Animation_iSkeleton_scfGetVersion(){ return scfInterfaceTraits<iSkeleton>::GetVersion(); }
-SWIGINTERN void delete_CS_Animation_iSkeleton(CS::Animation::iSkeleton *self){ if (self) self->DecRef (); }
-
-SWIGINTERNINLINE int
-SWIG_AsVal_size_t (PyObject * obj, size_t *val)
-{
-  unsigned long v;
-  int res = SWIG_AsVal_unsigned_SS_long (obj, val ? &v : 0);
-  if (SWIG_IsOK(res) && val) *val = static_cast< size_t >(v);
-  return res;
-}
-
 
 SWIGINTERNINLINE PyObject *
-SWIG_From_size_t  (size_t value)
+SWIG_From_unsigned_SS_int  (unsigned int value)
 {    
-  return SWIG_From_unsigned_SS_long  (static_cast< unsigned long >(value));
+  return SWIG_From_unsigned_SS_long  (value);
 }
 
+SWIGINTERN int CS_Animation_iSkeleton_scfGetVersion(){ return scfInterfaceTraits<iSkeleton>::GetVersion(); }
+SWIGINTERN void delete_CS_Animation_iSkeleton(CS::Animation::iSkeleton *self){ if (self) self->DecRef (); }
 SWIGINTERN int CS_Animation_iBodyManager_scfGetVersion(){ return scfInterfaceTraits<iBodyManager>::GetVersion(); }
 SWIGINTERN void delete_CS_Animation_iBodyManager(CS::Animation::iBodyManager *self){ if (self) self->DecRef (); }
 SWIGINTERN int CS_Animation_iBodySkeleton_scfGetVersion(){ return scfInterfaceTraits<iBodySkeleton>::GetVersion(); }
@@ -3218,6 +3193,32 @@ SWIGINTERN int CS_Animation_iSkeletonAnimPacketFactory_scfGetVersion(){ return s
 SWIGINTERN void delete_CS_Animation_iSkeletonAnimPacketFactory(CS::Animation::iSkeletonAnimPacketFactory *self){ if (self) self->DecRef (); }
 SWIGINTERN int CS_Animation_iSkeletonAnimPacket_scfGetVersion(){ return scfInterfaceTraits<iSkeletonAnimPacket>::GetVersion(); }
 SWIGINTERN void delete_CS_Animation_iSkeletonAnimPacket(CS::Animation::iSkeletonAnimPacket *self){ if (self) self->DecRef (); }
+
+#include <limits.h>
+#if !defined(SWIG_NO_LLONG_MAX)
+# if !defined(LLONG_MAX) && defined(__GNUC__) && defined (__LONG_LONG_MAX__)
+#   define LLONG_MAX __LONG_LONG_MAX__
+#   define LLONG_MIN (-LLONG_MAX - 1LL)
+#   define ULLONG_MAX (LLONG_MAX * 2ULL + 1ULL)
+# endif
+#endif
+
+
+SWIGINTERN int
+SWIG_AsVal_unsigned_SS_int (PyObject * obj, unsigned int *val)
+{
+  unsigned long v;
+  int res = SWIG_AsVal_unsigned_SS_long (obj, &v);
+  if (SWIG_IsOK(res)) {
+    if ((v > UINT_MAX)) {
+      return SWIG_OverflowError;
+    } else {
+      if (val) *val = static_cast< unsigned int >(v);
+    }
+  }  
+  return res;
+}
+
 SWIGINTERN int CS_Animation_iSkeletonAnimation_scfGetVersion(){ return scfInterfaceTraits<iSkeletonAnimation>::GetVersion(); }
 SWIGINTERN void delete_CS_Animation_iSkeletonAnimation(CS::Animation::iSkeletonAnimation *self){ if (self) self->DecRef (); }
 SWIGINTERN int CS_Animation_iSkeletonAnimNodeFactory_scfGetVersion(){ return scfInterfaceTraits<iSkeletonAnimNodeFactory>::GetVersion(); }
@@ -3336,7 +3337,7 @@ SWIGINTERN int Swig_var_InvalidBoneID_set(PyObject *) {
 SWIGINTERN PyObject *Swig_var_InvalidBoneID_get(void) {
   PyObject *pyobj = 0;
   
-  pyobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(CS::Animation::InvalidBoneID));
+  pyobj = SWIG_From_size_t(static_cast< size_t >(CS::Animation::InvalidBoneID));
   return pyobj;
 }
 
@@ -3587,7 +3588,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_CreateBone__SWIG_0(PyObject *SWIGUNU
   CS::Animation::BoneID arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -3599,13 +3600,13 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_CreateBone__SWIG_0(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_CreateBone" "', argument " "1"" of type '" "CS::Animation::iSkeletonFactory *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeletonFactory * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonFactory_CreateBone" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
   arg2 = static_cast< CS::Animation::BoneID >(val2);
-  result = (CS::Animation::BoneID)(arg1)->CreateBone(arg2);
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  result = (arg1)->CreateBone(arg2);
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   return resultobj;
 fail:
   return NULL;
@@ -3626,8 +3627,8 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_CreateBone__SWIG_1(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_CreateBone" "', argument " "1"" of type '" "CS::Animation::iSkeletonFactory *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeletonFactory * >(argp1);
-  result = (CS::Animation::BoneID)(arg1)->CreateBone();
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  result = (arg1)->CreateBone();
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   return resultobj;
 fail:
   return NULL;
@@ -3660,7 +3661,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_CreateBone(PyObject *self, PyObject 
     _v = SWIG_CheckState(res);
     if (_v) {
       {
-        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
         _v = SWIG_CheckState(res);
       }
       if (_v) {
@@ -3702,8 +3703,8 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_FindBone(PyObject *SWIGUNUSEDPARM(se
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSkeletonFactory_FindBone" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (CS::Animation::BoneID)((CS::Animation::iSkeletonFactory const *)arg1)->FindBone((char const *)arg2);
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  result = ((CS::Animation::iSkeletonFactory const *)arg1)->FindBone((char const *)arg2);
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
 fail:
@@ -3718,7 +3719,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_RemoveBone(PyObject *SWIGUNUSEDPARM(
   CS::Animation::BoneID arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -3729,7 +3730,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_RemoveBone(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_RemoveBone" "', argument " "1"" of type '" "CS::Animation::iSkeletonFactory *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeletonFactory * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonFactory_RemoveBone" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -3748,7 +3749,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_GetBoneParent(PyObject *SWIGUNUSEDPA
   CS::Animation::BoneID arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -3760,13 +3761,13 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_GetBoneParent(PyObject *SWIGUNUSEDPA
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_GetBoneParent" "', argument " "1"" of type '" "CS::Animation::iSkeletonFactory const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeletonFactory * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonFactory_GetBoneParent" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
   arg2 = static_cast< CS::Animation::BoneID >(val2);
-  result = (CS::Animation::BoneID)((CS::Animation::iSkeletonFactory const *)arg1)->GetBoneParent(arg2);
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  result = ((CS::Animation::iSkeletonFactory const *)arg1)->GetBoneParent(arg2);
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   return resultobj;
 fail:
   return NULL;
@@ -3779,7 +3780,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_HasBone(PyObject *SWIGUNUSEDPARM(sel
   CS::Animation::BoneID arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -3791,7 +3792,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_HasBone(PyObject *SWIGUNUSEDPARM(sel
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_HasBone" "', argument " "1"" of type '" "CS::Animation::iSkeletonFactory const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeletonFactory * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonFactory_HasBone" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -3811,7 +3812,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_SetBoneName(PyObject *SWIGUNUSEDPARM
   char *arg3 = (char *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   int res3 ;
   char *buf3 = 0 ;
@@ -3826,7 +3827,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_SetBoneName(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_SetBoneName" "', argument " "1"" of type '" "CS::Animation::iSkeletonFactory *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeletonFactory * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonFactory_SetBoneName" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -3852,7 +3853,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_GetBoneName(PyObject *SWIGUNUSEDPARM
   CS::Animation::BoneID arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -3864,7 +3865,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_GetBoneName(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_GetBoneName" "', argument " "1"" of type '" "CS::Animation::iSkeletonFactory const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeletonFactory * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonFactory_GetBoneName" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -3891,8 +3892,8 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_GetTopBoneID(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_GetTopBoneID" "', argument " "1"" of type '" "CS::Animation::iSkeletonFactory const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeletonFactory * >(argp1);
-  result = (CS::Animation::BoneID)((CS::Animation::iSkeletonFactory const *)arg1)->GetTopBoneID();
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  result = ((CS::Animation::iSkeletonFactory const *)arg1)->GetTopBoneID();
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   return resultobj;
 fail:
   return NULL;
@@ -3907,7 +3908,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_GetTransformBoneSpace(PyObject *SWIG
   csVector3 *arg4 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
@@ -3924,7 +3925,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_GetTransformBoneSpace(PyObject *SWIG
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_GetTransformBoneSpace" "', argument " "1"" of type '" "CS::Animation::iSkeletonFactory const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeletonFactory * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonFactory_GetTransformBoneSpace" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -3961,7 +3962,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_SetTransformBoneSpace(PyObject *SWIG
   csVector3 *arg4 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
@@ -3978,7 +3979,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_SetTransformBoneSpace(PyObject *SWIG
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_SetTransformBoneSpace" "', argument " "1"" of type '" "CS::Animation::iSkeletonFactory *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeletonFactory * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonFactory_SetTransformBoneSpace" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -4015,7 +4016,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_GetTransformAbsSpace(PyObject *SWIGU
   csVector3 *arg4 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
@@ -4032,7 +4033,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_GetTransformAbsSpace(PyObject *SWIGU
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_GetTransformAbsSpace" "', argument " "1"" of type '" "CS::Animation::iSkeletonFactory const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeletonFactory * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonFactory_GetTransformAbsSpace" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -4069,7 +4070,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_SetTransformAbsSpace(PyObject *SWIGU
   csVector3 *arg4 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
@@ -4086,7 +4087,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_SetTransformAbsSpace(PyObject *SWIGU
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_SetTransformAbsSpace" "', argument " "1"" of type '" "CS::Animation::iSkeletonFactory *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeletonFactory * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonFactory_SetTransformAbsSpace" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -4284,7 +4285,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory_GetBoneOrderList(PyObject *SWIGUNUSE
     csArray< CS::Animation::BoneID > const &_result_ref = (arg1)->GetBoneOrderList();
     result = (csArray< CS::Animation::BoneID > *) &_result_ref;
   }
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csArrayT_size_t_csArrayElementHandlerT_size_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -4362,7 +4363,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_GetTransformBoneSpace(PyObject *SWIGUNUSEDP
   csVector3 *arg4 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
@@ -4379,7 +4380,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_GetTransformBoneSpace(PyObject *SWIGUNUSEDP
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_GetTransformBoneSpace" "', argument " "1"" of type '" "CS::Animation::iSkeleton const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeleton * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeleton_GetTransformBoneSpace" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -4416,7 +4417,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_SetTransformBoneSpace(PyObject *SWIGUNUSEDP
   csVector3 *arg4 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
@@ -4433,7 +4434,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_SetTransformBoneSpace(PyObject *SWIGUNUSEDP
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_SetTransformBoneSpace" "', argument " "1"" of type '" "CS::Animation::iSkeleton *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeleton * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeleton_SetTransformBoneSpace" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -4470,7 +4471,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_GetTransformAbsSpace(PyObject *SWIGUNUSEDPA
   csVector3 *arg4 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
@@ -4487,7 +4488,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_GetTransformAbsSpace(PyObject *SWIGUNUSEDPA
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_GetTransformAbsSpace" "', argument " "1"" of type '" "CS::Animation::iSkeleton const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeleton * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeleton_GetTransformAbsSpace" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -4524,7 +4525,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_SetTransformAbsSpace(PyObject *SWIGUNUSEDPA
   csVector3 *arg4 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
@@ -4541,7 +4542,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_SetTransformAbsSpace(PyObject *SWIGUNUSEDPA
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_SetTransformAbsSpace" "', argument " "1"" of type '" "CS::Animation::iSkeleton *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeleton * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeleton_SetTransformAbsSpace" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -4578,7 +4579,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_GetTransformBindSpace(PyObject *SWIGUNUSEDP
   csVector3 *arg4 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
@@ -4595,7 +4596,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_GetTransformBindSpace(PyObject *SWIGUNUSEDP
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_GetTransformBindSpace" "', argument " "1"" of type '" "CS::Animation::iSkeleton const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeleton * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeleton_GetTransformBindSpace" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -4632,7 +4633,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_SetTransformBindSpace(PyObject *SWIGUNUSEDP
   csVector3 *arg4 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
@@ -4649,7 +4650,7 @@ SWIGINTERN PyObject *_wrap_iSkeleton_SetTransformBindSpace(PyObject *SWIGUNUSEDP
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeleton_SetTransformBindSpace" "', argument " "1"" of type '" "CS::Animation::iSkeleton *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeleton * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeleton_SetTransformBindSpace" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -5281,7 +5282,7 @@ SWIGINTERN PyObject *_wrap_csSkeletalState_IsBoneUsed(PyObject *SWIGUNUSEDPARM(s
   CS::Animation::BoneID arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -5293,7 +5294,7 @@ SWIGINTERN PyObject *_wrap_csSkeletalState_IsBoneUsed(PyObject *SWIGUNUSEDPARM(s
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSkeletalState_IsBoneUsed" "', argument " "1"" of type '" "CS::Animation::csSkeletalState const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::csSkeletalState * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csSkeletalState_IsBoneUsed" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -5312,7 +5313,7 @@ SWIGINTERN PyObject *_wrap_csSkeletalState_SetBoneUsed(PyObject *SWIGUNUSEDPARM(
   CS::Animation::BoneID arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -5323,7 +5324,7 @@ SWIGINTERN PyObject *_wrap_csSkeletalState_SetBoneUsed(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSkeletalState_SetBoneUsed" "', argument " "1"" of type '" "CS::Animation::csSkeletalState *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::csSkeletalState * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csSkeletalState_SetBoneUsed" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -5605,7 +5606,7 @@ SWIGINTERN PyObject *_wrap_iBodySkeleton_CreateBodyBone(PyObject *SWIGUNUSEDPARM
   CS::Animation::BoneID arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -5617,7 +5618,7 @@ SWIGINTERN PyObject *_wrap_iBodySkeleton_CreateBodyBone(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodySkeleton_CreateBodyBone" "', argument " "1"" of type '" "CS::Animation::iBodySkeleton *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodySkeleton * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iBodySkeleton_CreateBodyBone" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -5695,7 +5696,7 @@ SWIGINTERN PyObject *_wrap_iBodySkeleton_CreateBodyChain(PyObject *SWIGUNUSEDPAR
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  unsigned int val3 ;
+  size_t val3 ;
   int ecode3 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -5713,7 +5714,7 @@ SWIGINTERN PyObject *_wrap_iBodySkeleton_CreateBodyChain(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iBodySkeleton_CreateBodyChain" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_unsigned_SS_int(obj2, &val3);
+  ecode3 = SWIG_AsVal_size_t(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iBodySkeleton_CreateBodyChain" "', argument " "3"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -5789,7 +5790,7 @@ SWIGINTERN PyObject *_wrap_iBodySkeleton_FindBodyBone__SWIG_1(PyObject *SWIGUNUS
   CS::Animation::BoneID arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -5801,7 +5802,7 @@ SWIGINTERN PyObject *_wrap_iBodySkeleton_FindBodyBone__SWIG_1(PyObject *SWIGUNUS
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodySkeleton_FindBodyBone" "', argument " "1"" of type '" "CS::Animation::iBodySkeleton const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodySkeleton * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iBodySkeleton_FindBodyBone" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -5831,7 +5832,7 @@ SWIGINTERN PyObject *_wrap_iBodySkeleton_FindBodyBone(PyObject *self, PyObject *
     _v = SWIG_CheckState(res);
     if (_v) {
       {
-        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
         _v = SWIG_CheckState(res);
       }
       if (_v) {
@@ -5917,8 +5918,8 @@ SWIGINTERN PyObject *_wrap_iBodyBone_GetAnimeshBone(PyObject *SWIGUNUSEDPARM(sel
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyBone_GetAnimeshBone" "', argument " "1"" of type '" "CS::Animation::iBodyBone const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyBone * >(argp1);
-  result = (CS::Animation::BoneID)((CS::Animation::iBodyBone const *)arg1)->GetAnimeshBone();
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  result = ((CS::Animation::iBodyBone const *)arg1)->GetAnimeshBone();
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   return resultobj;
 fail:
   return NULL;
@@ -6201,7 +6202,7 @@ SWIGINTERN PyObject *_wrap_iBodyChain_AddSubChain(PyObject *SWIGUNUSEDPARM(self)
   CS::Animation::BoneID arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -6213,7 +6214,7 @@ SWIGINTERN PyObject *_wrap_iBodyChain_AddSubChain(PyObject *SWIGUNUSEDPARM(self)
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyChain_AddSubChain" "', argument " "1"" of type '" "CS::Animation::iBodyChain *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyChain * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iBodyChain_AddSubChain" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -6324,8 +6325,8 @@ SWIGINTERN PyObject *_wrap_iBodyChainNode_GetAnimeshBone(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyChainNode_GetAnimeshBone" "', argument " "1"" of type '" "CS::Animation::iBodyChainNode const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyChainNode * >(argp1);
-  result = (CS::Animation::BoneID)((CS::Animation::iBodyChainNode const *)arg1)->GetAnimeshBone();
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  result = ((CS::Animation::iBodyChainNode const *)arg1)->GetAnimeshBone();
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   return resultobj;
 fail:
   return NULL;
@@ -6413,7 +6414,7 @@ SWIGINTERN PyObject *_wrap_iBodyChainNode_FindSubChild(PyObject *SWIGUNUSEDPARM(
   CS::Animation::BoneID arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -6425,7 +6426,7 @@ SWIGINTERN PyObject *_wrap_iBodyChainNode_FindSubChild(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iBodyChainNode_FindSubChild" "', argument " "1"" of type '" "CS::Animation::iBodyChainNode const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iBodyChainNode * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iBodyChainNode_FindSubChild" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -8725,7 +8726,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_AddChannel(PyObject *SWIGUNUSEDPAR
   CS::Animation::BoneID arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -8737,7 +8738,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_AddChannel(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation_AddChannel" "', argument " "1"" of type '" "CS::Animation::iSkeletonAnimation *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeletonAnimation * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonAnimation_AddChannel" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -8756,7 +8757,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_FindChannel(PyObject *SWIGUNUSEDPA
   CS::Animation::BoneID arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -8768,7 +8769,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_FindChannel(PyObject *SWIGUNUSEDPA
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation_FindChannel" "', argument " "1"" of type '" "CS::Animation::iSkeletonAnimation const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeletonAnimation * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonAnimation_FindChannel" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -8922,7 +8923,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_GetKeyFrame(PyObject *SWIGUNUSEDPA
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iSkeletonAnimation_GetKeyFrame" "', argument " "3"" of type '" "CS::Animation::KeyFrameID""'");
   } 
   arg3 = static_cast< CS::Animation::KeyFrameID >(val3);
-  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_unsigned_int,  0 );
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_size_t,  0 );
   if (!SWIG_IsOK(res4)) {
     SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iSkeletonAnimation_GetKeyFrame" "', argument " "4"" of type '" "CS::Animation::BoneID &""'"); 
   }
@@ -9021,7 +9022,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_GetTwoKeyFrames(PyObject *SWIGUNUS
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iSkeletonAnimation_GetTwoKeyFrames" "', argument " "3"" of type '" "float""'");
   } 
   arg3 = static_cast< float >(val3);
-  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_unsigned_int,  0 );
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_size_t,  0 );
   if (!SWIG_IsOK(res4)) {
     SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iSkeletonAnimation_GetTwoKeyFrames" "', argument " "4"" of type '" "CS::Animation::BoneID &""'"); 
   }
@@ -9324,8 +9325,8 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_GetChannelBone(PyObject *SWIGUNUSE
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonAnimation_GetChannelBone" "', argument " "2"" of type '" "CS::Animation::ChannelID""'");
   } 
   arg2 = static_cast< CS::Animation::ChannelID >(val2);
-  result = (CS::Animation::BoneID)((CS::Animation::iSkeletonAnimation const *)arg1)->GetChannelBone(arg2);
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  result = ((CS::Animation::iSkeletonAnimation const *)arg1)->GetChannelBone(arg2);
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   return resultobj;
 fail:
   return NULL;
@@ -9341,7 +9342,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_SetChannelBone(PyObject *SWIGUNUSE
   int res1 = 0 ;
   unsigned int val2 ;
   int ecode2 = 0 ;
-  unsigned int val3 ;
+  size_t val3 ;
   int ecode3 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -9358,7 +9359,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimation_SetChannelBone(PyObject *SWIGUNUSE
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonAnimation_SetChannelBone" "', argument " "2"" of type '" "CS::Animation::ChannelID""'");
   } 
   arg2 = static_cast< CS::Animation::ChannelID >(val2);
-  ecode3 = SWIG_AsVal_unsigned_SS_int(obj2, &val3);
+  ecode3 = SWIG_AsVal_size_t(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iSkeletonAnimation_SetChannelBone" "', argument " "3"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -12449,7 +12450,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonIKNodeFactory_AddEffector(PyObject *SWIGUNUS
   int res1 = 0 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
-  unsigned int val3 ;
+  size_t val3 ;
   int ecode3 = 0 ;
   void *argp4 = 0 ;
   int res4 = 0 ;
@@ -12470,7 +12471,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonIKNodeFactory_AddEffector(PyObject *SWIGUNUS
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSkeletonIKNodeFactory_AddEffector" "', argument " "2"" of type '" "CS::Animation::iBodyChain *""'"); 
   }
   arg2 = reinterpret_cast< CS::Animation::iBodyChain * >(argp2);
-  ecode3 = SWIG_AsVal_unsigned_SS_int(obj2, &val3);
+  ecode3 = SWIG_AsVal_size_t(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iSkeletonIKNodeFactory_AddEffector" "', argument " "3"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -13627,7 +13628,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonLookAtNode_SetBone(PyObject *SWIGUNUSEDPARM(
   CS::Animation::BoneID arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -13638,7 +13639,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonLookAtNode_SetBone(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonLookAtNode_SetBone" "', argument " "1"" of type '" "CS::Animation::iSkeletonLookAtNode *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeletonLookAtNode * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonLookAtNode_SetBone" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -14673,7 +14674,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonRagdollNode_GetBoneRigidBody(PyObject *SWIGU
   CS::Animation::BoneID arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -14685,7 +14686,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonRagdollNode_GetBoneRigidBody(PyObject *SWIGU
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonRagdollNode_GetBoneRigidBody" "', argument " "1"" of type '" "CS::Animation::iSkeletonRagdollNode *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeletonRagdollNode * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonRagdollNode_GetBoneRigidBody" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -14704,7 +14705,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonRagdollNode_GetBoneJoint(PyObject *SWIGUNUSE
   CS::Animation::BoneID arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  size_t val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -14716,7 +14717,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonRagdollNode_GetBoneJoint(PyObject *SWIGUNUSE
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonRagdollNode_GetBoneJoint" "', argument " "1"" of type '" "CS::Animation::iSkeletonRagdollNode *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeletonRagdollNode * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonRagdollNode_GetBoneJoint" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
   } 
@@ -14792,8 +14793,8 @@ SWIGINTERN PyObject *_wrap_iSkeletonRagdollNode_GetBone(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iSkeletonRagdollNode_GetBone" "', argument " "3"" of type '" "uint""'");
   } 
   arg3 = static_cast< uint >(val3);
-  result = (CS::Animation::BoneID)((CS::Animation::iSkeletonRagdollNode const *)arg1)->GetBone(arg2,arg3);
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  result = ((CS::Animation::iSkeletonRagdollNode const *)arg1)->GetBone(arg2,arg3);
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   return resultobj;
 fail:
   return NULL;
@@ -14853,8 +14854,8 @@ SWIGINTERN PyObject *_wrap_iSkeletonRagdollNode_GetRigidBodyBone(PyObject *SWIGU
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSkeletonRagdollNode_GetRigidBodyBone" "', argument " "2"" of type '" "iRigidBody *""'"); 
   }
   arg2 = reinterpret_cast< iRigidBody * >(argp2);
-  result = (CS::Animation::BoneID)((CS::Animation::iSkeletonRagdollNode const *)arg1)->GetRigidBodyBone(arg2);
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  result = ((CS::Animation::iSkeletonRagdollNode const *)arg1)->GetRigidBodyBone(arg2);
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   return resultobj;
 fail:
   return NULL;
@@ -16070,7 +16071,7 @@ static swig_type_info _swigt__p__csMouseEventType = {"_p__csMouseEventType", "en
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csArrayCapacityFixedGrowT_16_t = {"_p_csArrayCapacityFixedGrowT_16_t", "CS::Container::ArrayCapacityDefault *|csArrayCapacityFixedGrow< 16 > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csArrayCapacityVariableGrow = {"_p_csArrayCapacityVariableGrow", "csArrayCapacityDefault *|csArrayCapacityVariableGrow *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t = {"_p_csArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t", "csArray< CS::Animation::BoneID > *|csArray< unsigned int,csArrayElementHandler< unsigned int >,CS::Container::ArrayAllocDefault,CS::Container::ArrayCapacityDefault > *|csArray< unsigned int > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_csArrayT_size_t_csArrayElementHandlerT_size_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t = {"_p_csArrayT_size_t_csArrayElementHandlerT_size_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t", "csArray< CS::Animation::BoneID > *|csArray< size_t > *|csArray< size_t,csArrayElementHandler< size_t >,CS::Container::ArrayAllocDefault,CS::Container::ArrayCapacityDefault > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csColliderGeometryType = {"_p_csColliderGeometryType", "csColliderGeometryType *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csMatrix3 = {"_p_csMatrix3", "csMatrix3 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csOrthoTransform = {"_p_csOrthoTransform", "csOrthoTransform *", 0, 0, (void*)0, 0};
@@ -16160,11 +16161,12 @@ static swig_type_info _swigt__p_int64_t = {"_p_int64_t", "int64_t *|int64 *", 0,
 static swig_type_info _swigt__p_int8_t = {"_p_int8_t", "int8 *|int8_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_long_long = {"_p_long_long", "longlong *|long long *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_iMeshWrapper = {"_p_p_iMeshWrapper", "iMeshWrapper **", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_size_t = {"_p_size_t", "size_t *|CS::Animation::BoneID *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint16_t = {"_p_uint16_t", "uint16 *|uint16_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint32_t = {"_p_uint32_t", "uint32_t *|uint32 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint64_t = {"_p_uint64_t", "uint64_t *|uint64 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint8_t = {"_p_uint8_t", "uint8 *|uint8_t *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_unsigned_int = {"_p_unsigned_int", "CS::StringIDValue *|unsigned int *|uint *|CS::Animation::ChannelID *|CS::Animation::StateID *|CS::Animation::KeyFrameID *|CS::Animation::EffectorID *|csTicks *|CS::Animation::BoneID *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_unsigned_int = {"_p_unsigned_int", "CS::StringIDValue *|unsigned int *|uint *|CS::Animation::ChannelID *|CS::Animation::StateID *|CS::Animation::KeyFrameID *|CS::Animation::EffectorID *|csTicks *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_long = {"_p_unsigned_long", "unsigned long *|scfInterfaceID *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_long_long = {"_p_unsigned_long_long", "ulonglong *|unsigned long long *", 0, 0, (void*)0, 0};
 
@@ -16235,7 +16237,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_char,
   &_swigt__p_csArrayCapacityFixedGrowT_16_t,
   &_swigt__p_csArrayCapacityVariableGrow,
-  &_swigt__p_csArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
+  &_swigt__p_csArrayT_size_t_csArrayElementHandlerT_size_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
   &_swigt__p_csColliderGeometryType,
   &_swigt__p_csConfigFile,
   &_swigt__p_csMatrix3,
@@ -16325,6 +16327,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_scfImplementation1T_csConfigFile_iConfigFile_t,
   &_swigt__p_scfImplementation1T_csObject_iObject_t,
   &_swigt__p_scfImplementationExt1T_csPath_csObject_iPath_t,
+  &_swigt__p_size_t,
   &_swigt__p_uint16_t,
   &_swigt__p_uint32_t,
   &_swigt__p_uint64_t,
@@ -16400,7 +16403,7 @@ static swig_cast_info _swigc__p__csMouseEventType[] = {  {&_swigt__p__csMouseEve
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csArrayCapacityFixedGrowT_16_t[] = {  {&_swigt__p_csArrayCapacityFixedGrowT_16_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csArrayCapacityVariableGrow[] = {  {&_swigt__p_csArrayCapacityVariableGrow, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t[] = {  {&_swigt__p_csArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csArrayT_size_t_csArrayElementHandlerT_size_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t[] = {  {&_swigt__p_csArrayT_size_t_csArrayElementHandlerT_size_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csColliderGeometryType[] = {  {&_swigt__p_csColliderGeometryType, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csMatrix3[] = {  {&_swigt__p_csMatrix3, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csOrthoTransform[] = {  {&_swigt__p_csOrthoTransform, 0, 0, 0},{0, 0, 0, 0}};
@@ -16490,6 +16493,7 @@ static swig_cast_info _swigc__p_int64_t[] = {  {&_swigt__p_int64_t, 0, 0, 0},{0,
 static swig_cast_info _swigc__p_int8_t[] = {  {&_swigt__p_int8_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_long_long[] = {  {&_swigt__p_long_long, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_iMeshWrapper[] = {  {&_swigt__p_p_iMeshWrapper, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_size_t[] = {  {&_swigt__p_size_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint16_t[] = {  {&_swigt__p_uint16_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint32_t[] = {  {&_swigt__p_uint32_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint64_t[] = {  {&_swigt__p_uint64_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -16565,7 +16569,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_char,
   _swigc__p_csArrayCapacityFixedGrowT_16_t,
   _swigc__p_csArrayCapacityVariableGrow,
-  _swigc__p_csArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
+  _swigc__p_csArrayT_size_t_csArrayElementHandlerT_size_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
   _swigc__p_csColliderGeometryType,
   _swigc__p_csConfigFile,
   _swigc__p_csMatrix3,
@@ -16655,6 +16659,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_scfImplementation1T_csConfigFile_iConfigFile_t,
   _swigc__p_scfImplementation1T_csObject_iObject_t,
   _swigc__p_scfImplementationExt1T_csPath_csObject_iPath_t,
+  _swigc__p_size_t,
   _swigc__p_uint16_t,
   _swigc__p_uint32_t,
   _swigc__p_uint64_t,
