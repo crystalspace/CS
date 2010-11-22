@@ -117,7 +117,9 @@ namespace CS
             depthShader = mat->GetShader (depthwriteID);
           }
 
-          // Disable the alpha test.
+          // Disable the alpha test (since alpha test disables fast GPU depth writing paths).
+          // If the alpha mode is smooth, ztest must be set on the mesh.
+          // If the alpha mode is binary, the *null depthwrite shader must be used.
           CS::Graphics::RenderMeshModes modes (*rm);
           modes.mixmode &= ~CS_MIXMODE_ALPHATEST_MASK;
           modes.mixmode |= CS_MIXMODE_ALPHATEST_DISABLE;
