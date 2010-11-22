@@ -61,9 +61,6 @@ namespace CS
           if (depthShader && !strcmp(depthShader->QueryObject ()->GetName (), "*null"))
           {
             bNeverDraw = true;
-
-            // If any rmesh is visible, they all are as we occlude at a greater granularity.
-            alwaysVisible = true;
           }
         }
 
@@ -117,13 +114,18 @@ namespace CS
 
       for (int m = 0; m < nodeMeshList->numMeshes; ++m)
       {
-        // Check whether to render this RM.
-        if (nodeMeshList->neverDraw[m])
-          continue;
-
         // Get the meshwrapper and set the zmode.
         iMeshWrapper* mw = nodeMeshList->meshList[m].imesh;
-        g3d->SetZMode (mw->GetZBufMode ());
+        
+		// Check whether to draw this RM to the z-buffer or just test against it.
+		if (nodeMeshList->neverDraw[m])
+		{
+			g3d->SetZMode (CS_ZBUF_TEST);
+		}
+		else
+		{
+			g3d->SetZMode (mw->GetZBufMode ());
+		}
 
         // Check for a depth shader to execute.
         iShader* depthShader = nullptr;
@@ -318,9 +320,6 @@ namespace CS
                   if (depthShader && !strcmp(depthShader->QueryObject ()->GetName (), "*null"))
                   {
                     meshes->neverDraw[m] = true;
-
-                    // If any rmesh is visible, they all are as we occlude at a greater granularity.
-                    meshes->alwaysVisible = true;
                   }
                 }
               }
