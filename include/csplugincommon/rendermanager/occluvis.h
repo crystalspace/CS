@@ -183,19 +183,19 @@ namespace CS
 
       struct NodeMeshList : public csRefCount
       {
-        NodeMeshList (AABBVisTreeNode*& node, const int& numMeshes,
-                      csSectorVisibleRenderMeshes*& mL, uint framePassed,
-                      bool alwaysVisible, csStringID depthWriteID);
+        NodeMeshList () : drawToZ (nullptr), meshList (nullptr)
+        {
+        }
 
         ~NodeMeshList ()
         {
           delete[] meshList;
-          delete[] neverDraw;
+          delete[] drawToZ;
         }
 
         int numMeshes;
         uint framePassed;
-        bool* neverDraw;
+        bool* drawToZ;
         bool alwaysVisible;
         AABBVisTreeNode* node;
         csSectorVisibleRenderMeshes* meshList;

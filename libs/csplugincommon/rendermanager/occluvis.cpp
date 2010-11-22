@@ -38,36 +38,6 @@ namespace CS
 {
   namespace RenderManager
   {
-    csOccluvis::NodeMeshList::NodeMeshList (AABBVisTreeNode*& node, const int& numMeshes,
-      csSectorVisibleRenderMeshes*& mL, uint framePassed,
-      bool alwaysVisible, csStringID depthWriteID)
-      : numMeshes(numMeshes), framePassed(framePassed),
-      alwaysVisible (alwaysVisible), node (node)
-    {
-      neverDraw = new bool[numMeshes];
-      meshList = new csSectorVisibleRenderMeshes[numMeshes];
-
-      for (int m = 0; m < numMeshes; ++m)
-      {
-        meshList[m] = mL[m];
-
-        // Check for 'always visible' and 'never draw' states.
-        bool bNeverDraw = false;
-        iMeshWrapper* mw = meshList[m].imesh;
-        if (mw->GetMeshObject ()->GetMaterialWrapper ())
-        {
-          iMaterial* mat = mw->GetMeshObject ()->GetMaterialWrapper ()->GetMaterial ();
-          iShader* depthShader = mat->GetShader (depthWriteID);
-          if (depthShader && !strcmp(depthShader->QueryObject ()->GetName (), "*null"))
-          {
-            bNeverDraw = true;
-          }
-        }
-
-        neverDraw[m] = bNeverDraw;
-      }
-    }
-
     csOccluvis::csVisibilityObjectWrapper::csVisibilityObjectWrapper (csOccluvis* culler, iVisibilityObject* vis_obj)
       : scfImplementationType (this), culler (culler), vis_obj (vis_obj)
     {
@@ -112,32 +82,40 @@ namespace CS
         BeginNodeQuery (node, rview);
       }
 
+      // Save the current zmode.
+      csZBufMode oldZMode = g3d->GetZMode ();
+
+      // We will check whether or not to draw each render mesh to the z-buffer.
+      bool* pDrawToZ = nodeMeshList->drawToZ;
+
       for (int m = 0; m < nodeMeshList->numMeshes; ++m)
       {
-        // Get the meshwrapper and set the zmode.
-        iMeshWrapper* mw = nodeMeshList->meshList[m].imesh;
-        
-		// Check whether to draw this RM to the z-buffer or just test against it.
-		if (nodeMeshList->neverDraw[m])
-		{
-			g3d->SetZMode (CS_ZBUF_TEST);
-		}
-		else
-		{
-			g3d->SetZMode (mw->GetZBufMode ());
-		}
-
-        // Check for a depth shader to execute.
-        iShader* depthShader = nullptr;
-        if (mw->GetMeshObject ()->GetMaterialWrapper ())
-        {
-          iMaterial* mat = mw->GetMeshObject ()->GetMaterialWrapper ()->GetMaterial ();
-          depthShader = mat->GetShader (depthwriteID);
-        }
-
-        for (int i = 0; i < nodeMeshList->meshList[m].num; ++i)
+        for (int i = 0; i < nodeMeshList->meshList[m].num; ++i, ++pDrawToZ)
         {
           csRenderMesh* rm = nodeMeshList->meshList[m].rmeshes[i];
+
+          // Check whether to draw this RM to the z-buffer or just test against it.
+          if (bQueryVisibility)
+          {
+            g3d->SetZMode (*pDrawToZ ? CS_ZBUF_USE : CS_ZBUF_TEST);
+          }
+          else
+          {
+            // If we're not testing or writing, skip.
+            if (!*pDrawToZ)
+              continue;
+
+            // Writing only.
+            g3d->SetZMode (CS_ZBUF_FILL);
+          }
+
+          // Check for a depth shader to execute.
+          iShader* depthShader = nullptr;
+          if (rm->material)
+          {
+            iMaterial* mat = rm->material->GetMaterial ();
+            depthShader = mat->GetShader (depthwriteID);
+          }
 
           // Disable the alpha test.
           CS::Graphics::RenderMeshModes modes (*rm);
@@ -237,6 +215,9 @@ namespace CS
         }
       }
 
+      // Restore the zmode.
+      g3d->SetZMode (oldZMode);
+
       if (bQueryVisibility)
       {
         g3d->OQEndQuery ();
@@ -292,36 +273,83 @@ namespace CS
             csRef<NodeMeshList> meshes = visobjMeshHash.Get (csPtrKey<iVisibilityObject> (visobj), csRef<NodeMeshList> ());
             if (!meshes.IsValid ())
             {
-              meshes.AttachNew (new NodeMeshList (node, numMeshes, sectorMeshList,
-                engine->GetCurrentFrameNumber (), visobj->GetMeshWrapper ()->GetFlags ().Check (CS_ENTITY_ALWAYSVISIBLE),
-                depthwriteID));
+              meshes.AttachNew (new NodeMeshList ());
               visobjMeshHash.Put (visobj, meshes);
             }
-            else
+
+            // Update the meshes data.
+            meshes->node = node;
+            meshes->numMeshes = numMeshes;
+            meshes->framePassed = engine->GetCurrentFrameNumber ();
+
+            delete[] meshes->meshList;
+            meshes->meshList = new csSectorVisibleRenderMeshes[numMeshes];
+
+            // We will store per-rendermesh data.
+            size_t numRenderMeshes = 0;
+            for (int i = 0; i < numMeshes; ++i)
+              numRenderMeshes += sectorMeshList[i].num;
+
+            delete[] meshes->drawToZ;
+            meshes->drawToZ = new bool[numRenderMeshes];
+
+            // Check for the 'always visible' state.
+            switch (visobj->GetMeshWrapper ()->GetZBufMode ())
             {
-              meshes->node = node;
-              meshes->numMeshes = numMeshes;
-              meshes->alwaysVisible = visobj->GetMeshWrapper ()->GetFlags ().Check (CS_ENTITY_ALWAYSVISIBLE);
-              meshes->framePassed = engine->GetCurrentFrameNumber ();
-
-              delete[] meshes->meshList;
-              meshes->meshList = new csSectorVisibleRenderMeshes[numMeshes];
-
-              for (int m = 0; m < numMeshes; ++m)
+            case CS_ZBUF_NONE:
+            case CS_ZBUF_INVERT:
+            case CS_ZBUF_FILL:
               {
-                meshes->meshList[m] = sectorMeshList[m];
+                meshes->alwaysVisible = true;
+                break;
+              }
+            default:
+              {
+                meshes->alwaysVisible = visobj->GetMeshWrapper ()->GetFlags ().Check (CS_ENTITY_ALWAYSVISIBLE);
+                break;
+              }
+            }
 
-                // Check for 'always visible' and 'never draw' states.
-                iMeshWrapper* mw = meshes->meshList[m].imesh;
-                if (mw->GetMeshObject ()->GetMaterialWrapper ())
+            // Check for a mesh 'never draw' state.
+            bool bNeverDrawAny = false;
+            switch (visobj->GetMeshWrapper ()->GetZBufMode ())
+            {
+            case CS_ZBUF_NONE:
+            case CS_ZBUF_INVERT:
+            case CS_ZBUF_TEST:
+            case CS_ZBUF_EQUAL:
+              {
+                bNeverDrawAny = true;
+                break;
+              }
+            default:
+              break;
+            }
+
+            // Check the 'never draw' state of each render mesh.
+            bool* pDrawToZ = meshes->drawToZ;
+            for (int m = 0; m < numMeshes; ++m)
+            {
+              meshes->meshList[m] = sectorMeshList[m];
+
+              // For each render mesh; check if the depthwrite shader is *null - don't draw to z.
+              for (int r = 0; r < sectorMeshList[m].num; ++r, ++pDrawToZ)
+              {
+                bool bDrawToZ = !bNeverDrawAny;
+                if (bDrawToZ)
                 {
-                  iMaterial* mat = mw->GetMeshObject ()->GetMaterialWrapper ()->GetMaterial ();
-                  iShader* depthShader = mat->GetShader (depthwriteID);
-                  if (depthShader && !strcmp(depthShader->QueryObject ()->GetName (), "*null"))
+                  if (sectorMeshList[m].rmeshes[r]->material)
                   {
-                    meshes->neverDraw[m] = true;
+                    iMaterial* mat = sectorMeshList[m].rmeshes[r]->material->GetMaterial ();
+                    iShader* depthShader = mat->GetShader (depthwriteID);
+                    if (depthShader == shaderMgr->GetShader ("*null"))
+                    {
+                      bDrawToZ = false;
+                    }
                   }
                 }
+
+                *pDrawToZ = bDrawToZ;
               }
             }
 
