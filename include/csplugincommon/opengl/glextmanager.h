@@ -10836,22 +10836,6 @@ typedef GLvoid (csAPIENTRY* csGLSTRINGMARKERGREMEDY) (GLsizei len, const GLvoid*
 #define GL_SAMPLES_PASSED_ARB                                        0x8914
 #endif
 
-#ifndef GL_QUERY_COUNTER_BITS_ARB
-#define GL_QUERY_COUNTER_BITS_ARB                                    0x8864
-#endif
-
-#ifndef GL_CURRENT_QUERY_ARB
-#define GL_CURRENT_QUERY_ARB                                         0x8865
-#endif
-
-#ifndef GL_QUERY_RESULT_ARB
-#define GL_QUERY_RESULT_ARB                                          0x8866
-#endif
-
-#ifndef GL_QUERY_RESULT_AVAILABLE_ARB
-#define GL_QUERY_RESULT_AVAILABLE_ARB                                0x8867
-#endif
-
 
 /** @} */
 
@@ -24614,14 +24598,6 @@ public:
     allclear = true;
     if (init)	// Don't check the functions if ext isn't reported anyway
     {
-      EXTMGR_FUNC_INIT(glGenQueriesARB, GLGENQUERIESARB);
-      EXTMGR_FUNC_INIT(glDeleteQueriesARB, GLDELETEQUERIESARB);
-      EXTMGR_FUNC_INIT(glIsQueryARB, GLISQUERYARB);
-      EXTMGR_FUNC_INIT(glBeginQueryARB, GLBEGINQUERYARB);
-      EXTMGR_FUNC_INIT(glEndQueryARB, GLENDQUERYARB);
-      EXTMGR_FUNC_INIT(glGetQueryivARB, GLGETQUERYIVARB);
-      EXTMGR_FUNC_INIT(glGetQueryObjectivARB, GLGETQUERYOBJECTIVARB);
-      EXTMGR_FUNC_INIT(glGetQueryObjectuivARB, GLGETQUERYOBJECTUIVARB);
 
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_occlusion_query)
     }
@@ -24639,7 +24615,12 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_occlusion_query2 = true;
     const char* ext = "GL_ARB_occlusion_query2";
-
+    InitQueries();
+    if (!CS_Queries)
+    {
+      Report (msgDependencyNotFound, "GL", ext, "Queries");
+      return;
+    }
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
