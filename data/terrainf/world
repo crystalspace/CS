@@ -61,15 +61,6 @@
         <shader>
             <file>/shader/lighting/fullbright.xml</file>
         </shader>
-        <shader>
-            <file>/shader/lighting/fullbright_instance.xml</file>
-        </shader>
-        <shader>
-            <file>/shader/lighting/lighting_default_instance.xml</file>
-        </shader>
-        <shader>
-            <file>/shader/lighting/lighting_default_instance_binalpha.xml</file>
-        </shader>
     </shaders>
     <materials>
         <material name="ScatterSky">
@@ -117,9 +108,6 @@
     <library>tree_skimp.lib</library>
     <library>treebark_bare.lib</library>
     <library>bush2.lib</library>
-    <settings>
-        <clearzbuf>yes</clearzbuf>
-    </settings>
     <start>
         <sector>room</sector>
         <position x="0" y="30" z="0" />

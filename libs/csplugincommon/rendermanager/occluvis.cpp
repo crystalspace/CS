@@ -85,28 +85,27 @@ namespace CS
       // Save the current zmode.
       csZBufMode oldZMode = g3d->GetZMode ();
 
-      // We will check whether or not to draw each render mesh to the z-buffer.
-      bool* pDrawToZ = nodeMeshList->drawToZ;
-
-      for (int m = 0; m < nodeMeshList->numMeshes; ++m)
+      for (int iCurrRenderMesh = 0, m = 0; m < nodeMeshList->numMeshes; ++m)
       {
-        for (int i = 0; i < nodeMeshList->meshList[m].num; ++i, ++pDrawToZ)
+        iMeshWrapper* mw = nodeMeshList->meshList[m].imesh;
+
+        for (int i = 0; i < nodeMeshList->meshList[m].num; ++i, ++iCurrRenderMesh)
         {
           csRenderMesh* rm = nodeMeshList->meshList[m].rmeshes[i];
 
           // Check whether to draw this RM to the z-buffer or just test against it.
           if (bQueryVisibility)
           {
-            g3d->SetZMode (*pDrawToZ ? CS_ZBUF_USE : CS_ZBUF_TEST);
+            g3d->SetZMode (nodeMeshList->onlyTestZ[iCurrRenderMesh] ? CS_ZBUF_TEST : CS_ZBUF_USE);
           }
           else
           {
-            // If we're not testing or writing, skip.
-            if (!*pDrawToZ)
+            // If we're not writing, skip.
+            if (nodeMeshList->onlyTestZ[iCurrRenderMesh])
               continue;
 
-            // Writing only.
-            g3d->SetZMode (CS_ZBUF_FILL);
+            // Else test against and write to the z-buffer.
+            g3d->SetZMode (CS_ZBUF_USE);
           }
 
           // Check for a depth shader to execute.
@@ -114,7 +113,15 @@ namespace CS
           if (rm->material)
           {
             iMaterial* mat = rm->material->GetMaterial ();
-            depthShader = mat->GetShader (depthwriteID);
+
+            if (nodeMeshList->onlyTestZ[iCurrRenderMesh])
+            {
+              depthShader = mat->GetShader (depthTestID);
+            }
+            else
+            {
+              depthShader = mat->GetShader (depthWriteID);
+            }
           }
 
           // Disable the alpha test (since alpha test disables fast GPU depth writing paths).
@@ -135,23 +142,28 @@ namespace CS
               g3d->DrawMeshBasic (rm, modes);
               g3d->DeactivateBuffers (&vA, 1);
             }
-            else
+            else // Render with a depth test/write shader.
             {
-              // Render with a depthwrite shader.
-              csShaderVariableStack& svStack = shaderMgr->GetShaderVariableStack ();
-              size_t ticket = depthShader->GetTicket (modes, svStack);
+              // Set up the shadervar stack.
+              mw->GetSVContext ()->PushVariables (shaderVarStack);
 
+              // Get a shader ticket.
+              size_t ticket = depthShader->GetTicket (modes, shaderVarStack);
+
+              // For each pass, render the mesh (more than 1 really needed?)
               const size_t numPasses = depthShader->GetNumberOfPasses (ticket);
               for (size_t p = 0; p < numPasses; ++p)
               {
                 if (!depthShader->ActivatePass (ticket, p)) continue;
-                if (!depthShader->SetupPass (ticket, rm, modes, svStack)) continue;
+                if (!depthShader->SetupPass (ticket, rm, modes, shaderVarStack)) continue;
 
-                g3d->DrawMesh (rm, modes, svStack);
+                g3d->DrawMesh (rm, modes, shaderVarStack);
 
                 depthShader->TeardownPass (ticket);
                 depthShader->DeactivatePass (ticket);
               }
+
+              shaderVarStack.Clear ();
             }
           }
           else
@@ -292,8 +304,7 @@ namespace CS
             for (int i = 0; i < numMeshes; ++i)
               numRenderMeshes += sectorMeshList[i].num;
 
-            delete[] meshes->drawToZ;
-            meshes->drawToZ = new bool[numRenderMeshes];
+            meshes->onlyTestZ.SetSize (numRenderMeshes);
 
             // Check for the 'always visible' state.
             switch (visobj->GetMeshWrapper ()->GetZBufMode ())
@@ -329,29 +340,28 @@ namespace CS
             }
 
             // Check the 'never draw' state of each render mesh.
-            bool* pDrawToZ = meshes->drawToZ;
-            for (int m = 0; m < numMeshes; ++m)
+            for (int iCurrRenderMesh = 0, m = 0; m < numMeshes; ++m)
             {
               meshes->meshList[m] = sectorMeshList[m];
 
-              // For each render mesh; check if the depthwrite shader is *null - don't draw to z.
-              for (int r = 0; r < sectorMeshList[m].num; ++r, ++pDrawToZ)
+              // For each render mesh; check if there is a depth-test shader - only test the z-buffer.
+              for (int r = 0; r < sectorMeshList[m].num; ++r, ++iCurrRenderMesh)
               {
-                bool bDrawToZ = !bNeverDrawAny;
-                if (bDrawToZ)
+                bool bOnlyTestZ = bNeverDrawAny;
+                if (!bOnlyTestZ)
                 {
                   if (sectorMeshList[m].rmeshes[r]->material)
                   {
                     iMaterial* mat = sectorMeshList[m].rmeshes[r]->material->GetMaterial ();
-                    iShader* depthShader = mat->GetShader (depthwriteID);
+                    iShader* depthShader = mat->GetShader (depthWriteID);
                     if (depthShader == shaderMgr->GetShader ("*null"))
                     {
-                      bDrawToZ = false;
+                      bOnlyTestZ = true;
                     }
                   }
                 }
 
-                *pDrawToZ = bDrawToZ;
+                meshes->onlyTestZ.Set (iCurrRenderMesh, bOnlyTestZ);
               }
             }
 
@@ -427,13 +437,16 @@ namespace CS
     }
 
     csOccluvis::csOccluvis (iObjectRegistry* object_reg)
-      : scfImplementationType (this), object_reg (object_reg)
+      : scfImplementationType (this), object_reg (object_reg),
+        shaderVarStack (0,0)
     {
       g3d = csQueryRegistry<iGraphics3D> (object_reg);
       engine = csQueryRegistry<iEngine> (object_reg);
       shaderMgr = csQueryRegistry<iShaderManager> (object_reg);
       stringSet = csQueryRegistryTagInterface<iStringSet> (
         object_reg, "crystalspace.shared.stringset");
+      svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
+        object_reg, "crystalspace.shader.variablenameset");
 
       bAllVisible = false;
     }
@@ -571,8 +584,10 @@ namespace CS
       f2bData.frustum = ctxt->clip_planes;
       f2bData.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
 
-      // Doing this in the ctor doesn't work for some reason.
-      depthwriteID = stringSet->Request ("depthwrite");
+      // Set up the shader variable stack and IDs
+      shaderVarStack.Setup (svStrings->GetSize ());
+      depthWriteID = stringSet->Request ("depthwrite");
+      depthTestID = stringSet->Request ("depthtest");
 
       /**
        * If the 'all visible' flag is set, render everything without any culling.

@@ -14,9 +14,18 @@
             <file>rocky_surface.jpg</file>
         </texture>
     </textures>
+    <shaders>
+        <shader>
+            <file>/shader/early_z/z_only_instanced.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/lighting/lighting_default_instance.xml</file>
+        </shader>
+    </shaders>
     <materials>
         <material name="rocky_surface.jpg">
             <texture>rocky_surface.jpg</texture>
+            <shader type="depthwrite">z_only_instanced</shader>
             <shader type="base">lighting_default_instance</shader>
             <shader type="diffuse">lighting_default_instance</shader>
         </material>

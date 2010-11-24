@@ -171,6 +171,7 @@ namespace CS
       csRef<iEngine> engine;
       csRef<iShaderManager> shaderMgr;
       csRef<iStringSet> stringSet;
+      csRef<iShaderVarStringSet> svStrings;
 
       // Structure of common f2b data.
       struct Front2BackData
@@ -183,19 +184,18 @@ namespace CS
 
       struct NodeMeshList : public csRefCount
       {
-        NodeMeshList () : drawToZ (nullptr), meshList (nullptr)
+        NodeMeshList () : meshList (nullptr)
         {
         }
 
         ~NodeMeshList ()
         {
           delete[] meshList;
-          delete[] drawToZ;
         }
 
         int numMeshes;
         uint framePassed;
-        bool* drawToZ;
+        csBitArray onlyTestZ;
         bool alwaysVisible;
         AABBVisTreeNode* node;
         csSectorVisibleRenderMeshes* meshList;
@@ -246,8 +246,14 @@ namespace CS
       VistestObjectsArray vistest_objects;
       bool vistest_objects_inuse;
 
-      // Depthwrite shader type ID.
-      csStringID depthwriteID;
+      // Depth test shader type ID.
+      csStringID depthTestID;
+
+      // Depth write shader type ID.
+      csStringID depthWriteID;
+
+      // Shader variable stack for depth rendering.
+      csShaderVariableStack shaderVarStack;
 
       friend class F2BSorter;
 

@@ -17,9 +17,19 @@
             </alpha>
         </texture>
     </textures>
+    <shaders>
+        <shader>
+            <file>/shader/early_z/z_only_instanced.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/lighting/fullbright_instance.xml</file>
+        </shader>
+    </shaders>
     <materials>
         <material name="grass.dds">
             <texture>grass.dds</texture>
+            <shader type="depthwrite">*null</shader>
+            <shader type="depthtest">z_only_instanced</shader>
             <shader type="base">lighting_fullbright_instance</shader>
             <shader type="diffuse">lighting_fullbright_instance</shader>
         </material>

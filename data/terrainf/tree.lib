@@ -14,14 +14,28 @@
             <file>bark.png</file>
         </texture>
     </textures>
+    <shaders>
+        <shader>
+            <file>/shader/early_z/z_only_instanced.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/lighting/lighting_default_instance.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/lighting/lighting_default_instance_binalpha.xml</file>
+        </shader>
+    </shaders>
     <materials>
         <material name="materialbark">
             <texture>bark.png</texture>
+            <shader type="depthwrite">z_only_instanced</shader>
             <shader type="base">lighting_default_instance</shader>
             <shader type="diffuse">lighting_default_instance</shader>
         </material>
         <material name="branch">
             <texture>branch.png</texture>
+            <shader type="depthwrite">*null</shader>
+            <shader type="depthtest">z_only_instanced</shader>
             <shader type="base">lighting_default_instance_binalpha</shader>
             <shader type="diffuse">lighting_default_instance_binalpha</shader>
         </material>
