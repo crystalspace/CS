@@ -130,6 +130,8 @@ public:
   bool HasNearPlane () const;
   bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
   long GetRenderState (G3D_RENDERSTATEOPTION op) const;
+  void SetEdgeDrawing (bool flag) {}
+  bool GetEdgeDrawing () { return false; }
   bool SetOption (const char*, const char*);
   bool ActivateBuffers (csRenderBufferHolder* /*holder*/, 
     csRenderBufferName mapping[CS_VATTRIB_SPECIFIC_LAST+1])

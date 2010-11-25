@@ -3409,11 +3409,7 @@ bool csGLGraphics3D::SetRenderState (G3D_RENDERSTATEOPTION op, long val)
   switch (op)
   {
     case G3DRENDERSTATE_EDGES:
-      forceWireframe = (val != 0);
-      if (forceWireframe)
-        glPolygonMode (GL_BACK, GL_LINE);
-      else
-        glPolygonMode (GL_BACK, GL_FILL);
+      SetEdgeDrawing (val != 0);
       return true;
     default:
       return false;
@@ -3429,6 +3425,20 @@ long csGLGraphics3D::GetRenderState (G3D_RENDERSTATEOPTION op) const
     default:
       return 0;
   }
+}
+
+void csGLGraphics3D::SetEdgeDrawing (bool flag)
+{
+  forceWireframe = flag;
+  if (forceWireframe)
+    glPolygonMode (GL_BACK, GL_LINE);
+  else
+    glPolygonMode (GL_BACK, GL_FILL);
+}
+
+bool csGLGraphics3D::GetEdgeDrawing ()
+{
+  return forceWireframe;
 }
 
 bool csGLGraphics3D::SetOption (const char* name, const char* value)

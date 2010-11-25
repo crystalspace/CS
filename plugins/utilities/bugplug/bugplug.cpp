@@ -497,16 +497,12 @@ void csBugPlug::VisculView (iCamera* camera)
       "Bugplug is now tracking a visibility culler");
 }
 
-void csBugPlug::ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name)
+void csBugPlug::ReportG3DState (bool prevState, bool state, const char* name)
 {
-  if (!G3D) return;
-  bool v;
-  v = (G3D->GetRenderState (op) != 0);
-  v = !v;
-  if (G3D->SetRenderState (op, v))
+  if (prevState != state)
   {
     Report (CS_REPORTER_SEVERITY_DEBUG, "BugPlug %s %s.",
-	v ? "enabled" : "disabled", name);
+	state ? "enabled" : "disabled", name);
   }
   else
   {
@@ -708,39 +704,11 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
       Report (CS_REPORTER_SEVERITY_DEBUG, "Not implemented yet.");
       break;
     case DEBUGCMD_EDGES:
-      ToggleG3DState (G3DRENDERSTATE_EDGES, "edge drawing");
       {
-	if (Engine && (Engine->GetBeginDrawFlags () & CSDRAW_CLEARSCREEN))
-	  break;
-	bool v;
-	v = (G3D->GetRenderState (G3DRENDERSTATE_EDGES) != 0);
+	bool oldEdge = G3D->GetEdgeDrawing ();
+	G3D->SetEdgeDrawing (!oldEdge);
+	ReportG3DState (oldEdge, G3D->GetEdgeDrawing (), "edge drawing");
       }
-      break;
-    case DEBUGCMD_TEXTURE:
-      ToggleG3DState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE, "texture mapping");
-      break;
-    case DEBUGCMD_BILINEAR:
-      ToggleG3DState (G3DRENDERSTATE_BILINEARMAPPINGENABLE,
-		"bi-linear filtering");
-	break;
-    case DEBUGCMD_TRILINEAR:
-      ToggleG3DState (G3DRENDERSTATE_TRILINEARMAPPINGENABLE,
-		"tri-linear filtering");
-	break;
-    case DEBUGCMD_LIGHTING:
-      ToggleG3DState (G3DRENDERSTATE_LIGHTINGENABLE, "lighting");
-	break;
-    case DEBUGCMD_GOURAUD:
-      ToggleG3DState (G3DRENDERSTATE_GOURAUDENABLE, "gouraud shading");
-	break;
-    case DEBUGCMD_ILACE:
-      ToggleG3DState (G3DRENDERSTATE_INTERLACINGENABLE, "interlaced mode");
-	break;
-    case DEBUGCMD_MMX:
-      ToggleG3DState (G3DRENDERSTATE_MMXENABLE, "mmx mode");
-	break;
-    case DEBUGCMD_TRANSP:
-      ToggleG3DState (G3DRENDERSTATE_TRANSPARENCYENABLE, "transp mode");
       break;
     case DEBUGCMD_CACHECLEAR:
       /*if (G3D)
@@ -2258,14 +2226,6 @@ int csBugPlug::GetCommandCode (const char* cmdstr, csString& args)
   if (!strcmp (cmd, "edges"))		return DEBUGCMD_EDGES;
   if (!strcmp (cmd, "cacheclear"))	return DEBUGCMD_CACHECLEAR;
   if (!strcmp (cmd, "cachedump"))	return DEBUGCMD_CACHEDUMP;
-  if (!strcmp (cmd, "texture"))		return DEBUGCMD_TEXTURE;
-  if (!strcmp (cmd, "bilinear"))	return DEBUGCMD_BILINEAR;
-  if (!strcmp (cmd, "trilinear"))	return DEBUGCMD_TRILINEAR;
-  if (!strcmp (cmd, "lighting"))	return DEBUGCMD_LIGHTING;
-  if (!strcmp (cmd, "gouraud"))		return DEBUGCMD_GOURAUD;
-  if (!strcmp (cmd, "ilace"))		return DEBUGCMD_ILACE;
-  if (!strcmp (cmd, "mmx"))		return DEBUGCMD_MMX;
-  if (!strcmp (cmd, "transp"))		return DEBUGCMD_TRANSP;
   if (!strcmp (cmd, "gamma"))		return DEBUGCMD_GAMMA;
   if (!strcmp (cmd, "dumpcam"))		return DEBUGCMD_DUMPCAM;
   if (!strcmp (cmd, "fov"))		return DEBUGCMD_FOV;

@@ -513,32 +513,6 @@ struct csAlphaMode
 /// Graphics3D render state options
 enum G3D_RENDERSTATEOPTION
 {
-  /// Set Z-buffer fill/test/use mode (parameter is a csZBufMode)
-  G3DRENDERSTATE_ZBUFFERMODE,
-  /// Enable/disable dithering (parameter is a bool)
-  G3DRENDERSTATE_DITHERENABLE,
-  /// Enable/disable bi-linear mapping (parameter is a bool)
-  G3DRENDERSTATE_BILINEARMAPPINGENABLE,
-  /// Enable/disable tri-linear mapping (parameter is a bool)
-  G3DRENDERSTATE_TRILINEARMAPPINGENABLE,
-  /// Enable/disable transparent textures (parameter is a bool)
-  G3DRENDERSTATE_TRANSPARENCYENABLE,
-  /// Enable/disable mip-mapping (parameter is a bool)
-  G3DRENDERSTATE_MIPMAPENABLE,
-  /// Enable/disable textures (parameter is a bool)
-  G3DRENDERSTATE_TEXTUREMAPPINGENABLE,
-  /// Enable/disable lighting (parameter is a bool)
-  G3DRENDERSTATE_LIGHTINGENABLE,
-  /// Enable/disable interlacing (parameter is a bool)
-  G3DRENDERSTATE_INTERLACINGENABLE,
-  /// Enable/disable MMX instructions usage (parameter is a bool)
-  G3DRENDERSTATE_MMXENABLE,
-  /// Set perspective-correction interpolation step (parameter is a int)
-  G3DRENDERSTATE_INTERPOLATIONSTEP,
-  /// Set maximal number of polygons per frame to draw (parameter is a int)
-  G3DRENDERSTATE_MAXPOLYGONSTODRAW,
-  /// Enable/disable Gouraud shading (parameter is a bool)
-  G3DRENDERSTATE_GOURAUDENABLE,
   /// Enable/disable edge drawing (debugging) (parameter is a bool)
   G3DRENDERSTATE_EDGES
 };
@@ -832,7 +806,7 @@ namespace CS
  */
 struct iGraphics3D : public virtual iBase
 {
-  SCF_INTERFACE(iGraphics3D, 4, 0, 2);
+  SCF_INTERFACE(iGraphics3D, 4, 0, 3);
   
   /// Open the 3D graphics display.
   virtual bool Open () = 0;
@@ -1096,9 +1070,11 @@ struct iGraphics3D : public virtual iBase
   virtual bool HasNearPlane () const = 0;
 
   /// Set a renderstate value.
+  CS_DEPRECATED_METHOD_MSG("Use SetEdgeDrawing() for sole supported render state")
   virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val) = 0;
 
   /// Get a renderstate value.
+  CS_DEPRECATED_METHOD_MSG("Use GetEdgeDrawing() for sole supported render state")
   virtual long GetRenderState (G3D_RENDERSTATEOPTION op) const = 0;
 
   /**
@@ -1251,6 +1227,11 @@ struct iGraphics3D : public virtual iBase
 
   virtual void DrawMeshBasic(const CS::Graphics::CoreRenderMesh* mymesh,
 							const CS::Graphics::RenderMeshModes& modes) = 0;
+  
+  /// Enable/disable edge drawing (for debugging purposes)
+  virtual void SetEdgeDrawing (bool flag) = 0;
+  /// Get state of edge drawing
+  virtual bool GetEdgeDrawing () = 0;
 };
 
 /** @} */

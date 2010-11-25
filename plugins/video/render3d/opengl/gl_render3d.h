@@ -761,6 +761,8 @@ public:
 
   virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
   virtual long GetRenderState (G3D_RENDERSTATEOPTION op) const;
+  virtual void SetEdgeDrawing (bool flag);
+  virtual bool GetEdgeDrawing ();
   virtual bool SetOption (const char*, const char*);
 
   virtual void DrawSimpleMesh (const csSimpleRenderMesh& mesh, 

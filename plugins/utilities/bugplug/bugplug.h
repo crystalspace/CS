@@ -92,14 +92,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(BugPlug)
 #define DEBUGCMD_EDGES		1002	// Enable edge drawing
 #define DEBUGCMD_CACHEDUMP	1004	// Dump texture cache
 #define DEBUGCMD_CACHECLEAR	1005	// Clear texture cache
-#define DEBUGCMD_TEXTURE	1006	// Enable texture mapping
-#define DEBUGCMD_BILINEAR	1007	// Enable bi-linear filtering
-#define DEBUGCMD_TRILINEAR	1008	// Enable tri-linear filtering
-#define DEBUGCMD_LIGHTING	1009	// Enable lighting
-#define DEBUGCMD_GOURAUD	1010	// Enable gouraud
-#define DEBUGCMD_ILACE		1011	// Enable interlacing
-#define DEBUGCMD_MMX		1012	// Enable MMX
-#define DEBUGCMD_TRANSP		1013	// Enable transparent mode
 #define DEBUGCMD_GAMMA		1016	// Set gamma
 #define DEBUGCMD_DUMPCAM	1018	// Dump the camera
 #define DEBUGCMD_FOV		1019	// Set fov
@@ -283,11 +275,11 @@ private:
 
   void Report (int severity, const char* msg, ...);
 
-  // Toggle a G3D boolean option.
   bool do_shadow_debug;
   csRef<iShader> standardShadowShader;
   csRef<iShader> debugShadowShader;
-  void ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name);
+  // Report on the result of a G3D state toggling
+  void ReportG3DState (bool prevState, bool state, const char* name);
 
   // The selected mesh.
   csWeakRefArray<iMeshWrapper> selected_meshes;
