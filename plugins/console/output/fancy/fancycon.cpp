@@ -221,7 +221,7 @@ void csFancyConsole::Draw3D (csRect *oArea)
 
   float u_stretch = 1.0, v_stretch = 1.0;
 
-  if (!deco.bgnd.do_stretch)
+  if (!deco.bgnd.do_stretch && deco.bgnd.txt)
   {
     int w, h;
     deco.bgnd.txt->GetRendererDimensions (w, h);
