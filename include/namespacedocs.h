@@ -102,6 +102,24 @@ namespace CS
   {}
 
   /**
+   * Noise generation and utilities
+   */
+  namespace Noise
+  {
+    /**
+     * Geometric models for noise generation
+     */
+    namespace Model
+    {}
+
+    /**
+     * Noise modules for the combination of noise functions
+     */
+    namespace Module
+    {}
+  }
+
+  /**
    * Platform specific code and wrappers
    */
   namespace Platform

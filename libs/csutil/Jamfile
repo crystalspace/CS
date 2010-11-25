@@ -48,6 +48,7 @@ if $(REGEX.AVAILABLE) != "yes"
 }
 
 SubInclude TOP libs csutil generic ;
+SubInclude TOP libs csutil noise ;
 SubInclude TOP libs csutil ptmalloc ;
 SubInclude TOP libs csutil threading ;
 SubInclude TOP libs csutil processor ;
