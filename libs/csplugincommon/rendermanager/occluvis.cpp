@@ -124,7 +124,7 @@ namespace CS
 
               if (!depthShader)
               {
-                mat->GetShader (fbDepthWriteID);
+                depthShader = mat->GetShader (fbDepthWriteID);
               }
             }
           }
