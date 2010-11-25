@@ -252,6 +252,9 @@ namespace CS
       // Depth write shader type ID.
       csStringID depthWriteID;
 
+      // Fallback depth write shader type ID.
+      csStringID fbDepthWriteID;
+
       // Shader variable stack for depth rendering.
       csShaderVariableStack shaderVarStack;
 

@@ -121,6 +121,11 @@ namespace CS
             else
             {
               depthShader = mat->GetShader (depthWriteID);
+
+              if (!depthShader)
+              {
+                mat->GetShader (fbDepthWriteID);
+              }
             }
           }
 
@@ -354,6 +359,11 @@ namespace CS
                   {
                     iMaterial* mat = sectorMeshList[m].rmeshes[r]->material->GetMaterial ();
                     iShader* depthShader = mat->GetShader (depthWriteID);
+                    if (!depthShader)
+                    {
+                      depthShader = mat->GetShader (fbDepthWriteID);
+                    }
+
                     if (depthShader == shaderMgr->GetShader ("*null"))
                     {
                       bOnlyTestZ = true;
@@ -586,8 +596,9 @@ namespace CS
 
       // Set up the shader variable stack and IDs
       shaderVarStack.Setup (svStrings->GetSize ());
-      depthWriteID = stringSet->Request ("depthwrite");
-      depthTestID = stringSet->Request ("depthtest");
+      depthWriteID = stringSet->Request ("oc_depthwrite");
+      depthTestID = stringSet->Request ("oc_depthtest");
+      fbDepthWriteID = stringSet->Request ("depthwrite");
 
       /**
        * If the 'all visible' flag is set, render everything without any culling.

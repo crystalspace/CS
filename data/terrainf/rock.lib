@@ -25,7 +25,7 @@
     <materials>
         <material name="rocky_surface.jpg">
             <texture>rocky_surface.jpg</texture>
-            <shader type="depthwrite">z_only_instanced</shader>
+            <shader type="oc_depthwrite">z_only_instanced</shader>
             <shader type="base">lighting_default_instance</shader>
             <shader type="diffuse">lighting_default_instance</shader>
         </material>

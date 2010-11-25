@@ -22,8 +22,8 @@
     <materials>
         <material name="sage2.png">
             <texture>sage2.png</texture>
-            <shader type="depthwrite">*null</shader>
-            <shader type="depthtest">z_only_instanced</shader>
+            <shader type="oc_depthwrite">*null</shader>
+            <shader type="oc_depthtest">z_only_instanced</shader>
             <shader type="base">lighting_fullbright_instance</shader>
             <shader type="diffuse">lighting_fullbright_instance</shader>
         </material>

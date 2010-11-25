@@ -28,14 +28,14 @@
     <materials>
         <material name="materialbark">
             <texture>bark.png</texture>
-            <shader type="depthwrite">z_only_instanced</shader>
+            <shader type="oc_depthwrite">z_only_instanced</shader>
             <shader type="base">lighting_default_instance</shader>
             <shader type="diffuse">lighting_default_instance</shader>
         </material>
         <material name="branch">
             <texture>branch.png</texture>
-            <shader type="depthwrite">*null</shader>
-            <shader type="depthtest">z_only_instanced</shader>
+            <shader type="oc_depthwrite">*null</shader>
+            <shader type="oc_depthtest">z_only_instanced</shader>
             <shader type="base">lighting_default_instance_binalpha</shader>
             <shader type="diffuse">lighting_default_instance_binalpha</shader>
         </material>
