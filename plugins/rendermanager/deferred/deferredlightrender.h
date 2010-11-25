@@ -513,12 +513,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       color.alpha = alpha;
 
       if (wireframe)
-        graphics3D->SetRenderState (G3DRENDERSTATE_EDGES, 1);
+        graphics3D->SetEdgeDrawing (true);
 
       RenderLightVolume (light, obj, color);
 
       if (wireframe)
-        graphics3D->SetRenderState (G3DRENDERSTATE_EDGES, 0);
+        graphics3D->SetEdgeDrawing (false);
     }
 
     /**
