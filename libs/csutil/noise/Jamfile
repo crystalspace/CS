@@ -1,0 +1,6 @@
+SubDir TOP libs csutil noise ;
+
+CsLibAddModule ;
+
+SubInclude TOP libs csutil noise model ;
+SubInclude TOP libs csutil noise module ;
