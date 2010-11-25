@@ -359,7 +359,10 @@ iVisibilityCuller* csSector::GetVisibilityCuller ()
     if (rmVC)
     {
       culler = rmVC->GetVisCuller ();
+    }
 
+    if (culler)
+    {
       // Loop through all meshes and register them to the visibility culler.
       for (int i = 0; i < meshes.GetCount (); i++)
       {
