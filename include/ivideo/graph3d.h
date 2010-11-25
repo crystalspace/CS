@@ -492,18 +492,6 @@ struct csAlphaMode
 };
 /** @} */
 
-/**\name Light parameters
- * @{ */
-/// Position of the light.
-#define CS_LIGHTPARAM_POSITION 0
-/// Diffuse color of the light.
-#define CS_LIGHTPARAM_DIFFUSE 1
-/// Specular color of the light.
-#define CS_LIGHTPARAM_SPECULAR 2
-/// Attenuation of the light.
-#define CS_LIGHTPARAM_ATTENUATION 3
-/** @} */
-
 /**\name Shadow states
  * @{ */
 /// Clear stencil.
