@@ -414,14 +414,9 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
   framebufferTexPersistent.Initialize (objectReg,
     &postEffects);
   
+  RMViscullCommon::Initialize (objectReg, "RenderManager.Unshadowed");
+  
   return true;
-}
-
-csPtr<iVisibilityCuller> RMUnshadowed::GetVisCuller ()
-{
-  csRef<iVisibilityCuller> psVisCuller;
-  psVisCuller.AttachNew (new csOccluvis (objectReg));
-  return csPtr<iVisibilityCuller> (psVisCuller);
 }
 
 }

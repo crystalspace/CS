@@ -24,6 +24,7 @@
 #include "csplugincommon/rendermanager/debugcommon.h"
 #include "csplugincommon/rendermanager/hdrexposure.h"
 #include "csplugincommon/rendermanager/posteffectssupport.h"
+#include "csplugincommon/rendermanager/viscullcommon.h"
 #include "csutil/scf_implementation.h"
 #include "iutil/comp.h"
 #include "iengine/rendermanager.h"
@@ -39,12 +40,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
   class RMUnshadowed : public scfImplementation6<RMUnshadowed, 
                                                  iRenderManager, 
                                                  iRenderManagerTargets,
-                                                 iRenderManagerVisCull,
+                                                 scfFakeInterface<iRenderManagerVisCull>,
                                                  scfFakeInterface<iRenderManagerPostEffects>,
                                                  iComponent,
                                                  scfFakeInterface<iDebugHelper> >,
                        public CS::RenderManager::RMDebugCommon<RenderTreeType>,
-		       public CS::RenderManager::PostEffectsSupport
+		       public CS::RenderManager::PostEffectsSupport,
+		       public CS::RenderManager::RMViscullCommon
   {
   public:
     RMUnshadowed (iBase* parent);
@@ -68,9 +70,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
       targets.MarkAsUsed (target);
     }
 
-    //---- iRenderManagerVisCull ----
-    virtual csPtr<iVisibilityCuller> GetVisCuller ();
-  
     //---- iComponent ----
     virtual bool Initialize (iObjectRegistry*);
 

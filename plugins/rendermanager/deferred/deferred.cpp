@@ -322,6 +322,8 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   portalPersistent.texCache.SetFormat (accumFmt);
   portalPersistent.texCache.SetFlags (flags);
 
+  RMViscullCommon::Initialize (objRegistry, "RenderManager.Deferred");
+  
   return true;
 }
 
@@ -544,14 +546,6 @@ bool RMDeferred::DebugCommand(const char *cmd)
   }
 
   return false;
-}
-
-//----------------------------------------------------------------------
-csPtr<iVisibilityCuller> RMDeferred::GetVisCuller ()
-{
-  csRef<iVisibilityCuller> psVisCuller;
-  psVisCuller.AttachNew (new csOccluvis (objRegistry));
-  return csPtr<iVisibilityCuller> (psVisCuller);
 }
 
 }

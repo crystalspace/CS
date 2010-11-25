@@ -549,14 +549,9 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   if (cfg->GetBool ("RenderManager.ShadowPSSM.ShadowsInRefractions", true))
     refrRefrShadows |= rrShadowRefract;
   
+  RMViscullCommon::Initialize (objectReg, "RenderManager.ShadowPSSM");
+  
   return true;
-}
-
-csPtr<iVisibilityCuller> RMShadowedPSSM::GetVisCuller ()
-{
-  csRef<iVisibilityCuller> psVisCuller;
-  psVisCuller.AttachNew (new csOccluvis (objectReg));
-  return csPtr<iVisibilityCuller> (psVisCuller);
 }
 
 }

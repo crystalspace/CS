@@ -27,6 +27,7 @@
 #include "csplugincommon/rendermanager/debugcommon.h"
 #include "csplugincommon/rendermanager/renderlayers.h"
 #include "csplugincommon/rendermanager/posteffectssupport.h"
+#include "csplugincommon/rendermanager/viscullcommon.h"
 
 #include "iutil/comp.h"
 #include "csutil/scf_implementation.h"
@@ -47,20 +48,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
   class RMDeferred : public scfImplementation5<RMDeferred, 
                                                iRenderManager,
-                                               iRenderManagerVisCull,
+                                               scfFakeInterface<iRenderManagerVisCull>,
                                                iComponent,
                                                scfFakeInterface<iRenderManagerPostEffects>,
                                                scfFakeInterface<iDebugHelper> >,
                      public CS::RenderManager::RMDebugCommon<RenderTreeType>,
-		     public CS::RenderManager::PostEffectsSupport
+		     public CS::RenderManager::PostEffectsSupport,
+		     public CS::RenderManager::RMViscullCommon
   {
   public:
 
     /// Constructor.
     RMDeferred(iBase *parent);
-
-    //---- iRenderManagerVisCull Interface ----
-    virtual csPtr<iVisibilityCuller> GetVisCuller ();
 
     //---- iComponent Interface ----
     virtual bool Initialize(iObjectRegistry *registry);
