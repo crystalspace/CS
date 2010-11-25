@@ -22,6 +22,8 @@
 #ifndef __MOCAPVIEWER_H__
 #define __MOCAPVIEWER_H__
 
+#include "csutil/noise/noise.h"
+#include "csutil/noise/noisegen.h"
 #include "cstool/csdemoapplication.h"
 #include "cstool/mocapparser.h"
 #include "imesh/animnode/skeleton2anim.h"
@@ -38,12 +40,14 @@ struct iSkeletonDebugNode;
 } // namespace Animation
 } // namespace CS
 
+
 class MocapViewer : public CS::Demo::DemoApplication,
   public scfImplementation1<MocapViewer, CS::Animation::iSkeletonAnimCallback>
 {
  private:
   bool CreateAvatar ();
 
+  // References to animesh objects
   csRef<iMovieRecorder> movieRecorder;
   csRef<CS::Animation::iBodyManager> bodyManager;
   csRef<CS::Animation::iSkeletonDebugNodeManager> debugNodeManager;
@@ -52,8 +56,15 @@ class MocapViewer : public CS::Demo::DemoApplication,
   csRef<iMeshWrapper> meshWrapper;
   CS::Animation::MocapParserResult parsingResult;
 
+  // Display of information
   csPixmap* debugImage;
   bool printInfo;
+
+  // Noise points
+  CS::Noise::Module::Perlin noiseX;
+  CS::Noise::Module::Perlin noiseY;
+  csArray<csVector3> noisePoints;
+  float noiseScale;
 
  public:
   MocapViewer ();

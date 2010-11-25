@@ -21,15 +21,14 @@
 
 #include "cssysdef.h"
 #include "mocapviewer.h"
+#include "csutil/floatrand.h"
+#include "csutil/randomgen.h"
 #include "cstool/cspixmap.h"
 #include "imesh/animesh.h"
 #include "imesh/bodymesh.h"
 #include "imesh/animnode/debug.h"
 #include "iutil/cfgmgr.h"
-
 #include "ivaria/movierecorder.h"
-
-//#include "mocapparser.h"
 
 MocapViewer::MocapViewer ()
   : DemoApplication ("CrystalSpace.MocapViewer", "csmocapviewer", "csmocapviewer [OPTIONS] [filename]"
@@ -42,7 +41,8 @@ MocapViewer::MocapViewer ()
 		     "\tcsmocapviewer -rootmask=Hips -childmask=Head -childmask=LeftHand idle01.bvh\n"
 		     "\tcsmocapviewer -rootmask=Hips -childall idle01.bvh\n"
 		     "\tcsmocapviewer -pld -record -recordfile=mocap.nuv idle01.bvh\n"
-		     "\tcsmocapviewer -rotcamera=-90 idle01.bvh\n",
+		     "\tcsmocapviewer -rotcamera=-90 idle01.bvh\n"
+		     "\tcsmocapviewer idle01.bvh -pld -ncount=200 -nfrequency=0.4 -poscamera=0.7\n",
 		     "Crystal Space's viewer for motion captured data. This viewer supports currently"
 		     " only the Biovision Hierarchical data file format (BVH).\n\n"
 		     "A bone chain can be set as a mask, then only the bones from this chain will be displayed."
@@ -50,15 +50,21 @@ MocapViewer::MocapViewer ()
 		     " sub-children of the root bone, either all bones on the way to a given child bone.\n\n"
 		     "This viewer can also be used to display Point Light Displays and record automatically"
 		     " videos with these data (e.g. for a psychology study on motion perception).\n\n"
+		     "The Point Light display can be perturbated by adding noise points animated by a Perlin"
+		     " noise. The behavior of the motion of these noise points can be tweaked by several"
+		     " parameters. See http://libnoise.sourceforge.net/docs/classnoise_1_1module_1_1Perlin.html"
+		     " for more information on these parameters.\n\n"
 		     "Finally, this application uses a configuration file. See \"/config/csmocapviewer.cfg\""
 		     " for more information"),
-    scfImplementationType (this), debugImage (nullptr)
+    scfImplementationType (this), debugImage (nullptr), noiseScale (0.5f)
 {
   // Configure the options for DemoApplication
   // Set the camera mode
   cameraHelper.SetCameraMode (CS::Demo::CSDEMO_CAMERA_MOVE_FREE);
 
   // Command line options
+  commandLineHelper.AddCommandLineOption
+    ("info", "Parse the file, print out the mocap data information, then exit");
   commandLineHelper.AddCommandLineOption
     ("start=<int>", "Set the index of the start frame");
   commandLineHelper.AddCommandLineOption
@@ -68,19 +74,31 @@ MocapViewer::MocapViewer ()
   commandLineHelper.AddCommandLineOption
     ("pld", "Set the display mode as 'Point Light Display'");
   commandLineHelper.AddCommandLineOption
+    ("rotcamera=<float>", "Rotate the camera of a given angle around the Y axis, in degree");
+  commandLineHelper.AddCommandLineOption
+    ("poscamera=<float>", "Scale the distance between the camera and the target. Default value is 1.0");
+  commandLineHelper.AddCommandLineOption
     ("rootmask=<string>", "Set the bone name of the root of the bone chain that will be used as a mask");
   commandLineHelper.AddCommandLineOption
     ("childmask=<string>", "Add a child to the bone chain that will be used as a mask");
   commandLineHelper.AddCommandLineOption
     ("childall", "Add all sub-children of the root bone to the bone chain that will be used as a mask");
   commandLineHelper.AddCommandLineOption
-    ("info", "Parse the file, print out the mocap data information, then exit");
-  commandLineHelper.AddCommandLineOption
     ("record", "Record the session in a video file, then exit");
   commandLineHelper.AddCommandLineOption
     ("recordfile=<string>", "Force the name of the video file to be created");
   commandLineHelper.AddCommandLineOption
-    ("rotcamera=<float>", "Rotate the camera of a given angle around the Y axis, in degree");
+    ("ncount=<int>", "Set the number of noise points added. Default value is 0");
+  commandLineHelper.AddCommandLineOption
+    ("nscale=<float>", "Scale to apply on the position of the noise points. Default value is 0.5");
+  commandLineHelper.AddCommandLineOption
+    ("noctaves=<int>", "Set the number of octaves of the noise. Value must be between 1 and 30. Default value is 6");
+  commandLineHelper.AddCommandLineOption
+    ("nfrequency=<float>", "Set the frequency of the noise. Value must be positive. Default value is 1.0");
+  commandLineHelper.AddCommandLineOption
+    ("nlacunarity=<float>", "Set the lacunarity of the noise. Value is suggested to be between 1.5 and 3.5. Default value is 2.0");
+  commandLineHelper.AddCommandLineOption
+    ("npersistence=<float>", "Set the persistence of the noise. Value is suggested to be between 0.0 and 1.0. Default value is 0.5");
   // TODO: animesh target & animation save
 }
 
@@ -99,14 +117,38 @@ void MocapViewer::Frame ()
   DemoApplication::Frame ();
 
   // Ask the debug node to display the data
-  debugNode->Draw (view->GetCamera (), csColor (0.0f, 8.0f, 0.0f));
+  csColor color (0.0f, 8.0f, 0.0f);
+  debugNode->Draw (view->GetCamera (), color);
+
+  // Display the noise points
+  int colorI = g2d->FindRGB (255.0f * color[0],
+			     255.0f * color[1],
+			     255.0f * color[2]);
+  float seed0 = ((float) vc->GetCurrentTicks ()) / 10000.0f;
+  for (csArray<csVector3>::Iterator it = noisePoints.GetIterator (); it.HasNext (); )
+  {
+    csVector3& point = it.Next ();
+
+    float px = noiseX.GetValue (seed0 + point[0], point[1], point[2])
+      * noiseScale * ((float) g2d->GetWidth ()) + ((float) g2d->GetWidth ()) * 0.5f;
+    float py = noiseY.GetValue (seed0 + point[0], point[1], point[2])
+      * noiseScale * ((float) g2d->GetHeight ()) + ((float) g2d->GetHeight ()) * 0.5f;
+
+    // TODO: can be PLD images too
+    size_t size = 5;
+    for (size_t i = 0; i < size; i++)
+      for (size_t j = 0; j < size; j++)
+	g2d->DrawPixel (((int) px) - size / 2 + i,
+			((int) py) - size / 2 + j,
+			colorI);
+  }
 
   // Update the HUD
   hudHelper.stateDescriptions.DeleteIndex (0);
   csString txt;
   txt.Format ("Frame: %i on %u",
 	      (int) (animNode->GetPlaybackPosition () / parsingResult.frameDuration),
-	      parsingResult.frameCount);
+	      (unsigned int) parsingResult.frameCount);
   hudHelper.stateDescriptions.Insert (0, txt);
 }
 
@@ -255,7 +297,7 @@ bool MocapViewer::CreateAvatar ()
     printf ("=================================================\n");
     printf ("=== Mocap file: %s ===\n", mocapFilename.GetData ());
     printf ("=================================================\n");
-    printf ("=== Frame count: %u ===\n", parsingResult.frameCount);
+    printf ("=== Frame count: %u ===\n", (unsigned int) parsingResult.frameCount);
     printf ("=== Frames per second: %.4f ===\n", 1.0f / parsingResult.frameDuration);
     printf ("=== Total duration: %.4f seconds ===\n",
 	    parsingResult.frameCount * parsingResult.frameDuration);
@@ -437,10 +479,17 @@ bool MocapViewer::CreateAvatar ()
     CS::Animation::BoneID rootBone = boneList[0];
     animation->GetKeyFrame (animation->FindChannel (rootBone), 0, rootBone, time, rotation, offset);
     csVector3 cameraTarget = offset + bbox.GetCenter ();
-    csVector3 cameraOffset = csVector3 (0.0f, 0.0f, -300.0f) * globalScale;
+
+    // Compute the position of the camera
+    csString txt = clp->GetOption ("poscamera", 0);
+    float scale = 1.0f;
+    float value;
+    if (txt && sscanf (txt.GetData (), "%f", &value) == 1)
+      scale = value;
+    csVector3 cameraOffset = csVector3 (0.0f, 0.0f, -300.0f * scale) * globalScale;
 
     // Check if the user has provided an angle for the camera
-    csString txt = clp->GetOption ("rotcamera", 0);
+    txt = clp->GetOption ("rotcamera", 0);
     float angle;
     if (txt && sscanf (txt.GetData (), "%f", &angle) == 1)
       // TODO: the csYRotMatrix3 is defined in right-handed coordinate system!
@@ -449,6 +498,68 @@ bool MocapViewer::CreateAvatar ()
     // Update the position of the camera
     view->GetCamera ()->GetTransform ().SetOrigin (cameraTarget + cameraOffset);
     view->GetCamera ()->GetTransform ().LookAt (-cameraOffset, csVector3 (0.0f, 1.0f, 0.0f));
+  }
+
+  // Setup the noise points
+  txt = clp->GetOption ("ncount", 0);
+  int noiseCount;
+  if (txt && sscanf (txt.GetData (), "%i", &noiseCount) == 1)
+  {
+    // Initialize the perlin noise modules
+    csRandomGen irandomGenerator (406321958);
+    csRandomGen irandomGenerator2 (18974329);
+    csRandomFloatGen frandomGenerator (50963095);
+    noiseX.SetSeed (irandomGenerator.Get (~0));
+    noiseY.SetSeed (irandomGenerator2.Get (~0));
+
+    // Read the command line parameters of the noise modules
+    txt = clp->GetOption ("noctaves", 0);
+    int ivalue;
+    if (txt && sscanf (txt.GetData (), "%i", &ivalue) == 1)
+    {
+      if (ivalue < 1)
+	ivalue = 1;
+      if (ivalue > 30)
+	ivalue = 30;
+      noiseX.SetOctaveCount (ivalue);
+      noiseY.SetOctaveCount (ivalue);
+    }
+
+    txt = clp->GetOption ("nscale", 0);
+    float fvalue;
+    if (txt && sscanf (txt.GetData (), "%f", &fvalue) == 1)
+      noiseScale = fvalue;
+
+    txt = clp->GetOption ("nfrequency", 0);
+    if (txt && sscanf (txt.GetData (), "%f", &fvalue) == 1)
+    {
+      noiseX.SetFrequency (fvalue);
+      noiseY.SetFrequency (fvalue);
+    }
+
+    txt = clp->GetOption ("nlacunarity", 0);
+    if (txt && sscanf (txt.GetData (), "%f", &fvalue) == 1)
+    {
+      noiseX.SetLacunarity (fvalue);
+      noiseY.SetLacunarity (fvalue);
+    }
+
+    txt = clp->GetOption ("npersistence", 0);
+    if (txt && sscanf (txt.GetData (), "%f", &fvalue) == 1)
+    {
+      noiseX.SetPersistence (fvalue);
+      noiseY.SetPersistence (fvalue);
+    }
+
+    // Create the noise points
+    for (int i = 0; i < noiseCount; i++)
+    {
+      csVector3 point;
+      point[0] = frandomGenerator.Get (10.0f);
+      point[1] = frandomGenerator.Get (10.0f);
+      point[2] = frandomGenerator.Get (10.0f);
+      noisePoints.Push (point);
+    }
   }
 
   // Display the origin
