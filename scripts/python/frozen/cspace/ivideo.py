@@ -244,10 +244,6 @@ class csAlphaMode(object):
 csAlphaMode_swigregister = _ivideo.csAlphaMode_swigregister
 csAlphaMode_swigregister(csAlphaMode)
 
-CS_LIGHTPARAM_POSITION = _ivideo.CS_LIGHTPARAM_POSITION
-CS_LIGHTPARAM_DIFFUSE = _ivideo.CS_LIGHTPARAM_DIFFUSE
-CS_LIGHTPARAM_SPECULAR = _ivideo.CS_LIGHTPARAM_SPECULAR
-CS_LIGHTPARAM_ATTENUATION = _ivideo.CS_LIGHTPARAM_ATTENUATION
 CS_SHADOW_VOLUME_BEGIN = _ivideo.CS_SHADOW_VOLUME_BEGIN
 CS_SHADOW_VOLUME_PASS1 = _ivideo.CS_SHADOW_VOLUME_PASS1
 CS_SHADOW_VOLUME_PASS2 = _ivideo.CS_SHADOW_VOLUME_PASS2
@@ -255,19 +251,6 @@ CS_SHADOW_VOLUME_FAIL1 = _ivideo.CS_SHADOW_VOLUME_FAIL1
 CS_SHADOW_VOLUME_FAIL2 = _ivideo.CS_SHADOW_VOLUME_FAIL2
 CS_SHADOW_VOLUME_USE = _ivideo.CS_SHADOW_VOLUME_USE
 CS_SHADOW_VOLUME_FINISH = _ivideo.CS_SHADOW_VOLUME_FINISH
-G3DRENDERSTATE_ZBUFFERMODE = _ivideo.G3DRENDERSTATE_ZBUFFERMODE
-G3DRENDERSTATE_DITHERENABLE = _ivideo.G3DRENDERSTATE_DITHERENABLE
-G3DRENDERSTATE_BILINEARMAPPINGENABLE = _ivideo.G3DRENDERSTATE_BILINEARMAPPINGENABLE
-G3DRENDERSTATE_TRILINEARMAPPINGENABLE = _ivideo.G3DRENDERSTATE_TRILINEARMAPPINGENABLE
-G3DRENDERSTATE_TRANSPARENCYENABLE = _ivideo.G3DRENDERSTATE_TRANSPARENCYENABLE
-G3DRENDERSTATE_MIPMAPENABLE = _ivideo.G3DRENDERSTATE_MIPMAPENABLE
-G3DRENDERSTATE_TEXTUREMAPPINGENABLE = _ivideo.G3DRENDERSTATE_TEXTUREMAPPINGENABLE
-G3DRENDERSTATE_LIGHTINGENABLE = _ivideo.G3DRENDERSTATE_LIGHTINGENABLE
-G3DRENDERSTATE_INTERLACINGENABLE = _ivideo.G3DRENDERSTATE_INTERLACINGENABLE
-G3DRENDERSTATE_MMXENABLE = _ivideo.G3DRENDERSTATE_MMXENABLE
-G3DRENDERSTATE_INTERPOLATIONSTEP = _ivideo.G3DRENDERSTATE_INTERPOLATIONSTEP
-G3DRENDERSTATE_MAXPOLYGONSTODRAW = _ivideo.G3DRENDERSTATE_MAXPOLYGONSTODRAW
-G3DRENDERSTATE_GOURAUDENABLE = _ivideo.G3DRENDERSTATE_GOURAUDENABLE
 G3DRENDERSTATE_EDGES = _ivideo.G3DRENDERSTATE_EDGES
 class csGraphics3DCaps(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -436,6 +419,8 @@ class iGraphics3D(core.iBase):
     def OQBeginQuery(*args): return _ivideo.iGraphics3D_OQBeginQuery(*args)
     def OQEndQuery(*args): return _ivideo.iGraphics3D_OQEndQuery(*args)
     def DrawMeshBasic(*args): return _ivideo.iGraphics3D_DrawMeshBasic(*args)
+    def SetEdgeDrawing(*args): return _ivideo.iGraphics3D_SetEdgeDrawing(*args)
+    def GetEdgeDrawing(*args): return _ivideo.iGraphics3D_GetEdgeDrawing(*args)
     scfGetVersion = staticmethod(_ivideo.iGraphics3D_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iGraphics3D
     __del__ = lambda self : None;
@@ -512,6 +497,8 @@ class RenderMeshModes(object):
     __del__ = lambda self : None;
     z_buf_mode = _swig_property(_ivideo.RenderMeshModes_z_buf_mode_get, _ivideo.RenderMeshModes_z_buf_mode_set)
     mixmode = _swig_property(_ivideo.RenderMeshModes_mixmode_get, _ivideo.RenderMeshModes_mixmode_set)
+    alphaToCoverage = _swig_property(_ivideo.RenderMeshModes_alphaToCoverage_get, _ivideo.RenderMeshModes_alphaToCoverage_set)
+    atcMixmode = _swig_property(_ivideo.RenderMeshModes_atcMixmode_get, _ivideo.RenderMeshModes_atcMixmode_set)
     renderPrio = _swig_property(_ivideo.RenderMeshModes_renderPrio_get, _ivideo.RenderMeshModes_renderPrio_set)
     cullMode = _swig_property(_ivideo.RenderMeshModes_cullMode_get, _ivideo.RenderMeshModes_cullMode_set)
     alphaType = _swig_property(_ivideo.RenderMeshModes_alphaType_get, _ivideo.RenderMeshModes_alphaType_set)

@@ -10160,6 +10160,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *OQBeginQuery = *cspacec::iGraphics3D_OQBeginQuery;
 *OQEndQuery = *cspacec::iGraphics3D_OQEndQuery;
 *DrawMeshBasic = *cspacec::iGraphics3D_DrawMeshBasic;
+*SetEdgeDrawing = *cspacec::iGraphics3D_SetEdgeDrawing;
+*GetEdgeDrawing = *cspacec::iGraphics3D_GetEdgeDrawing;
 *scfGetVersion = *cspacec::iGraphics3D_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -10319,6 +10321,10 @@ sub DESTROY {
 *swig_z_buf_mode_set = *cspacec::RenderMeshModes_z_buf_mode_set;
 *swig_mixmode_get = *cspacec::RenderMeshModes_mixmode_get;
 *swig_mixmode_set = *cspacec::RenderMeshModes_mixmode_set;
+*swig_alphaToCoverage_get = *cspacec::RenderMeshModes_alphaToCoverage_get;
+*swig_alphaToCoverage_set = *cspacec::RenderMeshModes_alphaToCoverage_set;
+*swig_atcMixmode_get = *cspacec::RenderMeshModes_atcMixmode_get;
+*swig_atcMixmode_set = *cspacec::RenderMeshModes_atcMixmode_set;
 *swig_renderPrio_get = *cspacec::RenderMeshModes_renderPrio_get;
 *swig_renderPrio_set = *cspacec::RenderMeshModes_renderPrio_set;
 *swig_cullMode_get = *cspacec::RenderMeshModes_cullMode_get;
@@ -22768,10 +22774,6 @@ sub CS_FX_MESH () { $cspacec::CS_FX_MESH }
 sub CS_FX_FLAT () { $cspacec::CS_FX_FLAT }
 sub CS_FX_MASK_ALPHA () { $cspacec::CS_FX_MASK_ALPHA }
 sub CS_FX_MASK_MIXMODE () { $cspacec::CS_FX_MASK_MIXMODE }
-sub CS_LIGHTPARAM_POSITION () { $cspacec::CS_LIGHTPARAM_POSITION }
-sub CS_LIGHTPARAM_DIFFUSE () { $cspacec::CS_LIGHTPARAM_DIFFUSE }
-sub CS_LIGHTPARAM_SPECULAR () { $cspacec::CS_LIGHTPARAM_SPECULAR }
-sub CS_LIGHTPARAM_ATTENUATION () { $cspacec::CS_LIGHTPARAM_ATTENUATION }
 sub CS_SHADOW_VOLUME_BEGIN () { $cspacec::CS_SHADOW_VOLUME_BEGIN }
 sub CS_SHADOW_VOLUME_PASS1 () { $cspacec::CS_SHADOW_VOLUME_PASS1 }
 sub CS_SHADOW_VOLUME_PASS2 () { $cspacec::CS_SHADOW_VOLUME_PASS2 }
@@ -22779,19 +22781,6 @@ sub CS_SHADOW_VOLUME_FAIL1 () { $cspacec::CS_SHADOW_VOLUME_FAIL1 }
 sub CS_SHADOW_VOLUME_FAIL2 () { $cspacec::CS_SHADOW_VOLUME_FAIL2 }
 sub CS_SHADOW_VOLUME_USE () { $cspacec::CS_SHADOW_VOLUME_USE }
 sub CS_SHADOW_VOLUME_FINISH () { $cspacec::CS_SHADOW_VOLUME_FINISH }
-sub G3DRENDERSTATE_ZBUFFERMODE () { $cspacec::G3DRENDERSTATE_ZBUFFERMODE }
-sub G3DRENDERSTATE_DITHERENABLE () { $cspacec::G3DRENDERSTATE_DITHERENABLE }
-sub G3DRENDERSTATE_BILINEARMAPPINGENABLE () { $cspacec::G3DRENDERSTATE_BILINEARMAPPINGENABLE }
-sub G3DRENDERSTATE_TRILINEARMAPPINGENABLE () { $cspacec::G3DRENDERSTATE_TRILINEARMAPPINGENABLE }
-sub G3DRENDERSTATE_TRANSPARENCYENABLE () { $cspacec::G3DRENDERSTATE_TRANSPARENCYENABLE }
-sub G3DRENDERSTATE_MIPMAPENABLE () { $cspacec::G3DRENDERSTATE_MIPMAPENABLE }
-sub G3DRENDERSTATE_TEXTUREMAPPINGENABLE () { $cspacec::G3DRENDERSTATE_TEXTUREMAPPINGENABLE }
-sub G3DRENDERSTATE_LIGHTINGENABLE () { $cspacec::G3DRENDERSTATE_LIGHTINGENABLE }
-sub G3DRENDERSTATE_INTERLACINGENABLE () { $cspacec::G3DRENDERSTATE_INTERLACINGENABLE }
-sub G3DRENDERSTATE_MMXENABLE () { $cspacec::G3DRENDERSTATE_MMXENABLE }
-sub G3DRENDERSTATE_INTERPOLATIONSTEP () { $cspacec::G3DRENDERSTATE_INTERPOLATIONSTEP }
-sub G3DRENDERSTATE_MAXPOLYGONSTODRAW () { $cspacec::G3DRENDERSTATE_MAXPOLYGONSTODRAW }
-sub G3DRENDERSTATE_GOURAUDENABLE () { $cspacec::G3DRENDERSTATE_GOURAUDENABLE }
 sub G3DRENDERSTATE_EDGES () { $cspacec::G3DRENDERSTATE_EDGES }
 sub CS_MESHTYPE_TRIANGLES () { $cspacec::CS_MESHTYPE_TRIANGLES }
 sub CS_MESHTYPE_QUADS () { $cspacec::CS_MESHTYPE_QUADS }

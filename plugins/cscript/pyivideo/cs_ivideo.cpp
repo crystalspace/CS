@@ -11757,6 +11757,58 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iGraphics3D_SetEdgeDrawing(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGraphics3D *arg1 = (iGraphics3D *) 0 ;
+  bool arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  bool val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGraphics3D_SetEdgeDrawing",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGraphics3D, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGraphics3D_SetEdgeDrawing" "', argument " "1"" of type '" "iGraphics3D *""'"); 
+  }
+  arg1 = reinterpret_cast< iGraphics3D * >(argp1);
+  ecode2 = SWIG_AsVal_bool(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iGraphics3D_SetEdgeDrawing" "', argument " "2"" of type '" "bool""'");
+  } 
+  arg2 = static_cast< bool >(val2);
+  (arg1)->SetEdgeDrawing(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGraphics3D_GetEdgeDrawing(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGraphics3D *arg1 = (iGraphics3D *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGraphics3D_GetEdgeDrawing",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGraphics3D, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGraphics3D_GetEdgeDrawing" "', argument " "1"" of type '" "iGraphics3D *""'"); 
+  }
+  arg1 = reinterpret_cast< iGraphics3D * >(argp1);
+  result = (bool)(arg1)->GetEdgeDrawing();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iGraphics3D_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -12584,6 +12636,110 @@ SWIGINTERN PyObject *_wrap_RenderMeshModes_mixmode_get(PyObject *SWIGUNUSEDPARM(
   }
   arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   result = (uint) ((arg1)->mixmode);
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_RenderMeshModes_alphaToCoverage_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
+  bool arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  bool val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_alphaToCoverage_set",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_alphaToCoverage_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
+  ecode2 = SWIG_AsVal_bool(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "RenderMeshModes_alphaToCoverage_set" "', argument " "2"" of type '" "bool""'");
+  } 
+  arg2 = static_cast< bool >(val2);
+  if (arg1) (arg1)->alphaToCoverage = arg2;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_RenderMeshModes_alphaToCoverage_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_alphaToCoverage_get",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_alphaToCoverage_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
+  result = (bool) ((arg1)->alphaToCoverage);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_RenderMeshModes_atcMixmode_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
+  uint arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  unsigned long val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_atcMixmode_set",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_atcMixmode_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "RenderMeshModes_atcMixmode_set" "', argument " "2"" of type '" "uint""'");
+  } 
+  arg2 = static_cast< uint >(val2);
+  if (arg1) (arg1)->atcMixmode = arg2;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_RenderMeshModes_atcMixmode_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  uint result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_atcMixmode_get",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_atcMixmode_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
+  result = (uint) ((arg1)->atcMixmode);
   resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
@@ -24569,6 +24725,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iGraphics3D_OQBeginQuery", _wrap_iGraphics3D_OQBeginQuery, METH_VARARGS, NULL},
 	 { (char *)"iGraphics3D_OQEndQuery", _wrap_iGraphics3D_OQEndQuery, METH_VARARGS, NULL},
 	 { (char *)"iGraphics3D_DrawMeshBasic", _wrap_iGraphics3D_DrawMeshBasic, METH_VARARGS, NULL},
+	 { (char *)"iGraphics3D_SetEdgeDrawing", _wrap_iGraphics3D_SetEdgeDrawing, METH_VARARGS, NULL},
+	 { (char *)"iGraphics3D_GetEdgeDrawing", _wrap_iGraphics3D_GetEdgeDrawing, METH_VARARGS, NULL},
 	 { (char *)"iGraphics3D_scfGetVersion", _wrap_iGraphics3D_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iGraphics3D", _wrap_delete_iGraphics3D, METH_VARARGS, NULL},
 	 { (char *)"iGraphics3D_swigregister", iGraphics3D_swigregister, METH_VARARGS, NULL},
@@ -24593,6 +24751,10 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"RenderMeshModes_z_buf_mode_get", _wrap_RenderMeshModes_z_buf_mode_get, METH_VARARGS, NULL},
 	 { (char *)"RenderMeshModes_mixmode_set", _wrap_RenderMeshModes_mixmode_set, METH_VARARGS, NULL},
 	 { (char *)"RenderMeshModes_mixmode_get", _wrap_RenderMeshModes_mixmode_get, METH_VARARGS, NULL},
+	 { (char *)"RenderMeshModes_alphaToCoverage_set", _wrap_RenderMeshModes_alphaToCoverage_set, METH_VARARGS, NULL},
+	 { (char *)"RenderMeshModes_alphaToCoverage_get", _wrap_RenderMeshModes_alphaToCoverage_get, METH_VARARGS, NULL},
+	 { (char *)"RenderMeshModes_atcMixmode_set", _wrap_RenderMeshModes_atcMixmode_set, METH_VARARGS, NULL},
+	 { (char *)"RenderMeshModes_atcMixmode_get", _wrap_RenderMeshModes_atcMixmode_get, METH_VARARGS, NULL},
 	 { (char *)"RenderMeshModes_renderPrio_set", _wrap_RenderMeshModes_renderPrio_set, METH_VARARGS, NULL},
 	 { (char *)"RenderMeshModes_renderPrio_get", _wrap_RenderMeshModes_renderPrio_get, METH_VARARGS, NULL},
 	 { (char *)"RenderMeshModes_cullMode_set", _wrap_RenderMeshModes_cullMode_set, METH_VARARGS, NULL},
@@ -26588,10 +26750,6 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "csAlphaMode_alphaNone",SWIG_From_int(static_cast< int >(csAlphaMode::alphaNone)));
   SWIG_Python_SetConstant(d, "csAlphaMode_alphaBinary",SWIG_From_int(static_cast< int >(csAlphaMode::alphaBinary)));
   SWIG_Python_SetConstant(d, "csAlphaMode_alphaSmooth",SWIG_From_int(static_cast< int >(csAlphaMode::alphaSmooth)));
-  SWIG_Python_SetConstant(d, "CS_LIGHTPARAM_POSITION",SWIG_From_int(static_cast< int >(0)));
-  SWIG_Python_SetConstant(d, "CS_LIGHTPARAM_DIFFUSE",SWIG_From_int(static_cast< int >(1)));
-  SWIG_Python_SetConstant(d, "CS_LIGHTPARAM_SPECULAR",SWIG_From_int(static_cast< int >(2)));
-  SWIG_Python_SetConstant(d, "CS_LIGHTPARAM_ATTENUATION",SWIG_From_int(static_cast< int >(3)));
   SWIG_Python_SetConstant(d, "CS_SHADOW_VOLUME_BEGIN",SWIG_From_int(static_cast< int >(1)));
   SWIG_Python_SetConstant(d, "CS_SHADOW_VOLUME_PASS1",SWIG_From_int(static_cast< int >(2)));
   SWIG_Python_SetConstant(d, "CS_SHADOW_VOLUME_PASS2",SWIG_From_int(static_cast< int >(3)));
@@ -26599,19 +26757,6 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CS_SHADOW_VOLUME_FAIL2",SWIG_From_int(static_cast< int >(5)));
   SWIG_Python_SetConstant(d, "CS_SHADOW_VOLUME_USE",SWIG_From_int(static_cast< int >(6)));
   SWIG_Python_SetConstant(d, "CS_SHADOW_VOLUME_FINISH",SWIG_From_int(static_cast< int >(7)));
-  SWIG_Python_SetConstant(d, "G3DRENDERSTATE_ZBUFFERMODE",SWIG_From_int(static_cast< int >(G3DRENDERSTATE_ZBUFFERMODE)));
-  SWIG_Python_SetConstant(d, "G3DRENDERSTATE_DITHERENABLE",SWIG_From_int(static_cast< int >(G3DRENDERSTATE_DITHERENABLE)));
-  SWIG_Python_SetConstant(d, "G3DRENDERSTATE_BILINEARMAPPINGENABLE",SWIG_From_int(static_cast< int >(G3DRENDERSTATE_BILINEARMAPPINGENABLE)));
-  SWIG_Python_SetConstant(d, "G3DRENDERSTATE_TRILINEARMAPPINGENABLE",SWIG_From_int(static_cast< int >(G3DRENDERSTATE_TRILINEARMAPPINGENABLE)));
-  SWIG_Python_SetConstant(d, "G3DRENDERSTATE_TRANSPARENCYENABLE",SWIG_From_int(static_cast< int >(G3DRENDERSTATE_TRANSPARENCYENABLE)));
-  SWIG_Python_SetConstant(d, "G3DRENDERSTATE_MIPMAPENABLE",SWIG_From_int(static_cast< int >(G3DRENDERSTATE_MIPMAPENABLE)));
-  SWIG_Python_SetConstant(d, "G3DRENDERSTATE_TEXTUREMAPPINGENABLE",SWIG_From_int(static_cast< int >(G3DRENDERSTATE_TEXTUREMAPPINGENABLE)));
-  SWIG_Python_SetConstant(d, "G3DRENDERSTATE_LIGHTINGENABLE",SWIG_From_int(static_cast< int >(G3DRENDERSTATE_LIGHTINGENABLE)));
-  SWIG_Python_SetConstant(d, "G3DRENDERSTATE_INTERLACINGENABLE",SWIG_From_int(static_cast< int >(G3DRENDERSTATE_INTERLACINGENABLE)));
-  SWIG_Python_SetConstant(d, "G3DRENDERSTATE_MMXENABLE",SWIG_From_int(static_cast< int >(G3DRENDERSTATE_MMXENABLE)));
-  SWIG_Python_SetConstant(d, "G3DRENDERSTATE_INTERPOLATIONSTEP",SWIG_From_int(static_cast< int >(G3DRENDERSTATE_INTERPOLATIONSTEP)));
-  SWIG_Python_SetConstant(d, "G3DRENDERSTATE_MAXPOLYGONSTODRAW",SWIG_From_int(static_cast< int >(G3DRENDERSTATE_MAXPOLYGONSTODRAW)));
-  SWIG_Python_SetConstant(d, "G3DRENDERSTATE_GOURAUDENABLE",SWIG_From_int(static_cast< int >(G3DRENDERSTATE_GOURAUDENABLE)));
   SWIG_Python_SetConstant(d, "G3DRENDERSTATE_EDGES",SWIG_From_int(static_cast< int >(G3DRENDERSTATE_EDGES)));
   SWIG_Python_SetConstant(d, "CS_MESHTYPE_TRIANGLES",SWIG_From_int(static_cast< int >(CS_MESHTYPE_TRIANGLES)));
   SWIG_Python_SetConstant(d, "CS_MESHTYPE_QUADS",SWIG_From_int(static_cast< int >(CS_MESHTYPE_QUADS)));
