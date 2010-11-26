@@ -436,6 +436,11 @@ public:
   void SetupClipPortalDrawing ();
 
   virtual bool HasStencil() { return stencilStorage != 0; }
+  virtual bool HasMultisample()
+  {
+    /* Needs EXT_framebuffer_multisample */
+    return false;
+  }
 
   void NextFrame (uint frameNum);
   void CleanupFBOs();

@@ -138,6 +138,7 @@ namespace Graphics
   struct RenderMeshModes
   {
     RenderMeshModes () : z_buf_mode ((csZBufMode)~0), mixmode (CS_FX_COPY),
+      alphaToCoverage (false), atcMixmode (CS_MIXMODE_BLEND (ONE, ZERO)),
       renderPrio (-1), cullMode (cullNormal),
       alphaType (csAlphaMode::alphaNone), zoffset (false), doInstancing (false)
     {
@@ -146,6 +147,8 @@ namespace Graphics
     RenderMeshModes (RenderMeshModes const& x) :
       z_buf_mode (x.z_buf_mode),
       mixmode (x.mixmode),
+      alphaToCoverage (x.alphaToCoverage),
+      atcMixmode (x.atcMixmode),
       renderPrio (x.renderPrio),
       cullMode (x.cullMode),
       alphaType (x.alphaType),
@@ -167,6 +170,17 @@ namespace Graphics
 
     /// mixmode to use
     uint mixmode;
+    
+    /**
+     * Whether to enable alpha to coverage.
+     * Note that alpha to coverage requires enabled multisampling
+     * If that is the case alpha to coverage is
+     * enabled and the mixmode from \c atcMixmode is used.
+     * Otherwise, the normal mixmode is used.
+     */
+    bool alphaToCoverage;
+    /// Mixmode to use together with alpha to coverage
+    uint atcMixmode;
     
     /// Mesh render priority
     RenderPriority renderPrio;

@@ -101,13 +101,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     {
       //mix and alpha mode
       uint mixMode;
+      bool alphaToCoverage;
+      uint atcMixMode;
       csAlphaMode alphaMode;
       csZBufMode zMode;
       bool overrideZmode;
       CS::Graphics::MeshCullMode cullMode;
       bool zoffset;
 
-      ShaderPass () : mixMode (CS_FX_MESH), zMode (CS_ZBUF_MESH),
+      ShaderPass () : mixMode (CS_FX_MESH),
+	alphaToCoverage (false), atcMixMode (CS_MIXMODE_BLEND (ONE, ZERO)),
+	zMode (CS_ZBUF_MESH),
         overrideZmode (false), cullMode (CS::Graphics::cullNormal),
         zoffset (false), minLights (0)
       { 

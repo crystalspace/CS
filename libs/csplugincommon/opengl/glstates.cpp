@@ -206,6 +206,18 @@ void csGLStateCacheContext::InitCache()
   else
     enabled_GL_TEXTURE_CUBE_MAP_SEAMLESS = false;
 
+  if (extmgr->CS_GL_ARB_multisample)
+  {
+    enabled_GL_SAMPLE_ALPHA_TO_COVERAGE_ARB =
+      (glIsEnabled (GL_SAMPLE_ALPHA_TO_COVERAGE_ARB) == GL_TRUE);
+    enabled_GL_SAMPLE_ALPHA_TO_ONE_ARB =
+      (glIsEnabled (GL_SAMPLE_ALPHA_TO_ONE_ARB) == GL_TRUE);
+  }
+  else
+  {
+    enabled_GL_SAMPLE_ALPHA_TO_ONE_ARB = false;
+  }
+  
   memset (currentBufferID, 0, sizeof (currentBufferID));
   {
     enum { extVBO = 1, extPBO = 2 };

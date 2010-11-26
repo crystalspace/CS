@@ -85,6 +85,7 @@ SCF_IMPLEMENT_FACTORY (csGLGraphics3D)
 csGLGraphics3D::csGLGraphics3D (iBase *parent) : 
   scfImplementationType (this, parent), isOpen (false), frameNum (0), 
   glProfiling (false), explicitProjection (false), needMatrixUpdate (true),
+  multisampleEnabled (false),
   imageUnits (0), activeVertexAttribs (0), wantToSwap (false),
   delayClearFlags (0), currentAttachments (0)
 {
@@ -1033,6 +1034,13 @@ bool csGLGraphics3D::Open ()
     Report (CS_REPORTER_SEVERITY_NOTIFY, 
       "Clearing Z buffer when stencil clear is needed %s", 
       stencilClearWithZ ? "enabled" : "disabled");
+  
+  if (ext->CS_GL_ARB_multisample)
+  {
+    GLint glmultisamp = 0;
+    glGetIntegerv (GL_SAMPLES_ARB, &glmultisamp);
+    multisampleEnabled = glmultisamp > 0;
+  }
 
   shadermgr = csQueryRegistryOrLoad<iShaderManager> (object_reg,
     "crystalspace.graphics3d.shadermanager", false);
@@ -1602,6 +1610,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
         statecache->ActivateTCUnit (csGLStateCache::activateTexCoord);
       }
       statecache->Disable_GL_POLYGON_OFFSET_FILL ();
+      if (ext->CS_GL_ARB_multisample)
+	statecache->Disable_GL_SAMPLE_ALPHA_TO_COVERAGE_ARB ();
 
       if (fixedFunctionForcefulEnable)
       {
@@ -2339,8 +2349,18 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       statecache->SetCullFace ((cullFace == GL_FRONT) ? GL_BACK : GL_FRONT);
   }
 
-  const uint mixmode = modes.mixmode;
+  bool alphaToCoverage = modes.alphaToCoverage;
+  if (currentAttachments != 0)
+    alphaToCoverage = alphaToCoverage && r2tbackend->HasMultisample();
+  else
+    alphaToCoverage = alphaToCoverage && multisampleEnabled;
+  const uint mixmode = alphaToCoverage ? modes.atcMixmode : modes.mixmode;
   statecache->SetShadeModel ((mixmode & CS_FX_FLAT) ? GL_FLAT : GL_SMOOTH);
+  
+  if (alphaToCoverage)
+    statecache->Enable_GL_SAMPLE_ALPHA_TO_COVERAGE_ARB ();
+  else
+    statecache->Disable_GL_SAMPLE_ALPHA_TO_COVERAGE_ARB ();
 
   if (modes.zoffset)
     statecache->Enable_GL_POLYGON_OFFSET_FILL ();

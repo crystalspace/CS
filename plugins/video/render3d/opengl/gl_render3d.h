@@ -293,6 +293,7 @@ private:
 
   csGraphics3DCaps rendercaps;
   GLint maxNpotsTexSize;
+  bool multisampleEnabled;
 
   csRef<iShaderVarStringSet> strings;
 
@@ -531,6 +532,9 @@ public:
   
   csGLRender2TextureBackend* GetR2TBackend()
   { return r2tbackend; }
+  
+  inline bool GetMultisampleEnabled() const
+  { return multisampleEnabled; }
 
   ////////////////////////////////////////////////////////////////////
   //                            iGraphics3D

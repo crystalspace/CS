@@ -637,5 +637,10 @@ bool csGLRender2TextureFramebuf::HasStencil()
   return sbits > 0;
 }
 
+bool csGLRender2TextureFramebuf::HasMultisample()
+{
+  return G3D->GetMultisampleEnabled();
+}
+
 }
 CS_PLUGIN_NAMESPACE_END(gl3d)

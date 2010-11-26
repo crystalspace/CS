@@ -86,6 +86,7 @@ public:
   virtual void SetClipRect (const csRect& clipRect);
   virtual void SetupClipPortalDrawing ();
   virtual bool HasStencil();
+  virtual bool HasMultisample();
 };
 
 }

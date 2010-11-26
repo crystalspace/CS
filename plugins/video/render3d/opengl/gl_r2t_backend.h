@@ -100,6 +100,7 @@ public:
   virtual void SetClipRect (const csRect& clipRect) = 0;
   virtual void SetupClipPortalDrawing () = 0;
   virtual bool HasStencil() = 0;
+  virtual bool HasMultisample() = 0;
 
   virtual void NextFrame (uint frameNum) {}
   virtual void CleanupFBOs() {}

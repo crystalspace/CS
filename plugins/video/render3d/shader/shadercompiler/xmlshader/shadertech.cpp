@@ -46,7 +46,7 @@ CS_LEAKGUARD_IMPLEMENT (csXMLShaderTech);
 /* Magic value for tech + pass cache files.
  * The most significant byte serves as a "version", increase when the
  * cache file format changes. */
-static const uint32 cacheFileMagic = 0x07747863;
+static const uint32 cacheFileMagic = 0x08747863;
 
 //---------------------------------------------------------------------------
 
@@ -599,6 +599,22 @@ bool csXMLShaderTech::ParseModes (ShaderPass* pass,
       pass->mixMode = mm;
   }
 
+  csRef<iDocumentNode> nodeAlphaToCoverage = node->GetNode ("alphatocoverage");
+  if (nodeAlphaToCoverage)
+  {
+    bool atcFlag;
+    h.synldr->ParseBool (nodeAlphaToCoverage, atcFlag, true);
+    pass->alphaToCoverage = atcFlag;
+  }
+  
+  csRef<iDocumentNode> nodeAtcMixMode = node->GetNode ("atcixmode");
+  if (nodeAtcMixMode != 0)
+  {
+    uint mm;
+    if (h.synldr->ParseMixmode (nodeAtcMixMode, mm, true))
+      pass->atcMixMode = mm;
+  }
+  
   csRef<iDocumentNode> nodeAlphaMode = node->GetNode ("alphamode");
   if (nodeAlphaMode != 0)
   {
@@ -877,6 +893,8 @@ enum
   
   cacheFlagAlphaAuto,
   
+  cacheFlagAlphaToCoverage,
+  
   cacheFlagLast
 };
 
@@ -898,6 +916,9 @@ bool csXMLShaderTech::WritePass (ShaderPass* pass,
     if (pass->zoffset) cacheFlags |= 1 << cacheFlagZoffset;
     
     if (pass->alphaMode.autoAlphaMode) cacheFlags |= 1 << cacheFlagAlphaAuto;
+    
+    if (pass->alphaToCoverage) cacheFlags |= 1 << cacheFlagAlphaToCoverage;
+    
     cacheFlags |= uint (pass->cullMode) << cacheFlagLast;
     
     uint32 diskFlags = csLittleEndian::UInt32 (cacheFlags);
@@ -907,6 +928,11 @@ bool csXMLShaderTech::WritePass (ShaderPass* pass,
   
   {
     uint32 diskMM = csLittleEndian::UInt32 (pass->mixMode);
+    if (cacheFile->Write ((char*)&diskMM, sizeof (diskMM))
+	!= sizeof (diskMM)) return false;
+  }
+  {
+    uint32 diskMM = csLittleEndian::UInt32 (pass->atcMixMode);
     if (cacheFile->Write ((char*)&diskMM, sizeof (diskMM))
 	!= sizeof (diskMM)) return false;
   }
@@ -1123,6 +1149,8 @@ bool csXMLShaderTech::ReadPass (ShaderPass* pass,
     pass->zoffset = (cacheFlags & (1 << cacheFlagZoffset)) != 0;
     
     pass->alphaMode.autoAlphaMode = (cacheFlags & (1 << cacheFlagAlphaAuto)) != 0;
+    
+    pass->alphaToCoverage = (cacheFlags & (1 << cacheFlagAlphaToCoverage)) != 0;
 
     pass->cullMode = (CS::Graphics::MeshCullMode)((cacheFlags >> cacheFlagLast) & 0x3);
   }
@@ -1132,6 +1160,12 @@ bool csXMLShaderTech::ReadPass (ShaderPass* pass,
     if (cacheFile->Read ((char*)&diskMM, sizeof (diskMM))
 	!= sizeof (diskMM)) return false;
     pass->mixMode = csLittleEndian::UInt32 (diskMM);
+  }
+  {
+    uint32 diskMM;
+    if (cacheFile->Read ((char*)&diskMM, sizeof (diskMM))
+	!= sizeof (diskMM)) return false;
+    pass->atcMixMode = csLittleEndian::UInt32 (diskMM);
   }
   
   if (pass->alphaMode.autoAlphaMode)
@@ -1956,6 +1990,9 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   uint originalMixMode = modes.mixmode;
   if ((thispass->mixMode & CS_MIXMODE_TYPE_MASK) != CS_FX_MESH)
     modes.mixmode = thispass->mixMode;
+  modes.alphaToCoverage = thispass->alphaToCoverage;
+  if ((thispass->atcMixMode & CS_MIXMODE_TYPE_MASK) != CS_FX_MESH)
+    modes.atcMixmode = thispass->atcMixMode;
 
   modes.cullMode = thispass->cullMode;
   
