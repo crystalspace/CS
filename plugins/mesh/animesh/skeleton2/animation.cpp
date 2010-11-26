@@ -189,7 +189,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   void Animation::RemoveChannel (CS::Animation::ChannelID channel)
   {
     CS_ASSERT(channel < channels.GetSize ());
-    printf ("Animation::RemoveChannel %i\n", channel);
     channels.DeleteIndex (channel);
   }
 
@@ -366,7 +365,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       const KeyFrame& k2 = channel->keyFrames[after];
 
       // blending factor
-      const float t = before == after ? 0 : (playbackTime - k1.time) / (k2.time - k1.time);
+      const float t = before == after ? -1.0f : (playbackTime - k1.time) / (k2.time - k1.time);
 
       // Blend together
       csQuaternion& q = state->GetQuaternion (channel->bone);
