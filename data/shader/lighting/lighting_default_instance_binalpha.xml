@@ -20,25 +20,37 @@
 <shader compiler="shaderweaver" name="lighting_default_instance_binalpha" lights="6">
   <alias name="position" file="/shader-snippets/position-instance.xml" />
   <alias name="ambient" file="/shader-snippets/lighting/ambient-simple.xml" />
-  <alias name="apply_alpha" file="/shader-snippets/surface/alpha-nochange.xml" />
+  <alias name="apply_alpha" file="/shader-snippets/surface/alpha-premult.xml" />
   <alias name="lighting" file="/shader-snippets/lighting/lighting-ppl.xml" />
-  <alias name="surface" file="/shader-snippets/surface/surface-modulate-alpha_instance.xml" />
+  <!--
+      The surface setup is slightly convoluted because:
+      - We want to kill the texel based on the original alpha value (ie source texture).
+      - We want to ignore the source texture alpha for blending (to give that "binary alpha" look).
+      - Rather, the final alpha value should be the per-instance alpha factor.
+      
+      The trick is to remember that a *_surface alias is applied _before_ the snippet using
+      that alias.
+    -->
+  <alias name="surface-alpha-force-opaque_surface" file="/shader-snippets/surface/surface-alphakill.xml" /> <!-- "Innermost" snippet, applied first -->
+  <alias name="surface-modulate-alpha_instance_surface" file="/shader-snippets/surface/surface-alpha-force-opaque.xml" /> <!-- One level up, applied second -->
+  <alias name="surface" file="/shader-snippets/surface/surface-modulate-alpha_instance.xml" /><!-- Outermost snippet, applied last -->
   
   <technique priority="500" minlights="5">
     <tag>per_pixel_lighting</tag>
     <!-- 1 pass, 6 lights -->
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: don't blend -->
+	<!-- First pass: blend with alpha.
+	     Note that the 'binalpha' part is provided by the alphakill snippet -->
 	<mixmode>
-	  <blendop src="one" dst="zero" />
-	  <alphatest>enable</alphatest>
+	  <blendop src="one" dst="srcalpha_inv" />
+	  <alphatest>disable</alphatest>
 	</mixmode>
       <?else?>
 	<!-- Later pass: blend with add -->
 	<mixmode>
 	  <blendop src="one" dst="one" />
-	  <alphatest>enable</alphatest>
+	  <alphatest>disable</alphatest>
 	</mixmode>
       <?endif?>
 
@@ -67,16 +79,17 @@
     <!-- 2 passes, 4+2 lights -->
     <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: don't blend -->
+	<!-- First pass: blend with alpha.
+	     Note that the 'binalpha' part is provided by the alphakill snippet -->
 	<mixmode>
-	  <blendop src="one" dst="zero" />
-	  <alphatest>enable</alphatest>
+	  <blendop src="one" dst="srcalpha_inv" />
+	  <alphatest>disable</alphatest>
 	</mixmode>
       <?else?>
 	<!-- Later pass: blend with add -->
 	<mixmode>
 	  <blendop src="one" dst="one" />
-	  <alphatest>enable</alphatest>
+	  <alphatest>disable</alphatest>
 	</mixmode>
       <?endif?>
       
@@ -95,7 +108,7 @@
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
-	<alphatest>enable</alphatest>
+	<alphatest>disable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -117,16 +130,17 @@
     <!-- 2 passes, 3+3 lights -->
     <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: don't blend -->
+	<!-- First pass: blend with alpha.
+	     Note that the 'binalpha' part is provided by the alphakill snippet -->
 	<mixmode>
-	  <blendop src="one" dst="zero" />
-	  <alphatest>enable</alphatest>
+	  <blendop src="one" dst="srcalpha_inv" />
+	  <alphatest>disable</alphatest>
 	</mixmode>
       <?else?>
 	<!-- Later pass: blend with add -->
 	<mixmode>
 	  <blendop src="one" dst="one" />
-	  <alphatest>enable</alphatest>
+	  <alphatest>disable</alphatest>
 	</mixmode>
       <?endif?>
       
@@ -145,7 +159,7 @@
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
-	<alphatest>enable</alphatest>
+	<alphatest>disable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -167,16 +181,17 @@
     <!-- 3 passes, 2+2+2 lights -->
     <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: don't blend -->
+	<!-- First pass: blend with alpha.
+	     Note that the 'binalpha' part is provided by the alphakill snippet -->
 	<mixmode>
-	  <blendop src="one" dst="zero" />
-	  <alphatest>enable</alphatest>
+	  <blendop src="one" dst="srcalpha_inv" />
+	  <alphatest>disable</alphatest>
 	</mixmode>
       <?else?>
 	<!-- Later pass: blend with add -->
 	<mixmode>
 	  <blendop src="one" dst="one" />
-	  <alphatest>enable</alphatest>
+	  <alphatest>disable</alphatest>
 	</mixmode>
       <?endif?>
       
@@ -195,7 +210,7 @@
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
-	<alphatest>enable</alphatest>
+	<alphatest>disable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -214,7 +229,7 @@
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
-	<alphatest>enable</alphatest>
+	<alphatest>disable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -236,16 +251,17 @@
     <!-- 6 passes, 1+1+1+1+1+1 lights -->
     <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: don't blend -->
+	<!-- First pass: blend with alpha.
+	     Note that the 'binalpha' part is provided by the alphakill snippet -->
 	<mixmode>
-	  <blendop src="one" dst="zero" />
-	  <alphatest>enable</alphatest>
+	  <blendop src="one" dst="srcalpha_inv" />
+	  <alphatest>disable</alphatest>
 	</mixmode>
       <?else?>
 	<!-- Later pass: blend with add -->
 	<mixmode>
 	  <blendop src="one" dst="one" />
-	  <alphatest>enable</alphatest>
+	  <alphatest>disable</alphatest>
 	</mixmode>
       <?endif?>
       
@@ -264,7 +280,7 @@
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
-	<alphatest>enable</alphatest>
+	<alphatest>disable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -283,7 +299,7 @@
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
-	<alphatest>enable</alphatest>
+	<alphatest>disable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -302,7 +318,7 @@
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
-	<alphatest>enable</alphatest>
+	<alphatest>disable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -321,7 +337,7 @@
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
-	<alphatest>enable</alphatest>
+	<alphatest>disable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -340,7 +356,7 @@
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
-	<alphatest>enable</alphatest>
+	<alphatest>disable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -362,10 +378,11 @@
   <technique priority="50">
     <tag>per_pixel_lighting</tag>
     <pass>
-      <!-- First(only) pass: don't blend -->
+      <!-- First (only) pass: blend with alpha.
+	   Note that the 'binalpha' part is provided by the alphakill snippet -->
       <mixmode>
-	<blendop src="one" dst="zero" />
-	<alphatest>enable</alphatest>
+	<blendop src="one" dst="srcalpha_inv" />
+	<alphatest>disable</alphatest>
       </mixmode>
       
       <!-- Combiner to use for this particular pass.

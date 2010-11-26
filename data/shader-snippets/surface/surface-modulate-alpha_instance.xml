@@ -17,8 +17,10 @@
 -->
 
 <snippet type="compound">
+  <alias name="surface-modulate-alpha_instance_surface" file="/shader-snippets/surface/surface-classic.xml" weak="yes"/>
+  
   <technique priority="100">
-    <snippet id="surface_classic" file="/shader-snippets/surface/surface-classic.xml" />
+    <snippet id="surface_classic" filealias="surface-modulate-alpha_instance_surface" />
     
     <snippet id="surface_modulate-alpha_instance">
       <technique priority="100">
