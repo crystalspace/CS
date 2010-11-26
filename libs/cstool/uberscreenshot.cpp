@@ -54,8 +54,7 @@ namespace CS
     
     shotView->SetRectangle (0, screenH - tileH, tileW, tileH);
     
-    if (!g3d->BeginDraw (engine->GetBeginDrawFlags () 
-      | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER))
+    if (!g3d->BeginDraw (CSDRAW_3DGRAPHICS))
       return false;
     
     shotView->Draw ();

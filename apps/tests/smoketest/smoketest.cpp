@@ -92,8 +92,7 @@ void SmokeTest::Frame()
   csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
   c->SetTransform (ot);
   // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw(
-    engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS))
+  if (!g3d->BeginDraw (CSDRAW_3DGRAPHICS))
     return;
 
   
@@ -263,7 +262,7 @@ void SmokeTest::ScreenShot(const std::string& fileName)
 {
   csRef<iImageIO> iio = csQueryRegistry<iImageIO> (object_reg);
 
-  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER))
+  if (!g3d->BeginDraw (CSDRAW_3DGRAPHICS))
      return;
 
   // Manually draw to bypass CEGUI.

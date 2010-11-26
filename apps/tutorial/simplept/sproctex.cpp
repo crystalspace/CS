@@ -145,8 +145,7 @@ void csEngineProcTex::Animate (csTicks CurrentTime)
   Engine->SetContext (tex->GetTextureHandle ());
 
   // Draw the engine view.
-  g3d->BeginDraw (CSDRAW_3DGRAPHICS | Engine->GetBeginDrawFlags () 
-    | CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER);
+  g3d->BeginDraw (CSDRAW_3DGRAPHICS);
   //g3d->GetDriver2D()->Clear (g3d->GetDriver2D()->FindRGB (0, 255, 0));
   View->Draw ();
   g3d->FinishDraw ();

@@ -282,8 +282,7 @@ void ASndTest::Frame ()
   movingsoundsprite->GetMovable ()->UpdateMove ();
 
   // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw(
-    engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS))
+  if (!g3d->BeginDraw (CSDRAW_3DGRAPHICS))
     return;
 
   // Tell the camera to render into the frame buffer.

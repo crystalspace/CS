@@ -117,7 +117,6 @@ bool Simple::CreateGenMesh (iMaterialWrapper* mat)
     return false;
   }
 
-  state->SetLighting (true);
   state->SetManualColors (false);
   genmesh->SetZBufMode (CS_ZBUF_FILL);
   genmesh->SetRenderPriority (engine->GetWallRenderPriority ());

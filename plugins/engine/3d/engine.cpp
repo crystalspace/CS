@@ -516,8 +516,6 @@ csEngine::csEngine (iBase *iParent) :
   renderLoopManager (0), topLevelClipper (0), resize (false),
   worldSaveable (false), defaultKeepImage (false), maxAspectRatio (0),
   nextframePending (0), currentFrameNumber (0), 
-  clearZBuf (false), defaultClearZBuf (false), 
-  clearScreen (false),  defaultClearScreen (false), 
   currentRenderContext (0), weakEventHandler(0),
   bAdaptiveLODsEnabled(false), adaptiveLODsTargetFPS(30), adaptiveLODsMultiplier(1.0f)
 {
@@ -964,8 +962,6 @@ const char* csEngine::GetRenderPriorityName (long priority) const
 
 void csEngine::ResetWorldSpecificSettings()
 {
-  SetClearZBuf (defaultClearZBuf);
-  SetClearScreen (defaultClearScreen);
   SetAmbientLight (csColor (
   	defaultAmbientRed / 255.0f,
 	defaultAmbientGreen / 255.0f, 
@@ -1601,13 +1597,6 @@ void csEngine::ReadConfig (iConfigFile *Config)
   lightAmbientRed = defaultAmbientRed;
   lightAmbientGreen = defaultAmbientGreen;
   lightAmbientBlue = defaultAmbientBlue;
-
-  defaultClearZBuf = 
-    Config->GetBool ("Engine.ClearZBuffer", defaultClearZBuf);
-  clearZBuf = defaultClearZBuf;
-  defaultClearScreen = 
-    Config->GetBool ("Engine.ClearScreen", defaultClearScreen);
-  clearScreen = defaultClearScreen;
   
   enableEnvTex = 
     Config->GetBool ("Engine.AutomaticEnvironmentCube", true);

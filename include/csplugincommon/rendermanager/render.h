@@ -286,8 +286,9 @@ namespace RenderManager
 
       RenderView* rview = context->renderView;
 
-      int drawFlags = rview->GetEngine ()->GetBeginDrawFlags ();
-      drawFlags |= CSDRAW_3DGRAPHICS;
+      int drawFlags = CSDRAW_3DGRAPHICS;
+      drawFlags |= CSDRAW_CLEARSCREEN;
+      drawFlags |= CSDRAW_CLEARZBUFFER;
       drawFlags |= context->drawFlags;
 
       iCamera* cam = rview->GetCamera ();
@@ -297,8 +298,8 @@ namespace RenderManager
       {
         iGraphics2D* G2D = g3d->GetDriver2D();
         g3d->BeginDraw (CSDRAW_2DGRAPHICS | CSDRAW_CLEARZBUFFER);
-	int bgcolor_clear = G2D->FindRGB (0, 255, 255);
-	G2D->Clear (bgcolor_clear);
+        int bgcolor_clear = G2D->FindRGB (0, 255, 255);
+        G2D->Clear (bgcolor_clear);
       }
       
       // Setup the camera etc.. @@should be delayed as well

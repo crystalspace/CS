@@ -316,7 +316,6 @@ bool DeferredDemo::SetupScene()
   else
     ReportInfo("Graphics3D supports %d color buffer attachments.", caps->MaxRTColorAttachments);
 
-  engine->SetClearScreen (true);
   engine->Prepare ();
 
   return true;

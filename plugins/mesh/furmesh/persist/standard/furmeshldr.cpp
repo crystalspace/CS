@@ -113,12 +113,12 @@ csPtr<iBase> FurMeshFactoryLoader::Parse (iDocumentNode* node,
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
 
-    switch (id)
-    {
-      default:
+//     switch (id)
+//     {
+//       default:
         synldr->ReportBadToken (child);
         return 0;
-    }
+//     }
   }
 
   return csPtr<iBase> (fact);

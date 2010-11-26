@@ -188,8 +188,7 @@ ViewMesh::ViewMesh () :
       }
     }
 
-    if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS
-      | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
+    if (!g3d->BeginDraw (CSDRAW_3DGRAPHICS))
       return;
 
     view->Draw ();

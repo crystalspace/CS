@@ -83,7 +83,7 @@ void AppWaterdemo2::Frame()
   csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
   c->SetTransform (ot);
   
-  if (g3d->BeginDraw(engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS))
+  if (g3d->BeginDraw(CSDRAW_3DGRAPHICS))
   {
     view->Draw ();
     g3d->FinishDraw();
@@ -191,8 +191,6 @@ bool AppWaterdemo2::Application()
 
   loader = csQueryRegistry<iLoader> (r);
   if (!loader) return ReportError("Failed to locate Loader!");
-
-  engine->SetClearScreen(true);
   
   rotY = 0;
   rotX = 0;

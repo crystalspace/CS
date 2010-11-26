@@ -189,7 +189,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         graphics3D->SetProjectionMatrix (context->perspectiveFixup * cam->GetProjectionMatrix ());
         graphics3D->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
 
-        int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | context->drawFlags;
+        int drawFlags = CSDRAW_3DGRAPHICS | context->drawFlags;
         drawFlags |= CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
         graphics3D->BeginDraw (drawFlags);
         graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
@@ -212,7 +212,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       {
         graphics3D->SetZMode (CS_ZBUF_MESH);
 
-        int drawFlags = engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | context->drawFlags;
+        int drawFlags = CSDRAW_3DGRAPHICS | context->drawFlags;
         drawFlags |= CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
 
         graphics3D->BeginDraw (drawFlags);

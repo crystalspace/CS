@@ -39,7 +39,7 @@ FrameBegin3DDraw::~FrameBegin3DDraw ()
 
 bool FrameBegin3DDraw::HandleEvent (iEvent & /*ev*/)
 {
-  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
+  if (!g3d->BeginDraw (CSDRAW_3DGRAPHICS))
     return false;
   view->Draw();
   return false;

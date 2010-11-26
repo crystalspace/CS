@@ -1831,8 +1831,6 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     csPlane3 farplane(0,0,-1,distance);
     Sys->views->GetCamera()->SetFarPlane(&farplane);
-    // turn on zclear to be sure
-    Sys->Engine->SetClearZBuf(true);
   }
   else if (!csStrCaseCmp (cmd, "saveworld"))
   {
@@ -1894,8 +1892,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 
     for (int i = 0; i < 6; i++)
     {
-      if (!Sys->myG3D->BeginDraw (Sys->Engine->GetBeginDrawFlags () 
-        | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER))
+      if (!Sys->myG3D->BeginDraw (CSDRAW_3DGRAPHICS))
       {
 	Sys->myG2D->SetClipRect (cMinX, cMinY, cMaxX, xMaxY);
 	return true;

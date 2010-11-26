@@ -429,8 +429,6 @@ void TerrainEd::CreateRoom ()
   csRef<iMeshFactoryWrapper> meshf = engine->CreateMeshFactory(meshFactory, "terrainFact");
   csRef<iMeshWrapper> mesh = engine->CreateMeshWrapper(meshf, "terrain", room);
 
-  engine->SetClearScreen(true);
-
   /*csRef<iTerrainSystem>*/ terrain = scfQueryInterface<iTerrainSystem> (mesh->GetMeshObject());
   if (terrain) printf("blah\n");
 

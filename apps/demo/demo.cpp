@@ -41,7 +41,7 @@ Demo::~Demo()
 void Demo::Frame()
 {
   // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw(engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS))
+  if (!g3d->BeginDraw (CSDRAW_3DGRAPHICS))
   {
     ReportError("BeginDraw Failed!");
     return;

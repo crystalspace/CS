@@ -4125,20 +4125,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           "<fastmesh> is no longer needed.");
         break;
       case XMLTOKEN_CLEARZBUF:
-        {
-          bool yesno;
-          if (!SyntaxService->ParseBool (child, yesno, true))
-            return false;
-          Engine->SetClearZBuf (yesno);
-        }
+        ReportWarning("crystalspace.maploader.parse.settings",
+          child, "The 'clearzbuf' attribute is deprecated!");
         break;
       case XMLTOKEN_CLEARSCREEN:
-        {
-          bool yesno;
-          if (!SyntaxService->ParseBool (child, yesno, true))
-            return false;
-          Engine->SetClearScreen (yesno);
-        }
+        ReportWarning("crystalspace.maploader.parse.settings",
+          child, "The 'clearscreen' attribute is deprecated!");
         break;
       case XMLTOKEN_LIGHTMAPCELLSIZE:
         ReportWarning("crystalspace.maploader.parse.settings",

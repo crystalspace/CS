@@ -945,14 +945,17 @@ struct iEngine : public virtual iBase
    * \param yesno true to clear the Z buffer after each frame, 
    * false to leave the zbuffer as-is
    */
+  CS_DEPRECATED_METHOD_MSG("Z buffer clearing handled by the rendermanager.")
   virtual void SetClearZBuf (bool yesno) = 0;
 
   /**
    * Get the value of the clear Z-buffer flag set with SetClearZBuf().
    */
+  CS_DEPRECATED_METHOD_MSG("Z buffer clearing handled by the rendermanager.")
   virtual bool GetClearZBuf () const = 0;
 
   /// Get default clear z-buffer flag.
+  CS_DEPRECATED_METHOD_MSG("Z buffer clearing handled by the rendermanager.")
   virtual bool GetDefaultClearZBuf () const = 0;
 
   /**
@@ -967,14 +970,17 @@ struct iEngine : public virtual iBase
    * \param yesno true to clear the screen before each frame, 
    * false to leave the screen as-is (which may leave garbage on the screen)
    */
+  CS_DEPRECATED_METHOD_MSG("Screen clearing handled by the rendermanager.")
   virtual void SetClearScreen (bool yesno) = 0;
 
   /**
    * Get the value of the clear screen flag set with SetClearScreen().
    */
+  CS_DEPRECATED_METHOD_MSG("Screen clearing handled by the rendermanager.")
   virtual bool GetClearScreen () const = 0;
 
   /// Get default clear screen flag
+  CS_DEPRECATED_METHOD_MSG("Screen clearing handled by the rendermanager.")
   virtual bool GetDefaultClearScreen () const = 0;
 
   /**
@@ -983,6 +989,7 @@ struct iEngine : public virtual iBase
    * flags that the application might be interested in. Use SetClearZBuf()
    * to let this function return that the Z-buffer must be cleared.
    */
+  CS_DEPRECATED_METHOD_MSG("Screen and Z buffer clearing handled by the rendermanager.")
   virtual int GetBeginDrawFlags () const = 0;
 
   /**

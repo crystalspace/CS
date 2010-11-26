@@ -99,7 +99,7 @@ void ImposterTest::Frame ()
   }
 
   // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
+  if (!g3d->BeginDraw (CSDRAW_3DGRAPHICS))
     return;
 
   // Tell the camera to render into the frame buffer.
@@ -210,9 +210,6 @@ bool ImposterTest::SetupModules()
   iGraphics2D* g2d = g3d->GetDriver2D ();
   // We use the full window to draw the world.
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
-
-  engine->SetClearZBuf(true);
-  engine->SetClearScreen(true);
 
   // Here we create our world.
   CreateRoom();

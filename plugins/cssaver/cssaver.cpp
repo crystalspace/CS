@@ -1302,12 +1302,6 @@ bool csSaver::SaveVariables (iDocumentNode* node)
 bool csSaver::SaveSettings (iDocumentNode* node)
 {
   csRef<iDocumentNode> settingsNode = CreateNode(node, "settings");
-
-  synldr->WriteBool(settingsNode,"clearzbuf",engine->GetClearZBuf (),
-    engine->GetDefaultClearZBuf ());
-  synldr->WriteBool(settingsNode,"clearscreen",engine->GetClearScreen (),
-    engine->GetDefaultClearScreen ());  
-
   csRef<iDocumentNode> ambientNode = CreateNode(settingsNode, "ambient");
   csColor c;
   engine->GetAmbientLight(c);

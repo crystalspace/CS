@@ -498,25 +498,22 @@ public:
   //-- Drawing related
 
   virtual void SetClearZBuf (bool yesno)
-  { clearZBuf = yesno; }
+  {}
   virtual bool GetClearZBuf () const
-  { return clearZBuf;}
+  { return false; }
   virtual bool GetDefaultClearZBuf () const 
-  { return defaultClearZBuf; }
+  { return false; }
 
   virtual void SetClearScreen (bool yesno)
-  { clearScreen = yesno; }
+  { }
   virtual bool GetClearScreen () const
-  { return clearScreen; }
+  { return true; }
   virtual bool GetDefaultClearScreen () const
-  { return defaultClearScreen; }
+  { return true; }
 
   virtual int GetBeginDrawFlags () const
   {
-    int flag = 0;
-    if (clearScreen) flag |= CSDRAW_CLEARSCREEN;
-    if (clearZBuf) flag |= CSDRAW_CLEARZBUFFER;
-    return flag;
+    return 0;
   }
 
   virtual iRenderView* GetTopLevelClipper () const
@@ -1016,18 +1013,6 @@ private:
 
   /// Store the current framenumber. Is incremented every Draw ()
   uint currentFrameNumber;
-
-  /// Clear the Z-buffer every frame.
-  bool clearZBuf;
-
-  /// default buffer clear flag.
-  bool defaultClearZBuf;
-
-  /// Clear the screen every frame.
-  bool clearScreen;
-
-  /// default buffer clear flag.
-  bool defaultClearScreen;
 
   /// default ambient color
   int defaultAmbientRed, defaultAmbientGreen, defaultAmbientBlue;

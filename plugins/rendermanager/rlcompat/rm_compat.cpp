@@ -50,8 +50,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RM_RLCompat)
     }
       
     CS::RenderManager::BeginFinishDrawScope drawScope (
-      view->GetContext(),
-      engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS);
+      view->GetContext(), CSDRAW_CLEARSCREEN | CSDRAW_3DGRAPHICS);
     engine->Draw (view->GetCamera(), view->GetClipper());
     return true;
   }

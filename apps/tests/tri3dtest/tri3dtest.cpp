@@ -100,7 +100,7 @@ void Tri3DTest::Frame()
 
   // if the user wants the item to be displayed triangulated, 
   // then do so
-  if (!g3d->BeginDraw(engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
+  if (!g3d->BeginDraw (CSDRAW_3DGRAPHICS))
   {
     ReportError("Cannot prepare renderer for 3D drawing.");
   }
