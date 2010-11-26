@@ -20,20 +20,10 @@
 <shader compiler="shaderweaver" name="lighting_default_instance_binalpha_pvl" lights="6">
   <alias name="position" file="/shader-snippets/position-instance.xml" />
   <alias name="ambient" file="/shader-snippets/lighting/ambient-simple.xml" />
-  <alias name="apply_alpha" file="/shader-snippets/surface/alpha-premult.xml" />
+  <alias name="apply_alpha" file="/shader-snippets/surface/alpha-none.xml" />
+  <alias name="apply_alpha_end" file="/shader-snippets/surface/alpha-modulate-instance.xml" />
   <alias name="lighting" file="/shader-snippets/lighting/lighting-pvl.xml" />
-  <!--
-      The surface setup is slightly convoluted because:
-      - We want to kill the texel based on the original alpha value (ie source texture).
-      - We want to ignore the source texture alpha for blending (to give that "binary alpha" look).
-      - Rather, the final alpha value should be the per-instance alpha factor.
-      
-      The trick is to remember that a *_surface alias is applied _before_ the snippet using
-      that alias.
-    -->
-  <alias name="surface-alpha-force-opaque_surface" file="/shader-snippets/surface/surface-alphakill.xml" /> <!-- "Innermost" snippet, applied first -->
-  <alias name="surface-modulate-alpha_instance_surface" file="/shader-snippets/surface/surface-alpha-force-opaque.xml" /> <!-- One level up, applied second -->
-  <alias name="surface" file="/shader-snippets/surface/surface-modulate-alpha_instance.xml" /><!-- Outermost snippet, applied last -->
+  <alias name="surface" file="/shader-snippets/surface/surface-alphakill.xml" />
   
   <technique priority="500" minlights="5">
     <!-- 1 pass, 6 lights -->
@@ -42,15 +32,26 @@
 	<!-- First pass: blend with alpha.
 	     Note that the 'binalpha' part is provided by the alphakill snippet -->
 	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
+	  <blendop src="srcalpha" dst="srcalpha_inv" />
 	  <alphatest>disable</alphatest>
 	</mixmode>
+	<alphatocoverage/>
+	<!-- ATC provides an alpha-blending 'lookalike' -->
+	<atcmixmode>
+	  <blendop src="one" dst="one" />
+	  <alphatest>disable</alphatest>
+	</atcmixmode>
       <?else?>
 	<!-- Later pass: blend with add -->
 	<mixmode>
-	  <blendop src="one" dst="one" />
+	  <blendop src="srcalpha" dst="one" />
 	  <alphatest>disable</alphatest>
 	</mixmode>
+	<alphatocoverage/>
+	<atcmixmode>
+	  <blendop src="one" dst="one" />
+	  <alphatest>disable</alphatest>
+	</atcmixmode>
       <?endif?>
 
       <!-- Combiner to use for this particular pass.
@@ -80,15 +81,26 @@
 	<!-- First pass: blend with alpha.
 	     Note that the 'binalpha' part is provided by the alphakill snippet -->
 	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
+	  <blendop src="srcalpha" dst="srcalpha_inv" />
 	  <alphatest>disable</alphatest>
 	</mixmode>
+	<alphatocoverage/>
+	<!-- ATC provides an alpha-blending 'lookalike' -->
+	<atcmixmode>
+	  <blendop src="one" dst="one" />
+	  <alphatest>disable</alphatest>
+	</atcmixmode>
       <?else?>
 	<!-- Later pass: blend with add -->
 	<mixmode>
-	  <blendop src="one" dst="one" />
+	  <blendop src="srcalpha" dst="one" />
 	  <alphatest>disable</alphatest>
 	</mixmode>
+	<alphatocoverage/>
+	<atcmixmode>
+	  <blendop src="one" dst="one" />
+	  <alphatest>disable</alphatest>
+	</atcmixmode>
       <?endif?>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -105,9 +117,14 @@
     <pass minlights="5">
       <!-- Later pass: blend with add -->
       <mixmode>
-	<blendop src="one" dst="one" />
+	<blendop src="srcalpha" dst="one" />
 	<alphatest>disable</alphatest>
       </mixmode>
+      <alphatocoverage/>
+      <atcmixmode>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
+      </atcmixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
@@ -130,15 +147,26 @@
 	<!-- First pass: blend with alpha.
 	     Note that the 'binalpha' part is provided by the alphakill snippet -->
 	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
+	  <blendop src="srcalpha" dst="srcalpha_inv" />
 	  <alphatest>disable</alphatest>
 	</mixmode>
+	<alphatocoverage/>
+	<!-- ATC provides an alpha-blending 'lookalike' -->
+	<atcmixmode>
+	  <blendop src="one" dst="one" />
+	  <alphatest>disable</alphatest>
+	</atcmixmode>
       <?else?>
 	<!-- Later pass: blend with add -->
 	<mixmode>
-	  <blendop src="one" dst="one" />
+	  <blendop src="srcalpha" dst="one" />
 	  <alphatest>disable</alphatest>
 	</mixmode>
+	<alphatocoverage/>
+	<atcmixmode>
+	  <blendop src="one" dst="one" />
+	  <alphatest>disable</alphatest>
+	</atcmixmode>
       <?endif?>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -155,9 +183,14 @@
     <pass minlights="4">
       <!-- Later pass: blend with add -->
       <mixmode>
-	<blendop src="one" dst="one" />
+	<blendop src="srcalpha" dst="one" />
 	<alphatest>disable</alphatest>
       </mixmode>
+      <alphatocoverage/>
+      <atcmixmode>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
+      </atcmixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
@@ -180,15 +213,26 @@
 	<!-- First pass: blend with alpha.
 	     Note that the 'binalpha' part is provided by the alphakill snippet -->
 	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
+	  <blendop src="srcalpha" dst="srcalpha_inv" />
 	  <alphatest>disable</alphatest>
 	</mixmode>
+	<alphatocoverage/>
+	<!-- ATC provides an alpha-blending 'lookalike' -->
+	<atcmixmode>
+	  <blendop src="one" dst="one" />
+	  <alphatest>disable</alphatest>
+	</atcmixmode>
       <?else?>
 	<!-- Later pass: blend with add -->
 	<mixmode>
-	  <blendop src="one" dst="one" />
+	  <blendop src="srcalpha" dst="one" />
 	  <alphatest>disable</alphatest>
 	</mixmode>
+	<alphatocoverage/>
+	<atcmixmode>
+	  <blendop src="one" dst="one" />
+	  <alphatest>disable</alphatest>
+	</atcmixmode>
       <?endif?>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -205,9 +249,14 @@
     <pass minlights="3">
       <!-- Later pass: blend with add -->
       <mixmode>
-	<blendop src="one" dst="one" />
+	<blendop src="srcalpha" dst="one" />
 	<alphatest>disable</alphatest>
       </mixmode>
+      <alphatocoverage/>
+      <atcmixmode>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
+      </atcmixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
@@ -224,9 +273,14 @@
     <pass minlights="5">
       <!-- Later pass: blend with add -->
       <mixmode>
-	<blendop src="one" dst="one" />
+	<blendop src="srcalpha" dst="one" />
 	<alphatest>disable</alphatest>
       </mixmode>
+      <alphatocoverage/>
+      <atcmixmode>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
+      </atcmixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
@@ -249,15 +303,26 @@
 	<!-- First pass: blend with alpha.
 	     Note that the 'binalpha' part is provided by the alphakill snippet -->
 	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
+	  <blendop src="srcalpha" dst="srcalpha_inv" />
 	  <alphatest>disable</alphatest>
 	</mixmode>
+	<alphatocoverage/>
+	<!-- ATC provides an alpha-blending 'lookalike' -->
+	<atcmixmode>
+	  <blendop src="one" dst="one" />
+	  <alphatest>disable</alphatest>
+	</atcmixmode>
       <?else?>
 	<!-- Later pass: blend with add -->
 	<mixmode>
-	  <blendop src="one" dst="one" />
+	  <blendop src="srcalpha" dst="one" />
 	  <alphatest>disable</alphatest>
 	</mixmode>
+	<alphatocoverage/>
+	<atcmixmode>
+	  <blendop src="one" dst="one" />
+	  <alphatest>disable</alphatest>
+	</atcmixmode>
       <?endif?>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -274,9 +339,14 @@
     <pass minlights="2">
       <!-- Later pass: blend with add -->
       <mixmode>
-	<blendop src="one" dst="one" />
+	<blendop src="srcalpha" dst="one" />
 	<alphatest>disable</alphatest>
       </mixmode>
+      <alphatocoverage/>
+      <atcmixmode>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
+      </atcmixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
@@ -293,9 +363,14 @@
     <pass minlights="3">
       <!-- Later pass: blend with add -->
       <mixmode>
-	<blendop src="one" dst="one" />
+	<blendop src="srcalpha" dst="one" />
 	<alphatest>disable</alphatest>
       </mixmode>
+      <alphatocoverage/>
+      <atcmixmode>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
+      </atcmixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
@@ -312,9 +387,14 @@
     <pass minlights="4">
       <!-- Later pass: blend with add -->
       <mixmode>
-	<blendop src="one" dst="one" />
+	<blendop src="srcalpha" dst="one" />
 	<alphatest>disable</alphatest>
       </mixmode>
+      <alphatocoverage/>
+      <atcmixmode>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
+      </atcmixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
@@ -331,9 +411,14 @@
     <pass minlights="5">
       <!-- Later pass: blend with add -->
       <mixmode>
-	<blendop src="one" dst="one" />
+	<blendop src="srcalpha" dst="one" />
 	<alphatest>disable</alphatest>
       </mixmode>
+      <alphatocoverage/>
+      <atcmixmode>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
+      </atcmixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
@@ -350,9 +435,14 @@
     <pass minlights="6">
       <!-- Later pass: blend with add -->
       <mixmode>
-	<blendop src="one" dst="one" />
+	<blendop src="srcalpha" dst="one" />
 	<alphatest>disable</alphatest>
       </mixmode>
+      <alphatocoverage/>
+      <atcmixmode>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
+      </atcmixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
@@ -375,9 +465,15 @@
       <!-- First (only) pass: blend with alpha.
 	   Note that the 'binalpha' part is provided by the alphakill snippet -->
       <mixmode>
-	<blendop src="one" dst="srcalpha_inv" />
+	<blendop src="srcalpha" dst="srcalpha_inv" />
 	<alphatest>disable</alphatest>
       </mixmode>
+      <alphatocoverage/>
+      <!-- ATC provides an alpha-blending 'lookalike' -->
+      <atcmixmode>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
+      </atcmixmode>
       
       <!-- Combiner to use for this particular pass.
 	   Techniques Referenced snippets must only utilize the same 

@@ -38,6 +38,7 @@
     <alias name="staticspecular" weak="yes" file="/shader-snippets/lighting/staticspec-default.xml" />
     <alias name="glow" weak="yes" file="/shader/lighting/glow.xml" />
     <alias name="lightmaptc" weak="yes" file="/shader-snippets/texcoord-lightmap.xml" />
+    <alias name="apply_alpha_end" weak="yes" file="/shader-snippets/surface/alpha-nochange.xml" />
 
     <!--
 	Snippets - the building blocks of this shader.
@@ -63,6 +64,7 @@
     <snippet id="apply_lighting" file="/shader-snippets/lighting/apply-lighting.xml" />
     <snippet id="glow" filealias="glow" />
     <snippet id="sectorfog" file="/shader-snippets/fog/fog-sector.xml" />
+    <snippet id="apply_alpha_end" filealias="apply_alpha_end" />
     <snippet id="hdrscale" file="/shader-snippets/hdr-postscale.xml" />
     <!-- "connections" describe what snippets take input from what other
 	  snippets (ie the "data flow" is modeled). The exact resolution of
@@ -102,7 +104,8 @@
       <explicit from="specularColor" to="surfaceSpecular" />
     </connection>
     <connection from="apply_lighting" to="glow" />
-    <connection from="glow" to="sectorfog" />
+    <connection from="glow" to="apply_alpha_end" />
+    <connection from="apply_alpha_end" to="sectorfog" />
     <connection from="sectorfog" to="hdrscale" />
   </technique>
 </snippet>
