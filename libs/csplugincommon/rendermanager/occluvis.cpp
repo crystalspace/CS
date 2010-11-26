@@ -1023,7 +1023,7 @@ namespace CS
         csVector3 box_isect;
         if (csIntersect3::BoxSegment (node_bbox, data->seg, box_isect) == -1)
         {
-          return false;
+          return true;
         }
 
         int num_objects=n->GetObjectCount();
@@ -1099,7 +1099,7 @@ namespace CS
             }
           }
         }
-        return true;
+        return false;
       }
     };
 
