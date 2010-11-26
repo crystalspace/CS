@@ -511,7 +511,7 @@ bool CS::Animation::BVHMocapParser::ParseAnimationFrame (iFile* file)
   char word[256];
 
   // Compute the frame time
-  float frameTime = ((float) currentFrame) * frameDuration;
+  float frameTime = ((float) currentFrame - 1) * frameDuration;
   if (startFrame)
     frameTime -= ((float) startFrame) * frameDuration;
 
