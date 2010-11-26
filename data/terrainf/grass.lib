@@ -131,6 +131,7 @@
     </meshfact>
     <meshfact name="GrassLow">
         <plugin>genmeshfact</plugin>
+	<priority>object2</priority>
         <params>
             <material>grass.dds</material>
             <numvt>28</numvt>
@@ -281,6 +282,7 @@
     </meshfact>
     <meshfact name="TallGrassLow">
         <plugin>genmeshfact</plugin>
+	<priority>object2</priority>
         <params>
             <material>grass.dds</material>
             <numvt>28</numvt>
