@@ -23,8 +23,11 @@
 #ifndef NOISE_H
 #define NOISE_H
 
-/// @mainpage libnoise
-///
+// These files have been imported from the libnoise library.
+// See http://libnoise.sourceforge.net for more information.
+// These files have been checked out from the libnoise CVS repository
+// on November 24th 2010.
+
 /// @section intro Introduction
 ///
 /// libnoise is a portable C++ library that is used to generate <i>coherent

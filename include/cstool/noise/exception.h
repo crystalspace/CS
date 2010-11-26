@@ -28,7 +28,7 @@ namespace Noise {
 
   /// @addtogroup libnoise
   /// @{
-
+  /*
   /// Abstract base class for libnoise exceptions
   class CS_CRYSTALSPACE_EXPORT Exception
   {
@@ -66,7 +66,7 @@ namespace Noise {
   class CS_CRYSTALSPACE_EXPORT ExceptionUnknown: public Exception
   {
   };
-
+  */
   /// @}
 
 } // namespace Noise

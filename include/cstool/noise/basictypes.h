@@ -33,7 +33,7 @@ namespace Noise {
   /// @defgroup libnoise libnoise
   /// @addtogroup libnoise
   /// @{
-
+  /*
   /// Unsigned integer type.
   typedef unsigned int uint;
 
@@ -54,7 +54,7 @@ namespace Noise {
 
   /// 8-bit signed integer type.
   typedef char int8;
-
+  */
   /// @}
 
 } // namespace Noise
