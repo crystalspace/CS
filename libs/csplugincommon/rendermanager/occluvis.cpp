@@ -355,7 +355,21 @@ namespace CS
                 bool bOnlyTestZ = bNeverDrawAny;
                 if (!bOnlyTestZ)
                 {
-                  if (sectorMeshList[m].rmeshes[r]->material)
+                  switch (sectorMeshList[m].rmeshes[r]->z_buf_mode)
+                  {
+                  case CS_ZBUF_NONE:
+                  case CS_ZBUF_INVERT:
+                  case CS_ZBUF_TEST:
+                  case CS_ZBUF_EQUAL:
+                    {
+                      bOnlyTestZ = true;
+                      break;
+                    }
+                  default:
+                    break;
+                  }
+
+                  if (!bOnlyTestZ && sectorMeshList[m].rmeshes[r]->material)
                   {
                     iMaterial* mat = sectorMeshList[m].rmeshes[r]->material->GetMaterial ();
                     iShader* depthShader = mat->GetShader (depthWriteID);
