@@ -23,7 +23,6 @@
 #include "csutil/noise/mathconsts.h"
 #include "csutil/noise/model/cylinder.h"
 
-using namespace CS::Noise;
 using namespace CS::Noise::Model;
 
 Cylinder::Cylinder (): m_pModule (NULL)

@@ -23,12 +23,12 @@
 #include "csutil/hash.h"
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
+#include "iengine/engine.h"
 #include "iengine/movable.h"
 #include "iengine/sector.h"
 #include "iengine/viscull.h"
 #include "imesh/objmodel.h"
 
-struct iEngine;
 struct iGraphics3D;
 struct iMeshWrapper;
 struct iObjectRegistry;

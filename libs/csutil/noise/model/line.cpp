@@ -19,7 +19,6 @@
 
 #include "csutil/noise/model/line.h"
 
-using namespace CS::Noise;
 using namespace CS::Noise::Model;
 
 Line::Line ():

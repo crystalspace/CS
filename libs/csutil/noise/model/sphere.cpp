@@ -23,7 +23,6 @@
 #include "csutil/noise/latlon.h"
 #include "csutil/noise/model/sphere.h"
 
-using namespace CS::Noise;
 using namespace CS::Noise::Model;
 
 Sphere::Sphere ():

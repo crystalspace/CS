@@ -24,8 +24,6 @@
 #include "csutil/noise/interp.h"
 #include "csutil/noise/vectortable.h"
 
-using namespace CS::Noise;
-
 // Specifies the version of the coherent-noise functions to use.
 // - Set to 2 to use the current version.
 // - Set to 1 to use the flawed version from the original version of libnoise.

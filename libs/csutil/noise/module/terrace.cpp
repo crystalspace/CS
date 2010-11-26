@@ -26,8 +26,6 @@
 
 using namespace CS::Noise::Module;
 
-using namespace CS::Noise;
-
 Terrace::Terrace ():
   Module (GetSourceModuleCount ()),
   m_controlPointCount (0),

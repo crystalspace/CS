@@ -21,7 +21,6 @@
 
 #include "csutil/noise/model/plane.h"
 
-using namespace CS::Noise;
 using namespace CS::Noise::Model;
 
 Plane::Plane ():
