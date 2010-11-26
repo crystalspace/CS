@@ -302,7 +302,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     playbackPosition += dt * playbackSpeed;
 
     const float duration = factory->animationDuration;
-    if (playbackPosition > duration)
+    if (duration < SMALL_EPSILON)
+    {
+      playbackPosition = 0;
+
+      if (factory->cyclic)
+          BaseNodeSingle::FireAnimationCycleCb ();
+
+      else
+      {
+        if (factory->automaticStop)
+          isPlaying = false;
+
+        BaseNodeSingle::FireAnimationFinishedCb ();
+      }
+    }
+
+    else if (playbackPosition > duration)
     {
       if (factory->cyclic)
       {
