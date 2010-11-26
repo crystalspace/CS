@@ -1,4 +1,0 @@
-SubDir TOP libs csutil noise model ;
-
-CsLibAddModule ;
-

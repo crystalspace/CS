@@ -22,10 +22,10 @@
 #ifndef __MOCAPVIEWER_H__
 #define __MOCAPVIEWER_H__
 
-#include "csutil/noise/noise.h"
-#include "csutil/noise/noisegen.h"
 #include "cstool/csdemoapplication.h"
 #include "cstool/mocapparser.h"
+#include "cstool/noise/noise.h"
+#include "cstool/noise/noisegen.h"
 #include "imesh/animnode/skeleton2anim.h"
 
 struct iMovieRecorder;
