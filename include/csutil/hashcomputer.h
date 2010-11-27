@@ -80,6 +80,11 @@ template<class T>
 class csHashComputer<T*> : public csHashComputerIntegral<T*> {};
 
 template<>
+class csHashComputer<char> : public csHashComputerIntegral<char> {};
+template<>
+class csHashComputer<unsined char> : public csHashComputerIntegral<unsigned char> {};
+
+template<>
 class csHashComputer<int> : public csHashComputerIntegral<int> {}; 
 template<>
 class csHashComputer<unsigned int> : 
