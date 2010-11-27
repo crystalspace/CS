@@ -82,7 +82,7 @@ class csHashComputer<T*> : public csHashComputerIntegral<T*> {};
 template<>
 class csHashComputer<char> : public csHashComputerIntegral<char> {};
 template<>
-class csHashComputer<unsined char> : public csHashComputerIntegral<unsigned char> {};
+class csHashComputer<unsigned char> : public csHashComputerIntegral<unsigned char> {};
 
 template<>
 class csHashComputer<int> : public csHashComputerIntegral<int> {}; 
