@@ -33,7 +33,9 @@ namespace Noise {
   /// @{
 
   /// Pi.
+#ifndef PI
   const double PI = 3.1415926535897932385;
+#endif
 
   /// Square root of 2.
   const double SQRT_2 = 1.4142135623730950488;
