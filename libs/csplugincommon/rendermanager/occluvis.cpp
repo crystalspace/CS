@@ -954,7 +954,7 @@ namespace CS
         csVector3 box_isect;
         if (csIntersect3::BoxSegment (node_bbox, data->seg, box_isect) == -1)
         {
-          return false;
+          return true;
         }
 
         int num_objects;
@@ -979,7 +979,7 @@ namespace CS
             }
           }
         }
-        return true;
+        return false;
       }
     };
 
@@ -1028,7 +1028,7 @@ namespace CS
         {
           csBox3 b (node_bbox.Min ()-data->seg.Start (),
     	            node_bbox.Max ()-data->seg.Start ());
-          if (b.SquaredOriginDist () > data->sqdist) return false;
+          if (b.SquaredOriginDist () > data->sqdist) return true;
         }
 
         // In the first part of this test we are going to test if the
