@@ -1750,7 +1750,7 @@ AC_DEFUN([CS_CHECK_LIBCG],
     AC_REQUIRE([CS_CHECK_PTHREAD])
     AC_REQUIRE([CS_PROG_LINK])
     LDFLAGS_BACKUP="$LDFLAGS"
-    LDFLAGS="$LDFLAGS -Wl,--no-as-needed"
+    LDFLAGS="$LDFLAGS $cs_cv_prog_link_no_as_needed"
     CS_CHECK_LIB_WITH([Cg],
     	[AC_LANG_PROGRAM(
     	    [[#include <Cg/cg.h>]],
