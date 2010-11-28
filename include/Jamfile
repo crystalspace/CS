@@ -35,6 +35,7 @@ CS_MASTER_HEADER_REJECTS =
   [ Wildcard [ ConcatDirs csplugincommon opengl        ] : *.h ]
   [ Wildcard [ ConcatDirs csplugincommon win32         ] : *.h ]
   [ Wildcard [ ConcatDirs csplugincommon rendermanager ] : *.h ]
+  [ Wildcard [ ConcatDirs cstool         noise         ] : *.h ]
   [ ConcatDirs cstool   tokenlist.h  ]
   [ ConcatDirs csutil   archive.h    ]
   [ ConcatDirs csutil   csosdefs.h   ]
