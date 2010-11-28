@@ -363,7 +363,12 @@ bool CS::Animation::BVHMocapParser::ParseSkeletonBone
   if (!ParseVector (buffer.Slice (strlen ("OFFSET ")), offset))
     return Report (CS_REPORTER_SEVERITY_ERROR,
 		   "Malformed BVH file: could not parse 'OFFSET' value");
+  // Convert from right- to left-handed coordinate system
   offset[2] = -offset[2];
+
+  // Move the root bone to the origin
+  if (parentBone == CS::Animation::InvalidBoneID)
+    offset[0]= offset[2] = 0.0f;
 
   // Parse the channels
   if (!ParseLine (file, buf, 511))
