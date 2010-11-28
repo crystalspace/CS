@@ -504,6 +504,11 @@ public:
       boneVecs[i].Set (0,0,0);
   }
 
+  inline void Reset ()
+  {
+    bitSet.Clear ();
+  }
+
 protected:
   csBitArray bitSet;
   csVector3* boneVecs;
