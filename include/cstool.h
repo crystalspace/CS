@@ -88,6 +88,7 @@
 #include "cstool/noise/module/voronoi.h"
 #include "cstool/noise/noise.h"
 #include "cstool/noise/noisegen.h"
+#include "cstool/noise/vectortable.h"
 #include "cstool/normalcalc.h"
 #include "cstool/numberedfilenamehelper.h"
 #include "cstool/objmodel.h"
