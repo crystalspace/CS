@@ -42,9 +42,12 @@ MocapViewer::MocapViewer ()
 		     "\tcsmocapviewer -rootmask=Hips -childall idle01.bvh\n"
 		     "\tcsmocapviewer -pld -record -recordfile=mocap.nuv idle01.bvh\n"
 		     "\tcsmocapviewer -rotcamera=-90 idle01.bvh\n"
-		     "\tcsmocapviewer idle01.bvh -pld -ncount=200 -nfrequency=0.4 -poscamera=0.7\n",
+		     "\tcsmocapviewer idle01.bvh -pld -ncount=200 -nfrequency=0.4 -poscamera=0.7\n"
+		     "\tcsmocapviewer -targetfile=data/krystal/krystal.xml -targetname=krystal idle01.bvh\n",
 		     "Crystal Space's viewer for motion captured data. This viewer supports currently"
 		     " only the Biovision Hierarchical data file format (BVH).\n\n"
+		     "The animation can be retargeted automatically to an animesh. The results will depend"
+		     " on the actual similitudes between the two skeletons.\n\n"
 		     "A bone chain can be set as a mask, then only the bones from this chain will be displayed."
 		     " A bone chain is defined by a root bone, then the user can add either all children and"
 		     " sub-children of the root bone, either all bones on the way to a given child bone.\n\n"
@@ -56,6 +59,7 @@ MocapViewer::MocapViewer ()
 		     " for more information on these parameters.\n\n"
 		     "Finally, this application uses a configuration file. See \"/config/csmocapviewer.cfg\""
 		     " for more information"),
+    // TODO: doc target
     scfImplementationType (this), debugImage (nullptr), noiseScale (0.5f)
 {
   // Configure the options for DemoApplication
@@ -66,11 +70,19 @@ MocapViewer::MocapViewer ()
   commandLineHelper.AddCommandLineOption
     ("info", "Parse the file, print out the mocap data information, then exit");
   commandLineHelper.AddCommandLineOption
+    ("noanim", "Don't play the animation, only display the skeleton in rest pose");
+  commandLineHelper.AddCommandLineOption
     ("start=<int>", "Set the index of the start frame");
   commandLineHelper.AddCommandLineOption
     ("end=<int>", "Set the index of the end frame");
   commandLineHelper.AddCommandLineOption
     ("scale=<float>", "Set the global scale to apply to the distances (default is 0.01)");
+  commandLineHelper.AddCommandLineOption
+    ("speed=<float>", "Set the speed to play the animation (default is 1.0)");
+  commandLineHelper.AddCommandLineOption
+    ("targetfile=<string>", "Set the file of the animesh to retarget the animation to");
+  commandLineHelper.AddCommandLineOption
+    ("targetname=<string>", "Set the name of the animesh factory to retarget the animation to");
   commandLineHelper.AddCommandLineOption
     ("pld", "Set the display mode as 'Point Light Display'");
   commandLineHelper.AddCommandLineOption
@@ -99,7 +111,7 @@ MocapViewer::MocapViewer ()
     ("nlacunarity=<float>", "Set the lacunarity of the noise. Value is suggested to be between 1.5 and 3.5. Default value is 2.0");
   commandLineHelper.AddCommandLineOption
     ("npersistence=<float>", "Set the persistence of the noise. Value is suggested to be between 0.0 and 1.0. Default value is 0.5");
-  // TODO: animesh target & animation save
+  // TODO: animation save
 }
 
 MocapViewer::~MocapViewer ()
@@ -110,6 +122,7 @@ MocapViewer::~MocapViewer ()
 void MocapViewer::Frame ()
 {
   // Update manually the animation of the animesh since it is not in a sector
+  // TODO: use engine flag ALWAYS_ANIMATE
   csVector3 position (0.0f);
   meshWrapper->GetMeshObject ()->NextFrame (vc->GetCurrentTicks (), position, 0);
 
@@ -169,6 +182,8 @@ bool MocapViewer::OnInitialize (int argc, char* argv[])
 		       CS::Animation::iBodyManager),
     CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.debug",
 		       CS::Animation::iSkeletonDebugNodeManager),
+    CS_REQUEST_PLUGIN ("crystalspace.mesh.animesh.animnode.retarget",
+		       CS::Animation::iSkeletonRetargetNodeManager),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
 
@@ -197,6 +212,11 @@ bool MocapViewer::Application ()
   if (!debugNodeManager)
     return ReportError("Failed to locate CS::Animation::iSkeletonDebugNodeManager plugin!");
 
+  retargetNodeManager =
+    csQueryRegistry<CS::Animation::iSkeletonRetargetNodeManager> (GetObjectRegistry ());
+  if (!retargetNodeManager)
+    return ReportError("Failed to locate CS::Animation::iSkeletonRetargetNodeManager plugin!");
+
   // Default behavior from DemoApplication for the creation of the scene
   if (!CreateRoom ())
     return false;
@@ -223,6 +243,8 @@ bool MocapViewer::CreateAvatar ()
   csString videoFormat = cfg->GetStr ("MocapViewer.Settings.VideoFormat", "");
   csString pldImage = cfg->GetStr ("MocapViewer.Settings.PLDImage", "");
   csString pldMode = cfg->GetStr ("MocapViewer.Settings.Display", "");
+  csString targetFile = cfg->GetStr ("MocapViewer.Settings.TargetFile", "");
+  csString targetName = cfg->GetStr ("MocapViewer.Settings.TargetName", "");
 
   // Read the command line options
   // Read the file name
@@ -264,9 +286,9 @@ bool MocapViewer::CreateAvatar ()
   // Read the global scale
   txt = clp->GetOption ("scale", 0);
   float globalScale = 0.01f;
-  float scale;
-  if (txt && sscanf (txt.GetData (), "%f", &scale) == 1)
-    globalScale = scale;
+  float fvalue;
+  if (txt && sscanf (txt.GetData (), "%f", &fvalue) == 1)
+    globalScale = fvalue;
 
   // Parse the BVH file
   CS::Animation::BVHMocapParser mocapParser (GetObjectRegistry (), vfs);
@@ -304,6 +326,7 @@ bool MocapViewer::CreateAvatar ()
     printf ("=================================================\n");
     printf ("=== Skeleton structure: ===\n");
     printf ("=================================================\n");
+    // TODO: skeleton print
     bodyChain->DebugPrint ();
     printf ("=================================================\n");
 
@@ -314,9 +337,14 @@ bool MocapViewer::CreateAvatar ()
   bool pld = clp->GetBoolOption ("pld", false)
     || pldMode == "PLD";
 
-  // Read if we need to record a video session
+  // Read the remaining configuration data
   bool recordVideo = clp->GetBoolOption ("record", false);
   csString recordFile = clp->GetOption ("recordfile", 0);
+  bool noAnimation = clp->GetBoolOption ("noanim", false);
+  float playbackSpeed = 1.0f;
+  txt = clp->GetOption ("speed", 0);
+  if (txt && sscanf (txt.GetData (), "%f", &fvalue) == 1)
+    playbackSpeed = fvalue;
 
   // Load the animesh plugin
   csRef<iMeshObjectType> meshType = csLoadPluginCheck<iMeshObjectType>
@@ -335,12 +363,15 @@ bool MocapViewer::CreateAvatar ()
 
   animeshFactory->SetSkeletonFactory (parsingResult.skeletonFactory);
 
+    // Check if the automatic animation has to be disabled
+  if (noAnimation)
+    parsingResult.skeletonFactory->SetAutoStart (false);
+
   // Load the iSkeletonManager plugin
   csRef<iPluginManager> plugmgr = 
     csQueryRegistry<iPluginManager> (object_reg);
   csRef<CS::Animation::iSkeletonManager> skeletonManager =
-    csLoadPlugin<CS::Animation::iSkeletonManager> (plugmgr,
-						   "crystalspace.skeletalanimation");
+    csLoadPlugin<CS::Animation::iSkeletonManager> (plugmgr, "crystalspace.skeletalanimation");
   if (!skeletonManager)
     return ReportError ("Could not load the skeleton plugin");
 
@@ -411,7 +442,7 @@ bool MocapViewer::CreateAvatar ()
 
     else
     {
-      // Create a 2D sprite for the logo
+      // Create the 2D sprite
       iTextureHandle* textureHandle = texture->GetTextureHandle ();
       if (textureHandle)
       {
@@ -427,6 +458,7 @@ bool MocapViewer::CreateAvatar ()
     animPacketFactory->CreateAnimationNode ("mocap");
   mocapNodeFactory->SetAnimation (parsingResult.animPacketFactory->GetAnimation (0));
   mocapNodeFactory->SetCyclic (!recordVideo);
+  mocapNodeFactory->SetPlaybackSpeed (playbackSpeed);
   debugNodeFactory->SetChildNode (mocapNodeFactory);
 
   // Create the animated mesh
@@ -466,9 +498,10 @@ bool MocapViewer::CreateAvatar ()
     csQuaternion rotation;
     csVector3 offset;
     float time;
-     CS::Animation::iSkeletonAnimation* animation = parsingResult.animPacketFactory->GetAnimation (0);
+    CS::Animation::iSkeletonAnimation* animation = parsingResult.animPacketFactory->GetAnimation (0);
 
-    for (size_t i = 0; i < parsingResult.skeletonFactory->GetTopBoneID (); i++)
+    // TODO: only the bones visible
+    for (size_t i = 0; i <= parsingResult.skeletonFactory->GetTopBoneID (); i++)
       if (parsingResult.skeletonFactory->HasBone (i))
       {
 	parsingResult.skeletonFactory->GetTransformAbsSpace (i, rotation, offset);
@@ -560,6 +593,130 @@ bool MocapViewer::CreateAvatar ()
       point[2] = frandomGenerator.Get (10.0f);
       noisePoints.Push (point);
     }
+  }
+
+  // Check if we have to retarget the animation to an animesh
+  txt = clp->GetOption ("targetfile", 0);
+  if (txt) targetFile = txt;
+
+  txt = clp->GetOption ("targetname", 0);
+  if (txt) targetName = txt;
+
+  if (targetFile != "" && targetName != "")
+  {
+    // Load the animesh factory
+    csLoadResult rc = loader->Load (targetFile.GetData ());
+    if (!rc.success)
+      return ReportError ("Can't load target library file %s!", targetFile.GetData ());
+
+    csRef<iMeshFactoryWrapper> meshfact = engine->FindMeshFactory (targetName.GetData ());
+    if (!meshfact)
+      return ReportError ("Can't find target mesh factory %s!", targetName.GetData ());
+
+    animeshFactory = scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
+      (meshfact->GetMeshObjectFactory ());
+    if (!animeshFactory)
+      return ReportError ("Can't find the animesh interface for the animesh target!");
+
+    // Check if the automatic animation has to be disabled
+    if (noAnimation)
+      animeshFactory->GetSkeletonFactory ()->SetAutoStart (false);
+
+    // Create a new animation tree. The structure of the tree is:
+    //   + Retarget node
+    //     + Animation node with the mocap data
+    csRef<CS::Animation::iSkeletonAnimPacketFactory> animPacketFactory =
+      animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ();
+
+    // Create the 'retarget' animation node
+    csRef<CS::Animation::iSkeletonRetargetNodeFactory> retargetNodeFactory =
+      retargetNodeManager->CreateAnimNodeFactory ("mocap_retarget");
+    debugNodeFactory->SetDebugModes ((CS::Animation::SkeletonDebugMode)
+				     (CS::Animation::DEBUG_2DLINES | CS::Animation::DEBUG_SQUARES));
+    animPacketFactory->SetAnimationRoot (retargetNodeFactory);
+    retargetNodeFactory->SetSourceSkeleton (parsingResult.skeletonFactory);
+
+    // This mapping is for the motion capture data with the same name of the bones
+    CS::Animation::BoneMapping skeletonMapping;
+    CS::Animation::NameBoneMappingHelper::GenerateMapping
+      (skeletonMapping, parsingResult.skeletonFactory, animeshFactory->GetSkeletonFactory ());
+    retargetNodeFactory->SetBoneMapping (skeletonMapping);
+
+    // If the animesh target is Krystal, then we load some hardcoded information to setup the retarget mode
+    if (targetName == "krystal")
+    {
+      // Create the bone mapping between the source and the target skeletons
+      /*
+      // This mapping is for the motion capture data of the Carnegie Mellon University
+      CS::Animation::BoneMapping skeletonMapping;
+      skeletonMapping.AddMapping (parsingResult.skeletonFactory->FindBone ("hip"), animeshFactory->GetSkeletonFactory ()->FindBone ("Hips"));;
+      skeletonMapping.AddMapping (parsingResult.skeletonFactory->FindBone ("abdomen"), animeshFactory->GetSkeletonFactory ()->FindBone ("ToSpine"));;
+      skeletonMapping.AddMapping (parsingResult.skeletonFactory->FindBone ("chest"), animeshFactory->GetSkeletonFactory ()->FindBone ("Spine"));;
+      skeletonMapping.AddMapping (parsingResult.skeletonFactory->FindBone ("neck"), animeshFactory->GetSkeletonFactory ()->FindBone ("Neck"));;
+      skeletonMapping.AddMapping (parsingResult.skeletonFactory->FindBone ("head"), animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));;
+      skeletonMapping.AddMapping (parsingResult.skeletonFactory->FindBone ("rCollar"), animeshFactory->GetSkeletonFactory ()->FindBone ("RightShoulder"));;
+      skeletonMapping.AddMapping (parsingResult.skeletonFactory->FindBone ("rShldr"), animeshFactory->GetSkeletonFactory ()->FindBone ("RightArm"));;
+      skeletonMapping.AddMapping (parsingResult.skeletonFactory->FindBone ("rForeArm"), animeshFactory->GetSkeletonFactory ()->FindBone ("RightForeArm"));;
+      skeletonMapping.AddMapping (parsingResult.skeletonFactory->FindBone ("rHand"), animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand"));;
+      skeletonMapping.AddMapping (parsingResult.skeletonFactory->FindBone ("lCollar"), animeshFactory->GetSkeletonFactory ()->FindBone ("LeftShoulder"));;
+      skeletonMapping.AddMapping (parsingResult.skeletonFactory->FindBone ("lShldr"), animeshFactory->GetSkeletonFactory ()->FindBone ("LeftArm"));;
+      skeletonMapping.AddMapping (parsingResult.skeletonFactory->FindBone ("lForeArm"), animeshFactory->GetSkeletonFactory ()->FindBone ("LeftForeArm"));;
+      skeletonMapping.AddMapping (parsingResult.skeletonFactory->FindBone ("lHand"), animeshFactory->GetSkeletonFactory ()->FindBone ("LeftHand"));;
+      skeletonMapping.AddMapping (parsingResult.skeletonFactory->FindBone ("rThigh"), animeshFactory->GetSkeletonFactory ()->FindBone ("RightUpLeg"));;
+      skeletonMapping.AddMapping (parsingResult.skeletonFactory->FindBone ("rShin"), animeshFactory->GetSkeletonFactory ()->FindBone ("RightLeg"));;
+      skeletonMapping.AddMapping (parsingResult.skeletonFactory->FindBone ("rFoot"), animeshFactory->GetSkeletonFactory ()->FindBone ("RightFoot"));;
+      skeletonMapping.AddMapping (parsingResult.skeletonFactory->FindBone ("lThigh"), animeshFactory->GetSkeletonFactory ()->FindBone ("LeftUpLeg"));;
+      skeletonMapping.AddMapping (parsingResult.skeletonFactory->FindBone ("lShin"), animeshFactory->GetSkeletonFactory ()->FindBone ("LeftLeg"));;
+      skeletonMapping.AddMapping (parsingResult.skeletonFactory->FindBone ("lFoot"), animeshFactory->GetSkeletonFactory ()->FindBone ("LeftFoot"));;
+      retargetNodeFactory->SetBoneMapping (skeletonMapping);
+      */
+
+      // Create the body chains used for retargeting
+      CS::Animation::iBodySkeleton* bodySkeleton =
+	bodyManager->CreateBodySkeleton ("target_body", animeshFactory->GetSkeletonFactory ());
+
+      CS::Animation::iBodyChain* bodyChain = bodySkeleton->CreateBodyChain
+	// (the "Hips" bone is positioned too differently from the mocap data, we therefore skip this bone)
+	//("torso", animeshFactory->GetSkeletonFactory ()->FindBone ("Hips"));
+	("torso", animeshFactory->GetSkeletonFactory ()->FindBone ("ToSpine"));
+      bodyChain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));
+      retargetNodeFactory->AddBodyChain (bodyChain);
+
+      bodyChain = bodySkeleton->CreateBodyChain
+	("left_arm", animeshFactory->GetSkeletonFactory ()->FindBone ("LeftShoulder"));
+      bodyChain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("LeftHand"));
+      retargetNodeFactory->AddBodyChain (bodyChain);
+
+      bodyChain = bodySkeleton->CreateBodyChain
+	("right_arm", animeshFactory->GetSkeletonFactory ()->FindBone ("RightShoulder"));
+      bodyChain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("RightHand"));
+      retargetNodeFactory->AddBodyChain (bodyChain);
+
+      bodyChain = bodySkeleton->CreateBodyChain
+	("left_leg", animeshFactory->GetSkeletonFactory ()->FindBone ("LeftUpLeg"));
+      bodyChain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("LeftToeBase"));
+      retargetNodeFactory->AddBodyChain (bodyChain);
+
+      bodyChain = bodySkeleton->CreateBodyChain
+	("right_leg", animeshFactory->GetSkeletonFactory ()->FindBone ("RightUpLeg"));
+      bodyChain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("RightToeBase"));
+      retargetNodeFactory->AddBodyChain (bodyChain);
+
+      retargetNodeFactory->SetRetargetMode (CS::Animation::RETARGET_ALIGN_BONES);
+    }
+
+    // Create the playback animation node of the motion captured data
+    csRef<CS::Animation::iSkeletonAnimationNodeFactory> mocapNodeFactory =
+      animPacketFactory->CreateAnimationNode ("mocap_retarget");
+    mocapNodeFactory->SetAnimation
+      (parsingResult.animPacketFactory->GetAnimation (0));
+    mocapNodeFactory->SetCyclic (true);
+    mocapNodeFactory->SetPlaybackSpeed (playbackSpeed);
+    retargetNodeFactory->SetChildNode (mocapNodeFactory);
+
+    // Create the animated mesh
+    csRef<iMeshWrapper> retargetMesh =
+      engine->CreateMeshWrapper (meshfact, "retarget", room, csVector3 (0.0f));
   }
 
   // Display the origin

@@ -26,6 +26,7 @@
 #include "cstool/mocapparser.h"
 #include "cstool/noise/noise.h"
 #include "cstool/noise/noisegen.h"
+#include "imesh/animnode/retarget.h"
 #include "imesh/animnode/skeleton2anim.h"
 
 struct iMovieRecorder;
@@ -51,6 +52,7 @@ class MocapViewer : public CS::Demo::DemoApplication,
   csRef<iMovieRecorder> movieRecorder;
   csRef<CS::Animation::iBodyManager> bodyManager;
   csRef<CS::Animation::iSkeletonDebugNodeManager> debugNodeManager;
+  csRef<CS::Animation::iSkeletonRetargetNodeManager> retargetNodeManager;
   csRef<CS::Animation::iSkeletonDebugNode> debugNode;
   csRef<CS::Animation::iSkeletonAnimNode> animNode;
   csRef<iMeshWrapper> meshWrapper;
