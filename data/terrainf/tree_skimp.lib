@@ -41,7 +41,6 @@
         </material>
     </materials>
     <meshfact name="tree_skimp">
-	<priority>transp</priority>
         <nullmesh>
             <min x="-2" y="0" z="-2" />
             <max x="2" y="4" z="2" />
@@ -49,6 +48,7 @@
         <meshfact name="treebark_skimp">
             <plugin>genmeshFactory</plugin>
             <zuse />
+	    <priority>transp</priority>
             <params>
                 <material>materialbark</material>
                 <numvt>592</numvt>
@@ -947,6 +947,7 @@
         <meshfact name="treetop_skimp">
             <plugin>genmeshFactory</plugin>
             <zuse />
+	    <priority>transp</priority>
             <params>
                 <material>branch</material>
                 <numvt>16</numvt>
