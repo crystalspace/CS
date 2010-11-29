@@ -466,7 +466,7 @@ csPtr<iScriptValue> csPython::Retrieve (const char *name)
   if (!py_curr)
   {
     ShowError();
-    return false;
+    return (iScriptValue*)nullptr;
   }
   return new Value (this, py_curr, true);
 }

@@ -1115,7 +1115,7 @@ void csDynaVis::UpdateCoverageBufferOutline (csVisibilityObjectWrapper* obj)
     {
       size_t vt1 = outline_info.outline_edges[j*2+0];
       size_t vt2 = outline_info.outline_edges[j*2+1];
-      csPrintf ("  E%zu: %u-%u\n", j, vt1, vt2);
+      csPrintf ("  E%zu: %zu-%zu\n", j, vt1, vt2);
     }
 
     csRef<iString> str = tcovbuf->Dump ();

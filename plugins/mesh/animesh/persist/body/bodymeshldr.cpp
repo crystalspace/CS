@@ -49,7 +49,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
     if (!bodyManager)
     {
       synldr->ReportError (msgid, node, "Couldn't get any body mesh system");
-      return false;
+      return (iBase*)nullptr;
     }
 
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -63,12 +63,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
       {
       case XMLTOKEN_SKELETON:
         if (!ParseSkeleton (child, ldr_context))
-          return false;
+          return (iBase*)nullptr;
         break;
 
       default:
         synldr->ReportBadToken (child);
-        return false;
+        return (iBase*)nullptr;
       }
     }
 

@@ -158,7 +158,7 @@ namespace lighter
       PrimitiveArray& primArray = submeshArray[submesh];
 
 	  #pragma omp parallel for
-      for (int pidx = 0; pidx < primArray.GetSize (); ++pidx)
+      for (size_t pidx = 0; pidx < primArray.GetSize (); ++pidx)
       {
         // Get next primitive
         Primitive& prim = primArray[pidx];
@@ -200,7 +200,7 @@ namespace lighter
 
         // Iterate all primitive elements
 		#pragma omp parallel for
-        for (int eidx = 0; eidx < numElements; ++eidx)
+        for (size_t eidx = 0; eidx < numElements; ++eidx)
         {
           // Skip empty elements
           Primitive::ElementType elemType = prim.GetElementType (eidx);

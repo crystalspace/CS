@@ -3062,7 +3062,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 	    csString cwd = vfs->GetCwd ();
             if(!ParseAddOnTC(itr, false, plug, paramsnode, ssource, ldr_context, context, cwd))
             {
-              return false;
+              return (iBase*)nullptr;
             }
             ret = itr->GetResultRefPtr();
           }
@@ -3072,7 +3072,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             csRef<iThreadReturn> itr = ParseAddOnWait(plug, paramsnode, ssource, ldr_context, context, cwd);
             if(!itr->WasSuccessful())
             {
-              return false;
+              return (iBase*)nullptr;
             }
             ret = itr->GetResultRefPtr();
           }

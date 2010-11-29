@@ -430,7 +430,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
   {
     for (size_t i = 0; i < level; i++)
       printf (" ");
-    printf ("+ node %i: %s\n", node->boneID, bodySkeleton->skeletonFactory->GetBoneName (node->boneID));
+    printf ("+ node %zu: %s\n", node->boneID, bodySkeleton->skeletonFactory->GetBoneName (node->boneID));
 
     for (csRefArray<BodyChainNode>::Iterator it = node->children.GetIterator (); it.HasNext (); )
     {
@@ -501,7 +501,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
   {
     for (size_t i = 0; i < level; i++)
       printf (" ");
-    printf ("+ node %i\n", boneID);
+    printf ("+ node %zu\n", boneID);
 
     for (csRefArray<BodyChainNode>::ConstIterator it = children.GetIterator (); it.HasNext (); )
       it.Next ()->Print (level + 1);

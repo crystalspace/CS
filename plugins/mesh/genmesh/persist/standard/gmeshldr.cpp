@@ -810,7 +810,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError ("crystalspace.genmeshloader.parse",
             node, "Submesh must be specified _after_ factory tag.");
-          return false;
+          return (iBase*)nullptr;
         }
         ParseSubMesh (child, state, ldr_context);
         break;

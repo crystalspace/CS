@@ -229,7 +229,7 @@ SocketDescriptor AnimeshAsset::GetSocketTransform(const char* socketName)
   csString str;
 
   desc["Name"] = TypeValue("String", sock->GetName());
-  desc["Bone"] = TypeValue("String", str.Format("%d", sock->GetBone()).GetData());
+  desc["Bone"] = TypeValue("String", str.Format("%zu", sock->GetBone()).GetData());
 
   //csVector3 offset = sock->GetFactory()->GetTransform().GetOrigin();
   csVector3 offset = sock->GetTransform().GetOrigin();

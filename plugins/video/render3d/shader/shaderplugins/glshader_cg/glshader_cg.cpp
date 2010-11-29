@@ -664,7 +664,7 @@ bool csGLShader_CG::IsRoutedProfileSupported (CGprofile profile)
 
 csPtr<iStringArray> csGLShader_CG::QueryPrecacheTags (const char* type)
 {
-  if (!Open()) return false;
+  if (!Open()) return (iStringArray*)nullptr;
   
   scfStringArray* tags = new scfStringArray;
   for (size_t i = 0; i < precacheLimits.GetSize(); i++)

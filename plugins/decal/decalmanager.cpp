@@ -196,7 +196,7 @@ csRef<iDecalTemplate> csDecalManager::CreateDecalTemplate (
   csRef<iDecalTemplate> ret;
 
   if (!EnsureEngineReference ())
-    return false;
+    return (iDecalTemplate*)nullptr;
 
   ret.AttachNew (new csDecalTemplate);
   ret->SetMaterialWrapper (pMaterial);

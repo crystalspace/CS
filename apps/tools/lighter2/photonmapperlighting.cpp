@@ -323,6 +323,11 @@ namespace lighter
 
         }
         break;
+	
+	// point light
+      case CS_LIGHT_POINTLIGHT:
+	// Nothing special to do
+	break;
 
       }
 
@@ -333,7 +338,7 @@ namespace lighter
 	  {
 
 		  #pragma omp parallel for
-		  for (int num = 0; num < photonsForCurLight; ++num)
+		  for (size_t num = 0; num < photonsForCurLight; ++num)
 		  {
 			// Get direction to emit the photon
 			csVector3 dir;
@@ -485,7 +490,7 @@ namespace lighter
 		  if(!stop)
 		  {
 			  #pragma omp parallel for
-			  for (int cnum = 0; cnum < causticPhotonsForMesh; ++cnum)
+			  for (size_t cnum = 0; cnum < causticPhotonsForMesh; ++cnum)
 			  {
 				// Get direction to emit the photon
 				csVector3 dir;

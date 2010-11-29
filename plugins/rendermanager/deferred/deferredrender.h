@@ -168,7 +168,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
       CS::RenderManager::RenderView *rview = context->renderView;
 
-      iEngine *engine = rview->GetEngine ();
       iCamera *cam = rview->GetCamera ();
       iClipper2D *clipper = rview->GetClipper ();
 
