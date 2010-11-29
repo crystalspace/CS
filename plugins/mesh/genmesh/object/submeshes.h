@@ -91,7 +91,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     csFrameDataHolder<csRef<iRenderBuffer> > b2fIndices;
 
     SubMesh () : scfImplementationType (this), bbox_valid (false), name (0), 
-      MixMode ((uint)~0), zmode ((csZBufMode)~0), renderPrio (-1),
+      MixMode ((uint)~0), zmode ((csZBufMode)~0),
       back2front (false), b2fTree (0)
     { }
     SubMesh (const SubMesh& other) : scfImplementationType (this), 

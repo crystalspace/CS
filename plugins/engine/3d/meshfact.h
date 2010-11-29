@@ -165,7 +165,7 @@ private:
   csRef<csStaticLODFactoryMesh> static_lod;
 
   /// Suggestion for new children created from factory.
-  long render_priority;
+  CS::Graphics::RenderPriority render_priority;
   /// Suggestion for new children created from factory.
   csZBufMode zbufMode;
 
@@ -280,12 +280,12 @@ public:
   void SetZBufMode (csZBufMode mode) { zbufMode = mode; }
   csZBufMode GetZBufMode () const { return zbufMode; }
   void SetZBufModeRecursive (csZBufMode mode);
-  void SetRenderPriority (long rp);
-  long GetRenderPriority () const
+  void SetRenderPriority (CS::Graphics::RenderPriority rp);
+  CS::Graphics::RenderPriority GetRenderPriority () const
   {
     return render_priority;
   }
-  void SetRenderPriorityRecursive (long rp);
+  void SetRenderPriorityRecursive (CS::Graphics::RenderPriority rp);
 
   /**
    * Sets the instance factory.

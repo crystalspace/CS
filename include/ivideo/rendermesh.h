@@ -43,7 +43,20 @@ namespace CS
 namespace Graphics
 {
   /// Rendering priority.
-  typedef int RenderPriority;
+  class RenderPriority
+  {
+    uint value;
+  public:
+    RenderPriority () : value (uint (~0)) {}
+    explicit RenderPriority (uint value) : value (value) {}
+    CS_DEPRECATED_METHOD_MSG("Please use CS::Graphics::RenderPriority to store render priorities")
+    RenderPriority (long value) : value (value) {}
+    CS_DEPRECATED_METHOD_MSG("Please use CS::Graphics::RenderPriority to store render priorities")
+    RenderPriority (int value) : value (value) {}
+    
+    bool IsValid() const { return value != uint (~0); }
+    operator uint () const { return value; }
+  };
 
   /// Culling mode of a mesh.
   enum MeshCullMode
@@ -139,7 +152,7 @@ namespace Graphics
   {
     RenderMeshModes () : z_buf_mode ((csZBufMode)~0), mixmode (CS_FX_COPY),
       alphaToCoverage (false), atcMixmode (CS_MIXMODE_BLEND (ONE, ZERO)),
-      renderPrio (-1), cullMode (cullNormal),
+      cullMode (cullNormal),
       alphaType (csAlphaMode::alphaNone), zoffset (false), doInstancing (false)
     {
     }

@@ -35,6 +35,7 @@
 #include "iengine/collection.h"
 #include "iengine/light.h"
 #include "iutil/threadmanager.h"
+#include "ivideo/rendermesh.h"
 
 class csBox3;
 class csColor;
@@ -158,7 +159,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine, 6, 4, 0);
+  SCF_INTERFACE(iEngine, 6, 5, 0);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -265,8 +266,13 @@ struct iEngine : public virtual iBase
    * priority, you must call ClearRenderPriorities() and re-add the 
    * default render priorities (using RegisterDefaultRenderPriorities())
    * along with your own new priorities.
+   *
+   * Priorities are identified by their number, not their name:
+   * If you call RegisterRenderPriority() twice, with the same
+   * priority number, but different names, the second call will
+   * <em>change the name</em>.
    */
-  virtual void RegisterRenderPriority (const char* name, long priority,
+  virtual void RegisterRenderPriority (const char* name, uint priority,
   	csRenderPrioritySorting rendsort = CS_RENDPRI_SORT_NONE) = 0;
   /**
    * Register default render priorities.
@@ -280,29 +286,29 @@ struct iEngine : public virtual iBase
    * or your own if you have defined your own render priorities).
    * \return 0 if render priority doesn't exist.
    */
-  virtual long GetRenderPriority (const char* name) const = 0;
+  virtual CS::Graphics::RenderPriority GetRenderPriority (const char* name) const = 0;
   /// Get the render priority sorting flag.
   virtual csRenderPrioritySorting GetRenderPrioritySorting (
   	const char* name) const = 0;
   /// Get the render priority sorting flag.
   virtual csRenderPrioritySorting GetRenderPrioritySorting (
-  	long priority) const = 0;
+  	CS::Graphics::RenderPriority priority) const = 0;
   /// Get the render priority for sky objects (attached to 'sky' name).
-  virtual long GetSkyRenderPriority () = 0;
+  virtual CS::Graphics::RenderPriority GetSkyRenderPriority () = 0;
   /// Get the render priority for portal objects (attached to 'portal' name).
-  virtual long GetPortalRenderPriority () = 0;
+  virtual CS::Graphics::RenderPriority GetPortalRenderPriority () = 0;
   /// Get the render priority for wall objects (attached to 'wall' name).
-  virtual long GetWallRenderPriority () = 0;
+  virtual CS::Graphics::RenderPriority GetWallRenderPriority () = 0;
   /// Get the render priority for general objects (attached to 'object' name).
-  virtual long GetObjectRenderPriority () = 0;
+  virtual CS::Graphics::RenderPriority GetObjectRenderPriority () = 0;
   /// Get the render priority for alpha objects (attached to 'alpha' name).
-  virtual long GetAlphaRenderPriority () = 0;
+  virtual CS::Graphics::RenderPriority GetAlphaRenderPriority () = 0;
   /// Clear all render priorities.
   virtual void ClearRenderPriorities () = 0;
   /// Get the number of render priorities.
-  virtual int GetRenderPriorityCount () const = 0;
-  /// Get the name of the render priority or 0 if none existant.
-  virtual const char* GetRenderPriorityName (long priority) const = 0;
+  virtual size_t GetRenderPriorityCount () const = 0;
+  /// Get the name of the render priority or 0 if it's not valid or registered.
+  virtual const char* GetRenderPriorityName (CS::Graphics::RenderPriority priority) const = 0;
 
   /** @} */
   

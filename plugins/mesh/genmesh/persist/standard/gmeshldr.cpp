@@ -125,7 +125,7 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
   csRef<iMaterialWrapper> material;
   uint mixmode = (uint)~0;
   csZBufMode zmode = (csZBufMode)~0;
-  CS::Graphics::RenderPriority renderPrio = -1;
+  CS::Graphics::RenderPriority renderPrio;
   csRef<iRenderBuffer> indexbuffer;
   csRefArray<csShaderVariable> shadervars;
   csArray<SlidingWindow> sliding_windows;
@@ -932,8 +932,8 @@ void csGeneralFactorySaver::WriteSubMesh (iGeneralMeshSubMesh* submesh,
     synldr->WriteZMode (submeshNode, zmode, false);
   }
   
-  int renderPrio = submesh->GetRenderPriority ();
-  if (renderPrio >= 0)
+  CS::Graphics::RenderPriority renderPrio = submesh->GetRenderPriority ();
+  if (renderPrio.IsValid())
   {
     csRef<iDocumentNode> prioNode = 
       submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
@@ -1201,7 +1201,7 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
     scfQueryInterface<iShaderVariableContext> (subMesh);
   uint mixmode = (uint)~0;
   csZBufMode zmode = (csZBufMode)~0;
-  CS::Graphics::RenderPriority renderPrio = -1;
+  CS::Graphics::RenderPriority renderPrio;
   bool b2f = false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -1564,7 +1564,7 @@ bool csGeneralMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
           iMaterialWrapper* smMaterial = objSubMesh->GetMaterial();
           uint mixmode = objSubMesh->GetMixmode ();
           csZBufMode zmode = objSubMesh->GetZMode ();
-	  int renderPrio = objSubMesh->GetRenderPriority ();
+	  CS::Graphics::RenderPriority renderPrio = objSubMesh->GetRenderPriority ();
           bool b2f = objSubMesh->GetBack2Front ();
 
           /* @@@ FIXME: shadervars.IsEmpty() only works for same reasons as 
@@ -1607,7 +1607,7 @@ bool csGeneralMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
 	      synldr->WriteZMode (submeshNode, zmode, false);
 	    }
 	    
-	    if (renderPrio >= 0)
+	    if (renderPrio.IsValid())
 	    {
 	      csRef<iDocumentNode> prioNode = 
 		submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);

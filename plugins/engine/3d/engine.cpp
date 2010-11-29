@@ -866,25 +866,18 @@ iObject *csEngine::QueryObject ()
 
 void csEngine::RegisterRenderPriority (
   const char *name,
-  long priority,
+  uint priority,
   csRenderPrioritySorting rendsort)
 {
-  int i;
-
   // If our priority goes over the number of defined priorities
   // then we have to initialize.
-  size_t old_pri_len = renderPriorities.GetSize ();
   if ((size_t)(priority + 1) >= renderPrioritySortflag.GetSize ())
   {
-    renderPrioritySortflag.SetSize (priority + 2);
+    renderPrioritySortflag.SetSize (priority + 2, CS_RENDPRI_SORT_NONE);
     renderPriorities.SetSize (priority+2);
   }
-  for (i = (int)old_pri_len; i <= priority; i++)
-  {
-    renderPrioritySortflag[i] = CS_RENDPRI_SORT_NONE;
-  }
 
-  renderPriorities.Put (priority, (char*)name);
+  renderPriorities.Put (priority, name);
   renderPrioritySortflag[priority] = rendsort;
   renderPrioritiesDirty = true;
 }
@@ -919,16 +912,16 @@ void csEngine::UpdateStandardRenderPriorities ()
   renderPrioritiesDirty = false;
 }
 
-long csEngine::GetRenderPriority (const char *name) const
+CS::Graphics::RenderPriority csEngine::GetRenderPriority (const char *name) const
 {
   size_t i;
   for (i = 0; i < renderPriorities.GetSize (); i++)
   {
     const char *n = renderPriorities[i];
-    if (n && !strcmp (name, n)) return (long)i;
+    if (n && !strcmp (name, n)) return CS::Graphics::RenderPriority (uint (i));
   }
 
-  return 0;
+  return CS::Graphics::RenderPriority ();
 }
 
 csRenderPrioritySorting csEngine::GetRenderPrioritySorting (const char *name) const
@@ -943,7 +936,7 @@ csRenderPrioritySorting csEngine::GetRenderPrioritySorting (const char *name) co
   return CS_RENDPRI_SORT_NONE;
 }
 
-csRenderPrioritySorting csEngine::GetRenderPrioritySorting (long priority) const
+csRenderPrioritySorting csEngine::GetRenderPrioritySorting (CS::Graphics::RenderPriority priority) const
 {
   return renderPrioritySortflag[priority];
 }
@@ -955,14 +948,14 @@ void csEngine::ClearRenderPriorities ()
   renderPrioritySortflag.SetSize (0);
 }
 
-int csEngine::GetRenderPriorityCount () const
+size_t csEngine::GetRenderPriorityCount () const
 {
   return (int)renderPriorities.GetSize ();
 }
 
-const char* csEngine::GetRenderPriorityName (long priority) const
+const char* csEngine::GetRenderPriorityName (CS::Graphics::RenderPriority priority) const
 {
-  if (priority < 0 && (size_t)priority >= renderPriorities.GetSize ()) 
+  if ((size_t)priority >= renderPriorities.GetSize ()) 
     return 0;
   return renderPriorities[priority];
 }

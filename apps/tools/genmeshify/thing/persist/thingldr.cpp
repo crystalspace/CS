@@ -771,11 +771,11 @@ bool csThingLoader::ParsePoly3d (
         portal_verts[i] = thing_fact_state->GetPolygonVertex (
 		CS_POLYINDEX_LAST, i);
 
-      int portal_pri = engine->GetPortalRenderPriority ();
-      if (portal_pri == 0)
+      CS::Graphics::RenderPriority portal_pri = engine->GetPortalRenderPriority ();
+      if (!portal_pri.IsValid())
         portal_pri = mesh->GetRenderPriority ();
       csString pc_name;
-      pc_name.Format ("__portals_%d_%s__", portal_pri,
+      pc_name.Format ("__portals_%u_%s__", uint (portal_pri),
       	destSectorName->GetData ());
 
       iPortal* portal;

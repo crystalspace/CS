@@ -107,7 +107,7 @@ void csMeshFactoryWrapper::SetZBufModeRecursive (csZBufMode mode)
     ml->Get (i)->SetZBufModeRecursive (mode);
 }
 
-void csMeshFactoryWrapper::SetRenderPriorityRecursive (long rp)
+void csMeshFactoryWrapper::SetRenderPriorityRecursive (CS::Graphics::RenderPriority rp)
 {
   SetRenderPriority (rp);
   const iMeshFactoryList* ml = &children;
@@ -117,7 +117,7 @@ void csMeshFactoryWrapper::SetRenderPriorityRecursive (long rp)
     ml->Get (i)->SetRenderPriorityRecursive (rp);
 }
 
-void csMeshFactoryWrapper::SetRenderPriority (long rp)
+void csMeshFactoryWrapper::SetRenderPriority (CS::Graphics::RenderPriority rp)
 {
   render_priority = rp;
 }

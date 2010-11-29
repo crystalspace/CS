@@ -54,7 +54,7 @@ namespace RenderManager
     /// Any extra data that should be defined for each mesh node
     struct MeshNodeExtraDataType
     {
-      int   priority;
+      CS::Graphics::RenderPriority priority;
     };
 
     /// Any extra data that should be defined for each context node
@@ -107,7 +107,7 @@ namespace RenderManager
     {
       MeshNodeKeyType result = {0};
 
-      if (rendermesh.renderPrio >= 0)
+      if (rendermesh.renderPrio.IsValid())
         result.priority = rendermesh.renderPrio;
       else
         result.priority = defaultPriority;
@@ -123,7 +123,7 @@ namespace RenderManager
                         const csRenderMesh& rendermesh,
                         const PersistentDataExtraDataType& data)
     {
-      if (rendermesh.renderPrio >= 0)
+      if (rendermesh.renderPrio.IsValid())
         meshNode.priority = rendermesh.renderPrio;
       else
         meshNode.priority = defaultPriority;

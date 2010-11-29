@@ -44,7 +44,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     /// Any extra data that should be defined for each mesh node
     struct MeshNodeExtraDataType
     {
-      int priority;
+      CS::Graphics::RenderPriority priority;
       bool useForwardRendering;
     };
 
@@ -103,7 +103,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
       for (size_t i = 0; i < strArray.GetSize (); i++)
       {
-        long p = engine->GetRenderPriority (strArray[i]);
+        CS::Graphics::RenderPriority p = engine->GetRenderPriority (strArray[i]);
         if (p <= 0)
         {
           csReport (registry, CS_REPORTER_SEVERITY_WARNING,
@@ -111,7 +111,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         }
         else
         {
-          if ((long)data.forwardPriorities.GetSize() <= p)
+          if (data.forwardPriorities.GetSize() <= p)
             data.forwardPriorities.SetSize (p + 1);
           data.forwardPriorities.SetBit (p);
         }
@@ -122,7 +122,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     static bool UseForwardRendering(CS::Graphics::RenderPriority priority,
                                     const PersistentDataExtraDataType &data)
     {
-      if (priority < (int)data.forwardPriorities.GetSize ())
+      if (priority < data.forwardPriorities.GetSize ())
         return data.forwardPriorities.IsBitSet (priority);
       return false;
     }
@@ -137,12 +137,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     {
       MeshNodeKeyType result = {0};
 
-      if (rendermesh.renderPrio >= 0)
+      if (rendermesh.renderPrio.IsValid())
         result.priority = rendermesh.renderPrio;
       else
         result.priority = defaultPriority;
       result.isPortal = rendermesh.portal != 0;
-      result.useForwardRendering = UseForwardRendering (result.priority, data);
+      result.useForwardRendering = UseForwardRendering (
+	CS::Graphics::RenderPriority (uint (result.priority)), data);
 
       return result;
     }
@@ -154,11 +155,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
                         const csRenderMesh& rendermesh,
                         const PersistentDataExtraDataType& data)
     {
-      if (rendermesh.renderPrio >= 0)
+      if (rendermesh.renderPrio.IsValid())
         meshNode.priority = rendermesh.renderPrio;
       else
         meshNode.priority = defaultPriority;
-      meshNode.useForwardRendering = UseForwardRendering (meshNode.priority, data);
+      meshNode.useForwardRendering = UseForwardRendering (
+	CS::Graphics::RenderPriority (meshNode.priority), data);
     }
     /** @} */
   };

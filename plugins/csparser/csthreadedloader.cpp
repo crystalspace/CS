@@ -2149,8 +2149,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       case XMLTOKEN_PRIORITY:
         {
           const char* priname = child->GetContentsValue ();
-          long pri = Engine->GetRenderPriority (priname);
-          if (pri == 0)
+          CS::Graphics::RenderPriority pri = Engine->GetRenderPriority (priname);
+          if (!pri.IsValid())
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.meshfactory",
@@ -3474,8 +3474,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     case XMLTOKEN_PRIORITY:
       {
         priority = child->GetContentsValue ();
-        long pri = Engine->GetRenderPriority (priority);
-        if (pri == 0)
+        CS::Graphics::RenderPriority pri = Engine->GetRenderPriority (priority);
+        if (!pri.IsValid())
         {
           SyntaxService->ReportError (
             "crystalspace.maploader.parse.meshobject",

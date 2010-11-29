@@ -57,7 +57,7 @@ public:
   TerrainBBCellRenderProperties (iEngine* engine)
     : scfImplementationType (this), visible (true), blockResolution (16), 
     minSteps (1), splitDistanceCoeff (128), splatDistance (200),
-    splatPrio (-1), engine (engine)
+    engine (engine)
   {
   }
 
@@ -120,7 +120,6 @@ public:
   void SetSplatRenderPriority (const char* prio)
   {
     splatPrio = engine->GetRenderPriority (prio);
-    if (splatPrio == 0) splatPrio = -1;
   }
   CS::Graphics::RenderPriority GetSplatRenderPriorityValue() const
   {
@@ -193,7 +192,7 @@ public:
     }
     else if (strcmp (name, "splat render priority") == 0)
     {
-      if (splatPrio <= 0)
+      if (!splatPrio.IsValid())
 	return 0;
       else
 	return engine->GetRenderPriorityName (splatPrio);

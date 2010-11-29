@@ -25,7 +25,6 @@ csDecalTemplate::csDecalTemplate ()
   : scfImplementationType (this),
     timeToLive (-1.0f),
     material (0),
-    renderPriority (0),
     zBufMode (CS_ZBUF_TEST),
     polygonNormalThreshold (0.01f),
     decalOffset (0.05f),
@@ -53,7 +52,6 @@ csDecalTemplate::csDecalTemplate (iBase* parent)
   : scfImplementationType (this, parent),
     timeToLive (-1.0f),
     material (0),
-    renderPriority (0),
     zBufMode (CS_ZBUF_TEST),
     polygonNormalThreshold (0.01f),
     decalOffset (0.05f),
@@ -91,7 +89,7 @@ iMaterialWrapper* csDecalTemplate::GetMaterialWrapper ()
   return material;
 }
 
-long csDecalTemplate::GetRenderPriority () const
+CS::Graphics::RenderPriority csDecalTemplate::GetRenderPriority () const
 {
     return renderPriority;
 }
@@ -186,7 +184,7 @@ void csDecalTemplate::SetMaterialWrapper (iMaterialWrapper* material)
   this->material = material;
 }
 
-void csDecalTemplate::SetRenderPriority (long renderPriority)
+void csDecalTemplate::SetRenderPriority (CS::Graphics::RenderPriority renderPriority)
 {
   this->renderPriority = renderPriority;
 }

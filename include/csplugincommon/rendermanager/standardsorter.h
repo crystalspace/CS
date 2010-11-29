@@ -62,7 +62,7 @@ namespace RenderManager
       renderPriorityCount = engine->GetRenderPriorityCount ();
       sortingTypeTable = new int[renderPriorityCount];
       
-      for (int i = 0; i < renderPriorityCount; ++i)
+      for (uint i = 0; i < renderPriorityCount; ++i)
       {       
         sortingTypeTable[i] = -1;
       }      
@@ -85,7 +85,7 @@ namespace RenderManager
     void operator()(typename Tree::MeshNode* meshNode)
     {
       // Get the render priority for node
-      int renderPrio = meshNode->priority;
+      CS::Graphics::RenderPriority renderPrio (meshNode->priority);
       
       int sorting = GetSorting (renderPrio);
       meshNode->sorting = sorting;
@@ -177,9 +177,9 @@ namespace RenderManager
       const float scaleFactor;
     };
   
-    csRenderPrioritySorting GetSorting (int renderPrio)
+    csRenderPrioritySorting GetSorting (CS::Graphics::RenderPriority renderPrio)
     {
-      CS_ASSERT(renderPrio >= 0 && renderPrio < renderPriorityCount);
+      CS_ASSERT(renderPrio.IsValid() && renderPrio < renderPriorityCount);
 
       if (sortingTypeTable[renderPrio] < 0)
       {
@@ -189,7 +189,7 @@ namespace RenderManager
       return (csRenderPrioritySorting)sortingTypeTable[renderPrio];
     }
 
-    int renderPriorityCount;
+    uint renderPriorityCount;
     int* sortingTypeTable;
     iEngine* engine;
     csVector3 cameraOrigin;

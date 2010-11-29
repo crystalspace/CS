@@ -697,7 +697,7 @@ struct iMeshWrapper : public virtual iBase
  */
 struct iMeshFactoryWrapper : public virtual iBase
 {
-  SCF_INTERFACE(iMeshFactoryWrapper, 2, 1, 0);
+  SCF_INTERFACE(iMeshFactoryWrapper, 2, 2, 0);
   /// Get the iObject for this mesh factory.
   virtual iObject *QueryObject () = 0;
   /// Get the iMeshObjectFactory.
@@ -848,17 +848,17 @@ struct iMeshFactoryWrapper : public virtual iBase
    *   using some other transparency system are rendered after that. They
    *   are usually rendered using ZTEST.
    */
-  virtual void SetRenderPriority (long rp) = 0;
+  virtual void SetRenderPriority (CS::Graphics::RenderPriority rp) = 0;
   /**
    * Get the render priority.
    */
-  virtual long GetRenderPriority () const = 0;
+  virtual CS::Graphics::RenderPriority GetRenderPriority () const = 0;
 
   /**
    * Same as SetRenderPriority() but this version will recursively set
    * render priority for the children too.
    */
-  virtual void SetRenderPriorityRecursive (long rp) = 0;
+  virtual void SetRenderPriorityRecursive (CS::Graphics::RenderPriority rp) = 0;
 
   /**
    * Get the shader variable context of the mesh factory.

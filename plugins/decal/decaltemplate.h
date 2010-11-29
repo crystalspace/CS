@@ -34,7 +34,7 @@ class csDecalTemplate : public scfImplementation1<csDecalTemplate,
 private:
   float timeToLive;
   csRef<iMaterialWrapper> material;
-  long renderPriority;
+  CS::Graphics::RenderPriority renderPriority;
   csZBufMode zBufMode;
   float polygonNormalThreshold;
   float decalOffset;
@@ -60,7 +60,7 @@ public:
 
   virtual float GetTimeToLive () const;
   virtual iMaterialWrapper* GetMaterialWrapper ();
-  virtual long GetRenderPriority () const;
+  virtual CS::Graphics::RenderPriority GetRenderPriority () const;
   virtual csZBufMode GetZBufMode () const;
   virtual float GetPolygonNormalThreshold () const;
   virtual float GetDecalOffset () const;
@@ -80,7 +80,7 @@ public:
 
   virtual void SetTimeToLive (float timeToLive);
   virtual void SetMaterialWrapper (iMaterialWrapper* material);
-  virtual void SetRenderPriority (long renderPriority);
+  virtual void SetRenderPriority (CS::Graphics::RenderPriority renderPriority);
   virtual void SetZBufMode (csZBufMode mode);
   virtual void SetPolygonNormalThreshold (float polygonNormalThreshold);
   virtual void SetDecalOffset (float decalOffset);

@@ -19,9 +19,10 @@
 #ifndef __CS_IGEOM_DECAL_H__
 #define __CS_IGEOM_DECAL_H__
 
-#include <csutil/scf.h>
-#include <csutil/array.h>
-#include <ivideo/graph3d.h>
+#include "csutil/scf.h"
+#include "csutil/array.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/rendermesh.h"
 
 struct iSector;
 struct iMaterialWrapper;
@@ -57,7 +58,7 @@ struct iDecal
  */
 struct iDecalTemplate : public virtual iBase
 {
-  SCF_INTERFACE(iDecalTemplate, 1, 2, 1);
+  SCF_INTERFACE(iDecalTemplate, 1, 3, 0);
 
   /**
    * Retrieves the time the decal will have to live in seconds before it is 
@@ -76,7 +77,7 @@ struct iDecalTemplate : public virtual iBase
    * Retrieves the rendering priority for this decal
    *  \return the rendering priority.
    */
-  virtual long GetRenderPriority () const = 0;
+  virtual CS::Graphics::RenderPriority GetRenderPriority () const = 0;
 
   /**
    * Retrieves the z-buffer mode for this decal.
@@ -213,7 +214,7 @@ struct iDecalTemplate : public virtual iBase
    * Sets the rendering priority for this decal
    *  \param renderPriority	The render priority of the decal.
    */
-  virtual void SetRenderPriority (long renderPriority) = 0;
+  virtual void SetRenderPriority (CS::Graphics::RenderPriority renderPriority) = 0;
 
   /**
    * Sets the z-buffer mode for this decal.
@@ -388,7 +389,7 @@ struct iDecalBuilder
  */
 struct iDecalManager : public virtual iBase
 {
-  SCF_INTERFACE (iDecalManager, 1, 0, 1);
+  SCF_INTERFACE (iDecalManager, 1, 1, 0);
 
   /**
    * Creates a decal that can be shared among several meshes.

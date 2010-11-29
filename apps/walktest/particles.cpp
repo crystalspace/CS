@@ -63,7 +63,7 @@ static void add_particles_rain (WalkTest* Sys, iSector* sector, char* matname, i
   if (do_camera)
   {
     iEngine* e = Sys->Engine;
-    int c = e->GetAlphaRenderPriority ();
+    CS::Graphics::RenderPriority c = e->GetAlphaRenderPriority ();
     exp->GetFlags ().Set (CS_ENTITY_CAMERA);
     exp->SetRenderPriority (c);
   }

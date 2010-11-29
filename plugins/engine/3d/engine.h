@@ -289,48 +289,48 @@ public:
 
   //-- Render priority functions
 
-  virtual void RegisterRenderPriority (const char* name, long priority,
+  virtual void RegisterRenderPriority (const char* name, uint priority,
   	csRenderPrioritySorting rendsort = CS_RENDPRI_SORT_NONE);
   virtual void RegisterDefaultRenderPriorities ();
-  virtual long GetRenderPriority (const char* name) const;
+  virtual CS::Graphics::RenderPriority GetRenderPriority (const char* name) const;
   virtual csRenderPrioritySorting GetRenderPrioritySorting (
   	const char* name) const;
   virtual csRenderPrioritySorting GetRenderPrioritySorting (
-  	long priority) const;
+  	CS::Graphics::RenderPriority priority) const;
 
-  virtual long GetSkyRenderPriority ()
+  virtual CS::Graphics::RenderPriority GetSkyRenderPriority ()
   {
     UpdateStandardRenderPriorities ();
     return renderPrioritySky;
   }
   
-  virtual long GetPortalRenderPriority ()
+  virtual CS::Graphics::RenderPriority GetPortalRenderPriority ()
   {
     UpdateStandardRenderPriorities ();
     return renderPriorityPortal;
   }
 
-  virtual long GetWallRenderPriority ()
+  virtual CS::Graphics::RenderPriority GetWallRenderPriority ()
   {
     UpdateStandardRenderPriorities ();
     return renderPriorityWall;
   }
 
-  virtual long GetObjectRenderPriority ()
+  virtual CS::Graphics::RenderPriority GetObjectRenderPriority ()
   {
     UpdateStandardRenderPriorities ();
     return renderPriorityObject;
   }
 
-  virtual long GetAlphaRenderPriority ()
+  virtual CS::Graphics::RenderPriority GetAlphaRenderPriority ()
   {
     UpdateStandardRenderPriorities ();
     return renderPriorityAlpha;
   }
 
   virtual void ClearRenderPriorities ();
-  virtual int GetRenderPriorityCount () const;
-  virtual const char* GetRenderPriorityName (long priority) const;
+  virtual size_t GetRenderPriorityCount () const;
+  virtual const char* GetRenderPriorityName (CS::Graphics::RenderPriority priority) const;
 
   //-- Material handling
 
@@ -996,11 +996,11 @@ private:
    * - "object": usually rendered using ZUSE
    * - "alpha": usually rendered using ZTEST
    */
-  long renderPrioritySky;
-  long renderPriorityPortal;
-  long renderPriorityWall;
-  long renderPriorityObject;
-  long renderPriorityAlpha;
+  CS::Graphics::RenderPriority renderPrioritySky;
+  CS::Graphics::RenderPriority renderPriorityPortal;
+  CS::Graphics::RenderPriority renderPriorityWall;
+  CS::Graphics::RenderPriority renderPriorityObject;
+  CS::Graphics::RenderPriority renderPriorityAlpha;
 
   /**
    * If this nextframe_pending is not 0 then a call of NextFrame
