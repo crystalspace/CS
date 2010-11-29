@@ -158,7 +158,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine, 6, 3, 0);
+  SCF_INTERFACE(iEngine, 6, 4, 0);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -263,10 +263,16 @@ struct iEngine : public virtual iBase
    * (in that priority order, where 'init' is rendered first and 
    * 'final' is rendered last).  Should you wish to add your own render 
    * priority, you must call ClearRenderPriorities() and re-add the 
-   * default render priorities along with your own new priorities.
+   * default render priorities (using RegisterDefaultRenderPriorities())
+   * along with your own new priorities.
    */
   virtual void RegisterRenderPriority (const char* name, long priority,
   	csRenderPrioritySorting rendsort = CS_RENDPRI_SORT_NONE) = 0;
+  /**
+   * Register default render priorities.
+   * \sa RegisterRenderPriority for list of default render priorities.
+   */
+  virtual void RegisterDefaultRenderPriorities () = 0;
 
   /**
    * Get a render priority by name.

@@ -291,6 +291,7 @@ public:
 
   virtual void RegisterRenderPriority (const char* name, long priority,
   	csRenderPrioritySorting rendsort = CS_RENDPRI_SORT_NONE);
+  virtual void RegisterDefaultRenderPriorities ();
   virtual long GetRenderPriority (const char* name) const;
   virtual csRenderPrioritySorting GetRenderPrioritySorting (
   	const char* name) const;

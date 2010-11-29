@@ -519,7 +519,7 @@ csEngine::csEngine (iBase *iParent) :
   currentRenderContext (0), weakEventHandler(0),
   bAdaptiveLODsEnabled(false), adaptiveLODsTargetFPS(30), adaptiveLODsMultiplier(1.0f)
 {
-  ClearRenderPriorities ();
+  RegisterDefaultRenderPriorities ();
 }
 
 csEngine::~csEngine ()
@@ -771,6 +771,8 @@ void csEngine::DeleteAllForce ()
 
   // Clear all render priorities.
   ClearRenderPriorities ();
+  // ...and register default ones
+  RegisterDefaultRenderPriorities ();
 
   // remove objects
   QueryObject ()->ObjRemoveAll ();
@@ -887,6 +889,22 @@ void csEngine::RegisterRenderPriority (
   renderPrioritiesDirty = true;
 }
 
+void csEngine::RegisterDefaultRenderPriorities ()
+{
+  renderPrioritiesDirty = true;
+  RegisterRenderPriority ("init", 1);
+  RegisterRenderPriority ("sky", 2);
+  RegisterRenderPriority ("sky2", 3);
+  RegisterRenderPriority ("portal", 4);
+  RegisterRenderPriority ("wall", 5);
+  RegisterRenderPriority ("wall2", 6);
+  RegisterRenderPriority ("object", 7);
+  RegisterRenderPriority ("object2", 8);
+  RegisterRenderPriority ("transp", 9);
+  RegisterRenderPriority ("alpha", 10, CS_RENDPRI_SORT_BACK2FRONT);
+  RegisterRenderPriority ("final", 11);
+}
+
 void csEngine::UpdateStandardRenderPriorities ()
 {
   if (!renderPrioritiesDirty)
@@ -935,17 +953,6 @@ void csEngine::ClearRenderPriorities ()
   renderPrioritiesDirty = true;
   renderPriorities.DeleteAll ();
   renderPrioritySortflag.SetSize (0);
-  RegisterRenderPriority ("init", 1);
-  RegisterRenderPriority ("sky", 2);
-  RegisterRenderPriority ("sky2", 3);
-  RegisterRenderPriority ("portal", 4);
-  RegisterRenderPriority ("wall", 5);
-  RegisterRenderPriority ("wall2", 6);
-  RegisterRenderPriority ("object", 7);
-  RegisterRenderPriority ("object2", 8);
-  RegisterRenderPriority ("transp", 9);
-  RegisterRenderPriority ("alpha", 10, CS_RENDPRI_SORT_BACK2FRONT);
-  RegisterRenderPriority ("final", 11);
 }
 
 int csEngine::GetRenderPriorityCount () const
