@@ -510,6 +510,20 @@ CS_CHECK_VTABLE_THUNKS
 
 
 #------------------------------------------------------------------------------
+# Check for option to enable OpenMP support.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD_FLAGS([for flag to enable OpenMP],
+    [cs_cv_prog_cxx_openmp],
+    [CS_CREATE_TUPLE([-fopenmp])], [C++],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS.OPENMP],
+	[$cs_cv_prog_cxx_openmp], [+])
+    # At least on gcc the flag needed for linking is -fopenmp as well.
+    CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS.OPENMP],
+	[$cs_cv_prog_cxx_openmp], [+])])
+
+
+
+#------------------------------------------------------------------------------
 # Check how to ask the linker to promote warnings to errors.
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD_FLAGS([how to treat linker warnings as errors],
