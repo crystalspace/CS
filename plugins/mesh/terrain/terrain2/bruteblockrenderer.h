@@ -54,7 +54,7 @@ public:
 
   virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview,
                                    iMovable* movable, uint32 frustum_mask,
-                                   const csArray<iTerrainCell*> cells);
+                                   const csArray<iTerrainCell*>& cells);
 
   virtual void OnMaterialPaletteUpdate (const csTerrainMaterialPalette&
                                         material_palette);  

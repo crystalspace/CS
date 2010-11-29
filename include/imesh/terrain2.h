@@ -419,7 +419,7 @@ struct iTerrainCollider : public virtual iBase
 /// Provides an interface for custom rendering
 struct iTerrainRenderer : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainRenderer, 2, 0, 0);
+  SCF_INTERFACE (iTerrainRenderer, 3, 0, 0);
 
   /**
    * Create an object that implements iTerrainCellRenderProperties
@@ -457,7 +457,7 @@ struct iTerrainRenderer : public virtual iBase
    */
   virtual CS::Graphics::RenderMesh** GetRenderMeshes (int& n, iRenderView* rview,
                                    iMovable* movable, uint32 frustum_mask,
-                                   const csArray<iTerrainCell*> cells) = 0;
+                                   const csArray<iTerrainCell*>& cells) = 0;
 
   
   /**

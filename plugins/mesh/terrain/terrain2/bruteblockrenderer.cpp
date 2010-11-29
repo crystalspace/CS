@@ -1144,7 +1144,7 @@ void csTerrainBruteBlockRenderer::DisconnectTerrain (iTerrainSystem* system)
 
 csRenderMesh** csTerrainBruteBlockRenderer::GetRenderMeshes (int& n, 
   iRenderView* rview, iMovable* movable, uint32 frustum_mask,
-  const csArray<iTerrainCell*> cells)
+  const csArray<iTerrainCell*>& cells)
 {
   renderMeshCache.Empty ();
 
