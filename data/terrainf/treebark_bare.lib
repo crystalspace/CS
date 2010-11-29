@@ -27,7 +27,7 @@
     <meshfact name="treebark_bare">
         <plugin>genmeshFactory</plugin>
         <zuse />
-	<priority>object2</priority>
+	<priority>transp</priority>
         <params>
             <material>materialbark</material>
             <numvt>2960</numvt>

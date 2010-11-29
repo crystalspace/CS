@@ -144,6 +144,9 @@
                     <gridsize width="257" height="257" />
                     <materialmapsize width="512" height="512" />
                     <size x="256" y="15" z="256" />
+		    <renderproperties>
+			<param name="splat render priority">object2</param>
+		    </renderproperties>
                 </celldefault>
                 <cell>
                     <name>0</name>

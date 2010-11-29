@@ -32,7 +32,7 @@
     </materials>
     <meshfact name="Rock">
         <plugin>genmeshfact</plugin>
-	<priority>object2</priority>
+	<priority>transp</priority>
         <params>
             <material>rocky_surface.jpg</material>
             <numvt>155</numvt>
@@ -390,7 +390,7 @@
     </meshfact>
     <meshfact name="RockSmall">
         <plugin>genmeshfact</plugin>
-	<priority>object2</priority>
+	<priority>transp</priority>
         <params>
             <material>rocky_surface.jpg</material>
             <numvt>53</numvt>

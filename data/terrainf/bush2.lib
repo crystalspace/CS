@@ -31,7 +31,7 @@
     <meshfact name="bush2">
         <plugin>genmeshFactory</plugin>
         <zuse />
-	<priority>object2</priority>
+	<priority>transp</priority>
         <params>
             <material>sage2.png</material>
             <numvt>848</numvt>

@@ -41,7 +41,7 @@
         </material>
     </materials>
     <meshfact name="tree_skimp">
-	<priority>object2</priority>
+	<priority>transp</priority>
         <nullmesh>
             <min x="-2" y="0" z="-2" />
             <max x="2" y="4" z="2" />
