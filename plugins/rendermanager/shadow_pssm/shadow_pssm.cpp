@@ -353,6 +353,7 @@ bool RMShadowedPSSM::RenderView (iView* view)
   RenderTreeType renderTree (treePersistent);
 
   RenderTreeType::ContextNode* startContext = renderTree.CreateContext (rview);
+  startContext->drawFlags |= (CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER);
   startContext->renderTargets[rtaColor0].texHandle = postEffects.GetScreenTarget ();
   startContext->perspectiveFixup = perspectiveFixup;
 

@@ -364,6 +364,7 @@ bool RMDeferred::RenderView(iView *view)
 
   RenderTreeType renderTree (treePersistent);
   RenderTreeType::ContextNode *startContext = renderTree.CreateContext (rview);
+  startContext->drawFlags |= (CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER);
 
   // Add gbuffer textures to be visualized.
   if (showGBuffer)

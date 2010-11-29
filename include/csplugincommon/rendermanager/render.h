@@ -287,8 +287,6 @@ namespace RenderManager
       RenderView* rview = context->renderView;
 
       int drawFlags = CSDRAW_3DGRAPHICS;
-      drawFlags |= CSDRAW_CLEARSCREEN;
-      drawFlags |= CSDRAW_CLEARZBUFFER;
       drawFlags |= context->drawFlags;
 
       iCamera* cam = rview->GetCamera ();
