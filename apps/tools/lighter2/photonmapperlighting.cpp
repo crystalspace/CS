@@ -332,7 +332,9 @@ namespace lighter
       }
 
       // Loop to generate the requested number of photons for this light source
+    #if defined(_OPENMP)
       omp_set_num_threads(omp_get_num_procs()*2);
+    #endif
 
 	  if(!stop)
 	  {
