@@ -1459,7 +1459,7 @@ AC_DEFUN([CS_CHECK_LIBOPENAL],
 	    [CS_AL_INCLUDE([CS_OPENAL_PATH],[AL],[alc.h])],
 	    [alcCreateContext (0,0);])],
 	[CS_CREATE_TUPLE([-DCS_OPENAL_PATH=OpenAL],[],[-framework OpenAL]) \
-	CS_CREATE_TUPLE([],[],[-lopenal]) \
+	CS_CREATE_TUPLE([],[],[-lopenal -lrt]) \
 	CS_CREATE_TUPLE([],[],[-lopenal32]) \
 	CS_CREATE_TUPLE([],[],[-lOpenAL32]) \
 	CS_CREATE_TUPLE([],[],[-lopenal -ldsound]) \
@@ -1732,7 +1732,7 @@ AS_IF([test $cs_host_family != windows],
 	    [unsigned char axes;
 	    unsigned char buttons;
 	    int version;
-	    char name[[[128]]];
+	    char name[[128]];
 	    int fd;
 	    struct js_event js;
 	    (void)js;
@@ -2188,7 +2188,7 @@ CS_CHECK_BUILD([for MAXPATHLEN], [cs_cv_c_macro_maxpathlen],
 	#if HAVE_SYS_PARAM_H
 	#include <sys/param.h>
 	#endif]],
-	[char s[[[MAXPATHLEN]]]; (void)s;])],
+	[char s[[MAXPATHLEN]]; (void)s;])],
     [], [], [CS_HEADER_PROPERTY([CS_MAXPATHLEN], [MAXPATHLEN])], [], [],
     [$cs_cv_prog_cxx_enable_pedantic])
 
