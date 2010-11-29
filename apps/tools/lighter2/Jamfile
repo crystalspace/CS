@@ -4,6 +4,8 @@ Description lighter2 : "New Renderer Lightmap Calculator, take 2" ;
 ApplicationIcon win32 : lighter2 : lighter.ico ;
 Application lighter2 : [ Wildcard *.cpp *.h ] : console ;
 MsvcUsePCH lighter2 : common.h ;
+CFlags lighter2 : $(COMPILER.C++FLAGS.OPENMP) ;
+LFlags lighter2 : $(COMPILER.LFLAGS.OPENMP) ;
 LinkWith lighter2 : crystalspace ;
 FileListEntryApplications lighter2 : app-tool ;
 
