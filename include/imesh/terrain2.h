@@ -422,7 +422,7 @@ struct iTerrainRenderer : public virtual iBase
   SCF_INTERFACE (iTerrainRenderer, 2, 0, 0);
 
   /**
-   * Create an object that implements iTerrainCellCollisionProperties
+   * Create an object that implements iTerrainCellRenderProperties
    * This object will be stored in the cell. This function gets invoked
    * at cells creation.
    *
