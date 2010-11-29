@@ -631,8 +631,6 @@ bool MocapViewer::CreateAvatar ()
     // Create the 'retarget' animation node
     csRef<CS::Animation::iSkeletonRetargetNodeFactory> retargetNodeFactory =
       retargetNodeManager->CreateAnimNodeFactory ("mocap_retarget");
-    debugNodeFactory->SetDebugModes ((CS::Animation::SkeletonDebugMode)
-				     (CS::Animation::DEBUG_2DLINES | CS::Animation::DEBUG_SQUARES));
     animPacketFactory->SetAnimationRoot (retargetNodeFactory);
     retargetNodeFactory->SetSourceSkeleton (parsingResult.skeletonFactory);
 
