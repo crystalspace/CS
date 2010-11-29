@@ -55052,7 +55052,7 @@ main ()
 unsigned char axes;
 	    unsigned char buttons;
 	    int version;
-	    char name[[128]];
+	    char name[128];
 	    int fd;
 	    struct js_event js;
 	    (void)js;
@@ -55180,7 +55180,7 @@ main ()
 unsigned char axes;
 	    unsigned char buttons;
 	    int version;
-	    char name[[128]];
+	    char name[128];
 	    int fd;
 	    struct js_event js;
 	    (void)js;
@@ -66363,7 +66363,7 @@ fi
 int
 main ()
 {
-char s[[MAXPATHLEN]]; (void)s;
+char s[MAXPATHLEN]; (void)s;
   ;
   return 0;
 }
@@ -66482,7 +66482,7 @@ fi
 int
 main ()
 {
-char s[[MAXPATHLEN]]; (void)s;
+char s[MAXPATHLEN]; (void)s;
   ;
   return 0;
 }
