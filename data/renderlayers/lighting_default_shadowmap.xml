@@ -24,18 +24,16 @@
 		<shadertype>base</shadertype>
 		<shadertype>ambient</shadertype>
 		<shadertype>standard</shadertype>
+		<!-- Rendering order of splatting terrain should be ensured by splat render priority -->
+		<shadertype>splatting ambient</shadertype>
+		<shadertype>terrain splat</shadertype>
 	</layer>
 	<layer>
 	        <defaultshader name="lighting_default_shadowmap" file="/shader/lighting/lighting_default_shadowmap.xml" />
 	        <shadertype>diffuse</shadertype>
 		<!-- Practically unlimited passes -->
 		<maxlightpasses>2147483647</maxlightpasses>
-	</layer>
-      <layer>
-		<shadervar name="pass do_ambient" type="integer">1</shadervar>
-		<ambient />
-            <maxlightpasses>1</maxlightpasses>
-            <shadertype>splatting ambient</shadertype>
+		<!-- Rendering order of splatting terrain should be ensured by splat render priority -->
 		<shadertype>terrain splat</shadertype>
-      </layer>
+	</layer>
 </layerconfig>
