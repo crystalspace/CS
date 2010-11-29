@@ -36,6 +36,7 @@
 #include "ivideo/txtmgr.h"
 
 #include "bruteblockrenderer.h"
+#include "terrainsystem.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 {
@@ -53,9 +54,10 @@ class TerrainBBCellRenderProperties :
   public CS::Graphics::ShaderVariableContextImpl
 {
 public:
-  TerrainBBCellRenderProperties ()
+  TerrainBBCellRenderProperties (iEngine* engine)
     : scfImplementationType (this), visible (true), blockResolution (16), 
-    minSteps (1), splitDistanceCoeff (128), splatDistance (200)
+    minSteps (1), splitDistanceCoeff (128), splatDistance (200),
+    splatPrio (-1), engine (engine)
   {
   }
 
@@ -63,7 +65,8 @@ public:
     : scfImplementationType (this), 
     CS::Graphics::ShaderVariableContextImpl (other), visible (other.visible), 
     blockResolution (other.blockResolution), minSteps (other.minSteps), 
-    splitDistanceCoeff (other.splitDistanceCoeff), splatDistance (other.splatDistance)
+    splitDistanceCoeff (other.splitDistanceCoeff), splatDistance (other.splatDistance),
+    splatPrio (other.splatPrio), engine (other.engine)
   {
 
   }
@@ -114,6 +117,15 @@ public:
     splatDistance = value;
   }
 
+  void SetSplatRenderPriority (const char* prio)
+  {
+    splatPrio = engine->GetRenderPriority (prio);
+    if (splatPrio == 0) splatPrio = -1;
+  }
+  CS::Graphics::RenderPriority GetSplatRenderPriorityValue() const
+  {
+    return splatPrio;
+  }
 
 
   virtual void SetParameter (const char* name, const char* value)
@@ -128,6 +140,8 @@ public:
       SetLODSplitCoeff (CS::Utility::strtof (value));
     else if (strcmp (name, "splat distance") == 0)
       SetSplatDistance (CS::Utility::strtof (value));
+    else if (strcmp (name, "splat render priority") == 0)
+      SetSplatRenderPriority (value);
 
   }
 
@@ -142,6 +156,7 @@ public:
       case 2: return "min steps";
       case 3: return "lod splitcoeff";
       case 4: return "splat distance";
+      case 5: return "splat render priority";
       default: return 0;
     }
   }
@@ -176,6 +191,13 @@ public:
       snprintf (scratch, sizeof (scratch), "%f", splatDistance);
       return scratch;
     }
+    else if (strcmp (name, "splat render priority") == 0)
+    {
+      if (splatPrio <= 0)
+	return 0;
+      else
+	return engine->GetRenderPriorityName (splatPrio);
+    }
     else
       return 0;
   }
@@ -201,6 +223,12 @@ private:
 
   // Splatting end distance
   float splatDistance;
+  
+  // Splat render priority
+  CS::Graphics::RenderPriority splatPrio;
+  
+  // Engine (needed for render prio...)
+  iEngine* engine;
 };
 
 class TerrainBBSVAccessor : public scfImplementation1<TerrainBBSVAccessor,
@@ -980,7 +1008,9 @@ void TerrainBlock::CullRenderMeshes (iRenderView* rview, const csPlane3* cullPla
 
     meshCache.Push (mesh);
   }
-
+  
+  CS::Graphics::RenderPriority splatPrio =
+    renderData->properties->GetSplatRenderPriorityValue();
   for (size_t j = 0; j < renderData->alphaMapArrayAlpha.GetSize (); ++j)
   {
     iMaterialWrapper* mat = renderData->materialArrayAlpha[j];
@@ -1002,6 +1032,7 @@ void TerrainBlock::CullRenderMeshes (iRenderView* rview, const csPlane3* cullPla
     mesh->material = mat;
     mesh->variablecontext = svContext;
     mesh->buffers = bufferHolder;
+    mesh->renderPrio = splatPrio;
 
     mesh->worldspace_origin = worldOrigin;
     mesh->bbox = boundingBox;
@@ -1116,7 +1147,7 @@ void TerrainCellRData::DisconnectCell ()
 
 //-- THE TERRAIN RENDERER ITSELF
 csTerrainBruteBlockRenderer::csTerrainBruteBlockRenderer (iBase* parent)
-  : scfImplementationType (this, parent), materialPalette (0)
+  : scfImplementationType (this, parent), engine (nullptr), materialPalette (0)
 {  
 }
 
@@ -1127,7 +1158,7 @@ csTerrainBruteBlockRenderer::~csTerrainBruteBlockRenderer ()
 
 csPtr<iTerrainCellRenderProperties> csTerrainBruteBlockRenderer::CreateProperties ()
 {
-  return csPtr<iTerrainCellRenderProperties> (new TerrainBBCellRenderProperties);
+  return csPtr<iTerrainCellRenderProperties> (new TerrainBBCellRenderProperties (engine));
 }
 
 void csTerrainBruteBlockRenderer::ConnectTerrain (iTerrainSystem* system)
@@ -1474,10 +1505,12 @@ bool csTerrainBruteBlockRenderer::Initialize (iObjectRegistry* objectReg)
   graph3d = csQueryRegistry<iGraphics3D> (objectReg);
   stringSet = csQueryRegistryTagInterface<iShaderVarStringSet> (objectReg,
     "crystalspace.shader.variablenameset");
+  csRef<iEngine> engine = csQueryRegistry<iEngine> (objectReg);
 
   // Error getting globals
-  if (!graph3d || !stringSet)
+  if (!graph3d || !stringSet || !engine)
     return false;
+  this->engine = engine;
 
   return true;
 }

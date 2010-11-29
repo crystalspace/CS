@@ -29,6 +29,8 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 
+struct iEngine;
+
 CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 {
 
@@ -114,6 +116,7 @@ private:
   iObjectRegistry* objectRegistry;
   csRef<iGraphics3D> graph3d;
   csRef<iShaderVarStringSet> stringSet;
+  iEngine* engine;
 
   const csTerrainMaterialPalette* materialPalette;
   csTerrainMaterialPalette emptyPalette;  
