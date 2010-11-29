@@ -4,4 +4,5 @@ SubInclude TOP plugins mesh animesh animnode debug ;
 SubInclude TOP plugins mesh animesh animnode ik ;
 SubInclude TOP plugins mesh animesh animnode lookat ;
 SubInclude TOP plugins mesh animesh animnode ragdoll ;
+SubInclude TOP plugins mesh animesh animnode retarget ;
 SubInclude TOP plugins mesh animesh animnode speed ;
