@@ -16486,6 +16486,149 @@ fi
 
 
 #------------------------------------------------------------------------------
+# Check for option to enable OpenMP support.
+#------------------------------------------------------------------------------
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for flag to enable OpenMP" >&5
+$as_echo_n "checking for flag to enable OpenMP... " >&6; }
+if test "${cs_cv_prog_cxx_openmp_ok+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "`echo @-fopenmp@@ | sed 'y% %#%'`"; then :
+  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    cs_cflags_save="$CXXFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @-fopenmp@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then :
+  cs_dummy=''
+else
+  if test "$1" = filler; then :
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_libs_test=''
+else
+  if test "$1" = filler; then :
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  cs_build_ok=yes
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then :
+  break
+fi
+    done
+
+
+    CXXFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then :
+  cs_build_cflags=`echo x$cs_cflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cxx_openmp=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+		cs_cv_prog_cxx_openmp_ok="$cs_cv_prog_cxx_openmp"
+else
+  cs_cv_prog_cxx_openmp=''
+		cs_cv_prog_cxx_openmp_ok=no
+fi
+else
+  cs_cv_prog_cxx_openmp=''
+            cs_cv_prog_cxx_openmp_ok=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $cs_cv_prog_cxx_openmp_ok" >&5
+$as_echo "$cs_cv_prog_cxx_openmp_ok" >&6; }
+    if test "$cs_cv_prog_cxx_openmp_ok" != no; then :
+  cs_build_prop_val="$cs_cv_prog_cxx_openmp"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then :
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.OPENMP += $cs_build_prop_val ;
+"
+fi
+    # At least on gcc the flag needed for linking is -fopenmp as well.
+    cs_build_prop_val="$cs_cv_prog_cxx_openmp"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then :
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS.OPENMP += $cs_build_prop_val ;
+"
+fi
+fi
+
+
+
+#------------------------------------------------------------------------------
 # Check how to ask the linker to promote warnings to errors.
 #------------------------------------------------------------------------------
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking how to treat linker warnings as errors" >&5
@@ -54909,7 +55052,7 @@ main ()
 unsigned char axes;
 	    unsigned char buttons;
 	    int version;
-	    char name[128];
+	    char name[[128]];
 	    int fd;
 	    struct js_event js;
 	    (void)js;
@@ -55037,7 +55180,7 @@ main ()
 unsigned char axes;
 	    unsigned char buttons;
 	    int version;
-	    char name[128];
+	    char name[[128]];
 	    int fd;
 	    struct js_event js;
 	    (void)js;
@@ -55121,7 +55264,7 @@ fi
 
 
     LDFLAGS_BACKUP="$LDFLAGS"
-    LDFLAGS="$LDFLAGS -Wl,--no-as-needed"
+    LDFLAGS="$LDFLAGS $cs_cv_prog_link_no_as_needed"
 
 # Check whether --with-Cg was given.
 if test "${with_Cg+set}" = set; then :
@@ -66220,7 +66363,7 @@ fi
 int
 main ()
 {
-char s[MAXPATHLEN]; (void)s;
+char s[[MAXPATHLEN]]; (void)s;
   ;
   return 0;
 }
@@ -66339,7 +66482,7 @@ fi
 int
 main ()
 {
-char s[MAXPATHLEN]; (void)s;
+char s[[MAXPATHLEN]]; (void)s;
   ;
   return 0;
 }
