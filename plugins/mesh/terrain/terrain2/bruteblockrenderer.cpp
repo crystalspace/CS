@@ -963,6 +963,8 @@ void TerrainBlock::CullRenderMeshes (iRenderView* rview, const csPlane3* cullPla
     renderData->renderer->GetIndexBuffer (renderData->blockResolution,
     indexType, numIndices));
 
+  CS::Graphics::RenderPriority splatPrio =
+    renderData->properties->GetSplatRenderPriorityValue();
   for (int j = -1; j < (int)palette.GetSize (); ++j)
   {
     iMaterialWrapper* mat = 0;
@@ -1001,6 +1003,7 @@ void TerrainBlock::CullRenderMeshes (iRenderView* rview, const csPlane3* cullPla
     mesh->material = mat;
     mesh->variablecontext = svContext;
     mesh->buffers = bufferHolder;
+    if (j >= 0) mesh->renderPrio = splatPrio;
 
     mesh->worldspace_origin = worldOrigin;
     mesh->bbox = boundingBox;
@@ -1008,8 +1011,6 @@ void TerrainBlock::CullRenderMeshes (iRenderView* rview, const csPlane3* cullPla
     meshCache.Push (mesh);
   }
   
-  CS::Graphics::RenderPriority splatPrio =
-    renderData->properties->GetSplatRenderPriorityValue();
   for (size_t j = 0; j < renderData->alphaMapArrayAlpha.GetSize (); ++j)
   {
     iMaterialWrapper* mat = renderData->materialArrayAlpha[j];
