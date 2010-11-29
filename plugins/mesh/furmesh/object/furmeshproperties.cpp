@@ -38,7 +38,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     heightFactor(0.5f), averageControlPointsCount(5), 
     controlPointsDistance(0.05f), thicknessVariation (1.0f), pointiness(0.5f),
     furStrandDeviation(0), positionDeviation(0.01f), growTangents(false), 
-    smallFur(false), mixmode(0), priority(10), z_buf_mode(CS_ZBUF_TEST)
+    smallFur(false), mixmode(0), z_buf_mode(CS_ZBUF_TEST)
   {
   }
 

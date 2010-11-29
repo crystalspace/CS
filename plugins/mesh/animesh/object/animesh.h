@@ -192,7 +192,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   public:
     FactorySubmesh (const char* name)
       : scfImplementationType (this), material(0), name(name), visible (true),
-      renderPriority (7), zbufMode (CS_ZBUF_USE)
+	zbufMode (CS_ZBUF_USE)
     {}
 
     virtual iRenderBuffer* GetIndices (size_t set)

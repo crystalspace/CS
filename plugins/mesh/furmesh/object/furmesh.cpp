@@ -55,6 +55,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     if (!engine) printf ("Failed to locate 3D engine!");
 
     rng = new csRandomGen(csGetTicks());
+    
+    if (engine)
+      SetRenderPriority (engine->GetRenderPriority ("transp"));
   }
 
   FurMesh::~FurMesh ()
