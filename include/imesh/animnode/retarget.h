@@ -28,32 +28,17 @@
 #include "csutil/scf_interface.h"
 
 #include "imesh/animnode/skeleton2anim.h"
+#include "csutil/hash.h"
 
 /**\addtogroup meshplugins
  * @{ */
 
-struct iMovable;
-struct iCamera;
-
-namespace CS {
-namespace Mesh {
-
-struct iAnimatedMesh;
-
-} // namespace Mesh
-} // namespace CS
-
-
 namespace CS {
 namespace Animation {
 
-  //struct iBodySkeleton;
 struct iBodyChain;
 struct iSkeletonFactory;
 struct iSkeletonRetargetNodeFactory;
-
-#include "csutil/hash.h"
-#include "imesh/skeleton2.h"
 
 /**
  * This class holds the mapping between the bones of a source and a target skeleton
