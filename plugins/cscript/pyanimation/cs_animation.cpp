@@ -5389,6 +5389,27 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csSkeletalState_Reset(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::csSkeletalState *arg1 = (CS::Animation::csSkeletalState *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csSkeletalState_Reset",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__csSkeletalState, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSkeletalState_Reset" "', argument " "1"" of type '" "CS::Animation::csSkeletalState *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Animation::csSkeletalState * >(argp1);
+  (arg1)->Reset();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *csSkeletalState_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
@@ -15249,6 +15270,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csSkeletalState_SetBoneUsed", _wrap_csSkeletalState_SetBoneUsed, METH_VARARGS, NULL},
 	 { (char *)"csSkeletalState_GetBoneCount", _wrap_csSkeletalState_GetBoneCount, METH_VARARGS, NULL},
 	 { (char *)"csSkeletalState_Setup", _wrap_csSkeletalState_Setup, METH_VARARGS, NULL},
+	 { (char *)"csSkeletalState_Reset", _wrap_csSkeletalState_Reset, METH_VARARGS, NULL},
 	 { (char *)"csSkeletalState_swigregister", csSkeletalState_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iBodyManager_CreateBodySkeleton", _wrap_iBodyManager_CreateBodySkeleton, METH_VARARGS, NULL},
 	 { (char *)"iBodyManager_FindBodySkeleton", _wrap_iBodyManager_FindBodySkeleton, METH_VARARGS, NULL},

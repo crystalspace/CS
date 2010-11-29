@@ -160,6 +160,7 @@ class csSkeletalState(core.csRefCount):
     def SetBoneUsed(*args): return _animation.csSkeletalState_SetBoneUsed(*args)
     def GetBoneCount(*args): return _animation.csSkeletalState_GetBoneCount(*args)
     def Setup(*args): return _animation.csSkeletalState_Setup(*args)
+    def Reset(*args): return _animation.csSkeletalState_Reset(*args)
 csSkeletalState_swigregister = _animation.csSkeletalState_swigregister
 csSkeletalState_swigregister(csSkeletalState)
 

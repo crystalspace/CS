@@ -33402,7 +33402,7 @@ SWIGINTERN PyObject *_wrap_iTerrainRenderer_GetRenderMeshes(PyObject *SWIGUNUSED
   iRenderView *arg3 = (iRenderView *) 0 ;
   iMovable *arg4 = (iMovable *) 0 ;
   uint32 arg5 ;
-  SwigValueWrapper< csArray< iTerrainCell * > > arg6 ;
+  csArray< iTerrainCell * > *arg6 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -33413,7 +33413,7 @@ SWIGINTERN PyObject *_wrap_iTerrainRenderer_GetRenderMeshes(PyObject *SWIGUNUSED
   int res4 = 0 ;
   unsigned long val5 ;
   int ecode5 = 0 ;
-  void *argp6 ;
+  void *argp6 = 0 ;
   int res6 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -33452,20 +33452,15 @@ SWIGINTERN PyObject *_wrap_iTerrainRenderer_GetRenderMeshes(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iTerrainRenderer_GetRenderMeshes" "', argument " "5"" of type '" "uint32""'");
   } 
   arg5 = static_cast< uint32 >(val5);
-  {
-    res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_csArrayT_iTerrainCell_p_csArrayElementHandlerT_iTerrainCell_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0  | 0);
-    if (!SWIG_IsOK(res6)) {
-      SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "iTerrainRenderer_GetRenderMeshes" "', argument " "6"" of type '" "csArray< iTerrainCell * > const""'"); 
-    }  
-    if (!argp6) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainRenderer_GetRenderMeshes" "', argument " "6"" of type '" "csArray< iTerrainCell * > const""'");
-    } else {
-      csArray< iTerrainCell * > * temp = reinterpret_cast< csArray< iTerrainCell * > * >(argp6);
-      arg6 = *temp;
-      if (SWIG_IsNewObj(res6)) delete temp;
-    }
+  res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_csArrayT_iTerrainCell_p_csArrayElementHandlerT_iTerrainCell_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0  | 0);
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "iTerrainRenderer_GetRenderMeshes" "', argument " "6"" of type '" "csArray< iTerrainCell * > const &""'"); 
   }
-  result = (CS::Graphics::RenderMesh **)(arg1)->GetRenderMeshes(*arg2,arg3,arg4,arg5,arg6);
+  if (!argp6) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainRenderer_GetRenderMeshes" "', argument " "6"" of type '" "csArray< iTerrainCell * > const &""'"); 
+  }
+  arg6 = reinterpret_cast< csArray< iTerrainCell * > * >(argp6);
+  result = (CS::Graphics::RenderMesh **)(arg1)->GetRenderMeshes(*arg2,arg3,arg4,arg5,(csArray< iTerrainCell * > const &)*arg6);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_p_CS__Graphics__RenderMesh, 0 |  0 );
   return resultobj;
 fail:
