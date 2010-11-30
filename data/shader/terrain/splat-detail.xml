@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <!--
-  Copyright (C) 2007 by Frank Richter
+  Copyright (C) 2007-2010 by Frank Richter
 	    (C) 2007 by Jorrit Tyberghein
 
   This library is free software; you can redistribute it and/or
@@ -390,7 +390,7 @@
   </technique>
   <?endif?>
   
-  <!-- If PPL is not available, try PVL -->
-  <fallbackshader name="terrain_splatting_pvl" file="/shader/terrain/splat_pvl.xml" />
+  <!-- Fallback to splat w/o detail -->
+  <fallbackshader name="terrain_splatting" file="/shader/terrain/splat.xml" />
 </shader>
 
