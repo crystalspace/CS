@@ -43,14 +43,18 @@ MocapViewer::MocapViewer ()
 		     "\tcsmocapviewer -pld -record -recordfile=mocap.nuv idle01.bvh\n"
 		     "\tcsmocapviewer -rotcamera=-90 idle01.bvh\n"
 		     "\tcsmocapviewer idle01.bvh -pld -ncount=200 -nfrequency=0.4 -poscamera=0.7\n"
-		     "\tcsmocapviewer -targetfile=data/krystal/krystal.xml -targetname=krystal idle01.bvh\n",
+		     "\tcsmocapviewer -targetfile=data/krystal/krystal.xml -targetname=krystal -nobone idle01.bvh\n",
 		     "Crystal Space's viewer for motion captured data. This viewer supports currently"
 		     " only the Biovision Hierarchical data file format (BVH).\n\n"
-		     "The animation can be retargeted automatically to an animesh. The results will depend"
-		     " on the actual similitudes between the two skeletons.\n\n"
-		     "A bone chain can be set as a mask, then only the bones from this chain will be displayed."
-		     " A bone chain is defined by a root bone, then the user can add either all children and"
-		     " sub-children of the root bone, either all bones on the way to a given child bone.\n\n"
+		     "The animation can be retargeted automatically to an animesh. Use either the -targetfile and"
+		     " -targetname options for that. The results will depend on the actual similitudes between the"
+		     " two skeletons.\n\n"
+		     "A mask can be defined to select the bones that are displayed. A simple way to populate the "
+		     "bone mask is by defining a bone chain.  A bone chain is defined by a root bone (option "
+		     "-rootmask), then the user can add either all children and sub-children of the root bone (option"
+		     " -childall), either all bones on the way to a given child bone (option -childmask). Some"
+		     " specific bones can be added and removed by using the -bone and -nobone options. If only one"
+		     " -nobone option is given, then no bones at all will be displayed.\n\n"
 		     "This viewer can also be used to display Point Light Displays and record automatically"
 		     " videos with these data (e.g. for a psychology study on motion perception).\n\n"
 		     "The Point Light display can be perturbated by adding noise points animated by a Perlin"
@@ -94,6 +98,10 @@ MocapViewer::MocapViewer ()
     ("childmask=<string>", "Add a child to the bone chain that will be used as a mask");
   commandLineHelper.AddCommandLineOption
     ("childall", "Add all sub-children of the root bone to the bone chain that will be used as a mask");
+  commandLineHelper.AddCommandLineOption
+    ("bone=<string>", "Add a bone to be displayed by its name");
+  commandLineHelper.AddCommandLineOption
+    ("nobone=<string>", "Remove a bone to be displayed by its name");
   commandLineHelper.AddCommandLineOption
     ("record", "Record the session in a video file, then exit");
   commandLineHelper.AddCommandLineOption
@@ -398,13 +406,21 @@ bool MocapViewer::CreateAvatar ()
   debugNodeFactory->SetLeafBonesDisplayed (false);
   animPacketFactory->SetAnimationRoot (debugNodeFactory);
 
-  // Setup the bone chain mask
+  // Setup the bone chain mask to select which bones are displayed
+  bool hasMask = false;
+  csBitArray boneMask;
+  boneMask.SetSize (parsingResult.skeletonFactory->GetTopBoneID () + 1);
+  boneMask.Clear ();
+
+  // Check for a definition of a bone chain
   txt = clp->GetOption ("rootmask", 0);
   if (txt)
   {
+    hasMask = true;
+
     CS::Animation::BoneID boneID = parsingResult.skeletonFactory->FindBone (txt);
     if (boneID == CS::Animation::InvalidBoneID)
-      ReportError ("Could not find root bone %s!", txt.GetData ());
+      ReportWarning ("Could not find root bone %s!", txt.GetData ());
 
     else
     {
@@ -426,7 +442,7 @@ bool MocapViewer::CreateAvatar ()
       {
 	boneID = parsingResult.skeletonFactory->FindBone (txt);
 	if (boneID == CS::Animation::InvalidBoneID)
-	  ReportError ("Could not find child bone %s!", txt.GetData ());
+	  ReportWarning ("Could not find child bone %s!", txt.GetData ());
 
 	else
 	  bodyChain->AddSubChain (boneID);
@@ -435,9 +451,47 @@ bool MocapViewer::CreateAvatar ()
 	txt = clp->GetOption ("childmask", index);
       }
 
-      debugNodeFactory->AddChainMask (bodyChain);
+      bodyChain->PopulateBoneMask (boneMask);
     }
   }
+
+  // Setup the mask for the bones that are explicitely given on command line
+  size_t index = 0;
+  txt = clp->GetOption ("bone", index);
+  while (txt)
+  {
+    hasMask = true;
+
+    CS::Animation::BoneID boneID = parsingResult.skeletonFactory->FindBone (txt);
+    if (boneID == CS::Animation::InvalidBoneID)
+      ReportWarning ("Could not find user specified bone %s!", txt.GetData ());
+
+    else boneMask.SetBit (boneID);
+
+    txt = clp->GetOption ("bone", ++index);
+  }
+
+  index = 0;
+  txt = clp->GetOption ("nobone", index);
+  while (txt)
+  {
+    hasMask = true;
+
+    if (txt != "")
+    {
+      CS::Animation::BoneID boneID = parsingResult.skeletonFactory->FindBone (txt);
+      if (boneID == CS::Animation::InvalidBoneID)
+	ReportWarning ("Could not find user specified bone %s!", txt.GetData ());
+
+      else boneMask.ClearBit (boneID);
+    }
+
+    txt = clp->GetOption ("nobone", ++index);
+  }
+
+  // Setup the bone mask
+  if (hasMask)
+    debugNodeFactory->SetBoneMask (boneMask);
 
   // Load the debug image
   if (pld && pldImage != "")
@@ -675,7 +729,6 @@ bool MocapViewer::CreateAvatar ()
       skeletonMapping.AddMapping (parsingResult.skeletonFactory->FindBone ("lFoot"), animeshFactory->GetSkeletonFactory ()->FindBone ("LeftFoot"));;
       retargetNodeFactory->SetBoneMapping (skeletonMapping);
       */
-
       // Create the body chains used for retargeting
       CS::Animation::iBodySkeleton* bodySkeleton =
 	bodyManager->CreateBodySkeleton ("target_body", animeshFactory->GetSkeletonFactory ());
