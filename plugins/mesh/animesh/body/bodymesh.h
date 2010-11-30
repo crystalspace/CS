@@ -266,8 +266,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
 
     virtual void DebugPrint () const;
 
+    virtual void PopulateBoneMask (csBitArray& boneMask) const;
+
   private:
     void Print (BodyChainNode* node, size_t level = 0) const;
+    void PopulateMask (BodyChainNode* node, csBitArray& boneMask) const;
 
     csString name;
     csRef<BodySkeleton> bodySkeleton;

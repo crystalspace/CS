@@ -430,13 +430,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
   {
     for (size_t i = 0; i < level; i++)
       printf (" ");
-    printf ("+ node %zu: %s\n", node->boneID, bodySkeleton->skeletonFactory->GetBoneName (node->boneID));
+    printf ("+ node %u: %s\n", node->boneID, bodySkeleton->skeletonFactory->GetBoneName (node->boneID));
 
     for (csRefArray<BodyChainNode>::Iterator it = node->children.GetIterator (); it.HasNext (); )
     {
       BodyChainNode*& node = it.Next ();
       Print (node, level + 1);
     }
+  }
+
+  void BodyChain::PopulateBoneMask (csBitArray& boneMask) const
+  {
+    boneMask.SetSize (bodySkeleton->skeletonFactory->GetTopBoneID () + 1);
+    PopulateMask (rootNode, boneMask);
+  }
+
+  void BodyChain::PopulateMask (BodyChainNode* node, csBitArray& boneMask) const
+  {
+    boneMask.SetBit (node->GetAnimeshBone ());
+    for (size_t i = 0; i < node->GetChildCount (); i++)
+      PopulateMask (node->children[i], boneMask);
   }
 
   /********************
@@ -501,7 +514,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
   {
     for (size_t i = 0; i < level; i++)
       printf (" ");
-    printf ("+ node %zu\n", boneID);
+    printf ("+ node %u\n", boneID);
 
     for (csRefArray<BodyChainNode>::ConstIterator it = children.GetIterator (); it.HasNext (); )
       it.Next ()->Print (level + 1);

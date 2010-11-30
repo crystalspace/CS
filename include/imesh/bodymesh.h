@@ -230,6 +230,13 @@ struct iBodyChain : public virtual iBase
    * Print the hierarchical structure of this bone chain to the standard output.
    */
   virtual void DebugPrint () const = 0;
+
+  /**
+   * Populate the given bone mask with the bones of this chain. The bit mask will
+   * not be reset before populating it, but its size will be grown if needed to the
+   * count of bones in the skeleton.
+   */
+  virtual void PopulateBoneMask (csBitArray& boneMask) const = 0;
 };
 
 /**
