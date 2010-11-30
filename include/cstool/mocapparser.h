@@ -29,6 +29,7 @@
 #include "csutil/ref.h"
 #include "csutil/csstring.h"
 #include "imesh/skeleton2.h"
+#include "imesh/animnode/skeleton2anim.h"
 
 struct iVFS;
 
@@ -36,7 +37,6 @@ namespace CS {
 namespace Animation {
 
 struct iSkeletonFactory;
-struct iSkeletonAnimation;
 
 /**
  * Return structure for CS::Animation::MocapParser::ParseData()
