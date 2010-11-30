@@ -464,6 +464,19 @@ class iNativeWindow(core.iBase):
 iNativeWindow_swigregister = _ivideo.iNativeWindow_swigregister
 iNativeWindow_swigregister(iNativeWindow)
 
+class RenderPriority(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _ivideo.new_RenderPriority(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def IsValid(*args): return _ivideo.RenderPriority_IsValid(*args)
+    __swig_destroy__ = _ivideo.delete_RenderPriority
+    __del__ = lambda self : None;
+RenderPriority_swigregister = _ivideo.RenderPriority_swigregister
+RenderPriority_swigregister(RenderPriority)
+
 cullNormal = _ivideo.cullNormal
 cullFlipped = _ivideo.cullFlipped
 cullDisabled = _ivideo.cullDisabled

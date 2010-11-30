@@ -10252,6 +10252,44 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::RenderPriority ##############
+
+package cspace::RenderPriority;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_RenderPriority(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*IsValid = *cspacec::RenderPriority_IsValid;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_RenderPriority($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::AlphaTestOptions ##############
 
 package cspace::AlphaTestOptions;
@@ -19113,6 +19151,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetVFSCacheManager = *cspacec::iEngine_SetVFSCacheManager;
 *GetCacheManager = *cspacec::iEngine_GetCacheManager;
 *RegisterRenderPriority = *cspacec::iEngine_RegisterRenderPriority;
+*RegisterDefaultRenderPriorities = *cspacec::iEngine_RegisterDefaultRenderPriorities;
 *GetRenderPriority = *cspacec::iEngine_GetRenderPriority;
 *GetRenderPrioritySorting = *cspacec::iEngine_GetRenderPrioritySorting;
 *GetSkyRenderPriority = *cspacec::iEngine_GetSkyRenderPriority;

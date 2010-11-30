@@ -421,6 +421,7 @@ class iEngine(core.iBase):
     def SetVFSCacheManager(*args): return _iengine.iEngine_SetVFSCacheManager(*args)
     def GetCacheManager(*args): return _iengine.iEngine_GetCacheManager(*args)
     def RegisterRenderPriority(*args): return _iengine.iEngine_RegisterRenderPriority(*args)
+    def RegisterDefaultRenderPriorities(*args): return _iengine.iEngine_RegisterDefaultRenderPriorities(*args)
     def GetRenderPriority(*args): return _iengine.iEngine_GetRenderPriority(*args)
     def GetRenderPrioritySorting(*args): return _iengine.iEngine_GetRenderPrioritySorting(*args)
     def GetSkyRenderPriority(*args): return _iengine.iEngine_GetSkyRenderPriority(*args)
