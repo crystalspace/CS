@@ -159,11 +159,88 @@ void Simple::AnimateGenMesh (csTicks elapsed)
   factstate->Invalidate ();
 }
 
+struct TargetToUse
+{
+  csRenderTargetAttachment attachment;
+  const char* format;
+};
+static const TargetToUse targetsToUse[] = {
+  {rtaColor0, "rgb8"},
+  {rtaColor0, "rgb16_f"},
+  //{rtaDepth,  "d32"} // FIXME: Requires attachment support in iRenderManagerTargets
+};
+
+static const char* AttachmentToStr (csRenderTargetAttachment a)
+{
+  switch(a)
+  {
+  case rtaColor0: return "color0";
+  case rtaDepth:  return "depth";
+  default: return 0;
+  }
+}
+
+void Simple::CreateTextures ()
+{
+  for (size_t n = 0; n < sizeof(targetsToUse)/sizeof(targetsToUse[0]); n++)
+  {
+    if (!g3d->CanSetRenderTarget (targetsToUse[n].format,
+      targetsToUse[n].attachment))
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	  "crystalspace.application.simplept",
+	  "Format unsupported: %s(%s)", targetsToUse[n].format,
+          AttachmentToStr (targetsToUse[n].attachment));
+      continue;
+    }
+      
+    csRef<iTextureHandle> texHandle = 
+      g3d->GetTextureManager()->CreateTexture (256, 256, csimg2D, 
+        targetsToUse[n].format, CS_TEXTURE_3D);
+    if (!texHandle) continue;
+    
+    Target target;
+    target.texh = texHandle;
+    target.format = targetsToUse[n].format;
+    target.attachment = targetsToUse[n].attachment;
+    targetTextures.Push (target);
+    
+    availableFormatsStr.AppendFmt ("%s ", target.format);
+    
+    if (!targetTex)
+    {
+      targetTex = texHandle;
+      currentTargetStr.Format ("%s(%s)", AttachmentToStr (target.attachment),
+        target.format);
+    }
+  }
+}
+
+void Simple::CycleTarget()
+{
+  csRef<iRenderManagerTargets> targets =
+    scfQueryInterface<iRenderManagerTargets> (rm);
+  if (!targets) return;
+      
+  targets->UnregisterRenderTarget (targetTex);
+  
+  currentTarget = (currentTarget + 1) % targetTextures.GetSize();
+  const Target& target = targetTextures[currentTarget];
+  currentTargetStr.Format ("%s(%s)", AttachmentToStr (target.attachment),
+    target.format);
+  
+  targetTex = target.texh;
+  targets->RegisterRenderTarget (targetTex, targetView);
+
+  // Also need to set new texture handle on material
+  targetMat->GetMaterial()->GetVariableAdd (svTexDiffuse)->SetValue (targetTex);
+}
+
 //-----------------------------------------------------------------------------
 
 static const char appID[] = "CrystalSpace.SimplePT";
 
-Simple::Simple ()
+Simple::Simple () : currentTarget (0)
 {
   SetApplicationName (appID);
 }
@@ -206,20 +283,18 @@ void Simple::Frame ()
   // Tell the camera to render into the frame buffer.
   rm->RenderView (view);
 
-#if 0
   g3d->BeginDraw(CSDRAW_2DGRAPHICS);
   int fontHeight = font->GetTextHeight();
   int y = g3d->GetDriver2D()->GetHeight() - fontHeight;
   int white = g3d->GetDriver2D()->FindRGB (255, 255, 255);
   g3d->GetDriver2D()->Write (font, 0, y, white, -1,
     csString().Format ("SPACE to cycle formats: %s",
-    ProcTexture->GetAvailableFormats()));
+    availableFormatsStr.GetData()));
   y -= fontHeight;
   g3d->GetDriver2D()->Write (font, 0, y, white, -1,
     csString().Format ("current target: %s",
-    ProcTexture->GetCurrentTarget()));
+    currentTargetStr.GetData()));
   g3d->FinishDraw ();
-#endif
 }
 
 bool Simple::OnKeyboard (iEvent& ev)
@@ -235,7 +310,7 @@ bool Simple::OnKeyboard (iEvent& ev)
   else if ((ev.Name == csevKeyboardUp(object_reg)) && 
     (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_SPACE))
   {
-    ProcTexture->CycleTarget ();
+    CycleTarget ();
     return true;
   }
 
@@ -358,6 +433,12 @@ bool Simple::SetupModules ()
   // We use the full window to draw the world.
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
   
+  // Grab string ID for "tex diffuse" SV name
+  csRef<iShaderVarStringSet> svstrings =
+    csQueryRegistryTagInterface<iShaderVarStringSet> (
+      GetObjectRegistry (), "crystalspace.shader.variablenameset");
+  svTexDiffuse = svstrings->Request ("tex diffuse");
+
   // Here we create our world.
   CreateRoom ();
 
@@ -376,7 +457,7 @@ bool Simple::SetupModules ()
   // pushing our work into the 3D engine and rendering it
   // to the screen.
   printer.AttachNew (new FramePrinter (GetObjectRegistry ()));
-
+  
   return true;
 }
 
@@ -400,13 +481,9 @@ bool Simple::CreateRoom ()
   bool Success = (loader->LoadMapFile ("world", false));
   VFS->PopDir ();
 
-  {
-    csRef<iTextureHandle> texHandle = 
-      g3d->GetTextureManager()->CreateTexture (256, 256, csimg2D, "rgb8",
-        CS_TEXTURE_3D);
-    targetTexture = engine->GetTextureList()->NewTexture (texHandle);
-  }
-  csRef<iMaterialWrapper> targetMat = engine->CreateMaterial ("rendertarget", targetTexture);
+  targetMat = engine->CreateMaterial ("rendertarget", nullptr);
+  CreateTextures ();
+  targetMat->GetMaterial()->GetVariableAdd (svTexDiffuse)->SetValue (targetTex);
   {
     iSector *room = engine->GetSectors ()->FindByName ("room");
     targetView = csPtr<iView> (new csView (engine, g3d));
@@ -420,7 +497,7 @@ bool Simple::CreateRoom ()
     csRef<iRenderManagerTargets> targets =
       scfQueryInterface<iRenderManagerTargets> (rm);
     if (targets)
-      targets->RegisterRenderTarget (targetTexture->GetTextureHandle(), targetView);
+      targets->RegisterRenderTarget (targetTex, targetView);
   }
   
   // Load the texture from the standard library.  This is located in

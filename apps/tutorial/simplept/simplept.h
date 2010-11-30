@@ -21,39 +21,6 @@
 
 #include <crystalspace.h>
 
-class csEngineProcTex : public csProcTexture
-{
-private:
-  csRef<iEngine> Engine;
-  csRef<iView> View;
-  
-  struct Target
-  {
-    csRef<iTextureHandle> texh;
-    csRenderTargetAttachment attachment;
-    const char* format;
-  };
-  csArray<Target> targets;
-  size_t currentTarget;
-
-  csString currentTargetStr;
-  csString availableFormatsStr;
-  bool renderTargetState;
-public:
-  csEngineProcTex ();
-  ~csEngineProcTex ();
-
-  bool LoadLevel ();
-  iTextureWrapper* CreateTexture (iObjectRegistry* object_reg);
-  virtual bool PrepareAnim ();
-  virtual void Animate (csTicks current_time);
-  
-  const char* GetCurrentTarget () const { return currentTargetStr; }
-  const char* GetAvailableFormats() const { return availableFormatsStr; }
-  bool GetRenderTargetState() const { return renderTargetState; }
-  void CycleTarget();
-};
-
 class Simple : public csApplicationFramework, public csBaseEventHandler
 {
 private:
@@ -65,13 +32,14 @@ private:
   csRef<iView> view;
   csRef<iRenderManager> rm;
   csRef<iVirtualClock> vc;
-  csEngineProcTex* ProcTexture;
   csRef<iMeshWrapper> genmesh;
   csRef<iGeneralFactoryState> factstate;
   csRef<iFont> font;
   csRef<FramePrinter> printer;
 
-  csRef<iTextureWrapper> targetTexture;
+  CS::ShaderVarStringID svTexDiffuse;
+  csRef<iTextureHandle> targetTex;
+  csRef<iMaterialWrapper> targetMat;
   csRef<iView> targetView;
 
   void CreatePolygon (iGeneralFactoryState *th, int v1, int v2, int v3, int v4);
@@ -84,6 +52,21 @@ private:
   bool CreateGenMesh (iMaterialWrapper* mat);
   void AnimateGenMesh (csTicks elapsed);
 
+  struct Target
+  {
+    csRef<iTextureHandle> texh;
+    csRenderTargetAttachment attachment;
+    const char* format;
+  };
+  csArray<Target> targetTextures;
+  size_t currentTarget;
+
+  csString currentTargetStr;
+  csString availableFormatsStr;
+  bool renderTargetState;
+  
+  void CreateTextures ();
+  void CycleTarget();
 public:
   bool SetupModules ();
 
