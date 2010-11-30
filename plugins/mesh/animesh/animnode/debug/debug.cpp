@@ -88,10 +88,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
 		    "crystalspace.mesh.animesh.animnode.debug",
 		    msg, arg);
     else
-      {
-	csPrintfV (msg, arg);
-	csPrintf ("\n");
-      }
+    {
+      csPrintfV (msg, arg);
+      csPrintf ("\n");
+    }
     va_end (arg);
   }
 
@@ -103,7 +103,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
 
   DebugNodeFactory::DebugNodeFactory (DebugNodeManager* manager, const char *name)
     : scfImplementationType (this), manager (manager), name (name),
-    modes (CS::Animation::DEBUG_SQUARES), image (nullptr), leafBonesDisplayed (true)
+    modes (CS::Animation::DEBUG_SQUARES), image (nullptr), boneMaskUsed (false),
+    leafBonesDisplayed (true)
   {
   }
 
@@ -122,37 +123,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     subFactory = factory;
   }
 
-  void DebugNodeFactory::AddChainMask (CS::Animation::iBodyChain* chain)
+  void DebugNodeFactory::SetBoneMask (csBitArray& boneMask)
   {
-    chains.Push (chain);
-    ResetChainMask ();
+    boneMaskUsed = true;
+    this->boneMask = boneMask;
   }
 
-  void DebugNodeFactory::RemoveChainMask (CS::Animation::iBodyChain* chain)
+  void DebugNodeFactory::UnsetBoneMask ()
   {
-    chains.Delete (chain);
-    ResetChainMask ();
-  }
-
-  void DebugNodeFactory::ResetChainMask ()
-  {
-    chainMask.Clear ();
-    for (csRefArray<CS::Animation::iBodyChain>::Iterator it = chains.GetIterator (); it.HasNext (); )
-    {
-      CS::Animation::iBodyChain*& chain = it.Next ();
-      ResetChainMaskNode (chain->GetRootNode ());
-    }
-  }
-
-  void DebugNodeFactory::ResetChainMaskNode (CS::Animation::iBodyChainNode* node)
-  {
-    CS::Animation::BoneID boneID = node->GetAnimeshBone ();
-    if (boneID >= chainMask.GetSize ())
-      chainMask.SetSize (boneID + 1);
-    chainMask.SetBit (boneID);
-
-    for (size_t i = 0; i < node->GetChildCount (); i++)
-      ResetChainMaskNode (node->GetChild (i));
+    boneMaskUsed = false;
   }
 
   void DebugNodeFactory::SetLeafBonesDisplayed (bool displayed)
@@ -167,9 +146,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     csRef<DebugNode> newP;
     newP.AttachNew (new DebugNode (this, skeleton));
 
-    csRef<CS::Animation::iSkeletonAnimNode> node =
-      subFactory->CreateInstance (packet, skeleton);
-    newP->subNode = node;
+    if (subFactory)
+    {
+      csRef<CS::Animation::iSkeletonAnimNode> node =
+	subFactory->CreateInstance (packet, skeleton);
+      newP->subNode = node;
+    }
 
     return csPtr<CS::Animation::iSkeletonAnimNode> (newP);
   }
@@ -248,9 +230,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     for (CS::Animation::BoneID i = 0; i <= lastId; i++)
     {
       if (!fact->HasBone (i)
-	  || (factory->chains.GetSize ()
-	      && (factory->chainMask.GetSize () <= i
-		  || !factory->chainMask.IsBitSet (i)))
+	  || (factory->boneMaskUsed
+	      && (factory->boneMask.GetSize () <= i
+		  || !factory->boneMask.IsBitSet (i)))
 	  || (!factory->leafBonesDisplayed && numChild[i] == 0))
 	continue;
 

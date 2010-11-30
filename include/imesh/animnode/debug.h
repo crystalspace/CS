@@ -78,7 +78,8 @@ enum SkeletonDebugMode
   DEBUG_NONE = 0,             /*!< No debug shapes are displayed. */
   DEBUG_2DLINES = 1 << 1,     /*!< The debug shapes displayed are 2D lines between the bones. */
   DEBUG_SQUARES = 1 << 2,     /*!< The debug shapes displayed are 2D squares at the bone positions. */
-  DEBUG_IMAGES = 1 << 3       /*!< The debug shapes displayed are images at the bone positions. */
+  DEBUG_IMAGES = 1 << 3       /*!< The debug shapes displayed are images at the bone positions.
+			       * SetDebugImage() must therefore be used. */
 };
 
 /**
@@ -105,16 +106,15 @@ struct iSkeletonDebugNodeFactory : public iSkeletonAnimNodeFactory
   virtual void SetChildNode (iSkeletonAnimNodeFactory* factory) = 0;
 
   /**
-   * Add a bone chain mask. If there is any chain mask, then only the bones from these chain
-   * masks will be displayed.
+   * Set the bone mask to be used. If this mask is provided, then only the bones from this
+   * mask will be displayed.
    */
-  virtual void AddChainMask (iBodyChain* chain) = 0;
+  virtual void SetBoneMask (csBitArray& boneMask) = 0;
 
   /**
-   * Remove the given bone chain mask. If there is any chain mask, then only the bones from
-   * these chain masks will be displayed.
+   * Unset the mask of bones that are displayed. All bones will now be displayed.
    */
-  virtual void RemoveChainMask (iBodyChain* chain) = 0;
+  virtual void UnsetBoneMask () = 0;
 
   /**
    * Set whether or not the leaf bones of the skeleton are displayed.
@@ -128,6 +128,8 @@ struct iSkeletonDebugNodeFactory : public iSkeletonAnimNodeFactory
  * of this node.
  * \warning Currently, this node actually displays the last state of the skeleton,
  * not the state defined by the child animation node.
+ * \warning You have to call Draw() at each frame if you want the 2D information
+ * displayed by this node.
  */
 struct iSkeletonDebugNode : public iSkeletonAnimNode
 {

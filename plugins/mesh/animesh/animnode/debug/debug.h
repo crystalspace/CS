@@ -76,8 +76,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     virtual void SetDebugModes (CS::Animation::SkeletonDebugMode modes);
     virtual void SetDebugImage (csPixmap* image);
     virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* factory);
-    virtual void AddChainMask (CS::Animation::iBodyChain* chain);
-    virtual void RemoveChainMask (CS::Animation::iBodyChain* chain);
+    virtual void SetBoneMask (csBitArray& boneMask);
+    virtual void UnsetBoneMask ();
     virtual void SetLeafBonesDisplayed (bool displayed);
 
     //-- CS::Animation::iSkeletonAnimNodeFactory
@@ -87,16 +87,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     virtual CS::Animation::iSkeletonAnimNodeFactory* FindNode (const char* name);
 
   private:
-    void ResetChainMask ();
-    void ResetChainMaskNode (CS::Animation::iBodyChainNode* node);
-
     DebugNodeManager* manager;
     csString name;
     CS::Animation::SkeletonDebugMode modes;
     csPixmap* image;
     csRef<CS::Animation::iSkeletonAnimNodeFactory> subFactory;
-    csRefArray<CS::Animation::iBodyChain> chains;
-    csBitArray chainMask;
+    bool boneMaskUsed;
+    csBitArray boneMask;
     bool leafBonesDisplayed;
 
     friend class DebugNode;
@@ -114,7 +111,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     //-- CS::Animation::iSkeletonDebugNode
     virtual void Draw (iCamera* camera, csColor color = csColor (255, 0, 255));
 
-    //-- CS::Animation::iSkeletonAnimPacket
+    //-- CS::Animation::iSkeletonAnimNode
     virtual void Play ();
     virtual void Stop ();
 
