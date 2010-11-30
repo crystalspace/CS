@@ -412,7 +412,7 @@ namespace Geometry //@@Right?
           const size_t firstIdx = (centerDiff * direction > 0) ? 0 : 1;
 
           ret = TraverseRecF2B (inner, leaf, direction, node->GetChild (firstIdx));
-          if (ret) ret = TraverseRecF2B (inner, leaf, direction, node->GetChild (1-firstIdx));
+          ret &= TraverseRecF2B (inner, leaf, direction, node->GetChild (1-firstIdx));
         }
       }
       return ret;
@@ -443,7 +443,7 @@ namespace Geometry //@@Right?
           const size_t firstIdx = (centerDiff * direction > 0) ? 0 : 1;
 
           ret = TraverseRecF2B (inner, leaf, direction, node->GetChild (firstIdx));
-          if (ret) ret = TraverseRecF2B (inner, leaf, direction, node->GetChild (1-firstIdx));
+          ret &= TraverseRecF2B (inner, leaf, direction, node->GetChild (1-firstIdx));
         }
       }
       return ret;
