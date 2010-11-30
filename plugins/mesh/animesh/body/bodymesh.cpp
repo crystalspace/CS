@@ -422,15 +422,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
 
   void BodyChain::DebugPrint () const
   {
-    printf ("Bone chain %s:\n", name.GetData ());
+    csPrintf ("Bone chain %s:\n", name.GetData ());
     Print (rootNode);
   }
 
   void BodyChain::Print (BodyChainNode* node, size_t level) const
   {
     for (size_t i = 0; i < level; i++)
-      printf (" ");
-    printf ("+ node %u: %s\n", node->boneID, bodySkeleton->skeletonFactory->GetBoneName (node->boneID));
+      csPrintf (" ");
+    csPrintf ("+ node %zu: %s\n", node->boneID, bodySkeleton->skeletonFactory->GetBoneName (node->boneID));
 
     for (csRefArray<BodyChainNode>::Iterator it = node->children.GetIterator (); it.HasNext (); )
     {
@@ -513,8 +513,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bodymesh)
   void BodyChainNode::Print (size_t level) const
   {
     for (size_t i = 0; i < level; i++)
-      printf (" ");
-    printf ("+ node %u\n", boneID);
+      csPrintf (" ");
+    csPrintf ("+ node %zu\n", boneID);
 
     for (csRefArray<BodyChainNode>::ConstIterator it = children.GetIterator (); it.HasNext (); )
       it.Next ()->Print (level + 1);
