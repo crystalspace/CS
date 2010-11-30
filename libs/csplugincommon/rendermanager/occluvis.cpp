@@ -918,7 +918,7 @@ namespace CS
 
     //======== IntersectSegment ================================================
 
-    struct  Common
+    struct Common
     {
       IntersectSegmentFront2BackData *data;
     };
@@ -941,45 +941,47 @@ namespace CS
       }
     };
 
-    struct LeafNodeIntersectSegmentSloppy : public Common
+    struct LeafNodeIntersectSegmentSloppy : public InnerNodeIntersectSegmentSloppy
     {
       uint32 cur_timestamp;
       bool operator() (AABBVisTreeNode* n)
       {
-        const csBox3& node_bbox = n->GetBBox ();
-
-        // In the first part of this test we are going to test if the
-        // start-end vector intersects with the node. If not then we don't
-        // need to continue.
-        csVector3 box_isect;
-        if (csIntersect3::BoxSegment (node_bbox, data->seg, box_isect) == -1)
+        // first test node intersection
+        if(!InnerNodeIntersectSegmentSloppy::operator()(n))
         {
           return true;
         }
 
-        int num_objects;
-        num_objects = n->GetObjectCount ();
+        int num_objects = n->GetObjectCount ();
         iVisibilityObject** objects = n->GetLeafObjects();
+        csVector3 box_isect;
 
+        bool hit = false;
         for (int i = 0 ; i < num_objects ; i++)
         {
           //if (objects[i]->timestamp != cur_timestamp)
           {
             //objects[i]->timestamp = cur_timestamp;
 
-            // First test the bounding box of the object.
-            const csBox3& obj_bbox = node_bbox;
+            // validate this is a proper mesh
+            iMeshWrapper* mesh = objects[i]->GetMeshWrapper();
+            if (!mesh || mesh->GetFlags().Check(CS_ENTITY_NOHITBEAM))
+            {
+              continue;
+            }
 
-            if (csIntersect3::BoxSegment (obj_bbox, data->seg, box_isect) != -1)
+            // First test the bounding box of the object.
+            const csBox3& obj_bbox = objects[i]->GetBBox();
+
+            if (csIntersect3::BoxSegment(obj_bbox, data->seg, box_isect) != -1)
             {
               // This object is possibly intersected by this beam.
-	            if (objects[i]->GetMeshWrapper())
-	              if (!objects[i]->GetMeshWrapper()->GetFlags ().Check (CS_ENTITY_NOHITBEAM))
-	                data->vector->Push (objects[i]);
+	      data->vector->Push (objects[i]);
+	      hit = true;
             }
           }
         }
-        return false;
+        return !hit;
       }
     };
 
@@ -989,17 +991,6 @@ namespace CS
       {
         const csBox3& node_bbox = n->GetBBox ();
 
-        // If mesh != 0 then we have already found our mesh. In that
-        // case we will compare the distance of the origin with the the
-        // box of the treenode and the already found shortest distance to
-        // see if we have to proceed.
-        if (data->mesh)
-        {
-          csBox3 b (node_bbox.Min ()-data->seg.Start (),
-    	            node_bbox.Max ()-data->seg.Start ());
-          if (b.SquaredOriginDist () > data->sqdist) return false;
-        }
-
         // In the first part of this test we are going to test if the
         // start-end vector intersects with the node. If not then we don't
         // need to continue.
@@ -1008,17 +999,6 @@ namespace CS
         {
           return false;
         }
-        return true;
-      }
-    };
-
-    struct LeafNodeIntersectSegment : public Common
-    {
-      uint32 cur_timestamp;
-      iGraphics3D *g3d;
-      bool operator() (AABBVisTreeNode* n)
-      {
-        const csBox3& node_bbox = n->GetBBox ();
 
         // If mesh != 0 then we have already found our mesh. In that
         // case we will compare the distance of the origin with the the
@@ -1026,22 +1006,34 @@ namespace CS
         // see if we have to proceed.
         if (data->mesh)
         {
-          csBox3 b (node_bbox.Min ()-data->seg.Start (),
-    	            node_bbox.Max ()-data->seg.Start ());
-          if (b.SquaredOriginDist () > data->sqdist) return true;
+          float sqdist = csSquaredDist::PointPoint(data->seg.Start(), box_isect);
+          if (sqdist > data->sqdist)
+          {
+            return false;
+          }
         }
 
-        // In the first part of this test we are going to test if the
-        // start-end vector intersects with the node. If not then we don't
-        // need to continue.
-        csVector3 box_isect;
-        if (csIntersect3::BoxSegment (node_bbox, data->seg, box_isect) == -1)
+        return true;
+      }
+    };
+
+    struct LeafNodeIntersectSegment : public InnerNodeIntersectSegment
+    {
+      uint32 cur_timestamp;
+      iGraphics3D *g3d;
+      bool operator() (AABBVisTreeNode* n)
+      {
+        // test node intersection and distance to best found match
+        if(!InnerNodeIntersectSegment::operator()(n))
         {
-          return true;
+            return true;
         }
 
-        int num_objects=n->GetObjectCount();
+        int num_objects = n->GetObjectCount();
         iVisibilityObject** objects = n->GetLeafObjects ();
+
+        bool hit = false;
+        csVector3 obj_isect;
         for (int i = 0 ; i < num_objects ; i++)
         {
           //if (objects[i]->timestamp != cur_timestamp)
@@ -1049,71 +1041,81 @@ namespace CS
           {
             //objects[i]->timestamp = cur_timestamp
 
+            // check whether we have a proper mesh here
             iMeshWrapper *mesh = objects[i]->GetMeshWrapper();
+            if(!mesh || mesh->GetFlags ().Check (CS_ENTITY_NOHITBEAM))
+            {
+              continue;
+            }
 
             // First test the bounding box of the object.
-            const csBox3& obj_bbox = n->GetBBox ();
+            const csBox3& obj_bbox = objects[i]->GetBBox ();
 
-            if (csIntersect3::BoxSegment (obj_bbox, data->seg, box_isect) != -1)
+            if (csIntersect3::BoxSegment (obj_bbox, data->seg, obj_isect) != -1)
             {
               // This object is possibly intersected by this beam.
-	            if (mesh)
-	            {
-	              if (!mesh->GetFlags ().Check (CS_ENTITY_NOHITBEAM))
-	              {
-	                // Transform our vector to object space.
-	                csVector3 obj_start;
-	                csVector3 obj_end;
-	                iMovable* movable = n->GetLeafData(i)->GetMovable ();
-	                bool identity = movable->IsFullTransformIdentity ();
-	                csReversibleTransform movtrans;
-	                if (identity)
-	                {
-	                  obj_start = data->seg.Start ();
-	                  obj_end = data->seg.End ();
-	                }
-	                else
-	                {
-	                  movtrans = movable->GetFullTransform ();
-	                  obj_start = movtrans.Other2This (data->seg.Start ());
-	                  obj_end = movtrans.Other2This (data->seg.End ());
-	                }
-	                csVector3 obj_isect;
-	                float r;
 
-	                bool rc;
-	                int pidx = -1;
-	                if (data->accurate)
-	                  rc = mesh->GetMeshObject ()->HitBeamObject (
-	    	              obj_start, obj_end, obj_isect, &r, &pidx);
-	                else
-	                  rc = mesh->GetMeshObject ()->HitBeamOutline (
-	    	              obj_start, obj_end, obj_isect, &r);
-	                if (rc)
-	                {
-	                  if (data->vector)
-	                  {
-		                  data->vector->Push (objects[i]);
-	                  }
-	                  else if (r < data->r)
-	                  {
-		                  data->r = r;
-		                  data->polygon_idx = pidx;
-		                  if (identity)
-		                    data->isect = obj_isect;
-		                  else
-		                    data->isect = movtrans.This2Other (obj_isect);
-		                  data->sqdist = csSquaredDist::PointPoint (
-			                  data->seg.Start (), data->isect);
-		                  data->mesh = mesh;
-	                  }
-	                }
-	              }
-	            }
+              // Transform our vector to object space.
+              csVector3 obj_start;
+              csVector3 obj_end;
+              iMovable* movable = n->GetLeafData(i)->GetMovable ();
+              bool identity = movable->IsFullTransformIdentity ();
+              csReversibleTransform movtrans;
+              if (identity)
+              {
+                obj_start = data->seg.Start ();
+                obj_end = data->seg.End ();
+              }
+              else
+              {
+                movtrans = movable->GetFullTransform ();
+                obj_start = movtrans.Other2This (data->seg.Start ());
+                obj_end = movtrans.Other2This (data->seg.End ());
+              }
+              float r;
+
+              bool rc;
+              int pidx = -1;
+              if (data->accurate)
+              {
+                rc = mesh->GetMeshObject ()->HitBeamObject (
+                     obj_start, obj_end, obj_isect, &r, &pidx);
+              }
+              else
+              {
+                rc = mesh->GetMeshObject ()->HitBeamOutline (
+                     obj_start, obj_end, obj_isect, &r);
+              }
+
+              if (rc)
+              {
+                if (data->vector)
+                {
+                  hit = true;
+                  data->vector->Push (objects[i]);
+                }
+                else if (r < data->r)
+                {
+                  hit = true;
+                  data->r = r;
+                  data->polygon_idx = pidx;
+                  if (identity)
+                  {
+                    data->isect = obj_isect;
+                  }
+                  else
+                  {
+                    data->isect = movtrans.This2Other(obj_isect);
+                    data->sqdist = csSquaredDist::PointPoint (
+                              data->seg.Start(), data->isect);
+                    data->mesh = mesh;
+                  }
+                }
+              }
             }
           }
         }
-        return false;
+        return !hit;
       }
     };
 
