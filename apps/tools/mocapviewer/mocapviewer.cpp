@@ -59,7 +59,6 @@ MocapViewer::MocapViewer ()
 		     " for more information on these parameters.\n\n"
 		     "Finally, this application uses a configuration file. See \"/config/csmocapviewer.cfg\""
 		     " for more information"),
-    // TODO: doc target
     scfImplementationType (this), debugImage (nullptr), noiseScale (0.5f)
 {
   // Configure the options for DemoApplication
@@ -147,13 +146,21 @@ void MocapViewer::Frame ()
     float py = noiseY.GetValue (seed0 + point[0], point[1], point[2])
       * noiseScale * ((float) g2d->GetHeight ()) + ((float) g2d->GetHeight ()) * 0.5f;
 
-    // TODO: can be PLD images too
-    size_t size = 5;
-    for (size_t i = 0; i < size; i++)
-      for (size_t j = 0; j < size; j++)
-	g2d->DrawPixel (((int) px) - size / 2 + i,
-			((int) py) - size / 2 + j,
-			colorI);
+    // Display the debug image if available
+    if (debugImage)
+      debugImage->Draw (g3d, px - debugImage->Width () / 2,
+			py - debugImage->Height () / 2);
+
+    // Else display a square
+    else
+    {
+      size_t size = 5;
+      for (size_t i = 0; i < size; i++)
+	for (size_t j = 0; j < size; j++)
+	  g2d->DrawPixel (((int) px) - size / 2 + i,
+			  ((int) py) - size / 2 + j,
+			  colorI);
+    }
   }
 
   // Update the HUD
