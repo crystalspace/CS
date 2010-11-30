@@ -70,7 +70,7 @@ struct MocapParserResult
  */
 class CS_CRYSTALSPACE_EXPORT MocapParser
 {
- public:
+public:
   /**
    * Set the VFS path of the ressource file containing the motion capture data. You may have
    * to add more than one ressource depending on the motion capture file format.
@@ -105,9 +105,11 @@ class CS_CRYSTALSPACE_EXPORT MocapParser
  */
 class CS_CRYSTALSPACE_EXPORT BVHMocapParser : public MocapParser
 {
- public:
+public:
   /// Constructor
   BVHMocapParser (iObjectRegistry* object_reg, iVFS* vfs);
+
+  virtual ~BVHMocapParser () { }
 
   /**
    * Set the VFS path of the ressource file containing the motion capture data. For the
