@@ -227,6 +227,7 @@ class iBodyChain(core.iBase):
     def AddSubChain(*args): return _animation.iBodyChain_AddSubChain(*args)
     def AddAllSubChains(*args): return _animation.iBodyChain_AddAllSubChains(*args)
     def DebugPrint(*args): return _animation.iBodyChain_DebugPrint(*args)
+    def PopulateBoneMask(*args): return _animation.iBodyChain_PopulateBoneMask(*args)
     scfGetVersion = staticmethod(_animation.iBodyChain_scfGetVersion)
     __swig_destroy__ = _animation.delete_iBodyChain
     __del__ = lambda self : None;
