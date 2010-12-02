@@ -18885,7 +18885,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    for cs_build_item in `echo @$cs_cv_prog_cxx_enable_errors@@ | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -18942,7 +18942,7 @@ fi
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-void f() __attribute__((visibility("hidden")));
+void* f() __attribute__((visibility("hidden")));
 int
 main ()
 {
@@ -19008,7 +19008,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    for cs_build_item in `echo @$cs_cv_prog_cxx_enable_errors@@ | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -19065,7 +19065,7 @@ fi
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-void f() __attribute__((visibility("default")));
+void* f() __attribute__((visibility("default")));
 int
 main ()
 {
@@ -67466,7 +67466,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    for cs_build_item in `echo @$cs_cv_prog_cxx_enable_errors@@ | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -67523,7 +67523,7 @@ fi
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-void f() __attribute__((deprecated));
+void* f() __attribute__((deprecated));
 int
 main ()
 {
@@ -67569,6 +67569,129 @@ $as_echo "$cs_cv_prog_cxx_declare_deprecated" >&6; }
   cs_header_text="${cs_header_text}#define CS_ATTRIBUTE_DEPRECATED $cs_cv_prog_cxx_declare_deprecated
 "
 fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking how to declare deprecation with message" >&5
+$as_echo_n "checking how to declare deprecation with message... " >&6; }
+if test "${cs_cv_prog_cxx_declare_deprecated_message+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  cs_cv_prog_cxx_declare_deprecated_message='no'
+	if test "$cs_cv_prog_cxx_declare_deprecated_message" = no; then :
+  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    cs_cflags_save="$CXXFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @$cs_cv_prog_cxx_enable_errors@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then :
+  cs_dummy=''
+else
+  if test "$1" = filler; then :
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_libs_test=''
+else
+  if test "$1" = filler; then :
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#define MSG "foo"
+    void* f() __attribute__((deprecated(MSG)));
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  cs_build_ok=yes
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then :
+  break
+fi
+    done
+
+
+    CXXFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then :
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cxx_declare_deprecated_message='__attribute__((deprecated(MSG)))'
+else
+  cs_cv_prog_cxx_declare_deprecated_message='no'
+fi
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $cs_cv_prog_cxx_declare_deprecated_message" >&5
+$as_echo "$cs_cv_prog_cxx_declare_deprecated_message" >&6; }
+    if test $cs_cv_prog_cxx_declare_deprecated_message != no; then :
+  cs_header_text="${cs_header_text}#define CS_ATTRIBUTE_DEPRECATED_MSG(MSG) $cs_cv_prog_cxx_declare_deprecated_message
+"
+fi
 
 
 
@@ -67594,7 +67717,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    for cs_build_item in `echo @$cs_cv_prog_c_enable_errors@@ | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -67651,7 +67774,7 @@ fi
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-void f() __attribute__((malloc));
+void* f() __attribute__((malloc));
 int
 main ()
 {
@@ -67722,7 +67845,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    for cs_build_item in `echo @$cs_cv_prog_cxx_enable_errors@@ | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
