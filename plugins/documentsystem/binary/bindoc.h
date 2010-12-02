@@ -62,7 +62,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(BinDoc)
 #endif
 
 /// The Binary Document magic ID
-#define BD_HEADER_MAGIC	      LE (0x7ada70fa)
+#define BD_HEADER_MAGIC	      			BE (0xfa57da7a)
+// Magic for files in "old" format (differs in float storage)
+#define BD_HEADER_MAGIC_OLDFLOAT		LE (0x7ada70fa)
 
 /*
    bd* structures: data as it appears on disk.
@@ -177,7 +179,7 @@ struct bdNode
    * Value of this node
    *  str: offset of string into string table or 'immediate' string
    *  int: value
-   *  float: value converted using csFloatToLong
+   *  float: IEEE float
    */
   uint32 value;
   /// Flags of this node
@@ -533,6 +535,7 @@ private:
   friend struct csBinaryDocAttributeIterator;
 
   csRef<iDataBuffer> data;
+  bool oldStyleFloats;
   uint8* dataStart;
   csBdNode* root;	
   csBinaryDocNode::Pool nodePool;
@@ -568,6 +571,21 @@ public:
   uint32 GetOutStringID (const char* str);
   /// Get a string for an ID in the input string table
   const char* GetInIDString (uint32 ID) const;
+  
+  inline float ConvertToFloat (uint32 l)
+  {
+    if (oldStyleFloats)
+    {
+      // Copied from csendian.h to avoid deprecation warnings
+      int exp = (l >> 24) & 0x7f;
+      if (exp & 0x40) exp = exp | ~0x7f;
+      float mant = float (l & 0x00ffffff) / 0x1000000;
+      if (l & 0x80000000) mant = -mant;
+      return (float) ldexp (mant, exp);
+    }
+    else
+      return csIEEEfloat::ToNative (l);
+  }
 
   virtual void Clear ();
   virtual csRef<iDocumentNode> CreateRoot ();

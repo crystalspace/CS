@@ -201,7 +201,7 @@ const char* csBinaryDocAttribute::GetValue ()
 	{
   	  char buf[50];
 	  cs_snprintf (buf, sizeof (buf) - 1,
-	    "%g", csLongToFloat (csLittleEndian::UInt32 (attrPtr->value)));
+	    "%g", node->doc->ConvertToFloat (csLittleEndian::UInt32 (attrPtr->value)));
 	  cs_free (vstr); 
 	  vstr = CS::StrDup (buf);
 	  vsptr = attrPtr;
@@ -231,7 +231,7 @@ int csBinaryDocAttribute::GetValueAsInt ()
       }
     case BD_VALUE_TYPE_FLOAT:
       {
-	return (int)csLongToFloat (csLittleEndian::UInt32 (attrPtr->value));
+	return (int)node->doc->ConvertToFloat (csLittleEndian::UInt32 (attrPtr->value));
       }
     default:
       return 0;
@@ -256,7 +256,7 @@ float csBinaryDocAttribute::GetValueAsFloat ()
       }
     case BD_VALUE_TYPE_FLOAT:
       {
-	return csLongToFloat (csLittleEndian::UInt32 (attrPtr->value));
+	return node->doc->ConvertToFloat (csLittleEndian::UInt32 (attrPtr->value));
       }
     default:
       return 0.0f;
@@ -287,7 +287,7 @@ bool csBinaryDocAttribute::GetValueAsBool ()
       }
     case BD_VALUE_TYPE_FLOAT:
       {
-	return (csLongToFloat (csLittleEndian::UInt32 (attrPtr->value))== 0);
+	return (node->doc->ConvertToFloat (csLittleEndian::UInt32 (attrPtr->value))== 0);
       }
     default:
       return false;
@@ -353,7 +353,7 @@ void csBinaryDocAttribute::SetValue (const char* val)
     {
       attrPtr->flags = (attrPtr->flags & ~BD_VALUE_TYPE_MASK) | 
 	BD_VALUE_TYPE_FLOAT;
-      attrPtr->value = csLittleEndian::UInt32 (csFloatToLong (f));
+      attrPtr->value = csLittleEndian::UInt32 (csIEEEfloat::FromNative (f));
     }
     else 
     {
@@ -384,7 +384,7 @@ void csBinaryDocAttribute::SetValueAsFloat (float f)
     cs_free (vstr); vstr = 0;
     attrPtr->flags = (attrPtr->flags & ~BD_VALUE_TYPE_MASK) | 
       BD_VALUE_TYPE_FLOAT;
-    attrPtr->value = csLittleEndian::UInt32 (csFloatToLong (f));
+    attrPtr->value = csLittleEndian::UInt32 (csIEEEfloat::FromNative (f));
   }
 }
 
@@ -833,7 +833,7 @@ const char* csBinaryDocNode::nodeValueStr (csBdNode* nodeData)
 	{
   	  char buf[50];
 	  cs_snprintf (buf, sizeof (buf) - 1, "%g", 
-	    csLongToFloat (csLittleEndian::UInt32 (nodeData->value)));
+	    doc->ConvertToFloat (csLittleEndian::UInt32 (nodeData->value)));
 	  cs_free (vstr);
 	  vstr = CS::StrDup (buf);
 	  vsptr = nodeData;
@@ -863,7 +863,7 @@ int csBinaryDocNode::nodeValueInt (csBdNode* nodeData)
       }
     case BD_VALUE_TYPE_FLOAT:
       {
-	return (int)csLongToFloat (csLittleEndian::UInt32 (nodeData->value));
+	return (int)doc->ConvertToFloat (csLittleEndian::UInt32 (nodeData->value));
       }
     default:
       return 0;
@@ -888,7 +888,7 @@ float csBinaryDocNode::nodeValueFloat (csBdNode* nodeData)
       }
     case BD_VALUE_TYPE_FLOAT:
       {
-	return csLongToFloat (csLittleEndian::UInt32 (nodeData->value));
+	return doc->ConvertToFloat (csLittleEndian::UInt32 (nodeData->value));
       }
     default:
       return 0.0f;
@@ -1016,7 +1016,7 @@ void csBinaryDocNode::SetValue (const char* value)
     {
       nodeData->flags = (nodeData->flags & ~BD_VALUE_TYPE_MASK) | 
 	BD_VALUE_TYPE_FLOAT;
-      nodeData->value = csLittleEndian::UInt32 (csFloatToLong (f));
+      nodeData->value = csLittleEndian::UInt32 (csIEEEfloat::FromNative (f));
     }
     else 
     {
@@ -1045,7 +1045,7 @@ void csBinaryDocNode::SetValueAsFloat (float value)
     cs_free (vstr); vstr = 0;
     nodeData->flags = (nodeData->flags & ~BD_VALUE_TYPE_MASK) | 
       BD_VALUE_TYPE_FLOAT;
-    nodeData->value = csLittleEndian::UInt32 (csFloatToLong (value));
+    nodeData->value = csLittleEndian::UInt32 (csIEEEfloat::FromNative (value));
   }
 }
 
@@ -1510,7 +1510,8 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
 // =================================================
 
 csBinaryDocument::csBinaryDocument () : scfImplementationType (this),
-  root (0), attrAlloc (2000), nodeAlloc (2000), outStrHash (0)
+  oldStyleFloats (false), root (0), attrAlloc (2000), nodeAlloc (2000),
+  outStrHash (0)
 {
 }
 
@@ -1595,6 +1596,7 @@ void csBinaryDocument::Clear ()
   data = 0; 
   dataStart = 0;
   root = 0;
+  oldStyleFloats = false;
 }
 
 csRef<iDocumentNode> csBinaryDocument::CreateRoot ()
@@ -1629,7 +1631,8 @@ const char* csBinaryDocument::Parse (iDataBuffer* buf, bool /* collapse */)
     return "Not enough data";
   }
   bdHeader *head = (bdHeader*)buf->GetData();
-  if (head->magic != (uint32)BD_HEADER_MAGIC)
+  if ((head->magic != (uint32)BD_HEADER_MAGIC)
+      && (head->magic != (uint32)BD_HEADER_MAGIC_OLDFLOAT))
   {
     return "Not a binary CS document";
   }
@@ -1644,6 +1647,7 @@ const char* csBinaryDocument::Parse (iDataBuffer* buf, bool /* collapse */)
   }
   
   Clear();
+  oldStyleFloats = head->magic == (uint32)BD_HEADER_MAGIC_OLDFLOAT;
   root = 0;
   data = buf;
   dataStart = data->GetUint8();
