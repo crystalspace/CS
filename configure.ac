@@ -2312,6 +2312,13 @@ CS_SYMBOL_QUALIFIER([how to declare deprecation],
     [__attribute__((deprecated))], [], [C++],
     [CS_HEADER_PROPERTY([CS_ATTRIBUTE_DEPRECATED],
 	[$cs_cv_prog_cxx_declare_deprecated])])
+CS_SYMBOL_QUALIFIER([how to declare deprecation with message],
+    [cs_cv_prog_cxx_declare_deprecated_message],
+    [__attribute__((deprecated(MSG)))],
+    [[#define MSG "foo"
+    void* f()]], [C++],
+    [CS_HEADER_PROPERTY([CS_ATTRIBUTE_DEPRECATED_MSG(MSG)],
+	[$cs_cv_prog_cxx_declare_deprecated_message])])
 
 
 
