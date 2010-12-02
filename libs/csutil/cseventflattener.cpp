@@ -27,7 +27,7 @@
 
 #include "iutil/event.h"
 
-#define CS_CRYSTAL_PROTOCOL	  0x43533032
+#define CS_CRYSTAL_PROTOCOL	  0x43533033
 
 enum
 {
@@ -383,8 +383,8 @@ csEventFlattenerError csEventFlattener::Flatten (iObjectRegistry *object_reg,
 	  ui8 = CS_DATATYPE_DOUBLE;
 	  b.Write((char *)&ui8, sizeof(uint8));
 	  // 8 byte data (longlong fixed format)
-	  i64 = csDoubleToLongLong (val);
-	  b.Write((char *)&i64, sizeof(int64));
+	  ui64 = csLittleEndian::Convert (csIEEEfloat::FromNative (val));
+	  b.Write((char *)&ui64, sizeof(uint64));
 	  break;
 	}
       default: 
@@ -482,8 +482,8 @@ csEventFlattenerError csEventFlattener::Unflatten (iObjectRegistry *object_reg,
         event->Add (name, ui64);
         break;
       case CS_DATATYPE_DOUBLE:
-        b.Read((char *)&i64, sizeof(int64));
-        d = csLongLongToDouble(i64);
+        b.Read((char *)&ui64, sizeof(uint64));
+        d = csIEEEfloat::ToNative (csLittleEndian::Convert (ui64));
         event->Add (name, d);
         break;
       case CS_DATATYPE_DATABUFFER:

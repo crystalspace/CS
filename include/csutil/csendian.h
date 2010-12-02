@@ -334,8 +334,10 @@ struct csSetToAddress
 /**
  * Convert a float to a cross-platform 32-bit format (no endianess
  * adjustments!)
+ * \deprecated Deprecated in 1.9. Use csIEEEfloat methods instead.
  */
-/*CS_DEPRECATED_METHOD*/ static inline int32 csFloatToLong (float f)
+CS_DEPRECATED_METHOD_MSG("Use csIEEEfloat methods instead")
+static inline int32 csFloatToLong (float f)
 {
   int exp;
   int32 mant = csQroundSure (frexp (f, &exp) * 0x1000000);
@@ -348,8 +350,10 @@ struct csSetToAddress
 /**
  * Convert a 32-bit cross-platform float to native format (no endianess
  * adjustments!)
+ * \deprecated Deprecated in 1.9. Use csIEEEfloat methods instead.
  */
-/*CS_DEPRECATED_METHOD*/ static inline float csLongToFloat (int32 l)
+CS_DEPRECATED_METHOD_MSG("Use csIEEEfloat methods instead")
+static inline float csLongToFloat (int32 l)
 {
   int exp = (l >> 24) & 0x7f;
   if (exp & 0x40) exp = exp | ~0x7f;
@@ -369,8 +373,10 @@ struct csSetToAddress
 /**
  * Convert a double to a cross-platform 64-bit format (no endianess
  * adjustments!)
+ * \deprecated Deprecated in 1.9. Use csIEEEfloat methods instead.
  */
-/*CS_DEPRECATED_METHOD*/ static inline int64 csDoubleToLongLong (double d)
+CS_DEPRECATED_METHOD_MSG("Use csIEEEfloat methods instead")
+static inline int64 csDoubleToLongLong (double d)
 {
   int exp;
   int64 mant = (int64) (frexp (d, &exp) * ((int64)1 << 48));
@@ -384,8 +390,10 @@ struct csSetToAddress
 /**
  * Convert a 64-bit cross-platform double to native format (no endianess
  * adjustments!)
+ * \deprecated Deprecated in 1.9. Use csIEEEfloat methods instead.
  */
-/*CS_DEPRECATED_METHOD*/ static inline double csLongLongToDouble (int64 i)
+CS_DEPRECATED_METHOD_MSG("Use csIEEEfloat methods instead")
+static inline double csLongLongToDouble (int64 i)
 {
   int exp = (i >> 48) & 0x7fff;
   if (exp & 0x4000) exp = exp | ~0x7fff;
@@ -406,8 +414,10 @@ struct csSetToAddress
 /**
  * Convert a float to a cross-platform 16-bit format (no endianess
  * adjustments!)
+ * \deprecated Deprecated in 1.9. Use csIEEEfloat methods instead.
  */
-/*CS_DEPRECATED_METHOD*/ static inline short csFloatToShort (float f)
+CS_DEPRECATED_METHOD_MSG("Use csIEEEfloat methods instead")
+static inline short csFloatToShort (float f)
 {
   int exp;
   long mant = csQroundSure (frexp (f, &exp) * 0x1000);
@@ -420,8 +430,10 @@ struct csSetToAddress
 /**
  * Convert a 16-bit cross-platform float to native format (no endianess
  * adjustments!)
+ * \deprecated Deprecated in 1.9. Use csIEEEfloat methods instead.
  */
-/*CS_DEPRECATED_METHOD*/ static inline float csShortToFloat (short s)
+CS_DEPRECATED_METHOD_MSG("Use csIEEEfloat methods instead")
+static inline float csShortToFloat (short s)
 {
   int exp = (s >> 11) & 0xf;
   if (exp & 0x8) exp = exp | ~0xf;
