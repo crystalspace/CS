@@ -314,7 +314,7 @@ public:
   }
 
   /**
-   * Construct with a size of \a size bits.
+   * Construct with an initial size of \a size bits. These bits will be initialized as false.
    */
   explicit csBitArrayTweakable (size_t size) : mLength(0), mNumBits(0)
   {
@@ -490,6 +490,12 @@ public:
   void Clear()
   {
     memset (GetStore(), 0, mLength * sizeof(csBitArrayStorageType));
+  }
+
+  /// Set all bits to true.
+  void SetAll()
+  {
+    memset (GetStore(), 255, mLength * sizeof(csBitArrayStorageType));
   }
 
   /// Set the bit at position pos to true.
@@ -997,7 +1003,7 @@ class csBitArray : public csBitArrayTweakable<>
 public:
   /// Default constructor.
   csBitArray () { }
-  /// Construct with a size of \a size bits.
+  ///Construct with an initial size of \a size bits. These bits will be initialized as false.
   explicit csBitArray (size_t size) : csBitArrayTweakable<> (size) { }
   /// Construct as duplicate of \a that (copy constructor).
   csBitArray (const csBitArray& that) : csBitArrayTweakable<> (that) { }
