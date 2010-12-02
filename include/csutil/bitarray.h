@@ -495,7 +495,9 @@ public:
   /// Set all bits to true.
   void SetAll()
   {
-    memset (GetStore(), 255, mLength * sizeof(csBitArrayStorageType));
+    csBitArrayStorageType* store = GetStore();
+    for (size_t i = 0; i < mNumBits; i++)
+      store[GetIndex(i)] = ((csBitArrayStorageType)1) << GetOffset(i);
   }
 
   /// Set the bit at position pos to true.
