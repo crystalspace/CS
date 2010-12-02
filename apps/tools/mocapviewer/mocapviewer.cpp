@@ -53,8 +53,8 @@ MocapViewer::MocapViewer ()
 		     "bone mask is by defining a bone chain.  A bone chain is defined by a root bone (option "
 		     "-rootmask), then the user can add either all children and sub-children of the root bone (option"
 		     " -childall), either all bones on the way to a given child bone (option -childmask). Some"
-		     " specific bones can be added and removed by using the -bone and -nobone options. If only one"
-		     " -nobone option is given, then no bones at all will be displayed.\n\n"
+		     " specific bones can be added and removed by using the -bone and -nobone options. If the only bone"
+		     " option provided is the empty -nobone option, then no bones at all will be displayed.\n\n"
 		     "This viewer can also be used to display Point Light Displays and record automatically"
 		     " videos with these data (e.g. for a psychology study on motion perception).\n\n"
 		     "The Point Light display can be perturbated by adding noise points animated by a Perlin"
@@ -249,8 +249,6 @@ bool MocapViewer::Application ()
 
 bool MocapViewer::CreateAvatar ()
 {
-  // TODO: catch errors
-
   // Load the configuration file
   csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (GetObjectRegistry());
   cfg->AddDomain ("/config/csmocapviewer.cfg", vfs, iConfigManager::ConfigPriorityPlugin);
@@ -324,13 +322,6 @@ bool MocapViewer::CreateAvatar ()
   printInfo = clp->GetBoolOption ("info", false);
   if (printInfo)
   {
-    // Create a body chain for easier analyzis of the skeleton structure
-    CS::Animation::iBodySkeleton* bodySkeleton =
-      bodyManager->CreateBodySkeleton ("mocap_body", parsingResult.skeletonFactory);
-    CS::Animation::iBodyChain* bodyChain = bodySkeleton->CreateBodyChain ("body_chain", 0);
-    bodyChain->AddAllSubChains ();
-
-    // Print 
     printf ("=================================================\n");
     printf ("=== Mocap file: %s ===\n", mocapFilename.GetData ());
     printf ("=================================================\n");
@@ -341,8 +332,7 @@ bool MocapViewer::CreateAvatar ()
     printf ("=================================================\n");
     printf ("=== Skeleton structure: ===\n");
     printf ("=================================================\n");
-    // TODO: skeleton print
-    bodyChain->DebugPrint ();
+    printf ("%s", parsingResult.skeletonFactory->Description ().GetData ());
     printf ("=================================================\n");
 
     return true;
@@ -407,16 +397,24 @@ bool MocapViewer::CreateAvatar ()
   animPacketFactory->SetAnimationRoot (debugNodeFactory);
 
   // Setup the bone chain mask to select which bones are displayed
-  bool hasMask = false;
+  bool hasMask = clp->GetOption ("rootmask", 0) || clp->GetOption ("bone", 0) || clp->GetOption ("nobone", 0);
   csBitArray boneMask;
   boneMask.SetSize (parsingResult.skeletonFactory->GetTopBoneID () + 1);
-  boneMask.Clear ();
+
+  // Check if there is only one empty "-nobone" option provided
+  txt = clp->GetOption ("nobone", 0);
+  if (txt && txt == ""
+      && !clp->GetOption ("rootmask", 0) && !clp->GetOption ("bone", 0))
+    boneMask.Clear ();
+
+  else
+    boneMask.SetAll ();
 
   // Check for a definition of a bone chain
   txt = clp->GetOption ("rootmask", 0);
   if (txt)
   {
-    hasMask = true;
+    boneMask.Clear ();
 
     CS::Animation::BoneID boneID = parsingResult.skeletonFactory->FindBone (txt);
     if (boneID == CS::Animation::InvalidBoneID)
@@ -430,8 +428,6 @@ bool MocapViewer::CreateAvatar ()
       CS::Animation::iBodyChain* bodyChain = bodySkeleton->CreateBodyChain ("body_chain", boneID);
 
       // Check if we need to add all children
-      if (clp->GetBoolOption ("childall", false))
-	printf ("add all children\n");
       if (clp->GetBoolOption ("childall", false))
 	bodyChain->AddAllSubChains ();
 
@@ -460,8 +456,6 @@ bool MocapViewer::CreateAvatar ()
   txt = clp->GetOption ("bone", index);
   while (txt)
   {
-    hasMask = true;
-
     CS::Animation::BoneID boneID = parsingResult.skeletonFactory->FindBone (txt);
     if (boneID == CS::Animation::InvalidBoneID)
       ReportWarning ("Could not find user specified bone %s!", txt.GetData ());
@@ -475,8 +469,6 @@ bool MocapViewer::CreateAvatar ()
   txt = clp->GetOption ("nobone", index);
   while (txt)
   {
-    hasMask = true;
-
     if (txt != "")
     {
       CS::Animation::BoneID boneID = parsingResult.skeletonFactory->FindBone (txt);
@@ -550,50 +542,6 @@ bool MocapViewer::CreateAvatar ()
   hudTxt.Format ("Total length: %.2f seconds", animNode->GetDuration ());
   hudHelper.stateDescriptions.Push (hudTxt);
 
-  // Initialize the position of the camera
-  const csArray<CS::Animation::BoneID>& boneList = parsingResult.skeletonFactory->GetBoneOrderList ();
-  if (boneList.GetSize ())
-  {
-    // Compute the bounding box of the skeleton
-    csBox3 bbox;
-    csQuaternion rotation;
-    csVector3 offset;
-    float time;
-    CS::Animation::iSkeletonAnimation* animation = parsingResult.animPacketFactory->GetAnimation (0);
-
-    // TODO: only the bones visible
-    for (size_t i = 0; i <= parsingResult.skeletonFactory->GetTopBoneID (); i++)
-      if (parsingResult.skeletonFactory->HasBone (i))
-      {
-	parsingResult.skeletonFactory->GetTransformAbsSpace (i, rotation, offset);
-	bbox.AddBoundingVertex (offset);
-      }
-
-    // Find the initial position of the root of the skeleton
-    CS::Animation::BoneID rootBone = boneList[0];
-    animation->GetKeyFrame (animation->FindChannel (rootBone), 0, rootBone, time, rotation, offset);
-    csVector3 cameraTarget = offset + bbox.GetCenter ();
-
-    // Compute the position of the camera
-    csString txt = clp->GetOption ("poscamera", 0);
-    float scale = 1.0f;
-    float value;
-    if (txt && sscanf (txt.GetData (), "%f", &value) == 1)
-      scale = value;
-    csVector3 cameraOffset = csVector3 (0.0f, 0.0f, -300.0f * scale) * globalScale;
-
-    // Check if the user has provided an angle for the camera
-    txt = clp->GetOption ("rotcamera", 0);
-    float angle;
-    if (txt && sscanf (txt.GetData (), "%f", &angle) == 1)
-      // TODO: the csYRotMatrix3 is defined in right-handed coordinate system!
-      cameraOffset = csYRotMatrix3 (-angle * 3.1415927 / 180.0f) * cameraOffset;
-
-    // Update the position of the camera
-    view->GetCamera ()->GetTransform ().SetOrigin (cameraTarget + cameraOffset);
-    view->GetCamera ()->GetTransform ().LookAt (-cameraOffset, csVector3 (0.0f, 1.0f, 0.0f));
-  }
-
   // Setup the noise points
   txt = clp->GetOption ("ncount", 0);
   int noiseCount;
@@ -663,6 +611,7 @@ bool MocapViewer::CreateAvatar ()
   txt = clp->GetOption ("targetname", 0);
   if (txt) targetName = txt;
 
+  CS::Animation::iSkeletonFactory* retargetSkeletonFactory = nullptr;
   if (targetFile != "" && targetName != "")
   {
     // Load the animesh factory
@@ -678,6 +627,7 @@ bool MocapViewer::CreateAvatar ()
       (meshfact->GetMeshObjectFactory ());
     if (!animeshFactory)
       return ReportError ("Can't find the animesh interface for the animesh target!");
+    retargetSkeletonFactory = animeshFactory->GetSkeletonFactory ();
 
     // Check if the automatic animation has to be disabled
     if (noAnimation)
@@ -776,6 +726,70 @@ bool MocapViewer::CreateAvatar ()
     csRef<iMeshWrapper> retargetMesh =
       engine->CreateMeshWrapper (meshfact, "retarget", room, csVector3 (0.0f));
   }
+
+  // Compute the position of the target of the camera
+  csVector3 cameraTarget (0.0f);
+
+  // Compute the bounding box of the bones of the skeleton that are visible
+  const csArray<CS::Animation::BoneID>& boneList = parsingResult.skeletonFactory->GetBoneOrderList ();
+  if (boneList.GetSize ())
+  {
+    csBox3 bbox;
+    csQuaternion rotation;
+    csVector3 offset;
+    CS::Animation::BoneID rootBone = CS::Animation::InvalidBoneID;
+    for (size_t i = 0; i < boneList.GetSize (); i++)
+      if (!hasMask || boneMask.IsBitSet (i))
+      {
+	if (rootBone == CS::Animation::InvalidBoneID)
+	  rootBone = i;
+
+	parsingResult.skeletonFactory->GetTransformAbsSpace (i, rotation, offset);
+	bbox.AddBoundingVertex (offset);
+      }
+    cameraTarget = bbox.GetCenter ();
+
+    // Find the initial position of the root of the skeleton
+    if (!noAnimation
+	&& rootBone != CS::Animation::InvalidBoneID)
+    {
+      float time;
+      CS::Animation::iSkeletonAnimation* animation = parsingResult.animPacketFactory->GetAnimation (0);
+      animation->GetKeyFrame (animation->FindChannel (rootBone), 0, rootBone, time, rotation, offset);
+      cameraTarget += offset;
+    }
+  }
+
+  // If there are no bones then use the position of the root of the target mesh
+  if (hasMask && boneMask.AllBitsFalse ()
+      && retargetSkeletonFactory
+      && retargetSkeletonFactory->GetBoneOrderList ().GetSize ())
+  {
+    csQuaternion rotation;
+    csVector3 offset;
+    retargetSkeletonFactory->GetTransformAbsSpace
+      (retargetSkeletonFactory->GetBoneOrderList ().Get (0), rotation, offset);
+    cameraTarget += offset;
+  }
+
+  // Compute the position of the camera
+  txt = clp->GetOption ("poscamera", 0);
+  float scale = 1.0f;
+  float value;
+  if (txt && sscanf (txt.GetData (), "%f", &value) == 1)
+    scale = value;
+  csVector3 cameraOffset = csVector3 (0.0f, 0.0f, -300.0f * scale) * globalScale;
+
+  // Check if the user has provided an angle for the camera
+  txt = clp->GetOption ("rotcamera", 0);
+  float angle;
+  if (txt && sscanf (txt.GetData (), "%f", &angle) == 1)
+    // TODO: the csYRotMatrix3 is defined in right-handed coordinate system!
+    cameraOffset = csYRotMatrix3 (-angle * 3.1415927 / 180.0f) * cameraOffset;
+
+  // Update the position of the camera
+  view->GetCamera ()->GetTransform ().SetOrigin (cameraTarget + cameraOffset);
+  view->GetCamera ()->GetTransform ().LookAt (-cameraOffset, csVector3 (0.0f, 1.0f, 0.0f));
 
   // Display the origin
   if (!pld)
