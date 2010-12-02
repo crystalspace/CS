@@ -234,6 +234,17 @@ struct LightHeader
 // crashes on exit if functions have local static variables with complex types
 static csString error_buf;
 
+// Copied from csendian.h to avoid deprecation warnings
+static inline short FloatToShort (float f)
+{
+  int exp;
+  long mant = csQroundSure (frexp (f, &exp) * 0x1000);
+  long sign = mant & 0x8000;
+  if (mant < 0) mant = -mant;
+  if (exp > 7) mant = 0x7ff, exp = 7; else if (exp < -8) mant = 0, exp = -8;
+  return short(sign | ((exp & 0xf) << 11) | (mant & 0x7ff));
+}
+
 const char* csLightMap::ReadFromCache (
   iFile* file,
   int w,
@@ -255,12 +266,12 @@ const char* csLightMap::ReadFromCache (
   memcpy (pswanted.header, LMMAGIC, 4);
   if (poly)
   {
-    pswanted.x1 = csFloatToShort (spoly->Vobj (0).x);
-    pswanted.y1 = csFloatToShort (spoly->Vobj (0).y);
-    pswanted.z1 = csFloatToShort (spoly->Vobj (0).z);
-    pswanted.x2 = csFloatToShort (spoly->Vobj (1).x);
-    pswanted.y2 = csFloatToShort (spoly->Vobj (1).y);
-    pswanted.z2 = csFloatToShort (spoly->Vobj (1).z);
+    pswanted.x1 = FloatToShort (spoly->Vobj (0).x);
+    pswanted.y1 = FloatToShort (spoly->Vobj (0).y);
+    pswanted.z1 = FloatToShort (spoly->Vobj (0).z);
+    pswanted.x2 = FloatToShort (spoly->Vobj (1).x);
+    pswanted.y2 = FloatToShort (spoly->Vobj (1).y);
+    pswanted.z2 = FloatToShort (spoly->Vobj (1).z);
   }
   pswanted.lm_size = (int32)lm_size;
   pswanted.lm_cnt = 111;
