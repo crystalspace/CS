@@ -737,12 +737,14 @@ bool MocapViewer::CreateAvatar ()
     csBox3 bbox;
     csQuaternion rotation;
     csVector3 offset;
-    CS::Animation::BoneID rootBone = CS::Animation::InvalidBoneID;
+    CS::Animation::ChannelID rootChannel = CS::Animation::InvalidChannelID;
+    CS::Animation::iSkeletonAnimation* animation = parsingResult.animPacketFactory->GetAnimation (0);
     for (size_t i = 0; i < boneList.GetSize (); i++)
       if (!hasMask || boneMask.IsBitSet (i))
       {
-	if (rootBone == CS::Animation::InvalidBoneID)
-	  rootBone = i;
+	if (rootChannel == CS::Animation::InvalidChannelID
+	    && animation->FindChannel (i))
+	  rootChannel = animation->FindChannel (i);
 
 	parsingResult.skeletonFactory->GetTransformAbsSpace (i, rotation, offset);
 	bbox.AddBoundingVertex (offset);
@@ -751,11 +753,11 @@ bool MocapViewer::CreateAvatar ()
 
     // Find the initial position of the root of the skeleton
     if (!noAnimation
-	&& rootBone != CS::Animation::InvalidBoneID)
+	&& rootChannel != CS::Animation::InvalidChannelID)
     {
       float time;
-      CS::Animation::iSkeletonAnimation* animation = parsingResult.animPacketFactory->GetAnimation (0);
-      animation->GetKeyFrame (animation->FindChannel (rootBone), 0, rootBone, time, rotation, offset);
+      CS::Animation::BoneID rootBone;
+      animation->GetKeyFrame (rootChannel, 0, rootBone, time, rotation, offset);
       cameraTarget += offset;
     }
   }
