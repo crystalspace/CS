@@ -129,34 +129,36 @@ struct iSkeletonFactory : public virtual iBase
    * @{ */
 
   /**
-   * Create a new bone with given parent
-   * \param parent bone id of parent or ~0 for no parent which creates a top
-   * level bone
+   * Create a new bone with the given parent bone
+   * \param parent bone The ID of the parent bone, or CS::Animation::InvalidBoneID if
+   * there are no parent (ie, this is one of the root bones). Theoritically, there can
+   * be more than one root bone, but this is not recommanded.
    */
-  virtual BoneID CreateBone (BoneID parent = InvalidBoneID) = 0;
+  virtual BoneID CreateBone (BoneID parent = CS::Animation::InvalidBoneID) = 0;
 
   /**
-   * Find a bone id from its name
+   * Find the ID of a bone from its name
    * \param name bone name
    */
   virtual BoneID FindBone (const char *name) const = 0;
 
   /**
-   * Remove a bone from skeleton. Any bones having the removed bone as parent
+   * Remove a bone from the skeleton. Any bones having the removed bone as parent
    * will be reparented one step up the chain.
    * \param bone bone id of bone to remove
    */
   virtual void RemoveBone (BoneID bone) = 0;
 
   /**
-   * Get the bone parent id
-   * \return parent id on success. Non existing bones will return ~0 as parent.
-   * \param bone bone Id
+   * Get the ID of the parent of the given bone
+   * \return The ID of the parent on success. Non existing bones or bones without parent
+   * will return CS::Animation::InvalidBoneID.
+   * \param bone The ID of the bone
    */
   virtual BoneID GetBoneParent (BoneID bone) const = 0;
 
   /**
-   * Return true if bone with given id exists within skeleton factory
+   * Return true if the bone with the given ID exists within this skeleton factory
    */
   virtual bool HasBone (BoneID bone) const = 0;
 
@@ -176,37 +178,37 @@ struct iSkeletonFactory : public virtual iBase
   virtual BoneID GetTopBoneID () const = 0;
 
   /**
-   * Get the bone transform in bone space.
-   * \param bone bone id to get the transform for
-   * \param rot rotation quaternion
-   * \param offset movement offset
+   * Get the transform of the bone in bone space.
+   * \param bone The ID of the bone to get the transform for
+   * \param rot The rotation quaternion provided as a result
+   * \param offset The movement offset provided as a result
    */
   virtual void GetTransformBoneSpace (BoneID bone, csQuaternion& rot, 
     csVector3& offset) const = 0;
 
   /**
-   * Set the bone transform in bone space.
-   * \param bone bone id to set the transform for
-   * \param rot rotation quaternion
-   * \param offset movement offset
+   * Set the transform of the bone in bone space.
+   * \param bone The ID of the bone to set the transform for
+   * \param rot The rotation quaternion of the bone
+   * \param offset The movement offset of the bone
    */
   virtual void SetTransformBoneSpace (BoneID bone, const csQuaternion& rot, 
     const csVector3& offset) = 0;
 
   /**
-   * Get the bone transform in skeleton absolute space.
-   * \param bone bone id to get the transform for
-   * \param rot rotation quaternion
-   * \param offset movement offset
+   * Get the transform of the bone in absolute space.
+   * \param bone The ID of the bone to get the transform for
+   * \param rot The rotation quaternion provided as a result
+   * \param offset The movement offset provided as a result
    */
   virtual void GetTransformAbsSpace (BoneID bone, csQuaternion& rot, 
     csVector3& offset) const = 0;
 
   /**
-   * Set the bone transform in skeleton absolute space.
-   * \param bone bone id to set the transform for
-   * \param rot rotation quaternion
-   * \param offset movement offset
+   * Set the transform of the bone in absolute space.
+   * \param bone The ID of the bone to set the transform for
+   * \param rot The rotation quaternion of the bone
+   * \param offset The movement offset of the bone
    */
   virtual void SetTransformAbsSpace (BoneID bone, const csQuaternion& rot, 
     const csVector3& offset) = 0;
@@ -261,11 +263,12 @@ struct iSkeletonFactory : public virtual iBase
  * copy of a skeleton, with the base pose and topology defined by the factory, but with the current
  * state defined internally. 
  * 
- * Skeleton instance adds one coordinate space per bone, the bind space.
- * Bind space is defined by the skeleton factory, so bind space is relative
- * transform compared to the default orientation.
+ * The skeleton level introduces a third coordinate space, in addition to the absolute and bone
+ * spaces defined for the CS::Animation::iSkeletonFactory. This new coordinate space is the bind
+ * space, and is defined by the relative position compared to the default orientation (ie the bone
+ * space).
  *
- * \sa CS::Animation::iSkeletonFactory for more information on coordinate spaces
+ * \sa CS::Animation::iSkeletonFactory for more information on the absolute and bone coordinate spaces.
  */
 struct iSkeleton : public virtual iBase
 {
@@ -280,72 +283,72 @@ struct iSkeleton : public virtual iBase
    * @{ */
 
   /**
-   * Get the bone transform in bone space.
-   * \param bone bone id to get the transform for
-   * \param rot rotation quaternion
-   * \param offset movement offset
+   * Get the transform of the bone in bone space.
+   * \param bone The ID of the bone to get the transform for
+   * \param rot The rotation quaternion provided as a result
+   * \param offset The movement offset provided as a result
    */
   virtual void GetTransformBoneSpace (BoneID bone, csQuaternion& rot, 
     csVector3& offset) const = 0;
 
   /**
-   * Set the bone transform in bone space.
-   * \param bone bone id to set the transform for
-   * \param rot rotation quaternion
-   * \param offset movement offset
+   * Set the transform of the bone in bone space.
+   * \param bone The ID of the bone to set the transform for
+   * \param rot The rotation quaternion of the bone
+   * \param offset The movement offset of the bone
    */
   virtual void SetTransformBoneSpace (BoneID bone, const csQuaternion& rot, 
     const csVector3& offset) = 0;
 
   /**
-   * Get the bone transform in skeleton absolute space.
-   * \param bone bone id to get the transform for
-   * \param rot rotation quaternion
-   * \param offset movement offset
+   * Get the transform of the bone in absolute space.
+   * \param bone The ID of the bone to get the transform for
+   * \param rot The rotation quaternion provided as a result
+   * \param offset The movement offset provided as a result
    */
   virtual void GetTransformAbsSpace (BoneID bone, csQuaternion& rot, 
     csVector3& offset) const = 0;
 
   /**
-   * Set the bone transform in skeleton absolute space.
-   * \param bone bone id to set the transform for
-   * \param rot rotation quaternion
-   * \param offset movement offset
+   * Set the transform of the bone in absolute space.
+   * \param bone The ID of the bone to set the transform for
+   * \param rot The rotation quaternion of the bone
+   * \param offset The movement offset of the bone
    */
   virtual void SetTransformAbsSpace (BoneID bone, const csQuaternion& rot, 
     const csVector3& offset) = 0;
   
   /**
-   * Get the bone transform in bind space.
-   * \param bone bone id to get the transform for
-   * \param rot rotation quaternion
-   * \param offset movement offset
+   * Get the transform of the bone in bind space.
+   * \param bone The ID of the bone to get the transform for
+   * \param rot The rotation quaternion provided as a result
+   * \param offset The movement offset provided as a result
    */
   virtual void GetTransformBindSpace (BoneID bone, csQuaternion& rot, 
     csVector3& offset) const = 0;
 
     
   /**
-   * Set the bone transform in bind space.
-   * \param bone bone id to set the transform for
-   * \param rot rotation quaternion
-   * \param offset movement offset
+   * Set the transform of the bone in bind space.
+   * \param bone The ID of the bone to set the transform for
+   * \param rot The rotation quaternion of the bone
+   * \param offset The movement offset of the bone
    */
   virtual void SetTransformBindSpace (BoneID bone, const csQuaternion& rot, 
     const csVector3& offset) = 0;
   
   /**
-   * Get the entire skeleton state (all transforms) in absolute space
+   * Get the state of the entire skeleton (ie all transforms) in absolute space
    */
   virtual csPtr<csSkeletalState> GetStateAbsSpace () = 0;
 
   /**
-   * Get the entire skeleton state (all transforms) in bone space
+   * Get the state of the entire skeleton (ie all transforms) in bone space
    */
   virtual csPtr<csSkeletalState> GetStateBoneSpace () = 0;
 
   /**
-   * Get the entire skeleton state (all transforms) in bind space
+   * Get the state of the entire skeleton (ie all transforms) in bind space
    */
   virtual csPtr<csSkeletalState> GetStateBindSpace () = 0;
 
@@ -367,19 +370,21 @@ struct iSkeleton : public virtual iBase
    */
   virtual void SetAnimationPacket (iSkeletonAnimPacket* packet) = 0;
 
-
   /**
-   * Recreate the skeleton structure from the factory
+   * Recreate the structure of the skeleton from the definition of the factory
    */
   virtual void RecreateSkeleton () = 0;
 
   /**
-   * Update the skeleton
+   * Update the state skeleton. The animation blending tree will be stepped with the given duration.
+   * \param dt The duration to step the animation, in seconds
+   * \sa CS::Animation::iSkeletonAnimNode::TickAnimation()
    */
   virtual void UpdateSkeleton (float dt) = 0;
 
   /**
-   * Get skeleton update version number
+   * Get the skeleton update version number. This number is incremented each time that a effective
+   * transformation has been made to the state of the skeleton.
    */
   virtual unsigned int GetSkeletonStateVersion () const = 0;
 
@@ -414,7 +419,7 @@ public:
     : boneVecs (0), boneQuats (0), numberOfBones (0)
   {}
 
-  ///
+  /// Destructor
   virtual inline ~csSkeletalState ()
   {
     delete[] boneVecs;
@@ -422,8 +427,8 @@ public:
   }
 
   /**
-   * Return the position vector of the specified bone, in bone space.
-   * \param i The BoneID of the bone.
+   * Return the position vector of the given bone, in bone space.
+   * \param i The CS::Animation::BoneID of the bone.
    */
   inline const csVector3& GetVector (size_t i) const
   {
@@ -431,8 +436,8 @@ public:
   }
 
   /**
-   * Return the position vector of the specified bone, in bone space.
-   * \param i The BoneID of the bone.
+   * Return the position vector of the given bone, in bone space.
+   * \param i The CS::Animation::BoneID of the bone.
    */
   inline csVector3& GetVector (size_t i) 
   {
@@ -441,8 +446,8 @@ public:
 
 
   /**
-   * Return the rotation quaternion of the specified bone, in bone space.
-   * \param i The BoneID of the bone.
+   * Return the rotation quaternion of the given bone, in bone space.
+   * \param i The CS::Animation::BoneID of the bone.
    */
   inline const csQuaternion& GetQuaternion (size_t i) const
   {
@@ -450,8 +455,8 @@ public:
   }
 
   /**
-   * Return the rotation quaternion of the specified bone, in bone space.
-   * \param i The BoneID of the bone.
+   * Return the rotation quaternion of the given bone, in bone space.
+   * \param i The CS::Animation::BoneID of the bone.
    */
   inline csQuaternion& GetQuaternion (size_t i) 
   {
@@ -460,7 +465,7 @@ public:
 
   /**
    * Return true if the position and rotation values have been set for
-   * the specified bone, false otherwise (last position and rotation values
+   * the given bone, false otherwise (last position and rotation values
    * which have been set for this bone will therefore be kept).
    */
   inline bool IsBoneUsed (BoneID bone) const
@@ -470,7 +475,7 @@ public:
 
   /**
    * Mark that the position and rotation values have been set for
-   * the specified bone. Both position and rotation must therefore be set.
+   * the given bone. Both position and rotation must therefore be set.
    */
   inline void SetBoneUsed (BoneID bone)
   {
@@ -478,7 +483,7 @@ public:
   }
 
   /**
-   * Return the count of bones of the animesh skeleton.
+   * Return the count of bones of this skeleton state
    */
   inline size_t GetBoneCount () const
   {
@@ -504,6 +509,9 @@ public:
       boneVecs[i].Set (0,0,0);
   }
 
+  /**
+   * Mark all bones as not used
+   */
   inline void Reset ()
   {
     bitSet.Clear ();
