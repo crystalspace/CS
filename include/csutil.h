@@ -144,6 +144,7 @@
 #include "csutil/strhashr.h"
 #include "csutil/stringarray.h"
 #include "csutil/stringconv.h"
+#include "csutil/stringquote.h"
 #include "csutil/stringreader.h"
 #include "csutil/strset.h"
 #include "csutil/sysfunc.h"
