@@ -49,6 +49,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     : scfImplementationType (this, parent)
   {
   }
+  // TODO: use bone order list
 
   CS::Animation::iSkeletonRagdollNodeFactory* RagdollNodeManager::CreateAnimNodeFactory
     (const char *name, CS::Animation::iBodySkeleton* skeleton, iDynamicSystem* dynSys)

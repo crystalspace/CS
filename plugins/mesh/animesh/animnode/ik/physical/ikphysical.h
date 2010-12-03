@@ -144,7 +144,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
 
     virtual void RemoveConstraint (CS::Animation::EffectorID effector);
 
-    //-- CS::Animation::iSkeletonAnimPacket
+    //-- CS::Animation::iSkeletonAnimNode
     virtual void Play ();
 
     virtual void Stop ();

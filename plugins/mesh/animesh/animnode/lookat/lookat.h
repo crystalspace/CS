@@ -121,7 +121,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     virtual void AddListener (CS::Animation::iSkeletonLookAtListener* listener);
     virtual void RemoveListener (CS::Animation::iSkeletonLookAtListener* listener);
 
-    //-- CS::Animation::iSkeletonAnimPacket
+    //-- CS::Animation::iSkeletonAnimNode
     virtual void Play ();
     virtual void Stop ();
 

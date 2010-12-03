@@ -129,7 +129,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
     virtual void ResetChainTransform (CS::Animation::iBodyChain* chain);
 
-    //-- CS::Animation::iSkeletonAnimPacket
+    //-- CS::Animation::iSkeletonAnimNode
     virtual void Play ();
 
     virtual void Stop ();

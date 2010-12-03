@@ -93,7 +93,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(SpeedNode)
     //-- CS::Animation::iSkeletonSpeedNode
     virtual void SetSpeed (float speed);
 
-    //-- CS::Animation::iSkeletonAnimPacket
+    //-- CS::Animation::iSkeletonAnimNode
     virtual void Play ();
     virtual void Stop ();
 
