@@ -192,7 +192,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     ref.AttachNew (new AnimationNode (this));
 
     // Convert the animation data to bind space if it was not yet made.
-    if (!animation->GetFramesInBindSpace ())
+    if (animation && !animation->GetFramesInBindSpace ())
     {
       for (size_t channel = 0; channel < animation->GetChannelCount ();
 	   channel++)
@@ -249,8 +249,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   
   void AnimationNode::Play ()
   {
-    CS_ASSERT (factory->animation);
-
     if (!isPlaying && factory->automaticReset)
       playbackPosition = 0;
 
@@ -276,7 +274,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   float AnimationNode::GetDuration () const
   {
-    return factory->animation->GetDuration ();
+    if (factory->animation)
+      return factory->animation->GetDuration ();
+
+    return 0.0f;
   }
 
   void AnimationNode::SetPlaybackSpeed (float speed)
@@ -291,7 +292,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   void AnimationNode::BlendState (CS::Animation::csSkeletalState* state, float baseWeight)
   {
-    factory->animation->BlendState (state, baseWeight, playbackPosition, factory->cyclic);
+    if (factory->animation)
+      factory->animation->BlendState (state, baseWeight, playbackPosition, factory->cyclic);
   }
   
   void AnimationNode::TickAnimation (float dt)
