@@ -112,6 +112,7 @@ private:
   CEGUI::Scrollbar* sliderStrandLOD;
   CEGUI::Scrollbar* sliderControlPointsLOD;
   CEGUI::Scrollbar* sliderOverallLOD;
+  CEGUI::Combobox* objectComboBox;
 
   CEGUI::Window* form;
   CEGUI::Window* stddlg;
@@ -176,6 +177,7 @@ public:
   bool OnEventThumbTrackEndedOverallLOD (const CEGUI::EventArgs& e);
   bool OnPhysicsButtonClicked (const CEGUI::EventArgs& e);
   bool OnEnableButtonClicked (const CEGUI::EventArgs& e);
+  bool OnEventListSelectionChanged (const CEGUI::EventArgs& e);
 
   //-- csApplicationFramework
   bool OnInitialize (int argc, char* argv[]);

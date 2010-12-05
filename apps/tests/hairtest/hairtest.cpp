@@ -293,6 +293,21 @@ bool HairTest::OnEnableButtonClicked (const CEGUI::EventArgs&)
   return true;
 }
 
+bool HairTest::OnEventListSelectionChanged (const CEGUI::EventArgs&)
+{
+  CS::ShaderVarName diffuseType (svStrings, "diffuse type");	
+
+  int type; 
+  avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
+    GetVariableAdd(diffuseType)->GetValue(type);
+
+  avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
+    GetVariableAdd(diffuseType)->
+    SetValue((int)(objectComboBox->getSelectedItem()->getID()));  
+
+  return true;
+}
+
 void HairTest::LoadTexture (const char* filename, const char* path, 
                             const char* shaderVariable)
 {
@@ -1166,6 +1181,31 @@ bool HairTest::Application ()
     sliderR->setScrollPosition(color.x);
     sliderG->setScrollPosition(color.y);
     sliderB->setScrollPosition(color.z);
+
+    objectComboBox = (CEGUI::Combobox*)winMgr->
+      getWindow("HairTest/MainWindow/Tab/Page3/Combobox");
+
+    CEGUI::ListboxTextItem *item = new CEGUI::ListboxTextItem( "Disabled", 0 );
+    objectComboBox->addItem( item );
+    item = new CEGUI::ListboxTextItem( "CS", 1 );
+    objectComboBox->addItem( item );
+    item = new CEGUI::ListboxTextItem( "NVidia", 2 );
+    objectComboBox->addItem( item ); 
+    item = new CEGUI::ListboxTextItem( "Kajiya&Kay", 3 );
+    objectComboBox->addItem( item ); 
+    item = new CEGUI::ListboxTextItem( "Ambient", 4 );
+    objectComboBox->addItem( item ); 
+
+    objectComboBox->subscribeEvent(CEGUI::Combobox::EventListSelectionAccepted,
+      CEGUI::Event::Subscriber(&HairTest::OnEventListSelectionChanged, this));
+
+    CS::ShaderVarName diffuseType (svStrings, "diffuse type");	
+
+    int type; 
+    avatarScene->furMesh->GetFurMeshProperties()->GetMaterial()->
+      GetVariableAdd(diffuseType)->GetValue(type);
+
+    objectComboBox->setText(objectComboBox->getListboxItemFromIndex(type)->getText() );
   }
 
   sliderGuideLOD = (CEGUI::Scrollbar*)winMgr->

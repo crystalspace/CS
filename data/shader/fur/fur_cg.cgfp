@@ -3,6 +3,7 @@
   <variablemap variable="light ambient" destination="AmbientColor" />
   <variablemap variable="diffuse type" destination="DiffuseType" />
   <variablemap variable="fur color" destination="FurColor" />
+  <variablemap variable="Ks" destination="Ks" />  
   <variablemap variable="hdr scale" destination="hdrScale" />
   <program>
 
@@ -13,6 +14,7 @@ struct vertex2fragment {
 	float3 WorldTangent : TEXCOORD2;	
 	float3 TangentShift : TEXCOORD3;
 	float2 TexCoord : TEXCOORD4;
+	float3 WorldView: TEXCOORD5;		
 };
 
 float4 main (vertex2fragment IN,
@@ -24,6 +26,7 @@ float4 main (vertex2fragment IN,
 			uniform float3 AmbientColor,
 			uniform float3 LightColor,
 			uniform float4 FurColor,
+			uniform float Ks,
 			uniform float4 hdrScale) : COLOR
 {
 	float4 OUT = float4(0, 0, 0, FurColor.a);
@@ -59,8 +62,17 @@ float4 main (vertex2fragment IN,
 	else // ambient instead of diffuse
 		diffuseColor.rgb = LightColor;
 
+	float3 Vn = normalize(IN.WorldView);
+	float tangentEye = dot(Nn, Vn);
+	float tangentLight = dot(Nn, Ln);
+
+	float3 specularColor = pow( tangentLight * tangentEye + sin( acos( tangentLight ) ) * sin( acos( tangentEye ) ) , 60.0);	
+	specularColor *= Ks;
+	specularColor *= LightColor;
+	specularColor = max (0.0, specularColor);
+	
 	// No specular color
-	OUT.xyz = /*(0.8 + 0.4 * IN.TangentShift.x ) */ FurColor.xyz * diffuseColor + AmbientColor;
+	OUT.xyz = /*(0.8 + 0.4 * IN.TangentShift.x ) */ FurColor.xyz * diffuseColor + AmbientColor + specularColor;
 	OUT.xyz = OUT.xyz*hdrScale.y+hdrScale.w;
 	return OUT;
 }

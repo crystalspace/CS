@@ -17,7 +17,7 @@
 	  <shadervar type="vector4" name="fur color">0, 0, 0, 0.9</shadervar>
 	  <shadervar type="texture" name="diffuse map">frankie_col</shadervar>
 	  <shadervar type="float" name="Ks">0.2</shadervar>
-	  <shadervar type="int" name="kajiya kay" />
+	  <shadervar type="int" name="kajiya kay disabled" />
     </material>
   </materials>
   <sounds/>

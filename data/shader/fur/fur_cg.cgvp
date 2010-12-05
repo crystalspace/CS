@@ -19,11 +19,13 @@ struct vertex2fragment {
 	float3 WorldTangent : TEXCOORD2;	
 	float3 TangentShift : TEXCOORD3;
 	float2 TexCoord : TEXCOORD4;
+	float3 WorldView: TEXCOORD5;	
 };
 
 // main function
 vertex2fragment main (app2vertex IN,
 	uniform float4x4 ModelViewI : state.matrix.modelview.inverse,	
+	uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,	
 	uniform float4x4 ModelViewProj : state.matrix.mvp,
 	uniform float4x4 obj_tr,	
 	uniform float4 LightPos)
@@ -42,6 +44,9 @@ vertex2fragment main (app2vertex IN,
 	// light vector
 	OUT.LightVec = objLight.xyz;
 
+	// view vector in world coords:
+	OUT.WorldView = normalize(ModelViewIT[3].xyz - Po.xyz);	
+	
 	// uv mapping
 	OUT.TexCoord = IN.TexCoord;
 	
