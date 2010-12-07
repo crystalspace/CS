@@ -187,7 +187,7 @@ bool FrankieScene::OnKeyboard (iEvent &ev)
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'a')
     {
       alwaysRotate = !alwaysRotate;
-      lookAtNode->SetAlwaysRotate (alwaysRotate);
+      lookAtNodeFactory->SetAlwaysRotate (alwaysRotate);
       return true;
     }
 
@@ -197,19 +197,19 @@ bool FrankieScene::OnKeyboard (iEvent &ev)
       if (rotationSpeed == ROTATION_SLOW)
       {
 	rotationSpeed = ROTATION_NORMAL;
-	lookAtNode->SetMaximumSpeed (5.0f);
+	lookAtNodeFactory->SetMaximumSpeed (5.0f);
       }
 
       else if (rotationSpeed == ROTATION_NORMAL)
       {
 	rotationSpeed = ROTATION_IMMEDIATE;
-	lookAtNode->SetMaximumSpeed (0.0f);
+	lookAtNodeFactory->SetMaximumSpeed (0.0f);
       }
 
       else if (rotationSpeed == ROTATION_IMMEDIATE)
       {
 	rotationSpeed = ROTATION_SLOW;
-	lookAtNode->SetMaximumSpeed (0.5f);
+	lookAtNodeFactory->SetMaximumSpeed (0.5f);
       }
 
       return true;
@@ -420,8 +420,10 @@ bool FrankieScene::CreateAvatar ()
     animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ();
 
   // Create the 'LookAt' animation node
-  csRef<CS::Animation::iSkeletonLookAtNodeFactory> lookAtNodeFactory =
-    avatarTest->lookAtManager->CreateAnimNodeFactory ("lookat", bodySkeleton);
+  lookAtNodeFactory = avatarTest->lookAtManager->CreateAnimNodeFactory ("lookat");
+  lookAtNodeFactory->SetBodySkeleton (bodySkeleton);
+  lookAtNodeFactory->SetBone (animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"));
+  lookAtNodeFactory->SetListenerDelay (0.6f);
 
   // Create the 'idle' animation node
   csRef<CS::Animation::iSkeletonAnimationNodeFactory> idleNodeFactory =
@@ -531,8 +533,6 @@ bool FrankieScene::CreateAvatar ()
   // Setup of the LookAt animation node
   lookAtNode = scfQueryInterface<CS::Animation::iSkeletonLookAtNode> (rootNode->FindNode ("lookat"));
   lookAtNode->AddListener (&lookAtListener);
-  lookAtNode->SetBone (animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"));
-  lookAtNode->SetListenerDelay (0.6f);
 
   // Setup of the speed animation node
   speedNode = scfQueryInterface<CS::Animation::iSkeletonSpeedNode> (rootNode->FindNode ("speed"));
@@ -610,11 +610,11 @@ void FrankieScene::ResetScene ()
 
   // Reset the 'LookAt' animation node
   alwaysRotate = false;
-  lookAtNode->SetAlwaysRotate (alwaysRotate);
+  lookAtNodeFactory->SetAlwaysRotate (alwaysRotate);
   targetMode = LOOKAT_CAMERA;
   lookAtNode->SetTarget (avatarTest->view->GetCamera(), csVector3 (0.0f));
   rotationSpeed = ROTATION_NORMAL;
-  lookAtNode->SetMaximumSpeed (5.0f);
+  lookAtNodeFactory->SetMaximumSpeed (5.0f);
   lookAtNode->Play ();
 
   // Reset the 'speed' animation node

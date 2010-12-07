@@ -59,6 +59,7 @@ class FrankieScene : public AvatarScene
 
   // LookAt node related
   csRef<CS::Animation::iSkeletonLookAtNode> lookAtNode;
+  csRef<CS::Animation::iSkeletonLookAtNodeFactory> lookAtNodeFactory;
   char targetMode;
   bool alwaysRotate;
   char rotationSpeed;
