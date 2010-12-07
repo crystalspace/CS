@@ -62,16 +62,18 @@ struct iSkeletonSpeedNodeManager : public virtual iBase
 
 /**
  * Factory for the 'speed' animation node.
+ * This animation node takes some animations of the animesh moving at different speed
+ * (eg idle, walking, running), and blend them to achieve any custom speed.
  */
 struct iSkeletonSpeedNodeFactory : public iSkeletonAnimNodeFactory
 {
   SCF_INTERFACE(CS::Animation::iSkeletonSpeedNodeFactory, 1, 0, 0);
 
   /**
-   * Add a child animation node to this controller. This child node should provide the
+   * Add a child animation node to this node. This child node should provide the
    * animation of the animesh moving at the given speed.
    * 
-   * The factory node should have been made cyclic, otherwise the 'speed' controller will not
+   * The factory node should have been made cyclic, otherwise the 'speed' animation node will not
    * work properly. However, as a user help, if the node is a CS::Animation::iSkeletonAnimationNodeFactory,
    * then the call to CS::Animation::iSkeletonAnimationNodeFactory::SetCyclic() is made automatically.
    * 
@@ -88,8 +90,8 @@ struct iSkeletonSpeedNodeFactory : public iSkeletonAnimNodeFactory
 };
 
 /**
- * An animation node that takes some animations of an Animated Mesh moving at different speed
- * (eg idle, walking, running) and blend them to achieve any custom speed.
+ * An animation node that takes some animations of the animesh moving at different speed
+ * (eg idle, walking, running), and blend them to achieve any custom speed.
  */
 struct iSkeletonSpeedNode : public iSkeletonAnimNode
 {
