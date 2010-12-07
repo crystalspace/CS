@@ -192,36 +192,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     ref.AttachNew (new AnimationNode (this));
 
     // Convert the animation data to bind space if it was not yet made.
-    if (animation && !animation->GetFramesInBindSpace ())
-    {
-      for (size_t channel = 0; channel < animation->GetChannelCount ();
-	   channel++)
-      {
-	// Get the bind transform of the bone
-	CS::Animation::BoneID boneID = animation->GetChannelBone (channel);
-	csQuaternion skeletonRotation;
-	csVector3 skeletonOffset;
-	skeleton->GetFactory ()->GetTransformBoneSpace (boneID, skeletonRotation,
-						       skeletonOffset);
-
-	// Convert each keyframe for this bone
-	for (size_t keyframe = 0;
-	     keyframe < animation->GetKeyFrameCount (channel); keyframe++)
-	{
-	  float time;
-	  csQuaternion keyframeRotation;
-	  csVector3 keyframeOffset;
-	  animation->GetKeyFrame (channel, keyframe, boneID, time,
-				  keyframeRotation, keyframeOffset);
-
-	  animation->SetKeyFrame (channel, keyframe,
-				  keyframeRotation * skeletonRotation.GetConjugate (),
-				  keyframeOffset - skeletonOffset);
-	}
-      }
-
-      animation->SetFramesInBindSpace (true);
-    }
+    if (animation)
+      animation->ConvertFrameSpace (skeleton->GetFactory ());
 
     return csPtr<CS::Animation::iSkeletonAnimNode> (ref);
   }
@@ -292,6 +264,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   void AnimationNode::BlendState (CS::Animation::csSkeletalState* state, float baseWeight)
   {
+    if (!isPlaying)
+      return;
+
     if (factory->animation)
       factory->animation->BlendState (state, baseWeight, playbackPosition, factory->cyclic);
   }
