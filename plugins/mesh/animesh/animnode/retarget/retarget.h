@@ -81,9 +81,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
     virtual void AddBodyChain (CS::Animation::iBodyChain* chain);
     virtual void RemoveBodyChain (CS::Animation::iBodyChain* chain);
 
-    virtual void SetRetargetMode (CS::Animation::RetargetMode mode);
-    virtual CS::Animation::RetargetMode GetRetargetMode () const;
-
     //-- CS::Animation::iSkeletonAnimNodeFactory
     virtual csPtr<CS::Animation::iSkeletonAnimNode> CreateInstance (
 	       CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton);
@@ -98,7 +95,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
     csRef<CS::Animation::iSkeletonAnimNodeFactory> childNode;
     csRef<CS::Animation::iSkeletonFactory> sourceSkeleton;
     CS::Animation::BoneMapping boneMapping;
-    CS::Animation::RetargetMode retargetMode;
     csRefArray<CS::Animation::iBodyChain> bodyChains;
   };
 

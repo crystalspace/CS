@@ -93,8 +93,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
   CS_LEAKGUARD_IMPLEMENT(RetargetAnimNodeFactory);
 
   RetargetAnimNodeFactory::RetargetAnimNodeFactory (RetargetNodeManager* manager, const char *name)
-    : scfImplementationType (this), manager (manager), name (name),
-    retargetMode (CS::Animation::RETARGET_NAIVE)
+    : scfImplementationType (this), manager (manager), name (name)
   {
   }
 
@@ -133,16 +132,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
   {
     bodyChains.Delete (chain);
   }
-
-  void RetargetAnimNodeFactory::SetRetargetMode (CS::Animation::RetargetMode mode)
-  {
-    retargetMode = mode;
-  }
-
- CS::Animation::RetargetMode RetargetAnimNodeFactory::GetRetargetMode () const
- {
-   return retargetMode;
- }
 
   csPtr<CS::Animation::iSkeletonAnimNode> RetargetAnimNodeFactory::CreateInstance
     (CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton)
@@ -186,9 +175,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
     : scfImplementationType (this), factory (factory), skeleton (skeleton), childNode (childNode),
     isPlaying (false)
   {
-    if (factory->retargetMode != CS::Animation::RETARGET_ALIGN_BONES)
-      return;
-
     // TODO: check the validity between the chains
     // TODO: move this computation in the factory
 
@@ -367,9 +353,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
 
       // Naive application of the rotation on the target bone
       csQuaternion targetQuaternion;
-      if (factory->retargetMode == CS::Animation::RETARGET_NAIVE
-	  || (factory->retargetMode == CS::Animation::RETARGET_ALIGN_BONES
-	      && !alignRotations.Contains (targetBoneID)))
+      if (!alignRotations.Contains (targetBoneID))
 	targetQuaternion = targetAbsQuaternion.GetConjugate ()
 	  * sourceAbsQuaternion * sourceBoneQuaternion.GetConjugate ()
 	  * childState.GetQuaternion (sourceBoneID)
@@ -377,16 +361,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
 	  * targetAbsQuaternion;
 
       // Retarget the bone by aligning the source and target child bones
-      else if (factory->retargetMode == CS::Animation::RETARGET_ALIGN_BONES)
+      else
 	targetQuaternion = *alignRotations[targetBoneID] * targetAbsQuaternion.GetConjugate ()
 	  * sourceAbsQuaternion * sourceBoneQuaternion.GetConjugate ()
 	  * childState.GetQuaternion (sourceBoneID)
 	  * sourceBoneQuaternion * sourceAbsQuaternion.GetConjugate ()
 	  * targetAbsQuaternion;
 
-      // TODO: blend weight
+      // Apply the new bone transform
       state->SetBoneUsed (targetBoneID);
-      //state->GetQuaternion (targetBoneID) = targetQuaternion;
       state->GetQuaternion (targetBoneID) = state->GetQuaternion (targetBoneID).SLerp
 	(targetBoneQuaternion * targetQuaternion * targetBoneQuaternion.GetConjugate (), baseWeight);
       state->GetVector (targetBoneID) = csLerp (state->GetVector (targetBoneID),

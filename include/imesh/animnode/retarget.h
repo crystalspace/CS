@@ -53,6 +53,13 @@ struct BoneMapping
     targetBones.PutUnique (targetBone, sourceBone);
   }
 
+  /// Remove a mapping between the given bones
+  void RemoveMapping (CS::Animation::BoneID sourceBone, CS::Animation::BoneID targetBone)
+  {
+    sourceBones.DeleteAll (sourceBone);
+    targetBones.DeleteAll (targetBone);
+  }
+
   /// Get the corresponding bone on the source skeleton
   CS::Animation::BoneID GetSourceBone (CS::Animation::BoneID bone)
   {
@@ -70,6 +77,30 @@ struct BoneMapping
 
     return *sourceBones.GetElementPointer (bone);
   }
+
+  void DebugPrint (CS::Animation::iSkeletonFactory* sourceSkeleton,
+		   CS::Animation::iSkeletonFactory* targetSkeleton) const
+  {
+    csPrintf ("Bone mapping:\n");
+
+    for (csHash<CS::Animation::BoneID, CS::Animation::BoneID>::ConstGlobalIterator it =
+	   sourceBones.GetIterator (); it.HasNext (); )
+    {
+      csTuple2<CS::Animation::BoneID, CS::Animation::BoneID> tuple = it.NextTuple ();
+
+      csPrintf ("source bone %zu", tuple.second);
+      if (sourceSkeleton->HasBone (tuple.second))
+	csPrintf (" ('%s') to target bone %zu (", sourceSkeleton->GetBoneName (tuple.second), tuple.first);
+      else
+	csPrintf ("(invalid) to target bone %zu (", tuple.first);
+      if (targetSkeleton->HasBone (tuple.first))
+	csPrintf ("'%s')\n", targetSkeleton->GetBoneName (tuple.first));
+      else
+	csPrintf ("invalid)\n");
+    }
+
+    csPrintf ("End of bone mapping:\n");
+  };
 
 private:
   csHash<CS::Animation::BoneID, CS::Animation::BoneID> sourceBones;
@@ -126,27 +157,20 @@ struct iSkeletonRetargetNodeManager : public virtual iBase
 };
 
 /**
- * The mode of animation retargeting
- * \sa CS::Animation::iSkeletonRetargetNodeFactory
- */
-enum RetargetMode
-{
-  RETARGET_NAIVE = 0,     /*!< The retargeting mode is a naive application of the bone rotation.
-			    This mode does not work very well but is the most easier to use. */
-  RETARGET_ALIGN_BONES    /*!< The retargeting mode is made by trying to align the bones of the skeletons.
-			    In order to work effectively, this mode needs to use the definition
-			    of body chains covering the skeleton bones as most as possible. See
-			    CS::Animation::iSkeletonRetargetNodeFactory::AddBodyChain() for more
-			    information.*/
-};
-
-/**
  * Factory for the 'Retarget' animation node. This animation node can retarget an animation from
  * one skeleton to another. It is useful for example to import motion capture data into your animesh.
  *
- * To work properly, this animation node needs a bone mapping (see SetBoneMapping()), and it may also
- * need to define body chains (see AddBodyChain()) if you want to use the more advanced retargeting mode
- * CS::Animation::RETARGET_ALIGN_BONES (see SetRetargetMode()).
+ * This node works by simply copying the rotation and position of the bones from the source to the
+ * target skeleton, after having converted the transformations from one space to another. This works
+ * effectively only if the two skeletons have a similar topology and default pose.
+ *
+ * To overcome the problem of a different default pose, this node has the ability to align the bones
+ * in world space instead of naively copying the applied rotation. To use this more advanced mode,
+ * you need to define some more semantic about the structure of the skeleton, this is made through
+ * the AddBodyChain()/RemoveBodyChain() methods.
+ *
+ * In all cases, this node will only be able to retarget the animations of the bones covered by the
+ * bone mapping provided by the user (see SetBoneMapping()).
  */
 struct iSkeletonRetargetNodeFactory : public iSkeletonAnimNodeFactory
 {
@@ -179,9 +203,11 @@ struct iSkeletonRetargetNodeFactory : public iSkeletonAnimNodeFactory
 
   /**
    * Add a body chain indicating a main structure that can be retargeted from one skeleton
-   * to another. This body chain can hold only one child bone for each bone of the chain.
-   * This method is only useful if you use CS::Animation::RETARGET_ALIGN_BONES
-   * (see SetRetargetMode()).
+   * to another. The bones from this chain will be aligned in world space instead of
+   * simply copied from the source skeleton.
+   *
+   * The given body chain can hold only one child bone for each bone of the chain
+   * (it is therefore effectively a chain, not a tree).
    */
   virtual void AddBodyChain (CS::Animation::iBodyChain* chain) = 0;
 
@@ -190,16 +216,6 @@ struct iSkeletonRetargetNodeFactory : public iSkeletonAnimNodeFactory
    * to another.
    */
   virtual void RemoveBodyChain (CS::Animation::iBodyChain* chain) = 0;
-
-  /**
-   * Set the retargeting mode to be used. The default value is CS::Animation::RETARGET_NAIVE.
-   */
-  virtual void SetRetargetMode (CS::Animation::RetargetMode mode) = 0;
-
-  /**
-   * Get the retargeting mode to be used
-   */
-  virtual CS::Animation::RetargetMode GetRetargetMode () const = 0;
 };
 
 /**
