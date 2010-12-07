@@ -50,14 +50,16 @@ MocapViewer::MocapViewer ()
 		     " -targetname options for that. The results will depend on the actual similitudes between the"
 		     " two skeletons.\n\n"
 		     "A mask can be defined to select the bones that are displayed. A simple way to populate the "
-		     "bone mask is by defining a bone chain.  A bone chain is defined by a root bone (option "
+		     "bone mask is by defining a bone chain. A bone chain is defined by a root bone (option "
 		     "-rootmask), then the user can add either all children and sub-children of the root bone (option"
-		     " -childall), either all bones on the way to a given child bone (option -childmask). Some"
+		     " -childall), either all bones on the way to a given child bone (option -childmask). Only one bone"
+		     " chain can be defined, but the -childmask option can be used additively. Some"
 		     " specific bones can be added and removed by using the -bone and -nobone options. If the only bone"
 		     " option provided is the empty -nobone option, then no bones at all will be displayed.\n\n"
-		     "This viewer can also be used to display Point Light Displays and record automatically"
-		     " videos with these data (e.g. for a psychology study on motion perception).\n\n"
-		     "The Point Light display can be perturbated by adding noise points animated by a Perlin"
+		     "This viewer can also be used as a Point Light Display system, and is able to record automatically"
+		     " videos with these data. This system has been designed as a base tool for a psychology study on "
+		     "the human perception of the motion.\n\n"
+		     "The Point Light Display can be perturbated by adding noise points animated by a Perlin"
 		     " noise. The behavior of the motion of these noise points can be tweaked by several"
 		     " parameters. See http://libnoise.sourceforge.net/docs/classnoise_1_1module_1_1Perlin.html"
 		     " for more information on these parameters.\n\n"
@@ -101,6 +103,8 @@ MocapViewer::MocapViewer ()
   commandLineHelper.AddCommandLineOption
     ("bone=<string>", "Add a bone to be displayed by its name");
   commandLineHelper.AddCommandLineOption
+    ("nobone", "Don't display any bone at all");
+  commandLineHelper.AddCommandLineOption
     ("nobone=<string>", "Remove a bone to be displayed by its name");
   commandLineHelper.AddCommandLineOption
     ("record", "Record the session in a video file, then exit");
@@ -118,7 +122,6 @@ MocapViewer::MocapViewer ()
     ("nlacunarity=<float>", "Set the lacunarity of the noise. Value is suggested to be between 1.5 and 3.5. Default value is 2.0");
   commandLineHelper.AddCommandLineOption
     ("npersistence=<float>", "Set the persistence of the noise. Value is suggested to be between 0.0 and 1.0. Default value is 0.5");
-  // TODO: animation save
 }
 
 MocapViewer::~MocapViewer ()
@@ -304,7 +307,7 @@ bool MocapViewer::CreateAvatar ()
     globalScale = fvalue;
 
   // Parse the BVH file
-  CS::Animation::BVHMocapParser mocapParser (GetObjectRegistry (), vfs);
+  CS::Animation::BVHMocapParser mocapParser (GetObjectRegistry ());
   if (!mocapParser.SetRessourceFile (mocapFilename.GetData ()))
     return false;
 
@@ -373,8 +376,7 @@ bool MocapViewer::CreateAvatar ()
     parsingResult.skeletonFactory->SetAutoStart (false);
 
   // Load the iSkeletonManager plugin
-  csRef<iPluginManager> plugmgr = 
-    csQueryRegistry<iPluginManager> (object_reg);
+  csRef<iPluginManager> plugmgr = csQueryRegistry<iPluginManager> (GetObjectRegistry ());
   csRef<CS::Animation::iSkeletonManager> skeletonManager =
     csLoadPlugin<CS::Animation::iSkeletonManager> (plugmgr, "crystalspace.skeletalanimation");
   if (!skeletonManager)
@@ -709,8 +711,6 @@ bool MocapViewer::CreateAvatar ()
 	("right_leg", animeshFactory->GetSkeletonFactory ()->FindBone ("RightUpLeg"));
       bodyChain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("RightToeBase"));
       retargetNodeFactory->AddBodyChain (bodyChain);
-
-      retargetNodeFactory->SetRetargetMode (CS::Animation::RETARGET_ALIGN_BONES);
     }
 
     // Create the playback animation node of the motion captured data
