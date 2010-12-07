@@ -128,8 +128,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual float GetDuration () const;
 
     virtual void SetFramesInBindSpace (bool isBindSpace);
-
     virtual bool GetFramesInBindSpace () const;
+    virtual void ConvertFrameSpace (CS::Animation::iSkeletonFactory* skeleton);
 
   private:
     csString name;

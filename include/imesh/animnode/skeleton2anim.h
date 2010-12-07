@@ -229,7 +229,7 @@ struct iSkeletonAnimPacket : public virtual iBase
  */
 struct iSkeletonAnimation : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonAnimation, 2, 0, 2);
+  SCF_INTERFACE(CS::Animation::iSkeletonAnimation, 2, 0, 3);
 
   /**
    * Get the name of the animation.
@@ -330,6 +330,7 @@ struct iSkeletonAnimation : public virtual iBase
    * but it is more efficient to introduce them directly in bind space.
    * \param isBindSpace True if the data are in bind space, false if they
    * are in bone space.
+   * \sa ConvertFrameSpace()
    */
   virtual void SetFramesInBindSpace (bool isBindSpace) = 0;
 
@@ -340,6 +341,12 @@ struct iSkeletonAnimation : public virtual iBase
    * space.
    */
   virtual bool GetFramesInBindSpace () const = 0;
+
+  /**
+   * Convert the frames from bone space to bind space if needed. GetFramesInBindSpace() will
+   * now return true.
+   */
+  virtual void ConvertFrameSpace (CS::Animation::iSkeletonFactory* skeleton) = 0;
 
   /**
    * Get the count of channels in this animation.

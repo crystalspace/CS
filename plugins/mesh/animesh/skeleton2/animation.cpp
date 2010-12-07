@@ -412,6 +412,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return isBindSpace;
   }
 
+  void Animation::ConvertFrameSpace (CS::Animation::iSkeletonFactory* skeleton)
+  {
+    if (isBindSpace)
+      return;
+
+    for (size_t ch = 0; ch < channels.GetSize (); ch++)
+    {
+      AnimationChannel* channel = channels[ch];
+
+      // Get the bind transform of the bone
+      csQuaternion skeletonRotation;
+      csVector3 skeletonOffset;
+      skeleton->GetTransformBoneSpace (channel->bone, skeletonRotation, skeletonOffset);
+
+      // Convert each keyframe for this bone
+      for (size_t keyframe = 0; keyframe < channel->keyFrames.GetSize (); keyframe++)
+      {
+	KeyFrame& keyFrame = channel->keyFrames[keyframe];
+	keyFrame.rotation = keyFrame.rotation * skeletonRotation.GetConjugate ();
+	keyFrame.offset = keyFrame.offset - skeletonOffset;
+      }
+    }
+
+    isBindSpace = true;
+  }
+
   int Animation::KeyFrameCompare (KeyFrame const& k1, KeyFrame const& k2)
   {
     return csComparator<float, float>::Compare (k1.time, k2.time);    
