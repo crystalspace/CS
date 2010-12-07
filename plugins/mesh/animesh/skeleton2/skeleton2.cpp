@@ -29,6 +29,9 @@
 #include "imesh/object.h"
 #include "iengine/mesh.h"
 
+#define MINIMUM_UPDATE_DELAY 1.0f / 50.0f
+#define MAXIMUM_UPDATE_FRAMES 5
+
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 {
   SCF_IMPLEMENT_FACTORY(SkeletonSystem)
@@ -389,7 +392,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   Skeleton::Skeleton (SkeletonFactory* factory)
     : scfImplementationType (this, factory), factory (factory), 
-    cachedTransformsDirty (true), version (0), animesh (nullptr)
+    cachedTransformsDirty (true), version (0), animesh (nullptr), accumulatedTime (0.0f),
+    accumulatedFrames (0)
   {
     // Setup the bones from the parent setup
     RecreateSkeletonP ();
@@ -650,8 +654,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     // If the root node is active then update the skeleton
     if (rootNode->IsActive ())
     {
+      // Check if we waited long enough since the last update
+      accumulatedTime += dt;
+      accumulatedFrames++;
+      if (accumulatedTime < MINIMUM_UPDATE_DELAY
+	  && accumulatedFrames < MAXIMUM_UPDATE_FRAMES)
+	return;
+
       // Update the root node
-      rootNode->TickAnimation (dt);
+      rootNode->TickAnimation (accumulatedTime);
+      accumulatedTime = 0.0f;
+      accumulatedFrames = 0;
 
       // TODO: Use a pool for these...
       csRef<CS::Animation::csSkeletalState> finalState;
@@ -662,6 +675,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       rootNode->BlendState (finalState);
 
       // Apply the skeleton state
+      bool changed = false;
       for (size_t i = 0; i < allBones.GetSize (); ++i)
       {
         Bone& boneRef = allBones[i];
@@ -669,6 +683,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 	// Apply the bone state
         if (boneRef.created && finalState->IsBoneUsed ((CS::Animation::BoneID) i))
         {
+	  changed = true;
+
 	  csQuaternion skeletonRotation;
 	  csVector3 skeletonOffset;
 	  factory->GetTransformBoneSpace ((CS::Animation::BoneID) i, skeletonRotation,
@@ -685,12 +701,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
             boneRef.boneRotation = q * skeletonRotation;
 
           boneRef.boneOffset = finalState->GetVector (i) + skeletonOffset;
-
-          cachedTransformsDirty = true;
         }
       }
       
-      version++;      
+      if (changed)
+      {
+	cachedTransformsDirty = true;
+	version++;
+      }
     }
   }
 
