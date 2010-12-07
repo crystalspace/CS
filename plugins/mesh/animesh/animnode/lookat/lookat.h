@@ -49,8 +49,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     LookAtNodeManager (iBase* parent);
 
     //-- CS::Animation::iSkeletonLookAtNodeManager
-    virtual CS::Animation::iSkeletonLookAtNodeFactory* CreateAnimNodeFactory (const char *name,
-							   CS::Animation::iBodySkeleton* skeleton);
+    virtual CS::Animation::iSkeletonLookAtNodeFactory* CreateAnimNodeFactory (const char *name);
 
     virtual CS::Animation::iSkeletonLookAtNodeFactory* FindAnimNodeFactory (const char* name) const;
     virtual void ClearAnimNodeFactories ();
@@ -74,10 +73,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
   public:
     CS_LEAKGUARD_DECLARE(LookAtAnimNodeFactory);
 
-    LookAtAnimNodeFactory (LookAtNodeManager* manager, const char *name,
-			   CS::Animation::iBodySkeleton* skeleton);
+    LookAtAnimNodeFactory (LookAtNodeManager* manager, const char *name);
 
     //-- CS::Animation::iSkeletonLookAtNodeFactory
+    virtual void SetBodySkeleton (CS::Animation::iBodySkeleton* skeleton);
+    virtual void SetBone (CS::Animation::BoneID boneID);
+    virtual void SetMaximumSpeed (float speed);
+    virtual void SetAlwaysRotate (bool alwaysRotate);
+    virtual void SetListenerDelay (float delay);
     virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* node);
     virtual CS::Animation::iSkeletonAnimNodeFactory* GetChildNode ();
     virtual void ClearChildNode ();
@@ -95,6 +98,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     csString name;
     csRef<CS::Animation::iBodySkeleton> skeleton;
     csRef<CS::Animation::iSkeletonAnimNodeFactory> childNode;
+    CS::Animation::BoneID boneID;
+    csRef<CS::Animation::iBodyBoneJoint> bodyJoint;
+    float maximumSpeed;
+    bool alwaysRotate;
+    float listenerMinimumDelay;
   };
 
   class LookAtAnimNode : public scfImplementation2<LookAtAnimNode, 
@@ -107,17 +115,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 		    CS::Animation::iSkeletonAnimNode* childNode);
 
     //-- CS::Animation::iSkeletonLookAtNode
-    virtual void SetBone (CS::Animation::BoneID boneID);
-
     virtual void SetTarget (csVector3 target);
     virtual void SetTarget (iMovable* target, const csVector3& offset);
     virtual void SetTarget (iCamera* target, const csVector3& offset);
     virtual void RemoveTarget ();
   
-    virtual void SetMaximumSpeed (float speed);
-    virtual void SetAlwaysRotate (bool alwaysRotate);
-
-    virtual void SetListenerDelay (float delay);
     virtual void AddListener (CS::Animation::iSkeletonLookAtListener* listener);
     virtual void RemoveListener (CS::Animation::iSkeletonLookAtListener* listener);
 
@@ -145,11 +147,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 
   private:
     LookAtAnimNodeFactory* factory;
-    csWeakRef<iSceneNode> sceneNode;
     csWeakRef<CS::Animation::iSkeleton> skeleton;
     csRef<CS::Animation::iSkeletonAnimNode> childNode;
-    CS::Animation::BoneID boneID;
-    csRef<CS::Animation::iBodyBoneJoint> bodyJoint;
     char targetMode;
     char trackingStatus;
     csVector3 targetPosition;
@@ -157,13 +156,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     csRef<iCamera> targetCamera;
     csVector3 targetOffset;
     bool isPlaying;
-    float maximumSpeed;
-    bool alwaysRotate;
     float frameDuration;
     float previousPitch, previousYaw, previousRoll;
     bool trackingInitialized;
     char listenerStatus;
-    float listenerMinimumDelay;
     float listenerDelay;
     csRefArray<CS::Animation::iSkeletonLookAtListener> listeners;
   };

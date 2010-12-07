@@ -23,16 +23,16 @@
 #include "csutil/scf.h"
 
 #include "lookat.h"
-#include <ivaria/reporter.h>
-#include <imesh/bodymesh.h>
-#include <csgeom/transfrm.h>
-#include <iengine/scenenode.h>
-#include <iengine/movable.h>
-#include <iengine/camera.h>
-#include <iengine/mesh.h>
-#include <imesh/animesh.h>
-#include <imesh/object.h>
-#include <imesh/bodymesh.h>
+#include "ivaria/reporter.h"
+#include "imesh/bodymesh.h"
+#include "csgeom/transfrm.h"
+#include "iengine/scenenode.h"
+#include "iengine/movable.h"
+#include "iengine/camera.h"
+#include "iengine/mesh.h"
+#include "imesh/animesh.h"
+#include "imesh/object.h"
+#include "imesh/bodymesh.h"
 
 #define TARGET_NONE 1
 #define TARGET_POSITION 2
@@ -60,11 +60,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
   {
   }
 
-  CS::Animation::iSkeletonLookAtNodeFactory* LookAtNodeManager::CreateAnimNodeFactory
-    (const char *name, CS::Animation::iBodySkeleton* skeleton)
+  CS::Animation::iSkeletonLookAtNodeFactory* LookAtNodeManager::CreateAnimNodeFactory (const char *name)
   {
     csRef<CS::Animation::iSkeletonLookAtNodeFactory> newFact;
-    newFact.AttachNew (new LookAtAnimNodeFactory (this, name, skeleton));
+    newFact.AttachNew (new LookAtAnimNodeFactory (this, name));
 
     return factoryHash.PutUnique (name, newFact);
   }
@@ -109,12 +108,51 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 
   CS_LEAKGUARD_IMPLEMENT(LookAtAnimNodeFactory);
 
-  LookAtAnimNodeFactory::LookAtAnimNodeFactory (LookAtNodeManager* manager,
-						const char *name,
-						CS::Animation::iBodySkeleton* skeleton)
+  LookAtAnimNodeFactory::LookAtAnimNodeFactory (LookAtNodeManager* manager, const char *name)
     : scfImplementationType (this), manager (manager), name (name),
-    skeleton (skeleton)
+    boneID (CS::Animation::InvalidBoneID), maximumSpeed (PI), alwaysRotate (false),
+    listenerMinimumDelay (0.1f)
   {
+  }
+
+  void LookAtAnimNodeFactory::SetBodySkeleton (CS::Animation::iBodySkeleton* skeleton)
+  {
+    this->skeleton = skeleton;
+  }
+
+  void LookAtAnimNodeFactory::SetBone (CS::Animation::BoneID boneID)
+  {
+    CS_ASSERT (boneID != CS::Animation::InvalidBoneID
+	       );//&& skeleton->GetFactory ()->HasBone (boneID));
+
+    this->boneID = boneID;
+
+    // check for a CS::Animation::iBodyBoneJoint
+    if (skeleton)
+    {
+      CS::Animation::iBodyBone* bodyBone = skeleton->FindBodyBone (boneID);
+      if (bodyBone)
+	bodyJoint = bodyBone->GetBoneJoint ();
+      else
+	bodyJoint = 0;
+    }
+  }
+
+  void LookAtAnimNodeFactory::SetMaximumSpeed (float speed)
+  {
+    CS_ASSERT (speed >= 0.0f);
+    maximumSpeed = speed;
+  }
+
+  void LookAtAnimNodeFactory::SetAlwaysRotate (bool alwaysRotate)
+  {
+    this->alwaysRotate = alwaysRotate;
+  }
+
+  void LookAtAnimNodeFactory::SetListenerDelay (float delay)
+  {
+    CS_ASSERT (delay >= 0.0f);
+    listenerMinimumDelay = delay;
   }
 
   void LookAtAnimNodeFactory::SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* node)
@@ -170,38 +208,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
   LookAtAnimNode::LookAtAnimNode (LookAtAnimNodeFactory* factory, 
 				  CS::Animation::iSkeleton* skeleton,
 				  CS::Animation::iSkeletonAnimNode* childNode)
-    : scfImplementationType (this), factory (factory), sceneNode (nullptr), skeleton (skeleton),
-    childNode (childNode), boneID (CS::Animation::InvalidBoneID), targetMode (TARGET_NONE),
-    isPlaying (false), maximumSpeed (PI), alwaysRotate (false),
-    trackingInitialized (true), listenerMinimumDelay (0.1f)
+    : scfImplementationType (this), factory (factory), skeleton (skeleton),
+    childNode (childNode), targetMode (TARGET_NONE),
+    isPlaying (false), trackingInitialized (true)    
   {
-  }
-
-  void LookAtAnimNode::SetBone (CS::Animation::BoneID boneID)
-  {
-    CS_ASSERT (boneID != CS::Animation::InvalidBoneID
-	       && skeleton
-	       && skeleton->GetFactory ()->HasBone (boneID));
-
-    // call listeners
-    if (listenerStatus == STATUS_TARGET_REACHED)
-      for (size_t i = 0; i < listeners.GetSize (); i++)
-	listeners[i]->TargetLost ();
-
-    // update data
-    this->boneID = boneID;
-    trackingStatus = STATUS_HEADING_TARGET;
-    listenerStatus = STATUS_HEADING_TARGET;
-
-    // check for a CS::Animation::iBodyBoneJoint
-    if (factory->skeleton)
-    {
-      CS::Animation::iBodyBone* bodyBone = factory->skeleton->FindBodyBone (boneID);
-      if (bodyBone)
-	bodyJoint = bodyBone->GetBoneJoint ();
-      else
-	bodyJoint = 0;
-    }
   }
 
   void LookAtAnimNode::SetTarget (csVector3 target)
@@ -281,23 +291,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     listenerStatus = STATUS_HEADING_BASE;
   }
 
-  void LookAtAnimNode::SetMaximumSpeed (float speed)
-  {
-    CS_ASSERT (speed >= 0.0f);
-    maximumSpeed = speed;
-  }
-
-  void LookAtAnimNode::SetAlwaysRotate (bool alwaysRotate)
-  {
-    this->alwaysRotate = alwaysRotate;
-  }
-
-  void LookAtAnimNode::SetListenerDelay (float delay)
-  {
-    CS_ASSERT (delay >= 0.0f);
-    listenerMinimumDelay = delay;
-  }
-
   void LookAtAnimNode::AddListener (CS::Animation::iSkeletonLookAtListener* listener)
   {
     listeners.PushSmart (listener);
@@ -310,14 +303,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 
   void LookAtAnimNode::Play ()
   {
-    CS_ASSERT (boneID != CS::Animation::InvalidBoneID
-	       && skeleton->GetSceneNode ());
+    CS_ASSERT (factory->boneID != CS::Animation::InvalidBoneID);
 
     if (isPlaying)
       return;
-
-    if (!sceneNode)
-      sceneNode = skeleton->GetSceneNode ();
 
     // init tracking
     isPlaying = true;
@@ -411,8 +400,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     }
 
     // compute parent bone transform
-    CS::Animation::BoneID parentBoneID = skeleton->GetFactory ()->GetBoneParent (boneID);
-    csOrthoTransform parentTransform (sceneNode->GetMovable ()->GetFullTransform ());
+    CS::Animation::BoneID parentBoneID = skeleton->GetFactory ()->GetBoneParent (factory->boneID);
+    csOrthoTransform parentTransform (skeleton->GetSceneNode ()->GetMovable ()->GetFullTransform ());
 
     if (parentBoneID != CS::Animation::InvalidBoneID)
     {
@@ -426,17 +415,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     // Get the bind transform of the bone
     csQuaternion skeletonRotation;
     csVector3 skeletonOffset;
-    skeleton->GetFactory ()->GetTransformBoneSpace (boneID, skeletonRotation,
+    skeleton->GetFactory ()->GetTransformBoneSpace (factory->boneID, skeletonRotation,
 						    skeletonOffset);
 
     // check if a child bone has already set this bone
-    bool transformAlreadySet = state->IsBoneUsed (boneID);
+    bool transformAlreadySet = state->IsBoneUsed (factory->boneID);
 
     // compute current transform of bone
     // (don't change position if a child node has already made it)
     csOrthoTransform boneTransform (csMatrix3 (skeletonRotation),
 				    transformAlreadySet ?
-				    state->GetVector (boneID) : skeletonOffset);
+				    state->GetVector (factory->boneID) : skeletonOffset);
     boneTransform = boneTransform * parentTransform;
 
     // compute target position
@@ -480,14 +469,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 	targetYaw = PI - targetYaw;
 
       // constrain angles from bodymesh data
-      if (bodyJoint)
+      if (factory->bodyJoint)
       {
 	// TODO: use spherical ellipsoid constraints
-	csVector3 minimumAngle = bodyJoint->GetMinimumAngle ();
-	csVector3 maximumAngle = bodyJoint->GetMaximumAngle ();
+	csVector3 minimumAngle = factory->bodyJoint->GetMinimumAngle ();
+	csVector3 maximumAngle = factory->bodyJoint->GetMaximumAngle ();
 
 	// constrain X axis
-	if (bodyJoint->IsXRotConstrained ())
+	if (factory->bodyJoint->IsXRotConstrained ())
 	{
 	  if (targetPitch != 0.0f)
 	    wasConstrained = true;
@@ -508,7 +497,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 	}
 
 	// constrain Y axis
-	if (bodyJoint->IsYRotConstrained ())
+	if (factory->bodyJoint->IsYRotConstrained ())
 	{
 	  if (targetYaw != 0.0f)
 	    wasConstrained = true;
@@ -543,7 +532,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 
       // 'always rotate' contraint
       if (wasConstrained
-	  && !alwaysRotate)
+	  && !factory->alwaysRotate)
 	trackingStatus = STATUS_HEADING_BASE;
       else
 	trackingStatus = STATUS_HEADING_TARGET;
@@ -557,7 +546,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
       if (transformAlreadySet)
       {
 	csQuaternion quaternion = skeletonRotation.GetConjugate ()
-	  * state->GetQuaternion (boneID) * skeletonRotation;
+	  * state->GetQuaternion (factory->boneID) * skeletonRotation;
 	csVector3 eulerAngles = quaternion.GetEulerAngles ();
 	targetPitch = eulerAngles.x;
 	targetYaw = eulerAngles.y;
@@ -584,7 +573,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     // (don't constraint if the child anim must simply be played)
     if (trackingStatus != STATUS_BASE_REACHED)
     {
-      if (maximumSpeed > 0.0f)
+      if (factory->maximumSpeed > SMALL_EPSILON)
       {
 	// TODO: find shortest and non-blocked path to the target
 	float deltaPitch = targetPitch - previousPitch;
@@ -598,9 +587,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 	  / frameDuration;
 
 	// apply constraint
-	if (currentSpeed > maximumSpeed)
+	if (currentSpeed > factory->maximumSpeed)
 	{
-	  float ratio = maximumSpeed / currentSpeed;
+	  float ratio = factory->maximumSpeed / currentSpeed;
 	  targetPitch = previousPitch + deltaPitch * ratio;
 	  targetYaw = previousYaw + deltaYaw * ratio;
 	  targetRoll = previousRoll + deltaRoll * ratio;
@@ -647,16 +636,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     // apply new transform
     if (!transformAlreadySet)
     {
-      state->SetBoneUsed (boneID);
-      state->GetVector (boneID) = csVector3 (0.0f);
+      state->SetBoneUsed (factory->boneID);
+      state->GetVector (factory->boneID) = csVector3 (0.0f);
     }
-    state->GetQuaternion (boneID) = newQuaternion;
+    state->GetQuaternion (factory->boneID) = newQuaternion;
 
     // call listeners
     if (listenerStatus == STATUS_TARGET_REACHED
 	&& trackingStatus != STATUS_TARGET_REACHED)
     {
-      if (listenerDelay > listenerMinimumDelay)
+      if (listenerDelay > factory->listenerMinimumDelay)
       {
 	for (size_t i = 0; i < listeners.GetSize (); i++)
 	  listeners[i]->TargetLost ();
