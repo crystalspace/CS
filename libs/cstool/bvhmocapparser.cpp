@@ -21,8 +21,8 @@
 
 #include "cssysdef.h"
 #include "csgeom/matrix3.h"
-#include "csutil/plugmgr.h"
 #include "imesh/animnode/skeleton2anim.h"
+#include "iutil/plugin.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "cstool/mocapparser.h"
@@ -69,14 +69,34 @@ bool ParseWord (const char* txt, char* buf, int& start)
   return found;
 }
 
-CS::Animation::BVHMocapParser::BVHMocapParser (iObjectRegistry* object_reg, iVFS* vfs)
-  : object_reg (object_reg), vfs (vfs), startFrame (0), endFrame (0), globalScale (0.01f),
+CS::Animation::BVHMocapParser::BVHMocapParser (iObjectRegistry* object_reg)
+  : object_reg (object_reg), startFrame (0), endFrame (0), globalScale (0.01f),
     endSitesAdded (true)
 {
+  vfs = csQueryRegistry<iVFS> (object_reg);
+  if (!vfs) Report (CS_REPORTER_SEVERITY_ERROR, "Failed to locate Virtual File System!");
+}
+
+void CS::Animation::BVHMocapParser::SetPacketName (const char* name)
+{
+  packetName = name;
+}
+
+void CS::Animation::BVHMocapParser::SetSkeletonName (const char* name)
+{
+  skeletonName = name;
+}
+
+void CS::Animation::BVHMocapParser::SetAnimationName (const char* name)
+{
+  animationName = name;
 }
 
 bool CS::Animation::BVHMocapParser::SetRessourceFile (const char* filename)
 {
+  if (!vfs)
+    return false;
+
   this->filename = filename;
 
   if (!vfs->Exists (this->filename.GetData ()))
@@ -132,13 +152,16 @@ CS::Animation::MocapParserResult CS::Animation::BVHMocapParser::ParseData ()
   char buf[256];
   csString buffer;
   size_t textSize;
-  csRef<iPluginManager> plugmgr;
   csRef<CS::Animation::iSkeletonManager> skeletonManager;
   endSitesCount = 0;
   sampleBone = CS::Animation::InvalidBoneID;
+  csRef<iFile> file;
+
+  if (!vfs)
+    goto parsing_failed;
 
   // Open the ressource file
-  csRef<iFile> file = vfs->Open (filenameVFS.GetData (), VFS_FILE_READ);
+  file = vfs->Open (filenameVFS.GetData (), VFS_FILE_READ);
   if (!file)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not open file %s",
@@ -155,9 +178,8 @@ CS::Animation::MocapParserResult CS::Animation::BVHMocapParser::ParseData ()
   }
 
   // Load the iSkeletonManager plugin
-  plugmgr = csQueryRegistry<iPluginManager> (object_reg);
-  skeletonManager = csLoadPlugin<CS::Animation::iSkeletonManager>
-    (plugmgr, "crystalspace.skeletalanimation");
+  skeletonManager = csQueryRegistryOrLoad<CS::Animation::iSkeletonManager>
+    (object_reg, "crystalspace.skeletalanimation");
   if (!skeletonManager)
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
@@ -166,13 +188,36 @@ CS::Animation::MocapParserResult CS::Animation::BVHMocapParser::ParseData ()
   }
 
   // Create the animation packet, the skeleton factory and the animation
+  if (packetName == "")
+    packetName = filename + "_packet";
+  if (skeletonName == "")
+    skeletonName = filename + "_skel";
+  if (animationName == "")
+    animationName = filename + "_anim";
+
   result.animPacketFactory =
-    skeletonManager->CreateAnimPacketFactory ((filename + "_packet").GetData ());
+    skeletonManager->CreateAnimPacketFactory (packetName.GetData ());
+  if (!result.animPacketFactory)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR,
+	    "Could not create animation packet '%s', an another packet with the same name exists probably already",
+	    packetName.GetData ());
+    goto parsing_failed;
+  }
+
   result.skeletonFactory = 
-    skeletonManager->CreateSkeletonFactory ((filename + "_skelfact").GetData ());
+    skeletonManager->CreateSkeletonFactory (skeletonName.GetData ());
+  if (!result.skeletonFactory)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR,
+	    "Could not create skeleton '%s', an another skeleton with the same name exists probably already",
+	    skeletonName.GetData ());
+    goto parsing_failed;
+  }
   result.skeletonFactory->SetAnimationPacket (result.animPacketFactory);
+
   animation = 
-    result.animPacketFactory->CreateAnimation ((filename + "_anim").GetData ());
+    result.animPacketFactory->CreateAnimation (animationName.GetData ());
 
   // Parse the skeleton
   totalChannelCount = 0;
@@ -234,6 +279,9 @@ CS::Animation::MocapParserResult CS::Animation::BVHMocapParser::ParseData ()
   if (currentFrame != frameCount)
     Report (CS_REPORTER_SEVERITY_WARNING,
 	    "Malformed BVH file: not as many frames as announced");
+
+  // Convert the frame space of the animation
+  animation->ConvertFrameSpace (result.skeletonFactory);
 
   // Validate the results
   result.result = true;

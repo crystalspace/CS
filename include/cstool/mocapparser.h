@@ -30,13 +30,10 @@
 #include "csutil/csstring.h"
 #include "imesh/skeleton2.h"
 #include "imesh/animnode/skeleton2anim.h"
-
-struct iVFS;
+#include "iutil/vfs.h"
 
 namespace CS {
 namespace Animation {
-
-struct iSkeletonFactory;
 
 /**
  * Return structure for CS::Animation::MocapParser::ParseData()
@@ -50,10 +47,10 @@ struct MocapParserResult
    * The newly created animation packet factory, if the parsing is successful, nullptr otherwise.
    * This animation packet will contain the animations imported from the parsing.
    */
-  csRef<CS::Animation::iSkeletonAnimPacketFactory> animPacketFactory;
+  CS::Animation::iSkeletonAnimPacketFactory* animPacketFactory;
 
   /// The newly created skeleton factory, if the parsing is successful, nullptr otherwise
-  csRef<CS::Animation::iSkeletonFactory> skeletonFactory;
+  CS::Animation::iSkeletonFactory* skeletonFactory;
 
   /// The count of animation frames that have been imported
   size_t frameCount;
@@ -71,6 +68,24 @@ struct MocapParserResult
 class CS_CRYSTALSPACE_EXPORT MocapParser
 {
 public:
+  /**
+   * Set the name of the animation packet that will be created. The default value is the
+   * name of the ressource file plus "_packet".
+   */
+  virtual void SetPacketName (const char* name) = 0;
+
+  /**
+   * Set the name of the skeleton that will be created. The default value is the
+   * name of the ressource file plus "_skel".
+   */
+  virtual void SetSkeletonName (const char* name) = 0;
+
+  /**
+   * Set the name of the animation that will be created. The default value is the
+   * name of the ressource file plus "_anim".
+   */
+  virtual void SetAnimationName (const char* name) = 0;
+
   /**
    * Set the VFS path of the ressource file containing the motion capture data. You may have
    * to add more than one ressource depending on the motion capture file format.
@@ -107,9 +122,27 @@ class CS_CRYSTALSPACE_EXPORT BVHMocapParser : public MocapParser
 {
 public:
   /// Constructor
-  BVHMocapParser (iObjectRegistry* object_reg, iVFS* vfs);
+  BVHMocapParser (iObjectRegistry* object_reg);
 
   virtual ~BVHMocapParser () { }
+
+  /**
+   * Set the name of the animation packet that will be created. The default value is the
+   * name of the ressource file plus "_packet".
+   */
+  virtual void SetPacketName (const char* name);
+
+  /**
+   * Set the name of the skeleton that will be created. The default value is the
+   * name of the ressource file plus "_skel".
+   */
+  virtual void SetSkeletonName (const char* name);
+
+  /**
+   * Set the name of the animation that will be created. The default value is the
+   * name of the ressource file plus "_anim".
+   */
+  virtual void SetAnimationName (const char* name);
 
   /**
    * Set the VFS path of the ressource file containing the motion capture data. For the
@@ -139,6 +172,11 @@ public:
    */
   virtual MocapParserResult ParseData ();
 
+  /**
+   * Set whether or not the "EndSite" leaf bones of the skeleton must be added. This
+   * can be useful in order to have some information on the orientation of the last bone.
+   * The default value is true.
+   */
   virtual void SetEndSitesAdded (bool added);
 
  private:
@@ -151,6 +189,9 @@ public:
 
   iObjectRegistry* object_reg;
   csRef<iVFS> vfs;
+  csString packetName;
+  csString skeletonName;
+  csString animationName;
   csString filename;
   csString filenameVFS;
   csString mountname;
