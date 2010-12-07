@@ -43,6 +43,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   void AnimationFifo::PushAnimation (CS::Animation::iSkeletonAnimNode* node, bool directSwitch,
     float blendInTime, size_t cbData)
   {
+    if (!node)
+      return;
+
     AnimationInstruction newInstr = {node, cbData, blendInTime, directSwitch};
     instructions.Push (newInstr);
 
@@ -82,7 +85,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
           AnimationInstruction& top = instructions.Top ();
 
           const float blendAmount = csClamp (blendTime / top.blendInTime, 1.0f, 0.0f);
-          currentAnimation.node->BlendState (state, baseWeight * (1 - blendAmount));
+          currentAnimation.node->BlendState (state, baseWeight);
           top.node->BlendState (state, baseWeight * blendAmount);
         }        
         else
@@ -107,10 +110,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
           AnimationInstruction& top = instructions.Top ();
 
           if (top.directSwitch ||
-	      currentAnimation.node->GetPlaybackPosition() + dt + top.blendInTime >
-	      currentAnimation.node->GetDuration ())
+	      currentAnimation.node->GetPlaybackPosition ()
+	      + dt * currentAnimation.node->GetPlaybackSpeed ()
+	      + top.blendInTime
+	      > currentAnimation.node->GetDuration ())
           {
-            if (top.blendInTime > 0.0f)
+            if (top.blendInTime > SMALL_EPSILON)
             {
               // Blend
               currentState = STATE_BLENDING;
@@ -144,9 +149,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
         {
           // Blend over, finalize switch
           currentAnimation.node->TickAnimation (dt);
-
-	  if (currentAnimation.node)
-	    currentAnimation.node->Stop ();
+	  currentAnimation.node->Stop ();
           currentAnimation = instructions.PopTop ();
           if (cb)
           {
@@ -162,6 +165,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
           // Tick both
           currentAnimation.node->TickAnimation (dt);
           top.node->TickAnimation (dt);
+	  blendTime += dt;
         }
       }
       break;
@@ -277,9 +281,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     for (size_t i = 0; i < stateList.GetSize (); ++i)
     {
       FSMNode::State newState;
-
-      newState.stateNode = stateList[i].nodeFactory->CreateInstance (packet, skeleton);
-
+      if (stateList[i].nodeFactory)
+	newState.stateNode = stateList[i].nodeFactory->CreateInstance (packet, skeleton);
       newn->stateList.Push (newState);
     }
 
