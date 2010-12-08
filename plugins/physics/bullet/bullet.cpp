@@ -398,6 +398,22 @@ csPtr<iJoint> csBulletDynamicsSystem::CreateJoint ()
   return csPtr<iJoint> (joint);
 }
 
+void csBulletDynamicsSystem::AddJoint (::iJoint* joint)
+{
+  csBulletJoint* csJoint = static_cast<csBulletJoint*> (joint);
+  CS_ASSERT (csJoint);
+  if (csJoint->constraint)
+  {
+    // remove from the previous dynamic system
+    csJoint->dynSys->bulletWorld->removeConstraint (csJoint->constraint);
+
+    // add the joint to this dynamic system
+    bulletWorld->addConstraint (csJoint->constraint);
+    csJoint->dynSys = this;
+  }
+  joints.Push (csJoint);
+}
+
 void csBulletDynamicsSystem::RemoveJoint (iJoint* joint)
 {
   joints.Delete (joint);

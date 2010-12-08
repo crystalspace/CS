@@ -372,12 +372,16 @@ struct iDynamicSystem : public virtual iBase
     float elasticity, float softness = 0.01f) = 0;
 
   /**
-   * Add a rigid body to this dynamic system after having removed it frome another
-   * one with RemoveBody().
+   * Add a rigid body to this dynamic system after having removed it from any previous one.
    * \warning For the Bullet plugin, it won't work if you use dynamic systems which
    * have different internal scales set through CS::Physics::Bullet::iDynamicSystem::SetInternalScale().
    */
   virtual void AddBody (iRigidBody* body) = 0;
+
+  /**
+   * Add a joint to this dynamic system after having removed it from any previous one.
+   */
+  virtual void AddJoint (iJoint* joint) = 0;
 };
 
 /**

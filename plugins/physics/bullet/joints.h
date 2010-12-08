@@ -129,6 +129,8 @@ public:
   virtual void SetAngularConstraintAxis (const csVector3& axis, int body,
 					 bool force_update = true);
   virtual csVector3 GetAngularConstraintAxis (int body);
+
+  friend class csBulletDynamicsSystem;
 };
 
 

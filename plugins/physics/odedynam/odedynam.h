@@ -359,6 +359,7 @@ public:
   virtual void RemoveGroup (iBodyGroup *group);
 
   virtual csPtr<iJoint> CreateJoint ();
+  virtual void AddJoint (iJoint* joint) { /* TODO */ }
   virtual csPtr<iODEBallJoint> CreateBallJoint ();
   virtual csPtr<iODEHingeJoint> CreateHingeJoint ();
   virtual csPtr<iODEHinge2Joint> CreateHinge2Joint ();

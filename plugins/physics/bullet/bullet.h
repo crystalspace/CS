@@ -160,6 +160,7 @@ public:
   virtual void RemoveGroup (iBodyGroup* group);
 
   virtual csPtr<iJoint> CreateJoint ();
+  virtual void AddJoint (iJoint* joint);
   virtual void RemoveJoint (iJoint* joint);
   virtual iDynamicsMoveCallback* GetDefaultMoveCallback ();
 
