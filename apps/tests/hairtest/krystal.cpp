@@ -304,9 +304,9 @@ bool KrystalScene::CreateAvatar ()
   {
     // Create the ragdoll controller
     csRef<CS::Animation::iSkeletonRagdollNodeFactory> ragdollNodeFactory =
-      hairTest->ragdollManager->CreateAnimNodeFactory
-      ("ragdoll", bodySkeleton, hairTest->dynamicSystem);
+      hairTest->ragdollManager->CreateAnimNodeFactory ("ragdoll");
     animPacketFactory->SetAnimationRoot (ragdollNodeFactory);
+    ragdollNodeFactory->SetBodySkeleton (bodySkeleton);
     ragdollNodeFactory->SetChildNode (randomNodeFactory);
 
     // Create bone chain for whole body and add it to the ragdoll controller. The chain
@@ -344,6 +344,7 @@ bool KrystalScene::CreateAvatar ()
       scfQueryInterface<CS::Animation::iSkeletonRagdollNode> (rootNode->FindNode ("ragdoll"));
 
     // Start the ragdoll animation node in order to have the rigid bodies created
+    ragdollNode->SetDynamicSystem (hairTest->dynamicSystem);
     ragdollNode->Play ();
   }
 

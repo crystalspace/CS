@@ -221,9 +221,9 @@ bool FrankieScene::CreateAvatar ()
   {
     // Create the ragdoll controller
     csRef<CS::Animation::iSkeletonRagdollNodeFactory> ragdollNodeFactory =
-      hairTest->ragdollManager->CreateAnimNodeFactory ("ragdoll",
-					     bodySkeleton, hairTest->dynamicSystem);
+      hairTest->ragdollManager->CreateAnimNodeFactory ("ragdoll");
     animPacketFactory->SetAnimationRoot (ragdollNodeFactory);
+    ragdollNodeFactory->SetBodySkeleton (bodySkeleton);
     ragdollNodeFactory->SetChildNode (randomNodeFactory);
 
     // Create a bone chain for the whole body and add it to the ragdoll controller.
@@ -265,6 +265,7 @@ bool FrankieScene::CreateAvatar ()
       scfQueryInterface<CS::Animation::iSkeletonRagdollNode> (rootNode->FindNode ("ragdoll"));
 
     // Start the ragdoll animation node in order to have the rigid bodies created
+    ragdollNode->SetDynamicSystem (hairTest->dynamicSystem);
     ragdollNode->Play ();
   }
 

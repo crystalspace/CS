@@ -1672,8 +1672,8 @@ void Simple::LoadRagdoll ()
 
   // Create ragdoll animation node factory
   csRef<CS::Animation::iSkeletonRagdollNodeFactory> ragdollFactory =
-    ragdollManager->CreateAnimNodeFactory ("frankie_ragdoll",
-					   bodySkeleton, dynamicSystem);
+    ragdollManager->CreateAnimNodeFactory ("frankie_ragdoll");
+  ragdollFactory->SetBodySkeleton (bodySkeleton);
   ragdollFactory->AddBodyChain (chain, CS::Animation::STATE_DYNAMIC);
 
   // Set the ragdoll anim node as the only node of the animation tree
@@ -1718,6 +1718,7 @@ void Simple::SpawnRagdoll ()
     GetAnimationRoot ();
   csRef<CS::Animation::iSkeletonRagdollNode> ragdoll =
     scfQueryInterfaceSafe<CS::Animation::iSkeletonRagdollNode> (root);
+  ragdoll->SetDynamicSystem (dynamicSystem);
   ragdoll->Play ();
 
   // Fling the body.

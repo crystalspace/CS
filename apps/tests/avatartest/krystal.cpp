@@ -502,16 +502,17 @@ bool KrystalScene::CreateAvatar ()
 
     // Create the ragdoll animation node
     csRef<CS::Animation::iSkeletonRagdollNodeFactory> ragdollNodeFactory =
-      avatarTest->ragdollManager->CreateAnimNodeFactory
-      ("ragdoll", bodySkeleton, avatarTest->dynamicSystem);
+      avatarTest->ragdollManager->CreateAnimNodeFactory ("ragdoll");
     debugNodeFactory->SetChildNode (ragdollNodeFactory);
+    ragdollNodeFactory->SetBodySkeleton (bodySkeleton);
     ragdollNodeFactory->AddBodyChain (bodyChain, CS::Animation::STATE_KINEMATIC);
     ragdollNodeFactory->AddBodyChain (armChain, CS::Animation::STATE_KINEMATIC);
 
     // Create the 'ik' node
     csRef<CS::Animation::iSkeletonIKNodeFactory> IKNodeFactory =
-      avatarTest->IKNodeManager->CreateAnimNodeFactory ("IK", bodySkeleton);
+      avatarTest->IKNodeManager->CreateAnimNodeFactory ("IK");
     ragdollNodeFactory->SetChildNode (IKNodeFactory);
+    IKNodeFactory->SetBodySkeleton (bodySkeleton);
 
     // Setup the IKCCD node interface
     csRef<CS::Animation::iSkeletonIKCCDNodeFactory> IKCCDNodeFactory =
@@ -578,6 +579,7 @@ bool KrystalScene::CreateAvatar ()
     */
 
     // Start the ragdoll animation node in order to have the rigid bodies created
+    ragdollNode->SetDynamicSystem (avatarTest->dynamicSystem);
     ragdollNode->Play ();
   }
 
