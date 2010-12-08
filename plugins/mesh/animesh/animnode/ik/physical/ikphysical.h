@@ -43,8 +43,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
     IKPhysicalManager (iBase* parent);
 
     //-- CS::Animation::iSkeletonIKNodeManager
-    virtual CS::Animation::iSkeletonIKNodeFactory* CreateAnimNodeFactory
-      (const char *name, CS::Animation::iBodySkeleton* skeleton);
+    virtual CS::Animation::iSkeletonIKNodeFactory* CreateAnimNodeFactory (const char *name);
 
     virtual CS::Animation::iSkeletonIKNodeFactory* FindAnimNodeFactory (const char* name) const;
     virtual void ClearAnimNodeFactories ();
@@ -81,8 +80,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
   public:
     CS_LEAKGUARD_DECLARE(IKPhysicalAnimNodeFactory);
 
-    IKPhysicalAnimNodeFactory (IKPhysicalManager* manager, const char *name,
-			       CS::Animation::iBodySkeleton* skeleton);
+    IKPhysicalAnimNodeFactory (IKPhysicalManager* manager, const char *name);
 
     //-- CS::Animation::iSkeletonAnimNodeFactory
     virtual csPtr<CS::Animation::iSkeletonAnimNode> CreateInstance
@@ -93,6 +91,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
     virtual CS::Animation::iSkeletonAnimNodeFactory* FindNode (const char* name);
 
     //-- CS::Animation::iSkeletonIKNodeFactory
+    virtual void SetBodySkeleton (CS::Animation::iBodySkeleton* skeleton);
+    virtual CS::Animation::iBodySkeleton* GetBodySkeleton () const;
     virtual CS::Animation::EffectorID AddEffector (CS::Animation::iBodyChain* chain,
 						   CS::Animation::BoneID bone,
 						   csOrthoTransform& transform);

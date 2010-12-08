@@ -46,13 +46,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
   {
   }
 
-  CS::Animation::iSkeletonIKNodeFactory* IKCCDNodeManager::CreateAnimNodeFactory
-    (const char *name, CS::Animation::iBodySkeleton* skeleton)
+  CS::Animation::iSkeletonIKNodeFactory* IKCCDNodeManager::CreateAnimNodeFactory (const char *name)
   {
-    CS_ASSERT(skeleton);
-
     csRef<CS::Animation::iSkeletonIKCCDNodeFactory> newFact;
-    newFact.AttachNew (new IKCCDNodeFactory (this, name, skeleton));
+    newFact.AttachNew (new IKCCDNodeFactory (this, name));
 
     return factoryHash.PutUnique (name, newFact);
   }
@@ -95,10 +92,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
 
   CS_LEAKGUARD_IMPLEMENT(IKCCDNodeFactory);
 
-  IKCCDNodeFactory::IKCCDNodeFactory
-    (IKCCDNodeManager* manager, const char *name, CS::Animation::iBodySkeleton* skeleton)
+  IKCCDNodeFactory::IKCCDNodeFactory (IKCCDNodeManager* manager, const char *name)
     : scfImplementationType (this), manager (manager), name (name),
-    bodySkeleton (skeleton), maxEffectorID (0), maximumIterations (50), targetDistance (0.001f),
+    maxEffectorID (0), maximumIterations (50), targetDistance (0.001f),
     motionRatio (0.1f), jointInitialized (true), upwardIterations (true)
   {
   }
@@ -130,6 +126,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
       return childNode->FindNode (name);
 
       return 0;
+  }
+
+  void IKCCDNodeFactory::SetBodySkeleton (CS::Animation::iBodySkeleton* skeleton)
+  {
+    bodySkeleton = skeleton;
+  }
+
+  CS::Animation::iBodySkeleton* IKCCDNodeFactory::GetBodySkeleton () const
+  {
+    return bodySkeleton;
   }
 
   CS::Animation::EffectorID IKCCDNodeFactory::AddEffector

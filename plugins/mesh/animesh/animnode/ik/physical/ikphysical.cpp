@@ -45,12 +45,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
   }
 
   CS::Animation::iSkeletonIKNodeFactory* IKPhysicalManager::CreateAnimNodeFactory
-    (const char *name, CS::Animation::iBodySkeleton* skeleton)
+    (const char *name)
   {
-    CS_ASSERT(skeleton);
-
     csRef<CS::Animation::iSkeletonIKPhysicalNodeFactory> newFact;
-    newFact.AttachNew (new IKPhysicalAnimNodeFactory (this, name, skeleton));
+    newFact.AttachNew (new IKPhysicalAnimNodeFactory (this, name));
 
     return factoryHash.PutUnique (name, newFact);
   }
@@ -94,9 +92,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
   CS_LEAKGUARD_IMPLEMENT(IKPhysicalAnimNodeFactory);
 
   IKPhysicalAnimNodeFactory::IKPhysicalAnimNodeFactory
-    (IKPhysicalManager* manager, const char *name, CS::Animation::iBodySkeleton* skeleton)
+    (IKPhysicalManager* manager, const char *name)
     : scfImplementationType (this), manager (manager), name (name),
-    bodySkeleton (skeleton), maxEffectorID (0), resetChain (true)
+    maxEffectorID (0), resetChain (true)
   {
   }
 
@@ -127,6 +125,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
       return childNode->FindNode (name);
 
       return 0;
+  }
+
+  void IKPhysicalAnimNodeFactory::SetBodySkeleton (CS::Animation::iBodySkeleton* skeleton)
+  {
+    bodySkeleton = skeleton;
+  }
+
+  CS::Animation::iBodySkeleton* IKPhysicalAnimNodeFactory::GetBodySkeleton () const
+  {
+    return bodySkeleton;
   }
 
   CS::Animation::EffectorID IKPhysicalAnimNodeFactory::AddEffector
@@ -342,12 +350,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
       sceneNode = skeleton->GetSceneNode ();
 
     // Find the Bullet dynamic system
-    csRef<CS::Animation::iSkeletonRagdollNodeFactory> ragdollNodeFactory =
-      scfQueryInterface<CS::Animation::iSkeletonRagdollNodeFactory>
-      (ragdollNode->GetFactory ());
-
     bulletDynamicSystem = scfQueryInterface<CS::Physics::Bullet::iDynamicSystem>
-      (ragdollNodeFactory->GetDynamicSystem ());
+      (ragdollNode->GetDynamicSystem ());
     if (!bulletDynamicSystem)
     {
       factory->manager->Report (CS_REPORTER_SEVERITY_ERROR,

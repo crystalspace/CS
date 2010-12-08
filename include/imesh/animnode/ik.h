@@ -67,8 +67,7 @@ struct iSkeletonIKNodeManager : public virtual iBase
   /**
    * Create a new Inverse Kinematics animation node factory.
    */
-  virtual iSkeletonIKNodeFactory* CreateAnimNodeFactory
-    (const char *name, CS::Animation::iBodySkeleton* skeleton) = 0;
+  virtual iSkeletonIKNodeFactory* CreateAnimNodeFactory (const char *name) = 0;
 
   /**
    * Find the Inverse Kinematics animation node factory with the given name.
@@ -98,6 +97,16 @@ struct iSkeletonIKNodeManager : public virtual iBase
 struct iSkeletonIKNodeFactory : public iSkeletonAnimNodeFactory
 {
   SCF_INTERFACE(CS::Animation::iSkeletonIKNodeFactory, 1, 0, 0);
+
+  /**
+   * Set the physical description of the skeleton.
+   */
+  virtual void SetBodySkeleton (CS::Animation::iBodySkeleton* skeleton) = 0;
+
+  /**
+   * Get the physical description of the skeleton.
+   */
+  virtual CS::Animation::iBodySkeleton* GetBodySkeleton () const = 0;
 
   /**
    * Set the child animation node of this node. The IK controller will
