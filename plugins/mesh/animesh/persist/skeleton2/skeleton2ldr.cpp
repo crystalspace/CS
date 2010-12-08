@@ -19,12 +19,17 @@
 
 #include "cssysdef.h"
 
+#include "cstool/mocapparser.h"
 #include "csutil/ref.h"
 #include "imap/services.h"
 #include "iutil/document.h"
 #include "iutil/plugin.h"
 #include "imap/ldrctxt.h"
+#include "imesh/bodymesh.h"
 #include "imesh/skeleton2.h"
+#include "imesh/animnode/debug.h"
+#include "imesh/animnode/lookat.h"
+#include "imesh/animnode/retarget.h"
 #include "imesh/animnode/skeleton2anim.h"
 
 #include "skeleton2ldr.h"
@@ -91,6 +96,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
 
     skelManager = csQueryRegistryOrLoad<CS::Animation::iSkeletonManager> (object_reg,
       "crystalspace.skeletalanimation");
+    if (!skelManager)
+      return false;
+
+    bodyManager = csQueryRegistryOrLoad<CS::Animation::iBodyManager> (object_reg,
+      "crystalspace.mesh.animesh.body");
+    if (!bodyManager)
+      return false;
 
     InitTokenTable (xmltokens);
     return true;
@@ -235,12 +247,52 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       return false;
     }
 
-    CS::Animation::iSkeletonAnimPacketFactory* packet = skelManager->CreateAnimPacketFactory (name);
-    if (!packet)
+    CS::Animation::iSkeletonAnimPacketFactory* packet;
+
+    // Check if this a motion capture packet
+    const char* type = node->GetAttributeValue ("type");
+    if (type && strcmp (type, "mocap") == 0)
     {
-      synldr->ReportError (msgid, node, 
-        "Could not create packet, another packet with same name might already exist.");
-      return false;
+      CS::Animation::BVHMocapParser mocapParser (object_reg);
+      mocapParser.SetPacketName (name);
+
+      const char* file = node->GetAttributeValue ("file");
+      if (file) mocapParser.SetRessourceFile (file);
+
+      const char* skelName = node->GetAttributeValue ("skelname");
+      if (skelName) mocapParser.SetSkeletonName (skelName);
+
+      const char* animName = node->GetAttributeValue ("animname");
+      if (animName) mocapParser.SetAnimationName (animName);
+
+      int startFrame = node->GetAttributeValueAsInt ("start");
+      if (startFrame > 0)
+	mocapParser.SetStartFrame (startFrame);
+
+      int endFrame = node->GetAttributeValueAsInt ("end");
+      if (endFrame > 0)
+	mocapParser.SetEndFrame (endFrame);
+
+      float scale = node->GetAttributeValueAsFloat ("scale");
+      if (abs (scale) > EPSILON) 
+	mocapParser.SetGlobalScale (scale);
+
+      CS::Animation::MocapParserResult parsingResult = mocapParser.ParseData ();
+      if (!parsingResult.result)
+	return false;
+
+      packet = parsingResult.animPacketFactory;
+    }
+
+    else
+    {
+      packet = skelManager->CreateAnimPacketFactory (name);
+      if (!packet)
+      {
+	synldr->ReportError (msgid, node, 
+	    "Could not create packet, another packet with same name might already exist.");
+	return false;
+      }
     }
 
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -321,8 +373,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
         result = ParseFSMNode (node, packet);
       }
       break;
+    case XMLTOKEN_DEBUG:
+      {
+        result = ParseDebugNode (node, packet);
+      }
+      break;
+    case XMLTOKEN_LOOKAT:
+      {
+        result = ParseLookAtNode (node, packet);
+      }
+      break;
+    case XMLTOKEN_RETARGET:
+      {
+        result = ParseRetargetNode (node, packet);
+      }
+      break;
     default:
-      synldr->ReportError (msgid, node, "Invalid node type %s", type);
+      synldr->ReportError (msgid, node, "Invalid node type '%s'", type);
       return 0;
     }
 
@@ -341,7 +408,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       CS::Animation::iSkeletonAnimation* fact = packet->FindAnimation (ref);
       if (!fact)
       {      
-        synldr->ReportError (msgid, node, "Referenced animation %s not found", ref);
+        synldr->ReportError (msgid, node, "Referenced animation '%s' not found", ref);
         return 0;
       }
 
@@ -450,11 +517,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
 
     factnode = packet->CreateAnimationNode (name);
 
+    // Check if we the animation is in another packet
+    CS::Animation::iSkeletonAnimPacketFactory* sourcePacket;
+    const char* packetName = node->GetAttributeValue ("packet");
+    if (packetName)
+    {
+      sourcePacket = skelManager->FindAnimPacketFactory (packetName);
+      if (!sourcePacket)
+      {
+	synldr->ReportError (msgid, node, "Animation packet '%s' not found", packetName);
+	return 0;
+      }
+    }
 
-    CS::Animation::iSkeletonAnimation* anim = packet->FindAnimation (animName);
+    else
+      sourcePacket = packet;
+
+    CS::Animation::iSkeletonAnimation* anim = sourcePacket->FindAnimation (animName);
     if (!anim)
     {
-      synldr->ReportError (msgid, node, "Animation \"%s\" not found", animName);
+      synldr->ReportError (msgid, node, "Animation '%s' not found", animName);
       return 0;
     }
     factnode->SetAnimation (anim);
@@ -692,13 +774,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
           if (fromState == CS::Animation::InvalidStateID)
           {
             synldr->ReportError (msgid, child, 
-              "Invalid from state %s", fromStateName);
+              "Invalid from state '%s'", fromStateName);
           }
 
           if (toState == CS::Animation::InvalidStateID)
           {
             synldr->ReportError (msgid, child, 
-              "Invalid to state %s", toStateName);
+              "Invalid to state '%s'", toStateName);
           }
 
           csRef<iDocumentNode> nodedoc = child->GetNode (
@@ -737,6 +819,249 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
     }
 
     return csPtr<CS::Animation::iSkeletonAnimNodeFactory> (factnode);
+  }
+
+  csPtr<CS::Animation::iSkeletonAnimNodeFactory> SkeletonLoader::ParseDebugNode (
+    iDocumentNode* node, CS::Animation::iSkeletonAnimPacketFactory* packet)
+  {
+    static const char* msgid = "crystalspace.skeletonloader.parsedebugnode";
+
+    csRef<CS::Animation::iSkeletonDebugNodeFactory> factnode;
+
+    csRef<CS::Animation::iSkeletonDebugNodeManager> debugManager =
+      csQueryRegistryOrLoad<CS::Animation::iSkeletonDebugNodeManager> (object_reg,
+      "crystalspace.mesh.animesh.animnode.debug");
+
+    const char* name = node->GetAttributeValue ("name");
+    // TODO: body skeleton + missing parameters
+    factnode = debugManager->CreateAnimNodeFactory (name);
+
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+      case XMLTOKEN_NODE:
+        {
+	  csRef<CS::Animation::iSkeletonAnimNodeFactory> childNode =
+	    ParseAnimTreeNode (child, packet);
+
+	  //if (childNode && factnode->GetChildNode ())
+	  //synldr->ReportError (msgid, node, "The Debug node can only handle one child node");
+
+	  //else if (childNode)
+	  if (childNode)
+	    factnode->SetChildNode (childNode);
+	}
+	break;
+
+      default:
+        synldr->ReportBadToken (child);
+        return 0;
+      }       
+    }
+
+    return csPtr<CS::Animation::iSkeletonAnimNodeFactory> (factnode);
+  }
+
+  csPtr<CS::Animation::iSkeletonAnimNodeFactory> SkeletonLoader::ParseLookAtNode (
+    iDocumentNode* node, CS::Animation::iSkeletonAnimPacketFactory* packet)
+  {
+    static const char* msgid = "crystalspace.skeletonloader.parselookatnode";
+
+    csRef<CS::Animation::iSkeletonLookAtNodeFactory> factnode;
+
+    csRef<CS::Animation::iSkeletonLookAtNodeManager> lookAtManager =
+      csQueryRegistryOrLoad<CS::Animation::iSkeletonLookAtNodeManager> (object_reg,
+      "crystalspace.mesh.animesh.animnode.lookat");
+
+    const char* name = node->GetAttributeValue ("name");
+    // TODO: body skeleton + missing parameters
+    factnode = lookAtManager->CreateAnimNodeFactory (name);
+
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+      case XMLTOKEN_NODE:
+        {
+	  csRef<CS::Animation::iSkeletonAnimNodeFactory> childNode =
+	    ParseAnimTreeNode (child, packet);
+
+	  if (childNode && factnode->GetChildNode ())
+	    synldr->ReportError (msgid, node, "The LookAt node can only handle one child node");
+
+	  else if (childNode)
+	    factnode->SetChildNode (childNode);
+	}
+	break;
+
+      default:
+        synldr->ReportBadToken (child);
+        return 0;
+      }       
+    }
+
+    return csPtr<CS::Animation::iSkeletonAnimNodeFactory> (factnode);
+  }
+
+  csPtr<CS::Animation::iSkeletonAnimNodeFactory> SkeletonLoader::ParseRetargetNode (
+    iDocumentNode* node, CS::Animation::iSkeletonAnimPacketFactory* packet)
+  {
+    static const char* msgid = "crystalspace.skeletonloader.parseretargetnode";
+
+    csRef<CS::Animation::iSkeletonRetargetNodeFactory> factnode;
+
+    csRef<CS::Animation::iSkeletonRetargetNodeManager> retargetManager =
+      csQueryRegistryOrLoad<CS::Animation::iSkeletonRetargetNodeManager> (object_reg,
+      "crystalspace.mesh.animesh.animnode.retarget");
+
+    const char* name = node->GetAttributeValue ("name");
+    factnode = retargetManager->CreateAnimNodeFactory (name);
+
+    const char* skelSource = node->GetAttributeValue ("skelsource");
+    CS::Animation::iSkeletonFactory* sourceSkeleton = skelManager->FindSkeletonFactory (skelSource);
+    if (!sourceSkeleton)
+    {
+      synldr->ReportError (msgid, node, "Could not find source skeleton '%s'", skelSource);
+      return 0;
+    }
+    factnode->SetSourceSkeleton (sourceSkeleton);
+
+    const char* skelTarget = node->GetAttributeValue ("skeltarget");
+    CS::Animation::iSkeletonFactory* targetSkeleton = skelManager->FindSkeletonFactory (skelTarget);
+    if (!targetSkeleton)
+    {
+      synldr->ReportError (msgid, node, "Could not find target skeleton '%s'", skelTarget);
+      return 0;
+    }
+
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+      case XMLTOKEN_NODE:
+        {
+	  csRef<CS::Animation::iSkeletonAnimNodeFactory> childNode =
+	    ParseAnimTreeNode (child, packet);
+
+	  if (childNode && factnode->GetChildNode ())
+	    synldr->ReportError (msgid, node, "The Retarget node can only handle one child node");
+
+	  else if (childNode)
+	    factnode->SetChildNode (childNode);
+	}
+        break;
+
+      case XMLTOKEN_CHAIN:
+        {
+	  const char* body = child->GetAttributeValue ("body");
+	  const char* name = child->GetAttributeValue ("name");
+
+	  CS::Animation::iBodySkeleton* bodySkeleton = bodyManager->FindBodySkeleton (body);
+	  if (!bodySkeleton)
+	  {
+	    synldr->ReportError (msgid, node, "Could not find body skeleton '%s'", body);
+	    return 0;
+	  }
+
+	  CS::Animation::iBodyChain* bodyChain = bodySkeleton->FindBodyChain (name);
+	  if (!bodyChain)
+	  {
+	    synldr->ReportError (msgid, node, "Could not find body chain '%s' within skeleton '%s'", name, body);
+	    return 0;
+	  }
+
+	  factnode->AddBodyChain (bodyChain);
+	}
+        break;
+
+      case XMLTOKEN_MAPPING:
+        {
+	  CS::Animation::BoneMapping mapping;
+	  if (!ParseBoneMapping (child, mapping, sourceSkeleton, targetSkeleton))
+	    return 0;
+
+	  mapping.DebugPrint(sourceSkeleton, targetSkeleton);
+	  factnode->SetBoneMapping (mapping);
+	}
+        break;
+
+      default:
+        synldr->ReportBadToken (child);
+        return 0;
+      }       
+    }
+
+    return csPtr<CS::Animation::iSkeletonAnimNodeFactory> (factnode);
+  }
+
+  bool SkeletonLoader::ParseBoneMapping (iDocumentNode* node, CS::Animation::BoneMapping& mapping,
+					 CS::Animation::iSkeletonFactory* sourceSkeleton,
+					 CS::Animation::iSkeletonFactory* targetSkeleton)
+  {
+    static const char* msgid = "crystalspace.skeletonloader.parsemapping";
+
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+      case XMLTOKEN_NAMEMAP:
+	CS::Animation::NameBoneMappingHelper::GenerateMapping (mapping, sourceSkeleton, targetSkeleton);
+        break;
+
+      case XMLTOKEN_BONEMAP:
+      case XMLTOKEN_NOBONEMAP:
+        {
+	  const char* source = child->GetAttributeValue ("source");
+	  CS::Animation::BoneID sourceID = sourceSkeleton->FindBone (source);
+	  if (sourceID == CS::Animation::InvalidBoneID)
+	  {
+	    synldr->ReportError (msgid, node, "Could not find bone '%s' in source skeleton", source);
+	    return false;
+	  }
+
+	  const char* target = child->GetAttributeValue ("target");
+	  CS::Animation::BoneID targetID = targetSkeleton->FindBone (target);
+	  if (targetID == CS::Animation::InvalidBoneID)
+	  {
+	    synldr->ReportError (msgid, node, "Could not find bone '%s' in target skeleton", target);
+	    return false;
+	  }
+
+	  if (id == XMLTOKEN_BONEMAP)
+	    mapping.AddMapping (sourceID, targetID);
+	  else
+	    mapping.RemoveMapping (sourceID, targetID);
+	}
+        break;
+
+      default:
+        synldr->ReportBadToken (child);
+        return false;
+      }
+    }
+
+    return true;
   }
 
 }

@@ -26,6 +26,11 @@
 #include "csutil/csstring.h"
 #include "imesh/skeleton2.h"
 
+namespace CS {
+namespace Animation {
+struct iBodyManager;
+}
+}
 
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
 {
@@ -69,10 +74,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       CS::Animation::iSkeletonAnimPacketFactory* packet);
     csPtr<CS::Animation::iSkeletonAnimNodeFactory> ParseFSMNode (iDocumentNode* node,
       CS::Animation::iSkeletonAnimPacketFactory* packet);
+    csPtr<CS::Animation::iSkeletonAnimNodeFactory> ParseDebugNode (iDocumentNode* node,
+      CS::Animation::iSkeletonAnimPacketFactory* packet);
+    csPtr<CS::Animation::iSkeletonAnimNodeFactory> ParseLookAtNode (iDocumentNode* node,
+      CS::Animation::iSkeletonAnimPacketFactory* packet);
+    csPtr<CS::Animation::iSkeletonAnimNodeFactory> ParseRetargetNode (iDocumentNode* node,
+      CS::Animation::iSkeletonAnimPacketFactory* packet);
+
+    bool ParseBoneMapping (iDocumentNode* node, CS::Animation::BoneMapping& mapping,
+			   CS::Animation::iSkeletonFactory* sourceSkeleton,
+			   CS::Animation::iSkeletonFactory* targetSkeleton);
 
     iObjectRegistry* object_reg;
     csRef<iSyntaxService> synldr;
     csRef<CS::Animation::iSkeletonManager> skelManager;
+    csRef<CS::Animation::iBodyManager> bodyManager;
 
     csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE \
