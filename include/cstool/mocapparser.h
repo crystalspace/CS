@@ -31,6 +31,7 @@
 #include "imesh/skeleton2.h"
 #include "imesh/animnode/skeleton2anim.h"
 #include "iutil/vfs.h"
+#include "csutil/objreg.h"
 
 namespace CS {
 namespace Animation {
