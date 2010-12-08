@@ -82,7 +82,7 @@
 
     <input name="texDiffuse2" type="tex2d" default="complex">
       <block location="pass">
-	  <texture name="tex diffuse 2" destination="fragmentIn.texDiffuse2" fallback="standardtex white" />
+	  <texture name="tex diffuse 2" destination="fragmentIn.texDiffuse2" fallback="standardtex black" />
       </block>
       
       <block location="cg:fragmentIn">
@@ -96,7 +96,7 @@
 
     <input name="texDiffuse3" type="tex2d" default="complex">
       <block location="pass">
-	  <texture name="tex diffuse 3" destination="fragmentIn.texDiffuse3" fallback="standardtex white" />
+	  <texture name="tex diffuse 3" destination="fragmentIn.texDiffuse3" fallback="standardtex black" />
       </block>
       
       <block location="cg:fragmentIn">
@@ -110,7 +110,7 @@
 
     <input name="texDiffuse4" type="tex2d" default="complex">
       <block location="pass">
-	  <texture name="tex diffuse 4" destination="fragmentIn.texDiffuse4" fallback="standardtex white" />
+	  <texture name="tex diffuse 4" destination="fragmentIn.texDiffuse4" fallback="standardtex black" />
       </block>
       
       <block location="cg:fragmentIn">
@@ -124,7 +124,7 @@
 
     <input name="texDiffuse5" type="tex2d" default="complex">
       <block location="pass">
-	  <texture name="tex diffuse 5" destination="fragmentIn.texDiffuse5" fallback="standardtex white" />
+	  <texture name="tex diffuse 5" destination="fragmentIn.texDiffuse5" fallback="standardtex black" />
       </block>
       
       <block location="cg:fragmentIn">
@@ -138,7 +138,7 @@
 
     <input name="texDiffuse6" type="tex2d" default="complex">
       <block location="pass">
-	  <texture name="tex diffuse 6" destination="fragmentIn.texDiffuse6" fallback="standardtex white" />
+	  <texture name="tex diffuse 6" destination="fragmentIn.texDiffuse6" fallback="standardtex black" />
       </block>
       
       <block location="cg:fragmentIn">
@@ -152,7 +152,7 @@
 
     <input name="texDiffuse7" type="tex2d" default="complex">
       <block location="pass">
-	  <texture name="tex diffuse 7" destination="fragmentIn.texDiffuse7" fallback="standardtex white" />
+	  <texture name="tex diffuse 7" destination="fragmentIn.texDiffuse7" fallback="standardtex black" />
       </block>
       
       <block location="cg:fragmentIn">
@@ -166,7 +166,7 @@
 
     <input name="texDiffuse8" type="tex2d" default="complex">
       <block location="pass">
-	  <texture name="tex diffuse 8" destination="fragmentIn.texDiffuse8" fallback="standardtex white" />
+	  <texture name="tex diffuse 8" destination="fragmentIn.texDiffuse8" fallback="standardtex black" />
       </block>
       
       <block location="cg:fragmentIn">
@@ -180,7 +180,7 @@
 
     <input name="texDiffuse9" type="tex2d" default="complex">
       <block location="pass">
-	  <texture name="tex diffuse 9" destination="fragmentIn.texDiffuse9" fallback="standardtex white" />
+	  <texture name="tex diffuse 9" destination="fragmentIn.texDiffuse9" fallback="standardtex black" />
       </block>
       
       <block location="cg:fragmentIn">
@@ -194,7 +194,7 @@
 
     <input name="texDiffuse10" type="tex2d" default="complex">
       <block location="pass">
-	  <texture name="tex diffuse 10" destination="fragmentIn.texDiffuse10" fallback="standardtex white" />
+	  <texture name="tex diffuse 10" destination="fragmentIn.texDiffuse10" fallback="standardtex black" />
       </block>
       
       <block location="cg:fragmentIn">
@@ -208,7 +208,7 @@
 
     <input name="texDiffuse11" type="tex2d" default="complex">
       <block location="pass">
-	  <texture name="tex diffuse 11" destination="fragmentIn.texDiffuse11" fallback="standardtex white" />
+	  <texture name="tex diffuse 11" destination="fragmentIn.texDiffuse11" fallback="standardtex black" />
       </block>
       
       <block location="cg:fragmentIn">
@@ -222,7 +222,7 @@
 
     <input name="texDiffuse12" type="tex2d" default="complex">
       <block location="pass">
-	  <texture name="tex diffuse 12" destination="fragmentIn.texDiffuse12" fallback="standardtex white" />
+	  <texture name="tex diffuse 12" destination="fragmentIn.texDiffuse12" fallback="standardtex black" />
       </block>
       
       <block location="cg:fragmentIn">
@@ -265,22 +265,22 @@
         tex2D (texDiffuse3, scaledTexCoord),
         tex2D (texDiffuse4, scaledTexCoord));
       surfaceColor = mul(tex2D (texAlpha1, texCoord), texValues);
-      <?if vars."tex alpha 2".texture ?>
+      <?if vars."tex alpha map 2".texture ?>
         texValues = float4x4(
           tex2D (texDiffuse5, scaledTexCoord),
           tex2D (texDiffuse6, scaledTexCoord),
           tex2D (texDiffuse7, scaledTexCoord),
           tex2D (texDiffuse8, scaledTexCoord));
-        surfaceColor+ = mul(tex2D (texAlpha2, texCoord), texValues);
-      <?if vars."tex alpha 3".texture ?>
+        surfaceColor += mul(tex2D (texAlpha2, texCoord), texValues);
+      <?if vars."tex alpha map 3".texture ?>
         texValues = float4x4(
           tex2D (texDiffuse9, scaledTexCoord),
           tex2D (texDiffuse10, scaledTexCoord),
           tex2D (texDiffuse11, scaledTexCoord),
           tex2D (texDiffuse12, scaledTexCoord));
-        surfaceColor+ = mul(tex2D (texAlpha3, texCoord), texValues);
-      <?endif?><?! vars."tex alpha 3".texture ?>
-      <?endif?><?! vars."tex alpha 2".texture ?>
+        surfaceColor += mul(tex2D (texAlpha3, texCoord), texValues);
+      <?endif?><?! vars."tex alpha map 3".texture ?>
+      <?endif?><?! vars."tex alpha map 2".texture ?>
 
       surfaceColor_attr_perfragment = true;
     </block>

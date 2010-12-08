@@ -1316,6 +1316,22 @@ void csGLGraphics3D::SetupShaderVariables()
     shadermgr->AddVariable (whitevar);
   }
 
+  {
+    csRGBpixel* black = new csRGBpixel[1];
+    black->Set (0, 0, 0);
+    img = csPtr<iImage> (new csImageMemory (1, 1, black, true, 
+      CS_IMGFMT_TRUECOLOR));
+
+    csRef<iTextureHandle> blacktex = txtmgr->RegisterTexture (
+      img, CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS);
+
+    csRef<csShaderVariable> blackvar = csPtr<csShaderVariable> (
+      new csShaderVariable (
+      strings->Request ("standardtex black")));
+    blackvar->SetValue (blacktex);
+    shadermgr->AddVariable (blackvar);
+  }
+
 }
 
 void csGLGraphics3D::Close ()
@@ -4510,11 +4526,11 @@ void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
     
   GLenum cullFace;
   statecache->GetCullFace (cullFace);
-    
+
   CS::Graphics::MeshCullMode cullMode = modes.cullMode;
   // Flip face culling if we do mirroring
-  //if (mirrorflag)
-  //  cullMode = CS::Graphics::GetFlippedCullMode (cullMode);
+  if (mymesh->do_mirror)
+    cullMode = CS::Graphics::GetFlippedCullMode (cullMode);
   
   if (cullMode == CS::Graphics::cullDisabled)
   {
