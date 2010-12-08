@@ -264,6 +264,8 @@ class CS_CRYSTALSPACE_EXPORT CameraManager
    */
   virtual csVector3 GetCameraTarget ()
   { return csVector3 (0.0f); }
+
+  virtual ~CameraManager () {}
 };
 
 /**
