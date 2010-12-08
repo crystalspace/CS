@@ -334,6 +334,8 @@ struct iDecalTemplate : public virtual iBase
  */
 struct iDecalAnimationControl
 {
+
+  virtual ~iDecalAnimationControl () {}
   /**
    * Update the vertices and normals of the decal.
    * \param decalTemplate The template of the decal
