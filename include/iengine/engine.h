@@ -159,7 +159,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine, 6, 5, 0);
+  SCF_INTERFACE(iEngine, 7, 0, 0);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;

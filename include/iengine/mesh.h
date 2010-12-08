@@ -697,7 +697,7 @@ struct iMeshWrapper : public virtual iBase
  */
 struct iMeshFactoryWrapper : public virtual iBase
 {
-  SCF_INTERFACE(iMeshFactoryWrapper, 2, 2, 0);
+  SCF_INTERFACE(iMeshFactoryWrapper, 3, 0, 0);
   /// Get the iObject for this mesh factory.
   virtual iObject *QueryObject () = 0;
   /// Get the iMeshObjectFactory.

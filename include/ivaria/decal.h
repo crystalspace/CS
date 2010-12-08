@@ -58,7 +58,7 @@ struct iDecal
  */
 struct iDecalTemplate : public virtual iBase
 {
-  SCF_INTERFACE(iDecalTemplate, 1, 3, 0);
+  SCF_INTERFACE(iDecalTemplate, 2, 0, 0);
 
   /**
    * Retrieves the time the decal will have to live in seconds before it is 
@@ -389,7 +389,7 @@ struct iDecalBuilder
  */
 struct iDecalManager : public virtual iBase
 {
-  SCF_INTERFACE (iDecalManager, 1, 1, 0);
+  SCF_INTERFACE (iDecalManager, 2, 0, 0);
 
   /**
    * Creates a decal that can be shared among several meshes.
