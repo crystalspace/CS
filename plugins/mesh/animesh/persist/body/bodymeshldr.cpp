@@ -577,7 +577,53 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
 
   bool BodyMeshLoader::ParseChain (iDocumentNode* node, CS::Animation::iBodySkeleton* skeleton)
   {
-    // TODO
+    const char* name = node->GetAttributeValue ("name");
+
+    const char* root = node->GetAttributeValue ("root");
+    CS::Animation::BoneID id = skeleton->GetSkeletonFactory ()->FindBone (root);
+    if (id == CS::Animation::InvalidBoneID)
+    {
+      synldr->ReportError (msgid, node, "Wrong root bone of chain: no bone with name %s in skeleton factory",
+			   root);
+      return false;
+    }
+
+    CS::Animation::iBodyChain* bodyChain = skeleton->CreateBodyChain (name, id);
+
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char *value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+	{
+	case XMLTOKEN_CHILDALL:
+	  bodyChain->AddAllSubChains ();
+	  break;
+
+	case XMLTOKEN_CHILD:
+	{
+	  const char* name = child->GetAttributeValue ("name");
+	  id = skeleton->GetSkeletonFactory ()->FindBone (name);
+	  if (id == CS::Animation::InvalidBoneID)
+	  {
+	    synldr->ReportError (msgid, node, "Wrong child bone of chain: no bone with name %s in skeleton factory",
+				 name);
+	    return false;
+	  }
+
+	  bodyChain->AddSubChain (id);
+	}
+	  break;
+
+	default:
+	  synldr->ReportBadToken (child);
+	  return false;
+	}
+    }
+
     return true;
   }
 
