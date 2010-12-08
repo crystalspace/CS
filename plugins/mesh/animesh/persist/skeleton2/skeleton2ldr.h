@@ -76,14 +76,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       CS::Animation::iSkeletonAnimPacketFactory* packet);
     csPtr<CS::Animation::iSkeletonAnimNodeFactory> ParseDebugNode (iDocumentNode* node,
       CS::Animation::iSkeletonAnimPacketFactory* packet);
+    csPtr<CS::Animation::iSkeletonAnimNodeFactory> ParseIKNode (iDocumentNode* node,
+      CS::Animation::iSkeletonAnimPacketFactory* packet);
+    bool ParseIKCCDNode (iDocumentNode* node, CS::Animation::iSkeletonIKNodeFactory* factnode);
+    bool ParseIKPhysicalNode (iDocumentNode* node, CS::Animation::iSkeletonIKNodeFactory* factnode);
     csPtr<CS::Animation::iSkeletonAnimNodeFactory> ParseLookAtNode (iDocumentNode* node,
       CS::Animation::iSkeletonAnimPacketFactory* packet);
+    csPtr<CS::Animation::iSkeletonAnimNodeFactory> ParseRagdollNode (iDocumentNode* node,
+      CS::Animation::iSkeletonAnimPacketFactory* packet);
     csPtr<CS::Animation::iSkeletonAnimNodeFactory> ParseRetargetNode (iDocumentNode* node,
+      CS::Animation::iSkeletonAnimPacketFactory* packet);
+    csPtr<CS::Animation::iSkeletonAnimNodeFactory> ParseSpeedNode (iDocumentNode* node,
       CS::Animation::iSkeletonAnimPacketFactory* packet);
 
     bool ParseBoneMapping (iDocumentNode* node, CS::Animation::BoneMapping& mapping,
 			   CS::Animation::iSkeletonFactory* sourceSkeleton,
 			   CS::Animation::iSkeletonFactory* targetSkeleton);
+    bool ParseEffector (iDocumentNode* node, CS::Animation::iSkeletonIKNodeFactory* factory);
 
     iObjectRegistry* object_reg;
     csRef<iSyntaxService> synldr;
