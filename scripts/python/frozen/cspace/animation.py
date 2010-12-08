@@ -394,6 +394,7 @@ class iSkeletonAnimation(core.iBase):
     def SetKeyFrame(*args): return _animation.iSkeletonAnimation_SetKeyFrame(*args)
     def SetFramesInBindSpace(*args): return _animation.iSkeletonAnimation_SetFramesInBindSpace(*args)
     def GetFramesInBindSpace(*args): return _animation.iSkeletonAnimation_GetFramesInBindSpace(*args)
+    def ConvertFrameSpace(*args): return _animation.iSkeletonAnimation_ConvertFrameSpace(*args)
     def GetChannelCount(*args): return _animation.iSkeletonAnimation_GetChannelCount(*args)
     def GetChannelBone(*args): return _animation.iSkeletonAnimation_GetChannelBone(*args)
     def SetChannelBone(*args): return _animation.iSkeletonAnimation_SetChannelBone(*args)
@@ -732,6 +733,11 @@ class iSkeletonLookAtNodeFactory(iSkeletonAnimNodeFactory):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
+    def SetBodySkeleton(*args): return _animation.iSkeletonLookAtNodeFactory_SetBodySkeleton(*args)
+    def SetBone(*args): return _animation.iSkeletonLookAtNodeFactory_SetBone(*args)
+    def SetMaximumSpeed(*args): return _animation.iSkeletonLookAtNodeFactory_SetMaximumSpeed(*args)
+    def SetAlwaysRotate(*args): return _animation.iSkeletonLookAtNodeFactory_SetAlwaysRotate(*args)
+    def SetListenerDelay(*args): return _animation.iSkeletonLookAtNodeFactory_SetListenerDelay(*args)
     def SetChildNode(*args): return _animation.iSkeletonLookAtNodeFactory_SetChildNode(*args)
     def GetChildNode(*args): return _animation.iSkeletonLookAtNodeFactory_GetChildNode(*args)
     def ClearChildNode(*args): return _animation.iSkeletonLookAtNodeFactory_ClearChildNode(*args)
@@ -746,12 +752,8 @@ class iSkeletonLookAtNode(iSkeletonAnimNode):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def SetBone(*args): return _animation.iSkeletonLookAtNode_SetBone(*args)
     def SetTarget(*args): return _animation.iSkeletonLookAtNode_SetTarget(*args)
     def RemoveTarget(*args): return _animation.iSkeletonLookAtNode_RemoveTarget(*args)
-    def SetMaximumSpeed(*args): return _animation.iSkeletonLookAtNode_SetMaximumSpeed(*args)
-    def SetAlwaysRotate(*args): return _animation.iSkeletonLookAtNode_SetAlwaysRotate(*args)
-    def SetListenerDelay(*args): return _animation.iSkeletonLookAtNode_SetListenerDelay(*args)
     def AddListener(*args): return _animation.iSkeletonLookAtNode_AddListener(*args)
     def RemoveListener(*args): return _animation.iSkeletonLookAtNode_RemoveListener(*args)
     scfGetVersion = staticmethod(_animation.iSkeletonLookAtNode_scfGetVersion)
