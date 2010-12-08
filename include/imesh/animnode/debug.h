@@ -71,7 +71,7 @@ struct iSkeletonDebugNodeManager : public virtual iBase
 // ----------------------------- iSkeletonDebugNode -----------------------------
 
 /**
- * The visualization mode to be used by the iSkeletonDebugNode.
+ * The visualization mode to be used by the CS::Animation::iSkeletonDebugNode.
  */
 enum SkeletonDebugMode
 {
@@ -96,14 +96,14 @@ struct iSkeletonDebugNodeFactory : public iSkeletonAnimNodeFactory
   virtual void SetDebugModes (SkeletonDebugMode modes) = 0;
 
   /**
+   * Get the combination of visualization modes to be used for displaying the animation.
+   */
+  virtual SkeletonDebugMode GetDebugModes () = 0;
+
+  /**
    * Set the image to be displayed when CS::Animation::DEBUG_IMAGES is used.
    */
   virtual void SetDebugImage (csPixmap* image) = 0;
-
-  /**
-   * Set the child animation node of this node.
-   */
-  virtual void SetChildNode (iSkeletonAnimNodeFactory* factory) = 0;
 
   /**
    * Set the bone mask to be used. If this mask is provided, then only the bones from this
@@ -120,6 +120,16 @@ struct iSkeletonDebugNodeFactory : public iSkeletonAnimNodeFactory
    * Set whether or not the leaf bones of the skeleton are displayed.
    */
   virtual void SetLeafBonesDisplayed (bool displayed) = 0;
+
+  /**
+   * Set the child animation node of this node.
+   */
+  virtual void SetChildNode (iSkeletonAnimNodeFactory* factory) = 0;
+
+  /**
+   * Get the child animation node of this node.
+   */
+  virtual iSkeletonAnimNodeFactory* GetChildNode () const = 0;
 };
 
 /**

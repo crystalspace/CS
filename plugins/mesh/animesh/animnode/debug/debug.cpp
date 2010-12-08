@@ -113,14 +113,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     this->modes = modes;
   }
 
+  CS::Animation::SkeletonDebugMode DebugNodeFactory::GetDebugModes ()
+  {
+    return modes;
+  }
+
   void DebugNodeFactory::SetDebugImage (csPixmap* image)
   {
     this->image = image;
-  }
-
-  void DebugNodeFactory::SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* factory)
-  {
-    subFactory = factory;
   }
 
   void DebugNodeFactory::SetBoneMask (csBitArray& boneMask)
@@ -137,6 +137,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
   void DebugNodeFactory::SetLeafBonesDisplayed (bool displayed)
   {
     leafBonesDisplayed = displayed;
+  }
+
+  void DebugNodeFactory::SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* factory)
+  {
+    subFactory = factory;
+  }
+
+  CS::Animation::iSkeletonAnimNodeFactory* DebugNodeFactory::GetChildNode () const
+  {
+    return subFactory;
   }
 
   csPtr<CS::Animation::iSkeletonAnimNode> DebugNodeFactory::CreateInstance

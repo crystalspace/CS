@@ -74,11 +74,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
 
     //-- CS::Animation::iSkeletonDebugNodeFactory
     virtual void SetDebugModes (CS::Animation::SkeletonDebugMode modes);
+    virtual CS::Animation::SkeletonDebugMode GetDebugModes ();
     virtual void SetDebugImage (csPixmap* image);
-    virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* factory);
     virtual void SetBoneMask (csBitArray& boneMask);
     virtual void UnsetBoneMask ();
     virtual void SetLeafBonesDisplayed (bool displayed);
+    virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* factory);
+    virtual iSkeletonAnimNodeFactory* GetChildNode () const;
 
     //-- CS::Animation::iSkeletonAnimNodeFactory
     virtual csPtr<CS::Animation::iSkeletonAnimNode> CreateInstance (
