@@ -260,14 +260,16 @@ rule LinkStaticPlugins
         Echo "$(target): Warning: Static plugin \"$(p)\" from package \"$(package)\" not available." ;
       }
       CFlags $(target) : $(STATICPLUGIN.$(p).CFLAGS) ;
-      lflags = [ MergeRemovingDups $(lflags) : $(STATICPLUGIN.$(p).LFLAGS) ] ;
+      local staticplugin_lflags = [ InferFlagTuples $(STATICPLUGIN.$(p).LFLAGS) ] ;
+      lflags = [ MergeRemovingDups $(lflags) : $(staticplugin_lflags) ] ;
       
       local relaydeps = $(STATICPLUGIN.$(p).RELAYDEPS) ;
       for relaydep in $(relaydeps)
       {
         CFlags $(target) : $(STATICPLUGIN.$(p).RELAYCFLAGS.$(relaydep)) ;
+	local staticplugin_relayflags = [ InferFlagTuples $(STATICPLUGIN.$(p).RELAYLFLAGS.$(relaydep)) ] ;
         lflags = [ MergeRemovingDups $(lflags) : 
-          [ RelayLFlags $(COMPILER.LFLAGS) $(STATICPLUGIN.$(p).RELAYLFLAGS.$(relaydep)) :
+          [ RelayLFlags $(COMPILER.LFLAGS) $(staticplugin_relayflags) :
             $(STATICPLUGIN.$(p).RELAYLIBS.$(relaydep)) ] ] ;
 	# @@@ If we can get the .a file name for the static plugin lib
 	# we could pass that for the minimal-objects
@@ -293,7 +295,8 @@ rule LinkStaticPlugins
     # Grab flags
     for p in $(plugins)
     {
-      lflags += [ Filter $($(p).LFLAGS.EXTERNAL) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ;
+      local staticplugin_lflags = [ InferFlagTuples $($(p).LFLAGS.EXTERNAL) ] ;
+      lflags += [ Filter $(staticplugin_lflags) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ;
       libs += $($(p).NEEDLIBS) ;
       
       local relaydeps = $($(p).RELAYDEPS) ;
@@ -304,8 +307,9 @@ rule LinkStaticPlugins
 	  [ on $($(STATICPLUGINS.LIBRARY)_TARGET) GetVar SEARCH ] 
 	  $($(STATICPLUGINS.LIBRARY)_TARGET)
 	] ;
+	local staticplugin_relayflags = [ InferFlagTuples $($(relaydep).LFLAGS) ] ;
 	lflags = [ MergeRemovingDups $(lflags) : 
-	  [ RelayLFlags $(COMPILER.LFLAGS) $($(relaydep).LFLAGS) :
+	  [ RelayLFlags $(COMPILER.LFLAGS) $(staticplugin_relayflags) :
 	    $($(p).RELAYLIBS.$(relaydep)) : $(libpath) ] ] ;
 	relayobjs += [ RelayObjs $(target) :
 	    $($(p).RELAYLIBS.$(relaydep)) : $(relaydep) ] ;
