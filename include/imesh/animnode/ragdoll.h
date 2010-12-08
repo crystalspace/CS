@@ -56,8 +56,7 @@ struct iSkeletonRagdollNodeManager : public virtual iBase
   /**
    * Create a new ragdoll animation node factory.
    */
-  virtual iSkeletonRagdollNodeFactory* CreateAnimNodeFactory (const char *name,
-		  iBodySkeleton* skeleton, iDynamicSystem* dynSys) = 0;
+  virtual iSkeletonRagdollNodeFactory* CreateAnimNodeFactory (const char *name) = 0;
 
   /**
    * Find the ragdoll animation node factory with the given name.
@@ -92,6 +91,16 @@ struct iSkeletonRagdollNodeFactory : public iSkeletonAnimNodeFactory
   SCF_INTERFACE(CS::Animation::iSkeletonRagdollNodeFactory, 1, 0, 3);
 
   /**
+   * Set the physical description of the skeleton.
+   */
+  virtual void SetBodySkeleton (CS::Animation::iBodySkeleton* skeleton) = 0;
+
+  /**
+   * Get the physical description of the skeleton.
+   */
+  virtual CS::Animation::iBodySkeleton* GetBodySkeleton () const = 0;
+
+  /**
    * Add a new body chain to the ragdoll animation node. The dynamic state
    * of each body chain can be set separately.
    * \param state The initial state of the body chain.
@@ -124,16 +133,6 @@ struct iSkeletonRagdollNodeFactory : public iSkeletonAnimNodeFactory
    * Clear the child animation node of this node.
    */
   virtual void ClearChildNode () = 0;
-
-  /**
-   * Get the dynamic system where the ragdoll bodies are evolving
-   */
-  virtual iDynamicSystem* GetDynamicSystem () const = 0;
-
-  /**
-   * Get the physical description of the skeleton.
-   */
-  virtual CS::Animation::iBodySkeleton* GetBodySkeleton () const = 0;
 };
 
 /**
@@ -144,6 +143,18 @@ struct iSkeletonRagdollNodeFactory : public iSkeletonAnimNodeFactory
 struct iSkeletonRagdollNode : public iSkeletonAnimNode
 {
   SCF_INTERFACE(CS::Animation::iSkeletonRagdollNode, 1, 0, 2);
+
+  /**
+   * Set the dynamic system where the rigid bodies are evolving. It is valid to provide a
+   * null system, in this case the bodies already created will be removed from any dynamic
+   * system.
+   */
+  virtual void SetDynamicSystem (iDynamicSystem* system) = 0;
+
+  /**
+   * Get the dynamic system where the rigid bodies are evolving
+   */
+  virtual iDynamicSystem* GetDynamicSystem () const = 0;
 
   /**
    * Set the body chain in the given physical state.

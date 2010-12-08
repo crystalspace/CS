@@ -52,10 +52,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   // TODO: use bone order list
 
   CS::Animation::iSkeletonRagdollNodeFactory* RagdollNodeManager::CreateAnimNodeFactory
-    (const char *name, CS::Animation::iBodySkeleton* skeleton, iDynamicSystem* dynSys)
+    (const char *name)
   {
     csRef<CS::Animation::iSkeletonRagdollNodeFactory> newFact;
-    newFact.AttachNew (new RagdollAnimNodeFactory (this, name, skeleton, dynSys));
+    newFact.AttachNew (new RagdollAnimNodeFactory (this, name));
 
     return factoryHash.PutUnique (name, newFact);
   }
@@ -124,10 +124,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
   CS_LEAKGUARD_IMPLEMENT(RagdollAnimNodeFactory);
 
-  RagdollAnimNodeFactory::RagdollAnimNodeFactory (RagdollNodeManager* manager,
-	    const char *name, CS::Animation::iBodySkeleton* skeleton, iDynamicSystem* dynSys)
-    : scfImplementationType (this), manager (manager), name (name),
-    bodySkeleton (skeleton), dynSys (dynSys)
+  RagdollAnimNodeFactory::RagdollAnimNodeFactory (RagdollNodeManager* manager, const char *name)
+    : scfImplementationType (this), manager (manager), name (name)
   {
   }
 
@@ -158,6 +156,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       return childNode->FindNode (name);
 
       return nullptr;
+  }
+
+  void RagdollAnimNodeFactory::SetBodySkeleton (CS::Animation::iBodySkeleton* skeleton)
+  {
+    bodySkeleton = skeleton;
+  }
+
+  CS::Animation::iBodySkeleton* RagdollAnimNodeFactory::GetBodySkeleton () const
+  {
+    return bodySkeleton;
   }
 
   void RagdollAnimNodeFactory::AddBodyChain (CS::Animation::iBodyChain* chain,
@@ -191,16 +199,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     childNode = 0;
   }
 
-  iDynamicSystem* RagdollAnimNodeFactory::GetDynamicSystem () const
-  {
-    return dynSys;
-  }
-
-  CS::Animation::iBodySkeleton* RagdollAnimNodeFactory::GetBodySkeleton () const
-  {
-    return bodySkeleton;
-  }
-
   /********************
    *  RagdollAnimNode
    ********************/
@@ -227,6 +225,44 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   RagdollAnimNode::~RagdollAnimNode ()
   {
     Stop ();
+  }
+
+  void RagdollAnimNode::SetDynamicSystem (iDynamicSystem* system)
+  {
+    if (!dynamicSystem)
+    {
+      dynamicSystem = system;
+      return;
+    }
+
+    for (csHash<BoneData, CS::Animation::BoneID>::GlobalIterator it = bones.GetIterator ();
+      it.HasNext(); )
+    {
+      BoneData& boneData = it.Next ();
+
+      if (system)
+      {
+	if (boneData.rigidBody)
+	  system->AddBody (boneData.rigidBody);
+	if (boneData.joint)
+	  system->AddJoint (boneData.joint);
+      }
+
+      else
+      {
+	if (boneData.rigidBody)
+	  dynamicSystem->RemoveBody (boneData.rigidBody);
+	if (boneData.joint)
+	  dynamicSystem->RemoveJoint (boneData.joint);
+      }
+    }
+
+    dynamicSystem = system;
+  }
+
+  iDynamicSystem* RagdollAnimNode::GetDynamicSystem () const
+  {
+    return dynamicSystem;
   }
 
   void RagdollAnimNode::CreateBoneData (CS::Animation::iBodyChainNode* chainNode,
@@ -327,7 +363,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     for (csHash<BoneData, CS::Animation::BoneID>::ConstGlobalIterator it = bones.GetIterator ();
 	 it.HasNext (); )
     {
-      BoneData boneData = it.Next ();
+      const BoneData& boneData = it.Next ();
 
       if (boneData.state == state)
 	count++;
@@ -342,7 +378,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     for (csHash<BoneData, CS::Animation::BoneID>::ConstGlobalIterator it = bones.GetIterator ();
 	 it.HasNext (); )
     {
-      BoneData boneData = it.Next ();
+      const BoneData& boneData = it.Next ();
 
       if (boneData.state == state)
       {
@@ -414,7 +450,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       sceneNode = skeleton->GetSceneNode ();
 
     // Check for the dynamic system
-    if (!factory->dynSys)
+    if (!dynamicSystem)
     {
       factory->manager->Report (CS_REPORTER_SEVERITY_ERROR,
         "No dynamic system defined while starting the ragdoll animation node.\n");
@@ -646,13 +682,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     {
       if (boneData->joint)
       {
-	factory->dynSys->RemoveJoint (boneData->joint);
+	dynamicSystem->RemoveJoint (boneData->joint);
 	boneData->joint = 0;
       }
 
       if (boneData->rigidBody)
       {
-	factory->dynSys->RemoveBody (boneData->rigidBody);
+	dynamicSystem->RemoveBody (boneData->rigidBody);
 	boneData->rigidBody = 0;
       }
 
@@ -678,7 +714,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       }
 
       // create rigid body
-      boneData->rigidBody = factory->dynSys->CreateBody ();
+      boneData->rigidBody = dynamicSystem->CreateBody ();
 
       // set body position
       csQuaternion rotation;
@@ -789,7 +825,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 	    "No supported geometry for collider in bone %i while creating rigid body.\n",
 				    bodyBone->GetAnimeshBone ());
 
-	  factory->dynSys->RemoveBody (boneData->rigidBody);
+	  dynamicSystem->RemoveBody (boneData->rigidBody);
 	  boneData->rigidBody = 0;
 	}
       }
@@ -842,7 +878,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       BoneData& parentBoneData = bones.Get (parentBoneID, nullBone);
 
       // create the dynamic joint
-      boneData->joint = factory->dynSys->CreateJoint ();
+      boneData->joint = dynamicSystem->CreateJoint ();
       boneData->joint->SetBounce (bodyBone->GetBoneJoint ()->GetBounce (), false);
       boneData->joint->SetRotConstraints (bodyBone->GetBoneJoint ()->IsXRotConstrained (),
 					  bodyBone->GetBoneJoint ()->IsYRotConstrained (),
@@ -909,7 +945,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       // remove the joint
       if (boneData->joint)
       {
-	factory->dynSys->RemoveJoint (boneData->joint);
+	dynamicSystem->RemoveJoint (boneData->joint);
 	boneData->joint = 0;
       }
     }
