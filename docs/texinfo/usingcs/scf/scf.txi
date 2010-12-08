@@ -395,8 +395,18 @@ Do not insert new methods into existing interfaces.  Instead, you should
 append them after last defined method.
 
 @item
+Avoid changing the signature of existing methods (i.e. don't add or remove
+parameters).  Instead, consider adding a new overload of the particular
+method that should get a different signature.
+
+@item
+Avoid changing the return type of existing methods.  (Since you can't overload
+by return type the only to deal with this is to add a new method with a different
+name.)
+
+@item
 If your change made the interface invalid for clients that expect older
-versions of interfaces (for example, you broke the previous rule), increase
+versions of interfaces (for example, you broke the previous three rules), increase
 the major version number, and set minor and micro versions to zero.
 
 @item
