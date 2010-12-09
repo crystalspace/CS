@@ -88,7 +88,10 @@ static int WriteConsoleUTF8 (HANDLE hCon, const utf8_char* inStr, size_t inLen)
         break;
     }
 
-    if (!WriteConsoleW (hCon, wideBuf, maxConsoleWrite - wideBufRemain, nullptr, nullptr))
+    DWORD charsToWrite = maxConsoleWrite - wideBufRemain;
+    DWORD charsWritten = 0;
+    if (!WriteConsoleW (hCon, wideBuf, charsToWrite, &charsWritten, nullptr)
+	|| (charsWritten != charsToWrite))
       return EOF;
   }
   return 0;
