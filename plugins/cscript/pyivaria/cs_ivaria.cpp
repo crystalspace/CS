@@ -4493,6 +4493,27 @@ SWIGINTERN PyObject *iDecalTemplate_swigregister(PyObject *SWIGUNUSEDPARM(self),
   return SWIG_Py_Void();
 }
 
+SWIGINTERN PyObject *_wrap_delete_iDecalAnimationControl(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDecalAnimationControl *arg1 = (iDecalAnimationControl *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iDecalAnimationControl",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDecalAnimationControl, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iDecalAnimationControl" "', argument " "1"" of type '" "iDecalAnimationControl *""'"); 
+  }
+  arg1 = reinterpret_cast< iDecalAnimationControl * >(argp1);
+  delete arg1;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iDecalAnimationControl_UpdateDecal(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iDecalAnimationControl *arg1 = (iDecalAnimationControl *) 0 ;
@@ -4561,27 +4582,6 @@ SWIGINTERN PyObject *_wrap_iDecalAnimationControl_UpdateDecal(PyObject *SWIGUNUS
   }
   arg6 = reinterpret_cast< csRenderBuffer * >(argp6);
   (arg1)->UpdateDecal(arg2,arg3,*arg4,*arg5,*arg6);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_delete_iDecalAnimationControl(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iDecalAnimationControl *arg1 = (iDecalAnimationControl *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"delete_iDecalAnimationControl",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDecalAnimationControl, SWIG_POINTER_DISOWN |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iDecalAnimationControl" "', argument " "1"" of type '" "iDecalAnimationControl *""'"); 
-  }
-  arg1 = reinterpret_cast< iDecalAnimationControl * >(argp1);
-  delete arg1;
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -16467,6 +16467,36 @@ SWIGINTERN PyObject *_wrap_iDynamicSystem_AddBody(PyObject *SWIGUNUSEDPARM(self)
   }
   arg2 = reinterpret_cast< iRigidBody * >(argp2);
   (arg1)->AddBody(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iDynamicSystem_AddJoint(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDynamicSystem *arg1 = (iDynamicSystem *) 0 ;
+  iJoint *arg2 = (iJoint *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iDynamicSystem_AddJoint",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDynamicSystem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDynamicSystem_AddJoint" "', argument " "1"" of type '" "iDynamicSystem *""'"); 
+  }
+  arg1 = reinterpret_cast< iDynamicSystem * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iJoint, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iDynamicSystem_AddJoint" "', argument " "2"" of type '" "iJoint *""'"); 
+  }
+  arg2 = reinterpret_cast< iJoint * >(argp2);
+  (arg1)->AddJoint(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -40679,8 +40709,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iDecalTemplate_scfGetVersion", _wrap_iDecalTemplate_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iDecalTemplate", _wrap_delete_iDecalTemplate, METH_VARARGS, NULL},
 	 { (char *)"iDecalTemplate_swigregister", iDecalTemplate_swigregister, METH_VARARGS, NULL},
-	 { (char *)"iDecalAnimationControl_UpdateDecal", _wrap_iDecalAnimationControl_UpdateDecal, METH_VARARGS, NULL},
 	 { (char *)"delete_iDecalAnimationControl", _wrap_delete_iDecalAnimationControl, METH_VARARGS, NULL},
+	 { (char *)"iDecalAnimationControl_UpdateDecal", _wrap_iDecalAnimationControl_UpdateDecal, METH_VARARGS, NULL},
 	 { (char *)"iDecalAnimationControl_swigregister", iDecalAnimationControl_swigregister, METH_VARARGS, NULL},
 	 { (char *)"delete_iDecalBuilder", _wrap_delete_iDecalBuilder, METH_VARARGS, NULL},
 	 { (char *)"iDecalBuilder_AddStaticPoly", _wrap_iDecalBuilder_AddStaticPoly, METH_VARARGS, NULL},
@@ -40939,6 +40969,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iDynamicSystem_GetColliderCount", _wrap_iDynamicSystem_GetColliderCount, METH_VARARGS, NULL},
 	 { (char *)"iDynamicSystem_AttachColliderCapsule", _wrap_iDynamicSystem_AttachColliderCapsule, METH_VARARGS, NULL},
 	 { (char *)"iDynamicSystem_AddBody", _wrap_iDynamicSystem_AddBody, METH_VARARGS, NULL},
+	 { (char *)"iDynamicSystem_AddJoint", _wrap_iDynamicSystem_AddJoint, METH_VARARGS, NULL},
 	 { (char *)"iDynamicSystem_scfGetVersion", _wrap_iDynamicSystem_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iDynamicSystem", _wrap_delete_iDynamicSystem, METH_VARARGS, NULL},
 	 { (char *)"iDynamicSystem_swigregister", iDynamicSystem_swigregister, METH_VARARGS, NULL},

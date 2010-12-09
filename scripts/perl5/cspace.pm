@@ -6340,7 +6340,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-*UpdateDecal = *cspacec::iDecalAnimationControl_UpdateDecal;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -6352,6 +6351,7 @@ sub DESTROY {
     }
 }
 
+*UpdateDecal = *cspacec::iDecalAnimationControl_UpdateDecal;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -7194,6 +7194,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetColliderCount = *cspacec::iDynamicSystem_GetColliderCount;
 *AttachColliderCapsule = *cspacec::iDynamicSystem_AttachColliderCapsule;
 *AddBody = *cspacec::iDynamicSystem_AddBody;
+*AddJoint = *cspacec::iDynamicSystem_AddJoint;
 *scfGetVersion = *cspacec::iDynamicSystem_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

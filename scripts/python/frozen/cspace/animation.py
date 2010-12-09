@@ -636,6 +636,8 @@ class iSkeletonIKNodeFactory(iSkeletonAnimNodeFactory):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
+    def SetBodySkeleton(*args): return _animation.iSkeletonIKNodeFactory_SetBodySkeleton(*args)
+    def GetBodySkeleton(*args): return _animation.iSkeletonIKNodeFactory_GetBodySkeleton(*args)
     def SetChildNode(*args): return _animation.iSkeletonIKNodeFactory_SetChildNode(*args)
     def GetChildNode(*args): return _animation.iSkeletonIKNodeFactory_GetChildNode(*args)
     def ClearChildNode(*args): return _animation.iSkeletonIKNodeFactory_ClearChildNode(*args)
@@ -797,13 +799,13 @@ class iSkeletonRagdollNodeFactory(iSkeletonAnimNodeFactory):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
+    def SetBodySkeleton(*args): return _animation.iSkeletonRagdollNodeFactory_SetBodySkeleton(*args)
+    def GetBodySkeleton(*args): return _animation.iSkeletonRagdollNodeFactory_GetBodySkeleton(*args)
     def AddBodyChain(*args): return _animation.iSkeletonRagdollNodeFactory_AddBodyChain(*args)
     def RemoveBodyChain(*args): return _animation.iSkeletonRagdollNodeFactory_RemoveBodyChain(*args)
     def SetChildNode(*args): return _animation.iSkeletonRagdollNodeFactory_SetChildNode(*args)
     def GetChildNode(*args): return _animation.iSkeletonRagdollNodeFactory_GetChildNode(*args)
     def ClearChildNode(*args): return _animation.iSkeletonRagdollNodeFactory_ClearChildNode(*args)
-    def GetDynamicSystem(*args): return _animation.iSkeletonRagdollNodeFactory_GetDynamicSystem(*args)
-    def GetBodySkeleton(*args): return _animation.iSkeletonRagdollNodeFactory_GetBodySkeleton(*args)
     scfGetVersion = staticmethod(_animation.iSkeletonRagdollNodeFactory_scfGetVersion)
     __swig_destroy__ = _animation.delete_iSkeletonRagdollNodeFactory
     __del__ = lambda self : None;
@@ -815,6 +817,8 @@ class iSkeletonRagdollNode(iSkeletonAnimNode):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
+    def SetDynamicSystem(*args): return _animation.iSkeletonRagdollNode_SetDynamicSystem(*args)
+    def GetDynamicSystem(*args): return _animation.iSkeletonRagdollNode_GetDynamicSystem(*args)
     def SetBodyChainState(*args): return _animation.iSkeletonRagdollNode_SetBodyChainState(*args)
     def GetBodyChainState(*args): return _animation.iSkeletonRagdollNode_GetBodyChainState(*args)
     def GetBoneRigidBody(*args): return _animation.iSkeletonRagdollNode_GetBoneRigidBody(*args)
