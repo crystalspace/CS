@@ -1318,7 +1318,7 @@ void csGLGraphics3D::SetupShaderVariables()
 
   {
     csRGBpixel* black = new csRGBpixel[1];
-    black->Set (0, 0, 0);
+    black->Set (0, 0, 0, 0);
     img = csPtr<iImage> (new csImageMemory (1, 1, black, true, 
       CS_IMGFMT_TRUECOLOR));
 
