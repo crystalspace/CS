@@ -46,7 +46,7 @@ namespace CS
 	while (meshNodeIter.HasNext ())
 	{
 	  typename RenderTree::TreeTraitsType::MeshNodeKeyType key;
-	  typename RenderTree::MeshNode* node = meshNodeIter.PeekNext (key);
+	  meshNodeIter.PeekNext (key);
 
 	  CS::RenderPriorityGrouping newGrouping = engine->GetRenderPriorityGrouping (
 	    CS::Graphics::RenderPriority (uint (key.priority)));
