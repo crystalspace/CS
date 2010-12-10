@@ -502,7 +502,7 @@ namespace RenderManager
 	typename TreeTraits::MeshNodeKeyType srcKey;
 	MeshNode* srcNode = sourceMeshNode.PeekNext (srcKey);
 
-	CS_ASSERT(targetContext->meshNodes.Get (srcKey, nullptr) == nullptr);
+	CS_ASSERT(!targetContext->meshNodes.Get (srcKey, nullptr));
 	size_t nodeMeshes = srcNode->meshes.GetSize ();
 	srcNode->owner = targetContext;
 	targetContext->meshNodes.Put (srcKey, srcNode);

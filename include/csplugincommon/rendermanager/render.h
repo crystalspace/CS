@@ -177,7 +177,7 @@ namespace RenderManager
     void operator() (typename RenderTree::MeshNode* node)
     {
       typename RenderTree::ContextNode& context = node->GetOwner();
-      const size_t layerOffset = context.totalRenderMeshes*currentLayer;
+      const size_t layerOffset = context.totalRenderMeshes*this->currentLayer;
 
       iShader* lastShader = 0;
       size_t lastTicket = ~0;
@@ -203,7 +203,7 @@ namespace RenderManager
         
         if (mesh.preCopyNum != 0)
         {
-          g3d->CopyFromRenderTargets (mesh.preCopyNum,
+          this->g3d->CopyFromRenderTargets (mesh.preCopyNum,
             mesh.preCopyAttachments, mesh.preCopyTextures);
         }
       }
@@ -231,12 +231,12 @@ namespace RenderManager
 	typename RenderTree::MeshNode::SingleMesh& mesh = node->meshes.Get (m);
 	if (mesh.preCopyNum != 0)
 	{
-	  g3d->CopyFromRenderTargets (mesh.preCopyNum,
+	  this->g3d->CopyFromRenderTargets (mesh.preCopyNum,
 	    mesh.preCopyAttachments, mesh.preCopyTextures);
 	}
 	for (size_t layer = 0; layer < context.svArrays.GetNumLayers(); layer++)
 	{
-	  SetLayer (layer);
+	  this->SetLayer (layer);
 	  const size_t layerOffset = context.totalRenderMeshes*layer;
 
 	  iShader* shader = context.shaderArray[mesh.contextLocalId+layerOffset];
