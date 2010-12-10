@@ -99,13 +99,15 @@ namespace RenderManager
         break;
       case CS_RENDPRI_SORT_BACK2FRONT:
         {
-          DistanceSorter sorter (cameraOrigin, 1);
+	  // B2F: we want to render meshes with the larger distance first.
+          DistanceSorter sorter (cameraOrigin, -1);
           meshNode->meshes.Sort (sorter);
         }
         break;
       case CS_RENDPRI_SORT_FRONT2BACK:
         {
-          DistanceSorter sorter (cameraOrigin, -1);
+	  // F2B: we want to render meshes with the smaller distance first.
+          DistanceSorter sorter (cameraOrigin, 1);
           meshNode->meshes.Sort (sorter);
         }
         break;
@@ -144,6 +146,7 @@ namespace RenderManager
     /**
      * Sorter function sorting based on distance between render mesh and
      * camera origin.
+     * Meshes with the smaller (scaled) distance to the camera are sorted first.
      * Scale factor is used to be able to invert sorting.
      */
     class DistanceSorter : NormalSorter
