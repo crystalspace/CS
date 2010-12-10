@@ -104,6 +104,27 @@ enum csRenderPrioritySorting
 };
 /** @} */
 
+namespace CS
+{
+  /// Render grouping for mesh multipass rendering
+  enum RenderPriorityGrouping
+  {
+    /**
+     * This first renders layer 1 for all meshes, then layer 2 for all meshes and
+     * and so on. This is the faster way of multipass rendering; however, some
+     * multipass effects produce incorrect results with this (especially when
+     * alpha transparency is involved).
+     */
+    rpgByLayer = 0,
+    /**
+     * This all layers in order for the first mesh, then all layers in order for
+     * the second mesh and so on. This is the slower way of multipass rendering;
+     * however, it always results in correct results (and should thus be used
+     * when alpha transparency is involved).
+     */
+    rpgByMesh = 1
+  };
+} // namespace CS
 
 /**
  * A callback that will be fired whenever the engine starts drawing
@@ -159,7 +180,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine, 7, 0, 0);
+  SCF_INTERFACE(iEngine, 8, 0, 0);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -273,7 +294,8 @@ struct iEngine : public virtual iBase
    * <em>change the name</em>.
    */
   virtual void RegisterRenderPriority (const char* name, uint priority,
-  	csRenderPrioritySorting rendsort = CS_RENDPRI_SORT_NONE) = 0;
+  	csRenderPrioritySorting rendsort = CS_RENDPRI_SORT_NONE,
+        CS::RenderPriorityGrouping grouping = CS::rpgByLayer) = 0;
   /**
    * Register default render priorities.
    * \sa RegisterRenderPriority for list of default render priorities.
@@ -284,7 +306,7 @@ struct iEngine : public virtual iBase
    * Get a render priority by name.
    * \param name is the name you want (one of the standard names
    * or your own if you have defined your own render priorities).
-   * \return 0 if render priority doesn't exist.
+   * \return -1 if render priority doesn't exist.
    */
   virtual CS::Graphics::RenderPriority GetRenderPriority (const char* name) const = 0;
   /// Get the render priority sorting flag.
@@ -293,6 +315,13 @@ struct iEngine : public virtual iBase
   /// Get the render priority sorting flag.
   virtual csRenderPrioritySorting GetRenderPrioritySorting (
   	CS::Graphics::RenderPriority priority) const = 0;
+  //@{
+  /// Get the render priority grouping flag.
+  virtual CS::RenderPriorityGrouping GetRenderPriorityGrouping (
+  	const char* name) const = 0;
+  virtual CS::RenderPriorityGrouping GetRenderPriorityGrouping (
+  	CS::Graphics::RenderPriority priority) const = 0;
+  //@}
   /// Get the render priority for sky objects (attached to 'sky' name).
   virtual CS::Graphics::RenderPriority GetSkyRenderPriority () = 0;
   /// Get the render priority for portal objects (attached to 'portal' name).

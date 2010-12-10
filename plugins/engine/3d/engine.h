@@ -290,12 +290,17 @@ public:
   //-- Render priority functions
 
   virtual void RegisterRenderPriority (const char* name, uint priority,
-  	csRenderPrioritySorting rendsort = CS_RENDPRI_SORT_NONE);
+  	csRenderPrioritySorting rendsort = CS_RENDPRI_SORT_NONE,
+        CS::RenderPriorityGrouping grouping = CS::rpgByLayer);
   virtual void RegisterDefaultRenderPriorities ();
   virtual CS::Graphics::RenderPriority GetRenderPriority (const char* name) const;
   virtual csRenderPrioritySorting GetRenderPrioritySorting (
   	const char* name) const;
   virtual csRenderPrioritySorting GetRenderPrioritySorting (
+  	CS::Graphics::RenderPriority priority) const;
+  virtual CS::RenderPriorityGrouping GetRenderPriorityGrouping (
+  	const char* name) const;
+  virtual CS::RenderPriorityGrouping GetRenderPriorityGrouping (
   	CS::Graphics::RenderPriority priority) const;
 
   virtual CS::Graphics::RenderPriority GetSkyRenderPriority ()
@@ -934,10 +939,17 @@ private:
   /// An array of objects to remove at a specific time.
   csArray<csDelayedRemoveObject> delayedRemoves;
 
-  /// The list of all named render priorities.
-  csStringArray renderPriorities;
-  /// Sorting flags for the render priorities.
-  csArray<csRenderPrioritySorting> renderPrioritySortflag;
+  /// Properties for the render priorities.
+  struct RenderPriorityProperties
+  {
+    csString name;
+    csRenderPrioritySorting sorting;
+    CS::RenderPriorityGrouping grouping;
+
+    RenderPriorityProperties() : sorting (CS_RENDPRI_SORT_NONE),
+      grouping (CS::rpgByLayer) {}
+  };
+  csArray<RenderPriorityProperties> renderPriorityProps;
 
   // - Pointers to other plugins
 

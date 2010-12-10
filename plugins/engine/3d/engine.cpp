@@ -535,7 +535,7 @@ csEngine::~csEngine ()
 
   DeleteAllForce();
 
-  renderPriorities.DeleteAll ();
+  renderPriorityProps.DeleteAll ();
 
   delete materials;
   delete textures;
@@ -867,18 +867,19 @@ iObject *csEngine::QueryObject ()
 void csEngine::RegisterRenderPriority (
   const char *name,
   uint priority,
-  csRenderPrioritySorting rendsort)
+  csRenderPrioritySorting rendsort,
+  CS::RenderPriorityGrouping grouping)
 {
   // If our priority goes over the number of defined priorities
   // then we have to initialize.
-  if ((size_t)(priority + 1) >= renderPrioritySortflag.GetSize ())
+  if ((size_t)(priority + 1) >= renderPriorityProps.GetSize ())
   {
-    renderPrioritySortflag.SetSize (priority + 2, CS_RENDPRI_SORT_NONE);
-    renderPriorities.SetSize (priority+2);
+    renderPriorityProps.SetSize (priority + 2);
   }
 
-  renderPriorities.Put (priority, name);
-  renderPrioritySortflag[priority] = rendsort;
+  renderPriorityProps[priority].name = name;
+  renderPriorityProps[priority].sorting = rendsort;
+  renderPriorityProps[priority].grouping = grouping;
   renderPrioritiesDirty = true;
 }
 
@@ -894,7 +895,7 @@ void csEngine::RegisterDefaultRenderPriorities ()
   RegisterRenderPriority ("object", 7);
   RegisterRenderPriority ("object2", 8);
   RegisterRenderPriority ("transp", 9);
-  RegisterRenderPriority ("alpha", 10, CS_RENDPRI_SORT_BACK2FRONT);
+  RegisterRenderPriority ("alpha", 10, CS_RENDPRI_SORT_BACK2FRONT, CS::rpgByMesh);
   RegisterRenderPriority ("final", 11);
 }
 
@@ -915,10 +916,10 @@ void csEngine::UpdateStandardRenderPriorities ()
 CS::Graphics::RenderPriority csEngine::GetRenderPriority (const char *name) const
 {
   size_t i;
-  for (i = 0; i < renderPriorities.GetSize (); i++)
+  for (i = 0; i < renderPriorityProps.GetSize (); i++)
   {
-    const char *n = renderPriorities[i];
-    if (n && !strcmp (name, n)) return CS::Graphics::RenderPriority (uint (i));
+    const csString& n = renderPriorityProps[i].name;
+    if (n == name) return (long)i;
   }
 
   return CS::Graphics::RenderPriority ();
@@ -926,38 +927,46 @@ CS::Graphics::RenderPriority csEngine::GetRenderPriority (const char *name) cons
 
 csRenderPrioritySorting csEngine::GetRenderPrioritySorting (const char *name) const
 {
-  size_t i;
-  for (i = 0; i < renderPriorities.GetSize (); i++)
-  {
-    const char *n = renderPriorities[i];
-    if (n && !strcmp (name, n)) return renderPrioritySortflag[i];
-  }
-
+  CS::Graphics::RenderPriority p = csEngine::GetRenderPriority (name);
+  if (p.IsValid()) return renderPriorityProps[p].sorting;
   return CS_RENDPRI_SORT_NONE;
 }
 
 csRenderPrioritySorting csEngine::GetRenderPrioritySorting (CS::Graphics::RenderPriority priority) const
 {
-  return renderPrioritySortflag[priority];
+  return renderPriorityProps[priority].sorting;
+}
+
+CS::RenderPriorityGrouping csEngine::GetRenderPriorityGrouping (
+  const char* name) const
+{
+  CS::Graphics::RenderPriority p = csEngine::GetRenderPriority (name);
+  if (p.IsValid()) return renderPriorityProps[p].grouping;
+  return CS::rpgByLayer;
+}
+
+CS::RenderPriorityGrouping csEngine::GetRenderPriorityGrouping (
+  CS::Graphics::RenderPriority priority) const
+{
+  return renderPriorityProps[priority].grouping;
 }
 
 void csEngine::ClearRenderPriorities ()
 {
   renderPrioritiesDirty = true;
-  renderPriorities.DeleteAll ();
-  renderPrioritySortflag.SetSize (0);
+  renderPriorityProps.DeleteAll ();
 }
 
 size_t csEngine::GetRenderPriorityCount () const
 {
-  return (int)renderPriorities.GetSize ();
+  return (int)renderPriorityProps.GetSize ();
 }
 
 const char* csEngine::GetRenderPriorityName (CS::Graphics::RenderPriority priority) const
 {
-  if ((size_t)priority >= renderPriorities.GetSize ()) 
+  if ((size_t)priority >= renderPriorityProps.GetSize ()) 
     return 0;
-  return renderPriorities[priority];
+  return renderPriorityProps[priority].name;
 }
 
 void csEngine::ResetWorldSpecificSettings()
