@@ -148,7 +148,7 @@ namespace CS
 	  size_t n = 0;
 	  int renderW = -1, renderH;
 	  
-	  typename RenderTree::ContextNode& context = node->owner;
+	  typename RenderTree::ContextNode& context = node->GetOwner();
 	  csShaderVariableStack localStack;
 	  context.svArrays.SetupSVStack (localStack, layer, mesh.contextLocalId);
 	  

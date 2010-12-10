@@ -346,7 +346,7 @@ namespace RenderManager
       typedef typename MeshArrayType::Iterator MeshArrayIteratorType;
 
       /// Owner
-      ContextNode& owner;
+      ContextNode& GetOwner() const { return *owner; }
       
       /// Our own key
       typename TreeTraitsType::MeshNodeKeyType key;
@@ -358,8 +358,12 @@ namespace RenderManager
       MeshArrayType meshes;
 
       MeshNode (ContextNode& owner)
-        : owner (owner)
+        : owner (&owner)
       {}
+    protected:
+      ContextNode* owner;
+
+      friend struct ContextNode;
     };
 
     /**
@@ -420,6 +424,8 @@ namespace RenderManager
       csRef<csShaderVariable> svFogplane;
       /// Context-specific shader variables
       csRef<iShaderVariableContext> shadervars;
+      /// Mesh render grouping
+      CS::RenderPriorityGrouping renderGrouping;
       
       /// Post processing effects to apply after rendering the context
       csRef<PostEffectManager> postEffects;
@@ -442,7 +448,8 @@ namespace RenderManager
       size_t totalRenderMeshes;
       
       ContextNode(TreeType& owner, MeshNodeTreeBlockAlloc& meshNodeAlloc) 
-        : owner (owner), drawFlags (0), 
+        : owner (owner), drawFlags (0),
+	  renderGrouping (CS::rpgByLayer),
           meshNodes (MeshNodeTreeBlockRefAlloc (meshNodeAlloc)),
           totalRenderMeshes (0) 
       {}
@@ -487,6 +494,22 @@ namespace RenderManager
     
 	meshNode->meshes.Push (sm);
 	totalRenderMeshes++;
+      }
+
+      void MoveRenderMeshes (MeshNodeTreeIteratorType& sourceMeshNode,
+			     ContextNode* targetContext)
+      {
+	typename TreeTraits::MeshNodeKeyType srcKey;
+	MeshNode* srcNode = sourceMeshNode.PeekNext (srcKey);
+
+	CS_ASSERT(targetContext->meshNodes.Get (srcKey, nullptr) == nullptr);
+	size_t nodeMeshes = srcNode->meshes.GetSize ();
+	srcNode->owner = targetContext;
+	targetContext->meshNodes.Put (srcKey, srcNode);
+	totalRenderMeshes -= nodeMeshes;
+	targetContext->totalRenderMeshes += nodeMeshes;
+
+	meshNodes.Delete (sourceMeshNode);
       }
 
       /// Add a new render layer after \a layer
@@ -594,6 +617,33 @@ namespace RenderManager
       contexts.Delete (context);
 
       persistentData.contextNodeAllocator.Free (context);
+    }
+
+    /**
+     * Clone a context. The new context is added <em>before</em> the
+     * context to be cloned.
+     */
+    ContextNode* CloneContext (ContextNode* context)
+    {
+      // Create an initial context
+      ContextNode* newCtx = persistentData.contextNodeAllocator.Alloc (*this,
+        persistentData.meshNodeTreeAlloc);
+      newCtx->renderView = context->renderView;
+      memcpy (newCtx->renderTargets, context->renderTargets, sizeof (newCtx->renderTargets));
+      newCtx->perspectiveFixup = context->perspectiveFixup;
+      newCtx->cameraTransform = context->cameraTransform;
+      newCtx->drawFlags = context->drawFlags;
+      newCtx->renderGrouping = context->renderGrouping;
+      newCtx->sector = context->sector;
+      newCtx->svFogplane = context->svFogplane; // should that be copied?
+      newCtx->shadervars = context->shadervars; // should that be copied?
+      newCtx->postEffects = context->postEffects; // should that be copied?
+
+      size_t n = contexts.Find (context);
+      CS_ASSERT(n != csArrayItemNotFound);
+      contexts.Insert (n, newCtx);
+
+      return newCtx;
     }
 
     /**

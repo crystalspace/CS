@@ -526,7 +526,7 @@ namespace RenderManager
 	clipToView = csBox3 (csVector3 (-1, -1, 0),
 	  csVector3 (1, 1, FLT_MAX));
 
-        typename RenderTree::ContextNode& context = meshNode->owner;
+        typename RenderTree::ContextNode& context = meshNode->GetOwner();
       
         CS_ALLOC_STACK_ARRAY(iTextureHandle*, texHandles,
           persist.settings.targets.GetSize());
@@ -1036,7 +1036,7 @@ private:
       typename RenderTree::MeshNode* node, 
       ViewSetup& viewSetup) 
       : persist (persist), layerConfig (layerConfig), 
-        renderTree (node->owner.owner), meshNode (node),
+        renderTree (node->GetOwner().owner), meshNode (node),
         viewSetup (viewSetup)
     { }
         

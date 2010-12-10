@@ -225,7 +225,7 @@ namespace CS
 	  typename PersistentData::ReflectRefractSVs& meshReflectRefract =
 	    persist.reflRefrCache.GetOrCreate (mesh.meshWrapper);
 	  
-	  typename RenderTree::ContextNode& context = node->owner;
+	  typename RenderTree::ContextNode& context = node->GetOwner();
 	  RenderTree& renderTree = context.owner;
 	  RenderView* rview = context.renderView;
 	  

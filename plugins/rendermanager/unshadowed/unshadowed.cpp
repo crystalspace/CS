@@ -27,6 +27,7 @@
 #include "csplugincommon/rendermanager/portalsetup.h"
 #include "csplugincommon/rendermanager/posteffects.h"
 #include "csplugincommon/rendermanager/render.h"
+#include "csplugincommon/rendermanager/rendergroupinghandler.h"
 #include "csplugincommon/rendermanager/renderlayers.h"
 #include "csplugincommon/rendermanager/rendertree.h"
 #include "csplugincommon/rendermanager/shadersetup.h"
@@ -77,8 +78,6 @@ public:
 
     if (recurseCount > maxPortalRecurse) return;
     
-    iShaderManager* shaderManager = rmanager->shaderManager;
-
     // @@@ This is somewhat "boilerplate" sector/rview setup.
     sector->PrepareDraw (rview);
     // Make sure the clip-planes are ok
@@ -98,7 +97,27 @@ public:
       portalSetup (context, portalSetupData);
       recurseCount--;
     }
-    
+
+    /* Split out mesh nodes with different render grouping
+       Note: Since creates new contexts and should be done after portal setup,
+       lest portal rendering order gets wrong */
+    {
+      ContextSetupMeshes setupMeshes (*this);
+      CS::RenderManager::RenderGroupingHandler<RenderTreeType,
+	ContextSetupMeshes> groupingHandler (rview->GetEngine (), context.owner,
+					     setupMeshes);
+      groupingHandler (&context);
+    }
+
+    HandleContextMeshes (context);
+  }
+
+  void HandleContextMeshes (typename RenderTreeType::ContextNode& context)
+  {
+    CS::RenderManager::RenderView* rview = context.renderView;
+    iShaderManager* shaderManager = rmanager->shaderManager;
+    iSector* sector = rview->GetThisSector ();
+
     // Sort the mesh lists  
     {
       StandardMeshSorter<RenderTreeType> mySorter (rview->GetEngine ());
@@ -176,6 +195,19 @@ private:
   const LayerConfigType& layerConfig;
   int recurseCount;
   int maxPortalRecurse;
+
+  // Used to set up contexts split out by render grouping
+  struct ContextSetupMeshes
+  {
+    StandardContextSetup& owner;
+
+    ContextSetupMeshes (StandardContextSetup& owner) : owner (owner) {}
+
+    void operator() (typename RenderTreeType::ContextNode& context)
+    {
+      owner.HandleContextMeshes (context);
+    }
+  };
 };
 
 

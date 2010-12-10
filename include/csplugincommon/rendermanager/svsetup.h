@@ -70,8 +70,8 @@ namespace RenderManager
       csShaderVariableStack localStack;
 
       // @@TODO: keep the sv-name around in a better way
-      const size_t svO2wName = node->owner.owner.GetPersistentData().svObjectToWorldName;
-      const size_t svO2wIName = node->owner.owner.GetPersistentData().svObjectToWorldInvName;
+      const size_t svO2wName = node->GetOwner().owner.GetPersistentData().svObjectToWorldName;
+      const size_t svO2wIName = node->GetOwner().owner.GetPersistentData().svObjectToWorldInvName;
 
       for (size_t i = 0; i < node->meshes.GetSize (); ++i)
       {
@@ -135,7 +135,7 @@ namespace RenderManager
 
     void operator() (typename RenderTree::MeshNode* node)
     {
-      const size_t totalMeshes = node->owner.totalRenderMeshes;
+      const size_t totalMeshes = node->GetOwner().totalRenderMeshes;
 
       for (size_t i = 0; i < node->meshes.GetSize (); ++i)
       {

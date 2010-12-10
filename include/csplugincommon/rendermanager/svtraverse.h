@@ -52,7 +52,7 @@ namespace RenderManager
 
     void operator() (typename RenderTree::MeshNode* node)
     {
-      typename RenderTree::ContextNode& context = node->owner;
+      typename RenderTree::ContextNode& context = node->GetOwner();
       
 
       iShader* lastShader = 0;
@@ -129,7 +129,7 @@ namespace RenderManager
 	// No names to check anyway, so leave right away ...
 	if (names.AllBitsFalse()) return;
 	
-	typename RenderTree::ContextNode& context = node->owner;
+	typename RenderTree::ContextNode& context = node->GetOwner();
 
 	csShaderVariableStack varStack;
 	context.svArrays.SetupSVStack (varStack, layer, mesh.contextLocalId);

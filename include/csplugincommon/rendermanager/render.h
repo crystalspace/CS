@@ -105,26 +105,78 @@ namespace RenderManager
     iGraphics3D* g3d;
   };
 
-  /**
-   * Render mesh nodes within one context.
-   * Does not handle setting render targets or camera transform.
-   */
+  /// Common mesh render functions
   template<typename RenderTree>
-  class SimpleContextRender
+  class RenderCommon
   {
   public:
-    SimpleContextRender (iGraphics3D* g3d, iShaderManager* shaderMgr)
-      : g3d (g3d), shaderMgr (shaderMgr), currentLayer (0)
-    {}
-    
     void SetLayer (size_t layer)
     {
       currentLayer = layer;
     }
+  protected:
+    iGraphics3D* g3d;
+    iShaderManager* shaderMgr;
+    size_t currentLayer;
 
+    RenderCommon (iGraphics3D* g3d, iShaderManager* shaderMgr)
+     : g3d (g3d), shaderMgr (shaderMgr), currentLayer (0) {}
+
+    void RenderMeshes (typename RenderTree::ContextNode& context, 
+		       const typename RenderTree::MeshNode::MeshArrayType& meshes,
+		       iShader* shader, size_t ticket,
+		       size_t firstMesh, size_t lastMesh)
+    {
+      if (firstMesh == lastMesh)
+        return;
+      
+      // Skip meshes without shader (for current layer)
+      if (!shader)
+        return;
+
+      csShaderVariableStack& svStack = shaderMgr->GetShaderVariableStack ();
+
+      const size_t numPasses = shader->GetNumberOfPasses (ticket);
+
+      for (size_t p = 0; p < numPasses; ++p)
+      {
+        if (!shader->ActivatePass (ticket, p)) continue;
+
+        for (size_t m = firstMesh; m < lastMesh; ++m)
+        {
+          const typename RenderTree::MeshNode::SingleMesh& mesh = meshes.Get (m);
+          context.svArrays.SetupSVStack (svStack, currentLayer, mesh.contextLocalId);
+
+          csRenderMeshModes modes (*mesh.renderMesh);
+          if (!shader->SetupPass (ticket, mesh.renderMesh, modes, svStack)) continue;
+          modes.z_buf_mode = mesh.zmode;
+
+          g3d->DrawMesh (mesh.renderMesh, modes, svStack);
+
+          shader->TeardownPass (ticket);
+        }
+        shader->DeactivatePass (ticket);
+      }
+    }
+  };
+
+  /**
+   * Render mesh nodes within one context.
+   * Does not handle setting render targets or camera transform.
+   * Assumes layers are set by calling code and batches meshes by shaders+tickets
+   * (ie it is for "by layer" grouped mesh rendering).
+   */
+  template<typename RenderTree>
+  class SimpleContextRender : public RenderCommon<RenderTree>
+  {
+  public:
+    SimpleContextRender (iGraphics3D* g3d, iShaderManager* shaderMgr)
+      : RenderCommon<RenderTree> (g3d, shaderMgr)
+    {}
+    
     void operator() (typename RenderTree::MeshNode* node)
     {
-      typename RenderTree::ContextNode& context = node->owner;
+      typename RenderTree::ContextNode& context = node->GetOwner();
       const size_t layerOffset = context.totalRenderMeshes*currentLayer;
 
       iShader* lastShader = 0;
@@ -142,7 +194,7 @@ namespace RenderManager
             || (mesh.preCopyNum != 0))
         {
           // Render the latest batch of meshes
-          RenderMeshes (node, lastShader, lastTicket, lastRenderedMesh, m);
+          RenderMeshes (context, node->meshes, lastShader, lastTicket, lastRenderedMesh, m);
           lastRenderedMesh = m;
 
           lastShader = shader;
@@ -156,51 +208,44 @@ namespace RenderManager
         }
       }
 
-      RenderMeshes (node, lastShader, lastTicket, lastRenderedMesh, node->meshes.GetSize ());
+      RenderMeshes (context, node->meshes, lastShader, lastTicket, lastRenderedMesh, node->meshes.GetSize ());
     }
+  };
 
-  private:
-    void RenderMeshes (typename RenderTree::MeshNode* node, 
-      iShader* shader, size_t ticket,
-      size_t firstMesh, size_t lastMesh)
+  /**
+   * Render mesh nodes within one context with "by mesh" render grouping.
+   */
+  template<typename RenderTree>
+  class SimpleContextRenderByMesh : public RenderCommon<RenderTree>
+  {
+  public:
+    SimpleContextRenderByMesh (iGraphics3D* g3d, iShaderManager* shaderMgr)
+      : RenderCommon<RenderTree> (g3d, shaderMgr)
+    {}
+    
+    void operator() (typename RenderTree::MeshNode* node)
     {
-      if (firstMesh == lastMesh)
-        return;
-      
-      // Skip meshes without shader (for current layer)
-      if (!shader)
-        return;
-
-      typename RenderTree::ContextNode& context = node->owner;
-      csShaderVariableStack& svStack = shaderMgr->GetShaderVariableStack ();
-
-      const size_t numPasses = shader->GetNumberOfPasses (ticket);
-
-      for (size_t p = 0; p < numPasses; ++p)
+      typename RenderTree::ContextNode& context = node->GetOwner();
+      for (size_t m = 0; m < node->meshes.GetSize (); ++m)
       {
-        if (!shader->ActivatePass (ticket, p)) continue;
+	typename RenderTree::MeshNode::SingleMesh& mesh = node->meshes.Get (m);
+	if (mesh.preCopyNum != 0)
+	{
+	  g3d->CopyFromRenderTargets (mesh.preCopyNum,
+	    mesh.preCopyAttachments, mesh.preCopyTextures);
+	}
+	for (size_t layer = 0; layer < context.svArrays.GetNumLayers(); layer++)
+	{
+	  SetLayer (layer);
+	  const size_t layerOffset = context.totalRenderMeshes*layer;
 
-        for (size_t m = firstMesh; m < lastMesh; ++m)
-        {
-          typename RenderTree::MeshNode::SingleMesh& mesh = node->meshes.Get (m);
-          context.svArrays.SetupSVStack (svStack, currentLayer, mesh.contextLocalId);
-
-          csRenderMeshModes modes (*mesh.renderMesh);
-          if (!shader->SetupPass (ticket, mesh.renderMesh, modes, svStack)) continue;
-          modes.z_buf_mode = mesh.zmode;
-
-          g3d->DrawMesh (mesh.renderMesh, modes, svStack);
-
-          shader->TeardownPass (ticket);
-        }
-        shader->DeactivatePass (ticket);
+	  iShader* shader = context.shaderArray[mesh.contextLocalId+layerOffset];
+        
+	  size_t ticket = context.ticketArray[mesh.contextLocalId+layerOffset];
+          RenderMeshes (context, node->meshes, shader, ticket, m, m+1);
+	}
       }
     }
-
-    iGraphics3D* g3d;
-    iShaderManager* shaderMgr;
-
-    size_t currentLayer;
   };
 
   template<typename RenderTree>
@@ -235,7 +280,9 @@ namespace RenderManager
   {
   public:
     SimpleTreeRenderer (iGraphics3D* g3di, iShaderManager* shaderMgri)
-      : targetSetup (g3di), meshRender (g3di, shaderMgri),
+      : targetSetup (g3di),
+	meshRender (g3di, shaderMgri),
+	meshRenderByMesh (g3di, shaderMgri),
       g3d (g3di), shaderMgr (shaderMgri), lastRenderView (0)
     {
       memset (lastTarget, 0, sizeof (lastTarget));
@@ -307,38 +354,32 @@ namespace RenderManager
 
       BeginFinishDrawScope bd (g3d, drawFlags);
 
-      /* Different contexts may have different numbers of layers,
-       * so determine the upper layer number */
-      size_t maxLayer = 0;
-      for (size_t i = 0; i < contextStack.GetSize (); ++i)
+      // All the contexts in the stack use the same rview, so only set W2C once.
+      g3d->SetWorldToCamera (context->cameraTransform.GetInverse ());
+      // Likewise, any rendering required for visculling can be done once only.
+      context->sector->GetVisibilityCuller ()->RenderViscull (rview);
+
+      // Detect subsequent contexts with same grouping
+      size_t firstContext = 0;
+      CS::RenderPriorityGrouping lastGrouping = CS::rpgByLayer;
+      for (size_t c = 0; c < contextStack.GetSize (); ++c)
       {
-        maxLayer = csMax (maxLayer,
-          contextStack[i]->svArrays.GetNumLayers());
+	if (contextStack[c]->renderGrouping != lastGrouping)
+	{
+	  // Render context 'stretches' with same grouping
+	  if (lastGrouping == CS::rpgByMesh)
+	    RenderGroupedByMesh (rview, firstContext, c);
+	  else
+	    RenderGroupedByLayer (rview, firstContext, c);
+	  firstContext = c;
+	  lastGrouping = contextStack[c]->renderGrouping;
+	}
       }
+      if (lastGrouping == CS::rpgByMesh)
+	RenderGroupedByMesh (rview, firstContext, contextStack.GetSize ());
+      else
+	RenderGroupedByLayer (rview, firstContext, contextStack.GetSize ());
 
-      // Render all mesh nodes in context
-      for (size_t layer = 0; layer < maxLayer; ++layer)
-      {
-        meshRender.SetLayer (layer);
-
-        for (size_t i = 0; i < contextStack.GetSize (); ++i)
-        {
-          context = contextStack.Get (i);
-          /* Bail out if layer index is above the actual layer count in the
-           * context */
-          if (layer >= context->svArrays.GetNumLayers()) continue;
-
-          g3d->SetWorldToCamera (context->cameraTransform.GetInverse ());
-
-          // Do any rendering required for visculling in the first layer.
-          if (layer == 0)
-          {
-            context->sector->GetVisibilityCuller ()->RenderViscull (rview);
-          }
-
-          ForEachMeshNode (*context, meshRender);
-        }
-      }
       /* @@@ FIXME: When switching from RT to screen with a clipper set
          the clip rect gets wrong (stays at RT size). This workaround ensures
          that no "old" clip rect is stored which is restored later.
@@ -349,6 +390,44 @@ namespace RenderManager
       
       if (context->postEffects.IsValid())
         context->postEffects->DrawPostEffects (context->owner);
+    }
+
+    void RenderGroupedByLayer (RenderView* rview, size_t firstContext, size_t lastContext)
+    {
+      /* Different contexts may have different numbers of layers,
+       * so determine the upper layer number */
+      size_t maxLayer = 0;
+      for (size_t i = firstContext; i < lastContext; ++i)
+      {
+        maxLayer = csMax (maxLayer,
+          contextStack[i]->svArrays.GetNumLayers());
+      }
+
+      // Render all mesh nodes in context
+      for (size_t layer = 0; layer < maxLayer; ++layer)
+      {
+        meshRender.SetLayer (layer);
+
+        for (size_t i = firstContext; i < lastContext; ++i)
+        {
+          typename RenderTree::ContextNode* context = contextStack.Get (i);
+          /* Bail out if layer index is above the actual layer count in the
+           * context */
+          if (layer >= context->svArrays.GetNumLayers()) continue;
+
+          ForEachMeshNode (*context, meshRender);
+        }
+      }
+    }
+
+    void RenderGroupedByMesh (RenderView* rview, size_t firstContext, size_t lastContext)
+    {
+      for (size_t i = firstContext; i < lastContext; ++i)
+      {
+        typename RenderTree::ContextNode* context = contextStack.Get (i);
+
+        ForEachMeshNode (*context, meshRenderByMesh);
+      }
     }
 
 
@@ -365,6 +444,7 @@ namespace RenderManager
 
     ContextTargetSetup<typename RenderTree::ContextNode> targetSetup;
     SimpleContextRender<RenderTree> meshRender;
+    SimpleContextRenderByMesh<RenderTree> meshRenderByMesh;
 
     iGraphics3D* g3d;
     iShaderManager* shaderMgr;

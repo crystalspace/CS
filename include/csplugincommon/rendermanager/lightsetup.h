@@ -427,8 +427,8 @@ namespace RenderManager
       /* Get the shader since the number of passes for that layer depend
 	* on it */
       iShader* shaderToUse =
-	node->owner.shaderArray[layers.GetNewLayerIndex (layer, 0) 
-          * node->owner.totalRenderMeshes + mesh.contextLocalId];
+	node->GetOwner().shaderArray[layers.GetNewLayerIndex (layer, 0) 
+          * node->GetOwner().totalRenderMeshes + mesh.contextLocalId];
       if (!shaderToUse) return 0;
 
       UpdateMetadata (layer, shaderToUse);
@@ -447,10 +447,10 @@ namespace RenderManager
         if (!layerConfig.IsAmbientLayer (layer)) return 0;
         
         // Render 1 layer only, no lights
-        layers.Ensure (layer, 1, node->owner);
+        layers.Ensure (layer, 1, node->GetOwner());
         
         csShaderVariableStack localStack;
-	node->owner.svArrays.SetupSVStack (localStack, 
+	node->GetOwner().svArrays.SetupSVStack (localStack, 
 	  layers.GetNewLayerIndex (layer, 0),
 	  mesh.contextLocalId);
 
@@ -568,7 +568,7 @@ namespace RenderManager
 	  remainingLights -= num;
 	  totalLayers += thisPassLayers * shadows.GetLightLayerSpread();
 	}
-	layers.Ensure (layer, totalLayers, node->owner);
+	layers.Ensure (layer, totalLayers, node->GetOwner());
 	if (remainingLights > 0)
 	{
 	  renderSublights[firstLight]->subLights += renderSublightNums[firstLight];
@@ -621,7 +621,7 @@ namespace RenderManager
 	    {
 	      /* The first layer will have the shader to use set;
 	       * subsequent ones don't */
-	      node->owner.CopyLayerShader (mesh.contextLocalId,
+	      node->GetOwner().CopyLayerShader (mesh.contextLocalId,
 		layers.GetNewLayerIndex (layer, 0),
 		layers.GetNewLayerIndex (layer, n*shadows.GetLightLayerSpread() + totalLayers));
 	    }
@@ -632,7 +632,7 @@ namespace RenderManager
 	    
 	    for (size_t s = 0; s < shadows.GetLightLayerSpread(); s++)
 	    {
-	      node->owner.svArrays.SetupSVStack (localStacks[s], 
+	      node->GetOwner().svArrays.SetupSVStack (localStacks[s], 
 		layers.GetNewLayerIndex (layer,
 		  n*shadows.GetLightLayerSpread() + totalLayers) + s,
 		mesh.contextLocalId);
@@ -681,7 +681,7 @@ namespace RenderManager
 	        if (!(lSpread & (1 << s))) continue;
 	        if (actualSpread > 0)
 	        {
-		  node->owner.CopyLayerShader (mesh.contextLocalId,
+		  node->GetOwner().CopyLayerShader (mesh.contextLocalId,
 		    layers.GetNewLayerIndex (layer, 0),
 		    layers.GetNewLayerIndex (layer,
 		      n*shadows.GetLightLayerSpread() + actualSpread + totalLayers));
@@ -699,9 +699,9 @@ namespace RenderManager
 	      }
 	      if (initialActualSpread != 0)
 	      {
-		node->owner.shaderArray[layers.GetNewLayerIndex (layer,
+		node->GetOwner().shaderArray[layers.GetNewLayerIndex (layer,
 		    n*shadows.GetLightLayerSpread() + totalLayers)
-		  * node->owner.totalRenderMeshes + mesh.contextLocalId] = 0;
+		  * node->GetOwner().totalRenderMeshes + mesh.contextLocalId] = 0;
 	      }
 	    }
 	    firstLight += thisNum;
@@ -779,7 +779,7 @@ namespace RenderManager
       LayerHelper<RenderTree, LayerConfigType,
         PostLightingLayers> layerHelper (
         static_cast<RenderTreeLightingTraits::ContextNodeExtraDataType&> (
-        node->owner).layerHelperData, layerConfig, newLayers);
+        node->GetOwner()).layerHelperData, layerConfig, newLayers);
       ShadowHandler shadows (persist.shadowPersist, layerConfig,
         node, shadowParam);
       ShadowNone<RenderTree, LayerConfigType> noShadows;
@@ -803,7 +803,7 @@ namespace RenderManager
                             | CS_LIGHTQUERY_GET_TYPE_DYNAMIC)
                        : CS_LIGHTQUERY_GET_ALL;
           
-          lightmgr->GetRelevantLightsSorted (node->owner.sector,
+          lightmgr->GetRelevantLightsSorted (node->GetOwner().sector,
             mesh.renderMesh->bbox, influences, numLights, allMaxLights,
             &mesh.renderMesh->object2world,
             relevantLightsFlags);
@@ -823,7 +823,7 @@ namespace RenderManager
                 light, newCacheData);
               light->SetLightCallback (persist.GetLightCallback());
             }
-            thisLightSVs->SetupFrame (node->owner.owner, shadows, light);
+            thisLightSVs->SetupFrame (node->GetOwner().owner, shadows, light);
             csFlags lightFlagsMask;
             if (mesh.meshFlags.Check (CS_ENTITY_NOSHADOWS))
               lightFlagsMask = noShadows.GetLightFlagsMask();
@@ -845,8 +845,8 @@ namespace RenderManager
           {
             /* Layer has no lights and is no ambient layer - prevent it from
             * being drawn completely */
-            node->owner.shaderArray[layerHelper.GetNewLayerIndex (layer, 0) 
-              * node->owner.totalRenderMeshes + mesh.contextLocalId] = 0;
+            node->GetOwner().shaderArray[layerHelper.GetNewLayerIndex (layer, 0) 
+              * node->GetOwner().totalRenderMeshes + mesh.contextLocalId] = 0;
             continue;
           }
 
@@ -864,8 +864,8 @@ namespace RenderManager
             && (!layerConfig.IsAmbientLayer (layer)))
           {
             /* No lights have been set up, so don't draw either */
-            node->owner.shaderArray[layerHelper.GetNewLayerIndex (layer, 0) 
-              * node->owner.totalRenderMeshes + mesh.contextLocalId] = 0;
+            node->GetOwner().shaderArray[layerHelper.GetNewLayerIndex (layer, 0) 
+              * node->GetOwner().totalRenderMeshes + mesh.contextLocalId] = 0;
             continue;
           }
           lightOffset += handledLights;

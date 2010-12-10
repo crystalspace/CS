@@ -56,7 +56,7 @@ namespace RenderManager
     void operator() (typename RenderTree::MeshNode* node)
     {
       // Get the shader
-      const size_t totalMeshes = node->owner.totalRenderMeshes;
+      const size_t totalMeshes = node->GetOwner().totalRenderMeshes;
 
       for (size_t i = 0; i < node->meshes.GetSize (); ++i)
       {
@@ -119,7 +119,7 @@ namespace RenderManager
 
     void operator() (typename RenderTree::MeshNode* node)
     {
-      const size_t totalMeshes = node->owner.totalRenderMeshes;
+      const size_t totalMeshes = node->GetOwner().totalRenderMeshes;
 
       for (size_t i = 0; i < node->meshes.GetSize (); ++i)
       {
