@@ -1233,6 +1233,21 @@ public:
       return treeIter.HasNext();
     }
 
+    /// Get the next element's value without advancing the iterator.
+    const T& PeekNext (K& key)
+    {
+      csRedBlackTreePayload<K, T>& d = treeIter.PeekNext();
+      key = d.GetKey ();
+      return d.GetValue ();
+    }
+
+    /// Get the next element's value without advancing the iterator.
+    const T& PeekNext ()
+    {
+      csRedBlackTreePayload<K, T>& d = treeIter.PeekNext();
+      return d.GetValue ();
+    }
+
     /// Get the next element's value.
     const T& Next (K& key)
     {
@@ -1266,6 +1281,21 @@ public:
     bool HasNext () const
     {
       return treeIter.HasNext();
+    }
+
+    /// Get the next element's value without advancing the iterator.
+    T& PeekNext (K& key)
+    {
+      csRedBlackTreePayload<K, T>& d = treeIter.PeekNext();
+      key = d.GetKey ();
+      return d.GetValue ();
+    }
+
+    /// Get the next element's value without advancing the iterator.
+    T& PeekNext ()
+    {
+      csRedBlackTreePayload<K, T>& d = treeIter.PeekNext();
+      return d.GetValue ();
     }
 
     /// Get the next element's value.
@@ -1302,6 +1332,21 @@ public:
       return treeIter.HasNext();
     }
 
+    /// Get the next element's value without advancing the iterator.
+    const T& PeekNext (K& key)
+    {
+      csRedBlackTreePayload<K, T>& d = treeIter.PeekNext();
+      key = d.GetKey ();
+      return d.GetValue ();
+    }
+
+    /// Get the next element's value without advancing the iterator.
+    const T& PeekNext ()
+    {
+      csRedBlackTreePayload<K, T>& d = treeIter.PeekNext();
+      return d.GetValue ();
+    }
+
     /// Get the next element's value.
     const T& Next (K& key)
     {
@@ -1335,6 +1380,21 @@ public:
     bool HasNext () const
     {
       return treeIter.HasNext();
+    }
+
+    /// Get the next element's value without advancing the iterator.
+    T& PeekNext (K& key)
+    {
+      csRedBlackTreePayload<K, T>& d = treeIter.PeekNext();
+      key = d.GetKey ();
+      return d.GetValue ();
+    }
+
+    /// Get the next element's value without advancing the iterator.
+    T& PeekNext ()
+    {
+      csRedBlackTreePayload<K, T>& d = treeIter.PeekNext();
+      return d.GetValue ();
     }
 
     /// Get the next element's value.
@@ -1393,6 +1453,15 @@ public:
     return ReverseIterator (this);
   }
   //@}
+
+  /**
+   * Delete the 'next' element pointed at by the iterator.
+   * \remarks Will repoint the iterator to the following element.
+   */
+  void Delete (Iterator& it)
+  {
+    supahclass::Delete (it.treeIter);
+  }
 };
 
 /** @} */
