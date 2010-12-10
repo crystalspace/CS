@@ -19155,6 +19155,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *RegisterDefaultRenderPriorities = *cspacec::iEngine_RegisterDefaultRenderPriorities;
 *GetRenderPriority = *cspacec::iEngine_GetRenderPriority;
 *GetRenderPrioritySorting = *cspacec::iEngine_GetRenderPrioritySorting;
+*GetRenderPriorityGrouping = *cspacec::iEngine_GetRenderPriorityGrouping;
 *GetSkyRenderPriority = *cspacec::iEngine_GetSkyRenderPriority;
 *GetPortalRenderPriority = *cspacec::iEngine_GetPortalRenderPriority;
 *GetWallRenderPriority = *cspacec::iEngine_GetWallRenderPriority;
@@ -23034,6 +23035,8 @@ sub CS_FOG_MODE_EXP2 () { $cspacec::CS_FOG_MODE_EXP2 }
 sub CS_RENDPRI_SORT_NONE () { $cspacec::CS_RENDPRI_SORT_NONE }
 sub CS_RENDPRI_SORT_BACK2FRONT () { $cspacec::CS_RENDPRI_SORT_BACK2FRONT }
 sub CS_RENDPRI_SORT_FRONT2BACK () { $cspacec::CS_RENDPRI_SORT_FRONT2BACK }
+sub CS::rpgByLayer () { $cspacec::CS::rpgByLayer }
+sub CS::rpgByMesh () { $cspacec::CS::rpgByMesh }
 sub CS_ENTITY_DETAIL () { $cspacec::CS_ENTITY_DETAIL }
 sub CS_ENTITY_CAMERA () { $cspacec::CS_ENTITY_CAMERA }
 sub CS_ENTITY_INVISIBLEMESH () { $cspacec::CS_ENTITY_INVISIBLEMESH }

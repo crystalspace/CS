@@ -388,6 +388,8 @@ iSectorIterator_scfGetVersion = _iengine.iSectorIterator_scfGetVersion
 CS_RENDPRI_SORT_NONE = _iengine.CS_RENDPRI_SORT_NONE
 CS_RENDPRI_SORT_BACK2FRONT = _iengine.CS_RENDPRI_SORT_BACK2FRONT
 CS_RENDPRI_SORT_FRONT2BACK = _iengine.CS_RENDPRI_SORT_FRONT2BACK
+rpgByLayer = _iengine.rpgByLayer
+rpgByMesh = _iengine.rpgByMesh
 class iEngineFrameCallback(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
@@ -424,6 +426,7 @@ class iEngine(core.iBase):
     def RegisterDefaultRenderPriorities(*args): return _iengine.iEngine_RegisterDefaultRenderPriorities(*args)
     def GetRenderPriority(*args): return _iengine.iEngine_GetRenderPriority(*args)
     def GetRenderPrioritySorting(*args): return _iengine.iEngine_GetRenderPrioritySorting(*args)
+    def GetRenderPriorityGrouping(*args): return _iengine.iEngine_GetRenderPriorityGrouping(*args)
     def GetSkyRenderPriority(*args): return _iengine.iEngine_GetSkyRenderPriority(*args)
     def GetPortalRenderPriority(*args): return _iengine.iEngine_GetPortalRenderPriority(*args)
     def GetWallRenderPriority(*args): return _iengine.iEngine_GetWallRenderPriority(*args)

@@ -10650,6 +10650,66 @@ SWIGINTERN PyObject *_wrap_iEngine_RegisterRenderPriority__SWIG_0(PyObject *SWIG
   char *arg2 = (char *) 0 ;
   uint arg3 ;
   csRenderPrioritySorting arg4 ;
+  CS::RenderPriorityGrouping arg5 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  unsigned long val3 ;
+  int ecode3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  int val5 ;
+  int ecode5 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iEngine_RegisterRenderPriority",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iEngine, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iEngine_RegisterRenderPriority" "', argument " "1"" of type '" "iEngine *""'"); 
+  }
+  arg1 = reinterpret_cast< iEngine * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iEngine_RegisterRenderPriority" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iEngine_RegisterRenderPriority" "', argument " "3"" of type '" "uint""'");
+  } 
+  arg3 = static_cast< uint >(val3);
+  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iEngine_RegisterRenderPriority" "', argument " "4"" of type '" "csRenderPrioritySorting""'");
+  } 
+  arg4 = static_cast< csRenderPrioritySorting >(val4);
+  ecode5 = SWIG_AsVal_int(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iEngine_RegisterRenderPriority" "', argument " "5"" of type '" "CS::RenderPriorityGrouping""'");
+  } 
+  arg5 = static_cast< CS::RenderPriorityGrouping >(val5);
+  (arg1)->RegisterRenderPriority((char const *)arg2,arg3,arg4,arg5);
+  resultobj = SWIG_Py_Void();
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iEngine_RegisterRenderPriority__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iEngine *arg1 = (iEngine *) 0 ;
+  char *arg2 = (char *) 0 ;
+  uint arg3 ;
+  csRenderPrioritySorting arg4 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   int res2 ;
@@ -10695,7 +10755,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iEngine_RegisterRenderPriority__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iEngine_RegisterRenderPriority__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iEngine *arg1 = (iEngine *) 0 ;
   char *arg2 = (char *) 0 ;
@@ -10739,12 +10799,12 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iEngine_RegisterRenderPriority(PyObject *self, PyObject *args) {
   int argc;
-  PyObject *argv[5];
+  PyObject *argv[6];
   int ii;
   
   if (!PyTuple_Check(args)) SWIG_fail;
   argc = (int)PyObject_Length(args);
-  for (ii = 0; (ii < argc) && (ii < 4); ii++) {
+  for (ii = 0; (ii < argc) && (ii < 5); ii++) {
     argv[ii] = PyTuple_GET_ITEM(args,ii);
   }
   if (argc == 3) {
@@ -10761,7 +10821,7 @@ SWIGINTERN PyObject *_wrap_iEngine_RegisterRenderPriority(PyObject *self, PyObje
           _v = SWIG_CheckState(res);
         }
         if (_v) {
-          return _wrap_iEngine_RegisterRenderPriority__SWIG_1(self, args);
+          return _wrap_iEngine_RegisterRenderPriority__SWIG_2(self, args);
         }
       }
     }
@@ -10785,7 +10845,38 @@ SWIGINTERN PyObject *_wrap_iEngine_RegisterRenderPriority(PyObject *self, PyObje
             _v = SWIG_CheckState(res);
           }
           if (_v) {
-            return _wrap_iEngine_RegisterRenderPriority__SWIG_0(self, args);
+            return _wrap_iEngine_RegisterRenderPriority__SWIG_1(self, args);
+          }
+        }
+      }
+    }
+  }
+  if (argc == 5) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iEngine, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        {
+          int res = SWIG_AsVal_unsigned_SS_long(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          {
+            int res = SWIG_AsVal_int(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            {
+              int res = SWIG_AsVal_int(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              return _wrap_iEngine_RegisterRenderPriority__SWIG_0(self, args);
+            }
           }
         }
       }
@@ -10795,6 +10886,7 @@ SWIGINTERN PyObject *_wrap_iEngine_RegisterRenderPriority(PyObject *self, PyObje
 fail:
   SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iEngine_RegisterRenderPriority'.\n"
     "  Possible C/C++ prototypes are:\n"
+    "    RegisterRenderPriority(iEngine *,char const *,uint,csRenderPrioritySorting,CS::RenderPriorityGrouping)\n"
     "    RegisterRenderPriority(iEngine *,char const *,uint,csRenderPrioritySorting)\n"
     "    RegisterRenderPriority(iEngine *,char const *,uint)\n");
   return NULL;
@@ -10971,6 +11063,125 @@ fail:
     "  Possible C/C++ prototypes are:\n"
     "    GetRenderPrioritySorting(iEngine const *,char const *)\n"
     "    GetRenderPrioritySorting(iEngine const *,CS::Graphics::RenderPriority)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iEngine_GetRenderPriorityGrouping__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iEngine *arg1 = (iEngine *) 0 ;
+  char *arg2 = (char *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  CS::RenderPriorityGrouping result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iEngine_GetRenderPriorityGrouping",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iEngine, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iEngine_GetRenderPriorityGrouping" "', argument " "1"" of type '" "iEngine const *""'"); 
+  }
+  arg1 = reinterpret_cast< iEngine * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iEngine_GetRenderPriorityGrouping" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  result = (CS::RenderPriorityGrouping)((iEngine const *)arg1)->GetRenderPriorityGrouping((char const *)arg2);
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iEngine_GetRenderPriorityGrouping__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iEngine *arg1 = (iEngine *) 0 ;
+  CS::Graphics::RenderPriority arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  CS::RenderPriorityGrouping result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iEngine_GetRenderPriorityGrouping",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iEngine, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iEngine_GetRenderPriorityGrouping" "', argument " "1"" of type '" "iEngine const *""'"); 
+  }
+  arg1 = reinterpret_cast< iEngine * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__Graphics__RenderPriority,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iEngine_GetRenderPriorityGrouping" "', argument " "2"" of type '" "CS::Graphics::RenderPriority""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iEngine_GetRenderPriorityGrouping" "', argument " "2"" of type '" "CS::Graphics::RenderPriority""'");
+    } else {
+      CS::Graphics::RenderPriority * temp = reinterpret_cast< CS::Graphics::RenderPriority * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  result = (CS::RenderPriorityGrouping)((iEngine const *)arg1)->GetRenderPriorityGrouping(arg2);
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iEngine_GetRenderPriorityGrouping(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[3];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 2); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iEngine, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_CS__Graphics__RenderPriority, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_iEngine_GetRenderPriorityGrouping__SWIG_1(self, args);
+      }
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iEngine, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_iEngine_GetRenderPriorityGrouping__SWIG_0(self, args);
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iEngine_GetRenderPriorityGrouping'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    GetRenderPriorityGrouping(iEngine const *,char const *)\n"
+    "    GetRenderPriorityGrouping(iEngine const *,CS::Graphics::RenderPriority)\n");
   return NULL;
 }
 
@@ -37900,6 +38111,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iEngine_RegisterDefaultRenderPriorities", _wrap_iEngine_RegisterDefaultRenderPriorities, METH_VARARGS, NULL},
 	 { (char *)"iEngine_GetRenderPriority", _wrap_iEngine_GetRenderPriority, METH_VARARGS, NULL},
 	 { (char *)"iEngine_GetRenderPrioritySorting", _wrap_iEngine_GetRenderPrioritySorting, METH_VARARGS, NULL},
+	 { (char *)"iEngine_GetRenderPriorityGrouping", _wrap_iEngine_GetRenderPriorityGrouping, METH_VARARGS, NULL},
 	 { (char *)"iEngine_GetSkyRenderPriority", _wrap_iEngine_GetSkyRenderPriority, METH_VARARGS, NULL},
 	 { (char *)"iEngine_GetPortalRenderPriority", _wrap_iEngine_GetPortalRenderPriority, METH_VARARGS, NULL},
 	 { (char *)"iEngine_GetWallRenderPriority", _wrap_iEngine_GetWallRenderPriority, METH_VARARGS, NULL},
@@ -40565,6 +40777,8 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CS_RENDPRI_SORT_NONE",SWIG_From_int(static_cast< int >(CS_RENDPRI_SORT_NONE)));
   SWIG_Python_SetConstant(d, "CS_RENDPRI_SORT_BACK2FRONT",SWIG_From_int(static_cast< int >(CS_RENDPRI_SORT_BACK2FRONT)));
   SWIG_Python_SetConstant(d, "CS_RENDPRI_SORT_FRONT2BACK",SWIG_From_int(static_cast< int >(CS_RENDPRI_SORT_FRONT2BACK)));
+  SWIG_Python_SetConstant(d, "rpgByLayer",SWIG_From_int(static_cast< int >(CS::rpgByLayer)));
+  SWIG_Python_SetConstant(d, "rpgByMesh",SWIG_From_int(static_cast< int >(CS::rpgByMesh)));
   SWIG_Python_SetConstant(d, "CS_ENTITY_DETAIL",SWIG_From_int(static_cast< int >(2)));
   SWIG_Python_SetConstant(d, "CS_ENTITY_CAMERA",SWIG_From_int(static_cast< int >(4)));
   SWIG_Python_SetConstant(d, "CS_ENTITY_INVISIBLEMESH",SWIG_From_int(static_cast< int >(8)));
