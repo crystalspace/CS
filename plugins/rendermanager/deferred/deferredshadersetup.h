@@ -59,7 +59,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     void ForwardSetup(typename RenderTree::MeshNode *node)
     {
       // Get the shader
-      const size_t totalMeshes = node->owner.totalRenderMeshes;
+      const size_t totalMeshes = node->GetOwner().totalRenderMeshes;
 
       const size_t meshCount = node->meshes.GetSize ();
       for (size_t i = 0; i < meshCount; i++)
@@ -102,7 +102,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     void DeferredSetup(typename RenderTree::MeshNode *node)
     {
       // Get the shader
-      const size_t totalMeshes = node->owner.totalRenderMeshes;
+      const size_t totalMeshes = node->GetOwner().totalRenderMeshes;
 
       const size_t meshCount = node->meshes.GetSize ();
       for (size_t i = 0; i < meshCount; i++)
