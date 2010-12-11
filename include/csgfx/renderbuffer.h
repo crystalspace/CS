@@ -110,7 +110,7 @@ public:
   virtual size_t GetElementDistance () const
   {
     return props.stride ? props.stride :
-      props.compCount * csRenderBufferComponentSizes[props.comptype];
+      props.compCount * csRenderBufferComponentSizes[props.comptype & ~CS_BUFCOMP_NORMALIZED];
   }
 
   virtual size_t GetOffset () const
@@ -276,7 +276,10 @@ protected:
     /// hint about main usage
     csRenderBufferType bufferType : 2;
     /// datatype for each component
-    csRenderBufferComponentType comptype : 4; 
+    csRenderBufferComponentType comptype : 5;
+    
+    // padding
+    uint unused0 : 1;
   
     /// number of components per element
     uint compCount : 8;
@@ -294,6 +297,9 @@ protected:
     /// if this is index-buffer  
     bool isIndex : 1;
 
+    // padding
+    uint unused1 : 2;
+    
     /// last type of lock used
     uint lastLock : 2;
 

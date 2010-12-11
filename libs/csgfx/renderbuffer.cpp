@@ -132,7 +132,7 @@ void csRenderBuffer::CopyInto (const void* data, size_t elementCount,
 {
   if (masterBuffer.IsValid ()) return;
   const size_t elemSize = 
-    csRenderBufferComponentSizes[props.comptype] * props.compCount;
+    csRenderBufferComponentSizes[props.comptype & ~CS_BUFCOMP_NORMALIZED] * props.compCount;
   const size_t byteOffs = elemSize * elemOffset;
   version++;
   if (!props.doCopy)
@@ -166,7 +166,7 @@ size_t csRenderBuffer::GetElementCount () const
     return masterBuffer->GetElementCount ();
 
   return bufferSize / 
-    (props.compCount * csRenderBufferComponentSizes[props.comptype]);
+    (props.compCount * csRenderBufferComponentSizes[props.comptype & ~CS_BUFCOMP_NORMALIZED]);
 }
 
 void csRenderBuffer::SetData (const void *data)
@@ -188,7 +188,7 @@ csRef<csRenderBuffer> csRenderBuffer::CreateRenderBuffer (size_t elementCount,
   if (componentCount > 255) return 0;
 
   size_t size = elementCount * componentCount * 
-    csRenderBufferComponentSizes[componentType];
+    csRenderBufferComponentSizes[componentType & ~CS_BUFCOMP_NORMALIZED];
   csRenderBuffer* buf = new csRenderBuffer (size, type, 
     componentType, componentCount, 0, 0);
   return csPtr<csRenderBuffer> (buf);
@@ -201,7 +201,7 @@ csRef<csRenderBuffer> csRenderBuffer::CreateRenderBuffer (size_t elementCount,
   if (componentCount > 255) return 0;
 
   size_t size = elementCount * componentCount * 
-    csRenderBufferComponentSizes[componentType];
+    csRenderBufferComponentSizes[componentType & ~CS_BUFCOMP_NORMALIZED];
   csRenderBuffer* buf = new csRenderBuffer (size, type, 
     componentType, componentCount, 0, 0, copy);
   return csPtr<csRenderBuffer> (buf);
@@ -211,7 +211,7 @@ csRef<csRenderBuffer> csRenderBuffer::CreateIndexRenderBuffer (size_t elementCou
   csRenderBufferType type, csRenderBufferComponentType componentType,
   size_t rangeStart, size_t rangeEnd)
 {
-  size_t size = elementCount * csRenderBufferComponentSizes[componentType];
+  size_t size = elementCount * csRenderBufferComponentSizes[componentType & ~CS_BUFCOMP_NORMALIZED];
   csRenderBuffer* buf = new csRenderBuffer (size, type, 
     componentType, 1, rangeStart, rangeEnd);
   buf->props.isIndex = true;
@@ -222,7 +222,7 @@ csRef<csRenderBuffer> csRenderBuffer::CreateIndexRenderBuffer (size_t elementCou
   csRenderBufferType type, csRenderBufferComponentType componentType,
   size_t rangeStart, size_t rangeEnd, bool copy)
 {
-  size_t size = elementCount * csRenderBufferComponentSizes[componentType];
+  size_t size = elementCount * csRenderBufferComponentSizes[componentType & ~CS_BUFCOMP_NORMALIZED];
   csRenderBuffer* buf = new csRenderBuffer (size, type, 
     componentType, 1, rangeStart, rangeEnd, copy);
   buf->props.isIndex = true;
@@ -241,7 +241,7 @@ csRef<csRenderBuffer> csRenderBuffer::CreateInterleavedRenderBuffers (size_t ele
   {
     const csInterleavedSubBufferOptions& element = elements[i];
     offsets[i+1] = offsets[i] + element.componentCount
-      * csRenderBufferComponentSizes[element.componentType];
+      * csRenderBufferComponentSizes[element.componentType & ~CS_BUFCOMP_NORMALIZED];
   }
   elementSize = offsets[count];
   if (elementSize > 255) return 0;
@@ -333,7 +333,7 @@ void csRenderBuffer::SetRenderBufferProperties (size_t elementCount,
 
 #ifdef CS_DEBUG
   size_t newSize = elementCount * componentCount * 
-    csRenderBufferComponentSizes[componentType];
+    csRenderBufferComponentSizes[componentType & ~CS_BUFCOMP_NORMALIZED];
   CS_ASSERT (newSize <= bufferSize);
 #else
   (void)elementCount; // unused except for above so silence the warning
@@ -351,7 +351,7 @@ void csRenderBuffer::SetIndexBufferProperties (size_t elementCount,
   CS_ASSERT (props.isIndex);
 
 #ifdef CS_DEBUG
-  size_t newSize = elementCount * csRenderBufferComponentSizes[componentType];
+  size_t newSize = elementCount * csRenderBufferComponentSizes[componentType & ~CS_BUFCOMP_NORMALIZED];
   CS_ASSERT (newSize <= bufferSize);
 #else
   (void)elementCount; // unused except for above assert so silence the warning

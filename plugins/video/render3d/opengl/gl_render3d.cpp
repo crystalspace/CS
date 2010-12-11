@@ -907,6 +907,7 @@ bool csGLGraphics3D::Open ()
   ext->InitGL_GREMEDY_string_marker ();
   ext->InitGL_ARB_seamless_cube_map ();
   ext->InitGL_AMD_seamless_cubemap_per_texture ();
+  ext->InitGL_ARB_half_float_vertex ();
   
   // Some 'assumed state' is for extensions, so set again
   CS::PluginCommon::GL::SetAssumedState (statecache, ext);
@@ -2819,7 +2820,8 @@ void csGLGraphics3D::ApplyBufferChanges()
       csRenderBufferComponentType compType = buffer->GetComponentType();
       csRenderBufferComponentType compTypeBase = csRenderBufferComponentType(compType & ~CS_BUFCOMP_NORMALIZED);
       bool isFloat = (compType == CS_BUFCOMP_FLOAT) 
-	|| (compType == CS_BUFCOMP_DOUBLE);
+	|| (compType == CS_BUFCOMP_DOUBLE)
+        || (compType == CS_BUFCOMP_HALF);
       bool normalized = !isFloat && (compType & CS_BUFCOMP_NORMALIZED);
 
       /* Normalization/data type fixup:
@@ -2832,59 +2834,43 @@ void csGLGraphics3D::ApplyBufferChanges()
         (1 << CS_BUFCOMP_SHORT) | (1 << CS_BUFCOMP_INT);
       const uint wants_byte_short_int = wants_short_int |
         (1 << CS_BUFCOMP_BYTE);
+	
+      bool needFixup = (compType == CS_BUFCOMP_HALF) && !ext->CS_GL_ARB_half_float_vertex;
       switch (att)
       {
       case CS_VATTRIB_POSITION:
-	if (!isFloat && (normalized
-	    || (((1 << compTypeBase) & wants_short_int) == 0)))
-        {
-          // Set up shadow buffer
-          buffer = bufferShadowDataHelper->QueryFloatVertexDataBuffer (buffer);
-          compType = buffer->GetComponentType();
-        }
+	needFixup |= (!isFloat && (normalized
+	  || (((1 << compTypeBase) & wants_short_int) == 0)));
         break;
       case CS_VATTRIB_NORMAL:
-	if (!isFloat && (!normalized
-	    || (((1 << compTypeBase) & wants_byte_short_int) == 0)))
-        {
-          // Set up shadow buffer
-          buffer = bufferShadowDataHelper->QueryFloatVertexDataBuffer (buffer);
-          compType = buffer->GetComponentType();
-        }
+	needFixup |= (!isFloat && (!normalized
+	  || (((1 << compTypeBase) & wants_byte_short_int) == 0)));
         break;
       case CS_VATTRIB_COLOR:
-        if (!isFloat && !normalized)
-        {
-          // Set up shadow buffer
-          buffer = bufferShadowDataHelper->QueryFloatVertexDataBuffer (buffer);
-          compType = buffer->GetComponentType();
-        }
+        needFixup |= (!isFloat && !normalized);
         break;
       case CS_VATTRIB_SECONDARY_COLOR:
         if (ext->CS_GL_EXT_secondary_color)
         {
-	  if (!isFloat && !normalized)
-	  {
-	    // Set up shadow buffer
-	    buffer = bufferShadowDataHelper->QueryFloatVertexDataBuffer (buffer);
-	    compType = buffer->GetComponentType();
-	  }
+	  needFixup |= (!isFloat && !normalized);
         }
         break;
       default:
         if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)
         {
-	if (!isFloat && (normalized
-	    || (((1 << compTypeBase) & wants_short_int) == 0)))
-	  {
-	    // Set up shadow buffer
-	    buffer = bufferShadowDataHelper->QueryFloatVertexDataBuffer (buffer);
-	    compType = buffer->GetComponentType();
-	  }
+	  needFixup |= (!isFloat && (normalized
+	    || (((1 << compTypeBase) & wants_short_int) == 0)));
         }
       }
 	
-      GLenum compGLType = compGLtypes[compType];
+      if (needFixup)
+      {
+	// Set up shadow buffer
+	buffer = bufferShadowDataHelper->QueryFloatVertexDataBuffer (buffer);
+	compType = buffer->GetComponentType();
+      }
+      
+      GLenum compGLType = compGLtypes[compType & ~CS_BUFCOMP_NORMALIZED];
       void *data = RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY);
 
       if (data == (void*)-1) continue;

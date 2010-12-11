@@ -20,6 +20,7 @@
 #ifndef __CS_CSGFX_VERTEXLISTWALKER_H__
 #define __CS_CSGFX_VERTEXLISTWALKER_H__
 
+#include "csutil/csendian.h"
 #include "cstool/rbuflock.h"
 
 /**\file
@@ -152,6 +153,19 @@ private:
       data += sizeof (C);
     }
   }
+
+  void FetchCurrentElementHalf()
+  {
+    uint16* data = (uint16*)((uint8*)bufLock) + (currElement * bufferComponents);
+    for (size_t c = 0; c < components; c++)
+    {
+      converted[c] = 
+	(c < bufferComponents) ? Tbase (csIEEEfloat::ToNative (*data)) :
+	GetDefaultComponent (c);
+      data++;
+    }
+  }
+  
   template<typename C, bool Signed, int range>
   void FetchCurrentElementRealNorm()
   {
@@ -234,6 +248,9 @@ private:
 	break;
       case CS_BUFCOMP_DOUBLE:
         FetchCurrentElementReal<double>();
+	break;
+      case CS_BUFCOMP_HALF:
+        FetchCurrentElementHalf ();
 	break;
     }
   }
