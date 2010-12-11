@@ -509,6 +509,7 @@ void TerrainBlock::SetupGeometry ()
 
     // Get the data
     csLockedHeightData cellData = renderData->cell->GetHeightData ();
+    csLockedNormalData cellNData = renderData->cell->GetNormalData ();
 
     // Temporary data holder
     float minX = centerPos.x - size.x/2.0f;
@@ -529,15 +530,15 @@ void TerrainBlock::SetupGeometry ()
     {
       float currX = minX;
       float* hRow = cellData.data + cellData.pitch * gridY + gridLeft;
+      csVector3* nRow = cellNData.data + cellNData.pitch * gridY + gridLeft;
 
-      for (size_t x = 0; x < numVerts; ++x, hRow += stepSize, currX += xStep)
+      for (size_t x = 0; x < numVerts; ++x, hRow += stepSize, nRow += stepSize, currX += xStep)
       {
         float height = *hRow;
+        csVector3 normal = *nRow;
+
         *vertexData++ = csVector3 (currX, height, currZ);
-        
-        //@@Optimize this!
-        *normalData++ = renderData->cell->GetNormal (
-          (int)(gridLeft+x*stepSize), (int)(gridTop+y*stepSize));
+        *normalData++ = normal;
 
         if (height < minHeight)
           minHeight = height;

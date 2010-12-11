@@ -73,6 +73,11 @@ public:
   virtual csLockedHeightData LockHeightData (const csRect& rectangle);
   virtual void UnlockHeightData ();
 
+  virtual csLockedNormalData GetNormalData ();
+  virtual csLockedNormalData LockNormalData (const csRect& rectangle);
+  virtual void UnlockNormalData ();
+  virtual void RecalculateNormalData ();
+
   virtual const csVector2& GetPosition () const;
   virtual const csVector3& GetSize () const;
 
@@ -161,6 +166,7 @@ private:
   // Stored data (if any)
   csDirtyAccessArray<unsigned char> materialmap;
   csDirtyAccessArray<float> heightmap;
+  csDirtyAccessArray<csVector3> normalmap;
 
   LoadState loadState;
 

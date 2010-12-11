@@ -56,7 +56,7 @@ struct csLockedHeightData
 };
 
 /**
- * Locked height data. This class holds an information needed to
+ * Locked material data. This class holds an information needed to
  * fill/interpret material map data. The elements are indices of materials
  * in material palette.
  *
@@ -68,6 +68,23 @@ struct csLockedMaterialMap
 {
   /// material index data array
   unsigned char* data;	
+
+  /// array pitch
+  size_t pitch;	
+};
+
+/**
+ * Locked normal data. This class holds an information needed to
+ * fill/interpret normal data. The elements are object space normals.
+ *
+ * Two-dimensional normal array is linearized, so additional math is
+ * needed to get access to desired values:
+ * Instead of data[y][x], use data[y * pitch + x]
+ */
+struct csLockedNormalData
+{
+  /// normal data array
+  csVector3* data;
 
   /// array pitch
   size_t pitch;	
@@ -194,12 +211,17 @@ struct iTerrainCellRenderProperties : public virtual iShaderVariableContext
  */
 struct iTerrainCellFeederProperties : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainCellFeederProperties, 3, 1, 0);
+  SCF_INTERFACE (iTerrainCellFeederProperties, 3, 2, 0);
   
   /**
    * Set heightmap source.
    */
   virtual void SetHeightmapSource (const char* source, const char* format) = 0;
+
+  /**
+   * Set normalmap source.
+   */
+  virtual void SetNormalMapSource (const char* source) = 0;
 
   /**
    * Set materialmap source
@@ -870,7 +892,7 @@ struct iTerrainSystem : public virtual iBase
  */
 struct iTerrainCell : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainCell, 3, 0, 1);
+  SCF_INTERFACE (iTerrainCell, 4, 0, 0);
 
   /// Enumeration that specifies current cell state
   enum LoadState
@@ -991,6 +1013,40 @@ struct iTerrainCell : public virtual iBase
    * Unlocking the cell that was not locked results in undefined behaviour
    */
   virtual void UnlockHeightData () = 0;
+
+  /**
+   * Get normal data (for reading purposes: do not modify it!)
+   * This can be used to perform very fast normal lookups.
+   *
+   * \return cell normal data
+   */
+  virtual csLockedNormalData GetNormalData () = 0;
+  
+  /**
+   * Lock an area of normal data (for reading/writing purposes)
+   * If you want to lock the whole cell, use the rectangle
+   * csRect(0, 0, grid width, grid height).
+   *
+   * Only one area may be locked at a time, locking more than once results in
+   * undefined behaviour.
+   *
+   * \param rectangle the rectangle which you want to lock.
+   *
+   * \return cell normal data
+   */
+  virtual csLockedNormalData LockNormalData (const csRect& rectangle) = 0;
+  
+  /**
+   * Commit changes to height data. Use it after changing the desired height values.
+   *
+   * Unlocking the cell that was not locked results in undefined behaviour
+   */
+  virtual void UnlockNormalData () = 0;
+
+  /**
+   * Recalculates the cell normals.
+   */
+  virtual void RecalculateNormalData () = 0;
 
   /**
    * Get cell position (in object space). X and Y components specify the

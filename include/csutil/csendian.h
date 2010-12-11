@@ -28,6 +28,7 @@
 
 #include <math.h>
 #include "cstypes.h"
+#include "csgeom/math.h"
 #include "csutil/bitops.h"
 #if defined(CS_HAVE_BYTESWAP_H)
 #include <byteswap.h>
@@ -221,7 +222,7 @@ struct csIEEEfloat
   #error Do not know how to convert to IEEE floats
 #endif
 
-  static CS_FORCEINLINE float HalfToNative (uint16 half)
+  static CS_FORCEINLINE float ToNative (uint16 half)
   {
     union
     {
@@ -273,7 +274,7 @@ struct csIEEEfloat
     return u2f.f;
   }
 
-  static CS_FORCEINLINE uint16 HalfFromNativeRTZ (float f)
+  static CS_FORCEINLINE uint16 FromNativeRTZ (float f)
   {
     union
     {
@@ -288,7 +289,7 @@ struct csIEEEfloat
     f2u.u &= 0x7FFFFFFF;
 
     // Check for a NaN
-    if(f2u.f != f2u.f)
+    if(csNaN (f2u.f))
     {
       // Construct a silent NaN.
       f2u.u >>= 13;

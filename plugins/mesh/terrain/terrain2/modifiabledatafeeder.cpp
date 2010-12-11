@@ -116,6 +116,20 @@ bool csTerrainModifiableDataFeeder::Load (iTerrainCell* cell)
   }
 
   cell->UnlockHeightData ();
+
+  if (!properties->normalmapSource.IsEmpty ())
+  {
+    csLockedNormalData ndata = cell->LockNormalData (csRect(0, 0, width, height));
+
+    NormalFeederParser nmapReader (properties->normalmapSource, loader, objectReg);
+    nmapReader.Load (ndata.data, width, height, ndata.pitch);
+
+    cell->UnlockNormalData ();
+  }
+  else
+  {
+    cell->RecalculateNormalData ();
+  }
   
   if (!properties->materialmapSource.IsEmpty ())
   {  
@@ -241,6 +255,7 @@ void csTerrainModifiableDataFeeder::RemoveModifier (iTerrainModifier* modifier)
       }
 
       cell->UnlockHeightData ();
+      cell->RecalculateNormalData ();
     }
 
     //Reapply modifiers
@@ -304,6 +319,7 @@ csTerrainModifiableDataFeederProperties::csTerrainModifiableDataFeederProperties
   : scfImplementationType (this),
     heightmapSource (other.heightmapSource),
     heightmapFormat (other.heightmapFormat),
+    normalmapSource (other.normalmapSource),
     materialmapSource (other.materialmapSource),
     alphaMaps (other.alphaMaps),
     heightOffset (other.heightOffset),
@@ -317,6 +333,11 @@ void csTerrainModifiableDataFeederProperties::SetHeightmapSource (const char* so
 {
   heightmapSource = source;
   heightmapFormat = format;
+}
+
+void csTerrainModifiableDataFeederProperties::SetNormalMapSource (const char* source)
+{
+  normalmapSource = source;
 }
 
 void csTerrainModifiableDataFeederProperties::SetMaterialMapSource (const char* source)
@@ -354,6 +375,10 @@ void csTerrainModifiableDataFeederProperties::SetParameter (const char* param, c
   else if (strcasecmp (param, "heightmap format") == 0)
   {
     heightmapFormat = value;
+  }
+  else if (strcasecmp (param, "normalmap source") == 0)
+  {
+    normalmapSource = value;
   }
   else if (strcasecmp (param, "materialmap source") == 0)
   {
@@ -411,6 +436,10 @@ const char* csTerrainModifiableDataFeederProperties::GetParameterValue (const ch
   else if (strcasecmp (name, "heightmap format") == 0)
   {
     return heightmapFormat;
+  }
+  else if (strcasecmp (name, "normalmap source") == 0)
+  {
+    return normalmapSource;
   }
   else if (strcasecmp (name, "materialmap source") == 0)
   {

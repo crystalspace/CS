@@ -66,6 +66,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 
   void SmoothHeightmap (float* heightBuffer, size_t width, size_t height, 
     size_t pitch);
+
+  class NormalFeederParser
+  {
+  public:
+    NormalFeederParser (const csString& mapSource, iLoader* imageLoader, iObjectRegistry* objReg);
+    bool Load (csVector3* outputBuffer, size_t outputWidth, size_t outputHeight, size_t outputPitch);
+
+  private:
+    csString sourceLocation;
+
+    csRef<iLoader> imageLoader;
+    iObjectRegistry* objReg;
+  };
   
 }
 CS_PLUGIN_NAMESPACE_END(Terrain2)

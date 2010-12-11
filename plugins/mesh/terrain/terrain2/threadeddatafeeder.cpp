@@ -51,9 +51,10 @@ struct ThreadedFeederData : public csRefCount
   csRef<iJob> loaderJob;
 
   csDirtyAccessArray<float> heightmapData;
+  csDirtyAccessArray<csVector3> normalmapData;
   csArray<csDirtyAccessArray<unsigned char> > materialmapData;
 
-  csString heightmapSource, materialmapSource, heightmapFormat;
+  csString heightmapSource, normalmapSource, materialmapSource, heightmapFormat;
   float heightScale, heightOffset;
 
   csArray<csString> alphaMapsSources;
@@ -94,6 +95,16 @@ public:
     if (data->smoothHeightmap)
     {
       SmoothHeightmap (h_data, data->gridWidth, data->gridHeight, data->gridWidth);
+    }
+
+    if (!data->normalmapSource.IsEmpty ())
+    {
+      data->normalmapData.SetSize (data->gridWidth * data->gridHeight);
+
+      csVector3* n_data = data->normalmapData.GetArray ();
+
+      NormalFeederParser nmapReader (data->normalmapSource, loader, objReg);
+      nmapReader.Load (n_data, data->gridWidth, data->gridHeight, data->gridWidth);
     }
 
     csRef<iImage> material = loader->LoadImage (
@@ -190,6 +201,7 @@ bool csTerrainThreadedDataFeeder::PreLoad (iTerrainCell* cell)
   
   // Setup job
   data->heightmapSource = properties->heightmapSource;
+  data->normalmapSource = properties->normalmapSource;
   data->materialmapSource = properties->materialmapSource;
   data->gridWidth = cell->GetGridWidth ();
   data->gridHeight = cell->GetGridHeight ();
@@ -246,6 +258,27 @@ bool csTerrainThreadedDataFeeder::Load (iTerrainCell* cell)
     }
 
     cell->UnlockHeightData ();
+
+    if (!data->normalmapSource.IsEmpty ())
+    {
+      csLockedNormalData normalData = cell->LockNormalData (csRect (0, 0,
+        data->gridWidth, data->gridHeight));
+
+      csVector3* src_ndata = data->normalmapData.GetArray ();
+
+      for (unsigned int y = 0; y < data->gridHeight; ++y)
+      {
+        memcpy (normalData.data, src_ndata, data->gridWidth * sizeof(csVector3));
+        normalData.data += normalData.pitch;
+        src_ndata += data->gridWidth;
+      }
+
+      cell->UnlockNormalData ();
+    }
+    else
+    {
+      cell->RecalculateNormalData ();
+    }
 
     for (size_t m = 0; m < data->materialmapData.GetSize (); ++m)
     {

@@ -356,5 +356,52 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
     cs_free (tempBuffer);
   }
 
+  NormalFeederParser::NormalFeederParser (const csString& mapSource, iLoader* imageLoader, iObjectRegistry* objReg)
+    : sourceLocation (mapSource), imageLoader (imageLoader), objReg (objReg)
+  {
+
+  }
+
+  bool NormalFeederParser::Load (csVector3* outputBuffer, size_t outputWidth, size_t outputHeight, size_t outputPitch)
+  {
+    csRef<iImage> image = imageLoader->LoadImage (sourceLocation.GetDataSafe (),
+      CS_IMGFMT_ANY);
+
+    if (!image)
+      return false;
+
+    if ((size_t)image->GetWidth () != outputWidth || 
+      (size_t)image->GetHeight () != outputHeight)
+    {
+      image = csImageManipulate::Rescale (image, (int)outputWidth,
+        (int)outputHeight);
+    }
+
+    if ((image->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
+    {
+      const uint16 *data = (uint16*)image->GetImageData ();
+
+      for (size_t y = 0; y < outputHeight; ++y)
+      {
+        csVector3* row = outputBuffer;
+
+        for (size_t x = 0; x < outputWidth; ++x, ++row)
+        {
+          // Convert to 'single' precision float.
+          row->x = csIEEEfloat::ToNative (csBigEndian::Convert(*data++));
+          row->y = csIEEEfloat::ToNative (csBigEndian::Convert(*data++));
+
+          // Calculate z.
+          row->z = 1.0f - (row->x + row->y);
+        }
+
+        outputBuffer += outputPitch;
+      }
+      return true;
+    }
+
+    return false;
+  }
+
 }
 CS_PLUGIN_NAMESPACE_END(Terrain2)

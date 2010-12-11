@@ -41,7 +41,7 @@ csTerrainCell::csTerrainCell (csTerrainSystem* terrain, const char* name, int gr
   iTerrainCellRenderProperties* renderProperties,
   iTerrainCellCollisionProperties* collisionProperties,
   iTerrainCellFeederProperties* feederProperties)
-  : scfImplementationType (this), 
+  : scfImplementationType (this),
   terrain (terrain), name (name), materialMapWidth (materialMapWidth), 
   materialMapHeight (materialMapHeight), position (position), size (size),
   minHeight (-FLT_MAX*0.9f), maxHeight (FLT_MAX*0.9f),
@@ -100,6 +100,7 @@ void csTerrainCell::SetLoadState(LoadState state)
         case PreLoaded:
         {
           heightmap.SetSize (gridWidth * gridHeight, 0);
+          normalmap.SetSize (gridWidth * gridHeight, 0);
 
           if (materialMapPersistent)
             materialmap.SetSize (materialMapWidth * materialMapHeight, 0);
@@ -117,6 +118,7 @@ void csTerrainCell::SetLoadState(LoadState state)
         case Loaded:
         {
           heightmap.SetSize (gridWidth * gridHeight);
+          normalmap.SetSize (gridWidth * gridHeight);
 
           if (materialMapPersistent)
             materialmap.SetSize (materialMapWidth * materialMapHeight, 0);
@@ -169,6 +171,7 @@ void csTerrainCell::SetLoadState(LoadState state)
           terrain->FireUnloadCallbacks (this);
 
           heightmap.DeleteAll ();
+          normalmap.DeleteAll ();
           materialmap.DeleteAll ();
 
           renderData = 0;
@@ -273,6 +276,47 @@ void csTerrainCell::UnlockHeightData ()
   terrain->CellSizeUpdate (this);
 
   terrain->FireHeightUpdateCallbacks (this, lockedHeightRect);
+}
+
+csLockedNormalData csTerrainCell::GetNormalData ()
+{
+  csLockedNormalData data;
+  data.data = normalmap.GetArray ();
+  data.pitch = gridWidth;
+
+  return data;
+}
+
+csLockedNormalData csTerrainCell::LockNormalData (const csRect& rectangle)
+{
+  csLockedNormalData data;
+
+  data.data = normalmap.GetArray () + gridWidth * rectangle.ymin +
+    rectangle.xmin;
+
+  data.pitch = gridWidth;
+
+  return data;
+}
+
+void csTerrainCell::UnlockNormalData ()
+{
+  Touch();
+}
+
+void csTerrainCell::RecalculateNormalData ()
+{
+  csLockedNormalData cellNData = GetNormalData ();
+
+  for (int y = 0; y < gridWidth; ++y)
+  {
+    csVector3* nRow = cellNData.data + y * gridHeight;
+
+    for (int x = 0; x < gridHeight; ++x)
+    {
+      *nRow++ = GetNormal (x, y);
+    }
+  }
 }
 
 const csVector2& csTerrainCell::GetPosition () const

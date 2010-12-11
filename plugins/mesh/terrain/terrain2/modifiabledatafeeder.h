@@ -43,6 +43,7 @@ struct csTerrainModifiableDataFeederProperties
   // ---- iTerrainCellFeederProperties ----
   virtual void SetHeightmapSource (const char* source, const char* format);
   virtual void SetMaterialMapSource (const char* source);
+  virtual void SetNormalMapSource (const char* source);
   virtual void SetHeightOffset (float offset);
   virtual void AddAlphaMap (const char* material, const char* alphaMapSource);
   virtual void SetParameter (const char* param, const char* value);
@@ -64,7 +65,7 @@ struct csTerrainModifiableDataFeederProperties
   virtual void SetHeightmapSmooth (bool doSmooth);  
   virtual bool GetHeightmapSmooth () const;
   
-  csString heightmapSource, heightmapFormat, materialmapSource;
+  csString heightmapSource, heightmapFormat, normalmapSource, materialmapSource;
 
   struct AlphaPair
   {
