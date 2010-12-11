@@ -919,7 +919,7 @@ CS::Graphics::RenderPriority csEngine::GetRenderPriority (const char *name) cons
   for (i = 0; i < renderPriorityProps.GetSize (); i++)
   {
     const csString& n = renderPriorityProps[i].name;
-    if (n == name) return (long)i;
+    if (n == name) return CS::Graphics::RenderPriority (uint (i));
   }
 
   return CS::Graphics::RenderPriority ();
