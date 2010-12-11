@@ -235,10 +235,6 @@
     </input>
 
     <input name="texture_scale" type="float2" default="complex">
-      <block location="pass">
-	  <shadervar name="texture scale" type="vector2">1,1</shadervar>
-      </block>
-      
       <block location="cg:variablemap">
 	  <variablemap variable="texture scale" destination="fragmentIn.texture_scale" />
       </block>
@@ -251,6 +247,20 @@
 	  texture_scale = fragmentIn.texture_scale;
       </block>
     </input>
+
+    <input name="alpha_scaleoffset" type="float2" default="complex">     
+      <block location="cg:variablemap">
+	  <variablemap variable="alpha scaleoffset" destination="fragmentIn.alpha_scaleoffset" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	  <uniform type="float2" name="alpha_scaleoffset" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	  alpha_scaleoffset = fragmentIn.alpha_scaleoffset;
+      </block>
+    </input>
     
     <block location="cg:vertexMain">
       surfaceColor = float4(0);
@@ -258,27 +268,38 @@
     </block>
     
     <block location="cg:fragmentMain">
-      float2 scaledTexCoord = texCoord*texture_scale;
+      float2 scaledTexCoord = texCoord;
+      float2 offsetAlphaCoord = texCoord;
+
+      <?if vars."texture scale" ?>
+        scaledTexCoord *= texture_scale;
+      <?endif?>
+
+      <?if vars."alpha scaleoffset" ?>
+        offsetAlphaCoord *= alpha_scaleoffset.x;
+        offsetAlphaCoord += alpha_scaleoffset.y;
+      <?endif?>
+
       float4x4 texValues = float4x4(
         tex2D (texDiffuse1, scaledTexCoord),
         tex2D (texDiffuse2, scaledTexCoord),
         tex2D (texDiffuse3, scaledTexCoord),
         tex2D (texDiffuse4, scaledTexCoord));
-      surfaceColor = mul(tex2D (texAlpha1, texCoord), texValues);
+      surfaceColor = mul(tex2D (texAlpha1, offsetAlphaCoord), texValues);
       <?if vars."tex alpha map 2".texture ?>
         texValues = float4x4(
           tex2D (texDiffuse5, scaledTexCoord),
           tex2D (texDiffuse6, scaledTexCoord),
           tex2D (texDiffuse7, scaledTexCoord),
           tex2D (texDiffuse8, scaledTexCoord));
-        surfaceColor += mul(tex2D (texAlpha2, texCoord), texValues);
+        surfaceColor += mul(tex2D (texAlpha2, offsetAlphaCoord), texValues);
       <?if vars."tex alpha map 3".texture ?>
         texValues = float4x4(
           tex2D (texDiffuse9, scaledTexCoord),
           tex2D (texDiffuse10, scaledTexCoord),
           tex2D (texDiffuse11, scaledTexCoord),
           tex2D (texDiffuse12, scaledTexCoord));
-        surfaceColor += mul(tex2D (texAlpha3, texCoord), texValues);
+        surfaceColor += mul(tex2D (texAlpha3, offsetAlphaCoord), texValues);
       <?endif?><?! vars."tex alpha map 3".texture ?>
       <?endif?><?! vars."tex alpha map 2".texture ?>
 
