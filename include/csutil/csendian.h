@@ -28,6 +28,7 @@
 
 #include <math.h>
 #include "cstypes.h"
+#include "csutil/bitops.h"
 #if defined(CS_HAVE_BYTESWAP_H)
 #include <byteswap.h>
 #endif
@@ -219,6 +220,102 @@ struct csIEEEfloat
 #else
   #error Do not know how to convert to IEEE floats
 #endif
+
+  static CS_FORCEINLINE float HalfToNative (uint16 half)
+  {
+    union
+    {
+      uint32 u;
+      float f;
+    } u2f;
+
+    uint32 sign = (half & 0x8000) << 16;
+    int32 exponent = (half & 0x7C00) >> 10;
+    uint32 mantissa = (half & 0x03ff) << 13;
+   
+    // Check for INF or NaN.
+    if (exponent == 0x1F)
+    {
+      u2f.u = sign | mantissa;
+
+      if (mantissa != 0)
+      {
+        // NaN
+        u2f.u |= 0x7FC00000;
+      }
+      else
+      {
+        // INF
+        u2f.u |= 0x7f800000;
+      }
+
+      return u2f.f;
+    }
+
+    // Check for a denorm.
+    if(exponent == 0)
+    {
+      unsigned long index;
+      CS::Utility::BitOps::ScanBitReverse (mantissa, index);
+
+      exponent -= (index - 9);
+      mantissa <<= (index - 8);
+      mantissa &= 0x007FFFFF;
+    }
+
+    // Convert the exponent...
+    exponent += 112;
+    exponent <<= 23;
+
+    // And create the float...
+    u2f.u = sign | exponent | mantissa;
+
+    return u2f.f;
+  }
+
+  static CS_FORCEINLINE uint16 HalfFromNativeRTZ (float f)
+  {
+    union
+    {
+      float f;
+      unsigned int u;
+    } f2u;
+
+    f2u.f = f;
+    unsigned short sign = 0x8000 & (f2u.u >> 16);
+
+    // Get the absolute value.
+    f2u.u &= 0x7FFFFFFF;
+
+    // Check for a NaN
+    if(f2u.f != f2u.f)
+    {
+      // Construct a silent NaN.
+      f2u.u >>= 13;
+      f2u.u &= 0x7fff;
+      f2u.u |= 0x0200;
+      return sign | f2u.u;
+    }
+
+    // Check for overflow.
+    if(f2u.u >= 0x47800000)
+    {
+      // Check for INF.
+      if(f2u.u == 0x7F800000)
+        return sign | 0x7C00;
+
+      return sign | 0x7BFF;
+    }
+
+    // Check for underflow and denorms (flush to zero).
+    if(f2u.u < 0x38800000)
+      return sign;
+
+    // Convert the float to a half (rounding to zero).
+    f2u.u &= 0xFFFFE000U;
+    f2u.u -= 0x38000000U;
+    return sign | (f2u.u >> 13);
+  }
 };
 
 /**
