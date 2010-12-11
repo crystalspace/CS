@@ -235,6 +235,10 @@
     </input>
 
     <input name="texture_scale" type="float2" default="complex">
+      <block location="pass">
+         <shadervar name="texture scale" type="vector2">1,1</shadervar>
+      </block> 
+
       <block location="cg:variablemap">
 	  <variablemap variable="texture scale" destination="fragmentIn.texture_scale" />
       </block>
@@ -248,7 +252,11 @@
       </block>
     </input>
 
-    <input name="alpha_scaleoffset" type="float2" default="complex">     
+    <input name="alpha_scaleoffset" type="float2" default="complex">
+      <block location="pass">
+         <shadervar name="alpha scaleoffset" type="vector2">1,0</shadervar>
+      </block> 
+
       <block location="cg:variablemap">
 	  <variablemap variable="alpha scaleoffset" destination="fragmentIn.alpha_scaleoffset" />
       </block>
@@ -268,17 +276,8 @@
     </block>
     
     <block location="cg:fragmentMain">
-      float2 scaledTexCoord = texCoord;
-      float2 offsetAlphaCoord = texCoord;
-
-      <?if vars."texture scale" ?>
-        scaledTexCoord *= texture_scale;
-      <?endif?>
-
-      <?if vars."alpha scaleoffset" ?>
-        offsetAlphaCoord *= alpha_scaleoffset.x;
-        offsetAlphaCoord += alpha_scaleoffset.y;
-      <?endif?>
+      float2 scaledTexCoord = texCoord * texture_scale;
+      float2 offsetAlphaCoord = (texCoord * alpha_scaleoffset.x) + alpha_scaleoffset.y;
 
       float4x4 texValues = float4x4(
         tex2D (texDiffuse1, scaledTexCoord),
