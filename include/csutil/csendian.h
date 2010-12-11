@@ -222,6 +222,7 @@ struct csIEEEfloat
   #error Do not know how to convert to IEEE floats
 #endif
 
+  /// Convert IEEE half-precision float number to native 'float' type value
   static CS_FORCEINLINE float ToNative (uint16 half)
   {
     union
@@ -274,6 +275,10 @@ struct csIEEEfloat
     return u2f.f;
   }
 
+  /**
+   * Convert native 'float' type value to IEEE half-precision float number.
+   *  Rounds towards zero.
+   */
   static CS_FORCEINLINE uint16 FromNativeRTZ (float f)
   {
     union
