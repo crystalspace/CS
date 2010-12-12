@@ -892,7 +892,7 @@ struct iTerrainSystem : public virtual iBase
  */
 struct iTerrainCell : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainCell, 4, 0, 0);
+  SCF_INTERFACE (iTerrainCell, 4, 1, 0);
 
   /// Enumeration that specifies current cell state
   enum LoadState
@@ -1165,6 +1165,20 @@ struct iTerrainCell : public virtual iBase
   virtual iMaterialWrapper* GetBaseMaterial () const = 0;
 
   /**
+   * Set the optional alpha-splat material for the cell.
+   *
+   * \param material material handle of the alpha-splat material.
+   */
+  virtual void SetAlphaSplatMaterial (iMaterialWrapper* material) = 0;
+
+  /**
+   * Get the optional alpha-splat material for the cell.
+   *
+   * \return nullptr if no material, else the material.
+   */
+  virtual iMaterialWrapper* GetAlphaSplatMaterial () const = 0;
+
+  /**
    * Collide segment with cell (using the collider)
    *
    * \param start segment start (specified in object space)
@@ -1328,7 +1342,7 @@ struct iTerrainCell : public virtual iBase
 /// Factory representation of a cell
 struct iTerrainFactoryCell : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainFactoryCell, 1, 0 ,1);
+  SCF_INTERFACE (iTerrainFactoryCell, 2, 0, 0);
 
   /**
    * Get cell rendering properties. Returns pointer to a renderer-specific
@@ -1357,9 +1371,16 @@ struct iTerrainFactoryCell : public virtual iBase
   /**
    * Set base material for the cell.
    *
-   * \param material material handle of base material
+   * \param material material handle of base material.
    */
   virtual void SetBaseMaterial (iMaterialWrapper* material) = 0;
+
+  /**
+   * Set the optional alpha-splat material for the cell.
+   *
+   * \param material material handle of the alpha-splat material.
+   */
+  virtual void SetAlphaSplatMaterial (iMaterialWrapper* material) = 0;
 
   /// Get name of this cell
   virtual const char* GetName() = 0;
@@ -1418,9 +1439,16 @@ struct iTerrainFactoryCell : public virtual iBase
   virtual int GetMaterialMapHeight () const = 0;
 
   /**
-   * Get base material for the cell
+   * Get base material for the cell.
    */
   virtual iMaterialWrapper* GetBaseMaterial () const = 0;
+
+  /**
+   * Get the optional alpha-splat material for the cell.
+   *
+   * \return nullptr if no material, else the material.
+   */
+  virtual iMaterialWrapper* GetAlphaSplatMaterial () const = 0;
 
   /**
    * Get material persistent flag. If it is true, material data is stored in

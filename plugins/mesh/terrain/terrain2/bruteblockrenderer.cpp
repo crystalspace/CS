@@ -56,7 +56,7 @@ class TerrainBBCellRenderProperties :
 public:
   TerrainBBCellRenderProperties (iEngine* engine)
     : scfImplementationType (this), visible (true), blockResolution (32), 
-    minSteps (1), splitDistanceCoeff (128), splatDistance (200),
+    minSteps (1), splitDistanceCoeff (128), splatDistance (100),
     engine (engine)
   {
   }
@@ -970,31 +970,49 @@ void TerrainBlock::CullRenderMeshes (iRenderView* rview, const csPlane3* cullPla
   // Calculate whether to render the base material or the splatting.
   bool renderSplatting = (fCellDistance < renderData->properties->GetSplatDistance ());
 
-  CS::Graphics::RenderPriority splatPrio =
-    renderData->properties->GetSplatRenderPriorityValue();
-  for (int j = -1; j < (int)palette.GetSize (); ++j)
+  // Get the render priority of terrain splatting.
+  CS::Graphics::RenderPriority splatPrio = renderData->properties->GetSplatRenderPriorityValue();
+
+  // Get the optional alpha-splat material.
+  csRef<iMaterialWrapper> alphaSplatMaterial = renderData->cell->GetAlphaSplatMaterial ();
+
+  const int renderBaseMaterial = -2;
+  const int renderAlphaSplatMaterial = -1;
+  for (int j = -2; j < (int)palette.GetSize (); ++j)
   {
     iMaterialWrapper* mat = 0;
     iShaderVariableContext* svContext;
 
-    if (j < 0)
+    if (!renderSplatting)
     {
-      if (!renderSplatting)
+      if (j == renderBaseMaterial)
       {
         mat = renderData->cell->GetBaseMaterial ();
         svContext = renderData->commonSVContext;
       }
     }
-    else if (renderSplatting)
+    else
     {
-      // Map not used
-      if (!renderData->alphaMapMMUse.IsBitSet (j))
+      if (j == renderAlphaSplatMaterial)
       {
-        continue;
-      }
+        // Check that we have this material.
+        if (!alphaSplatMaterial.IsValid ())
+          continue;
 
-      mat = palette.Get (j);
-      svContext = renderData->svContextArrayMM[j];
+        mat = alphaSplatMaterial;
+        svContext = renderData->commonSVContext;
+      }
+      else if (j != renderBaseMaterial)
+      {
+        // Check if the map is used.
+        if (!renderData->alphaMapMMUse.IsBitSet (j))
+        {
+          continue;
+        }
+
+        mat = palette.Get (j);
+        svContext = renderData->svContextArrayMM[j];
+      }
     }
 
     if (!mat || !svContext)

@@ -445,6 +445,18 @@ iMaterialWrapper* csTerrainCell::GetBaseMaterial () const
   return baseMaterial;
 }
 
+void csTerrainCell::SetAlphaSplatMaterial (iMaterialWrapper* material)
+{
+  Touch ();
+
+  alphaSplatMaterial = material;
+}
+
+iMaterialWrapper* csTerrainCell::GetAlphaSplatMaterial () const
+{
+  return alphaSplatMaterial;
+}
+
 bool csTerrainCell::CollideSegment (const csVector3& start, 
   const csVector3& end, bool oneHit, iTerrainVector3Array* points)
 {

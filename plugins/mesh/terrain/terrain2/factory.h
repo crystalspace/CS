@@ -62,6 +62,7 @@ public:
   virtual iTerrainCellFeederProperties* GetFeederProperties () const;
 
   virtual void SetBaseMaterial (iMaterialWrapper* material);
+  virtual void SetAlphaSplatMaterial (iMaterialWrapper* material);
 
   virtual const char* GetName() { return name; }
   virtual void SetName (const char* name) { this->name = name; }
@@ -76,6 +77,7 @@ public:
   virtual int GetMaterialMapHeight () const { return materialMapHeight; }
 
   virtual iMaterialWrapper* GetBaseMaterial () const { return baseMaterial; }
+  virtual iMaterialWrapper* GetAlphaSplatMaterial () const { return alphaSplatMaterial; }
   virtual bool GetMaterialPersistent() const { return materialMapPersistent; }
 
   virtual void SetGridWidth (int w) { gridWidth = w; }
@@ -95,6 +97,7 @@ private:
   int gridWidth, gridHeight, materialMapWidth, materialMapHeight;
   bool materialMapPersistent;
   csRef<iMaterialWrapper> baseMaterial;
+  csRef<iMaterialWrapper> alphaSplatMaterial;
 
   csRef<iTerrainCellRenderProperties> rendererProperties;
   csRef<iTerrainCellCollisionProperties> colliderProperties;

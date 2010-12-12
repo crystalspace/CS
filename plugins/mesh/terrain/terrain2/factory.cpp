@@ -234,6 +234,7 @@ csTerrainFactoryCell::csTerrainFactoryCell (const csTerrainFactoryCell& other)
   materialMapHeight (other.materialMapHeight),
   materialMapPersistent (other.materialMapPersistent),
   baseMaterial (other.baseMaterial),
+  alphaSplatMaterial (other.alphaSplatMaterial),
   rendererProperties (other.rendererProperties->Clone()),
   colliderProperties (other.colliderProperties->Clone()),
   feederProperties (other.feederProperties->Clone())
@@ -258,6 +259,7 @@ csPtr<csTerrainCell> csTerrainFactoryCell::CreateCell (csTerrainSystem* terrain)
     renderProp, collProp, feederProp);
 
   cell->SetBaseMaterial (baseMaterial);
+  cell->SetAlphaSplatMaterial (alphaSplatMaterial);
 
   return csPtr<csTerrainCell> (cell);
 }
@@ -282,6 +284,10 @@ void csTerrainFactoryCell::SetBaseMaterial (iMaterialWrapper* material)
   baseMaterial = material;
 }
 
+void csTerrainFactoryCell::SetAlphaSplatMaterial (iMaterialWrapper* material)
+{
+  alphaSplatMaterial = material;
+}
 
 }
 CS_PLUGIN_NAMESPACE_END(Terrain2)
