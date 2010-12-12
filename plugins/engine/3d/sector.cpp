@@ -315,13 +315,20 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
   }
   culler = 0;
 
+  if (!plugname)
+  {
+    return true;
+  }
+
   // Load the culler plugin.
   csRef<iPluginManager> plugmgr = 
   	csQueryRegistry<iPluginManager> (engine->objectRegistry);
   culler = csLoadPlugin<iVisibilityCuller> (plugmgr, plugname);
 
-  if (!culler)
+  if (!culler.IsValid())
   {
+    engine->Error ("Failed loading visibility culler plugin %s!",
+        plugname);
     return false;
   }
 

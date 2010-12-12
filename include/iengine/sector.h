@@ -385,8 +385,10 @@ struct iSector : public virtual iBase
 
   /**
    * Use the specified plugin as the visibility culler for
-   * this sector. Returns false if the culler could not be
-   * loaded for some reason.
+   * this sector.
+   * Pass NULL as plugin name to set the default culler.
+   * Returns false if the culler could not be loaded for some
+   * reason.
    * The optional culler parameters will be given to the new
    * visibility culler.
    */
