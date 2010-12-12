@@ -317,7 +317,7 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
 
   // If the plugname is NULL it means we are requesting the default culler
   // (as of writing occluvis). So we are done here.
-  if(!plugname)
+  if (!plugname)
   {
     return true;
   }
