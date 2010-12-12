@@ -222,7 +222,12 @@ CS_FORCEINLINE bool csNaN (double d)
   return CS::IsNaN (d);
 }
 
-/// Checks if a floating point value is normal (not infinite or nan).
+/**
+ * Checks if a floating point value is normal (not infinite or nan).
+ * \deprecated Deprecated in 1.9. Usage not recommended as results are
+ *   inconsistent across platforms.
+ */
+CS_DEPRECATED_METHOD_MSG("Usage not recommended, inconsistent results")
 CS_FORCEINLINE bool csNormal (float f)
 {
 #if defined (CS_HAVE_NORMALF)
@@ -235,7 +240,12 @@ CS_FORCEINLINE bool csNormal (float f)
   return csFinite(f) && !csNaN(f);
 #endif
 }
-/// Checks if a double-precision floating point value is normal.
+/**
+ * Checks if a double-precision floating point value is normal.
+ * \deprecated Deprecated in 1.9. Usage not recommended as results are
+ *   inconsistent across platforms.
+ */
+CS_DEPRECATED_METHOD_MSG("Usage not recommended, inconsistent results")
 CS_FORCEINLINE bool csNormal (double d)
 {
 #if defined (CS_HAVE_STD__ISNORMAL)
