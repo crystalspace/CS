@@ -88,11 +88,14 @@ struct BoneMapping
     {
       csTuple2<CS::Animation::BoneID, CS::Animation::BoneID> tuple = it.NextTuple ();
 
-      csPrintf ("source bone %zu", tuple.second);
+      /* Note: 'real' BoneID format is %zu, but use %lu here to quell warnings
+	 when compiling with -ansi -pedantic. */
+      csPrintf ("source bone %lu", (unsigned long)tuple.second);
       if (sourceSkeleton->HasBone (tuple.second))
-	csPrintf (" ('%s') to target bone %zu (", sourceSkeleton->GetBoneName (tuple.second), tuple.first);
+	csPrintf (" ('%s') to target bone %lu (", sourceSkeleton->GetBoneName (tuple.second),
+		  (unsigned long)tuple.first);
       else
-	csPrintf ("(invalid) to target bone %zu (", tuple.first);
+	csPrintf ("(invalid) to target bone %lu (", (unsigned long)tuple.first);
       if (targetSkeleton->HasBone (tuple.first))
 	csPrintf ("'%s')\n", targetSkeleton->GetBoneName (tuple.first));
       else
