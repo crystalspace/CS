@@ -726,13 +726,21 @@ namespace CS
     bool F2BSorter::operator() (csOccluvis::NodeMeshList* const& m1,
                                 csOccluvis::NodeMeshList* const& m2)
     {
-      csBox3& m1box = m1->node->GetBBox ();
-      csBox3& m2box = m2->node->GetBBox ();
+      iMeshWrapper* mw1 = m1->meshList->imesh;
+      iMeshWrapper* mw2 = m2->meshList->imesh;
 
-      const float distSqRm1 = m1box.SquaredPosDist (cameraOrigin);
-      const float distSqRm2 = m2box.SquaredPosDist (cameraOrigin);
+      if (mw1->GetRenderPriority () == mw2->GetRenderPriority ())
+      {
+        csBox3& m1box = m1->node->GetBBox ();
+        csBox3& m2box = m2->node->GetBBox ();
 
-      return distSqRm1 < distSqRm2;
+        const float distSqRm1 = m1box.SquaredPosDist (cameraOrigin);
+        const float distSqRm2 = m2box.SquaredPosDist (cameraOrigin);
+
+        return distSqRm1 < distSqRm2;
+      }
+
+      return (mw1->GetRenderPriority () < mw2->GetRenderPriority ());
     }
 
     //======== VisTest box =====================================================
