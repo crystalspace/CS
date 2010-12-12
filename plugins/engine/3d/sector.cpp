@@ -315,7 +315,9 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
   }
   culler = 0;
 
-  if (!plugname)
+  // If the plugname is NULL it means we are requesting the default culler
+  // (as of writing occluvis). So we are done here.
+  if(!plugname)
   {
     return true;
   }
@@ -325,10 +327,9 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
   	csQueryRegistry<iPluginManager> (engine->objectRegistry);
   culler = csLoadPlugin<iVisibilityCuller> (plugmgr, plugname);
 
+  // The plugin couldn't be loaded.
   if (!culler.IsValid())
   {
-    engine->Error ("Failed loading visibility culler plugin %s!",
-        plugname);
     return false;
   }
 
