@@ -17045,6 +17045,47 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csLockedNormalData ##############
+
+package cspace::csLockedNormalData;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_data_get = *cspacec::csLockedNormalData_data_get;
+*swig_data_set = *cspacec::csLockedNormalData_data_set;
+*swig_pitch_get = *cspacec::csLockedNormalData_pitch_get;
+*swig_pitch_set = *cspacec::csLockedNormalData_pitch_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csLockedNormalData(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csLockedNormalData($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iTerrainVector3Array ##############
 
 package cspace::iTerrainVector3Array;
@@ -17193,6 +17234,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *SetHeightmapSource = *cspacec::iTerrainCellFeederProperties_SetHeightmapSource;
+*SetNormalMapSource = *cspacec::iTerrainCellFeederProperties_SetNormalMapSource;
 *SetMaterialMapSource = *cspacec::iTerrainCellFeederProperties_SetMaterialMapSource;
 *SetHeightOffset = *cspacec::iTerrainCellFeederProperties_SetHeightOffset;
 *AddAlphaMap = *cspacec::iTerrainCellFeederProperties_AddAlphaMap;
@@ -17536,6 +17578,10 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetHeightData = *cspacec::iTerrainCell_GetHeightData;
 *LockHeightData = *cspacec::iTerrainCell_LockHeightData;
 *UnlockHeightData = *cspacec::iTerrainCell_UnlockHeightData;
+*GetNormalData = *cspacec::iTerrainCell_GetNormalData;
+*LockNormalData = *cspacec::iTerrainCell_LockNormalData;
+*UnlockNormalData = *cspacec::iTerrainCell_UnlockNormalData;
+*RecalculateNormalData = *cspacec::iTerrainCell_RecalculateNormalData;
 *GetPosition = *cspacec::iTerrainCell_GetPosition;
 *GetSize = *cspacec::iTerrainCell_GetSize;
 *GetMaterialMapWidth = *cspacec::iTerrainCell_GetMaterialMapWidth;

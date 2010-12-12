@@ -1421,6 +1421,20 @@ class csLockedMaterialMap(object):
 csLockedMaterialMap_swigregister = _imesh.csLockedMaterialMap_swigregister
 csLockedMaterialMap_swigregister(csLockedMaterialMap)
 
+class csLockedNormalData(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    data = _swig_property(_imesh.csLockedNormalData_data_get, _imesh.csLockedNormalData_data_set)
+    pitch = _swig_property(_imesh.csLockedNormalData_pitch_get, _imesh.csLockedNormalData_pitch_set)
+    def __init__(self, *args): 
+        this = _imesh.new_csLockedNormalData(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _imesh.delete_csLockedNormalData
+    __del__ = lambda self : None;
+csLockedNormalData_swigregister = _imesh.csLockedNormalData_swigregister
+csLockedNormalData_swigregister(csLockedNormalData)
+
 class iTerrainVector3Array(csgeom.csVector3ArrayChangeAll):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
@@ -1480,6 +1494,7 @@ class iTerrainCellFeederProperties(core.iBase):
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetHeightmapSource(*args): return _imesh.iTerrainCellFeederProperties_SetHeightmapSource(*args)
+    def SetNormalMapSource(*args): return _imesh.iTerrainCellFeederProperties_SetNormalMapSource(*args)
     def SetMaterialMapSource(*args): return _imesh.iTerrainCellFeederProperties_SetMaterialMapSource(*args)
     def SetHeightOffset(*args): return _imesh.iTerrainCellFeederProperties_SetHeightOffset(*args)
     def AddAlphaMap(*args): return _imesh.iTerrainCellFeederProperties_AddAlphaMap(*args)
@@ -1646,6 +1661,10 @@ class iTerrainCell(core.iBase):
     def GetHeightData(*args): return _imesh.iTerrainCell_GetHeightData(*args)
     def LockHeightData(*args): return _imesh.iTerrainCell_LockHeightData(*args)
     def UnlockHeightData(*args): return _imesh.iTerrainCell_UnlockHeightData(*args)
+    def GetNormalData(*args): return _imesh.iTerrainCell_GetNormalData(*args)
+    def LockNormalData(*args): return _imesh.iTerrainCell_LockNormalData(*args)
+    def UnlockNormalData(*args): return _imesh.iTerrainCell_UnlockNormalData(*args)
+    def RecalculateNormalData(*args): return _imesh.iTerrainCell_RecalculateNormalData(*args)
     def GetPosition(*args): return _imesh.iTerrainCell_GetPosition(*args)
     def GetSize(*args): return _imesh.iTerrainCell_GetSize(*args)
     def GetMaterialMapWidth(*args): return _imesh.iTerrainCell_GetMaterialMapWidth(*args)
