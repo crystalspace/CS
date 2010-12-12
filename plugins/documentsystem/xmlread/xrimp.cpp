@@ -361,34 +361,34 @@ csRef<iDocumentAttribute> csXmlReadNode::GetAttribute (const char* name)
   return attr;
 }
 
-const char* csXmlReadNode::GetAttributeValue (const char* name)
+const char* csXmlReadNode::GetAttributeValue (const char* name, const char* defaultValue)
 {
   if (use_contents_value) return 0;
   TrXmlElement* el = node->ToElement ();
   if (el) return el->Attribute (name);
-  else return 0;
+  else return defaultValue;
 }
 
-int csXmlReadNode::GetAttributeValueAsInt (const char* name)
+int csXmlReadNode::GetAttributeValueAsInt (const char* name, int defaultValue)
 {
   TrDocumentAttribute* a = GetAttributeInternal (name);
-  if (!a) return 0;
+  if (!a) return defaultValue;
   return a->IntValue ();
 }
 
-float csXmlReadNode::GetAttributeValueAsFloat (const char* name)
+float csXmlReadNode::GetAttributeValueAsFloat (const char* name, float defaultValue)
 {
   TrDocumentAttribute* a = GetAttributeInternal (name);
-  if (!a) return 0;
+  if (!a) return defaultValue;
   float f;
   csScanStr (a->Value (), "%f", &f);
   return f;
 }
 
-bool csXmlReadNode::GetAttributeValueAsBool (const char* name,bool defaultvalue)
+bool csXmlReadNode::GetAttributeValueAsBool (const char* name,bool defaultValue)
 {
   TrDocumentAttribute* a = GetAttributeInternal (name);
-  if (!a || !a->Value () ) return defaultvalue;
+  if (!a || !a->Value () ) return defaultValue;
   if (strcasecmp(a->Value(),"true")==0 ||
       strcasecmp(a->Value(),"yes")==0 ||
       atoi(a->Value())!=0)

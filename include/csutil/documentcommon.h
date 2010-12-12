@@ -110,11 +110,11 @@ public:
   csRef<iDocumentAttribute> GetAttribute (const char*) { return 0; }
   //@{
   /// Returns value of an attribute.
-  virtual const char* GetAttributeValue (const char* name);
-  virtual int GetAttributeValueAsInt (const char* name);
-  virtual float GetAttributeValueAsFloat (const char* name);
+  virtual const char* GetAttributeValue (const char* name, const char* defaultValue = 0);
+  virtual int GetAttributeValueAsInt (const char* name, int defaultValue = 0);
+  virtual float GetAttributeValueAsFloat (const char* name, float defaultValue = 0.0f);
   virtual bool GetAttributeValueAsBool (const char* name, 
-    bool defaultvalue = false);
+    bool defaultValue = false);
   //@}
 
   //@{

@@ -1282,7 +1282,7 @@ csRef<iDocumentAttribute> csBinaryDocNode::GetAttribute (const char* name)
   return 0;
 }
 
-const char* csBinaryDocNode::GetAttributeValue (const char* name)
+const char* csBinaryDocNode::GetAttributeValue (const char* name, const char* defaultValue)
 {
   getAttributeValueStrKeeper = GetAttribute (name);
   if (getAttributeValueStrKeeper)
@@ -1291,11 +1291,11 @@ const char* csBinaryDocNode::GetAttributeValue (const char* name)
   }
   else
   {
-    return 0;
+    return defaultValue;
   }
 }
 
-int csBinaryDocNode::GetAttributeValueAsInt (const char* name)
+int csBinaryDocNode::GetAttributeValueAsInt (const char* name, int defaultValue)
 {
   csRef<iDocumentAttribute> attr = GetAttribute (name);
   if (attr)
@@ -1304,11 +1304,11 @@ int csBinaryDocNode::GetAttributeValueAsInt (const char* name)
   }
   else
   {
-    return 0;
+    return defaultValue;
   }
 }
 
-float csBinaryDocNode::GetAttributeValueAsFloat (const char* name)
+float csBinaryDocNode::GetAttributeValueAsFloat (const char* name, float defaultValue)
 {
   csRef<iDocumentAttribute> attr = GetAttribute (name);
   if (attr)
@@ -1317,12 +1317,12 @@ float csBinaryDocNode::GetAttributeValueAsFloat (const char* name)
   }
   else
   {
-    return 0.0f;
+    return defaultValue;
   }
 }
 
 bool csBinaryDocNode::GetAttributeValueAsBool (const char* name,
-					       bool defaultvalue)
+					       bool defaultValue)
 {
   csRef<iDocumentAttribute> attr = GetAttribute (name);
   if (attr)
@@ -1331,7 +1331,7 @@ bool csBinaryDocNode::GetAttributeValueAsBool (const char* name,
   }
   else
   {
-    return defaultvalue;
+    return defaultValue;
   }
 }
 

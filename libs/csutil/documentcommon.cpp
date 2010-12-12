@@ -102,33 +102,33 @@ float csDocumentNodeCommon::GetContentsValueAsFloat ()
   return val;
 }
 
-const char* csDocumentNodeCommon::GetAttributeValue (const char* name)
+const char* csDocumentNodeCommon::GetAttributeValue (const char* name, const char* defaultValue)
 {
   csRef<iDocumentAttribute> attr = GetAttribute (name);
   if (attr) return attr->GetValue();
-  return 0;
+  return defaultValue;
 }
 
-int csDocumentNodeCommon::GetAttributeValueAsInt (const char* name)
+int csDocumentNodeCommon::GetAttributeValueAsInt (const char* name, int defaultValue)
 {
   csRef<iDocumentAttribute> attr = GetAttribute (name);
   if (attr) return attr->GetValueAsInt();
-  return 0;
+  return defaultValue;
 }
 
-float csDocumentNodeCommon::GetAttributeValueAsFloat (const char* name)
+float csDocumentNodeCommon::GetAttributeValueAsFloat (const char* name, float defaultValue)
 {
   csRef<iDocumentAttribute> attr = GetAttribute (name);
   if (attr) return attr->GetValueAsFloat();
-  return 0;
+  return defaultValue;
 }
 
 bool csDocumentNodeCommon::GetAttributeValueAsBool (const char* name, 
-						    bool defaultvalue)
+						    bool defaultValue)
 {
   csRef<iDocumentAttribute> attr = GetAttribute (name);
   if (attr) return attr->GetValueAsBool();
-  return defaultvalue;
+  return defaultValue;
 }
 
 void csDocumentNodeCommon::SetAttributeAsInt (const char* name, int value)

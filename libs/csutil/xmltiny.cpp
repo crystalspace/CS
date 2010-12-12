@@ -463,34 +463,34 @@ csRef<iDocumentAttribute> csTinyXmlNode::GetAttribute (const char* name)
   return attr;
 }
 
-const char* csTinyXmlNode::GetAttributeValue (const char* name)
+const char* csTinyXmlNode::GetAttributeValue (const char* name, const char* defaultValue)
 {
   TiXmlElement* el = node->ToElement ();
   if (el) return el->Attribute (name);
-  else return 0;
+  else return defaultValue;
 }
 
-int csTinyXmlNode::GetAttributeValueAsInt (const char* name)
+int csTinyXmlNode::GetAttributeValueAsInt (const char* name, int defaultValue)
 {
   TiDocumentAttribute* a = GetAttributeInternal (name);
-  if (!a) return 0;
+  if (!a) return defaultValue;
   return a->IntValue ();
 }
 
-float csTinyXmlNode::GetAttributeValueAsFloat (const char* name)
+float csTinyXmlNode::GetAttributeValueAsFloat (const char* name, float defaultValue)
 {
   TiDocumentAttribute* a = GetAttributeInternal (name);
-  if (!a) return 0;
+  if (!a) return defaultValue;
   float f;
   csScanStr (a->Value (), "%f", &f);
   return f;
 }
 
 bool csTinyXmlNode::GetAttributeValueAsBool(const char* name,
-					    bool defaultvalue)
+					    bool defaultValue)
 {
   TiDocumentAttribute* a = GetAttributeInternal (name);
-  if (!a || !a->Value () ) return defaultvalue;
+  if (!a || !a->Value () ) return defaultValue;
   if (strcasecmp(a->Value(),"true")==0 ||
       strcasecmp(a->Value(),"yes")==0 ||
       atoi(a->Value())!=0)

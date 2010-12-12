@@ -179,7 +179,7 @@ struct iDocumentNodeIterator : public virtual iBase
  */
 struct iDocumentNode : public virtual iBase
 {
-  SCF_INTERFACE(iDocumentNode, 2,0,0);
+  SCF_INTERFACE(iDocumentNode, 3,0,0);
   /**
    * Get the type of this node (one of CS_NODE_...).
    */
@@ -285,18 +285,33 @@ struct iDocumentNode : public virtual iBase
   virtual csRef<iDocumentAttributeIterator> GetAttributes () = 0;
   /// Get an attribute by name.
   virtual csRef<iDocumentAttribute> GetAttribute (const char* name) = 0;
-  /// Get an attribute value by name as a string.
-  virtual const char* GetAttributeValue (const char* name) = 0;
-  /// Get an attribute value by name as an integer.
-  virtual int GetAttributeValueAsInt (const char* name) = 0;
-  /// Get an attribute value by name as a floating point value.
-  virtual float GetAttributeValueAsFloat (const char* name) = 0;
+  /** Get an attribute value by name as a string.
+   *  \param name The name of the parameter to fetch.
+   *  \param defaultValue The default return value if the fetch fails.
+   *  \return A pointer to the fetched text. defaultValue if it fails.
+   */
+  virtual const char* GetAttributeValue (const char* name, const char* defaultValue = 0) = 0;
+  /** Get an attribute value by name as an integer.
+   *  \param name The name of the parameter to fetch.
+   *  \param defaultValue The default return value if the fetch fails.
+   *  \return The fetched int. defaultValue if it fails.
+   */
+  virtual int GetAttributeValueAsInt (const char* name, int defaultValue = 0) = 0;
+  /** Get an attribute value by name as a floating point value.
+   *  \param name The name of the parameter to fetch.
+   *  \param defaultValue The default return value if the fetch fails.
+   *  \return The fetched float. defaultValue if it fails.
+   */
+  virtual float GetAttributeValueAsFloat (const char* name, float defaultValue = 0.0f) = 0;
   /**
    * Get an attribute value by name as a bool.  "yes", "true", and "1" all
    * are returned as true.
+   * \param name The name of the parameter to fetch.
+   * \param defaultValue The default return value if the fetch fails.
+   * \return The fetched bool. defaultValue if it fails.
    */
   virtual bool GetAttributeValueAsBool (const char* name,
-  	bool defaultvalue=false) = 0;
+  	bool defaultValue=false) = 0;
 
   /// Remove an attribute.
   virtual void RemoveAttribute (const csRef<iDocumentAttribute>& attr) = 0;
