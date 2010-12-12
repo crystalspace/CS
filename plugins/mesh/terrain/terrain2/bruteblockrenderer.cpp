@@ -964,17 +964,18 @@ void TerrainBlock::CullRenderMeshes (iRenderView* rview, const csPlane3* cullPla
     renderData->renderer->GetIndexBuffer (renderData->blockResolution,
     indexType, numIndices));
 
+  // Get the optional alpha-splat material.
+  csRef<iMaterialWrapper> alphaSplatMaterial = renderData->cell->GetAlphaSplatMaterial ();
+
   // Calculate the WS distance from the camera to this cell.
   float fCellDistance = sqrt (boundingBox.SquaredPosDist (rview->GetCamera ()->GetTransform ().GetOrigin ()));
 
   // Calculate whether to render the base material or the splatting.
   bool renderSplatting = (fCellDistance < renderData->properties->GetSplatDistance ());
+  renderSplatting &= (!palette.IsEmpty () || alphaSplatMaterial.IsValid ());
 
   // Get the render priority of terrain splatting.
   CS::Graphics::RenderPriority splatPrio = renderData->properties->GetSplatRenderPriorityValue();
-
-  // Get the optional alpha-splat material.
-  csRef<iMaterialWrapper> alphaSplatMaterial = renderData->cell->GetAlphaSplatMaterial ();
 
   const int renderBaseMaterial = -2;
   const int renderAlphaSplatMaterial = -1;
