@@ -230,7 +230,7 @@ public:
 
   virtual csRef<iDocumentAttributeIterator> GetAttributes ();
   virtual csRef<iDocumentAttribute> GetAttribute (const char* name);
-  virtual int GetAttributeValueAsInt (const char* name, int defaultValue = 0.0f);
+  virtual int GetAttributeValueAsInt (const char* name, int defaultValue = 0);
   virtual float GetAttributeValueAsFloat (const char* name, float defaultValue = 0.0f);
   virtual bool  GetAttributeValueAsBool (const char* name,
 					 bool defaultValue = false);
