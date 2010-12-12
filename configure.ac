@@ -2418,12 +2418,6 @@ AC_DEFUN([CS_CHECK_STD_SPECIAL_FLOAT],
 	[], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_STD__$1]))],
 	[], [], [$cs_cv_prog_cxx_enable_pedantic])])
 
-CS_CHECK_SPECIAL_FLOAT([isfinite])
-CS_CHECK_SPECIAL_FLOAT([finitef])
-CS_CHECK_SPECIAL_FLOAT([finite])
-CS_CHECK_SPECIAL_FLOAT([_finite])
-CS_CHECK_STD_SPECIAL_FLOAT([isfinite])
-
 CS_CHECK_SPECIAL_FLOAT([isnormal])
 CS_CHECK_SPECIAL_FLOAT([normalf])
 CS_CHECK_STD_SPECIAL_FLOAT([isnormal])

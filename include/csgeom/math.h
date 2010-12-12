@@ -166,41 +166,60 @@ namespace CS
     #error Do not know how to test for NaN
   #endif
   }
+  
+  /// Checks if a floating point value is finite.
+  CS_FORCEINLINE bool IsFinite (float f)
+  {
+  #ifdef CS_IEEE_DOUBLE_FORMAT
+    const uint32 exponentMask = 0x7f800000;
+    union
+    {
+      float f;
+      uint32 ui32;
+    } u;
+    u.f = f;
+    return ((u.ui32 & exponentMask) != exponentMask);
+  #else
+    #error Do not know how to test for NaN
+  #endif
+  }
+  /// Checks if a double-precision floating point value is finite.
+  CS_FORCEINLINE bool IsFinite (double d)
+  {
+  #ifdef CS_IEEE_DOUBLE_FORMAT
+    const uint64 exponentMask = CONST_UINT64(0x7ff0000000000000);
+    union
+    {
+      double d;
+      uint64 ui64;
+    } u;
+    u.d = d;
+    return ((u.ui64 & exponentMask) != exponentMask);
+  #else
+    #error Do not know how to test for NaN
+  #endif
+  }
   /** @} */
 } // namespace CS
 
 //@{
-/// Checks if a floating point value is finite.
+/**
+ * Checks if a floating point value is finite.
+ * \deprecated Deprecated in 1.9. Use CS::IsFinite() instead.
+ */
+CS_DEPRECATED_METHOD_MSG("Use CS::IsFinite(x) instead")
 CS_FORCEINLINE bool csFinite (float f)
 {
-#if defined (CS_HAVE_FINITEF)
-  return finitef (f);
-#elif defined (CS_HAVE_STD__ISFINITE)
-  return std::isfinite (f);
-#elif defined(CS_HAVE_ISFINITE)
-  return isfinite (f);
-#elif defined (CS_HAVE_FINITE)
-  return finite (f);
-#elif defined (CS_HAVE__FINITE)
-  return _finite (f) != 0;
-#else
-#error Your platform has no isfinite()-alike function!
-#endif
+  return CS::IsFinite (f);
 }
-/// Checks if a double-precision floating point value is finite.
+/**
+ * Checks if a double-precision floating point value is finite.
+ * \deprecated Deprecated in 1.9. Use CS::IsFinite() instead.
+ */
+CS_DEPRECATED_METHOD_MSG("Use CS::IsFinite(x) instead")
 CS_FORCEINLINE bool csFinite (double d)
 {
-#if defined (CS_HAVE_STD__ISFINITE)
-  return std::isfinite (d);
-#elif defined(CS_HAVE_ISFINITE)
-  return isfinite (d);
-#elif defined (CS_HAVE_FINITE)
-  return finite (d);
-#elif defined (CS_HAVE__FINITE)
-  return _finite (d) != 0;
-#else
-#error Your platform has no isfinite()-alike function!
-#endif
+  return CS::IsFinite (d);
 }
 
 /**

@@ -89,7 +89,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         {
           if (flags & FiniteDirty)
           {
-            if (csFinite (value))
+            if (CS::IsFinite (value))
             {
               flags = (flags & ~FiniteDirty) | Finite;
               return true;
@@ -172,7 +172,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       bool IsEmpty() const;
       bool IsSingleValue() const
       {
-        return ((left == right) && csFinite (left.GetValue()));
+        return ((left == right) && CS::IsFinite (left.GetValue()));
       }
 
       friend bool operator== (const Interval& a, const Interval& b)
