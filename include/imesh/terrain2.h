@@ -892,7 +892,7 @@ struct iTerrainSystem : public virtual iBase
  */
 struct iTerrainCell : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainCell, 4, 1, 0);
+  SCF_INTERFACE (iTerrainCell, 5, 0, 0);
 
   /// Enumeration that specifies current cell state
   enum LoadState
