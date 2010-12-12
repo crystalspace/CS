@@ -32,9 +32,6 @@
 CS_PLUGIN_NAMESPACE_BEGIN(ImgPlex)
 {
 
-// For SetDithering()
-#include "csutil/deprecated_warn_off.h"
-
 /**
  * Through this plugin you can load/save a set of different formats.
  * It works by loading other plzugins and transfers execution to them.
@@ -50,7 +47,6 @@ class csImageIOMultiplexer :
   csConfigAccess config;
   csRef<iStringArray> classlist;
   csWeakRef<iPluginManager> plugin_mgr;
-  bool global_dither;
   CS::Threading::Mutex lock;
 
   void StoreDesc (const csImageIOFileFormatDescriptions& format);
@@ -67,15 +63,12 @@ class csImageIOMultiplexer :
   virtual bool Initialize (iObjectRegistry*);
   virtual const csImageIOFileFormatDescriptions& GetDescription ();
   virtual csPtr<iImage> Load (iDataBuffer* buf, int iFormat);
-  virtual void SetDithering (bool iEnable);
   virtual csPtr<iDataBuffer> Save (iImage *image, const char *mime = 0,
     const char* extraoptions = 0);
   virtual csPtr<iDataBuffer> Save (iImage *image,
   	iImageIO::FileFormatDescription *format = 0,
     	const char* extraoptions = 0);
 };
-
-#include "csutil/deprecated_warn_on.h"
 
 }
 CS_PLUGIN_NAMESPACE_END(ImgPlex)

@@ -39,9 +39,6 @@ extern "C"
 CS_PLUGIN_NAMESPACE_BEGIN(JPGImageIO)
 {
 
-// For SetDithering()
-#include "csutil/deprecated_warn_off.h"
-
 /**
  * The JPG image file format loader.
  */
@@ -59,7 +56,6 @@ public:
 
   virtual const csImageIOFileFormatDescriptions& GetDescription ();
   virtual csPtr<iImage> Load (iDataBuffer* buf, int iFormat);
-  virtual void SetDithering (bool iEnable);
   virtual csPtr<iDataBuffer> Save (iImage *image, const char *mime = 0,
     const char* extraoptions = 0);
   virtual csPtr<iDataBuffer> Save (iImage *image,
@@ -69,8 +65,6 @@ public:
   bool Initialize (iObjectRegistry* p) 
   { object_reg = p; return true; }
 };
-
-#include "csutil/deprecated_warn_on.h"
 
 /* ==== Error mgmnt ==== */
 struct my_error_mgr
@@ -88,8 +82,6 @@ typedef struct my_error_mgr *my_error_ptr;
 class ImageJpgFile : public csCommonImageFile
 {
   friend class csJPGImageIO;
-  static bool dither;
-
 private:
 
   class JpegLoader : public csCommonImageFileLoader

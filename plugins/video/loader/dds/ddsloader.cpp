@@ -61,10 +61,6 @@ const csImageIOFileFormatDescriptions& csDDSImageIO::GetDescription ()
   return formats;
 }
 
-void csDDSImageIO::SetDithering (bool)
-{
-}
-
 csDDSRawDataType csDDSImageIO::IdentifyPixelFormat (const dds::PixelFormat& pf, 
                                                     uint32 dxgiFormat, bool isDX10,
                                                     uint& bpp)

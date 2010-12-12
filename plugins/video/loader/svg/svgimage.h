@@ -27,9 +27,6 @@
 CS_PLUGIN_NAMESPACE_BEGIN(SVGImage)
 {
 
-// For SetDithering()
-#include "csutil/deprecated_warn_off.h"
-
 class SVGImageIO : public scfImplementation2<SVGImageIO,
                                              iImageIO,
                                              iComponent>
@@ -43,7 +40,6 @@ class SVGImageIO : public scfImplementation2<SVGImageIO,
 
   virtual const csImageIOFileFormatDescriptions& GetDescription ();
   virtual csPtr<iImage> Load (iDataBuffer* buf, int iFormat);
-  virtual void SetDithering (bool iEnable) {}
   virtual csPtr<iDataBuffer> Save (iImage *image, const char *mime = 0,
     const char* extraoptions = 0)
   { return 0; }
@@ -54,8 +50,6 @@ class SVGImageIO : public scfImplementation2<SVGImageIO,
 
   virtual bool Initialize (iObjectRegistry*) { return true; }
 };
-
-#include "csutil/deprecated_warn_on.h"
 
 class SVGImage : public csImageMemory
 {

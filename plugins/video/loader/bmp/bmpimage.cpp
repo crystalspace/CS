@@ -161,10 +161,6 @@ csPtr<iImage> csBMPImageIO::Load (iDataBuffer* buf, int iFormat)
   return csPtr<iImage> (i);
 }
 
-void csBMPImageIO::SetDithering (bool)
-{
-}
-
 static inline int PadToFourBytes (int n)
 {
   // (4-n) may get negative, but the logic still works correctly

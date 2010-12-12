@@ -116,10 +116,6 @@ csPtr<iImage> csPNGImageIO::Load (iDataBuffer* buf, int iFormat)
   return csPtr<iImage> (i);
 }
 
-void csPNGImageIO::SetDithering (bool)
-{
-}
-
 csPtr<iDataBuffer> csPNGImageIO::Save (iImage *Image,
     iImageIO::FileFormatDescription *, const char* extraoptions)
 {

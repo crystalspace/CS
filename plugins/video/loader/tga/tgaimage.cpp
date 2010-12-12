@@ -109,10 +109,6 @@ csPtr<iImage> csTGAImageIO::Load (iDataBuffer* buf, int iFormat)
   return csPtr<iImage> (i);
 }
 
-void csTGAImageIO::SetDithering (bool)
-{
-}
-
 csPtr<iDataBuffer> csTGAImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *,
   const char* extraoptions)
 {

@@ -61,10 +61,6 @@ csPtr<iImage> csGIFImageIO::Load (iDataBuffer* buf, int iFormat)
   return csPtr<iImage> (i);
 }
 
-void csGIFImageIO::SetDithering (bool)
-{
-}
-
 csPtr<iDataBuffer> csGIFImageIO::Save (iImage* image, iImageIO::FileFormatDescription* format,
   const char* extraoptions)
 {

@@ -74,7 +74,7 @@ typedef csArray<csImageIOFileFormatDescription const*>
  */
 struct iImageIO : public virtual iBase
 {
-  SCF_INTERFACE (iImageIO, 1, 0, 1);
+  SCF_INTERFACE (iImageIO, 2, 0, 0);
 
   /// Description for a file format supported by an image loader.
   typedef csImageIOFileFormatDescription FileFormatDescription;
@@ -96,16 +96,6 @@ struct iImageIO : public virtual iBase
    * method of the image will return a value without that bit set.
    */
   virtual csPtr<iImage> Load (iDataBuffer* buf, int iFormat) = 0;
-
-  /**
-   * Set global image dithering option.<p>
-   * By default this option is disabled. If you enable it, all images will
-   * be dithered both after loading and after mipmapping/scaling. This will
-   * affect all truecolor->paletted image conversions.
-   * \deprecated Deprecated in 1.3. Defunct option.
-   */
-  CS_DEPRECATED_METHOD_MSG("Defunct option")
-  virtual void SetDithering (bool iEnable) = 0;
 
   /**
    * Save an image using a prefered format.<p>

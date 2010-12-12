@@ -31,9 +31,6 @@
 CS_PLUGIN_NAMESPACE_BEGIN(JNGImageIO)
 {
 
-// For SetDithering()
-#include "csutil/deprecated_warn_off.h"
-
 /**
  * The JNG image file format loader.
  */
@@ -63,7 +60,6 @@ class csJNGImageIO : public scfImplementation2<csJNGImageIO,
 
   virtual const csImageIOFileFormatDescriptions& GetDescription ();
   virtual csPtr<iImage> Load (iDataBuffer* buf, int iFormat);
-  virtual void SetDithering (bool iEnable);
   virtual csPtr<iDataBuffer> Save (iImage *image, const char *mime = 0,
     const char* extraoptions = 0);
   virtual csPtr<iDataBuffer> Save (iImage *image,
@@ -73,8 +69,6 @@ class csJNGImageIO : public scfImplementation2<csJNGImageIO,
   virtual bool Initialize (iObjectRegistry* p) 
   { object_reg = p; return true; }
 };
-
-#include "csutil/deprecated_warn_on.h"
 
 /**
  * An csImageFile subclass for reading JNG files.<p>

@@ -130,10 +130,6 @@ csPtr<iImage> csJNGImageIO::Load (iDataBuffer* buf, int iFormat)
   return csPtr<iImage> (i);
 }
 
-void csJNGImageIO::SetDithering (bool)
-{
-}
-
 // a couple of callbacks used by both reading & writing
 
 /// memory alloc callback for libmng

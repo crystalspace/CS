@@ -29,9 +29,6 @@
 CS_PLUGIN_NAMESPACE_BEGIN(BMPImageIO)
 {
 
-// For SetDithering()
-#include "csutil/deprecated_warn_off.h"
-
 /**
  * The BMP image file format loader.
  */
@@ -48,7 +45,6 @@ class csBMPImageIO : public scfImplementation2<csBMPImageIO,
 
   virtual const csImageIOFileFormatDescriptions& GetDescription ();
   virtual csPtr<iImage> Load (iDataBuffer* buf, int iFormat);
-  virtual void SetDithering (bool iEnable);
   virtual csPtr<iDataBuffer> Save (iImage *image, const char *mime = 0,
     const char* extraoptions = 0);
   virtual csPtr<iDataBuffer> Save (iImage *image,
@@ -57,8 +53,6 @@ class csBMPImageIO : public scfImplementation2<csBMPImageIO,
 
   virtual bool Initialize (iObjectRegistry*) { return true; }
 };
-
-#include "csutil/deprecated_warn_on.h"
 
 /**
  * An csImageFile subclass for reading BMP files.
