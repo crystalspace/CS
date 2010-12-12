@@ -667,12 +667,12 @@ public:
    */
   bool IsNaN () const
   {
-    if (csNaN (minbox.x)) return true;
-    if (csNaN (minbox.y)) return true;
-    if (csNaN (minbox.z)) return true;
-    if (csNaN (maxbox.x)) return true;
-    if (csNaN (maxbox.y)) return true;
-    if (csNaN (maxbox.z)) return true;
+    if (CS::IsNaN (minbox.x)) return true;
+    if (CS::IsNaN (minbox.y)) return true;
+    if (CS::IsNaN (minbox.z)) return true;
+    if (CS::IsNaN (maxbox.x)) return true;
+    if (CS::IsNaN (maxbox.y)) return true;
+    if (CS::IsNaN (maxbox.z)) return true;
     return false;
   }
 

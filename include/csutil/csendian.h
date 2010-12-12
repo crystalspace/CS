@@ -294,7 +294,7 @@ struct csIEEEfloat
     f2u.u &= 0x7FFFFFFF;
 
     // Check for a NaN
-    if(csNaN (f2u.f))
+    if(CS::IsNaN (f2u.f))
     {
       // Construct a silent NaN.
       f2u.u >>= 13;
