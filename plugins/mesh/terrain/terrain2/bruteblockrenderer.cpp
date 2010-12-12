@@ -964,6 +964,12 @@ void TerrainBlock::CullRenderMeshes (iRenderView* rview, const csPlane3* cullPla
     renderData->renderer->GetIndexBuffer (renderData->blockResolution,
     indexType, numIndices));
 
+  // Calculate the WS distance from the camera to this cell.
+  float fCellDistance = sqrt (boundingBox.SquaredPosDist (rview->GetCamera ()->GetTransform ().GetOrigin ()));
+
+  // Calculate whether to render the base material or the splatting.
+  bool renderSplatting = (fCellDistance < renderData->properties->GetSplatDistance ());
+
   CS::Graphics::RenderPriority splatPrio =
     renderData->properties->GetSplatRenderPriorityValue();
   for (int j = -1; j < (int)palette.GetSize (); ++j)
@@ -973,19 +979,22 @@ void TerrainBlock::CullRenderMeshes (iRenderView* rview, const csPlane3* cullPla
 
     if (j < 0)
     {
-      mat = renderData->cell->GetBaseMaterial ();
-      svContext = renderData->commonSVContext;
+      if (!renderSplatting)
+      {
+        mat = renderData->cell->GetBaseMaterial ();
+        svContext = renderData->commonSVContext;
+      }
     }
-    else
+    else if (renderSplatting)
     {
-      mat = palette.Get (j);
-      svContext = renderData->svContextArrayMM[j];
-
       // Map not used
       if (!renderData->alphaMapMMUse.IsBitSet (j))
       {
         continue;
       }
+
+      mat = palette.Get (j);
+      svContext = renderData->svContextArrayMM[j];
     }
 
     if (!mat || !svContext)
