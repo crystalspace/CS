@@ -627,7 +627,8 @@ bool CS::Animation::BVHMocapParser::ParseAnimationFrame (iFile* file)
 
     // Create an animation keyframe
     CS::Animation::ChannelID channelID = animation->FindChannel (channel.boneID);
-    position = position + channel.offset;
+    if (i != 0)
+      position = position + channel.offset;
     csQuaternion quaternion;
     quaternion.SetMatrix (rotation);
     animation->AddKeyFrame (channelID, frameTime, quaternion, position);
