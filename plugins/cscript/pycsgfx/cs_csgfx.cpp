@@ -3125,17 +3125,6 @@ SWIG_AsVal_int (PyObject * obj, int *val)
   return res;
 }
 
-
-SWIGINTERN int
-SWIG_AsVal_bool (PyObject *obj, bool *val)
-{
-  int r = PyObject_IsTrue(obj);
-  if (r == -1)
-    return SWIG_ERROR;
-  if (val) *val = r ? true : false;
-  return SWIG_OK;
-}
-
 SWIGINTERN int iImageIO_scfGetVersion(){ return scfInterfaceTraits<iImageIO>::GetVersion(); }
 SWIGINTERN void delete_iImageIO(iImageIO *self){ if (self) self->DecRef (); }
 
@@ -3152,6 +3141,17 @@ SWIG_AsVal_unsigned_SS_int (PyObject * obj, unsigned int *val)
     }
   }  
   return res;
+}
+
+
+SWIGINTERN int
+SWIG_AsVal_bool (PyObject *obj, bool *val)
+{
+  int r = PyObject_IsTrue(obj);
+  if (r == -1)
+    return SWIG_ERROR;
+  if (val) *val = r ? true : false;
+  return SWIG_OK;
 }
 
 
@@ -5563,36 +5563,6 @@ SWIGINTERN PyObject *_wrap_iImageIO_Load(PyObject *SWIGUNUSEDPARM(self), PyObjec
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iImage *)ref, SWIGTYPE_p_iImage, 1);
   }
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iImageIO_SetDithering(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iImageIO *arg1 = (iImageIO *) 0 ;
-  bool arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  bool val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iImageIO_SetDithering",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iImageIO, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iImageIO_SetDithering" "', argument " "1"" of type '" "iImageIO *""'"); 
-  }
-  arg1 = reinterpret_cast< iImageIO * >(argp1);
-  ecode2 = SWIG_AsVal_bool(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iImageIO_SetDithering" "', argument " "2"" of type '" "bool""'");
-  } 
-  arg2 = static_cast< bool >(val2);
-  (arg1)->SetDithering(arg2);
-  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -14867,7 +14837,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csImageIOFileFormatDescription_swigregister", csImageIOFileFormatDescription_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iImageIO_GetDescription", _wrap_iImageIO_GetDescription, METH_VARARGS, NULL},
 	 { (char *)"iImageIO_Load", _wrap_iImageIO_Load, METH_VARARGS, NULL},
-	 { (char *)"iImageIO_SetDithering", _wrap_iImageIO_SetDithering, METH_VARARGS, NULL},
 	 { (char *)"iImageIO_Save", _wrap_iImageIO_Save, METH_VARARGS, NULL},
 	 { (char *)"iImageIO_scfGetVersion", _wrap_iImageIO_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iImageIO", _wrap_delete_iImageIO, METH_VARARGS, NULL},

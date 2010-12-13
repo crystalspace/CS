@@ -178,7 +178,6 @@ class iImageIO(core.iBase):
     __repr__ = _swig_repr
     def GetDescription(*args): return _csgfx.iImageIO_GetDescription(*args)
     def Load(*args): return _csgfx.iImageIO_Load(*args)
-    def SetDithering(*args): return _csgfx.iImageIO_SetDithering(*args)
     def Save(*args): return _csgfx.iImageIO_Save(*args)
     scfGetVersion = staticmethod(_csgfx.iImageIO_scfGetVersion)
     __swig_destroy__ = _csgfx.delete_iImageIO
