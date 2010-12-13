@@ -115,24 +115,38 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
   {
     static const char* msgid = "crystalspace.skeletonloader.parseskeleton";
 
-    CS::Animation::iSkeletonFactory* factory = 0;
+    CS::Animation::iSkeletonFactory* factory = nullptr;
 
-    // Get common properties
-    const char* name = node->GetAttributeValue ("name");
-    if (!name)
+    // Find or create the skeleton
+    const char* ref = node->GetAttributeValue ("ref");
+    if (ref)
     {
-      synldr->ReportError (msgid, node, "No name set for skeleton");
-      return false;
+      factory = skelManager->FindSkeletonFactory (ref);
+      if (!factory)
+      {
+	synldr->Report (msgid, CS_REPORTER_SEVERITY_WARNING, node, 
+			"Could not find referenced skeleton '%s'.", ref);
+	return false;
+      }
     }
 
-    factory = skelManager->CreateSkeletonFactory (name);
-    if (!factory)
+    else
     {
-      synldr->ReportError (msgid, node, 
-        "Could not create skeleton, another skeleton with same name might already exist.");
-      return false;
-    }
+      const char* name = node->GetAttributeValue ("name");
+      if (!name)
+      {
+	synldr->ReportError (msgid, node, "No name set for skeleton");
+	return false;
+      }
 
+      factory = skelManager->CreateSkeletonFactory (name);
+      if (!factory)
+      {
+	synldr->ReportError (msgid, node, 
+			     "Could not create skeleton '%s'.", name);
+	return false;
+      }
+    }
 
     // Load bones etc..
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -242,20 +256,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
   {
     static const char* msgid = "crystalspace.skeletonloader.parseanimpacket";
 
-    // Get common properties
-    const char* name = node->GetAttributeValue ("name");
-    if (!name)
-    {
-      synldr->ReportError (msgid, node, "No name set for animation packet");
-      return false;
-    }
-
-    CS::Animation::iSkeletonAnimPacketFactory* packet;
+    CS::Animation::iSkeletonAnimPacketFactory* packet = nullptr;
 
     // Check if this a motion capture packet
     const char* type = node->GetAttributeValue ("type");
     if (type && strcmp (type, "mocap") == 0)
     {
+      const char* name = node->GetAttributeValue ("name");
+      if (!name)
+      {
+	synldr->ReportError (msgid, node, "No name set for animation packet");
+	return false;
+      }
+
       CS::Animation::BVHMocapParser mocapParser (object_reg);
       mocapParser.SetPacketName (name);
 
@@ -296,14 +309,37 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       packet = parsingResult.animPacketFactory;
     }
 
+    // Find or create the packet
     else
     {
-      packet = skelManager->CreateAnimPacketFactory (name);
-      if (!packet)
+      const char* ref = node->GetAttributeValue ("ref");
+      if (ref)
       {
-	synldr->ReportError (msgid, node, 
-	    "Could not create packet, another packet with same name might already exist.");
-	return false;
+	packet = skelManager->FindAnimPacketFactory (ref);
+	if (!packet)
+	{
+	  synldr->Report (msgid, CS_REPORTER_SEVERITY_WARNING, node, 
+			  "Could not find referenced packet '%s'.", ref);
+	  return false;
+	}
+      }
+
+      else
+      {
+	const char* name = node->GetAttributeValue ("name");
+	if (!name)
+	{
+	  synldr->ReportError (msgid, node, "No name set for animation packet");
+	  return false;
+	}
+
+	packet = skelManager->CreateAnimPacketFactory (name);
+	if (!packet)
+	{
+	  synldr->ReportError (msgid, node, 
+			       "Could not create packet '%s'.", name);
+	  return false;
+	}
       }
     }
 
@@ -327,14 +363,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
         break;
       case XMLTOKEN_NODE:
         {
-          csRef<CS::Animation::iSkeletonAnimNodeFactory> nodeFact = ParseAnimTreeNode (child, packet);
-
+          csRef<CS::Animation::iSkeletonAnimNodeFactory> nodeFact =
+	    ParseAnimTreeNode (child, packet);
           if (!nodeFact)
-          {
-            synldr->ReportError (msgid, child, "Error loading animation node.");
             return false;
-          }
-          // New root
+
+          // Set new root
           packet->SetAnimationRoot (nodeFact);
         }
         break;
@@ -368,6 +402,34 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
     case XMLTOKEN_BLEND:
       {
         result = ParseBlendNode (node, packet);
+      }
+      break;
+    case XMLTOKEN_BLENDTREE:
+      {
+	if (!node->GetAttribute ("packet"))
+	{
+	  synldr->ReportError (msgid, node, "No animation packet provided");
+	  return 0;
+	}
+
+	const char* packetName = node->GetAttributeValue ("packet");
+	CS::Animation::iSkeletonAnimPacketFactory* refPacket =
+	  skelManager->FindAnimPacketFactory (packetName);
+
+	if (!refPacket)
+	{
+	  synldr->ReportError (msgid, node, "Animation packet '%s' not found", packetName);
+	  return 0;
+	}
+
+	if (refPacket == packet)
+	{
+	  synldr->ReportError (msgid, node,
+			       "The referenced packet is not different from the current one");
+	  return 0;
+	}
+
+        result = refPacket->GetAnimationRoot ();
       }
       break;
     case XMLTOKEN_PRIORITY:
@@ -436,7 +498,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
       CS::Animation::iSkeletonAnimation* fact = packet->FindAnimation (ref);
       if (!fact)
       {      
-        synldr->ReportError (msgid, node, "Referenced animation '%s' not found", ref);
+        synldr->ReportError (msgid, node, "Could not find referenced animation '%s'", ref);
         return 0;
       }
 
@@ -459,8 +521,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
     }
     
     // Handle "separate-file" loading...
-
-
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
     while (it->HasNext ())
     {
@@ -1199,6 +1259,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
 	synldr->ReportError (msgid, node, "No skeleton factory of bodymesh provided while defining bone %s", bone);
 	return 0;
       }
+
+      factnode->SetBone (boneID);
     }
 
     if (node->GetAttribute ("maxspeed"))
@@ -1521,7 +1583,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
 
 	  if (!child->GetAttribute ("nodespeed"))
 	  {
-	    synldr->ReportError (msgid, node, "No speed provided for child of node %s", name);
+	    synldr->ReportError (msgid, node, "No speed provided for child of node '%s'", name);
 	    return 0;
 	  }
 
