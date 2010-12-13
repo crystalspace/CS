@@ -115,6 +115,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 		    CS::Animation::iSkeletonAnimNode* childNode);
 
     //-- CS::Animation::iSkeletonLookAtNode
+    virtual bool HasTarget ();
     virtual void SetTarget (csVector3 target);
     virtual void SetTarget (iMovable* target, const csVector3& offset);
     virtual void SetTarget (iCamera* target, const csVector3& offset);

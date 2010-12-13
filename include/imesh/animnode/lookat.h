@@ -165,6 +165,11 @@ struct iSkeletonLookAtNode : public iSkeletonAnimNode
   SCF_INTERFACE(CS::Animation::iSkeletonLookAtNode, 1, 0, 0);
 
   /**
+   * Return whether or not there is currently a target defined
+   */
+  virtual bool HasTarget () = 0;
+
+  /**
    * Set the target to look at as a fixed position (in world coordinates). Don't
    * be afraid to update often this position if you want it moving.
    * Listeners will be called with the 'target lost' event if a target was specified and

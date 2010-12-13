@@ -122,13 +122,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 
   void LookAtAnimNodeFactory::SetBone (CS::Animation::BoneID boneID)
   {
-    CS_ASSERT (boneID != CS::Animation::InvalidBoneID
-	       );//&& skeleton->GetFactory ()->HasBone (boneID));
-
     this->boneID = boneID;
 
     // check for a CS::Animation::iBodyBoneJoint
-    if (skeleton)
+    if (boneID == CS::Animation::InvalidBoneID
+	|| !skeleton)
+      bodyJoint = 0;
+
+    else
     {
       CS::Animation::iBodyBone* bodyBone = skeleton->FindBodyBone (boneID);
       if (bodyBone)
@@ -212,6 +213,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     childNode (childNode), targetMode (TARGET_NONE),
     isPlaying (false), trackingInitialized (true)    
   {
+  }
+
+  bool LookAtAnimNode::HasTarget ()
+  {
+    return targetMode != TARGET_NONE;
   }
 
   void LookAtAnimNode::SetTarget (csVector3 target)
@@ -303,8 +309,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 
   void LookAtAnimNode::Play ()
   {
-    CS_ASSERT (factory->boneID != CS::Animation::InvalidBoneID);
-
     if (isPlaying)
       return;
 
@@ -368,6 +372,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     // make the child node blend the state
     if (childNode)
       childNode->BlendState (state, baseWeight);
+
+    // check if we have a valid bone to control
+    if (factory->boneID == CS::Animation::InvalidBoneID)
+      return;
 
     // compute target position
     csVector3 target (0.0f);
