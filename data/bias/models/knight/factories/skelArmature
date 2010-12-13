@@ -6531,47 +6531,8 @@
       <key time="2.06327" x="-1.16376413114e-008" y="-1.44439045271e-008" z="0.133211810683" qx="-0.274644821882" qy="0.0596494525671" qz="0.0175566785038" qw="-0.959533154964" />
     </channel>
   </animation>
-
-    <node type="fsm" name="fsm" start="3">
-   <state name="hit">
-      <node type="animation" animation="hit" cyclic="false" autoreset="true" autostop="true"/>
-   </state>
-   <state name="Sit">
-      <node type="animation" animation="Sit"/>
-   </state>
-   <state name="die">
-      <node type="animation" animation="die"/>
-   </state>
-   <state name="idle">
-      <node type="animation" animation="idle"/>
-   </state>
-   <state name="Sit_up">
-      <node type="animation" animation="Sit_up"/>
-   </state>
-   <state name="walk">
-      <node type="animation" animation="walk"/>
-   </state>
-   <state name="jump">
-      <node type="animation" animation="jump"/>
-   </state>
-   <state name="attack">
-      <node type="animation" animation="attack" cyclic="false" autoreset="true" autostop="true"/>
-   </state>
-   <state name="run">
-      <node type="animation" animation="run"/>
-   </state>
-   <state name="levitate">
-      <node type="animation" animation="levitate"/>
-   </state>
-   <state name="Sit_down">
-      <node type="animation" animation="Sit_down"/>
-   </state>
-   <state name="horse_mount">
-      <node type="animation" animation="horse_mount"/>
-   </state>
-   <transition from="attack" to="idle" automatic="true"/>
-    </node>
  </animationpacket>
+
   <skeleton name="Armature">
     <bone name="TargetRodilla.R">
      <transform x="-0.133314467588" y="0.769023915221" z="-0.64714962663" qx="0.0" qy="1.0" qz="0.0" qw="0.0" />
@@ -6726,7 +6687,55 @@
     </bone>
     </bone>
     </bone>
-   <animationpacket>Armature_packet</animationpacket>
   </skeleton>
+
+  <animationpacket ref="Armature_packet">
+    <node type="lookat" name="lookat" skeleton="Armature" bone="Head">
+      <node type="fsm" name="fsm" start="3">
+        <state name="hit">
+           <node type="animation" animation="hit" cyclic="false" autoreset="true" autostop="true"/>
+        </state>
+        <state name="Sit">
+           <node type="animation" animation="Sit"/>
+        </state>
+        <state name="die">
+           <node type="animation" animation="die"/>
+        </state>
+        <state name="idle">
+           <node type="animation" animation="idle"/>
+        </state>
+        <state name="Sit_up">
+           <node type="animation" animation="Sit_up"/>
+        </state>
+        <state name="walk">
+           <node type="animation" animation="walk"/>
+        </state>
+        <state name="jump">
+           <node type="animation" animation="jump"/>
+        </state>
+        <state name="attack">
+           <node type="animation" animation="attack" cyclic="false" autoreset="true" autostop="true"/>
+        </state>
+        <state name="run">
+           <node type="animation" animation="run"/>
+        </state>
+        <state name="levitate">
+           <node type="animation" animation="levitate"/>
+        </state>
+        <state name="Sit_down">
+           <node type="animation" animation="Sit_down"/>
+        </state>
+        <state name="horse_mount">
+           <node type="animation" animation="horse_mount"/>
+        </state>
+        <transition from="attack" to="idle" automatic="true"/>
+      </node>
+    </node>
+  </animationpacket>
+
+  <skeleton ref="Armature">
+    <animationpacket>Armature_packet</animationpacket>
+  </skeleton>
+
 </addon>
 </library>

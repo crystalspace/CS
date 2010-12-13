@@ -6005,29 +6005,8 @@
       <key time="1.66667" x="4.76858660595e-009" y="-2.43667660225e-010" z="0.116859133551" qx="0.0370917767286" qy="-0.0185928288847" qz="-0.00379275670275" qw="-0.999131679535" />
     </channel>
   </animation>
-
-    <node type="fsm" name="fsm" start="5">
-   <state name="run">
-      <node type="animation" animation="run"/>
-   </state>
-   <state name="attack">
-      <node type="animation" animation="attack" cyclic="false" autoreset="true" autostop="true"/>
-   </state>
-   <state name="hit">
-      <node type="animation" animation="hit" cyclic="false" autoreset="true" autostop="true"/>
-   </state>
-   <state name="walk">
-      <node type="animation" animation="walk"/>
-   </state>
-   <state name="die">
-      <node type="animation" animation="die"/>
-   </state>
-   <state name="idle">
-      <node type="animation" animation="idle"/>
-   </state>
-   <transition from="attack" to="idle" automatic="true"/>
-    </node>
  </animationpacket>
+
   <skeleton name="Armature">
     <bone name="TargetRodilla.R">
      <transform x="-0.07456642293" y="0.416515140416" z="-0.361968461723" qx="0.0" qy="1.0" qz="0.0" qw="0.0" />
@@ -6182,7 +6161,37 @@
     </bone>
     </bone>
     </bone>
-   <animationpacket>Armature_packet</animationpacket>
   </skeleton>
+
+  <animationpacket ref="Armature_packet">
+    <node type="lookat" name="lookat" skeleton="Armature" bone="Head">
+      <node type="fsm" name="fsm" start="5">
+        <state name="run">
+           <node type="animation" animation="run"/>
+        </state>
+        <state name="attack">
+           <node type="animation" animation="attack" cyclic="false" autoreset="true" autostop="true"/>
+        </state>
+        <state name="hit">
+           <node type="animation" animation="hit" cyclic="false" autoreset="true" autostop="true"/>
+        </state>
+        <state name="walk">
+           <node type="animation" animation="walk"/>
+        </state>
+        <state name="die">
+           <node type="animation" animation="die"/>
+        </state>
+        <state name="idle">
+           <node type="animation" animation="idle"/>
+        </state>
+        <transition from="attack" to="idle" automatic="true"/>
+      </node>
+    </node>
+  </animationpacket>
+
+  <skeleton ref="Armature">
+    <animationpacket>Armature_packet</animationpacket>
+  </skeleton>
+
 </addon>
 </library>
