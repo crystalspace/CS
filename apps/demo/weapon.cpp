@@ -161,12 +161,10 @@ void Weapon::ApplyDamage(Entity* entity)
     entity->Step(0);
     if (entity->frozen)
     {
-      printf("I: exploded!\n");
       entity->Explode();
     }
     else
     {
-      printf("I: died!\n");
       entity->PlayAnimation("die", true);
     }
     entity->died = true;

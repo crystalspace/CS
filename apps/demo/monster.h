@@ -34,6 +34,7 @@ private:
 
   CS::Animation::iSkeletonFSMNode* fsmNode;
   CS::Animation::iSkeletonFSMNodeFactory* fsmNodeFactory;
+  CS::Animation::iSkeletonLookAtNode* lookAtNode;
 
 public:
   float awareRadius, curAwareRadius;

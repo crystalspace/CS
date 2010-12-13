@@ -98,13 +98,10 @@ void Player::Fire(int x, int y)
 
     if (weapon->Fire() && result.mesh)
     {
-      printf("PLAYER HIT %s\n", result.mesh->QueryObject()->GetName());
-
       iObject* ob = result.mesh->QueryObject()->GetChild("Entity");
       if (ob)
       {
         weapon->ApplyDamage((Entity*)ob);
-        printf("HITT\n");
       }
     }
   }

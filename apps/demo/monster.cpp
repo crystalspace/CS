@@ -96,9 +96,12 @@ bool Monster::Initialize(iMeshWrapper* spawn)
       animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
 
     // Find the FSM animation node
-    weapon->fsmNode = fsmNode = (CS::Animation::iSkeletonFSMNode*) rootNode->FindNode ("fsm");
+    weapon->fsmNode = fsmNode = static_cast<CS::Animation::iSkeletonFSMNode*> (rootNode->FindNode ("fsm"));
     weapon->fsmNodeFactory =
       fsmNodeFactory = fsmNode ? (CS::Animation::iSkeletonFSMNodeFactory*) fsmNode->GetFactory () : 0;
+
+    // Find the LookAt animation node
+    lookAtNode = (CS::Animation::iSkeletonLookAtNode*) rootNode->FindNode ("lookat");
   }
 
   // If this is the 'knight' monster then create and attach a sword in his hand
@@ -151,7 +154,6 @@ void Monster::Behaviour()
   
   if (weapon->IsReady())
   {
-    //printf("I: player found!\n");
     csVector3 v1, v2;
     v2 = this->GetPosition();
     v1 = player->GetPosition();
@@ -162,7 +164,6 @@ void Monster::Behaviour()
       Stop();
       if (weapon->Fire())
       {
-        printf("Monster HIT\n");
         weapon->ApplyDamage(player);
       }
     }
@@ -178,6 +179,14 @@ void Monster::Behaviour()
       angleToReachFlag = true;
 
       Step(-1);
+
+      // Make the monster look at the player
+      if (lookAtNode && !lookAtNode->HasTarget ())
+      {
+	csRef<iView> view (csQueryRegistry<iView> (object_reg));
+	csVector3 offset (0.0f);
+	lookAtNode->SetTarget (view->GetCamera (), offset);
+      }
     }
     else
     {
@@ -190,6 +199,13 @@ void Monster::Behaviour()
 	CS::Animation::StateID runState = fsmNodeFactory->FindState ("idle");
 	if (runState != fsmNode->GetCurrentState ())
 	  fsmNode->SwitchToState (runState);
+      }
+
+      // Make the monster look at nothing
+      if (lookAtNode)
+      {
+	csRef<iView> view (csQueryRegistry<iView> (object_reg));
+	lookAtNode->RemoveTarget ();
       }
     }
   }
@@ -208,7 +224,6 @@ void Monster::Behaviour()
 
       float yrot_delta = fabs (atan2f (sin (desiredAngle - currentAngle), cos (desiredAngle - currentAngle)));
 
-      //printf("%f\n", yrot_delta);
       if (fabs(angle) > yrot_delta)
       {
         angle = (angle / fabs (angle)) * yrot_delta;
@@ -216,7 +231,6 @@ void Monster::Behaviour()
         //desired_angle_velocity = 0;
         angleToReachFlag = false;
         desiredAngle = currentAngle;
-        //printf("angle reached!\n");
       }
 
       csYRotMatrix3 rotMat (angle);
