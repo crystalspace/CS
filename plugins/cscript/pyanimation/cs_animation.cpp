@@ -13891,6 +13891,28 @@ SWIGINTERN PyObject *iSkeletonLookAtNodeFactory_swigregister(PyObject *SWIGUNUSE
   return SWIG_Py_Void();
 }
 
+SWIGINTERN PyObject *_wrap_iSkeletonLookAtNode_HasTarget(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::iSkeletonLookAtNode *arg1 = (CS::Animation::iSkeletonLookAtNode *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonLookAtNode_HasTarget",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonLookAtNode, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonLookAtNode_HasTarget" "', argument " "1"" of type '" "CS::Animation::iSkeletonLookAtNode *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Animation::iSkeletonLookAtNode * >(argp1);
+  result = (bool)(arg1)->HasTarget();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iSkeletonLookAtNode_SetTarget__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CS::Animation::iSkeletonLookAtNode *arg1 = (CS::Animation::iSkeletonLookAtNode *) 0 ;
@@ -15762,6 +15784,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonLookAtNodeFactory_scfGetVersion", _wrap_iSkeletonLookAtNodeFactory_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonLookAtNodeFactory", _wrap_delete_iSkeletonLookAtNodeFactory, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonLookAtNodeFactory_swigregister", iSkeletonLookAtNodeFactory_swigregister, METH_VARARGS, NULL},
+	 { (char *)"iSkeletonLookAtNode_HasTarget", _wrap_iSkeletonLookAtNode_HasTarget, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonLookAtNode_SetTarget", _wrap_iSkeletonLookAtNode_SetTarget, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonLookAtNode_RemoveTarget", _wrap_iSkeletonLookAtNode_RemoveTarget, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonLookAtNode_AddListener", _wrap_iSkeletonLookAtNode_AddListener, METH_VARARGS, NULL},

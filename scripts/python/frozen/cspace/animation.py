@@ -754,6 +754,7 @@ class iSkeletonLookAtNode(iSkeletonAnimNode):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
+    def HasTarget(*args): return _animation.iSkeletonLookAtNode_HasTarget(*args)
     def SetTarget(*args): return _animation.iSkeletonLookAtNode_SetTarget(*args)
     def RemoveTarget(*args): return _animation.iSkeletonLookAtNode_RemoveTarget(*args)
     def AddListener(*args): return _animation.iSkeletonLookAtNode_AddListener(*args)
