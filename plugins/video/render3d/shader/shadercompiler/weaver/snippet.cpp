@@ -31,6 +31,7 @@
 #include "csutil/documenthelper.h"
 #include "csutil/fifo.h"
 #include "csutil/scopeddelete.h"
+#include "csutil/stringquote.h"
 
 #include "snippet.h"
 #include "weaver.h"
@@ -588,6 +589,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (filenameAlias != 0)
     {
       filename = aliases.Get (filenameAlias, (const char*)0);
+      if (!filename)
+      {
+	compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
+			  "filealias %s not specified",
+			  CS::Quote::Single (filenameAlias));
+      }
     }
     else
       filename = node->GetAttributeValue ("file");
