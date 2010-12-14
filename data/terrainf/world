@@ -38,6 +38,8 @@
         </texture>
         <texture name="materialmap_base.png">
             <file>materialmap_base.png</file>
+	    <clamp />
+	    <class>nosharpen</class>
         </texture>
         <texture name="clouds">
             <file>clouddome.jpg</file>
@@ -59,6 +61,9 @@
             <file>/shader/sky/basic_cubemap.xml</file>
         </shader>
         <shader>
+            <file>/shader/terrain/basemap.xml</file>
+        </shader>
+        <shader>
             <file>/shader/terrain/splat.xml</file>
         </shader>
         <shader>
@@ -74,6 +79,9 @@
         </material>
         <material name="Base">
             <texture>materialmap_base.png</texture>
+            <shader type="base">terrain_basemap</shader>
+	    <!-- 511/512,511/512,0.5/512,0.5/512 -->
+            <shadervar name="basemap scale" type="vector4">0.998046875,0.998046875,0.000976562,0.000976562</shadervar>
         </material>
         <material name="Marble">
             <texture>andrew_marble4.jpg</texture>
