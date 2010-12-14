@@ -852,7 +852,7 @@ struct iGraphics3D : public virtual iBase
    * \remarks The coordinates are vertically mirrored in comparison to screen
    *   space, i.e. y=0 is at the bottom of the viewport, y=GetHeight() at the 
    *   top.
-   * \deprecated Use explicit camera's projection matrix instead
+   * \deprecated Deprecated in 1.9. Use explicit camera's projection matrix instead
    */
   CS_DEPRECATED_METHOD_MSG("Use explicit projection matrix instead")
   virtual void SetPerspectiveCenter (int x, int y) = 0;
@@ -862,21 +862,21 @@ struct iGraphics3D : public virtual iBase
    * \remarks The coordinates are vertically mirrored in comparison to screen
    *   space, i.e. y=0 is at the bottom of the viewport, y=GetHeight() at the 
    *   top.
-   * \deprecated Use explicit camera's projection matrix instead
+   * \deprecated Deprecated in 1.9. Use explicit camera's projection matrix instead
    */
   CS_DEPRECATED_METHOD_MSG("Use explicit projection matrix instead")
   virtual void GetPerspectiveCenter (int& x, int& y) const = 0;
 
   /**
    * Set aspect ratio for perspective projection.
-   * \deprecated Use explicit camera's projection matrix instead
+   * \deprecated Deprecated in 1.9. Use explicit camera's projection matrix instead
    */
   CS_DEPRECATED_METHOD_MSG("Use explicit projection matrix instead")
   virtual void SetPerspectiveAspect (float aspect) = 0;
 
   /**
    * Get aspect ratio.
-   * \deprecated Use explicit camera's projection matrix instead
+   * \deprecated Deprecated in 1.9. Use explicit camera's projection matrix instead
    */
   CS_DEPRECATED_METHOD_MSG("Use explicit projection matrix instead")
   virtual float GetPerspectiveAspect () const = 0;
@@ -1069,11 +1069,17 @@ struct iGraphics3D : public virtual iBase
    */
   virtual bool HasNearPlane () const = 0;
 
-  /// Set a renderstate value.
+  /**
+   * Set a renderstate value.
+   * \deprecated Deprecated in 1.9. Use SetEdgeDrawing() for sole supported render state.
+   */
   CS_DEPRECATED_METHOD_MSG("Use SetEdgeDrawing() for sole supported render state")
   virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val) = 0;
 
-  /// Get a renderstate value.
+  /**
+   * Get a renderstate value.
+   * \deprecated Deprecated in 1.9. Use SetEdgeDrawing() for sole supported render state.
+   */
   CS_DEPRECATED_METHOD_MSG("Use GetEdgeDrawing() for sole supported render state")
   virtual long GetRenderState (G3D_RENDERSTATEOPTION op) const = 0;
 
@@ -1205,11 +1211,14 @@ struct iGraphics3D : public virtual iBase
   virtual void DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
     size_t numMeshes, uint flags = 0) = 0;
 
+  /**\name Occlusion queries
+   * @{ */
   /**
    * Initialise a set of occlusion queries.
    */
   virtual void OQInitQueries (unsigned int* queries, int num_queries) = 0;
 
+  /// Delete a set of occlusion queries.
   virtual void OQDelQueries (unsigned int* queries, int num_queries) = 0;
 
   /**
@@ -1222,8 +1231,11 @@ struct iGraphics3D : public virtual iBase
    */
   virtual bool OQIsVisible (unsigned int occlusion_query, unsigned int sampleLimit = 0) = 0;
 
+  /// Start counting unoccluded fragments for a given query.
   virtual void OQBeginQuery (unsigned int occlusion_query) = 0;
+  /// End counting unoccluded fragments for current query.
   virtual void OQEndQuery () = 0;
+  /** @} */
 
   virtual void DrawMeshBasic(const CS::Graphics::CoreRenderMesh* mymesh,
 							const CS::Graphics::RenderMeshModes& modes) = 0;
