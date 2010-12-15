@@ -56,15 +56,13 @@ struct csMGMesh
 };
 
 /**
- * Per-vertex information for instancing.
+ * Per-instance information.
  */
 struct csMGInstVertexInfo
 {
   csRef<csShaderVariable> transformVar;
   csRef<csShaderVariable> fadeFactorVar;
-  csRef<csShaderVariable> windVar;
-  csRef<csShaderVariable> windSpeedVar;
-  float windRandVar;
+  csRef<csShaderVariable> windRandVar;
 };
 
 /**
@@ -77,6 +75,7 @@ struct csMGGeom
   float sqmaxdistance;
 
   csMGInstVertexInfo vertexInfoArray;
+  csRef<csShaderVariable> windDataVar;
   csRef<iMeshWrapper> mesh;
   csArray<csMGInstVertexInfo> vertexinfo_setaside;
 };
@@ -101,6 +100,9 @@ private:
   float density;
   float total_max_dist;
 
+  // Random number generator for wind randomness.
+  csRandomGen rng;
+
   //density map
   csRef<iTerraFormer> density_map;
   float density_map_factor;
@@ -117,7 +119,7 @@ private:
   int celldim;
 
   /// For wind.
-  csVector3 wind_direction;
+  csVector2 wind_direction;
   float wind_bias;
   float wind_speed;
 
@@ -170,7 +172,7 @@ public:
     default_material_factor = factor;
   }
 
-  const csVector3& GetWindDirection() const { return wind_direction; }
+  const csVector2& GetWindDirection() const { return wind_direction; }
   virtual void SetWindDirection (float x, float z);
 
   const float& GetWindBias() const { return wind_bias; }
@@ -479,9 +481,6 @@ private:
   void SetFade (csMGPosition& p, float factor);
   void SetFade (iMeshWrapper* mesh, uint mode);
 
-  /// Set wind data for a mesh.
-  void SetWindData (csMGPosition& p);
-
   /// Statistics.
   size_t CountPositions (int cidx, csMGCell& cell);
   size_t CountAllPositions ();
@@ -495,8 +494,8 @@ public:
   csRef<iShaderVarStringSet> SVstrings;
   CS::ShaderVarStringID varTransform;
   CS::ShaderVarStringID varFadeFactor;
-  CS::ShaderVarStringID varWind;
-  CS::ShaderVarStringID varWindSpeed;
+  CS::ShaderVarStringID varWindData;
+  CS::ShaderVarStringID varWindRand;
 
   csMeshGenerator (csEngine* engine);
   virtual ~csMeshGenerator ();

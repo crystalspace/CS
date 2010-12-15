@@ -67,32 +67,37 @@
       </block>
     </input>
 
-    <!-- Direction (x,z), random factor, bias. -->
-    <input name="wind_data" type="float4" default="complex">
-      <block location="cg:vertexIn">
-        <varying type="float4" name="wind_data" />
-      </block>
-  
-      <block location="cg:vertexMain">
-        wind_data= vertexIn.wind_data;
-      </block>
+    <!-- Max vertex wind offset (x, y), bias (z). -->
+    <input name="wind_data" type="float3" default="complex">
+      <block location="shadervars">
+         <shadervar name="wind data" type="vector3">0,0,0</shadervar>
+      </block> 
 
-      <block location="pass">
-        <instanceparam source="wind data" destination="vertexIn.wind_data" />
+      <block location="cg:variablemap">
+	  <variablemap variable="wind data" destination="vertexIn.wind_data" />
+      </block>
+      
+      <block location="cg:vertexIn">
+	  <uniform type="float3" name="wind_data" />
+      </block>
+      
+      <block location="cg:vertexMain">
+	  wind_data = vertexIn.wind_data;
       </block>
     </input>
 
-    <input name="wind_speed" type="float" default="complex">
+    <!-- Wind randomness -->
+    <input name="wind_seed" type="float" default="complex">
       <block location="cg:vertexIn">
-        <varying type="float" name="wind_speed" />
+        <varying type="float" name="wind_seed" />
       </block>
   
       <block location="cg:vertexMain">
-        wind_speed = vertexIn.wind_speed;
+        wind_seed= vertexIn.wind_seed;
       </block>
 
       <block location="pass">
-        <instanceparam source="wind speed" destination="vertexIn.wind_speed" />
+        <instanceparam source="wind seed" destination="vertexIn.wind_seed" />
       </block>
     </input>
 
@@ -134,24 +139,25 @@
     <block location="cg:definitions">
       <?Include /shader-snippets/cg-global_objectToWorld.cginc?>
     </block>
-	
+
+    <block location="cg:definitions">
+      <?Include /shader-snippets/cg-common.cginc?>
+    </block>
+
     <block location="cg:vertexMain">
       float4x4 complete_objectToWorld = mul (objectToWorld, instancingTransforms);
-      
-      position_world = mul (instancingTransforms, Hposition);
-      float posOffset = dot(position_world.xz, wind_data.xy) + wind_data.z;
-      float2 offset = clamp(Hposition.y, 0.0, Hposition.y) * (wind_data.xy * ((wind_data.w-1)/wind_data.w + sin(wind_speed*standard_time+posOffset)/(wind_data.w)));
-      Hposition.x += offset.x;
-      Hposition.z += offset.y;
+
+      if (Hposition.y > 0.0)
+        Hposition.xz += calcWindOffset(standard_time, wind_data.xy, wind_data.z, wind_seed);
 
       position_object = Hposition;
       position_world = mul (complete_objectToWorld, position_object);
       float4 position_instanced = mul (instancingTransforms, position_object);
       position_camera = mul (ModelView, position_instanced);
       position_screen = position = mul (ModelViewProj, position_instanced);
-      
+
       APPLY_CLIPPING_VP(position_camera, position_world, position_object);
-      
+
       /* The objectToWorld transform is needed in other places, so there is a 
 	 global variable for it. Set that */
       SetGlobalObjectToWorld (complete_objectToWorld);

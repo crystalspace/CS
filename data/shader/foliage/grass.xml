@@ -18,7 +18,7 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
 <shader compiler="shaderweaver" name="foliage_grass" lights="2">
-  <alias name="position" file="/shader-snippets/position-instance-wind.xml" />
+  <alias name="position" file="/shader-snippets/foliage/position-grass.xml" />
   <alias name="normalmap" file="/shader-snippets/surface/normalmap-none.xml" />
   <alias name="surface" file="/shader-snippets/surface/surface-modulate-alpha_instance.xml" />
   <alias name="lighting" file="/shader-snippets/lighting/lighting-pvl.xml" />

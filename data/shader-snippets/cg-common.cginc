@@ -105,6 +105,23 @@ float3 refraction( float3 incident, float3 normal, float ni_nt, float ni_nt_sqr 
 	return  normalize( ni_nt * incident + (ni_nt* IdotN - cosSqr) * normal ); 
 }
 
+// Calculates a vertex offset for wind simulation
+// currTime: standard_time
+// maxOffset: wind_direction (normalised vec2) * wind_speed (float)
+// biasFactor: The bias towards the wind direction (0.0 - 1.0)
+// randomFactor: per-instance randomness
+float2 calcWindOffset(float currTime, float2 maxOffset, float biasFactor, float randomFactor)
+{
+	// The motion of the vertex follows a sine wave.
+	// Each instance has a random factor to make the wave a little unique.
+	// A bias is applied to the result of the sine, tending the movement towards the wind direction.
+	// This result (-1.0 to 1.0) is then multiplied with the maxOffset to determine the actual offset.
+
+	float sinePosition = sin(currTime + randomFactor);
+	float biasedPosition = biasFactor * sinePosition + (1.0 - biasFactor);
+	return maxOffset * biasedPosition;
+}
+
 #endif // __CG_COMMON_CG_INC__
  
 ]]></include>

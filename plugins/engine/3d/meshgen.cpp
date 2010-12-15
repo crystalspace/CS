@@ -91,7 +91,7 @@ csMeshGeneratorGeometry::csMeshGeneratorGeometry (
   default_material_factor = 0.0f;
   celldim = 0;
   positions = 0;
-  wind_direction = csVector3(0, 0, 0);
+  wind_direction = csVector2(0.0f);
   wind_bias = 1.0f;
   wind_speed = 1.0f;
 }
@@ -228,22 +228,22 @@ void csMeshGeneratorGeometry::AddFactory (iMeshFactoryWrapper* factory,
   g.mesh = generator->engine->CreateMeshWrapper (g.factory, 0);
   g.mesh->GetFlags ().Set (CS_ENTITY_NOHITBEAM);
   g.mesh->SetZBufModeRecursive (CS_ZBUF_USE); 
+  g.windDataVar.AttachNew (new csShaderVariable (generator->varWindData));
+  g.windDataVar->SetType (csShaderVariable::VECTOR3);
   g.vertexInfoArray.transformVar.AttachNew (new csShaderVariable (generator->varTransform)); 
   g.vertexInfoArray.transformVar->SetType (csShaderVariable::ARRAY); 
   g.vertexInfoArray.transformVar->SetArraySize (0); 
   g.vertexInfoArray.fadeFactorVar.AttachNew (new csShaderVariable (generator->varFadeFactor)); 
   g.vertexInfoArray.fadeFactorVar->SetType (csShaderVariable::ARRAY);
-  g.vertexInfoArray.fadeFactorVar->SetArraySize (0); 
-  g.vertexInfoArray.windVar.AttachNew (new csShaderVariable (generator->varWind)); 
-  g.vertexInfoArray.windVar->SetType (csShaderVariable::ARRAY);
-  g.vertexInfoArray.windVar->SetArraySize (0);
-  g.vertexInfoArray.windSpeedVar.AttachNew (new csShaderVariable (generator->varWindSpeed)); 
-  g.vertexInfoArray.windSpeedVar->SetType (csShaderVariable::ARRAY);
-  g.vertexInfoArray.windSpeedVar->SetArraySize (0); 
+  g.vertexInfoArray.fadeFactorVar->SetArraySize (0);
+  g.vertexInfoArray.windRandVar.AttachNew (new csShaderVariable (generator->varWindRand)); 
+  g.vertexInfoArray.windRandVar->SetType (csShaderVariable::ARRAY);
+  g.vertexInfoArray.windRandVar->SetArraySize (0); 
+  AddSVToMesh (g.mesh, g.windDataVar);
   AddSVToMesh (g.mesh, g.vertexInfoArray.transformVar); 
   AddSVToMesh (g.mesh, g.vertexInfoArray.fadeFactorVar); 
-  AddSVToMesh (g.mesh, g.vertexInfoArray.windVar); 
-  AddSVToMesh (g.mesh, g.vertexInfoArray.windSpeedVar); 
+  AddSVToMesh (g.mesh, g.vertexInfoArray.windRandVar);
+
   csBox3 bbox;
   bbox.SetSize (csVector3 (maxdist, maxdist, maxdist));
   SetMeshBBox (g.mesh, bbox);
@@ -289,16 +289,13 @@ iMeshWrapper* csMeshGeneratorGeometry::AllocMesh (
       geom.mesh->GetMovable ()->UpdateMove ();
     }
     vertexInfo.transformVar.AttachNew (new csShaderVariable);
- 	vertexInfo.fadeFactorVar.AttachNew (new csShaderVariable);
-    vertexInfo.windVar.AttachNew (new csShaderVariable);
-    vertexInfo.windSpeedVar.AttachNew (new csShaderVariable);
-    csRandomGen rng (csGetTicks ());
-    vertexInfo.windRandVar = rng.Get();
- 	geom.vertexInfoArray.transformVar->AddVariableToArray (vertexInfo.transformVar);
- 	geom.vertexInfoArray.fadeFactorVar->AddVariableToArray (vertexInfo.fadeFactorVar);
-    geom.vertexInfoArray.windVar->AddVariableToArray (vertexInfo.windVar);
-    geom.vertexInfoArray.windSpeedVar->AddVariableToArray (vertexInfo.windSpeedVar);
+  	vertexInfo.fadeFactorVar.AttachNew (new csShaderVariable);
+    vertexInfo.windRandVar.AttachNew (new csShaderVariable);
+ 	  geom.vertexInfoArray.transformVar->AddVariableToArray (vertexInfo.transformVar);
+ 	  geom.vertexInfoArray.fadeFactorVar->AddVariableToArray (vertexInfo.fadeFactorVar);
+    geom.vertexInfoArray.windRandVar->AddVariableToArray (vertexInfo.windRandVar);
     vertexInfo.fadeFactorVar->SetValue(1.0f);
+    vertexInfo.windRandVar->SetValue(rng.Get());
 
     return geom.mesh;
   }
@@ -318,19 +315,41 @@ void csMeshGeneratorGeometry::MoveMesh (int cidx, iMeshWrapper* mesh,
 void csMeshGeneratorGeometry::SetWindDirection (float x, float z)
 {
   wind_direction.x = x;
-  wind_direction.z = z;
+  wind_direction.y = z;
+
+  for (size_t g = 0; g < factories.GetSize (); ++g)
+  {
+    csVector2 maxOffset = wind_direction * wind_speed;
+    factories[g].windDataVar->SetValue (csVector3(maxOffset.x, maxOffset.y, wind_bias));
+  }
 }
 
 void csMeshGeneratorGeometry::SetWindBias (float bias)
 {
   if(bias >= 1.0f)
+  {
     wind_bias = bias;
+
+    for (size_t g = 0; g < factories.GetSize (); ++g)
+    {
+      csVector2 maxOffset = wind_direction * wind_speed;
+      factories[g].windDataVar->SetValue (csVector3(maxOffset.x, maxOffset.y, wind_bias));
+    }
+  }
 }
 
 void csMeshGeneratorGeometry::SetWindSpeed (float speed)
 {
   if(speed >= 0.0f)
+  {
     wind_speed = speed;
+
+    for (size_t g = 0; g < factories.GetSize (); ++g)
+    {
+      csVector2 maxOffset = wind_direction * wind_speed;
+      factories[g].windDataVar->SetValue (csVector3(maxOffset.x, maxOffset.y, wind_bias));
+    }
+  }
 }
 
 void csMeshGeneratorGeometry::SetAsideMesh (int cidx, iMeshWrapper* mesh,
@@ -364,17 +383,10 @@ void csMeshGeneratorGeometry::FreeSetAsideMeshes ()
         varRemoved = true; 
       } 
 
-      idx = geom.vertexInfoArray.windVar->FindArrayElement (vertexInfo.windVar); 
+      idx = geom.vertexInfoArray.windRandVar->FindArrayElement (vertexInfo.windRandVar); 
       if (idx != csArrayItemNotFound) 
       { 
-        geom.vertexInfoArray.windVar->RemoveFromArray (idx); 
-        varRemoved = true; 
-      } 
-
-      idx = geom.vertexInfoArray.windSpeedVar->FindArrayElement (vertexInfo.windSpeedVar); 
-      if (idx != csArrayItemNotFound) 
-      { 
-        geom.vertexInfoArray.windSpeedVar->RemoveFromArray (idx); 
+        geom.vertexInfoArray.windRandVar->RemoveFromArray (idx); 
         varRemoved = true; 
       } 
     } 
@@ -448,8 +460,8 @@ csMeshGenerator::csMeshGenerator (csEngine* engine) :
     engine->objectRegistry, "crystalspace.shader.variablenameset");
   varTransform = SVstrings->Request ("instancing transforms");
   varFadeFactor = SVstrings->Request ("alpha factor");
-  varWind = SVstrings->Request ("wind data");
-  varWindSpeed = SVstrings->Request ("wind speed");
+  varWindData = SVstrings->Request ("wind data");
+  varWindRand = SVstrings->Request ("wind seed");
 }
 
 csMeshGenerator::~csMeshGenerator ()
@@ -923,19 +935,6 @@ void csMeshGenerator::SetFade (csMGPosition& p, float factor)
   p.vertexInfo.fadeFactorVar->SetValue (factor);
 }
 
-void csMeshGenerator::SetWindData (csMGPosition& p)
-{
-  csMeshGeneratorGeometry* geom = geometries[p.geom_type];
-  if(!geom->GetWindDirection().IsZero())
-  {
-    csReversibleTransform transform;
-    p.vertexInfo.transformVar->GetValue(transform);
-    csVector3 windDirection = transform.Other2ThisRelative(geom->GetWindDirection());
-    p.vertexInfo.windVar->SetValue (csVector4(windDirection.x, windDirection.z, p.vertexInfo.windRandVar, geom->GetWindBias()));
-    p.vertexInfo.windSpeedVar->SetValue (geom->GetWindSpeed());
-  }
-}
-
 void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
                                       const csVector3& pos,
                                       const csVector3& delta)
@@ -1008,10 +1007,7 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
             p.position, rotation_matrices[p.rotation]); 
         } 
       }
-      if (p.mesh)
-      {
-        SetWindData(p);
-      }
+
       if (!delta.IsZero() && p.mesh && use_alpha_scaling)
       {
         // These are used when we have both density and alpha scaling.
