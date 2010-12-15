@@ -326,29 +326,23 @@ void csMeshGeneratorGeometry::SetWindDirection (float x, float z)
 
 void csMeshGeneratorGeometry::SetWindBias (float bias)
 {
-  if(bias >= 1.0f)
-  {
-    wind_bias = bias;
+  wind_bias = csClamp (bias, 1.0f, 0.0f);
 
-    for (size_t g = 0; g < factories.GetSize (); ++g)
-    {
-      csVector2 maxOffset = wind_direction * wind_speed;
-      factories[g].windDataVar->SetValue (csVector3(maxOffset.x, maxOffset.y, wind_bias));
-    }
+  for (size_t g = 0; g < factories.GetSize (); ++g)
+  {
+    csVector2 maxOffset = wind_direction * wind_speed;
+    factories[g].windDataVar->SetValue (csVector3(maxOffset.x, maxOffset.y, wind_bias));
   }
 }
 
 void csMeshGeneratorGeometry::SetWindSpeed (float speed)
 {
-  if(speed >= 0.0f)
-  {
-    wind_speed = speed;
+  wind_speed = csClamp (speed, FLT_MAX, 0.0f);
 
-    for (size_t g = 0; g < factories.GetSize (); ++g)
-    {
-      csVector2 maxOffset = wind_direction * wind_speed;
-      factories[g].windDataVar->SetValue (csVector3(maxOffset.x, maxOffset.y, wind_bias));
-    }
+  for (size_t g = 0; g < factories.GetSize (); ++g)
+  {
+    csVector2 maxOffset = wind_direction * wind_speed;
+    factories[g].windDataVar->SetValue (csVector3(maxOffset.x, maxOffset.y, wind_bias));
   }
 }
 
