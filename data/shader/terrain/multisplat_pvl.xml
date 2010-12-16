@@ -17,17 +17,16 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
-<shader compiler="shaderweaver" name="terrain_alphasplat" lights="6">
+<shader compiler="shaderweaver" name="terrain_multisplat_pvl" lights="6">
   <alias name="ambient" file="/shader-snippets/lighting/ambient-static.xml" />
   <!-- Terrain doesn't provide lightmap TCs, uses default TCs for that -->
   <alias name="lightmaptc" file="/shader-snippets/texcoord-default.xml" />
   <alias name="apply_alpha" file="/shader-snippets/surface/alpha-nochange.xml" />
-  <alias name="lighting" file="/shader-snippets/lighting/lighting-ppl.xml" />
+  <alias name="lighting" file="/shader-snippets/lighting/lighting-pvl.xml" />
   <alias name="surface" file="/shader-snippets/surface/surface-alphasplat.xml" />
-  <alias name="normalmap" file="/shader-snippets/surface/normalmap.xml" />
+  <alias name="normalmap" file="/shader-snippets/surface/normalmap-none.xml" />
   
   <technique priority="500" minlights="5">
-    <tag>per_pixel_lighting</tag>
     <!-- 1 pass, 6 lights -->
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
@@ -65,7 +64,6 @@
   </technique>
   
   <technique priority="400" minlights="4">
-    <tag>per_pixel_lighting</tag>
     <!-- 2 passes, 4+2 lights -->
     <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
@@ -115,7 +113,6 @@
   </technique>
   
   <technique priority="300" minlights="3">
-    <tag>per_pixel_lighting</tag>
     <!-- 2 passes, 3+3 lights -->
     <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
@@ -165,7 +162,6 @@
   </technique>
   
   <technique priority="200" minlights="2">
-    <tag>per_pixel_lighting</tag>
     <!-- 3 passes, 2+2+2 lights -->
     <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
@@ -234,7 +230,6 @@
   </technique>
   
   <technique priority="100" minlights="1">
-    <tag>per_pixel_lighting</tag>
     <!-- 6 passes, 1+1+1+1+1+1 lights -->
     <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
@@ -362,7 +357,6 @@
   <!-- No lights (ie ambient only) technique -->
   <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
   <technique priority="50">
-    <tag>per_pixel_lighting</tag>
     <pass>
       <!-- First(only) pass: blend with alpha -->
       <mixmode>
@@ -389,6 +383,6 @@
   </technique>
   <?endif?>
 
-  <fallbackshader name="terrain_alphasplat_pvl" file="/shader/terrain/alphasplat_pvl.xml" />
+  <fallbackshader name="lighting_default_pvl" file="/shader/lighting/lighting_default_pvl.xml" />
 </shader>
 
