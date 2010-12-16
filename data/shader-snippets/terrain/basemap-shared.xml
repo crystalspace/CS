@@ -26,37 +26,8 @@
     <!-- @@@ Should be an object-space normal map -->
     <snippet id="normalmap" file="/shader-snippets/surface/normalmap-none.xml" />
     
-    <snippet id="basemapscale">
-      <technique priority="50">
-	<combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" name="cg" />
+    <snippet id="tc_basemapadjust" file="/shader-snippets/terrain/texcoord-basemap.xml" />
 
-	<input name="basemapscale" type="float4" default="complex" private="yes">
-	  <block location="shadervars">
-	    <shadervar name="basemap scale" type="vector4">1,1,0,0</shadervar>
-	  </block> 
-	  
-	  <block location="cg:fragmentIn">
-	    <uniform type="float4" name="basemapscale" />
-	  </block>
-	  
-	  <block location="cg:fragmentMain">
-	    basemapscale = fragmentIn.basemapscale;
-	  </block>
-
-	  <block location="cg:variablemap">
-	    <variablemap variable="basemap scale" 
-	      destination="fragmentIn.basemapscale" />
-	  </block>
-	</input>
-	
-	<block location="cg:fragmentMain">
-	  scale = basemapscale;
-	</block>
-	<output name="scale" type="float4" />
-      </technique>
-    </snippet>
-    <snippet id="tc_basemapadjust" file="/shader-snippets/texcoord2-scale-xlate.xml" />
-    
     <snippet id="surface" file="/shader-snippets/surface/surface-classic.xml" />
     
     <snippet id="apply_mixmode_alpha" file="/shader-snippets/mixmode-alpha.xml" />
@@ -75,7 +46,6 @@
     <connection from="position" to="lighting" />
     
     <connection from="position" to="surface" />
-    <connection from="basemapscale" to="tc_basemapadjust" />
     <connection from="tc_basemapadjust" to="surface" />
     <connection from="normalmap" to="surface" />
 
