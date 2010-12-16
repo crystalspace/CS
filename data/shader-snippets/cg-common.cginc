@@ -118,7 +118,7 @@ float2 calcWindOffset(float currTime, float2 maxOffset, float biasFactor, float 
 	// This result (-1.0 to 1.0) is then multiplied with the maxOffset to determine the actual offset.
 
 	float sinePosition = sin(currTime + randomFactor);
-	float biasedPosition = biasFactor * sinePosition + (1.0 - biasFactor);
+	float biasedPosition = (1.0 - biasFactor) * sinePosition + biasFactor;
 	return maxOffset * biasedPosition;
 }
 
