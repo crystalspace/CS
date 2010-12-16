@@ -19,8 +19,8 @@
 -->
 <shader compiler="shaderweaver" name="terrain_splatting-detail" lights="6">
   <alias name="ambient" file="/shader-snippets/lighting/ambient-static.xml" />
-  <!-- Terrain doesn't provide lightmap TCs, uses default TCs for that -->
-  <alias name="lightmaptc" file="/shader-snippets/texcoord-default.xml" />
+  <!-- Terrain doesn't provide lightmap TCs, uses basemap TCs for that -->
+  <alias name="lightmaptc" file="/shader-snippets/terrain/texcoord-basemap.xml" />
   <alias name="apply_alpha" file="/shader-snippets/surface/alpha-nochange.xml" />
   <alias name="lighting" file="/shader-snippets/lighting/lighting-ppl.xml" />
   <alias name="surface" file="/shader-snippets/surface/surface-detail.xml" />
