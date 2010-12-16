@@ -36,7 +36,7 @@
     <alias name="surface" weak="yes" file="/shader-snippets/surface/surface-classic.xml" />
     <alias name="specular" weak="yes" file="/shader-snippets/surface/specular-weirdold.xml" />
     <alias name="staticspecular" weak="yes" file="/shader-snippets/lighting/staticspec-default.xml" />
-    <alias name="glow" weak="yes" file="/shader/lighting/glow.xml" />
+    <alias name="glow" weak="yes" file="/shader-snippets/lighting/glow.xml" />
     <alias name="lightmaptc" weak="yes" file="/shader-snippets/texcoord-lightmap.xml" />
 
     <!--

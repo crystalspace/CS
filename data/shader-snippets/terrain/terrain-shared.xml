@@ -36,7 +36,7 @@
     
     <snippet id="specular" file="/shader-snippets/surface/specular-weirdold.xml" />
     <snippet id="apply_lighting" file="/shader-snippets/lighting/apply-lighting.xml" />
-    <snippet id="glow" file="/shader/lighting/glow.xml" />
+    <snippet id="glow" file="/shader-snippets/lighting/glow.xml" />
     <snippet id="sectorfog" file="/shader-snippets/fog/fog-sector.xml" />
     <snippet id="hdrscale" file="/shader-snippets/hdr-postscale.xml" />
 
