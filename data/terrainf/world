@@ -80,8 +80,6 @@
         <material name="Base">
             <texture>materialmap_base.png</texture>
             <shader type="base">terrain_basemap</shader>
-	    <!-- 511/512,511/512,0.5/512,0.5/512 -->
-            <shadervar name="basemap scale" type="vector4">0.998046875,0.998046875,0.000976562,0.000976562</shadervar>
         </material>
         <material name="Marble">
             <texture>andrew_marble4.jpg</texture>
@@ -162,6 +160,8 @@
                     <size x="256" y="15" z="256" />
 		    <renderproperties>
 			<param name="splat render priority">object2</param>
+			<!-- 511/512,511/512,0.5/512,0.5/512 -->
+			<shadervar name="basemap scale" type="vector4">0.998046875,0.998046875,0.000976562,0.000976562</shadervar>
 		    </renderproperties>
                 </celldefault>
                 <cell>
