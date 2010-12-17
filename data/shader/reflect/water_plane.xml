@@ -76,7 +76,7 @@
       <snippet id="staticspecular" filealias="staticspecular" />
       <snippet id="add_specular" file="/shader-snippets/add.xml" />
       <snippet id="apply_lighting" file="/shader-snippets/lighting/apply-lighting.xml" />
-      <snippet id="glow" file="/shader/lighting/glow.xml" />
+      <snippet id="glow" file="/shader-snippets/lighting/glow.xml" />
       <snippet id="sectorfog" file="/shader-snippets/fog/fog-sector.xml" />
       <snippet id="hdrscale" file="/shader-snippets/hdr-postscale.xml" />
       <!-- "connections" describe what snippets take input from what other
@@ -237,7 +237,7 @@
       <snippet id="lerp_reflect_refract" file="/shader-snippets/lerp.xml" />
       <snippet id="apply_mixmode_alpha" file="/shader-snippets/mixmode-alpha.xml" />
       <snippet id="apply_alpha" filealias="apply_alpha" />
-      <snippet id="glow" file="/shader/lighting/glow.xml" />
+      <snippet id="glow" file="/shader-snippets/lighting/glow.xml" />
       <snippet id="sectorfog" file="/shader-snippets/fog/fog-sector.xml" />
       <snippet id="hdrscale" file="/shader-snippets/hdr-postscale.xml" />
       <!-- "connections" describe what snippets take input from what other
@@ -348,7 +348,7 @@
       <snippet id="ambient" file="/shader-snippets/lighting/ambient-null.xml" />
       <snippet id="specular" file="/shader-snippets/surface/specular-default.xml" />
       <snippet id="apply_lighting" file="/shader-snippets/lighting/apply-lighting.xml" />
-      <snippet id="glow" file="/shader/lighting/glow.xml" />
+      <snippet id="glow" file="/shader-snippets/lighting/glow.xml" />
       <snippet id="sectorfog" file="/shader-snippets/fog/fog-sector.xml" />
       <snippet id="hdrscale" file="/shader-snippets/hdr-postscale.xml" />
       <!-- "connections" describe what snippets take input from what other

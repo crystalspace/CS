@@ -28,7 +28,7 @@
       <snippet id="normalmap" file="/shader-snippets/surface/normalmap.xml" />
       <snippet id="surface" file="/shader-snippets/surface/surface-modulate.xml" />
       <snippet id="apply_mixmode_alpha" file="/shader-snippets/mixmode-alpha.xml" />
-      <snippet id="glow" file="/shader/lighting/glow.xml" />
+      <snippet id="glow" file="/shader-snippets/lighting/glow.xml" />
       <snippet id="sectorfog" file="/shader-snippets/fog/fog-sector.xml" />
       <snippet id="hdrscale" file="/shader-snippets/hdr-postscale.xml" />
       <!-- "connections" describe what snippets take input from what other
