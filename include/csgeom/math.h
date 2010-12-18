@@ -256,7 +256,7 @@ CS_FORCEINLINE bool csNormal (float f)
 #elif defined(CS_HAVE_ISNORMAL)
   return isnormal (f);
 #else
-  return csFinite(f) && !csNaN(f);
+  return CS::IsFinite(f) && !CS::IsNaN(f);
 #endif
 }
 /**
@@ -272,7 +272,7 @@ CS_FORCEINLINE bool csNormal (double d)
 #elif defined(CS_HAVE_ISNORMAL)
   return isnormal (d);
 #else
-  return csFinite(d) && !csNaN(d);
+  return CS::IsFinite(d) && !CS::IsNaN(d);
 #endif
 }
 //@}
