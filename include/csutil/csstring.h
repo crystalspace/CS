@@ -539,8 +539,9 @@ public:
   /**
    * Find all occurrences of \p search in this string and replace them with
    * \p replacement.
+   * \return Reference to itself.
    */
-  void ReplaceAll (const char* search, const char* replacement);
+  csStringBase& ReplaceAll (const char* search, const char* replacement);
 
   /**
    * Find all occurrences of \p search in this string and replace them with
