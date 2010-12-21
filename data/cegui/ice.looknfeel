@@ -3285,6 +3285,7 @@
                 <Dim type="Height" ><AbsoluteDim value="12" /></Dim>
             </Area>
             <VertAlignment type="BottomAligned" />
+            <Property name="NonClient" value="True" />
         </Child>
         <Child  type="ice/VerticalScrollbar" nameSuffix="__auto_vscrollbar__">
             <Area>
@@ -3294,6 +3295,7 @@
                 <Dim type="Height" ><UnifiedDim scale="1" offset="-12" type="Height" /></Dim>
             </Area>
             <HorzAlignment type="RightAligned" />
+            <Property name="NonClient" value="True" />
         </Child>
         <StateImagery name="Enabled" />
         <StateImagery name="Disabled" />
