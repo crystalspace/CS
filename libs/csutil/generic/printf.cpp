@@ -37,6 +37,31 @@ int csPrintf (char const* str, ...)
   return rc;
 }
 
+static char CheapToASCII (wchar_t ch)
+{
+  // Translate some often-used characters to their nearest ASCII equivalent
+  switch (ch)
+  {
+  // Typographical single quotation marks
+  case 0x2018:
+  case 0x2019:
+  case 0x201b:
+    return '\'';
+  // Typographical double quotation marks
+  case 0x201c:
+  case 0x201d:
+  case 0x201f:
+    return '"';
+  }
+  
+  if (ch < 0x80)
+    // Already ASCII
+    return char (ch);
+    // Not ASCII. Not much we can do
+  else
+    return '?';
+}
+
 static int cs_fputsn (FILE* file, const char* str, size_t len)
 {
   size_t wstrSize = len + 1;
@@ -75,15 +100,14 @@ static int cs_fputsn (FILE* file, const char* str, size_t len)
 	  if (mbstr[0] == 0)
           {
 	    // Catch char that couldn't be encoded, print ? instead
-	    if (fputc ('?', file) == EOF) return EOF;
-	    if (CS_UC_IS_HIGH_SURROGATE (*wcsPtr))
+	    wchar_t wch = *wcsPtr;
+	    if (fputc (CheapToASCII (wch), file) == EOF) return EOF;
+	    wcsPtr++;
+	    if (CS_UC_IS_HIGH_SURROGATE (wch))
 	    {
-	      wcsPtr++;
 	      if (CS_UC_IS_LOW_SURROGATE (*wcsPtr))
 	        wcsPtr++;
 	    }
-	    else
-	      wcsPtr++;
       	    numwcs = wcsEnd - wcsPtr;
           }
 	  else
@@ -111,18 +135,15 @@ static int cs_fputsn (FILE* file, const char* str, size_t len)
   
   while (len-- > 0)
   {
-    if (*ch < 0x80)
+    wchar_t wch = *ch;
+    if (fputc (CheapToASCII (wch), file) == EOF) return EOF;
+    ch++;
+    if (CS_UC_IS_HIGH_SURROGATE (wch))
     {
-      if (fputc ((char)*ch, file) == EOF) return EOF;
-      n++;
+      if (CS_UC_IS_LOW_SURROGATE (*ch))
+	ch++;
     }
-    else 
-    {
-      if (fputc ('?', file) == EOF) return EOF;
-      n++;
-    }
-      
-    ch++; 
+    n++;
   }
   
   return n;
