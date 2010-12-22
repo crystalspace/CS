@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csutil/csstring.h"
 #include "csutil/util.h"
+#include "csutil/stringquote.h"
 #include "csutil/sysfunc.h"
 
 #define WIN32_LEAN_AND_MEAN

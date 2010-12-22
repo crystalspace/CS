@@ -37,6 +37,7 @@
 #include "csutil/scfstr.h"
 #include "csutil/scfstringarray.h"
 #include "csutil/strhash.h"
+#include "csutil/stringquote.h"
 #include "csutil/util.h"
 #include "csutil/xmltiny.h"
 #include "iutil/document.h"
