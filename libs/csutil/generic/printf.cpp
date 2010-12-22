@@ -64,6 +64,7 @@ static int cs_fputsn (FILE* file, const char* str, size_t len)
     {
       memset (mbstr, 0, sizeof (mbstr));
       memcpy (&oldstate, &mbs, sizeof (mbs));
+      const wchar_t* wcsOld = wcsPtr;
       mbslen = wcsnrtombs (mbstr, &wcsPtr, numwcs, sizeof (mbstr) - 1, &mbs);
       if (mbslen == (size_t)-1)
       {
@@ -90,6 +91,7 @@ static int cs_fputsn (FILE* file, const char* str, size_t len)
 	    // Try converting only a substring
 	    numwcs = csMin (numwcs-1, strlen (mbstr));
 	    memcpy (&mbs, &oldstate, sizeof (mbs));
+	    wcsPtr = wcsOld;
 	  }
 	  continue;
 	}
