@@ -11645,7 +11645,7 @@ struct csGLExtensionFunctions
 public:
   /**\name GL_version_1_2 functions
    * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
-   * this extension when teh appropriate GL version was detected. 
+   * this extension when the appropriate GL version was detected.
    * @{ */
   #ifndef GLDRAWRANGEELEMENTS_DECL
   #define GLDRAWRANGEELEMENTS_DECL
@@ -11671,7 +11671,7 @@ public:
   /** @} */
   /**\name GL_version_1_3 functions
    * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
-   * this extension when teh appropriate GL version was detected. 
+   * this extension when the appropriate GL version was detected.
    * @{ */
   #ifndef GLACTIVETEXTURE_DECL
   #define GLACTIVETEXTURE_DECL
@@ -11907,7 +11907,7 @@ public:
   /** @} */
   /**\name GL_version_1_4 functions
    * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
-   * this extension when teh appropriate GL version was detected. 
+   * this extension when the appropriate GL version was detected.
    * @{ */
   #ifndef GLFOGCOORDF_DECL
   #define GLFOGCOORDF_DECL
@@ -12128,7 +12128,7 @@ public:
   /** @} */
   /**\name GL_version_1_5 functions
    * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
-   * this extension when teh appropriate GL version was detected. 
+   * this extension when the appropriate GL version was detected.
    * @{ */
   #ifndef GLBINDBUFFER_DECL
   #define GLBINDBUFFER_DECL
@@ -12229,7 +12229,7 @@ public:
   /** @} */
   /**\name GL_version_2_0 functions
    * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
-   * this extension when teh appropriate GL version was detected. 
+   * this extension when the appropriate GL version was detected.
    * @{ */
   #ifndef GLDELETESHADER_DECL
   #define GLDELETESHADER_DECL
@@ -12670,7 +12670,7 @@ public:
   /** @} */
   /**\name GL_version_2_1 functions
    * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
-   * this extension when teh appropriate GL version was detected. 
+   * this extension when the appropriate GL version was detected.
    * @{ */
   #ifndef GLUNIFORMMATRIX2X3FV_DECL
   #define GLUNIFORMMATRIX2X3FV_DECL

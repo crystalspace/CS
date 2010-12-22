@@ -1,6 +1,6 @@
   /**\name %Name% functions
    * This is not a real OpenGL extension. The OpenGL canvases will 'initialize'
-   * this extension when teh appropriate GL version was detected. 
+   * this extension when the appropriate GL version was detected.
    * @{ */
 %Functions%
   /** @} */
