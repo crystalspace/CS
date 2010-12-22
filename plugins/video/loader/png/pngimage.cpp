@@ -554,14 +554,6 @@ nomem2:
   if (rowbytes != exp_rowbytes)
     goto nomem2;                        // Yuck! Something went wrong!
 
-  png_bytep * const row_pointers = new png_bytep[Height];
-
-  if (setjmp (png_jmpbuf (png)))             // Set a new exception handler
-  {
-    delete [] row_pointers;
-    goto nomem2;
-  }
-
   uint8 *NewImage = 0;
   if (ImageType == imgRGB)
     NewImage = new uint8 [Width * Height * 4];
@@ -571,6 +563,42 @@ nomem2:
     NewImage = new uint8 [Width * Height];
   if (!NewImage)
     goto nomem2;
+
+  png_bytep * const row_pointers = new png_bytep[Height];
+
+  if (setjmp (png_jmpbuf (png)))             // Set a new exception handler
+  {
+    /* Set some dummy image data. Necessary because threaded image loading
+       expects _some_ data to be returned (too late for reporting a load
+       failure...) */
+    if (ImageType == imgRGB)
+    {
+      rgbaData = (csRGBpixel*)NewImage;
+      memset (NewImage, 0xff, Width * Height * 4);
+    }
+    else if (ImageType == imgPAL)
+    {
+      paletteCount = 256;
+      palette = new csRGBpixel[paletteCount];
+      memset (palette, 0xff, paletteCount * sizeof (csRGBpixel));
+      memset (palette, 0xff, paletteCount);
+      indexData = NewImage;
+      memset (NewImage, 0xff, Width * Height);
+    }
+    else // grayscale + alpha
+    {
+      paletteCount = 256;
+      palette = new csRGBpixel[paletteCount];
+      memset (palette, 0xff, paletteCount * sizeof (csRGBpixel));
+      indexData = NewImage;
+      memset (NewImage, 0xff, Width * Height);
+      alpha = new uint8 [Width * Height];
+      memset (alpha, 0xff, Width * Height);
+    }
+  
+    delete [] row_pointers;
+    goto nomem2;
+  }
 
   for (int row = 0; row < Height; row++)
     row_pointers [row] = ((png_bytep)NewImage) + row * rowbytes;
