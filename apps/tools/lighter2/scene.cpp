@@ -1900,19 +1900,54 @@ namespace lighter
       objNode->RemoveNodes (DocSystem::FilterDocumentNodeIterator (
         objNode->GetNodes ("shadervar"),
         DocSystem::NodeAttributeRegexpTest ("name", "tex lightmap.*")));
+      objNode->RemoveNodes (DocSystem::FilterDocumentNodeIterator (
+        objNode->GetNodes ("shadervar"),
+        DocSystem::NodeAttributeRegexpTest ("name", "tex spec directions.*")));
         
-      // ...and add current one
+      // ...and add current ones
       iShaderVariableContext* meshSVs = meshwrap->GetSVContext ();
-      CS::ShaderVarName lightmapName (globalLighter->svStrings, "tex lightmap");
-      csRef<csShaderVariable> lightmapSV = meshSVs->GetVariable (lightmapName);
-      if (lightmapSV.IsValid())
+      CS::ShaderVarName lightmapName[4] =
+      { 
+        CS::ShaderVarName (globalLighter->svStrings, "tex lightmap"),
+        CS::ShaderVarName (globalLighter->svStrings, "tex lightmap dir 1"),
+        CS::ShaderVarName (globalLighter->svStrings, "tex lightmap dir 2"),
+        CS::ShaderVarName (globalLighter->svStrings, "tex lightmap dir 3")
+      };
+
+      int numLMs = globalConfig.GetLighterProperties().directionalLMs ? 4 : 1;
+      for (int l = 0; l < numLMs; l++)
       {
-        csRef<iDocumentNode> shadervarNode = objNode->CreateNodeBefore (
-          CS_NODE_ELEMENT, 0);
-	shadervarNode->SetValue ("shadervar");
-	csRef<iSyntaxService> synsrv = 
-	  csQueryRegistry<iSyntaxService> (globalLighter->objectRegistry);
-	synsrv->WriteShaderVar (shadervarNode, *lightmapSV);
+        csRef<csShaderVariable> lightmapSV = meshSVs->GetVariable (lightmapName[l]);
+        if (lightmapSV.IsValid())
+        {
+          csRef<iDocumentNode> shadervarNode = objNode->CreateNodeBefore (
+            CS_NODE_ELEMENT, 0);
+          shadervarNode->SetValue ("shadervar");
+          csRef<iSyntaxService> synsrv = 
+            csQueryRegistry<iSyntaxService> (globalLighter->objectRegistry);
+          synsrv->WriteShaderVar (shadervarNode, *lightmapSV);
+        }
+      }
+
+      if (globalConfig.GetLighterProperties().specularDirectionMaps)
+      {
+        csRef<csShaderVariable> svInfluence;
+        for (int i = 0; i < Scene::specDirectionMapCount; i++)
+        {
+          CS::ShaderVarName specDirName = CS::ShaderVarName (globalLighter->svStrings,
+            csString().Format ("tex spec directions %d", i+1));
+
+          csRef<csShaderVariable> lightmapSV = meshSVs->GetVariable (specDirName);
+          if (lightmapSV.IsValid())
+          {
+            csRef<iDocumentNode> shadervarNode = objNode->CreateNodeBefore (
+              CS_NODE_ELEMENT, 0);
+            shadervarNode->SetValue ("shadervar");
+            csRef<iSyntaxService> synsrv = 
+              csQueryRegistry<iSyntaxService> (globalLighter->objectRegistry);
+            synsrv->WriteShaderVar (shadervarNode, *lightmapSV);
+          }
+        }
       }
     }
 
