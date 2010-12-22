@@ -322,7 +322,7 @@ void csMovieRecorder::Start(void)
   if (!movieFile)
   {
     Report (CS_REPORTER_SEVERITY_WARNING,
-    	"Couldn't open file '%s' for recording", movieFileName.GetData());
+    	"Couldn't open file %s for recording", CS::Quote::Single (movieFileName.GetData()));
     return;
   }
   fakeTicksPerFrame = (1000 / frameRate);

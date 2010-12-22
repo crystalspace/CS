@@ -99,7 +99,8 @@ static int value_choice (const char* arg, int old_value, const char* const* choi
     	"    %s%s", choices[i], i == old_value ? " (current)" : "");
     i++;
   }
-  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "    or 'next' or 'prev'");
+  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "    or %s or %s",
+	       CS::Quote::Single ("next"), CS::Quote::Single ("prev"));
   return -1;
 }
 
@@ -336,7 +337,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
   {
     iGraphics2D* g2d = g3d->GetDriver2D ();
     if (!g2d->PerformExtension (arg))
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Extension '%s' not supported!", arg);
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Extension %s not supported!", CS::Quote::Single (arg));
   }
   else if (!csStrCaseCmp (cmd, "db_maxpol"))
   {
@@ -464,7 +465,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
                                0,  1,  0 ) );
   else
   {
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Unknown command: `%s'", cmd);
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Unknown command: %s", CS::Quote::Single (cmd));
     return false;
   }
   return true;
@@ -481,7 +482,7 @@ bool csCommandProcessor::start_script (const char* scr)
       csRef<iFile> f (v->Open (scr, VFS_FILE_READ));
       if (!f)
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-		"Could not open script file '%s'!", scr);
+		"Could not open script file %s!", CS::Quote::Single (scr));
       else
       {
         // Replace possible running script with this one.

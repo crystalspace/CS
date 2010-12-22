@@ -245,15 +245,15 @@ bool csPixelShaderParser::GetInstruction (const char *str,
   if (inst_id == csInvalidStringID)
   {
     Report (CS_REPORTER_SEVERITY_WARNING, 
-      "Unknown pixel shader instruction '%s'",
-      istr.GetData ());
+      "Unknown pixel shader instruction %s",
+      CS::Quote::Single (istr.GetData ()));
     return false;
   }
   if(!PS_Instructions[inst_id].supported)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, 
-      "Pixel shader instruction '%s' is not supported at this time",
-      istr.GetData ());
+      "Pixel shader instruction %s is not supported at this time",
+      CS::Quote::Single (istr.GetData ()));
     return false;
   }
   
@@ -277,8 +277,8 @@ bool csPixelShaderParser::GetInstruction (const char *str,
     != PS_Instructions[inst_id].arguments)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, 
-      "Incorrect number of arguments for Pixel Shader instruction '%s'!",
-      istr.GetData ());
+      "Incorrect number of arguments for Pixel Shader instruction %s!",
+      CS::Quote::Single (istr.GetData ()));
     return false;
   }
 
@@ -309,8 +309,8 @@ bool csPixelShaderParser::GetInstruction (const char *str,
     if(inst.dest_reg_num >= max_registers[inst.dest_reg])
     {
       Report (CS_REPORTER_SEVERITY_ERROR,
-	"Destination register out of range, max for version '%s' is '%d'!",
-	version_string.GetData(),
+	"Destination register out of range, max for version %s is %d!",
+	CS::Quote::Single (version_string.GetData()),
 	max_registers[inst.dest_reg]);
       return false;
     }
@@ -353,8 +353,8 @@ bool csPixelShaderParser::GetInstruction (const char *str,
       if(inst.src_reg_num[j] >= max_registers[inst.src_reg[j]])
       {
 	Report (CS_REPORTER_SEVERITY_ERROR,
-	  "Source register out of range, max for version '%s' is '%d'!",
-	  version_string.GetData(),
+	  "Source register out of range, max for version %s is %d!",
+	  CS::Quote::Single (version_string.GetData()),
 	  max_registers[inst.src_reg[j]]);
 	return false;
       }
@@ -450,8 +450,9 @@ bool csPixelShaderParser::ParseProgram (iDataBuffer* program)
     if(!(version & PS_Instructions[inst.instruction].versions))
     {
       Report (CS_REPORTER_SEVERITY_ERROR, 
-	"Pixel Shader version %s does not support instruction '%s'",
-	GetVersionString (version), GetInstructionName (inst.instruction));
+	"Pixel Shader version %s does not support instruction %s",
+	GetVersionString (version),
+	CS::Quote::Single (GetInstructionName (inst.instruction)));
       return false;
     }
 

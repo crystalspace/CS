@@ -20,6 +20,7 @@
 
 #include "csgeom/plane3.h"
 #include "csgeom/transfrm.h"
+#include "csutil/stringquote.h"
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
@@ -714,7 +715,7 @@ bool csPhysicsLoader::ParseJoint (iDocumentNode* node, iJoint* joint,
 	    if (!body1)
 	    {
               synldr->ReportError ("crystalspace.dynamics.loader",
-                child, "Can't find body with name '%s'!", name);
+                child, "Can't find body with name %s!", CS::Quote::Single (name));
               return false;
 	    }
           }
@@ -734,7 +735,7 @@ bool csPhysicsLoader::ParseJoint (iDocumentNode* node, iJoint* joint,
 	    if (!body2)
 	    {
               synldr->ReportError ("crystalspace.dynamics.loader",
-                child, "Can't find body with name '%s'!", name);
+                child, "Can't find body with name %s!", CS::Quote::Single (name));
               return false;
 	    }
           }

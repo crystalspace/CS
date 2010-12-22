@@ -45,7 +45,7 @@ bool HeightMapGen::LoadMap ()
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.heightmapgen",
-    	"Error setting directory '%s'!", map.GetData ());
+    	"Error setting directory %s!", CS::Quote::Single (map.GetData ()));
     return false;
   }
 
@@ -54,7 +54,8 @@ bool HeightMapGen::LoadMap ()
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.heightmapgen",
-    	"Couldn't load level '%s' on '%s'!", world.GetData (), map.GetData ());
+    	"Couldn't load level %s on %s!",
+	CS::Quote::Single (world.GetData ()), CS::Quote::Single (map.GetData ()));
     return false;
   }
   engine->Prepare ();
@@ -260,7 +261,7 @@ void HeightMapGen::Start ()
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.heightmapgen",
-    	"Can't find mesh '%s'!", meshname.GetData ());
+    	"Can't find mesh %s!", CS::Quote::Single (meshname.GetData ()));
     return;
   }
 
@@ -325,7 +326,7 @@ void HeightMapGen::Start ()
     {
       csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.heightmapgen",
-	"Failed to read texture file '%s'!", txt_layers[i].texture_file.GetData());
+	"Failed to read texture file %s!", CS::Quote::Single (txt_layers[i].texture_file.GetData()));
       return;
     }
     txt_layers[i].image = imageio->Load (buf, CS_IMGFMT_TRUECOLOR);
@@ -396,7 +397,7 @@ void HeightMapGen::Start ()
     {
       csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.heightmapgen",
-	"Failed to write file '%s'!", heightmap_output_file.GetData ());
+	"Failed to write file %s!", CS::Quote::Single (heightmap_output_file.GetData ()));
       return;
     }
   }
@@ -417,7 +418,7 @@ void HeightMapGen::Start ()
     {
       csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.heightmapgen",
-	"Failed to write file '%s'!", basemap_output_file.GetData ());
+	"Failed to write file %s!", CS::Quote::Single (basemap_output_file.GetData ()));
       return;
     }
   }

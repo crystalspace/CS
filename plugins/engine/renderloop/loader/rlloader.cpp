@@ -160,9 +160,9 @@ csPtr<iBase> csRenderLoopLoader::Parse (iDocumentNode* node,
 	  "crystalspace.renderloop.loop.loader",
 	  CS_REPORTER_SEVERITY_WARNING,
 	  node,
-	  "Couldn't register render loop '%s'. Maybe a loop of the same "
+	  "Couldn't register render loop %s. Maybe a loop of the same "
 	  "name already exists?",
-	  loopName);
+	  CS::Quote::Single (loopName));
       }
     }
   }

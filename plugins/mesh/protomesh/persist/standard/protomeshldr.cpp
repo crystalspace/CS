@@ -314,7 +314,7 @@ csPtr<iBase> csProtoMeshLoader::Parse (iDocumentNode* node,
     {
       synldr->ReportError (
         "crystalspace.protomeshloader.parse.unknownfactory",
-        child, "Couldn't find factory '%s'!", factname);
+        child, "Couldn't find factory %s!", CS::Quote::Single (factname));
       return 0;
     }
 
@@ -325,8 +325,8 @@ csPtr<iBase> csProtoMeshLoader::Parse (iDocumentNode* node,
 	  {
       	    synldr->ReportError (
 		"crystalspace.protomeshloader.parse.badfactory",
-		child, "Factory '%s' doesn't appear to be a protomesh factory!",
-		factname);
+		child, "Factory %s doesn't appear to be a protomesh factory!",
+		CS::Quote::Single (factname));
 	    return 0;
 	  }
 	}
@@ -339,7 +339,7 @@ csPtr<iBase> csProtoMeshLoader::Parse (iDocumentNode* node,
 	  {
       	    synldr->ReportError (
 		"crystalspace.protomeshloader.parse.unknownmaterial",
-		child, "Couldn't find material '%s'!", matname);
+		child, "Couldn't find material %s!", CS::Quote::Single (matname));
             return 0;
 	  }
 	  CHECK_MESH (mesh);

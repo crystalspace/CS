@@ -152,7 +152,7 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
         {
           synldr->ReportError (
             "crystalspace.genmeshloader.parse.unknownmaterial",
-            node, "Couldn't find material '%s'!", matname);
+            node, "Couldn't find material %s!", CS::Quote::Single (matname));
           return false;
         }
         break;
@@ -246,8 +246,8 @@ bool csGeneralFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
   if (!state->AddRenderBuffer (name, buf))
   {
     synldr->ReportError ("crystalspace.genmeshfactoryloader.parse",
-      node, "A <renderbuffer> of name '%s' was already provided",
-      name);
+      node, "A <renderbuffer> of name %s was already provided",
+      CS::Quote::Single (name));
     return false;
   }
   return true;
@@ -429,7 +429,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
     {
       synldr->ReportError (
         "crystalspace.genmeshfactoryloader.parse.unknownmaterial",
-        child, "Couldn't find material '%s'!", matname);
+        child, "Couldn't find material %s!", CS::Quote::Single (matname));
       return 0;
     }
     fact->SetMaterialWrapper (mat);
@@ -546,7 +546,8 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	{
 	  synldr->ReportError (
 		"crystalspace.genmeshfactoryloader.parse.frame.badformat",
-		child, "Don't use 'numtri' in combination with 'triangles'!");
+		child, "Don't use %s in combination with %s!",
+		CS::Quote::Single ("numtri"), CS::Quote::Single ("triangles"));
 	  return 0;
 	}
 	else
@@ -623,7 +624,8 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError (
 		    "crystalspace.genmeshfactoryloader.parse.frame.badformat",
-		    child, "You didn't specify 'numvt'. You should add normal information to the vertex!");
+		    child, "You didn't specify %s. You should add normal information to the vertex!",
+		    CS::Quote::Single ("numvt"));
 	    return 0;
 	  }
 	  csVector3* no = state->GetNormals ();
@@ -648,7 +650,8 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError (
 		    "crystalspace.genmeshfactoryloader.parse.frame.badformat",
-		    child, "You didn't specify 'numvt'. You should add color information to the vertex!");
+		    child, "You didn't specify %s. You should add color information to the vertex!",
+		    CS::Quote::Single ("numvt"));
 	    return 0;
 	  }
 	  csColor4* co = state->GetColors ();
@@ -677,7 +680,8 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	{
 	  synldr->ReportError (
 		"crystalspace.genmeshfactoryloader.parse.frame.badformat",
-		child, "Don't use 'numvt' in combination with 'vertices'!");
+		child, "Don't use %s in combination with %s!",
+		CS::Quote::Single ("numvt"), CS::Quote::Single ("vertices"));
 	  return 0;
 	}
 	else
@@ -689,7 +693,8 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		"crystalspace.genmeshfactoryloader.parse.frame.badformat",
 		child,
-		"Format specifier must start with 'v'. Vertices are not optional!");
+		"Format specifier must start with %s. Vertices are not optional!",
+		CS::Quote::Single ("v"));
 	    return 0;
 	  }
 	  format++;
@@ -704,7 +709,8 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		"crystalspace.genmeshfactoryloader.parse.frame.badformat",
 		child,
-		"Wrong format specifier. Must be a string similar to 'vunc'!");
+		"Wrong format specifier. Must be a string similar to %s!",
+		CS::Quote::Single ("vunc"));
 	    return 0;
 	  }
 
@@ -787,8 +793,8 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError (
 		"crystalspace.genmeshfactoryloader.parse",
-		child, "Could not load animation control plugin '%s'!",
-		pluginname);
+		child, "Could not load animation control plugin %s!",
+		CS::Quote::Single (pluginname));
 	    return 0;
     	  }
 	  csRef<iGenMeshAnimationControlFactory> anim_ctrl_fact = type->
@@ -798,7 +804,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError (
 		"crystalspace.genmeshfactoryloader.parse",
-		child, "Error loading animation control factory: '%s'!",
+		child, "Error loading animation control factory: %s!",
 		error);
 	    return 0;
 	  }
@@ -1175,8 +1181,8 @@ bool csGeneralMeshLoader::ParseRenderBuffer(iDocumentNode *node,
   if (!state->AddRenderBuffer (name, buf))
   {
     synldr->ReportError ("crystalspace.genmeshloader.parse",
-      node, "A <renderbuffer> of name '%s' was already provided",
-      name);
+      node, "A <renderbuffer> of name %s was already provided",
+      CS::Quote::Single (name));
     return false;
   }
   return true;
@@ -1193,7 +1199,7 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
   {
     synldr->ReportError (
       "crystalspace.genmeshloader.parse.invalidsubmeshname",
-      node, "No submesh of name '%s'", name);
+      node, "No submesh of name %s", CS::Quote::Single (name));
     return false;
   }
 
@@ -1231,7 +1237,7 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
         {
           synldr->ReportError (
             "crystalspace.genmeshloader.parse.unknownmaterial",
-            node, "Couldn't find material '%s'!", matname);
+            node, "Couldn't find material %s!", CS::Quote::Single (matname));
           return false;
         }
         subMesh->SetMaterial (material);
@@ -1344,7 +1350,7 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError (
             "crystalspace.genmeshloader.parse.unknownfactory",
-            child, "Couldn't find factory '%s'!", factname);
+            child, "Couldn't find factory %s!", CS::Quote::Single (factname));
           return 0;
         }
 
@@ -1354,8 +1360,8 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError (
             "crystalspace.genmeshloader.parse.badfactory",
-            child, "Factory '%s' doesn't appear to be a genmesh factory!",
-            factname);
+            child, "Factory %s doesn't appear to be a genmesh factory!",
+            CS::Quote::Single (factname));
           return 0;
         }
         mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -1365,8 +1371,8 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError (
             "crystalspace.genmeshloader.parse.badfactory",
-            child, "Factory '%s' doesn't appear to be a genmesh factory!",
-            factname);
+            child, "Factory %s doesn't appear to be a genmesh factory!",
+            CS::Quote::Single (factname));
           return 0;
         }
       }
@@ -1379,7 +1385,7 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError (
             "crystalspace.genmeshloader.parse.unknownmaterial",
-            child, "Couldn't find material '%s'!", matname);
+            child, "Couldn't find material %s!", CS::Quote::Single (matname));
           return 0;
         }
         CHECK_MESH(meshstate);
@@ -1420,8 +1426,8 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError (
             "crystalspace.genmeshloader.parse",
-            child, "Could not load animation control plugin '%s'!",
-            pluginname);
+            child, "Could not load animation control plugin %s!",
+            CS::Quote::Single (pluginname));
           return 0;
         }
         csRef<iGenMeshAnimationControlFactory> anim_ctrl_fact = type->
@@ -1431,7 +1437,7 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError (
             "crystalspace.genmeshloader.parse",
-            child, "Error loading animation control factory: '%s'!",
+            child, "Error loading animation control factory: %s!",
             error);
           return 0;
         }

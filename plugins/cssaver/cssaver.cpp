@@ -95,7 +95,8 @@ bool csSaver::Initialize(iObjectRegistry* p)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
       "crystalspace.plugin.cssaver",
-      "'Saveable' flag not set in engine. Saved worlds can be incomplete.");
+      "%s flag not set in engine. Saved worlds can be incomplete.",
+      CS::Quote::Single ("Saveable"));
   }
 
   return true;

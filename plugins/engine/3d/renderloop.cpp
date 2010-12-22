@@ -221,15 +221,15 @@ csPtr<iRenderLoop> csRenderLoopManager::Load (const char* fileName)
 
   if (rlLoader == 0)
   {
-    engine->Error ("Error loading '%s': could not retrieve render loop loader",
-      fileName);
+    engine->Error ("Error loading %s: could not retrieve render loop loader",
+      CS::Quote::Single (fileName));
     return 0;
   }
 
   csRef<iFile> file = engine->VFS->Open (fileName, VFS_FILE_READ);
   if (file == 0)
   {
-    engine->Error ("Error loading '%s': could open file on VFS", fileName);
+    engine->Error ("Error loading %s: could open file on VFS", CS::Quote::Single (fileName));
     return 0;
   }
 
@@ -242,14 +242,14 @@ csPtr<iRenderLoop> csRenderLoopManager::Load (const char* fileName)
   const char* error = doc->Parse (file, true);
   if (error != 0)
   {
-    engine->Error ("Error parsing '%s': %s", fileName, error);
+    engine->Error ("Error parsing %s: %s", CS::Quote::Single (fileName), error);
     return 0;
   }
 
   csRef<iDocumentNode> rlNode = doc->GetRoot ()->GetNode ("params");
   if (rlNode == 0)
   {
-    engine->Error ("Error loading '%s': no <params> node", fileName);
+    engine->Error ("Error loading %s: no <params> node", CS::Quote::Single (fileName));
     return 0;
   }
 
@@ -263,8 +263,8 @@ csPtr<iRenderLoop> csRenderLoopManager::Load (const char* fileName)
   if (rl == 0)
   {
     engine->ReportBug (
-      "Error loading '%s': returned object doesn't implement iRenderLoop", 
-      fileName);
+      "Error loading %s: returned object doesn't implement iRenderLoop", 
+      CS::Quote::Single (fileName));
   }
   return (csPtr<iRenderLoop> (rl));
 }

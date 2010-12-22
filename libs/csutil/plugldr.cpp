@@ -24,6 +24,7 @@
 #include "csutil/plugldr.h"
 #include "csutil/util.h"
 #include "csutil/snprintf.h"
+#include "csutil/stringquote.h"
 #include "ivaria/reporter.h"
 #include "iutil/objreg.h"
 #include "iutil/cmdline.h"
@@ -166,12 +167,14 @@ bool csPluginLoader::LoadPlugins ()
 	if (r->Tag)
 	  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
 	    "crystalspace.pluginloader.loadplugins",
-	    "Duplicate tag '%s' found for plugin '%s'!", r->Tag.GetData(), 
-	    r->ClassID.GetData());
+	    "Duplicate tag %s found for plugin %s!",
+	    CS::Quote::Single (r->Tag.GetData()), 
+	    CS::Quote::Single (r->ClassID.GetData()));
 	else
 	  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
 	    "crystalspace.pluginloader.loadplugins",
-	    "Could not register plugin '%s'!", r->ClassID.GetData());
+	    "Could not register plugin %s!",
+	    CS::Quote::Single (r->ClassID.GetData()));
 	return false;
       }
     }

@@ -524,12 +524,14 @@ void csSndSysRendererOpenAL::QueryExtensions ()
     if (ext##Ext)					\
     {							\
       Report (CS_REPORTER_SEVERITY_NOTIFY, 		\
-	"Found extension: '%s'", #Ext);			\
+	"Found extension: %s", 				\
+	CS::Quote::Single (#Ext));			\
     }							\
     else						\
     {							\
       Report (CS_REPORTER_SEVERITY_NOTIFY,		\
-	"Did not find extension: '%s'", #Ext);		\
+	"Did not find extension: %s", 			\
+	CS::Quote::Single (#Ext));			\
     }							\
   }
   

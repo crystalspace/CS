@@ -277,7 +277,7 @@ static void ShowBlockInfo (csMemTrackerEntry& me)
   csPrintf ("BLOCK: start=%08p size=%zu freed=%d\n", me.start,
         me.size, (int)me.freed);
 # ifdef CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
-  csPrintf ("       alloced at '%s' %d\n", me.alloc_file, me.alloc_line);
+  csPrintf ("       alloced at %s %d\n", CS::Quote::Single (me.alloc_file), me.alloc_line);
 # endif
 }
 

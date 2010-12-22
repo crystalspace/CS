@@ -43,7 +43,7 @@ static void add_particles_rain (WalkTest* Sys, iSector* sector, char* matname, i
   if (!mat)
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"Can't find material '%s' in memory!", matname);
+    	"Can't find material %s in memory!", CS::Quote::Single (matname));
     return;
   }
 
@@ -119,7 +119,8 @@ static void add_particles_snow (WalkTest* Sys, iSector* sector, char* matname,
   	FindByName (matname);
   if (!mat)
   {
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material %s in memory!",
+		 CS::Quote::Single (matname));
     return;
   }
 
@@ -188,7 +189,8 @@ static void add_particles_fire (WalkTest* Sys, iSector* sector, char* matname, i
   iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (matname);
   if (!mat)
   {
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material %s in memory!",
+		 CS::Quote::Single (matname));
     return;
   }
 
@@ -260,7 +262,8 @@ static void add_particles_fountain (WalkTest* Sys, iSector* sector, char* matnam
   iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (matname);
   if (!mat)
   {
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s'!", matname);
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material %s!",
+		 CS::Quote::Single (matname));
     return;
   }
 
@@ -320,7 +323,8 @@ static void add_particles_explosion (WalkTest* Sys, iSector* sector, iEngine* en
   	FindByName (matname);
   if (!mat)
   {
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material %s in memory!",
+		 CS::Quote::Single (matname));
     return;
   }
 
@@ -456,7 +460,7 @@ void WalkTestParticleDemos::Explosion (WalkTest* Sys, const char* arg)
   if (cnt != 1)
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Expected parameter 'texture'!");
+      "Expected parameter %s!", CS::Quote::Single ("texture"));
   }
   else
     add_particles_explosion (Sys, Sys->views->GetCamera ()->GetSector (),

@@ -82,7 +82,8 @@ void csDetectDriver::DetermineDriver (const char* monitorName)
     screenDriverName.Replace ((char*)dm.dmDeviceName);
   }
   if (verbose)
-    csPrintf ("csDetectDriver: driver name is '%s'\n", screenDriverName.GetData ());
+    csPrintf ("csDetectDriver: driver name is %s\n",
+	      CS::Quote::Single (screenDriverName.GetData ()));
 
   csString glDllName;
   if (!screenDriverName.IsEmpty())
@@ -130,8 +131,8 @@ void csDetectDriver::DetermineDriver (const char* monitorName)
   if (glDllName.IsEmpty() && !screenDriverName.IsEmpty())
   {
     if (verbose)
-      csPrintf ("csDetectDriver: maybe DLL '%s' exists\n", 
-      screenDriverName.GetData());
+      csPrintf ("csDetectDriver: maybe DLL %s exists\n", 
+      CS::Quote::Single (screenDriverName.GetData()));
     HMODULE dllHandle = LoadLibraryExA (screenDriverName, 0, 
       LOAD_LIBRARY_AS_DATAFILE);
     if (dllHandle != 0)
@@ -196,7 +197,8 @@ void csDetectDriver::DetermineDriver (const char* monitorName)
   {
     DriverDLL = glDllName;
     if (verbose)
-      csPrintf ("%s: found DLL '%s'\n", CS_FUNCTION_NAME, DriverDLL.GetData());
+      csPrintf ("%s: found DLL %s\n", CS_FUNCTION_NAME,
+		CS::Quote::Single (DriverDLL.GetData()));
   }
 }
 
@@ -233,8 +235,8 @@ void csDetectDriver::ScanForDriver ()
     {
       DriverDLL = glDllName;
       if (verbose)
-        csPrintf ("%s: found DLL '%s'\n", CS_FUNCTION_NAME, 
-          DriverDLL.GetData());
+        csPrintf ("%s: found DLL %s\n", CS_FUNCTION_NAME, 
+          CS::Quote::Single (DriverDLL.GetData()));
     }
   }
 }
@@ -332,7 +334,8 @@ void csDetectDriver::DoDetection (HWND window, HDC dc)
       }
 
       if (verbose)
-        csPrintf ("csDetectDriver: monitor name is '%s'\n", screenDevice.GetData ());
+        csPrintf ("csDetectDriver: monitor name is %s\n",
+		  CS::Quote::Single (screenDevice.GetData ()));
       
       // Try to determine the driver
       DetermineDriver (screenDevice.GetData ());

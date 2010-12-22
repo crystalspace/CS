@@ -398,7 +398,7 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
 	else
 	{
           error_buf.Format (
-            "Can't load skeleton file '%s'!", filename);
+            "Can't load skeleton file %s!", CS::Quote::Single (filename));
           return error_buf;
 	}
       }
@@ -433,8 +433,8 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
       break;
     default:
       error_buf.Format (
-        "Don't recognize token '%s' in anim control!",
-        value);
+        "Don't recognize token %s in anim control!",
+        CS::Quote::Single (value));
       return error_buf;
     }
   }

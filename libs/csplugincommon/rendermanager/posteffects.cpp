@@ -25,6 +25,7 @@
 #include "csutil/cfgacc.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/objreg.h"
+#include "csutil/stringquote.h"
 #include "csutil/xmltiny.h"
 #include "cstool/rbuflock.h"
 #include "iengine/rview.h"
@@ -797,7 +798,8 @@ bool PostEffectLayersParser::ParseInputs (iDocumentNode* node,
     const char* layerInpID = child->GetAttributeValue ("layer");
     if (!layerInpID || !*layerInpID)
     {
-      synldr->ReportError (messageID, child, "Expected 'layer' attribute");
+      synldr->ReportError (messageID, child, "Expected %s attribute",
+			   CS::Quote::Single ("layer"));
       return false;
     }
     PostEffectManager::Layer* inpLayer = 0;
@@ -871,7 +873,8 @@ bool PostEffectLayersParser::ParseLayer (iDocumentNode* node,
   const char* shader = node->GetAttributeValue ("shader");
   if (!shader || (*shader == 0))
   {
-    synldr->ReportError (messageID, node, "Expected 'shader' attribute");
+    synldr->ReportError (messageID, node, "Expected %s attribute",
+			 CS::Quote::Single ("shader"));
     return false;
   }
   csRef<iShader> shaderObj = shaders.Get (shader, 0);
@@ -944,7 +947,7 @@ bool PostEffectLayersParser::AddLayersFromFile (const char* filename,
   if (!file)
   {
     csReport (objReg, CS_REPORTER_SEVERITY_WARNING, messageID,
-      "Error opening '%s'", filename);
+      "Error opening %s", CS::Quote::Single (filename));
     return false;
   }
   
@@ -953,7 +956,7 @@ bool PostEffectLayersParser::AddLayersFromFile (const char* filename,
   if (error != 0)
   {
     csReport (objReg, CS_REPORTER_SEVERITY_WARNING, messageID,
-      "Error parsing '%s': %s", filename, error);
+      "Error parsing %s: %s", CS::Quote::Single (filename), error);
     return false;
   }
   
@@ -963,7 +966,7 @@ bool PostEffectLayersParser::AddLayersFromFile (const char* filename,
   if (!postEffectNode)
   {
     csReport (objReg, CS_REPORTER_SEVERITY_WARNING, messageID,
-      "No <posteffect> in '%s'", filename);
+      "No <posteffect> in %s", CS::Quote::Single (filename));
     return false;
   }
   return AddLayersFromDocument (postEffectNode, effects);

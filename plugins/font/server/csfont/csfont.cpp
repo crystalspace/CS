@@ -305,7 +305,8 @@ error:
       {
         csReport (object_reg, GetErrorSeverity(),
 	  "crystalspace.font.csfont",
-      	  "Unrecognized property '%s' in font file %s.", kw, file);
+      	  "Unrecognized property %s in font file %s.",
+	  CS::Quote::Single (kw), file);
       }
 
     }
@@ -356,8 +357,10 @@ error:
       {
 	csReport (object_reg, GetErrorSeverity(),
 	  "crystalspace.font.csfont",
-	  "Malformed font %s: neither 'Glyphs' nor 'HasCharRanges' property",
-	  fontdef.Name);
+	  "Malformed font %s: neither %s nor %s property",
+	  fontdef.Name,
+	  CS::Quote::Single ("Glyphs"),
+	  CS::Quote::Single ("HasCharRanges"));
 	return 0;
       }
       ranges.SetSize (2);

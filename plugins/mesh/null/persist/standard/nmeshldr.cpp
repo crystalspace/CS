@@ -384,7 +384,7 @@ csPtr<iBase> csNullMeshLoader::Parse (iDocumentNode* node,
     {
       synldr->ReportError (
         "crystalspace.nullmeshloader.parse.unknownfactory",
-        child, "Couldn't find factory '%s'!", factname);
+        child, "Couldn't find factory %s!", CS::Quote::Single (factname));
       return 0;
     }
 
@@ -394,8 +394,8 @@ csPtr<iBase> csNullMeshLoader::Parse (iDocumentNode* node,
 	  {
       	    synldr->ReportError (
 		"crystalspace.nullmeshloader.parse.badfactory",
-		child, "Factory '%s' doesn't appear to be a null factory!",
-		factname);
+		child, "Factory %s doesn't appear to be a null factory!",
+		CS::Quote::Single (factname));
 	    return 0;
 	  }
 	}

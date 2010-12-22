@@ -167,6 +167,7 @@ typedef uint64 GLuint64;
 #include "ivaria/reporter.h"
 #include "ivideo/graph2d.h"
 #include "csutil/cfgacc.h"
+#include "csutil/stringquote.h"
 #include "csplugincommon/iopengl/openglinterface.h"
 
 /**\name GL_version_1_2 constants
@@ -11627,16 +11628,17 @@ typedef GLvoid (csAPIENTRY* csGLQUERYCOUNTER) (GLuint id, GLenum target);
         CS_##nameNC &= config->GetBool (cfgkey, defaultUse);		\
         if (CS_##nameNC)						\
         {								\
-          Report (msgExtFoundAndUsed, exttype, ext);			\
+          Report (msgExtFoundAndUsed, exttype, CS::Quote::Single (ext));\
         }								\
         else								\
         {								\
-          Report (msgExtFoundAndNotUsed, exttype, ext);			\
+          Report (msgExtFoundAndNotUsed, exttype,			\
+		  CS::Quote::Single (ext));				\
         }								\
       }									\
       else								\
       {									\
-        Report (msgExtInitFail, exttype, ext);				\
+        Report (msgExtInitFail, exttype, CS::Quote::Single (ext));	\
       }
 
 /// Struct containing all GL extension functions.
@@ -18520,11 +18522,11 @@ public:
     defaultUse (true)
   {
     msgExtRetrieveFail = "Failed to retrieve %s";
-    msgExtFoundAndUsed = "%s Extension '%s' found and used.";
-    msgExtFoundAndNotUsed = "%s Extension '%s' found, but not used.";
-    msgExtInitFail = "%s Extension '%s' failed to initialize.";
-    msgExtNotFound = "%s Extension '%s' not found.";
-    msgDependencyNotFound = "%s Extension '%s' depends on '%s' which did "
+    msgExtFoundAndUsed = "%s Extension %s found and used.";
+    msgExtFoundAndNotUsed = "%s Extension %s found, but not used.";
+    msgExtInitFail = "%s Extension %s failed to initialize.";
+    msgExtNotFound = "%s Extension %s not found.";
+    msgDependencyNotFound = "%s Extension %s depends on %s which did "
       "not initialize.";
     
     Reset ();
@@ -18558,7 +18560,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -18572,7 +18574,7 @@ public:
     InitGL_version_1_2();
     if (!CS_GL_version_1_2)
     {
-      Report (msgDependencyNotFound, "GL", ext, "GL_version_1_2");
+      Report (msgDependencyNotFound, "GL", CS::Quote::Single (ext), CS::Quote::Single ("GL_version_1_2"));
       return;
     }
     char cfgkey[26 + 14 + 1];
@@ -18637,7 +18639,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -18651,7 +18653,7 @@ public:
     InitGL_version_1_3();
     if (!CS_GL_version_1_3)
     {
-      Report (msgDependencyNotFound, "GL", ext, "GL_version_1_3");
+      Report (msgDependencyNotFound, "GL", CS::Quote::Single (ext), CS::Quote::Single ("GL_version_1_3"));
       return;
     }
     char cfgkey[26 + 14 + 1];
@@ -18713,7 +18715,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -18727,7 +18729,7 @@ public:
     InitGL_version_1_4();
     if (!CS_GL_version_1_4)
     {
-      Report (msgDependencyNotFound, "GL", ext, "GL_version_1_4");
+      Report (msgDependencyNotFound, "GL", CS::Quote::Single (ext), CS::Quote::Single ("GL_version_1_4"));
       return;
     }
     char cfgkey[26 + 14 + 1];
@@ -18765,7 +18767,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -18779,7 +18781,7 @@ public:
     InitGL_version_1_5();
     if (!CS_GL_version_1_5)
     {
-      Report (msgDependencyNotFound, "GL", ext, "GL_version_1_5");
+      Report (msgDependencyNotFound, "GL", CS::Quote::Single (ext), CS::Quote::Single ("GL_version_1_5"));
       return;
     }
     char cfgkey[26 + 14 + 1];
@@ -18885,7 +18887,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -18899,7 +18901,7 @@ public:
     InitGL_version_2_0();
     if (!CS_GL_version_2_0)
     {
-      Report (msgDependencyNotFound, "GL", ext, "GL_version_2_0");
+      Report (msgDependencyNotFound, "GL", CS::Quote::Single (ext), CS::Quote::Single ("GL_version_2_0"));
       return;
     }
     char cfgkey[26 + 14 + 1];
@@ -18924,7 +18926,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -18958,16 +18960,16 @@ public:
       CS_Queries = allclear;
       if (CS_Queries)
       {
-	Report (msgExtFoundAndUsed, "pseudo", ext);
+	Report (msgExtFoundAndUsed, "pseudo", CS::Quote::Single (ext));
       }
       else
       {
-        Report (msgExtInitFail, "pseudo", ext);
+        Report (msgExtInitFail, "pseudo", CS::Quote::Single (ext));
       }
     }
     else
     {
-      Report (msgExtNotFound, "pseudo", ext);
+      Report (msgExtNotFound, "pseudo", CS::Quote::Single (ext));
     }
   }
   
@@ -18982,7 +18984,7 @@ public:
     InitQueries();
     if (!CS_Queries)
     {
-      Report (msgDependencyNotFound, "GL", ext, "Queries");
+      Report (msgDependencyNotFound, "GL", CS::Quote::Single (ext), CS::Quote::Single ("Queries"));
       return;
     }
     
@@ -19000,16 +19002,16 @@ public:
       CS_Queries64 = allclear;
       if (CS_Queries64)
       {
-	Report (msgExtFoundAndUsed, "pseudo", ext);
+	Report (msgExtFoundAndUsed, "pseudo", CS::Quote::Single (ext));
       }
       else
       {
-        Report (msgExtInitFail, "pseudo", ext);
+        Report (msgExtInitFail, "pseudo", CS::Quote::Single (ext));
       }
     }
     else
     {
-      Report (msgExtNotFound, "pseudo", ext);
+      Report (msgExtNotFound, "pseudo", CS::Quote::Single (ext));
     }
   }
   
@@ -19072,7 +19074,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19135,7 +19137,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19168,7 +19170,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19198,7 +19200,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19231,7 +19233,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GLX", ext);
+      Report (msgExtNotFound, "GLX", CS::Quote::Single (ext));
     }
   }
 #endif
@@ -19261,7 +19263,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19292,7 +19294,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "WGL", ext);
+      Report (msgExtNotFound, "WGL", CS::Quote::Single (ext));
     }
   }
 #endif
@@ -19329,7 +19331,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "WGL", ext);
+      Report (msgExtNotFound, "WGL", CS::Quote::Single (ext));
     }
   }
 #endif
@@ -19359,7 +19361,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19388,7 +19390,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19419,7 +19421,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19448,7 +19450,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19477,7 +19479,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19506,7 +19508,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19542,7 +19544,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19571,7 +19573,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19600,7 +19602,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19629,7 +19631,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19658,7 +19660,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19698,7 +19700,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19789,7 +19791,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19834,7 +19836,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19863,7 +19865,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19892,7 +19894,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19921,7 +19923,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19951,7 +19953,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -19981,7 +19983,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20010,7 +20012,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20040,7 +20042,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20069,7 +20071,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20098,7 +20100,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20129,7 +20131,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20160,7 +20162,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20202,7 +20204,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20236,7 +20238,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20275,7 +20277,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20306,7 +20308,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20335,7 +20337,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20369,7 +20371,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20400,7 +20402,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20430,7 +20432,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20476,7 +20478,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20505,7 +20507,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20534,7 +20536,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20563,7 +20565,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20593,7 +20595,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20622,7 +20624,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20654,7 +20656,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20684,7 +20686,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20713,7 +20715,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20742,7 +20744,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20771,7 +20773,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20800,7 +20802,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20829,7 +20831,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20858,7 +20860,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20893,7 +20895,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -20931,7 +20933,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21002,7 +21004,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21034,7 +21036,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21063,7 +21065,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21092,7 +21094,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21121,7 +21123,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21150,7 +21152,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21188,7 +21190,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21224,7 +21226,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21253,7 +21255,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21282,7 +21284,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21311,7 +21313,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21347,7 +21349,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21376,7 +21378,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21407,7 +21409,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21449,7 +21451,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21480,7 +21482,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21509,7 +21511,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21538,7 +21540,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21567,7 +21569,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21596,7 +21598,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21625,7 +21627,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21654,7 +21656,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21683,7 +21685,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21712,7 +21714,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21745,7 +21747,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21774,7 +21776,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21865,7 +21867,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21894,7 +21896,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21926,7 +21928,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -21959,7 +21961,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22002,7 +22004,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22033,7 +22035,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22062,7 +22064,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22103,7 +22105,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22135,7 +22137,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22209,7 +22211,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22245,7 +22247,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "WGL", ext);
+      Report (msgExtNotFound, "WGL", CS::Quote::Single (ext));
     }
   }
 #endif
@@ -22282,7 +22284,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "WGL", ext);
+      Report (msgExtNotFound, "WGL", CS::Quote::Single (ext));
     }
   }
 #endif
@@ -22319,7 +22321,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "WGL", ext);
+      Report (msgExtNotFound, "WGL", CS::Quote::Single (ext));
     }
   }
 #endif
@@ -22349,7 +22351,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22378,7 +22380,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22409,7 +22411,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22438,7 +22440,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22467,7 +22469,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22503,7 +22505,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22533,7 +22535,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22586,7 +22588,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22615,7 +22617,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22644,7 +22646,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22673,7 +22675,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22702,7 +22704,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22733,7 +22735,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22766,7 +22768,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22795,7 +22797,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22825,7 +22827,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22854,7 +22856,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22883,7 +22885,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22912,7 +22914,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22941,7 +22943,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22970,7 +22972,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -22999,7 +23001,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -23028,7 +23030,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -23064,7 +23066,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -23093,7 +23095,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -23162,7 +23164,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -23210,7 +23212,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -23239,7 +23241,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -23268,7 +23270,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -23302,7 +23304,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -23339,7 +23341,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -23372,7 +23374,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -23404,7 +23406,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -23439,7 +23441,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "WGL", ext);
+      Report (msgExtNotFound, "WGL", CS::Quote::Single (ext));
     }
   }
 #endif
@@ -23474,7 +23476,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "WGL", ext);
+      Report (msgExtNotFound, "WGL", CS::Quote::Single (ext));
     }
   }
 #endif
@@ -23512,7 +23514,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "WGL", ext);
+      Report (msgExtNotFound, "WGL", CS::Quote::Single (ext));
     }
   }
 #endif
@@ -23547,7 +23549,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "WGL", ext);
+      Report (msgExtNotFound, "WGL", CS::Quote::Single (ext));
     }
   }
 #endif
@@ -23583,7 +23585,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "WGL", ext);
+      Report (msgExtNotFound, "WGL", CS::Quote::Single (ext));
     }
   }
 #endif
@@ -23617,7 +23619,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "WGL", ext);
+      Report (msgExtNotFound, "WGL", CS::Quote::Single (ext));
     }
   }
 #endif
@@ -23652,7 +23654,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "WGL", ext);
+      Report (msgExtNotFound, "WGL", CS::Quote::Single (ext));
     }
   }
 #endif
@@ -23690,7 +23692,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "WGL", ext);
+      Report (msgExtNotFound, "WGL", CS::Quote::Single (ext));
     }
   }
 #endif
@@ -23726,7 +23728,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "WGL", ext);
+      Report (msgExtNotFound, "WGL", CS::Quote::Single (ext));
     }
   }
 #endif
@@ -23761,7 +23763,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "WGL", ext);
+      Report (msgExtNotFound, "WGL", CS::Quote::Single (ext));
     }
   }
 #endif
@@ -23798,7 +23800,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "WGL", ext);
+      Report (msgExtNotFound, "WGL", CS::Quote::Single (ext));
     }
   }
 #endif
@@ -23843,7 +23845,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "WGL", ext);
+      Report (msgExtNotFound, "WGL", CS::Quote::Single (ext));
     }
   }
 #endif
@@ -23878,7 +23880,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -23912,7 +23914,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -23941,7 +23943,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -23980,7 +23982,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24011,7 +24013,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24040,7 +24042,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24080,7 +24082,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24111,7 +24113,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24140,7 +24142,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24169,7 +24171,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24198,7 +24200,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24266,7 +24268,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24295,7 +24297,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24367,7 +24369,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24382,7 +24384,7 @@ public:
     InitGL_ARB_vertex_buffer_object();
     if (!CS_GL_ARB_vertex_buffer_object)
     {
-      Report (msgDependencyNotFound, "GL", ext, "GL_ARB_vertex_buffer_object");
+      Report (msgDependencyNotFound, "GL", CS::Quote::Single (ext), CS::Quote::Single ("GL_ARB_vertex_buffer_object"));
       return;
     }
     char cfgkey[26 + 26 + 1];
@@ -24401,7 +24403,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24430,7 +24432,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24476,7 +24478,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24491,7 +24493,7 @@ public:
     InitGL_ARB_vertex_buffer_object();
     if (!CS_GL_ARB_vertex_buffer_object)
     {
-      Report (msgDependencyNotFound, "GL", ext, "GL_ARB_vertex_buffer_object");
+      Report (msgDependencyNotFound, "GL", CS::Quote::Single (ext), CS::Quote::Single ("GL_ARB_vertex_buffer_object"));
       return;
     }
     char cfgkey[26 + 26 + 1];
@@ -24510,7 +24512,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24540,7 +24542,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24569,7 +24571,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24584,7 +24586,7 @@ public:
     InitQueries();
     if (!CS_Queries)
     {
-      Report (msgDependencyNotFound, "GL", ext, "Queries");
+      Report (msgDependencyNotFound, "GL", CS::Quote::Single (ext), CS::Quote::Single ("Queries"));
       return;
     }
     char cfgkey[26 + 22 + 1];
@@ -24603,7 +24605,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24618,7 +24620,7 @@ public:
     InitQueries();
     if (!CS_Queries)
     {
-      Report (msgDependencyNotFound, "GL", ext, "Queries");
+      Report (msgDependencyNotFound, "GL", CS::Quote::Single (ext), CS::Quote::Single ("Queries"));
       return;
     }
     char cfgkey[26 + 23 + 1];
@@ -24637,7 +24639,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24667,7 +24669,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24697,7 +24699,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24726,7 +24728,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24755,7 +24757,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24784,7 +24786,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24813,7 +24815,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24858,7 +24860,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24889,7 +24891,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24919,7 +24921,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24948,7 +24950,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -24981,7 +24983,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GLX", ext);
+      Report (msgExtNotFound, "GLX", CS::Quote::Single (ext));
     }
   }
 #endif
@@ -25014,7 +25016,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "WGL", ext);
+      Report (msgExtNotFound, "WGL", CS::Quote::Single (ext));
     }
   }
 #endif
@@ -25046,7 +25048,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -25075,7 +25077,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -25105,7 +25107,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -25134,7 +25136,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -25165,7 +25167,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -25194,7 +25196,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -25223,7 +25225,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -25252,7 +25254,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -25281,7 +25283,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   
@@ -25296,7 +25298,7 @@ public:
     InitQueries64();
     if (!CS_Queries64)
     {
-      Report (msgDependencyNotFound, "GL", ext, "Queries64");
+      Report (msgDependencyNotFound, "GL", CS::Quote::Single (ext), CS::Quote::Single ("Queries64"));
       return;
     }
     char cfgkey[26 + 18 + 1];
@@ -25317,7 +25319,7 @@ public:
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   

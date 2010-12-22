@@ -24,6 +24,7 @@
 #include "csutil/scfstr.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
+#include "csutil/stringquote.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "csgeom/frustum.h"
@@ -133,8 +134,8 @@ public:
     const csBox3& b = child->GetBBox ();
     csFrustVisObjectWrapper* obj = (csFrustVisObjectWrapper*)(
     	child->GetObject ());
-    str->Format ("'%s' (%g,%g,%g)-(%g,%g,%g)",
-    	obj->mesh->QueryObject ()->GetName (),
+    str->Format ("%s (%g,%g,%g)-(%g,%g,%g)",
+    	CS::Quote::Single (obj->mesh->QueryObject ()->GetName ()),
 	b.MinX (), b.MinY (), b.MinZ (),
 	b.MaxX (), b.MaxY (), b.MaxZ ());
     return str;
@@ -240,8 +241,8 @@ void csFrustumVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox)
     if (bbox.IsNaN ())
     {
       iMeshWrapper* mesh = visobj->GetMeshWrapper ();
-      csPrintfErr ("The bounding box of '%s' is invalid!\n",
-	  mesh ? mesh->QueryObject ()->GetName () : "<unknown>");
+      csPrintfErr ("The bounding box of %s is invalid!\n",
+	  CS::Quote::Single (mesh ? mesh->QueryObject ()->GetName () : "<unknown>"));
     }
 #endif
   }
@@ -252,8 +253,8 @@ void csFrustumVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox)
     if (box.IsNaN ())
     {
       iMeshWrapper* mesh = visobj->GetMeshWrapper ();
-      csPrintfErr ("The bounding box of '%s' is invalid!\n",
-	  mesh ? mesh->QueryObject ()->GetName () : "<unknown>");
+      csPrintfErr ("The bounding box of %s is invalid!\n",
+	  CS::Quote::Single (mesh ? mesh->QueryObject ()->GetName () : "<unknown>"));
     }
 #endif
     csReversibleTransform trans = movable->GetFullTransform ();
@@ -269,8 +270,8 @@ void csFrustumVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox)
     if (bbox.IsNaN ())
     {
       iMeshWrapper* mesh = visobj->GetMeshWrapper ();
-      csPrintfErr ("The transformed bounding box of '%s' is invalid!\n",
-	  mesh ? mesh->QueryObject ()->GetName () : "<unknown>");
+      csPrintfErr ("The transformed bounding box of %s is invalid!\n",
+	  CS::Quote::Single (mesh ? mesh->QueryObject ()->GetName () : "<unknown>"));
     }
 #endif
   }

@@ -23,6 +23,7 @@
 #include "cstool/fogmath.h"
 #include "csgeom/math3d.h"
 #include "csutil/flags.h"
+#include "csutil/stringquote.h"
 #include "csutil/sysfunc.h"
 #include "iengine/camera.h"
 #include "iengine/material.h"
@@ -559,8 +560,8 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
 #ifdef CS_DEBUG
       if (!mesh->material)
       {
-	csPrintfErr ("INTERNAL ERROR: mesh '%s' is missing a material!\n",
-	  mesh->db_mesh_name);
+	csPrintfErr ("INTERNAL ERROR: mesh %s is missing a material!\n",
+	  CS::Quote::Single (mesh->db_mesh_name));
 	exit (-1);
       }
 #endif
@@ -568,8 +569,8 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
 #ifdef CS_DEBUG
       if (!hdl)
       {
-        csPrintfErr ("INTERNAL ERROR: mesh '%s' is missing a material!\n",
-	  mesh->db_mesh_name);
+        csPrintfErr ("INTERNAL ERROR: mesh %s is missing a material!\n",
+	  CS::Quote::Single (mesh->db_mesh_name));
 	exit (-1);
       }
 #endif

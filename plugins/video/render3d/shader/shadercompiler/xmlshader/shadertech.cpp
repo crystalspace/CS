@@ -333,8 +333,9 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
         if(do_verbose)
         {
           parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
-            "Shader '%s', pass %d: invalid instanceparam destination '%s'",
-            parent->GetName (), GetPassNumber (pass), dest);
+            "Shader %s, pass %d: invalid instanceparam destination %s",
+            CS::Quote::Single (parent->GetName ()), GetPassNumber (pass),
+	    CS::Quote::Single (dest));
         }
         return false;
       }
@@ -659,8 +660,8 @@ bool csXMLShaderTech::ParseModes (ShaderPass* pass,
     {
       parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
 	nodeFlipCulling,
-	"Shader '%s', pass %d: <flipculling> is deprecated",
-	parent->GetName (), GetPassNumber (pass));
+	"Shader %s, pass %d: <flipculling> is deprecated",
+	CS::Quote::Single (parent->GetName ()), GetPassNumber (pass));
     }
   }
 
@@ -686,8 +687,9 @@ bool csXMLShaderTech::ParseModes (ShaderPass* pass,
       {
       parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
 	nodeFlipCulling,
-	"Shader '%s', pass %d: invalid culling mode '%s'",
-	parent->GetName (), GetPassNumber (pass), cullModeStr);
+	"Shader %s, pass %d: invalid culling mode %s",
+	CS::Quote::Single (parent->GetName ()), GetPassNumber (pass),
+	CS::Quote::Single (cullModeStr));
       }
     }
   }
@@ -769,8 +771,8 @@ bool csXMLShaderTech::ParseBuffers (ShaderPassPerTag& pass, int passNum,
         //default mapping
 	if ((sourceName < CS_BUFFER_POSITION) && !explicitlyUnmapped)
         {
-          SetFailReason ("invalid buffermapping, '%s' not allowed here.",
-	    source);
+          SetFailReason ("invalid buffermapping, %s not allowed here.",
+	    CS::Quote::Single (source));
           return false;
         }
         
@@ -794,8 +796,9 @@ bool csXMLShaderTech::ParseBuffers (ShaderPassPerTag& pass, int passNum,
       if (attrib != CS_VATTRIB_UNUSED && parent->compiler->do_verbose)
       {
         parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
-	  "Shader '%s', pass %d: invalid buffer destination '%s'",
-	  parent->GetName (), passNum, dest);
+	  "Shader %s, pass %d: invalid buffer destination %s",
+	  CS::Quote::Single (parent->GetName ()), passNum,
+	  CS::Quote::Single (dest));
       }
     }
   }
@@ -843,8 +846,8 @@ bool csXMLShaderTech::ParseTextures (ShaderPassPerTag& pass,
           texMap.texCompare.mode = CS::Graphics::TextureComparisonMode::compareNone;
 	else
 	{
-          SetFailReason ("invalid texture comparison mode '%s'",
-	    compareMode);
+          SetFailReason ("invalid texture comparison mode %s",
+	    CS::Quote::Single (compareMode));
           return false;
 	}
       
@@ -854,8 +857,8 @@ bool csXMLShaderTech::ParseTextures (ShaderPassPerTag& pass,
           texMap.texCompare.function = CS::Graphics::TextureComparisonMode::funcGEqual;
 	else
 	{
-          SetFailReason ("invalid texture comparison function '%s'",
-	    compareMode);
+          SetFailReason ("invalid texture comparison function %s",
+	    CS::Quote::Single (compareMode));
           return false;
 	}
       }
@@ -1398,9 +1401,10 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadProgramFromCache (
   {
     if (parent->compiler->do_verbose)
       SetFailReason(
-	  "Couldn't retrieve shader plugin '%s' for '%s' in shader '%s'",
-	  cacheInfo.pluginID.GetData(), cacheInfo.progType.GetData(),
-	  parent->GetName ());
+	  "Couldn't retrieve shader plugin %s for %s in shader %s",
+	  CS::Quote::Single (cacheInfo.pluginID.GetData()),
+	  CS::Quote::Single (cacheInfo.progType.GetData()),
+	  CS::Quote::Single (parent->GetName ()));
     return iShaderProgram::loadFail;
   }
 
@@ -1413,8 +1417,8 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadProgramFromCache (
   {
     if (parent->compiler->do_verbose)
       SetFailReason(
-	"Failed to read '%s' for pass %d from cache: %s",
-	cacheInfo.progType.GetData(), passNumber,
+	"Failed to read %s for pass %d from cache: %s",
+	CS::Quote::Single (cacheInfo.progType.GetData()), passNumber,
 	failReason.IsValid() ? failReason->GetData() : "no reason given");
     return iShaderProgram::loadFail;
   }
@@ -1472,8 +1476,8 @@ void csXMLShaderTech::GetProgramPlugin (iDocumentNode *node,
   if (node->GetAttributeValue("plugin") == 0)
   {
     parent->compiler->Report (CS_REPORTER_SEVERITY_ERROR,
-      "No shader program plugin specified for <%s> in shader '%s'",
-      node->GetValue (), parent->GetName ());
+      "No shader program plugin specified for <%s> in shader %s",
+      node->GetValue (), CS::Quote::Single (parent->GetName ()));
     return;
   }
 
@@ -1489,8 +1493,10 @@ void csXMLShaderTech::GetProgramPlugin (iDocumentNode *node,
   {
     if (parent->compiler->do_verbose)
       parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
-	  "Couldn't retrieve shader plugin '%s' for <%s> in shader '%s'",
-	  plugin.GetData(), node->GetValue (), parent->GetName ());
+	  "Couldn't retrieve shader plugin %s for <%s> in shader %s",
+	  CS::Quote::Single (plugin.GetData()),
+	  node->GetValue (),
+	  CS::Quote::Single (parent->GetName ()));
     return;
   }
 
@@ -1551,8 +1557,8 @@ bool csXMLShaderTech::LoadBoilerplate (iLoaderContext* ldr_context,
     }
     else if (forbiddenTags.In (tagID))
     {
-      if (do_verbose) SetFailReason ("Shader tag '%s' is forbidden", 
-	tagName);
+      if (do_verbose) SetFailReason ("Shader tag %s is forbidden", 
+	CS::Quote::Single (tagName));
       return false;
     }
   }
@@ -1761,7 +1767,8 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadFromCache (
   csRef<iDataBuffer> cacheData (cache->ReadCache ("/passes"));
   if (!cacheData.IsValid())
   {
-    SetFailReason("Failed to load cache data from '/passes'");
+    SetFailReason("Failed to load cache data from %s",
+		  CS::Quote::Single ("/passes"));
     return iShaderProgram::loadFail;
   }
 

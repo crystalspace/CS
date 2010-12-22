@@ -574,7 +574,8 @@ bool Game::CreateFactories ()
   fstate->GenerateSphere (ellips, 10);
 
   if (!loader->LoadTexture ("adversary_texture", "/lib/stdtex/misty.jpg"))
-    return app->ReportError ("Error loading 'misty' texture!");
+    return app->ReportError ("Error loading %s texture!",
+			     CS::Quote::Single ("misty"));
   iMaterialWrapper* adversary_material = engine->GetMaterialList ()
   	->FindByName ("adversary_texture");
   adversary_factory->GetMeshObjectFactory ()
@@ -600,7 +601,8 @@ bool Game::CreateFactories ()
   	->SetTriangleData (colldet_id, 0);
 
   if (!loader->LoadTexture ("laserbeam_texture", "/lib/stdtex/blobby.jpg"))
-    return app->ReportError ("Error loading 'blobby' texture!");
+    return app->ReportError ("Error loading %s texture!",
+			     CS::Quote::Single ("blobby"));
   iMaterialWrapper* laserbeam_material = engine->GetMaterialList ()
   	->FindByName ("laserbeam_texture");
   laserbeam_factory->GetMeshObjectFactory ()
@@ -628,7 +630,8 @@ bool Game::CreateFactories ()
   	iParticleSystemFactory> (explosion_factory->GetMeshObjectFactory ());
 
   if (!loader->LoadTexture ("explosion_texture", "/lib/std/spark.png"))
-    return app->ReportError ("Error loading 'spark' texture!");
+    return app->ReportError ("Error loading %s texture!",
+			     CS::Quote::Single ("spark"));
   iMaterialWrapper* explosion_material = engine->GetMaterialList ()
   	->FindByName ("explosion_texture");
   

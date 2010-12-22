@@ -39,6 +39,7 @@
 #include "csutil/parray.h"
 #include "csutil/memfile.h"
 #include "csutil/scfstringarray.h"
+#include "csutil/stringquote.h"
 #include "csutil/threading/mutex.h"
 #include "csutil/strset.h"
 #include "csutil/util.h"
@@ -255,7 +256,8 @@ scfSharedLibrary::scfSharedLibrary (csStringID libraryName, const char *core)
     initFunc = (scfInitFunc)csGetLibrarySymbol(LibraryHandle, sym);
     if (!initFunc)
     {
-      csPrintfErr("SCF_ERROR: '%s' doesn't export '%s'\n", lib, sym.GetData());
+      csPrintfErr("SCF_ERROR: %s doesn't export %s\n",
+		  CS::Quote::Single (lib), CS::Quote::Single (sym.GetData()));
       csPrintLibraryError (sym);
     }
     sym.Clear ();
@@ -263,7 +265,8 @@ scfSharedLibrary::scfSharedLibrary (csStringID libraryName, const char *core)
     finisFunc = (scfFinisFunc)csGetLibrarySymbol(LibraryHandle, sym);
     if (!finisFunc)
     {
-      csPrintfErr("SCF_ERROR: '%s' doesn't export '%s'\n", lib, sym.GetData());
+      csPrintfErr("SCF_ERROR: %s doesn't export %s\n",
+		  CS::Quote::Single (lib), CS::Quote::Single (sym.GetData()));
       csPrintLibraryError (sym);
     }
     if (initFunc && finisFunc)
@@ -621,8 +624,8 @@ void csSCF::ScanPluginsInt (csPathsList const* pluginPaths,
       {
         char const* x = scannedDirs.Contains(pathrec.path) ? "re-" : "";
         csPrintfErr("SCF_NOTIFY: %sscanning plugin directory: %s "
-          "(context `%s'; recursive %s)\n", x, pathrec.path.GetData(),
-          GetContextName(pathrec.type),
+          "(context %s; recursive %s)\n", x, pathrec.path.GetData(),
+          CS::Quote::Single (GetContextName(pathrec.type)),
           pathrec.scanRecursive ? "yes" : "no");
       }
 
@@ -636,7 +639,7 @@ void csSCF::ScanPluginsInt (csPathsList const* pluginPaths,
       if ((messages != 0) && (messages->GetSize () > 0))
       {
         csPrintfErr("SCF_WARNING: the following issue(s) arose while "
-          "scanning '%s':", pathrec.path.GetData());
+          "scanning %s:", CS::Quote::Single (pathrec.path.GetData()));
         for (j = 0; j < messages->GetSize (); j++)
           csPrintfErr(" %s\n", messages->Get (j));
       }
@@ -872,13 +875,14 @@ void csSCF::RegisterClasses (char const* pluginPath,
 	  RegisterClassesInt (pluginPath, scfnode, context);
 	else
 	  csPrintfErr("SCF_ERROR: missing <scf> node in metadata for %s "
-	    "in context `%s'\n", pluginPath != 0 ? pluginPath : "{unknown}",
-	    GetContextName(context));
+	    "in context %s\n", pluginPath != 0 ? pluginPath : "{unknown}",
+	    CS::Quote::Single (GetContextName(context)));
       }
       else
         csPrintfErr("SCF_ERROR: missing root <plugin> node in metadata "
-	  "for %s in context `%s'\n",
-	  pluginPath != 0 ? pluginPath : "{unknown}", GetContextName(context));
+	  "for %s in context %s\n",
+	  pluginPath != 0 ? pluginPath : "{unknown}",
+	  CS::Quote::Single (GetContextName(context)));
     }
   }
 }
@@ -899,10 +903,10 @@ void csSCF::RegisterClassesInt(char const* pluginPath, iDocumentNode* scfnode,
     char const* s = pluginPath != 0 ? pluginPath : "{unknown}";
     char const* c = GetContextName(context);
     if (!seen)
-      csPrintfErr("SCF_NOTIFY: registering plugin %s in context `%s'\n", s, c);
+      csPrintfErr("SCF_NOTIFY: registering plugin %s in context %s\n", s, CS::Quote::Single (c));
     else
       csPrintfErr("SCF_NOTIFY: ignoring duplicate plugin registration %s "
-        "in context `%s'\n", s, c);
+        "in context %s\n", s, CS::Quote::Single (c));
   }
 
   if (seen)
@@ -1027,8 +1031,8 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
     context ? contexts.Request (context) : csInvalidStringID;
 
   if (IsVerbose(SCF_VERBOSE_CLASS_REGISTER))
-    csPrintfErr("SCF_NOTIFY: registering class %s in context `%s' (from %s)\n",
-      iClassID, GetContextName(context), iLibraryName);
+    csPrintfErr("SCF_NOTIFY: registering class %s in context %s (from %s)\n",
+      iClassID, CS::Quote::Single (GetContextName(context)), iLibraryName);
 
   if ((idx = ClassRegistry->FindClass(iClassID)) != (size_t)-1)
   {
@@ -1036,8 +1040,8 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
     if (ContextClash (cf->classContext, contextID))
     {
       csPrintfErr("SCF_WARNING: class %s (from %s) has already been "
-        "registered in the same context `%s' (in %s)\n",
-        iClassID, iLibraryName, GetContextName(context),
+        "registered in the same context %s (in %s)\n",
+        iClassID, iLibraryName, CS::Quote::Single (GetContextName(context)),
 	get_library_name(cf->LibraryName));
     }
     else
@@ -1054,10 +1058,12 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
       {
 	// @@@ some way to have this warning in non-debug builds would be nice.
 	csPrintfErr("SCF_NOTIFY: class %s (from %s) has already been "
-	  "registered in a different context: '%s' vs. '%s' (from %s); this "
+	  "registered in a different context: %s vs. %s (from %s); this "
 	  "message appears only in debug builds\n",
-	  iClassID, iLibraryName, GetContextName(context),
-	  GetContextName(cf->classContext), get_library_name(cf->LibraryName));
+	  iClassID, iLibraryName,
+	  CS::Quote::Single (GetContextName(context)),
+	  CS::Quote::Single (GetContextName(cf->classContext)),
+	  get_library_name(cf->LibraryName));
       }
     #endif
     }
@@ -1080,8 +1086,8 @@ bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
     context ? contexts.Request (context) : csInvalidStringID;
 
   if (IsVerbose(SCF_VERBOSE_CLASS_REGISTER))
-    csPrintfErr("SCF_NOTIFY: registering class %s in context `%s' "
-      "(statically linked)\n", iClassID, GetContextName(context));
+    csPrintfErr("SCF_NOTIFY: registering class %s in context %s "
+      "(statically linked)\n", iClassID, CS::Quote::Single (GetContextName(context)));
 
   if ((idx = ClassRegistry->FindClass(iClassID)) != (size_t)-1)
   {
@@ -1089,8 +1095,8 @@ bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
     if (ContextClash (cf->classContext, contextID))
     {
       csPrintfErr("SCF_WARNING: class %s (statically linked) has already been "
-	"registered in the same context `%s' (from %s)\n",
-	iClassID, GetContextName(context), get_library_name(cf->LibraryName));
+	"registered in the same context %s (from %s)\n",
+	iClassID, CS::Quote::Single (GetContextName(context)), get_library_name(cf->LibraryName));
     }
     else
     {
@@ -1106,9 +1112,11 @@ bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
       {
 	// @@@ some way to have this warning in non-debug builds would be nice.
 	csPrintfErr("SCF_NOTIFY: class %s (statically linked) has already "
-	  "been registered in a different context: '%s' vs. '%s' (from %s); "
+	  "been registered in a different context: %s vs. %s (from %s); "
 	  "this message appears only in debug builds\n",
-	  iClassID, GetContextName(context), GetContextName(cf->classContext),
+	  iClassID,
+	  CS::Quote::Single (GetContextName(context)),
+	  CS::Quote::Single (GetContextName(cf->classContext)),
 	  get_library_name(cf->LibraryName));
       }
     #endif
@@ -1184,8 +1192,8 @@ bool csSCF::RegisterPlugin (const char* path)
 
   if ((msg = csGetPluginMetadata (path, metadata)) != 0)
   {
-    csPrintfErr("SCF_ERROR: couldn't retrieve metadata for '%s': %s\n", 
-      path, msg->GetData ());
+    csPrintfErr("SCF_ERROR: couldn't retrieve metadata for %s: %s\n", 
+      CS::Quote::Single (path), msg->GetData ());
     return false;
   }
 

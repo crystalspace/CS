@@ -40,6 +40,7 @@
 #include "iutil/verbositymanager.h"
 #include "ivaria/reporter.h"
 #include "csutil/cfgacc.h"
+#include "csutil/stringquote.h"
 
 using namespace CS::RenderManager;
 
@@ -370,7 +371,7 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
   {
     if (doVerbose)
       csReport (objectReg, CS_REPORTER_SEVERITY_NOTIFY, messageID,
-	"Reading render layers from '%s'", layersFile);
+	"Reading render layers from %s", CS::Quote::Single (layersFile));
     layersValid = CS::RenderManager::AddLayersFromFile (objectReg, layersFile,
       renderLayer);
     if (!layersValid) renderLayer.Clear();
@@ -381,7 +382,8 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
   {
     if (doVerbose)
       csReport (objectReg, CS_REPORTER_SEVERITY_NOTIFY, messageID,
-	"Reading reflection render layers from '%s'", layersFile);
+	"Reading reflection render layers from %s",
+	CS::Quote::Single (layersFile));
     layersValid = CS::RenderManager::AddLayersFromFile (objectReg, layersFile,
       renderLayerReflect);
     if (!layersValid) renderLayerReflect = renderLayer;
@@ -394,7 +396,8 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
   {
     if (doVerbose)
       csReport (objectReg, CS_REPORTER_SEVERITY_NOTIFY, messageID,
-	"Reading refraction render layers from '%s'", layersFile);
+	"Reading refraction render layers from %s",
+	CS::Quote::Single (layersFile));
     layersValid = CS::RenderManager::AddLayersFromFile (objectReg, layersFile,
       renderLayerRefract);
     if (!layersValid) renderLayerRefract = renderLayer;

@@ -107,13 +107,14 @@ bool Shagnetron::PrecacheShaderFile (const char* file, bool doQuick)
     type = shaderNode->GetAttributeValue ("type");
   if (type == 0)
   {
-    csPrintf ("'compiler' attribute is missing!\n");
+    csPrintf ("%s attribute is missing!\n",
+	      CS::Quote::Single ("compiler"));
     return false;
   }
   csRef<iShaderCompiler> shcom = shaderMgr->GetCompiler (type);
   if (!shcom.IsValid()) 
   {
-    csPrintf ("Could not get shader compiler '%s'", type);
+    csPrintf ("Could not get shader compiler %s", CS::Quote::Single (type));
     return false;
   }
 
@@ -217,7 +218,8 @@ void Shagnetron::PrintHelp ()
   csPrintf ("\n");
   csPrintf ("Pre-warms a shader cache with all the shaders from the given directories.\n");
   csPrintf ("\n");
-  csPrintf ("The name is a portmanteau of 'shader' and 'magnetron'.\n");
+  csPrintf ("The name is a portmanteau of %s and %s.\n",
+	    CS::Quote::Single ("shader"), CS::Quote::Single ("magnetron"));
   csPrintf ("\n");
   csPrintf ("Available options:\n");
   csPrintf (" -cachedir=<dir>   Specify additional cache VFS directories.\n");
@@ -225,7 +227,8 @@ void Shagnetron::PrintHelp ()
   csPrintf ("                   The first directory is written to.\n");
   csPrintf (" -nodefaultcaches  Do not use default caches set in config\n");
   csPrintf (" -cacheclear       Clear used caches\n");
-  csPrintf (" -quick            Do a 'quick' precache.\n");
+  csPrintf (" -quick            Do a %s precache.\n",
+	    CS::Quote::Single ("quick"));
   csPrintf ("                   Precaching will take less time, but some shader processing\n");
   csPrintf ("                   will still happen at run time.\n");
   csPrintf ("\n");

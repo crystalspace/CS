@@ -350,8 +350,11 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
 
     else
     {
-      printf ("Given scene ('%s') is not one of {'frankie', 'krystal', 'sintel'}. Falling back to Frankie\n",
-	      sceneName.GetData ());
+      csPrintf ("Given scene (%s) is not one of {%s, %s, %s}. Falling back to Frankie\n",
+		CS::Quote::Single (sceneName.GetData ()),
+		CS::Quote::Single ("frankie"),
+		CS::Quote::Single ("krystal"),
+		CS::Quote::Single ("sintel"));
       avatarSceneType = MODEL_FRANKIE;
     }
   }

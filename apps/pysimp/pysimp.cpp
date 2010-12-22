@@ -254,7 +254,7 @@ void Simple::CreateRoom ()
     }
 
     // Load a python module.
-    ReportInfo ("Loading script file `%s'...", module);
+    ReportInfo ("Loading script file %s...", CS::Quote::Single (module));
     if (!is->LoadModule (module))
       return;
 

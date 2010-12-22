@@ -45,7 +45,7 @@ void BaseMapGen::ScanOldMaterialMaps()
     if ((terraformerRE != 0) && (terraformerRE->Match (name) != csrxNoError))
       continue;
     
-    csPrintf ("Found terraformer '%s' ...\n", name.GetData());
+    csPrintf ("Found terraformer %s ...\n", CS::Quote::Single (name.GetData()));
     fflush (stdout);
     
     csRef<iDocumentNode> matmap = params->GetNode ("materialmap");
@@ -56,8 +56,8 @@ void BaseMapGen::ScanOldMaterialMaps()
       csRef<iImage> image = LoadImage (imageFile, CS_IMGFMT_PALETTED8);
       if (!image )
       {
-	Report("Failed to load material map '%s'!", 
-	  imageFile);
+	Report("Failed to load material map %s!", 
+	  CS::Quote::Single (imageFile));
 	continue;
       }
       csRef<AlphaLayers> layers;
@@ -83,7 +83,7 @@ void BaseMapGen::ScanOldMaterialMaps()
 	csRef<iImage> image = LoadImage (imageFile, CS_IMGFMT_ANY);
 	if (!image.IsValid())
 	{
-	  Report("Failed to load alpha map '%s'!", imageFile);
+	  Report("Failed to load alpha map %s!", CS::Quote::Single (imageFile));
 	  continue;
 	}
 	layers->AddAlphaMap (image);
@@ -94,8 +94,8 @@ void BaseMapGen::ScanOldMaterialMaps()
     }
     // else: no alpha maps
 
-    Report("Failed to load alpha maps or a material map for '%s'!", 
-      name.GetData());
+    Report("Failed to load alpha maps or a material map for %s!", 
+      CS::Quote::Single (name.GetData()));
 
     continue;
   } // while
@@ -167,7 +167,7 @@ void BaseMapGen::ScanTerrain1Meshes ()
       // Get texture file name.
       const char* matname = material->GetContentsValue();
       
-      csPrintf ("Found terrain '%s' ...\n", name.GetData());
+      csPrintf ("Found terrain %s ...\n", CS::Quote::Single (name.GetData()));
       fflush (stdout);
     
       MaterialLayer* mat = materials.Get (matname, (MaterialLayer*)0);

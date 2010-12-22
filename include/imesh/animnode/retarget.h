@@ -29,6 +29,7 @@
 
 #include "imesh/animnode/skeleton2anim.h"
 #include "csutil/hash.h"
+#include "csutil/stringquote.h"
 
 /**\addtogroup meshplugins
  * @{ */
@@ -92,12 +93,13 @@ struct BoneMapping
 	 when compiling with -ansi -pedantic. */
       csPrintf ("source bone %lu", (unsigned long)tuple.second);
       if (sourceSkeleton->HasBone (tuple.second))
-	csPrintf (" ('%s') to target bone %lu (", sourceSkeleton->GetBoneName (tuple.second),
+	csPrintf (" (%s) to target bone %lu (",
+		  CS::Quote::Single (sourceSkeleton->GetBoneName (tuple.second)),
 		  (unsigned long)tuple.first);
       else
 	csPrintf ("(invalid) to target bone %lu (", (unsigned long)tuple.first);
       if (targetSkeleton->HasBone (tuple.first))
-	csPrintf ("'%s')\n", targetSkeleton->GetBoneName (tuple.first));
+	csPrintf ("%s)\n", CS::Quote::Single (targetSkeleton->GetBoneName (tuple.first)));
       else
 	csPrintf ("invalid)\n");
     }

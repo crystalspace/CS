@@ -225,7 +225,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   if (layersFile)
   {
     csReport (objRegistry, CS_REPORTER_SEVERITY_NOTIFY, messageID, 
-      "Reading render layers from '%s'", layersFile);
+      "Reading render layers from %s", CS::Quote::Single (layersFile));
 
     layersValid = CS::RenderManager::AddLayersFromFile (objRegistry, layersFile, renderLayer);
     
@@ -240,7 +240,9 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
       if (deferredLayer < 0)
       {
         csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
-          messageID, "The render layers file '%s' does not contain a 'gbuffer fill' layer.", layersFile);
+          messageID, "The render layers file %s does not contain a %s layer.",
+	  CS::Quote::Single (layersFile),
+	  CS::Quote::Single ("gbuffer fill"));
 
         AddDeferredLayer (renderLayer, deferredLayer);
       }
@@ -250,7 +252,9 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
       if (zonlyLayer < 0)
       {
         csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
-          messageID, "The render layers file '%s' does not contain a 'depthwrite' layer.", layersFile);
+          messageID, "The render layers file %s does not contain a %s layer.",
+	  CS::Quote::Single (layersFile),
+	  CS::Quote::Single ("depthwrite"));
 
         AddZOnlyLayer (renderLayer, zonlyLayer);
       }

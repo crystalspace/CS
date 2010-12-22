@@ -302,8 +302,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(BodyMeshLdr)
 	      if (!mesh)
 		{
 		  synldr->ReportError (msgid, child,
-				       "Unable to find mesh or factory '%s' while loading collider",
-				       child->GetAttributeValue ("mesh"));
+				       "Unable to find mesh or factory %s while loading collider",
+				       CS::Quote::Single (child->GetAttributeValue ("mesh")));
 		  return false;
 		}
 	    }

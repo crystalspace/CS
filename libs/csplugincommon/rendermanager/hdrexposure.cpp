@@ -22,6 +22,7 @@
 
 #include "iutil/verbositymanager.h"
 #include "ivaria/reporter.h"
+#include "csutil/stringquote.h"
 
 namespace CS
 {
@@ -176,13 +177,13 @@ namespace CS
 	  if (doVerbose)
 	  {
 	    csReport (objReg, CS_REPORTER_SEVERITY_NOTIFY, messageID,
-	      "Configured exposure type: '%s'", exposureStr);
+	      "Configured exposure type: %s", CS::Quote::Single (exposureStr));
 	  }
 	  exposure = CreateExposure (exposureStr);
 	  if (!exposure)
 	  {
 	    csReport (objReg, CS_REPORTER_SEVERITY_WARNING, messageID,
-	      "Invalid exposure type '%s'", exposureStr);
+	      "Invalid exposure type %s", CS::Quote::Single (exposureStr));
 	  }
 	  else
 	  {

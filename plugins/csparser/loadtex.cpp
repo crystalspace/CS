@@ -37,6 +37,7 @@
 #include "cstool/vfsdirchange.h"
 #include "csutil/cscolor.h"
 #include "csutil/scfstr.h"
+#include "csutil/stringquote.h"
 #include "iengine/collection.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
@@ -122,7 +123,7 @@ csPtr<iImage> csThreadedLoader::LoadImage (iDataBuffer* buf, const char* fname,
   {
     ReportWarning (
       "crystalspace.maploader.parse.image",
-      "Could not open image file '%s' on VFS!", fname ? fname : "<unknown>");
+      "Could not open image file %s on VFS!", CS::Quote::Single (fname ? fname : "<unknown>"));
     return 0;
   }
 
@@ -132,8 +133,8 @@ csPtr<iImage> csThreadedLoader::LoadImage (iDataBuffer* buf, const char* fname,
   {
     ReportWarning (
       "crystalspace.maploader.parse.image",
-      "Could not load image '%s'. Unknown format!",
-      fname ? fname : "<unknown>");
+      "Could not load image %s. Unknown format!",
+      CS::Quote::Single (fname ? fname : "<unknown>"));
     return 0;
   }
 
@@ -202,7 +203,7 @@ THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadTexture, const char* cwd, const ch
   if (!Image)
   {
     ReportWarning ("crystalspace.maploader.parse.texture",
-      "Couldn't load image '%s', using error texture instead!", fname);
+      "Couldn't load image %s, using error texture instead!", CS::Quote::Single (fname));
     Image = GenerateErrorTexture (32, 32);
     if (!Image)
     {
@@ -226,7 +227,7 @@ THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadTexture, const char* cwd, const ch
   if (!TexHandle)
   {
     ReportError ("crystalspace.maploader.parse.texture",
-      "Cannot create texture from '%s': '%s'", fname, fail_reason->GetData ());
+      "Cannot create texture from %s: %s", CS::Quote::Single (fname), fail_reason->GetData ());
     return false;
   }
 
@@ -697,9 +698,10 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
           fname = child->GetContentsValue ();
           if (!fname)
           {
-            SyntaxService->ReportError (
-              PLUGIN_TEXTURELOADER_CUBEMAP,
-              child, "Expected VFS filename for 'file'!");
+	  SyntaxService->ReportError (
+	       PLUGIN_TEXTURELOADER_CUBEMAP,
+	       child, "Expected VFS filename for %s!",
+	       CS::Quote::Single ("file"));
             return 0;
           }
 
@@ -713,9 +715,10 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
           fname = child->GetContentsValue ();
           if (!fname)
           {
-            SyntaxService->ReportError (
-              PLUGIN_TEXTURELOADER_CUBEMAP,
-              child, "Expected VFS filename for 'file'!");
+	  SyntaxService->ReportError (
+	       PLUGIN_TEXTURELOADER_CUBEMAP,
+	       child, "Expected VFS filename for %s!",
+	       CS::Quote::Single ("file"));
             return 0;
           }
           cstldr->LoadImageTC (ret, false, cstldr->GetVFS()->GetCwd(), fname, Format, false);
@@ -729,7 +732,8 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	{
 	  SyntaxService->ReportError (
 	       PLUGIN_TEXTURELOADER_CUBEMAP,
-	       child, "Expected VFS filename for 'file'!");
+	       child, "Expected VFS filename for %s!",
+	       CS::Quote::Single ("file"));
 	  return 0;
 	}
       
@@ -744,7 +748,8 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	{
 	  SyntaxService->ReportError (
 	       PLUGIN_TEXTURELOADER_CUBEMAP,
-	       child, "Expected VFS filename for 'file'!");
+	       child, "Expected VFS filename for %s!",
+	       CS::Quote::Single ("file"));
 	  return 0;
 	}
       
@@ -759,7 +764,8 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	{
 	  SyntaxService->ReportError (
 	       PLUGIN_TEXTURELOADER_CUBEMAP,
-	       child, "Expected VFS filename for 'file'!");
+	       child, "Expected VFS filename for %s!",
+	       CS::Quote::Single ("file"));
 	  return 0;
 	}
       
@@ -774,7 +780,8 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	{
 	  SyntaxService->ReportError (
 	       PLUGIN_TEXTURELOADER_CUBEMAP,
-	       child, "Expected VFS filename for 'file'!");
+	       child, "Expected VFS filename for %s!",
+	       CS::Quote::Single ("file"));
 	  return 0;
 	}
       
@@ -867,7 +874,8 @@ csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node,
 	{
 	  SyntaxService->ReportError (
 	    PLUGIN_TEXTURELOADER_TEX3D,
-	       child, "Expected VFS filename for 'file'!");
+	    child, "Expected VFS filename for %s!",
+	    "file");
 	  return 0;
 	}
       

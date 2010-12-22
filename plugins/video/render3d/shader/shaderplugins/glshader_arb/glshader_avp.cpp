@@ -25,6 +25,7 @@
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
+#include "csutil/stringquote.h"
 #include "iutil/document.h"
 #include "iutil/string.h"
 #include "ivaria/reporter.h"
@@ -281,10 +282,10 @@ bool csShaderGLAVP::LoadProgramStringToGL ()
     if (doVerbose)
     {
       Report (CS_REPORTER_SEVERITY_WARNING, 
-        "Couldn't load vertex program \"%s\"", description.GetDataSafe ());
-      Report (CS_REPORTER_SEVERITY_WARNING, "Program error at: \"%s\"", start);
-      Report (CS_REPORTER_SEVERITY_WARNING, "Error string: '%s'", 
-        programErrorString);
+        "Couldn't load vertex program %s", CS::Quote::Double (description.GetDataSafe ()));
+      Report (CS_REPORTER_SEVERITY_WARNING, "Program error at: %s", CS::Quote::Double (start));
+      Report (CS_REPORTER_SEVERITY_WARNING, "Error string: %s", 
+        CS::Quote::Single ((const char*)programErrorString));
     }
     return false;
   }
@@ -294,8 +295,8 @@ bool csShaderGLAVP::LoadProgramStringToGL ()
       && (*programErrorString != 0))
     {
       Report (CS_REPORTER_SEVERITY_WARNING, 
-	"Warning for vertex program \"%s\": '%s'", description.GetDataSafe (), 
-	programErrorString);
+	"Warning for vertex program %s: %s", CS::Quote::Double (description.GetDataSafe ()), 
+	CS::Quote::Single ((const char*)programErrorString));
     }
   }
 

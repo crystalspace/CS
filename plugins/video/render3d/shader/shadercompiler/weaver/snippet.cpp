@@ -119,7 +119,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	else
 	{
 	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	    "Unknown snippet type '%s'", snippetType);
+	    "Unknown snippet type %s", CS::Quote::Single (snippetType));
 	  okay = false;
 	}
       }
@@ -325,7 +325,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	if (hasCombiner)
 	{
 	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-	    "Multiple 'combiner' nodes");
+	    "Multiple %s nodes", CS::Quote::Single ("combiner"));
 	}
 	
 	Technique::CombinerPlugin newCombiner;
@@ -340,7 +340,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       if (!canOmitCombiner && !hasCombiner)
       {
 	compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	  "Technique without 'combiner' node");
+	  "Technique without %s node", CS::Quote::Single ("combiner"));
         return 0;
       }
     }
@@ -389,14 +389,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (newCombiner.name.IsEmpty())
     {
       compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-        "'combiner' node without 'name' attribute");
+        "%s node without %s attribute",
+	CS::Quote::Single ("combiner"), CS::Quote::Single ("name"));
       return false;
     }
     newCombiner.classId = child->GetAttributeValue ("plugin");
     if (newCombiner.classId.IsEmpty())
     {
       compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-        "'combiner' node without 'plugin' attribute");
+        "%s node without %s attribute",
+	CS::Quote::Single ("combiner"), CS::Quote::Single ("plugin"));
       return false;
     }
     newCombiner.params = child;
@@ -425,14 +427,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (newInput.name.IsEmpty())
     {
       compiler->Report (CS_REPORTER_SEVERITY_WARNING, inputNode,
-        "'input' node without 'name' attribute");
+        "%s node without %s attribute",
+	CS::Quote::Single ("input"), CS::Quote::Single ("name"));
       return false;
     }
     newInput.type = inputNode->GetAttributeValue ("type");
     if (newInput.type.IsEmpty())
     {
       compiler->Report (CS_REPORTER_SEVERITY_WARNING, inputNode,
-        "'input' node without 'type' attribute");
+        "%s node without %s attribute",
+	CS::Quote::Single ("input"), CS::Quote::Single ("type"));
       return false;
     }
     const char* def = inputNode->GetAttributeValue ("default");
@@ -452,7 +456,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         if (newInput.defaultValue.IsEmpty())
         {
           compiler->Report (CS_REPORTER_SEVERITY_WARNING, inputNode,
-            "'input' node with a 'value' default but without 'defval' attribute");
+            "%s node with a %s default but without %s attribute",
+	    CS::Quote::Single ("input"),
+	    CS::Quote::Single ("value"),
+	    CS::Quote::Single ("defval"));
           return false;
         }
       }
@@ -463,7 +470,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       else
       {
         compiler->Report (CS_REPORTER_SEVERITY_WARNING, inputNode,
-          "Invalid 'default' attribute for 'input' node: %s", def);
+          "Invalid %s attribute for %s node: %s",
+	  CS::Quote::Single ("default"), CS::Quote::Single ("input"),
+	  def);
       }
     }
 
@@ -488,14 +497,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (newOutput.name.IsEmpty())
     {
       compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-        "'output' node without 'name' attribute");
+        "%s node without %s attribute",
+	CS::Quote::Single ("output"), CS::Quote::Single ("name"));
       return false;
     }
     newOutput.type = child->GetAttributeValue ("type");
     if (newOutput.type.IsEmpty())
     {
       compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-        "'output' node without 'type' attribute");
+        "%s node without %s attribute",
+	CS::Quote::Single ("output"), CS::Quote::Single ("type"));
       return false;
     }
 
@@ -523,14 +534,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (attr.name.IsEmpty())
     {
       compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-        "'attribute' node without 'name' attribute");
+        "%s node without %s attribute",
+	CS::Quote::Single ("attribute"), CS::Quote::Single ("name"));
       return false;
     }
     attr.type = child->GetAttributeValue ("type");
     if (attr.type.IsEmpty())
     {
       compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-        "'attribute' node without 'type' attribute");
+        "%s node without %s attribute",
+	CS::Quote::Single ("attribute"),
+	CS::Quote::Single ("type"));
       return false;
     }
 
@@ -557,7 +571,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       if (location.IsEmpty())
       {
 	compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-	  "'block' node without 'location' attribute");
+	  "%s node without %s attribute",
+	  CS::Quote::Single ("block"),
+	  CS::Quote::Single ("location"));
 	return false;
       }
       size_t colon = location.FindFirst (':');
@@ -608,7 +624,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       if (!fileNode.IsValid())
       {
 	compiler->Report (CS_REPORTER_SEVERITY_WARNING,
-          "Expected '%s' node in file '%s'", rootName, filename);
+          "Expected %s node in file %s",
+	  CS::Quote::Single (rootName), CS::Quote::Single (filename));
 	return 0;
       }
       if (outFilename != 0) *outFilename = filename;
@@ -747,13 +764,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (id == 0)
     {
 	compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	  "Referenced snippets must have an 'id' attribute");
+	  "Referenced snippets must have an %s attribute",
+	  CS::Quote::Single ("id"));
 	return;
     }
     if (tech.GetSnippet (id) != 0)
     {
 	compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	  "Duplicate snippet id '%s'", id);
+	  "Duplicate snippet id %s", CS::Quote::Single (id));
 	return;
     }
     
@@ -798,7 +816,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       if (fromId == 0)
       {
 	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	    "'connection' node lacks 'from' attribute");
+	    "%s node lacks %s attribute",
+	    CS::Quote::Single ("connection"),
+	    CS::Quote::Single ("from"));
 	  return;
       }
       
@@ -806,7 +826,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       if (newConn.from == 0)
       {
 	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	    "Invalid 'from' attribute %s", fromId);
+	    "Invalid %s attribute %s",
+	    CS::Quote::Single ("from"),
+	    fromId);
 	  return;
       }
     }
@@ -815,7 +837,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       if (toId == 0)
       {
 	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	    "'connection' node lacks 'to' attribute");
+	    "%s node lacks %s attribute",
+	    CS::Quote::Single ("connection"), CS::Quote::Single ("to"));
 	  return;
       }
       
@@ -823,7 +846,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       if (newConn.to == 0)
       {
 	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	    "Invalid 'from' attribute %s", toId);
+	    "Invalid %s attribute %s",
+	    CS::Quote::Single ("from"),
+	    toId);
 	  return;
       }
     }
@@ -838,21 +863,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       if (strcmp (child->GetValue(), "explicit") != 0)
       {
 	compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-	  "Expected 'explicit' node");
+	  "Expected %s node", CS::Quote::Single ("explicit"));
 	return;
       }
       const char* fromId = child->GetAttributeValue ("from");
       if (fromId == 0)
       {
 	compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-	  "'explicit' node lacks 'from' attribute");
+	  "%s node lacks %s attribute",
+	  CS::Quote::Single ("explicit"), CS::Quote::Single ("from"));
 	return;
       }
       const char* toId = child->GetAttributeValue ("to");
       if (toId == 0)
       {
 	compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-	  "'explicit' node lacks 'to' attribute");
+	  "%s node lacks %s attribute",
+	  CS::Quote::Single ("explicit"), CS::Quote::Single ("to"));
 	return;
       }
       
@@ -893,7 +920,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  {
 	    if (to.snip == newConn.to)
 	      compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-		"An explicit input was already mapped to '%s'", toId);
+		"An explicit input was already mapped to %s", CS::Quote::Single (toId));
 	  }
 	  else
 	  {
@@ -920,7 +947,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (!tech.combiner.classId.IsEmpty())
     {
       compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	"Multiple 'combiner' nodes");
+	"Multiple %s nodes",
+	CS::Quote::Single ("combiner"));
     }
   
     Technique::CombinerPlugin newCombiner;
@@ -928,7 +956,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (newCombiner.classId.IsEmpty())
     {
       compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	"'combiner' node without 'plugin' attribute");
+	"%s node without %s attribute",
+	CS::Quote::Single ("combiner"),
+	CS::Quote::Single ("plugin"));
       return;
     }
     newCombiner.params = node;
@@ -966,13 +996,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (!id || !*id)
     {
 	compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	  "Parameters must have an 'id' attribute");
+	  "Parameters must have an %s attribute",
+	  CS::Quote::Single ("id"));
 	return;
     }
     if (tech.GetSnippet (id) != 0)
     {
 	compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	  "Duplicate snippet id '%s'", id);
+	  "Duplicate snippet id %s", CS::Quote::Single (id));
 	return;
     }
 
@@ -1050,7 +1081,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       if (weaverType.IsEmpty())
       {
         compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	  "Need a 'weavertype' attribute for non-constant parameters");
+	  "Need a %s attribute for non-constant parameters",
+	  CS::Quote::Single ("weavertype"));
         return;
       }
       combinerLoader->GenerateSVInputBlocks (techNode, "c", 
@@ -1083,13 +1115,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (!id || !*id)
     {
 	compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	  "Varyings must have an 'id' attribute");
+	  "Varyings must have an %s attribute",
+	  CS::Quote::Single ("id"));
 	return;
     }
     if (tech.GetSnippet (id) != 0)
     {
 	compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	  "Duplicate snippet id '%s'", id);
+	  "Duplicate snippet id %s", CS::Quote::Single (id));
 	return;
     }
 
@@ -1106,7 +1139,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (!source || !*source)
     {
       compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	"Varyings must have a 'source' attribute");
+	"Varyings must have a %s attribute",
+	CS::Quote::Single ("source"));
       return;
     }
 
@@ -1130,7 +1164,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (weaverType.IsEmpty())
     {
       compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	"Need a 'weavertype' attribute for varyings");
+	"Need a %s attribute for varyings",
+	CS::Quote::Single ("weavertype"));
       return;
     }
     combinerLoader->GenerateBufferInputBlocks (techNode, "c", 

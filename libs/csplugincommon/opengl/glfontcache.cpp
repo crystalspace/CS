@@ -162,8 +162,8 @@ void csGLFontCache::Setup()
         Report (CS_REPORTER_SEVERITY_WARNING, 
           "Couldn't load fragment program for text drawing");
         Report (CS_REPORTER_SEVERITY_WARNING, "Program error at position %d", errorpos);
-        Report (CS_REPORTER_SEVERITY_WARNING, "Error string: '%s'", 
-          programErrorString);
+        Report (CS_REPORTER_SEVERITY_WARNING, "Error string: %s", 
+          CS::Quote::Single ((const char*)programErrorString));
         G2D->ext.glDeleteProgramsARB (1, &textProgram);
         afpText = false;
       }
@@ -173,8 +173,8 @@ void csGLFontCache::Setup()
       if (do_verbose && (programErrorString != 0) && (*programErrorString != 0))
       {
         Report (CS_REPORTER_SEVERITY_WARNING, 
-	  "Warning for text drawing fragment program: '%s'", 
-	  programErrorString);
+	  "Warning for text drawing fragment program: %s", 
+	  CS::Quote::Single ((const char*)programErrorString));
       }
     }
   }

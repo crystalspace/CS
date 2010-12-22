@@ -21,6 +21,7 @@
 
 #include "csgfx/renderbuffer.h"
 #include "csutil/scanstr.h"
+#include "csutil/stringquote.h"
 
 #include "condeval.h"
 #include "condeval_eval_sv.h"
@@ -355,8 +356,8 @@ const char* csConditionEvaluator::ResolveExpValue (const csExpressionToken& valu
       char dummy;
       if (csScanStr (number, "%f%c", &operand.floatVal, &dummy) != 1)
       {
-	return SetLastError ("Malformed float value: '%s'",
-	  number.GetData());
+	return SetLastError ("Malformed float value: %s",
+	  CS::Quote::Single (number.GetData()));
       }
       operand.type = operandFloat;
     }
@@ -365,8 +366,8 @@ const char* csConditionEvaluator::ResolveExpValue (const csExpressionToken& valu
       char dummy;
       if (sscanf (number, "%d%c", &operand.intVal, &dummy) != 1)
       {
-	return SetLastError ("Malformed int value: '%s'",
-	  number.GetData());
+	return SetLastError ("Malformed int value: %s",
+	  CS::Quote::Single (number.GetData()));
       }
       operand.type = operandInt;
     }
@@ -388,14 +389,15 @@ const char* csConditionEvaluator::ResolveExpValue (const csExpressionToken& valu
     }
     else
     {
-      return SetLastError ("Unknown identifier '%s'",
-	csExpressionToken::Extractor (value).Get ());
+      return SetLastError ("Unknown identifier %s",
+	CS::Quote::Single (csExpressionToken::Extractor (value).Get ()));
     }
   }
   else
   {
-    return SetLastError ("Value of '%s' of type '%s'",
-      csExpressionToken::Extractor (value).Get (), csExpressionToken::TypeDescription (value.type));
+    return SetLastError ("Value of %s of type %s",
+      CS::Quote::Single (csExpressionToken::Extractor (value).Get ()),
+      CS::Quote::Single (csExpressionToken::TypeDescription (value.type)));
   }
 
   CS_ASSERT (false);
@@ -412,8 +414,9 @@ const char* csConditionEvaluator::ResolveOperand (csExpression* expression,
     err = ResolveExpValue (expression->valueValue, operand);
     if (err)
     {
-      return SetLastError ("Can't resolve value '%s': %s",
-	csExpressionToken::Extractor (expression->valueValue).Get (), err);
+      return SetLastError ("Can't resolve value %s: %s",
+	CS::Quote::Single (csExpressionToken::Extractor (expression->valueValue).Get ()),
+	err);
     }
     return 0;
   }
@@ -443,8 +446,8 @@ const char* csConditionEvaluator::ResolveOperand (csExpression* expression,
     }
     else
     {
-      return SetLastError ("Unknown identifier '%s'",
-	csExpressionToken::Extractor (left).Get ());
+      return SetLastError ("Unknown identifier %s",
+	CS::Quote::Single (csExpressionToken::Extractor (left).Get ()));
     }
   }
   else
@@ -477,14 +480,15 @@ const char* csConditionEvaluator::ResolveSVIdentifier (
     const csExpressionToken& t = expression->expressionValue.op;
     if (!TokenEquals (t.tokenStart, t.tokenLen, "."))
     {
-      return SetLastError ("Unexpected operator '%s'",
-	csExpressionToken::Extractor (t).Get ());
+      return SetLastError ("Unexpected operator %s",
+	CS::Quote::Single (csExpressionToken::Extractor (t).Get ()));
     }
     if (expression->expressionValue.left->type != csExpression::Value)
     {
       CS_ASSERT_MSG ("It should not happen that the 'left' subexpression "
 	"is not a value", false);
-      return "Left subexpression is not of type 'value'";
+      return SetLastError ("Left subexpression is not of type %s",
+			   CS::Quote::Single ("value"));
     }
     if (expression->expressionValue.right->type != csExpression::Value)
     {
@@ -492,7 +496,8 @@ const char* csConditionEvaluator::ResolveSVIdentifier (
        * will incarnate here as a right expression of type Expression.
        * Clearer error msg?
        */
-      return "Right subexpression is not of type 'value'";
+      return SetLastError ("Right subexpression is not of type %s",
+			   CS::Quote::Single ("value"));
     }
     {
       csExpressionToken::Extractor svIdentifier (expression->expressionValue.left->valueValue);
@@ -540,8 +545,8 @@ const char* csConditionEvaluator::ResolveSVIdentifier (
     }
     else
     {
-      return SetLastError ("Unknown shader variable specializer '%s'",
-	csExpressionToken::Extractor (right).Get ());
+      return SetLastError ("Unknown shader variable specializer %s",
+	CS::Quote::Single (csExpressionToken::Extractor (right).Get ()));
     }
     return 0;
   }
@@ -558,7 +563,7 @@ const char* csConditionEvaluator::ResolveConst (csExpression* expression,
     const CondOperand* constOp = constants.GetConstant (symbol.Get());
     if (!constOp)
     {
-      SetLastError ("Unknown symbol '%s'", symbol.Get());
+      SetLastError ("Unknown symbol %s", CS::Quote::Single (symbol.Get()));
     }
     operand = *constOp;
     return 0;
@@ -597,16 +602,18 @@ const char* csConditionEvaluator::ProcessExpressionInternal (csExpression* expre
     err = ResolveExpValue (expression->valueValue, newOp.left);
     if (err)
     {
-      return SetLastError ("Can't resolve value '%s': %s",
-	csExpressionToken::Extractor (expression->valueValue).Get (), err);
+      return SetLastError ("Can't resolve value %s: %s",
+	CS::Quote::Single (csExpressionToken::Extractor (expression->valueValue).Get ()),
+	err);
     }
     newOp.right.type = operandBoolean;
     newOp.right.boolVal = true;
     if (!OpTypesCompatible (newOp.left.type, newOp.right.type))
     {
-      return SetLastError ("Type of '%s' is '%s', not compatible to '%s'",
-	csExpressionToken::Extractor (expression->valueValue).Get (), OperandTypeDescription (newOp.left.type),
-	OperandTypeDescription (newOp.right.type));
+      return SetLastError ("Type of %s is %s, not compatible to %s",
+	CS::Quote::Single (csExpressionToken::Extractor (expression->valueValue).Get ()),
+	CS::Quote::Single (OperandTypeDescription (newOp.left.type)),
+	CS::Quote::Single (OperandTypeDescription (newOp.right.type)));
     }
   }
   else
@@ -629,9 +636,10 @@ const char* csConditionEvaluator::ProcessExpressionInternal (csExpression* expre
 	return err;
       if (!OpTypesCompatible (newOp.left.type, operandBoolean))
       {
-	return SetLastError ("Type of '%s' is '%s', not compatible to '%s'",
-	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.left.type),
-	  OperandTypeDescription (operandBoolean));
+	return SetLastError ("Type of %s is %s, not compatible to %s",
+	  CS::Quote::Single (csExpressionToken::Extractor (t).Get ()),
+	  CS::Quote::Single (OperandTypeDescription (newOp.left.type)),
+	  CS::Quote::Single (OperandTypeDescription (operandBoolean)));
       }
       newOp.right.Clear();
       newOp.right.type = operandBoolean;
@@ -648,9 +656,10 @@ const char* csConditionEvaluator::ProcessExpressionInternal (csExpression* expre
 	return err;
       if (!OpTypesCompatible (newOp.left.type, newOp.right.type))
       {
-	return SetLastError ("Type of '%s' is '%s', not compatible to '%s'",
-	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.left.type),
-	  OperandTypeDescription (newOp.right.type));
+	return SetLastError ("Type of %s is %s, not compatible to %s",
+	  CS::Quote::Single (csExpressionToken::Extractor (t).Get ()),
+	  CS::Quote::Single (OperandTypeDescription (newOp.left.type)),
+	  CS::Quote::Single (OperandTypeDescription (newOp.right.type)));
       }
     }
     else if (TokenEquals (t.tokenStart, t.tokenLen, "!="))
@@ -664,9 +673,10 @@ const char* csConditionEvaluator::ProcessExpressionInternal (csExpression* expre
 	return err;
       if (!OpTypesCompatible (newOp.left.type, newOp.right.type))
       {
-	return SetLastError ("Type of '%s' is '%s', not compatible to '%s'",
-	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.left.type),
-	  OperandTypeDescription (newOp.right.type));
+	return SetLastError ("Type of %s is %s, not compatible to %s",
+	  CS::Quote::Single (csExpressionToken::Extractor (t).Get ()),
+	  CS::Quote::Single (OperandTypeDescription (newOp.left.type)),
+	  CS::Quote::Single (OperandTypeDescription (newOp.right.type)));
       }
     }
     else if (TokenEquals (t.tokenStart, t.tokenLen, "<"))
@@ -680,9 +690,10 @@ const char* csConditionEvaluator::ProcessExpressionInternal (csExpression* expre
 	return err;
       if (!OpTypesCompatible (newOp.left.type, newOp.right.type))
       {
-	return SetLastError ("Type of '%s' is '%s', not compatible to '%s'",
-	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.left.type),
-	  OperandTypeDescription (newOp.right.type));
+	return SetLastError ("Type of %s is %s, not compatible to %s",
+	  CS::Quote::Single (csExpressionToken::Extractor (t).Get ()),
+	  CS::Quote::Single (OperandTypeDescription (newOp.left.type)),
+	  CS::Quote::Single (OperandTypeDescription (newOp.right.type)));
       }
     }
     else if (TokenEquals (t.tokenStart, t.tokenLen, "<="))
@@ -696,9 +707,10 @@ const char* csConditionEvaluator::ProcessExpressionInternal (csExpression* expre
 	return err;
       if (!OpTypesCompatible (newOp.left.type, newOp.right.type))
       {
-	return SetLastError ("Type of '%s' is '%s', not compatible to '%s'",
-	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.left.type),
-	  OperandTypeDescription (newOp.right.type));
+	return SetLastError ("Type of %s is %s, not compatible to %s",
+	  CS::Quote::Single (csExpressionToken::Extractor (t).Get ()),
+	  CS::Quote::Single (OperandTypeDescription (newOp.left.type)),
+	  CS::Quote::Single (OperandTypeDescription (newOp.right.type)));
       }
     }
     else if (TokenEquals (t.tokenStart, t.tokenLen, ">="))
@@ -712,9 +724,10 @@ const char* csConditionEvaluator::ProcessExpressionInternal (csExpression* expre
 	return err;
       if (!OpTypesCompatible (newOp.left.type, newOp.right.type))
       {
-	return SetLastError ("Type of '%s' is '%s', not compatible to '%s'",
-	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.left.type),
-	  OperandTypeDescription (newOp.right.type));
+	return SetLastError ("Type of %s is %s, not compatible to %s",
+	  CS::Quote::Single (csExpressionToken::Extractor (t).Get ()),
+	  CS::Quote::Single (OperandTypeDescription (newOp.left.type)),
+	  CS::Quote::Single (OperandTypeDescription (newOp.right.type)));
       }
     }
     else if (TokenEquals (t.tokenStart, t.tokenLen, ">"))
@@ -728,9 +741,10 @@ const char* csConditionEvaluator::ProcessExpressionInternal (csExpression* expre
 	return err;
       if (!OpTypesCompatible (newOp.left.type, newOp.right.type))
       {
-	return SetLastError ("Type of '%s' is '%s', not compatible to '%s'",
-	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.left.type),
-	  OperandTypeDescription (newOp.right.type));
+	return SetLastError ("Type of %s is %s, not compatible to %s",
+	  CS::Quote::Single (csExpressionToken::Extractor (t).Get ()),
+	  CS::Quote::Single (OperandTypeDescription (newOp.left.type)),
+	  CS::Quote::Single (OperandTypeDescription (newOp.right.type)));
       }
     }
     else if (TokenEquals (t.tokenStart, t.tokenLen, "&&"))
@@ -742,9 +756,10 @@ const char* csConditionEvaluator::ProcessExpressionInternal (csExpression* expre
 	return err;
       if (!OpTypesCompatible (newOp.left.type, operandBoolean))
       {
-	return SetLastError ("Type of '%s' is '%s', not compatible to '%s'",
-	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.left.type),
-	  OperandTypeDescription (operandBoolean));
+	return SetLastError ("Type of %s is %s, not compatible to %s",
+	  CS::Quote::Single (csExpressionToken::Extractor (t).Get ()),
+	  CS::Quote::Single (OperandTypeDescription (newOp.left.type)),
+	  CS::Quote::Single (OperandTypeDescription (operandBoolean)));
       }
       if (newOp.left.type != operandOperation)
       {
@@ -766,9 +781,10 @@ const char* csConditionEvaluator::ProcessExpressionInternal (csExpression* expre
 	return err;
       if (!OpTypesCompatible (newOp.right.type, operandBoolean))
       {
-	return SetLastError ("Type of '%s' is '%s', not compatible to '%s'",
-	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.right.type),
-	  OperandTypeDescription (operandBoolean));
+	return SetLastError ("Type of %s is %s, not compatible to %s",
+	  CS::Quote::Single (csExpressionToken::Extractor (t).Get ()),
+	  CS::Quote::Single (OperandTypeDescription (newOp.right.type)),
+	  CS::Quote::Single (OperandTypeDescription (operandBoolean)));
       }
       if (newOp.right.type != operandOperation)
       {
@@ -794,9 +810,10 @@ const char* csConditionEvaluator::ProcessExpressionInternal (csExpression* expre
 	return err;
       if (!OpTypesCompatible (newOp.left.type, operandBoolean))
       {
-	return SetLastError ("Type of '%s' is '%s', not compatible to '%s'",
-	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.left.type),
-	  OperandTypeDescription (operandBoolean));
+	return SetLastError ("Type of %s is %s, not compatible to %s",
+	  CS::Quote::Single (csExpressionToken::Extractor (t).Get ()),
+	  CS::Quote::Single (OperandTypeDescription (newOp.left.type)),
+	  CS::Quote::Single (OperandTypeDescription (operandBoolean)));
       }
       if (newOp.left.type != operandOperation)
       {
@@ -818,9 +835,10 @@ const char* csConditionEvaluator::ProcessExpressionInternal (csExpression* expre
 	return err;
       if (!OpTypesCompatible (newOp.right.type, operandBoolean))
       {
-	return SetLastError ("Type of '%s' is '%s', not compatible to '%s'",
-	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.right.type),
-	  OperandTypeDescription (operandBoolean));
+	return SetLastError ("Type of %s is %s, not compatible to %s",
+	  CS::Quote::Single (csExpressionToken::Extractor (t).Get ()),
+	  CS::Quote::Single (OperandTypeDescription (newOp.right.type)),
+	  CS::Quote::Single (OperandTypeDescription (operandBoolean)));
       }
       if (newOp.right.type != operandOperation)
       {
@@ -839,8 +857,8 @@ const char* csConditionEvaluator::ProcessExpressionInternal (csExpression* expre
     }
     else
     {
-      return SetLastError ("Unknown operator '%s'", 
-	csExpressionToken::Extractor (t).Get ());
+      return SetLastError ("Unknown operator %s", 
+	CS::Quote::Single (csExpressionToken::Extractor (t).Get ()));
     }
   }
 

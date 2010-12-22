@@ -138,7 +138,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FurMesh)
     {
       if (!VFS->WriteFile (texname, (const char*)db->GetData (), db->GetSize ()))
       {
-        csPrintfErr ("Failed to write file '%s'!", texname);
+        csPrintfErr ("Failed to write file %s!", CS::Quote::Single (texname));
         return;
       }
     }

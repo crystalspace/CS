@@ -86,9 +86,12 @@ namespace lighter
       lighterProperties.directLightEngine = LIGHT_ENGINE_PHOTONMAPPER;
     else
     {
-      csPrintf("Error: Unknown direct light engine '%s'.\n"
-               "       Options are 'none', 'raytracer' or 'photonmapper'.\n",
-               DLEngineStr);
+      csPrintf("Error: Unknown direct light engine %s.\n"
+               "       Options are %s, %s or %s.\n",
+               CS::Quote::Single (DLEngineStr),
+	       CS::Quote::Single ("none"),
+	       CS::Quote::Single ("raytracer"),
+	       CS::Quote::Single ("photonmapper"));
       exit(1);
     }
 
@@ -101,9 +104,11 @@ namespace lighter
       lighterProperties.indirectLightEngine = LIGHT_ENGINE_PHOTONMAPPER;
     else
     {
-      csPrintf("Error: Unknown indirect light engine '%s'.\n"
-               "       Options are 'none' or 'photonmapper'.\n",
-               ILEngineStr);
+      csPrintf("Error: Unknown indirect light engine %s.\n"
+               "       Options are %s or %s.\n",
+               CS::Quote::Single (ILEngineStr),
+	       CS::Quote::Single ("none"),
+	       CS::Quote::Single ("photonmapper"));
       exit(1);
     }
 

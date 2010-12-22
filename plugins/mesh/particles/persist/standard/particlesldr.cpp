@@ -831,7 +831,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
           {
             synldr->ReportError (
               "crystalspace.genmeshfactoryloader.parse.unknownmaterial",
-              child, "Couldn't find material '%s'!", matname);
+              child, "Couldn't find material %s!", CS::Quote::Single (matname));
             return 0;
           }
           factoryObj->SetMaterialWrapper (mat);
@@ -885,7 +885,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
           if(!fact)
           {
             synldr->ReportError ("crystalspace.particleloader.parsesystem",
-              child, "Could not find factory '%s'!", factname);
+              child, "Could not find factory %s!", CS::Quote::Single (factname));
             return 0;
           }
 
@@ -895,8 +895,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
           if (!particleSystem)
           {
             synldr->ReportError ("crystalspace.particleloader.parsesystem",
-              child, "Factory '%s' does not seem to be a particle system factory!", 
-              factname);
+              child, "Factory %s does not seem to be a particle system factory!", 
+              CS::Quote::Single (factname));
 
             return 0;
           }
@@ -921,7 +921,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
           {
             synldr->ReportError (
               "crystalspace.genmeshfactoryloader.parse.unknownmaterial",
-              child, "Couldn't find material '%s'!", matname);
+              child, "Couldn't find material %s!", CS::Quote::Single (matname));
             return 0;
           }
           meshObj->SetMaterialWrapper (mat);

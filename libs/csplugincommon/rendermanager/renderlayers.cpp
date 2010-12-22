@@ -27,6 +27,7 @@
 #include "csutil/objreg.h"
 #include "csutil/xmltiny.h"
 #include "csutil/cfgacc.h"
+#include "csutil/stringquote.h"
 
 #include "csplugincommon/rendermanager/renderlayers.h"
 
@@ -271,7 +272,7 @@ namespace CS
       if (!file)
       {
         csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, messageID,
-          "Error opening '%s'", fileName);
+          "Error opening %s", CS::Quote::Single (fileName));
         return false;
       }
       
@@ -280,7 +281,7 @@ namespace CS
       if (error != 0)
       {
         csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, messageID,
-          "Error parsing '%s': %s", fileName, error);
+          "Error parsing %s: %s", CS::Quote::Single (fileName), error);
         return false;
       }
       
@@ -290,7 +291,7 @@ namespace CS
       if (!layerConfigNode)
       {
         csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, messageID,
-          "No <layerconfig> in '%s'", fileName);
+          "No <layerconfig> in %s", CS::Quote::Single (fileName));
         return false;
       }
       return AddLayersFromDocument (objectReg, layerConfigNode, layers);

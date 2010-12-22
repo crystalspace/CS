@@ -89,10 +89,10 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
       if (ext != ".dae" && ext != ".DAE")
       {
-        std::string warningMsg = "Warning:  File extension \'";
-        warningMsg.append(ext);
-        warningMsg.append("\' does not conform to expected COLLADA standard file extension \'.dae\'.  File is possibly not a COLLADA file.");
-        Report(CS_REPORTER_SEVERITY_WARNING, warningMsg.c_str());
+        Report(CS_REPORTER_SEVERITY_WARNING,
+	       "Warning:  File extension %s does not conform to expected COLLADA "
+	       "standard file extension %s.  File is possibly not a COLLADA file.",
+	       CS::Quote::Single (ext.c_str()), CS::Quote::Single ("dae"));
       }
     }
   }

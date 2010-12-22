@@ -154,8 +154,8 @@ csRef<iStringArray> csScanPluginDirs (csPathsList* dirs,
     if (dirMessages != 0)
     {
       csString tmp;
-      tmp.Format ("The following error(s) occured while scanning '%s':",
-	(*dirs)[i].path.GetDataSafe ());
+      tmp.Format ("The following error(s) occured while scanning %s:",
+	CS::Quote::Single ((*dirs)[i].path.GetDataSafe ()));
 
       AppendStrVecString (messages, tmp);
 

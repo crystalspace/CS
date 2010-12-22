@@ -182,8 +182,10 @@ void LodView::Usage()
   csPrintf("  -adap      adaptive LODs (best if used with -m)\n\n");
 
   csPrintf("When viewing the model:\n");
-  csPrintf("  'k' / 'l'  increase/reduce LOD resolution\n");
-  csPrintf("  'a'        switch to auto LOD\n");
+  csPrintf("  %s / %s  increase/reduce LOD resolution\n",
+	   CS::Quote::Single ("k"), CS::Quote::Single ("l"));
+  csPrintf("  %s        switch to auto LOD\n",
+	   CS::Quote::Single ("a"));
 }
 
 bool LodView::OnInitialize (int argc, char* argv [])
@@ -369,7 +371,8 @@ void LodView::CreateRoom ()
 void LodView::CreateSmallRoom()
 {
   if (!loader->LoadTexture ("stone", "/lib/std/mystone2.gif"))
-    ReportError ("Error loading 'stone4' texture!");
+    ReportError ("Error loading %s texture!",
+		 CS::Quote::Single ("stone4"));
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
   room = engine->CreateSector ("room");
   using namespace CS::Geometry;
@@ -394,7 +397,8 @@ void LodView::CreateSmallRoom()
 void LodView::CreateLargeRoom()
 {
   if (!loader->LoadTexture ("stone", "/lib/std/mystone2.gif"))
-    ReportError ("Error loading 'stone4' texture!");
+    ReportError ("Error loading %s texture!",
+		 CS::Quote::Single ("stone4"));
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
   room = engine->CreateSector ("room");
   using namespace CS::Geometry;

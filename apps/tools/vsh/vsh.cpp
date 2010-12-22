@@ -169,14 +169,14 @@ static void cmd_help (char *)
 {
   csPrintf (
 "----========************* Virtual Shell commands: *************========----\n"
-"cat {-} file           Display file contents to console; with '-' in one pass\n"
+"cat {-} file           Display file contents to console; with %s in one pass\n"
 "cd {path}              Change directory to path; or to root if path not given\n"
-"config {-} file        Parse a VFS config file; with '-' file is on real FS\n"
-"cp {-} src dst         Copy file src to file dst; with '-' in one pass\n"
+"config {-} file        Parse a VFS config file; with %s file is on real FS\n"
+"cp {-} src dst         Copy file src to file dst; with %s in one pass\n"
 "create file            Create a file and copy from stdin to file until EOF\n"
 "exists file            Test if file exists on VFS\n"
 "exit                   Exit Virtual Shell\n"
-"ls {-} {path}          List files; with '-' shows full pathname\n"
+"ls {-} {path}          List files; with %s shows full pathname\n"
 "mount vpath rpath      Add a virtual path mapped to given real path\n"
 "mounts                 Display all virtual mounts\n"
 "pwd                    Print working directory\n"
@@ -192,7 +192,11 @@ static void cmd_help (char *)
 "chdir --> cd        copy --> cp         del  --> rm\n"
 "dir   --> ls        quit --> exit       type --> cat\n"
 "------------------------\n"
-"Wildcards are okay in these commands: ls, cp, rm\n"
+"Wildcards are okay in these commands: ls, cp, rm\n",
+CS::Quote::Single ("-"),
+CS::Quote::Single ("-"),
+CS::Quote::Single ("-"),
+CS::Quote::Single ("-")
   );
 }
 
@@ -216,7 +220,7 @@ static void cmd_cat (char *args)
     csRef<iDataBuffer> data (VFS->ReadFile (args));
     if (!data)
     {
-      csPrintfErr ("cat: cannot read file \"%s\"\n", args);
+      csPrintfErr ("cat: cannot read file %s\n", CS::Quote::Double (args));
       return;
     }
 
@@ -231,7 +235,7 @@ static void cmd_cat (char *args)
     csRef<iFile> F (VFS->Open (args, VFS_FILE_READ));
     if (!F)
     {
-      csPrintfErr ("cat: cannot open file \"%s\" for reading\n", args);
+      csPrintfErr ("cat: cannot open file %s for reading\n", CS::Quote::Double (args));
       return;
     }
 
@@ -250,12 +254,12 @@ static void cmd_create (char *args)
   csRef<iFile> F (VFS->Open (args, VFS_FILE_WRITE));
   if (!F)
   {
-    csPrintfErr ("create: cannot create or open for writing file \"%s\"\n",
-      args);
+    csPrintfErr ("create: cannot create or open for writing file %s\n",
+      CS::Quote::Double (args));
     return;
   }
 
-  csPrintf ("Copying from stdin to file \"%s\", enter EOF to finish\n", args);
+  csPrintf ("Copying from stdin to file %s, enter EOF to finish\n", CS::Quote::Double (args));
   for (;;)
   {
     char buff [160];
@@ -264,7 +268,7 @@ static void cmd_create (char *args)
     size_t len = F->Write (buff, strlen (buff));
     if (len < strlen (buff))
     {
-      csPrintfErr ("create: error writing to file \"%s\"\n", args);
+      csPrintfErr ("create: error writing to file %s\n", CS::Quote::Double (args));
       break;
     }
   }
@@ -367,25 +371,25 @@ static void cmd_cp (char *args)
       csRef<iDataBuffer> data (VFS->ReadFile (src));
       if (!data)
       {
-        csPrintfErr ("cp: cannot read file \"%s\"\n", src);
+        csPrintfErr ("cp: cannot read file %s\n", CS::Quote::Double (src));
         return;
       }
 
       if (!VFS->WriteFile (dst, **data, data->GetSize ()))
-        csPrintfErr ("cp: error writing to file \"%s\"\n", dst);
+        csPrintfErr ("cp: error writing to file %s\n", CS::Quote::Double (dst));
     }
     else
     {
       csRef<iFile> dF (VFS->Open (dst, VFS_FILE_WRITE));
       if (!dF)
       {
-        csPrintfErr ("cp: cannot open destination file \"%s\"\n", dst);
+        csPrintfErr ("cp: cannot open destination file %s\n", CS::Quote::Double (dst));
         return;
       }
       csRef<iFile> sF (VFS->Open (src, VFS_FILE_READ));
       if (!sF)
       {
-        csPrintfErr ("cp: cannot open source file \"%s\"\n", src);
+        csPrintfErr ("cp: cannot open source file %s\n", CS::Quote::Double (src));
         return;
       }
       while (!sF->AtEOF ())
@@ -394,7 +398,7 @@ static void cmd_cp (char *args)
         size_t len = sF->Read (buff, sizeof (buff));
         if (dF->Write (buff, len) != len)
         {
-          csPrintfErr ("cp: error writing to file \"%s\"\n", dst);
+          csPrintfErr ("cp: error writing to file %s\n", CS::Quote::Double (dst));
           break;
         }
       }
@@ -407,7 +411,7 @@ static void cmd_rm (char *args)
   if (!args)
     csPrintfErr ("rm: empty argument\n");
   else if (!VFS->DeleteFile (args))
-    csPrintfErr ("rm: cannot remove file \"%s\"\n", args);
+    csPrintfErr ("rm: cannot remove file %s\n", CS::Quote::Double (args));
 }
 
 static void cmd_save (char *)
@@ -423,7 +427,7 @@ static void cmd_mount (char *args)
     return;
 
   if (!VFS->Mount (vpath, rpath))
-    csPrintfErr ("mount: cannot mount \"%s\" to \"%s\"\n", rpath, vpath);
+    csPrintfErr ("mount: cannot mount %s to %s\n", CS::Quote::Double (rpath), CS::Quote::Double (vpath));
 }
 
 static void cmd_unmount (char *args)
@@ -436,8 +440,8 @@ static void cmd_unmount (char *args)
     rpath = 0;
 
   if (!VFS->Unmount (vpath, rpath))
-    csPrintfErr ("unmount: cannot unmount \"%s\" from \"%s\"\n",
-      rpath, vpath);
+    csPrintfErr ("unmount: cannot unmount %s from %s\n",
+      CS::Quote::Double (rpath), CS::Quote::Double (vpath));
 }
 
 static void cmd_config (char *args)
@@ -451,8 +455,8 @@ static void cmd_config (char *args)
 
   if (!config)
   {
-    csPrintfErr ("config: cannot load config file \"%s\" in %s\n",
-      args, real_fs ? "real filesystem" : "VFS");
+    csPrintfErr ("config: cannot load config file %s in %s\n",
+      CS::Quote::Double (args), real_fs ? "real filesystem" : "VFS");
     return;
   }
 
@@ -480,7 +484,7 @@ static void cmd_exists (char *args)
   }
 
   bool IsDir = args [strlen (args) - 1] == '/';
-  csPrintf ("%s \"%s\" %s\n", IsDir ? "Directory" : "File", args,
+  csPrintf ("%s %s %s\n", IsDir ? "Directory" : "File", CS::Quote::Double (args),
     VFS->Exists (args) ? "exists" : "does not exist");
 }
 
@@ -523,7 +527,7 @@ static void cmd_rpath (char *args)
   csRef<iDataBuffer> db (VFS->GetRealPath (args));
   if (!db)
   {
-    csPrintfErr ("rpath: no real-world path corresponding to `%s'\n", args);
+    csPrintfErr ("rpath: no real-world path corresponding to %s\n", CS::Quote::Single (args));
     return;
   }
 
@@ -570,7 +574,7 @@ static void cmd_rmounts (char *args)
     }
   }
   else
-    csPrintf ("rmounts: no virtual mount at path `%s'\n", args);
+    csPrintf ("rmounts: no virtual mount at path %s\n", CS::Quote::Single (args));
 }
 
 static bool execute (char *command)
@@ -627,8 +631,9 @@ int main (int argc, char *argv [])
   VFS->MountRoot ("native");
 
   csPrintf ("Welcome to Virtual Shell\n"
-          "Type \"help\" to get a short description of commands\n"
-          "\n");
+          "Type %s to get a short description of commands\n"
+          "\n",
+	  CS::Quote::Double ("help"));
 
   while (!ShutDown)
   {

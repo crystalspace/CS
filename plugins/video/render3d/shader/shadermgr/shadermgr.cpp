@@ -216,8 +216,9 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
     else
     {
       Report (CS_REPORTER_SEVERITY_WARNING, 
-	"Unknown shader tag presence '%s' for tag config '%s'",
-	tagPresence, (const char*)cfgKey);
+	"Unknown shader tag presence %s for tag config %s",
+	CS::Quote::Single (tagPresence),
+	CS::Quote::Single ((const char*)cfgKey));
       continue;
     }
     csStringID tagID = strings->Request (tagName);

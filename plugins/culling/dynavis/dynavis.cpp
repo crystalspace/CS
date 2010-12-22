@@ -28,6 +28,7 @@
 #include "csutil/cfgacc.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
+#include "csutil/stringquote.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "csgeom/frustum.h"
@@ -143,8 +144,8 @@ public:
     const csBox3& b = child->GetBBox ();
     csVisibilityObjectWrapper* obj = (csVisibilityObjectWrapper*)(
     	child->GetObject ());
-    str->Format ("'%s' (%g,%g,%g)-(%g,%g,%g)",
-    	obj->mesh->QueryObject ()->GetName (),
+    str->Format ("%s (%g,%g,%g)-(%g,%g,%g)",
+    	CS::Quote::Single (obj->mesh->QueryObject ()->GetName ()),
 	b.MinX (), b.MinY (), b.MinZ (),
 	b.MaxX (), b.MaxY (), b.MaxZ ());
     return str;
@@ -362,8 +363,8 @@ void csDynaVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox,
     if (bbox.IsNaN ())
     {
       iMeshWrapper* mesh = visobj->GetMeshWrapper ();
-      csPrintfErr ("The bounding box of '%s' is invalid!\n",
-	  mesh ? mesh->QueryObject ()->GetName () : "<unknown>");
+      csPrintfErr ("The bounding box of %s is invalid!\n",
+	  CS::Quote::Single (mesh ? mesh->QueryObject ()->GetName () : "<unknown>"));
     }
 #endif
   }
@@ -374,8 +375,8 @@ void csDynaVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox,
     if (box.IsNaN ())
     {
       iMeshWrapper* mesh = visobj->GetMeshWrapper ();
-      csPrintfErr ("The bounding box of '%s' is invalid!\n",
-	  mesh ? mesh->QueryObject ()->GetName () : "<unknown>");
+      csPrintfErr ("The bounding box of %s is invalid!\n",
+	  CS::Quote::Single (mesh ? mesh->QueryObject ()->GetName () : "<unknown>"));
     }
 #endif
     csReversibleTransform trans = movable->GetFullTransform ();
@@ -391,8 +392,8 @@ void csDynaVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox,
     if (bbox.IsNaN ())
     {
       iMeshWrapper* mesh = visobj->GetMeshWrapper ();
-      csPrintfErr ("The transformed bounding box of '%s' is invalid!\n",
-	  mesh ? mesh->QueryObject ()->GetName () : "<unknown>");
+      csPrintfErr ("The transformed bounding box of %s is invalid!\n",
+	  CS::Quote::Single (mesh ? mesh->QueryObject ()->GetName () : "<unknown>"));
     }
 #endif
   }
@@ -584,7 +585,7 @@ bool PrintObjects (csKDTree* treenode, void*, uint32, uint32&)
     if (iobj)
     {
       if (iobj->GetName ()) 
-	csPrintf ("'%s' ", iobj->GetName ());
+	csPrintf ("%s ", CS::Quote::Single (iobj->GetName ()));
       else 
 	csPrintf ("<noname> ");
     }
@@ -3173,9 +3174,9 @@ bool csDynaVis::DebugCommand (const char* cmd)
       {
         csRef<iObject> iobj (
 		scfQueryInterface<iObject> (visobj_wrap->visobj));
-        csPrintf ("  obj(%zu,'%s')  vis=%s   vispix=%d totpix=%d      %s\n",
+        csPrintf ("  obj(%zu,%s)  vis=%s   vispix=%d totpix=%d      %s\n",
       	  i,
-	  (iobj && iobj->GetName ()) ? iobj->GetName () : "?",
+	  CS::Quote::Single ((iobj && iobj->GetName ()) ? iobj->GetName () : "?"),
 	  visobj_wrap->history->reason == INVISIBLE_PARENT ? "invis parent" :
 	  visobj_wrap->history->reason == INVISIBLE_FRUSTUM ? "invis frustum" :
 	  visobj_wrap->history->reason == INVISIBLE_TESTRECT?"invis testrect" :

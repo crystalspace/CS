@@ -72,7 +72,7 @@ bool Lod::ParseParams(int argc, char* argv[])
     if (outfile.Find (".zip", outfile.Length () - 4) == (size_t)-1)
     {
       outfile += "_lod";
-      ReportInfo ("Output file not specified. Using '%s'\n", outfile.GetData ());
+      ReportInfo ("Output file not specified. Using %s\n", CS::Quote::Single (outfile.GetData ()));
     }
   }
 
@@ -206,7 +206,7 @@ void Lod::CreateLODs(const char* filename_in, const char* filename_out)
 
     if (!buf.IsValid ())
     {
-      ReportError ("Error opening file '%s'!", filenameIn.GetData());
+      ReportError ("Error opening file %s!", CS::Quote::Single (filenameIn.GetData()));
       return;
     }
 
@@ -263,7 +263,7 @@ void Lod::CreateLODsRecursive(csRef<iDocumentNode> node)
       csRef<iThreadReturn> itr = tloader->LoadNodeWait(cwd, node);
       if (!itr->WasSuccessful())
       {
-        ReportError("Error parsing node '%s' in input file.", value.GetData ());
+        ReportError("Error parsing node %s in input file.", CS::Quote::Single (value.GetData ()));
       }
     }
     else
@@ -280,7 +280,7 @@ void Lod::CreateLODWithMeshFact(csRef<iDocumentNode> node)
   csString name = node->GetAttributeValue ("name");
   if (!itr->WasSuccessful())
   {
-    ReportError("Error parsing meshfact '%s' in input file.\n", name.GetData ());
+    ReportError("Error parsing meshfact %s in input file.\n", CS::Quote::Single (name.GetData ()));
     return;
   }
 
@@ -306,8 +306,8 @@ void Lod::CreateLODWithMeshFact(csRef<iDocumentNode> node)
   bool b_have_cmdline_dist = params.dist_specified;
   if (!b_have_file_dist && !b_have_cmdline_dist)
   {
-    csPrintf("Factory '%s' ignored. Distances not specified via the command line or in the factory.\n",
-      name.GetData());
+    csPrintf("Factory %s ignored. Distances not specified via the command line or in the factory.\n",
+      CS::Quote::Single (name.GetData()));
     return;
   }
 
@@ -447,7 +447,7 @@ void Lod::Save(csRef<iDocument> doc, const char* filename)
 
     if (!vfs->WriteFile(fname, str.GetData(), str.Length()))
     {
-      ReportError ("Failed to write to output file '%s'!", filename);
+      ReportError ("Failed to write to output file %s!", CS::Quote::Single (filename));
     }
   }
 

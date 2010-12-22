@@ -224,7 +224,8 @@ bool CEGUITest::OnKeyboard(iEvent& ev)
         csQueryRegistry<iEventQueue> (GetObjectRegistry());
       if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
     }
-    csPrintf("Keyboard event fell through or no input window, like a 'Editbox', was active.\n");
+    csPrintf("Keyboard event fell through or no input window, like an %s, was active.\n",
+	     CS::Quote::Single ("Editbox"));
   }
   return false;
 }
@@ -241,7 +242,8 @@ void CEGUITest::CreateRoom ()
   // CS/data/standard.zip and mounted as /lib/std using the Virtual
   // File System (VFS) plugin.
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-    ReportError("Error loading 'stone4' texture!");
+    ReportError("Error loading %s texture!",
+		CS::Quote::Single ("stone4"));
 
   iMaterialWrapper* tm =
     engine->GetMaterialList ()->FindByName ("stone");

@@ -233,8 +233,8 @@ void csFontServerMultiplexer::ReportFontNotFound (bool fallback, const char* fon
     csReport (object_reg,
       newSeverity,
       "crystalspace.font.server.multiplexer",
-      "Could not load font \"%s\"",
-      font);
+      "Could not load font %s",
+      CS::Quote::Double (font));
     fontsNotFound.PutUnique (font, newSeverity);
   }
 }

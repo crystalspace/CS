@@ -96,6 +96,8 @@ private:
   };
   csArray<ColorBuffer> buffers;
 
+  csString lastError;
+  const char* SetLastError (const char* msg, ...);
   void Report (iSyntaxService* synsrv, int severity, iDocumentNode* node, 
     const char* msg, ...);
   bool HexToLightID (uint8* lightID, const char* lightIDHex);

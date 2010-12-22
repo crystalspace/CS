@@ -23,6 +23,7 @@
 #include "csgfx/vertexlistwalker.h"
 #include "csutil/util.h"
 #include "csutil/event.h"
+#include "csutil/stringquote.h"
 #include "iengine/engine.h"
 #include "iengine/sector.h"
 #include "imesh/object.h"
@@ -64,17 +65,17 @@ void GenmeshAnimationPDL::PrepareBuffer (iEngine* engine,
         if (!engLight)
         {
           factory->type->Report (CS_REPORTER_SEVERITY_WARNING, 
-            "Could not find light '%s' in sector '%s'", 
-            factoryLight.lightId->lightName.GetData(),
-            factoryLight.lightId->sectorName.GetData());
+            "Could not find light %s in sector %s", 
+            CS::Quote::Single (factoryLight.lightId->lightName.GetData()),
+            CS::Quote::Single (factoryLight.lightId->sectorName.GetData()));
         }
       }
       else
       {
         factory->type->Report (CS_REPORTER_SEVERITY_WARNING, 
-          "Could not find sector '%s' for light '%s'", 
-          factoryLight.lightId->sectorName.GetData(),
-          factoryLight.lightId->lightName.GetData());
+          "Could not find sector %s for light %s", 
+          CS::Quote::Single (factoryLight.lightId->sectorName.GetData()),
+          CS::Quote::Single (factoryLight.lightId->lightName.GetData()));
       }
     }
     else
@@ -87,7 +88,7 @@ void GenmeshAnimationPDL::PrepareBuffer (iEngine* engine,
         for (int i = 0; i < 16; i++)
           hexId.AppendFmt ("%02x", factoryLight.lightId->lightId[i]);
         factory->type->Report (CS_REPORTER_SEVERITY_WARNING, 
-          "Could not find light with ID '%s'", hexId.GetData());
+          "Could not find light with ID %s", CS::Quote::Single (hexId.GetData()));
       }
     }
     if (engLight)
@@ -287,6 +288,15 @@ void GenmeshAnimationPDL::ColorBuffer::RemoveLight (iLight* l)
 
 //-------------------------------------------------------------------------
 
+const char* GenmeshAnimationPDLFactory::SetLastError (const char* msg, ...)
+{
+  va_list args;
+  va_start (args, msg);
+  lastError.FormatV (msg, args);
+  va_end (args);
+  return lastError;
+}
+
 void GenmeshAnimationPDLFactory::Report (iSyntaxService* synsrv, 
                                          int severity, iDocumentNode* node, 
                                          const char* msg, ...)
@@ -377,7 +387,7 @@ const char* GenmeshAnimationPDLFactory::ParseBuffer (iSyntaxService* synsrv,
 	}
         break;
       default:
-        parseError.Format ("Unknown token '%s'", value);
+        parseError.Format ("Unknown token %s", CS::Quote::Single (value));
         return parseError;
     }
   }
@@ -401,14 +411,18 @@ const char* GenmeshAnimationPDLFactory::ParseLight (ColorBuffer::MappedLight& li
   bool hasLightName = lightName && *lightName;
   if ((hasSector || hasLightName) && (!hasSector || !hasLightName))
   {
-    return "Both 'lightsector' and 'lightname' attributes need to be specified";
+    return SetLastError ("Both %s and %s attributes need to be specified",
+			 CS::Quote::Single ("lightsector"),
+			 CS::Quote::Single ("lightname"));
   }
   const char* lightId = node->GetAttributeValue ("lightid");
   bool hasLightID = lightId && *lightId;
   if (!hasSector && !hasLightName && !hasLightID)
   {
-    return "'lightsector' and 'lightname' attributes or a 'lightid' attribute "
-      "need to be specified";
+    return SetLastError ("%s and %s attributes or a %s attribute need to be specified",
+			 CS::Quote::Single ("lightsector"),
+			 CS::Quote::Single ("lightname"),
+			 CS::Quote::Single ("lightid"));
   }
 
   light.colors = synsrv->ParseRenderBuffer (node);
@@ -427,7 +441,7 @@ const char* GenmeshAnimationPDLFactory::ParseLight (ColorBuffer::MappedLight& li
   {
     if (!HexToLightID (light.lightId->lightId, lightId))
     {
-      parseError.Format ("Invalid light ID '%s'", lightId);
+      parseError.Format ("Invalid light ID %s", CS::Quote::Single (lightId));
       return parseError;
     }
     return 0;
@@ -496,7 +510,7 @@ const char* GenmeshAnimationPDLFactory::Load (iDocumentNode* node)
 
         if (id != XMLTOKEN_BUFFER)
         {
-          parseError.Format ("Unknown token '%s'", value);
+          parseError.Format ("Unknown token %s", CS::Quote::Single (value));
           return parseError;
         }
 

@@ -599,7 +599,7 @@ bool csGLShaderFVP::ParseTexMatrixOp (iDocumentNode* node,
     synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
       CS_REPORTER_SEVERITY_WARNING,
       node,
-      "No 'type' attribute");
+      "No %s attribute", CS::Quote::Single ("type"));
     return false;
   }
   if (!ParseProgramParam (node, op.param,
@@ -803,7 +803,8 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
 	    if (layer < 0)
 	    {
 	      synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
-		variablesnode, "'layer' attribute invalid");
+		variablesnode, "%s attribute invalid",
+		CS::Quote::Single ("layer"));
 	      return false;
 	    }
             if (layers.GetSize ()<= (size_t)layer)
@@ -830,7 +831,8 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
 	    if (layer < 0)
 	    {
 	      synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
-		variablesnode, "'layer' attribute invalid");
+		variablesnode, "%s attribute invalid",
+		CS::Quote::Single ("layer"));
 	      return false;
 	    }
             if (layers.GetSize () <= (size_t)layer)
@@ -853,7 +855,8 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
 		  else
 		  {
 		    synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
-		      variablesnode, "invalid mapping '%s'", str);
+		      variablesnode, "invalid mapping %s",
+		      CS::Quote::Single (str));
 		    return false;
 		  }
                 }
@@ -883,7 +886,8 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
 	      else
 	      {
 		synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
-		  variablesnode, "invalid type '%s'", str);
+		  variablesnode, "invalid type %s",
+		  CS::Quote::Single (str));
 		return false;
 	      }
             }
@@ -895,7 +899,8 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
 	    if (layer < 0)
 	    {
 	      synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
-		variablesnode, "'layer' attribute invalid");
+		variablesnode, "%s attribute invalid",
+		CS::Quote::Single ("layer"));
 	      return false;
 	    }
             if (layers.GetSize () <= (size_t)layer)
@@ -927,8 +932,8 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
 		break;
 	      default:
 		synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
-		  child, "invalid colormaterial '%s'",
-		  child->GetContentsValue());
+		  child, "invalid colormaterial %s",
+		  CS::Quote::Single (child->GetContentsValue()));
 		colorMaterial = 0;
 		return false;
 	    }

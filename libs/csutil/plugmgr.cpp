@@ -27,6 +27,7 @@
 #include "csutil/scf_implementation.h"
 #include "csutil/scfstringarray.h"
 #include "csutil/stringconv.h"
+#include "csutil/stringquote.h"
 #include "csutil/util.h"
 
 #include "iutil/comp.h"
@@ -264,7 +265,7 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
     if (flags & lpiReportErrors)
       Report (CS_REPORTER_SEVERITY_WARNING,
       "loadplugin",
-      "could not load plugin '%s'", classID);
+      "could not load plugin %s", CS::Quote::Single (classID));
   }
   else
   {
@@ -365,7 +366,7 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
     {
       Report (CS_REPORTER_SEVERITY_WARNING,
         "loadplugin",
-        "failed to initialize plugin '%s'", classID);
+        "failed to initialize plugin %s", CS::Quote::Single (classID));
     }
   }
 
@@ -391,7 +392,7 @@ bool csPluginManager::RegisterPluginInstance (const char *classID,
     mutex.Unlock(); // Lock is not needed here any more ...
     Report (CS_REPORTER_SEVERITY_WARNING,
       "registerplugin",
-      "failed to initialize plugin '%s'", classID);
+      "failed to initialize plugin %s", CS::Quote::Single (classID));
     // ... but must be retaken to make 'lock' destruction work
     mutex.Lock();
     return false;

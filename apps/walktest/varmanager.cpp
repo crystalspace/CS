@@ -117,29 +117,29 @@ bool WalkTestVarManager::ShowVariable (WalkTest* Sys, const char* arg)
   if (!v)
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	      "Couldn't find variable '%s'!", name);
+	      "Couldn't find variable %s!", CS::Quote::Single (name));
     return false;
   }
   int t = v->GetType ();
   switch (t)
   {
     case iSharedVariable::SV_FLOAT:
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  float '%s'=%g",
-	      v->GetName (), v->Get ());
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  float %s=%g",
+	      CS::Quote::Single (v->GetName ()), v->Get ());
       break;
     case iSharedVariable::SV_COLOR:
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  color '%s'=%g,%g,%g",
-	      v->GetName (), v->GetColor ().red, v->GetColor ().green,
-	      v->GetColor ().blue);
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  color %s=%g,%g,%g",
+	      CS::Quote::Single (v->GetName ()),
+	      v->GetColor ().red, v->GetColor ().green, v->GetColor ().blue);
       break;
     case iSharedVariable::SV_VECTOR:
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  vector '%s'=%g,%g,%g",
-	      v->GetName (), v->GetVector ().x, v->GetVector ().y,
-	      v->GetVector ().z);
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  vector %s=%g,%g,%g",
+	      CS::Quote::Single (v->GetName ()),
+	      v->GetVector ().x, v->GetVector ().y, v->GetVector ().z);
       break;
     default:
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  unknown '%s'=?",
-	      v->GetName ());
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  unknown %s=?",
+	      CS::Quote::Single (v->GetName ()));
       break;
   }
   return true;
@@ -156,22 +156,22 @@ bool WalkTestVarManager::ListVariables (WalkTest* Sys, const char* arg)
     switch (t)
     {
       case iSharedVariable::SV_FLOAT:
-	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  float '%s'=%g",
-	      v->GetName (), v->Get ());
+	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  float %s=%g",
+		CS::Quote::Single (v->GetName ()), v->Get ());
 	break;
       case iSharedVariable::SV_COLOR:
-	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  color '%s'=%g,%g,%g",
-	      v->GetName (), v->GetColor ().red, v->GetColor ().green,
-	      v->GetColor ().blue);
+	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  color %s=%g,%g,%g",
+		CS::Quote::Single (v->GetName ()),
+		v->GetColor ().red, v->GetColor ().green, v->GetColor ().blue);
 	break;
       case iSharedVariable::SV_VECTOR:
-	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  vector '%s'=%g,%g,%g",
-	      v->GetName (), v->GetVector ().x, v->GetVector ().y,
-	      v->GetVector ().z);
+	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  vector %s=%g,%g,%g",
+		CS::Quote::Single (v->GetName ()),
+		v->GetVector ().x, v->GetVector ().y, v->GetVector ().z);
 	break;
       default:
-	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  unknown '%s'=?",
-	      v->GetName ());
+	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  unknown %s=?",
+		CS::Quote::Single (v->GetName ()));
 	break;
     }
   }

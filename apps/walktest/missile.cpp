@@ -72,7 +72,7 @@ void WalkTestMissileLauncher::FireMissile ()
   	->FindByName (misname);
   if (!tmpl)
     walktest->Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"Could not find '%s' sprite factory!", misname.GetData());
+    	"Could not find %s sprite factory!", CS::Quote::Single (misname.GetData()));
   else
   {
     csRef<iMeshWrapper> sp (

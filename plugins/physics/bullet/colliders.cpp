@@ -22,6 +22,7 @@
 #include "cssysdef.h"
 
 #include "csgeom/sphere.h"
+#include "csutil/stringquote.h"
 #include "igeom/trimesh.h"
 #include "imesh/objmodel.h"
 #include "iengine/movable.h"
@@ -57,8 +58,8 @@ static csRef<iTriangleMesh> FindColdetTriangleMesh(iMeshWrapper* mesh,
   if (!trimesh || trimesh->GetVertexCount () == 0
       || trimesh->GetTriangleCount () == 0)
   {
-    csFPrintf (stderr, "csBulletRigidBody: No collision polygons, triangles or vertices on mesh factory '%s'\n",
-      mesh->QueryObject()->GetName());
+    csFPrintf (stderr, "csBulletRigidBody: No collision polygons, triangles or vertices on mesh factory %s\n",
+      CS::Quote::Single (mesh->QueryObject()->GetName()));
 
     return 0;
   }

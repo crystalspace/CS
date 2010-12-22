@@ -116,7 +116,7 @@ void DocConv::ConvertFile(const char* val, csRef<iDocumentSystem> inputDS, csRef
   csRef<iDataBuffer> buf = vfs->ReadFile (filename);
   if (!buf || !buf->GetSize ())
   {
-    ReportError ("File '%s' does not exist!", (const char*)filename);
+    ReportError ("File %s does not exist!", CS::Quote::Single ((const char*)filename));
     return;
   }
 
@@ -189,7 +189,7 @@ void DocConv::ConvertFile(const char* val, csRef<iDocumentSystem> inputDS, csRef
 	csTicks writing_end = csGetTicks();
 	if (error != 0)
 	{
-	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
+	  ReportError ("Error writing %s: %s!", CS::Quote::Single ((const char*)filename), error);
 	  return;
 	}
 	else
@@ -245,8 +245,8 @@ void DocConv::Main ()
 	  csString().Format ("crystalspace.documentsystem.%s", inds));
       if (!inputDS)
       {
-	ReportError ("Unable to load input document system '%s'!",
-	  inds);
+	ReportError ("Unable to load input document system %s!",
+	  CS::Quote::Single (inds));
         return;
       }
     }
@@ -258,8 +258,8 @@ void DocConv::Main ()
 	  csString().Format ("crystalspace.documentsystem.%s", outds));
       if (!outputDS)
       {
-	ReportError ("Unable to load output document system '%s'!",
-	  outds);
+	ReportError ("Unable to load output document system %s!",
+	  CS::Quote::Single (outds));
         return;
       }
     }
@@ -270,7 +270,8 @@ void DocConv::Main ()
   if (!val)
   {
     ReportError ("Please give VFS world file name or name of the zip archive! "
-      "Use 'docconv -help' to get a list of possible options.");
+      "Use %s to get a list of possible options.",
+      CS::Quote::Single ("docconv -help"));
     return;
   }
   

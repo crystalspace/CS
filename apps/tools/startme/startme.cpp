@@ -260,14 +260,14 @@ bool StartMe::OnMouseDown (iEvent& /*event*/)
 bool StartMe::LoadTextures ()
 {
   if (!loader->LoadTexture ("spark", "/lib/std/sparka.dds"))
-    return ReportError ("Error loading '%s' texture!", "spark");
+    return ReportError ("Error loading %s texture!", CS::Quote::Single ("spark"));
 
   vfs->ChDir ("/lib/startme");
   size_t i;
   for (i = 0 ; i < demos.GetSize () ; i++)
   {
     if (!loader->LoadTexture (demos[i].name, demos[i].image))
-      return ReportError ("Error loading '%s' texture!", demos[i].image);
+      return ReportError ("Error loading %s texture!", CS::Quote::Single (demos[i].image));
   }
 
   return true;
@@ -277,7 +277,8 @@ bool StartMe::OnInitialize(int /*argc*/, char* /*argv*/ [])
 {
   if (!csInitializer::SetupConfigManager (GetObjectRegistry (),
   	"/config/startme.cfg"))
-    return ReportError ("Error reading config file 'startme.cfg'!");
+    return ReportError ("Error reading config file %s!",
+			CS::Quote::Single ("startme.cfg"));
 
   // RequestPlugins() will load all plugins we specify. In addition
   // it will also check if there are plugins that need to be loaded

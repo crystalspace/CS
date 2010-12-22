@@ -70,7 +70,7 @@ void map_key (const char* _keyname, csKeyMap* map)
     else if (!strcmp (wordstart, "ctrl")) map->ctrl = 1;
     else if (!strcmp (wordstart, "status")) map->need_status = 1;
     else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"Bad modifier '%s'!", wordstart);
+    	"Bad modifier %s!", CS::Quote::Single (wordstart));
 
     *dash = '-';
     wordstart = dash+1;
@@ -106,7 +106,7 @@ void map_key (const char* _keyname, csKeyMap* map)
   else if (!strcmp (wordstart, "f12")) map->key = CSKEY_F12;
   /*
   else if (*(wordstart+0) != 0) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-  	"Bad key '%s'!", wordstart);
+  	"Bad key %s!", CS::Quote::Single (wordstart));
   else if ((*wordstart >= 'A' && *wordstart <= 'Z') ||
     strchr ("!@#$%^&*()_+", *wordstart))
   {
@@ -123,7 +123,7 @@ void map_key (const char* _keyname, csKeyMap* map)
       nameLen, key, &charValid);
     if (!charValid || ((size_t)encLen < nameLen))
     {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Bad key '%s'!", wordstart);
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Bad key %s!", CS::Quote::Single (wordstart));
     }
     else
       map->key = key;
@@ -202,7 +202,8 @@ void bind_key (const char* _arg)
     while (map)
     {
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Key '%s' bound to '%s'.", keyname (map), map->cmd);
+      	"Key %s bound to %s.", CS::Quote::Single (keyname (map)),
+	CS::Quote::Single (map->cmd));
       map = map->next;
     }
     return;
@@ -235,7 +236,7 @@ void bind_key (const char* _arg)
   {
     csKeyMap* map = find_mapping (arg);
     if (map) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"Key bound to '%s'!", map->cmd);
+    	"Key bound to %s!", CS::Quote::Single (map->cmd));
     else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Key not bound!");
   }
   delete[] arg;
@@ -574,15 +575,17 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
     iMeshObject* obj = mesh->GetMeshObject ();
     csRef<iObject> psobj = 
     	scfQueryInterface<iObject> (obj->GetMeshWrapper ());
-    Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "Hit object/polygon '%s/%d'",
-    	psobj ? psobj->GetName () : "<null>", sel);
+    csString polystr;
+    polystr.Format ("%s/%d", psobj ? psobj->GetName () : "<null>", sel);
+    Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "Hit object/polygon %s",
+		 CS::Quote::Single (polystr.GetData()));
   }
   else if (mesh)
   {
     csRef<iObject> psobj = 
     	scfQueryInterface<iObject> (mesh->GetMeshObject ()->GetMeshWrapper ());
-    Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "Hit mesh '%s'",
-    	psobj ? psobj->GetName () : "<null>");
+    Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "Hit mesh %s",
+    	CS::Quote::Single (psobj ? psobj->GetName () : "<null>"));
   }
   else
   {

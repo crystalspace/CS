@@ -23,7 +23,7 @@
     }
     else
     {
-      Report (msgExtNotFound, "WGL", ext);
+      Report (msgExtNotFound, "WGL", CS::Quote::Single (ext));
     }
   }
 #endif

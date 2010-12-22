@@ -20,6 +20,8 @@
 #include "cssysdef.h"
 #include <ctype.h>
 
+#include "csutil/stringquote.h"
+
 #include "expparser.h"
 #include "tokenhelper.h"
 
@@ -137,8 +139,9 @@ const char* csExpressionTokenizer::Tokenize (const char* string, size_t len,
 	}
 	else
 	{
-	  return SetLastError ("Unexpected character '%c' (%" PRId8 ")",
-	    *string, *string);
+	  const char chstr[2] = { *string, 0 };
+	  return SetLastError ("Unexpected character %s (%" PRId8 ")",
+	    CS::Quote::Single (chstr), *string);
 	}
 	break;
       case tOperator:
@@ -321,8 +324,8 @@ const char* csExpressionParser::Parse (const csExpressionTokenList& tokens,
       }
       if (op->opToken == 0)
       {
-	return SetLastError ("Unknown operator '%s'", 
-	  csExpressionToken::Extractor (tokens[pos]).Get ());
+	return SetLastError ("Unknown operator %s", 
+	  CS::Quote::Single (csExpressionToken::Extractor (tokens[pos]).Get ()));
       }
     }
     pos++;
@@ -333,7 +336,7 @@ const char* csExpressionParser::Parse (const csExpressionTokenList& tokens,
     // special case: !
     if (opPos != offset)
     {
-      return "Misplaced '!'";
+      return SetLastError ("Misplaced %s", CS::Quote::Single ("!"));
     }
     csExpression* rightExp;
     err = Parse (tokens, rightExp, offset + 1, num - 1);
@@ -356,8 +359,8 @@ const char* csExpressionParser::Parse (const csExpressionTokenList& tokens,
       {
 	CS_ASSERT (opEnd < end);
 	delete result; result = 0;
-	return SetLastError ("Excess tokens beyond '%s'",
-	  csExpressionToken::Extractor (tokens[opEnd]).Get ());
+	return SetLastError ("Excess tokens beyond %s",
+	  CS::Quote::Single (csExpressionToken::Extractor (tokens[opEnd]).Get ()));
       }
     }
   }
@@ -397,8 +400,8 @@ const char* csExpressionParser::ParseOperand (const csExpressionTokenList& token
     }
     else
     {
-      return SetLastError ("Unexpected operator '%s'", 
-	csExpressionToken::Extractor (tokens[offset]).Get ());
+      return SetLastError ("Unexpected operator %s", 
+	CS::Quote::Single (csExpressionToken::Extractor (tokens[offset]).Get ()));
     }
   }
   else if ((tokens[offset].type == tokenIdentifier) ||
@@ -420,14 +423,14 @@ const char* csExpressionParser::ParseOperand (const csExpressionTokenList& token
       return err;
     }
     else
-      return SetLastError ("Unexpected token '%s'", 
-	csExpressionToken::Extractor (tokens[offset]).Get ());
+      return SetLastError ("Unexpected token %s", 
+	CS::Quote::Single (csExpressionToken::Extractor (tokens[offset]).Get ()));
   }
   else
   {
-    return SetLastError ("Unexpected token ('%s') of type '%s'",
-      csExpressionToken::Extractor (tokens[offset]).Get (), 
-      csExpressionToken::TypeDescription (tokens[offset].type));
+    return SetLastError ("Unexpected token (%s) of type %s",
+      CS::Quote::Single (csExpressionToken::Extractor (tokens[offset]).Get ()), 
+      CS::Quote::Single (csExpressionToken::TypeDescription (tokens[offset].type)));
   }
 }
 
@@ -444,8 +447,9 @@ const char* csExpressionParser::MatchBrace (
 
   if (!TokenEquals (tokens[offset].tokenStart, tokens[offset].tokenLen, "("))
   {
-    return SetLastError ("'(' expected, '%s' found",
-      csExpressionToken::Extractor (tokens[offset]).Get ());
+    return SetLastError ("%s expected, %s found",
+      CS::Quote::Single ("("),
+      CS::Quote::Single (csExpressionToken::Extractor (tokens[offset]).Get ()));
   }
 
   size_t pos = offset + 1;
@@ -466,8 +470,9 @@ const char* csExpressionParser::MatchBrace (
       }
       else
       {
-	return SetLastError ("'(' or ')' expected, '%s' found",
-	  csExpressionToken::Extractor (tokens[pos]).Get ());
+	return SetLastError ("%s or %s expected, %s found",
+	  CS::Quote::Single ("("), CS::Quote::Single (")"),
+	  CS::Quote::Single (csExpressionToken::Extractor (tokens[pos]).Get ()));
       }
     }
     if (braceLevel == 0) break;

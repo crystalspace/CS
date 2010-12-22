@@ -163,6 +163,7 @@ typedef uint64 GLuint64;
 #include "ivaria/reporter.h"
 #include "ivideo/graph2d.h"
 #include "csutil/cfgacc.h"
+#include "csutil/stringquote.h"
 #include "csplugincommon/iopengl/openglinterface.h"
 
 %Definitions%
@@ -193,16 +194,17 @@ typedef uint64 GLuint64;
         CS_##nameNC &= config->GetBool (cfgkey, defaultUse);		\
         if (CS_##nameNC)						\
         {								\
-          Report (msgExtFoundAndUsed, exttype, ext);			\
+          Report (msgExtFoundAndUsed, exttype, CS::Quote::Single (ext));\
         }								\
         else								\
         {								\
-          Report (msgExtFoundAndNotUsed, exttype, ext);			\
+          Report (msgExtFoundAndNotUsed, exttype,			\
+		  CS::Quote::Single (ext));				\
         }								\
       }									\
       else								\
       {									\
-        Report (msgExtInitFail, exttype, ext);				\
+        Report (msgExtInitFail, exttype, CS::Quote::Single (ext));	\
       }
 
 /// Struct containing all GL extension functions.
@@ -356,11 +358,11 @@ public:
     defaultUse (true)
   {
     msgExtRetrieveFail = "Failed to retrieve %%s";
-    msgExtFoundAndUsed = "%%s Extension '%%s' found and used.";
-    msgExtFoundAndNotUsed = "%%s Extension '%%s' found, but not used.";
-    msgExtInitFail = "%%s Extension '%%s' failed to initialize.";
-    msgExtNotFound = "%%s Extension '%%s' not found.";
-    msgDependencyNotFound = "%%s Extension '%%s' depends on '%%s' which did "
+    msgExtFoundAndUsed = "%%s Extension %%s found and used.";
+    msgExtFoundAndNotUsed = "%%s Extension %%s found, but not used.";
+    msgExtInitFail = "%%s Extension %%s failed to initialize.";
+    msgExtNotFound = "%%s Extension %%s not found.";
+    msgDependencyNotFound = "%%s Extension %%s depends on %%s which did "
       "not initialize.";
     
     Reset ();

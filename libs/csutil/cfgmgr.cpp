@@ -24,6 +24,7 @@
 #include "csutil/scfstringarray.h"
 #include "csutil/strhash.h"
 #include "csutil/stringconv.h"
+#include "csutil/stringquote.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
 
@@ -276,8 +277,8 @@ csConfigManager::~csConfigManager()
 {
   // save our config.
   if (!Save())
-    csPrintf("Error saving configuration '%s'.\n",
-	    DynamicDomain->Cfg->GetFileName());
+    csPrintf("Error saving configuration %s.\n",
+	    CS::Quote::Single (DynamicDomain->Cfg->GetFileName()));
   CleanUp ();
 }
 

@@ -341,8 +341,8 @@ namespace lighter
       csStringArray paths;
       paths.Push ("/lev/");
       if (!globalLighter->vfs->ChDirAuto (sceneFiles[i].directory, &paths, 0, "world"))
-        return globalLighter->Report ("Error setting directory '%s'!", 
-          sceneFiles[i].directory.GetData());
+        return globalLighter->Report ("Error setting directory %s!", 
+          CS::Quote::Single (sceneFiles[i].directory.GetData()));
 
       sceneFiles[i].fileName = "world";
       // Load it
@@ -359,8 +359,8 @@ namespace lighter
 
         if (!globalLighter->vfs->ChDirAuto (directory, &paths, 0, filename))
         {
-          return globalLighter->Report ("Error setting directory '%s'!", 
-            sceneFiles[i].directory.GetData());
+          return globalLighter->Report ("Error setting directory %s!", 
+            CS::Quote::Single (sceneFiles[i].directory.GetData()));
         }
 
         buf = globalLighter->vfs->Open (filename, VFS_FILE_READ);
@@ -371,8 +371,8 @@ namespace lighter
         }
         else
         {
-          return globalLighter->Report ("Error opening file '%s'!",
-            sceneFiles[i].fileName.GetData());
+          return globalLighter->Report ("Error opening file %s!",
+            CS::Quote::Single (sceneFiles[i].fileName.GetData()));
         }
       }
       
@@ -446,7 +446,8 @@ namespace lighter
       rc = globalLighter->loader->Load (sceneFiles[i].GetDocument()->GetRoot(), 0, false,
         sceneFiles[i].sceneConfig.GetLighterProperties().checkDupes);
       if (!rc.success)
-        return globalLighter->Report ("Error loading file 'world'!");
+        return globalLighter->Report ("Error loading file %s!",
+				      CS::Quote::Single ("world"));
 
       // Parses meshes from engine
       Statistics::Progress* progEngine = filesProgress.CreateProgress (div);
@@ -531,8 +532,8 @@ namespace lighter
       //Change path
       if (!globalLighter->vfs->ChDir (sceneFiles[i].directory))
       {
-        globalLighter->Report ("Error setting directory '%s'!", 
-          sceneFiles[i].directory.GetData());
+        globalLighter->Report ("Error setting directory %s!", 
+          CS::Quote::Single (sceneFiles[i].directory.GetData()));
         return false;
       }
 
@@ -544,15 +545,15 @@ namespace lighter
       if (!buf) 
       {
         globalLighter->Report (
-          "Error opening file '%s' for writing!", tempfile.GetData());
+          "Error opening file %s for writing!", CS::Quote::Single (tempfile.GetData()));
         return false;
       }
 
       const char *err = sceneFiles[i].GetDocument()->Write (buf);
       if (err)
       {
-        globalLighter->Report ("Error writing file '%s': %s", 
-          tempfile.GetData(), err);
+        globalLighter->Report ("Error writing file %s: %s", 
+          CS::Quote::Single (tempfile.GetData()), err);
         return false;
       }
 
@@ -597,8 +598,8 @@ namespace lighter
       //Change path
       if (!globalLighter->vfs->ChDir (sceneFiles[i].directory))
       {
-        globalLighter->Report ("Error setting directory '%s'!", 
-          sceneFiles[i].directory.GetData());
+        globalLighter->Report ("Error setting directory %s!", 
+          CS::Quote::Single (sceneFiles[i].directory.GetData()));
         return false;
       }
 
@@ -609,7 +610,8 @@ namespace lighter
       csRef<iDataBuffer> buf = globalLighter->vfs->ReadFile (tempfile, false);
       if (!buf) 
       {
-        globalLighter->Report ("Error reading file '%s'!", tempfile.GetData());
+        globalLighter->Report ("Error reading file %s!",
+			       CS::Quote::Single (tempfile.GetData()));
         return false;
       }
 
@@ -619,8 +621,8 @@ namespace lighter
       if (!globalLighter->vfs->WriteFile (sceneFiles[i].fileName, buf->GetData(), 
         buf->GetSize()))
       {
-        globalLighter->Report ("Error writing to '%s'!",
-          sceneFiles[i].fileName.GetData());
+        globalLighter->Report ("Error writing to %s!",
+          CS::Quote::Single (sceneFiles[i].fileName.GetData()));
         return false;
       }
 
@@ -628,8 +630,8 @@ namespace lighter
       buf.Invalidate();
       if (!globalLighter->vfs->DeleteFile (tempfile))
       {
-        globalLighter->Report ("Error deleting file '%s'!", 
-          tempfile.GetData());
+        globalLighter->Report ("Error deleting file %s!", 
+          CS::Quote::Single (tempfile.GetData()));
         return false;
       }
 
@@ -696,8 +698,8 @@ namespace lighter
       //Change path
       if (!globalLighter->vfs->ChDir (sceneFiles[i].directory))
       {
-        globalLighter->Report ("Error setting directory '%s'!", 
-          sceneFiles[i].directory.GetData());
+        globalLighter->Report ("Error setting directory %s!", 
+          CS::Quote::Single (sceneFiles[i].directory.GetData()));
         return false;
       }
 
@@ -710,8 +712,8 @@ namespace lighter
         const char* err = doc->Parse (buf);
         if (err != 0)
         {
-          globalLighter->Report ("Error parsing file '%s': %s", 
-            lightmapLibraryName, err);
+          globalLighter->Report ("Error parsing file %s: %s", 
+            CS::Quote::Single (lightmapLibraryName), err);
           return false;
         }
         doc = EnsureChangeable (doc);
@@ -734,15 +736,16 @@ namespace lighter
       buf = globalLighter->vfs->Open (lightmapLibraryName, VFS_FILE_WRITE);
       if (!buf) 
       {
-        globalLighter->Report ("Error opening file '%s' for writing!", 
-          lightmapLibraryName);
+        globalLighter->Report ("Error opening file %s for writing!", 
+          CS::Quote::Single (lightmapLibraryName));
         return false;
       }
 
       const char *err = doc->Write (buf);
       if (err)
       {
-        globalLighter->Report ("Error writing file '%s': %s", lightmapLibraryName, err);
+        globalLighter->Report ("Error writing file %s: %s",
+			       CS::Quote::Single (lightmapLibraryName), err);
         return false;
       }
 
@@ -773,8 +776,8 @@ namespace lighter
       //Change path
       if (!globalLighter->vfs->ChDir (sceneFiles[i].directory))
       {
-        globalLighter->Report ("Error setting directory '%s'!", 
-          sceneFiles[i].directory.GetData());
+        globalLighter->Report ("Error setting directory %s!", 
+          CS::Quote::Single (sceneFiles[i].directory.GetData()));
         return false;
       }
 
@@ -1039,8 +1042,9 @@ namespace lighter
       if (ParseMesh (fileInfo, radSector, mesh, obj) == mpFailure)
       {
         if (!isPortal)
-          globalLighter->Report ("Error parsing mesh '%s' in sector '%s'!", 
-            mesh->QueryObject()->GetName(), radSector->sectorName.GetData ());
+          globalLighter->Report ("Error parsing mesh %s in sector %s!", 
+            CS::Quote::Single (mesh->QueryObject()->GetName()),
+	    CS::Quote::Single (radSector->sectorName.GetData ()));
       }
       // Mesh is parsed, release resources
       if (!isPortal) meshList->Remove (i);
@@ -1070,8 +1074,8 @@ namespace lighter
       if (lightNames.Contains (lightName))
       {
         globalLighter->Report (
-          "A light named '%s' already exists in sector '%s'",
-          lightName, sectorName);
+          "A light named %s already exists in sector %s",
+          CS::Quote::Single (lightName), CS::Quote::Single (sectorName));
         lightList->Remove (i);
         continue;
       }
@@ -1306,8 +1310,8 @@ namespace lighter
     if (sector->allObjects.Contains (meshName))
     {
       globalLighter->Report (
-        "A mesh named '%s' already exists in sector '%s'",
-        meshName, sector->sectorName.GetData());
+        "A mesh named %s already exists in sector %s",
+        CS::Quote::Single (meshName), CS::Quote::Single (sector->sectorName.GetData()));
       return mpSuccess;
     }
 
@@ -1692,7 +1696,7 @@ namespace lighter
     csRef<iFile> buf = globalLighter->vfs->Open (libFile, VFS_FILE_READ);
     if (!buf) 
     {
-      globalLighter->Report ("Error opening file '%s'!", libFile);
+      globalLighter->Report ("Error opening file %s!", CS::Quote::Single (libFile));
       progress.SetProgress (1);
       return false;
     }
@@ -1711,7 +1715,7 @@ namespace lighter
     csRef<iDocumentNode> libRoot = docRoot->GetNode ("library");
     if (!libRoot)
     {
-      globalLighter->Report ("'%s' is not a library", libFile);
+      globalLighter->Report ("%s is not a library", CS::Quote::Single (libFile));
       progress.SetProgress (1);
       return false;
     }
@@ -1752,7 +1756,8 @@ namespace lighter
       buf = globalLighter->vfs->Open (libFile, VFS_FILE_WRITE);
       if (!buf) 
       {
-	globalLighter->Report ("Error opening file '%s' for writing!", libFile);
+	globalLighter->Report ("Error opening file %s for writing!",
+			       CS::Quote::Single (libFile));
 	return false;
       }
       error = doc->Write (buf);
@@ -1802,8 +1807,8 @@ namespace lighter
     if (savedObjects.Contains (name))
     {
       globalLighter->Report (
-        "A factory named '%s' already exists",
-        name.GetData());
+        "A factory named %s already exists",
+        CS::Quote::Single (name.GetData()));
       return svFailure;
     }
 
@@ -2508,8 +2513,8 @@ namespace lighter
     const char* err = doc->Parse (sourceData);
     if (err != 0)
     {
-      globalLighter->Report ("Error re-parsing '%s': %s", 
-        fileInfo.levelName.GetData(), err);
+      globalLighter->Report ("Error re-parsing %s: %s", 
+        CS::Quote::Single (fileInfo.levelName.GetData()), err);
       return csPtr<iDataBuffer> (csRef<iDataBuffer> (sourceData));
     }
 
@@ -2580,8 +2585,8 @@ namespace lighter
     err = newDoc->Write (&mf);
     if (err != 0)
     {
-      globalLighter->Report ("Error re-writing '%s': %s", 
-        fileInfo.levelName.GetData(), err);
+      globalLighter->Report ("Error re-writing %s: %s", 
+        CS::Quote::Single (fileInfo.levelName.GetData()), err);
       return csPtr<iDataBuffer> (csRef<iDataBuffer> (sourceData));
     }
     return mf.GetAllData ();

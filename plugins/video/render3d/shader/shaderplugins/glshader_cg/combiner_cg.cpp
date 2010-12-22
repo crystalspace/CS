@@ -37,6 +37,7 @@
 #include "csutil/scfstr.h"
 #include "csutil/set.h"
 #include "csutil/stringarray.h"
+#include "csutil/stringquote.h"
 #include "csutil/xmltiny.h"
 
 #include "combiner_cg.h"
@@ -426,7 +427,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     if (!startNode.IsValid())
     {
       Report (CS_REPORTER_SEVERITY_ERROR,
-	"Expected 'combinerlibrary' node in file '%s'", path);
+	"Expected %s node in file %s",
+	CS::Quote::Single ("combinerlibrary"),
+	CS::Quote::Single (path));
       return false;
     }
     
@@ -482,14 +485,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     if (!from || !*from)
     {
       Report (CS_REPORTER_SEVERITY_ERROR, node, 
-        "Non-empty 'from' attribute expeected");
+        "Non-empty %s attribute expected",
+	CS::Quote::Single ("from"));
       return false;
     }
     const char* to = node->GetAttributeValue ("to");
     if (!to || !*to)
     {
       Report (CS_REPORTER_SEVERITY_ERROR, node, 
-        "Non-empty 'to' attribute expeected");
+        "Non-empty %s attribute expected",
+	CS::Quote::Single ("to"));
       return false;
     }
     int cost;
@@ -497,7 +502,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     if (!costAttr.IsValid())
     {
       Report (CS_REPORTER_SEVERITY_WARNING, node,
-        "No 'cost' attribute, assuming cost 0");
+        "No %s attribute, assuming cost 0",
+	CS::Quote::Single ("cost"));
       cost = 0;
     }
     else
@@ -541,7 +547,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     if (!name || !*name)
     {
       Report (CS_REPORTER_SEVERITY_ERROR, node, 
-        "Non-empty 'name' attribute expeected");
+        "Non-empty %s attribute expected",
+	CS::Quote::Single ("name"));
       return false;
     }
     templates.PutUnique (name, node);
@@ -556,7 +563,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     if (!templNormalize)
     {
       Report (CS_REPORTER_SEVERITY_ERROR, 
-        "No 'normalize' coercion template");
+        "No %s coercion template",
+	CS::Quote::Single ("normalize"));
       return false;
     }
     iDocumentNode* templPassthrough = templates.Get ("passthrough", 
@@ -564,7 +572,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     if (!templPassthrough)
     {
       Report (CS_REPORTER_SEVERITY_ERROR, 
-        "No 'passthrough' coercion template");
+        "No %s coercion template",
+	CS::Quote::Single ("passthrough"));
       return false;
     }
 
@@ -993,15 +1002,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       csString annotation (currentSnippet.annotation);
       size_t linebreak = annotation.FindFirst ('\n');
       if (linebreak != (size_t)-1) annotation.Truncate (linebreak);
-      globals.AppendFmt ("// Attribute '%s %s' for '%s'\n",
-        type, name, annotation.GetData());
+      globals.AppendFmt ("// Attribute %s for %s\n",
+        CS::Quote::Single (csString().Format ("%s %s", type, name)),
+	CS::Quote::Single (annotation.GetData()));
     }
     globals.AppendFmt ("%s %s;\n", 
       CgType (type).GetData(), outIdMapped.GetData());
 
     if (loader->annotateCombined)
-      currentSnippet.locals.AppendFmt ("// Attribute '%s %s'\n",
-        type, name);
+      currentSnippet.locals.AppendFmt ("// Attribute %s\n",
+        CS::Quote::Single (csString().Format("%s %s", type, name)));
     currentSnippet.locals.AppendFmt ("%s %s;\n", 
       CgType (type).GetData(), outId.GetData());
   }
@@ -1017,8 +1027,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 
     csString outId (GetAttrIdentifier (srcName, name));
     if (loader->annotateCombined)
-      currentSnippet.locals.AppendFmt ("// Attribute '%s %s'\n",
-        type, name);
+      currentSnippet.locals.AppendFmt ("// Attribute %s\n",
+        CS::Quote::Single (csString().Format ("%s %s", type, name)));
     currentSnippet.locals.AppendFmt ("%s %s;\n", 
       CgType (type).GetData(), outId.GetData());
 

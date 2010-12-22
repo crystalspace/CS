@@ -523,8 +523,8 @@ iMeshFactoryWrapper* csSprite3DMD2FactoryLoader::Load (const char* factname,
     ReportError (object_reg,
 		"crystalspace.sprite3dmd2factoryloader.load",
 		filename
-		    ? "Error loading MD2 file '%s'!"
-		    : "Error loading MD2 file!", filename);
+		    ? "Error loading MD2 file %s!"
+		    : "Error loading MD2 file!", CS::Quote::Single (filename));
     return 0;
   }
   return ff;
@@ -545,7 +545,7 @@ iMeshFactoryWrapper* csSprite3DMD2FactoryLoader::Load (const char* factname,
   {
     ReportError (object_reg,
 		"crystalspace.sprite3dmd2factoryloader.load",
-		"Can't load file '%s'!", filename);
+		"Can't load file %s!", CS::Quote::Single (filename));
     return 0;
   }
   return Load (factname, filename, dbuf);

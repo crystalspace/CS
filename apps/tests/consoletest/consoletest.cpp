@@ -21,6 +21,7 @@
 #include <locale.h>
 #include "csutil/ansicommand.h"
 #include "csutil/csuctransform.h"
+#include "csutil/stringquote.h"
 #include "csutil/sysfunc.h"
 
 #include "teststrings.h"
@@ -134,7 +135,7 @@ int main (int /*argc*/, char* /*argv*/ [])
   csPrintf ("%c%c%c%c%c", 'h', 'e', 'l', 'l', 'o');
   csPrintf ("%3s%-6s", "no", "where");
   errno = 1;
-  csPrintf ("can't open `%s': %m\n", "filename");
+  csPrintf ("can't open %s: %m\n", CS::Quote::Single ("filename"));
   int nchar;
   csPrintf ("%d %s%n\n", 3, "bears", &nchar);
   csPrintf ("chars printed: %d\n", nchar);

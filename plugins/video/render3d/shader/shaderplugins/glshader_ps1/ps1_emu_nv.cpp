@@ -448,8 +448,8 @@ bool csShaderGLPS1_NV::GetNVInstructions (const csPixelShaderParser& parser,
         csString instrStr;
         parser.GetInstructionString (inst, instrStr);
         Report (CS_REPORTER_SEVERITY_WARNING,
-          "Register Combiners doesn't support one or more modifiers for '%s' (%zu).",
-	  instrStr.GetData(), i);
+          "Register Combiners doesn't support one or more modifiers for %s (%zu).",
+	  CS::Quote::Single (instrStr.GetData()), i);
       }
       return false;
     }
@@ -568,9 +568,9 @@ bool csShaderGLPS1_NV::GetNVInstructions (const csPixelShaderParser& parser,
             csString instrStr;
             parser.GetInstructionString (inst, instrStr);
             Report (CS_REPORTER_SEVERITY_WARNING,
-              "Unsupported replication modfiers '%s' for '%s' (%zu).",
-              csBitmaskToString::GetStr (rep, srcRegisterMods), 
-              instrStr.GetData(), i);
+              "Unsupported replication modfiers %s for %s (%zu).",
+              CS::Quote::Single (csBitmaskToString::GetStr (rep, srcRegisterMods)), 
+              CS::Quote::Single (instrStr.GetData()), i);
           }
         }
       }
@@ -620,12 +620,14 @@ bool csShaderGLPS1_NV::GetNVInstructions (const csPixelShaderParser& parser,
         case CS_PS_INS_BEM:
           if (shaderPlug->doVerbose)
             Report(CS_REPORTER_SEVERITY_WARNING,
-              "NV_register_combiners does not support the 'bem' instruction");
+              "NV_register_combiners does not support the %s instruction",
+		   CS::Quote::Single ("bem"));
 	  return false;
         case CS_PS_INS_CMP:
           if (shaderPlug->doVerbose)
             Report(CS_REPORTER_SEVERITY_WARNING,
-              "NV_register_combiners does not support the 'cmp' instruction");
+              "NV_register_combiners does not support the %s instruction",
+		   CS::Quote::Single ("cmp"));
 	  return false;
         case CS_PS_INS_CND:
           combiner.numInputs = 4;

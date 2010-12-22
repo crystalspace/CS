@@ -463,7 +463,8 @@ void ViewMesh::LoadTexture(const char* file, const char* name)
     iTextureWrapper* txt = loader->LoadTexture (name, file, CS_TEXTURE_3D, 0, true, true, true, collection);
     if (txt == 0)
     {
-      ReportError("Cannot load texture '%s' from file '%s'.\n", name, file);
+      ReportError("Cannot load texture %s from file %s.\n",
+		  CS::Quote::Single (name), CS::Quote::Single (file));
       return;
     }
     engine->PrepareTextures();
@@ -686,8 +687,9 @@ void ViewMesh::LoadSprite (const char* filename, const char* path)
 
   if (!loading)
   {
-    printf ("Loading model '%s' from vfs dir '%s'\n",
-      filename, vfs->GetCwd ()); fflush (stdout);
+    printf ("Loading model %s from vfs dir %s\n",
+      CS::Quote::Single (filename), CS::Quote::Single (vfs->GetCwd ()));
+    fflush (stdout);
 
     loading = tloader->LoadFile (vfs->GetCwd(), filename, collection);
   }

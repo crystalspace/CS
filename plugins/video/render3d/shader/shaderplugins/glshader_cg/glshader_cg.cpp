@@ -26,6 +26,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/scf.h"
 #include "csutil/scfstr.h"
 #include "csutil/scfstringarray.h"
+#include "csutil/stringquote.h"
 #include "csutil/xmltiny.h"
 #include "iutil/comp.h"
 #include "iutil/hiercache.h"
@@ -480,7 +481,7 @@ bool csGLShader_CG::Open()
       {
         if (doVerbose)
           Report (CS_REPORTER_SEVERITY_WARNING,
-              "Unknown fake vertex program profile '%s'", profileStr);
+              "Unknown fake vertex program profile %s", CS::Quote::Single (profileStr));
       }
       else
       {
@@ -498,8 +499,8 @@ bool csGLShader_CG::Open()
 	{
 	  if (doVerbose)
 	    Report (CS_REPORTER_SEVERITY_WARNING,
-	      "Fake vertex program profile '%s' unsupported",
-	      cgGetProfileString (profile));
+	      "Fake vertex program profile %s unsupported",
+	      CS::Quote::Single (cgGetProfileString (profile)));
 	}
       }
     }
@@ -559,7 +560,7 @@ bool csGLShader_CG::Open()
       {
         if (doVerbose)
           Report (CS_REPORTER_SEVERITY_WARNING,
-              "Unknown fake fragment program profile '%s'", profileStr);
+              "Unknown fake fragment program profile %s", CS::Quote::Single (profileStr));
       }
       else
       {
@@ -589,7 +590,7 @@ bool csGLShader_CG::Open()
 	{
 	  if (doVerbose)
 	    Report (CS_REPORTER_SEVERITY_WARNING,
-	      "Fake fragment program profile '%s' unsupported", profileStr);
+	      "Fake fragment program profile %s unsupported", CS::Quote::Single (profileStr));
 	}
       }
     }

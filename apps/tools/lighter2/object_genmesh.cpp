@@ -671,16 +671,16 @@ namespace lighter
         VFS_FILE_READ);
       if (!paramsData.IsValid())
       {
-        globalLighter->Report ("Error reading '%s'", 
-          paramsFile.GetData());
+        globalLighter->Report ("Error reading %s", 
+          CS::Quote::Single (paramsFile.GetData()));
         return;
       }
       csRef<iDocument> paramsDoc = globalLighter->docSystem->CreateDocument();
       const char* err = paramsDoc->Parse (paramsData);
       if (err != 0)
       {
-        globalLighter->Report ("Error reading '%s': %s", 
-          paramsFile.GetData(), err);
+        globalLighter->Report ("Error reading %s: %s", 
+          CS::Quote::Single (paramsFile.GetData()), err);
         return;
       }
 
@@ -764,8 +764,8 @@ namespace lighter
       err = paramsDoc->Write (globalLighter->vfs, paramsFile);
       if (err != 0)
       {
-        globalLighter->Report ("Error writing '%s': %s", 
-          paramsFile.GetData(), err);
+        globalLighter->Report ("Error writing %s: %s", 
+          CS::Quote::Single (paramsFile.GetData()), err);
       }
     }
   }

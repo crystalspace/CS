@@ -1032,14 +1032,14 @@ void LevTool::SplitThing (iDocumentNode* meshnode, iDocumentNode* parentnode)
 	if (j == 0)
 	{
           newmesh->SetAttribute ("name", th->GetName ());
-	  csPrintf ("Processing '%s' ...\n", th->GetName ()); fflush (stdout);
+	  csPrintf ("Processing %s ...\n", CS::Quote::Single (th->GetName ())); fflush (stdout);
 	}
 	else
 	{
 	  csString newname;
 	  newname.Format ("%s_%d", th->GetName (), j);
           newmesh->SetAttribute ("name", newname);
-	  csPrintf ("Processing '%s' ...\n", newname.GetData()); 
+	  csPrintf ("Processing %s ...\n", CS::Quote::Single (newname.GetData()));
 	  fflush (stdout);
 	}
 
@@ -1584,8 +1584,8 @@ void LevTool::ValidateContents (ltThing* thing)
 	float d = plane.Distance (thing->GetVertex (pol->GetVertex (j)));
 	if (d > 0.01)
 	{
-	  csPrintf ("WARNING! polygon '%s' in thing/part '%s' seems to be non-coplanar with distance %g\n",
-			  pol->GetName (), thing->GetName (), d);
+	  csPrintf ("WARNING! polygon %s in thing/part %s seems to be non-coplanar with distance %g\n",
+			  CS::Quote::Single (pol->GetName ()), CS::Quote::Single (thing->GetName ()), d);
 	}
       }
     }
@@ -1650,7 +1650,8 @@ void LevTool::Main ()
     csPrintf ("     List world contents.\n");
     csPrintf ("  -analyze:\n");         
     csPrintf ("     Analyze all things and show the distribution of size.\n");
-    csPrintf ("              You can use this to decide on the 'minsize' parameter.\n");
+    csPrintf ("              You can use this to decide on the %s parameter.\n",
+	      CS::Quote::Single ("minsize"));
     csPrintf ("  -validate:\n");        
     csPrintf ("     Validate world contents. This will currently check\n");
     csPrintf ("              only for non-coplanar polygons.\n");
@@ -1690,7 +1691,8 @@ void LevTool::Main ()
     csPrintf ("     -minpoly=<number>: min number of polygons (default 6).\n");
     csPrintf ("     -maxpoly=<number>: max number of polygons (default 1000000000).\n");
     csPrintf ("  -planes:\n");          
-    csPrintf ("     Move all 'addon' planes to the polygons that use them.\n");
+    csPrintf ("     Move all %s planes to the polygons that use them.\n",
+	      CS::Quote::Single ("addon"));
     csPrintf ("  -fixpolymesh:\n");       
     csPrintf ("     Fix maps using <polymesh>es by replacing these with <trimesh>es.\n");
     csPrintf ("  -inds=<plugin>:\n");       
@@ -1747,8 +1749,8 @@ void LevTool::Main ()
       if (!inputDS)
       {
 	Report (CS_REPORTER_SEVERITY_ERROR,
-	  "Unable to load input document system '%s'!",
-	  inds);
+	  "Unable to load input document system %s!",
+	  CS::Quote::Single (inds));
         return;
       }
     }
@@ -1761,8 +1763,8 @@ void LevTool::Main ()
       if (!outputDS)
       {
 	Report (CS_REPORTER_SEVERITY_ERROR,
-	  "Unable to load output document system '%s'!",
-	  outds);
+	  "Unable to load output document system %s!",
+	  CS::Quote::Single (outds));
         return;
       }
     }
@@ -1772,7 +1774,8 @@ void LevTool::Main ()
   if (!val)
   {
     ReportError ("Please give VFS world file name or name of the zip archive! "
-      "Use 'levtool -help' to get a list of possible options.");
+      "Use %s to get a list of possible options.",
+      CS::Quote::Single ("levtool -help"));
     return;
   }
 
@@ -1784,8 +1787,8 @@ void LevTool::Main ()
       &actualFilename));
     if (!file.IsValid ())
     {
-      ReportError ("Could not open a '%s' file at given path '%s'.", 
-        actualFilename, val);
+      ReportError ("Could not open a %s file at given path %s.", 
+        CS::Quote::Single (actualFilename), CS::Quote::Single (val));
       return;
     }
     buf = file->GetAllData ();
@@ -1941,7 +1944,8 @@ void LevTool::Main ()
         error = newdoc->Write (vfs, filename);
 	if (error != 0)
 	{
-	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
+	  ReportError ("Error writing %s: %s!",
+		       CS::Quote::Single ((const char*)filename), error);
 	  return;
 	}
       }
@@ -1965,7 +1969,8 @@ void LevTool::Main ()
         error = newdoc->Write (vfs, filename);
 	if (error != 0)
 	{
-	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
+	  ReportError ("Error writing %s: %s!",
+		       CS::Quote::Single ((const char*)filename), error);
 	  return;
 	}
       }
@@ -1992,7 +1997,8 @@ void LevTool::Main ()
         error = newdoc->Write (vfs, filename);
 	if (error != 0)
 	{
-	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
+	  ReportError ("Error writing %s: %s!",
+		       CS::Quote::Single ((const char*)filename), error);
 	  return;
 	}
       }
@@ -2042,7 +2048,8 @@ void LevTool::Main ()
         error = newdoc->Write (vfs, filename);
 	if (error != 0)
 	{
-	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
+	  ReportError ("Error writing %s: %s!",
+		       CS::Quote::Single ((const char*)filename), error);
 	  return;
 	}
       }
@@ -2091,7 +2098,8 @@ void LevTool::Main ()
         error = newdoc->Write (vfs, filename);
 	if (error != 0)
 	{
-	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
+	  ReportError ("Error writing %s: %s!",
+		       CS::Quote::Single ((const char*)filename), error);
 	  return;
 	}
       }
@@ -2127,7 +2135,8 @@ void LevTool::Main ()
         error = newdoc->Write (vfs, filename);
 	if (error != 0)
 	{
-	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
+	  ReportError ("Error writing %s: %s!",
+		       CS::Quote::Single ((const char*)filename), error);
 	  return;
 	}
       }
@@ -2152,7 +2161,8 @@ void LevTool::Main ()
 	csTicks writing_end = csGetTicks();
 	if (error != 0)
 	{
-	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
+	  ReportError ("Error writing %s: %s!",
+		       CS::Quote::Single ((const char*)filename), error);
 	  return;
 	}
 	else
@@ -2183,7 +2193,8 @@ void LevTool::Main ()
         error = newdoc->Write (vfs, filename);
 	if (error != 0)
 	{
-	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
+	  ReportError ("Error writing %s: %s!",
+		       CS::Quote::Single ((const char*)filename), error);
 	  return;
 	}
       }

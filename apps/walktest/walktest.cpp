@@ -246,16 +246,18 @@ void WalkTest::Help ()
   csPrintf ("Options for WalkTest:\n");
   csPrintf ("  -exec=<script>     execute given script at startup\n");
   csPrintf ("  -threaded          use threaded loading (default yes)\n");
-  csPrintf ("  -[no]colldet       collision detection system (default '%scolldet')\n", collider_actor.HasCD () ? "" : "no");
-  csPrintf ("  -[no]logo          draw logo (default '%slogo')\n", do_logo ? "" : "no");
+  csPrintf ("  -[no]colldet       collision detection system (default %s)\n", collider_actor.HasCD () ? "yes" : "no");
+  csPrintf ("  -[no]logo          draw logo (default %s)\n", do_logo ? "yes" : "no");
   csPrintf ("  -[no]collections   load every map in a separate collection (default no)\n");
   csPrintf ("  -[no]dupes         check for duplicate objects in multiple maps (default yes)\n");
   csPrintf ("  -noprecache        after loading don't precache to speed up rendering\n");
   csPrintf ("  -bots              allow random generation of bots\n");
-  csPrintf ("  -[no]saveable      enable/disable engine 'saveable' flag\n");
-  csPrintf ("  -world=<file>      use given world file instead of 'world'\n");
-  csPrintf ("  <path>             load map from VFS <path> (default '%s')\n",
-        cfg->GetStr ("Walktest.Settings.WorldFile", "world"));
+  csPrintf ("  -[no]saveable      enable/disable engine %s flag\n",
+	    CS::Quote::Single ("saveable"));
+  csPrintf ("  -world=<file>      use given world file instead of %s\n",
+	    CS::Quote::Single ("world"));
+  csPrintf ("  <path>             load map from VFS <path> (default %s)\n",
+        CS::Quote::Single (cfg->GetStr ("Walktest.Settings.WorldFile", "world")));
 }
 
 //-----------------------------------------------------------------------------
@@ -734,8 +736,8 @@ bool WalkTest::SetMapDir (const char* map_dir, csString& map_file)
   const char* fileNameToOpen;
   if (!CS::Utility::SmartChDir (myVFS, map_dir, world_file, &fileNameToOpen))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Error setting directory '%s'!",
-	map_dir);
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error setting directory %s!",
+	CS::Quote::Single (map_dir));
     return false;
   }
 
@@ -909,8 +911,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   Font = Gfx2D->GetFontServer ()->LoadFont (cfg_font);
   if (!Font)
   {
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "Couldn't load font '%s', using standard one",
-      cfg_font);
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Couldn't load font %s, using standard one",
+      CS::Quote::Single (cfg_font));
     Font = Gfx2D->GetFontServer ()->LoadFont (CSFONT_COURIER);
   }
   if (!Font)
@@ -966,20 +968,20 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
   // Load from a map file.
   if (num_maps == 1)
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.",
-      first_map->map_name.GetData());
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map %s.",
+      CS::Quote::Single (first_map->map_name.GetData()));
   else if (num_maps == 2 && cache_map != 0)
   {
     if (cache_map != first_map)
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.",
-	      first_map->map_name.GetData());
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map %s.",
+	      CS::Quote::Single (first_map->map_name.GetData()));
     else
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.",
-	      first_map->next_map->map_name.GetData());
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map %s.",
+	      CS::Quote::Single (first_map->next_map->map_name.GetData()));
   }
   else if (num_maps > 1)
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading multiple maps '%s', ...",
-      first_map->map_name.GetData());
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading multiple maps %s, ...",
+      CS::Quote::Single (first_map->map_name.GetData()));
 
   // Check if we have to load every separate map in a separate collection.
   csRef<iCommandLineParser> cmdline = 
@@ -1013,8 +1015,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
     // Load the map from the file.
     if (num_maps > 1)
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "  Loading map '%s'",
-	      map->map_name.GetData());
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "  Loading map %s",
+	      CS::Quote::Single (map->map_name.GetData()));
     iCollection* collection = 0;
     if (do_collections)
     {
@@ -1074,7 +1076,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
       "Map does not contain a valid starting point!\n"
-      "Try adding a room called 'room' or a START keyword");
+      "Try adding a room called %s or a START keyword",
+      CS::Quote::Single ("room"));
     return false;
   }
 

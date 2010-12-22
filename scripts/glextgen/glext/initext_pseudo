@@ -19,16 +19,16 @@
       CS_%Name% = allclear;
       if (CS_%Name%)
       {
-	Report (msgExtFoundAndUsed, "pseudo", ext);
+	Report (msgExtFoundAndUsed, "pseudo", CS::Quote::Single (ext));
       }
       else
       {
-        Report (msgExtInitFail, "pseudo", ext);
+        Report (msgExtInitFail, "pseudo", CS::Quote::Single (ext));
       }
     }
     else
     {
-      Report (msgExtNotFound, "pseudo", ext);
+      Report (msgExtNotFound, "pseudo", CS::Quote::Single (ext));
     }
   }
   

@@ -173,7 +173,8 @@ CS::Animation::MocapParserResult CS::Animation::BVHMocapParser::ParseData ()
   if (!ParseLine (file, buf, 255)
       || strcmp (buf, "HIERARCHY") != 0)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Malformed BVH file: no 'HIERARCHY' tag");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Malformed BVH file: no %s tag",
+	    CS::Quote::Single ("HIERARCHY"));
     goto parsing_failed;
   }
 
@@ -200,8 +201,8 @@ CS::Animation::MocapParserResult CS::Animation::BVHMocapParser::ParseData ()
   if (!result.animPacketFactory)
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
-	    "Could not create animation packet '%s', an another packet with the same name exists probably already",
-	    packetName.GetData ());
+	    "Could not create animation packet %s, an another packet with the same name exists probably already",
+	    CS::Quote::Single (packetName.GetData ()));
     goto parsing_failed;
   }
 
@@ -210,8 +211,8 @@ CS::Animation::MocapParserResult CS::Animation::BVHMocapParser::ParseData ()
   if (!result.skeletonFactory)
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
-	    "Could not create skeleton '%s', an another skeleton with the same name exists probably already",
-	    skeletonName.GetData ());
+	    "Could not create skeleton %s, an another skeleton with the same name exists probably already",
+	    CS::Quote::Single (skeletonName.GetData ()));
     goto parsing_failed;
   }
   result.skeletonFactory->SetAnimationPacket (result.animPacketFactory);
@@ -228,7 +229,8 @@ CS::Animation::MocapParserResult CS::Animation::BVHMocapParser::ParseData ()
   if (!ParseLine (file, buf, 255)
       || strcmp (buf, "MOTION") != 0)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Malformed BVH file: no 'MOTION' tag");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Malformed BVH file: no %s tag",
+	    CS::Quote::Single ("MOTION"));
     goto parsing_failed;
   }
 
@@ -237,7 +239,8 @@ CS::Animation::MocapParserResult CS::Animation::BVHMocapParser::ParseData ()
   if (!ParseLine (file, buf, 255)
       || strncmp (buf, "Frames:", textSize) != 0)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Malformed BVH file: no 'Frames' tag");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Malformed BVH file: no %s tag",
+	    CS::Quote::Single ("Frames"));
     goto parsing_failed;
   }
 
@@ -256,7 +259,8 @@ CS::Animation::MocapParserResult CS::Animation::BVHMocapParser::ParseData ()
   if (!ParseLine (file, buf, 255)
       || strncmp (buf, "Frame Time:", textSize) != 0)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Malformed BVH file: no 'Frame Time' tag");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Malformed BVH file: no %s tag",
+	    CS::Quote::Single ("Frame Time"));
     goto parsing_failed;
   }
 
@@ -328,7 +332,8 @@ bool CS::Animation::BVHMocapParser::ParseSkeletonBone
     // Parse the offset
     if (!ParseLine (file, buf, 511))
       return Report (CS_REPORTER_SEVERITY_ERROR,
-		     "Malformed BVH file: no 'OFFSET' tag");
+		     "Malformed BVH file: no %s tag",
+		     CS::Quote::Single ("OFFSET"));
 
     else if (endSitesAdded)
     {
@@ -338,12 +343,14 @@ bool CS::Animation::BVHMocapParser::ParseSkeletonBone
 
       if (!buffer.StartsWith ("OFFSET "))
 	return Report (CS_REPORTER_SEVERITY_ERROR,
-		       "Malformed BVH file: no 'OFFSET' tag");
+		       "Malformed BVH file: no %s tag",
+		       CS::Quote::Single ("OFFSET"));
 
       csVector3 offset;
       if (!ParseVector (buffer.Slice (strlen ("OFFSET ")), offset))
 	return Report (CS_REPORTER_SEVERITY_ERROR,
-		       "Malformed BVH file: could not parse 'OFFSET' value");
+		       "Malformed BVH file: could not parse %s value",
+		       CS::Quote::Single ("OFFSET"));
 
       // The BVH file format is in a right-handed coordinate system, while CS is left-handed.
       // Therefore, convert the transform:
@@ -371,7 +378,8 @@ bool CS::Animation::BVHMocapParser::ParseSkeletonBone
   {
     if (!buffer.StartsWith ("ROOT "))
       return Report (CS_REPORTER_SEVERITY_ERROR,
-		     "Malformed BVH file: no 'ROOT' tag");
+		     "Malformed BVH file: no %s tag",
+		     CS::Quote::Single ("ROOT"));
     else
       buffer.SubString (boneName, strlen ("ROOT "));
   }
@@ -380,7 +388,8 @@ bool CS::Animation::BVHMocapParser::ParseSkeletonBone
   {
     if (!buffer.StartsWith ("JOINT "))
       return Report (CS_REPORTER_SEVERITY_ERROR,
-		     "Malformed BVH file: no 'JOINT' tag");
+		     "Malformed BVH file: no %s tag",
+		     CS::Quote::Single ("JOINT"));
     else
       buffer.SubString (boneName, strlen ("JOINT "));
   }
@@ -388,29 +397,34 @@ bool CS::Animation::BVHMocapParser::ParseSkeletonBone
   // Parse the start parenthesis
   if (!ParseLine (file, buf, 511))
     return Report (CS_REPORTER_SEVERITY_ERROR,
-		   "Malformed BVH file: no '{' tag");
+		   "Malformed BVH file: no %s tag",
+		   CS::Quote::Single ("{"));
   buffer = buf;
   buffer.Collapse ();
 
   if (buffer != "{")
     return Report (CS_REPORTER_SEVERITY_ERROR,
-		   "Malformed BVH file: no '{' tag");
+		   "Malformed BVH file: no %s tag",
+		   CS::Quote::Single ("{"));
 
   // Parse the offset
   if (!ParseLine (file, buf, 511))
     return Report (CS_REPORTER_SEVERITY_ERROR,
-		   "Malformed BVH file: no 'OFFSET' tag");
+		   "Malformed BVH file: no %s tag",
+		   CS::Quote::Single ("OFFSET"));
   buffer = buf;
   buffer.Collapse ();
 
   if (!buffer.StartsWith ("OFFSET "))
     return Report (CS_REPORTER_SEVERITY_ERROR,
-		   "Malformed BVH file: no 'OFFSET' tag");
+		   "Malformed BVH file: no %s tag",
+		   CS::Quote::Single ("OFFSET"));
 
   csVector3 offset;
   if (!ParseVector (buffer.Slice (strlen ("OFFSET ")), offset))
     return Report (CS_REPORTER_SEVERITY_ERROR,
-		   "Malformed BVH file: could not parse 'OFFSET' value");
+		   "Malformed BVH file: could not parse %s value",
+		   CS::Quote::Single ("OFFSET"));
   // Convert from right- to left-handed coordinate system
   offset[2] = -offset[2];
 
@@ -421,13 +435,15 @@ bool CS::Animation::BVHMocapParser::ParseSkeletonBone
   // Parse the channels
   if (!ParseLine (file, buf, 511))
     return Report (CS_REPORTER_SEVERITY_ERROR,
-		   "Malformed BVH file: no 'CHANNELS' tag");
+		   "Malformed BVH file: no %s tag",
+		   CS::Quote::Single ("CHANNELS"));
   buffer = buf;
   buffer.Collapse ();
 
   if (!buffer.StartsWith ("CHANNELS "))
     return Report (CS_REPORTER_SEVERITY_ERROR,
-		   "Malformed BVH file: no 'CHANNELS' tag");
+		   "Malformed BVH file: no %s tag",
+		   CS::Quote::Single ("CHANNELS"));
 
   // Create the bone entry
   CS::Animation::BoneID boneID = result.skeletonFactory->CreateBone (parentBone);
@@ -446,7 +462,8 @@ bool CS::Animation::BVHMocapParser::ParseSkeletonBone
   // Parse the channels
   if (!ParseChannels (buffer.Slice (strlen ("CHANNELS ")), boneID, offset))
     return Report (CS_REPORTER_SEVERITY_ERROR,
-		   "Malformed BVH file: could not parse 'CHANNELS' values");
+		   "Malformed BVH file: could not parse %s values",
+		   CS::Quote::Single ("CHANNELS"));
 
   // Parse the child bones
   while (1)
@@ -454,7 +471,8 @@ bool CS::Animation::BVHMocapParser::ParseSkeletonBone
     // Parse the end parenthesis
     if (!ParseLine (file, buf, 511))
       return Report (CS_REPORTER_SEVERITY_ERROR,
-		     "Malformed BVH file: no '}' tag");
+		     "Malformed BVH file: no %s tag",
+		     CS::Quote::Single ("}"));
     buffer = buf;
     buffer.Collapse ();
 

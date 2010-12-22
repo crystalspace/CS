@@ -172,7 +172,8 @@ bool DeferredDemo::LoadScene()
 {
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
   if (!vfs->ChDir (cfgWorldDir))
-    return ReportError("Could not navigate to level directory '%s'!", cfgWorldDir.GetDataSafe ());
+    return ReportError("Could not navigate to level directory %s!",
+		       CS::Quote::Single (cfgWorldDir.GetDataSafe ()));
 
   if (!loader->LoadMapFile (cfgWorldFile))
      return ReportError("Could not load level!");
@@ -329,9 +330,11 @@ void DeferredDemo::Help()
   csPrintf ("Options for DeferredDemo:\n");
   csPrintf ("  -nologo            do not draw logo.\n");
   csPrintf ("  -forward           use forward rendering on startup.\n");
-  csPrintf ("  -world=<file>      use given world file instead of 'world'\n");
-  csPrintf ("  -worlddir=<path>   load map from VFS <path> (default '%s')\n", 
-    cfg->GetStr ("Walktest.Settings.WorldFile", DEFAULT_CFG_WORLDDIR));
+  csPrintf ("  -world=<file>      use given world file instead of %s\n",
+	    CS::Quote::Single ("world"));
+  csPrintf ("  -worlddir=<path>   load map from VFS <path> (default %s)\n", 
+    CS::Quote::Single (cfg->GetStr ("Walktest.Settings.WorldFile",
+				    DEFAULT_CFG_WORLDDIR)));
 }
 
 //----------------------------------------------------------------------
@@ -460,7 +463,8 @@ bool DeferredDemo::LoadLogo()
 
   if (!logoTex.IsValid ())
   {
-    return ReportError("Could not load logo '%s'!", cfgLogoFile.GetDataSafe ());
+    return ReportError("Could not load logo %s!",
+		       CS::Quote::Single (cfgLogoFile.GetDataSafe ()));
   }
 
   return true;

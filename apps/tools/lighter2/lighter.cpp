@@ -789,14 +789,19 @@ namespace lighter
 
     csPrintf (" --directlight=<engine>\n");
     csPrintf ("  Calculate direct lighting using specified engine.  Valid engines are:\n");
-    csPrintf ("    'none' - Disable direct lighting (useful for debugging)\n");
-    csPrintf ("    'raytracer' - DEFAULT, sharp shadows, no noise, faster\n");
-    csPrintf ("    'photonmapper' - Softer shadows, noisy, slower\n\n");
+    csPrintf ("    %s - Disable direct lighting (useful for debugging)\n",
+	      CS::Quote::Single ("none"));
+    csPrintf ("    %s - DEFAULT, sharp shadows, no noise, faster\n",
+	      CS::Quote::Single ("raytracer"));
+    csPrintf ("    %s - Softer shadows, noisy, slower\n\n",
+	      CS::Quote::Single ("photonmapper"));
 
     csPrintf (" --indirectlight=<engine>\n");
     csPrintf ("  Calculate indirect lighting using specified engine.  Valid engines are:\n");
-    csPrintf ("    'none' - DEFAULT, Disable indirect lighting (much faster)\n");
-    csPrintf ("    'photonmapper' - Slower but more realistic (captures color blead)\n\n");
+    csPrintf ("    %s - DEFAULT, Disable indirect lighting (much faster)\n",
+	      CS::Quote::Single ("none"));
+    csPrintf ("    %s - Slower but more realistic (captures color bleed)\n\n",
+	      CS::Quote::Single ("photonmapper"));
 
     csPrintf (" --lmdensity=<number>\n");
     csPrintf ("  Set scaling between world space units and lightmap pixels\n");
@@ -817,7 +822,8 @@ namespace lighter
 
     csPrintf (" --lightpowerscale\n");
     csPrintf ("  Scale the power of all light sources evenly by the indicated value.\n");
-    csPrintf ("  Note that this effects both raytracing and photonmapping (useful with 'forceRealistic').\n");
+    csPrintf ("  Note that this effects both raytracing and photonmapping (useful with %s).\n",
+	      CS::Quote::Single ("forceRealistic"));
     csPrintf ("   Default: 1.0\n\n");
 
     csPrintf (" --normalstolerance=<angle>\n");
@@ -864,7 +870,8 @@ namespace lighter
       csPrintf ("   Default: true\n\n");
 
       csPrintf (" --[no]forcerealistic\n");
-      csPrintf ("  Override light attenuation to be 'realistic' (important if combining with photonmapping).\n");
+      csPrintf ("  Override light attenuation to be %s (important if combining with photonmapping).\n",
+		CS::Quote::Single ("realistic"));
       csPrintf ("   Default: false\n\n");
     }
 

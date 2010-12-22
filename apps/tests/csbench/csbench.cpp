@@ -159,7 +159,8 @@ bool CsBench::SetupMaterials ()
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
         "crystalspace.application.simple1",
-        "Error loading 'stone4' texture!");
+        "Error loading %s texture!",
+	CS::Quote::Single ("stone4"));
     return false;
   }
   if (!loader->LoadTexture ("stone_normal", "/lib/stdtex/stone2DOT3.png", 
@@ -167,7 +168,8 @@ bool CsBench::SetupMaterials ()
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
         "crystalspace.application.simple1",
-        "Error loading 'stone2DOT3' texture!");
+        "Error loading %s texture!",
+	CS::Quote::Single ("stone2DOT3"));
     return false;
   }
   material = engine->GetMaterialList ()->FindByName ("stone");
@@ -523,8 +525,10 @@ void CsBench::PerformTests ()
 # else
   Report ("Crystal Space compiled in release mode.");
 # endif
-  Report ("Compiler '%s', platform '%s', processor '%s'",
-  	CS_COMPILER_NAME, CS_PLATFORM_NAME, CS_PROCESSOR_NAME);
+  Report ("Compiler %s, platform %s, processor %s",
+	  CS::Quote::Single (CS_COMPILER_NAME),
+	  CS::Quote::Single (CS_PLATFORM_NAME),
+	  CS::Quote::Single (CS_PROCESSOR_NAME));
 #ifdef CS_NO_QSQRT
   Report ("csQsqrt() disabled!");
 #endif

@@ -119,11 +119,11 @@ bool WalkTest::LoadCamera (const char *fName)
 #define IFFAIL(x) if (ok && !(ok = (x)))
   IFFAIL (myVFS->Exists (fName))
     Report (CS_REPORTER_SEVERITY_WARNING,
-	    "Could not open camera file '%s'!", fName);
+	    "Could not open camera file %s!", CS::Quote::Single (fName));
   csRef<iDataBuffer> data;
   IFFAIL ((data = myVFS->ReadFile(fName)) != 0)
     Report (CS_REPORTER_SEVERITY_WARNING,
-	    "Could not read camera file '%s'!", fName);
+	    "Could not read camera file %s!", CS::Quote::Single (fName));
   csMatrix3 m;
   csVector3 v;
   int imirror = false;
@@ -145,12 +145,12 @@ bool WalkTest::LoadCamera (const char *fName)
 			   sector_name,
 			   &imirror))
     Report (CS_REPORTER_SEVERITY_WARNING,
-	    "Wrong format for camera file '%s'", fName);
+	    "Wrong format for camera file %s", CS::Quote::Single (fName));
   iSector* s = 0;
   IFFAIL ((s = Engine->GetSectors ()->FindByName (sector_name)) != 0)
     Report (CS_REPORTER_SEVERITY_WARNING,
-	    "Sector `%s' in coordinate file does not "
-	    "exist in this map!", sector_name);
+	    "Sector %s in coordinate file does not "
+	    "exist in this map!", CS::Quote::Single (sector_name));
   if (ok)
   {
     iCamera *c = views->GetCamera ();
@@ -181,7 +181,7 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
   if (!Sys->Engine->GetMaterialList ()->FindByName (txtname))
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"Can't find material '%s' in memory!", txtname);
+    	"Can't find material %s in memory!", CS::Quote::Single (txtname));
     return;
   }
 
@@ -189,7 +189,7 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
   if (!rc.success)
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "There was an error reading model '%s'!", filename);
+      "There was an error reading model %s!", CS::Quote::Single (filename));
     return;
   }
 
@@ -207,7 +207,7 @@ iMeshWrapper* GenerateSprite(const char* tname, char* sname, iSector* where,
   if (!tmpl)
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"Unknown mesh factory '%s'!", tname);
+    	"Unknown mesh factory %s!", CS::Quote::Single (tname));
     return 0;
   }
   csRef<iMeshWrapper> spr (Sys->Engine->CreateMeshWrapper (tmpl, sname));
@@ -225,7 +225,7 @@ iMeshWrapper* add_meshobj (const char* tname, char* sname, iSector* where,
   if (!tmpl)
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"Unknown mesh factory '%s'!", tname);
+    	"Unknown mesh factory %s!", CS::Quote::Single (tname));
     return 0;
   }
   csRef<iMeshWrapper> spr (
@@ -644,7 +644,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
 	    if (portal == 0)
 	    {
 	      Sys->Report (CS_REPORTER_SEVERITY_WARNING,
-	    	  "Cannot find a portal named '%s'!", polyname);
+	    	  "Cannot find a portal named %s!", CS::Quote::Single (polyname));
 	    }
 	    else
 	    {
@@ -853,7 +853,8 @@ bool CommandHandler (const char *cmd, const char *arg)
 
       if (!plugin)
 	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-		"Bad value for plugin (see 'plugins' command)!");
+		"Bad value for plugin (see %s command)!",
+		CS::Quote::Single ("plugins"));
       else
       {
         csRef<iPluginConfig> config (scfQueryInterface<iPluginConfig> (plugin));
@@ -898,7 +899,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     else
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Expected index to plugin (from 'plugins' command)!");
+      	"Expected index to plugin (from %s command)!",
+	CS::Quote::Single ("plugins"));
   }
   else if (!csStrCaseCmp (cmd, "confset"))
   {
@@ -922,7 +924,8 @@ bool CommandHandler (const char *cmd, const char *arg)
       if (!plugin)
       {
 	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-		"Bad value for plugin (see 'plugins' command)!");
+		"Bad value for plugin (see %s command)!",
+		CS::Quote::Single ("plugins"));
       }
       else
       {
@@ -931,7 +934,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     else
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Expected index to plugin (from 'plugins' command)!");
+      	"Expected index to plugin (from %s command)!",
+	CS::Quote::Single ("plugins"));
   }
   else if (!csStrCaseCmp (cmd, "saverec"))
   {
@@ -1148,7 +1152,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       if (!Sys->SetMapDir (level, levelFile))
       {
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	  "Couldn't open level '%s'!", level);
+      	  "Couldn't open level %s!", CS::Quote::Single (level));
 	return false;
       }
       csRef<iEngineSequenceManager> engseq = csQueryRegistry<
@@ -1163,7 +1167,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       if (!Sys->LevelLoader->LoadMapFile (levelFile))
       {
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-          "Couldn't load level '%s'!", level);
+          "Couldn't load level %s!", CS::Quote::Single (level));
         return false;
       }
       Sys->Engine->Prepare ();
@@ -1173,7 +1177,8 @@ bool CommandHandler (const char *cmd, const char *arg)
       {
         Sys->Report (CS_REPORTER_SEVERITY_ERROR,
           "Map does not contain a valid starting point!\n"
-          "Try adding a room called 'room' or a START keyword");
+          "Try adding a room called %s or a START keyword",
+	  CS::Quote::Single ("room"));
         return false;
       }
       Sys->InitCollDet (Sys->Engine, 0);
@@ -1190,7 +1195,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     else
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Expected parameter 'level'!");
+      	"Expected parameter %s!", CS::Quote::Single ("level"));
   }
   else if (!csStrCaseCmp (cmd, "fs_inter"))
   {
@@ -1481,7 +1486,10 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (cnt != 3)
     {
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Expected parameters 'file','template','texture'!");
+      	"Expected parameters %s,%s,%s!",
+	CS::Quote::Single ("file"),
+	CS::Quote::Single ("template"),
+	CS::Quote::Single ("texture"));
     }
     else load_meshobj (filename, tempname, txtname);
   }
@@ -1495,7 +1503,10 @@ bool CommandHandler (const char *cmd, const char *arg)
     if(cnt != 3)
     {
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Expected parameters 'templatename','meshname','size'!");
+      	"Expected parameters %s,%s,%s!",
+	CS::Quote::Single ("templatename"),
+	CS::Quote::Single ("meshname"),
+	CS::Quote::Single ("size"));
     }
     else
     {
@@ -1533,9 +1544,10 @@ bool CommandHandler (const char *cmd, const char *arg)
     if(cnt != 1)
     {
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Expected parameters 'meshname'!");
+      	"Expected parameters %s!",
+	CS::Quote::Single ("meshname"));
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"To get the names use 'listmeshes'");
+      	"To get the names use %s", CS::Quote::Single ("listmeshes"));
     }
     else
     {
@@ -1559,9 +1571,10 @@ bool CommandHandler (const char *cmd, const char *arg)
       else
       {
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-		"Expected parameters 'meshname'!");
+		"Expected parameters %s!", CS::Quote::Single ("meshname"));
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-		"To get the names use 'listmeshes'");
+		"To get the names use %s",
+		CS::Quote::Single ("listmeshes"));
       }
     }
   }
@@ -1574,9 +1587,11 @@ bool CommandHandler (const char *cmd, const char *arg)
     if(cnt != 2)
     {
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Expected parameters 'meshname,action'!");
+      	"Expected parameters %s!",
+	CS::Quote::Single ("meshname,action"));
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"To get the names use 'listmeshes'");
+      	"To get the names use %s",
+	CS::Quote::Single ("listmeshes"));
     }
     else
     {
@@ -1595,7 +1610,8 @@ bool CommandHandler (const char *cmd, const char *arg)
           if (!state->SetAction (action))
 	  {
             Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-		         "Expected parameters 'meshname,action'!");
+		         "Expected parameters %s!",
+			 CS::Quote::Single ("meshname,action"));
 	    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
 		   "That mesh does not have that action.");
 	  }
@@ -1713,7 +1729,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (!l)
     {
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Couldn't find light '%s' in this sector!", name);
+      	"Couldn't find light %s in this sector!", CS::Quote::Single (name));
     }
     else
     {
@@ -1782,7 +1798,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
       else
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-		"Sound '%s' not found!", arg);
+		"Sound %s not found!", CS::Quote::Single (arg));
     }
   }
   else if (!csStrCaseCmp (cmd, "snd_volume"))
@@ -1842,7 +1858,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (Sys->myVFS->Exists (arg))
     {
       Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,
-        "saveworld: Specified file `%s' already exists.", arg);
+        "saveworld: Specified file %s already exists.", CS::Quote::Single (arg));
       return true;
     }
     csRef<iSaver> saver = csQueryRegistry<iSaver> (Sys->object_reg);
@@ -1858,7 +1874,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->object_reg->Register (saver, "iSaver");
     }
     if (saver->SaveMapFile (arg))
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "saveworld: Saved world to `%s'", arg);
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "saveworld: Saved world to %s", CS::Quote::Single (arg));
     else
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "saveworld: Error saving map file!");
   }
@@ -1911,8 +1927,8 @@ bool CommandHandler (const char *cmd, const char *arg)
       shot = csImageManipulate::Crop (shot, 0, g2dh - dim, dim, dim);
       csRef<iDataBuffer> data = iio->Save (shot, "image/png");
       if (Sys->myVFS->WriteFile (fn, data->GetData(), data->GetSize()))
-	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Written '%s'...",
-	  fn.GetData());
+	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Written %s...",
+	  CS::Quote::Single (fn.GetData()));
     }
     
     Sys->myG2D->SetClipRect (cMinX, cMinY, cMaxX, xMaxY);
@@ -1955,7 +1971,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       bool success = bugplug->ExecCommand (arg);
       if (!success)
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, 
-        "bugplug failed to execute '%s'", arg);
+        "bugplug failed to execute %s", CS::Quote::Single (arg));
     }
   }
   else if (!csStrCaseCmp (cmd, "sk2"))

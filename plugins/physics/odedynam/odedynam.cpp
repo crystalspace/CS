@@ -242,7 +242,7 @@ static void HandleMessageSeverity (iObjectRegistry* object_reg,
   else
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-      messageID, "Unknown message severity '%s'", sevStr);
+      messageID, "Unknown message severity %s", CS::Quote::Single (sevStr));
   }
 }
 
@@ -1219,8 +1219,8 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
   if (!trimesh || trimesh->GetVertexCount () == 0
       || trimesh->GetTriangleCount () == 0)
   {
-    csFPrintf(stderr, "csODECollider: No collision polygons, triangles or vertices on mesh factory '%s'\n",
-      mesh->QueryObject()->GetName());
+    csFPrintf(stderr, "csODECollider: No collision polygons, triangles or vertices on mesh factory %s\n",
+      CS::Quote::Single (mesh->QueryObject()->GetName()));
     return false;
   }
 

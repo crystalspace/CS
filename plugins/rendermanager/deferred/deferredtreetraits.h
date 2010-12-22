@@ -26,6 +26,7 @@
 #include "csutil/comparator.h"
 #include "csutil/compileassert.h"
 #include "csutil/stringarray.h"
+#include "csutil/stringquote.h"
 #include "csutil/cfgacc.h"
 #include "csplugincommon/rendermanager/lightsetup.h"
 #include "csplugincommon/rendermanager/renderview.h"
@@ -107,7 +108,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         if (p <= 0)
         {
           csReport (registry, CS_REPORTER_SEVERITY_WARNING,
-            messageID, "Unknown render priority '%s' specified.", strArray[i]);
+            messageID, "Unknown render priority %s specified.", CS::Quote::Single (strArray[i]));
         }
         else
         {

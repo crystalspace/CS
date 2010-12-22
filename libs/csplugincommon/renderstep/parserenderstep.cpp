@@ -57,7 +57,8 @@ csPtr<iRenderStep> csRenderStepParser::Parse (
       synldr->ReportError (
 	"crystalspace.renderloop.step.parser",
 	node,
-	"'plugin' attribute missing");
+	"%s attribute missing",
+	CS::Quote::Single ("plugin"));
     }					  
     return 0;
   }
@@ -77,8 +78,8 @@ csPtr<iRenderStep> csRenderStepParser::Parse (
       synldr->ReportError (
 	"crystalspace.renderloop.step.parser",
 	node,
-	"Could not retrieve plugin '%s'",
-	pluginID);
+	"Could not retrieve plugin %s",
+	CS::Quote::Single (pluginID));
     }					  
     return 0;
   }

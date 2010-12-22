@@ -84,7 +84,8 @@ bool csTranslatorLoaderXml::Process (iDocumentNode* node, const char* lang)
         {
           synldr->ReportError (
           	"crystalspace.translation.loader.xml",
-          	node, "Translator: Missing 'name' attribute!");
+          	node, "Translator: Missing %s attribute!",
+		CS::Quote::Single ("name"));
           return false;
         }
         if (!strcmp (lang, language))

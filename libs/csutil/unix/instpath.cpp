@@ -26,6 +26,7 @@
    needed here */
 #include "csver.h.template"
 #include "csutil/util.h"
+#include "csutil/stringquote.h"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
 
@@ -109,8 +110,8 @@ csString csGetConfigPath ()
     }
     
     csFPrintf (stderr,
-        "Failed to find vfs.cfg in '%s' (defined by "
-        "CRYSTAL_" VERSION_STR " var).\n", crystal);
+        "Failed to find vfs.cfg in %s (defined by "
+        "CRYSTAL_" VERSION_STR " var).\n", CS::Quote::Single (crystal));
     return "";
   }
 

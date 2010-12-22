@@ -22,6 +22,8 @@
 
 #include "ivaria/reporter.h"
 
+#include "csutil/stringquote.h"
+
 #include "glshader_cg.h"
 #include "glshader_cgcommon.h"
 
@@ -47,7 +49,7 @@ bool csShaderGLCGCommon::ParseClip (iDocumentNode* node)
         synsrv->Report ("crystalspace.graphics3d.shader.glcg",
           CS_REPORTER_SEVERITY_WARNING,
           node,
-          "Invalid 'space' attribute %s", space);
+          "Invalid %s attribute %s", CS::Quote::Single ("space"), space);
       return false;
     }
   }
@@ -99,7 +101,7 @@ bool csShaderGLCGCommon::ParseClip (iDocumentNode* node)
 	  synsrv->Report ("crystalspace.graphics3d.shader.glcg",
 	    CS_REPORTER_SEVERITY_WARNING,
 	    node,
-	    "Invalid 'comp' attribute %s", fullCompStr);
+	    "Invalid %s attribute %s", CS::Quote::Single ("comp"), fullCompStr);
 	return false;
       }
     }
@@ -121,7 +123,8 @@ bool csShaderGLCGCommon::ParseVmap (iDocumentNode* node)
   {
     synsrv->Report ("crystalspace.graphics3d.shader.common",
       CS_REPORTER_SEVERITY_WARNING, node,
-      "<variablemap> has no 'destination' attribute");
+      "<variablemap> has no %s attribute",
+      CS::Quote::Single ("destination"));
     return false;
   }
   
@@ -261,7 +264,7 @@ bool csShaderGLCGCommon::GetProgramNode (iDocumentNode* passProgNode)
 	      {
 		synsrv->Report ("crystalspace.graphics3d.shader.cg",
 		  CS_REPORTER_SEVERITY_WARNING, child,
-		  "Could not open '%s'", filename);
+		  "Could not open %s", CS::Quote::Single (filename));
 		return false;
 	      }
     

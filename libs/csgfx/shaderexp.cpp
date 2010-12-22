@@ -27,6 +27,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "csutil/scanstr.h"
 #include "csutil/scfarray.h"
+#include "csutil/stringquote.h"
 #include "csutil/sysfunc.h"
 
 #include "iutil/strset.h"
@@ -600,8 +601,8 @@ bool csShaderExpression::eval_const (cons*& head)
 
     if (cell->cdr)
     {
-      EvalError ("Single argument operator \'%s\' has more than 1 argument.", 
-        GetOperName (oper));
+      EvalError ("Single argument operator %s has more than 1 argument.", 
+        CS::Quote::Single (GetOperName (oper)));
 
       return false;
     }
@@ -918,8 +919,8 @@ bool csShaderExpression::eval_oper (int oper, oper_arg arg1, oper_arg arg2,
     csShaderVariable* var = ResolveVar (arg1.var);
     if (!var)
     {
-      EvalError ("Cannot resolve variable name '%s' in symbol table.", 
-        strset->Request (arg1.var.id));
+      EvalError ("Cannot resolve variable name %s in symbol table.", 
+        CS::Quote::Single (strset->Request (arg1.var.id)));
 
       return false;
     }
@@ -937,8 +938,8 @@ bool csShaderExpression::eval_oper (int oper, oper_arg arg1, oper_arg arg2,
     csShaderVariable* var = ResolveVar (arg2.var);
     if (!var)
     {
-      EvalError ("Cannot resolve variable name '%s' in symbol table.", 
-        strset->Request (arg2.var.id));
+      EvalError ("Cannot resolve variable name %s in symbol table.", 
+        CS::Quote::Single (strset->Request (arg2.var.id)));
 
       return false;
     }
@@ -988,8 +989,8 @@ bool csShaderExpression::eval_oper (int oper, oper_arg arg1, oper_arg& output)
     csShaderVariable* var = ResolveVar (arg1.var);
     if (!var)
     {
-      EvalError ("Cannot resolve variable name '%s' in symbol table.", 
-        strset->Request (arg1.var.id));
+      EvalError ("Cannot resolve variable name %s in symbol table.", 
+        CS::Quote::Single (strset->Request (arg1.var.id)));
 
       return false;
     }
@@ -1785,7 +1786,7 @@ bool csShaderExpression::parse_xml (cons* head, iDocumentNode* node)
   }
   else if (tok <= OP_INVALID || tok >= OP_LIMIT)
   {
-    ParseError ("Invalid XML token: '%s'.", node->GetValue ());
+    ParseError ("Invalid XML token: %s.", CS::Quote::Single (node->GetValue ()));
 
     return false;
   }
@@ -1869,7 +1870,7 @@ bool csShaderExpression::parse_sexp_form (const char*& text, cons* head)
   csStringID func_name = GetSexpTokenOp (tmp2);
   if (func_name <= OP_INVALID || func_name >= OP_LIMIT)
   {
-    ParseError ("Invalid S-EXP function-name: '%s'.", tmp2);
+    ParseError ("Invalid S-EXP function-name: %s.", CS::Quote::Single (tmp2));
 
     return false;
   }
@@ -1974,7 +1975,8 @@ bool csShaderExpression::parse_sexp_atom (const char*& text, cons* head)
 
     if (*text != ')') 
     {
-      ParseError ("Vector doesn't terminate with ')', or too many elements in vector. Error at position: %s", text);
+      ParseError ("Vector doesn't terminate with %s, or too many elements in vector. Error at position: %s",
+		  CS::Quote::Single (")"), text);
       return false;
     }
 

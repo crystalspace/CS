@@ -19,6 +19,8 @@
 #include "cssysdef.h"
 
 #include "csgeom/sphere.h"
+#include "csutil/stringquote.h"
+
 #include "imap/services.h"
 #include "ivaria/reporter.h"
 #include "ivaria/sequence.h"
@@ -89,8 +91,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     {
       SyntaxService->ReportError (
         "crystalspace.maploader.parse.sequence", opnode,
-        "Missing attribute '%s' or '%s_par' in sequence '%s'!",
-        partype, partype, seqname);
+        "Missing attribute %s or %s in sequence %s!",
+        CS::Quote::Single (partype),
+	CS::Quote::Single (csString().Format ("%s_par", partype)),
+	CS::Quote::Single (seqname));
       return 0;
     }
 
@@ -100,8 +104,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
         SyntaxService->ReportError (
           "crystalspace.maploader.parse.sequence", opnode,
-          "No parameters defined in sequence '%s'!",
-          seqname);
+          "No parameters defined in sequence %s!",
+          CS::Quote::Single (seqname));
         return 0;
       }
       csRef<iParameterESM> par = base_params->CreateParameterESM (parname);
@@ -109,8 +113,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
         SyntaxService->ReportError (
           "crystalspace.maploader.parse.sequence", opnode,
-          "Parameter '%s' is not defined in sequence '%s'!",
-          parname, seqname);
+          "Parameter %s is not defined in sequence %s!",
+          CS::Quote::Single (parname), CS::Quote::Single (seqname));
         return 0;
       }
       return csPtr<iParameterESM>(par);
@@ -153,15 +157,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       case PARTYPE_POLYGON:
         SyntaxService->Report (
           "crystalspace.maploader.parse.sequence", CS_REPORTER_SEVERITY_WARNING,
-          opnode, "The 'polygon' parameter is obsolete since thing objects have been removed.");
+          opnode, "The %s parameter is obsolete since thing objects have been removed.",
+	  CS::Quote::Single ("polygon"));
         break;
       }
       if (!value)
       {
         SyntaxService->ReportError (
           "crystalspace.maploader.parse.sequence",
-          opnode, "Couldn't find %s '%s' (sequence '%s)'!",
-          partype, parname, seqname);
+          opnode, "Couldn't find %s %s (sequence %s)!",
+          partype, CS::Quote::Single (parname), CS::Quote::Single (seqname));
         return 0;
       }
       return eseqmgr->CreateParameterESM (value);
@@ -186,8 +191,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
         SyntaxService->ReportError (
           "crystalspace.maploader.parse.sequenceparams", child,
-          "Sequence '%s' doesn't have parameters (%s '%s')!",
-          sequence->QueryObject ()->GetName (), parenttype, parentname);
+          "Sequence %s doesn't have parameters (%s %s)!",
+          CS::Quote::Single (sequence->QueryObject ()->GetName ()),
+	  parenttype, CS::Quote::Single (parentname));
         error = true;
         return 0;
       }
@@ -197,8 +203,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
         SyntaxService->ReportError (
           "crystalspace.maploader.parse.sequenceparams", child,
-          "Missing 'name' attribute in %s '%s'!",
-          parenttype, parentname);
+          "Missing %s attribute in %s %s!",
+	  CS::Quote::Single ("name"),
+          parenttype, CS::Quote::Single (parentname));
         error = true;
         return 0;
       }
@@ -207,8 +214,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
         SyntaxService->ReportError (
           "crystalspace.maploader.parse.sequenceparams", child,
-          "Bad parameter '%s' for sequence '%s' (%s '%s')!",
-          parname, sequence->QueryObject ()->GetName (), parenttype, parentname);
+          "Bad parameter %s for sequence %s (%s %s)!",
+          CS::Quote::Single (parname),
+	  CS::Quote::Single (sequence->QueryObject ()->GetName ()),
+	  parenttype, CS::Quote::Single (parentname));
         error = true;
         return 0;
       }
@@ -224,8 +233,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.sequenceparams", child,
-              "Missing 'mesh' attribute in %s '%s'!",
-              parenttype, parentname);
+              "Missing %s attribute in %s %s!",
+	      CS::Quote::Single ("mesh"),
+              parenttype, CS::Quote::Single (parentname));
             error = true;
             return 0;
           }
@@ -234,8 +244,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.sequenceparams", child,
-              "Couldn't find mesh '%s' in %s '%s'!",
-              meshname, parenttype, parentname);
+              "Couldn't find mesh %s in %s %s!",
+              CS::Quote::Single (meshname),
+	      parenttype, CS::Quote::Single (parentname));
             error = true;
             return 0;
           }
@@ -250,8 +261,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.sequenceparams", child,
-              "Missing 'light' attribute in %s '%s'!",
-              parenttype, parentname);
+              "Missing %s attribute in %s %s!",
+	      CS::Quote::Single ("light"),
+              parenttype, CS::Quote::Single (parentname));
             error = true;
             return 0;
           }
@@ -260,8 +272,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.sequenceparams", child,
-              "Couldn't find light '%s' in %s '%s'!",
-              lightname, parenttype, parentname);
+              "Couldn't find light %s in %s %s!",
+              CS::Quote::Single (lightname),
+	      parenttype, CS::Quote::Single (parentname));
             error = true;
             return 0;
           }
@@ -276,8 +289,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.sequenceparams", child,
-              "Missing 'sector' attribute in %s '%s'!",
-              parenttype, parentname);
+              "Missing %s attribute in %s %s!",
+	      CS::Quote::Single ("sector"),
+              parenttype, CS::Quote::Single (parentname));
             error = true;
             return 0;
           }
@@ -286,8 +300,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.sequenceparams", child,
-              "Couldn't find sector '%s' in %s '%s'!",
-              sectname, parenttype, parentname);
+              "Couldn't find sector %s in %s %s!",
+              CS::Quote::Single (sectname),
+	      parenttype, CS::Quote::Single (parentname));
             error = true;
             return 0;
           }
@@ -302,8 +317,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.sequenceparams", child,
-              "Missing 'material' attribute in %s '%s'!",
-              parenttype, parentname);
+              "Missing %s attribute in %s %s!",
+	      CS::Quote::Single ("material"),
+              parenttype, CS::Quote::Single (parentname));
             error = true;
             return 0;
           }
@@ -312,8 +328,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.sequenceparams", child,
-              "Couldn't find material '%s' in %s '%s'!",
-              matname, parenttype, parentname);
+              "Couldn't find material %s in %s %s!",
+              CS::Quote::Single (matname), parenttype, CS::Quote::Single (parentname));
             error = true;
             return 0;
           }
@@ -324,7 +340,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       case XMLTOKEN_POLYGON:
         SyntaxService->Report (
           "crystalspace.maploader.parse.sequence", CS_REPORTER_SEVERITY_WARNING,
-          child, "The 'polygon' parameter is obsolete since thing objects have been removed.");
+          child, "The %s parameter is obsolete since thing objects have been removed.",
+	  CS::Quote::Single ("polygon"));
         break;
       default:
         SyntaxService->ReportBadToken (child);
@@ -336,8 +353,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     {
       SyntaxService->ReportError (
         "crystalspace.maploader.parse.sequenceparams", node,
-        "Missing parameters for firing sequence in %s '%s'!",
-        parenttype, parentname);
+        "Missing parameters for firing sequence in %s %s!",
+        parenttype, CS::Quote::Single (parentname));
       error = true;
       return 0;
     }
@@ -372,8 +389,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.trigger",
-              child, "Couldn't find 'mesh' attribute in trigger '%s'!",
-              trigname);
+              child, "Couldn't find %s attribute in trigger %s!",
+	      CS::Quote::Single ("mesh"),
+              CS::Quote::Single (trigname));
             return 0;
           }
 
@@ -382,8 +400,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.trigger",
-              child, "Couldn't find mesh '%s' in trigger '%s'!", meshname,
-              trigname);
+              child, "Couldn't find mesh %s in trigger %s!",
+	      CS::Quote::Single (meshname),
+              CS::Quote::Single (trigname));
             return 0;
           }
           trigger->AddConditionMeshClick (mesh);
@@ -396,8 +415,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.trigger",
-              child, "Couldn't find 'light' attribute in trigger '%s'!",
-              trigname);
+              child, "Couldn't find %s attribute in trigger %s!",
+	      CS::Quote::Single ("light"),
+              CS::Quote::Single (trigname));
             return 0;
           }
           iLight* light = ldr_context->FindLight (lightname);
@@ -405,8 +425,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.trigger",
-              child, "Couldn't find light '%s' in trigger '%s'!", lightname,
-              trigname);
+              child, "Couldn't find light %s in trigger %s!",
+	      CS::Quote::Single (lightname),
+              CS::Quote::Single (trigname));
             return 0;
           }
           int oper = -1;
@@ -437,8 +458,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.trigger",
-              child, "Couldn't find 'sector' attribute in trigger '%s'!",
-              trigname);
+              child, "Couldn't find %s attribute in trigger %s!",
+	      CS::Quote::Single ("sector"),
+              CS::Quote::Single (trigname));
             return 0;
           }
 
@@ -447,8 +469,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.trigger",
-              child, "Couldn't find sector '%s' in trigger '%s'!", sectname,
-              trigname);
+              child, "Couldn't find sector %s in trigger %s!",
+	      CS::Quote::Single (sectname),
+              CS::Quote::Single (trigname));
             return 0;
           }
           bool insideonly = false;
@@ -487,8 +510,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.trigger",
-              child, "Couldn't find 'sequence' attribute in trigger '%s'!",
-              trigname);
+              child, "Couldn't find %s attribute in trigger %s!",
+	      CS::Quote::Single ("sequence"),
+              CS::Quote::Single (trigname));
             return 0;
           }
 
@@ -497,8 +521,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.trigger",
-              child, "Couldn't find sequence '%s' in trigger '%s'!",
-              seqname, trigname);
+              child, "Couldn't find sequence %s in trigger %s!",
+              CS::Quote::Single (seqname), CS::Quote::Single (trigname));
             return 0;
           }
 
@@ -571,7 +595,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     {
       SyntaxService->ReportError (
         "crystalspace.maploader.parse.trigger",
-        node, "Duplicate sequence '%s'!", seqname);
+        node, "Duplicate sequence %s!", CS::Quote::Single (seqname));
       return 0;
     }
 
@@ -637,8 +661,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.sequence",
-              child, "Missing 'sequence' in sequence '%s'!",
-              seqname);
+              child, "Missing %s in sequence %s!",
+	      CS::Quote::Single ("sequence"),
+              CS::Quote::Single (seqname));
             return 0;
           }
           iSequenceWrapper* sequence2 = FindSequence (eseqmgr, seqname2);
@@ -646,8 +671,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.sequence",
-              child, "Can't find sequence '%s' in sequence '%s'!",
-              seqname2, seqname);
+              child, "Can't find sequence %s in sequence %s!",
+              CS::Quote::Single (seqname2), CS::Quote::Single (seqname));
             return 0;
           }
           bool error;
@@ -673,8 +698,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.sequence", child,
-              "Delay tag in sequence '%s' must specify time, or min and max!",
-              seqname);
+              "Delay tag in sequence %s must specify time, or min and max!",
+              CS::Quote::Single (seqname));
             return 0;
           }
           if (!time)
@@ -776,8 +801,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
                 default:
                   SyntaxService->ReportError (
                     "crystalspace.maploader.parse.sequence",
-                    child2, "Maximum 3 rotations in sequence '%s'!",
-                    seqname);
+                    child2, "Maximum 3 rotations in sequence %s!",
+                    CS::Quote::Single (seqname));
                   return 0;
                 }
                 nr++;
@@ -917,7 +942,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.sequence", child,
-              "Please specify a variable name ('var' attribute)!");
+              "Please specify a variable name (%s attribute)!",
+	      CS::Quote::Single ("var"));
             return 0;
           }
           var = FindSharedVariable (varname, iSharedVariable::SV_UNKNOWN);
@@ -925,8 +951,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.sequence", child,
-              "Shared variable '%s' not found for 'var'!",
-              varname);
+              "Shared variable %s not found for %s!",
+              CS::Quote::Single (varname),
+	      CS::Quote::Single ("var"));
             return 0;
           }
           csRef<iDocumentAttribute> value_a = child->GetAttribute ("value");
@@ -944,8 +971,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             {
               SyntaxService->ReportError (
                 "crystalspace.maploader.parse.sequence", child,
-                "Variable '%s' is not a float variable!",
-                varname);
+                "Variable %s is not a float variable!",
+                CS::Quote::Single (varname));
               return 0;
             }
             sequence->AddOperationSetVariable (cur_time, var, 0, v);
@@ -960,8 +987,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             {
               SyntaxService->ReportError (
                 "crystalspace.maploader.parse.sequence", child,
-                "Shared variable '%s' not found for 'value_var'!",
-                value_var_name);
+                "Shared variable %s not found for %s!",
+                CS::Quote::Single (value_var_name),
+		CS::Quote::Single ("value_var"));
               return 0;
             }
             sequence->AddOperationSetVariable (cur_time, var, srcvar, 0);
@@ -976,16 +1004,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             {
               SyntaxService->ReportError (
                 "crystalspace.maploader.parse.sequence", child,
-                "Shared variable '%s' not found for 'add_var'!",
-                add_var_name);
+                "Shared variable %s not found for %s!",
+                CS::Quote::Single (add_var_name),
+		CS::Quote::Single ("add_var"));
               return 0;
             }
             if (addvar->GetType () != iSharedVariable::SV_FLOAT)
             {
               SyntaxService->ReportError (
                 "crystalspace.maploader.parse.sequence", child,
-                "Variable '%s' is not a float variable!",
-                varname);
+                "Variable %s is not a float variable!",
+                CS::Quote::Single (varname));
               return 0;
             }
             sequence->AddOperationSetVariable (cur_time, var, 0, addvar);
@@ -1013,8 +1042,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
           SyntaxService->ReportError (
             "crystalspace.maploader.parse.sequence", child,
-            "Invalid operation on shared variable '%s'!",
-            varname);
+            "Invalid operation on shared variable %s!",
+            CS::Quote::Single (varname));
           return 0;
         }
         break;
@@ -1034,8 +1063,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             {
               SyntaxService->ReportError (
                 "crystalspace.maploader.parse.sequence", child,
-                "Shared variable '%s' not found or not a color!",
-                colvar);
+                "Shared variable %s not found or not a color!",
+                CS::Quote::Single (colvar));
               return 0;
             }
           }
@@ -1132,8 +1161,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             {
               SyntaxService->ReportError (
                 "crystalspace.maploader.parse.sequence",
-                child, "Can't find sequence '%s' in sequence '%s'!",
-                trueseqname, seqname);
+                child, "Can't find sequence %s in sequence %s!",
+                CS::Quote::Single (trueseqname), CS::Quote::Single (seqname));
               return 0;
             }
             trueseq = trueseqwrap->GetSequence ();
@@ -1147,8 +1176,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             {
               SyntaxService->ReportError (
                 "crystalspace.maploader.parse.sequence",
-                child, "Can't find sequence '%s' in sequence '%s'!",
-                falseseqname, seqname);
+                child, "Can't find sequence %s in sequence %s!",
+                CS::Quote::Single (falseseqname), CS::Quote::Single (seqname));
               return 0;
             }
             falseseq = falseseqwrap->GetSequence ();

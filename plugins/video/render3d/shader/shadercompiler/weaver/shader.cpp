@@ -92,14 +92,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (!counterParam || !*counterParam)
     {
       compiler->Report (CS_REPORTER_SEVERITY_WARNING,
-        passgenNode, "<passgen> node needs 'param' attribute");
+        passgenNode, "<passgen> node needs %s attribute",
+	CS::Quote::Single ("param"));
       return false;
     }
     const char* sequence = passgenNode->GetAttributeValue ("sequence");
     if (!sequence || !*sequence)
     {
       compiler->Report (CS_REPORTER_SEVERITY_WARNING,
-        passgenNode, "<passgen> node needs 'sequence' attribute");
+        passgenNode, "<passgen> node needs %s attribute",
+	CS::Quote::Single ("sequence"));
       return false;
     }
     const char* compareSV = passgenNode->GetAttributeValue ("comparesv");
@@ -259,8 +261,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (compiler->do_verbose && (!cacheFailReason.IsEmpty()))
     {
       compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-        "Could not get shader '%s' from cache because: %s",
-        ci.shaderName.GetData(), cacheFailReason.GetData());
+        "Could not get shader %s from cache because: %s",
+        CS::Quote::Single (ci.shaderName.GetData()), cacheFailReason.GetData());
     }
 
     return synthShader;
@@ -436,8 +438,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       if (cacheState.IsValid() && compiler->do_verbose)
       {
 	compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  "Could not cache '%s' because: %s",
-	  ci.shaderName.GetData(), cacheState->GetData());
+	  "Could not cache %s because: %s",
+	  CS::Quote::Single (ci.shaderName.GetData()),
+	  cacheState->GetData());
       }
     }
     CS_ASSERT (synthShader.IsValid());
@@ -652,7 +655,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (!newNode.IsValid())
     {
       compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	"'%s' does not have a '%s' node", fileAttr, wantNode);
+	"%s does not have a %s node",
+	CS::Quote::Single (fileAttr), CS::Quote::Single (wantNode));
       return 0;
     }
     

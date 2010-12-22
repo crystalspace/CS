@@ -27,6 +27,7 @@
 #include "csutil/parasiticdatabuffer.h"
 #include "csutil/rootedhiercache.h"
 #include "csutil/scfstringarray.h"
+#include "csutil/stringquote.h"
 #include "csutil/sysfunc.h"
 #include "csutil/xmltiny.h"
 #include "cstool/vfsdirchange.h"
@@ -75,8 +76,8 @@ namespace CS
           if (err != 0)
           {
 	  #ifdef CS_DEBUG
-	    csPrintf ("%s: parse error '%s' in '%s'\n", CS_FUNCTION_NAME,
-	      err, entry.fullPath.GetData());
+	    csPrintf ("%s: parse error %s in %s\n", CS_FUNCTION_NAME,
+	      CS::Quote::Single (err), CS::Quote::Single (entry.fullPath.GetData()));
 	  #endif
             return;
           }
@@ -224,8 +225,8 @@ namespace CS
 	else
 	{
 	#ifdef CS_DEBUG
-	  csPrintf ("%s: failed to open '%s'\n", CS_FUNCTION_NAME,
-	    fullPath->GetData());
+	  csPrintf ("%s: failed to open %s\n", CS_FUNCTION_NAME,
+	    CS::Quote::Single (fullPath->GetData()));
 	#endif
 	  return false;
 	}

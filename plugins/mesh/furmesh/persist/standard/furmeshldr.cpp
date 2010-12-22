@@ -193,7 +193,7 @@ csPtr<iBase> FurMeshLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError (
             "crystalspace.furmeshloader.parse.unknownfactory",
-            child, "Couldn't find texture '%s'!", densityMapName);
+            child, "Couldn't find texture %s!", CS::Quote::Single (densityMapName));
           return 0;
         }
      
@@ -208,7 +208,7 @@ csPtr<iBase> FurMeshLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError (
             "crystalspace.furmeshloader.parse.unknownfactory",
-            child, "Couldn't find texture '%s'!", heightMapName);
+            child, "Couldn't find texture %s!", CS::Quote::Single (heightMapName));
           return 0;
         }
 
@@ -307,7 +307,7 @@ csPtr<iBase> FurMeshLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError (
             "crystalspace.furmeshloader.parse.unknownfactory",
-            child, "Couldn't find factory '%s'!", factname);
+            child, "Couldn't find factory %s!", CS::Quote::Single (factname));
           return 0;
         }
 
@@ -319,8 +319,8 @@ csPtr<iBase> FurMeshLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError (
             "crystalspace.furmeshloader.parse.badfactory",
-            child, "Factory '%s' doesn't appear to be a genmesh factory!",
-            factname);
+            child, "Factory %s doesn't appear to be a furmesh factory!",
+            CS::Quote::Single (factname));
           return 0;
         }
       }

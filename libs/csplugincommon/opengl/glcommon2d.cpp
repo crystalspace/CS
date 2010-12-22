@@ -384,7 +384,7 @@ void csGraphics2DGLCommon::OpenDriverDB (const char* phase)
   if (!dbfile)
   {
     Report (CS_REPORTER_SEVERITY_WARNING, 
-      "Could not open driver database file '%s'", driverDB);
+      "Could not open driver database file %s", CS::Quote::Single (driverDB));
     return;
   }
 

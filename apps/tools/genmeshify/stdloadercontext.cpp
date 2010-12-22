@@ -48,8 +48,9 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename, bool doL
   if (mat)
     return mat;
 
-  app->Report (CS_REPORTER_SEVERITY_NOTIFY, "Could not find material '%s'. "
-    "Creating new material using texture with that name", filename);
+  app->Report (CS_REPORTER_SEVERITY_NOTIFY, "Could not find material %s. "
+    "Creating new material using texture with that name",
+    CS::Quote::Single (filename));
   iTextureWrapper* tex = FindTexture (filename);
   if (tex)
   {
@@ -80,8 +81,9 @@ iMaterialWrapper* StdLoaderContext::FindNamedMaterial (const char* name,
   if (mat)
     return mat;
 
-  app->Report (CS_REPORTER_SEVERITY_NOTIFY, "Could not find material '%s'. "
-    "Creating new material using texture with that name", name);
+  app->Report (CS_REPORTER_SEVERITY_NOTIFY, "Could not find material %s. "
+    "Creating new material using texture with that name",
+    CS::Quote::Single (name));
   iTextureWrapper* tex = FindNamedTexture (name,filename);
   if (tex)
   {
@@ -148,7 +150,7 @@ iTextureWrapper* StdLoaderContext::FindTexture (const char* name, bool doLoad)
   if (!result)
   {
     app->Report (CS_REPORTER_SEVERITY_NOTIFY, 
-      "Could not find texture '%s'. Attempting to load.", name);
+      "Could not find texture %s. Attempting to load.", CS::Quote::Single (name));
     csRef<iTextureWrapper> rc = app->loader->LoadTexture(name, name,
         CS_TEXTURE_3D, 0, true, false, true, collection);
     result = rc;
@@ -164,7 +166,7 @@ iTextureWrapper* StdLoaderContext::FindNamedTexture (const char* name,
   if (!result)
   {
     app->Report (CS_REPORTER_SEVERITY_NOTIFY, 
-      "Could not find texture '%s'. Attempting to load.", name);
+      "Could not find texture %s. Attempting to load.", CS::Quote::Single (name));
     csRef<iTextureWrapper> rc = app->loader->LoadTexture(name, filename,
         CS_TEXTURE_3D, 0, false, false, true, collection);
     result = rc;

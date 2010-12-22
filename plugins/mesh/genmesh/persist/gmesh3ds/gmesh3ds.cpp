@@ -149,7 +149,7 @@ bool csGenmesh3DSFactoryLoader::LoadMeshObjectData (
     {
       ReportError (object_reg,
 		"crystalspace.genmesh3dsfactoryloader.load",
-		"Can't find material '%s'!", curFace->material);
+		"Can't find material %s!", CS::Quote::Single (curFace->material));
       return false;
     }
     size_t j;
@@ -428,8 +428,8 @@ iMeshFactoryWrapper* csGenmesh3DSFactoryLoader::Load (const char* factname,
     ReportError (object_reg,
 		"crystalspace.genmesh3dsfactoryloader.load",
 		filename
-			? "Error loading 3DS file '%s'!"
-			: "Error loading 3DS file!", filename);
+			? "Error loading 3DS file %s!"
+			: "Error loading 3DS file!", CS::Quote::Single (filename));
     return 0;
   }
   return ff;
@@ -450,7 +450,7 @@ iMeshFactoryWrapper* csGenmesh3DSFactoryLoader::Load (const char* factname,
   {
     ReportError (object_reg,
 		"crystalspace.genmesh3dsfactoryloader.load",
-		"Can't load file '%s'!", filename);
+		"Can't load file %s!", CS::Quote::Single (filename));
     return 0;
   }
   return Load (factname, filename, dbuf);

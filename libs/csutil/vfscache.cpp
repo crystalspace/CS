@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/stringquote.h"
 #include "csutil/util.h"
 #include "csutil/vfscache.h"
 #include "iutil/databuff.h"
@@ -136,7 +137,8 @@ bool csVfsCacheManager::CacheData (const void* data, size_t size,
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.vfscachemgr.createfile",
-	"Could not create file '%s' in VFS dir '%s'", buf.GetData(), vfsdir);
+	"Could not create file %s in VFS dir %s",
+	CS::Quote::Single (buf.GetData()), CS::Quote::Single (vfsdir));
     return false;
   }
 
@@ -145,7 +147,8 @@ bool csVfsCacheManager::CacheData (const void* data, size_t size,
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.vfscachemgr.writefile",
-	"Could not write file '%s' in VFS dir '%s'", buf.GetData(), vfsdir);
+	"Could not write file %s in VFS dir %s",
+	CS::Quote::Single (buf.GetData()), CS::Quote::Single (vfsdir));
     return false;
   }
 

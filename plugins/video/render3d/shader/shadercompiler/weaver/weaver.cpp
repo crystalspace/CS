@@ -83,7 +83,7 @@ csPtr<iDocumentNode> WeaverCompiler::LoadDocumentFromFile (
   if (!file)
   {
     Report (CS_REPORTER_SEVERITY_WARNING, node,
-      "Unable to open file '%s'", filename);
+      "Unable to open file %s", CS::Quote::Single (filename));
     return 0;
   }
   csRef<iDocumentSystem> docsys (
@@ -95,7 +95,7 @@ csPtr<iDocumentNode> WeaverCompiler::LoadDocumentFromFile (
   if (err != 0)
   {
     Report (CS_REPORTER_SEVERITY_WARNING, node,
-      "Unable to parse file '%s': %s", filename, err);
+      "Unable to parse file %s: %s", CS::Quote::Single (filename), err);
     return 0;
   }
 
@@ -263,8 +263,10 @@ bool WeaverCompiler::IsTemplateToCompiler(iDocumentNode *templ)
     XMLTOKEN_SHADERWEAVER))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, 
-      "Type of shader '%s' is not 'shaderweaver', but '%s'",
-      shaderName, shaderType);
+      "Type of shader %s is not %s, but %s",
+      CS::Quote::Single (shaderName),
+      CS::Quote::Single ("shaderweaver"),
+      CS::Quote::Single (shaderType));
     return false;
   }
 

@@ -68,11 +68,11 @@ bool EventTest::HandleEvent (iEvent &ev)
     char cookedStr[CS_UC_MAX_UTF8_ENCODED+1];
     cookedStr[csUnicodeTransform::EncodeUTF8 (cooked, (utf8_char*)cookedStr, sizeof (cookedStr))] = 0;
     csPrintf ("Key %s: raw=%" PRId32 "(%s) "
-        "cooked=%" PRId32 "(%s) rep=%d mods=%08" PRIu32 " desc='%s'\n",
+        "cooked=%" PRId32 "(%s) rep=%d mods=%08" PRIu32 " desc=%s\n",
     	type == csKeyEventTypeUp ? "UP" : "DO",
 	key, ((key >= 32) && !CSKEY_IS_SPECIAL(key)) ? rawStr : "-",
 	cooked, ((cooked >= 32) && !CSKEY_IS_SPECIAL(cooked)) ? cookedStr : "-",
-	autorep, modifiers, str.GetData ());
+	autorep, modifiers, CS::Quote::Single (str.GetData ()));
     fflush (stdout);
   }
   else if (CS_IS_MOUSE_EVENT (namereg, ev))
@@ -94,7 +94,7 @@ bool EventTest::HandleEvent (iEvent &ev)
     csInputDefinition def (namereg, &ev, modifiers, true); //do we want cooked?
     csString str = def.ToString ();
     csPrintf ("Mouse %s: but=%d%s (state=%d,mask=%08" PRIx32 ") "
-        "device=%d x=%d y=%d mods=%08" PRIx32 " desc='%s'\n",
+        "device=%d x=%d y=%d mods=%08" PRIx32 " desc=%s\n",
 	type == csMouseEventTypeMove ? "MOVE" :
     	type == csMouseEventTypeUp ? "UP" :
 	type == csMouseEventTypeDown ? "DO" :
@@ -103,7 +103,7 @@ bool EventTest::HandleEvent (iEvent &ev)
 	"?",
 	but, GetMouseButtonString (but),
         butstate, butmask, device, x, y,
-	modifiers, str.GetData ());
+	modifiers, CS::Quote::Single (str.GetData ()));
     fflush (stdout);
   }
   else if (CS_IS_JOYSTICK_EVENT (namereg, ev))
@@ -123,9 +123,9 @@ bool EventTest::HandleEvent (iEvent &ev)
       bool butstate = csJoystickEventHelper::GetButtonState (&ev);
       uint32 butmask = csJoystickEventHelper::GetButtonMask (&ev);
       csPrintf ("Joystick %s: device=%d but=%d(state=%d,mask=%08" PRIu32 ") "
-          "mods=%08" PRIu32 " desc='%s'\n",
+          "mods=%08" PRIu32 " desc=%s\n",
           butstate ? "DO" : "UP", device, but, butstate, butmask,
-          modifiers, str.GetData ());
+          modifiers, CS::Quote::Single (str.GetData ()));
     }
     else if (CS_IS_JOYSTICK_MOVE_EVENT (namereg, ev, device))
     {
@@ -133,8 +133,9 @@ bool EventTest::HandleEvent (iEvent &ev)
       str.SubString (desc, pos + 4, (size_t)-1);
       uint axisnum = atoi(desc.GetData ());
       csPrintf ("Joystick MOVE: device=%d axis=%" PRId32 " value=%d "
-          "mods=%08" PRIu32 " desc='%s'\n",
-          device, axisnum, data.axes[axisnum], modifiers, str.GetData ());
+          "mods=%08" PRIu32 " desc=%s\n",
+          device, axisnum, data.axes[axisnum], modifiers,
+	  CS::Quote::Single (str.GetData ()));
     }
     fflush(stdout);
   }
@@ -192,8 +193,9 @@ bool EventTest::OnInitialize(int /*argc*/, char* /*argv*/ [])
     {
       const char* className = joystickClasses->Get (i);
       csRef<iBase> b = csLoadPlugin<iBase> (plugmgr, className);
-      ReportInfo ("Attempt to load plugin '%s' %s",
-		  className, (b != 0) ? "successful" : "failed");
+      ReportInfo ("Attempt to load plugin %s %s",
+		  CS::Quote::Single (className),
+		  (b != 0) ? "successful" : "failed");
     }
   }
 

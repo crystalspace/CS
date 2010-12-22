@@ -38,7 +38,9 @@ iMeshWrapper* LoadMesh(iObjectRegistry* object_reg, const char* name, const char
     bool l = loader->LoadLibraryFile(file);
     if (!l)
     {
-      printf("Error: Could not load mesh factory '%s' from file '%s'!\n", name, file);
+      printf("Error: Could not load mesh factory %s from file %s!\n",
+	     CS::Quote::Single (name),
+	     CS::Quote::Single (file));
       return nullptr;
     }
 
@@ -47,7 +49,9 @@ iMeshWrapper* LoadMesh(iObjectRegistry* object_reg, const char* name, const char
 
   if (!mf)
   {
-    printf("Error: Could not find mesh factory '%s' in file '%s'!\n", name, file);
+    printf("Error: Could not find mesh factory %s in file %s!\n",
+	   CS::Quote::Single (name),
+	   CS::Quote::Single (file));
     return nullptr;
   }
 

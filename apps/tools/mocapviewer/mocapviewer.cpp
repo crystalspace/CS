@@ -31,7 +31,8 @@
 #include "ivaria/movierecorder.h"
 
 MocapViewer::MocapViewer ()
-  : DemoApplication ("CrystalSpace.MocapViewer", "csmocapviewer", "csmocapviewer [OPTIONS] [filename]"
+  : DemoApplication ("CrystalSpace.MocapViewer", "csmocapviewer",
+		     "csmocapviewer [OPTIONS] [filename]"
 		     "\n\nUsage examples:\n"
 		     "\tcsmocapviewer idle01.bvh\n"
 		     "\tcsmocapviewer /lib/krystal/mocap/idle01.bvh\n"
@@ -44,6 +45,7 @@ MocapViewer::MocapViewer ()
 		     "\tcsmocapviewer -rotcamera=-90 idle01.bvh\n"
 		     "\tcsmocapviewer idle01.bvh -pld -ncount=200 -nfrequency=0.4 -poscamera=0.7\n"
 		     "\tcsmocapviewer -targetfile=data/krystal/krystal.xml -targetname=krystal -nobone idle01.bvh\n",
+		     csString().Format (
 		     "Crystal Space's viewer for motion captured data. This viewer supports currently"
 		     " only the Biovision Hierarchical data file format (BVH).\n\n"
 		     "The animation can be retargeted automatically to an animesh. Use either the -targetfile and"
@@ -63,8 +65,8 @@ MocapViewer::MocapViewer ()
 		     " noise. The behavior of the motion of these noise points can be tweaked by several"
 		     " parameters. See http://libnoise.sourceforge.net/docs/classnoise_1_1module_1_1Perlin.html"
 		     " for more information on these parameters.\n\n"
-		     "Finally, this application uses a configuration file. See \"/config/csmocapviewer.cfg\""
-		     " for more information"),
+		     "Finally, this application uses a configuration file. See %s"
+		     " for more information", CS::Quote::Double ("/config/csmocapviewer.cfg"))),
     scfImplementationType (this), debugImage (nullptr), noiseScale (0.5f)
 {
   // Configure the options for DemoApplication
@@ -89,7 +91,8 @@ MocapViewer::MocapViewer ()
   commandLineHelper.AddCommandLineOption
     ("targetname=<string>", "Set the name of the animesh factory to retarget the animation to");
   commandLineHelper.AddCommandLineOption
-    ("pld", "Set the display mode as 'Point Light Display'");
+    ("pld", csString().Format ("Set the display mode as %s",
+			       CS::Quote::Single ("Point Light Display")));
   commandLineHelper.AddCommandLineOption
     ("rotcamera=<float>", "Rotate the camera of a given angle around the Y axis, in degree");
   commandLineHelper.AddCommandLineOption

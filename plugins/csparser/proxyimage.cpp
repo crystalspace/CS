@@ -18,6 +18,8 @@
 
 #include "cssysdef.h"
 
+#include "csutil/stringquote.h"
+
 #include "iutil/databuff.h"
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
@@ -52,8 +54,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         csRef<iReporter> reporter = csQueryRegistry<iReporter>(object_reg);
         reporter->ReportWarning (
           "crystalspace.maploader.parse.texture",
-          "Couldn't load image '%s', using error texture instead!",
-          filename.GetData());
+          "Couldn't load image %s, using error texture instead!",
+          CS::Quote::Single (filename.GetData()));
         img = GenerateErrorTexture (32, 32);
         CS_ASSERT(img.IsValid());
       }

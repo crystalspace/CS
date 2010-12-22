@@ -221,9 +221,10 @@ void csGLGraphics3D::CheckGLError (const wchar_t* sourceFile, int sourceLine,
   if (glerror != GL_NO_ERROR)
   {
     Report (CS_REPORTER_SEVERITY_WARNING,
-	    "GL error %s in \"%s\" [%ls:%d]",
+	    "GL error %s in %s [%ls:%d]",
 	    CS::PluginCommon::OpenGLErrors.StringForIdent (glerror),
-	    call, sourceFile, sourceLine);
+	    CS::Quote::Double (call),
+	    sourceFile, sourceLine);
   }
 }
 
@@ -806,7 +807,7 @@ void csGLGraphics3D::ParseByteSize (const char* sizeStr, size_t& size)
   else if (*end != 0)
   { 	 
     Report (CS_REPORTER_SEVERITY_WARNING, 	 
-      "Unknown suffix '%s' in maximum buffer size '%s'.", end, sizeStr); 	 
+      "Unknown suffix %s in maximum buffer size %s.", CS::Quote::Single (end), CS::Quote::Single (sizeStr)); 	 
     sizeFactor = 0; 	 
   } 	 
   if (sizeFactor != 0) 	 
@@ -819,7 +820,7 @@ void csGLGraphics3D::ParseByteSize (const char* sizeStr, size_t& size)
     }
     else 	 
       Report (CS_REPORTER_SEVERITY_WARNING, 	 
-      "Invalid buffer size '%s'.", sizeStr); 	 
+      "Invalid buffer size %s.", CS::Quote::Single (sizeStr)); 	 
   }
 }
 
@@ -1160,8 +1161,8 @@ bool csGLGraphics3D::Open ()
         Report (CS_REPORTER_SEVERITY_WARNING, 
           "Couldn't load fragment program for text drawing");
         Report (CS_REPORTER_SEVERITY_WARNING, "Program error at position %d", errorpos);
-        Report (CS_REPORTER_SEVERITY_WARNING, "Error string: '%s'", 
-          programErrorString);
+        Report (CS_REPORTER_SEVERITY_WARNING, "Error string: %s", 
+          CS::Quote::Single ((const char*)programErrorString));
         ext->glDeleteProgramsARB (1, &drawPixmapProgram);
         drawPixmapAFP = false;
       }
@@ -1171,8 +1172,8 @@ bool csGLGraphics3D::Open ()
       if (verbose && (programErrorString != 0) && (*programErrorString != 0))
       {
         Report (CS_REPORTER_SEVERITY_WARNING, 
-	  "Warning for DrawPixmap() fragment program: '%s'", 
-	  programErrorString);
+	  "Warning for DrawPixmap() fragment program: %s", 
+	  CS::Quote::Single ((const char*)programErrorString));
       }
     }
   }
@@ -2190,7 +2191,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 
   CS_PROFILER_ZONE(csGLGraphics3D_DrawMesh);
 
-  GLRENDER3D_OUTPUT_STRING_MARKER(("%p ('%s')", mymesh, mymesh->db_mesh_name));
+  GLRENDER3D_OUTPUT_STRING_MARKER(("%p (%s)", mymesh, CS::Quote::Single (mymesh->db_mesh_name)));
   SwapIfNeeded();
 
   SetupProjection ();
@@ -4394,7 +4395,7 @@ void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
 
   CS_PROFILER_ZONE(csGLGraphics3D_DrawMesh);
 
-  GLRENDER3D_OUTPUT_STRING_MARKER(("%p ('%s')", mymesh, mymesh->db_mesh_name));
+  GLRENDER3D_OUTPUT_STRING_MARKER(("%p (%s)", mymesh, CS::Quote::Single (mymesh->db_mesh_name)));
   SwapIfNeeded();
 
   SetupProjection ();

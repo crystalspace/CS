@@ -91,8 +91,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
           if (!mat)
           {
-            synldr->ReportError (msgidFactory, child, "Couldn't find material '%s'!", 
-              matname);
+            synldr->ReportError (msgidFactory, child, "Couldn't find material %s!", 
+              CS::Quote::Single (matname));
             return 0;
           }
           fact->SetMaterialWrapper (mat);
@@ -253,8 +253,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
                 material = ldr_context->FindMaterial (matname);
                 if (!material)
                 {
-                  synldr->ReportError (msgidFactory, child2, "Couldn't find material '%s'!", 
-                    matname);
+                  synldr->ReportError (msgidFactory, child2, "Couldn't find material %s!", 
+                    CS::Quote::Single (matname));
                   return 0;
                 }
               }
@@ -454,7 +454,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           if(!fact)
           {
             synldr->ReportError (msgid, child, 
-              "Couldn't find factory '%s'!", factname);
+              "Couldn't find factory %s!", CS::Quote::Single (factname));
             return 0;
           }
 
@@ -463,7 +463,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           if (!amfact)
           {
             synldr->ReportError (msgid, child, 
-              "Factory '%s' doesn't appear to be a animesh factory!", factname);
+              "Factory %s doesn't appear to be a animesh factory!", CS::Quote::Single (factname));
             return 0;
           }
 
@@ -472,7 +472,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           if (!ammesh)
           {
             synldr->ReportError (msgid, child, 
-              "Factory '%s' doesn't appear to be a animesh factory!", factname);
+              "Factory %s doesn't appear to be a animesh factory!", CS::Quote::Single (factname));
             return 0;
           }
         }
@@ -483,8 +483,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
           if (!mat)
           {
-            synldr->ReportError (msgid, child, "Couldn't find material '%s'!", 
-              matname);
+            synldr->ReportError (msgid, child, "Couldn't find material %s!", 
+              CS::Quote::Single (matname));
             return 0;
           }
           mesh->SetMaterialWrapper (mat);

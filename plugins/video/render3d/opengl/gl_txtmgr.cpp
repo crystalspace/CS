@@ -154,7 +154,7 @@ void csGLTextureManager::read_config (iConfigFile *config)
   else
   {
     G3D->Report (CS_REPORTER_SEVERITY_WARNING, 
-      "Invalid texture filter mode '%s'.", filterModeStr);
+      "Invalid texture filter mode %s.", CS::Quote::Single (filterModeStr));
   }
 
   ReadTextureClasses (config);
@@ -191,7 +191,7 @@ GLenum csGLTextureManager::ParseTextureFormat (const char* formatName,
     if (textureFmt == 0)
     {
       G3D->Report (CS_REPORTER_SEVERITY_ERROR,
-	"Unknown texture format name '%s'", extractedFormat.GetData());
+	"Unknown texture format name %s", CS::Quote::Single (extractedFormat.GetData()));
     }
     else
     {
@@ -264,8 +264,9 @@ void csGLTextureManager::ReadTextureClasses (iConfigFile* config)
       else
       {
 	G3D->Report (CS_REPORTER_SEVERITY_ERROR,
-	  "Unknown texture class option '%s' for '%s'", 
-	  optionName, extractedClass.GetData());
+	  "Unknown texture class option %s for %s", 
+	  CS::Quote::Single (optionName),
+	  CS::Quote::Single (extractedClass.GetData()));
       }
     }
     else

@@ -161,11 +161,11 @@ bool SndTest::LoadSound ()
 
   csRef<iDataBuffer> soundbuf = vfs->ReadFile (fname.GetData ());
   if (!soundbuf)
-    return ReportError ("Can't load file '%s'!", fname.GetData ());
+    return ReportError ("Can't load file %s!", CS::Quote::Single (fname.GetData ()));
 
   csRef<iSndSysData> snddata = sndloader->LoadSound (soundbuf);
   if (!snddata)
-    return ReportError ("Can't load sound '%s'!", fname.GetData ());
+    return ReportError ("Can't load sound %s!", CS::Quote::Single (fname.GetData ()));
 
   const csSndSysSoundFormat* format = snddata->GetFormat ();
   csPrintf ("=== iSndSysData format informations ===\n");
@@ -178,7 +178,7 @@ bool SndTest::LoadSound ()
   csRef<iSndSysStream> sndstream = sndrenderer->CreateStream (snddata,
         cmdline->GetBoolOption("no3d") ? CS_SND3D_DISABLE : CS_SND3D_ABSOLUTE);
   if (!sndstream)
-    return ReportError ("Can't create stream for '%s'!", fname.GetData ());
+    return ReportError ("Can't create stream for %s!", CS::Quote::Single (fname.GetData ()));
 
   const csSndSysSoundFormat* rformat = sndstream->GetRenderedFormat ();
   csPrintf ("=== iSndSysStream \"rendered\" format informations ===\n");
@@ -189,7 +189,7 @@ bool SndTest::LoadSound ()
 
   sndsource = sndrenderer->CreateSource (sndstream);
   if (!sndsource)
-    return ReportError ("Can't create source for '%s'!", fname.GetData ());
+    return ReportError ("Can't create source for %s!", CS::Quote::Single (fname.GetData ()));
   sndsource3d = scfQueryInterface<iSndSysSource3D> (sndsource);
   if (sndsource3d)
     sndsource3d->SetPosition (GetSoundPos (0));
@@ -284,7 +284,8 @@ bool SndTest::CreateRoom ()
   // CS/data/standard.zip and mounted as /lib/std using the Virtual
   // File System (VFS) plugin.
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-    return ReportError("Error loading 'stone4' texture!");
+    return ReportError("Error loading %s texture!",
+		       CS::Quote::Single ("stone4"));
 
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 

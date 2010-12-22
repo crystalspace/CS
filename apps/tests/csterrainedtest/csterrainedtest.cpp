@@ -333,16 +333,19 @@ void TerrainEd::CreateRoom ()
 
   iTextureWrapper* grass = loader->LoadTexture ("grass", "/this/data/terrained/cobgrass.png", 2, 0, true, false);
   if (!grass)
-    ReportError ("Error loading 'grass' texture!");
+    ReportError ("Error loading %s texture!",
+		 CS::Quote::Single ("grass"));
 
   
   iTextureWrapper* stone = loader->LoadTexture ("stone", "/this/data/terrained/cliff34ug6.jpg", 2, 0, true, false);
   if (!stone)
-    ReportError ("Error loading 'stone' texture!");
+    ReportError ("Error loading %s texture!",
+		 CS::Quote::Single ("stone"));
 
   csRef<iShader> shader = loader->LoadShader ("/shader/terrain/terrain.xml");
   if (!stone)
-    ReportError ("Error loading 'stone' texture!");
+    ReportError ("Error loading %s shader!",
+		 CS::Quote::Single ("terrain"));
 
   csRef<iMaterialWrapper> terrainmat = engine->CreateMaterial("terrain", 0);
 

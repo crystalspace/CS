@@ -24,7 +24,7 @@
     }
     else
     {
-      Report (msgExtNotFound, "GLX", ext);
+      Report (msgExtNotFound, "GLX", CS::Quote::Single (ext));
     }
   }
 #endif

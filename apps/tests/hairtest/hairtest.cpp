@@ -891,8 +891,10 @@ bool HairTest::OnInitialize (int argc, char* argv[])
     else if (sceneName == "frankie")
       avatarSceneType = MODEL_FRANKIE;
     else
-      printf ("Given scene ('%s') is not one of {'krystal', 'frankie'}. Falling back to Krystal\n", 
-        sceneName.GetData ());
+      printf ("Given scene (%s) is not one of {%s, %s}. Falling back to Krystal\n", 
+        CS::Quote::Single (sceneName.GetData ()),
+	CS::Quote::Single ("krystal"),
+	CS::Quote::Single ("frankie"));
   }
 
   return true;

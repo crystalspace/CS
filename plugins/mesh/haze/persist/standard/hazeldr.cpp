@@ -180,7 +180,7 @@ csPtr<iBase> csHazeFactoryLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError (
 		"crystalspace.hazeloader.parse.badmaterial",
-		child, "Could not find material '%s'!", matname);
+		child, "Could not find material %s!", CS::Quote::Single (matname));
             return 0;
 	  }
 	  fact->SetMaterialWrapper (mat);
@@ -390,7 +390,7 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
     {
       synldr->ReportError (
         "crystalspace.hazeloader.parse.badfactory",
-        child, "Could not find factory '%s'!", factname);
+        child, "Could not find factory %s!", CS::Quote::Single (factname));
       return 0;
     }
 
@@ -400,8 +400,8 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 	  {
       	    synldr->ReportError (
 		"crystalspace.hazeloader.parse.badfactory",
-		child, "Factory '%s' doesn't appear to be a haze factory!",
-		factname);
+		child, "Factory %s doesn't appear to be a haze factory!",
+		CS::Quote::Single (factname));
 	    return 0;
 	  }
 	  hazefactorystate = scfQueryInterface<iHazeFactoryState> (
@@ -416,7 +416,8 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError (
 		"crystalspace.hazeloader.parse.badmaterial",
-		child, "Could not find material '%s'!", matname);
+		child, "Could not find material %s!",
+		CS::Quote::Single (matname));
 	    return 0;
 	  }
 	  CHECK_MESH (mesh);

@@ -261,7 +261,7 @@ csPtr<iBase> csWaterMeshLoader::Parse (iDocumentNode* node,
 	  {
       	    synldr->ReportError (
 		"crystalspace.watermeshloader.parse.unknownfactory",
-		child, "Couldn't find factory '%s'!", factname);
+		child, "Couldn't find factory %s!", CS::Quote::Single (factname));
 	    return 0;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -271,8 +271,8 @@ csPtr<iBase> csWaterMeshLoader::Parse (iDocumentNode* node,
 	  {
       	    synldr->ReportError (
 		"crystalspace.watermeshloader.parse.badfactory",
-		child, "Factory '%s' doesn't appear to be a watermesh factory!",
-		factname);
+		child, "Factory %s doesn't appear to be a watermesh factory!",
+		CS::Quote::Single (factname));
 	    return 0;
 	  }
 	}
@@ -285,7 +285,7 @@ csPtr<iBase> csWaterMeshLoader::Parse (iDocumentNode* node,
 	  {
       	    synldr->ReportError (
 		"crystalspace.watermeshloader.parse.unknownmaterial",
-		child, "Couldn't find material '%s'!", matname);
+		child, "Couldn't find material %s!", CS::Quote::Single (matname));
             return 0;
 	  }
 	  CHECK_MESH (mesh);

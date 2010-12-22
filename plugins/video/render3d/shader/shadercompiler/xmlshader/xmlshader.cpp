@@ -294,8 +294,10 @@ bool csXMLShaderCompiler::IsTemplateToCompiler(iDocumentNode *templ)
     XMLTOKEN_XMLSHADER))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, 
-      "Type of shader '%s' is not 'xmlshader', but '%s'",
-      shaderName, shaderType);
+      "Type of shader %s is not %s, but %s",
+      CS::Quote::Single (shaderName),
+      CS::Quote::Single ("xmlshader"),
+      CS::Quote::Single (shaderType));
     return false;
   }
 

@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "csutil/xmltiny.h"
+#include "csutil/stringquote.h"
 #include "iutil/objreg.h"
 #include "iutil/document.h"
 #include "iutil/object.h"
@@ -108,11 +109,12 @@ csPtr<iPath> csPathLoader::Load (const char* path, const char* file)
     if (path)
       csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
 	"crystalspace.addons.pathloader",
-	"Can't load file '%s' from '%s'!", file, path);
+	"Can't load file %s from %s!",
+	CS::Quote::Single (file), CS::Quote::Single (path));
     else
       csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
 	"crystalspace.addons.pathloader",
-	"Can't load file '%s'!", file);
+	"Can't load file %s!", CS::Quote::Single (file));
     return 0;
   }
 
@@ -124,7 +126,8 @@ csPtr<iPath> csPathLoader::Load (const char* path, const char* file)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
 	    "crystalspace.addons.pathloader",
-	    "Document system error for file '%s': %s!", file, error);
+	    "Document system error for file %s: %s!",
+	    CS::Quote::Single (file), error);
     return 0;
   }
   csRef<iPath> cspath = Load (doc->GetRoot ()->GetNode ("addon"));

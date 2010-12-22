@@ -30,6 +30,7 @@
 
 
 #include "csutil/scf.h"
+#include "csutil/stringquote.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "iutil/threadmanager.h"
@@ -323,8 +324,8 @@ inline csPtr<Interface> csLoadPluginCheck (iObjectRegistry* object_reg,
   {
     if (report)
       csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      	"crystalspace.plugin.load", "Couldn't load plugin with class '%s'!",
-		ClassID);
+      	"crystalspace.plugin.load", "Couldn't load plugin with class %s!",
+		CS::Quote::Single (ClassID));
     return 0;
   }
   return (csPtr<Interface>) i;
@@ -385,7 +386,7 @@ inline csPtr<Interface> csQueryRegistryOrLoad (iObjectRegistry *Reg,
     if (report)
       csReport (Reg, CS_REPORTER_SEVERITY_ERROR,
       	"crystalspace.plugin.query",
-	"Couldn't load plugin with class '%s'!", classID);
+	"Couldn't load plugin with class %s!", CS::Quote::Single (classID));
     return 0;
   }
   if (!Reg->Register (i, scfInterfaceTraits<Interface>::GetName ()))
@@ -393,7 +394,7 @@ inline csPtr<Interface> csQueryRegistryOrLoad (iObjectRegistry *Reg,
     if (report)
       csReport (Reg, CS_REPORTER_SEVERITY_ERROR,
       	"crystalspace.plugin.query",
-	"Couldn't register plugin with class '%s'!", classID);
+	"Couldn't register plugin with class %s!", CS::Quote::Single (classID));
     return 0;
   }
   return (csPtr<Interface>)i;

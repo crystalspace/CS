@@ -69,7 +69,7 @@ bool Simple::Setup ()
     return ReportError("Failed to locate CEGUI plugin");
 
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-    return ReportError("Error loading 'stone4' texture!");
+    return ReportError("Error loading %s texture!", CS::Quote::Single ("stone4"));
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");

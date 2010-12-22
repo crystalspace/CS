@@ -239,7 +239,8 @@ void Simple::CreateRoom ()
   // CS/data/standard.zip and mounted as /lib/std using the Virtual
   // File System (VFS) plugin.
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-    ReportError ("Error loading 'stone4' texture!");
+    ReportError ("Error loading %s texture!",
+		 CS::Quote::Single ("stone4"));
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   // We create a new sector called "room".

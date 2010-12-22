@@ -234,11 +234,13 @@ bool SmokeTest::Application()
     csPrintf ("  --help:\n");       
     csPrintf ("     Print this help.\n");
     csPrintf ("  -path=<path>:\n");       
-    csPrintf ("     Get meshes from specified path (default: '/data/tests/').\n");
+    csPrintf ("     Get meshes from specified path (default: %s).\n",
+	      CS::Quote::Single ("/data/tests/"));
     csPrintf ("  -index=<index>:\n");       
     csPrintf ("     Which index to load by default.\n");
     csPrintf ("  -renderall:\n");       
-    csPrintf ("     Render all meshes into '/this/regression.zip' and include logs.\n");
+    csPrintf ("     Render all meshes into %s and include logs.\n",
+	      CS::Quote::Single ("/this/regression.zip"));
     csPrintf ("  -renderalltopath:\n");       
     csPrintf ("     DON'T USE: Render all meshes to their preview images.\n");
     return true;
@@ -273,7 +275,7 @@ void SmokeTest::ScreenShot(const std::string& fileName)
   csRef<iImage> shot = g3d->GetDriver2D()->ScreenShot();
   csRef<iDataBuffer> data = iio->Save (shot, "image/png");
   if (vfs->WriteFile (fileName.c_str(), data->GetData(), data->GetSize()))
-    printf("Written '%s'...\n", fileName.c_str());
+    printf("Written %s...\n", CS::Quote::Single (fileName.c_str()));
 }
 
 void SmokeTest::ScanDirectory(const std::string& path)
@@ -423,7 +425,8 @@ void SmokeTest::CreateRoom ()
   // CS/data/standard.zip and mounted as /lib/std using the Virtual
   // File System (VFS) plugin.
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-    ReportError("Error loading 'stone4' texture!");
+    ReportError("Error loading %s texture!",
+		CS::Quote::Single ("stone4"));
 
   iMaterialWrapper* tm =
     engine->GetMaterialList ()->FindByName ("stone");

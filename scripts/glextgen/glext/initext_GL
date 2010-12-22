@@ -22,7 +22,7 @@
     }
     else
     {
-      Report (msgExtNotFound, "GL", ext);
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
     }
   }
   

@@ -21,6 +21,7 @@
 
 #include "csutil/databuf.h"
 #include "csutil/scanstr.h"
+#include "csutil/stringquote.h"
 #include "csutil/util.h"
 #include "csutil/xmltiny.h"
 #include "csgfx/shaderexp.h"
@@ -81,7 +82,8 @@ bool csShaderProgram::ProgramParamParser::ParseProgramParam (
     synsrv->Report ("crystalspace.graphics3d.shader.common",
       CS_REPORTER_SEVERITY_WARNING,
       node,
-      "No 'type' attribute");
+      "No %s attribute",
+      CS::Quote::Single ("type"));
     return false;
   }
 
@@ -175,7 +177,7 @@ bool csShaderProgram::ProgramParamParser::ParseProgramParam (
     synsrv->Report ("crystalspace.graphics3d.shader.common",
       CS_REPORTER_SEVERITY_WARNING,
       node,
-      "Unknown type '%s'", type);
+      "Unknown type %s", CS::Quote::Single (type));
     return false;
   }
 
@@ -184,7 +186,7 @@ bool csShaderProgram::ProgramParamParser::ParseProgramParam (
     synsrv->Report ("crystalspace.graphics3d.shader.common",
       CS_REPORTER_SEVERITY_WARNING,
       node,
-      "Type '%s' not supported by this parameter", type);
+      "Type %s not supported by this parameter", CS::Quote::Single (type));
     return false;
   }
 
@@ -224,7 +226,7 @@ bool csShaderProgram::ProgramParamParser::ParseProgramParam (
 	  synsrv->Report ("crystalspace.graphics3d.shader.common",
 	    CS_REPORTER_SEVERITY_WARNING,
 	    node,
-	    "Couldn't parse vector2 '%s'", value);
+	    "Couldn't parse vector2 %s", CS::Quote::Single (value));
 	  return false;
 	}
 	var->SetValue (csVector2 (x,y));
@@ -247,7 +249,7 @@ bool csShaderProgram::ProgramParamParser::ParseProgramParam (
 	  synsrv->Report ("crystalspace.graphics3d.shader.common",
 	    CS_REPORTER_SEVERITY_WARNING,
 	    node,
-	    "Couldn't parse vector3 '%s'", value);
+	    "Couldn't parse vector3 %s", CS::Quote::Single (value));
 	  return false;
 	}
 	var->SetValue (csVector3 (x,y,z));
@@ -270,7 +272,7 @@ bool csShaderProgram::ProgramParamParser::ParseProgramParam (
 	  synsrv->Report ("crystalspace.graphics3d.shader.common",
 	    CS_REPORTER_SEVERITY_WARNING,
 	    node,
-	    "Couldn't parse vector4 '%s'", value);
+	    "Couldn't parse vector4 %s", CS::Quote::Single (value));
 	  return false;
 	}
 	var->SetValue (csVector4 (x,y,z,w));
@@ -327,7 +329,8 @@ bool csShaderProgram::ParseCommon (iDocumentNode* child)
 	{
 	  synsrv->Report ("crystalspace.graphics3d.shader.common",
 	    CS_REPORTER_SEVERITY_WARNING, child,
-	    "<variablemap> has no 'destination' attribute");
+	    "<variablemap> has no %s attribute",
+	    CS::Quote::Single ("destination"));
 	  return false;
 	}
 
@@ -369,7 +372,7 @@ bool csShaderProgram::ParseCommon (iDocumentNode* child)
 	  {
 	    synsrv->Report ("crystalspace.graphics3d.shader.common",
 	      CS_REPORTER_SEVERITY_WARNING, child,
-	      "Could not open '%s'", filename);
+	      "Could not open %s", CS::Quote::Single (filename));
 	    return false;
 	  }
 

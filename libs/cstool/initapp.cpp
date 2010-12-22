@@ -294,7 +294,9 @@ iVFS* csInitializer::SetupVFS(iObjectRegistry* r, const char* pluginID)
 	"from -\n");
 #if defined(CS_PLATFORM_MACOSX)
       csFPrintf (stderr, "  on MaxOS/X, it should be the directory containing the\n"
-	"  '<application>.app' subdirectory, *not* '<application>.app/Contents/MacOS'.\n");
+	"  %s subdirectory, *not* %s.\n",
+	CS::Quote::Single ("<application>.app"),
+	CS::Quote::Single ("<application>.app/ContentsMacOS"));
 #else
       csFPrintf (stderr, "  usually, it is the same as the directory with the "
 	"executable.\n");
@@ -304,8 +306,8 @@ iVFS* csInitializer::SetupVFS(iObjectRegistry* r, const char* pluginID)
       csFPrintf (stderr, "Check if the CRYSTAL environment var points to the\n");
       csFPrintf (stderr, "  correct location - usually the directory CS was "
 	"built in.\n");
-      csFPrintf (stderr, "  You can also use the '--verbose' command line switch "
-	"to troubleshoot\n");
+      csFPrintf (stderr, "  You can also use the %s command line switch "
+	"to troubleshoot\n", CS::Quote::Single ("--verbose"));
       csFPrintf (stderr, "  where CS looks for plugins.\n");
       return 0;
     }

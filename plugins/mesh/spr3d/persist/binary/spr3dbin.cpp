@@ -203,7 +203,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (iDataBuffer* data,
   {
     ReportError (object_reg,
 	"crystalspace.sprite3dbinfactoryloader.parse.unknownmaterial",
-	"Couldn't find material named '%s'", mat_name);
+	"Couldn't find material named %s", CS::Quote::Single (mat_name));
     return 0;
   }
   fact->SetMaterialWrapper (mat);
@@ -334,8 +334,8 @@ bool csSprite3DBinFactoryLoader::ReadFrame (iSprite3DFactoryState* spr3dLook,
     {
       ReportError (object_reg,
 	  "crystalspace.sprite3dbinfactoryloader.parse.frame.vertices",
-	  "Trying to add too many vertices to frame '%s'!",
-	  fr->GetName ());
+	  "Trying to add too many vertices to frame %s!",
+	  CS::Quote::Single (fr->GetName ()));
       return false;
     }
     spr3dLook->SetVertex (anm_idx, j, csVector3 (x, y, z));
@@ -347,8 +347,8 @@ bool csSprite3DBinFactoryLoader::ReadFrame (iSprite3DFactoryState* spr3dLook,
   {
     ReportError (object_reg,
       "crystalspace.sprite3dbinfactoryloader.parse.frame.vertices",
-      "Too few vertices in frame '%s'!",
-      fr->GetName ());
+      "Too few vertices in frame %s!",
+      CS::Quote::Single (fr->GetName ()));
     return false;
   }
   
@@ -378,8 +378,8 @@ bool csSprite3DBinFactoryLoader::ReadAction (iSprite3DFactoryState* spr3dLook, i
     {
       ReportError (object_reg,
 	"crystalspace.sprite3dbinfactoryloader.parse.action.badframe",
-	"Trying to add unknown frame '%s' to action '%s'!",
-	fn, act->GetName ());
+	"Trying to add unknown frame %s to action %s!",
+	CS::Quote::Single (fn), CS::Quote::Single (act->GetName ()));
       return false;
     }
 

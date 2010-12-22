@@ -28,6 +28,7 @@
 #include "csutil/csendian.h"
 #include "csutil/databuf.h"
 #include "csutil/dirtyaccessarray.h"
+#include "csutil/stringquote.h"
 #include "cstool/rbuflock.h"
 
 #include "syntxldr.h"
@@ -106,8 +107,8 @@ struct BufferParser
 	&& (strcmp (child->GetValue(), "e") != 0)
 	&& (strcmp (child->GetValue(), "dongledome") != 0))
       {
-	GetBufferParseError()->Format ("unexpected node '%s'", 
-	  child->GetValue());
+	GetBufferParseError()->Format ("unexpected node %s", 
+	  CS::Quote::Single (child->GetValue()));
 	return GetBufferParseError()->GetData();
       }
       for (int c = 0; c < compNum; c++)
@@ -206,7 +207,8 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
     csRef<iDataBuffer> data = vfs->ReadFile (filename, false);
     if (!data.IsValid())
     {
-      ReportError (msgid, node, "could not read from '%s'", filename);
+      ReportError (msgid, node, "could not read from %s",
+		   CS::Quote::Single (filename));
       return 0;
     }
     return ReadRenderBuffer (data, KeepSaveInfo() ? filename : 0);
@@ -215,13 +217,15 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
   const char* componentType = node->GetAttributeValue ("type");
   if (componentType == 0)
   {
-    ReportError (msgid, node, "no 'type' attribute");
+    ReportError (msgid, node, "no %s attribute",
+		 CS::Quote::Single ("type"));
     return 0;
   }
   int componentNum = node->GetAttributeValueAsInt ("components");
   if (componentNum <= 0)
   {
-    ReportError (msgid, node, "bogus 'components' attribute: %d", componentNum);
+    ReportError (msgid, node, "bogus %s attribute: %d",
+		 CS::Quote::Single ("components"), componentNum);
     return 0;
   }
   
@@ -356,7 +360,8 @@ csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node
   }
   else
   {
-    ReportError (msgid, node, "unknown value for 'type': %s", componentType);
+    ReportError (msgid, node, "unknown value for %s: %s",
+		 CS::Quote::Single ("type"), componentType);
     return 0;
   }
   if (err != 0)
@@ -378,7 +383,8 @@ bool csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node, iRenderBuffer*
     csRef<iDataBuffer> data = vfs->ReadFile (filename, false);
     if (!data.IsValid())
     {
-      ReportError (msgid, node, "could not read from '%s'", filename);
+      ReportError (msgid, node, "could not read from %s",
+		   CS::Quote::Single (filename));
       return false;
     }
     //return ReadRenderBuffer (data, KeepSaveInfo() ? filename : 0);
@@ -389,19 +395,22 @@ bool csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node, iRenderBuffer*
   const char* componentType = node->GetAttributeValue ("type");
   if (componentType == 0)
   {
-    ReportError (msgid, node, "no 'type' attribute");
+    ReportError (msgid, node, "no %s attribute",
+		 CS::Quote::Single ("type"));
     return false;
   }  
 
   int componentNum = node->GetAttributeValueAsInt ("components");
   if (componentNum <= 0)
   {
-    ReportError (msgid, node, "bogus 'components' attribute: %d", componentNum);
+    ReportError (msgid, node, "bogus %s attribute: %d",
+		 CS::Quote::Single ("components"), componentNum);
     return false;
   }
   if (componentNum != buffer->GetComponentCount ())
   {
-    ReportError (msgid, node, "'components' attribute %d does not match expected %d", 
+    ReportError (msgid, node, "%s attribute %d does not match expected %d", 
+      CS::Quote::Single ("components"),
       componentNum, buffer->GetComponentCount ());
     return false;
   }
@@ -657,7 +666,8 @@ bool csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node, iRenderBuffer*
   }
   else
   {
-    ReportError (msgid, node, "unknown value for 'type': %s", componentType);
+    ReportError (msgid, node, "unknown value for %s: %s",
+		 CS::Quote::Single ("type"), componentType);
     return 0;
   }
   if (err != 0)
@@ -700,7 +710,8 @@ bool csTextSyntaxService::WriteRenderBuffer (iDocumentNode* node, iRenderBuffer*
       csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
       if (!vfs->WriteFile (filename, saveData->GetData(), saveData->GetSize()))
       {
-        ReportError (msgid, node, "could not write to '%s'", filename);
+        ReportError (msgid, node, "could not write to %s",
+		     CS::Quote::Single (filename));
         return false;
       }
       node->SetAttribute ("file", filename);

@@ -32,6 +32,7 @@
 #include "csutil/parray.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/scfstringarray.h"
+#include "csutil/stringquote.h"
 #include "csutil/strset.h"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
@@ -202,18 +203,18 @@ public:
     VfsArchive::verbosity = verbosity;
     UpdateTime ();
     if (IsVerbose(csVFS::VERBOSITY_DEBUG))
-      csPrintf ("VFS_DEBUG: opening archive \"%s\"\n", filename);
+      csPrintf ("VFS_DEBUG: opening archive %s\n", CS::Quote::Double (filename));
   }
   virtual ~VfsArchive ()
   {
     CS_ASSERT (RefCount == 0);
     bool const debug = IsVerbose(csVFS::VERBOSITY_DEBUG);
     if (debug)
-      csPrintf ("VFS_DEBUG: archive \"%s\" closing (writing=%d)\n",
-		GetName (), Writing);
+      csPrintf ("VFS_DEBUG: archive %s closing (writing=%d)\n",
+		CS::Quote::Double (GetName ()), Writing);
     Flush ();
     if (debug)
-      csPrintf ("VFS_DEBUG: archive \"%s\" closed\n", GetName ());
+      csPrintf ("VFS_DEBUG: archive %s closed\n", CS::Quote::Double (GetName ()));
   }
 };
 
@@ -487,7 +488,7 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, size_t RIndex,
   for (t = 1; t <= 2; t++)
   {
     if (debug)
-      csPrintf ("VFS_DEBUG: Trying to open disk file \"%s\"\n", fName);
+      csPrintf ("VFS_DEBUG: Trying to open disk file %s\n", CS::Quote::Double (fName));
     if ((Mode & VFS_FILE_MODE) == VFS_FILE_WRITE)
         file = fopen (fName, "wb");
     else if ((Mode & VFS_FILE_MODE) == VFS_FILE_APPEND)
@@ -605,11 +606,11 @@ void DiskFile::MakeDir (const char *PathBase, const char *PathSuffix)
     char oldchar = *cur;
     *cur = 0;
     if (debug)
-      csPrintf ("VFS_DEBUG: Trying to create directory \"%s\"\n", path);
+      csPrintf ("VFS_DEBUG: Trying to create directory %s\n", CS::Quote::Double (path));
     errno = 0;
     CS_MKDIR (path);
     if (debug && errno != 0)
-      csPrintf ("VFS_DEBUG: Couldn't create directory \"%s\", errno=%d\n", path, errno);
+      csPrintf ("VFS_DEBUG: Couldn't create directory %s, errno=%d\n", CS::Quote::Double (path), errno);
     *cur = oldchar;
     if (*cur)
       cur++;
@@ -882,8 +883,8 @@ ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, size_t RIndex,
   ArchiveCache->CheckUp ();
 
   if (debug)
-    csPrintf ("VFS_DEBUG: Trying to open file \"%s\" from archive \"%s\"\n",
-	      NameSuffix, Archive->GetName ());
+    csPrintf ("VFS_DEBUG: Trying to open file %s from archive %s\n",
+	      CS::Quote::Double (NameSuffix), CS::Quote::Double (Archive->GetName ()));
 
   if ((Mode & VFS_FILE_MODE) == VFS_FILE_READ)
   {
@@ -910,8 +911,8 @@ ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, size_t RIndex,
 ArchiveFile::~ArchiveFile ()
 {
   if (IsVerbose(csVFS::VERBOSITY_DEBUG))
-    csPrintf("VFS_DEBUG: Closing a file from archive \"%s\"\n",
-	     Archive->GetName());
+    csPrintf("VFS_DEBUG: Closing a file from archive %s\n",
+	     CS::Quote::Double (Archive->GetName()));
 
   CS::Threading::RecursiveMutexScopedLock lock (Archive->archive_mutex);
   if (fh)
@@ -2180,7 +2181,8 @@ bool csVFS::LoadMountsFromFile (iConfigFile* file)
     const char *rpath = iter->GetKey (true);
     const char *vpath = iter->GetStr ();
     if (!Mount (rpath, vpath)) {
-      csPrintfErr("VFS_WARNING: cannot mount \"%s\" to \"%s\"\n", rpath,vpath);
+      csPrintfErr("VFS_WARNING: cannot mount %s to %s\n",
+		  CS::Quote::Double (rpath), CS::Quote::Double (vpath));
       success = false;
     }
   }

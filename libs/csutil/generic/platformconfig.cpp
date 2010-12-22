@@ -25,6 +25,7 @@
 #include "cssysdef.h"
 #include "csutil/cfgfile.h"
 #include "csutil/csstring.h"
+#include "csutil/stringquote.h"
 #include "csutil/sysfunc.h"
 
 #ifndef S_IRUSR
@@ -72,8 +73,8 @@ csPtr<iConfigFile> csGetPlatformConfig (const char* key)
       S_IRUSR|S_IWUSR|S_IXUSR|S_IRGRP|S_IWGRP|S_IXGRP|S_IROTH|S_IWOTH|S_IXOTH;
     if (mkdir (dir, m) != 0)
     {
-      csPrintfErr ("Failed to create `%s' for configuration files (errno %d).\n",
-	dir.GetData(), errno);
+      csPrintfErr ("Failed to create %s for configuration files (errno %d).\n",
+	CS::Quote::Single (dir.GetData()), errno);
       return 0;
     }
   }

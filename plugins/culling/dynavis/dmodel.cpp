@@ -18,6 +18,7 @@
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
 #include "csutil/scfstr.h"
+#include "csutil/stringquote.h"
 #include "iutil/string.h"
 #include "csqint.h"
 #include "csqsqrt.h"
@@ -244,8 +245,9 @@ bool csObjectModelManager::CheckObjectModel (csDynavisObjectModel* model,
 	    model->use_outline_filler = false;
 	    if (show_notclosed > 0)
 	    {
-	      csPrintf ("WARNING! Object '%s' is not closed!\n", mw != 0 ?
-	  	  mw->QueryObject ()->GetName () : "<no mesh>");
+	      csPrintf ("WARNING! Object %s is not closed!\n",
+		  CS::Quote::Single (mw != 0 ?
+		    mw->QueryObject ()->GetName () : "<no mesh>"));
 	      fflush (stdout);
 	      show_notclosed--;
 	    }

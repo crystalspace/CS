@@ -24,6 +24,7 @@
 #include "cssysdef.h"
 
 #include "cstool/vfsdirchange.h"
+#include "csutil/stringquote.h"
 #include "iengine/engine.h"
 #include "isndsys/ss_loader.h"
 #include "isndsys/ss_manager.h"
@@ -54,7 +55,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     {
       ReportError (
         "crystalspace.maploader.parse.sound",
-        "Cannot open sound file '%s' from VFS!", filename);
+        "Cannot open sound file %s from VFS!", CS::Quote::Single (filename));
       return false;
     }
 
@@ -66,7 +67,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     {
       ReportError (
         "crystalspace.maploader.parse.sound",
-        "Cannot create sound data from file '%s'!", filename);
+        "Cannot create sound data from file %s!", CS::Quote::Single (filename));
       return false;
     }
 
@@ -104,7 +105,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     {
       ReportError (
         "crystalspace.maploader.parse.sound",
-        "Cannot register sound '%s'!", fname);
+        "Cannot register sound %s!", CS::Quote::Single (fname));
       return false;
     }
 

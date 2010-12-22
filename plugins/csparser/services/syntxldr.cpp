@@ -32,6 +32,7 @@
 #include "cstool/keyval.h"
 #include "csutil/cscolor.h"
 #include "csutil/scfstr.h"
+#include "csutil/stringquote.h"
 
 #include "iengine/engine.h"
 #include "iengine/portal.h"
@@ -89,7 +90,7 @@ bool csTextSyntaxService::ParseBoolAttribute (iDocumentNode* node,
     if (required)
     {
       ReportError ("crystalspace.syntax.boolean", node,
-        "Boolean attribute '%s' is missing!", attrname);
+        "Boolean attribute %s is missing!", CS::Quote::Single (attrname));
       return false;
     }
     else
@@ -110,7 +111,8 @@ bool csTextSyntaxService::ParseBoolAttribute (iDocumentNode* node,
   if (!strcasecmp (v, "on"))    { result = true; return true; }
   if (!strcasecmp (v, "off"))   { result = false; return true; }
   ReportError ("crystalspace.syntax.boolean", node,
-    "Bad boolean value '%s' for attribute '%s'!", v, attrname);
+    "Bad boolean value %s for attribute %s!",
+    CS::Quote::Single (v), CS::Quote::Single (attrname));
   return false;
 }
 
@@ -128,7 +130,7 @@ bool csTextSyntaxService::ParseBool (iDocumentNode* node, bool& result,
   if (!strcasecmp (v, "on"))    { result = true; return true; }
   if (!strcasecmp (v, "off"))   { result = false; return true; }
   ReportError ("crystalspace.syntax.boolean", node,
-    "Bad boolean value '%s'!", v);
+    "Bad boolean value %s!", CS::Quote::Single (v));
   return false;
 }
 
@@ -345,7 +347,7 @@ bool csTextSyntaxService::ParseBox (iDocumentNode* node, csBox3 &v)
   if (!minnode)
   {
     ReportError ("crystalspace.syntax.box", node,
-      "Expected 'min' node!");
+      "Expected %s node!",CS::Quote::Single ("min"));
     return false;
   }
   miv.x = minnode->GetAttributeValueAsFloat ("x");
@@ -355,7 +357,7 @@ bool csTextSyntaxService::ParseBox (iDocumentNode* node, csBox3 &v)
   if (!maxnode)
   {
     ReportError ("crystalspace.syntax.box", node,
-      "Expected 'max' node!");
+      "Expected %s node!", CS::Quote::Single ("max"));
     return false;
   }
   mav.x = maxnode->GetAttributeValueAsFloat ("x");
@@ -390,7 +392,8 @@ bool csTextSyntaxService::ParseBox (iDocumentNode* node, csOBB &b)
     //Try to parse ourselves as a box node
     if (!ParseBox (node, (csBox3&)b))
     {
-      ReportError ("crystalspace.syntax.box", node, "Expected 'box' node!");
+      ReportError ("crystalspace.syntax.box", node, "Expected %s node!",
+		   CS::Quote::Single ("box"));
       return false;
     }
     return true;
@@ -897,7 +900,8 @@ bool csTextSyntaxService::ParseGradientShade (iDocumentNode* node,
 	      "crystalspace.syntax.gradient.shade",
 	      CS_REPORTER_SEVERITY_WARNING,
 	      child,
-	      "'color' overrides previously specified 'left'.");
+	      "%s overrides previously specified %s.",
+	      CS::Quote::Single ("color"), CS::Quote::Single ("left"));
 	  }
 	  else if (has_right)
 	  {
@@ -905,7 +909,8 @@ bool csTextSyntaxService::ParseGradientShade (iDocumentNode* node,
 	      "crystalspace.syntax.gradient.shade",
 	      CS_REPORTER_SEVERITY_WARNING,
 	      child,
-	      "'color' overrides previously specified 'right'.");
+	      "%s overrides previously specified %s.",
+	      CS::Quote::Single ("color"), CS::Quote::Single ("right"));
 	  }
 	  else if (has_color)
 	  {
@@ -913,7 +918,8 @@ bool csTextSyntaxService::ParseGradientShade (iDocumentNode* node,
 	      "crystalspace.syntax.gradient.shade",
 	      CS_REPORTER_SEVERITY_WARNING,
 	      child,
-	      "'color' overrides previously specified 'color'.");
+	      "%s overrides previously specified %s.",
+	      CS::Quote::Single ("color"), CS::Quote::Single ("color"));
 	  }
 	  csColor c;
 	  if (!ParseColor (child, c))
@@ -936,7 +942,8 @@ bool csTextSyntaxService::ParseGradientShade (iDocumentNode* node,
 	      "crystalspace.syntax.gradient.shade",
 	      CS_REPORTER_SEVERITY_WARNING,
 	      child,
-	      "'left' overrides previously specified 'color'.");
+	      "%s overrides previously specified %s.",
+	      CS::Quote::Single ("left"), CS::Quote::Single ("color"));
 	  }
 	  if (!ParseColor (child, shade.left))
 	  {
@@ -956,7 +963,8 @@ bool csTextSyntaxService::ParseGradientShade (iDocumentNode* node,
 	      "crystalspace.syntax.gradient.shade",
 	      CS_REPORTER_SEVERITY_WARNING,
 	      child,
-	      "'right' overrides previously specified 'color'.");
+	      "%s overrides previously specified %s.",
+	      CS::Quote::Single ("right"), CS::Quote::Single ("color"));
 	  }
 	  if (!ParseColor (child, shade.right))
 	  {
@@ -984,7 +992,8 @@ bool csTextSyntaxService::ParseGradientShade (iDocumentNode* node,
       "crystalspace.syntax.gradient.shade",
       CS_REPORTER_SEVERITY_WARNING,
       node,
-      "Only one of 'left' or 'right' specified.");
+      "Only one of %s or %s specified.",
+      CS::Quote::Single ("left"), CS::Quote::Single ("right"));
   }
   if (!has_color && !has_left && !has_right)
   {
@@ -1277,7 +1286,8 @@ csPtr<iKeyValuePair> csTextSyntaxService::ParseKey (iDocumentNode* node)
   if (!name)
   {
     ReportError ("crystalspace.syntax.key",
-    	        node, "Missing 'name' attribute for 'key'!");
+    	         node, "Missing %s attribute for %s!",
+		 CS::Quote::Single ("name"), CS::Quote::Single ("key"));
     return 0;
   }
   csRef<csKeyValuePair> cskvp;
@@ -1400,8 +1410,8 @@ void csTextSyntaxService::ReportBadToken (iDocumentNode* badtokennode)
 {
   Report ("crystalspace.syntax.badtoken",
         CS_REPORTER_SEVERITY_ERROR,
-  	badtokennode, "Unexpected token '%s'!",
-	badtokennode->GetValue ());
+  	badtokennode, "Unexpected token %s!",
+	CS::Quote::Single (badtokennode->GetValue ()));
 }
 
 

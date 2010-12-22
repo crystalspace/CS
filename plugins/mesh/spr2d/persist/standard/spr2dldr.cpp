@@ -199,7 +199,7 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
           {
             synldr->ReportError (
                 "crystalspace.sprite2dfactoryloader.parse.unknownmaterial",
-                child, "Couldn't find material named '%s'", matname);
+                child, "Couldn't find material named %s", CS::Quote::Single (matname));
             return 0;
           }
           fact->SetMaterialWrapper (mat);
@@ -426,7 +426,7 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
     {
       synldr->ReportError (
         "crystalspace.sprite2dloader.parse.unknownfactory",
-        child, "Couldn't find factory '%s'!", factname);
+        child, "Couldn't find factory %s!", CS::Quote::Single (factname));
       return 0;
     }
 
@@ -437,8 +437,8 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
           {
             synldr->ReportError (
               "crystalspace.sprite2dloader.parse.badfactory",
-              child, "Factory '%s' doesn't appear to be a spr2d factory!",
-              factname);
+              child, "Factory %s doesn't appear to be a spr2d factory!",
+              CS::Quote::Single (factname));
             return 0;
           }
           verts = spr2dLook->GetVertices ();
@@ -452,7 +452,7 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
           {
             synldr->ReportError (
               "crystalspace.sprite2dloader.parse.unknownmaterial",
-              child, "Couldn't find material '%s'!", matname);
+              child, "Couldn't find material %s!", CS::Quote::Single (matname));
             return 0;
           }
           CHECK_MESH (mesh);
@@ -534,7 +534,7 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
           {
             synldr->ReportError (
               "crystalspace.sprite2dloader.parse.uvanim",
-              child, "UVAnimation '%s' not found!", animname);
+              child, "UVAnimation %s not found!", CS::Quote::Single (animname));
             return 0;
           }
         }

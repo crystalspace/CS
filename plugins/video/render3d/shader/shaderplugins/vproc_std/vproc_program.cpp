@@ -23,6 +23,7 @@
 #include "csgfx/vertexlight.h"
 #include "csgfx/vertexlistwalker.h"
 #include "csgeom/quaternion.h"
+#include "csutil/stringquote.h"
 
 #include "imap/services.h"
 #include "iutil/document.h"
@@ -584,7 +585,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
       else
       {
         synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
-          child, "Invalid light mix mode '%s'", str);
+          child, "Invalid light mix mode %s", CS::Quote::Single (str));
         return false;
       }
       return true;
@@ -688,14 +689,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
             if (!buffer)
             {
               synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
-                pnode, "'buffer' attribute missing");
+                pnode, "%s attribute missing",
+		CS::Quote::Single ("buffer"));
               return false;
             }
             csRenderBufferName bufferName = csRenderBuffer::GetBufferNameFromDescr (buffer);
             if (bufferName == CS_BUFFER_NONE)
             {
               synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
-                pnode, "buffer name '%s' invalid here", buffer);
+                pnode, "buffer name %s invalid here", CS::Quote::Single (buffer));
               return false;
             }
             specularOutputBuffer = bufferName;
@@ -720,14 +722,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
             if (!buffer)
             {
               synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
-                pnode, "'buffer' attribute missing");
+                pnode, "%s attribute missing",
+                CS::Quote::Single ("buffer"));
               return false;
             }
             csRenderBufferName bufferName = csRenderBuffer::GetBufferNameFromDescr (buffer);
             if (bufferName == CS_BUFFER_NONE)
             {
               synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
-                pnode, "buffer name '%s' invalid here", buffer);
+                pnode, "buffer name %s invalid here", CS::Quote::Single (buffer));
               return false;
             }
             skinnedPositionOutputBuffer = bufferName;
@@ -741,14 +744,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
             if (!buffer)
             {
               synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
-                pnode, "'buffer' attribute missing");
+                pnode, "%s attribute missing",
+		CS::Quote::Single ("buffer"));
               return false;
             }
             csRenderBufferName bufferName = csRenderBuffer::GetBufferNameFromDescr (buffer);
             if (bufferName == CS_BUFFER_NONE)
             {
               synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
-                pnode, "buffer name '%s' invalid here", buffer);
+                pnode, "buffer name %s invalid here", CS::Quote::Single (buffer));
               return false;
             }
             skinnedNormalOutputBuffer = bufferName;
@@ -762,14 +766,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
             if (!buffer)
             {
               synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
-                pnode, "'buffer' attribute missing");
+                pnode, "%s attribute missing",
+		CS::Quote::Single ("buffer"));
               return false;
             }
             csRenderBufferName bufferName = csRenderBuffer::GetBufferNameFromDescr (buffer);
             if (bufferName == CS_BUFFER_NONE)
             {
               synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
-                pnode, "buffer name '%s' invalid here", buffer);
+                pnode, "buffer name %s invalid here", CS::Quote::Single (buffer));
               return false;
             }
             skinnedTangentOutputBuffer = bufferName;
@@ -783,14 +788,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
             if (!buffer)
             {
               synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
-                pnode, "'buffer' attribute missing");
+                pnode, "%s attribute missing",
+		CS::Quote::Single ("buffer"));
               return false;
             }
             csRenderBufferName bufferName = csRenderBuffer::GetBufferNameFromDescr (buffer);
             if (bufferName == CS_BUFFER_NONE)
             {
               synsrv->ReportError ("crystalspace.graphics3d.shader.vproc_std",
-                pnode, "buffer name '%s' invalid here", buffer);
+                pnode, "buffer name %s invalid here", CS::Quote::Single (buffer));
               return false;
             }
             skinnedBiTangentOutputBuffer = bufferName;

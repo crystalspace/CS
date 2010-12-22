@@ -248,14 +248,14 @@ csPtr<iFont> csFreeType2Server::LoadFont (const char *filename, float size)
 	  encName[3] = map->encoding & 0xff;
 	  encName[4] = 0;
 	  if (FreetypeError (FT_Set_Charmap (ftFace, map),
-	    "Could not select charmap '%s' for %s", encName, filename))
+	    "Could not select charmap %s for %s", CS::Quote::Single (encName), filename))
 	  {
 	    return 0;
 	  }
 	  else
 	  {
 	    Report (GetErrorSeverity (),
-	      "Using charmap '%s' for %s", encName, filename);
+	      "Using charmap %s for %s", CS::Quote::Single (encName), filename);
 	  }
 	}
 

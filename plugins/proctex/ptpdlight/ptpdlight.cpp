@@ -27,6 +27,7 @@
 
 #include "csgeom/math.h"
 #include "csgfx/imageautoconvert.h"
+#include "csutil/stringquote.h"
 
 #include "ptpdlight.h"
 #include "ptpdlight_loader.h"
@@ -413,17 +414,17 @@ bool ProctexPDLight::PrepareAnim ()
         if (!light.light)
         {
           Report (CS_REPORTER_SEVERITY_WARNING, 
-            "Could not find light '%s' in sector '%s'", 
-            light.lightId->lightName.GetData(),
-            light.lightId->sectorName.GetData());
+            "Could not find light %s in sector %s", 
+            CS::Quote::Single (light.lightId->lightName.GetData()),
+            CS::Quote::Single (light.lightId->sectorName.GetData()));
         }
       }
       else
       {
         Report (CS_REPORTER_SEVERITY_WARNING, 
-          "Could not find sector '%s' for light '%s'", 
-          light.lightId->sectorName.GetData(),
-          light.lightId->lightName.GetData());
+          "Could not find sector %s for light %s", 
+          CS::Quote::Single (light.lightId->sectorName.GetData()),
+          CS::Quote::Single (light.lightId->lightName.GetData()));
       }
     }
     else
@@ -435,7 +436,7 @@ bool ProctexPDLight::PrepareAnim ()
         for (int i = 0; i < 16; i++)
           hexId.AppendFmt ("%02x", light.lightId->lightId[i]);
         Report (CS_REPORTER_SEVERITY_WARNING, 
-          "Could not find light with ID '%s'", hexId.GetData());
+          "Could not find light with ID %s", CS::Quote::Single (hexId.GetData()));
       }
     }
     if (light.light)

@@ -834,7 +834,8 @@ void G2DTestSystemDriver::DrawCustomIconScreen ()
   SetFont (fontLarge);
   WriteCentered (0, tpos + 16*2, black,  -1, "If your current canvas supports custom window icons");
   WriteCentered (0, tpos + 16*3, black,  -1, "the window icon should have changed.");
-  WriteCentered (0, tpos + 16*4, black,  -1, "It should look like a \"shard\" of the Crystal Space logo.");
+  WriteCentered (0, tpos + 16*4, black,  -1, "It should look like a %s of the Crystal Space logo.",
+		 CS::Quote::Double ("shard"));
 }
 
 void G2DTestSystemDriver::DrawAlphaTestScreen ()
@@ -900,7 +901,8 @@ void G2DTestSystemDriver::DrawUnicodeTest1 ()
   WriteCentered (0, tpos, white, -1, "UNICODE TEST 1");
 
   SetFont (fontLarge);
-  WriteCentered (0, tpos + 16*2, black,  -1, "Below you see the equivalent of \"Quick brown fox\"");
+  WriteCentered (0, tpos + 16*2, black,  -1, "Below you see the equivalent of %s",
+		 CS::Quote::Double ("Quick brown fox"));
   WriteCentered (0, tpos + 16*3, black,  -1, "in several languages.");
   WriteCentered (0, tpos + 16*4, black,  -1, "In the ideal case, all characters should be displayed.");
   WriteCentered (0, tpos + 16*5, black,  -1, "If you see a box in some places, a particular");
@@ -940,7 +942,8 @@ void G2DTestSystemDriver::DrawUnicodeTest2 ()
   WriteCentered (0, tpos, white, -1, "UNICODE TEST 2");
 
   SetFont (fontLarge);
-  WriteCentered (0, tpos + 16*2, black,  -1, "Below you see some translations for \"I can eat glass\".");
+  WriteCentered (0, tpos + 16*2, black,  -1, "Below you see some translations for %s.",
+		 CS::Quote::Double ("I can eat glass"));
   WriteCentered (0, tpos + 16*3, black,  -1, "In the ideal case, all characters should be displayed.");
   WriteCentered (0, tpos + 16*4, black,  -1, "If you see a box in some places, a particular");
   WriteCentered (0, tpos + 16*5, black,  -1, "character is not available in the font.");
@@ -1561,7 +1564,8 @@ void G2DTestSystemDriver::BlitTest ()
   WriteCentered (0,-16*7, black, dsteel, "This will test whether iGraphics2D->Blit() works correctly");
   WriteCentered (0,-16*6, black, dsteel, "on this canvas.");
 
-  WriteCentered (0,-16*4, black, dsteel, "You should see an image of an arrow and the word \"up\".");
+  WriteCentered (0,-16*4, black, dsteel, "You should see an image of an arrow and the word %s.",
+		 CS::Quote::Double ("up"));
   WriteCentered (0,-16*3, black, dsteel, "It is surrounded by a green rectangle, and the image");
   WriteCentered (0,-16*2, black, dsteel, "itself has a black border. No red should be visible");
   WriteCentered (0,-16*1, black, dsteel, "and the border has to be complete, too.");

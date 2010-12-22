@@ -277,8 +277,9 @@ bool csShaderGLCGCommon::DefaultLoadProgram (iShaderProgramCG* cgResolve,
   if (shaderPlug->doVerbose || shaderPlug->doVerbosePrecache)
   {
     shaderPlug->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "Cg %s program '%s': using profile %s[%d]", GetProgramType(),
-      description.GetData (), cgGetProfileString (profile), profile);
+      "Cg %s program %s: using profile %s[%d]", GetProgramType(),
+      CS::Quote::Single (description.GetData ()),
+      cgGetProfileString (profile), profile);
   }
 
   ArgumentArray args;
@@ -533,14 +534,14 @@ void csShaderGLCGCommon::DoDebugDump ()
   {
     csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, 
       "crystalspace.graphics3d.shader.glcg",
-      "Could not write '%s'", debugFN.GetData());
+      "Could not write %s", CS::Quote::Single (debugFN.GetData()));
   }
   else
   {
     debugFile->Write (output.GetData(), output.Length ());
     csReport (objectReg, CS_REPORTER_SEVERITY_NOTIFY, 
       "crystalspace.graphics3d.shader.glcg",
-      "Dumped Cg program info to '%s'", debugFN.GetData());
+      "Dumped Cg program info to %s", CS::Quote::Single (debugFN.GetData()));
   }
 }
 
@@ -594,7 +595,7 @@ void csShaderGLCGCommon::WriteAdditionalDumpInfo (const char* description,
   {
     csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, 
       "crystalspace.graphics3d.shader.glcg",
-      "Could not augment '%s'", debugFN.GetData());
+      "Could not augment %s", CS::Quote::Single (debugFN.GetData()));
   }
 }
 

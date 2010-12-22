@@ -32,6 +32,7 @@
 #include "csgfx/shadervar.h"
 #include "cstool/vfsdirchange.h"
 #include "csutil/scanstr.h"
+#include "csutil/stringquote.h"
 #include "csutil/xmltiny.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(SyntaxService)
@@ -121,7 +122,7 @@ bool csTextSyntaxService::ParseShaderVar (iLoaderContext* ldr_context,
                 "crystalspace.syntax.shadervariable",
                 CS_REPORTER_SEVERITY_WARNING,
                 node,
-                "Texture '%s' not found.", texname);
+                "Texture %s not found.", CS::Quote::Single (texname));
             }
 
             if(i >= (int)(failedTextures->GetSize()-1))
@@ -141,7 +142,7 @@ bool csTextSyntaxService::ParseShaderVar (iLoaderContext* ldr_context,
             "crystalspace.syntax.shadervariable",
             CS_REPORTER_SEVERITY_WARNING,
             node,
-            "Texture '%s' not found.", texname);
+            "Texture %s not found.", CS::Quote::Single (texname));
         }
 
         var.SetValue (tex);
@@ -154,7 +155,8 @@ bool csTextSyntaxService::ParseShaderVar (iLoaderContext* ldr_context,
 	{
 	  Report ("crystalspace.syntax.shadervariable.expression",
 		CS_REPORTER_SEVERITY_ERROR,
-		node, "'exprname' attribute missing for shader expression!");
+		node, "%s attribute missing for shader expression!",
+		CS::Quote::Single ("exprname"));
 	  return false;
 	}
 	csRef<iShaderManager> shmgr = csQueryRegistry<iShaderManager> (
@@ -223,7 +225,7 @@ bool csTextSyntaxService::ParseShaderVar (iLoaderContext* ldr_context,
         "crystalspace.syntax.shadervariable",
         CS_REPORTER_SEVERITY_WARNING,
         node,
-	"Invalid shadervar type '%s'.", type);
+	"Invalid shadervar type %s.", CS::Quote::Single (type));
       return false;
   }
 
@@ -344,7 +346,8 @@ csRef<iShader> csTextSyntaxService::ParseShaderRef (
   const char* shaderName = node->GetAttributeValue ("name");
   if (shaderName == 0)
   {
-    ReportError (msgid, node, "no 'name' attribute");
+    ReportError (msgid, node, "no %s attribute",
+		 CS::Quote::Single ("name"));
     return 0;
   }
 
@@ -363,7 +366,7 @@ csRef<iShader> csTextSyntaxService::ParseShaderRef (
     if(!shaderFile)
     {
       Report (msgid, CS_REPORTER_SEVERITY_WARNING, node,
-	"Unable to open shader file '%s'!", shaderFileName);
+	"Unable to open shader file %s!", CS::Quote::Single (shaderFileName));
       return 0;
     }
 
@@ -376,8 +379,8 @@ csRef<iShader> csTextSyntaxService::ParseShaderRef (
     if (err != 0)
     {
       Report (msgid, CS_REPORTER_SEVERITY_WARNING, node,
-	"Could not parse shader file '%s': %s",
-	shaderFileName, err);
+	"Could not parse shader file %s: %s",
+	CS::Quote::Single (shaderFileName), err);
       return 0;
     }
     csRef<iDocumentNode> shaderNode = 
@@ -416,14 +419,14 @@ csRef<iShader> csTextSyntaxService::ParseShader (
   if (type == 0)
   {
     ReportError (msgid, node,
-      "'compiler' attribute is missing!");
+      "%s attribute is missing!", CS::Quote::Single ("compiler"));
     return 0;
   }
   csRef<iShaderCompiler> shcom = shaderMgr->GetCompiler (type);
   if (!shcom.IsValid()) 
   {
     ReportError (msgid, node,
-      "Could not get shader compiler '%s'", type);
+      "Could not get shader compiler %s", CS::Quote::Single (type));
     return 0;
   }
   csRef<iShader> shader = shcom->CompileShader (ldr_context, node);

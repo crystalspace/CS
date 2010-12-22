@@ -31,6 +31,7 @@
 #include "csutil/cfgacc.h"
 #include "csutil/cscolor.h"
 #include "csutil/processorspecdetection.h"
+#include "csutil/stringquote.h"
 
 #include "ptpdlight.h"
 #include "ptpdlight_loader.h"
@@ -123,7 +124,7 @@ csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,
         if (!img) 
         {
           Report (CS_REPORTER_SEVERITY_WARNING, file, 
-	    "Couldn't load image '%s'", fname);
+	    "Couldn't load image %s", CS::Quote::Single (fname));
         }
       }
     }
@@ -268,7 +269,9 @@ bool ProctexPDLightLoader::ParseMap (iDocumentNode* node, ProctexPDLight* pt,
   if ((hasSector || hasLightName) && (!hasSector || !hasLightName))
   {
     Report (CS_REPORTER_SEVERITY_WARNING, node, 
-      "Both 'lightsector' and 'lightname' attributes need to be specified");
+      "Both %s and %s attributes need to be specified",
+      CS::Quote::Single ("lightsector"),
+      CS::Quote::Single ("lightname"));
     return false;
   }
   const char* lightId = node->GetAttributeValue ("lightid");
@@ -276,8 +279,11 @@ bool ProctexPDLightLoader::ParseMap (iDocumentNode* node, ProctexPDLight* pt,
   if (!hasSector && !hasLightName && !hasLightID)
   {
     Report (CS_REPORTER_SEVERITY_WARNING, node, 
-      "'lightsector' and 'lightname' attributes or a 'lightid' attribute "
-      "need to be specified");
+      "%s and %s attributes or a %s attribute "
+      "need to be specified",
+      CS::Quote::Single ("lightsector"),
+      CS::Quote::Single ("lightname"),
+      CS::Quote::Single ("lightid"));
     return false;
   }
   const char* image = node->GetContentsValue ();
@@ -286,7 +292,7 @@ bool ProctexPDLightLoader::ParseMap (iDocumentNode* node, ProctexPDLight* pt,
   if (!map)
   {
     Report (CS_REPORTER_SEVERITY_WARNING, node, 
-      "Couldn't load image '%s'", image);
+      "Couldn't load image %s", CS::Quote::Single (image));
     return false;
   }
   ProctexPDLight::MappedLight light (pt->NewLight (map));;
@@ -301,7 +307,7 @@ bool ProctexPDLightLoader::ParseMap (iDocumentNode* node, ProctexPDLight* pt,
     if (!HexToLightID (light.lightId->lightId, lightId))
     {
       Report (CS_REPORTER_SEVERITY_WARNING, node, 
-        "Invalid light ID '%s'", lightId);
+        "Invalid light ID %s", CS::Quote::Single (lightId));
     }
     return false;
   }
@@ -309,7 +315,8 @@ bool ProctexPDLightLoader::ParseMap (iDocumentNode* node, ProctexPDLight* pt,
   if (err != 0)
   {
     Report (CS_REPORTER_SEVERITY_WARNING, node, 
-      "Couldn't add map '%s' for light '%s': %s", image, lightId, err);
+      "Couldn't add map %s for light %s: %s",
+      CS::Quote::Single (image), CS::Quote::Single (lightId), err);
   }
   
   return !err;

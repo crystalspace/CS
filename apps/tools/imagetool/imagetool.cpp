@@ -155,7 +155,8 @@ static int display_help ()
   csPrintf ("  -C   --cube          Merge 6 images into a cubemap\n");
   csPrintf ("  -E   --split-image   Split image up into subimages (e.g. faces of a cubemap)\n");
   csPrintf ("  -M   --mime=#        Output file mime type (default: image/png)\n");
-  csPrintf ("  -O   --options=#     Optional output format options (e.g. \"progressive\")\n");
+  csPrintf ("  -O   --options=#     Optional output format options (e.g. %s)\n",
+	    CS::Quote::Double ("progressive"));
   csPrintf ("  -P   --prefix=#      Add prefix before output filename\n");
   csPrintf ("  -U   --suffix=#      Add suffix after output filename\n");
   csPrintf ("  -D   --display=#,#   Display the image in ASCII format :-)\n");

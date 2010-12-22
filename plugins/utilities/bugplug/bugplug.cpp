@@ -348,7 +348,7 @@ void csBugPlug::SetupPlugin ()
     else
     {
       Report (CS_REPORTER_SEVERITY_WARNING,
-        "Invalid value '%s' for frame speed display", framespeed);
+        "Invalid value %s for frame speed display", CS::Quote::Single (framespeed));
     }
   }
 
@@ -360,7 +360,7 @@ void csBugPlug::SetupPlugin ()
 void csBugPlug::SwitchCuller (iSector* sector, const char* culler)
 {
   Report (CS_REPORTER_SEVERITY_DEBUG,
-      "Switching to visibility culler '%s'.", culler);
+      "Switching to visibility culler %s.", CS::Quote::Single (culler));
   sector->SetVisibilityCullerPlugin (culler);
 }
 
@@ -396,7 +396,7 @@ void csBugPlug::SelectMesh (iSector* sector, const char* meshname)
   else
   {
     Report (CS_REPORTER_SEVERITY_DEBUG,
-      "Couldn't find matching meshes for pattern '%s'.", meshname);
+      "Couldn't find matching meshes for pattern %s.", CS::Quote::Single (meshname));
   }
 }
 
@@ -464,12 +464,12 @@ void csBugPlug::VisculCmd (const char* cmd)
   if (dbghelp->DebugCommand (cmd))
   {
     Report (CS_REPORTER_SEVERITY_DEBUG,
-      "Viscul command '%s' performed.", cmd);
+      "Viscul command %s performed.", CS::Quote::Single (cmd));
   }
   else
   {
     Report (CS_REPORTER_SEVERITY_DEBUG,
-      "Viscul command '%s' not supported!", cmd);
+      "Viscul command %s not supported!", CS::Quote::Single (cmd));
   }
 }
 
@@ -521,8 +521,9 @@ void csBugPlug::MouseButtonRight (iCamera* camera)
     float sqdist = csSquaredDist::PointPoint (
 	camera->GetTransform ().GetOrigin (), result.isect);
     Report (CS_REPORTER_SEVERITY_DEBUG,
-    	"Hit a mesh '%s' at distance %g!",
-	result.mesh->QueryObject ()->GetName (), csQsqrt (sqdist));
+    	"Hit a mesh %s at distance %g!",
+	CS::Quote::Single (result.mesh->QueryObject ()->GetName ()),
+	csQsqrt (sqdist));
   }
   else
   {
@@ -547,8 +548,8 @@ void csBugPlug::MouseButtonLeft (iCamera* camera)
     selected_meshes.Empty ();
     AddSelectedMesh (sel);
     const char* n = sel->QueryObject ()->GetName ();
-    Report (CS_REPORTER_SEVERITY_DEBUG, "BugPlug found mesh '%s'!",
-      	n ? n : "<noname>");
+    Report (CS_REPORTER_SEVERITY_DEBUG, "BugPlug found mesh %s!",
+      	CS::Quote::Single (n ? n : "<noname>"));
     bool bbox, rad, norm, skel;
     shadow->GetShowOptions (bbox, rad, norm, skel);
 
@@ -639,12 +640,12 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
 	    if (dbghelp->DebugCommand (args))
 	    {
             Report (CS_REPORTER_SEVERITY_DEBUG,
-	        "Engine command '%s' performed.", args.GetData());
+	        "Engine command %s performed.", CS::Quote::Single (args.GetData()));
 	    }
 	    else
 	    {
             Report (CS_REPORTER_SEVERITY_DEBUG,
-	        "Engine command '%s' not supported!", args.GetData());
+	        "Engine command %s not supported!", CS::Quote::Single (args.GetData()));
 	    }
 	  }
 	}
@@ -2118,8 +2119,8 @@ void csBugPlug::DebugCmd (const char* cmd)
     if (!comp)
     {
       Report (CS_REPORTER_SEVERITY_DEBUG,
-	"Could not load plugin '%s' for debug command execution.",
-	cmdstr);
+	"Could not load plugin %s for debug command execution.",
+	CS::Quote::Single (cmdstr));
     }
     else
     {
@@ -2128,15 +2129,15 @@ void csBugPlug::DebugCmd (const char* cmd)
       if (!dbghelp)
       {
 	Report (CS_REPORTER_SEVERITY_DEBUG,
-	  "Plugin '%s' doesn't support debug command execution.",
-	  cmdstr);
+	  "Plugin %s doesn't support debug command execution.",
+	  CS::Quote::Single (cmdstr));
       }
       else
       {
 	bool res = dbghelp->DebugCommand (params);
 	Report (CS_REPORTER_SEVERITY_DEBUG,
-	  "Execution of debug command '%s' on '%s' %s.",
-	  params, cmdstr,
+	  "Execution of debug command %s on %s %s.",
+	  CS::Quote::Single (params), CS::Quote::Single (cmdstr),
 	  res ? "successful" : "failed");
       }
     }
@@ -2381,7 +2382,7 @@ void csBugPlug::ReadKeyBindings (const char* filename)
       else
       {
         Report (CS_REPORTER_SEVERITY_WARNING,
-    	  "BugPlug hit a badly formed line in '%s'!", filename);
+    	  "BugPlug hit a badly formed line in %s!", CS::Quote::Single (filename));
         return;
       }
     }
@@ -2389,7 +2390,7 @@ void csBugPlug::ReadKeyBindings (const char* filename)
   else
   {
     Report (CS_REPORTER_SEVERITY_WARNING,
-    	"BugPlug could not read '%s'!", filename);
+    	"BugPlug could not read %s!", CS::Quote::Single (filename));
   }
 }
 
@@ -2413,14 +2414,14 @@ void csBugPlug::Dump (iEngine* engine)
   for (i = 0 ; i < txts->GetCount () ; i++)
   {
     iTextureWrapper* txt = txts->Get (i);
-    Report (CS_REPORTER_SEVERITY_DEBUG, "texture %d '%s'", i,
-    	txt->QueryObject ()->GetName ());
+    Report (CS_REPORTER_SEVERITY_DEBUG, "texture %d %s", i,
+    	CS::Quote::Single (txt->QueryObject ()->GetName ()));
   }
   for (i = 0 ; i < mats->GetCount () ; i++)
   {
     iMaterialWrapper* mat = mats->Get (i);
-    Report (CS_REPORTER_SEVERITY_DEBUG, "material %d '%s'", i,
-    	mat->QueryObject ()->GetName ());
+    Report (CS_REPORTER_SEVERITY_DEBUG, "material %d %s", i,
+    	CS::Quote::Single (mat->QueryObject ()->GetName ()));
   }
   for (i = 0 ; i < sectors->GetCount () ; i++)
   {
@@ -2444,8 +2445,8 @@ void csBugPlug::Dump (iEngine* engine)
 void csBugPlug::Dump (iSector* sector)
 {
   const char* sn = sector->QueryObject ()->GetName ();
-  Report (CS_REPORTER_SEVERITY_DEBUG, "    Sector '%s' (%08p)",
-  	sn ? sn : "?", sector);
+  Report (CS_REPORTER_SEVERITY_DEBUG, "    Sector %s (%08p)",
+  	CS::Quote::Single (sn ? sn : "?"), sector);
   Report (CS_REPORTER_SEVERITY_DEBUG, "    %d meshes, %d lights",
   	sector->GetMeshes ()->GetCount (),
 	sector->GetLights ()->GetCount ());
@@ -2454,16 +2455,16 @@ void csBugPlug::Dump (iSector* sector)
   {
     iMeshWrapper* mesh = sector->GetMeshes ()->Get (i);
     const char* n = mesh->QueryObject ()->GetName ();
-    Report (CS_REPORTER_SEVERITY_DEBUG, "        Mesh '%s' (%08p)",
-    	n ? n : "?", mesh);
+    Report (CS_REPORTER_SEVERITY_DEBUG, "        Mesh %s (%08p)",
+    	CS::Quote::Single (n ? n : "?"), mesh);
   }
 }
 
 void csBugPlug::Dump (int indent, iMeshWrapper* mesh)
 {
   const char* mn = mesh->QueryObject ()->GetName ();
-  Report (CS_REPORTER_SEVERITY_DEBUG, "%*s    Mesh wrapper '%s' (%08p)", 
-    indent, "", mn ? mn : "?", mesh);
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%*s    Mesh wrapper %s (%08p)", 
+    indent, "", CS::Quote::Single (mn ? mn : "?"), mesh);
   iMeshObject* obj = mesh->GetMeshObject ();
   if (!obj)
   {
@@ -2474,9 +2475,9 @@ void csBugPlug::Dump (int indent, iMeshWrapper* mesh)
   {
     csRef<iFactory> fact (scfQueryInterface<iFactory> (obj));
     if (fact)
-      Report (CS_REPORTER_SEVERITY_DEBUG, "%*s        Plugin '%s'",
+      Report (CS_REPORTER_SEVERITY_DEBUG, "%*s        Plugin %s",
   	  indent, "",
-          fact->QueryDescription () ? fact->QueryDescription () : "0");
+          CS::Quote::Single (fact->QueryDescription () ? fact->QueryDescription () : "0"));
     const csBox3& bbox = obj->GetObjectModel ()->GetObjectBoundingBox ();
     Report (CS_REPORTER_SEVERITY_DEBUG, "%*s        Object bounding box:",
       indent, "");
@@ -2499,8 +2500,8 @@ void csBugPlug::Dump (int indent, iMeshWrapper* mesh)
     {
       iSector* sec = movable->GetSectors ()->Get (i);
       const char* sn = sec->QueryObject ()->GetName ();
-      Report (CS_REPORTER_SEVERITY_DEBUG, "%*s        In sector '%s'",
-      	indent, "", sn ? sn : "?");
+      Report (CS_REPORTER_SEVERITY_DEBUG, "%*s        In sector %s",
+      	indent, "", CS::Quote::Single (sn ? sn : "?"));
     }
   }
   csRef<iSceneNodeArray> children = mesh->QuerySceneNode ()->GetChildrenArray ();
@@ -2515,13 +2516,13 @@ void csBugPlug::Dump (int indent, iMeshWrapper* mesh)
 void csBugPlug::Dump (iMeshFactoryWrapper* meshfact)
 {
   const char* mn = meshfact->QueryObject ()->GetName ();
-  Report (CS_REPORTER_SEVERITY_DEBUG, "        Mesh factory wrapper '%s' (%08p)",
-  	mn ? mn : "?", meshfact);
+  Report (CS_REPORTER_SEVERITY_DEBUG, "        Mesh factory wrapper %s (%08p)",
+  	CS::Quote::Single (mn ? mn : "?"), meshfact);
 }
 
 void csBugPlug::Dump (int indent, const csMatrix3& m, char const* name)
 {
-  Report (CS_REPORTER_SEVERITY_DEBUG, "%*sMatrix '%s':", indent, "", name);
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%*sMatrix %s:", indent, "", CS::Quote::Single (name));
   Report (CS_REPORTER_SEVERITY_DEBUG, "%*s/", indent, "");
   Report (CS_REPORTER_SEVERITY_DEBUG, "%*s| %3.2f %3.2f %3.2f", indent,
   	"", m.m11, m.m12, m.m13);
@@ -2535,13 +2536,13 @@ void csBugPlug::Dump (int indent, const csMatrix3& m, char const* name)
 void csBugPlug::Dump (int indent, const csVector3& v, char const* name)
 {
   Report (CS_REPORTER_SEVERITY_DEBUG,
-  	"%*sVector '%s': (%f,%f,%f)", indent, "", name, v.x, v.y, v.z);
+  	"%*sVector %s: (%f,%f,%f)", indent, "", CS::Quote::Single (name), v.x, v.y, v.z);
 }
 
 void csBugPlug::Dump (int indent, const csVector2& v, char const* name)
 {
-  Report (CS_REPORTER_SEVERITY_DEBUG, "%*sVector '%s': (%f,%f)",
-  	indent, "", name, v.x, v.y);
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%*sVector %s: (%f,%f)",
+  	indent, "", CS::Quote::Single (name), v.x, v.y);
 }
 
 void csBugPlug::Dump (int indent, const csPlane3& p)

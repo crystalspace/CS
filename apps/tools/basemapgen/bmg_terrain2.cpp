@@ -169,7 +169,7 @@ void BaseMapGen::ScanTerrain2Meshes ()
         (Terrain2Factory*)0);
       if (!factory) continue;
     
-      csPrintf ("Found terrain '%s' ...\n", name.GetData());
+      csPrintf ("Found terrain %s ...\n", CS::Quote::Single (name.GetData()));
       fflush (stdout);
       
       // Get the materialpalette.

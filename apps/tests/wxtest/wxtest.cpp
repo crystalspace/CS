@@ -345,7 +345,8 @@ bool Simple::Initialize ()
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
               "crystalspace.application.wxtest",
-              "Error loading 'stone4' texture!");
+              "Error loading %s texture!",
+	      CS::Quote::Single ("stone4"));
     return false;
   }
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");

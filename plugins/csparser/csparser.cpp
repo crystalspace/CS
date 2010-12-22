@@ -26,6 +26,7 @@
 #include "cstool/vfsdirchange.h"
 #include "csutil/csobject.h"
 #include "csutil/scfstr.h"
+#include "csutil/stringquote.h"
 #include "csutil/xmltiny.h"
 #include "iengine/engine.h"
 #include "iengine/halo.h"
@@ -696,8 +697,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.light",
               child,
-              "Unknown halo type '%s'. Use 'cross', 'nova' or 'flare'!",
-              type);
+              "Unknown halo type %s. Use %s, %s or %s!",
+              CS::Quote::Single (type),
+	      CS::Quote::Single ("cross"),
+	      CS::Quote::Single ("nova"),
+	      CS::Quote::Single ("flare"));
             return 0;
           }
         }
@@ -791,7 +795,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_DIRECTION:
         SyntaxService->ReportError ("crystalspace.maploader.light", child,
-          "'direction' is no longer support for lights. Use 'move'!");
+          "%s is no longer support for lights. Use %s!",
+	  CS::Quote::Single ("direction"), CS::Quote::Single ("move"));
         return 0;
       case XMLTOKEN_SPOTLIGHTFALLOFF:
         {
@@ -813,8 +818,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.load.meshobject", child,
-              "Error loading shader variable '%s' in light '%s'.", 
-              varname, lightname);
+              "Error loading shader variable %s in light %s.", 
+              CS::Quote::Single (varname), CS::Quote::Single (lightname));
             break;
           }
           //svc->AddVariable (var);
@@ -983,7 +988,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       if(!shaderFile)
       {
         ReportWarning ("crystalspace.maploader",
-          "Unable to open shader file '%s'!", filename.GetData());
+          "Unable to open shader file %s!", CS::Quote::Single (filename.GetData()));
         return false;
       }
 
@@ -996,16 +1001,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       if (err != 0)
       {
         ReportWarning ("crystalspace.maploader",
-          "Could not parse shader file '%s': %s",
-          filename.GetData(), err);
+          "Could not parse shader file %s: %s",
+          CS::Quote::Single (filename.GetData()), err);
         return false;
       }
       shaderNode = shaderDoc->GetRoot ()->GetNode ("shader");
       if (!shaderNode)
       {
         SyntaxService->ReportError ("crystalspace.maploader", node,
-          "Shader file '%s' is not a valid shader XML file!",
-          filename.GetData ());
+          "Shader file %s is not a valid shader XML file!",
+          CS::Quote::Single (filename.GetData ()));
         return false;
       }
 
@@ -1017,7 +1022,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       if (!shaderNode)
       {
         SyntaxService->ReportError ("crystalspace.maploader", node,
-          "'shader' or 'file' node is missing!");
+          "%s or %s node is missing!",
+	  CS::Quote::Single ("shader"),
+	  CS::Quote::Single ("file"));
         return false;
       }
     }
@@ -1095,7 +1102,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     else
     {
       SyntaxService->ReportError ("crystalspace.maploader",
-        node, "Variable tag does not have 'name' attribute.");
+        node, "Variable tag does not have %s attribute.",
+	CS::Quote::Single ("name"));
       return false;
     }
 
@@ -1253,8 +1261,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.load.trimesh",
-              child, "'trimesh' requires a name in sector '%s'!",
-              secname ? secname : "<noname>");
+              child, "%s requires a name in sector %s!",
+	      CS::Quote::Single ("trimesh"),
+              CS::Quote::Single (secname ? secname : "<noname>"));
             return 0;
           }
           csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (
@@ -1280,8 +1289,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.load.meshobject",
-              child, "'meshobj' requires a name in sector '%s'!",
-              secname ? secname : "<noname>");
+              child, "%s requires a name in sector %s!",
+	      CS::Quote::Single ("meshobj"),
+              CS::Quote::Single (secname ? secname : "<noname>"));
             return 0;
           }
           csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (meshname, false);
@@ -1297,8 +1307,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.load.meshobject",
-              child, "'meshlib' requires a name (sector '%s')!",
-              secname ? secname : "<noname>");
+              child, "%s requires a name (sector %s)!",
+	      CS::Quote::Single ("meshlib"),
+              CS::Quote::Single (secname ? secname : "<noname>"));
             return 0;
           }
           iMeshWrapper* mesh = Engine->GetMeshes ()->FindByName (meshname);
@@ -1307,8 +1318,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.load.meshobject",
               child,
-              "Could not find mesh object '%s' (sector '%s') for MESHLIB!",
-              meshname, secname ? secname : "<noname>");
+              "Could not find mesh object %s (sector %s) for MESHLIB!",
+              CS::Quote::Single (meshname),
+	      CS::Quote::Single (secname ? secname : "<noname>"));
             return 0;
           }
           csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, 0, child, ssource, sector, meshname, vfs->GetCwd());
@@ -1464,8 +1476,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         {
           SyntaxService->Report ("crystalspace.maploader.parse.settings",
             CS_REPORTER_SEVERITY_ERROR,
-            node, "Render loop '%s' not found",
-            loopName);
+            node, "Render loop %s not found",
+            CS::Quote::Single (loopName));
           return 0;
         }
         return loop;
@@ -1518,9 +1530,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     {
       SyntaxService->ReportError (
         "crystalspace.maploader.load.sector",
-        culler_params, "Could not load visibility culler for sector '%s'!",
-        sector->QueryObject()->GetName() ? sector->QueryObject()->GetName()
-        : "<noname>");
+        culler_params, "Could not load visibility culler for sector %s!",
+        CS::Quote::Single (sector->QueryObject()->GetName() ? sector->QueryObject()->GetName()
+        : "<noname>"));
       return false;
     }
     return true;
@@ -1546,12 +1558,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       case XMLTOKEN_ADDON:
         SyntaxService->ReportError (
           "crystalspace.maploader.parse.node",
-          child, "'addon' not yet supported in node!");
+          child, "%s not yet supported in node!",
+	  CS::Quote::Single ("addon"));
         return 0;
       case XMLTOKEN_META:
         SyntaxService->ReportError (
           "crystalspace.maploader.parse.node",
-          child, "'meta' not yet supported in node!");
+          child, "%s not yet supported in node!",
+	  CS::Quote::Single ("meta"));
         return 0;
       case XMLTOKEN_KEY:
         if (!ParseKey (child, pNode->QueryObject()))

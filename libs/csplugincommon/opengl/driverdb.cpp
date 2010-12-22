@@ -139,7 +139,9 @@ bool csDriverDBReader::ParseConditions (iDocumentNode* node,
 	"crystalspace.canvas.openglcommon.driverdb",
 	CS_REPORTER_SEVERITY_WARNING,
 	node,
-	"Invalid 'fulfill' attribute '%s'", fulfillAttr);
+	"Invalid %s attribute %s",
+	CS::Quote::Single ("fulfill"),
+	CS::Quote::Single (fulfillAttr));
       return false;
     }
   }
@@ -207,7 +209,8 @@ bool csDriverDBReader::ParseRegexp (iDocumentNode* node, bool& result)
       "crystalspace.canvas.openglcommon.driverdb",
       CS_REPORTER_SEVERITY_WARNING,
       node,
-      "No 'string' attribute");
+      "No %s attribute",
+      CS::Quote::Single ("string"));
     return false;
   }
   const char* pattern = node->GetAttributeValue ("pattern");
@@ -217,7 +220,8 @@ bool csDriverDBReader::ParseRegexp (iDocumentNode* node, bool& result)
       "crystalspace.canvas.openglcommon.driverdb",
       CS_REPORTER_SEVERITY_WARNING,
       node,
-      "No 'pattern' attribute");
+      "No %s attribute",
+      CS::Quote::Single ("pattern"));
     return false;
   }
   
@@ -242,7 +246,8 @@ bool csDriverDBReader::ParseCompareVer (iDocumentNode* node, bool& result)
       "crystalspace.canvas.openglcommon.driverdb",
       CS_REPORTER_SEVERITY_WARNING,
       node,
-      "No 'version' attribute");
+      "No %s attribute",
+      CS::Quote::Single ("version"));
     return false;
   }
   const char* relation = node->GetAttributeValue ("relation");
@@ -252,7 +257,8 @@ bool csDriverDBReader::ParseCompareVer (iDocumentNode* node, bool& result)
       "crystalspace.canvas.openglcommon.driverdb",
       CS_REPORTER_SEVERITY_WARNING,
       node,
-      "No 'relation' attribute");
+      "No %s attribute",
+      CS::Quote::Single ("relation"));
     return false;
   }
 
@@ -263,7 +269,8 @@ bool csDriverDBReader::ParseCompareVer (iDocumentNode* node, bool& result)
       "crystalspace.canvas.openglcommon.driverdb",
       CS_REPORTER_SEVERITY_WARNING,
       node,
-      "Malformed 'relation'");
+      "Malformed %s",
+      CS::Quote::Single ("relation"));
     return false;
   }
   int rellen = space - relation;
@@ -290,7 +297,7 @@ bool csDriverDBReader::ParseCompareVer (iDocumentNode* node, bool& result)
       "crystalspace.canvas.openglcommon.driverdb",
       CS_REPORTER_SEVERITY_WARNING,
       node,
-      "Unknown relation '%s'", relstr.GetData());
+      "Unknown relation %s", CS::Quote::Single (relstr.GetData()));
     return false;
   }
 

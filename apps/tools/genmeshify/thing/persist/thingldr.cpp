@@ -275,14 +275,14 @@ bool csThingLoader::ParseTextureMapping (
     if (!len.y)
     {
       synldr->ReportError ("crystalspace.thingldr.texture", node,
-        "Bad texture specification for polygon '%s'", polyname);
+        "Bad texture specification for polygon %s", CS::Quote::Single (polyname));
       len.y = 1;
       return false;
     }
     if (!len.z)
     {
       synldr->ReportError ("crystalspace.thingldr.texture", node,
-        "Bad texture specification for polygon '%s'", polyname);
+        "Bad texture specification for polygon %s", CS::Quote::Single (polyname));
       len.z = 1;
       return false;
     }
@@ -292,7 +292,7 @@ bool csThingLoader::ParseTextureMapping (
     if (!len.y)
     {
       synldr->ReportError ("crystalspace.thingldr.texture", node,
-        "Bad texture specification for polygon '%s'", polyname);
+        "Bad texture specification for polygon %s", CS::Quote::Single (polyname));
       len.y = 1;
       return false;
     }
@@ -436,7 +436,7 @@ bool csThingLoader::ParsePoly3d (
         if (mat == 0)
         {
           synldr->ReportError ("crystalspace.thingldr.polygon", child,
-            "Couldn't find material named '%s'!", child->GetContentsValue ());
+            "Couldn't find material named %s!", CS::Quote::Single (child->GetContentsValue ()));
           return false;
         }
 	thing_fact_state->SetPolygonMaterial (CS_POLYRANGE_LAST, mat);
@@ -502,8 +502,8 @@ bool csThingLoader::ParsePoly3d (
 	    if (vertices_to_add[i] == vt_idx+vt_offset)
 	    {
 	      csPrintf ("Duplicate vertex-index found! "
-			"(polygon '%s') ignored ...\n",
-			thing_fact_state->GetPolygonName (CS_POLYINDEX_LAST));
+			"(polygon %s) ignored ...\n",
+			CS::Quote::Single (thing_fact_state->GetPolygonName (CS_POLYINDEX_LAST)));
 	      ignore = true;
 	    }
 	  }
@@ -555,8 +555,8 @@ bool csThingLoader::ParsePoly3d (
   if (vertices_to_add.GetSize () < 3)
   {
     synldr->ReportError ("crystalspace.thingldr.polygon", node,
-      "Polygon '%s' contains just %d vertices!",
-      thing_fact_state->GetPolygonName (CS_POLYINDEX_LAST),
+      "Polygon %s contains just %d vertices!",
+      CS::Quote::Single (thing_fact_state->GetPolygonName (CS_POLYINDEX_LAST)),
       thing_fact_state->GetPolygonVertexCount (CS_POLYINDEX_LAST));
     return false;
   }
@@ -862,9 +862,9 @@ bool csThingLoader::ParsePoly3d (
       rb.name, rb.buf))
     {
       synldr->ReportError ("crystalspace.thingldr.polygon", rb.node,
-	"Either a renderbuffer '%s' was already attached to the polygon "
+	"Either a renderbuffer %s was already attached to the polygon "
 	"or the format does not match other buffers of the same name attached "
-	"to other polygons.", rb.name.GetData());
+	"to other polygons.", CS::Quote::Single (rb.name.GetData()));
       return false;
     }
   }
@@ -882,26 +882,27 @@ bool csThingLoader::LoadThingPart (iThingEnvironment* te, iDocumentNode* node,
 #define CHECK_TOPLEVEL(m) \
 if (!isParent) { \
 synldr->ReportError ("crystalspace.thingloader.parse", child, \
-	"'%s' flag only for top-level thing!", m); \
+	"%s flag only for top-level thing!", CS::Quote::Single (m)); \
 return false; \
 }
 
 #define CHECK_OBJECTONLY(m) \
 if (info.load_factory) { \
 synldr->ReportError ("crystalspace.thingloader.parse", child, \
-	"'%s' is not for factories!", m); \
+	"%s is not for factories!", CS::Quote::Single (m)); \
 return false; \
 } \
 if (!info.thing_state) { \
 synldr->ReportError ("crystalspace.thingloader.parse", child, \
-	"Factory must be given before using '%s'!", m); \
+	"Factory must be given before using %s!", CS::Quote::Single (m)); \
 return false; \
 }
 
 #define CHECK_DONTEXTENDFACTORY \
 if ((!info.load_factory) && info.global_factory) { \
 synldr->ReportError ("crystalspace.thingloader.parse", child, \
-	"Can't change the object when using 'factory' or 'clone'!"); \
+	"Can't change the object when using %s or %s!", \
+	CS::Quote::Single ("factory"),CS::Quote::Single ("clone")); \
 return false; \
 }
 
@@ -929,8 +930,10 @@ if (!info.thing_fact_state) \
       case XMLTOKEN_VISTREE:
 	synldr->ReportError (
 	    "crystalspace.thingloader.parse.vistree",
-	    child, "'vistree' no longer supported! Convert your level to Dynavis using 'levtool'!\n");
-	csPrintf ("'vistree' no longer supported! Convert your level to Dynavis using 'levtool'!\n");
+	    child, "%s no longer supported! Convert your level to Dynavis using %s!",
+	    CS::Quote::Single ("vistree"), CS::Quote::Single ("levtool"));
+	csPrintf ("%s no longer supported! Convert your level to Dynavis using %s!\n",
+		  CS::Quote::Single ("vistree"), CS::Quote::Single ("levtool"));
 	return false;
       case XMLTOKEN_COSFACT:
         CHECK_TOPLEVEL("cosfact");
@@ -953,14 +956,16 @@ if (!info.thing_fact_state) \
 	{
 	  synldr->ReportError (
 	    "crystalspace.thingloader.parse.factory",
-	    child, "Can't use 'factory' when parsing a factory!");
+	    child, "Can't use %s when parsing a factory!",
+	    CS::Quote::Single ("factory"));
 	  return false;
 	}
         if (info.thing_fact_state)
 	{
 	  synldr->ReportError (
 	    "crystalspace.thingloader.parse.factory",
-	    child, "'factory' already specified!");
+	    child, "%s already specified!",
+	    CS::Quote::Single ("factory"));
 	  return false;
 	}
 	info.global_factory = true;
@@ -972,7 +977,7 @@ if (!info.thing_fact_state) \
           {
 	    synldr->ReportError (
 	      "crystalspace.thingloader.parse.factory",
-              child, "Couldn't find thing factory '%s'!", factname);
+              child, "Couldn't find thing factory %s!", CS::Quote::Single (factname));
             return false;
           }
 	  info.fact = fact->GetMeshObjectFactory ();
@@ -982,7 +987,7 @@ if (!info.thing_fact_state) \
 	  {
 	    synldr->ReportError (
 	      "crystalspace.thingloader.parse.factory",
-              child, "Factory '%s' is not a thing factory!", factname);
+              child, "Factory %s is not a thing factory!", CS::Quote::Single (factname));
             return false;
 	  }
 	  info.obj = fact->GetMeshObjectFactory ()->NewInstance ();
@@ -995,14 +1000,16 @@ if (!info.thing_fact_state) \
 	{
 	  synldr->ReportError (
 	    "crystalspace.thingloader.parse.factory",
-	    child, "Parsing a factory, so can't use 'clone'!");
+	    child, "Parsing a factory, so can't use %s!",
+	    CS::Quote::Single ("clone"));
 	  return false;
 	}
         if (info.thing_fact_state)
 	{
 	  synldr->ReportError (
 	    "crystalspace.thingloader.parse.factory",
-	    child, "'factory' already specified, so can't use 'clone'!");
+	    child, "%s already specified, so can't use %s!",
+	    CS::Quote::Single ("factory"), CS::Quote::Single ("clone"));
 	  return false;
 	}
 	info.global_factory = true;
@@ -1014,7 +1021,7 @@ if (!info.thing_fact_state) \
           {
 	    synldr->ReportError (
 	      "crystalspace.thingloader.parse.clone",
-              child, "Couldn't find thing '%s'!", meshname);
+              child, "Couldn't find thing %s!", CS::Quote::Single (meshname));
             return false;
           }
 
@@ -1024,7 +1031,7 @@ if (!info.thing_fact_state) \
 	  {
 	    synldr->ReportError (
 	      "crystalspace.thingloader.parse.clone",
-              child, "Object '%s' is not a thing!", meshname);
+              child, "Object %s is not a thing!", CS::Quote::Single (meshname));
             return false;
 	  }
 	  info.fact = wrap->GetMeshObject ()->GetFactory ();
@@ -1108,7 +1115,7 @@ Nag to Jorrit about this feature if you want it.");
           {
 	    synldr->ReportError (
 	        "crystalspace.thingloader.parse.material",
-                child, "Couldn't find material named '%s'!", matname);
+                child, "Couldn't find material named %s!", CS::Quote::Single (matname));
             return false;
           }
 	}
@@ -1201,7 +1208,7 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
       {
 	synldr->ReportError (
 	        "crystalspace.thingloader.parse.material",
-                node, "Couldn't find material named '%s'!", rm.oldmat);
+                node, "Couldn't find material named %s!", CS::Quote::Single (rm.oldmat));
 	return 0;
       }
       iMaterialWrapper* new_mat = ldr_context->FindMaterial (rm.newmat);
@@ -1209,7 +1216,7 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
       {
 	synldr->ReportError (
 	        "crystalspace.thingloader.parse.material",
-                node, "Couldn't find material named '%s'!", rm.newmat);
+                node, "Couldn't find material named %s!", CS::Quote::Single (rm.newmat));
 	return 0;
       }
       info.thing_state->ReplaceMaterial (old_mat, new_mat);

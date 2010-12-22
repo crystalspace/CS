@@ -40,9 +40,12 @@ FrankieScene::FrankieScene (AvatarTest* avatarTest)
   avatarTest->hudHelper.keyDescriptions.Push ("arrow keys: move camera");
   avatarTest->hudHelper.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
   avatarTest->hudHelper.keyDescriptions.Push ("+/-: walk faster/slower");
-  avatarTest->hudHelper.keyDescriptions.Push ("t: toggle 'LookAt' target mode");
-  avatarTest->hudHelper.keyDescriptions.Push ("a: toggle 'LookAt: always rotate' mode");
-  avatarTest->hudHelper.keyDescriptions.Push ("s: toggle 'LookAt: rotation speed'");
+  avatarTest->hudHelper.keyDescriptions.Push (csString().Format ("t: toggle %s target mode",
+					      CS::Quote::Single ("LookAt")));
+  avatarTest->hudHelper.keyDescriptions.Push (csString().Format ("a: toggle %s mode",
+					      CS::Quote::Single ("LookAt: always rotate")));
+  avatarTest->hudHelper.keyDescriptions.Push (csString().Format ("s: toggle %s",
+					      CS::Quote::Single ("LookAt: rotation speed")));
   if (avatarTest->physicsEnabled)
   {
     avatarTest->hudHelper.keyDescriptions.Push ("f: toggle physical tail");
@@ -579,13 +582,13 @@ bool FrankieScene::CreateAvatar ()
 
 void FrankieScene::LookAtListener::TargetReached ()
 {
-  printf ("'LookAt' target reached\n");
+  csPrintf ("%s target reached\n", CS::Quote::Single ("LookAt"));
   frankieScene->targetReached = true;
 }
 
 void FrankieScene::LookAtListener::TargetLost ()
 {
-  printf ("'LookAt' target lost\n");
+  csPrintf ("%s target lost\n", CS::Quote::Single ("LookAt"));
   frankieScene->targetReached = false;
 }
 

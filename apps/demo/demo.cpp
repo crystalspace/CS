@@ -309,7 +309,8 @@ void Demo::CreateRoom ()
     bool suc = vfs->Mount("/bias/", "$@data$/bias$/world.zip");
     if (!suc)
     {
-      ReportError ("Error: could not mount VFS path '$@data$/bias$/world.zip'\n");
+      ReportError ("Error: could not mount VFS path %s",
+		   CS::Quote::Single ("$@data$/bias$/world.zip"));
       return;
     }
 
@@ -333,7 +334,8 @@ void Demo::CreateRoom ()
   else
   {
     if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-      ReportError("Error loading 'stone4' texture!");
+      ReportError("Error loading %s texture!",
+		  CS::Quote::Single ("stone4"));
 
     iMaterialWrapper* tm =
       engine->GetMaterialList ()->FindByName ("stone");

@@ -51,8 +51,9 @@ namespace genmeshify
     fileNameToOpen = actualFilename;
     if (!file.IsValid ())
     {
-      app->Report ("Could not open a '%s' file at given path '%s'.", 
-        actualFilename, path);
+      app->Report ("Could not open a %s file at given path %s.", 
+        CS::Quote::Single (actualFilename),
+	CS::Quote::Single (path));
       return 0;
     }
 
@@ -107,7 +108,8 @@ namespace genmeshify
     csRef<iDataBuffer> data = buf->GetAllData ();
     if (!app->vfs->WriteFile (backupFile, data->GetData(), data->GetSize()))
     {
-      app->Report ("Error writing backup file '%s'!", backupFile.GetData());
+      app->Report ("Error writing backup file %s!",
+		   CS::Quote::Single (backupFile.GetData()));
       return false;
     }
 
@@ -165,8 +167,8 @@ namespace genmeshify
     buf = app->vfs->Open (fileNameToOpen, VFS_FILE_WRITE);
     if (!buf) 
     {
-      app->Report ("Error opening file '%s' for writing!", 
-        fileNameToOpen.GetData());
+      app->Report ("Error opening file %s for writing!", 
+        CS::Quote::Single (fileNameToOpen.GetData()));
       return false;
     }
     error = newDoc->Write (buf);

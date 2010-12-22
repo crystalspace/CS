@@ -26,6 +26,7 @@
 #include "csutil/csendian.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/memfile.h"
+#include "csutil/stringquote.h"
 
 #include "iengine/engine.h"
 #include "iengine/light.h"
@@ -622,8 +623,9 @@ bool csPolygon3DStatic::Finish (iBase* thing_logparent)
       }
       else mname = "<unknown>";
       thing_static->thing_type->Notify ("Oversize lightmap (%dx%d > %dx%d) "
-        "for polygon '%s/%s'", lmw, lmh,
-        max_lmw, max_lmh, mname, GetName());
+        "for polygon %s", lmw, lmh,
+        max_lmw, max_lmh,
+	CS::Quote::Single (csString().Format ("%s/%s", mname, GetName())));
       flags.Reset (CS_POLY_LIGHTING);
     }
   }
@@ -691,7 +693,7 @@ bool csPolygon3DStatic::SetTextureSpace (
     if (csThingObjectType::do_verbose)
     {
       thing_static->thing_type->Warn (
-        "Warning: bad UV coordinates for poly '%s'!", GetName ());
+        "Warning: bad UV coordinates for poly %s!", CS::Quote::Single (GetName ()));
     }
     if (!((p1-p2) < SMALL_EPSILON))
       SetTextureSpace (p1, p2, 1);
@@ -805,10 +807,10 @@ int csPolygon3DStatic::AddVertex (int v)
   if (v >= thing_static->GetVertexCount ())
   {
     thing_static->thing_type->Bug (
-        "Index number %d is too high for a polygon (max=%d) (polygon '%s')!",
+        "Index number %d is too high for a polygon (max=%d) (polygon %s)!",
         v,
         thing_static->GetVertexCount (),
-        GetName () ? GetName () : "<noname>");
+        CS::Quote::Single (GetName () ? GetName () : "<noname>"));
     return 0;
   }
 

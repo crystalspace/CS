@@ -35,6 +35,7 @@
 #include "csutil/parasiticdatabuffer.h"
 #include "csutil/scfarray.h"
 #include "csutil/scfstr.h"
+#include "csutil/stringquote.h"
 #include "csutil/xmltiny.h"
 #include "cstool/vfsdirchange.h"
 
@@ -993,8 +994,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         
         if (compiler->do_verbose)
 	  compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  "Shader '%s': priority %d: %zu variations",
-	  GetName(), tech.priority, vc);
+	  "Shader %s: priority %d: %zu variations",
+	  CS::Quote::Single (GetName()), tech.priority, vc);
 
         totalTechs += vc;
       }
@@ -1045,8 +1046,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 	    if (compiler->do_verbose)
 	    {
 	      compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	        "Shader '%s'<%zu/%zu>: Technique with priority %d fails. Reason: %s.",
-	        GetName(), vi, tech.priority,
+	        "Shader %s<%zu/%zu>: Technique with priority %d fails. Reason: %s.",
+	        CS::Quote::Single (GetName()), vi, tech.priority,
 	        xmltech->GetFailReason());
 	    }
 	    result = false;
@@ -1384,22 +1385,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 	    case iShaderProgram::loadFail:
 	      {
 		compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-		  "Shader '%s': Technique with priority %d<%zu> fails (from cache). Reason: %s.",
-		  GetName(), tech.priority, vi, var->GetFailReason());
+		  "Shader %s: Technique with priority %d<%zu> fails (from cache). Reason: %s.",
+		  CS::Quote::Single (GetName()), tech.priority, vi, var->GetFailReason());
 	      }
 	      break;
 	    case iShaderProgram::loadSuccessShaderInvalid:
 	      {
 		compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-		  "Shader '%s': Technique with priority %d<%zu> succeeds (from cache) but shader is invalid.",
-		  GetName(), tech.priority, vi);
+		  "Shader %s: Technique with priority %d<%zu> succeeds (from cache) but shader is invalid.",
+		  CS::Quote::Single (GetName()), tech.priority, vi);
 	      }
 	      break;
 	    case iShaderProgram::loadSuccessShaderValid:
 	      {
 		compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-		  "Shader '%s': Technique with priority %d<%zu> succeeds (from cache).",
-		  GetName(), tech.priority, vi);
+		  "Shader %s: Technique with priority %d<%zu> succeeds (from cache).",
+		  CS::Quote::Single (GetName()), tech.priority, vi);
 	      }
 	      break;
 	    }
@@ -1424,16 +1425,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 	  {
 	    if (compiler->do_verbose)
 	      compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	      "Shader '%s': Technique with priority %d<%zu> succeeds!",
-	      GetName(), tech.priority, vi);
+	      "Shader %s: Technique with priority %d<%zu> succeeds!",
+	      CS::Quote::Single (GetName()), tech.priority, vi);
 	  }
 	  else
 	  {
 	    if (compiler->do_verbose)
 	    {
 	      compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-		"Shader '%s': Technique with priority %d<%zu> fails. Reason: %s.",
-		GetName(), tech.priority, vi, var->GetFailReason());
+		"Shader %s: Technique with priority %d<%zu> fails. Reason: %s.",
+		CS::Quote::Single (GetName()), tech.priority, vi, var->GetFailReason());
 	    }
 	    delete var; var = 0;
 	  }
@@ -1491,8 +1492,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 	if (compiler->do_verbose && !techVar.shownError)
 	{
 	  compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    "No technique validated for shader '%s' TV %zu: using fallback", 
-	    GetName(), tvi);
+	    "No technique validated for shader %s TV %zu: using fallback", 
+	    CS::Quote::Single (GetName()), tvi);
 	}
 	size_t fbticket = (size_t)~0;
 	if (useShortcut && (fallbackXML != 0))
@@ -1510,7 +1511,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 	ticket = csArrayItemNotFound;
 	if (!techVar.shownError && compiler->do_verbose)
 	  compiler->Report (CS_REPORTER_SEVERITY_WARNING,
-	    "No technique validated for shader '%s' TV %zu", GetName(), tvi);
+	    "No technique validated for shader %s TV %zu",
+	    CS::Quote::Single (GetName()), tvi);
       }
     }
     techVar.shownError = true;
@@ -1851,7 +1853,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     if (!file)
     {
       compiler->Report (CS_REPORTER_SEVERITY_ERROR,
-        "Unable to open shader program file '%s'", filename);
+        "Unable to open shader program file %s", CS::Quote::Single (filename));
       return 0;
     }
     csRef<iDocumentSystem> docsys (
@@ -1864,7 +1866,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     if (err != 0)
     {
       compiler->Report (CS_REPORTER_SEVERITY_ERROR,
-        "Unable to parse shader program file '%s': %s", filename, err);
+        "Unable to parse shader program file %s: %s",
+	CS::Quote::Single (filename), err);
       return 0;
     }
 

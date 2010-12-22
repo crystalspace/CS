@@ -292,7 +292,7 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
         if(!fact)
         {
           synldr->ReportError ("crystalspace.terrain.object.loader",
-            child, "Couldn't find factory '%s'!", factname);
+            child, "Couldn't find factory %s!", CS::Quote::Single (factname));
           return 0;
         }
 
@@ -302,8 +302,8 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
 	{
       	  synldr->ReportError (
 		"crystalspace.terrain.parse.badfactory",
-		child, "Factory '%s' doesn't appear to be a terrain factory!",
-		factname);
+		child, "Factory %s doesn't appear to be a terrain factory!",
+		CS::Quote::Single (factname));
 	  return 0;
 	}
         break;
@@ -328,7 +328,7 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
         if (!mat)
         {
           synldr->ReportError ("crystalspace.terrain.object.loader",
-            child, "Couldn't find material '%s'!", matname);
+            child, "Couldn't find material %s!", CS::Quote::Single (matname));
           return 0;
         }
 	CHECK_MESH (mesh);
@@ -376,7 +376,8 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
 	if (name == 0)
 	{
           synldr->ReportError ("crystalspace.terrain.factory.loader",
-              child, "<lodvalue> has no 'name' attribute");
+              child, "<lodvalue> has no %s attribute",
+	      CS::Quote::Single ("name"));
           return 0;
 	}
         float val = child->GetContentsValueAsFloat ();
@@ -431,7 +432,7 @@ bool csTerrainObjectLoader::ParseMaterialPalette (iDocumentNode *node,
         {
           synldr->ReportError (
             "crystalspace.terrain.object.loader.materialpalette",
-            child, "Couldn't find material '%s'!", matname);
+            child, "Couldn't find material %s!", CS::Quote::Single (matname));
           return false;
         }
         palette.Push (mat);

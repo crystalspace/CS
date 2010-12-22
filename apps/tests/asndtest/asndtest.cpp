@@ -33,17 +33,20 @@ void ASndTest::CreateWorld ()
 {
   // Load the first texture from the standard library.
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-    ReportError("Error loading 'stone4' texture!");
+    ReportError("Error loading %s texture!",
+		CS::Quote::Single ("stone4"));
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   // Load a second texture from the standard library.
   if (!loader->LoadTexture ("spark", "/lib/std/spark.png"))
-    ReportError("Error loading 'spark' texture!");
+    ReportError("Error loading %s texture!",
+		CS::Quote::Single ("spark"));
 
   // Load a sprite from the standard library.
   csRef<iMeshFactoryWrapper> imeshfact (loader->LoadMeshObjectFactory ("/lib/std/sprite1"));
   if (imeshfact == 0)
-    ReportError("Error loading 'sprite1' mesh object factory!");
+    ReportError("Error loading %s mesh object factory!",
+		CS::Quote::Single ("sprite1"));
   csRef<iMeshWrapper> sprite;
   csRef<iSprite3DState> spstate;
 
@@ -80,12 +83,12 @@ void ASndTest::CreateWorld ()
 
   csRef<iDataBuffer> soundbuf = vfs->ReadFile (fname.GetData ());
   if (!soundbuf)
-    ReportError ("Can't load file '%s'!", fname.GetData ());
+    ReportError ("Can't load file %s!", CS::Quote::Single (fname.GetData ()));
 
   // Interpret the sound
   csRef<iSndSysData> snddata = sndloader->LoadSound (soundbuf);
   if (!snddata)
-    ReportError ("Can't load sound '%s'!", fname.GetData ());
+    ReportError ("Can't load sound %s!", CS::Quote::Single (fname.GetData ()));
 
   const csSndSysSoundFormat* format = snddata->GetFormat ();
   csPrintf ("=== iSndSysData format informations ===\n");
@@ -98,7 +101,7 @@ void ASndTest::CreateWorld ()
   // Create a stream for the sound
   csRef<iSndSysStream> sndstream = sndrenderer->CreateStream (snddata, CS_SND3D_ABSOLUTE);
   if (!sndstream)
-    ReportError ("Can't create stream for '%s'!", fname.GetData ());
+    ReportError ("Can't create stream for %s!", CS::Quote::Single (fname.GetData ()));
 
   const csSndSysSoundFormat* rformat = sndstream->GetRenderedFormat ();
   csPrintf ("=== iSndSysStream format informations ===\n");

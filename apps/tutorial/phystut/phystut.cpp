@@ -1121,7 +1121,7 @@ bool Simple::SpawnStarCollider ()
     loader->Load ("/lib/std/star.xml");
     starFact = engine->FindMeshFactory ("genstar");
     if (!starFact)
-      return ReportError ("Error loading 'star.xml'!");
+      return ReportError ("Error loading %s!", CS::Quote::Single ("star.xml"));
   }
 
   // Use the camera transform.
@@ -1918,7 +1918,8 @@ void Simple::CreateWalls (const csVector3& /*radius*/)
       engine, room, "walls", "walls_factory", &box);
 
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-    ReportWarning ("Could not load texture 'stone'");
+    ReportWarning ("Could not load texture %s",
+		   CS::Quote::Single ("stone"));
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
 

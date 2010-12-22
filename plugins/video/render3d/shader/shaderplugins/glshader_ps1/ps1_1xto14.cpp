@@ -19,6 +19,8 @@
 
 #include "cssysdef.h"
 
+#include "csutil/stringquote.h"
+
 #include "ps1_1xto14.h"
 #include "ps1_instr.h"
 
@@ -237,8 +239,9 @@ const char* csPS1xTo14Converter::AddInstruction (
     case CS_PS_INS_TEXDEPTH:
     case CS_PS_INS_TEXLD:
       // PS1.4 only instructions
-      return SetLastError ("PS1.4 only instruction '%s'(%zu)",
-	GetInstructionName (instr.instruction), instrIndex);
+      return SetLastError ("PS1.4 only instruction %s(%zu)",
+	CS::Quote::Single (GetInstructionName (instr.instruction)),
+	instrIndex);
 
     case CS_PS_INS_ADD:
     case CS_PS_INS_CMP:
@@ -260,8 +263,9 @@ const char* csPS1xTo14Converter::AddInstruction (
       return AddTEXCOORD (instr, instrIndex);
 
     default:
-      return SetLastError ("Instruction '%s'(%zu) not supported yet",
-	GetInstructionName (instr.instruction), instrIndex);
+      return SetLastError ("Instruction %s(%zu) not supported yet",
+	CS::Quote::Single (GetInstructionName (instr.instruction)),
+	instrIndex);
   }
 
   return 0;

@@ -18,6 +18,9 @@
 
 #include "cssysdef.h"
 #include <math.h>
+
+#include "csutil/stringquote.h"
+
 #include "igraphic/image.h"
 #include "ivideo/txtmgr.h"
 
@@ -142,9 +145,9 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
 
     if (!csIsPowerOf2 (Width) || !csIsPowerOf2 (Height))
     {
-      engine->Warn ("Inefficient texture image '%s' dimensions!\n"
+      engine->Warn ("Inefficient texture image %s dimensions!\n"
         "The width (%d) and height (%d) should be a power of two.",
-        GetName (), Width, Height);
+        CS::Quote::Single (GetName ()), Width, Height);
     }
   }
 

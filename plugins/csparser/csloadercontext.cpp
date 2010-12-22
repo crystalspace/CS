@@ -19,6 +19,8 @@
 
 #include "cssysdef.h"
 
+#include "csutil/stringquote.h"
+
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "imap/loader.h"
@@ -131,7 +133,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       else
       {
         // *** This is deprecated behaviour ***
-        ReportWarning("Could not find material '%s'. Creating material. This behaviour is deprecated.", name);
+        ReportWarning("Could not find material %s. Creating material. This behaviour is deprecated.",
+		      CS::Quote::Single (name));
         if(missingdata)
         {
           mat = missingdata->MissingMaterial(name, name);
@@ -166,7 +169,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
       if(do_verbose)
       {
-        ReportNotify("Could not find material '%s'.", name);
+        ReportNotify("Could not find material %s.", CS::Quote::Single (name));
       }
     }
 
@@ -205,7 +208,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     if(!fact.IsValid() && notify && do_verbose)
     {
-      ReportNotify("Could not find mesh factory '%s'.", name);
+      ReportNotify("Could not find mesh factory %s.", CS::Quote::Single (name));
     }
 
     return fact;
@@ -254,7 +257,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     if(!mesh.IsValid() && do_verbose)
     {
-      ReportNotify("Could not find mesh object '%s'.", name);
+      ReportNotify("Could not find mesh object %s.", CS::Quote::Single (name));
     }
 
     return mesh;
@@ -303,7 +306,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     if(!light.IsValid() && do_verbose)
     {
-      ReportNotify("Could not find light '%s'.", name);
+      ReportNotify("Could not find light %s.", CS::Quote::Single (name));
     }
 
     return light;
@@ -361,7 +364,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     if(!shader && do_verbose)
     {
-      ReportNotify("Could not find shader '%s'.", name);
+      ReportNotify("Could not find shader %s.", CS::Quote::Single (name));
     }
 
     return shader;
@@ -403,8 +406,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       // *** This is deprecated behaviour ***
       if(!result.IsValid())
       {
-        ReportWarning("Could not find texture '%s'. Loading texture. This behaviour is deprecated.", 
-          name);
+        ReportWarning("Could not find texture %s. Loading texture. This behaviour is deprecated.", 
+          CS::Quote::Single (name));
         csRef<iThreadManager> tman = csQueryRegistry<iThreadManager>(object_reg);
         csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(tman));
         loader->LoadTextureTC(itr, false, loader->GetVFS()->GetCwd(), name, name, CS_TEXTURE_3D, tm, true, false, true, collection,
@@ -415,7 +418,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
       if(!result.IsValid() && do_verbose)
       {
-        ReportNotify ("Could not find texture '%s'. Attempting to load.", name);
+        ReportNotify ("Could not find texture %s. Attempting to load.", CS::Quote::Single (name));
       }
     }
 

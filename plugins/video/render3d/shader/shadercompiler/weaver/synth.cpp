@@ -391,14 +391,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       if (!loader.IsValid())
       {
 	compiler->Report (CS_REPORTER_SEVERITY_WARNING, errorNode,
-	  "Could not load combiner plugin '%s'", comb->classId.GetData());
+	  "Could not load combiner plugin %s",
+	  CS::Quote::Single (comb->classId.GetData()));
 	return false;
       }
       combiner = loader->GetCombiner (comb->params); 
       if (!combiner.IsValid())
       {
 	compiler->Report (CS_REPORTER_SEVERITY_WARNING, errorNode,
-	  "Could not get combiner from '%s'", comb->classId.GetData());
+	  "Could not get combiner from %s",
+	  CS::Quote::Single (comb->classId.GetData()));
 	return false;
       }
       combiner->SetDescription (synth->shaderName);
@@ -506,8 +508,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  {
             if (compiler->do_verbose)
               compiler->Report (CS_REPORTER_SEVERITY_WARNING,
-                inp.node, "Duplicate input named '%s' of snippet '%s'",
-                inp.name.GetData(), node.tech->snippetName);
+                inp.node, "Duplicate input named %s of snippet %s",
+                CS::Quote::Single (inp.name.GetData()),
+		CS::Quote::Single (node.tech->snippetName));
             continue;
 	  }
 
@@ -590,9 +593,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                   if (compiler->do_verbose)
                     compiler->Report (CS_REPORTER_SEVERITY_WARNING,
                       inp.node, "No matching input found and no default given "
-                      "for '%s %s' of snippet '%s'",
-                      inp.type.GetData(), inp.name.GetData(), 
-                      node.tech->snippetName);
+                      "for %s of snippet %s",
+		      CS::Quote::Single (csString().Format ("%s %s", inp.type.GetData(), inp.name.GetData())), 
+                      CS::Quote::Single (node.tech->snippetName));
                   return false;
                 }
 	        break;
@@ -687,8 +690,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         const EmittedInput& emitted = emitInputs[i];
         const Snippet::Technique::Input& inp = *emitted.input;
 
-        const char* snippetAnnotate = GetAnnotation ("input \"%s\" tag \"%s\"",
-          inp.name.GetData(), emitted.tag.GetData());
+        const char* snippetAnnotate = GetAnnotation ("input %s tag %s",
+          CS::Quote::Double (inp.name.GetData()),
+	  CS::Quote::Double (emitted.tag.GetData()));
 	defaultCombiner->BeginSnippet (snippetAnnotate);
 	combiner->BeginSnippet (snippetAnnotate);
 	for (size_t b = 0; b < inp.complexBlocks.GetSize(); b++)
@@ -721,8 +725,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         csString inpOutputName;
 	inpOutputName.Format ("in_%s", inp.name.GetData());
 	combiner->AddGlobal (inpOutputName, inp.type,
-          GetAnnotation ("Unique name for default input \"%s\" tag \"%s\"",
-            inp.name.GetData(), emitted.tag.GetData()));
+          GetAnnotation ("Unique name for default input %s tag %s",
+	    CS::Quote::Double (inp.name.GetData()), 
+	    CS::Quote::Double (emitted.tag.GetData())));
 		  
 	combiner->AddOutput (inp.name, inp.type);
 	combiner->OutputRename (inp.name, inpOutputName);
@@ -750,8 +755,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       {
         const SynthesizeNodeTree::Node& node = nodeIt->Next();
         
-        const char* snippetAnnotate = GetAnnotation ("snippet \"%s<%d>\"\n\n%s",
-          node.tech->snippetName, node.tech->priority,
+        const char* snippetAnnotate = GetAnnotation ("snippet %s\n\n%s",
+	  CS::Quote::Double (csString().Format ("%s<%d>",
+						node.tech->snippetName,
+						node.tech->priority)),
           node.annotation.GetData());
         csString nodeCondition (node.tech->GetInnerCondition());
         {
@@ -1246,8 +1253,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         newName.Format ("%s_%zu", outp.name.GetData(), renameNr++);
         node.outputRenames.Put (outp.name, newName);
         combiner->AddGlobal (newName, outp.type,
-          synthTech.GetAnnotation ("Unique name for snippet \"%s<%d>\" output \"%s\"", 
-            node.tech->snippetName, node.tech->priority, outp.name.GetData()));
+          synthTech.GetAnnotation ("Unique name for snippet %s output %s", 
+	    CS::Quote::Double (csString().Format ("%s<%d>", node.tech->snippetName, node.tech->priority)),
+	    CS::Quote::Double (outp.name.GetData())));
       }
     }
   }
@@ -1324,9 +1332,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         link = linkChain->Next (fromType, toType);
         
         csString snippetName;
-        snippetName.Format ("coerce %s to %s for \"%s<%d>\"",
+        snippetName.Format ("coerce %s to %s for %s",
           fromType, toType,
-          inNode.tech->snippetName, inNode.tech->priority);
+	  CS::Quote::Double (csString().Format ("%s<%d>",
+						inNode.tech->snippetName,
+						inNode.tech->priority)));
         snippet = new Snippet (compiler, snippetName);
       }
       else

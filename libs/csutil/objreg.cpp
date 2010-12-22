@@ -25,6 +25,7 @@
 #include "csutil/objreg.h"
 #include "csutil/refarr.h"
 #include "csutil/scf.h"
+#include "csutil/stringquote.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
 #include "csutil/eventnames.h"
@@ -231,9 +232,9 @@ iBase* csObjectRegistry::Get (char const* tag, scfInterfaceID id, int version)
       if (!interf)
       {
         csPrintf (CS_ANSI_FY CS_ANSI_TEXT_BOLD_ON 
-          "WARNING! Suspicious: object with tag '%s' does not implement "
-          "interface '%s'!\n" CS_ANSI_RST, t, 
-          iSCF::SCF->GetInterfaceName(id));
+          "WARNING! Suspicious: object with tag %s does not implement "
+          "interface %s!\n" CS_ANSI_RST, CS::Quote::Single (t), 
+          CS::Quote::Single (iSCF::SCF->GetInterfaceName(id)));
         fflush (stdout);
         return 0;
       }

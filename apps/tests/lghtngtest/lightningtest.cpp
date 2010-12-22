@@ -240,10 +240,12 @@ void Simple::CreateRoom ()
   // CS/data/standard.zip and mounted as /lib/std using the Virtual
   // File System (VFS) plugin.
   if (!loader->LoadTexture ("brick", "/lib/std/castle/brick1_d.jpg"))
-    ReportError("Error loading 'brick1_d' texture!");
+    ReportError("Error loading %s texture!",
+		CS::Quote::Single ("brick1_d"));
 
   if (!loader->LoadTexture("energy", "/lib/std/energy.jpg"))
-    ReportError("Error loading 'energy' texture!");
+    ReportError("Error loading %s texture!",
+		CS::Quote::Single ("energy"));
 
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("brick");
 

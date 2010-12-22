@@ -397,7 +397,7 @@ bool csTerrain2FactoryLoader::ParseCell (iDocumentNode *node,
         {
           synldr->ReportError (
             "crystalspace.terrain.object.loader.basematerial",
-            child, "Couldn't find material '%s'!", matname);
+            child, "Couldn't find material %s!", CS::Quote::Single (matname));
           return false;
         }
 
@@ -413,7 +413,7 @@ bool csTerrain2FactoryLoader::ParseCell (iDocumentNode *node,
         {
           synldr->ReportError (
             "crystalspace.terrain.object.loader.basematerial",
-            child, "Couldn't find material '%s'!", matname);
+            child, "Couldn't find material %s!", CS::Quote::Single (matname));
           return false;
         }
 
@@ -504,7 +504,7 @@ csPtr<iBase> csTerrain2ObjectLoader::Parse (iDocumentNode* node,
         if(!fact)
         {
           synldr->ReportError ("crystalspace.terrain.object.loader",
-            child, "Couldn't find factory '%s'!", factname);
+            child, "Couldn't find factory %s!", CS::Quote::Single (factname));
           return 0;
         }
 
@@ -515,8 +515,8 @@ csPtr<iBase> csTerrain2ObjectLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError (
                     "crystalspace.terrain.parse.badfactory", child,
-                    "Factory '%s' doesn't appear to be a terrain factory!",
-                    factname);
+                    "Factory %s doesn't appear to be a terrain factory!",
+                    CS::Quote::Single (factname));
           return 0;
         }
             
@@ -543,7 +543,7 @@ csPtr<iBase> csTerrain2ObjectLoader::Parse (iDocumentNode* node,
               {
                 synldr->ReportError (
                   "crystalspace.terrain.object.loader.materialpalette",
-                  child, "Couldn't find material '%s'!", matname);
+                  child, "Couldn't find material %s!", CS::Quote::Single (matname));
                 return 0;
               }
               pal.Push (mat);
@@ -625,7 +625,7 @@ bool csTerrain2ObjectLoader::ParseCell (iDocumentNode* node,
   {
     synldr->ReportError (
       "crystalspace.terrain.object.loader.cell",
-      node, "Invalid cell name '%s'", cellName);
+      node, "Invalid cell name %s", CS::Quote::Single (cellName));
     return false;
   }
 

@@ -22,6 +22,8 @@
 
 #include "csgfx/imagememory.h"
 #include "cstool/vfsdirchange.h"
+#include "csutil/stringquote.h"
+
 #include "igraphic/animimg.h"
 #include "imap/services.h"
 #include "itexture/iproctex.h"
@@ -135,7 +137,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.texture",
-              child, "Expected VFS filename for 'file'!");
+              child, "Expected VFS filename for %s!",
+	      CS::Quote::Single ("file"));
             RemoveLoadingTexture(txtname);
             return false;
           }
@@ -402,7 +405,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
         ReportWarning (
           "crystalspace.maploader.parse.texture",
-          node, "'defaults' section is ignored for textures!");
+          node, "%s section is ignored for textures!",
+	  CS::Quote::Single ("defaults"));
       }
     }
 
@@ -411,7 +415,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       SyntaxService->Report (
         "crystalspace.maploader.parse.texture",
         CS_REPORTER_SEVERITY_WARNING,
-        node, "Could not get plugin '%s', using default", (const char*)type);
+        node, "Could not get plugin %s, using default",
+	CS::Quote::Single ((const char*)type));
 
       if (!BuiltinImageTexLoader)
       {
@@ -433,7 +438,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       SyntaxService->Report (
         "crystalspace.maploader.parse.texture",
         CS_REPORTER_SEVERITY_WARNING,
-        node, "Could not load texture '%s', using checkerboard instead", txtname);
+        node, "Could not load texture %s, using checkerboard instead",
+	CS::Quote::Single (txtname));
 
       csRef<iLoaderPlugin> BuiltinErrorTexLoader;
       BuiltinErrorTexLoader.AttachNew(new csMissingTextureLoader (object_reg));
@@ -556,7 +562,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             {
               ReportError (
                 "crystalspace.maploader.parse.material",
-                "Cannot find texture '%s' for material `%s'", txtname, matname);
+                "Cannot find texture %s for material %s",
+		CS::Quote::Single (txtname), CS::Quote::Single (matname));
               RemoveLoadingMaterial(matname);
               return false;
             }

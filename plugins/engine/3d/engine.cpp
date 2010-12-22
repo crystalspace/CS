@@ -706,7 +706,7 @@ void csEngine::ReloadRenderManager (csConfigAccess& cfg)
   const char* defaultRM = cfg->GetStr ("Engine.RenderManager.Default", 0);
   if (defaultRM == 0)
   {
-    Warn ("No default render manager given, using '%s'", fallbackRM);
+    Warn ("No default render manager given, using %s", CS::Quote::Single (fallbackRM));
     defaultRM = fallbackRM;
   }
   csRef<iRenderManager> newRM = csLoadPlugin<iRenderManager> (objectRegistry,
@@ -1314,21 +1314,23 @@ csRef<iShader> csEngine::LoadShader (iDocumentSystem* docsys,
       GetNode ("shader");
     if (!shaderNode)
     {
-      Warn ("%s has no 'shader' node", filename);
+      Warn ("%s has no %s node", filename, CS::Quote::Single ("shader"));
       return 0;
     }
     
     const char* compilerAttr = shaderNode->GetAttributeValue ("compiler");
     if (!compilerAttr)
     {
-      Warn ("%s: 'shader' node has no 'compiler' attribute", filename);
+      Warn ("%s: %s node has no %s attribute", filename,
+	    CS::Quote::Single ("shader"), CS::Quote::Single ("compiler"));
       return 0;
     }
     
     csRef<iShaderCompiler> shcom (shaderManager->GetCompiler (compilerAttr));
     if (!shcom.IsValid())
     {
-      Warn ("%s: '%s' shader compiler not available", filename, compilerAttr);
+      Warn ("%s: %s shader compiler not available", filename,
+	    CS::Quote::Single (compilerAttr));
       return 0;
     }
 
@@ -2361,7 +2363,7 @@ iTextureWrapper *csEngine::CreateTexture (
   csRef<iDataBuffer> data = VFS->ReadFile (iFileName, false);
   if (!data || !data->GetSize ())
   {
-    Warn ("Cannot read image file \"%s\" from VFS.", iFileName);
+    Warn ("Cannot read image file %s from VFS.", CS::Quote::Double (iFileName));
     return 0;
   }
 
@@ -2371,7 +2373,7 @@ iTextureWrapper *csEngine::CreateTexture (
 
   if (!ifile)
   {
-    Warn ("Unknown image file format: \"%s\".", iFileName);
+    Warn ("Unknown image file format: %s.", CS::Quote::Double (iFileName));
     return 0;
   }
 

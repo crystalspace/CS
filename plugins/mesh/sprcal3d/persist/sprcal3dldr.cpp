@@ -478,7 +478,7 @@ iMaterialWrapper *csSpriteCal3DFactoryLoader::LoadMaterialTag(
     {
       synldr->ReportError (
 	"crystalspace.spritecal3dfactoryloader.parse.unknownmaterial",
-	child, "Couldn't find material named '%s'", name);
+	child, "Couldn't find material named %s", CS::Quote::Single (name));
       return 0;
     }
         
@@ -728,7 +728,7 @@ csPtr<iBase> csSpriteCal3DLoader::Parse (iDocumentNode* node,
   {
     synldr->ReportError (
       "crystalspace.spritecal3dloader.parse.unknownfactory",
-      child, "Couldn't find factory '%s'!", factname);
+      child, "Couldn't find factory %s!", CS::Quote::Single (factname));
     return 0;
   }
 
@@ -742,7 +742,9 @@ csPtr<iBase> csSpriteCal3DLoader::Parse (iDocumentNode* node,
 	synldr->ReportError (
 	  "crystalspace.spritecal3dloader.parse.motion.missingfactory",
 	  child,
-	  "No Factory! Please define 'factory' before 'animcycle'!");
+	  "No Factory! Please define %s before %s!",
+	  CS::Quote::Single ("factory"),
+	  CS::Quote::Single ("animcycle"));
 	return 0;
       }
       if (sprCal3dLook->FindAnim(child->GetContentsValue ()) != -1)
@@ -765,7 +767,9 @@ csPtr<iBase> csSpriteCal3DLoader::Parse (iDocumentNode* node,
 	synldr->ReportError (
 	  "crystalspace.spritecal3dloader.parse.motion.missingfactory",
 	  child,
-	  "No Factory! Please define 'factory' before 'idleanim'!");
+	  "No Factory! Please define %s before %s!",
+	  CS::Quote::Single ("factory"),
+	  CS::Quote::Single ("idleanim"));
 	return 0;
       }
       if (sprCal3dLook->FindAnim(child->GetContentsValue ()) != -1)
@@ -787,7 +791,9 @@ csPtr<iBase> csSpriteCal3DLoader::Parse (iDocumentNode* node,
 	synldr->ReportError (
 	  "crystalspace.spritecal3dloader.parse.motion.missingfactory",
 	  child,
-	  "No Factory! Please define 'factory' before 'idle'!");
+	  "No Factory! Please define %s before %s!",
+	  CS::Quote::Single ("factory"),
+	  CS::Quote::Single ("idle"));
 	return 0;
       }
       sprCal3dLook->SetVelocity(0);

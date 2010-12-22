@@ -96,9 +96,12 @@ void BaseMapGen::OnCommandLineHelp()
   csPrintf (" Example: basemapgen /this/data/terrain world\n");
   csPrintf ("\n");
   csPrintf ("<path>                    The path to the worldfile           (default /this)\n");
-  csPrintf ("<world>                   Name of the world file              (default 'world')\n");
-  csPrintf ("-terrainname=<regexp>     Regexp for the terrain mesh objects (default '.*')\n");
-  csPrintf ("-terraformername=<regexp> Regexp for the terraformer          (default '.*')\n");
+  csPrintf ("<world>                   Name of the world file              (default %s)\n",
+	    CS::Quote::Single ("world"));
+  csPrintf ("-terrainname=<regexp>     Regexp for the terrain mesh objects (default %s)\n",
+	    CS::Quote::Single (".*"));
+  csPrintf ("-terraformername=<regexp> Regexp for the terraformer          (default %s)\n",
+	    CS::Quote::Single (".*"));
   csPrintf ("-resolution=<pixels>      The resolution for the basemap      (default basemap resolution)\n");
 }
 
@@ -135,7 +138,7 @@ static csPtr<iImage> GenerateErrorTexture (int width, int height)
 
 csRef<iImage> BaseMapGen::LoadImage (const csString& filename, int format)
 {
-  csPrintf ("Trying to load '%s'... \t", filename.GetData());
+  csPrintf ("Trying to load %s... \t", CS::Quote::Single (filename.GetData()));
   fflush (stdout);
   csRef<iImage> image;
   csRef<iImageIO> imageio = csQueryRegistry<iImageIO> (object_reg);
@@ -144,7 +147,7 @@ csRef<iImage> BaseMapGen::LoadImage (const csString& filename, int format)
   csRef<iDataBuffer> buf = VFS->ReadFile (filename.GetData(), false);
   if (!buf)
   {
-    Report ("Failed to load image file '%s'!", filename.GetData());
+    Report ("Failed to load image file %s!", CS::Quote::Single (filename.GetData()));
     return GenerateErrorTexture (32, 32);
   }
   image = imageio->Load (buf, format);
@@ -262,14 +265,14 @@ bool BaseMapGen::LoadMap ()
   paths.Push ("/lev/");
   if (!vfs->ChDirAuto(path.GetData(), &paths, 0, "world"))
   {
-    Report("Error setting directory '%s'!", path.GetData ());
+    Report("Error setting directory %s!", CS::Quote::Single (path.GetData ()));
     return false;
   }
 
   csRef<iFile> buf = vfs->Open(world.GetData(), VFS_FILE_READ);
   if (!buf)
   {
-    Report("Failed to open file '%s'!", world.GetData());
+    Report("Failed to open file %s!", CS::Quote::Single (world.GetData()));
     return false;
   }
 
@@ -281,7 +284,7 @@ bool BaseMapGen::LoadMap ()
   const char* error = doc->Parse (buf, true);
   if (error != 0)
   {
-    Report("Failed to parse file '%s': %s", world.GetData(),
+    Report("Failed to parse file %s: %s", CS::Quote::Single (world.GetData()),
       error);
     return false;
   }
@@ -461,7 +464,7 @@ void BaseMapGen::SaveImage (iImage* image, const char* texname)
   {
     if (!VFS->WriteFile (texname, (const char*)db->GetData (), db->GetSize ()))
     {
-      Report("Failed to write file '%s'!", texname);
+      Report("Failed to write file %s!", CS::Quote::Single (texname));
       return;
     }
   }

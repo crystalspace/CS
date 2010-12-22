@@ -112,7 +112,7 @@ csPtr<iBase> csAnimateProctexLoader::Parse (iDocumentNode* node,
     if (!img) 
     {
       Report (CS_REPORTER_SEVERITY_WARNING, file, 
-	"Couldn't load image '%s'", fname);
+	"Couldn't load image %s", CS::Quote::Single (fname));
       return 0;
     }
   }

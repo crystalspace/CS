@@ -36,6 +36,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/hash.h"
 #include "csutil/sysfunc.h"
 #include "csutil/scfarray.h"
+#include "csutil/stringquote.h"
 #include "cstool/rbuflock.h"
 
 #include "ivideo/graph3d.h"
@@ -88,7 +89,7 @@ static void ReportCalError (iObjectRegistry* objreg, const char* msgId,
 
   if (CalError::getLastErrorText ().size () > 0)
   {
-    text << " '" << CalError::getLastErrorText().data() << "'";
+    text << " " << CS::Quote::Single (CalError::getLastErrorText().data());
   }
 
   text << " in " << CalError::getLastErrorFile().data() << "(" << 

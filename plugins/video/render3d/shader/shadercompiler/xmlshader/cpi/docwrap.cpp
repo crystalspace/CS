@@ -25,6 +25,7 @@
 #include "csutil/csendian.h"
 #include "csutil/documenthelper.h"
 #include "csutil/set.h"
+#include "csutil/stringquote.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
 #include "csutil/xmltiny.h"
@@ -803,7 +804,7 @@ void csWrappedDocumentNode::ParseCondition (WrapperStackEntry& newWrapper,
     TempString<> condStr;
     condStr.Append (cond, condLen);
     Report (syntaxErrorSeverity, node,
-      "Error parsing condition '%s': %s", condStr.GetData(),
+      "Error parsing condition %s: %s", CS::Quote::Single (condStr.GetData()),
       result);
     newWrapper.child->condition = csCondAlwaysFalse;
   }
@@ -848,7 +849,7 @@ void csWrappedDocumentNode::ProcessInclude (ConditionEval& eval,
     if (!include.IsValid ())
     {
       Report (syntaxErrorSeverity, node,
-	"could not open '%s'", filename.GetData ());
+	"could not open %s", CS::Quote::Single (filename.GetData ()));
     }
     else
     {
@@ -862,7 +863,7 @@ void csWrappedDocumentNode::ProcessInclude (ConditionEval& eval,
       if (err != 0)
       {
 	Report (syntaxErrorSeverity, node,
-	  "error parsing '%s': %s", filename.GetData (), err);
+	  "error parsing %s: %s", CS::Quote::Single (filename.GetData ()), err);
 	return;
       }
       else
@@ -915,7 +916,8 @@ bool csWrappedDocumentNode::ProcessTemplate (ConditionEval& eval,
           if (shared->plugin->do_verbose)
           {
             Report (CS_REPORTER_SEVERITY_WARNING, node,
-              "Deprecated syntax, please use 'Endtemplate'");
+              "Deprecated syntax, please use %s",
+	      CS::Quote::Single ("Endtemplate"));
           }
           // Fall through
 	case csWrappedDocumentNodeFactory::PITOKEN_ENDTEMPLATE_NEW:
@@ -932,7 +934,8 @@ bool csWrappedDocumentNode::ProcessTemplate (ConditionEval& eval,
           if (shared->plugin->do_verbose)
           {
             Report (CS_REPORTER_SEVERITY_WARNING, node,
-              "Deprecated syntax, please use 'Template'");
+              "Deprecated syntax, please use %s",
+	      CS::Quote::Single ("Template"));
           }
           // Fall through
 	case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATE_NEW:
@@ -1094,7 +1097,8 @@ void csWrappedDocumentNode::ValidateTemplateEnd (iDocumentNode* node,
   if ((state->templActive) && (state->templNestLevel != 0))
   {
     Report (syntaxErrorSeverity, node,
-      "'Template' without 'Endtemplate'");
+      "%s without %s",
+      CS::Quote::Single ("Template"), CS::Quote::Single ("EndTemplate"));
   }
 }
 
@@ -1104,7 +1108,8 @@ void csWrappedDocumentNode::ValidateGenerateEnd (iDocumentNode* node,
   if ((state->generateActive) && (state->generateNestLevel != 0))
   {
     Report (syntaxErrorSeverity, node,
-      "'Generate' without 'Endgenerate'");
+      "%s without %s",
+      CS::Quote::Single ("Generate"), CS::Quote::Single ("EndGenerate"));
   }
 }
 
@@ -1114,7 +1119,8 @@ void csWrappedDocumentNode::ValidateStaticIfEnd (iDocumentNode* node,
   if (!state->staticIfStateStack.IsEmpty())
   {
     Report (syntaxErrorSeverity, node,
-      "'SIfDef' without 'SEndIf'");
+      "%s without %s",
+      CS::Quote::Single ("SIfDef"), CS::Quote::Single ("SEndIf"));
   }
 }
 
@@ -1158,7 +1164,8 @@ bool csWrappedDocumentNode::ProcessStaticIf (NodeProcessingState* state,
             if (ifState.elseBranch)
             {
               Report (syntaxErrorSeverity, node,
-                "Multiple 'SElse's in 'SIfDef'");
+                "Multiple %ss in %s",
+		CS::Quote::Single ("SElse"), CS::Quote::Single ("SIfDef"));
               ifState.processNodes = false;
             }
             else
@@ -1180,7 +1187,8 @@ bool csWrappedDocumentNode::ProcessStaticIf (NodeProcessingState* state,
             if (ifState.elseBranch)
             {
               Report (syntaxErrorSeverity, node,
-                "Multiple 'SElse's in 'SIfDef'");
+                "Multiple %ss in %s",
+		CS::Quote::Single ("SElse"), CS::Quote::Single ("SIfDef"));
               ifState.processNodes = false;
             }
             else
@@ -1229,8 +1237,8 @@ bool csWrappedDocumentNode::ProcessInstrTemplate (NodeProcessingState* state,
       if (dupeCheck.Contains (paramNames[i]))
       {
         Report (syntaxErrorSeverity, node,
-                "Duplicate template parameter '%s'", 
-	        paramNames[i].GetData());
+                "Duplicate template parameter %s", 
+	        CS::Quote::Single (paramNames[i].GetData()));
         return false;
       }
       newTempl.paramMap.Push (paramNames[i]);
@@ -1242,13 +1250,14 @@ bool csWrappedDocumentNode::ProcessInstrTemplate (NodeProcessingState* state,
   if (templateName.IsEmpty())
   {
     Report (syntaxErrorSeverity, node,
-            "'template' without name");
+            "%s without name",
+            CS::Quote::Single ("template"));
     return false;
   }
   if (shared->pitokens.Request (templateName) != csInvalidStringID)
   {
     Report (syntaxErrorSeverity, node,
-            "Reserved template name '%s'", templateName.GetData());
+            "Reserved template name %s", CS::Quote::Single (templateName.GetData()));
     return false;
   }
   state->templateName = templateName;
@@ -1270,7 +1279,8 @@ bool csWrappedDocumentNode::ProcessDefine (NodeProcessingState* state,
   if (param.IsEmpty() || (*p != 0))
   {
     Report (syntaxErrorSeverity, node,
-            "One parameter expected for 'Define'");
+            "One parameter expected for %s",
+	    CS::Quote::Single ("Define"));
     return false;
   }
   globalState->defines.Add (param);
@@ -1288,7 +1298,8 @@ bool csWrappedDocumentNode::ProcessUndef (NodeProcessingState* state,
   if (param.IsEmpty() || (*p != 0))
   {
     Report (syntaxErrorSeverity, node,
-            "One parameter expected for 'Undef'");
+            "One parameter expected for %s",
+	    CS::Quote::Single ("Undef"));
     return false;
   }
   globalState->defines.Delete (param);
@@ -1306,7 +1317,8 @@ bool csWrappedDocumentNode::ProcessStaticIfDef (NodeProcessingState* state,
   if (param.IsEmpty() || (*p != 0))
   {
     Report (syntaxErrorSeverity, node,
-            "One parameter expected for 'SIfDef'");
+            "One parameter expected for %s",
+	    CS::Quote::Single ("SIfDef"));
     return false;
   }
   bool lastState = 
@@ -1429,13 +1441,17 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      if (space != 0)
 	      {
 		Report (syntaxErrorSeverity, node,
-		  "'endif' has parameters");
+		  "%s has parameters",
+		  CS::Quote::Single ("endif"));
 		okay = false;
 	      }
 	      if (okay && (wrapperStack.GetSize () == 0))
 	      {
 		Report (syntaxErrorSeverity, node,
-		  "'endif' without 'if' or 'elsif'");
+		  "%s without %s or %s",
+		  CS::Quote::Single ("endif"),
+		  CS::Quote::Single ("if"),
+		  CS::Quote::Single ("elsif"));
 		okay = false;
 	      }
 	      if (okay)
@@ -1464,19 +1480,23 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      if (space != 0)
 	      {
 		Report (syntaxErrorSeverity, node,
-		  "'else' has parameters");
+		  "%s has parameters",
+		  CS::Quote::Single ("else"));
 		okay = false;
 	      }
 	      if (okay && (wrapperStack.GetSize () == 0))
 	      {
 		Report (syntaxErrorSeverity, node,
-		  "'else' without 'if' or 'elsif'");
+		  "%s without %s or %s",
+		  CS::Quote::Single ("else"),
+		  CS::Quote::Single ("if"),
+		  CS::Quote::Single ("elsif"));
 		okay = false;
 	      }
               if (eval.GetBranch() != 0)
 	      {
 	        Report (syntaxErrorSeverity, node,
-	          "Double 'else'");
+	          "Double %s", CS::Quote::Single ("else"));
 	        okay = false;
 	      }
 	      if (okay)
@@ -1501,13 +1521,16 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      if (wrapperStack.GetSize () == 0)
 	      {
 		Report (syntaxErrorSeverity, node,
-		  "'elsif' without 'if' or 'elsif'");
+		  "%s without %s or %s",
+		  CS::Quote::Single ("elsif"),
+		  CS::Quote::Single ("if"),
+		  CS::Quote::Single ("elsif"));
 		okay = false;
 	      }
               if (okay && (eval.GetBranch() != 0))
 	      {
 		Report (syntaxErrorSeverity, node,
-		  "Double 'else'");
+		  "Double %s", CS::Quote::Single ("else"));
 		okay = false;
 	      }
 	      if (okay)
@@ -1550,7 +1573,8 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
             if (shared->plugin->do_verbose)
             {
               Report (CS_REPORTER_SEVERITY_WARNING, node,
-                "Deprecated syntax, please use 'Include'");
+                "Deprecated syntax, please use %s",
+		CS::Quote::Single ("Include"));
             }
             // Fall through
 	  case csWrappedDocumentNodeFactory::PITOKEN_INCLUDE_NEW:
@@ -1569,7 +1593,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      if ((space == 0) || (filename.IsEmpty ()))
 	      {
 		Report (syntaxErrorSeverity, node,
-		  "'include' without filename");
+		  "%s without filename", CS::Quote::Single ("Include"));
 		okay = false;
 	      }
 	      if (okay)
@@ -1583,7 +1607,8 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
             if (shared->plugin->do_verbose)
             {
               Report (CS_REPORTER_SEVERITY_WARNING, node,
-                "Deprecated syntax, please use 'Template'");
+                "Deprecated syntax, please use %s",
+		CS::Quote::Single ("Template"));
             }
             // Fall through
           case csWrappedDocumentNodeFactory::PITOKEN_TEMPLATE_NEW:
@@ -1601,7 +1626,8 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
             if (shared->plugin->do_verbose)
             {
               Report (CS_REPORTER_SEVERITY_WARNING, node,
-                "Deprecated syntax, please use 'Endtemplate'");
+                "Deprecated syntax, please use %s",
+		CS::Quote::Single ("Endtemplate"));
 	      handled = true;
             }
             // Fall through
@@ -1609,7 +1635,9 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	    if (parseOpts & wdnfpoExpandTemplates)
 	    {
 	      Report (syntaxErrorSeverity, node,
-		"'Endtemplate' without 'Template'");
+		"%s without %s",
+		CS::Quote::Single ("Endtemplate"),
+		CS::Quote::Single ("Template"));
               // ProcessTemplate() would've handled it otherwise
 	      handled = true;
 	    }
@@ -1628,7 +1656,8 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
               {
                 okay = false;
 	        Report (syntaxErrorSeverity, node,
-		  "'Generate' expects 3 or 4 arguments, got %zu", args.GetSize());
+		  "%s expects 3 or 4 arguments, got %zu",
+		  CS::Quote::Single ("Generate"), args.GetSize());
               }
               if (okay)
               {
@@ -1639,13 +1668,13 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
                 if (sscanf (args[1], "%d%c", &start, &dummy) != 1)
                 {
 	          Report (syntaxErrorSeverity, node,
-		    "Argument '%s' is not an integer", args[1].GetData());
+		    "Argument %s is not an integer", CS::Quote::Single (args[1].GetData()));
                   okay = false;
                 }
                 if (okay && sscanf (args[2], "%d%c", &end, &dummy) != 1)
                 {
 	          Report (syntaxErrorSeverity, node,
-		    "Argument '%s' is not an integer", args[2].GetData());
+		    "Argument %s is not an integer", CS::Quote::Single (args[2].GetData()));
                   okay = false;
                 }
                 if (okay)
@@ -1655,7 +1684,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
                     if (sscanf (args[3], "%d%c", &step, &dummy) != 1)
                     {
 	              Report (syntaxErrorSeverity, node,
-		        "Argument '%s' is not an integer", args[3].GetData());
+		        "Argument %s is not an integer", CS::Quote::Single (args[3].GetData()));
                       okay = false;
                     }
                   }
@@ -1693,7 +1722,9 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	    if (parseOpts & wdnfpoExpandTemplates)
 	    {
 	      Report (syntaxErrorSeverity, node,
-		"'Endgenerate' without 'Generate'");
+		"%s without %s",
+		CS::Quote::Single ("Endgenerate"),
+		CS::Quote::Single ("Generate"));
               // ProcessTemplate() would've handled it otherwise
 	    }
 	    break;
@@ -1733,7 +1764,9 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	    if (parseOpts & wdnfpoExpandTemplates)
             {
 	      Report (syntaxErrorSeverity, node,
-		"'%s' without 'SIfDef'", shared->pitokens.Request (tokenID));
+		"%s without %s",
+		CS::Quote::Single (shared->pitokens.Request (tokenID)),
+		CS::Quote::Single ("SIfDef"));
               // ProcessStaticIf() would've handled it otherwise
 	      handled = true;
             }
@@ -1752,7 +1785,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      if (!InvokeTemplate (eval, tokenStr, node, state, params, parseOpts))
 	      {
 		Report (syntaxErrorSeverity, node,
-		  "Unknown command '%s'", tokenStr.GetData());
+		  "Unknown command %s", CS::Quote::Single (tokenStr.GetData()));
 	      }
 	      handled = true;
 	    }
