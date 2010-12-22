@@ -18,6 +18,9 @@
 */
 #include "cssysdef.h"
 
+// for setlocale(), see below why that is called
+#include <locale.h>
+
 #if defined(CS_REF_TRACKER) && !defined(CS_REF_TRACKER_EXTENSIVE)
   // Performance hack
   #undef CS_REF_TRACKER
@@ -680,6 +683,13 @@ static unsigned int parse_verbosity(int argc, const char* const argv[])
 
 void scfInitialize (csPathsList const* pluginPaths, unsigned int verbose)
 {
+#ifndef CS_PLATFORM_WIN32
+  /* Required so non-Win32 csPrintf() picks up the right char set
+     Done early here instead of in csPlatformStartup because SCF may already
+     use csPrintf() */
+  setlocale (LC_CTYPE, "");
+#endif
+
   if (!PrivateSCF)
     PrivateSCF = new csSCF (verbose);
   else if (verbose != SCF_VERBOSE_NONE)

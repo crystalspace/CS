@@ -36,7 +36,6 @@ bool csPlatformStartup (iObjectRegistry*)
 #ifdef CS_USE_I18N
   // Never do "LC_ALL" because it would break things such as numeric format.
   setlocale (LC_COLLATE, "");
-  setlocale (LC_CTYPE, "");
   setlocale (LC_MESSAGES, "");
   setlocale (LC_TIME, "");
 #endif
