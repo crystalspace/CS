@@ -252,9 +252,9 @@
       </block>
     </input>
 
-    <input name="alpha_scaleoffset" type="float2" default="complex">
+    <input name="alpha_scaleoffset" type="float4" default="complex">
       <block location="shadervars">
-         <shadervar name="alpha scaleoffset" type="vector2">1,0</shadervar>
+         <shadervar name="alpha scaleoffset" type="vector4">1,1,0,0</shadervar>
       </block> 
 
       <block location="cg:variablemap">
@@ -262,7 +262,7 @@
       </block>
       
       <block location="cg:fragmentIn">
-	  <uniform type="float2" name="alpha_scaleoffset" />
+	  <uniform type="float4" name="alpha_scaleoffset" />
       </block>
       
       <block location="cg:fragmentMain">
@@ -274,10 +274,10 @@
       surfaceColor = float4(0);
       surfaceColor_attr_perfragment = true;
     </block>
-    
+
     <block location="cg:fragmentMain">
       float2 scaledTexCoord = texCoord * texture_scale;
-      float2 offsetAlphaCoord = (texCoord * alpha_scaleoffset.x) + alpha_scaleoffset.y;
+      float2 offsetAlphaCoord = (texCoord * alpha_scaleoffset.xy) + alpha_scaleoffset.zw;
 
       float4x4 texValues = float4x4(
         tex2D (texDiffuse1, scaledTexCoord),
