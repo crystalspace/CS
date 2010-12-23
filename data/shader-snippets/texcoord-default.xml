@@ -20,7 +20,7 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input file="/shader-snippets/texCoord.inp"	/>
+    <input file="/shader-snippets/texCoord.inp"	private="yes" />
     
     <block location="cg:fragmentMain">
       result = texCoord;
