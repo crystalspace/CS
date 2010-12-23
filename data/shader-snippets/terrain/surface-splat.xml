@@ -20,7 +20,8 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input file="/shader-snippets/texCoord.inp"	/>
+    <input name="texCoordSplat" type="texcoord2" />
+    <input file="/shader-snippets/texCoord.inp" private="yes" />
 
     <input name="position" type="position4_camera" />
     
@@ -52,31 +53,13 @@
       </block>
     </input>
 
-    <input name="texture_scale" type="float2" default="complex">
-      <block location="shadervars">
-	  <shadervar name="texture scale" type="vector2">1,1</shadervar>
-      </block>
-      
-      <block location="cg:variablemap">
-	  <variablemap variable="texture scale" destination="fragmentIn.texture_scale" />
-      </block>
-      
-      <block location="cg:fragmentIn">
-	  <uniform type="float2" name="texture_scale" />
-      </block>
-      
-      <block location="cg:fragmentMain">
-	  texture_scale = fragmentIn.texture_scale;
-      </block>
-    </input>
-    
     <block location="cg:vertexMain">
       surfaceColor = float4(0);
       surfaceColor_attr_perfragment = true;
     </block>
     
     <block location="cg:fragmentMain">
-      surfaceColor = tex2D (texDiffuse, texCoord*texture_scale);
+      surfaceColor = tex2D (texDiffuse, texCoordSplat);
       surfaceColor *= tex2D (texAlpha, texCoord).x;
       surfaceColor_attr_perfragment = true;
     </block>
@@ -86,4 +69,3 @@
     </output>
   </technique>
 </snippet>
-
