@@ -655,6 +655,21 @@ csCubemapTextureLoader::csCubemapTextureLoader (iBase *p) :
   InitTokenTable (xmltokens);
 }
 
+void csCubemapTextureLoader::SetCubeFace (csImageCubeMapMaker* cube, int face, iBase* loadResult)
+{
+  csRef<iImage> faceImage (scfQueryInterfaceSafe<iImage> (loadResult));
+  if (!faceImage)
+  {
+    /* Loading of face failed, use error texture
+       (May result in faces having different dimensions when some sides load, others not.
+       Should we care much? Probably not. Texture is broken anyway.
+       Could test for mismatching face sizes in the renderer or at the end of Parse()
+       below.) */
+    faceImage = GenerateErrorTexture (32, 32);
+  }
+  cube->SetSubImage (face, faceImage);
+}
+
 csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node, 
 					    iStreamSource*,
 					    iLoaderContext* /*ldr_context*/,
@@ -706,7 +721,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
           }
 
           cstldr->LoadImageTC (ret, false, cstldr->GetVFS()->GetCwd(), fname, Format, false);
-          cube->SetSubImage (4, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
+	  SetCubeFace (cube, 4, ret->GetResultRefPtr());
           break;
         }    
       case XMLTOKEN_NEGZ:
@@ -722,7 +737,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
             return 0;
           }
           cstldr->LoadImageTC (ret, false, cstldr->GetVFS()->GetCwd(), fname, Format, false);
-          cube->SetSubImage (5, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
+	  SetCubeFace (cube, 5, ret->GetResultRefPtr());
           break;
         }    
       case XMLTOKEN_POSX:
@@ -737,8 +752,8 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-  cstldr->LoadImageTC (ret, false, cstldr->GetVFS()->GetCwd(), fname, Format, false);
-	cube->SetSubImage (0, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
+	cstldr->LoadImageTC (ret, false, cstldr->GetVFS()->GetCwd(), fname, Format, false);
+	SetCubeFace (cube, 0, ret->GetResultRefPtr());
         break;
     
       case XMLTOKEN_NEGX:
@@ -753,8 +768,8 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-  cstldr->LoadImageTC (ret, false, cstldr->GetVFS()->GetCwd(), fname, Format, false);
-	cube->SetSubImage (1, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
+	cstldr->LoadImageTC (ret, false, cstldr->GetVFS()->GetCwd(), fname, Format, false);
+	SetCubeFace (cube, 1, ret->GetResultRefPtr());
         break;
     
       case XMLTOKEN_POSY:
@@ -769,8 +784,8 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-  cstldr->LoadImageTC (ret, false, cstldr->GetVFS()->GetCwd(), fname, Format, false);
-	cube->SetSubImage (2, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
+	cstldr->LoadImageTC (ret, false, cstldr->GetVFS()->GetCwd(), fname, Format, false);
+	SetCubeFace (cube, 2, ret->GetResultRefPtr());
         break;
     
       case XMLTOKEN_NEGY:
@@ -785,8 +800,8 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-  cstldr->LoadImageTC (ret, false, cstldr->GetVFS()->GetCwd(), fname, Format, false);
-	cube->SetSubImage (3, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
+	cstldr->LoadImageTC (ret, false, cstldr->GetVFS()->GetCwd(), fname, Format, false);
+	SetCubeFace (cube, 3, ret->GetResultRefPtr());
         break;
     }
   }
@@ -798,7 +813,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
     ctx->HasFlags() ? ctx->GetFlags() : CS_TEXTURE_3D, fail_reason));
   if (!TexHandle)
   {
-    ReportError (object_reg, "crystalspace.checkertextureloader",
+    ReportError (object_reg, "crystalspace.cubetextureloader",
 	"Error creating texture: %s", fail_reason->GetData ());
     return 0;
   }

@@ -33,6 +33,7 @@
 #include "iutil/comp.h"
 
 struct iDocumentNode;
+class csImageCubeMapMaker;
 
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
@@ -152,6 +153,8 @@ class csCubemapTextureLoader :
 #define CS_TOKEN_ITEM_FILE "plugins/csparser/cubemaploader.tok"
 #include "cstool/tokenlist.h"
 #undef CS_TOKEN_ITEM_FILE 
+
+  void SetCubeFace (csImageCubeMapMaker* cube, int face, iBase* loadResult);
 public:
   csCubemapTextureLoader (iBase *p);
 
