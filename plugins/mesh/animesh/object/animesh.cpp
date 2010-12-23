@@ -43,6 +43,9 @@
 
 #include "animesh.h"
 
+#define MINIMUM_UPDATE_DELAY 1.0f / 50.0f
+#define MAXIMUM_UPDATE_FRAMES 5
+
 CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 {
 
@@ -639,7 +642,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     : scfImplementationType (this), factory (factory), logParent (0),
     material (0), mixMode (0), skeleton (0), initialized (false), morphVersion (0), morphStateChanged (false),
     skinVertexVersion (~0), skinNormalVersion (~0), skinTangentBinormalVersion (~0),
-    morphVertexVersion (0), skinVertexLF (false), skinNormalLF (false), skinTangentBinormalLF (false)
+    morphVertexVersion (0), skinVertexLF (false), skinNormalLF (false), skinTangentBinormalLF (false),
+    accumulatedTime (0.0f), accumulatedFrames (0)
   {
     bufferAccessor.AttachNew (new RenderBufferAccessor (this));
     postMorphVertices = factory->vertexBuffer;
@@ -855,8 +859,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 	}
       }
 
+      // Check if we waited long enough since the last update
+      accumulatedTime += (current_time - lastTick) / 1000.0f;
+      accumulatedFrames++;
+      if (accumulatedTime < MINIMUM_UPDATE_DELAY
+	  && accumulatedFrames < MAXIMUM_UPDATE_FRAMES)
+	return;
+
       // Update the skeleton
-      skeleton->UpdateSkeleton ((current_time - lastTick) / 1000.0f);
+      skeleton->UpdateSkeleton (accumulatedTime);
+      accumulatedTime = 0.0f;
+      accumulatedFrames = 0;
 
       // Copy the skeletal state into our buffers
       UpdateLocalBoneTransforms ();

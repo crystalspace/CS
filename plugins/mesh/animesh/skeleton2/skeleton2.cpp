@@ -29,9 +29,6 @@
 #include "imesh/object.h"
 #include "iengine/mesh.h"
 
-#define MINIMUM_UPDATE_DELAY 1.0f / 50.0f
-#define MAXIMUM_UPDATE_FRAMES 5
-
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 {
   SCF_IMPLEMENT_FACTORY(SkeletonSystem)
@@ -392,8 +389,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   Skeleton::Skeleton (SkeletonFactory* factory)
     : scfImplementationType (this, factory), factory (factory), 
-    cachedTransformsDirty (true), version (0), animesh (nullptr), accumulatedTime (0.0f),
-    accumulatedFrames (0)
+    cachedTransformsDirty (true), version (0), animesh (nullptr)
   {
     // Setup the bones from the parent setup
     RecreateSkeletonP ();
@@ -654,17 +650,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     // If the root node is active then update the skeleton
     if (rootNode->IsActive ())
     {
-      // Check if we waited long enough since the last update
-      accumulatedTime += dt;
-      accumulatedFrames++;
-      if (accumulatedTime < MINIMUM_UPDATE_DELAY
-	  && accumulatedFrames < MAXIMUM_UPDATE_FRAMES)
-	return;
-
       // Update the root node
-      rootNode->TickAnimation (accumulatedTime);
-      accumulatedTime = 0.0f;
-      accumulatedFrames = 0;
+      rootNode->TickAnimation (dt);
 
       // TODO: Use a pool for these...
       csRef<CS::Animation::csSkeletalState> finalState;

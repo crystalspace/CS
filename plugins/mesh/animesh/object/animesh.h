@@ -526,6 +526,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     unsigned int morphVertexVersion;
     // Things we skinned last frame
     bool skinVertexLF, skinNormalLF, skinTangentBinormalLF;
+
+    // LOD on the animation
+    float accumulatedTime;
+    char accumulatedFrames;
   };
 
 }

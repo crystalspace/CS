@@ -221,8 +221,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     bool cachedTransformsDirty;
     unsigned int version;
     csWeakRef<CS::Mesh::iAnimatedMesh> animesh;
-    float accumulatedTime;
-    char accumulatedFrames;
   };
 
 }
