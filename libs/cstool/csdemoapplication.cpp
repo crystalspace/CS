@@ -26,10 +26,8 @@
 #include "cstool/materialbuilder.h"
 #include "cstool/csdemoapplication.h"
 
-namespace CS
-{
-namespace Demo
-{
+namespace CS {
+namespace Demo {
 
 // ------------------------ CommandLineHelper ------------------------
 
@@ -38,14 +36,28 @@ CommandLineHelper::CommandLineHelper (const char* applicationCommand,
 				      const char* applicationDescription)
   : applicationCommand (applicationCommand),
     applicationCommandUsage (applicationCommandUsage),
-    applicationDescription (applicationDescription)
+    applicationDescription (applicationDescription),
+    blockCount (0)
 {
+  // Create the default 'application' block
+  CommandBlock block ("");
+  commandBlocks.Push (block);
+}
+
+CommandLineBlockID CommandLineHelper::AddCommandLineBlock (const char* name)
+{
+  CommandBlock block (name);
+  commandBlocks.Push (block);
+  return ++blockCount;
 }
 
 void CommandLineHelper::AddCommandLineOption (const char* option,
-						    const char* description)
+					      const char* description,
+					      CommandLineBlockID block)
 {
-  commandOptions.Push (CommandOption (option, description));
+  CS_ASSERT (block <= blockCount);
+  CommandBlock& cblock = commandBlocks[block];
+  cblock.commandOptions.Push (CommandOption (option, description));
 }
 
 void CommandLineHelper::WriteHelp (iObjectRegistry* registry) const
@@ -54,19 +66,31 @@ void CommandLineHelper::WriteHelp (iObjectRegistry* registry) const
   csPrintf ("Usage: %s\n\n", applicationCommandUsage.GetData ());
   csPrintf ("Available options:\n\n");
 
-  if (commandOptions.GetSize ())
-    csPrintf ("Specific options for %s:\n", applicationCommand.GetData ());
-
-  for (csArray<CommandOption>::ConstIterator it = commandOptions.GetIterator ();
-       it.HasNext (); )
+  for (csArray<CommandBlock>::ReverseConstIterator it = commandBlocks.GetReverseIterator (); it.HasNext (); )
   {
-    CommandOption commandOption = it.Next ();
-    csPrintf ("  -%-*s%s\n", 18, commandOption.option.GetData (),
-	      commandOption.description.GetData ());
-  }
+    const CommandBlock& block = it.Next ();
 
-  if (commandOptions.GetSize ())
-    csPrintf ("\n");
+    if (block.commandOptions.GetSize ())
+    {
+      if (!it.HasNext ())
+	csPrintf ("Specific options for %s:\n", applicationCommand.GetData ());
+      else
+	csPrintf ("%s-specific options\n", block.name.GetData ());
+    }
+
+    for (csArray<CommandOption>::ConstIterator it = block.commandOptions.GetIterator ();
+	 it.HasNext (); )
+    {
+      //const csTuple2<CommandOption, CommandLineBlockID>& tuple = it.NextTuple ();
+      CommandOption commandOption = it.Next ();
+      //const CommandOption& commandOption = tuple.first;
+      csPrintf ("  -%-*s%s\n", 18, commandOption.option.GetData (),
+		commandOption.description.GetData ());
+    }
+
+    if (block.commandOptions.GetSize ())
+      csPrintf ("\n");
+  }
 
   csCommandLineHelper::Help (registry);
 }
@@ -102,7 +126,6 @@ bool HUDHelper::SetContext (csApplicationFramework* applicationFramework,
   if (!g2d) return applicationFramework->ReportError ("no 2D graphics!");
   this->g2d = g2d;
   if (!loader) return applicationFramework->ReportError ("no loader!");
-  //this->loader = loader;
   if (!vc) return applicationFramework->ReportError ("no virtual clock!");
   this->vc = vc;
 
@@ -258,7 +281,8 @@ void HUDHelper::DisplayHUD ()
 // ------------------------ CameraHelper ------------------------
 
 CameraHelper::CameraHelper ()
-  : cameraMode (CSDEMO_CAMERA_MOVE_FREE), mouseMoveEnabled (true)
+  : cameraMode (CSDEMO_CAMERA_MOVE_FREE), mouseMoveEnabled (true), motionSpeed (5.0f),
+    rotationSpeed (2.0f)
 {
 }
 
@@ -294,9 +318,16 @@ bool CameraHelper::SetContext (CameraManager* manager, iKeyboardDriver* kbd,
 
 void CameraHelper::Frame ()
 {
-  // Get elasped time
-  csTicks elapsed_time = vc->GetElapsedTicks ();
-  float speed = (elapsed_time / 1000.0) * (0.06 * 20);
+  // Compute the speed of the camera
+  float elapsedTime = ((float) vc->GetElapsedTicks ()) / 1000.0f;
+  float moveSpeed = elapsedTime * motionSpeed;
+  float rotateSpeed = elapsedTime * rotationSpeed;
+
+  if (kbd->GetKeyState (CSKEY_CTRL))
+  {
+    moveSpeed *= 10.0f;
+    rotateSpeed *= 5.0f;
+  }
 
   // Update the camera
   csVector3 cameraOrigin = camera->GetTransform ().GetOrigin ();
@@ -312,13 +343,13 @@ void CameraHelper::Frame ()
 	// the camera to strafe up, down, left or right from it's
 	// current position.
 	if (kbd->GetKeyState (CSKEY_RIGHT))
-	  camera->Move (CS_VEC_RIGHT * 4 * speed);
+	  camera->Move (CS_VEC_RIGHT * moveSpeed);
 	if (kbd->GetKeyState (CSKEY_LEFT))
-	  camera->Move (CS_VEC_LEFT * 4 * speed);
+	  camera->Move (CS_VEC_LEFT * moveSpeed);
 	if (kbd->GetKeyState (CSKEY_UP))
-	  camera->Move (CS_VEC_UP * 4 * speed);
+	  camera->Move (CS_VEC_UP * moveSpeed);
 	if (kbd->GetKeyState (CSKEY_DOWN))
-	  camera->Move (CS_VEC_DOWN * 4 * speed);
+	  camera->Move (CS_VEC_DOWN * moveSpeed);
       }
       else
       {
@@ -327,18 +358,22 @@ void CameraHelper::Frame ()
 	// _camera's_ X axis (more on this in a second) and up and down
 	// arrows cause the camera to go forwards and backwards.
 	if (kbd->GetKeyState (CSKEY_RIGHT))
-	  camera->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
+	  cameraYaw += rotateSpeed;
 	if (kbd->GetKeyState (CSKEY_LEFT))
-	  camera->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
+	  cameraYaw -= rotateSpeed;
 	if (kbd->GetKeyState (CSKEY_PGUP))
-	  camera->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed);
+	  cameraPitch += rotateSpeed;
 	if (kbd->GetKeyState (CSKEY_PGDN))
-	  camera->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
+	  cameraPitch -= rotateSpeed;
 	if (kbd->GetKeyState (CSKEY_UP))
-	  camera->Move (CS_VEC_FORWARD * 4 * speed);
+	  camera->Move (CS_VEC_FORWARD * moveSpeed);
 	if (kbd->GetKeyState (CSKEY_DOWN))
-	  camera->Move (CS_VEC_BACKWARD * 4 * speed);
+	  camera->Move (CS_VEC_BACKWARD * moveSpeed);
       }
+
+      csMatrix3 rot = csXRotMatrix3 (cameraPitch) * csYRotMatrix3 (cameraYaw);
+      csOrthoTransform ot (rot, camera->GetTransform().GetOrigin ());
+      camera->SetTransform (ot);
 
       break;
     }
@@ -346,17 +381,17 @@ void CameraHelper::Frame ()
   case CSDEMO_CAMERA_MOVE_LOOKAT:
     {
       if (kbd->GetKeyState (CSKEY_DOWN))
-	cameraOrigin.z -= 4 * speed;
+	cameraOrigin.z -= moveSpeed;
       if (kbd->GetKeyState (CSKEY_UP))
-	cameraOrigin.z += 4 * speed;
+	cameraOrigin.z += moveSpeed;
       if (kbd->GetKeyState (CSKEY_LEFT))
-	cameraOrigin.x -= 4 * speed;
+	cameraOrigin.x -= moveSpeed;
       if (kbd->GetKeyState (CSKEY_RIGHT))
-	cameraOrigin.x += 4 * speed;
+	cameraOrigin.x += moveSpeed;
       if (kbd->GetKeyState (CSKEY_PGUP))
-	cameraOrigin.y += 4 * speed;
+	cameraOrigin.y += moveSpeed;
       if (kbd->GetKeyState (CSKEY_PGDN))
-	cameraOrigin.y -= 4 * speed;
+	cameraOrigin.y -= moveSpeed;
       UpdateCameraOrigin (cameraOrigin);
       UpdateCamera ();
       break;
@@ -365,33 +400,29 @@ void CameraHelper::Frame ()
   case CSDEMO_CAMERA_ROTATE:
     {
       if (kbd->GetKeyState (CSKEY_LEFT))
-	cameraYaw += speed * 2.5f;
+	cameraYaw += rotateSpeed;
       if (kbd->GetKeyState (CSKEY_RIGHT))
-	cameraYaw -= speed * 2.5f;
+	cameraYaw -= rotateSpeed;
       if (kbd->GetKeyState (CSKEY_UP))
       {
 	if (kbd->GetKeyState (CSKEY_SHIFT))
 	  cameraDist =
-	    csMax<float> (cameraManager->GetCameraMinimumDistance (),
-			  cameraDist - speed * 4);
+	    csMax<float> (cameraManager->GetCameraMinimumDistance (), cameraDist - moveSpeed);
 	else
-	  cameraPitch =
-	    csMax<float> (-3.14159f * 0.5f + 0.01f, cameraPitch - speed * 2.5f);
+	  cameraPitch = csMax<float> (-3.14159f * 0.5f + 0.01f, cameraPitch - rotateSpeed);
       }
       if (kbd->GetKeyState (CSKEY_DOWN))
       {
 	if (kbd->GetKeyState (CSKEY_SHIFT))
-	  cameraDist += speed * 4;
+	  cameraDist += moveSpeed * 4;
 	else
-	  cameraPitch =
-	    csMin<float> (3.14159f * 0.5f - 0.01f, cameraPitch + speed * 2.5f);
+	  cameraPitch = csMin<float> (3.14159f * 0.5f - 0.01f, cameraPitch + rotateSpeed);
       }
       if (kbd->GetKeyState (CSKEY_PGUP))
 	cameraDist =
-	  csMax<float> (cameraManager->GetCameraMinimumDistance (),
-			cameraDist - speed * 4);
+	  csMax<float> (cameraManager->GetCameraMinimumDistance (), cameraDist - moveSpeed);
       if (kbd->GetKeyState (CSKEY_PGDN))
-	cameraDist += speed * 4;
+	cameraDist += moveSpeed;
       UpdateCamera ();
       break;
     }
@@ -527,6 +558,26 @@ void CameraHelper::ResetCamera ()
   UpdateCamera ();
 }
 
+void CameraHelper::SetMotionSpeed (float speed)
+{
+  motionSpeed = speed;
+}
+
+float CameraHelper::GetMotionSpeed ()
+{
+  return motionSpeed;
+}
+
+void CameraHelper::SetRotationSpeed (float speed)
+{
+  rotationSpeed = speed;
+}
+
+float CameraHelper::GetRotationSpeed ()
+{
+  return rotationSpeed;
+}
+
 void CameraHelper::UpdateCamera ()
 {
   csVector3 cameraPos;
@@ -549,7 +600,7 @@ void CameraHelper::UpdateCameraOrigin
 (const csVector3& desiredOrigin)
 {
   // Compute distance, yaw, and pitch values that will put the
-  // origin at the desired origin
+  // camera at the desired origin
   csVector3 cameraTarget = cameraManager->GetCameraTarget ();
   cameraDist = (cameraTarget - desiredOrigin).Norm ();
 
@@ -711,12 +762,13 @@ bool DemoApplication::Application ()
   view = csPtr<iView> (new csView (engine, g3d));
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
-  // Initialize the HUD helper
+  // Initialize the HUD & camera helpers
   hudHelper.SetContext (this, g3d, g2d, loader, vc);
+  cameraHelper.SetContext (this, kbd, vc, view->GetCamera ());
 
   // Workaround for correct initialization of mouseX and mouseY:
   // initialize the mouse position to the center of the window
-  g2d->SetMousePosition (g2d->GetWidth () / 2, g2d->GetHeight () / 2);
+  //g2d->SetMousePosition (g2d->GetWidth () / 2, g2d->GetHeight () / 2);
 
   return true;
 }
@@ -726,9 +778,6 @@ bool DemoApplication::CreateRoom ()
   // Create the main sector
   room = engine->CreateSector ("room");
   view->GetCamera ()->SetSector (room);
-
-  // Initialize the camera helper
-  cameraHelper.SetContext (this, kbd, vc, view->GetCamera ());
 
   // Creating the background
   // First we make a primitive for our geometry.

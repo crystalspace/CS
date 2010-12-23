@@ -37,6 +37,7 @@
 #include "csutil/common_handlers.h"
 #include "csutil/csbaseeventh.h"
 #include "csutil/event.h"
+#include "csutil/hash.h"
 #include "csutil/stringarray.h"
 #include "iengine/camera.h"
 #include "iengine/scenenode.h"
@@ -52,12 +53,15 @@
 
 class csPixmap;
 
-namespace CS
-{
-namespace Demo
-{
+namespace CS {
+namespace Demo {
 
 // ------------------------ CommandLineHelper ------------------------
+
+/**
+ * Identifier for a command line block (see CS::Demo::CommandLineHelper::AddCommandLineBlock()).
+ */
+typedef size_t CommandLineBlockID;
 
 /**
  * A generic tool to print the command line help when the '-help' option is used
@@ -65,7 +69,8 @@ namespace Demo
  * To use this tool, you should define the applicationCommand,
  * applicationCommandUsage and applicationDescription variables (to be defined in
  * the constructor CommandLineHelper()), and add the needed command line
- * options through AddCommandLineOption().
+ * options through AddCommandLineOption(). Separate blocks of options can be defined
+ * through AddCommandLineBlock().
  * 
  * When the WriteHelp() method is called, this tool will write to the standard
  * output a help text of the following structure:
@@ -75,13 +80,17 @@ namespace Demo
 Usage: <applicationCommandUsage>
 
 Available options:
-7
+
 Specific options for <applicationCommand>:
+<list of options>
+
+<block name>-specific options:
 <list of options>
 
 General options:
 <list of CS general options>
 \endverbatim
+\sa csCommandLineHelper
  */
 class CS_CRYSTALSPACE_EXPORT CommandLineHelper
 {
@@ -99,12 +108,22 @@ class CS_CRYSTALSPACE_EXPORT CommandLineHelper
 		     const char* applicationDescription);
 
   /**
+   * Add a new block of options
+   */
+  CommandLineBlockID AddCommandLineBlock (const char* name);
+
+  /**
    * Add a command option to be described in the help text.
    * \param option The name of the option, eg 'enable-debug'.
    * \param description A user friendly description of the option, eg 'Enable
    * output of debug information'.
+   * \param option Name of the option
+   * \param description Description of the option
+   * \param block The block of the option. A value of 0
+   * means the default 'application' block.
    */
-  void AddCommandLineOption (const char* option, const char* description);
+  void AddCommandLineOption (const char* option, const char* description,
+			     CommandLineBlockID block = 0);
 
   /**
    * Print to standard output all command options and usages of this executable.
@@ -124,12 +143,25 @@ class CS_CRYSTALSPACE_EXPORT CommandLineHelper
     csString description;
   };
 
+  struct CommandBlock
+  {
+    // Constructor
+    CommandBlock (const char* name)
+    : name (name) {}
+
+    // Name of the block
+    csString name;
+    // Array of options
+    csArray<CommandOption> commandOptions;
+  };
+
   // Command line help
   csString applicationCommand;
   csString applicationCommandUsage;
   csString applicationDescription;
-  // Array of command line options
-  csArray<CommandOption> commandOptions;
+  // Array of command line blocks
+  csArray<CommandBlock> commandBlocks;
+  CommandLineBlockID blockCount;
 };
 
 // ------------------------ HUDHelper ------------------------
@@ -323,6 +355,26 @@ class CS_CRYSTALSPACE_EXPORT CameraHelper
    */
   void ResetCamera ();
 
+  /**
+   * Set the speed of the camera's motion, in unit per second. The default value is 5.
+   * Note that the camera moves ten times faster when the CTRL key is pressed. 
+   */
+  void SetMotionSpeed (float speed);
+  /**
+   * Get the speed of the camera's motion, in unit per second.
+   */
+  float GetMotionSpeed ();
+
+  /**
+   * Set the rotation speed of the camera, in radian per second. The default value is 2.
+   * Note that the camera rotates five times faster when the CTRL key is pressed. 
+   */
+  void SetRotationSpeed (float speed);
+  /**
+   * Get the speed of the camera's motion, in unit per second.
+   */
+  float GetRotationSpeed ();
+
  private:
   void UpdateCamera ();
   void UpdateCameraOrigin (const csVector3& desiredOrigin);
@@ -347,6 +399,9 @@ class CS_CRYSTALSPACE_EXPORT CameraHelper
   bool cameraModeRotate;
   bool cameraModeZoom;
 
+  float motionSpeed;
+  float rotationSpeed;
+
   int lastMouseX, lastMouseY;
 };
 
@@ -362,10 +417,10 @@ class CS_CRYSTALSPACE_EXPORT CameraHelper
  * The basic functionalities provided by this class are:
  * - creation of the main objects of the engine
  * - default creation of the scene
- * - management of the camera (class CameraHelper).
+ * - management of the camera (class CS::Demo::CameraHelper).
  * - display of the available keys, Crystal Space logo and other informations
- * (class HUDHelper).
- * - management of the command line's help (class CommandLineHelper).
+ * (class CS::Demo::HUDHelper).
+ * - management of the command line's help (class CS::Demo::CommandLineHelper).
  *
  * Here is an example for the most simple use of this class:
  * \code
