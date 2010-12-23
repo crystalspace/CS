@@ -1,0 +1,109 @@
+<library>
+    <textures>
+        <texture name="basemap_00000_00000_000.PNG">
+            <file>basemaps/basemap_00000_00000_000.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_000_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_000_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="ground01.jpg">
+            <file>textures/ground01.jpg</file>
+        </texture>
+        <texture name="generic_grass1_col.jpg">
+            <file>textures/generic_grass1_col.jpg</file>
+        </texture>
+        <texture name="generic_grass4_col.jpg">
+            <file>textures/generic_grass4_col.jpg</file>
+        </texture>
+        <texture name="stone_cliff_tile_001_col.jpg">
+            <file>textures/stone_cliff_tile_001_col.jpg</file>
+        </texture>
+        <texture name="alphamap_00000_00000_000_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_000_1.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="generic_grass4_dirt2.jpg">
+            <file>textures/generic_grass4_dirt2.jpg</file>
+        </texture>
+        <texture name="generic_grayrock1_col.jpg">
+            <file>textures/generic_grayrock1_col.jpg</file>
+        </texture>
+        <texture name="generic_darkrock_col.jpg">
+            <file>textures/generic_darkrock_col.jpg</file>
+        </texture>
+        <texture name="generic_lightrock_col.jpg">
+            <file>textures/generic_lightrock_col.jpg</file>
+        </texture>
+        <texture name="alphamap_00000_00000_000_2.PNG">
+            <file>alphamaps/alphamap_00000_00000_000_2.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="grass_01.png">
+            <file>textures/grass_01.png</file>
+        </texture>
+    </textures>
+    <shaders>
+        <shader>
+            <file>/shader/terrain/multisplat.xml</file>
+            <file>/shader/terrain/basemap.xml</file>
+        </shader>
+    </shaders>
+    <materials>
+        <material name="basemap_00000_00000_000">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9995117188,0.9995117188,0.0002441406,0.0002441406</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_000.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_000">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9990243912,0.9990243912,0.0004878049,0.0004878049</shadervar>
+            <shadervar type="vector2" name="texture scale">512,512</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_000_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_000_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grass4_dirt2.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 7">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 8">generic_lightrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 3">alphamap_00000_00000_000_2.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 9">grass_01.png</shadervar>
+        </material>
+    </materials>
+    <meshfact name="island">
+        <plugin>crystalspace.mesh.loader.factory.terrain2</plugin>
+        <priority>wall</priority>
+        <params>
+            <renderer>crystalspace.mesh.object.terrain2.bruteblockrenderer</renderer>
+            <collider>crystalspace.mesh.object.terrain2.collider</collider>
+            <feeder>crystalspace.mesh.object.terrain2.threadeddatafeeder</feeder>
+            <maxloadedcells>-1</maxloadedcells>
+            <cells>
+                <celldefault>
+                    <gridsize width="1025" height="1025" />
+                    <size x="512" y="10000" z="512" />
+                </celldefault>
+                <cell>
+                    <name>TerrainCell_00000_00000_000</name>
+                    <position x="0" y="0" />
+                    <basematerial>basemap_00000_00000_000</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_000</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000.PNG</param>
+                    </feederproperties>
+                </cell>
+            </cells>
+        </params>
+    </meshfact>
+</library>

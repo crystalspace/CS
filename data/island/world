@@ -1,0 +1,150 @@
+<world>
+    <variables>
+        <variable name="LodM" value="-0.00666667" />
+        <variable name="LodA" value="1.33333" />
+    </variables>
+    <plugins>
+        <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
+        <plugin name="genmeshfact">crystalspace.mesh.loader.factory.genmesh</plugin>
+        <plugin name="waterfact">crystalspace.mesh.loader.factory.watermesh</plugin>
+        <plugin name="water">crystalspace.mesh.loader.watermesh</plugin>
+    </plugins>
+    <shaders>
+        <shader>
+            <file>/shader/reflect/water_plane.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/water/water.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/lighting/fullbright.xml</file>
+        </shader>
+    </shaders>
+    <textures>
+        <texture name="normal map 1">
+            <file>/water/723-normal.jpg</file>
+        </texture>
+        <texture name="normal map 2">
+            <file>/water/w_normalmap.png</file>
+        </texture>
+        <texture name="normal map 3">
+            <file>/water/940-bump.jpg</file>
+        </texture>
+        <texture name="sky_001.dds">
+            <file>textures/sky_001.dds</file>
+        </texture>
+        <texture name="BUMPgeneric_water_001_ani">
+            <file>textures/generic_water_001_ani</file>
+            <class>normalmap</class>
+            <mipmap>no</mipmap>
+        </texture>
+        <texture name="water_envmap_01.dds">
+            <file>textures/water_envmap_01.dds</file>
+        </texture>
+    </textures>
+    <materials>
+        <material name="oceanmat">
+            <shader type="standard">water</shader>
+            <shadervar name="tex normal" type="texture">normal map 2</shadervar>
+        </material>
+        <material name="sky_001">
+            <texture>sky_001.dds</texture>
+            <shader type="base">lighting_fullbright</shader>
+            <shader type="diffuse">*null</shader>
+        </material>
+        <material name="water_01">
+            <shader type="base">reflect_water_plane</shader>
+            <shader type="diffuse">reflect_water_plane</shader>
+            <shadervar name="tex normal" type="texture">BUMPgeneric_water_001_ani</shadervar>
+            <shadervar name="tex environment" type="texture">water_envmap_01.dds</shadervar>
+            <shadervar name="water fog color" type="vector4">0.4,0.7,0.9,0.5</shadervar>
+            <shadervar name="water perturb scale" type="vector4">10,10,0,0</shadervar>
+            <shadervar name="specular" type="vector4">0.4,0.7,0.9,1</shadervar>
+        </material>
+    </materials>
+    <meshfact name="oceanfact">
+        <plugin>waterfact</plugin>
+        <params>
+	  <length>1000</length>
+	  <width>1000</width>
+            <isocean>no</isocean>
+        </params>
+    </meshfact>
+    <library>terrain.cslib</library>
+    <library>factories/skydome_frankieisland_SkyDome</library>
+    <library>factories/water</library>
+    <start>
+        <sector>TerrainSector</sector>
+        <position x="500" y="200" z="500" />
+        <forward x="0" y="0" z="1" />
+        <up x="0" y="1" z="0" />
+    </start>
+    <sector name="TerrainSector">
+        <light name="sun">
+            <center x="-50000" y="86030" z="0" />
+            <color red="1.25903" green="1.20995" blue="1.10420" />
+            <radius>1000000</radius>
+        </light>
+        <meshobj name="Terrain">
+            <plugin>crystalspace.mesh.loader.terrain2</plugin>
+            <params>
+                <factory>island</factory>
+            </params>
+            <move>
+                <v x="0" y="0" z="0" />
+            </move>
+            <priority>wall</priority>
+        </meshobj>
+        <meshobj name="ocean">
+            <plugin>water</plugin>
+            <params>
+                <factory>oceanfact</factory>
+                <material>oceanmat</material>
+            </params>
+            <move>
+                <v x="-250" y="50" z="-250" />
+            </move>
+        </meshobj>
+        <!--meshobj name="oceanreflect">
+            <plugin>water</plugin>
+            <params>
+                <factory>oceanfact</factory>
+                <material>oceanmat</material>
+            </params>
+            <move>
+	        <rotate x="3.1415927" />
+                <v x="-250" y="50" z="-250" />
+            </move>
+        </meshobj-->
+        <meshobj name="skydome_frankieisland_SkyDome">
+            <plugin>genmesh</plugin>
+            <params>
+                <factory>skydome_frankieisland_SkyDome</factory>
+            </params>
+            <trimesh>
+                <id>shadows</id>
+            </trimesh>
+            <zuse />
+            <noshadows />
+            <noshadowreceive />
+            <move>
+                <v x="5000" y="0" z="5000" />
+            </move>
+        </meshobj>
+        <!--meshobj name="water">
+            <plugin>genmesh</plugin>
+            <noshadowreceive />
+            <priority>alpha</priority>
+            <params>
+                <factory>water</factory>
+            </params>
+            <trimesh>
+                <id>colldet</id>
+            </trimesh>
+            <zuse />
+            <move>
+                <v x="15.022" y="1.9622" z="15.8728" />
+            </move>
+        </meshobj-->
+    </sector>
+</world>
