@@ -86,6 +86,8 @@ namespace CS
             {TypeInfo::Vector,  false, 3, TypeInfo::Color,       TypeInfo::NoSpace, false}},
           {"rgba",
             {TypeInfo::Vector,  false, 4, TypeInfo::Color,       TypeInfo::NoSpace, false}},
+          {"scale2", 
+            {TypeInfo::Vector,  false, 2, TypeInfo::Scale,       TypeInfo::NoSpace, false}},
           {"tex2d", 
             {TypeInfo::Sampler, false, 2, TypeInfo::NoSemantics, TypeInfo::NoSpace, false}},
           {"texcoord2", 

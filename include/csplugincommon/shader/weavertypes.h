@@ -73,7 +73,9 @@ namespace CS
            * Translation+scale values (first components are translation,
            * last components scale)
            */
-          TranslateScale
+          TranslateScale,
+          /// Scale values
+	  Scale
         } semantics;
         /// Space of direction/position
         enum
