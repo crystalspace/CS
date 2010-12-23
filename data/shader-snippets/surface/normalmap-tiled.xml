@@ -50,7 +50,7 @@
       </block>
     </input>
 
-    <input name="texture_scale" type="float2" default="complex">
+    <input name="texture_scale" type="scale2" default="complex">
       <block location="shadervars">
 	  <shadervar name="texture scale" type="vector2">1,1</shadervar>
       </block>

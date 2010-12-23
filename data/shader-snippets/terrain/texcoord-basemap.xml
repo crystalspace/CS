@@ -23,7 +23,7 @@
       <technique priority="50">
 	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 
-	<input name="basemapscale" type="float4" default="complex" private="yes">
+	<input name="basemapscale" type="translateScale2" default="complex" private="yes">
 	  <block location="shadervars">
 	    <shadervar name="basemap scale" type="vector4">1,1,0,0</shadervar>
 	  </block> 

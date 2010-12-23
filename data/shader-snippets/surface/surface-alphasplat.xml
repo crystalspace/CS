@@ -234,7 +234,7 @@
       </block>
     </input>
 
-    <input name="texture_scale" type="float2" default="complex">
+    <input name="texture_scale" type="scale2" default="complex">
       <block location="shadervars">
          <shadervar name="texture scale" type="vector2">1,1</shadervar>
       </block> 
@@ -252,7 +252,7 @@
       </block>
     </input>
 
-    <input name="alpha_scaleoffset" type="float4" default="complex">
+    <input name="alpha_scaleoffset" type="translateScale2" default="complex">
       <block location="shadervars">
          <shadervar name="alpha scaleoffset" type="vector4">1,1,0,0</shadervar>
       </block> 
