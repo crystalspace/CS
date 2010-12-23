@@ -1,4 +1,4 @@
-SubDir TOP apps pysimp ;
+SubDir TOP apps tutorial pysimp ;
 
 if $(PYTHON.AVAILABLE) = yes
 {

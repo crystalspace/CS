@@ -1,0 +1,11 @@
+SubDir TOP apps demos bias ;
+
+if $(CEGUI.AVAILABLE) = "yes"
+{
+Description csbias : "Demo" ;
+Application csbias : [ Wildcard *.cpp *.h ] ;
+CFlags csbias : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+LinkWith csbias : crystalspace ;
+ExternalLibs csbias : CEGUI ;
+FileListEntryApplications csbias : app-demo ;
+}

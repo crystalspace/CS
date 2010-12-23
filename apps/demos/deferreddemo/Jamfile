@@ -1,4 +1,4 @@
-SubDir TOP apps deferreddemo ;
+SubDir TOP apps demos deferreddemo ;
 
 if $(CEGUI.AVAILABLE) = "yes"
 {
