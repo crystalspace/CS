@@ -23,7 +23,7 @@
   <alias name="lightmaptc" file="/shader-snippets/terrain/texcoord-basemap.xml" />
   <alias name="apply_alpha" file="/shader-snippets/surface/alpha-nochange.xml" />
   <alias name="lighting" file="/shader-snippets/lighting/lighting-ppl.xml" />
-  <alias name="surface" file="/shader-snippets/surface/surface-splat.xml" />
+  <alias name="surface" file="/shader-snippets/terrain/surface-splat.xml" />
   <alias name="normalmap" file="/shader-snippets/surface/normalmap-tiled.xml" />
   
   <technique priority="500" minlights="5">
