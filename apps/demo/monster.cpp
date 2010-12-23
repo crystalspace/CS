@@ -196,9 +196,9 @@ void Monster::Behaviour()
       // Switch animation to idle state
       if (fsmNode)
       {
-	CS::Animation::StateID runState = fsmNodeFactory->FindState ("idle");
-	if (runState != fsmNode->GetCurrentState ())
-	  fsmNode->SwitchToState (runState);
+	CS::Animation::StateID state = fsmNodeFactory->FindState ("idle");
+	if (state != fsmNode->GetCurrentState ())
+	  fsmNode->SwitchToState (state);
       }
 
       // Make the monster look at nothing

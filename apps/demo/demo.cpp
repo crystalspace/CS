@@ -359,7 +359,7 @@ void Demo::CreateRoom ()
     csRef<iCollideSystem> collide_system (csQueryRegistry<iCollideSystem> (object_reg));
     csColliderHelper::InitializeCollisionWrappers (collide_system, engine);
 
-    //monsters
+    // Create the empty meshes for the monsters
     {
       DensityTextureMapper mapper (0.3f);
       TesselatedBox box (csVector3 (0, 0, 0), csVector3 (1, 2, 1));
@@ -401,7 +401,8 @@ void Demo::CreateRoom ()
       csRef<iMeshWrapper> m = GeneralMeshBuilder::CreateFactoryAndMesh (
 	engine, room, "entity_knight.003", "monster_factory3", &box);
       m->GetMeshObject ()->SetMaterialWrapper (tm);
-      m->GetMovable()->SetPosition(room, csVector3(5,1,-5));
+      //m->GetMovable()->SetPosition(room, csVector3(5,1,-5));
+      m->GetMovable()->SetPosition(room, csVector3(5,1,10));
       m->GetMovable()->UpdateMove();
     }
 
@@ -420,6 +421,22 @@ void Demo::CreateRoom ()
       m->GetMovable()->UpdateMove();
     }
 
+    {
+      DensityTextureMapper mapper (0.3f);
+      TesselatedBox box (csVector3 (0, 0, 0), csVector3 (5, 5, 5));
+      box.SetLevel (3);
+      box.SetMapper (&mapper);
+      //box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+      // Now we make a factory and a mesh at once.
+      csRef<iMeshWrapper> m = GeneralMeshBuilder::CreateFactoryAndMesh (
+	engine, room, "mybox", "mybox2", &box);
+      m->GetMeshObject ()->SetMaterialWrapper (tm);
+      m->GetMovable()->SetPosition(room, csVector3(-5,0,10));
+      m->GetMovable()->UpdateMove();
+    }
+
+    // Create some lights
     csRef<iLight> light;
     iLightList* ll = room->GetLights ();
 
@@ -441,7 +458,7 @@ void Demo::CreateRoom ()
     SimpleStaticLighter::ShineLights (room, engine, 4);
   }
 
-  // Create the monsters
+  // Switch the monster meshes with their real models and objects
   csArray<int> index;
   csRef<iMeshList> list = engine->GetMeshes();
   for (int i = 0; i < list->GetCount(); i++)
