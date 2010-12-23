@@ -31,6 +31,7 @@
 	of this snippets to provide all aliases.
       -->
     <alias name="position" weak="yes" file="/shader-snippets/position.xml" />
+    <alias name="texcoord" weak="yes" file="/shader-snippets/texcoord-default.xml" />
     <alias name="parallax" weak="yes" file="/shader-snippets/surface/parallax-occlusion.xml" />
     <alias name="normalmap" weak="yes" file="/shader-snippets/surface/normalmap.xml" />
     <alias name="surface" weak="yes" file="/shader-snippets/surface/surface-classic.xml" />
@@ -50,6 +51,7 @@
 	important than a parallax effect.
     -->
     <snippet id="position" filealias="position" />
+    <snippet id="texcoord" filealias="texcoord" />
     <snippet id="specular" filealias="specular" />
     <snippet id="normalmap" filealias="normalmap" />
     <snippet id="ambient_lightmaptc" filealias="lightmaptc" />
@@ -71,8 +73,11 @@
 	  what output is linked to what input is done automatically. -->
     <connection from="position" to="parallax" />
     <connection from="position" to="lighting" />
+    <connection from="texcoord" to="parallax" />
     <connection from="parallax" to="surface" />
     <connection from="parallax" to="normalmap" />
+    <connection from="parallax" to="specular" />
+    <connection from="parallax" to="glow" />
     <connection from="ambient_lightmaptc" to="ambient">
       <explicit from="result" to="texCoordLM" />
     </connection>
