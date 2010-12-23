@@ -86,7 +86,7 @@
             <shadervar name="texture scale" type="vector2">32,32</shadervar>
             <shader type="terrain splat">terrain_splatting-detail</shader>
             <shadervar name="tex detail" type="texture">marble-detail</shadervar>
-            <shadervar name="tex detail scale" type="vector2">160,160</shadervar>
+            <shadervar name="tex detail scale" type="vector2">5,5</shadervar>
         </material>
         <material name="Stone">
             <texture>stone4.gif</texture>
