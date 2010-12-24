@@ -75,6 +75,22 @@ namespace CS
         static const bool value = true;
       };
 
+      template <bool b1, bool b2, bool b3 = false, bool b4 = false, bool b5 = false,
+                bool b6 = false, bool b7 = false>
+      struct TraitOr;
+
+      template <bool b1, bool b2, bool b3, bool b4, bool b5, bool b6, bool b7>
+      struct TraitOr
+      {
+        static const bool value = true;
+      };
+
+      template<>
+      struct TraitOr<false, false, false, false, false, false, false>
+      {
+        static const bool value = false;
+      };
+
       template <class T>
       YesType IsSameTester(T*, T*);
 
@@ -90,6 +106,24 @@ namespace CS
           sizeof(YesType) == sizeof(IsSameTester(t, u)),
           IsReferenceImpl<T>::value == IsReferenceImpl<U>::value,
           sizeof(T) == sizeof(U)>::value;
+      };
+
+      template<typename B, typename D>
+      struct IsBaseOfHelper
+      {
+        operator const B*() const;
+        operator const D*();
+      };
+
+      template<typename B, typename D>
+      struct IsBaseOfImpl
+      {
+        template<typename T>
+        static YesType Test(const D*,T);
+        static NoType Test(const B*,int);
+        static const bool value = TraitOr<
+          sizeof(YesType) == sizeof(Test(IsBaseOfHelper<B,D>(),0)),
+          IsSameImpl<B,D>::value>::value;
       };
     } // namespace Implementation
 
@@ -112,6 +146,16 @@ namespace CS
     {
       static const bool value = CS::Meta::Implementation
 	::IsSameImpl<Type1, Type2>::value;
+    };
+
+    /**
+     * Check if Type1 is a base of Type2.
+     */
+    template <class Type1, class Type2>
+    struct IsBaseOf
+    {
+      static const bool value = CS::Meta::Implementation
+        ::IsBaseOfImpl<Type1, Type2>::value;
     };
   } // namespace TypeTraits
 
