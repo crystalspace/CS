@@ -235,7 +235,7 @@
     </input>
 
     <input name="texture_scale" type="scale2" default="complex">
-      <block location="shadervars">
+      <block location="pass">
          <shadervar name="texture scale" type="vector2">1,1</shadervar>
       </block> 
 
