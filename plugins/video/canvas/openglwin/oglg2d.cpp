@@ -42,7 +42,7 @@
 #error OpenGL version 1.1 required! Stopping compilation.
 #endif
 
-
+#include "DwmapiAPI.h"
 
 /*
     In fs mode, the window is topmost, means above every other
@@ -95,13 +95,17 @@ csGraphics2DOpenGL::csGraphics2DOpenGL (iBase *iParent) :
   m_nGraphicsReady (true),
   m_hWnd (0),
   modeSwitched (true),
-  customIcon (0)
+  customIcon (0),
+  transparencyRequested (false),
+  transparencyState (false)
 {
+  Dwmapi::IncRef ();
 }
 
 csGraphics2DOpenGL::~csGraphics2DOpenGL (void)
 {
   m_nGraphicsReady = 0;
+  Dwmapi::DecRef ();
 }
 
 void csGraphics2DOpenGL::Report (int severity, const char* msg, ...)
@@ -502,6 +506,9 @@ bool csGraphics2DOpenGL::Open ()
       vsync ? "enabled" : "disabled");
   }
 
+  // Set transparency, if any was requested
+  csGraphics2DOpenGL::SetWindowTransparent (transparencyRequested);
+
   return true;
 }
 
@@ -840,6 +847,11 @@ LRESULT CALLBACK csGraphics2DOpenGL::WindowProc (HWND hWnd, UINT message,
     case WM_DESTROY:
       This->m_hWnd = 0;
       break;
+    case WM_DWMCOMPOSITIONCHANGED:
+      /* Desktop compositing was enabled or disabled.
+         Try to restore the last set window transparency state. */
+      This->csGraphics2DOpenGL::SetWindowTransparent (This->transparencyState);
+      break;
   }
   if (IsWindowUnicode (hWnd))
   {
@@ -978,4 +990,47 @@ void csGraphics2DOpenGL::SwitchDisplayMode (bool userMode)
   curdmode.dmDriverExtra = 0;
   EnumDisplaySettings (0, ENUM_CURRENT_SETTINGS, &curdmode);
   refreshRate = curdmode.dmDisplayFrequency;
+}
+
+bool csGraphics2DOpenGL::IsWindowTransparencyAvailable()
+{
+  if (!Dwmapi::DwmapiAvailable ()) return false;
+  BOOL compositionFlag;
+  HRESULT hr = Dwmapi::DwmIsCompositionEnabled (&compositionFlag);
+  if (!SUCCEEDED (hr))
+    return false;
+  return compositionFlag != FALSE; // NB: != avoids warning on MSVC
+}
+
+bool csGraphics2DOpenGL::SetWindowTransparent (bool transparent)
+{
+  if (!csGraphics2DOpenGL::IsWindowTransparencyAvailable()) return false;
+
+  if (!is_open)
+  {
+    transparencyRequested = transparent;
+    return true;
+  }
+
+  DWM_BLURBEHIND bb;
+  memset (&bb, 0, sizeof (bb));
+  bb.dwFlags = DWM_BB_ENABLE;
+  bb.fEnable = transparent;
+  HRESULT hr = Dwmapi::DwmEnableBlurBehindWindow (m_hWnd, &bb);
+  if (SUCCEEDED (hr))
+  {
+    transparencyState = transparent;
+    return true;
+  }
+  else
+    return false;
+}
+
+bool csGraphics2DOpenGL::GetWindowTransparent ()
+{
+  if (!Dwmapi::DwmapiAvailable ()) return false;
+
+  if (!is_open) return transparencyRequested;
+
+  return transparencyState;
 }

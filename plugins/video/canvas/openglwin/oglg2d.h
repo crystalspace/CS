@@ -99,6 +99,11 @@ public:
   { return (void*)(wglGetProcAddress ((const char *)funcname)); }
 
   virtual HWND GetWindowHandle() { return m_hWnd; }
+
+  // Vista+ window transparency
+  virtual bool IsWindowTransparencyAvailable();
+  virtual bool SetWindowTransparent (bool transparent);
+  virtual bool GetWindowTransparent ();
 protected:
 
   HDC hDC;
@@ -135,6 +140,9 @@ protected:
 
   csWin32CustomCursors cursors;
   HICON customIcon;
+
+  bool transparencyRequested;
+  bool transparencyState;
 };
 
 #endif // __CS_OGLG2D_H__
