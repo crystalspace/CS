@@ -62,7 +62,33 @@ void TransparentWindow::Frame ()
   c->GetTransform().LookAt(camTarget - camPos, csVector3(0,1,0));
 
   rm->RenderView (view);
+
+  g3d->BeginDraw (CSDRAW_2DGRAPHICS);
   DrawLogo ();
+  
+  if (natwin)
+  {
+    static const char* statusLines[] = 
+    {
+      "Window transparency: "
+    };
+    size_t numLines = sizeof (statusLines)/sizeof (statusLines[0]);
+    
+    int colWidth = 0;
+    for (size_t l = 0; l < numLines; l++)
+    {
+      int textW, textH;
+      font->GetDimensions (statusLines[l], textW, textH);
+      colWidth = csMax (textW, colWidth);
+    }
+    
+    int x = 4, y = 4;
+    bool transpState = natwin->GetWindowTransparent();
+    DrawOutlineText (font, x, y, statusLines[0]);
+    DrawOutlineText (font, x + colWidth + 4, y, transpState ? "on" : "off");
+  }
+  
+  g3d->FinishDraw();
 }
 
 void TransparentWindow::DrawLogo()
@@ -83,14 +109,28 @@ void TransparentWindow::DrawLogo()
   const int width = (int)screenW * widthFraction;
   const int height = width * h / w;
 
-  g3d->BeginDraw (CSDRAW_2DGRAPHICS);
   g3d->DrawPixmap (logoTex, 
 		   screenW - width - margin, 
 		   margin,
 		   width,
 		   height,
 		   0, 0, w, h, 0);
-  g3d->FinishDraw();
+}
+
+void TransparentWindow::DrawOutlineText (iFont* font, int x, int y, const char* text)
+{
+  iGraphics2D* g2d = g3d->GetDriver2D();
+  int black = g2d->FindRGB (0, 0, 0);
+  int white = g2d->FindRGB (255, 255, 255);
+  for (int dy = -1; dy < 2; dy++)
+  {
+    for (int dx = -1; dx < 2; dx++)
+    {
+      if ((dx == 0) && (dy == 0)) continue;
+      g2d->Write (font, dx+x, dy+y, black, -1, text);
+    }
+  }
+  g2d->Write (font, x, y, white, -1, text);
 }
 
 bool TransparentWindow::OnKeyboard (iEvent& ev)
@@ -169,7 +209,7 @@ bool TransparentWindow::Application ()
   // Set up window transparency. Must happen _before_ system is opened!
   csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (GetObjectRegistry ());
   if (!g2d) return ReportError ("Failed to obtain canvas!");
-  csRef<iNativeWindow> natwin (scfQueryInterface<iNativeWindow> (g2d));
+  natwin = scfQueryInterface<iNativeWindow> (g2d);
   if (natwin)
   {
     ReportInfo ("Window transparency available: %s",
@@ -214,6 +254,10 @@ bool TransparentWindow::SetupModules ()
   loader = csQueryRegistry<iLoader> (GetObjectRegistry ());
   if (!loader) return ReportError ("Failed to locate Loader!");
 
+  csRef<iFontServer> fontServ (csQueryRegistry<iFontServer> (GetObjectRegistry ()));
+  if (!fontServ) return ReportError ("Failed to obtain font server!");
+  font = fontServ->LoadFont (CSFONT_LARGE);
+
   // We need a View to the virtual world.
   view.AttachNew(new csView (engine, g3d));
   iGraphics2D* g2d = g3d->GetDriver2D ();
@@ -232,7 +276,7 @@ bool TransparentWindow::SetupModules ()
     ReportWarning ("Could not load logo %s!",
 		   CS::Quote::Single (logoFile));
   }
-
+  
   // Let the engine prepare the meshes and textures.
   engine->Prepare ();
 

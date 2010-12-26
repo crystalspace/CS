@@ -31,10 +31,12 @@ private:
   csRef<iVirtualClock> vc;
   csRef<iView> view;
   csRef<iRenderManager> rm;
+  csRef<iNativeWindow> natwin;
 
   iSector* room;
   float rotX, rotY;
   csRef<iTextureHandle> logoTex;
+  csRef<iFont> font;
   csRef<FramePrinter> printer;
 public:
   bool SetupModules ();
@@ -43,6 +45,7 @@ public:
   
   void Frame ();
   void DrawLogo ();
+  void DrawOutlineText (iFont* font, int x, int y, const char* text);
   
   void CreateRoom ();
   void CreateTeapot ();
