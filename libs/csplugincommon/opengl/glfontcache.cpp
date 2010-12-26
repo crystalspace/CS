@@ -532,8 +532,6 @@ void csGLFontCache::FlushArrays ()
     {
       glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }
-    statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    statecache->Enable_GL_BLEND ();
 
     static const float envTransparent[4] = {1.0f, 1.0f, 1.0f, 0.0f};
     if (afpText)

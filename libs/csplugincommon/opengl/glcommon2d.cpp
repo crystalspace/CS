@@ -173,6 +173,7 @@ bool csGraphics2DGLCommon::Open ()
       glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
     }
   }
+  ext.InitGL_EXT_blend_func_separate ();
   ext.InitGL_ARB_multisample();
 
   if (ext.CS_GL_ARB_multisample)
@@ -205,7 +206,7 @@ bool csGraphics2DGLCommon::Open ()
 	      "Multisample: disabled");
     }
   }
-
+  
   GLFontCache->Setup();
 
   CS::PluginCommon::GL::SetAssumedState (statecache, &ext);
@@ -288,7 +289,12 @@ bool csGraphics2DGLCommon::BeginDraw ()
   statecache->SetColorMask (true, true, true, true);
     
   statecache->Enable_GL_BLEND ();		      
-  statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  if (ext.CS_GL_EXT_blend_func_separate)
+    // Blending mode that's premultiplied alpha friendly
+    statecache->SetBlendFuncSeparate (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA,
+				      GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  else
+    statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   return true;
 }
