@@ -1,0 +1,5 @@
+SubDir TOP apps tests transparentwindow ;
+
+Description transparentwindow : "transparent window test" ;
+Application transparentwindow : [ Wildcard *.cpp *.h ] : noinstall ;
+LinkWith transparentwindow : crystalspace ;
