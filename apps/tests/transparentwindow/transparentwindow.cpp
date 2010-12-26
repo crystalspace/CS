@@ -62,6 +62,35 @@ void TransparentWindow::Frame ()
   c->GetTransform().LookAt(camTarget - camPos, csVector3(0,1,0));
 
   rm->RenderView (view);
+  DrawLogo ();
+}
+
+void TransparentWindow::DrawLogo()
+{
+  if (!logoTex) return;
+  
+  int w, h;
+  logoTex->GetRendererDimensions (w, h);
+
+  int screenW = g3d->GetDriver2D()->GetWidth ();
+
+  // Margin to the edge of the screen, as a fraction of screen width
+  const float marginFraction = 0.01f;
+  const int margin = (int)screenW * marginFraction;
+
+  // Width of the logo, as a fraction of screen width
+  const float widthFraction = 0.3f;
+  const int width = (int)screenW * widthFraction;
+  const int height = width * h / w;
+
+  g3d->BeginDraw (CSDRAW_2DGRAPHICS);
+  g3d->DrawPixmap (logoTex, 
+		   screenW - width - margin, 
+		   margin,
+		   width,
+		   height,
+		   0, 0, w, h, 0);
+  g3d->FinishDraw();
 }
 
 bool TransparentWindow::OnKeyboard (iEvent& ev)
@@ -195,6 +224,14 @@ bool TransparentWindow::SetupModules ()
   CreateRoom ();
 
   CreateTeapot ();
+  
+  static const char logoFile[] = "/lib/std/cslogo2.png";
+  logoTex = loader->LoadTexture (logoFile, CS_TEXTURE_2D);
+  if (!logoTex.IsValid ())
+  {
+    ReportWarning ("Could not load logo %s!",
+		   CS::Quote::Single (logoFile));
+  }
 
   // Let the engine prepare the meshes and textures.
   engine->Prepare ();

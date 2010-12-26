@@ -34,6 +34,7 @@ private:
 
   iSector* room;
   float rotX, rotY;
+  csRef<iTextureHandle> logoTex;
   csRef<FramePrinter> printer;
 public:
   bool SetupModules ();
@@ -41,6 +42,7 @@ public:
   bool OnKeyboard (iEvent&);
   
   void Frame ();
+  void DrawLogo ();
   
   void CreateRoom ();
   void CreateTeapot ();
