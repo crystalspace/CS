@@ -22,6 +22,7 @@
   <alias name="ambient" file="/shader-snippets/lighting/ambient-simple.xml" />
   <alias name="apply_alpha" file="/shader-snippets/surface/alpha-none.xml" />
   <alias name="apply_alpha_end" file="/shader-snippets/surface/alpha-modulate-instance.xml" />
+  <alias name="staticspecular" file="/shader-snippets/lighting/staticspec-null.xml" />
   <alias name="lighting" file="/shader-snippets/lighting/lighting-pvl.xml" />
   <alias name="surface" file="/shader-snippets/surface/surface-classic.xml" />
   
