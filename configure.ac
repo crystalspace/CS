@@ -1007,7 +1007,20 @@ AS_IF([test "$no_x" != yes],
 	[$X_CFLAGS], 
 	[$X_LFLAGS], 
 	[$X_PRE_LIBS $X_LIBS -lXt -lX11 $X_EXTRA_LIBS],
-	[Xaw])])
+	[Xaw])
+
+    CS_CHECK_LIB_WITH([xrender],
+	[AC_LANG_PROGRAM(
+	    [[#include <X11/extensions/Xrender.h>]],
+	    [XRenderFindVisualFormat (0,0)])],
+	[], [],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libxrender], [XRENDER])
+	CS_HEADER_PROPERTY([CS_HAVE_XRENDER])],
+	[],
+	[$X_CFLAGS], 
+	[$X_LFLAGS], 
+	[$X_PRE_LIBS $X_LIBS -lX11 -lXext $X_EXTRA_LIBS],
+	[Xrender])])
 
 
 
