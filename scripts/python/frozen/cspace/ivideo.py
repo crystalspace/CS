@@ -459,6 +459,9 @@ class iNativeWindow(core.iBase):
     __repr__ = _swig_repr
     def SetTitle(*args): return _ivideo.iNativeWindow_SetTitle(*args)
     def SetIcon(*args): return _ivideo.iNativeWindow_SetIcon(*args)
+    def IsWindowTransparencyAvailable(*args): return _ivideo.iNativeWindow_IsWindowTransparencyAvailable(*args)
+    def SetWindowTransparent(*args): return _ivideo.iNativeWindow_SetWindowTransparent(*args)
+    def GetWindowTransparent(*args): return _ivideo.iNativeWindow_GetWindowTransparent(*args)
     __swig_destroy__ = _ivideo.delete_iNativeWindow
     __del__ = lambda self : None;
 iNativeWindow_swigregister = _ivideo.iNativeWindow_swigregister

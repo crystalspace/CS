@@ -12255,6 +12255,81 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iNativeWindow_IsWindowTransparencyAvailable(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iNativeWindow *arg1 = (iNativeWindow *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iNativeWindow_IsWindowTransparencyAvailable",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iNativeWindow, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iNativeWindow_IsWindowTransparencyAvailable" "', argument " "1"" of type '" "iNativeWindow *""'"); 
+  }
+  arg1 = reinterpret_cast< iNativeWindow * >(argp1);
+  result = (bool)(arg1)->IsWindowTransparencyAvailable();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iNativeWindow_SetWindowTransparent(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iNativeWindow *arg1 = (iNativeWindow *) 0 ;
+  bool arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  bool val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iNativeWindow_SetWindowTransparent",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iNativeWindow, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iNativeWindow_SetWindowTransparent" "', argument " "1"" of type '" "iNativeWindow *""'"); 
+  }
+  arg1 = reinterpret_cast< iNativeWindow * >(argp1);
+  ecode2 = SWIG_AsVal_bool(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iNativeWindow_SetWindowTransparent" "', argument " "2"" of type '" "bool""'");
+  } 
+  arg2 = static_cast< bool >(val2);
+  result = (bool)(arg1)->SetWindowTransparent(arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iNativeWindow_GetWindowTransparent(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iNativeWindow *arg1 = (iNativeWindow *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iNativeWindow_GetWindowTransparent",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iNativeWindow, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iNativeWindow_GetWindowTransparent" "', argument " "1"" of type '" "iNativeWindow *""'"); 
+  }
+  arg1 = reinterpret_cast< iNativeWindow * >(argp1);
+  result = (bool)(arg1)->GetWindowTransparent();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_iNativeWindow(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iNativeWindow *arg1 = (iNativeWindow *) 0 ;
@@ -24920,6 +24995,9 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iNativeWindowManager_swigregister", iNativeWindowManager_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iNativeWindow_SetTitle", _wrap_iNativeWindow_SetTitle, METH_VARARGS, NULL},
 	 { (char *)"iNativeWindow_SetIcon", _wrap_iNativeWindow_SetIcon, METH_VARARGS, NULL},
+	 { (char *)"iNativeWindow_IsWindowTransparencyAvailable", _wrap_iNativeWindow_IsWindowTransparencyAvailable, METH_VARARGS, NULL},
+	 { (char *)"iNativeWindow_SetWindowTransparent", _wrap_iNativeWindow_SetWindowTransparent, METH_VARARGS, NULL},
+	 { (char *)"iNativeWindow_GetWindowTransparent", _wrap_iNativeWindow_GetWindowTransparent, METH_VARARGS, NULL},
 	 { (char *)"delete_iNativeWindow", _wrap_delete_iNativeWindow, METH_VARARGS, NULL},
 	 { (char *)"iNativeWindow_swigregister", iNativeWindow_swigregister, METH_VARARGS, NULL},
 	 { (char *)"new_RenderPriority", _wrap_new_RenderPriority, METH_VARARGS, NULL},
