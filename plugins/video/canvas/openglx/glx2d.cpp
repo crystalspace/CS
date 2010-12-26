@@ -270,7 +270,12 @@ bool csGraphics2DGLX::ChooseVisual ()
       const int accumComponentSize = 
         ((accumBits % 32) == 0) ? accumBits / 4 : accumBits / 3;
       desired_attributes.DeleteAll();
-      desired_attributes.Push (GLX_RGBA);
+      desired_attributes.Push (GLX_RENDER_TYPE);
+      desired_attributes.Push (GLX_RGBA_BIT);
+      desired_attributes.Push (GLX_DRAWABLE_TYPE);
+      desired_attributes.Push (GLX_WINDOW_BIT);
+      desired_attributes.Push (GLX_DOUBLEBUFFER);
+      desired_attributes.Push (True);
       desired_attributes.Push (GLX_DEPTH_SIZE);
       desired_attributes.Push (format[glpfvDepthBits]);
       desired_attributes.Push (GLX_RED_SIZE);
@@ -279,7 +284,6 @@ bool csGraphics2DGLX::ChooseVisual ()
       desired_attributes.Push (colorComponentSize);
       desired_attributes.Push (GLX_GREEN_SIZE);
       desired_attributes.Push (colorComponentSize);
-      desired_attributes.Push (GLX_DOUBLEBUFFER);
       desired_attributes.Push (GLX_ALPHA_SIZE);
       desired_attributes.Push (format[glpfvAlphaBits]);
       desired_attributes.Push (GLX_STENCIL_SIZE);
@@ -300,12 +304,20 @@ bool csGraphics2DGLX::ChooseVisual ()
         desired_attributes.Push (format[glpfvMultiSamples]);
       }
       desired_attributes.Push (None);
-      // find a visual that supports all the features we need
-      xvis = glXChooseVisual (dpy, screen_num, desired_attributes.GetArray ());
-      if (xvis) break;
+      // find an fbconfig that supports all the features we need
+      int numConfigs;
+      GLXFBConfig* fbconfigs = glXChooseFBConfig (dpy, screen_num,
+						  desired_attributes.GetArray (),
+						  &numConfigs);
+      if (fbconfigs)
+      {
+	xvis = glXGetVisualFromFBConfig (dpy, fbconfigs[0]);
+	XFree (fbconfigs);
+	break;
+      }
     }
   }
-
+  
   // if a visual was found that we can use, make a graphics context which
   // will be bound to the application window.  If a visual was not
   // found, then try to figure out why it failed
@@ -313,45 +325,31 @@ bool csGraphics2DGLX::ChooseVisual ()
   {
     Report (CS_REPORTER_SEVERITY_WARNING,
       "Cannot use preferred GLX visual - Generic visual will be used.");
-    hardwareaccelerated = false;
 
-    // what attribute was not supplied? we know that trying to get
-    // all the attributes at once doesn't work.  provide more user info by
-    // trying each of the pieces and seeing if any single piece is not provided
-
-    // try to get a visual with 12 bit color
-    int generic_attributes [] = { GLX_RGBA, GLX_DOUBLEBUFFER,
-      GLX_DEPTH_SIZE, 1, None };
-    if (!(xvis=glXChooseVisual (dpy, screen_num, generic_attributes)))
+    // try to get a basic fbconfig
+    static const int generic_attributes [] =
     {
-      Report (CS_REPORTER_SEVERITY_WARNING,
-        "Graphics display does not support a generic visual with double buffer and depth buffer");
-		
-      int doublebuffer_attributes [] = { GLX_RGBA, GLX_DOUBLEBUFFER, None };
-      if (!(xvis=glXChooseVisual (dpy, screen_num, doublebuffer_attributes)))
-      {
-        Report (CS_REPORTER_SEVERITY_WARNING,
-          "Graphics display does not provide double buffering");
-
-        int depthbuffer_attributes [] = { GLX_RGBA, GLX_DEPTH_SIZE, 1, None };
-          
-        if (!(xvis=glXChooseVisual (dpy, screen_num, depthbuffer_attributes)))
-        {
-          Report (CS_REPORTER_SEVERITY_WARNING,
-            "Graphics display does not support a depth buffer");
-
-          int color_attributes[] = { GLX_RGBA, GLX_RED_SIZE, 4, GLX_BLUE_SIZE,
-            4, GLX_GREEN_SIZE, 4, None };
-
-          if (!(xvis=glXChooseVisual (dpy, screen_num, color_attributes)))
-          {
-            Report (CS_REPORTER_SEVERITY_WARNING,
-              "Graphics display does not support at least 12 bit color");
-            return false;
-          }
-        }
-      }
+      GLX_RENDER_TYPE, 		GLX_RGBA_BIT,
+      GLX_DRAWABLE_TYPE,	GLX_WINDOW_BIT,
+      GLX_DOUBLEBUFFER,		True,
+      GLX_DEPTH_SIZE,		1,
+      GLX_RED_SIZE,		1,
+      GLX_GREEN_SIZE,		1,
+      GLX_BLUE_SIZE,		1,
+      None
+    };
+    int numConfigs;
+    GLXFBConfig* fbconfigs = glXChooseFBConfig (dpy, screen_num,
+						generic_attributes,
+						&numConfigs);
+    if (!fbconfigs)
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR,
+	"Graphics display does not support basic GLX configuration");
+      return false;
     }
+    xvis = glXGetVisualFromFBConfig (dpy, fbconfigs[0]);
+    XFree (fbconfigs);
   }
   return true;
 }
