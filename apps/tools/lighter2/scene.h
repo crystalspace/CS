@@ -246,6 +246,7 @@ namespace lighter
     typedef csHash<Sector*, csPtrKey<iSector> > SectorOrigSectorHash;
     SectorOrigSectorHash originalSectorHash;
 
+    CS::Threading::Mutex lightmapMutex;
     LightmapPtrDelArray lightmaps;
     typedef csHash<LightmapPtrDelArray*, csPtrKey<Light> > PDLightmapsHash;
     PDLightmapsHash pdLightmaps;

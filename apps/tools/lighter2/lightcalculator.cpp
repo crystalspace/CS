@@ -136,7 +136,6 @@ namespace lighter
     // Local lists of pseudo-dynamic lights affecting this object
     // and the lightmaps associated with them
     LightRefArray PDLights;
-    csArray<Lightmap*> pdLightLMs;
 
     // Create list of pseudo-dynamic lights that will affect object
     for (size_t pdli = 0; pdli < allPDLights.GetSize (); ++pdli)
@@ -157,7 +156,7 @@ namespace lighter
       // Loop through all element primitives    
       PrimitiveArray& primArray = submeshArray[submesh];
 
-	  #pragma omp parallel for
+    #pragma omp parallel for
       for (size_t pidx = 0; pidx < primArray.GetSize (); ++pidx)
       {
         // Get next primitive
@@ -172,7 +171,7 @@ namespace lighter
         Lightmap* normalLM = sector->scene->GetLightmap (
           prim.GetGlobalLightmapID (), subLightmapNum, (Light*)0);
 
-        // Lock access to this lightmap (for thread syncronization)
+        // Lock access to this lightmap
         ScopedSwapLock<Lightmap> lightLock (*normalLM);
 
         // This seems to have something to do with specular maps but I'm unsure ??
@@ -181,7 +180,7 @@ namespace lighter
           && (subLightmapNum == 0);
 
         // Rebuild the list of pseudo-dynamic lightmaps
-        pdLightLMs.Empty ();
+	csArray<Lightmap*> pdLightLMs;
         for (size_t pdli = 0; pdli < PDLights.GetSize (); ++pdli)
         {
           // Ger reference to this light's lightmap
@@ -237,7 +236,7 @@ namespace lighter
           }
 
           // Update the normal lightmap
-		  #pragma omp critical
+	#pragma omp critical
           normalLM->SetAddPixel (u, v, c * pixelAreaPart);
 
           // Loop through pseudo-dynamic lights
@@ -264,7 +263,7 @@ namespace lighter
             }
 
             // Update this light's light map
-			#pragma omp critical
+	  #pragma omp critical
             lm->SetAddPixel (u, v, c * pixelAreaPart);
           }
 

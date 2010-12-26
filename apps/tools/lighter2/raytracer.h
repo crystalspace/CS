@@ -323,7 +323,7 @@ namespace lighter
 
   private:
     // For now, only one, later we want per-thread state
-    RaytraceState rayState;
+    CS::Threading::ThreadLocal<RaytraceState> rayState;
   };
   extern RaytraceCore globalRaycore;
 

@@ -21,7 +21,10 @@
 #include "photonmapperlighting.h"
 #include "material.h"
 #include "scene.h"
+
+#if defined(_OPENMP)
 #include "omp.h"
+#endif
 
 namespace lighter
 {

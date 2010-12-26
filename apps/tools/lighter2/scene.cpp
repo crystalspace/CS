@@ -849,6 +849,8 @@ namespace lighter
   Lightmap* Scene::GetLightmap (uint lightmapID, size_t subLightmapNum, 
                                 Light* light)
   {
+    CS::Threading::ScopedLock<CS::Threading::Mutex> lock (lightmapMutex);
+    
     size_t realLmNum = lightmapID;
     if (globalConfig.GetLighterProperties().directionalLMs)
       realLmNum += (lightmaps.GetSize()/4) * subLightmapNum;

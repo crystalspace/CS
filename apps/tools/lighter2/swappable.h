@@ -164,7 +164,8 @@ namespace lighter
    */
   class Swappable : public iSwappable
   {
-    mutable uint lockCount;
+    mutable CS::Threading::Mutex lockMutex;
+    mutable int32 lockCount;
   public:
     Swappable() : lockCount (0)
     {
@@ -181,9 +182,11 @@ namespace lighter
       globalLighter->swapManager->UnregisterSwappable (this);
     }
 
-    bool IsLocked () const { return lockCount != 0; }
+    bool IsLocked () const
+    { return CS::Threading::AtomicOperations::Read (&lockCount) != 0; }
     void Lock () const
     {
+      CS::Threading::ScopedLock<CS::Threading::Mutex> swapLock (lockMutex);
       if (lockCount == 0)
         globalLighter->swapManager->Lock (
           const_cast<iSwappable*> ((iSwappable*)this));
@@ -191,6 +194,7 @@ namespace lighter
     }
     void Unlock () const
     {
+      CS::Threading::ScopedLock<CS::Threading::Mutex> swapLock (lockMutex);
       CS_ASSERT(lockCount > 0);
       lockCount--;
       if (lockCount == 0)
