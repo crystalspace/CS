@@ -88,7 +88,7 @@ struct iNativeWindowManager : public virtual iBase
  */
 struct iNativeWindow : public virtual iBase
 {
-  SCF_INTERFACE (iNativeWindow, 2, 0, 2);
+  SCF_INTERFACE (iNativeWindow, 2, 0, 3);
   
   /**
    * Set the title for this window.
@@ -105,6 +105,59 @@ struct iNativeWindow : public virtual iBase
    *  @param image the iImage to set as the icon of this window.
    */  
   virtual void SetIcon (iImage *image) = 0;
+
+  /**\name Window transparency
+   * Window transparency allows windows to be transparent, that is, the
+   * background behind it shows through (desktop, other windows...)
+   * where the framebuffer alpha is not opaque.
+   * (Clearing the framebuffer leaves the alpha at zero - fully transparent -
+   * so not rendering every pixel would be enough to see something.)
+   * 
+   * Note that window transparency is not available on all platforms or
+   * certain configurations:
+   * - Windows: available on Vista and above. Must be enabled by the user.
+   *   IsWindowTransparencyAvailable() returns false when compositing is
+   *   not available or enabled. Note that the user can enable or disable
+   *   compositing on the fly. Currently, the only way for CrystalSpace 
+   *   applications to detect this is by polling GetWindowTransparent.
+   *   Disabling compositing will obviously disable any window transparency
+   *   (GetWindowTransparent returns \a false), however, CrystalSpace
+   *   will re-enable transparency if the user re-enables compositing.
+   *   (There is currently no way to inhibit this re-enabling.
+   *   Polling GetWindowTransparent is, again, the way to detect whether
+   *   this will happen.)
+   * - X11: compositing window manager is required.
+   *   Window transparency must be enabled _before_ the window was created
+   *   (i.e. system was opened) and can't be toggled later.
+   * @{ */
+  /**
+   * Return whether window transparency is available.
+   * Returns \a true when the current platform and OS version generally support
+   *   transparency and the user enabled it.
+   */
+  virtual bool IsWindowTransparencyAvailable() = 0;
+  /**
+   * Set whether window transparency is desired.
+   * \param transparent "Transparency desired" flag.
+   * \returns Whether the flag was successfully changed.
+   *   If the system is not open, and compositing is not supported at all,
+   *   returns \a false (the flag is not changed).
+   *   If the system is not open, and compositing is generally supported,
+   *   the flag is stored and the actual window transparency will be set
+   *   when the system opens. Returns \a true in that case.     
+   *   If the system is open, returns whether the transparency could be
+   *   changed.
+   */
+  virtual bool SetWindowTransparent (bool transparent) = 0;
+  /**
+   * Query the window transparency state.
+   * \returns If the system is not open, returns the value of the
+   *   "transparency desired" flag.
+   *   If the system is open, returns whether the window is actually
+   *   currently transparent (when transparency is desired and available),
+   */
+  virtual bool GetWindowTransparent () = 0;
+  /** @} */
 };
 
 /** @} */

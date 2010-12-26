@@ -320,6 +320,10 @@ protected:
    *  @param image the iImage to set as the icon of this window.
    */  
   virtual void SetIcon (iImage *image);
+
+  virtual bool IsWindowTransparencyAvailable() { return false; }
+  virtual bool SetWindowTransparent (bool transparent) { return false; }
+  virtual bool GetWindowTransparent () { return false; }
   /** @} */
 
   /**\name iPluginConfig implementation
