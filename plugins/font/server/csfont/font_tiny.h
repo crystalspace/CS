@@ -1,6 +1,6 @@
 // Tiny proportional ~4x6 font
 
-static const uint8 font_Tiny [193 * 8] =
+static const uint8 font_Tiny [197 * 6] =
 {
   0x00, 0x70, 0x50, 0x50, 0x70, 0x00,
   0x7E, 0x81, 0xA5, 0x81, 0x99, 0x7E,
@@ -195,10 +195,19 @@ static const uint8 font_Tiny [193 * 8] =
   0x40, 0xA0, 0x40, 0xE0, 0x00, 0x00,
   0x00, 0x00, 0x60, 0x60, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-  0x30, 0x48, 0x74, 0xc4, 0x58, 0x30
+  0x30, 0x48, 0x74, 0xc4, 0x58, 0x30,	// 0xbe
+
+  // Left double quotation mark
+  0xA0, 0xA0, 0x00, 0x00, 0x00, 0x00,
+  // Right double quotation mark
+  0xA0, 0xA0, 0x00, 0x00, 0x00, 0x00,
+  // Left single quotation mark
+  0x80, 0x80, 0x00, 0x00, 0x00, 0x00,
+  // Right single quotation mark
+  0x80, 0x80, 0x00, 0x00, 0x00, 0x00,
 };
 
-static const unsigned char width_Tiny[193] =
+static const unsigned char width_Tiny[197] =
 {
   5,4,2,3,6,6,6,6,6,6,6,6,4,4,4,4,		// 00-0F
   4,4,4,4,4,4,4,4,4,4,6,6,4,4,4,4,		// 10-1F
@@ -212,7 +221,7 @@ static const unsigned char width_Tiny[193] =
   4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,		// B0-BF
   4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,		// A0-AF
   4,4,4,4,    4,4,2,4,4,5,5,5,5,5,		// B0-BD
-  6
+  6,4,4,4,4
 };
 
 static const csDefaultFont::CharRange ranges_Tiny[] =
@@ -313,6 +322,9 @@ static const csDefaultFont::CharRange ranges_Tiny[] =
   {0x00a0,  1}, 
   // be - replacer
   {0xFFFD,  1}, 
+  // Quotation marks
+  {0x201c,  2}, 
+  {0x2018,  2}, 
   {0, 0}
 };
 
