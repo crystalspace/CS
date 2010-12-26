@@ -39,7 +39,6 @@
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DGLX)
 
-#define DEF_OGLDISP "crystalspace.graphics2d.glx.disp.empty"
 #define XWIN_SCF_ID "crystalspace.window.x"
 
 // csGraphics2DGLX function
@@ -65,8 +64,6 @@ void csGraphics2DGLX::Report (int severity, const char* msg, ...)
 
 bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
 {
-  const char *strDriver;
-  dispdriver = 0;
   xvis = 0;
   hardwareaccelerated = false;
 
@@ -88,23 +85,6 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
 
   csRef<iPluginManager> plugin_mgr (
   	csQueryRegistry<iPluginManager> (object_reg));
-  if ((strDriver = config->GetStr ("Video.OpenGL.Display.Driver", 0)))
-  {
-    dispdriver = csLoadPlugin<iOpenGLDisp> (plugin_mgr, strDriver);
-    if (!dispdriver)
-    {
-      Report (CS_REPORTER_SEVERITY_WARNING,
-        "Could not create an instance of %s ! Using 0 instead.",
-        strDriver);
-    }
-    else if (!dispdriver->open ())
-    {
-      Report (CS_REPORTER_SEVERITY_ERROR,
-        "open of displaydriver %s failed!", strDriver);
-      return false;
-    }
-  }
-
   xwin = csLoadPlugin<iXWindow> (plugin_mgr, XWIN_SCF_ID);
   if (!xwin)
   {
@@ -191,9 +171,6 @@ void csGraphics2DGLX::Close (void)
     glXDestroyContext (dpy,active_GLContext);
     active_GLContext = 0;
   }
-
-  if (dispdriver)
-    dispdriver->close ();
 
   if (xwin)
     xwin->Close ();

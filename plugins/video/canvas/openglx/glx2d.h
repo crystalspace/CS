@@ -28,8 +28,6 @@
 #include "csplugincommon/iopengl/openglinterface.h"
 #include "ivaria/xwindow.h"
 
-#include "iogldisp.h"
-
 #ifndef XK_MISCELLANY
 #define XK_MISCELLANY 1
 #endif
@@ -50,9 +48,6 @@ class csGraphics2DGLX : public scfImplementationExt1<csGraphics2DGLX ,
   Colormap cmap;
   GLXContext active_GLContext;
   bool hardwareaccelerated;
-
-  // we are using a specific displaydriver
-  csRef<iOpenGLDisp> dispdriver;
 
   /**
    * Helper function, attempts to choose a visual with the
