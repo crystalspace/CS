@@ -35,7 +35,9 @@
 
 #include "plugins/video/canvas/openglx/glx2d.h"
 
-
+#ifdef CS_HAVE_XRENDER
+#include <X11/extensions/Xrender.h>
+#endif
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DGLX)
 
@@ -43,7 +45,8 @@ SCF_IMPLEMENT_FACTORY (csGraphics2DGLX)
 
 // csGraphics2DGLX function
 csGraphics2DGLX::csGraphics2DGLX (iBase *iParent) :
-  scfImplementationType (this, iParent), cmap (0), hardwareaccelerated(false)
+  scfImplementationType (this, iParent), cmap (0), hardwareaccelerated(false),
+  transparencyRequested (false), transparencyAvailable (false)
 {
 }
 
@@ -95,6 +98,15 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
 
   dpy = xwin->GetDisplay ();
   screen_num = xwin->GetScreen ();
+  {
+    /* According to http://standards.freedesktop.org/wm-spec/wm-spec-latest.html#id2552725
+       (section "Compositing Managers") presence of a compositing window manager
+       is signalled by the WM owning a selection "_NET_WM_CM_Sn", n being the screen
+       number. */
+    csString selname;
+    selname.Format ("_NET_WM_CM_S%d", screen_num);
+    compositingManagerPresenceSelection = XInternAtom (dpy, selname.GetData(), True);
+  }
 
   // Create the event outlet
   csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
@@ -288,7 +300,31 @@ bool csGraphics2DGLX::ChooseVisual ()
 						  &numConfigs);
       if (fbconfigs)
       {
-	xvis = glXGetVisualFromFBConfig (dpy, fbconfigs[0]);
+	int fbconfig = 0; // Default to first available config
+      #ifdef CS_HAVE_XRENDER
+	// If transparency was requested, check if a transparent fbconfig is available
+	if (transparencyRequested)
+	{
+	  for (int i = 0; i < numConfigs; i++)
+	  {
+	    XVisualInfo* vis = glXGetVisualFromFBConfig (dpy, fbconfigs[i]);
+	    if (!vis) continue;
+	    XRenderPictFormat* pictFormat = XRenderFindVisualFormat (dpy, vis->visual);
+	    if (!pictFormat) continue;
+
+	    if(pictFormat->direct.alphaMask > 0)
+	    {
+	      fbconfig = i;
+	      transparencyAvailable = true;
+	      break;
+	    }
+
+	    XFree (vis);
+	  }
+	}
+      #endif
+	
+	xvis = glXGetVisualFromFBConfig (dpy, fbconfigs[fbconfig]);
 	XFree (fbconfigs);
 	break;
       }
@@ -328,6 +364,7 @@ bool csGraphics2DGLX::ChooseVisual ()
     xvis = glXGetVisualFromFBConfig (dpy, fbconfigs[0]);
     XFree (fbconfigs);
   }
+  
   return true;
 }
 
@@ -430,6 +467,43 @@ bool csGraphics2DGLX::PerformExtensionV (char const* command, va_list args)
 void csGraphics2DGLX::Print (csRect const* /*area*/)
 {
   glXSwapBuffers (dpy,window);
+}
+
+bool csGraphics2DGLX::IsWindowTransparencyAvailable()
+{
+#ifdef CS_HAVE_XRENDER
+  if (compositingManagerPresenceSelection == None) return false;
+  /* According to http://standards.freedesktop.org/wm-spec/wm-spec-latest.html#id2552725
+     (section "Compositing Managers") presence of a compositing window manager
+     is signalled by the WM owning a selection "_NET_WM_CM_Sn", n being the screen
+     number. Check that. */
+  return (XGetSelectionOwner (dpy, compositingManagerPresenceSelection) != None);
+#else
+  return false;
+#endif
+}
+
+bool csGraphics2DGLX::SetWindowTransparent (bool transparent)
+{
+#ifdef CS_HAVE_XRENDER
+  if (!is_open)
+  {
+    transparencyRequested = transparent;
+    return true;
+  }
+  else
+  {
+    // This train has left the station.
+    return false;
+  }
+#else
+  return false;
+#endif
+}
+
+bool csGraphics2DGLX::GetWindowTransparent ()
+{
+  return is_open ? transparencyAvailable : transparencyRequested;
 }
 
 void csGraphics2DGLX::SetFullScreen (bool yesno)

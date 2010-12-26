@@ -57,6 +57,10 @@ class csGraphics2DGLX : public scfImplementationExt1<csGraphics2DGLX ,
   /// Obtain (and report) the actual attributes of the context.
   void GetCurrentAttributes ();
 
+  // Window transparency stuff
+  Atom compositingManagerPresenceSelection;
+  bool transparencyRequested;
+  bool transparencyAvailable;
 public:
   csGraphics2DGLX (iBase *iParent);
   virtual ~csGraphics2DGLX ();
@@ -94,6 +98,10 @@ public:
    */
   virtual void SetIcon (iImage *image)
   { xwin->SetIcon (image); }
+  
+  virtual bool IsWindowTransparencyAvailable();
+  virtual bool SetWindowTransparent (bool transparent);
+  virtual bool GetWindowTransparent ();
 
   virtual void SetFullScreen (bool yesno);
 
