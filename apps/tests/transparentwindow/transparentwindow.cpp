@@ -70,7 +70,7 @@ void TransparentWindow::Frame ()
   {
     static const char* statusLines[] = 
     {
-      "Window transparency: "
+      "Window (t)ransparency: "
     };
     size_t numLines = sizeof (statusLines)/sizeof (statusLines[0]);
     
@@ -85,7 +85,13 @@ void TransparentWindow::Frame ()
     int x = 4, y = 4;
     bool transpState = natwin->GetWindowTransparent();
     DrawOutlineText (font, x, y, statusLines[0]);
-    DrawOutlineText (font, x + colWidth + 4, y, transpState ? "on" : "off");
+    csString statusString;
+    statusString = transpState ? "on" : "off";
+    if (transpState != transpRequested)
+    {
+      statusString.Append (" (couldn't be changed)");
+    }
+    DrawOutlineText (font, x + colWidth + 4, y, statusString);
   }
   
   g3d->FinishDraw();
@@ -141,17 +147,28 @@ bool TransparentWindow::OnKeyboard (iEvent& ev)
   {
     // The user pressed a key (as opposed to releasing it).
     utf32_char code = csKeyEventHelper::GetCookedCode (&ev);
-    if (code == CSKEY_ESC)
+    switch (code)
     {
-      // The user pressed escape to exit the application.
-      // The proper way to quit a Crystal Space application
-      // is by broadcasting a csevQuit event. That will cause the
-      // main runloop to stop. To do that we get the event queue from
-      // the object registry and then post the event.
-      csRef<iEventQueue> q = 
-        csQueryRegistry<iEventQueue> (GetObjectRegistry ());
-      if (q.IsValid ()) q->GetEventOutlet ()->Broadcast(
-      	csevQuit (GetObjectRegistry ()));
+    case CSKEY_ESC:
+      {
+	// The user pressed escape to exit the application.
+	// The proper way to quit a Crystal Space application
+	// is by broadcasting a csevQuit event. That will cause the
+	// main runloop to stop. To do that we get the event queue from
+	// the object registry and then post the event.
+	csRef<iEventQueue> q = 
+	  csQueryRegistry<iEventQueue> (GetObjectRegistry ());
+	if (q.IsValid ()) q->GetEventOutlet ()->Broadcast(
+	  csevQuit (GetObjectRegistry ()));
+      }
+      break;
+    case 't':
+      if (natwin)
+      {
+	transpRequested = !natwin->GetWindowTransparent();
+	natwin->SetWindowTransparent (transpRequested);
+      }
+      break;
     }
   }
 
@@ -218,6 +235,7 @@ bool TransparentWindow::Application ()
     ReportInfo ("Window transparency could be enabled: %s",
                 transpResult ? "yes" : "no");
   }
+  transpRequested = true;
 
   // Open the main system. This will open all the previously loaded plug-ins.
   // i.e. all windows will be opened.

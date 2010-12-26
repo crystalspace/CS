@@ -38,6 +38,8 @@ private:
   csRef<iTextureHandle> logoTex;
   csRef<iFont> font;
   csRef<FramePrinter> printer;
+  
+  bool transpRequested;
 public:
   bool SetupModules ();
 
