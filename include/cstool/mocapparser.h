@@ -69,6 +69,9 @@ struct MocapParserResult
 class CS_CRYSTALSPACE_EXPORT MocapParser
 {
 public:
+  ///Destructor
+  virtual ~MocapParser () {}
+
   /**
    * Set the name of the animation packet that will be created. The default value is the
    * name of the ressource file plus "_packet".
