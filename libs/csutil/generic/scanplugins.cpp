@@ -34,6 +34,7 @@
 #include "csutil/syspath.h"
 #include "csutil/util.h"
 #include "csutil/xmltiny.h"
+#include "csutil/stringquote.h"
 #include "iutil/document.h"
 
 static void AppendStrVecString (iStringArray*& strings, const char* str)
