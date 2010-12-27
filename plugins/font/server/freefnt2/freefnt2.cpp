@@ -411,7 +411,8 @@ csPtr<iDataBuffer> csFreeType2Font::GetGlyphBitmap (utf32_char c,
   GridFitCbox (cbox, glyphW, glyphH);
 
   int maxrows = (size->metrics.height + 63) >> 6;
-  int stride, bitmapsize;
+  int stride = 0;
+  int bitmapsize = 0;
   uint8* bitmap;
   if ((glyphW > 0) && (glyphH > 0))
   {
@@ -424,8 +425,6 @@ csPtr<iDataBuffer> csFreeType2Font::GetGlyphBitmap (utf32_char c,
     stride = (face->face->glyph->bitmap.width + 7) / 8;
     bitmapsize = maxrows*stride;
   }
-  else
-    bitmapsize = 0;
 
   int descend = (-size->metrics.descender + 63) >> 6;;
 
@@ -486,7 +485,8 @@ csPtr<iDataBuffer> csFreeType2Font::GetGlyphAlphaBitmap (utf32_char c,
   GridFitCbox (cbox, glyphW, glyphH);
 
   int maxrows = (size->metrics.height + 63) >> 6;
-  int stride, bitmapsize;
+  int stride = 0;
+  int bitmapsize = 0;
   uint8* bitmap;
   if ((glyphW > 0) && (glyphH > 0))
   {
@@ -508,7 +508,6 @@ csPtr<iDataBuffer> csFreeType2Font::GetGlyphAlphaBitmap (utf32_char c,
   }
   else
   {
-    bitmapsize = 0;
     metrics.width = glyphW >> 6;
     metrics.left = (FT_Int)( cbox.xMin >> 6 );
   }
