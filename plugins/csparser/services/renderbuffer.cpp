@@ -1270,7 +1270,7 @@ csRef<iRenderBuffer> csTextSyntaxService::ReadRenderBuffer (iDataBuffer* buf,
       ConvertFloatBufferDataFromLE ((uint64*)src, (double*)dst, totalElements);
       break;
     case CS_BUFCOMP_HALF:
-      ConvertBufferDataFromLE ((uint16*)source, (uint16*)dest, totalElements);
+      ConvertBufferDataFromLE ((uint16*)src, (uint16*)dst, totalElements);
       break;
     default:
       ConvertBufferDataToLE ((csRenderBufferComponentType)compType,
@@ -1321,7 +1321,7 @@ csRef<iDataBuffer> csTextSyntaxService::StoreRenderBuffer (iRenderBuffer* rbuf)
       ConvertFloatBufferDataToLE ((double*)src, (uint64*)dst, totalElements);
       break;
     case CS_BUFCOMP_HALF:
-      ConvertBufferDataToLE ((uint16*)source, (uint16*)dest, totalElements);
+      ConvertBufferDataToLE ((uint16*)src, (uint16*)dst, totalElements);
       break;
     default:
       ConvertBufferDataToLE (rbuf->GetComponentType(), src, dst, 
