@@ -85,6 +85,11 @@ template<>
 class csHashComputer<unsigned char> : public csHashComputerIntegral<unsigned char> {};
 
 template<>
+class csHashComputer<short> : public csHashComputerIntegral<short> {};
+template<>
+class csHashComputer<unsigned short> : public csHashComputerIntegral<unsigned short> {};
+
+template<>
 class csHashComputer<int> : public csHashComputerIntegral<int> {}; 
 template<>
 class csHashComputer<unsigned int> : 
