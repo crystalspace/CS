@@ -285,7 +285,7 @@ namespace lighter
 	if (v < oldVertNum)
 	  srcVert = v;
 	else
-	  srcVert = vertexData.splits[v-oldVertNum].i0;
+	  srcVert = vertexData.splits[v-oldVertNum];
 	memcpy (newData + v*newStride, oldData + srcVert * oldStride,
 		elementSize);
       }
@@ -837,15 +837,10 @@ namespace lighter
         if (!subMesh) continue;
         csRef<iShaderVariableContext> svc = 
           scfQueryInterface<iShaderVariableContext> (subMesh);
-        for (int i = 0; i < 4; i++)
+	for (const char* const* lmtn = lightmapTextures; *lmtn; lmtn++)
         {
-          csString svName;
-          if (i == 0)
-            svName = "tex lightmap";
-          else
-            svName.Format ("tex lightmap dir %d", i);
           csShaderVariable* sv = svc->GetVariable (
-            globalLighter->svStrings->Request (svName));
+            globalLighter->svStrings->Request (*lmtn));
           if (sv != 0)
           {
             iTextureWrapper* tex;

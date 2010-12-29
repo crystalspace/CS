@@ -254,6 +254,9 @@ namespace lighter
     uint GetPrimitiveGroupLightmap (uint groupID) const
     { return allPrimitives[groupID].Get (0).GetGlobalLightmapID (); }
   protected:
+    // Lightmap texture names (used for stripping)
+    static const char* const lightmapTextures[];
+    
     // All faces, already transformed
     csArray<PrimitiveArray> allPrimitives;
     csArray<uint> lightmapIDs;

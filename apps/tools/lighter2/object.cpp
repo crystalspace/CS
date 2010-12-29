@@ -212,6 +212,18 @@ namespace lighter
   }
   
   //-------------------------------------------------------------------------
+  
+  const char* const Object::lightmapTextures[] =
+  {
+    "tex lightmap",
+    "tex lightmap dir 1",
+    "tex lightmap dir 2",
+    "tex lightmap dir 3",
+    "tex spec directions 1",
+    "tex spec directions 2",
+    "tex spec directions 3",
+    nullptr
+  };
 
   Object::Object (ObjectFactory* fact)
     : lightPerVertex (fact->lightPerVertex), sector (0), litColors (0), 
@@ -352,15 +364,10 @@ namespace lighter
   void Object::StripLightmaps (csSet<csString>& lms)
   {
     iShaderVariableContext* svc = meshWrapper->GetSVContext();
-    for (int i = 0; i < 4; i++)
+    for (const char* const* lmtn = lightmapTextures; *lmtn; lmtn++)
     {
-      csString svName;
-      if (i == 0)
-        svName = "tex lightmap";
-      else
-        svName.Format ("tex lightmap dir %d", i);
       csShaderVariable* sv = svc->GetVariable (
-        globalLighter->svStrings->Request (svName));
+        globalLighter->svStrings->Request (*lmtn));
       if (sv != 0)
       {
         iTextureWrapper* tex;
