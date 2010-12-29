@@ -170,7 +170,7 @@ iEventHandler *csEventHandlerRegistry::GetHandler (csHandlerID id)
     (iEventHandler*)0;
 }
 
-bool const csEventHandlerRegistry::IsInstanceOf (csHandlerID instanceid,
+bool csEventHandlerRegistry::IsInstanceOf (csHandlerID instanceid,
 	csHandlerID genericid)
 {
   CS_ASSERT(IsInstance(instanceid));
@@ -178,7 +178,7 @@ bool const csEventHandlerRegistry::IsInstanceOf (csHandlerID instanceid,
   return (instantiation.Get (instanceid, CS_HANDLER_INVALID) == genericid);
 }
 
-bool const csEventHandlerRegistry::IsInstance (csHandlerID id)
+bool csEventHandlerRegistry::IsInstance (csHandlerID id)
 {
   CS::Threading::ScopedReadLock lock(mutex);
   return (instantiation.Get (id, CS_HANDLER_INVALID) != CS_HANDLER_INVALID);

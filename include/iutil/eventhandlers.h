@@ -107,12 +107,12 @@ struct iEventHandlerRegistry : public virtual iBase
    * genericid is a generic instance, and instanceid is an
    * instance of genericid in particular.
    */
-  virtual bool const IsInstanceOf (csHandlerID instanceid, 
+  virtual bool IsInstanceOf (csHandlerID instanceid, 
     csHandlerID genericid) = 0;
   /**
    * returns true if id is a handler instance (i.e., not a generic name).
    */
-  virtual bool const IsInstance (csHandlerID id) = 0;
+  virtual bool IsInstance (csHandlerID id) = 0;
   /**
    * Returns the csHandleID for the generic name for instance name id.
    */

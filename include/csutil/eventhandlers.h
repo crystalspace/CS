@@ -145,7 +145,7 @@ public:
    * genericid is a generic instance, and instanceid is an
    * instance of genericid in particular.
    */
-  bool const IsInstanceOf (csHandlerID instanceid, 
+  bool IsInstanceOf (csHandlerID instanceid, 
     csHandlerID genericid);
   static inline bool IsInstanceOf (iObjectRegistry *reg, 
     csHandlerID instanceid, csHandlerID genericid) 
@@ -156,7 +156,7 @@ public:
   /**
    * returns true if id is a handler instance (i.e., not a generic name).
    */
-  bool const IsInstance (csHandlerID id);
+  bool IsInstance (csHandlerID id);
   static inline bool IsInstance (iObjectRegistry *reg, 
     csHandlerID id) 
   {
