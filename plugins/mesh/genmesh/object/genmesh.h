@@ -532,7 +532,11 @@ public:
   bool IsBack2Front () const { return back2front; }
   void BuildBack2FrontTree ();
 
+  /* Internal methods to set render buffers.
+     They can also correctly replace an attached buffer. */
   bool InternalSetBuffer (csRenderBufferName name, iRenderBuffer* buffer);
+  bool InternalSetBuffer (CS::ShaderVarStringID bufID, iRenderBuffer* buffer,
+			  csRenderBufferName name);
   
   bool AddRenderBuffer (const char *name, iRenderBuffer* buffer);
   bool AddRenderBuffer (csRenderBufferName name, iRenderBuffer* buffer);

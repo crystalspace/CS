@@ -1051,29 +1051,20 @@ iRenderBuffer* csGenmeshMeshObjectFactory::GetPositions()
 
 template<typename T>
 static void RemapIndexBuffer (csRef<iRenderBuffer>& index_buffer,
-                              csCompressVertexInfo* vt)
+                              size_t* vt,
+			      size_t lastIndex)
 {
   csRef<iRenderBuffer> newBuffer;
   {
     csRenderBufferLock<T> indices (index_buffer, CS_BUF_LOCK_READ);
-    size_t rangeMin = (size_t)~0, rangeMax = 0;
-    for (size_t n = 0; n < indices.GetSize(); n++)
-    {
-      size_t index = size_t (indices[n]);
-      size_t newIndex = vt[index].new_idx;
-      if (newIndex < rangeMin)
-        rangeMin = newIndex;
-      else if (newIndex > rangeMax)
-        rangeMax = newIndex;
-    }
     newBuffer = csRenderBuffer::CreateIndexRenderBuffer (
       index_buffer->GetElementCount(), index_buffer->GetBufferType(), 
-      index_buffer->GetComponentType(), rangeMin, rangeMax);
+      index_buffer->GetComponentType(), 0, lastIndex);
     csRenderBufferLock<T> newIndices (newBuffer);
     for (size_t n = 0; n < indices.GetSize(); n++)
     {
       size_t index = size_t (indices[n]);
-      size_t newIndex = vt[index].new_idx;
+      size_t newIndex = vt[index];
       newIndices[n] = T (newIndex);
     }
   }
@@ -1082,16 +1073,22 @@ static void RemapIndexBuffer (csRef<iRenderBuffer>& index_buffer,
 
 void csGenmeshMeshObjectFactory::Compress ()
 {
-  CreateLegacyBuffers();
-  //size_t old_num = legacyBuffers.mesh_vertices.GetSize ();
-  csCompressVertexInfo* vt = csVertexCompressor::Compress (
-    legacyBuffers.mesh_vertices, legacyBuffers.mesh_texels,
-    legacyBuffers.mesh_normals, legacyBuffers.mesh_colors);
+  UpdateFromLegacyBuffers ();
+  ClearLegacyBuffers ();
+  
+  csDirtyAccessArray<csRef<iRenderBuffer> > buffers;
+  buffers.SetCapacity (user_buffer_names.GetSize());
+  for (size_t i = 0; i < user_buffer_names.GetSize(); i++)
+  {
+    buffers.Push (userBuffers.GetRenderBuffer (user_buffer_names[i]));
+  }
+  
+  size_t newVtNum;
+  size_t* vt = csVertexCompressor::Compress (buffers.GetArray(),
+					     buffers.GetSize(),
+					     newVtNum);
   if (vt)
   {
-    //printf ("From %d to %d\n", int (old_num), int (mesh_vertices.GetSize ()));
-    //fflush (stdout);
-
     for (size_t s = 0; s < subMeshes.GetSize(); s++)
     {
       SubMesh* subMesh = subMeshes[s];
@@ -1101,36 +1098,43 @@ void csGenmeshMeshObjectFactory::Compress ()
       switch (compType & ~CS_BUFCOMP_NORMALIZED)
       {
 	case CS_BUFCOMP_BYTE:
-	  RemapIndexBuffer<char> (indices, vt);
+	  RemapIndexBuffer<char> (indices, vt, newVtNum-1);
 	  break;
 	case CS_BUFCOMP_UNSIGNED_BYTE:
-	  RemapIndexBuffer<unsigned char> (indices, vt);
+	  RemapIndexBuffer<unsigned char> (indices, vt, newVtNum-1);
 	  break;
 	case CS_BUFCOMP_SHORT:
-	  RemapIndexBuffer<short> (indices, vt);
+	  RemapIndexBuffer<short> (indices, vt, newVtNum-1);
 	  break;
 	case CS_BUFCOMP_UNSIGNED_SHORT:
-	  RemapIndexBuffer<unsigned short> (indices, vt);
+	  RemapIndexBuffer<unsigned short> (indices, vt, newVtNum-1);
 	  break;
 	case CS_BUFCOMP_INT:
-	  RemapIndexBuffer<int> (indices, vt);
+	  RemapIndexBuffer<int> (indices, vt, newVtNum-1);
 	  break;
 	case CS_BUFCOMP_UNSIGNED_INT:
-	  RemapIndexBuffer<unsigned int> (indices, vt);
+	  RemapIndexBuffer<unsigned int> (indices, vt, newVtNum-1);
 	  break;
 	case CS_BUFCOMP_FLOAT:
-	  RemapIndexBuffer<float> (indices, vt);
+	  RemapIndexBuffer<float> (indices, vt, newVtNum-1);
 	  break;
 	case CS_BUFCOMP_DOUBLE:
-	  RemapIndexBuffer<double> (indices, vt);
+	  RemapIndexBuffer<double> (indices, vt, newVtNum-1);
 	  break;
 	default:
 	  CS_ASSERT_MSG("invalid component type", false);
       }
       subMesh->SetIndices (indices);
     }
+    delete[] vt;
+    
+    for (size_t b = 0; b < buffers.GetSize(); b++)
+    {
+      csRenderBufferName bufName = csRenderBuffer::GetBufferNameFromDescr (
+	svstrings->Request (user_buffer_names[b]));
+      InternalSetBuffer (user_buffer_names[b], buffers[b], bufName);
+    }
   }
-  delete[] vt;
 }
 
 class csTriangleMeshGenMesh :
@@ -1439,14 +1443,22 @@ bool csGenmeshMeshObjectFactory::InternalSetBuffer (csRenderBufferName name,
   const char* nameStr = csRenderBuffer::GetDescrFromBufferName (name);
 
   CS::ShaderVarStringID bufID = svstrings->Request (nameStr);
+  return InternalSetBuffer (bufID, buffer, name);
+}
+
+bool csGenmeshMeshObjectFactory::InternalSetBuffer (CS::ShaderVarStringID bufID,
+						    iRenderBuffer* buffer,
+						    csRenderBufferName name)
+{
+  bool hasName = false;
   if (userBuffers.RemoveRenderBuffer (bufID))
   {
-    user_buffer_names.Delete (bufID);
     userBuffers.RemoveRenderBuffer (bufID);
+    hasName = true;
   }
   if (userBuffers.AddRenderBuffer (bufID, buffer))
   {
-    user_buffer_names.Push (bufID);
+    if (!hasName) user_buffer_names.Push (bufID);
     user_buffer_change++;
     
     switch (name)
