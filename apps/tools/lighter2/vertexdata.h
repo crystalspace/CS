@@ -79,35 +79,6 @@ namespace lighter
       return index;
     }
 
-    /// Interpolate between two vertices with t
-    size_t InterpolateVertex (size_t i0, size_t i1, float t)
-    {
-      const csVector3& p0 = positions[i0];
-      const csVector3& p1 = positions[i1];
-      size_t index = positions.Push (p0 - (p1 - p0) * t);
-
-      const csVector3& n0 = normals[i0];
-      const csVector3& n1 = normals[i1];
-      csVector3 newNormal (n0 - (n1 - n0) * t);
-      newNormal.Normalize ();
-      normals.Push (newNormal);
-
-      const csVector2& uv0 = uvs[i0];
-      const csVector2& uv1 = uvs[i1];
-      uvs.Push (csLerp (uv0, uv1, t));
-
-      customData.SetSize (customData.GetSize() + customDataTotalComp);
-      const float* cds1 = GetCustomData (i0, 0);
-      const float* cds2 = GetCustomData (i1, 0);
-      float* cdd = GetCustomData (index, 0);
-      for (size_t c = 0; c < customDataTotalComp; c++)
-      {
-        *cdd++ = csLerp (*cds1++, *cds2++, t);
-      }
-
-      return index;
-    }
-
     /// Transform all vertex positions and normal
     void Transform (const csReversibleTransform& transform)
     {
@@ -121,25 +92,12 @@ namespace lighter
 
   struct ObjectFactoryVertexData : public ObjectBaseVertexData
   {
-    struct SplitInfo
-    {
-      size_t i0, i1;
-      float t;
-
-      SplitInfo (size_t i0, size_t i1, float t) : i0 (i0), i1 (i1),t (t) {}
-    };
-    csArray<SplitInfo> splits;
+    csArray<size_t> splits;
 
     size_t SplitVertex (size_t oldIndex)
     {
       size_t ret = ObjectBaseVertexData::SplitVertex (oldIndex);
-      splits.Push (SplitInfo (oldIndex, (size_t)~0, 0));
-      return ret;
-    }
-    size_t InterpolateVertex (size_t i0, size_t i1, float t)
-    {
-      size_t ret = ObjectBaseVertexData::InterpolateVertex (i0, i1, t);
-      splits.Push (SplitInfo (i0, i1, t));
+      splits.Push (oldIndex);
       return ret;
     }
   };
@@ -152,14 +110,6 @@ namespace lighter
     {
       ObjectBaseVertexData::SplitVertex (oldIndex);
       return lightmapUVs.Push (lightmapUVs[oldIndex]);
-    }
-
-    size_t InterpolateVertex (size_t i0, size_t i1, float t)
-    {
-      ObjectBaseVertexData::InterpolateVertex (i0, i1, t);
-      const csVector2& l0 = lightmapUVs[i0];
-      const csVector2& l1 = lightmapUVs[i1];
-      return lightmapUVs.Push (l0 - (l1 - l0) * t);
     }
 
     ObjectVertexData& operator= (const ObjectBaseVertexData& other)
