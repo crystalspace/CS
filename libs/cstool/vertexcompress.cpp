@@ -17,9 +17,16 @@
 */
 #include "cssysdef.h"
 #include "csqsqrt.h"
-#include "csgeom/math3d.h"
+
 #include "cstool/vertexcompress.h"
 
+#include "csgeom/math3d.h"
+#include "csgfx/renderbuffer.h"
+#include "csgfx/vertexlistwalker.h"
+#include "csutil/dirtyaccessarray.h"
+#include "csutil/sysfunc.h"
+
+#include "ivideo/rndbuf.h"
 
 static int compare_vt_orig (const void *p1, const void *p2)
 {
@@ -260,6 +267,122 @@ csCompressVertexInfo* csVertexCompressor::Compress (
   delete[] new_normals;
   delete[] new_colors;
   return vt;
+}
+
+size_t* csVertexCompressor::Compress (csRef<iRenderBuffer>* buffers, size_t numBuffers,
+				      size_t& newCount)
+{
+  newCount = 0;
+  if (!buffers || (numBuffers == 0))
+    return nullptr;
+  
+  // Some input validation
+  size_t numVerts = buffers[0]->GetElementCount();
+  for (size_t b = 0; b < numBuffers; b++)
+  {
+    size_t bufVerts = buffers[b]->GetElementCount();
+    if (bufVerts != numVerts)
+    {
+      csPrintfErr ("%s: buffersize mismatch for buffer %zu (expected %zu, got %zu)\n",
+		   CS_FUNCTION_NAME, b, numVerts, bufVerts);
+      return nullptr;
+    }
+  }
+  
+  if (numVerts == 0)
+    return nullptr;
+  
+  // Collect all components ...
+  size_t totalComps = 0;
+  for (size_t b = 0; b < numBuffers; b++)
+  {
+    totalComps += buffers[b]->GetComponentCount();
+  }
+  // ... and convert to format suitable for comparison.
+  const int precision = 1000000;
+  csDirtyAccessArray<int> allData;
+  allData.SetSize (totalComps * numVerts);
+  {
+    size_t compOffs = 0;
+    for (size_t b = 0; b < numBuffers; b++)
+    {
+      size_t bufComps = buffers[b]->GetComponentCount();
+      /* @@@ TODO: Don't fetch components as floats if buffer contains
+	integer data anyway */
+      csVertexListWalker<float> bufWalker (buffers[b]);
+      for (size_t v = 0; v < numVerts; v++)
+      {
+	for (size_t c = 0; c < bufComps; c++)
+	{
+	  allData[v*totalComps+compOffs+c] = ceil ((*bufWalker)[c] * precision);
+	}
+	++bufWalker;
+      }
+      compOffs += bufComps;
+    }
+  }
+  
+  size_t* newIndices = new size_t[numVerts];
+  csArray<size_t> vertexMapNewToOld;
+  vertexMapNewToOld.SetCapacity (numVerts);
+  typedef csHash<size_t, uint> VerticesHash;
+  VerticesHash newVertices;
+  for (size_t v = 0; v < numVerts; v++)
+  {
+    const int* vertPtr = allData.GetArray() + v*totalComps;
+    uint hash = csHashCompute ((char*)vertPtr, totalComps * sizeof (int));
+    VerticesHash::Iterator it (newVertices.GetIterator (hash));
+    size_t prevVertex = csArrayItemNotFound;
+    while (it.HasNext())
+    {
+      size_t oldIndex = it.Next();
+      const int* oldVertPtr = allData.GetArray() + oldIndex*totalComps;
+      if (memcmp (vertPtr, oldVertPtr, totalComps * sizeof (int)) == 0)
+      {
+	prevVertex = oldIndex;
+	break;
+      }
+    }
+    if (prevVertex == csArrayItemNotFound)
+    {
+      prevVertex = vertexMapNewToOld.Push (v);
+      newVertices.Put (hash, prevVertex);
+    }
+    newIndices[v] = prevVertex;
+  }
+  newCount = vertexMapNewToOld.GetSize();
+  
+  // No change
+  if (newCount == numVerts)
+  {
+    delete[] newIndices;
+    return nullptr;
+  }
+
+  for (size_t b = 0; b < numBuffers; b++)
+  {
+    iRenderBuffer* oldbuf = buffers[b];
+    csRef<iRenderBuffer> newbuf (
+      csRenderBuffer::CreateRenderBuffer (newCount,
+					  oldbuf->GetBufferType(),
+					  oldbuf->GetComponentType(),
+					  oldbuf->GetComponentCount()));
+    csRenderBufferLock<uint8> oldBufLock (oldbuf, CS_BUF_LOCK_READ);
+    csRenderBufferLock<uint8> newBufLock (newbuf);
+    size_t compDataSize = oldbuf->GetComponentCount()
+      * csRenderBufferComponentSizes[oldbuf->GetComponentType() & ~CS_BUFCOMP_NORMALIZED];
+    size_t oldBufDist = oldbuf->GetElementDistance();
+    size_t newBufDist = newbuf->GetElementDistance();
+    for (size_t v = 0; v < newCount; v++)
+    {
+      memcpy (newBufLock + v * newBufDist,
+	      oldBufLock + vertexMapNewToOld[v] * oldBufDist,
+	      compDataSize);
+    }
+    buffers[b] = newbuf;
+  }
+  
+  return newIndices;
 }
 
 //---------------------------------------------------------------------------

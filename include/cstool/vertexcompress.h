@@ -27,8 +27,11 @@
 
 #include "csgeom/vector3.h"
 #include "csgeom/vector2.h"
+#include "csutil/array.h"
 #include "csutil/cscolor.h"
-#include "csutil/dirtyaccessarray.h"
+#include "csutil/ref.h"
+
+struct iRenderBuffer;
 
 /// This structure is used by csVertexCompressor::Compress().
 struct csCompressVertexInfo
@@ -76,6 +79,22 @@ public:
   static csCompressVertexInfo* Compress (csArray<csVector3>& vertices,
   	csArray<csVector2>& texels, csArray<csVector3>& normals,
 	csArray<csColor4>& colors);
+	
+  /**
+   * Compress an array of vertices (i.e. remove all duplicated
+   * vertices).
+   * \param buffers Array of render buffers to compress.
+   *   All buffers must have the same amount of elements.
+   *   The pointed-to references will be replaced with the compressed
+   *   buffers.
+   * \param numBuffers Number of render buffers in \a buffers.
+   * \param newCount Receives the new vertex count.
+   * \returns An array of indices to map from an old index to a new one.
+   *    The array size will be equal to old the number of vertices.
+   *    It must be freed with delete[] after use.
+   */
+  static size_t* Compress (csRef<iRenderBuffer>* buffers, size_t numBuffers,
+			   size_t& newCount);
 };
 
 /** @} */
