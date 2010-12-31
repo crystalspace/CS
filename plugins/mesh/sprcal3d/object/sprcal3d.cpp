@@ -1331,6 +1331,13 @@ void csSpriteCal3DMeshObject::PositionChild (iMeshObject* child,
   size_t i;
   for ( i = 0; i < sockets.GetSize (); i++)
   {
+    if(FindMesh(sockets[i]->GetMeshIndex()) == csArrayItemNotFound)
+    {
+        // the mesh this socket belongs to is currently detached
+        // therefore skip this one
+        continue;
+    }
+
     if(sockets[i]->GetMeshWrapper())
     {
       if (sockets[i]->GetMeshWrapper()->GetMeshObject() == child)
