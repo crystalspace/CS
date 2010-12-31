@@ -26,6 +26,8 @@ PLUGIN.CFLAGS += $(COMPILER.C++FLAGS.PIC) ;
 LIBRARY.CFLAGS += $(COMPILER.C++FLAGS.PIC) ;
 APPLICATION.LFLAGS += $(LINK.GC_SECTIONS) ;
 PLUGIN.LFLAGS += $(LINK.GC_SECTIONS) ;
+PLUGIN.LFLAGS += $(COMPILER.C++FLAGS.PIC) ;
+LIBRARY.LFLAGS += $(COMPILER.C++FLAGS.PIC) ;
 
 # The BFD tag name under which to embed meta-information into a plugin module.
 # This much match the name expected by csGetPluginMetadata() (bfdplugins.cpp).
