@@ -103,8 +103,6 @@ csXWindow::~csXWindow ()
       q->RemoveListener (scfiEventHandler);
   }
 
-  cachedCursors.DeleteAll ();
-  
   if (oldErrorHandler != 0)
   {
     XSetErrorHandler (oldErrorHandler);
@@ -452,6 +450,8 @@ void csXWindow::Close ()
     MouseCursor [i] = None;
   }
 
+  cachedCursors.DeleteAll ();
+  
   if (ctx_win)
   {
     XFreeGC (dpy, gc);
@@ -1109,10 +1109,10 @@ bool csXWindow::SetMouseCursor (iImage *image, const csRGBcolor* keycolor,
   // Check for cached cursor - we can only cache images with a name
   if (image->GetName ())
   {
-    Cursor cur = cachedCursors.Get (image->GetName(), 0);
+    csRef<CursorWrapper> cur (cachedCursors.Get (image, csRef<CursorWrapper> ()));
     if (cur) 
     {
-      XDefineCursor (dpy, ctx_win, cur);
+      XDefineCursor (dpy, ctx_win, *cur);
       return true;
     }
   }
@@ -1131,8 +1131,9 @@ bool csXWindow::SetMouseCursor (iImage *image, const csRGBcolor* keycolor,
     {
       // Select + cache cursor
       XDefineCursor (dpy, ctx_win, cur);
-      if (image->GetName())
-	cachedCursors.Put (image->GetName(), cur);
+      csRef<CursorWrapper> curWrap;
+      curWrap.AttachNew (new CursorWrapper (dpy, cur));
+      cachedCursors.Put (image, curWrap);
       return true;
     }
   }
@@ -1173,8 +1174,9 @@ bool csXWindow::SetMouseCursor (iImage *image, const csRGBcolor* keycolor,
   XDefineCursor (dpy, ctx_win, mouseCursor);
 
   // Cache a pointer to the cursor (will it will be deleted in the destructor?)
-  if (image->GetName())
-    cachedCursors.Put (image->GetName(), mouseCursor);
+  csRef<CursorWrapper> curWrap;
+  curWrap.AttachNew (new CursorWrapper (dpy, mouseCursor));
+  cachedCursors.Put (image, curWrap);
 
   return true;
 }

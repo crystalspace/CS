@@ -25,6 +25,7 @@
 #include "csutil/hash.h"
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/weakkeyedhash.h"
 #include "csutil/weakref.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -99,8 +100,21 @@ class csXWindow : public scfImplementation3<csXWindow, iXWindow,
   Cursor EmptyMouseCursor;
   /// A empty pixmap
   Pixmap EmptyPixmap;
+  
+  /// Wrapper for X mouse cursors
+  class CursorWrapper : public CS::Utility::FastRefCount<CursorWrapper>
+  {
+    Display* dpy;
+    Cursor xcur;
+  public:
+    CursorWrapper (Display* dpy, Cursor xcur) : dpy (dpy), xcur (xcur) {}
+    ~CursorWrapper() { XFreeCursor (dpy, xcur); }
+    
+    operator Cursor() const { return xcur; }
+  };
   /// List of image-based cursors
-  csHash<Cursor, csString> cachedCursors;
+  typedef CS::Container::WeakKeyedHash<csRef<CursorWrapper>, csWeakRef<iImage> > CursorCache;
+  CursorCache cachedCursors;
   
   Cursor GetXCursor (csMouseCursorID shape);
   
