@@ -27,6 +27,9 @@
 #include "csextern_win.h"
 #include "csutil/csstring.h"
 #include "csutil/hash.h"
+#include "csutil/refcount.h"
+#include "csutil/weakkeyedhash.h"
+#include "csutil/weakref.h"
 #include "csgfx/rgbpixel.h"
 
 /**\addtogroup plugincommon
@@ -37,7 +40,7 @@
  */
 class CS_CSPLUGINCOMMON_WIN_EXPORT csWin32CustomCursors
 {
-  struct CachedCursor
+  struct CachedCursor : public CS::Utility::FastRefCount<CachedCursor>
   {
     HCURSOR cursor;
     bool destroyAsIcon;
@@ -48,11 +51,11 @@ class CS_CSPLUGINCOMMON_WIN_EXPORT csWin32CustomCursors
       destroyAsIcon = false;
     }
     CachedCursor (HCURSOR h, bool b) : cursor (h), destroyAsIcon (b) {}
+    ~CachedCursor();
   };
-  csHash<CachedCursor, csString> cachedCursors;
-  csArray<CachedCursor> blindCursors;
+  CS::Container::WeakKeyedHash<csRef<CachedCursor>, csWeakRef<iImage> > cachedCursors;
 
-  CachedCursor CreateMonoCursor (iImage* image, const csRGBcolor* keycolor, 
+  csPtr<CachedCursor> CreateMonoCursor (iImage* image, const csRGBcolor* keycolor, 
     int hotspot_x, int hotspot_y);
 public:
   ~csWin32CustomCursors ();
@@ -61,7 +64,7 @@ public:
     int hotspot_x, int hotspot_y, csRGBcolor fg, csRGBcolor bg);
 private:
 
-  CachedCursor CreateCursor (iImage* image, const csRGBcolor* keycolor,
+  csPtr<CachedCursor> CreateCursor (iImage* image, const csRGBcolor* keycolor,
     int hotspot_x, int hotspot_y);
 };
 

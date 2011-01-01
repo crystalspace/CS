@@ -29,30 +29,20 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-csWin32CustomCursors::~csWin32CustomCursors ()
+csWin32CustomCursors::CachedCursor::~CachedCursor()
 {
-  csHash<CachedCursor, csString>::GlobalIterator it =
-    cachedCursors.GetIterator();
-
-  while (it.HasNext())
-  {
-    CachedCursor cur = it.Next();
-    if (cur.destroyAsIcon)
-      DestroyIcon (cur.cursor);
-    else
-      DestroyCursor (cur.cursor);
-  }
-  for (size_t i = 0; i < blindCursors.GetSize (); i++)
-  {
-    CachedCursor& cur = blindCursors[i];
-    if (cur.destroyAsIcon)
-      DestroyIcon (cur.cursor);
-    else
-      DestroyCursor (cur.cursor);
-  }
+  if (!cursor) return;
+  if (destroyAsIcon)
+    DestroyIcon (cursor);
+  else
+    DestroyCursor (cursor);
 }
 
-csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateMonoCursor (
+csWin32CustomCursors::~csWin32CustomCursors ()
+{
+}
+
+csPtr<csWin32CustomCursors::CachedCursor> csWin32CustomCursors::CreateMonoCursor (
   iImage* image, const csRGBcolor* keycolor, int hotspot_x, int hotspot_y)
 {
   HCURSOR cursor;
@@ -62,7 +52,7 @@ csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateMonoCursor (
   if (!csCursorConverter::ConvertTo1bpp (image, XORmask, ANDmask, 
     csRGBcolor (255, 255, 255), csRGBcolor (0, 0, 0), keycolor)) 
     // @@@ Force color to black & white for now
-    return CachedCursor ();
+    return csPtr<CachedCursor> (nullptr);
 
   // Need to invert AND mask
   {
@@ -79,7 +69,7 @@ csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateMonoCursor (
   delete[] ANDmask;
   delete[] XORmask;
 
-  return CachedCursor (cursor, false);
+  return csPtr<CachedCursor> (new CachedCursor (cursor, false));
 }
 
 HCURSOR csWin32CustomCursors::GetMouseCursor (iImage* image, 
@@ -88,29 +78,22 @@ HCURSOR csWin32CustomCursors::GetMouseCursor (iImage* image,
 					      csRGBcolor /*fg*/, 
 					      csRGBcolor /*bg*/)
 {
-  CachedCursor cursor;
-  const char* cacheName = image->GetName();
-  if (cacheName != 0)
-  {
-    cursor = cachedCursors.Get (cacheName, CachedCursor ());
-    if (cursor.cursor != 0)
-      return cursor.cursor;
-  }
+  csRef<CachedCursor> cursor;
+  cursor = cachedCursors.Get (image, csRef<CachedCursor> ());
+  if (cursor)
+    return cursor->cursor;
 
   cursor = CreateCursor (image, keycolor, hotspot_x, hotspot_y);
   //cursor = CreateMonoCursor (image, keycolor, hotspot_x, hotspot_y);
 
-  if (cursor.cursor != 0)
+  if (cursor != 0)
   {
-    if (cacheName != 0)
-      cachedCursors.Put (cacheName, cursor);
-    else
-      blindCursors.Push (cursor);
+    cachedCursors.Put (image, cursor);
   }
-  return cursor.cursor;
+  return cursor->cursor;
 }
 
-csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateCursor(
+csPtr<csWin32CustomCursors::CachedCursor> csWin32CustomCursors::CreateCursor (
   iImage* image, const csRGBcolor* keycolor,  int hotspot_x, int hotspot_y)
 {
   ICONINFO iconInfo;
@@ -122,7 +105,7 @@ csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateCursor(
     CS::Platform::Win32::IconTools::IconFromImage (image, &iconInfo);
 
   if (hCursor == 0)
-    return CachedCursor ();
+    return csPtr<CachedCursor> (nullptr);
 
-  return CachedCursor (hCursor, true);
+  return csPtr<CachedCursor> (new CachedCursor (hCursor, true));
 }
