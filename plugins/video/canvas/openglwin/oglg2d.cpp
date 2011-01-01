@@ -136,12 +136,6 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
   m_hInstance = m_piWin32Assistant->GetInstance ();
   m_nCmdShow  = m_piWin32Assistant->GetCmdShow ();
 
-  csRef<iCommandLineParser> cmdline (
-  	csQueryRegistry<iCommandLineParser> (object_reg));
-  m_bHardwareCursor = config->GetBool ("Video.SystemMouseCursor", true);
-  if (cmdline->GetOption ("sysmouse")) m_bHardwareCursor = true;
-  if (cmdline->GetOption ("nosysmouse")) m_bHardwareCursor = false;
-
   // store a copy of the refresh rate as we may need it later
   m_nDisplayFrequency = refreshRate;
 
@@ -578,7 +572,7 @@ bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape)
   	csQueryRegistry<iWin32Assistant> (object_reg));
   if (winhelper == 0) return false;
   bool rc;
-  if (!m_bHardwareCursor)
+  if (hwMouse == hwmcOff)
   {
     winhelper->SetCursor (csmcNone);
     rc = false;
@@ -594,7 +588,7 @@ bool csGraphics2DOpenGL::SetMouseCursor (iImage *image, const csRGBcolor* keycol
 					 int hotspot_x, int hotspot_y,
 					 csRGBcolor fg, csRGBcolor bg)
 {
-  if (!m_bHardwareCursor)
+  if (hwMouse == hwmcOff)
   {
     m_piWin32Assistant->SetCursor (csmcNone);
     return false;

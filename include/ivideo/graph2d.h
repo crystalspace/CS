@@ -250,10 +250,21 @@ struct iGraphics2D : public virtual iBase
 
   /**
    * Set mouse cursor using an image.  If the operation is unsupported, 
-   * return 'false' otherwise return 'true'.
-   * On some platforms there is only monochrome pointers available.  In this
-   * all black colors in the image will become the value of 'bg' and all 
-   * non-black colors will become 'fg'
+   * \c false is returned, otherwise \c true.
+   *
+   * \remarks
+   * If setting a custom mouse is not supported no mouse cursor "emulation"
+   * is done in the canvas.  You can use the custom cursor plugin (see
+   * iCursor) for automatic mouse cursor emulation in case the canvas
+   * doesn't support it, or do it yourself (after everything was drawn,
+   * draw the desired mouse cursor image at the current mouse cursor
+   * position).
+   *
+   * On some platforms there are only monochrome pointers available.  In this
+   * all black colors in the image will become the value of \a bg and all 
+   * non-black colors will become \a fg. This behaviour can be disabled
+   * by setting the <tt>Video.SystemMouseCursor</tt> configuration key to
+   * \c rgbaonly.
    */
   virtual bool SetMouseCursor (iImage *image, const csRGBcolor* keycolor = 0, 
                                int hotspot_x = 0, int hotspot_y = 0,

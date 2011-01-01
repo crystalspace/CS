@@ -116,8 +116,6 @@ protected:
 
   csRef<iWin32Assistant> m_piWin32Assistant;
 
-  bool m_bHardwareCursor;
-
   uint m_nDisplayFrequency;
 
   // Old window procedure (the one in win32.cpp)

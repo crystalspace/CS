@@ -26,6 +26,7 @@
 #include "csplugincommon/canvas/fontcache.h"
 #include "csplugincommon/canvas/graph2d.h"
 #include "csqint.h"
+#include "iutil/cmdline.h"
 #include "iutil/plugin.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
@@ -39,7 +40,7 @@
 #include "ivaria/reporter.h"
 
 csGraphics2D::csGraphics2D (iBase* parent) : 
-  scfImplementationType (this, parent), fontCache (0)
+  scfImplementationType (this, parent), fontCache (0), hwMouse (hwmcOff)
 {
   static uint g2d_count = 0;
 
@@ -86,6 +87,29 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
   DisplayNumber = config->GetInt ("Video.DisplayNumber", DisplayNumber);
   refreshRate = config->GetInt ("Video.DisplayFrequency", 0);
   vsync = config->GetBool ("Video.VSync", false);
+  
+  const char* hwMouseFlag = config->GetStr ("Video.SystemMouseCursor", "yes");
+  if ((strcasecmp (hwMouseFlag, "yes") == 0)
+      || (strcasecmp (hwMouseFlag, "true") == 0)
+      || (strcasecmp (hwMouseFlag, "on") == 0)
+      || (strcmp (hwMouseFlag, "1") == 0))
+  {
+    hwMouse = hwmcOn;
+  }
+  else if (strcasecmp (hwMouseFlag, "rgbaonly") == 0)
+  {
+    hwMouse = hwmcRGBAOnly;
+  }
+  else
+  {
+    hwMouse = hwmcOff;
+  }
+  csRef<iCommandLineParser> cmdline (
+    csQueryRegistry<iCommandLineParser> (object_reg));
+  if (cmdline->GetOption ("sysmouse") || cmdline->GetOption ("nosysmouse"))
+  {
+    hwMouse = cmdline->GetBoolOption ("sysmouse") ? hwmcOn : hwmcOff;
+  }
 
   // Get the font server: A missing font server is NOT an error
   if (!FontServer)

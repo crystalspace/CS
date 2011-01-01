@@ -116,6 +116,17 @@ public:
    */
   virtual const char *GetName() const;
 
+  /// Hardware mouse cursor setting
+  enum HWMouseMode
+  {
+    /// Never use hardware cursor
+    hwmcOff,
+    /// Always use hardware cursor, if possible
+    hwmcOn,
+    /// Only use hardware cursor if true RGBA cursor is available
+    hwmcRGBAOnly
+  };
+  HWMouseMode hwMouse;
 protected:
   /// Screen refresh rate
   int refreshRate;

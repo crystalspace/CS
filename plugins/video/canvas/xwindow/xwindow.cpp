@@ -65,7 +65,9 @@ SCF_IMPLEMENT_FACTORY (csXWindow)
 #define CS_XEXT_XF86VM "XFree86-VidModeExtension"
 
 csXWindow::csXWindow (iBase* parent) : scfImplementationType (this, parent),
-  keyboardIM (0), keyboardIC (0), haveRGBAcursors (false)
+  keyboardIM (0), keyboardIC (0),
+  hwMouse (csGraphics2D::hwmcOff),
+  haveRGBAcursors (false)
 {
   EmptyMouseCursor = 0;
   memset (&MouseCursor, 0, sizeof (MouseCursor));
@@ -142,11 +144,6 @@ bool csXWindow::Initialize (iObjectRegistry *object_reg)
   this->object_reg = object_reg;
   this->name_reg = csEventNameRegistry::GetRegistry (object_reg);
   csConfigAccess Config(object_reg, "/config/video.cfg");
-  csRef<iCommandLineParser> cmdline (
-    csQueryRegistry<iCommandLineParser> (object_reg));
-  do_hwmouse = Config->GetBool ("Video.SystemMouseCursor", true);
-  if (cmdline->GetOption ("sysmouse")) do_hwmouse = true;
-  if (cmdline->GetOption ("nosysmouse")) do_hwmouse = false;
   // Open display
   dpy = XOpenDisplay (0);
 
@@ -662,14 +659,6 @@ bool csXWindow::HandleEvent (iEvent &Event)
   bool prevdown, down;
   bool resize = false;
 
-  if (Event.Name == csevCommandLineHelp (name_reg))
-  {
-    csPrintf ("Options for X-Window Plugin:\n");
-    csPrintf ("  -[no]sysmouse      use/don't use system mouse cursor "
-      "(default=%s)\n", do_hwmouse ? "use" : "don't");
-    return true;
-  }
-
   while (XCheckIfEvent (dpy, &event, AlwaysTruePredicate, 0))
   {
     switch (event.type)
@@ -1032,7 +1021,7 @@ Cursor csXWindow::GetXCursor (csMouseCursorID shape)
 bool csXWindow::SetMouseCursor (csMouseCursorID iShape)
 {
   Cursor cursor = GetXCursor (iShape);
-  if (do_hwmouse && (cursor != None))
+  if ((hwMouse != csGraphics2D::hwmcOff) && (cursor != None))
   {
     XDefineCursor (dpy, ctx_win, cursor);
     return true;
@@ -1113,6 +1102,8 @@ bool csXWindow::SetMouseCursor (iImage *image, const csRGBcolor* keycolor,
                                 int hotspot_x, int hotspot_y,
                                 csRGBcolor fg, csRGBcolor bg)
 {
+  if (hwMouse == csGraphics2D::hwmcOff) return false;
+  
   if (!image) return false;
 
   // Check for cached cursor - we can only cache images with a name
@@ -1145,6 +1136,8 @@ bool csXWindow::SetMouseCursor (iImage *image, const csRGBcolor* keycolor,
       return true;
     }
   }
+  
+  if (hwMouse == csGraphics2D::hwmcRGBAOnly) return false;
 
   // Fall back to a monochrome pointer. csCursorConverter takes care of
   // the conversion.

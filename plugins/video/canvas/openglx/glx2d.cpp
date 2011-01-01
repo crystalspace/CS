@@ -107,6 +107,8 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
     selname.Format ("_NET_WM_CM_S%d", screen_num);
     compositingManagerPresenceSelection = XInternAtom (dpy, selname.GetData(), True);
   }
+  
+  xwin->SetHWMouseMode (hwMouse);
 
   // Create the event outlet
   csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));

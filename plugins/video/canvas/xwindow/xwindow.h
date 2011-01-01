@@ -90,7 +90,7 @@ class csXWindow : public scfImplementation3<csXWindow, iXWindow,
 
   //-------------------------------------------------------------
   // Hardware mouse cursor or software emulation?
-  bool do_hwmouse;
+  csGraphics2D::HWMouseMode hwMouse;
   // Number of CS mouse cursors
   enum { lastCursor = csmcWait, cursorNum = lastCursor+1 };
   /// Mouse cursors (if hardware mouse cursors are used)
@@ -176,6 +176,8 @@ public:
   bool AlertV_GTK (int type, const char* title, const char* okMsg,
   	const char* msg, va_list arg) CS_GNUC_PRINTF (5, 0);
 #endif
+  void SetHWMouseMode (csGraphics2D::HWMouseMode hwMouse)
+  { this->hwMouse = hwMouse; }
 
   struct EventHandler : 
     public scfImplementation1<EventHandler, iEventHandler>

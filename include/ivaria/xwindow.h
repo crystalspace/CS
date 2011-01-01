@@ -32,13 +32,15 @@
 #include "ivideo/cursor.h"
 #include "csgfx/rgbpixel.h"
 
+#include "csplugincommon/canvas/graph2d.h" // for csGraphics2D::HWMouseMode
+
 struct iGraphics2D;
 struct iImage;
 
 /// Document me! @@@
 struct iXWindow : public virtual iBase
 {
-  SCF_INTERFACE (iXWindow, 2, 0, 0);
+  SCF_INTERFACE (iXWindow, 2, 0, 1);
 
   // These should be inherited from csNativeWindow
   virtual bool Open () = 0;
@@ -81,6 +83,8 @@ struct iXWindow : public virtual iBase
    */
   virtual bool AlertV (int type, const char* title, const char* okMsg,
         const char* msg, va_list arg) CS_GNUC_PRINTF (5, 0) = 0;
+	
+  virtual void SetHWMouseMode (csGraphics2D::HWMouseMode hwMouse) = 0;
 };
 
 #endif // __CS_IVIDEO_XWINDOW_H__
