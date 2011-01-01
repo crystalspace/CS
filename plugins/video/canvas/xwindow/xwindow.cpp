@@ -349,19 +349,19 @@ bool csXWindow::Open ()
   // Create mouse cursors
   MouseCursor [csmcArrow] = XCreateFontCursor (dpy, XC_left_ptr);
 //MouseCursor [csmcLens] = XCreateFontCursor (dpy,
-  MouseCursor [csmcCross] = XCreateFontCursor (dpy, 33/*XC_crosshair*/);
-  MouseCursor [csmcPen] = XCreateFontCursor (dpy, /*XC_hand2*/XC_pencil);
+  MouseCursor [csmcCross] = XCreateFontCursor (dpy, XC_crosshair);
+  MouseCursor [csmcPen] = XCreateFontCursor (dpy, XC_pencil);
   MouseCursor [csmcMove] = XCreateFontCursor (dpy, XC_fleur);
   /// Diagonal (\) resizing cursor
-//MouseCursor [csmcSizeNWSE] = XCreateFontCursor (dpy,
+  MouseCursor [csmcSizeNWSE] = XCreateFontCursor (dpy, XC_sizing);
   /// Diagonal (/) resizing cursor
-//MouseCursor [csmcSizeNESW] = XCreateFontCursor (dpy,
+  MouseCursor [csmcSizeNESW] = XCreateFontCursor (dpy, XC_sizing);
   /// Vertical sizing cursor
-//MouseCursor [csmcSizeNS] = XCreateFontCursor (dpy, XC_sb_v_double_arrow);
+  MouseCursor [csmcSizeNS] = XCreateFontCursor (dpy, XC_sb_v_double_arrow);
   /// Horizontal sizing cursor
-//MouseCursor [csmcSizeEW] = XCreateFontCursor (dpy, XC_sb_h_double_arrow);
+  MouseCursor [csmcSizeEW] = XCreateFontCursor (dpy, XC_sb_h_double_arrow);
   /// Invalid operation cursor
-//MouseCursor [csmcStop] = XCreateFontCursor (dpy, XC_pirate);
+  MouseCursor [csmcStop] = XCreateFontCursor (dpy, XC_X_cursor);
   /// Wait (longplay operation) cursor
   MouseCursor [csmcWait] = XCreateFontCursor (dpy, XC_watch);
 
