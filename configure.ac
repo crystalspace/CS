@@ -1019,7 +1019,19 @@ AS_IF([test "$no_x" != yes],
 	[$X_CFLAGS], 
 	[$X_LFLAGS], 
 	[$X_PRE_LIBS $X_LIBS -lX11 -lXext $X_EXTRA_LIBS],
-	[Xrender])])
+	[Xrender])
+
+    CS_CHECK_LIB_WITH([xcursor],
+	[AC_LANG_PROGRAM(
+	    [[#include <X11/Xcursor/Xcursor.h>]],
+	    [XcursorShapeLoadCursor (0,0)])],
+	[], [],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libxcursor], [XCURSOR])],
+	[],
+	[$X_CFLAGS], 
+	[$X_LFLAGS], 
+	[$X_PRE_LIBS $X_LIBS -lX11 -lXext $X_EXTRA_LIBS],
+	[Xcursor])])
 
 
 

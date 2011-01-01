@@ -99,6 +99,8 @@ class csXWindow : public scfImplementation3<csXWindow, iXWindow,
   Pixmap EmptyPixmap;
   /// List of image-based cursors
   csHash<Cursor, csString> cachedCursors;
+  
+  Cursor GetXCursor (csMouseCursorID shape);
   //------------------------------------------------------------
   
   typedef int (*XErrorHandler)(Display*, XErrorEvent*);
