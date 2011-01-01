@@ -251,6 +251,10 @@ public:
    */
   bool IsValid () const
   { return (obj != 0); }
+
+  /// Return a hash value for this smart pointer.
+  uint GetHash() const
+  { return (uintptr_t)obj;  }
 };
 
 #endif // __CS_WEAKREF_H__

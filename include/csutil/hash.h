@@ -99,11 +99,10 @@ namespace CS
       template <class _T, class _K, class ArrayMemoryAlloc,
         class ArrayElementHandler> friend class csHash;
       
-      const K key;
+      K key;
       T value;
-
-      HashElement (const K& key0, const T &value0) : key (key0), value (value0) {}
     public:
+      HashElement (const K& key0, const T &value0) : key (key0), value (value0) {}
       HashElement (const HashElement& other) : key (other.key), value (other.value) {}
       
       const K& GetKey() const { return key; }
@@ -144,7 +143,6 @@ protected:
   size_t Modulo;
   size_t Size;
 
-private:
   size_t InitModulo;
   size_t GrowRate;
   size_t MaxSize;
