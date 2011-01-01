@@ -214,10 +214,10 @@ public:
 
   /**
    * Add an element to the hash table.
-   * \remarks If `key' is already present, does NOT replace the existing value,
-   *   but merely adds `value' as an additional value of `key'. To retrieve all
+   * \remarks If \a key is already present, does NOT replace the existing value,
+   *   but merely adds \a value as an additional value of \a key. To retrieve all
    *   values for a given key, use GetAll(). If you instead want to replace an
-   *   existing value for 'key', use PutUnique().
+   *   existing value for \a key, use PutUnique().
    */
   T& Put (const K& key, const T &value)
   {
@@ -377,7 +377,7 @@ public:
   }
 
   /**
-   * Get the first element matching the given key, or \p fallback if there is 
+   * Get the first element matching the given key, or \a fallback if there is 
    * none.
    */
   const T& Get (const K& key, const T& fallback) const
