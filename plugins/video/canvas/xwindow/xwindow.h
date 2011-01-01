@@ -103,6 +103,10 @@ class csXWindow : public scfImplementation3<csXWindow, iXWindow,
   csHash<Cursor, csString> cachedCursors;
   
   Cursor GetXCursor (csMouseCursorID shape);
+  
+  // RGBA cursor support
+  bool haveRGBAcursors;
+  Cursor CreateRGBACursor (iImage* imageRGBA, int hotspotX, int hotspotY);
   //------------------------------------------------------------
   
   typedef int (*XErrorHandler)(Display*, XErrorEvent*);

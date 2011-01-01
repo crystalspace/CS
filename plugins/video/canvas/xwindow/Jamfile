@@ -46,4 +46,9 @@ if $(X11.AVAILABLE) = "yes"
     CFlags xwin : [ FDefines HAVE_XCURSOR ] ;
     ExternalLibs xwin : XCURSOR ;
   }
+  if $(XRENDER.AVAILABLE) = "yes"
+  {
+    CFlags xwin : [ FDefines HAVE_XRENDER ] ;
+    ExternalLibs xwin : XRENDER ;
+  }
 }

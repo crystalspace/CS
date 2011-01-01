@@ -25,6 +25,7 @@
 #include "csutil/eventhandlers.h"
 #include "xwindow.h"
 #include "csgeom/csrect.h"
+#include "csgfx/bakekeycolor.h"
 #include "csgfx/imageautoconvert.h"
 #include "csgfx/imagemanipulate.h"
 #include "csutil/callstack.h"
@@ -45,6 +46,9 @@
 #ifdef HAVE_XCURSOR
 #include <X11/Xcursor/Xcursor.h>
 #endif
+#ifdef HAVE_XRENDER
+#include <X11/extensions/Xrender.h>
+#endif
 
 // Define this if you want keyboard-grabbing behavior enabled.  For now it is
 // disabled by default.  In the future, we should probably provide an API for
@@ -61,7 +65,7 @@ SCF_IMPLEMENT_FACTORY (csXWindow)
 #define CS_XEXT_XF86VM "XFree86-VidModeExtension"
 
 csXWindow::csXWindow (iBase* parent) : scfImplementationType (this, parent),
-  keyboardIM (0), keyboardIC (0)
+  keyboardIM (0), keyboardIC (0), haveRGBAcursors (false)
 {
   EmptyMouseCursor = 0;
   memset (&MouseCursor, 0, sizeof (MouseCursor));
@@ -349,6 +353,16 @@ bool csXWindow::Open ()
   memset (&Black, 0, sizeof (Black));
   EmptyMouseCursor = XCreatePixmapCursor (dpy, EmptyPixmap, EmptyPixmap,
     &Black, &Black, 0, 0);
+    
+#ifdef HAVE_XRENDER
+  {
+    int eventBase, errorBase;
+    int major, minor;
+    haveRGBAcursors = XRenderQueryExtension (dpy, &eventBase, &errorBase)
+      && XRenderQueryVersion (dpy, &major, &minor)
+      && ((major > 0) || (minor >= 5));
+  }
+#endif
 
   // Wait for expose event
   XEvent event;
@@ -1030,6 +1044,71 @@ bool csXWindow::SetMouseCursor (csMouseCursorID iShape)
   } /* endif */
 }
 
+Cursor csXWindow::CreateRGBACursor (iImage *image, int hotspotX, int hotspotY)
+{
+  int imgW = image->GetWidth();
+  int imgH = image->GetHeight();
+  
+  /* Convert RGBA data to required format
+     (It seems the XImage allows fiddling with the pixel format ...
+     but in practice this doesn't seem to make a difference.) */
+  uint32* dataARGB32 = (uint32*)cs_malloc (imgW*imgH*sizeof(uint32));
+  {
+    const csRGBpixel* srcPtr = (csRGBpixel*)image->GetImageData();
+    uint32* dstPtr = dataARGB32;
+    int n = imgW*imgH;
+    while (n-- > 0)
+    {
+      *dstPtr = (srcPtr->alpha << 24)
+	      | (srcPtr->red << 16)
+	      | (srcPtr->green << 8)
+	      | (srcPtr->blue);
+      srcPtr++;
+      dstPtr++;
+    }
+  }
+  
+  XImage ximg;
+  memset (&ximg, 0, sizeof (ximg));
+  ximg.width = imgW;
+  ximg.height = imgH;
+  ximg.format = ZPixmap;
+  ximg.data = (char*)dataARGB32;
+#ifdef CS_LITTLE_ENDIAN
+  ximg.byte_order = LSBFirst;
+#else
+  ximg.byte_order = MSBFirst;
+#endif
+  ximg.bitmap_unit = 32;
+  ximg.bitmap_bit_order = ximg.byte_order;
+  ximg.bitmap_pad = 32;
+  ximg.depth = 32;
+  ximg.bytes_per_line = imgW*4;
+  ximg.bits_per_pixel = 32;
+  ximg.red_mask = 0xff0000;
+  ximg.green_mask = 0x00ff00;
+  ximg.blue_mask = 0x0000ff;
+  if (!XInitImage (&ximg))
+  {
+    cs_free (dataARGB32);
+    return None;
+  }
+  Pixmap pixm = XCreatePixmap (dpy, RootWindow (dpy, screen_num),
+			       imgW, imgH, 32);
+  GC gc = XCreateGC (dpy, pixm, 0, nullptr);
+  XPutImage (dpy, pixm, gc, &ximg, 0, 0, 0, 0,
+	     imgW, imgH);
+  XFreeGC (dpy, gc);
+  cs_free (dataARGB32);
+  
+  XRenderPictFormat* pictFmt = XRenderFindStandardFormat (dpy, PictStandardARGB32);
+  Picture pic = XRenderCreatePicture (dpy, pixm, pictFmt, 0, nullptr);
+  XFreePixmap (dpy, pixm);
+  Cursor cur = XRenderCreateCursor (dpy, pic, hotspotX, hotspotY);
+  XRenderFreePicture (dpy, pic);
+  return cur;
+}
+
 bool csXWindow::SetMouseCursor (iImage *image, const csRGBcolor* keycolor,
                                 int hotspot_x, int hotspot_y,
                                 csRGBcolor fg, csRGBcolor bg)
@@ -1046,8 +1125,28 @@ bool csXWindow::SetMouseCursor (iImage *image, const csRGBcolor* keycolor,
       return true;
     }
   }
+  
+  // Set an RGBA cursor, if we can
+  if (haveRGBAcursors)
+  {
+    csRef<iImage> imageRGBA (CS::ImageAutoConvert (image, CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
+    if (keycolor)
+    {
+      imageRGBA = csBakeKeyColor::Image (imageRGBA, *keycolor);
+    }
+    
+    Cursor cur = CreateRGBACursor (imageRGBA, hotspot_x, hotspot_y);
+    if (cur)
+    {
+      // Select + cache cursor
+      XDefineCursor (dpy, ctx_win, cur);
+      if (image->GetName())
+	cachedCursors.Put (image->GetName(), cur);
+      return true;
+    }
+  }
 
-  // In X we must have a monochrome pointer. csCursorConverter takes care of
+  // Fall back to a monochrome pointer. csCursorConverter takes care of
   // the conversion.
   uint8* source;
   uint8* mask;
