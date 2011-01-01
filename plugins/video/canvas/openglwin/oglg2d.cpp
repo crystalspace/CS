@@ -1026,5 +1026,5 @@ bool csGraphics2DOpenGL::GetWindowTransparent ()
 
   if (!is_open) return transparencyRequested;
 
-  return transparencyState;
+  return IsWindowTransparencyAvailable() && transparencyState;
 }
