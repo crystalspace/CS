@@ -41,4 +41,9 @@ if $(X11.AVAILABLE) = "yes"
       CFlags xwin : [ FDefines GTK_MESSAGE_HAS_SECONDARY ] ;
     }
   }
+  if $(XCURSOR.AVAILABLE) = "yes"
+  {
+    CFlags xwin : [ FDefines HAVE_XCURSOR ] ;
+    ExternalLibs xwin : XCURSOR ;
+  }
 }

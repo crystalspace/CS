@@ -42,6 +42,10 @@
 #include "igraphic/image.h"
 #include "csplugincommon/canvas/cursorconvert.h"
 
+#ifdef HAVE_XCURSOR
+#include <X11/Xcursor/Xcursor.h>
+#endif
+
 // Define this if you want keyboard-grabbing behavior enabled.  For now it is
 // disabled by default.  In the future, we should probably provide an API for
 // setting this at run-time (though this API, when properly generalized to be
@@ -345,25 +349,6 @@ bool csXWindow::Open ()
   memset (&Black, 0, sizeof (Black));
   EmptyMouseCursor = XCreatePixmapCursor (dpy, EmptyPixmap, EmptyPixmap,
     &Black, &Black, 0, 0);
-
-  // Create mouse cursors
-  MouseCursor [csmcArrow] = XCreateFontCursor (dpy, XC_left_ptr);
-//MouseCursor [csmcLens] = XCreateFontCursor (dpy,
-  MouseCursor [csmcCross] = XCreateFontCursor (dpy, XC_crosshair);
-  MouseCursor [csmcPen] = XCreateFontCursor (dpy, XC_pencil);
-  MouseCursor [csmcMove] = XCreateFontCursor (dpy, XC_fleur);
-  /// Diagonal (\) resizing cursor
-  MouseCursor [csmcSizeNWSE] = XCreateFontCursor (dpy, XC_sizing);
-  /// Diagonal (/) resizing cursor
-  MouseCursor [csmcSizeNESW] = XCreateFontCursor (dpy, XC_sizing);
-  /// Vertical sizing cursor
-  MouseCursor [csmcSizeNS] = XCreateFontCursor (dpy, XC_sb_v_double_arrow);
-  /// Horizontal sizing cursor
-  MouseCursor [csmcSizeEW] = XCreateFontCursor (dpy, XC_sb_h_double_arrow);
-  /// Invalid operation cursor
-  MouseCursor [csmcStop] = XCreateFontCursor (dpy, XC_X_cursor);
-  /// Wait (longplay operation) cursor
-  MouseCursor [csmcWait] = XCreateFontCursor (dpy, XC_watch);
 
   // Wait for expose event
   XEvent event;
@@ -980,12 +965,62 @@ bool csXWindow::SetMousePosition (int x, int y)
   return true;
 }
 
+Cursor csXWindow::GetXCursor (csMouseCursorID shape)
+{
+  Cursor cur = None;
+  if ((shape >= 0) && (shape <= csMouseCursorID (lastCursor)))
+  {
+    cur = MouseCursor[shape];
+    if (cur == None)
+    {
+    #ifdef HAVE_XCURSOR
+      /* With Xcursor there's some more choice when it comes to cursors,
+       * prefer those for some cursors */
+      const char* cursorName = nullptr;
+      switch (shape)
+      {
+      case csmcSizeNWSE:	cursorName = "bd_double_arrow";	break;
+      case csmcSizeNESW:	cursorName = "fd_double_arrow";	break;
+      case csmcStop:		cursorName = "crossed_circle";	break;
+      default:			break;
+      }
+      if (cursorName)
+	cur = XcursorLibraryLoadCursor (dpy, cursorName);
+    #endif
+      if (!cur)
+      {
+	static const int cursorGlyphs[cursorNum] =
+	{
+	  XC_left_ptr, 		// Arrow
+	  -1,			// Lens
+	  XC_crosshair,		// Cross
+	  XC_pencil,		// Pen
+	  XC_fleur,		// Move
+	  XC_sizing,		// SizeNWSE
+	  XC_sizing,		// SizeNESW
+	  XC_sb_v_double_arrow,	// SizeNS
+	  XC_sb_h_double_arrow,	// SizeEW
+	  XC_X_cursor,		// Stop
+	  XC_watch		// Wait
+	};
+	if (cursorGlyphs[shape] >= 0)
+	{
+	  cur = XCreateFontCursor (dpy, cursorGlyphs[shape]);
+	}
+      }
+      MouseCursor [shape] = cur;
+    }
+  }
+
+  return cur;
+}
+
 bool csXWindow::SetMouseCursor (csMouseCursorID iShape)
 {
-  if (do_hwmouse && (iShape >= 0) && (iShape <= csmcWait)
-    && (MouseCursor [iShape] != None))
+  Cursor cursor = GetXCursor (iShape);
+  if (do_hwmouse && (cursor != None))
   {
-    XDefineCursor (dpy, ctx_win, MouseCursor [iShape]);
+    XDefineCursor (dpy, ctx_win, cursor);
     return true;
   }
   else

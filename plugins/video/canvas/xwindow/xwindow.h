@@ -91,8 +91,10 @@ class csXWindow : public scfImplementation3<csXWindow, iXWindow,
   //-------------------------------------------------------------
   // Hardware mouse cursor or software emulation?
   bool do_hwmouse;
+  // Number of CS mouse cursors
+  enum { lastCursor = csmcWait, cursorNum = lastCursor+1 };
   /// Mouse cursors (if hardware mouse cursors are used)
-  Cursor MouseCursor [int(csmcWait) + 1];
+  Cursor MouseCursor [cursorNum];
   /// Empty mouse cursor (consist of EmptyPixmap)
   Cursor EmptyMouseCursor;
   /// A empty pixmap
