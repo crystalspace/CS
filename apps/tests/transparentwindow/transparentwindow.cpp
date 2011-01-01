@@ -84,10 +84,16 @@ void TransparentWindow::Frame ()
     
     int x = 4, y = 4;
     bool transpState = natwin->GetWindowTransparent();
+    transpOutsideChange |= transpState != lastTranspState;
+    lastTranspState = transpState;
     DrawOutlineText (font, x, y, statusLines[0]);
     csString statusString;
     statusString = transpState ? "on" : "off";
-    if (transpState != transpRequested)
+    if (transpOutsideChange)
+    {
+      statusString.Append (" (changed from outside)");
+    }
+    else if (transpState != transpRequested)
     {
       statusString.Append (" (couldn't be changed)");
     }
@@ -165,8 +171,10 @@ bool TransparentWindow::OnKeyboard (iEvent& ev)
     case 't':
       if (natwin)
       {
+	transpOutsideChange = false;
 	transpRequested = !natwin->GetWindowTransparent();
 	natwin->SetWindowTransparent (transpRequested);
+	lastTranspState = natwin->GetWindowTransparent ();
       }
       break;
     }
@@ -234,8 +242,12 @@ bool TransparentWindow::Application ()
     bool transpResult = natwin->SetWindowTransparent (true);
     ReportInfo ("Window transparency could be enabled: %s",
                 transpResult ? "yes" : "no");
+    lastTranspState = transpResult;
   }
+  else
+    lastTranspState = false;
   transpRequested = true;
+  transpOutsideChange = false;
 
   // Open the main system. This will open all the previously loaded plug-ins.
   // i.e. all windows will be opened.

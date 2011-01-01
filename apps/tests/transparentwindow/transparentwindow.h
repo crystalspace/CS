@@ -40,6 +40,8 @@ private:
   csRef<FramePrinter> printer;
   
   bool transpRequested;
+  bool lastTranspState;
+  bool transpOutsideChange;
 public:
   bool SetupModules ();
 
