@@ -8,7 +8,7 @@ ApplicationIcon macosx : startme : startme.icns ;
 Application startme : [ Wildcard *.cpp *.h ] ;
 CFlags startme : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
 LinkWith startme : crystalspace ;
-ExternalLibs ceguitest : CEGUI ;
+ExternalLibs startme : CEGUI ;
 FileListEntryApplications startme : app-demo ;
 }
 
