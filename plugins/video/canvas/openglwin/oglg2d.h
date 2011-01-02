@@ -104,6 +104,10 @@ public:
   virtual bool IsWindowTransparencyAvailable();
   virtual bool SetWindowTransparent (bool transparent);
   virtual bool GetWindowTransparent ();
+
+  // Window decorations
+  virtual bool SetWindowDecoration (WindowDecoration decoration, bool flag);
+  virtual bool GetWindowDecoration (WindowDecoration decoration);
 protected:
 
   HDC hDC;
@@ -135,12 +139,16 @@ protected:
   void SwitchDisplayMode (bool userMode);
   /// hardware accelerated?
   bool hardwareAccelerated;
+  /// Window style in windowed mode
+  LONG windowModeStyle;
 
   csWin32CustomCursors cursors;
   HICON customIcon;
 
   bool transparencyRequested;
   bool transparencyState;
+
+  bool hideDecoClientFrame;
 };
 
 #endif // __CS_OGLG2D_H__

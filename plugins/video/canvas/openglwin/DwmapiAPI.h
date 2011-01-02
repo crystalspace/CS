@@ -17,6 +17,14 @@ struct DWM_BLURBEHIND
   BOOL	fTransitionOnMaximized;
 };
 
+struct dwmMARGINS
+{
+  int cxLeftWidth;
+  int cxRightWidth;
+  int cyTopHeight;
+  int cyBottomHeight;
+};
+
 #ifndef WM_DWMCOMPOSITIONCHANGED
 #define WM_DWMCOMPOSITIONCHANGED  0x031e
 #endif

@@ -97,7 +97,8 @@ csGraphics2DOpenGL::csGraphics2DOpenGL (iBase *iParent) :
   modeSwitched (true),
   customIcon (0),
   transparencyRequested (false),
-  transparencyState (false)
+  transparencyState (false),
+  hideDecoClientFrame (false)
 {
   Dwmapi::IncRef ();
 }
@@ -381,6 +382,7 @@ bool csGraphics2DOpenGL::Open ()
   int wheight = fbHeight;
   DWORD exStyle = 0;
   DWORD style = WS_POPUP | WS_SYSMENU;
+  windowModeStyle = WS_CAPTION;
   int xpos = 0;
   int ypos = 0;
   if (FullScreen)
@@ -389,7 +391,7 @@ bool csGraphics2DOpenGL::Open ()
   }
   else
   {
-    style |= WS_CAPTION | WS_MINIMIZEBOX;
+    style |= windowModeStyle | WS_MINIMIZEBOX;
     if (AllowResizing) 
       style |= WS_THICKFRAME | WS_MAXIMIZEBOX;
     
@@ -500,6 +502,7 @@ bool csGraphics2DOpenGL::Open ()
       vsync ? "enabled" : "disabled");
   }
 
+  hideDecoClientFrame = false;
   // Set transparency, if any was requested
   csGraphics2DOpenGL::SetWindowTransparent (transparencyRequested);
 
@@ -777,6 +780,7 @@ void csGraphics2DOpenGL::SetFullScreen (bool b)
     DWORD style;
     if (FullScreen)
     {
+      windowModeStyle = GetWindowLong (m_hWnd, GWL_STYLE);
       SwitchDisplayMode (false);
       style = WS_POPUP | WS_VISIBLE | WS_SYSMENU;
       SetWindowLong (m_hWnd, GWL_STYLE, style);
@@ -786,7 +790,8 @@ void csGraphics2DOpenGL::SetFullScreen (bool b)
     else
     {
       SwitchDisplayMode (true);
-      style = WS_CAPTION | WS_MINIMIZEBOX | WS_POPUP | WS_SYSMENU;
+      style = WS_MINIMIZEBOX | WS_POPUP | WS_SYSMENU;
+      style |= (windowModeStyle & (WS_CAPTION));
       int wwidth, wheight;
       if (AllowResizing)
       {
@@ -1014,6 +1019,11 @@ bool csGraphics2DOpenGL::SetWindowTransparent (bool transparent)
   if (SUCCEEDED (hr))
   {
     transparencyState = transparent;
+    if (hideDecoClientFrame)
+    {
+      dwmMARGINS frameMargins = {-1};
+      Dwmapi::DwmExtendFrameIntoClientArea (m_hWnd, &frameMargins);
+    }
     return true;
   }
   else
@@ -1027,4 +1037,81 @@ bool csGraphics2DOpenGL::GetWindowTransparent ()
   if (!is_open) return transparencyRequested;
 
   return IsWindowTransparencyAvailable() && transparencyState;
+}
+
+bool csGraphics2DOpenGL::SetWindowDecoration (WindowDecoration decoration, bool flag)
+{
+  if (FullScreen) return false;
+
+  LONG style = GetWindowLong (m_hWnd, GWL_STYLE);
+  LONG exstyle = GetWindowLong (m_hWnd, GWL_EXSTYLE);
+  RECT newRect;
+  GetClientRect (m_hWnd, &newRect);
+  ClientToScreen (m_hWnd, (POINT*)(&newRect.left));
+  ClientToScreen (m_hWnd, (POINT*)(&newRect.right));
+  switch (decoration)
+  {
+  case decoCaption:
+    if (flag)
+    {
+      style |= WS_CAPTION;
+    }
+    else
+    {
+      style &= ~WS_CAPTION;
+    }
+    break;
+  case decoClientFrame:
+    {
+      if (GetWindowTransparent ())
+      {
+	dwmMARGINS frameMargins;
+	hideDecoClientFrame = !flag;
+	if (hideDecoClientFrame)
+	{
+	  frameMargins.cxLeftWidth = frameMargins.cxRightWidth =
+	    frameMargins.cyTopHeight = frameMargins.cyBottomHeight = -1;
+	}
+	else
+	{
+	  frameMargins.cxLeftWidth = frameMargins.cxRightWidth =
+	    frameMargins.cyTopHeight = frameMargins.cyBottomHeight = 0;
+	}
+	HRESULT hr = Dwmapi::DwmExtendFrameIntoClientArea (m_hWnd, &frameMargins);
+	return SUCCEEDED (hr);
+      }
+    }
+    // else fall through
+  default:
+    return false;
+  }
+
+  SetWindowLong (m_hWnd, GWL_STYLE, style);
+  AdjustWindowRectEx (&newRect, style, false, exstyle);
+  SetWindowPos (m_hWnd, 0,
+		newRect.left, newRect.top,
+		newRect.right - newRect.left, newRect.bottom - newRect.top,
+		SWP_FRAMECHANGED | SWP_NOACTIVATE | SWP_NOZORDER);
+  return true;
+}
+
+bool csGraphics2DOpenGL::GetWindowDecoration (WindowDecoration decoration)
+{
+  LONG style = GetWindowLong (m_hWnd, GWL_STYLE);
+  switch (decoration)
+  {
+  case decoCaption:
+    return (style & WS_CAPTION) != 0;
+  case decoClientFrame:
+    {
+      // Client frame not drawn w/o compositing
+      if (!IsWindowTransparencyAvailable()) return false;
+      return !hideDecoClientFrame;
+    }
+    break;
+  default:
+    break;
+  }
+
+  return csGraphics2DGLCommon::GetWindowDecoration (decoration);
 }
