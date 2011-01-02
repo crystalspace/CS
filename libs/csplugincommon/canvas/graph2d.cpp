@@ -448,6 +448,19 @@ bool csGraphics2D::DebugCommand (const char* /*cmd*/)
   return false;
 }
 
+bool csGraphics2D::GetWindowDecoration (WindowDecoration decoration)
+{
+  // Decorations that are commonly on
+  switch (decoration)
+  {
+  case decoCaption:
+    return !FullScreen;
+  }
+
+  // Everything else: assume off
+  return false;
+}
+
 //---------------------------------------------------------------------------
 
 #define NUM_OPTIONS 3

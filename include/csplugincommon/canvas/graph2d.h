@@ -335,6 +335,10 @@ protected:
   virtual bool IsWindowTransparencyAvailable() { return false; }
   virtual bool SetWindowTransparent (bool transparent) { return false; }
   virtual bool GetWindowTransparent () { return false; }
+
+  virtual bool SetWindowDecoration (WindowDecoration decoration, bool flag)
+  { return false; }
+  virtual bool GetWindowDecoration (WindowDecoration decoration);
   /** @} */
 
   /**\name iPluginConfig implementation

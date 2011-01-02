@@ -88,7 +88,7 @@ struct iNativeWindowManager : public virtual iBase
  */
 struct iNativeWindow : public virtual iBase
 {
-  SCF_INTERFACE (iNativeWindow, 2, 0, 3);
+  SCF_INTERFACE (iNativeWindow, 2, 0, 4);
   
   /**
    * Set the title for this window.
@@ -158,6 +158,41 @@ struct iNativeWindow : public virtual iBase
    */
   virtual bool GetWindowTransparent () = 0;
   /** @} */
+
+  /// Window decorations that can be shown or hidden.
+  enum WindowDecoration
+  {
+    /**
+     * Window caption ("title bar").
+     * Caveat: Hiding the caption may prevent the user from moving the window.
+     */
+    decoCaption,
+    /**
+     * On Windows, thin frame between "client" area and window borders.
+     * This flag actually only has effect on Windows Vista+ with compositing
+     * enabled, and it's actual effect depends on whether the window caption
+     * is shown or not.
+     *
+     * If the window has a caption, it controls the thin frame between client
+     * area and window border. Removing that frame gives the window the
+     * appearance of a continuous "sheet of glass".
+     *
+     * If the window is transparent, has no caption and is not resizeable,
+     * setting this decoration to off actually removes the "glassy" backdrop,
+     * making transparent areas of the framebuffer truly translucent.
+     */
+    decoClientFrame
+  };
+  /**
+   * Show or hide a window decoration.
+   * \param decoration Decoration to change
+   * \param flag Whether to show (\c true) or hide (\c false) a decoration.
+   * \returns Whether changing the visibility of the decoration was successful.
+   * \remarks Always fails when in fullscreen mode.
+   */
+  virtual bool SetWindowDecoration (WindowDecoration decoration, bool flag) = 0;
+  /// Return whether a decoration is visible.
+  virtual bool GetWindowDecoration (WindowDecoration decoration) = 0;
 };
 
 /** @} */
