@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2005 by Jorrit Tyberghein
+    Copyright (C) 2011 by Jorrit Tyberghein and Jelle Hellemans
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -25,8 +25,7 @@ CS_IMPLEMENT_APPLICATION
 StartMe::StartMe ()
 {
   SetApplicationName ("CrystalSpace.StartMe");
-  last_selected = (size_t)-1;
-  description_selected = (size_t)-1;
+  rotate = true;
 }
 
 StartMe::~StartMe ()
@@ -36,130 +35,7 @@ StartMe::~StartMe ()
 void StartMe::Frame ()
 {
   // First get elapsed time from the virtual clock.
-  csTicks elapsed_time = vc->GetElapsedTicks ();
-  if (elapsed_time > 200) elapsed_time = 200;
-  // Now rotate the camera according to keyboard state
-  float elapsed_seconds = float (elapsed_time) / 1000.0f;
-
-  int mouse_x = mouse->GetLastX ();
-  int mouse_y = mouse->GetLastY ();
-  iCamera* camera = view->GetCamera ();
-  csVector2 p (mouse_x, g3d->GetDriver2D ()->GetHeight () - mouse_y);
-
-  csVector3 light_v, star_v;
-
-  star_v = camera->InvPerspective (p, DEMO_MESH_Z-5);
-  star_ticks += elapsed_time;
-  while (star_ticks > star_timeout)
-  {
-    star_ticks -= star_timeout;
-    star_v.x += ((float)rand() / (float)RAND_MAX - 0.5f) / 4.0f;
-    star_v.y += ((float)rand() / (float)RAND_MAX - 0.5f) / 4.0f;
-    star_v.z += ((float)rand() / (float)RAND_MAX - 0.5f) / 4.0f;
-
-    size_t max = star_count;
-    while (stars[cur_star].inqueue)
-    {
-      cur_star++;
-      if (cur_star >= star_count) cur_star = 0;
-      max--;
-      if (max <= 0) break;
-    }
-    if (max <= 0) { printf ("MAX!\n"); fflush (stdout); break; }
-    StarInfo& si = stars[cur_star];
-    si.star->GetMovable ()->GetTransform ().SetOrigin (star_v);
-    si.star->GetMovable ()->UpdateMove ();
-    si.r = 0;
-    si.stars_mesh->SetColor (csColor (0, 0, 0));
-    si.star->GetFlags ().Reset (CS_ENTITY_INVISIBLE);
-    si.inqueue = true;
-    star_queue.Push (int (cur_star));
-    cur_star++;
-    if (cur_star >= star_count) cur_star = 0;
-  }
-
-  float dr = elapsed_seconds / star_maxage;
-  size_t j = star_queue.GetSize ();
-  while (j > 0)
-  {
-    j--;
-    int star_idx = star_queue[j];
-    StarInfo& si = stars[star_idx];
-    si.r += dr;
-    if (si.r >= 1)
-    {
-      si.star->GetFlags ().Set (CS_ENTITY_INVISIBLE);
-      si.inqueue = false;
-      star_queue.DeleteIndex (j);
-    }
-    else
-    {
-      float f = 1.0f;
-      if (si.r < star_fade1)
-      {
-        f = 1.0f - (star_fade1-si.r) / star_fade1;
-      }
-      else if (si.r >= star_fade2)
-      {
-        f = 1.0f - (si.r - star_fade2) / (1.0f - star_fade2);
-      }
-      si.stars_mesh->SetColor (csColor (f+.2, f, f));
-    }
-  }
-
-  light_v = camera->InvPerspective (p, DEMO_MESH_Z-3);
-  pointer_light->GetMovable()->SetPosition (light_v);
-  pointer_light->GetMovable()->UpdateMove();
-
-  csVector3 start_v, end_v;
-  start_v = camera->InvPerspective (p, DEMO_MESH_Z-4);
-  end_v = camera->InvPerspective (p, 100.0f);
-  csVector3 start = camera->GetTransform ().This2Other (start_v);
-  csVector3 end = camera->GetTransform ().This2Other (end_v);
-
-  iSector* sector = camera->GetSector ();
-  csVector3 isect;
-  csIntersectingTriangle closest_tri;
-  iMeshWrapper* sel_mesh;
-  float sqdist = 1.0f;
-
-  if (InDescriptionMode ())
-    sel_mesh = demos[description_selected].mesh;
-  else
-    sqdist = csColliderHelper::TraceBeam (cdsys, sector,
-	start, end, true,
-	closest_tri, isect, &sel_mesh);
-
-  size_t i, sel = (size_t)-1;
-  if (sqdist >= 0 && sel_mesh)
-  {
-    const char* name = sel_mesh->QueryObject ()->GetName ();
-    for (i = 0 ; i < demos.GetSize () ; i++)
-      if (!strcmp (demos[i].name, name))
-      {
-        demos[i].spinning_speed += elapsed_seconds / 80.0f;
-	if (demos[i].spinning_speed > 0.05f) demos[i].spinning_speed = 0.05f;
-	sel = i;
-        break;
-      }
-  }
-  last_selected = sel;
-
-  for (i = 0 ; i < demos.GetSize () ; i++)
-  {
-    if (sel != i)
-    {
-      if (demos[i].spinning_speed > 0)
-      {
-        demos[i].spinning_speed -= elapsed_seconds / 80.0f;
-	if (demos[i].spinning_speed < 0)
-	  demos[i].spinning_speed = 0;
-      }
-    }
-    csYRotMatrix3 rot (demos[i].spinning_speed);
-    demos[i].mesh->GetMovable ()->Transform (rot);
-    demos[i].mesh->GetMovable ()->UpdateMove ();
-  }
+  double time = vc->GetCurrentTicks () / 4000.0;
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (CSDRAW_3DGRAPHICS))
@@ -167,42 +43,40 @@ void StartMe::Frame ()
 
   // Tell the camera to render into the frame buffer.
   view->Draw ();
+  
+  /* CEGUI rendering is done by the CEGUI plugin itself since
+     we called SetAutoRender (true). */
 
-  if (InDescriptionMode ())
+  static bool rotating = true;
+  if (rotate) rotating = true;
+
+  if (rotating)
   {
-    g3d->BeginDraw (CSDRAW_2DGRAPHICS);
-    iGraphics2D* g2d = g3d->GetDriver2D ();
-    csString desc = demos[description_selected].description->GetData ();
-    size_t idx = desc.FindFirst ('#');
-    int y = 50;
-    int fw, fh;
-    font->GetMaxSize (fw, fh);
-    while (idx != (size_t)-1)
+    CEGUI::Window* description = cegui->GetWindowManagerPtr()->getWindow("Description");
+    
+    size_t all = demos.GetSize ();
+    float offset = (PI*2)/(float)all;
+	  for (size_t i = 0 ; i < demos.GetSize (); i++)
     {
-      csString start, remainder;
-      desc.SubString (start, 0, idx);
-      desc.SubString (remainder, idx+1);
-      g2d->Write (font, 30, y, font_fg, font_bg, start);
-      y += fh + 5;
-      desc = remainder;
-      idx = desc.FindFirst ('#');
-    }
-    g2d->Write (font, 30, y, font_fg, font_bg, desc);
+	    float y = cos(i*offset-time);
+	    float x = sin(i*offset-time);
+	    bool left = x < -0.6f && y < -0.6f;
+      bool leftPeak = x < -0.7f && y < -0.7f;
+	    x = (x * 350.0f) - 40.0f;
+	    y = (y * 350.0f) + 70.0f;
+      x -= (left?128:64);
+      y -= (left?128:64);
+
+      float size = left?192.0f:128.0f;
+      demos[i].window->setSize(CEGUI::UVector2(CEGUI::UDim(0.0f, size), CEGUI::UDim(0.0f, size)));
+      demos[i].window->setPosition(CEGUI::UVector2(CEGUI::UDim(1.0f, x), CEGUI::UDim(1.0f, y)));
+      demos[i].window->setEnabled(left);
+      demos[i].window->setProperty("Alpha", left?"1":"0.6");
+      if (left) description->setText(demos[i].description);
+      
+      if (leftPeak && !rotate) { rotating = false; }
+	  }
   }
-}
-
-void StartMe::EnterDescriptionMode ()
-{
-  description_selected = last_selected;
-  main_light->SetColor (MAIN_LIGHT_OFF);
-  pointer_light->SetColor (POINTER_LIGHT_OFF);
-}
-
-void StartMe::LeaveDescriptionMode ()
-{
-  description_selected = (size_t)-1;
-  main_light->SetColor (MAIN_LIGHT_ON);
-  pointer_light->SetColor (POINTER_LIGHT_ON);
 }
 
 bool StartMe::OnKeyboard(iEvent& ev)
@@ -215,62 +89,18 @@ bool StartMe::OnKeyboard(iEvent& ev)
     utf32_char code = csKeyEventHelper::GetCookedCode(&ev);
     if (code == CSKEY_ESC)
     {
-      if (InDescriptionMode ())
-        LeaveDescriptionMode ();
-      else
-      {
         // The user pressed escape to exit the application.
         // The proper way to quit a Crystal Space application
         // is by broadcasting a csevQuit event. That will cause the
         // main runloop to stop. To do that we get the event queue from
         // the object registry and then post the event.
-        csRef<iEventQueue> q = 
-          csQueryRegistry<iEventQueue> (GetObjectRegistry());
-        if (q.IsValid()) 
-	  q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
-      }
+      csRef<iEventQueue> q = 
+        csQueryRegistry<iEventQueue> (GetObjectRegistry());
+      if (q.IsValid()) 
+        q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
     }
   }
   return false;
-}
-
-bool StartMe::OnMouseDown (iEvent& /*event*/)
-{
-  if (InDescriptionMode ())
-  {
-    csRef<iCommandLineParser> cmdline =
-        csQueryRegistry<iCommandLineParser> (GetObjectRegistry());
-    csString appdir = cmdline->GetAppDir ();
-    system (csString("\"") << appdir << CS_PATH_SEPARATOR <<
-        csInstallationPathsHelper::GetAppFilename (
-            demos[description_selected].exec) << "\" " << 
-        demos[description_selected].args);
-
-    LeaveDescriptionMode ();
-    return true;
-  }
-
-  if (last_selected != (size_t)-1)
-  {
-    EnterDescriptionMode ();
-  }
-  return true;
-}
-
-bool StartMe::LoadTextures ()
-{
-  if (!loader->LoadTexture ("spark", "/lib/std/sparka.dds"))
-    return ReportError ("Error loading %s texture!", CS::Quote::Single ("spark"));
-
-  vfs->ChDir ("/lib/startme");
-  size_t i;
-  for (i = 0 ; i < demos.GetSize () ; i++)
-  {
-    if (!loader->LoadTexture (demos[i].name, demos[i].image))
-      return ReportError ("Error loading %s texture!", CS::Quote::Single (demos[i].image));
-  }
-
-  return true;
 }
 
 bool StartMe::OnInitialize(int /*argc*/, char* /*argv*/ [])
@@ -294,8 +124,7 @@ bool StartMe::OnInitialize(int /*argc*/, char* /*argv*/ [])
       CS_REQUEST_LEVELLOADER,
       CS_REQUEST_REPORTER,
       CS_REQUEST_REPORTERLISTENER,
-      CS_REQUEST_PLUGIN("crystalspace.collisiondetection.opcode",
-		iCollideSystem),
+      CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
       CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
 
@@ -317,10 +146,26 @@ void StartMe::OnExit()
 
 bool StartMe::Application()
 {
+  // Set up window transparency. Must happen _before_ system is opened!
+  csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (GetObjectRegistry ());
+  if (!g2d) return ReportError ("Failed to obtain canvas!");
+  natwin = scfQueryInterface<iNativeWindow> (g2d);
+  if (natwin)
+  {
+    natwin->SetWindowTransparent (true);
+  }
+
   // Open the main system. This will open all the previously loaded plug-ins.
   // i.e. all windows will be opened.
   if (!OpenApplication(GetObjectRegistry()))
     return ReportError("Error opening system!");
+
+  // The window is open, so lets make it dissappear! 
+  if (natwin)
+  {
+    natwin->SetWindowDecoration (iNativeWindow::decoCaption, false);
+	  natwin->SetWindowDecoration (iNativeWindow::decoClientFrame, false);
+  }
 
   // Now get the pointer to various modules we need. We fetch them
   // from the object registry. The RequestPlugins() call we did earlier
@@ -337,12 +182,6 @@ bool StartMe::Application()
   kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry());
   if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
 
-  mouse = csQueryRegistry<iMouseDriver> (GetObjectRegistry());
-  if (!mouse) return ReportError("Failed to locate Mouse Driver!");
-
-  cdsys = csQueryRegistry<iCollideSystem> (GetObjectRegistry());
-  if (!cdsys) return ReportError("Failed to locate CollDet System!");
-
   loader = csQueryRegistry<iLoader> (GetObjectRegistry());
   if (!loader) return ReportError("Failed to locate Loader!");
 
@@ -352,17 +191,70 @@ bool StartMe::Application()
   confman = csQueryRegistry<iConfigManager> (GetObjectRegistry());
   if (!confman) return ReportError("Failed to locate Config Manager!");
 
+   cegui = csQueryRegistry<iCEGUI> (GetObjectRegistry());
+  if (!cegui) return ReportError("Failed to locate CEGUI plugin");
+
+  // Initialize CEGUI wrapper
+  cegui->Initialize ();
+  
+  /* Let CEGUI plugin install an event handler that takes care of rendering
+     every frame */
+  cegui->SetAutoRender (true);
+  
+  // Set the logging level
+  cegui->GetLoggerPtr ()->setLoggingLevel(CEGUI::Informative);
+
+  vfs->ChDir ("/cegui/");
+
+  // Load the ice skin (which uses Falagard skinning system)
+  cegui->GetSchemeManagerPtr ()->create("ice.scheme");
+
+  cegui->GetSystemPtr ()->setDefaultMouseCursor("ice", "MouseArrow");
+
+  cegui->GetFontManagerPtr ()->createFreeTypeFont("DejaVuSans", 10, true, "/fonts/ttf/DejaVuSans.ttf");
+
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  // Load layout and set as root
+  vfs->ChDir ("/this/data/startme/");
+  cegui->GetSchemeManagerPtr ()->create("crystal.scheme");
+  cegui->GetSystemPtr ()->setGUISheet(winMgr->loadWindowLayout("startme.layout"));
+
   // We need a View to the virtual world.
   view.AttachNew(new csView (engine, g3d));
-  iGraphics2D* g2d = g3d->GetDriver2D ();
   // We use the full window to draw the world.
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   LoadConfig ();
 
-  // Load textures.
-  if (!LoadTextures ())
-    return false;
+  CEGUI::Window* logo = winMgr->getWindow("Logo");
+  logo->subscribeEvent(CEGUI::Window::EventMouseClick,
+      CEGUI::Event::Subscriber(&StartMe::OnLogoClicked, this));
+
+  vfs->ChDir ("/lib/startme");
+  CEGUI::Window* root = winMgr->getWindow("root");
+  for (size_t i = 0 ; i < demos.GetSize () ; i++)
+  {
+    demos[i].window = winMgr->createWindow("crystal/StaticImage");
+    demos[i].window->setSize(CEGUI::UVector2(CEGUI::UDim(0.0f, 128.0f), CEGUI::UDim(0.0f, 128.0f)));
+    demos[i].window->setPosition(CEGUI::UVector2(CEGUI::UDim(0.0f, 0.0f), CEGUI::UDim(0.0f, 0.0f)));
+    CEGUI::ImagesetManager* imsetmgr = cegui->GetImagesetManagerPtr();
+    if (!imsetmgr->isDefined(demos[i].image))
+    {
+      imsetmgr->createFromImageFile(demos[i].image, demos[i].image);
+      std::string img = "set:"+std::string(demos[i].image)+" image:full_image";
+      demos[i].window->setProperty("Image", img);
+    }
+    root->addChildWindow(demos[i].window);
+
+    demos[i].window->subscribeEvent(CEGUI::Window::EventMouseClick,
+      CEGUI::Event::Subscriber(&StartMe::OnClick, this));
+
+    demos[i].window->subscribeEvent(CEGUI::Window::EventMouseEntersArea,
+      CEGUI::Event::Subscriber(&StartMe::OnEnter, this));
+    demos[i].window->subscribeEvent(CEGUI::Window::EventMouseLeavesArea,
+      CEGUI::Event::Subscriber(&StartMe::OnLeave, this));
+  }
 
   // Here we create our world.
   CreateRoom ();
@@ -378,11 +270,6 @@ bool StartMe::Application()
 
   printer.AttachNew (new FramePrinter (object_reg));
 
-  // Get our font.
-  font = g2d->GetFontServer ()->LoadFont (CSFONT_LARGE);
-  font_fg = g2d->FindRGB (255, 255, 255);
-  font_bg = -1;
-
   // This calls the default runloop. This will basically just keep
   // broadcasting process events to keep the game going.
   Run();
@@ -390,116 +277,66 @@ bool StartMe::Application()
   return true;
 }
 
-csPtr<iMeshWrapper> StartMe::CreateDemoMesh (const char* name,
-	const csVector3& pos)
+bool StartMe::OnLogoClicked (const CEGUI::EventArgs& e)
 {
-  csRef<iMeshWrapper> m;
-  m = engine->CreateMeshWrapper (box_fact, name, room, pos);
-  m->SetRenderPriority (engine->GetWallRenderPriority ());
-  iMaterialWrapper* mat = engine->FindMaterial (name);
-  m->GetMeshObject ()->SetMaterialWrapper (mat);
-  return (csPtr<iMeshWrapper>)m;
+  csRef<iEventQueue> q =
+    csQueryRegistry<iEventQueue> (GetObjectRegistry());
+  if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
+  return true;
+}
+
+bool StartMe::OnClick (const CEGUI::EventArgs& e)
+{
+  const CEGUI::WindowEventArgs& args =static_cast<const CEGUI::WindowEventArgs&>(e);
+
+  for (size_t i = 0 ; i < demos.GetSize () ; i++)
+    if (demos[i].window == args.window)
+    {
+      csRef<iCommandLineParser> cmdline = csQueryRegistry<iCommandLineParser> (GetObjectRegistry());
+      csString appdir = cmdline->GetAppDir ();
+      system (csString("\"") << appdir << CS_PATH_SEPARATOR <<
+        csInstallationPathsHelper::GetAppFilename (
+          demos[i].exec) << "\" " << 
+          demos[i].args);
+    }
+  return true;
+}
+
+bool StartMe::OnEnter (const CEGUI::EventArgs& e)
+{
+  rotate = false;
+  return true;
+}
+
+bool StartMe::OnLeave (const CEGUI::EventArgs& e)
+{
+  rotate = true;
+  return true;
 }
 
 void StartMe::CreateRoom ()
 {
-  // We create a new sector called "room".
+    // We create a new sector called "room".
   room = engine->CreateSector ("room");
 
-  iMaterialWrapper* spark_mat = engine->FindMaterial ("spark");
-  csRef<iMeshFactoryWrapper> spark_fact = engine->CreateMeshFactory (
-  	"crystalspace.mesh.object.genmesh", "spark_fact");
-  csRef<iGeneralFactoryState> spark_state = 
-    scfQueryInterface<iGeneralFactoryState> (
-      spark_fact->GetMeshObjectFactory ());
-  spark_state->SetVertexCount (4);
-  spark_state->GetVertices ()[0].Set (-.1f, -.1f, 0);
-  spark_state->GetVertices ()[1].Set (.1f, -.1f, 0);
-  spark_state->GetVertices ()[2].Set (.1f, .1f, 0);
-  spark_state->GetVertices ()[3].Set (-.1f, .1f, 0);
-  spark_state->GetTexels ()[0].Set (0, 0);
-  spark_state->GetTexels ()[1].Set (1, 0);
-  spark_state->GetTexels ()[2].Set (1, 1);
-  spark_state->GetTexels ()[3].Set (0, 1);
-  spark_state->GetNormals ()[0].Set (0, 0, 1);
-  spark_state->GetNormals ()[1].Set (0, 0, 1);
-  spark_state->GetNormals ()[2].Set (0, 0, 1);
-  spark_state->GetNormals ()[3].Set (0, 0, 1);
-  spark_state->SetTriangleCount (2);
-  spark_state->GetTriangles ()[0].Set (2, 1, 0);
-  spark_state->GetTriangles ()[1].Set (3, 2, 0);
-  spark_fact->GetMeshObjectFactory ()->SetMixMode (CS_FX_ADD);
-  spark_state->SetColor (csColor (1, 1, 1));
-  spark_fact->GetMeshObjectFactory ()->SetMaterialWrapper (spark_mat);
-  size_t i;
-  for (i = 0 ; i < star_count ; i++)
-  {
-    StarInfo starinfo;
-    stars.Push (starinfo);
-    stars[i].star = engine->CreateMeshWrapper (spark_fact, "star", room);
-    stars[i].star->GetFlags ().Set (CS_ENTITY_INVISIBLE);
-    stars[i].star->SetRenderPriority (engine->GetObjectRenderPriority ());
-    stars[i].star->SetZBufMode (CS_ZBUF_NONE);
-    stars[i].stars_mesh = stars[i].star->GetMeshObject ();
-  }
-  cur_star = 0;
-  star_ticks = 0;
-
-  box_fact = engine->CreateMeshFactory (
-  	"crystalspace.mesh.object.genmesh", "box_fact");
-  csRef<iGeneralFactoryState> box_state = 
-    scfQueryInterface<iGeneralFactoryState> (
-      box_fact->GetMeshObjectFactory ());
-  csBox3 b (-1, -1, -1, 1, 1, 1);
-  box_state->GenerateBox (b);
-  box_state->CalculateNormals ();
-
-  int cols = 4;
-  int rows = int (demos.GetSize ()-1) / cols + 1;
-  float dx = (DEMO_MESH_MAXX-DEMO_MESH_MINX) / float (cols-1);
-  float dy = (DEMO_MESH_MAXY-DEMO_MESH_MINY) / float (rows-1);
-  int x = 0, y = rows-1;
-  for (i = 0 ; i < demos.GetSize () ; i++)
-  {
-    demos[i].mesh = CreateDemoMesh (demos[i].name,
-      	csVector3 (DEMO_MESH_MINX + dx * float (x),
-		   DEMO_MESH_MINY + dy * float (y),
-		   DEMO_MESH_Z));
-    x++;
-    if (x >= cols) { y--; x = 0; }
-    demos[i].spinning_speed = 0;
-  }
+  // Note: no walls are created - to get the point of this demo across...
 
   // Now we need light to see something.
+  csRef<iLight> light;
   iLightList* ll = room->GetLights ();
 
-  main_light = engine->CreateLight(0, csVector3(0, 0, -5), 100,
-  	MAIN_LIGHT_ON, CS_LIGHT_DYNAMICTYPE_DYNAMIC);
-  ll->Add (main_light);
-
-  pointer_light = engine->CreateLight(0, csVector3(0, 0, DEMO_MESH_Z-3), 5,
-  	POINTER_LIGHT_ON, CS_LIGHT_DYNAMICTYPE_DYNAMIC);
-  ll->Add (pointer_light);
-
-  csColliderHelper::InitializeCollisionWrappers (cdsys, engine, 0);
+  light = engine->CreateLight (0, csVector3 (-3, 5, -3), 20, csColor (1, 1, 1));
+  ll->Add (light);
 }
 
 void StartMe::LoadConfig ()
-{
-  // Retrieve star cursor informations.
-  star_count = confman->GetInt ("Stars.Count", 100);
-  star_timeout = confman->GetInt ("Stars.Timeout", 10);
-  star_maxage = confman->GetFloat ("Stars.MaxAge", 0.5f);
-  star_fade1 = confman->GetFloat ("Stars.Fade1", 0.2f);
-  star_fade2 = confman->GetFloat ("Stars.Fade2", 0.4f);
-  
+{  
   // Retrieve demo programs informations.
   size_t i = 0;
   csString pattern;
   while (confman->SubsectionExists (pattern.Format ("StartMe.%zu.", i)))
   {
     DemoData demo;
-    demo.description = new scfString ();
     csRef<iConfigIterator> iterator (confman->Enumerate (pattern.GetData()));
     while (iterator->HasNext ())
     {
@@ -519,8 +356,8 @@ void StartMe::LoadConfig ()
         demo.image = iterator->GetStr ();
       else
       {
-        demo.description->Append (iterator->GetStr ());
-        demo.description->Append ("#");
+        demo.description += iterator->GetStr ();
+        demo.description += "\n";
       }
     }
     demos.Push (demo);

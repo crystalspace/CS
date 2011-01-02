@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Imageset Name="crystal" Imagefile="crystal.png" NativeHorzRes="800" NativeVertRes="600" AutoScaled="false">
+  <Image Name="logo" XPos="13" YPos="0" Width="437" Height="301" />
+
+  <Image Name="StaticTopLeft"     XPos="15"  YPos="326" Width="10" Height="10" />
+  <Image Name="StaticTop"         XPos="76"  YPos="326" Width="10" Height="10" />
+  <Image Name="StaticTopRight"    XPos="134" YPos="326" Width="10" Height="10" />
+  <Image Name="StaticLeft"        XPos="15"  YPos="390" Width="10" Height="10" />
+  <Image Name="StaticBackdrop"    XPos="76"  YPos="336" Width="10" Height="10" />
+  <Image Name="StaticRight"       XPos="134" YPos="390" Width="10" Height="10" />
+  <Image Name="StaticBottomLeft"  XPos="15"  YPos="444" Width="10" Height="10" />
+  <Image Name="StaticBottom"      XPos="76"  YPos="444" Width="10" Height="10" />
+  <Image Name="StaticBottomRight" XPos="134" YPos="444" Width="10" Height="10" />
+</Imageset>
