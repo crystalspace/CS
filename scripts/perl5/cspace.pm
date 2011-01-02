@@ -10231,6 +10231,10 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *IsWindowTransparencyAvailable = *cspacec::iNativeWindow_IsWindowTransparencyAvailable;
 *SetWindowTransparent = *cspacec::iNativeWindow_SetWindowTransparent;
 *GetWindowTransparent = *cspacec::iNativeWindow_GetWindowTransparent;
+*decoCaption = *cspacec::iNativeWindow_decoCaption;
+*decoClientFrame = *cspacec::iNativeWindow_decoClientFrame;
+*SetWindowDecoration = *cspacec::iNativeWindow_SetWindowDecoration;
+*GetWindowDecoration = *cspacec::iNativeWindow_GetWindowDecoration;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

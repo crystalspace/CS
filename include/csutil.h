@@ -170,6 +170,7 @@
 #include "csutil/vfshiercache.h"
 #include "csutil/vfsplat.h"
 #include "csutil/virtclk.h"
+#include "csutil/weakkeyedhash.h"
 #include "csutil/weakref.h"
 #include "csutil/weakrefarr.h"
 #include "csutil/weakreferenced.h"

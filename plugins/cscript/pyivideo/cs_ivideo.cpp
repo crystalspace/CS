@@ -12330,6 +12330,77 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iNativeWindow_SetWindowDecoration(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iNativeWindow *arg1 = (iNativeWindow *) 0 ;
+  iNativeWindow::WindowDecoration arg2 ;
+  bool arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  bool val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iNativeWindow_SetWindowDecoration",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iNativeWindow, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iNativeWindow_SetWindowDecoration" "', argument " "1"" of type '" "iNativeWindow *""'"); 
+  }
+  arg1 = reinterpret_cast< iNativeWindow * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iNativeWindow_SetWindowDecoration" "', argument " "2"" of type '" "iNativeWindow::WindowDecoration""'");
+  } 
+  arg2 = static_cast< iNativeWindow::WindowDecoration >(val2);
+  ecode3 = SWIG_AsVal_bool(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iNativeWindow_SetWindowDecoration" "', argument " "3"" of type '" "bool""'");
+  } 
+  arg3 = static_cast< bool >(val3);
+  result = (bool)(arg1)->SetWindowDecoration(arg2,arg3);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iNativeWindow_GetWindowDecoration(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iNativeWindow *arg1 = (iNativeWindow *) 0 ;
+  iNativeWindow::WindowDecoration arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iNativeWindow_GetWindowDecoration",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iNativeWindow, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iNativeWindow_GetWindowDecoration" "', argument " "1"" of type '" "iNativeWindow *""'"); 
+  }
+  arg1 = reinterpret_cast< iNativeWindow * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iNativeWindow_GetWindowDecoration" "', argument " "2"" of type '" "iNativeWindow::WindowDecoration""'");
+  } 
+  arg2 = static_cast< iNativeWindow::WindowDecoration >(val2);
+  result = (bool)(arg1)->GetWindowDecoration(arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_iNativeWindow(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iNativeWindow *arg1 = (iNativeWindow *) 0 ;
@@ -24998,6 +25069,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iNativeWindow_IsWindowTransparencyAvailable", _wrap_iNativeWindow_IsWindowTransparencyAvailable, METH_VARARGS, NULL},
 	 { (char *)"iNativeWindow_SetWindowTransparent", _wrap_iNativeWindow_SetWindowTransparent, METH_VARARGS, NULL},
 	 { (char *)"iNativeWindow_GetWindowTransparent", _wrap_iNativeWindow_GetWindowTransparent, METH_VARARGS, NULL},
+	 { (char *)"iNativeWindow_SetWindowDecoration", _wrap_iNativeWindow_SetWindowDecoration, METH_VARARGS, NULL},
+	 { (char *)"iNativeWindow_GetWindowDecoration", _wrap_iNativeWindow_GetWindowDecoration, METH_VARARGS, NULL},
 	 { (char *)"delete_iNativeWindow", _wrap_delete_iNativeWindow, METH_VARARGS, NULL},
 	 { (char *)"iNativeWindow_swigregister", iNativeWindow_swigregister, METH_VARARGS, NULL},
 	 { (char *)"new_RenderPriority", _wrap_new_RenderPriority, METH_VARARGS, NULL},
@@ -27079,6 +27152,8 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CS_ALERT_ERROR",SWIG_From_int(static_cast< int >(1)));
   SWIG_Python_SetConstant(d, "CS_ALERT_WARNING",SWIG_From_int(static_cast< int >(2)));
   SWIG_Python_SetConstant(d, "CS_ALERT_NOTE",SWIG_From_int(static_cast< int >(3)));
+  SWIG_Python_SetConstant(d, "iNativeWindow_decoCaption",SWIG_From_int(static_cast< int >(iNativeWindow::decoCaption)));
+  SWIG_Python_SetConstant(d, "iNativeWindow_decoClientFrame",SWIG_From_int(static_cast< int >(iNativeWindow::decoClientFrame)));
   SWIG_Python_SetConstant(d, "cullNormal",SWIG_From_int(static_cast< int >(CS::Graphics::cullNormal)));
   SWIG_Python_SetConstant(d, "cullFlipped",SWIG_From_int(static_cast< int >(CS::Graphics::cullFlipped)));
   SWIG_Python_SetConstant(d, "cullDisabled",SWIG_From_int(static_cast< int >(CS::Graphics::cullDisabled)));
