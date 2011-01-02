@@ -149,6 +149,9 @@ protected:
   bool transparencyState;
 
   bool hideDecoClientFrame;
+
+  // Compute the default window rect (centered on screen)
+  void ComputeDefaultRect (RECT& windowRect, LONG style, LONG exStyle = 0);
 };
 
 #endif // __CS_OGLG2D_H__

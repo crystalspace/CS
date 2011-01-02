@@ -378,6 +378,7 @@ bool csGraphics2DOpenGL::Open ()
 
   m_bActivated = true;
 
+  RECT wndRect;
   int wwidth = fbWidth;
   int wheight = fbHeight;
   DWORD exStyle = 0;
@@ -388,6 +389,10 @@ bool csGraphics2DOpenGL::Open ()
   if (FullScreen)
   {
     /*exStyle |= WS_EX_TOPMOST;*/
+    wndRect.left = 0;
+    wndRect.top = 0;
+    wndRect.right = fbWidth;
+    wndRect.bottom = fbHeight;
   }
   else
   {
@@ -395,14 +400,12 @@ bool csGraphics2DOpenGL::Open ()
     if (AllowResizing) 
       style |= WS_THICKFRAME | WS_MAXIMIZEBOX;
     
-    wwidth += 2 * GetSystemMetrics (SM_CXFIXEDFRAME);
-    wheight += 2 * GetSystemMetrics (SM_CYFIXEDFRAME) + GetSystemMetrics (SM_CYCAPTION);
-    xpos = (GetSystemMetrics (SM_CXSCREEN) - wwidth) / 2;
-    ypos = (GetSystemMetrics (SM_CYSCREEN) - wheight) / 2;
+    ComputeDefaultRect (wndRect, style, exStyle);
   }
 
   m_hWnd = m_piWin32Assistant->CreateCSWindow (this, exStyle, style,
-    xpos, ypos, wwidth, wheight);
+    wndRect.left, wndRect.top,
+    wndRect.right - wndRect.left, wndRect.bottom - wndRect.top);
 
   if (!m_hWnd)
     SystemFatalError (L"Cannot create Crystal Space window", GetLastError());
@@ -713,26 +716,15 @@ void csGraphics2DOpenGL::AllowResize (bool iAllow)
       AllowResizing = iAllow;
       if (AllowResizing)
       {
-	R.left -= GetSystemMetrics (SM_CXSIZEFRAME);
-	R.top -= (GetSystemMetrics (SM_CXSIZEFRAME)
-	  + GetSystemMetrics (SM_CYCAPTION));
-	R.right += GetSystemMetrics (SM_CXSIZEFRAME);
-	R.bottom += GetSystemMetrics (SM_CXSIZEFRAME);
-
 	style |= WS_THICKFRAME | WS_MAXIMIZEBOX;
       }
       else
       {
-	R.left -= GetSystemMetrics (SM_CXFIXEDFRAME);
-	R.top -= (GetSystemMetrics (SM_CXFIXEDFRAME)
-	  + GetSystemMetrics (SM_CYCAPTION));
-	R.right += GetSystemMetrics (SM_CXFIXEDFRAME);
-	R.bottom += GetSystemMetrics (SM_CXFIXEDFRAME);
-
 	style &= ~(WS_THICKFRAME | WS_MAXIMIZEBOX);
       }
       SetWindowLong (m_hWnd, GWL_STYLE, style);
 
+      AdjustWindowRectEx (&R, style, false, 0);
       SetWindowPos (m_hWnd, 0, R.left, R.top, R.right - R.left,
 	R.bottom - R.top, SWP_NOZORDER | SWP_DRAWFRAME);
     }
@@ -752,15 +744,17 @@ bool csGraphics2DOpenGL::Resize (int width, int height)
       // We only resize the window when the canvas is different. This only
       // happens on a manual Resize() from the app, as this is called after
       // the window resizing is finished     
-      int wwidth = fbWidth + 2 * GetSystemMetrics (SM_CXSIZEFRAME);
-      int wheight = fbHeight + 2 * GetSystemMetrics (SM_CYSIZEFRAME)
-        + GetSystemMetrics (SM_CYCAPTION);
+      RECT wndRect;
+      LONG style = GetWindowLong (m_hWnd, GWL_STYLE);
+      ComputeDefaultRect (wndRect, style);
 
       // To prevent a second resize of the canvas, we temporarily disable resizing
       AllowResizing = false;
 
-      SetWindowPos (m_hWnd, 0, (GetSystemMetrics (SM_CXSCREEN) - wwidth) / 2,
-        (GetSystemMetrics (SM_CYSCREEN) - wheight) / 2, wwidth, wheight, SWP_NOZORDER);
+      SetWindowPos (m_hWnd, 0,
+    		    wndRect.left, wndRect.right,
+		    wndRect.right - wndRect.left, wndRect.bottom - wndRect.top,
+		    SWP_NOZORDER);
       
       // Reset. AllowResizing must be true in order to reach this point anyway
       AllowResizing = true;
@@ -792,23 +786,15 @@ void csGraphics2DOpenGL::SetFullScreen (bool b)
       SwitchDisplayMode (true);
       style = WS_MINIMIZEBOX | WS_POPUP | WS_SYSMENU;
       style |= (windowModeStyle & (WS_CAPTION));
-      int wwidth, wheight;
+      RECT wndRect;
+      ComputeDefaultRect (wndRect, style);
       if (AllowResizing)
-      {
         style |= WS_THICKFRAME | WS_MAXIMIZEBOX;
-        wwidth = fbWidth + 2 * GetSystemMetrics (SM_CXSIZEFRAME);
-        wheight = fbHeight + 2 * GetSystemMetrics (SM_CYSIZEFRAME)
-          + GetSystemMetrics (SM_CYCAPTION);
-      }
-      else
-      {
-        wwidth = fbWidth + 2 * GetSystemMetrics (SM_CXFIXEDFRAME);
-        wheight = fbHeight + 2 * GetSystemMetrics (SM_CYFIXEDFRAME)
-          + GetSystemMetrics (SM_CYCAPTION);
-      }
       SetWindowLong (m_hWnd, GWL_STYLE, style);
-      SetWindowPos (m_hWnd, HWND_NOTOPMOST, (GetSystemMetrics (SM_CXSCREEN) - wwidth) / 2,
-        (GetSystemMetrics (SM_CYSCREEN) - wheight) / 2, wwidth, wheight, SWP_FRAMECHANGED);
+      SetWindowPos (m_hWnd, HWND_NOTOPMOST,
+		    wndRect.left, wndRect.right,
+		    wndRect.right - wndRect.left, wndRect.bottom - wndRect.top,
+		    SWP_FRAMECHANGED);
       ShowWindow (m_hWnd, SW_SHOW);
     }
   }
@@ -989,6 +975,17 @@ void csGraphics2DOpenGL::SwitchDisplayMode (bool userMode)
   curdmode.dmDriverExtra = 0;
   EnumDisplaySettings (0, ENUM_CURRENT_SETTINGS, &curdmode);
   refreshRate = curdmode.dmDisplayFrequency;
+}
+
+void csGraphics2DOpenGL::ComputeDefaultRect (RECT& windowRect, LONG style, LONG exStyle)
+{
+  RECT clientRect;
+  clientRect.left = (GetSystemMetrics (SM_CXSCREEN) - fbWidth) / 2;
+  clientRect.top = (GetSystemMetrics (SM_CYSCREEN) - fbHeight) / 2;
+  clientRect.right = clientRect.left + fbWidth;
+  clientRect.bottom = clientRect.top + fbHeight;
+  AdjustWindowRectEx (&clientRect, style, false, exStyle);
+  windowRect = clientRect;
 }
 
 bool csGraphics2DOpenGL::IsWindowTransparencyAvailable()
