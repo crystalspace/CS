@@ -42,6 +42,9 @@ private:
   bool transpRequested;
   bool lastTranspState;
   bool transpOutsideChange;
+
+  bool captionGotChanged;
+  bool clientFrameGotChanged;
 public:
   bool SetupModules ();
 

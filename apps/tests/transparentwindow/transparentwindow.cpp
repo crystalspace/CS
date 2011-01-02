@@ -22,7 +22,8 @@ CS_IMPLEMENT_APPLICATION
 
 //---------------------------------------------------------------------------
 
-TransparentWindow::TransparentWindow ()
+TransparentWindow::TransparentWindow () : captionGotChanged (true),
+  clientFrameGotChanged (true)
 {
   SetApplicationName ("CrystalSpace.TransparentWindow");
 }
@@ -70,7 +71,9 @@ void TransparentWindow::Frame ()
   {
     static const char* statusLines[] = 
     {
-      "Window (t)ransparency: "
+      "Window (t)ransparency: ",
+      "Window (c)aption: ",
+      "Client (f)rame: "
     };
     size_t numLines = sizeof (statusLines)/sizeof (statusLines[0]);
     
@@ -97,6 +100,20 @@ void TransparentWindow::Frame ()
     {
       statusString.Append (" (couldn't be changed)");
     }
+    DrawOutlineText (font, x + colWidth + 4, y, statusString);
+
+    y += font->GetTextHeight ();
+    DrawOutlineText (font, x, y, statusLines[1]);
+    statusString =
+      natwin->GetWindowDecoration (iNativeWindow::decoCaption) ? "on" : "off";
+    if (!captionGotChanged) statusString.Append (" (couldn't be changed)");
+    DrawOutlineText (font, x + colWidth + 4, y, statusString);
+
+    y += font->GetTextHeight ();
+    DrawOutlineText (font, x, y, statusLines[2]);
+    statusString =
+      natwin->GetWindowDecoration (iNativeWindow::decoClientFrame) ? "on" : "off";
+    if (!clientFrameGotChanged) statusString.Append (" (couldn't be changed)");
     DrawOutlineText (font, x + colWidth + 4, y, statusString);
   }
   
@@ -175,6 +192,22 @@ bool TransparentWindow::OnKeyboard (iEvent& ev)
 	transpRequested = !natwin->GetWindowTransparent();
 	natwin->SetWindowTransparent (transpRequested);
 	lastTranspState = natwin->GetWindowTransparent ();
+      }
+      break;
+    case 'c':
+      if (natwin)
+      {
+	captionGotChanged =
+	  natwin->SetWindowDecoration (iNativeWindow::decoCaption,
+				       !natwin->GetWindowDecoration (iNativeWindow::decoCaption));
+      }
+      break;
+    case 'f':
+      if (natwin)
+      {
+	clientFrameGotChanged =
+	  natwin->SetWindowDecoration (iNativeWindow::decoClientFrame,
+				       !natwin->GetWindowDecoration (iNativeWindow::decoClientFrame));
       }
       break;
     }
