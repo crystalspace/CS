@@ -250,9 +250,11 @@ bool StartMe::Application()
     demos[i].window->subscribeEvent(CEGUI::Window::EventMouseClick,
       CEGUI::Event::Subscriber(&StartMe::OnClick, this));
 
-    demos[i].window->subscribeEvent(CEGUI::Window::EventMouseEntersArea,
+    ///TODO: Using 'EventMouseEntersArea' is more correct but is only available
+    /// in 0.7.2+
+    demos[i].window->subscribeEvent(CEGUI::Window::EventMouseEnters,
       CEGUI::Event::Subscriber(&StartMe::OnEnter, this));
-    demos[i].window->subscribeEvent(CEGUI::Window::EventMouseLeavesArea,
+    demos[i].window->subscribeEvent(CEGUI::Window::EventMouseLeaves,
       CEGUI::Event::Subscriber(&StartMe::OnLeave, this));
   }
 
