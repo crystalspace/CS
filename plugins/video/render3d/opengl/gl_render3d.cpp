@@ -394,7 +394,11 @@ void csGLGraphics3D::SetMixMode (uint mode, csAlphaMode::AlphaType alphaType,
 	default:
 	case csAlphaMode::alphaSmooth:
 	  statecache->Enable_GL_BLEND ();
-	  statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	  if (ext->CS_GL_EXT_blend_func_separate)
+	    statecache->SetBlendFuncSeparate (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA,
+					      GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	  else
+	    statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	  break;
       }
       break;
