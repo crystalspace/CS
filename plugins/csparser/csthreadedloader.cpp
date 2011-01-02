@@ -3856,6 +3856,36 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         mesh->GetMovable ()->UpdateMove ();
         }
         break;
+      case XMLTOKEN_INSTANCES:
+      {
+        // Get instances.
+        csRef<iDocumentNodeIterator> instances = child->GetNodes("instance");
+        while(instances->HasNext())
+        {
+          csRef<iDocumentNode> instance = instances->Next();
+
+          // Get o2w rotation.
+          csMatrix3 rotation;
+          csRef<iDocumentNode> matrix_node = instance->GetNode ("matrix");
+          if (matrix_node)
+          {
+            if (!SyntaxService->ParseMatrix(matrix_node, rotation))
+              return false;
+          }
+
+          // Get position offset.
+          csRef<iDocumentNode> vector_node = instance->GetNode ("v");
+          if (!vector_node)
+            return false;
+          
+          csVector3 v;
+          if (!SyntaxService->ParseVector (vector_node, v))
+            return false;
+
+          mesh->AddInstance (v, rotation);
+        }
+      }
+      break;
     case XMLTOKEN_BOX:
       TEST_MISSING_MESH
         else
