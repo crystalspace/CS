@@ -216,7 +216,7 @@ bool StartMe::Application()
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
   // Load layout and set as root
-  vfs->ChDir ("/this/data/startme/");
+  vfs->ChDir ("/data/startme/");
   cegui->GetSchemeManagerPtr ()->create("crystal.scheme");
   cegui->GetSystemPtr ()->setGUISheet(winMgr->loadWindowLayout("startme.layout"));
 
