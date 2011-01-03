@@ -43,6 +43,8 @@
 #include "igraphic/image.h"
 #include "csplugincommon/canvas/cursorconvert.h"
 
+#include "MwmUtil.h"
+
 #ifdef HAVE_XCURSOR
 #include <X11/Xcursor/Xcursor.h>
 #endif
@@ -266,6 +268,8 @@ bool csXWindow::Open ()
 
   XStoreName (dpy, wm_win, win_title);
   XSelectInput (dpy, wm_win, si_wm_mask);
+
+  xaMotifWmHints = XInternAtom (dpy, _XA_MOTIF_WM_HINTS, False);
 
   // Intern WM_DELETE_WINDOW and set window manager protocol
   // (Needed to catch user using window manager "delete window" button)
@@ -1191,4 +1195,117 @@ bool csXWindow::AlertV (int type, const char* title, const char* okMsg,
   if (AlertV_Xaw (type, title, okMsg, msg, arg)) return true;
 #endif
   return false;
+}
+
+bool csXWindow::SetWindowDecoration (iNativeWindow::WindowDecoration decoration, bool flag)
+{
+  const unsigned long hintsPropItems = sizeof (PropMotifWmHints) / sizeof (long);
+  PropMotifWmHints newHints;
+  
+  Atom type;
+  int format;
+  unsigned long items;
+  unsigned long bytesRemaining;
+  PropMotifWmHints* wmHints = nullptr;
+  XGetWindowProperty (dpy, wm_win, xaMotifWmHints,
+		      0, hintsPropItems,
+		      False, AnyPropertyType,
+		      &type, &format, &items, &bytesRemaining,
+		      reinterpret_cast<unsigned char**> (&wmHints));
+		      
+  if (type != None)
+    memcpy (&newHints, wmHints, sizeof (PropMotifWmHints));
+  else
+    memset (&newHints, 0, sizeof (PropMotifWmHints));
+  if (wmHints) XFree (wmHints);
+  
+  bool decoKnown = false;
+  // Decoration flags that trigger a visible title bar
+  const unsigned long titleFlags = MWM_DECOR_TITLE;
+  switch (decoration)
+  {
+  case iNativeWindow::decoCaption:
+    {
+      if (newHints.flags & MWM_HINTS_DECORATIONS)
+      {
+	/* If MWM_DECOR_ALL is set, all other flags that are set
+	   _are supposed to disable_ these decorations.
+	   If MWM_DECOR_ALL is not set, flags are enabling. */
+	if (newHints.decorations & MWM_DECOR_ALL)
+	{
+	  if (flag)
+	    newHints.decorations &= ~titleFlags;
+	  else
+	    newHints.decorations |= titleFlags;
+	}
+	else
+	{
+	  if (flag)
+	    newHints.decorations |= titleFlags;
+	  else
+	    newHints.decorations &= ~titleFlags;
+	}
+      }
+      else
+      {
+	newHints.flags |= MWM_HINTS_DECORATIONS;
+	/* Metacity seems to always show the caption when ALL is set,
+	   so initialize decorations with only the title flags. */
+	newHints.decorations = (flag ? titleFlags : 0);
+      }
+      decoKnown = true;
+    }
+    break;
+  default:
+    break;
+  }
+  
+  if (decoKnown)
+  {
+    XChangeProperty (dpy, wm_win, xaMotifWmHints, xaMotifWmHints, 32,
+      PropModeReplace, (unsigned char*)&newHints,
+      hintsPropItems);
+  }
+  return decoKnown;
+}
+
+bool csXWindow::GetWindowDecoration (iNativeWindow::WindowDecoration decoration, bool& result)
+{
+  const unsigned long hintsPropItems = sizeof (PropMotifWmHints) / sizeof (long);
+  
+  bool ret = false;
+  Atom type;
+  int format;
+  unsigned long items;
+  unsigned long bytesRemaining;
+  PropMotifWmHints* wmHints = nullptr;
+  XGetWindowProperty (dpy, wm_win, xaMotifWmHints,
+		      0, hintsPropItems,
+		      False, AnyPropertyType,
+		      &type, &format, &items, &bytesRemaining,
+		      reinterpret_cast<unsigned char**> (&wmHints));
+
+  if (type != None)
+  {
+    switch (decoration)
+    {
+    case iNativeWindow::decoCaption:
+      {
+	if (wmHints->flags & MWM_HINTS_DECORATIONS)
+	{
+	  if (wmHints->decorations & MWM_DECOR_ALL)
+	    result = (wmHints->decorations & MWM_DECOR_TITLE) == 0;
+	  else
+	    result = (wmHints->decorations & MWM_DECOR_TITLE) != 0;
+	  ret = true;
+	}
+      }
+      break;
+    default:
+      break;
+    }
+  }
+  
+  if (wmHints) XFree (wmHints);
+  return ret;
 }

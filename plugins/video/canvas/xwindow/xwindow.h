@@ -75,7 +75,9 @@ class csXWindow : public scfImplementation3<csXWindow, iXWindow,
   Window wm_win;
   /// Dimensions
   int wm_width, wm_height;
-
+  // "_MOTIF_WM_HINTS" atom, for window decoration manipulation
+  Atom xaMotifWmHints;
+  
   XEvent storedEvent;
 
   // "WM_DELETE_WINDOW" atom
@@ -88,7 +90,6 @@ class csXWindow : public scfImplementation3<csXWindow, iXWindow,
   XIM keyboardIM;
   /// Keyboard input context
   XIC keyboardIC;
-
   //-------------------------------------------------------------
   // Hardware mouse cursor or software emulation?
   csGraphics2D::HWMouseMode hwMouse;
@@ -192,6 +193,9 @@ public:
 #endif
   void SetHWMouseMode (csGraphics2D::HWMouseMode hwMouse)
   { this->hwMouse = hwMouse; }
+  
+  bool SetWindowDecoration (iNativeWindow::WindowDecoration decoration, bool flag);
+  bool GetWindowDecoration (iNativeWindow::WindowDecoration decoration, bool& result);
 
   struct EventHandler : 
     public scfImplementation1<EventHandler, iEventHandler>

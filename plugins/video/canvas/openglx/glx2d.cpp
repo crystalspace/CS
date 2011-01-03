@@ -34,6 +34,7 @@
 #include "ivaria/reporter.h"
 
 #include "plugins/video/canvas/openglx/glx2d.h"
+#include "MwmUtil.h"
 
 #ifdef CS_HAVE_XRENDER
 #include <X11/extensions/Xrender.h>
@@ -506,6 +507,19 @@ bool csGraphics2DGLX::SetWindowTransparent (bool transparent)
 bool csGraphics2DGLX::GetWindowTransparent ()
 {
   return is_open ? transparencyAvailable : transparencyRequested;
+}
+
+bool csGraphics2DGLX::SetWindowDecoration (WindowDecoration decoration, bool flag)
+{
+  return xwin->SetWindowDecoration (decoration, flag);
+}
+
+bool csGraphics2DGLX::GetWindowDecoration (WindowDecoration decoration)
+{
+  bool flag;
+  if (xwin->GetWindowDecoration (decoration, flag))
+    return flag;
+  return csGraphics2D::GetWindowDecoration (decoration);
 }
 
 void csGraphics2DGLX::SetFullScreen (bool yesno)

@@ -103,6 +103,9 @@ public:
   virtual bool SetWindowTransparent (bool transparent);
   virtual bool GetWindowTransparent ();
 
+  virtual bool SetWindowDecoration (WindowDecoration decoration, bool flag);
+  virtual bool GetWindowDecoration (WindowDecoration decoration);
+
   virtual void SetFullScreen (bool yesno);
 
   virtual bool GetFullScreen ()

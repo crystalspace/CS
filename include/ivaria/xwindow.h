@@ -40,7 +40,7 @@ struct iImage;
 /// Document me! @@@
 struct iXWindow : public virtual iBase
 {
-  SCF_INTERFACE (iXWindow, 2, 0, 1);
+  SCF_INTERFACE (iXWindow, 2, 0, 2);
 
   // These should be inherited from csNativeWindow
   virtual bool Open () = 0;
@@ -85,6 +85,9 @@ struct iXWindow : public virtual iBase
         const char* msg, va_list arg) CS_GNUC_PRINTF (5, 0) = 0;
 	
   virtual void SetHWMouseMode (csGraphics2D::HWMouseMode hwMouse) = 0;
+  
+  virtual bool SetWindowDecoration (iNativeWindow::WindowDecoration decoration, bool flag) = 0;
+  virtual bool GetWindowDecoration (iNativeWindow::WindowDecoration decoration, bool& result) = 0;
 };
 
 #endif // __CS_IVIDEO_XWINDOW_H__
