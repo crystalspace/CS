@@ -455,6 +455,8 @@ bool csGraphics2D::GetWindowDecoration (WindowDecoration decoration)
   {
   case decoCaption:
     return !FullScreen;
+  default:
+    break;
   }
 
   // Everything else: assume off
