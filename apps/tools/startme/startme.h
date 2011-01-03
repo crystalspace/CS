@@ -118,7 +118,7 @@ private:
 
   bool OnLogoClicked (const CEGUI::EventArgs& e);
 
-  bool OnMouseMove (const CEGUI::EventArgs& e);
+  bool OnMouseMove (iEvent& ev);
 
 public:
 

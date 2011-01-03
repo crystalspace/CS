@@ -290,19 +290,10 @@ bool StartMe::Application()
   CEGUI::Window* logo = winMgr->getWindow("Logo");
   logo->subscribeEvent(CEGUI::Window::EventMouseClick,
       CEGUI::Event::Subscriber(&StartMe::OnLogoClicked, this));
-  // TODO: is there a better way to know the mouse position instead of listening to all widgets?
-  logo->subscribeEvent(CEGUI::Window::EventMouseMove,
-      CEGUI::Event::Subscriber(&StartMe::OnMouseMove, this));
 
   vfs->ChDir ("/lib/startme");
 
   CEGUI::Window* root = winMgr->getWindow("root");
-  root->subscribeEvent(CEGUI::Window::EventMouseMove,
-    CEGUI::Event::Subscriber(&StartMe::OnMouseMove, this));
-
-  CEGUI::Window* description = winMgr->getWindow("Description");
-  description->subscribeEvent(CEGUI::Window::EventMouseMove,
-    CEGUI::Event::Subscriber(&StartMe::OnMouseMove, this));
 
   for (size_t i = 0 ; i < demos.GetSize () ; i++)
   {
@@ -321,9 +312,6 @@ bool StartMe::Application()
 
     demos[i].window->subscribeEvent(CEGUI::Window::EventMouseClick,
       CEGUI::Event::Subscriber(&StartMe::OnClick, this));
-
-    demos[i].window->subscribeEvent(CEGUI::Window::EventMouseMove,
-      CEGUI::Event::Subscriber(&StartMe::OnMouseMove, this));
   }
 
   // Here we create our world.
@@ -376,14 +364,12 @@ bool StartMe::OnClick (const CEGUI::EventArgs& e)
   return true;
 }
 
-bool StartMe::OnMouseMove (const CEGUI::EventArgs& e)
+bool StartMe::OnMouseMove (iEvent& ev)
 {
-  const CEGUI::MouseEventArgs& args = static_cast<const CEGUI::MouseEventArgs&>(e);
-
   // Compute the angle and distance to the bottom right corner of the window
   csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (GetObjectRegistry ());
-  float x = g2d->GetWidth () - args.position.d_x;
-  float y = g2d->GetHeight () - args.position.d_y;
+  float x = g2d->GetWidth () - csMouseEventHelper::GetX(&ev);
+  float y = g2d->GetHeight () - csMouseEventHelper::GetY(&ev);
   float distance = csQsqrt (x * x + y * y);
   float angle = atan2 (y, x);
 
