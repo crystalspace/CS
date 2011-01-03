@@ -64,6 +64,14 @@ AC_DEFUN([CS_PROG_CC],[
 		        [append])
 		;;
 	esac
+
+	# The -ffunction-sections and -fdata-sections can, in conjunction with
+	# the linker flag --gc-sections, reduce the size of the final linked
+	# binaries.
+	CS_EMIT_BUILD_FLAGS([if $CC accepts -ffunction-sections -fdata-sections],
+	    [cs_cv_prog_cc_individual_sections],
+	    [CS_CREATE_TUPLE([-ffunction-sections -fdata-sections])],
+	    [C], [COMPILER.CFLAGS], [append])
     ])
 ])
 
