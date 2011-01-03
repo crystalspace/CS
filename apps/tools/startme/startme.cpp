@@ -61,10 +61,10 @@ void StartMe::Frame ()
       position = closest;
 
     else if (distance < 0.0f)
-      position += time * DEFAULT_ROTATION_SPEED * 1.5f;
+      position += time * DEFAULT_ROTATION_SPEED * 3.0f;
 
     else
-      position -= time * DEFAULT_ROTATION_SPEED * 1.5f;
+      position -= time * DEFAULT_ROTATION_SPEED * 3.0f;
   }
 
   else
@@ -119,12 +119,27 @@ void StartMe::Frame ()
     x = (x * 350.0f) - 40.0f;
     y = (y * 350.0f) + 70.0f;
 
+    // Check if this is the currently selected demo
+    float size;
     bool selected = currentDemo == i;
-    x -= (selected ? 128 : 64);
-    y -= (selected ? 128 : 64);
+    if (selected)
+    {
+      // Compute the size of the window
+      int closest = position + 0.5f;
+      float distance = (0.5f - fabs (position - closest)) * 2.0f;
+      size = 128.0f + distance * 64.0f;
+      x -= 64.0f + distance * 64.0f;
+      y -= 64.0f + distance * 64.0f;
+    }
+
+    else
+    {
+      x -= 64;
+      y -= 64;
+      size = 128.0f;
+    }
 
     // Setup the window
-    float size = selected ? 192.0f : 128.0f;
     demos[i].window->setSize(CEGUI::UVector2(CEGUI::UDim(0.0f, size), CEGUI::UDim(0.0f, size)));
     demos[i].window->setPosition(CEGUI::UVector2(CEGUI::UDim(1.0f, x), CEGUI::UDim(1.0f, y)));
     demos[i].window->setVisible(true);
