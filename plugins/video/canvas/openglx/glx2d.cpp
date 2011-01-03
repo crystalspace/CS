@@ -34,7 +34,6 @@
 #include "ivaria/reporter.h"
 
 #include "plugins/video/canvas/openglx/glx2d.h"
-#include "MwmUtil.h"
 
 #ifdef CS_HAVE_XRENDER
 #include <X11/extensions/Xrender.h>
