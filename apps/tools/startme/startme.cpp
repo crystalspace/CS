@@ -302,7 +302,11 @@ bool StartMe::Application()
 
   LoadConfig ();
 
+  CEGUI::Window* description = cegui->GetWindowManagerPtr()->getWindow("Description");
+  description->setMouseInputPropagationEnabled(true);
+
   CEGUI::Window* logo = winMgr->getWindow("Logo");
+  logo->setMouseInputPropagationEnabled(true);
   logo->subscribeEvent(CEGUI::Window::EventMouseClick,
       CEGUI::Event::Subscriber(&StartMe::OnLogoClicked, this));
 
@@ -325,6 +329,7 @@ bool StartMe::Application()
     }
     root->addChildWindow(demos[i].window);
 
+    demos[i].window->setMouseInputPropagationEnabled(true);
     demos[i].window->subscribeEvent(CEGUI::Window::EventMouseClick,
       CEGUI::Event::Subscriber(&StartMe::OnClick, this));
   }
