@@ -60,6 +60,9 @@ C++FLAGS += -pipe ;
 LINKLIBS += -L/usr/lib/w32api -lgdi32 -lshell32 ;
 PLUGIN.LFLAGS += -mwindows ;
 WINDRES.FLAGS = --use-temp-file ;
+APPLICATION.LFLAGS += $(LINK.GC_SECTIONS) ;
+PLUGIN.LFLAGS += $(LINK.GC_SECTIONS) ;
+LIBRARY.LFLAGS += $(LINK.GC_SECTIONS) ;
 
 if "$(USE_DLLWRAP)" = "yes"
 {
