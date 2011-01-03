@@ -52,15 +52,13 @@ void StartMe::Frame ()
 
   // TODO: don't rotate if demos.GetSize () too small
 
-  // Compute the active demo
-  int currentDemo = position + 0.5f;
-
   // Compute the new position for the rotation
   if (rotationStatus == ROTATE_SELECTING)
   {
-    float distance = position - currentDemo;
+    int closest = position + 0.5f;
+    float distance = position - closest;
     if (fabs (distance) < 0.01f)
-      position = currentDemo;
+      position = closest;
 
     else if (distance < 0.0f)
       position += time * DEFAULT_ROTATION_SPEED * 1.5f;
@@ -80,6 +78,10 @@ void StartMe::Frame ()
   if (fabs (position - lastPosition) < EPSILON)
     return;
   lastPosition = position;
+
+  // Compute the active demo
+  int currentDemo = position + 0.5f;
+  currentDemo = (currentDemo + 1) % (int) demos.GetSize ();
 
   // Update each demo's window
   for (int i = 0 ; i < (int) demos.GetSize (); i++)
@@ -117,7 +119,7 @@ void StartMe::Frame ()
     x = (x * 350.0f) - 40.0f;
     y = (y * 350.0f) + 70.0f;
 
-    bool selected = currentDemo == i - 1;
+    bool selected = currentDemo == i;
     x -= (selected ? 128 : 64);
     y -= (selected ? 128 : 64);
 
@@ -222,7 +224,7 @@ bool StartMe::Application()
   if (natwin)
   {
     natwin->SetWindowDecoration (iNativeWindow::decoCaption, false);
-	  natwin->SetWindowDecoration (iNativeWindow::decoClientFrame, false);
+    natwin->SetWindowDecoration (iNativeWindow::decoClientFrame, false);
   }
 
   // Now get the pointer to various modules we need. We fetch them
