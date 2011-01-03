@@ -93,6 +93,14 @@ private:
 
   virtual bool OnKeyboard (iEvent&);
 
+  float position, lastPosition;
+  enum {
+    ROTATE_NORMAL = 0,
+    ROTATE_SELECTING,
+    ROTATE_SEARCHING
+  } rotationStatus;
+  float rotationSpeed;
+
   /**
    * Setup everything that needs to be rendered on screen. This routine
    * is called from the event handler in response to a cscmdProcess
@@ -106,14 +114,11 @@ private:
   /// Load configuration from file.
   void LoadConfig ();
 
-  bool rotate;
-
-  bool OnEnter (const CEGUI::EventArgs& e);
-  bool OnLeave (const CEGUI::EventArgs& e);
-
   bool OnClick (const CEGUI::EventArgs& e);
 
   bool OnLogoClicked (const CEGUI::EventArgs& e);
+
+  bool OnMouseMove (const CEGUI::EventArgs& e);
 
 public:
 

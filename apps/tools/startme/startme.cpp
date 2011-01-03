@@ -18,14 +18,17 @@
 
 #include "startme.h"
 
+#define DEFAULT_ROTATION_SPEED 0.0005f
+
 CS_IMPLEMENT_APPLICATION
 
 //---------------------------------------------------------------------------
 
 StartMe::StartMe ()
+  : position (0.0f), lastPosition (0.0f), rotationStatus (ROTATE_NORMAL),
+    rotationSpeed (DEFAULT_ROTATION_SPEED)
 {
   SetApplicationName ("CrystalSpace.StartMe");
-  rotate = true;
 }
 
 StartMe::~StartMe ()
@@ -35,7 +38,7 @@ StartMe::~StartMe ()
 void StartMe::Frame ()
 {
   // First get elapsed time from the virtual clock.
-  double time = vc->GetCurrentTicks () / 4000.0;
+  double time = vc->GetElapsedTicks ();
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (CSDRAW_3DGRAPHICS))
@@ -47,35 +50,90 @@ void StartMe::Frame ()
   /* CEGUI rendering is done by the CEGUI plugin itself since
      we called SetAutoRender (true). */
 
-  static bool rotating = true;
-  if (rotate) rotating = true;
+  // TODO: don't rotate if demos.GetSize () too small
 
-  if (rotating)
+  // Compute the active demo
+  int currentDemo = position + 0.5f;
+
+  // Compute the new position for the rotation
+  if (rotationStatus == ROTATE_SELECTING)
   {
-    CEGUI::Window* description = cegui->GetWindowManagerPtr()->getWindow("Description");
-    
-    size_t all = demos.GetSize ();
-    float offset = (PI*2)/(float)all;
-	  for (size_t i = 0 ; i < demos.GetSize (); i++)
-    {
-	    float y = cos(i*offset-time);
-	    float x = sin(i*offset-time);
-	    bool left = x < -0.6f && y < -0.6f;
-      bool leftPeak = x < -0.7f && y < -0.7f;
-	    x = (x * 350.0f) - 40.0f;
-	    y = (y * 350.0f) + 70.0f;
-      x -= (left?128:64);
-      y -= (left?128:64);
+    float distance = position - currentDemo;
+    if (fabs (distance) < 0.01f)
+      position = currentDemo;
 
-      float size = left?192.0f:128.0f;
-      demos[i].window->setSize(CEGUI::UVector2(CEGUI::UDim(0.0f, size), CEGUI::UDim(0.0f, size)));
-      demos[i].window->setPosition(CEGUI::UVector2(CEGUI::UDim(1.0f, x), CEGUI::UDim(1.0f, y)));
-      demos[i].window->setEnabled(left);
-      demos[i].window->setProperty("Alpha", left?"1":"0.6");
-      if (left) description->setText(demos[i].description);
-      
-      if (leftPeak && !rotate) { rotating = false; }
-	  }
+    else if (distance < 0.0f)
+      position += time * DEFAULT_ROTATION_SPEED * 1.5f;
+
+    else
+      position -= time * DEFAULT_ROTATION_SPEED * 1.5f;
+  }
+
+  else
+    position += time * rotationSpeed;
+
+  while (position > (float) demos.GetSize ())
+    position -= (float) demos.GetSize ();
+  while (position < 0.0f)
+    position += (float) demos.GetSize ();
+
+  if (fabs (position - lastPosition) < EPSILON)
+    return;
+  lastPosition = position;
+
+  // Update each demo's window
+  for (int i = 0 ; i < (int) demos.GetSize (); i++)
+  {
+    // Compute the distance from this index to the current position
+    float distance1 = ((float) i) - position;
+    float distance2 = ((float) demos.GetSize ()) - position + ((float) i);
+    float distance3 = ((float) i) - ((float) demos.GetSize ()) - position;
+    float distance;
+    if (fabs (distance1) < fabs (distance2))
+    {
+      if (fabs (distance1) < fabs (distance3))
+	distance = distance1;
+      else distance = distance3;
+    }
+    else
+    {
+      if (fabs (distance2) < fabs (distance3))
+	distance = distance2;
+      else distance = distance3;
+    }
+
+    // Check if the window is visible
+    if (fabs (distance) > 2.5f)
+    {
+      demos[i].window->setVisible(false);
+      demos[i].window->setEnabled(false);
+      continue;
+    }
+
+    // Compute the position of the window
+    float angle = distance * PI * 0.2f - PI;
+    float x = sin (angle);
+    float y = cos (angle);
+    x = (x * 350.0f) - 40.0f;
+    y = (y * 350.0f) + 70.0f;
+
+    bool selected = currentDemo == i - 1;
+    x -= (selected ? 128 : 64);
+    y -= (selected ? 128 : 64);
+
+    // Setup the window
+    float size = selected ? 192.0f : 128.0f;
+    demos[i].window->setSize(CEGUI::UVector2(CEGUI::UDim(0.0f, size), CEGUI::UDim(0.0f, size)));
+    demos[i].window->setPosition(CEGUI::UVector2(CEGUI::UDim(1.0f, x), CEGUI::UDim(1.0f, y)));
+    demos[i].window->setVisible(true);
+    demos[i].window->setEnabled(true);
+    demos[i].window->setProperty("Alpha", selected ? "1" : "0.6");
+
+    if (selected)
+    {
+      CEGUI::Window* description = cegui->GetWindowManagerPtr()->getWindow("Description");
+      description->setText(demos[i].description);
+    }
   }
 }
 
@@ -230,14 +288,26 @@ bool StartMe::Application()
   CEGUI::Window* logo = winMgr->getWindow("Logo");
   logo->subscribeEvent(CEGUI::Window::EventMouseClick,
       CEGUI::Event::Subscriber(&StartMe::OnLogoClicked, this));
+  // TODO: is there a better way to know the mouse position instead of listening to all widgets?
+  logo->subscribeEvent(CEGUI::Window::EventMouseMove,
+      CEGUI::Event::Subscriber(&StartMe::OnMouseMove, this));
 
   vfs->ChDir ("/lib/startme");
+
   CEGUI::Window* root = winMgr->getWindow("root");
+  root->subscribeEvent(CEGUI::Window::EventMouseMove,
+    CEGUI::Event::Subscriber(&StartMe::OnMouseMove, this));
+
+  CEGUI::Window* description = winMgr->getWindow("Description");
+  description->subscribeEvent(CEGUI::Window::EventMouseMove,
+    CEGUI::Event::Subscriber(&StartMe::OnMouseMove, this));
+
   for (size_t i = 0 ; i < demos.GetSize () ; i++)
   {
     demos[i].window = winMgr->createWindow("crystal/StaticImage");
     demos[i].window->setSize(CEGUI::UVector2(CEGUI::UDim(0.0f, 128.0f), CEGUI::UDim(0.0f, 128.0f)));
     demos[i].window->setPosition(CEGUI::UVector2(CEGUI::UDim(0.0f, 0.0f), CEGUI::UDim(0.0f, 0.0f)));
+
     CEGUI::ImagesetManager* imsetmgr = cegui->GetImagesetManagerPtr();
     if (!imsetmgr->isDefined(demos[i].image))
     {
@@ -250,12 +320,8 @@ bool StartMe::Application()
     demos[i].window->subscribeEvent(CEGUI::Window::EventMouseClick,
       CEGUI::Event::Subscriber(&StartMe::OnClick, this));
 
-    ///TODO: Using 'EventMouseEntersArea' is more correct but is only available
-    /// in 0.7.2+
-    demos[i].window->subscribeEvent(CEGUI::Window::EventMouseEnters,
-      CEGUI::Event::Subscriber(&StartMe::OnEnter, this));
-    demos[i].window->subscribeEvent(CEGUI::Window::EventMouseLeaves,
-      CEGUI::Event::Subscriber(&StartMe::OnLeave, this));
+    demos[i].window->subscribeEvent(CEGUI::Window::EventMouseMove,
+      CEGUI::Event::Subscriber(&StartMe::OnMouseMove, this));
   }
 
   // Here we create our world.
@@ -289,7 +355,10 @@ bool StartMe::OnLogoClicked (const CEGUI::EventArgs& e)
 
 bool StartMe::OnClick (const CEGUI::EventArgs& e)
 {
-  const CEGUI::WindowEventArgs& args =static_cast<const CEGUI::WindowEventArgs&>(e);
+  if (rotationStatus != ROTATE_SELECTING)
+    return true;
+
+  const CEGUI::WindowEventArgs& args = static_cast<const CEGUI::WindowEventArgs&>(e);
 
   for (size_t i = 0 ; i < demos.GetSize () ; i++)
     if (demos[i].window == args.window)
@@ -300,20 +369,53 @@ bool StartMe::OnClick (const CEGUI::EventArgs& e)
         csInstallationPathsHelper::GetAppFilename (
           demos[i].exec) << "\" " << 
           demos[i].args);
+      break;
     }
   return true;
 }
 
-bool StartMe::OnEnter (const CEGUI::EventArgs& e)
+bool StartMe::OnMouseMove (const CEGUI::EventArgs& e)
 {
-  rotate = false;
-  return true;
-}
+  const CEGUI::MouseEventArgs& args = static_cast<const CEGUI::MouseEventArgs&>(e);
 
-bool StartMe::OnLeave (const CEGUI::EventArgs& e)
-{
-  rotate = true;
-  return true;
+  // Compute the angle and distance to the bottom right corner of the window
+  csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (GetObjectRegistry ());
+  float x = g2d->GetWidth () - args.position.d_x;
+  float y = g2d->GetHeight () - args.position.d_y;
+  float distance = csQsqrt (x * x + y * y);
+  float angle = atan2 (y, x);
+
+  // If the mouse is too far away then rotate at default speed
+  if (distance < 250.0f || distance > 475.0f)
+  {
+    rotationStatus = ROTATE_NORMAL;
+    rotationSpeed = DEFAULT_ROTATION_SPEED;
+    return false;
+  }
+
+  // If the mouse is near the center then stop the rotation
+  if (angle > PI * 0.166f && angle < PI * 0.333f)
+    rotationStatus = ROTATE_SELECTING;
+
+  // If the mouse is on the side, then rotate faster
+  else
+  {
+    rotationStatus = ROTATE_SEARCHING;
+
+    if (angle < PI * 0.166f)
+    {
+      float distance = PI * 0.166f - angle;
+      rotationSpeed = - DEFAULT_ROTATION_SPEED * distance * 15.0f;
+    }
+
+    else
+    {
+      float distance = angle - PI * 0.333f;
+      rotationSpeed = DEFAULT_ROTATION_SPEED * distance * 15.0f;
+    }
+  }
+
+  return false;
 }
 
 void StartMe::CreateRoom ()
