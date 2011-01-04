@@ -35,6 +35,20 @@ StartMe::~StartMe ()
 {
 }
 
+void SizeWindow (CEGUI::Window* w)
+{//Size window to contents.
+  const CEGUI::RenderedString& rs(w->getRenderedString());
+  float height(20.0f);
+  for (size_t i = 0; i < rs.getLineCount(); ++i)
+  {
+    const CEGUI::Size line_sz(rs.getPixelSize(i));
+    height += line_sz.d_height;
+  }
+  height += rs.getLineCount()*10.0f;
+  w->setHeight(cegui_absdim(height));
+  w->setYPosition(CEGUI::UDim(0.5f, -height/2));
+}
+
 void StartMe::Frame ()
 {
   // First get elapsed time from the virtual clock.
@@ -150,6 +164,7 @@ void StartMe::Frame ()
     {
       CEGUI::Window* description = cegui->GetWindowManagerPtr()->getWindow("Description");
       description->setText(demos[i].description);
+      SizeWindow(description);
     }
   }
 
@@ -158,6 +173,7 @@ void StartMe::Frame ()
   {
     CEGUI::Window* description = cegui->GetWindowManagerPtr()->getWindow("Description");
     description->setText("Click to exit application");
+    SizeWindow(description);
   }
 }
 
@@ -293,7 +309,7 @@ bool StartMe::Application()
 
   cegui->GetSystemPtr ()->setDefaultMouseCursor("ice", "MouseArrow");
 
-  cegui->GetFontManagerPtr ()->createFreeTypeFont("DejaVuSans", 10, true, "/fonts/ttf/DejaVuSans.ttf");
+  cegui->GetFontManagerPtr ()->createFreeTypeFont("DejaVuSans-Bold", 10, true, "/fonts/ttf/DejaVuSans.ttf");
 
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 

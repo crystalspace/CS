@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GUILayout>
-    <Window Type="crystal/StaticText" Name="root">
+    <Window Type="DefaultWindow" Name="root">
         <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
         <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
         <Property Name="MousePassThroughEnabled" Value="True" />
-	<Property Name="BackgroundEnabled" Value="True" />
+	
 
         <Window Type="crystal/StaticText" Name="Description" >
           <Property Name="UnifiedAreaRect" Value="{{0.0,10},{0.0,10},{1.0,-400},{1.0,-150}}" />
