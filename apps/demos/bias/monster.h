@@ -32,6 +32,7 @@ private:
   csRef<iMeshWrapper> mesh;
   csRef<iMeshWrapper> sword;
 
+  CS::Animation::iSkeletonAnimNode* rootNode;
   CS::Animation::iSkeletonFSMNode* fsmNode;
   CS::Animation::iSkeletonFSMNodeFactory* fsmNodeFactory;
   CS::Animation::iSkeletonLookAtNode* lookAtNode;

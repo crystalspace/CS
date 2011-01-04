@@ -92,8 +92,7 @@ bool Monster::Initialize(iMeshWrapper* spawn)
   if (animesh)
   {
     // Start the root animation node
-    CS::Animation::iSkeletonAnimNode* rootNode =
-      animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
+    rootNode = animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
 
     // Find the FSM animation node
     weapon->fsmNode = fsmNode = static_cast<CS::Animation::iSkeletonFSMNode*> (rootNode->FindNode ("fsm"));
@@ -260,8 +259,7 @@ void Monster::PlayAnimation (const char* script, bool lock)
 
 void Monster::StopAnimation()
 {
-  if (fsmNode)
-    fsmNode->Stop ();
+  rootNode->Stop ();
 }
 
 void Monster::Explode()
