@@ -105,7 +105,7 @@ void StartMe::Frame ()
     }
 
     // Check if the window is visible
-    if (fabs (distance) > 2.5f)
+    if (distance < -0.3f || distance > 2.5f)
     {
       demos[i].window->setVisible(false);
       demos[i].window->setEnabled(false);
@@ -146,11 +146,18 @@ void StartMe::Frame ()
     demos[i].window->setEnabled(true);
     demos[i].window->setProperty("Alpha", selected ? "1" : "0.6");
 
-    if (selected)
+    if (selected && rotationStatus != OVER_EXIT)
     {
       CEGUI::Window* description = cegui->GetWindowManagerPtr()->getWindow("Description");
       description->setText(demos[i].description);
     }
+  }
+
+  // Display the "Exit" message if needed
+  if (rotationStatus == OVER_EXIT)
+  {
+    CEGUI::Window* description = cegui->GetWindowManagerPtr()->getWindow("Description");
+    description->setText("Click to exit application");
   }
 }
 
@@ -306,6 +313,13 @@ bool StartMe::Application()
   logo->subscribeEvent(CEGUI::Window::EventMouseClick,
       CEGUI::Event::Subscriber(&StartMe::OnLogoClicked, this));
 
+  ///TODO: Using 'EventMouseEntersArea' is more correct but is only available 
+  /// in 0.7.2+
+  logo->subscribeEvent(CEGUI::Window::EventMouseEnters,
+      CEGUI::Event::Subscriber(&StartMe::OnEnterLogo, this));
+  logo->subscribeEvent(CEGUI::Window::EventMouseLeaves,
+      CEGUI::Event::Subscriber(&StartMe::OnLeaveLogo, this));
+
   vfs->ChDir ("/lib/startme");
 
   CEGUI::Window* root = winMgr->getWindow("root");
@@ -350,14 +364,6 @@ bool StartMe::Application()
   return true;
 }
 
-bool StartMe::OnLogoClicked (const CEGUI::EventArgs& e)
-{
-  csRef<iEventQueue> q =
-    csQueryRegistry<iEventQueue> (GetObjectRegistry());
-  if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
-  return true;
-}
-
 bool StartMe::OnClick (const CEGUI::EventArgs& e)
 {
   if (rotationStatus != ROTATE_SELECTING)
@@ -379,8 +385,32 @@ bool StartMe::OnClick (const CEGUI::EventArgs& e)
   return true;
 }
 
+bool StartMe::OnLogoClicked (const CEGUI::EventArgs& e)
+{
+  csRef<iEventQueue> q =
+    csQueryRegistry<iEventQueue> (GetObjectRegistry());
+  if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
+  return true;
+}
+
+bool StartMe::OnEnterLogo (const CEGUI::EventArgs& e)
+{
+  rotationStatus = OVER_EXIT;
+  rotationSpeed = DEFAULT_ROTATION_SPEED;
+  return true;
+}
+
+bool StartMe::OnLeaveLogo (const CEGUI::EventArgs& e) 
+{
+  rotationStatus = ROTATE_NORMAL;
+  return true;
+}
+
 bool StartMe::OnMouseMove (iEvent& ev)
 {
+  if (rotationStatus == OVER_EXIT)
+    return false;
+
   // Compute the angle and distance to the bottom right corner of the window
   csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (GetObjectRegistry ());
   float x = g2d->GetWidth () - csMouseEventHelper::GetX(&ev);

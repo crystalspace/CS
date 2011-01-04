@@ -97,7 +97,8 @@ private:
   enum {
     ROTATE_NORMAL = 0,
     ROTATE_SELECTING,
-    ROTATE_SEARCHING
+    ROTATE_SEARCHING,
+    OVER_EXIT
   } rotationStatus;
   float rotationSpeed;
 
@@ -117,6 +118,8 @@ private:
   bool OnClick (const CEGUI::EventArgs& e);
 
   bool OnLogoClicked (const CEGUI::EventArgs& e);
+  bool OnEnterLogo (const CEGUI::EventArgs& e);
+  bool OnLeaveLogo (const CEGUI::EventArgs& e);
 
   bool OnMouseMove (iEvent& ev);
 
