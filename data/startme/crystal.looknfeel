@@ -64,7 +64,7 @@
                 </Area>
                 <Image imageset="crystal" image="StaticBackdrop" />
                 <!--<ColourRectProperty name="BackgroundColours" />-->
-                <Colours topLeft="FFFFFFFF" topRight="FFFFFFFF" bottomLeft="FFFFFFFF" bottomRight="FFFFFFFF" />
+                <Colours topLeft="FF000000" topRight="00000000" bottomLeft="FF000000" bottomRight="FFFFFFFF" />
                 <VertFormat type="Stretched" />
                 <HorzFormat type="Stretched" />
             </ImageryComponent>
