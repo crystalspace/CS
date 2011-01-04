@@ -329,6 +329,7 @@ bool StartMe::Application()
     demos[i].window = winMgr->createWindow("crystal/StaticImage");
     demos[i].window->setSize(CEGUI::UVector2(CEGUI::UDim(0.0f, 128.0f), CEGUI::UDim(0.0f, 128.0f)));
     demos[i].window->setPosition(CEGUI::UVector2(CEGUI::UDim(0.0f, 0.0f), CEGUI::UDim(0.0f, 0.0f)));
+    demos[i].window->setVisible(false);
 
     CEGUI::ImagesetManager* imsetmgr = cegui->GetImagesetManagerPtr();
     if (!imsetmgr->isDefined(demos[i].image))
