@@ -152,8 +152,8 @@ public:
    // Declare the name of this event handler.
   CS_EVENTHANDLER_NAMES("application.startme")
       
-  /* Declare that we want to receive events *after* the CEGUI plugin. */
-  virtual const csHandlerID * GenericPrec (csRef<iEventHandlerRegistry> &r1, 
+  /* Declare that we want to receive events *before* the CEGUI plugin. */
+  virtual const csHandlerID * GenericSucc (csRef<iEventHandlerRegistry> &r1, 
     csRef<iEventNameRegistry> &r2, csEventID event) const 
   {
     static csHandlerID precConstraint[2];
