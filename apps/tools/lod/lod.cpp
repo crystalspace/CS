@@ -16,10 +16,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <iostream>
-#include <vector>
-using namespace std;
-
 #include <crystalspace.h>
 #include "lodgen.h"
 #include "lod.h"
