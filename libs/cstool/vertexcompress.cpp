@@ -314,7 +314,7 @@ size_t* csVertexCompressor::Compress (csRef<iRenderBuffer>* buffers, size_t numB
       {
 	for (size_t c = 0; c < bufComps; c++)
 	{
-	  allData[v*totalComps+compOffs+c] = ceil ((*bufWalker)[c] * precision);
+	  allData[v*totalComps+compOffs+c] = int (ceil ((*bufWalker)[c] * precision));
 	}
 	++bufWalker;
       }
