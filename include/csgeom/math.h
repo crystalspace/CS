@@ -148,9 +148,14 @@ namespace CS
     #error Do not know how to test for NaN
   #endif
   }
+  // External definition; used below as a workaround for __STRICT_ANSI__
+  CS_CRYSTALSPACE_EXPORT bool IsNaN_ext (double d);
   /// Checks if a double-precision floating point value is not-a-number.
   CS_FORCEINLINE bool IsNaN (double d)
   {
+  #ifdef __STRICT_ANSI__
+    return IsNaN_ext (d);
+  #else
   #ifdef CS_IEEE_DOUBLE_FORMAT
     const uint64 exponentMask = CONST_UINT64(0x7ff0000000000000);
     const uint64 mantissaMask = CONST_UINT64(0x000fffffffffffff);
@@ -164,6 +169,7 @@ namespace CS
 	&& ((u.ui64 & mantissaMask) != 0);
   #else
     #error Do not know how to test for NaN
+  #endif
   #endif
   }
   
@@ -183,9 +189,14 @@ namespace CS
     #error Do not know how to test for NaN
   #endif
   }
+  // External definition; used below as a workaround for __STRICT_ANSI__
+  CS_CRYSTALSPACE_EXPORT bool IsFinite_ext (double d);
   /// Checks if a double-precision floating point value is finite.
   CS_FORCEINLINE bool IsFinite (double d)
   {
+  #ifdef __STRICT_ANSI__
+    return IsFinite_ext (d);
+  #else
   #ifdef CS_IEEE_DOUBLE_FORMAT
     const uint64 exponentMask = CONST_UINT64(0x7ff0000000000000);
     union
@@ -197,6 +208,7 @@ namespace CS
     return ((u.ui64 & exponentMask) != exponentMask);
   #else
     #error Do not know how to test for NaN
+  #endif
   #endif
   }
   /** @} */
