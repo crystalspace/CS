@@ -130,11 +130,14 @@ void StartMe::Frame ()
     float angle = distance * PI * 0.2f - PI;
     float x = sin (angle);
     float y = cos (angle);
-    x = (x * 350.0f) - 40.0f;
-    y = (y * 350.0f) + 70.0f;
+    x = (x * 350.0f) - 104.0f;
+    y = (y * 350.0f) + 4.0f;
+
+    float size = 128.0f;
+    float alpha1 = 0.6f;
+    float alpha2 = 0.0f;
 
     // Check if this is the currently selected demo
-    float size;
     bool selected = currentDemo == i;
     if (selected)
     {
@@ -142,15 +145,10 @@ void StartMe::Frame ()
       int closest = position + 0.5f;
       float distance = (0.5f - fabs (position - closest)) * 2.0f;
       size = 128.0f + distance * 64.0f;
-      x -= 64.0f + distance * 64.0f;
-      y -= 64.0f + distance * 64.0f;
-    }
-
-    else
-    {
-      x -= 64;
-      y -= 64;
-      size = 128.0f;
+      x -= distance * 64.0f;
+      y -= distance * 64.0f;
+      alpha1 = 0.6f + distance * 0.4f;
+      alpha2 = distance * 1.0f;
     }
 
     // Setup the window
@@ -158,13 +156,18 @@ void StartMe::Frame ()
     demos[i].window->setPosition(CEGUI::UVector2(CEGUI::UDim(1.0f, x), CEGUI::UDim(1.0f, y)));
     demos[i].window->setVisible(true);
     demos[i].window->setEnabled(true);
-    demos[i].window->setProperty("Alpha", selected ? "1" : "0.6");
+    csString alphas;
+    alphas += alpha1;
+    demos[i].window->setProperty("Alpha", alphas.GetData ());
 
     if (selected && rotationStatus != OVER_EXIT)
     {
       CEGUI::Window* description = cegui->GetWindowManagerPtr()->getWindow("Description");
       description->setText(demos[i].description);
       SizeWindow(description);
+      csString alphas;
+      alphas += alpha2;
+      description->setProperty("Alpha", alphas.GetData ());
     }
   }
 
@@ -173,6 +176,7 @@ void StartMe::Frame ()
   {
     CEGUI::Window* description = cegui->GetWindowManagerPtr()->getWindow("Description");
     description->setText("Click to exit application");
+    description->setProperty("Alpha", "1.0");
     SizeWindow(description);
   }
 }
@@ -510,7 +514,11 @@ void StartMe::LoadConfig ()
         demo.image = iterator->GetStr ();
       else
       {
-        demo.description += iterator->GetStr ();
+	// CECGUI will throw away all empty lines, therefore we add a single space in place
+	if (strcmp (iterator->GetStr (), "") != 0)
+	  demo.description += iterator->GetStr ();
+	else
+	  demo.description += " ";
         demo.description += "\n";
       }
     }
