@@ -25,7 +25,7 @@ CS_IMPLEMENT_APPLICATION
 //---------------------------------------------------------------------------
 
 StartMe::StartMe ()
-  : position (0.0f), lastPosition (0.0f), rotationStatus (ROTATE_NORMAL),
+  : position (0.0f), lastPosition (-100.0f), rotationStatus (ROTATE_NORMAL),
     rotationSpeed (DEFAULT_ROTATION_SPEED)
 {
   SetApplicationName ("CrystalSpace.StartMe");
@@ -434,13 +434,16 @@ bool StartMe::OnMouseMove (iEvent& ev)
 
   // Compute the angle and distance to the bottom right corner of the window
   csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (GetObjectRegistry ());
-  float x = g2d->GetWidth () - csMouseEventHelper::GetX(&ev);
-  float y = g2d->GetHeight () - csMouseEventHelper::GetY(&ev);
+  float x = g2d->GetWidth () - csMouseEventHelper::GetX(&ev) - 104.0f;
+  float y = g2d->GetHeight () - csMouseEventHelper::GetY(&ev) + 4.0f;
   float distance = csQsqrt (x * x + y * y);
-  float angle = atan2 (y, x);
+  float angle = atan2 (y - 4.0f, x + 104.0f);
+
+  float angleDistance = 1.0f - fabs (PI * 0.27f - angle) / (PI * 0.25f);
+  distance -= angleDistance * 50.0f;
 
   // If the mouse is too far away then rotate at default speed
-  if (distance < 250.0f || distance > 475.0f)
+  if (distance < 170.0f || distance > 380.0f)
   {
     rotationStatus = ROTATE_NORMAL;
     rotationSpeed = DEFAULT_ROTATION_SPEED;
