@@ -221,7 +221,8 @@ platforms = [
     debugformat_debug => 4,
     debugformat_release => 3,
     debugformat10_debug => 'EditAndContinue',
-    debugformat10_release => 'ProgramDatabase'
+    debugformat10_release => 'ProgramDatabase',
+    rcdefs => []
   },
   {
     name => 'x64',
@@ -232,7 +233,8 @@ platforms = [
     debugformat_debug => 3,
     debugformat_release => 3,
     debugformat10_debug => 'ProgramDatabase',
-    debugformat10_release => 'ProgramDatabase'
+    debugformat10_release => 'ProgramDatabase',
+    rcdefs => ['_WIN64']
   }
 ];
 
