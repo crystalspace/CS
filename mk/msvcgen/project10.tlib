@@ -121,6 +121,7 @@ END -%]
     <Lib>
 [% interpolate('librarian') -%]
       <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetMachine>[% platform.targetmachine10 %]</TargetMachine>
     </Lib>
     <PostBuildEvent>
 [% interpolate('postbuild') -%]
