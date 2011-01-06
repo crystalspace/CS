@@ -51,13 +51,8 @@ groups = [
     itemtype => 'ResourceCompile'
   },
   {
-    name => 'Manifest Files'
-    types => '\.manifest$'
-    itemtype => 'Manifest'
-  },
-  {
     name => 'Other Files'
-    types => '\.(?!(?i:h|hh|hpp|hxx|c|cc|cpp|cxx|m|mm|rc|manifest)$)\w*$'
+    types => '\.(?!(?i:h|hh|hpp|hxx|c|cc|cpp|cxx|m|mm|rc)$)\w*$'
     itemtype => 'None'
   },
 ];

@@ -509,7 +509,6 @@ if $(MSVC_VERSION) = 6
   SUFWSP = dsw ;
   MSVC_FORCE_CRLF = yes ;
   MSVC_TEMPLATE_SUFFIX = 6 ;
-  MSVC_MANIFEST_IN_PROJECT = no ;
 }
 else if $(MSVC_VERSION) = 10 # Version 10
 {
@@ -519,7 +518,6 @@ else if $(MSVC_VERSION) = 10 # Version 10
   MSVC_TEMPLATE_SUFFIX = 10 ;
   MSVC_FORMATVERSION_WSP = 11.00 ;
   MSVC_WSP_HEADERCOMMENT = "# Visual C++ Express 2010" ;
-  MSVC_MANIFEST_IN_PROJECT = yes ;
 }
 else # Versions 7, 71, 8, 9 and "unknown"
 {
@@ -531,27 +529,23 @@ else # Versions 7, 71, 8, 9 and "unknown"
   {
     MSVC_FORMATVERSION_PRJ = 7.00 ;
     MSVC_FORMATVERSION_WSP = 7.00 ;
-    MSVC_MANIFEST_IN_PROJECT = no ;
   }
   else if $(MSVC_VERSION) = 71
   {
     MSVC_FORMATVERSION_PRJ = 7.10 ;
     MSVC_FORMATVERSION_WSP = 8.00 ;
-    MSVC_MANIFEST_IN_PROJECT = no ;
   }
   else if $(MSVC_VERSION) = 8
   {
     MSVC_FORMATVERSION_PRJ = 8.00 ;
     MSVC_FORMATVERSION_WSP = 9.00 ;
     MSVC_WSP_HEADERCOMMENT = "# Visual C++ Express 2005" ;
-    MSVC_MANIFEST_IN_PROJECT = yes ;
   }
   else if $(MSVC_VERSION) = 9
   {
     MSVC_FORMATVERSION_PRJ = 9.00 ;
     MSVC_FORMATVERSION_WSP = 10.00 ;
     MSVC_WSP_HEADERCOMMENT = "# Visual C++ Express 2008" ;
-    MSVC_MANIFEST_IN_PROJECT = yes ;
   }
   else
   {
@@ -989,18 +983,21 @@ rule MsvcProject
         Depends $(manifest) : $(SUBDIR)/Jamfile ;
         Depends msvcgen : $(manifest) ;
       
+        local manifest_amd64 = $(msvcname:S=)-x64.manifest ; 
+        MakeLocate $(manifest_amd64) : $(outdircommon) ;
+        MakeManifestFile $(manifest_amd64) : $(rawname) : amd64 ;
+        Depends $(manifest_amd64) : $(TOP)/Jamconfig ;
+        Depends $(manifest_amd64) : $(SUBDIR)/Jamfile ;
+        Depends msvcgen : $(manifest_amd64) ;
+      
         local manifestrc = $(resource:S=.mfrctmp) ;
         MakeLocate $(manifestrc) : $(workdircommon) ;
         MANIFEST_NAME on $(manifestrc) = $(manifest) ;
         GenerateWin32ManifestRc $(manifestrc) ;
         Depends $(manifestrc) : $(manifest) ;
-        if "$(MSVC_MANIFEST_IN_PROJECT)" = "yes"
-        {
-          # VC8: Manifest appears in project along other files, a special build
-          # tool cares about the embedding into a resource. (The resource goop
-          # still has to be generated since it is shared with other VCs.)
-	  MsvcAddFileToProject $(respfile) : $(manifest:R=$(outdircommon)) : $(respdir) ;
-        }
+  
+	ResponseFile $(respfile) : "manifest|$(manifest:R=$(outdircommon))" : notfile : $(respdir) ;
+	ResponseFile $(respfile) : "manifest-x64|$(manifest_amd64:R=$(outdircommon))" : notfile : $(respdir) ;
       
         Win32Resource $(rawname) : $(manifestrc) ;
         MsvcRmTemps $(resource) : $(manifestrc) ;

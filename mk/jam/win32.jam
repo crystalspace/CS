@@ -157,7 +157,7 @@ __EOF__
     echo '$(PACKAGE_VERSION_NORM[1]).$(PACKAGE_VERSION_NORM[2]).$(PACKAGE_VERSION_NORM[3]).$(PACKAGE_VERSION_NORM[4])' | $(SED) 's/RC\([0-9]\)//g' | $(SED) 's/[^0123456789.]//g' | $(SED) 's/\(.*\)/    version="\1"/' >> $(<)
   
     cat >> $(<) << __EOF__
-    processorArchitecture="X86"
+    processorArchitecture="$(MANIFEST_ARCH)"
     name="$(PRODUCT_NAME)"
     type="win32"
 />
@@ -168,7 +168,7 @@ __EOF__
 	      type="win32"
 	      name="Microsoft.Windows.Common-Controls"
 	      version="6.0.0.0"
-	      processorArchitecture="X86"
+	      processorArchitecture="$(MANIFEST_ARCH)"
 	      publicKeyToken="6595b64144ccf1df"
 	      language="*"
 	  />
@@ -307,11 +307,14 @@ rule MakeManifestFile
   local desc = [ Description $(>) ] ;
   if ! $(desc) { desc = "$(>)" ; }
   PRODUCT_DESCRIPTION on $(<) = $(desc) ;
+  local arch = $(3) ;
+  if ! $(arch) { arch = X86 ; }
 
   local name ;
   if $(PACKAGE_NAME) { name = $(PACKAGE_NAME).$(>) ; }
   else { name = $(>) ; }
   PRODUCT_NAME on $(<) = $(name) ;
+  MANIFEST_ARCH on $(<) = $(arch) ;
       
   GenerateWin32Manifest $(<) ;
 }

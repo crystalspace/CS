@@ -132,6 +132,11 @@ END -%]
       <AdditionalIncludeDirectories>[% composedirs('incdirs', ['.', path([my.doc.sourceroot.0, my.doc.subdir.0])]) %]</AdditionalIncludeDirectories>
       <Culture>0x0409</Culture>
     </ResourceCompile>
+[%- IF ${"my.doc.manifest${platform.suffix}"} %]
+    <Manifest>
+      <AdditionalManifestFiles>[% path([my.doc.sourceroot.0, ${"my.doc.manifest${platform.suffix}.0"}]) %]</AdditionalManifestFiles>
+    </Manifest>
+[%- END %]
   </ItemDefinitionGroup>
       [%~ END %]
     [%~ END %]
