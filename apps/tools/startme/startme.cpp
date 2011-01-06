@@ -119,7 +119,7 @@ void StartMe::Frame ()
     }
 
     // Check if the window is visible
-    if (distance < -0.3f || distance > 2.5f)
+    if (distance < -0.5f || distance > 2.5f)
     {
       demos[i].window->setVisible(false);
       demos[i].window->setEnabled(false);
@@ -459,15 +459,15 @@ bool StartMe::OnMouseMove (iEvent& ev)
   {
     rotationStatus = ROTATE_SEARCHING;
 
-    if (angle < PI * 0.166f)
+    if (angle > PI * 0.333f)
     {
-      float distance = PI * 0.166f - angle;
+      float distance = angle - PI * 0.333f;
       rotationSpeed = - DEFAULT_ROTATION_SPEED * distance * 15.0f;
     }
 
     else
     {
-      float distance = angle - PI * 0.333f;
+      float distance = PI * 0.166f - angle;
       rotationSpeed = DEFAULT_ROTATION_SPEED * distance * 15.0f;
     }
   }
