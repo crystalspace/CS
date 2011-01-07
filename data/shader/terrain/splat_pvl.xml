@@ -30,19 +30,11 @@
   <technique priority="500" minlights="5">
     <!-- 1 pass, 6 lights -->
     <pass>
-      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: blend with alpha -->
-	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
-	  <alphatest>disable</alphatest>
-	</mixmode>
-      <?else?>
-	<!-- Later pass: blend with add -->
-	<mixmode>
-	  <blendop src="one" dst="one" />
-	  <alphatest>disable</alphatest>
-	</mixmode>
-      <?endif?>
+      <!-- Output color is w/ premultiplied alpha; assume black 'base' layer -->
+      <mixmode>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
+      </mixmode>
       
       <!-- Combiner to use for this particular pass.
 	   Techniques Referenced snippets must only utilize the same 
@@ -67,19 +59,11 @@
   <technique priority="400" minlights="4">
     <!-- 2 passes, 4+2 lights -->
     <pass minlights="1">
-      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: blend with alpha -->
-	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
-	  <alphatest>disable</alphatest>
-	</mixmode>
-      <?else?>
-	<!-- Later pass: blend with add -->
-	<mixmode>
-	  <blendop src="one" dst="one" />
-	  <alphatest>disable</alphatest>
-	</mixmode>
-      <?endif?>
+      <!-- Output color is w/ premultiplied alpha; assume black 'base' layer -->
+      <mixmode>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
+      </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
@@ -93,7 +77,6 @@
       <connection from="minLights" to="shared" />
     </pass>
     <pass minlights="5">
-      <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>disable</alphatest>
@@ -116,19 +99,11 @@
   <technique priority="300" minlights="3">
     <!-- 2 passes, 3+3 lights -->
     <pass minlights="1">
-      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: blend with alpha -->
-	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
-	  <alphatest>disable</alphatest>
-	</mixmode>
-      <?else?>
-	<!-- Later pass: blend with add -->
-	<mixmode>
-	  <blendop src="one" dst="one" />
-	  <alphatest>disable</alphatest>
-	</mixmode>
-      <?endif?>
+      <!-- Output color is w/ premultiplied alpha; assume black 'base' layer -->
+      <mixmode>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
+      </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
@@ -142,7 +117,6 @@
       <connection from="minLights" to="shared" />
     </pass>
     <pass minlights="4">
-      <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>disable</alphatest>
@@ -165,19 +139,11 @@
   <technique priority="200" minlights="2">
     <!-- 3 passes, 2+2+2 lights -->
     <pass minlights="1">
-      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: blend with alpha -->
-	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
-	  <alphatest>disable</alphatest>
-	</mixmode>
-      <?else?>
-	<!-- Later pass: blend with add -->
-	<mixmode>
-	  <blendop src="one" dst="one" />
-	  <alphatest>disable</alphatest>
-	</mixmode>
-      <?endif?>
+      <!-- Output color is w/ premultiplied alpha; assume black 'base' layer -->
+      <mixmode>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
+      </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
@@ -191,7 +157,6 @@
       <connection from="minLights" to="shared" />
     </pass>
     <pass minlights="3">
-      <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>disable</alphatest>
@@ -210,7 +175,6 @@
       <connection from="minLights" to="shared" />
     </pass>
     <pass minlights="5">
-      <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>disable</alphatest>
@@ -233,19 +197,11 @@
   <technique priority="100" minlights="1">
     <!-- 6 passes, 1+1+1+1+1+1 lights -->
     <pass minlights="1">
-      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: blend with alpha -->
-	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
-	  <alphatest>disable</alphatest>
-	</mixmode>
-      <?else?>
-	<!-- Later pass: blend with add -->
-	<mixmode>
-	  <blendop src="one" dst="one" />
-	  <alphatest>disable</alphatest>
-	</mixmode>
-      <?endif?>
+      <!-- Output color is w/ premultiplied alpha; assume black 'base' layer -->
+      <mixmode>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
+      </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
@@ -259,7 +215,6 @@
       <connection from="minLights" to="shared" />
     </pass>
     <pass minlights="2">
-      <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>disable</alphatest>
@@ -278,7 +233,6 @@
       <connection from="minLights" to="shared" />
     </pass>
     <pass minlights="3">
-      <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>disable</alphatest>
@@ -297,7 +251,6 @@
       <connection from="minLights" to="shared" />
     </pass>
     <pass minlights="4">
-      <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>disable</alphatest>
@@ -316,7 +269,6 @@
       <connection from="minLights" to="shared" />
     </pass>
     <pass minlights="5">
-      <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>disable</alphatest>
@@ -335,7 +287,6 @@
       <connection from="minLights" to="shared" />
     </pass>
     <pass minlights="6">
-      <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>disable</alphatest>
@@ -359,9 +310,9 @@
   <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
   <technique priority="50">
     <pass>
-      <!-- First(only) pass: blend with alpha -->
+      <!-- Output color is w/ premultiplied alpha; assume black 'base' layer -->
       <mixmode>
-	<blendop src="one" dst="srcalpha_inv" />
+	<blendop src="one" dst="one" />
 	<alphatest>disable</alphatest>
       </mixmode>
       

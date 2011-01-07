@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+  Copyright (C) 2007-2011 by Frank Richter
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<shader compiler="xmlshader" name="terrain_splatbase">
+  <technique priority="350">
+    <pass>
+      <mixmode><blendop src="one" dst="zero" /></mixmode>
+      <texture name="standardtex white" destination="diffuse" />
+      <vp plugin="glfixed">
+	<fixedvp>
+	  <constantcolor layer="diffuse" type="vector4">0,0,0,1</constantcolor>
+	</fixedvp>
+      </vp>
+      <fp plugin="glfixed">
+        <fixedfp>
+	  <layer name="diffuse">
+	    <colorsource num="0" source="constant color" modifier="color"/>
+	    <coloroperation operation="replace" />
+            <alphasource num="0" source="constant color" modifier="alpha"/>
+	    <alphaoperation operation="replace"/>
+	  </layer>
+        </fixedfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>
