@@ -965,14 +965,15 @@ void TerrainBlock::CullRenderMeshes (iRenderView* rview, const csPlane3* cullPla
     indexType, numIndices));
 
   // Get the optional alpha-splat material.
-  csRef<iMaterialWrapper> alphaSplatMaterial = renderData->cell->GetAlphaSplatMaterial ();
+  iMaterialWrapper* alphaSplatMaterial = renderData->cell->GetAlphaSplatMaterial ();
+  iMaterialWrapper* splatBaseMaterial = renderData->cell->GetSplatBaseMaterial ();
 
   // Calculate the WS distance from the camera to this cell.
   float fCellDistance = sqrt (boundingBox.SquaredPosDist (rview->GetCamera ()->GetTransform ().GetOrigin ()));
 
   // Calculate whether to render the base material or the splatting.
   bool renderSplatting = (fCellDistance < renderData->properties->GetSplatDistance ());
-  renderSplatting &= (!palette.IsEmpty () || alphaSplatMaterial.IsValid ());
+  renderSplatting &= (!palette.IsEmpty () || alphaSplatMaterial);
 
   // Get the render priority of terrain splatting.
   CS::Graphics::RenderPriority splatPrio = renderData->properties->GetSplatRenderPriorityValue();
@@ -994,16 +995,24 @@ void TerrainBlock::CullRenderMeshes (iRenderView* rview, const csPlane3* cullPla
     }
     else
     {
-      if (j == renderAlphaSplatMaterial)
+      if (j == renderBaseMaterial)
+      {
+        if (!splatBaseMaterial)
+          continue;
+
+        mat = splatBaseMaterial;
+        svContext = renderData->commonSVContext;
+      }
+      else if (j == renderAlphaSplatMaterial)
       {
         // Check that we have this material.
-        if (!alphaSplatMaterial.IsValid ())
+        if (!alphaSplatMaterial)
           continue;
 
         mat = alphaSplatMaterial;
         svContext = renderData->commonSVContext;
       }
-      else if (j != renderBaseMaterial)
+      else
       {
         // Check if the map is used.
         if (!renderData->alphaMapMMUse.IsBitSet (j))

@@ -892,7 +892,7 @@ struct iTerrainSystem : public virtual iBase
  */
 struct iTerrainCell : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainCell, 5, 0, 0);
+  SCF_INTERFACE (iTerrainCell, 5, 0, 1);
 
   /// Enumeration that specifies current cell state
   enum LoadState
@@ -1337,12 +1337,23 @@ struct iTerrainCell : public virtual iBase
    *   careless changing of cell names can confuse the mapping of cells.
    */
   virtual void SetName (const char* name) = 0;
+
+  /**
+   * Set optional splat base material for the cell.
+   * The splat base material is rendered before splatting or
+   * alpha-splatting is rendered for the cell.
+   * \param material material handle of spalt base material.
+   */
+  virtual void SetSplatBaseMaterial (iMaterialWrapper* material) = 0;
+  
+  /// Get splat base material for the cell.
+  virtual iMaterialWrapper* GetSplatBaseMaterial () const = 0;
 };
 
 /// Factory representation of a cell
 struct iTerrainFactoryCell : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainFactoryCell, 2, 0, 0);
+  SCF_INTERFACE (iTerrainFactoryCell, 2, 0, 1);
 
   /**
    * Get cell rendering properties. Returns pointer to a renderer-specific
@@ -1500,6 +1511,17 @@ struct iTerrainFactoryCell : public virtual iBase
    * \sa GetMaterialPersistent
    */
   virtual void SetMaterialPersistent (bool flag) = 0;
+
+  /**
+   * Set optional splat base material for the cell.
+   * The splat base material is rendered before splatting or
+   * alpha-splatting is rendered for the cell.
+   * \param material material handle of spalt base material.
+   */
+  virtual void SetSplatBaseMaterial (iMaterialWrapper* material) = 0;
+  
+  /// Get splat base material for the cell.
+  virtual iMaterialWrapper* GetSplatBaseMaterial () const = 0;
 };
 
 /// Provides an interface for creating terrain system

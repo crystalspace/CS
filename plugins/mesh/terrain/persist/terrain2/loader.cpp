@@ -404,6 +404,22 @@ bool csTerrain2FactoryLoader::ParseCell (iDocumentNode *node,
         cell->SetBaseMaterial (baseMaterial);
         break;
       }
+    case XMLTOKEN_SPLATBASEMATERIAL:
+      {
+        const char* matname = child->GetContentsValue ();
+        csRef<iMaterialWrapper> baseMaterial = ldr_ctx->FindMaterial (matname);
+
+        if (!baseMaterial)
+        {
+          synldr->ReportError (
+            "crystalspace.terrain.object.loader.basematerial",
+            child, "Couldn't find material %s!", CS::Quote::Single (matname));
+          return false;
+        }
+
+        cell->SetSplatBaseMaterial (baseMaterial);
+        break;
+      }
     case XMLTOKEN_ALPHASPLATMATERIAL:
       {
         const char* matname = child->GetContentsValue ();

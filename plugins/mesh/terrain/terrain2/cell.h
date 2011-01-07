@@ -100,6 +100,9 @@ public:
   virtual void SetAlphaSplatMaterial (iMaterialWrapper* material);
   virtual iMaterialWrapper* GetAlphaSplatMaterial () const;
 
+  virtual void SetSplatBaseMaterial (iMaterialWrapper* material);
+  virtual iMaterialWrapper* GetSplatBaseMaterial () const;
+
   virtual bool CollideSegment (const csVector3& start, const csVector3& end,
     bool oneHit, iTerrainVector3Array* points);
   virtual csTerrainColliderCollideSegmentResult CollideSegment (
@@ -165,6 +168,7 @@ private:
   csRef<iTerrainCellCollisionProperties> collisionProperties;
   csRef<iTerrainCellFeederProperties> feederProperties;
   csRef<iMaterialWrapper> baseMaterial;
+  csRef<iMaterialWrapper> splatBaseMaterial;
   csRef<iMaterialWrapper> alphaSplatMaterial;
 
   // Stored data (if any)
