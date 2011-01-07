@@ -89,6 +89,20 @@ public:
   inline float Norm () const
   { return csQsqrt (x * x + y * y); }
 
+  /// Normalizes a vector to a unit vector.
+  inline static csVector2 Unit (const csVector2& v) 
+  { return v.Unit(); }
+
+  /**
+   * Returns the unit vector in the direction of this vector.
+   * Attempting to normalize a zero-vector will result in a divide by
+   * zero error.  This is as it should be... fix the calling code.
+   */
+  inline csVector2 Unit () const 
+  { return (*this)/(this->Norm()); }
+
+
+
   /// Return the squared norm (magnitude) of this vector.
   inline float SquaredNorm () const
   { return x * x + y * y; }
