@@ -279,7 +279,11 @@ public:
 
   /// Returns the norm of this vector.
   inline float Norm () const
-  { return csQsqrt (x * x + y * y + z * z); }
+  { return csQsqrt(SquaredNorm()); }
+
+  /// Returns the inverse norm (1/Norm()) of this vector.
+  inline float InverseNorm () const
+  { return csQisqrt(SquaredNorm()); }
 
   /// Return the squared norm (magnitude) of this vector.
   inline float SquaredNorm () const
@@ -291,7 +295,7 @@ public:
    * zero error.  This is as it should be... fix the calling code.
    */
   inline csVector3 Unit () const 
-  { return (*this)/(this->Norm()); }
+  { return (*this)*(this->InverseNorm()); }
 
   /// Returns the norm (magnitude) of a vector.
   inline static float Norm (const csVector3& v) 
@@ -304,7 +308,7 @@ public:
   /// Scale this vector to length = 1.0;
   inline void Normalize ()
   {
-    float sqlen = x * x + y * y + z * z;
+    float sqlen = SquaredNorm();
     if (sqlen < SMALL_EPSILON) return ;
 
     float invlen = csQisqrt (sqlen);

@@ -278,7 +278,11 @@ public:
 
   /// Returns the norm of this vector.
   inline T Norm () const 
-  { return sqrt (x * x + y * y + z * z + w * w); }
+  { return csQsqrt(SquaredNorm()); }
+
+  /// Returns the inverse norm (1/Norm()) of this vector.
+  inline float InverseNorm () const
+  { return csQisqrt(SquaredNorm()); }
 
   /// Return the squared norm (magnitude) of this vector.
   inline T SquaredNorm () const
@@ -290,7 +294,7 @@ public:
    * zero error.  This is as it should be... fix the calling code.
    */
   inline csVector4T Unit () const 
-  { return (*this)/(this->Norm()); }
+  { return (*this)*(this->InverseNorm()); }
 
   /// Returns the norm (magnitude) of a vector.
   inline static T Norm (const csVector4T& v) 
@@ -303,7 +307,7 @@ public:
   /// Scale this vector to length = 1.0;
   inline void Normalize ()
   {
-    T sqlen = x * x + y * y + z * z + w * w;
+    T sqlen = SquaredNorm();
     if (sqlen < SMALL_EPSILON) return ;
   
     T invlen = csQisqrt (sqlen);

@@ -83,11 +83,15 @@ public:
 
   /// Return the norm (magnitude) of a 2D vector.
   inline static float Norm (csVector2 const& v)
-  { return csQsqrt (v * v); }
+  { return csQsqrt(v * v); }
 
   /// Return the norm (magnitude) of this vector.
   inline float Norm () const
-  { return csQsqrt (x * x + y * y); }
+  { return csQsqrt(SquaredNorm()); }
+
+  /// Return the inverse norm (1/Norm()) (magnitude) of this vector.
+  inline float InverseNorm () const
+  { return csQisqrt(SquaredNorm()); }
 
   /// Normalizes a vector to a unit vector.
   inline static csVector2 Unit (const csVector2& v) 
@@ -99,9 +103,35 @@ public:
    * zero error.  This is as it should be... fix the calling code.
    */
   inline csVector2 Unit () const 
-  { return (*this)/(this->Norm()); }
+  { return (*this)*(this->InverseNorm()); }
 
+  /// Scale this vector to length = 1.0;
+  inline void Normalize ()
+  {
+    float sqlen = SquaredNorm();
+    if (sqlen < SMALL_EPSILON) return ;
 
+    float invlen = csQisqrt (sqlen);
+    *this *= invlen;
+  }
+
+  /// Query if the vector is zero
+  inline bool IsZero (float precision = SMALL_EPSILON) const
+  { 
+    return (fabsf(x) < precision) && (fabsf(y) < precision);
+  }
+
+  /// Return a version of the vector clamped to closest unit vector (+-xyz)
+  inline csVector2 UnitAxisClamped () const
+  {
+    if (IsZero())
+      return csVector2(0, 0);
+
+    if (fabsf(x) > fabsf(y))
+      return csVector2(x / fabsf (x), 0); //X biggest
+    else
+      return csVector2(0, y / fabsf (y)); //Y biggest
+  }
 
   /// Return the squared norm (magnitude) of this vector.
   inline float SquaredNorm () const
