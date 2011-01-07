@@ -1032,7 +1032,10 @@ void TerrainBlock::CullRenderMeshes (iRenderView* rview, const csPlane3* cullPla
     mesh->material = mat;
     mesh->variablecontext = svContext;
     mesh->buffers = bufferHolder;
-    if (j >= 0) mesh->renderPrio = splatPrio;
+    if (j >= 0)
+      mesh->renderPrio = splatPrio;
+    else
+      mesh->renderPrio = CS::Graphics::RenderPriority ();
 
     mesh->worldspace_origin = worldOrigin;
     mesh->bbox = boundingBox;
