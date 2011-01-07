@@ -203,7 +203,7 @@ void csGLTextureHandle::CreateMipMaps()
 	if ((w == 1) && (h == 1) && (d == 1)) break;
 
 	nMip++;
-	csRef<iImage> cimg;
+	csRef<iImage> origMip, cimg;
 	bool precompMip = false;
 	if (nMipmaps != 0)
 	{
@@ -215,6 +215,7 @@ void csGLTextureHandle::CreateMipMaps()
 	{
 	  cimg = csImageManipulate::Mipmap (thisImage, 1, tc);
 	}
+	origMip = cimg;
 	if (mipskip == 0) // don't postprocess when doing skip...
 	{
 	  if (txtmgr->sharpen_mipmaps 
@@ -234,7 +235,7 @@ void csGLTextureHandle::CreateMipMaps()
 	csDebugImageWriter::DebugImageWrite (cimg,
 	  "/tmp/mipdebug/%p_%zu_%d.png", this, i, nMip);
   #endif
-	thisImage = cimg;
+	thisImage = origMip;
 	if (mipskip != 0) mipskip--;
       }
       while (true);
