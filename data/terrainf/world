@@ -64,6 +64,9 @@
             <file>/shader/terrain/basemap.xml</file>
         </shader>
         <shader>
+            <file>/shader/terrain/splatbase.xml</file>
+        </shader>
+        <shader>
             <file>/shader/terrain/splat.xml</file>
         </shader>
         <shader>
@@ -80,6 +83,9 @@
         <material name="Base">
             <texture>materialmap_base.png</texture>
             <shader type="base">terrain_basemap</shader>
+        </material>
+        <material name="splatbase">
+            <shader type="base">terrain_splatbase</shader>
         </material>
         <material name="Marble">
             <texture>andrew_marble4.jpg</texture>
@@ -158,6 +164,7 @@
                     <gridsize width="257" height="257" />
                     <materialmapsize width="512" height="512" />
                     <size x="256" y="15" z="256" />
+		    <splatbasematerial>splatbase</splatbasematerial>
 		    <renderproperties>
 			<param name="splat render priority">object2</param>
 			<!-- 511/512,511/512,0.5/512,0.5/512 -->
