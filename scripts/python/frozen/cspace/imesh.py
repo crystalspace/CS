@@ -1692,6 +1692,8 @@ class iTerrainCell(core.iBase):
     def GetFeederData(*args): return _imesh.iTerrainCell_GetFeederData(*args)
     def SetFeederData(*args): return _imesh.iTerrainCell_SetFeederData(*args)
     def SetName(*args): return _imesh.iTerrainCell_SetName(*args)
+    def SetSplatBaseMaterial(*args): return _imesh.iTerrainCell_SetSplatBaseMaterial(*args)
+    def GetSplatBaseMaterial(*args): return _imesh.iTerrainCell_GetSplatBaseMaterial(*args)
     scfGetVersion = staticmethod(_imesh.iTerrainCell_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainCell
     __del__ = lambda self : None;
@@ -1726,6 +1728,8 @@ class iTerrainFactoryCell(core.iBase):
     def SetMaterialMapWidth(*args): return _imesh.iTerrainFactoryCell_SetMaterialMapWidth(*args)
     def SetMaterialMapHeight(*args): return _imesh.iTerrainFactoryCell_SetMaterialMapHeight(*args)
     def SetMaterialPersistent(*args): return _imesh.iTerrainFactoryCell_SetMaterialPersistent(*args)
+    def SetSplatBaseMaterial(*args): return _imesh.iTerrainFactoryCell_SetSplatBaseMaterial(*args)
+    def GetSplatBaseMaterial(*args): return _imesh.iTerrainFactoryCell_GetSplatBaseMaterial(*args)
     scfGetVersion = staticmethod(_imesh.iTerrainFactoryCell_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainFactoryCell
     __del__ = lambda self : None;

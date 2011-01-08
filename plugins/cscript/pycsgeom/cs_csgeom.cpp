@@ -2901,12 +2901,6 @@ SWIG_From_float  (float value)
   return SWIG_From_double  (value);
 }
 
-SWIGINTERN csVector2 csVector2_operator_Sa_(csVector2 const *self,csVector2 const &v){ return *self + v; }
-SWIGINTERN csVector2 csVector2_operator_Ss_(csVector2 const *self,csVector2 const &v){ return *self - v; }
-SWIGINTERN float csVector2_operator_Sm___SWIG_0(csVector2 const *self,csVector2 const &v){ return *self * v; }
-SWIGINTERN csVector2 csVector2_operator_Sm___SWIG_1(csVector2 const *self,float f){ return *self * f; }
-SWIGINTERN csVector2 csVector2_operator_Sd_(csVector2 const *self,float f){ return *self / f; }
-SWIGINTERN bool csVector2_operator_Se__Se_(csVector2 const *self,csVector2 const &v){ return *self == v; }
 
 SWIGINTERNINLINE PyObject*
   SWIG_From_bool  (bool value)
@@ -2914,6 +2908,12 @@ SWIGINTERNINLINE PyObject*
   return PyBool_FromLong(value ? 1 : 0);
 }
 
+SWIGINTERN csVector2 csVector2_operator_Sa_(csVector2 const *self,csVector2 const &v){ return *self + v; }
+SWIGINTERN csVector2 csVector2_operator_Ss_(csVector2 const *self,csVector2 const &v){ return *self - v; }
+SWIGINTERN float csVector2_operator_Sm___SWIG_0(csVector2 const *self,csVector2 const &v){ return *self * v; }
+SWIGINTERN csVector2 csVector2_operator_Sm___SWIG_1(csVector2 const *self,float f){ return *self * f; }
+SWIGINTERN csVector2 csVector2_operator_Sd_(csVector2 const *self,float f){ return *self / f; }
+SWIGINTERN bool csVector2_operator_Se__Se_(csVector2 const *self,csVector2 const &v){ return *self == v; }
 SWIGINTERN bool csVector2_operator_SN__Se_(csVector2 const *self,csVector2 const &v){ return *self != v; }
 SWIGINTERN bool csVector2_operator_Sl_(csVector2 const *self,float f){ return *self < f; }
 SWIGINTERN bool csVector2_operator_Sg_(csVector2 const *self,float f){ return f > *self; }
@@ -3792,6 +3792,252 @@ SWIGINTERN PyObject *_wrap_csVector2_Norm(PyObject *SWIGUNUSEDPARM(self), PyObje
   arg1 = reinterpret_cast< csVector2 * >(argp1);
   result = (float)((csVector2 const *)arg1)->Norm();
   resultobj = SWIG_From_float(static_cast< float >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csVector2_InverseNorm(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csVector2 *arg1 = (csVector2 *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  float result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csVector2_InverseNorm",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csVector2, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csVector2_InverseNorm" "', argument " "1"" of type '" "csVector2 const *""'"); 
+  }
+  arg1 = reinterpret_cast< csVector2 * >(argp1);
+  result = (float)((csVector2 const *)arg1)->InverseNorm();
+  resultobj = SWIG_From_float(static_cast< float >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csVector2_Unit__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csVector2 *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  csVector2 result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csVector2_Unit",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csVector2,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csVector2_Unit" "', argument " "1"" of type '" "csVector2 const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csVector2_Unit" "', argument " "1"" of type '" "csVector2 const &""'"); 
+  }
+  arg1 = reinterpret_cast< csVector2 * >(argp1);
+  result = csVector2::Unit((csVector2 const &)*arg1);
+  resultobj = SWIG_NewPointerObj((new csVector2(static_cast< const csVector2& >(result))), SWIGTYPE_p_csVector2, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csVector2_Unit__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csVector2 *arg1 = (csVector2 *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  csVector2 result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csVector2_Unit",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csVector2, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csVector2_Unit" "', argument " "1"" of type '" "csVector2 const *""'"); 
+  }
+  arg1 = reinterpret_cast< csVector2 * >(argp1);
+  result = ((csVector2 const *)arg1)->Unit();
+  resultobj = SWIG_NewPointerObj((new csVector2(static_cast< const csVector2& >(result))), SWIGTYPE_p_csVector2, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csVector2_Unit(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[2];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 1); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 1) {
+    int _v;
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_csVector2, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_csVector2_Unit__SWIG_0(self, args);
+    }
+  }
+  if (argc == 1) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csVector2, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_csVector2_Unit__SWIG_1(self, args);
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csVector2_Unit'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    Unit(csVector2 const &)\n"
+    "    Unit(csVector2 const *)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csVector2_Normalize(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csVector2 *arg1 = (csVector2 *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csVector2_Normalize",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csVector2, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csVector2_Normalize" "', argument " "1"" of type '" "csVector2 *""'"); 
+  }
+  arg1 = reinterpret_cast< csVector2 * >(argp1);
+  (arg1)->Normalize();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csVector2_IsZero__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csVector2 *arg1 = (csVector2 *) 0 ;
+  float arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  float val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csVector2_IsZero",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csVector2, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csVector2_IsZero" "', argument " "1"" of type '" "csVector2 const *""'"); 
+  }
+  arg1 = reinterpret_cast< csVector2 * >(argp1);
+  ecode2 = SWIG_AsVal_float(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csVector2_IsZero" "', argument " "2"" of type '" "float""'");
+  } 
+  arg2 = static_cast< float >(val2);
+  result = (bool)((csVector2 const *)arg1)->IsZero(arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csVector2_IsZero__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csVector2 *arg1 = (csVector2 *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csVector2_IsZero",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csVector2, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csVector2_IsZero" "', argument " "1"" of type '" "csVector2 const *""'"); 
+  }
+  arg1 = reinterpret_cast< csVector2 * >(argp1);
+  result = (bool)((csVector2 const *)arg1)->IsZero();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csVector2_IsZero(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[3];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 2); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 1) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csVector2, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_csVector2_IsZero__SWIG_1(self, args);
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csVector2, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_float(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        return _wrap_csVector2_IsZero__SWIG_0(self, args);
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csVector2_IsZero'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    IsZero(csVector2 const *,float)\n"
+    "    IsZero(csVector2 const *)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csVector2_UnitAxisClamped(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csVector2 *arg1 = (csVector2 *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  csVector2 result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csVector2_UnitAxisClamped",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csVector2, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csVector2_UnitAxisClamped" "', argument " "1"" of type '" "csVector2 const *""'"); 
+  }
+  arg1 = reinterpret_cast< csVector2 * >(argp1);
+  result = ((csVector2 const *)arg1)->UnitAxisClamped();
+  resultobj = SWIG_NewPointerObj((new csVector2(static_cast< const csVector2& >(result))), SWIGTYPE_p_csVector2, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -5508,6 +5754,28 @@ SWIGINTERN PyObject *_wrap_csVector3_Norm(PyObject *SWIGUNUSEDPARM(self), PyObje
   }
   arg1 = reinterpret_cast< csVector3 * >(argp1);
   result = (float)((csVector3 const *)arg1)->Norm();
+  resultobj = SWIG_From_float(static_cast< float >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csVector3_InverseNorm(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csVector3 *arg1 = (csVector3 *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  float result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csVector3_InverseNorm",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csVector3, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csVector3_InverseNorm" "', argument " "1"" of type '" "csVector3 const *""'"); 
+  }
+  arg1 = reinterpret_cast< csVector3 * >(argp1);
+  result = (float)((csVector3 const *)arg1)->InverseNorm();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -48626,6 +48894,11 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csVector2_Set", _wrap_csVector2_Set, METH_VARARGS, NULL},
 	 { (char *)"csVector2_Get", _wrap_csVector2_Get, METH_VARARGS, NULL},
 	 { (char *)"csVector2_Norm", _wrap_csVector2_Norm, METH_VARARGS, NULL},
+	 { (char *)"csVector2_InverseNorm", _wrap_csVector2_InverseNorm, METH_VARARGS, NULL},
+	 { (char *)"csVector2_Unit", _wrap_csVector2_Unit, METH_VARARGS, NULL},
+	 { (char *)"csVector2_Normalize", _wrap_csVector2_Normalize, METH_VARARGS, NULL},
+	 { (char *)"csVector2_IsZero", _wrap_csVector2_IsZero, METH_VARARGS, NULL},
+	 { (char *)"csVector2_UnitAxisClamped", _wrap_csVector2_UnitAxisClamped, METH_VARARGS, NULL},
 	 { (char *)"csVector2_SquaredNorm", _wrap_csVector2_SquaredNorm, METH_VARARGS, NULL},
 	 { (char *)"csVector2_Rotate", _wrap_csVector2_Rotate, METH_VARARGS, NULL},
 	 { (char *)"csVector2_IsLeft", _wrap_csVector2_IsLeft, METH_VARARGS, NULL},
@@ -48664,6 +48937,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csVector3_Set", _wrap_csVector3_Set, METH_VARARGS, NULL},
 	 { (char *)"csVector3_Get", _wrap_csVector3_Get, METH_VARARGS, NULL},
 	 { (char *)"csVector3_Norm", _wrap_csVector3_Norm, METH_VARARGS, NULL},
+	 { (char *)"csVector3_InverseNorm", _wrap_csVector3_InverseNorm, METH_VARARGS, NULL},
 	 { (char *)"csVector3_SquaredNorm", _wrap_csVector3_SquaredNorm, METH_VARARGS, NULL},
 	 { (char *)"csVector3_Unit", _wrap_csVector3_Unit, METH_VARARGS, NULL},
 	 { (char *)"csVector3_Normalize", _wrap_csVector3_Normalize, METH_VARARGS, NULL},

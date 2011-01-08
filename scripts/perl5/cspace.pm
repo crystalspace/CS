@@ -11389,6 +11389,11 @@ sub new {
 *Set = *cspacec::csVector2_Set;
 *Get = *cspacec::csVector2_Get;
 *Norm = *cspacec::csVector2_Norm;
+*InverseNorm = *cspacec::csVector2_InverseNorm;
+*Unit = *cspacec::csVector2_Unit;
+*Normalize = *cspacec::csVector2_Normalize;
+*IsZero = *cspacec::csVector2_IsZero;
+*UnitAxisClamped = *cspacec::csVector2_UnitAxisClamped;
 *SquaredNorm = *cspacec::csVector2_SquaredNorm;
 *Rotate = *cspacec::csVector2_Rotate;
 *IsLeft = *cspacec::csVector2_IsLeft;
@@ -11468,6 +11473,7 @@ sub new {
 *Set = *cspacec::csVector3_Set;
 *Get = *cspacec::csVector3_Get;
 *Norm = *cspacec::csVector3_Norm;
+*InverseNorm = *cspacec::csVector3_InverseNorm;
 *SquaredNorm = *cspacec::csVector3_SquaredNorm;
 *Unit = *cspacec::csVector3_Unit;
 *Normalize = *cspacec::csVector3_Normalize;
@@ -17615,6 +17621,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetFeederData = *cspacec::iTerrainCell_GetFeederData;
 *SetFeederData = *cspacec::iTerrainCell_SetFeederData;
 *SetName = *cspacec::iTerrainCell_SetName;
+*SetSplatBaseMaterial = *cspacec::iTerrainCell_SetSplatBaseMaterial;
+*GetSplatBaseMaterial = *cspacec::iTerrainCell_GetSplatBaseMaterial;
 *scfGetVersion = *cspacec::iTerrainCell_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -17670,6 +17678,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetMaterialMapWidth = *cspacec::iTerrainFactoryCell_SetMaterialMapWidth;
 *SetMaterialMapHeight = *cspacec::iTerrainFactoryCell_SetMaterialMapHeight;
 *SetMaterialPersistent = *cspacec::iTerrainFactoryCell_SetMaterialPersistent;
+*SetSplatBaseMaterial = *cspacec::iTerrainFactoryCell_SetSplatBaseMaterial;
+*GetSplatBaseMaterial = *cspacec::iTerrainFactoryCell_GetSplatBaseMaterial;
 *scfGetVersion = *cspacec::iTerrainFactoryCell_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

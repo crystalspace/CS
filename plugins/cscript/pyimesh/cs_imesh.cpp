@@ -37428,6 +37428,58 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iTerrainCell_SetSplatBaseMaterial(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainCell *arg1 = (iTerrainCell *) 0 ;
+  iMaterialWrapper *arg2 = (iMaterialWrapper *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_SetSplatBaseMaterial",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_SetSplatBaseMaterial" "', argument " "1"" of type '" "iTerrainCell *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainCell * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iMaterialWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTerrainCell_SetSplatBaseMaterial" "', argument " "2"" of type '" "iMaterialWrapper *""'"); 
+  }
+  arg2 = reinterpret_cast< iMaterialWrapper * >(argp2);
+  (arg1)->SetSplatBaseMaterial(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainCell_GetSplatBaseMaterial(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainCell *arg1 = (iTerrainCell *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  iMaterialWrapper *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetSplatBaseMaterial",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetSplatBaseMaterial" "', argument " "1"" of type '" "iTerrainCell const *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainCell * >(argp1);
+  result = (iMaterialWrapper *)((iTerrainCell const *)arg1)->GetSplatBaseMaterial();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iMaterialWrapper, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iTerrainCell_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -38064,6 +38116,58 @@ SWIGINTERN PyObject *_wrap_iTerrainFactoryCell_SetMaterialPersistent(PyObject *S
   arg2 = static_cast< bool >(val2);
   (arg1)->SetMaterialPersistent(arg2);
   resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainFactoryCell_SetSplatBaseMaterial(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainFactoryCell *arg1 = (iTerrainFactoryCell *) 0 ;
+  iMaterialWrapper *arg2 = (iMaterialWrapper *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactoryCell_SetSplatBaseMaterial",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactoryCell, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainFactoryCell_SetSplatBaseMaterial" "', argument " "1"" of type '" "iTerrainFactoryCell *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainFactoryCell * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iMaterialWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTerrainFactoryCell_SetSplatBaseMaterial" "', argument " "2"" of type '" "iMaterialWrapper *""'"); 
+  }
+  arg2 = reinterpret_cast< iMaterialWrapper * >(argp2);
+  (arg1)->SetSplatBaseMaterial(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainFactoryCell_GetSplatBaseMaterial(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainFactoryCell *arg1 = (iTerrainFactoryCell *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  iMaterialWrapper *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainFactoryCell_GetSplatBaseMaterial",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainFactoryCell, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainFactoryCell_GetSplatBaseMaterial" "', argument " "1"" of type '" "iTerrainFactoryCell const *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainFactoryCell * >(argp1);
+  result = (iMaterialWrapper *)((iTerrainFactoryCell const *)arg1)->GetSplatBaseMaterial();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iMaterialWrapper, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -45432,6 +45536,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iTerrainCell_GetFeederData", _wrap_iTerrainCell_GetFeederData, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCell_SetFeederData", _wrap_iTerrainCell_SetFeederData, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCell_SetName", _wrap_iTerrainCell_SetName, METH_VARARGS, NULL},
+	 { (char *)"iTerrainCell_SetSplatBaseMaterial", _wrap_iTerrainCell_SetSplatBaseMaterial, METH_VARARGS, NULL},
+	 { (char *)"iTerrainCell_GetSplatBaseMaterial", _wrap_iTerrainCell_GetSplatBaseMaterial, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCell_scfGetVersion", _wrap_iTerrainCell_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iTerrainCell", _wrap_delete_iTerrainCell, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCell_swigregister", iTerrainCell_swigregister, METH_VARARGS, NULL},
@@ -45458,6 +45564,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iTerrainFactoryCell_SetMaterialMapWidth", _wrap_iTerrainFactoryCell_SetMaterialMapWidth, METH_VARARGS, NULL},
 	 { (char *)"iTerrainFactoryCell_SetMaterialMapHeight", _wrap_iTerrainFactoryCell_SetMaterialMapHeight, METH_VARARGS, NULL},
 	 { (char *)"iTerrainFactoryCell_SetMaterialPersistent", _wrap_iTerrainFactoryCell_SetMaterialPersistent, METH_VARARGS, NULL},
+	 { (char *)"iTerrainFactoryCell_SetSplatBaseMaterial", _wrap_iTerrainFactoryCell_SetSplatBaseMaterial, METH_VARARGS, NULL},
+	 { (char *)"iTerrainFactoryCell_GetSplatBaseMaterial", _wrap_iTerrainFactoryCell_GetSplatBaseMaterial, METH_VARARGS, NULL},
 	 { (char *)"iTerrainFactoryCell_scfGetVersion", _wrap_iTerrainFactoryCell_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iTerrainFactoryCell", _wrap_delete_iTerrainFactoryCell, METH_VARARGS, NULL},
 	 { (char *)"iTerrainFactoryCell_swigregister", iTerrainFactoryCell_swigregister, METH_VARARGS, NULL},
