@@ -465,8 +465,8 @@ csRef<iDocumentAttribute> csTinyXmlNode::GetAttribute (const char* name)
 
 const char* csTinyXmlNode::GetAttributeValue (const char* name, const char* defaultValue)
 {
-  TiXmlElement* el = node->ToElement ();
-  if (el) return el->Attribute (name);
+  TiDocumentAttribute* a = GetAttributeInternal(name);
+  if (a) return a->Value();
   else return defaultValue;
 }
 
