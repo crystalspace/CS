@@ -166,7 +166,7 @@ Condition="'$(Configuration)|$(Platform)'=='[% build.name %][% mutator.namesuffi
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-[% END %]
+[%- END %]
 
 [% MACRO compiler_debug BLOCK -%]
       <Optimization>Disabled</Optimization>
@@ -177,7 +177,7 @@ Condition="'$(Configuration)|$(Platform)'=='[% build.name %][% mutator.namesuffi
 [% END %]
 
 # The default PDB file name
-[% MACRO compiler_default_pdb BLOCK -%]
+[% MACRO compiler_default_pdb BLOCK %]
       <ProgramDataBaseFileName>[% workbuild([platform.name, '\\', my.doc.rawtarget.0, '.pdb']) %]</ProgramDataBaseFileName>
 [% END %]
 [% MACRO compiler_appcon  GET compiler_default_pdb %]
@@ -188,12 +188,12 @@ Condition="'$(Configuration)|$(Platform)'=='[% build.name %][% mutator.namesuffi
 
 # For shared libraries, use a different PDB name (resembling the shared lib
 # file name)
-[% MACRO compiler_library_shared_release BLOCK -%]
+[% MACRO compiler_library_shared_release BLOCK %]
       <ProgramDataBaseFileName>[% workbuild([platform.name, '\\', library_dll_outfile('.pdb')]) %]</ProgramDataBaseFileName>
 [% END %]
 
 [% MACRO compiler_library_shared_debug BLOCK -%]
-[% precompiled_header -%]
+[% precompiled_header %]
       <ProgramDataBaseFileName>[% workbuild([platform.name, '\\', library_dll_outfile('_d.pdb')]) %]</ProgramDataBaseFileName>
 [% END %]
 
