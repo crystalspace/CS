@@ -98,5 +98,31 @@ namespace DocSystem
     
     return csPtr<iDocument> (newDoc);
   }
+  
+  bool SetContentsValue (iDocumentNode* node, const char* contents)
+  {
+    if (node->GetType() != CS_NODE_ELEMENT) return false;
+    
+    csRef<iDocumentNode> textNode;
+    {
+      csRef<iDocumentNodeIterator> children (node->GetNodes());
+      while (children->HasNext())
+      {
+	csRef<iDocumentNode> child (children->Next());
+	if (child->GetType() == CS_NODE_TEXT)
+	{
+	  textNode = child;
+	  break;
+	}
+      }
+    }
+    if (!textNode)
+    {
+      textNode = node->CreateNodeBefore (CS_NODE_TEXT);
+      if (!textNode) return false;
+    }
+    textNode->SetValue (contents);
+    return true;
+  }
 } // namespace DocSystem
 } // namespace CS

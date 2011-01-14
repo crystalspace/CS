@@ -371,6 +371,17 @@ namespace DocSystem
    */
   CS_CRYSTALSPACE_EXPORT csPtr<iDocument> MakeChangeable (iDocument* doc,
 							  iDocumentSystem* docsys);
+
+  /**
+   * Set the contents of a document node.
+   * This is the converse of iDocumentNode::GetContentsValue(): if \a node
+   * has a child of type #CS_NODE_TEXT, the value of that child is changed
+   * to \a contents. If no such node exists one is created.
+   * Returns \c false if node couldn't be changed or a child created.
+   * (Typically if \a node was not of type #CS_NODE_ELEMENT.)
+   */
+  CS_CRYSTALSPACE_EXPORT bool SetContentsValue (iDocumentNode* node,
+						const char* contents);
 } // namespace DocSystem
 
 
