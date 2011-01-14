@@ -192,6 +192,7 @@ void BaseMapGen::ScanTextures ()
       csRef<iDocumentNode> current = it->Next();
       csString name = current->GetAttributeValue("name");
       csRef<iDocumentNode> file = current->GetNode("file");
+      if (!file) continue;
       csString filename = file->GetContentsValue();
       textureFiles.Put (name, filename);
     }
