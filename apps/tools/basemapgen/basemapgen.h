@@ -20,6 +20,9 @@
 #define __BASEMAPGEN_H__
 
 #include "layers.h"
+#include "textureclass.h"
+
+class TextureInfo;
 
 class BaseMapGen
 {
@@ -39,9 +42,11 @@ private:
   csRef<iDocumentNode> rootnode;
   csString worldFileName;
   
+  int mipSharpen;
+  TextureClassManager textureClasses;
 public:
   csHash<csString, csString> pluginMap;
-  csHash<csString, csString> textureFiles;
+  csHash<csRef<TextureInfo>, csString> textureFiles;
   csHash<csRef<MaterialLayer>, csString> materials;
   
   csHash<csRef<AlphaLayers>, csString> terrain1Layers;
@@ -101,6 +106,8 @@ public:
   ~BaseMapGen ();
 
   csRef<iImage> LoadImage (const csString& filename, int format);
+  const TextureClass& GetTextureClass (const char* texClass);
+  int GetMipSharpen () const { return mipSharpen; }
   
   bool Initialize ();
   void Start ();
@@ -108,6 +115,8 @@ public:
   void Report(const char* msg, ...);
   void DrawProgress (int percent);
 };
+// The global pointer to basemapgen
+extern BaseMapGen *basemapgen;
 
 #endif // __BASEMAPGEN_H__
 

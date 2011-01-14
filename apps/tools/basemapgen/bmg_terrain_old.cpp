@@ -21,6 +21,8 @@
 
 #include "basemapgen.h"
 
+#include "textureinfo.h"
+
 void BaseMapGen::ScanOldMaterialMaps()
 {
   // Get the terraformer node
@@ -172,7 +174,6 @@ void BaseMapGen::ScanTerrain1Meshes ()
     
       MaterialLayer* mat = materials.Get (matname, (MaterialLayer*)0);
       if (!mat) continue;
-      const char* texname = mat->texture_name;
       
       // Get the materialpalette.
       csRef<iDocumentNode> materialpalette = params->GetNode ("materialpalette");
@@ -203,15 +204,17 @@ void BaseMapGen::ScanTerrain1Meshes ()
 	basemap_w = basemap_h = basemap_res;
       }
     
+      const TextureInfo* texinfo = mat->texture;
+      if (!texinfo) continue;
+      if (texinfo->GetFileName ().IsEmpty ()) continue;
+      
       csPrintf ("Basemap resolution: %dx%d\n", basemap_w, basemap_h); fflush (stdout);
       
       csRef<iImage> basemap = CreateBasemap (basemap_w, basemap_h,
         *alphaLayers, mlayers);
       if (!basemap) continue;
-      const char* texfile = textureFiles.Get (texname, (const char*)0);
-      if (texfile == 0) continue;
       
-      SaveImage (basemap, texfile);
+      SaveImage (basemap, texinfo->GetFileName ());
     } // while meshobj
   } // while sector
 }

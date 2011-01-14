@@ -21,8 +21,7 @@
 
 #include "basemapgen.h"
 
-// The global pointer to basemapgen
-extern BaseMapGen *basemapgen;
+#include "textureinfo.h"
 
 bool BaseMapGen::Terrain2Cell::Parse (iDocumentNode* node, bool isDefault)
 {
@@ -236,15 +235,17 @@ void BaseMapGen::ScanTerrain2Meshes ()
 	  basemap_w = basemap_h = basemap_res;
 	}
       
+	const TextureInfo* texinfo = mat->texture;
+	if (!texinfo) continue;
+	if (texinfo->GetFileName ().IsEmpty()) continue;
+	
 	csPrintf ("Basemap resolution: %dx%d\n", basemap_w, basemap_h); fflush (stdout);
 	
 	csRef<iImage> basemap = CreateBasemap (basemap_w, basemap_h,
 	  *(cell.alphaLayers), cell.alphaMaterials);
 	if (!basemap) continue;
-	const char* texfile = textureFiles.Get (mat->texture_name, (const char*)0);
-	if (texfile == 0) continue;
 	
-	SaveImage (basemap, texfile);
+	SaveImage (basemap, texinfo->GetFileName());
 	
 	csRef<iDocumentNode> renderPropertiesNode (cell.renderPropertiesNode);
 	if (!renderPropertiesNode)
@@ -259,7 +260,7 @@ void BaseMapGen::ScanTerrain2Meshes ()
 					     0.5 / basemap_w,
 					     0.5 / basemap_h));
 	
-	baseMapWriteCounts.GetOrCreate (texfile, 0)++;
+	baseMapWriteCounts.GetOrCreate (texinfo->GetFileName(), 0)++;
       }
     } // while meshobj
   } // while sector

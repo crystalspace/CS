@@ -156,15 +156,3 @@ float AlphaLayers::GetAlpha (size_t layer, float coord_x, float coord_y) const
   return csLerp (csLerp (p00, p10, f1), 
     csLerp (p01, p11, f1), f2);
 }
-
-//-----------------------------------------------------------------------------
-  
-iImage* MaterialLayer::GetImage()
-{
-  if (!image.IsValid())
-  {
-    image = basemapgen->LoadImage (texture_file, CS_IMGFMT_TRUECOLOR);
-  }
-  return image;
-}
-  

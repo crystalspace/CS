@@ -19,6 +19,8 @@
 #include "crystalspace.h"
 #include "basemapgen.h"
 
+#include "textureinfo.h"
+
 CS_IMPLEMENT_APPLICATION
 
 // The global pointer to basemapgen
@@ -57,6 +59,13 @@ bool BaseMapGen::Initialize ()
     return false;
   }
 
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+  if (!vfs)
+  {
+    Report("No iVFS plugin!");
+    return false;
+  }
+  
   cmdline = csQueryRegistry<iCommandLineParser> (object_reg);
   if (!cmdline)
   {
@@ -70,6 +79,18 @@ bool BaseMapGen::Initialize ()
     Report("Error opening system!");
     return false;
   }
+
+  csRef<iConfigManager> cfgmgr = csQueryRegistry<iConfigManager> (object_reg);
+  if (!cfgmgr)
+  {
+    Report("No iConfigManager plugin!");
+    return false;
+  }
+  // Used for reading texture classes.
+  cfgmgr->AddDomain ("/config/r3dopengl.cfg", vfs,
+		     iConfigManager::ConfigPriorityPlugin);
+  mipSharpen = cfgmgr->GetInt ("Video.OpenGL.SharpenMipmaps", 0);
+  textureClasses.Parse (cfgmgr);
   
   const char* optTerrain = cmdline->GetOption ("terrainname", 0);
   if (optTerrain != 0)
@@ -155,7 +176,12 @@ csRef<iImage> BaseMapGen::LoadImage (const csString& filename, int format)
 
   return image;
 }
-  
+
+const TextureClass& BaseMapGen::GetTextureClass (const char* texClass)
+{
+  return textureClasses.GetTextureClass (texClass);
+}
+
 void BaseMapGen::ScanPluginNodes ()
 {
   csRef<iDocumentNode> plugins = rootnode->GetNode ("plugins");
@@ -193,8 +219,14 @@ void BaseMapGen::ScanTextures ()
       csString name = current->GetAttributeValue("name");
       csRef<iDocumentNode> file = current->GetNode("file");
       if (!file) continue;
-      csString filename = file->GetContentsValue();
-      textureFiles.Put (name, filename);
+      csString texFile, texClass;
+      texFile = file->GetContentsValue();
+      csRef<iDocumentNode> texClassNode = current->GetNode ("class");
+      if (texClassNode)
+	texClass = texClassNode->GetContentsValue();
+      csRef<TextureInfo> texInfo;
+      texInfo.AttachNew (new TextureInfo (texFile, texClass));
+      textureFiles.Put (name, texInfo);
     }
   }
 }
@@ -214,8 +246,9 @@ void BaseMapGen::ScanMaterials ()
     csRef<iDocumentNode> tex = mat->GetNode ("texture");
     if (!tex) continue;
     const char* texname = tex->GetContentsValue();
-    const char* texture_file = textureFiles.Get (texname, (const char*)0);
-    if (!texture_file) continue;
+    TextureInfo* texInfo = textureFiles.Get (texname, (TextureInfo*)nullptr);
+    if (!texInfo) continue;
+    if (texInfo->GetFileName().IsEmpty ()) continue;
     
     // Set the texture scale.
     csRef<iDocumentNodeIterator> it = mat->GetNodes("shadervar");
@@ -240,8 +273,7 @@ void BaseMapGen::ScanMaterials ()
     csRef<MaterialLayer> material;
     material.AttachNew (new MaterialLayer);
     material->name = matname;
-    material->texture_name = texname;
-    material->texture_file = texture_file;
+    material->texture = texInfo;
     material->texture_scale = texscale;
     materials.Put (matname, material);
   }
@@ -328,20 +360,6 @@ bool BaseMapGen::SaveMap ()
   return true;
 }
 
-/* Get mipmap for an image, using precomputed mipmaps as far as
-   possible. */
-static csRef<iImage> GetImageMip (iImage* img, uint mip)
-{
-  if (mip == 0) return img;
-  csRef<iImage> imgToMip (img);
-  uint hasMips = img->HasMipmaps();
-  if (mip <= hasMips) return img->GetMipmap (mip);
-  imgToMip = img->GetMipmap (hasMips);
-  mip -= hasMips;
-  if (mip == 0) return imgToMip;
-  return csImageManipulate::Mipmap (imgToMip, mip);
-}
-
 static csColor GetPixelWrap (iImage* img, int img_w, int img_h, 
                              int x, int y)
 {
@@ -365,7 +383,7 @@ public:
   {
     float layer_needed_x = float (basemap_w) / textureScale.x;
     float layer_needed_y = float (basemap_h) / textureScale.y;
-    iImage* layerImage = layer->GetImage();
+    iImage* layerImage = layer->texture->GetMip (0);
     int mip_x = csFindNearestPowerOf2 (
       int (ceil (layerImage->GetWidth() / layer_needed_x)));
     int mip_y = csFindNearestPowerOf2 (
@@ -373,7 +391,7 @@ public:
     int mip = csMax (
       csClamp (csLog2 (mip_x), csLog2 (layerImage->GetWidth()), 0),
       csClamp (csLog2 (mip_y), csLog2 (layerImage->GetHeight()), 0));
-    img = GetImageMip (layerImage, mip);
+    img = layer->texture->GetMip (mip);
     img_w = img->GetWidth();
     img_h = img->GetHeight();
   }
