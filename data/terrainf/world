@@ -164,12 +164,10 @@
                     <gridsize width="257" height="257" />
                     <materialmapsize width="512" height="512" />
                     <size x="256" y="15" z="256" />
-		    <splatbasematerial>splatbase</splatbasematerial>
-		    <renderproperties>
-			<param name="splat render priority">object2</param>
-			<!-- 511/512,511/512,0.5/512,0.5/512 -->
-			<shadervar name="basemap scale" type="vector4">0.998046875,0.998046875,0.000976562,0.000976562</shadervar>
-		    </renderproperties>
+                    <splatbasematerial>splatbase</splatbasematerial>
+                    <renderproperties>
+                        <param name="splat render priority">object2</param>
+                    </renderproperties>
                 </celldefault>
                 <cell>
                     <name>0</name>
@@ -207,6 +205,8 @@
                             <shadervar name="texture lod distance" type="vector3">200.000000,200.000000,200.000000</shadervar>
                             <shadervar name="tex lightmap dir 2" type="texture">lightmaps_terrainf_0_d2_png</shadervar>
                             <shadervar name="tex lightmap dir 3" type="texture">lightmaps_terrainf_0_d3_png</shadervar>
+                            <!-- basemap scale is: (w-1)/w,(h-1)/h,0.5/w,0.5/h -->
+                            <shadervar name="basemap scale" type="vector4">0.999023438,0.999023438,0.00048828125,0.00048828125</shadervar>
                         </renderproperties>
                     </cell>
                 </cells>
