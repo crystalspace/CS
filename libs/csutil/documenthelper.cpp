@@ -76,5 +76,27 @@ namespace DocSystem
     // Ignore children, that's what the 'shallow' part is about ...
     return FlattenNodeCommon (node, 0);
   }
+  
+  csPtr<iDocument> MakeChangeable (iDocument* doc, iDocumentSystem* docsys)
+  {
+    csRef<iDocument> newDoc;
+    
+    int changeable = doc->Changeable ();
+    if (changeable == CS_CHANGEABLE_YES)
+      newDoc = doc;
+    else
+    {
+      if (changeable == CS_CHANGEABLE_NEWROOT)
+	newDoc = doc;
+      else
+	newDoc = docsys->CreateDocument ();
+
+      csRef<iDocumentNode> oldRoot (doc->GetRoot ());
+      csRef<iDocumentNode> newRoot (newDoc->CreateRoot ());
+      CS::DocSystem::CloneNode (oldRoot, newRoot);
+    }
+    
+    return csPtr<iDocument> (newDoc);
+  }
 } // namespace DocSystem
 } // namespace CS

@@ -361,6 +361,16 @@ namespace DocSystem
    * \sa FlattenNode
    */
   CS_CRYSTALSPACE_EXPORT csString FlattenNodeShallow (iDocumentNode* node);
+  
+  /**
+   * Make a document changeable.
+   * Not all documents can be changed in-place. This helper function checks
+   * the document \a doc and either returns the original document, if
+   * changeable, or a newly created, changeable document from \a docsys
+   * with the same contents as \a doc.
+   */
+  CS_CRYSTALSPACE_EXPORT csPtr<iDocument> MakeChangeable (iDocument* doc,
+							  iDocumentSystem* docsys);
 } // namespace DocSystem
 
 
