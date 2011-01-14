@@ -137,9 +137,6 @@ END -%]
       <AdditionalManifestFiles>[% path([my.doc.sourceroot.0, ${"my.doc.manifest${platform.suffix}.0"}]) %]</AdditionalManifestFiles>
     </Manifest>
 [%- END %]
-    <ProjectReference>
-      <LinkLibraryDependencies>true</LinkLibraryDependencies>
-    </ProjectReference>
   </ItemDefinitionGroup>
       [%~ END %]
     [%~ END %]

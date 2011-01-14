@@ -1710,8 +1710,7 @@ rule CompileGroups
 
 rule LinkWith
 {
-  ExternalLibs $(<) : $($(>).EXTERNALLIBS) ;
-  local libs = [ ResolveLibs $(>) ] ;
+  local libs = [ ResolveLibs $(>) $($(>).NEEDLIBS) ] ;
   LibDepends $(<) : $(libs) ;
 }
 
@@ -1731,7 +1730,7 @@ rule LibDepends
     }
   }
   local l ;
-  for l in $(libs)
+  for l in $(libs) $($(libs).NEEDLIBS)
   {
     if ! [ IsElem $(l) : $($(<).NEEDLIBS) ]
     {
@@ -1739,7 +1738,9 @@ rule LibDepends
         notfile : $($(<)_PRJ_RESPDIR) ;
       $(<).NEEDLIBS += $(l) ;
     }
-  }  
+  }
+  
+  ExternalLibs $(<) : $($(>).EXTERNALLIBS) ;
 }
 
 rule RelayLibs
