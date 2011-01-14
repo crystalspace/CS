@@ -1752,12 +1752,27 @@ void csTerrainBruteBlockRenderer::SetupCellMMArrays (iTerrainCell* cell)
 
         data->alphaMapArrayMM.Put (matIdx, txtHandle);
 
-        csRef<csShaderVariable> var;
-        var.AttachNew (new csShaderVariable(stringSet->Request ("splat alpha map")));
-        var->SetType (csShaderVariable::TEXTURE);
-        var->SetValue (data->alphaMapArrayMM[matIdx]);
+	{
+	  csRef<csShaderVariable> var;
+	  var.AttachNew (new csShaderVariable(stringSet->Request ("splat alpha map")));
+	  var->SetType (csShaderVariable::TEXTURE);
+	  var->SetValue (data->alphaMapArrayMM[matIdx]);
 
-        data->svContextArrayMM[matIdx]->AddVariable (var);
+	  data->svContextArrayMM[matIdx]->AddVariable (var);
+	}
+	{
+	  csRef<csShaderVariable> var;
+	  var.AttachNew (new csShaderVariable(stringSet->Request ("alpha map scale")));
+	  float inv_matmap_w = 1.0f / cell->GetMaterialMapWidth ();
+	  float inv_matmap_h = 1.0f / cell->GetMaterialMapHeight ();
+	  var->SetValue (
+	    csVector4 ((cell->GetMaterialMapWidth ()-1) * inv_matmap_w,
+		       (cell->GetMaterialMapHeight ()-1) * inv_matmap_h,
+		       0.5f * inv_matmap_w,
+		       0.5f * inv_matmap_h));
+
+	  data->svContextArrayMM[matIdx]->AddVariable (var);
+	}
       }
     }
   }
