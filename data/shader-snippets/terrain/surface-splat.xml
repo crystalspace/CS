@@ -52,6 +52,33 @@
 	  texAlpha = fragmentIn.texAlpha;
       </block>
     </input>
+    
+    <input name="alphamap_scale" type="translateScale2" default="complex" private="yes">
+      <block location="shadervars">
+	  <shadervar name="alpha map scale" type="vector4">1,1,0,0</shadervar>
+      </block>
+      
+      <block location="cg:variablemap">
+	  <variablemap variable="alpha map scale" destination="vertexIn.alphamap_scale" />
+	  <variablemap variable="alpha map scale" destination="fragmentIn.alphamap_scale" />
+      </block>
+      
+      <block location="cg:vertexIn">
+	  <uniform type="float4" name="alphamap_scale" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	  <uniform type="float4" name="alphamap_scale" />
+      </block>
+      
+      <block location="cg:vertexMain">
+	  alphamap_scale = vertexIn.alphamap_scale;
+      </block>
+      
+      <block location="cg:fragmentMain">
+	  alphamap_scale = fragmentIn.alphamap_scale;
+      </block>
+    </input>
 
     <block location="cg:vertexMain">
       surfaceColor = float4(0);
@@ -60,7 +87,8 @@
     
     <block location="cg:fragmentMain">
       surfaceColor = tex2D (texDiffuse, texCoordSplat);
-      surfaceColor *= tex2D (texAlpha, texCoord).x;
+      float2 tcAlpha = texCoord*alphamap_scale.xy + alphamap_scale.zw;
+      surfaceColor *= tex2D (texAlpha, tcAlpha).x;
       surfaceColor_attr_perfragment = true;
     </block>
     
