@@ -225,7 +225,7 @@ void BaseMapGen::ScanTextures ()
       if (texClassNode)
 	texClass = texClassNode->GetContentsValue();
       csRef<TextureInfo> texInfo;
-      texInfo.AttachNew (new TextureInfo (texFile, texClass));
+      texInfo.AttachNew (new TextureInfo (current, texFile, texClass));
       textureFiles.Put (name, texInfo);
     }
   }
@@ -558,6 +558,27 @@ void BaseMapGen::SetShaderVarNode (iDocumentNode* parentNode,
   }
   svNode->SetAttribute ("type", svType);
   CS::DocSystem::SetContentsValue (svNode, svValue);
+}
+
+void BaseMapGen::SetTextureFlag (iDocumentNode* texNode, const char* flagStr)
+{
+  csRef<iDocumentNode> flagNode (texNode->GetNode (flagStr));
+  if (!flagNode)
+  {
+    flagNode = texNode->CreateNodeBefore (CS_NODE_ELEMENT);
+    flagNode->SetValue (flagStr);
+  }
+}
+
+void BaseMapGen::SetTextureClassNode (iDocumentNode* texNode, const char* texClass)
+{
+  csRef<iDocumentNode> classNode (texNode->GetNode ("class"));
+  if (!classNode)
+  {
+    classNode = texNode->CreateNodeBefore (CS_NODE_ELEMENT);
+    classNode->SetValue ("class");
+  }
+  CS::DocSystem::SetContentsValue (classNode, texClass);
 }
 
 void BaseMapGen::DrawProgress (int percent)

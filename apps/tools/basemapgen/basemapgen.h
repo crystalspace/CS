@@ -101,6 +101,8 @@ public:
 			 const char* svName,
 			 const char* svType,
 			 const char* svValue);
+  void SetTextureFlag (iDocumentNode* texNode, const char* flagStr);
+  void SetTextureClassNode (iDocumentNode* texNode, const char* texClass);
 public:
   BaseMapGen (iObjectRegistry* object_reg);
   ~BaseMapGen ();

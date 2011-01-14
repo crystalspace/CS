@@ -23,17 +23,20 @@
 #include "csutil/refarr.h"
 #include "csutil/refcount.h"
 
+struct iDocumentNode;
 struct iImage;
 
 class TextureInfo : public CS::Utility::FastRefCount<TextureInfo>
 {
+  csRef<iDocumentNode> node;
   csString file;
   csString texClass;
   
   csRefArray<iImage> mips;
 public:
-  TextureInfo (const char* file, const char* texClass);
+  TextureInfo (iDocumentNode* node, const char* file, const char* texClass);
   
+  iDocumentNode* GetDocumentNode() const { return node; }
   const csString& GetFileName() const
   { return file; }
   iImage* GetMip (uint mip);

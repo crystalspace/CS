@@ -21,8 +21,9 @@
 
 #include "basemapgen.h"
 
-TextureInfo::TextureInfo (const char* file, const char* texClass)
- : file (file), texClass (texClass) {}
+TextureInfo::TextureInfo (iDocumentNode* node, const char* file,
+			  const char* texClass)
+ : node (node), file (file), texClass (texClass) {}
 
 iImage* TextureInfo::GetMip (uint mip)
 {

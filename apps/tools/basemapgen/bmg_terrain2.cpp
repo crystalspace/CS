@@ -246,6 +246,8 @@ void BaseMapGen::ScanTerrain2Meshes ()
 	if (!basemap) continue;
 	
 	SaveImage (basemap, texinfo->GetFileName());
+	SetTextureClassNode (texinfo->GetDocumentNode(), "nosharpen");
+	SetTextureFlag (texinfo->GetDocumentNode(), "clamp");
 	
 	csRef<iDocumentNode> renderPropertiesNode (cell.renderPropertiesNode);
 	if (!renderPropertiesNode)
