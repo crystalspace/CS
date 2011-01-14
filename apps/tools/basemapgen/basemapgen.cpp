@@ -323,8 +323,8 @@ static csColor GetPixelWrap (iImage* img, int img_w, int img_h,
                              int x, int y)
 {
   // Wrap around the texture coordinates.
-  x = x % img_w;
-  y = y % img_h;
+  x = (x < 0) ? (x + img_w) : (x % img_w);
+  y = (y < 0) ? (y + img_h) : (y % img_h);
 
   // Get the pixel.
   csRGBpixel* px = (csRGBpixel*)img->GetImageData() + x + (y * img_h);
@@ -364,8 +364,11 @@ public:
     // Calculate the material coordinates.
     float matcoord_x_f = (coord_x * img_w);
     float matcoord_y_f = (coord_y * img_h);
-    int matcoord_x = int (matcoord_x_f);
-    int matcoord_y = int (matcoord_y_f);
+    // offset to match GL filtering
+    matcoord_x_f -= 0.5f;
+    matcoord_y_f -= 0.5f;
+    int matcoord_x = int (floorf (matcoord_x_f));
+    int matcoord_y = int (floorf (matcoord_y_f));
   
     // Bilinearly filter from material.
     csColor p00 (GetPixelWrap (img, img_w, img_h,
@@ -408,9 +411,17 @@ csPtr<iImage> BaseMapGen::CreateBasemap (int basemap_w, int basemap_h,
     csRGBpixel* bm_dst = (csRGBpixel*)(basemapImage->GetImageData());
 
     float coord_x, coord_y;
+    float alpha_coord_x, alpha_coord_y;
 
-    float inv_basemap_w = 1.0f / basemap_w;
-    float inv_basemap_h = 1.0f / basemap_h;
+    // Used to compute basemap TCs from basemap pixel coords
+    float inv_basemap_w = 1.0f / (basemap_w-1);
+    float inv_basemap_h = 1.0f / (basemap_h-1);
+    /* Used to compute alphamap TCs from basemap pixel coords
+       (alphamap res may differ from basemap res) */
+    const int alphamap_w = alphaLayers.GetWidth();
+    const int alphamap_h = alphaLayers.GetHeight();
+    float inv_alphamap_w = inv_basemap_w * (float (alphamap_w-1) / alphamap_w);
+    float inv_alphamap_h = inv_basemap_h * (float (alphamap_h-1) / alphamap_h);
 
     for (int y = 0 ; y < basemap_h ; y++)
     {
@@ -423,13 +434,15 @@ csPtr<iImage> BaseMapGen::CreateBasemap (int basemap_w, int basemap_h,
         // Calculate the destination coordinates.
         coord_x    = x * inv_basemap_w;
         coord_y    = y * inv_basemap_h;
+        alpha_coord_x = x * inv_alphamap_w;
+        alpha_coord_y = y * inv_alphamap_h;
 
         csColor col (0, 0, 0);
         for (size_t l = 0; l < samplers.GetSize(); l++)
         {
           if (l >= alphaLayers.GetSize()) break;
         
-          float a = alphaLayers.GetAlpha (l, coord_x, coord_y);
+          float a = alphaLayers.GetAlpha (l, alpha_coord_x, alpha_coord_y);
           // Blend material colors.
           col += samplers[l].GetPixel (coord_x, coord_y) * a;
         }
