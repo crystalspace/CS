@@ -262,15 +262,24 @@ bool BaseMapGen::LoadMap ()
   if (path.IsEmpty()) path = "/this";
   if (world.IsEmpty()) world = "world";
 
-  csRef<iFile> buf (CS::Utility::SmartFileOpen (vfs, path, world));
-  if (!buf)
+  const char* worldFN;
+  if (!CS::Utility::SmartChDir (vfs, path, world, &worldFN))
   {
-    Report("Failed to open file %s in %s!", CS::Quote::Single (world.GetData()),
+    Report("Failed to locate a %s file in %s!",
+	   CS::Quote::Single (world.GetData()),
 	   CS::Quote::Single (path));
     return false;
   }
+  csRef<iFile> buf (vfs->Open (worldFN, VFS_FILE_READ));
+  if (!buf)
+  {
+    Report("Failed to open file %s in %s for reading!",
+	   CS::Quote::Single (worldFN),
+	   CS::Quote::Single (path));
+    return false;
+  }
+  worldFileName = worldFN;
 
-  csRef<iDocument> doc;
   csRef<iDocumentSystem> docsys;
 
   if (!docsys) docsys = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
@@ -282,13 +291,12 @@ bool BaseMapGen::LoadMap ()
       error);
     return false;
   }
+  
+  doc = CS::DocSystem::MakeChangeable (doc, docsys);
 
-  if (doc)
-  {
-    rootnode = doc->GetRoot()->GetNode("world");
-    if (!rootnode)
-      return false;
-  }
+  rootnode = doc->GetRoot()->GetNode("world");
+  if (!rootnode)
+    return false;
   
   ScanPluginNodes ();
   
@@ -297,7 +305,29 @@ bool BaseMapGen::LoadMap ()
   
   return true;
 }
+
+bool BaseMapGen::SaveMap ()
+{
+  scfString docstr;
+  docstr.SetGrowsBy (0);
+  const char* err = doc->Write (&docstr);
+  if (err != 0)
+  {
+    Report("Failed to write document: %s", err);
+    return false;
+  }
+
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+  if (!vfs->WriteFile (worldFileName, docstr.GetData(), docstr.Length()))
+  {
+    Report("Failed to write file %s!",
+	   CS::Quote::Single (worldFileName));
+    return false;
+  }
   
+  return true;
+}
+
 /* Get mipmap for an image, using precomputed mipmaps as far as
    possible. */
 static csRef<iImage> GetImageMip (iImage* img, uint mip)
@@ -481,6 +511,36 @@ void BaseMapGen::SaveImage (iImage* image, const char* texname)
     return;
   }
 }
+  
+
+void BaseMapGen::SetShaderVarNode (iDocumentNode* parentNode,
+				   const char* svName,
+				   const char* svType,
+				   const char* svValue)
+{
+  csRef<iDocumentNode> svNode;
+  {
+    csRef<iDocumentNodeIterator> svNodes (parentNode->GetNodes ("shadervar"));
+    while (svNodes->HasNext())
+    {
+      csRef<iDocumentNode> testNode (svNodes->Next ());
+      const char* name = testNode->GetAttributeValue ("name");
+      if (name && (strcmp (name, svName) == 0))
+      {
+	svNode = testNode;
+	break;
+      }
+    }
+  }
+  if (!svNode)
+  {
+    svNode = parentNode->CreateNodeBefore (CS_NODE_ELEMENT);
+    svNode->SetValue ("shadervar");
+    svNode->SetAttribute ("name", svName);
+  }
+  svNode->SetAttribute ("type", svType);
+  CS::DocSystem::SetContentsValue (svNode, svValue);
+}
 
 void BaseMapGen::DrawProgress (int percent)
 {
@@ -517,6 +577,12 @@ void BaseMapGen::Start ()
   
   ScanTerrain2Factories();
   ScanTerrain2Meshes();
+  
+  if (!SaveMap ())
+  {
+    Report("Error writing world file!");
+    return;
+  }
 }
 
 /*---------------------------------------------------------------------*

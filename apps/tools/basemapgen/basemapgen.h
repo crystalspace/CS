@@ -35,7 +35,9 @@ private:
   csRegExpMatcher* meshRE;
 
   // The worldfile
+  csRef<iDocument> doc;
   csRef<iDocumentNode> rootnode;
+  csString worldFileName;
   
 public:
   csHash<csString, csString> pluginMap;
@@ -51,6 +53,7 @@ public:
   void ScanMaterials ();
 
   bool LoadMap ();
+  bool SaveMap ();
   void ScanOldMaterialMaps();
   void ScanTerrain1Factories ();
   void ScanTerrain1Meshes ();
@@ -63,7 +66,11 @@ public:
     MaterialLayers alphaMaterials;
     csRef<AlphaLayers> materialMapLayers;
     
-    bool Parse (iDocumentNode* node);
+    csRef<iDocumentNode> cellNode;
+    csRef<iDocumentNode> renderPropertiesNode;
+    csRef<iDocumentNode> defRenderPropertiesNode;
+    
+    bool Parse (iDocumentNode* node, bool isDefault = false);
     void ApplyMaterialMap (const MaterialLayers& matMap);
   };
   struct Terrain2Factory : public csRefCount
@@ -84,6 +91,11 @@ public:
                                const AlphaLayers& alphaLayers,
                                MaterialLayers& txt_layers);
   void SaveImage (iImage* image, const char* filename);
+  
+  void SetShaderVarNode (iDocumentNode* parentNode,
+			 const char* svName,
+			 const char* svType,
+			 const char* svValue);
 public:
   BaseMapGen (iObjectRegistry* object_reg);
   ~BaseMapGen ();

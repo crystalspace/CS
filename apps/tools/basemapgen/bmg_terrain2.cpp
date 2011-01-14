@@ -24,8 +24,10 @@
 // The global pointer to basemapgen
 extern BaseMapGen *basemapgen;
 
-bool BaseMapGen::Terrain2Cell::Parse (iDocumentNode* node)
+bool BaseMapGen::Terrain2Cell::Parse (iDocumentNode* node, bool isDefault)
 {
+  if (!isDefault)
+    cellNode = node;
   {
     csRef<iDocumentNode> name = node->GetNode ("name");
     if (name.IsValid())
@@ -35,6 +37,13 @@ bool BaseMapGen::Terrain2Cell::Parse (iDocumentNode* node)
     csRef<iDocumentNode> basematerial = node->GetNode ("basematerial");
     if (basematerial.IsValid())
       this->baseMaterial = basematerial->GetContentsValue();
+  }
+  {
+    csRef<iDocumentNode> renderProperties = node->GetNode ("renderproperties");
+    if (isDefault)
+      this->defRenderPropertiesNode = renderProperties;
+    else
+      this->renderPropertiesNode = renderProperties;
   }
   {
     csRef<iDocumentNode> feederProperties = node->GetNode ("feederproperties");
@@ -236,6 +245,19 @@ void BaseMapGen::ScanTerrain2Meshes ()
 	if (texfile == 0) continue;
 	
 	SaveImage (basemap, texfile);
+	
+	csRef<iDocumentNode> renderPropertiesNode (cell.renderPropertiesNode);
+	if (!renderPropertiesNode)
+	{
+	  renderPropertiesNode = cell.cellNode->CreateNodeBefore (CS_NODE_ELEMENT);
+	  renderPropertiesNode->SetValue ("renderproperties");
+	}
+	SetShaderVarNode (renderPropertiesNode, "basemap scale", "vector4",
+			  csString().Format ("%.9g,%.9g,%.9g,%.9g",
+					     float (basemap_w-1) / basemap_w,
+					     float (basemap_h-1) / basemap_h,
+					     0.5 / basemap_w,
+					     0.5 / basemap_h));
 	
 	baseMapWriteCounts.GetOrCreate (texfile, 0)++;
       }
