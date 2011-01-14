@@ -262,18 +262,11 @@ bool BaseMapGen::LoadMap ()
   if (path.IsEmpty()) path = "/this";
   if (world.IsEmpty()) world = "world";
 
-  csStringArray paths;
-  paths.Push ("/lev/");
-  if (!vfs->ChDirAuto(path.GetData(), &paths, 0, "world"))
-  {
-    Report("Error setting directory %s!", CS::Quote::Single (path.GetData ()));
-    return false;
-  }
-
-  csRef<iFile> buf = vfs->Open(world.GetData(), VFS_FILE_READ);
+  csRef<iFile> buf (CS::Utility::SmartFileOpen (vfs, path, world));
   if (!buf)
   {
-    Report("Failed to open file %s!", CS::Quote::Single (world.GetData()));
+    Report("Failed to open file %s in %s!", CS::Quote::Single (world.GetData()),
+	   CS::Quote::Single (path));
     return false;
   }
 
