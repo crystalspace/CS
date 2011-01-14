@@ -158,13 +158,7 @@ END -%]
     <[% group.itemtype %] Include="[% path([my.doc.sourceroot.0, file]) %]" />
     [%- ELSE %]
     <[% group.itemtype %] Include="[% path([my.doc.sourceroot.0, file]) %]">
-    [%~ FOREACH build IN builds %]
-      [%~ FOREACH mutator IN mutators %]
-        [%~ FOREACH platform IN platforms %]
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='[% build.name %][% mutator.namesuffix %]|[% platform.name %]'">[% workbuild([file.replace('/', '_'), '.obj']) %]</ObjectFileName>
-        [%~ END %]
-      [%~ END %]
-    [%~ END %]
+      <ObjectFileName>[% "\$(IntermediateOutputPath)" _ file.replace('/', '_') _ '.obj' %]</ObjectFileName>
     </[% group.itemtype %]>
     [%~ END %]
   [%~ END %]
