@@ -33,6 +33,10 @@
 #    itemtype
 #        "Item type" for msbuild projects (as used by VC10) - the name of
 #        elements under the output <ItemGroup> created for the group.
+#    apply_exclusion
+#	 Optional string to exclude files from a build.  If give, uses
+#	'interpolate' with the argument 'exclude_<apply_exclusion>' for files
+#	of the group over combinations of all builds and mutators.
 #------------------------------------------------------------------------------
 groups = [
   {
@@ -49,6 +53,7 @@ groups = [
     name => 'Resource Files'
     types => '\.rc$'
     itemtype => 'ResourceCompile'
+    apply_exclusion => 'rc'
   },
   {
     name => 'Other Files'

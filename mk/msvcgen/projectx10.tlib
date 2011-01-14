@@ -265,3 +265,7 @@ copy /y "$(TargetPath)" [% path([workroot, 'bin\\']) %]
 [% MACRO postbuild_library_shared GET postbuild_common %]
 [% MACRO postbuild_plugin	GET postbuild_common %]
 [% MACRO postbuild_dll		GET postbuild_common %]
+
+[% MACRO exclude_rc_library BLOCK %]
+      <ExcludedFromBuild Condition="'$(Configuration)'=='[% build.name %][% mutator.namesuffix %]'">true</ExcludedFromBuild>
+[%- END %]
