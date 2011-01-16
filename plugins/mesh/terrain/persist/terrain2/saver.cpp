@@ -289,6 +289,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2Loader)
 	  }
 	}
 
+	{
+	  iMaterialWrapper* basemat = defaultCell->GetSplatBaseMaterial();
+	  if (basemat)
+	  {
+	    csRef<iDocumentNode> node = 
+	      defaultNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+	    node->SetValue ("splatbasematerial");
+	    node->CreateNodeBefore (CS_NODE_TEXT, 0)
+	     ->SetValue (basemat->QueryObject()->GetName());
+	  }
+	}
+
 	synldr->WriteBool (defaultNode, "materialmappersistent",
 	  defaultCell->GetMaterialPersistent(), false);
 
