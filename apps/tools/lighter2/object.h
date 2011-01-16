@@ -78,6 +78,8 @@ namespace lighter
     // Getters
     inline float GetLMDensity () const
     { return lmScale; }
+    const ObjectFactoryVertexData& GetVertexData() const
+    { return vertexData; }
 
     // Name of the factory
     csString factoryName;

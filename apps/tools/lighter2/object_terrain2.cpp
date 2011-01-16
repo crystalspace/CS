@@ -33,13 +33,6 @@ namespace lighter
   {
     if (!factory || !meshWrapper) return false;
 
-    if (factory->hasTangents)
-    {
-      objFlags.Set (OBJECT_FLAG_TANGENTS);
-      vdataBitangents = factory->vdataBitangents;
-      vdataTangents = factory->vdataTangents;
-    }
-
     this->sector = sector;
 
     const csReversibleTransform transform = meshWrapper->GetMovable ()->
@@ -80,6 +73,14 @@ namespace lighter
        So set up a "vertex" for each of these points and use PVL.
        Later, the data is copied into a lightmap image. */
     lightPerVertex = true;
+
+    if (factory->hasTangents)
+    {
+      objFlags.Set (OBJECT_FLAG_TANGENTS);
+      vdataBitangents = factory->vdataBitangents;
+      vdataTangents = factory->vdataTangents;
+    }
+    vertexData = factory->GetVertexData();
 
     size_t numCells = terrSys->GetCellCount();
     for (size_t c = 0; c < numCells; c++)
@@ -193,6 +194,15 @@ namespace lighter
 	      p.x + cellPos.x, height, 
 	      cellSize.z - p.y + cellPos.y));
 	    vertexData.normals.Push (norm);
+	    if (factory->hasTangents)
+	    {
+	      csVector3 tang (cell->GetTangent (p));
+	      csVector3 bitang (cell->GetBinormal (p));
+	      size_t v = vertexData.positions.GetSize()-1;
+	      vertexData.customData.SetSize ((v+1)*vertexData.customDataTotalComp);
+	      *((csVector3*)vertexData.GetCustomData (v, vdataTangents)) = tang;
+	      *((csVector3*)vertexData.GetCustomData (v, vdataBitangents)) = bitang;
+	    }
 	  }
 	}
 
@@ -365,6 +375,13 @@ namespace lighter
       factory->GetMeshObjectFactory());
     if (!terrFact.IsValid()) return;
 
+    if (globalConfig.GetLighterProperties().directionalLMs)
+    {
+      vdataTangents = vertexData.AddCustomData (3);
+      vdataBitangents = vertexData.AddCustomData (3);
+      hasTangents = true;
+    }
+    
     // Each cell needs a unique name
     uint counter = 0;
     csSet<csString> usedCellNames;
