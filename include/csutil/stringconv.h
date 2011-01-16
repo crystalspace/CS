@@ -19,6 +19,8 @@
 #ifndef __CS_CSUTIL_STRINGCONV_H__
 #define __CS_CSUTIL_STRINGCONV_H__
 
+#include "csutil/csstring.h"
+
 /**\file
  * Routines to convert data to and from strings.
  */
@@ -38,6 +40,16 @@ namespace CS
      */
     float CS_CRYSTALSPACE_EXPORT strtof (const char* str,
       const char** end = 0);
+      
+    /**
+     * Convert a float to a string, and attempting
+     * to keep as much precision as possible.
+     * \param f The float value to convert.
+     * \return String representation of the float value.
+     * \remarks Practically, the float value will be converted to a decimal
+     *   number. The decimal point will be a '.', independent of locale.
+     */
+    csString CS_CRYSTALSPACE_EXPORT ftostr (float f);
   } // namespace Utility
 } // namespace CS
 

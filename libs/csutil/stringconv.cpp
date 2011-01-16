@@ -231,5 +231,18 @@ namespace CS
       return val;
     }
 
+    csString ftostr (float f)
+    {
+      /*
+       * - Thinking behind the format is pretty simple:
+       *   float has 23bits of mantissa -> ~8 digits of precision.
+       *   Width is not limited, so 'e' notation should be taken for smaller
+       *   numbers.
+       *   (If you know a better format or have a better justification,
+       *   by all means improve this ;)
+       * - Format() cares about the right decimal point.
+       */
+      return csString().Format ("%.8g", f);
+    }
   } // namespace Utility
 } // namespace CS
