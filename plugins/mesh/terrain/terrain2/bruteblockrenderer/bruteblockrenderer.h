@@ -25,9 +25,10 @@
 #include "csutil/scf_implementation.h"
 #include "imesh/terrain2.h"
 #include "iutil/comp.h"
-#include "iutil/strset.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/shader/shader.h"
+/*#include "iutil/strset.h"
+#include "ivideo/graph3d.h"*/
+#include "ivideo/rendermesh.h"
+/*#include "ivideo/shader/shader.h"*/
 
 struct iEngine;
 
@@ -44,6 +45,9 @@ class csTerrainBruteBlockRenderer :
                             iComponent>
 {
 public:
+  // @@@ FIXME: static IDs aren't good...
+  static CS::ShaderVarStringID textureLodDistanceID;
+  
   csTerrainBruteBlockRenderer (iBase* parent);
 
   virtual ~csTerrainBruteBlockRenderer ();

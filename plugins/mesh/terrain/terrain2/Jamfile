@@ -4,6 +4,7 @@ Description terrain2 : "Improved terrain mesh plugin" ;
 
 Plugin terrain2
         : [ Wildcard *.cpp *.h ]
+	[ Wildcard bruteblockrenderer : *.cpp *.h ]
 ;
 LinkWith terrain2 : crystalspace ;
 
