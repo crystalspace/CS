@@ -127,7 +127,7 @@ public:
 
   }
 
-  virtual size_t GetParameterCount() { return 5; }
+  virtual size_t GetParameterCount() { return 6; }
 
   virtual const char* GetParameterName (size_t index)
   {
