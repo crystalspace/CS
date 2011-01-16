@@ -321,7 +321,7 @@ namespace lighter
 
         if(!value.IsBlack())
         {
-          c += componentCoefficient[i] * value + componentOffset[i];
+          c += componentCoefficient[j] * value + componentOffset[j];
         }
       }
 
