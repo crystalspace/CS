@@ -33,14 +33,39 @@
 CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 {
 
+class TerrainBlock::BufferAccessor
+  : public scfImplementation1<TerrainBlock::BufferAccessor,
+			      iRenderBufferAccessor>
+{
+  TerrainBlock* block;
+public:
+  BufferAccessor (TerrainBlock* block)
+   : scfImplementationType (this), block (block) {}
+  
+  void PreGetBuffer (csRenderBufferHolder* holder, 
+		     csRenderBufferName buffer)
+  {
+    block->SetupTangentsBitangents();
+    holder->SetAccessor (nullptr, 0);
+  }
+};
+
+//---------------------------------------------------------------------
+
 TerrainBlock::TerrainBlock ()
-: stepSize (0), childIndex (0), parent (0), renderData (0), dataValid (false)
+: stepSize (0), childIndex (0), parent (0), renderData (0), dataValid (false),
+  tangentsBitangentsValid (false)
 {
   for (size_t i = 0; i < 4; ++i)
   {
     children[i] = 0;
     neighbours[i] = 0;
   }
+}
+
+TerrainBlock::~TerrainBlock ()
+{
+  if (bufferHolder) bufferHolder->SetAccessor (nullptr, 0);
 }
 
 void TerrainBlock::SetupGeometry ()
@@ -63,6 +88,10 @@ void TerrainBlock::SetupGeometry ()
   bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, meshVertices);
   bufferHolder->SetRenderBuffer (CS_BUFFER_NORMAL, meshNormals);
   bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, meshTexCoords);
+  csRef<iRenderBufferAccessor> accessor;
+  accessor.AttachNew (new BufferAccessor (this));
+  bufferHolder->SetAccessor (accessor, CS_BUFFER_TANGENT_MASK
+				       | CS_BUFFER_BINORMAL_MASK);
 
   const csVector2& cellPosition = renderData->cell->GetPosition ();
   const csVector3& cellSize = renderData->cell->GetSize ();
@@ -152,11 +181,59 @@ void TerrainBlock::SetupGeometry ()
   dataValid = true;
 }
 
+void TerrainBlock::SetupTangentsBitangents ()
+{
+  if (tangentsBitangentsValid)
+    return;
+
+  size_t numVerts = (renderData->blockResolution) + 1;
+
+  // Allocate the standard renderbuffers
+  meshTangents = csRenderBuffer::CreateRenderBuffer (numVerts*numVerts, 
+    CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+  meshBitangents = csRenderBuffer::CreateRenderBuffer (numVerts*numVerts,
+    CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+
+  bufferHolder->SetRenderBuffer (CS_BUFFER_TANGENT, meshTangents);
+  bufferHolder->SetRenderBuffer (CS_BUFFER_BINORMAL, meshBitangents);
+
+  {
+    // Lock and write the buffers
+    csRenderBufferLock<csVector3> tangentData (meshTangents);
+    csRenderBufferLock<csVector3> bitangentData (meshBitangents);
+
+    // Get the data
+    csLockedNormalData cellTData = renderData->cell->GetTangentData ();
+    csLockedNormalData cellBData = renderData->cell->GetBitangentData ();
+
+    for (size_t y = 0, gridY = gridTop; y < numVerts; ++y, gridY += stepSize)
+    {
+      csVector3* tRow = cellTData.data + cellTData.pitch * gridY + gridLeft;
+      csVector3* bRow = cellBData.data + cellBData.pitch * gridY + gridLeft;
+
+      for (size_t x = 0; x < numVerts; ++x, tRow += stepSize, bRow += stepSize)
+      {
+        csVector3 tangent = *tRow;
+        csVector3 bitangent = *bRow;
+
+        *tangentData++ = tangent;
+        *bitangentData++ = bitangent;
+      }
+    }
+  }
+
+
+  tangentsBitangentsValid = true;
+}
+
 void TerrainBlock::InvalidateGeometry (bool recursive)
 {
   dataValid = false;
   meshVertices = meshNormals = meshTexCoords = 0;
   boundingBox = csBox3 ();
+  tangentsBitangentsValid = false;
+  meshTangents.Invalidate();
+  meshBitangents.Invalidate();
 
   if (recursive && !IsLeaf ())
   {

@@ -46,7 +46,9 @@ csTerrainCell::csTerrainCell (csTerrainSystem* terrain, const char* name, int gr
   materialMapHeight (materialMapHeight), position (position), size (size),
   minHeight (-FLT_MAX*0.9f), maxHeight (FLT_MAX*0.9f),
   renderProperties (renderProperties), collisionProperties (collisionProperties),
-  feederProperties (feederProperties), loadState (NotLoaded),
+  feederProperties (feederProperties),
+  needTangentsUpdate (true),
+  loadState (NotLoaded),
   lruTicks (0)
 {
   // Here we do grid width/height correction. The height map will be a
@@ -101,6 +103,7 @@ void csTerrainCell::SetLoadState(LoadState state)
         {
           heightmap.SetSize (gridWidth * gridHeight, 0);
           normalmap.SetSize (gridWidth * gridHeight, 0);
+	  needTangentsUpdate = true;
 
           if (materialMapPersistent)
             materialmap.SetSize (materialMapWidth * materialMapHeight, 0);
@@ -119,6 +122,7 @@ void csTerrainCell::SetLoadState(LoadState state)
         {
           heightmap.SetSize (gridWidth * gridHeight);
           normalmap.SetSize (gridWidth * gridHeight);
+	  needTangentsUpdate = true;
 
           if (materialMapPersistent)
             materialmap.SetSize (materialMapWidth * materialMapHeight, 0);
@@ -173,6 +177,8 @@ void csTerrainCell::SetLoadState(LoadState state)
           heightmap.DeleteAll ();
           normalmap.DeleteAll ();
           materialmap.DeleteAll ();
+	  tangentmap.DeleteAll ();
+	  bitangentmap.DeleteAll ();
 
           renderData = 0;
           collisionData = 0;
@@ -302,6 +308,7 @@ csLockedNormalData csTerrainCell::LockNormalData (const csRect& rectangle)
 void csTerrainCell::UnlockNormalData ()
 {
   Touch();
+  needTangentsUpdate = true;
 }
 
 void csTerrainCell::RecalculateNormalData ()
@@ -315,6 +322,52 @@ void csTerrainCell::RecalculateNormalData ()
     for (int x = 0; x < gridHeight; ++x)
     {
       *nRow++ = GetNormal (x, y);
+    }
+  }
+  needTangentsUpdate = true;
+}
+
+csLockedNormalData csTerrainCell::GetTangentData ()
+{
+  RecalculateTangentData();
+  
+  csLockedNormalData data;
+  data.data = tangentmap.GetArray ();
+  data.pitch = gridWidth;
+
+  return data;
+}
+
+csLockedNormalData csTerrainCell::GetBitangentData ()
+{
+  RecalculateTangentData();
+  
+  csLockedNormalData data;
+  data.data = bitangentmap.GetArray ();
+  data.pitch = gridWidth;
+
+  return data;
+}
+
+void csTerrainCell::RecalculateTangentData ()
+{
+  if (!needTangentsUpdate) return;
+  needTangentsUpdate = false;
+  
+  tangentmap.SetSize (gridWidth * gridHeight);
+  bitangentmap.SetSize (gridWidth * gridHeight);
+  csVector3* tData = tangentmap.GetArray ();
+  csVector3* bData = bitangentmap.GetArray ();
+
+  for (int y = 0; y < gridWidth; ++y)
+  {
+    csVector3* tRow = tData + y * gridHeight;
+    csVector3* bRow = bData + y * gridHeight;
+
+    for (int x = 0; x < gridHeight; ++x)
+    {
+      *tRow++ = GetTangent (x, y);
+      *bRow++ = GetBinormal (x, y);
     }
   }
 }

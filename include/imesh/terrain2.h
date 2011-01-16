@@ -892,7 +892,7 @@ struct iTerrainSystem : public virtual iBase
  */
 struct iTerrainCell : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainCell, 5, 0, 1);
+  SCF_INTERFACE (iTerrainCell, 5, 0, 2);
 
   /// Enumeration that specifies current cell state
   enum LoadState
@@ -1348,6 +1348,18 @@ struct iTerrainCell : public virtual iBase
   
   /// Get splat base material for the cell.
   virtual iMaterialWrapper* GetSplatBaseMaterial () const = 0;
+
+  /**
+   * Get tangent data (for reading purposes: do not modify it!).
+   * \return cell tangent data
+   */
+  virtual csLockedNormalData GetTangentData () = 0;
+  
+  /**
+   * Get tangent data (for reading purposes: do not modify it!).
+   * \return cell tangent data
+   */
+  virtual csLockedNormalData GetBitangentData () = 0;
 };
 
 /// Factory representation of a cell

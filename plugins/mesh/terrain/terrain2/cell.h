@@ -77,6 +77,9 @@ public:
   virtual csLockedNormalData LockNormalData (const csRect& rectangle);
   virtual void UnlockNormalData ();
   virtual void RecalculateNormalData ();
+  virtual csLockedNormalData GetTangentData ();
+  virtual csLockedNormalData GetBitangentData ();
+  void RecalculateTangentData ();
 
   virtual const csVector2& GetPosition () const;
   virtual const csVector3& GetSize () const;
@@ -177,6 +180,9 @@ private:
   csDirtyAccessArray<unsigned char> materialmap;
   csDirtyAccessArray<float> heightmap;
   csDirtyAccessArray<csVector3> normalmap;
+  bool needTangentsUpdate;
+  csDirtyAccessArray<csVector3> tangentmap;
+  csDirtyAccessArray<csVector3> bitangentmap;
 
   LoadState loadState;
 

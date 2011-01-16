@@ -58,9 +58,11 @@ struct TerrainCellRData;
 struct TerrainBlock
 {
   TerrainBlock ();
+  ~TerrainBlock ();
 
   // Setup geometry
   void SetupGeometry ();
+  void SetupTangentsBitangents ();
 
   // Invalidate the geometry and make it recalculate it
   void InvalidateGeometry (bool recursive = false);
@@ -119,6 +121,7 @@ struct TerrainBlock
 
   // Data holders for rendering
   csRef<iRenderBuffer> meshVertices, meshNormals, meshTexCoords;
+  csRef<iRenderBuffer> meshTangents, meshBitangents;
   csRef<csRenderBufferHolder> bufferHolder;
 
   // Bounding box (in mesh-space)
@@ -126,6 +129,9 @@ struct TerrainBlock
 
   // Is data built and valid?
   bool dataValid;
+  bool tangentsBitangentsValid;
+  
+  class BufferAccessor;
 };
 
 }
