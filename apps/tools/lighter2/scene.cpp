@@ -1334,7 +1334,8 @@ namespace lighter
     // Save material name in Object
     iMeshObject * meshObject = mesh->GetMeshObject();
     iMaterialWrapper * material = meshObject->GetMaterialWrapper();
-    obj->materialName = material->QueryObject()->GetName();
+    if (material)
+      obj->materialName = material->QueryObject()->GetName();
 
     // Save it
     sector->allObjects.Put (obj->meshName, obj);
