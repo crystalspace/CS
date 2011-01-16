@@ -556,8 +556,8 @@ namespace lighter
     csVector3 tang, bitang;
     if (objFlags.Check (OBJECT_FLAG_TANGENTS))
     {
-      tang = prim->ComputeCustomData<csVector3> (pt, vdataTangents);
-      bitang = prim->ComputeCustomData<csVector3> (pt, vdataBitangents);
+      tang = prim->ComputeCustomData<csVector3> (pt, vdataTangents).Unit();
+      bitang = prim->ComputeCustomData<csVector3> (pt, vdataBitangents).Unit();
     }
     else
     {
