@@ -121,9 +121,11 @@ public:
   virtual float GetHeight (int x, int y) const;
   virtual float GetHeight (const csVector2& pos) const;
 
+  inline csVector3 GetTangentDN (int x, int y) const;
   virtual csVector3 GetTangent (int x, int y) const;
   virtual csVector3 GetTangent (const csVector2& pos) const;
 
+  inline csVector3 GetBinormalDN (int x, int y) const;
   virtual csVector3 GetBinormal (int x, int y) const;
   virtual csVector3 GetBinormal (const csVector2& pos) const;
 

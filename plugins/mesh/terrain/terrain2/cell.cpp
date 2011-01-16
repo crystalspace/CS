@@ -568,14 +568,25 @@ static inline csVector3 Lerp (const csVector3& x, const csVector3& y,
   return x + (y - x) * t;
 }
 
-csVector3 csTerrainCell::GetTangent (int x, int y) const
+csVector3 csTerrainCell::GetTangentDN (int x, int y) const
 {
   //@@TODO! check if this is correct
   float center = GetHeight (x, y);
-  float left = x == 0 ? center : GetHeight (x-1, y);
-  float right = x + 1 == gridWidth ? center : GetHeight (x+1, y);
+  
+  float dfdx = 0;
+  if (x - 1 >= 0 && x + 1 < gridWidth)
+    dfdx = (GetHeight (x + 1, y) - GetHeight (x - 1, y)) / (2*step_x); 
+  else if (x - 1 >= 0)
+    dfdx = (center - GetHeight (x - 1, y)) / step_x;
+  else if (x + 1 < gridWidth)
+    dfdx = (GetHeight (x + 1, y) - center) / step_x;
 
-  return csVector3(1.0f / gridWidth, right - left, 0);
+  return csVector3 (1, dfdx, 0);
+}
+
+csVector3 csTerrainCell::GetTangent (int x, int y) const
+{
+  return GetTangentDN (x, y).Unit ();
 }
 
 csVector3 csTerrainCell::GetTangent (const csVector2& pos) const
@@ -586,20 +597,31 @@ csVector3 csTerrainCell::GetTangent (const csVector2& pos) const
 
   LerpHelper (pos, x1, x2, xfrac, y1, y2, yfrac);
 
-  csVector3 n1 = Lerp (GetTangent (x1, y1), GetTangent (x2, y1), xfrac);
-  csVector3 n2 = Lerp (GetTangent (x1, y2), GetTangent (x2, y2), xfrac);
+  csVector3 n1 = Lerp (GetTangentDN (x1, y1), GetTangentDN (x2, y1), xfrac);
+  csVector3 n2 = Lerp (GetTangentDN (x1, y2), GetTangentDN (x2, y2), xfrac);
 
   return Lerp (n1, n2, yfrac).Unit ();
 }
 
-csVector3 csTerrainCell::GetBinormal (int x, int y) const
+csVector3 csTerrainCell::GetBinormalDN (int x, int y) const
 {
   //@@TODO! check if this is correct
   float center = GetHeight (x, y);
-  float up = y == 0 ? center : GetHeight (x, y-1);
-  float down = y + 1 == gridHeight ? center : GetHeight (x, y+1);
+  
+  float dfdy = 0;
+  if (y - 1 >= 0 && y + 1 < gridHeight)
+    dfdy = (GetHeight (x, y + 1) - GetHeight (x, y - 1)) / (2*step_z); 
+  else if (y - 1 >= 0)
+    dfdy = (center - GetHeight (x, y - 1)) / step_z;
+  else if (y + 1 < gridHeight)
+    dfdy = (GetHeight (x, y + 1) - center) / step_z;
 
-  return csVector3(0, down - up, 1.0f / gridHeight);
+  return csVector3(0, dfdy, -1);
+}
+
+csVector3 csTerrainCell::GetBinormal (int x, int y) const
+{
+  return GetBinormalDN (x, y).Unit ();
 }
 
 csVector3 csTerrainCell::GetBinormal (const csVector2& pos) const
@@ -610,8 +632,8 @@ csVector3 csTerrainCell::GetBinormal (const csVector2& pos) const
 
   LerpHelper (pos, x1, x2, xfrac, y1, y2, yfrac);
 
-  csVector3 n1 = Lerp (GetBinormal (x1, y1), GetBinormal (x2, y1), xfrac);
-  csVector3 n2 = Lerp (GetBinormal (x1, y2), GetBinormal (x2, y2), xfrac);
+  csVector3 n1 = Lerp (GetBinormalDN (x1, y1), GetBinormalDN (x2, y1), xfrac);
+  csVector3 n2 = Lerp (GetBinormalDN (x1, y2), GetBinormalDN (x2, y2), xfrac);
 
   return Lerp (n1, n2, yfrac).Unit ();
 }
