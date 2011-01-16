@@ -202,7 +202,6 @@
                         <renderproperties>
                             <shadervar name="tex lightmap" type="texture">lightmaps_terrainf_0_png</shadervar>
                             <shadervar name="tex lightmap dir 1" type="texture">lightmaps_terrainf_0_d1_png</shadervar>
-                            <shadervar name="texture lod distance" type="vector3">200.000000,200.000000,200.000000</shadervar>
                             <shadervar name="tex lightmap dir 2" type="texture">lightmaps_terrainf_0_d2_png</shadervar>
                             <shadervar name="tex lightmap dir 3" type="texture">lightmaps_terrainf_0_d3_png</shadervar>
                             <!-- basemap scale is: (w-1)/w,(h-1)/h,0.5/w,0.5/h -->
