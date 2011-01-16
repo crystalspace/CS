@@ -28,7 +28,8 @@ struct OverlaidShaderVariableContext :
 			    scfFakeInterface<iShaderVariableContext> >,
   public CS::Graphics::OverlayShaderVariableContextImpl
 {
-  OverlaidShaderVariableContext () : scfImplementationType (this) {}
+  OverlaidShaderVariableContext (iShaderVariableContext* parent = nullptr)
+   : scfImplementationType (this), OverlayShaderVariableContextImpl (parent) {}
 };
 
 }

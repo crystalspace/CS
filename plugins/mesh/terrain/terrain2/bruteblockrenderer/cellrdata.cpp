@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 
 #include "cellrdata.h"
+#include "overlaidsvc.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 {
@@ -32,7 +33,8 @@ TerrainCellRData::TerrainCellRData (iTerrainCell* cell,
 
   blockResolution = properties->GetBlockResolution ();
 
-  commonSVContext = cell->GetRenderProperties ();
+  commonSVContext.AttachNew (
+    new OverlaidShaderVariableContext (cell->GetRenderProperties ()));
   svContextArrayMM.SetSize (renderer->GetMaterialPalette ().GetSize ());
   alphaMapArrayMM.SetSize (renderer->GetMaterialPalette ().GetSize ());
   alphaMapMMUse.SetSize (renderer->GetMaterialPalette ().GetSize ());
