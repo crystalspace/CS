@@ -32,6 +32,7 @@
 #include "csgfx/shadervar.h"
 #include "cstool/vfsdirchange.h"
 #include "csutil/scanstr.h"
+#include "csutil/stringconv.h"
 #include "csutil/stringquote.h"
 #include "csutil/xmltiny.h"
 
@@ -298,7 +299,9 @@ bool csTextSyntaxService::WriteShaderVar (iDocumentNode* node,
         csString val;
         csVector2 vec;
         var.GetValue (vec);
-        val.Format ("%f,%f", vec.x, vec.y);
+        val.Format ("%s,%s",
+		    CS::Utility::ftostr (vec.x).GetData(),
+		    CS::Utility::ftostr (vec.y).GetData());
         node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (val);
       }
       break;
@@ -308,7 +311,10 @@ bool csTextSyntaxService::WriteShaderVar (iDocumentNode* node,
         csString val;
         csVector3 vec;
         var.GetValue (vec);
-        val.Format ("%f,%f,%f", vec.x, vec.y, vec.z);
+        val.Format ("%s,%s,%s",
+		    CS::Utility::ftostr (vec.x).GetData(),
+		    CS::Utility::ftostr (vec.y).GetData(),
+		    CS::Utility::ftostr (vec.z).GetData());
         node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (val);
       }
       break;
@@ -318,7 +324,11 @@ bool csTextSyntaxService::WriteShaderVar (iDocumentNode* node,
         csString val;
         csVector4 vec;
         var.GetValue (vec);
-        val.Format ("%f,%f,%f,%f", vec.x, vec.y, vec.z, vec.w);
+        val.Format ("%s,%s,%s,%s",
+		    CS::Utility::ftostr (vec.x).GetData(),
+		    CS::Utility::ftostr (vec.y).GetData(),
+		    CS::Utility::ftostr (vec.z).GetData(),
+		    CS::Utility::ftostr (vec.w).GetData());
         node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (val);
       }
       break;
