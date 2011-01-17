@@ -1694,6 +1694,8 @@ class iTerrainCell(core.iBase):
     def SetName(*args): return _imesh.iTerrainCell_SetName(*args)
     def SetSplatBaseMaterial(*args): return _imesh.iTerrainCell_SetSplatBaseMaterial(*args)
     def GetSplatBaseMaterial(*args): return _imesh.iTerrainCell_GetSplatBaseMaterial(*args)
+    def GetTangentData(*args): return _imesh.iTerrainCell_GetTangentData(*args)
+    def GetBitangentData(*args): return _imesh.iTerrainCell_GetBitangentData(*args)
     scfGetVersion = staticmethod(_imesh.iTerrainCell_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainCell
     __del__ = lambda self : None;

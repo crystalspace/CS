@@ -37480,6 +37480,50 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iTerrainCell_GetTangentData(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainCell *arg1 = (iTerrainCell *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  csLockedNormalData result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetTangentData",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetTangentData" "', argument " "1"" of type '" "iTerrainCell *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainCell * >(argp1);
+  result = (arg1)->GetTangentData();
+  resultobj = SWIG_NewPointerObj((new csLockedNormalData(static_cast< const csLockedNormalData& >(result))), SWIGTYPE_p_csLockedNormalData, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainCell_GetBitangentData(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainCell *arg1 = (iTerrainCell *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  csLockedNormalData result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_GetBitangentData",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_GetBitangentData" "', argument " "1"" of type '" "iTerrainCell *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainCell * >(argp1);
+  result = (arg1)->GetBitangentData();
+  resultobj = SWIG_NewPointerObj((new csLockedNormalData(static_cast< const csLockedNormalData& >(result))), SWIGTYPE_p_csLockedNormalData, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iTerrainCell_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -45538,6 +45582,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iTerrainCell_SetName", _wrap_iTerrainCell_SetName, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCell_SetSplatBaseMaterial", _wrap_iTerrainCell_SetSplatBaseMaterial, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCell_GetSplatBaseMaterial", _wrap_iTerrainCell_GetSplatBaseMaterial, METH_VARARGS, NULL},
+	 { (char *)"iTerrainCell_GetTangentData", _wrap_iTerrainCell_GetTangentData, METH_VARARGS, NULL},
+	 { (char *)"iTerrainCell_GetBitangentData", _wrap_iTerrainCell_GetBitangentData, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCell_scfGetVersion", _wrap_iTerrainCell_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iTerrainCell", _wrap_delete_iTerrainCell, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCell_swigregister", iTerrainCell_swigregister, METH_VARARGS, NULL},

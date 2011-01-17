@@ -17623,6 +17623,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetName = *cspacec::iTerrainCell_SetName;
 *SetSplatBaseMaterial = *cspacec::iTerrainCell_SetSplatBaseMaterial;
 *GetSplatBaseMaterial = *cspacec::iTerrainCell_GetSplatBaseMaterial;
+*GetTangentData = *cspacec::iTerrainCell_GetTangentData;
+*GetBitangentData = *cspacec::iTerrainCell_GetBitangentData;
 *scfGetVersion = *cspacec::iTerrainCell_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
