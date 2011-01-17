@@ -346,7 +346,7 @@ bool StartMe::Application()
 
   for (size_t i = 0 ; i < demos.GetSize () ; i++)
   {
-    demos[i].window = winMgr->createWindow("crystal/StaticImage");
+    demos[i].window = winMgr->createWindow("crystal/Icon");
     demos[i].window->setSize(CEGUI::UVector2(CEGUI::UDim(0.0f, 128.0f), CEGUI::UDim(0.0f, 128.0f)));
     demos[i].window->setPosition(CEGUI::UVector2(CEGUI::UDim(0.0f, 0.0f), CEGUI::UDim(0.0f, 0.0f)));
     demos[i].window->setVisible(false);
