@@ -106,13 +106,19 @@ rule CompileObject
   # header files of the same name in different directories,
   # they can be distinguished with HDRGRIST.
 
+  local source_dir = $(SEARCH_SOURCE:E) ;
+  if $(<:D)
+  {
+    source_dir = [ ConcatDirs $(SEARCH_SOURCE:E) $(<:D) ] ;
+  }
+
   # $(SEARCH_SOURCE:E) is where cc first looks for #include 
   # "foo.h" files.  If the source file is in a distant directory, 
   # look there.  Else, look in "" (the current directory).
   if $(HDRRULE_$(<:S))
   {
     HDRSEARCH on $(<) = 
-	$(SEARCH_SOURCE:E) $(SUBDIRHDRS) $(HDRS) $(STDHDRS) ;  
+	$(source_dir) $(SUBDIRHDRS) $(HDRS) $(STDHDRS) ;  
     HDRGRIST on $(<) = $(HDRGRIST) ;                               
     HDRRULE on $(<) = $(HDRRULE_$(<:S)) ;
     HDRSCAN on $(<) = $(HDRPATTERN_$(<:S)) ;
