@@ -367,6 +367,7 @@ bool KrystalScene::CreateAvatar ()
     furMeshType->CreateHairMeshMarschnerProperties("krsytal_marschner");
 
   hairMeshProperties->SetMaterial(materialWrapper->GetMaterial());
+  animesh->GetSubMesh(1)->SetMaterial(materialWrapper);
 
   hairPhysicsControl = scfQueryInterface<CS::Animation::iFurPhysicsControl>
     (furMeshType->CreateFurPhysicsControl("krystal_hairs_physics"));
@@ -401,7 +402,7 @@ bool KrystalScene::CreateAvatar ()
 
   furMesh->SetAnimatedMesh(animesh);
   furMesh->SetMeshFactory(animeshFactory);
-  furMesh->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
+  furMesh->SetMeshFactorySubMesh(animesh -> GetSubMesh(2)->GetFactorySubMesh());
   furMesh->GenerateGeometry(hairTest->view, hairTest->room);
 
   furMesh->SetAnimationControl(hairPhysicsControl);
