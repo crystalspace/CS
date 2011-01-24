@@ -49,7 +49,6 @@
 class csEngine;
 class csProgressPulse;
 class csSector;
-class csMeshGenerator;
 struct iVisibilityCuller;
 struct iMeshWrapper;
 
@@ -357,7 +356,7 @@ public:
   }
   iMeshGenerator* GetMeshGenerator (size_t idx)
   {
-    return (iMeshGenerator*)(csMeshGenerator*)meshGenerators[idx];
+    return meshGenerators[idx];
   }
   iMeshGenerator* GetMeshGeneratorByName (const char* name);
   void RemoveMeshGenerator (size_t idx);
@@ -470,7 +469,7 @@ private:
   /**
    * Mesh generators.
    */
-  csRefArrayObject<csMeshGenerator> meshGenerators;
+  csRefArrayObject<CS_PLUGIN_NAMESPACE_NAME(Engine)::csMeshGenerator> meshGenerators;
 
   /**
    * List of sector callbacks.

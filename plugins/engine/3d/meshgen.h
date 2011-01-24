@@ -36,6 +36,10 @@
 #include "ivaria/terraform.h"
 
 struct iSector;
+
+CS_PLUGIN_NAMESPACE_BEGIN(Engine)
+{
+
 class csMeshGenerator;
 struct csMGCell;
 
@@ -554,6 +558,9 @@ public:
 
   virtual void SelfDestruct ();
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(Engine)
 
 #endif // __CS_MESHGEN_H__
 

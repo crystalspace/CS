@@ -25,6 +25,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iengine/material.h"
 #include "igraphic/image.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(Engine)
+{
+
 static int AreaCompare(csVector4 const& r, csVector4 const& k)
 {
   float a = (r.z - r.x) * (r.w - r.y);
@@ -1196,3 +1199,5 @@ void csMeshGenerator::RemoveMesh (size_t idx)
   meshes.DeleteIndex (idx);
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(Engine)
