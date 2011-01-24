@@ -308,8 +308,6 @@ struct csMGPositionBlock
 			 parent_cell (csArrayItemNotFound) { }
 };
 
-class PositionMap;
-
 /**
  * The 2D x/z plane of the box used by the mesh generator is divided
  * in cells.
@@ -324,18 +322,16 @@ struct csMGCell
    */
   csMGPositionBlock* block;
 
-  /**
-   * A map of all available positions.
-   */
-  PositionMap* positionMap;
-
+  /// Flag whether the block needs new positions to be generated.
+  bool needPositions;
+  
   /**
    * An array of meshes that are relevant in this cell (for calculating the
    * beam downwards).
    */
   csRefArray<iMeshWrapper> meshes;
 
-  csMGCell () : block (0), positionMap (0) { }
+  csMGCell () : block (0), needPositions (true) { }
 };
 
 /**

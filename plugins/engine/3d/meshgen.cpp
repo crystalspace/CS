@@ -570,8 +570,6 @@ void csMeshGenerator::SetupSampleBox ()
     {
       float wx = GetWorldX (x);
       cells[idx].box.Set (wx, wz, wx + samplecellwidth_x, wz + samplecellheight_z);
-      delete cells[idx].positionMap;
-      cells[idx].positionMap = new PositionMap(cells[idx].box);
       // Here we need to calculate the meshes relevant for this cell (i.e.
       // meshes that intersect this cell as seen in 2D space).
       // @@@ For now we just copy the list of meshes from csMeshGenerator.
@@ -652,9 +650,12 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
   random.Initialize ((unsigned int)cidx); // @@@ Consider using a better seed?
 
   block->positions.Empty ();
+  cell.needPositions = false;
 
   const csBox2& box = cell.box;
   float box_area = box.Area ();
+  
+  PositionMap positionMap (box);
 
   if(minRadius < 0.0f)
   {
@@ -691,7 +692,7 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
       if (mpos_count == 0)
       {
         float r = geometries[g]->GetRadius();
-        if(!cell.positionMap->GetRandomPosition(x, z, r, minRadius))
+        if(!positionMap.GetRandomPosition(x, z, r, minRadius))
         {
           // Ran out of room in this cell.
           return;
@@ -810,11 +811,10 @@ void csMeshGenerator::AllocateBlock (int cidx, csMGCell& cell)
       inuse_blocks->prev = block;
       inuse_blocks = block;
     }
-    // It is possible that our positionMap got cleared so we may have to
-    // recalculate it here.
-    if (!cell.positionMap)
+    // It is possible that our positions got cleared so we may have to
+    // recalculate them here.
+    if (cell.needPositions)
     {
-      cell.positionMap = new PositionMap(cell.box);
       GeneratePositions (cidx, cell, block);
     }
   }
@@ -833,8 +833,6 @@ void csMeshGenerator::AllocateBlock (int cidx, csMGCell& cell)
     else inuse_blocks_last = block;
     inuse_blocks = block;
 
-    delete cell.positionMap;
-    cell.positionMap = new PositionMap(cell.box);
     GeneratePositions (cidx, cell, block);
   }
   else
@@ -858,8 +856,6 @@ void csMeshGenerator::AllocateBlock (int cidx, csMGCell& cell)
     inuse_blocks->prev = block;
     inuse_blocks = block;
 
-    delete cell.positionMap;
-    cell.positionMap = new PositionMap(cell.box);
     GeneratePositions (cidx, cell, block);
   }
 }
@@ -1008,8 +1004,7 @@ void csMeshGenerator::ClearPosition (const csVector3& pos)
   int cidx = cellz*cell_dim + cellx;
   csMGCell& cell = cells[cidx];
   FreeMeshesInBlock (cidx, cell);
-  delete cell.positionMap;
-  cell.positionMap = 0;
+  cell.needPositions = true;
 }
 
 void csMeshGenerator::UpdateForPosition (const csVector3& pos)
