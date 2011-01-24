@@ -308,27 +308,7 @@ struct csMGPositionBlock
 			 parent_cell (csArrayItemNotFound) { }
 };
 
-/**
- * A map of available positions.
- */
-class PositionMap
-{
-public:
-  PositionMap(const csBox2& box);
-
-  /**
-   * Get a random available position. 
-   * \param xpos X position.
-   * \param zpos Z position.
-   * \param radius The radius from the (x, z) coordinates to mark off as used.
-   * \param minRadius The minimum radius used by all geometries.
-   */
-  bool GetRandomPosition(float& xpos, float& zpos, float& radius, float& minRadius);
-
-private:
-  csArray<csVector4> freeAreas;
-  csRandomGen posGen;
-};
+class PositionMap;
 
 /**
  * The 2D x/z plane of the box used by the mesh generator is divided
