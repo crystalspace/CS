@@ -249,6 +249,40 @@ bool csTerrainSystem::CollideSegment (const csVector3& start, const csVector3&
   return size != points->GetSize ();
 }
 
+bool csTerrainSystem::CollideSegment (const csVector3& start, const csVector3& end,
+				      csVector3& hitPoint,
+				      iMaterialWrapper** hitMaterial)
+{
+  if (!collider) 
+    return false;
+
+  for (size_t i = 0; i < cells.GetSize (); ++i)
+  {
+    csSegment3 seg(start, end);
+    csBox3 box = cells[i]->GetBBox ();
+
+    csVector3 isect;
+
+    if (csIntersect3::BoxSegment (box, seg, isect) >= 0)
+    {
+      seg.SetStart (seg.End ());
+      seg.SetEnd (isect);
+      
+      if (csIntersect3::BoxSegment (box, seg, isect) >= 0)
+        seg.SetStart (isect);
+
+      if (cells[i]->CollideSegment (seg.End (), seg.Start (), hitPoint))
+      {
+        if (hitMaterial)
+          *hitMaterial = cells[i]->GetBaseMaterial();
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 csTerrainColliderCollideSegmentResult csTerrainSystem::CollideSegment (
       const csVector3& start, const csVector3& end, bool use_ray)
 {
@@ -570,15 +604,14 @@ csRenderMesh** csTerrainSystem::GetRenderMeshes (int& num, iRenderView* rview,
 
 bool csTerrainSystem::HitBeamOutline (const csVector3& start,
         const csVector3& end, csVector3& isect, float* pr,
-        iMaterialArray* materials)
+        iMaterialWrapper** material)
 {
   //@@TODO: See if this needs some touch-up
-  csRef<iTerrainVector3Array> collArray;
-  collArray.AttachNew (new scfArray<iTerrainVector3Array> );
-
-  if (CollideSegment (start, end, true, collArray, materials))
+  csVector3 collPt;
+  
+  if (csTerrainSystem::CollideSegment (start, end, collPt, material))
   {
-    isect = collArray->Get (0);
+    isect = collPt;
 
     if (pr)
     {
@@ -597,7 +630,7 @@ bool csTerrainSystem::HitBeamOutline (const csVector3& start,
         gr_max = fabsf (end.y - start.y);
       }
 
-      *pr = fabsf (collArray->Get (0)[gr] - start[gr]) / gr_max;
+      *pr = fabsf (collPt[gr] - start[gr]) / gr_max;
     }
 
     return true;
@@ -621,9 +654,7 @@ bool csTerrainSystem::HitBeamObject (const csVector3& start,
   if (polygon_idx) *polygon_idx = -1;
   if (material) *material = 0;
 
-  bool rc = HitBeamOutline (start, end, isect, pr, materials);
-  if (material && materials->GetSize () >= 1)
-    *material = materials->Get (0);
+  bool rc = csTerrainSystem::HitBeamOutline (start, end, isect, pr, material);
   return rc;
 }
 

@@ -94,6 +94,9 @@ public:
 
   virtual bool CollideSegment (const csVector3& start, const csVector3& end,
     bool oneHit, iTerrainVector3Array* points, iMaterialArray* materials);
+  virtual bool CollideSegment (const csVector3& start, const csVector3& end,
+			       csVector3& hitPoint,
+			       iMaterialWrapper** hitMaterial);
   virtual csTerrainColliderCollideSegmentResult CollideSegment (
       const csVector3& start, const csVector3& end, bool use_ray);
 
@@ -174,7 +177,7 @@ private:
 
   bool HitBeamOutline (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr,
-    iMaterialArray* materials);
+    iMaterialWrapper** material);
 };
 
 }

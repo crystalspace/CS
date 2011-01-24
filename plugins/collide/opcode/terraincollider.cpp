@@ -211,6 +211,28 @@ bool csTerrainCollider::CollideSegment (iTerrainCell* cell,
   return points_size != points->GetSize ();
 }
 
+bool csTerrainCollider::CollideSegment (iTerrainCell* cell, const csVector3& start,
+					const csVector3& end,
+					csVector3& hitPoint)
+{
+  csTerrainSegmentCellCollider collider (cell, start, end);
+  
+  csVector3 result;
+  csVector2 cell_result;
+  int rv;
+  
+  while ((rv = collider.GetIntersection (result, cell_result)) >= 0)
+  {
+    if (rv == 1)
+    {
+      hitPoint = result;
+      return true;
+    }
+  }
+  
+  return false;
+}
+
 struct csTerrainTriangle
 {
   unsigned int x, y; // quad coords, 0..width/height-2
