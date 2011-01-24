@@ -20,8 +20,13 @@
 #include "cssysdef.h"
 #include "meshgen_positionmap.h"
 
+#include "csutil/blockallocator.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 {
+  typedef csBlockAllocator<csBox2> BoxAllocator;
+  CS_IMPLEMENT_STATIC_VAR(GetBoxAlloc, BoxAllocator, )
+
   PositionMap::PositionMap (const float* minRadii, size_t numMinRadii,
 			    const csBox2& box)
   {
@@ -36,6 +41,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
     
     InsertNewArea (box);
   }
+  
+  PositionMap::~PositionMap ()
+  {
+    for (size_t b = 0; b < buckets.GetSize(); b++)
+    {
+      Bucket& bucket = buckets[b];
+      for (size_t a = 0; a < bucket.freeAreas.GetSize(); a++)
+      {
+	GetBoxAlloc()->Free (bucket.freeAreas[a].box);
+      }
+    }
+  }
 
   bool PositionMap::GetRandomPosition (const float radius, float& xpos, float& zpos,
 				       AreaID& area)
@@ -45,8 +62,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
     float totalArea = 0;
     for (size_t b = 0; b < buckets.GetSize(); b++)
     {
-      if (buckets[b].minSide < radius*2) break;
-      totalArea += buckets[b].areaSum;
+      const Bucket& bucket = buckets[b];
+      if (bucket.minSide < radius*2) break;
+      if (bucket.freeAreas.GetSize() == 0) continue;
+      totalArea += bucket.freeAreas[0].area;
     }
     // No space found.
     if (totalArea < SMALL_EPSILON) return false;
@@ -59,21 +78,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
     for (size_t b = 0; b < buckets.GetSize(); b++)
     {
       const Bucket& bucket = buckets[b];
-      if (theArea < bucket.areaSum)
+      if (bucket.freeAreas.GetSize() == 0) continue;
+      float bucketArea = bucket.freeAreas[0].area;
+      if (theArea < bucketArea)
       {
-	size_t areaIndex = 0;
-	while (theArea > bucket.freeAreas[areaIndex].area)
-	{
-	  theArea -= bucket.freeAreas[areaIndex].area;
-	  areaIndex++;
-	}
-	freeArea = bucket.freeAreas[areaIndex].box;
+	size_t areaIndex = FindBox (bucket, theArea);
+	freeArea = *(bucket.freeAreas[areaIndex].box);
 	area.first = b;
 	area.second = areaIndex;
 	break;
       }
       else
-	theArea -= bucket.areaSum;
+	theArea -= bucketArea;
     }
     
     CS_ASSERT ((freeArea.MaxX() - freeArea.MinX() >= radius*2) 
@@ -99,15 +115,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
     
     size_t b = area.first;
     size_t areaIndex = area.second;
+    Bucket& bucket = buckets[b];
     Bucket::Area freeArea (buckets[b].freeAreas[areaIndex]);
+    csBox2 box (*(freeArea.box));
     
-    buckets[b].freeAreas.DeleteIndexFast (areaIndex);
-    buckets[b].areaSum -= freeArea.area;
+    Bucket::Area replaceArea = bucket.freeAreas.Pop ();
+    BubbleAreaIncrease (bucket, bucket.freeAreas.GetSize(), -replaceArea.area);
+    if (bucket.freeAreas.GetSize() > areaIndex)
+    {
+      BubbleAreaIncrease (bucket, areaIndex, replaceArea.area - freeArea.area);
+      bucket.freeAreas[areaIndex] = replaceArea;
+    }
+    GetBoxAlloc()->Free (freeArea.box);
     
-    InsertNewArea (csBox2 (freeArea.box.MinX(), freeArea.box.MinY(), xpos+radius, zpos-radius));
-    InsertNewArea (csBox2 (xpos+radius, freeArea.box.MinY(), freeArea.box.MaxX(), zpos+radius));
-    InsertNewArea (csBox2 (xpos-radius, zpos+radius, freeArea.box.MaxX(), freeArea.box.MaxY()));
-    InsertNewArea (csBox2 (freeArea.box.MinX(), zpos-radius, xpos-radius, freeArea.box.MaxY()));
+    InsertNewArea (csBox2 (box.MinX(), box.MinY(), xpos+radius, zpos-radius));
+    InsertNewArea (csBox2 (xpos+radius, box.MinY(), box.MaxX(), zpos+radius));
+    InsertNewArea (csBox2 (xpos-radius, zpos+radius, box.MaxX(), box.MaxY()));
+    InsertNewArea (csBox2 (box.MinX(), zpos-radius, xpos-radius, box.MaxY()));
   }
 
   void PositionMap::InsertNewArea (const csBox2& areaBox)
@@ -120,16 +144,60 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
        to minSide */
     for (size_t b = 0; b < buckets.GetSize(); b++)
     {
-      if (minSide >= buckets[b].minSide)
+      Bucket& bucket = buckets[b];
+      if (minSide >= bucket.minSide)
       {
 	Bucket::Area newArea;
 	newArea.area = side1*side2;
-	newArea.box = areaBox;
-	buckets[b].freeAreas.Push (newArea);
-	buckets[b].areaSum += newArea.area;
+	newArea.box = GetBoxAlloc()->Alloc (areaBox);
+	size_t index = bucket.freeAreas.Push (newArea);
+	if (index > 0)
+	{
+	  size_t parent = (index-1) / 2;
+	  if (bucket.freeAreas[parent].box)
+	  {
+	    // 'Parent' node is a leaf, turn it into a node
+	    bucket.freeAreas.Push (bucket.freeAreas[parent]);
+	    bucket.freeAreas[parent].box = nullptr;
+	  }
+	}
+	BubbleAreaIncrease (bucket, index, newArea.area);
 	break;
       }
     }
   }
+  
+  void PositionMap::BubbleAreaIncrease (Bucket& bucket, size_t index, float amount)
+  {
+    if (index == 0) return;
+
+    do
+    {
+      index = ((index-1) / 2);
+      bucket.freeAreas[index].area += amount;
+    } while (index > 0);
+  }
+  
+  size_t PositionMap::FindBox (const Bucket& bucket, float pos)
+  {
+    size_t index = ~0;
+    size_t nextIndex = 0;
+    while (nextIndex < bucket.freeAreas.GetSize())
+    {
+      index = nextIndex;
+      float nodeArea = bucket.freeAreas[index].area;
+      if (pos < nodeArea)
+      {
+	nextIndex = index*2+1; // 'left' child
+      }
+      else
+      {
+	nextIndex = index+1; // step to 'right' child
+	pos -= nodeArea;
+      }
+    }
+    return index;
+  }
+  
 }
 CS_PLUGIN_NAMESPACE_END(Engine)

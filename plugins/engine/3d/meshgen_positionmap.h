@@ -36,6 +36,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
   public:
     PositionMap(const float* minRadii, size_t numMinRadii,
 		const csBox2& box);
+    ~PositionMap ();
 
     typedef csTuple2<size_t, size_t> AreaID;
     /**
@@ -63,22 +64,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
       float minSide;
       struct Area
       {
-	csBox2 box;
+	/// Sum of children areas
 	float area;
+	/// Free box, if node is leaf
+	csBox2* box;
 	
-	Area() : area (0) {}
+	Area() : area (0), box (nullptr) {}
       };
+      /// Actually a tree of free areas.
       csArray<Area> freeAreas;
-      float areaSum;
       
-      Bucket (float minSide) : minSide (minSide), areaSum (0) {}
+      Bucket (float minSide) : minSide (minSide) {}
       
       bool operator< (const Bucket& other) const
       { return minSide > other.minSide; }
     };
     csArray<Bucket> buckets;
-    // Insert an area into the right bucket (or discard if too small)
+    /// Insert an area into the right bucket (or discard if too small)
     void InsertNewArea (const csBox2& area);
+    /// Add an amount of summed areas to all parents of a node
+    void BubbleAreaIncrease (Bucket& bucket, size_t index, float amount);
+    
+    size_t FindBox (const Bucket& bucket, float pos);
   };
 }
 CS_PLUGIN_NAMESPACE_END(Engine)
