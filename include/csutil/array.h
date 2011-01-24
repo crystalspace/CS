@@ -156,6 +156,15 @@ public:
   {
     memmove (mem + dest, mem + src, count * sizeof(T));
   }
+
+  /**
+   * Move elements inside a region.
+   * \warning Only use if you _know_ source and destination regions don't overlap!
+   */
+  static void MoveElementsNoOverlap (T* mem, size_t dest, size_t src, size_t count)
+  {
+    memcpy (mem + dest, mem + src, count * sizeof(T));
+  }
 };
 
 /**
@@ -249,6 +258,12 @@ public:
 	Destroy (mem + src + i);
       }
     }
+  }
+  
+  /// \copydoc MoveElements
+  static void MoveElementsNoOverlap (T* mem, size_t dest, size_t src, size_t count)
+  {
+    MoveElements (mem, dest, src, count);
   }
 };
 
@@ -1120,7 +1135,7 @@ public:
       size_t const nmove = ncount - n;
       ElementHandler::Destroy (root.p + n);
       if (nmove > 0)
-        ElementHandler::MoveElements (root.p, n, ncount, 1);
+        ElementHandler::MoveElementsNoOverlap (root.p, n, ncount, 1);
       SetSizeUnsafe (ncount);
       return true;
     }
