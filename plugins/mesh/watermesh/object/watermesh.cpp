@@ -560,11 +560,10 @@ bool csWaterMeshObject::HitBeamOutline (const csVector3& start,
 
 bool csWaterMeshObject::HitBeamObject (const csVector3& start,
                                        const csVector3& end, csVector3& isect, float *pr, int* polygon_idx,
-                                       iMaterialWrapper** material, iMaterialArray* materials)
+                                       iMaterialWrapper** material)
 {
   
   if (material) *material = csWaterMeshObject::material;
-  if (materials) materials->Push (csWaterMeshObject::material);
   if (polygon_idx) *polygon_idx = -1;
   // This is the slow version. Use for an accurate hit on the object.
   // It will cycle through every triangle in the mesh serching for the

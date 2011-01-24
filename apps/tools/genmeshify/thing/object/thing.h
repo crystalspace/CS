@@ -885,7 +885,7 @@ public:
    */
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr, int* polygon_idx = 0,
-	iMaterialWrapper** material = 0, iMaterialArray* materials = 0);
+	iMaterialWrapper** material = 0);
 
   //----------------------------------------------------------------------
   // Various

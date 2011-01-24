@@ -90,12 +90,11 @@ bool csNullmeshMeshObject::HitBeamOutline (const csVector3& start,
 bool csNullmeshMeshObject::HitBeamObject (const csVector3& start,
                                           const csVector3& end, 
                                           csVector3& isect, float* pr,
-                                          int* polygon_idx, iMaterialWrapper** mwrap,
-                                          iMaterialArray* mwraps)
+                                          int* polygon_idx, iMaterialWrapper** mwrap)
 {
   if(hitbeam_mesh)
   {
-    return hitbeam_mesh->HitBeamObject(start, end, isect, pr, polygon_idx, mwrap, mwraps);
+    return hitbeam_mesh->HitBeamObject(start, end, isect, pr, polygon_idx, mwrap);
   }
 
   return false;

@@ -648,8 +648,7 @@ bool csTerrainSystem::HitBeamOutline (const csVector3& start,
 bool csTerrainSystem::HitBeamObject (const csVector3& start,
         const csVector3& end,
         csVector3& isect, float* pr, int* polygon_idx,
-        iMaterialWrapper** material,
-        iMaterialArray* materials)
+        iMaterialWrapper** material)
 {
   if (polygon_idx) *polygon_idx = -1;
   if (material) *material = 0;

@@ -719,7 +719,6 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
         end.y = samplebox.MinY ();
         bool hit = false;
         iMaterialWrapper* hit_material = 0;
-        csRef<iArrayChangeAll<iMaterialWrapper*> > hit_materials;
         for (i = 0 ; i < cell.meshes.GetSize () ; i++)
         {
           csHitBeamResult rc = cell.meshes[i]->HitBeam (start, end,
@@ -729,7 +728,6 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
             pos.position = rc.isect;
             end.y = rc.isect.y + 0.0001;
             hit_material = rc.material;
-            hit_materials = rc.materials;
             hit = true;
           }
         }
@@ -739,41 +737,14 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
           {
             // We use material density tables.
             float factor = default_material_factor;
-            if(hit_materials != 0)
-            {
-              // Get the highest material factor.
-              float factorh = 0;
-              for(size_t m=0; m<hit_materials->GetSize(); ++m)
-              {
-                for (size_t mi=0 ; mi<mftable.GetSize (); ++mi)
-                {
-                  if (mftable[mi].material == hit_materials->Get(m))
-                  {
-                    if(mftable[mi].factor > factorh)
-                    {
-                      factorh = mftable[mi].factor;
-                    }
-                    break;
-                  }
-                }
-              }
-
-              if(factorh > 0)
-              {
-                factor = factorh;
-              }
-            }
-	    else
-            {
-              for (size_t mi = 0 ; mi < mftable.GetSize () ; mi++)
-              {
-                if (mftable[mi].material == hit_material)
-                {
-                  factor = mftable[mi].factor;
-                  break;
-                }
-              }
-            }
+	    for (size_t mi = 0 ; mi < mftable.GetSize () ; mi++)
+	    {
+	      if (mftable[mi].material == hit_material)
+	      {
+		factor = mftable[mi].factor;
+		break;
+	      }
+	    }
 
             if (factor < 0.0001 || (factor < 0.9999 && random.Get () > factor))
             {

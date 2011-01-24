@@ -503,7 +503,7 @@ bool csGenmeshMeshObject::HitBeamOutline (const csVector3& start,
 
 bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
   const csVector3& end, csVector3& isect, float *pr, int* polygon_idx,
-  iMaterialWrapper** material, iMaterialArray* materials)
+  iMaterialWrapper** material)
 {
   if (polygon_idx) *polygon_idx = -1;
   // This is the slow version. Use for an accurate hit on the object.
@@ -550,7 +550,6 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
     return false;
 
   if (material) *material = mat;
-  if (materials) materials->Push (mat);
 
   return true;
 }

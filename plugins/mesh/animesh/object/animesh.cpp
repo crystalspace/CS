@@ -927,7 +927,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   bool AnimeshObject::HitBeamObject (const csVector3& start, const csVector3& end,
     csVector3& isect, float* pr, int* polygon_idx,
-    iMaterialWrapper** material, iMaterialArray* materials)
+    iMaterialWrapper** material)
   {
     // TODO: use a pre-test on the collision boxes of each bones
 
@@ -977,7 +977,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       return false;
 
     if (material) *material = mat;
-    if (materials) materials->Push (mat);
 
     return true;
   }

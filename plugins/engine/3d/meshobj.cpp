@@ -991,8 +991,7 @@ csHitBeamResult csMeshWrapper::HitBeam (
   {
     if (do_material)
     {
-      rc.materials.AttachNew (new scfArray<iMaterialArray> ());
-      rc.hit = meshobj->HitBeamObject (startObj, endObj, rc.isect, &rc.r, 0, &rc.material, rc.materials);
+      rc.hit = meshobj->HitBeamObject (startObj, endObj, rc.isect, &rc.r, 0, &rc.material);
     }
     else
     {

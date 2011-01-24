@@ -200,11 +200,6 @@ struct csHitBeamResult
    */
   iMaterialWrapper* material;
   /**
-   * Only for HitBeamObject and HitBeam: the materials that were hit. Can be
-   * empty in the case that the meshobject doesn't support getting the material.
-   */
-  csRef<iMaterialArray> materials;
-  /**
    * Only for HitBeamBBox: Face number that was hit.
    * \sa csIntersect3::BoxSegment
    */
@@ -267,7 +262,7 @@ struct csScreenBoxResult
  */
 struct iMeshWrapper : public virtual iBase
 {
-  SCF_INTERFACE(iMeshWrapper, 3, 0, 0);
+  SCF_INTERFACE(iMeshWrapper, 4, 0, 0);
 
   /**
    * Get the iObject for this mesh object. This can be used to get the
