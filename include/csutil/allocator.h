@@ -186,7 +186,7 @@ namespace CS
         startThis = this;
       #endif
       }
-      T* Alloc (size_t allocSize)
+      void* Alloc (size_t allocSize)
       {
         CS_ASSERT(startThis == this);
         if (SingleAllocation)
@@ -210,11 +210,11 @@ namespace CS
           memset (localBuf, newlyAllocatedSalt, localSize);
       #endif
 	  if (allocSize <= localSize)
-	    return (T*)localBuf;
+	    return (void*)localBuf;
 	  else
           {
             void* p = ExcessAllocator::Alloc (allocSize);
-	    return (T*)p;
+	    return p;
           }
         }
         else
@@ -236,12 +236,12 @@ namespace CS
         }
       }
     
-      void Free (T* mem)
+      void Free (void* mem)
       {
         CS_ASSERT(startThis == this);
         if (SingleAllocation)
         {
-          if (mem != (T*)localBuf)
+          if (mem != (void*)localBuf)
 	    ExcessAllocator::Free (mem);
 	  else
 	  {
@@ -268,7 +268,7 @@ namespace CS
         }
         else
         {
-          if (mem != (T*)localBuf) 
+          if (mem != (void*)localBuf) 
             ExcessAllocator::Free (mem);
           else
           {
