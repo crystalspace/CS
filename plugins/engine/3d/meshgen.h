@@ -505,13 +505,14 @@ public:
   csRef<iStringSet> GetStringSet () { return strings; }
 
   /**
-   * Allocate blocks. This function will allocate all blocks needed
+   * Update block for a position.
+   * This function will allocate all blocks needed
    * around a certain position and associate those blocks with the
    * appropriate cells. If a new block is needed it will first
    * take one from 'cache_blocks'. If 'cache_blocks' is empty
    * then we take the block we needed last from 'inuse_blocks'.
    */
-  void AllocateBlocks (const csVector3& pos);
+  void UpdateForPosition (const csVector3& pos);
 
   /**
    * Make sure that the sample box dependend data is correctly set up.

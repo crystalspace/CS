@@ -1061,7 +1061,7 @@ void csMeshGenerator::ClearPosition (const csVector3& pos)
   cell.positionMap = 0;
 }
 
-void csMeshGenerator::AllocateBlocks (const csVector3& pos)
+void csMeshGenerator::UpdateForPosition (const csVector3& pos)
 {
   csVector3 delta = pos - last_pos;
 

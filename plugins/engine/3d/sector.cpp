@@ -993,7 +993,7 @@ void csSector::PrepareDraw (iRenderView *rview)
   const csVector3& pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
   for (i = 0 ; i < meshGenerators.GetSize () ; i++)
   {
-    meshGenerators[i]->AllocateBlocks (pos);
+    meshGenerators[i]->UpdateForPosition (pos);
   }
 
   // CS_ENTITY_CAMERA meshes have to be moved to right position first.
