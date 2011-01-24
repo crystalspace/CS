@@ -328,21 +328,7 @@ void csLightManager::FreeInfluenceArray (csLightInfluence* Array)
     cs_free (Array);
 }
 
-template<typename T>
-class csDirtyAccessArrayDetach : 
-  public csDirtyAccessArray<T, csArrayElementHandler<T>,
-                            CS::Memory::AllocatorMalloc>
-{
-public:
-  T* Detach()
-  {
-    T* p = this->GetArray();
-    this->SetData (0);
-    return p;
-  }
-};
-
-typedef csDirtyAccessArrayDetach<csLightInfluence> LightInfluenceArray;
+typedef csDirtyAccessArray<csLightInfluence> LightInfluenceArray;
 
 template<typename ArrayType, typename BoxSpace>
 struct LightCollectArrayPtr

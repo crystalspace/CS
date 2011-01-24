@@ -463,7 +463,17 @@ protected:
    * Set the internal pointer to the data.
    * \warning This is \em obviously dangerous.
    */
-  void SetData (T* data) { root.p = data; }
+  void SetDataVeryUnsafe (T* data) { root.p = data; }
+  /**
+   * Set the internal array size.
+   * \warning This is \em obviously dangerous.
+   */
+  void SetSizeVeryUnsafe (size_t n) { count = n; }
+  /**
+   * Set the internal array capacity.
+   * \warning This is \em obviously dangerous.
+   */
+  void SetCapacityVeryUnsafe (size_t n) { capacity.c = n; }
 private:
   /// Copy from one array to this one, properly constructing the copied items.
   void CopyFrom (const csArray& source)
