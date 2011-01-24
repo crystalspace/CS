@@ -20,7 +20,6 @@
 */
 
 #include "cssysdef.h"
-
 #include "csutil/scf.h"
 
 #include "ikccd.h"
@@ -30,102 +29,20 @@
 #include "iengine/movable.h"
 #include "imesh/bodymesh.h"
 
-#include "iutil/visualdebug.h"
-
 CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
 {
 
-  // --------------------------  IKCCDNodeManager  --------------------------
-
-  SCF_IMPLEMENT_FACTORY(IKCCDNodeManager);
-
-  CS_LEAKGUARD_IMPLEMENT(IKCCDNodeManager);
-
-  IKCCDNodeManager::IKCCDNodeManager (iBase* parent)
-    : scfImplementationType (this, parent)
-  {
-  }
-
-  CS::Animation::iSkeletonIKNodeFactory* IKCCDNodeManager::CreateAnimNodeFactory (const char *name)
-  {
-    csRef<CS::Animation::iSkeletonIKCCDNodeFactory> newFact;
-    newFact.AttachNew (new IKCCDNodeFactory (this, name));
-
-    return factoryHash.PutUnique (name, newFact);
-  }
-
-  CS::Animation::iSkeletonIKNodeFactory* IKCCDNodeManager::FindAnimNodeFactory
-    (const char* name) const
-  {
-    return factoryHash.Get (name, 0);
-  }
-
-  void IKCCDNodeManager::ClearAnimNodeFactories ()
-  {
-    factoryHash.DeleteAll ();
-  }
-
-  bool IKCCDNodeManager::Initialize (iObjectRegistry* object_reg)
-  {
-    this->object_reg = object_reg;
-    return true;
-  }
-
-  void IKCCDNodeManager::Report (int severity, const char* msg, ...) const
-  {
-    va_list arg;
-    va_start (arg, msg);
-    csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
-    if (rep)
-      rep->ReportV (severity,
-		    "crystalspace.mesh.animesh.animnode.IKCCD",
-		    msg, arg);
-    else
-      {
-	csPrintfV (msg, arg);
-	csPrintf ("\n");
-      }
-    va_end (arg);
-  }
+  CS_IMPLEMENT_ANIMNODE_MANAGER(IKCCDNode, CS::Animation::iSkeletonIKCCDNodeFactory, "ik.ccd");
 
   // --------------------------  IKCCDNodeFactory  --------------------------
 
   CS_LEAKGUARD_IMPLEMENT(IKCCDNodeFactory);
 
   IKCCDNodeFactory::IKCCDNodeFactory (IKCCDNodeManager* manager, const char *name)
-    : scfImplementationType (this), manager (manager), name (name),
-    maxEffectorID (0), maximumIterations (50), targetDistance (0.001f),
+    : scfImplementationType (this), CS::Animation::csSkeletonAnimNodeFactorySingle (name),
+    manager (manager), maxEffectorID (0), maximumIterations (50), targetDistance (0.001f),
     motionRatio (0.1f), jointInitialized (true), upwardIterations (true)
   {
-  }
-
-  csPtr<CS::Animation::iSkeletonAnimNode> IKCCDNodeFactory::CreateInstance
-    (CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton)
-  {
-    csRef<CS::Animation::iSkeletonAnimNode> child;
-    if (childNode)
-      child = childNode->CreateInstance (packet, skeleton);
-
-    csRef<CS::Animation::iSkeletonAnimNode> newP;
-    newP.AttachNew (new IKCCDNode (this, skeleton, child));
-    return csPtr<CS::Animation::iSkeletonAnimNode> (newP);
-  }
-
-  const char* IKCCDNodeFactory::GetNodeName () const
-  {
-    return name;
-  }
-
-  CS::Animation::iSkeletonAnimNodeFactory* IKCCDNodeFactory::FindNode
-    (const char* name)
-  {
-    if (this->name == name)
-      return this;
-
-    if (childNode)
-      return childNode->FindNode (name);
-
-      return 0;
   }
 
   void IKCCDNodeFactory::SetBodySkeleton (CS::Animation::iBodySkeleton* skeleton)
@@ -156,21 +73,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
   void IKCCDNodeFactory::RemoveEffector (CS::Animation::EffectorID effector)
   {
     effectors.DeleteAll (effector);
-  }
-
-  void IKCCDNodeFactory::SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* node)
-  {
-    childNode = node;
-  }
-
-  CS::Animation::iSkeletonAnimNodeFactory* IKCCDNodeFactory::GetChildNode () const
-  {
-    return childNode;
-  }
-
-  void IKCCDNodeFactory::ClearChildNode ()
-  {
-    childNode = 0;
   }
 
   void IKCCDNodeFactory::SetMaximumIterations (size_t max)
@@ -223,15 +125,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
     return upwardIterations;
   }
 
+  CS_IMPLEMENT_ANIMNODE_FACTORY_SINGLE(IKCCDNode);
+
   // --------------------------  IKCCDNode  --------------------------
 
   CS_LEAKGUARD_IMPLEMENT(IKCCDNode);
 
   IKCCDNode::IKCCDNode (IKCCDNodeFactory* factory, 
-			CS::Animation::iSkeleton* skeleton,
-			CS::Animation::iSkeletonAnimNode* childNode)
-    : scfImplementationType (this), factory (factory), sceneNode (nullptr),
-    skeleton (skeleton), childNode (childNode), isActive (false)
+			CS::Animation::iSkeleton* skeleton)
+    : scfImplementationType (this), csSkeletonAnimNodeSingle (skeleton), factory (factory),
+    sceneNode (nullptr)
   {
   }
 
@@ -291,14 +194,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
   {
     CS_ASSERT (skeleton->GetSceneNode ());
 
-    if (isActive)
+    if (isPlaying)
       return;
 
     // Find the scene node
     if (!sceneNode)
       sceneNode = skeleton->GetSceneNode ();
 
-    isActive = true;
+    isPlaying = true;
 
     // Start the child node
     if (childNode)
@@ -307,10 +210,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
 
   void IKCCDNode::Stop ()
   {
-    if (!isActive)
+    if (!isPlaying)
       return;
 
-    isActive = false;
+    isPlaying = false;
 
     // Stop the child node
     if (childNode)
@@ -326,46 +229,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
     }
   }
 
-  void IKCCDNode::SetPlaybackPosition (float time)
-  {
-    if (childNode)
-      childNode->SetPlaybackPosition (time);
-  }
-
-  float IKCCDNode::GetPlaybackPosition () const
-  {
-    if (childNode)
-      return childNode->GetPlaybackPosition ();
-
-    return 0.0;
-  }
-
-  float IKCCDNode::GetDuration () const
-  {
-    if (childNode)
-      return childNode->GetDuration ();
-
-    return 0.0;
-  }
-
-  void IKCCDNode::SetPlaybackSpeed (float speed)
-  {
-    if (childNode)
-      childNode->SetPlaybackSpeed (speed);
-  }
-
-  float IKCCDNode::GetPlaybackSpeed () const
-  {
-    if (childNode)
-      return childNode->GetPlaybackSpeed ();
-
-    return 1.0;
-  }
-
   void IKCCDNode::BlendState (CS::Animation::csSkeletalState* state, float baseWeight)
   {
     // Check that this node is active
-    if (!isActive)
+    if (!isPlaying)
       return;
 
     // Make the child node blend the state
@@ -547,45 +414,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
     }
   }
 
-  void IKCCDNode::TickAnimation (float dt)
-  {
-    // Update the child node
-    if (childNode)
-      childNode->TickAnimation (dt);
-  }
-
-  bool IKCCDNode::IsActive () const
-  {
-    return isActive;
-  }
-
-  CS::Animation::iSkeletonAnimNodeFactory* IKCCDNode::GetFactory () const
-  {
-    return factory;
-  }
-
-  CS::Animation::iSkeletonAnimNode* IKCCDNode::FindNode (const char* name)
-  {
-    if (factory->name == name)
-      return this;
-
-    if (childNode)
-      return childNode->FindNode (name);
-
-    return 0;
-  }
-
-  void IKCCDNode::AddAnimationCallback
-    (CS::Animation::iSkeletonAnimCallback* callback)
-  {
-    // TODO
-  }
-
-  void IKCCDNode::RemoveAnimationCallback
-    (CS::Animation::iSkeletonAnimCallback* callback)
-  {
-    // TODO
-  }
+  CS_IMPLEMENT_ANIMNODE_SINGLE(IKCCDNode);
 
 }
 CS_PLUGIN_NAMESPACE_END(IKCCD)

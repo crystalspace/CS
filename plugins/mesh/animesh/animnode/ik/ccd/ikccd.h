@@ -22,46 +22,19 @@
 #define __CS_IKCCD_H__
 
 #include "csutil/scf_implementation.h"
-#include "iutil/comp.h"
 #include "csgeom/transfrm.h"
+#include "cstool/animnodetmpl.h"
 #include "csutil/leakguard.h"
 #include "csutil/weakref.h"
 #include "csutil/csstring.h"
 #include "imesh/animnode/ik.h"
 #include "imesh/bodymesh.h"
-
-#include "iutil/visualdebug.h"
+#include "iutil/comp.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
 {
 
-  class IKCCDNodeManager : public scfImplementation2<IKCCDNodeManager,
-    CS::Animation::iSkeletonIKNodeManager, iComponent>
-  {
-  public:
-    CS_LEAKGUARD_DECLARE(IKCCDNodeManager);
-
-    IKCCDNodeManager (iBase* parent);
-
-    //-- CS::Animation::iSkeletonIKNodeManager
-    virtual CS::Animation::iSkeletonIKNodeFactory* CreateAnimNodeFactory (const char *name);
-
-    virtual CS::Animation::iSkeletonIKNodeFactory* FindAnimNodeFactory (const char* name) const;
-    virtual void ClearAnimNodeFactories ();
-
-    //-- iComponent
-    virtual bool Initialize (iObjectRegistry*);
-
-    // Error reporting
-    void Report (int severity, const char* msg, ...) const;
-
-  private:
-    iObjectRegistry* object_reg;
-    csHash<csRef<CS::Animation::iSkeletonIKNodeFactory>, csString> factoryHash;
-
-    friend class IKCCDNodeFactory;
-    friend class IKCCDNode;
-  };
+  CS_DECLARE_ANIMNODE_MANAGER(IKCCDNode, IKNode, CS::Animation::iSkeletonIKCCDNodeFactory);
 
   struct EffectorData
   {
@@ -70,26 +43,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
     csOrthoTransform transform;
   };
 
-  class IKCCDNodeFactory : public scfImplementation3
-    <IKCCDNodeFactory,
+  class IKCCDNodeFactory
+    : public scfImplementation3<IKCCDNodeFactory,
     scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory>,
     scfFakeInterface<CS::Animation::iSkeletonIKNodeFactory>,
-    CS::Animation::iSkeletonIKCCDNodeFactory>
+    CS::Animation::iSkeletonIKCCDNodeFactory>,
+    CS::Animation::csSkeletonAnimNodeFactorySingle
   {
-    friend class IKCCDNode;
-
   public:
     CS_LEAKGUARD_DECLARE(IKCCDNodeFactory);
 
     IKCCDNodeFactory (IKCCDNodeManager* manager, const char *name);
-
-    //-- CS::Animation::iSkeletonAnimNodeFactory
-    virtual csPtr<CS::Animation::iSkeletonAnimNode> CreateInstance
-      (CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton);
-
-    virtual const char* GetNodeName () const;
-
-    virtual CS::Animation::iSkeletonAnimNodeFactory* FindNode (const char* name);
 
     //-- CS::Animation::iSkeletonIKNodeFactory
     virtual void SetBodySkeleton (CS::Animation::iBodySkeleton* skeleton);
@@ -98,9 +62,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
 						   CS::Animation::BoneID bone,
 						   csOrthoTransform& transform);
     virtual void RemoveEffector (CS::Animation::EffectorID effector);
-    virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* node);
-    virtual CS::Animation::iSkeletonAnimNodeFactory* GetChildNode () const;
-    virtual void ClearChildNode ();
+
+    inline virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* factory)
+    { CS::Animation::csSkeletonAnimNodeFactorySingle::SetChildNode (factory); }
+    inline virtual iSkeletonAnimNodeFactory* GetChildNode () const
+    { return CS::Animation::csSkeletonAnimNodeFactorySingle::GetChildNode (); }
 
     //-- CS::Animation::iSkeletonIKCCDNodeFactory
     virtual void SetMaximumIterations (size_t max);
@@ -114,11 +80,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
     virtual void SetUpwardIterations (bool upward);
     virtual bool GetUpwardIterations ();
 
+    //-- CS::Animation::iSkeletonAnimNodeFactory
+    virtual csPtr<CS::Animation::iSkeletonAnimNode> CreateInstance
+      (CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton);
+    inline virtual const char* GetNodeName () const
+      { return csSkeletonAnimNodeFactorySingle::GetNodeName (); }
+    virtual CS::Animation::iSkeletonAnimNodeFactory* FindNode (const char* name);
+
   protected:
     IKCCDNodeManager* manager;
-    csString name;
     csRef<CS::Animation::iBodySkeleton> bodySkeleton;
-    csRef<CS::Animation::iSkeletonAnimNodeFactory> childNode;
     csHash<EffectorData, CS::Animation::EffectorID> effectors;
     CS::Animation::EffectorID maxEffectorID;
     size_t maximumIterations;
@@ -126,20 +97,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
     float motionRatio;
     bool jointInitialized;
     bool upwardIterations;
+
+    friend class IKCCDNode;
   };
 
-  class IKCCDNode : public scfImplementation3
-    <IKCCDNode,
+  class IKCCDNode
+    : public scfImplementation3<IKCCDNode,
     scfFakeInterface<CS::Animation::iSkeletonAnimNode>,
     scfFakeInterface<CS::Animation::iSkeletonIKNode>,
-    CS::Animation::iSkeletonIKCCDNode>
+    CS::Animation::iSkeletonIKCCDNode>,
+    CS::Animation::csSkeletonAnimNodeSingle
   {
   public:
     CS_LEAKGUARD_DECLARE(IKCCDNode);
 
     IKCCDNode (IKCCDNodeFactory* factory,
-		   CS::Animation::iSkeleton* skeleton,
-		   CS::Animation::iSkeletonAnimNode* childNode);
+	       CS::Animation::iSkeleton* skeleton);
     ~IKCCDNode ();
 
     //-- CS::Animation::iSkeletonIKCCDNode
@@ -156,33 +129,35 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
 
     //-- CS::Animation::iSkeletonAnimNode
     virtual void Play ();
-
     virtual void Stop ();
 
-    virtual void SetPlaybackPosition (float time);
+    inline virtual void SetPlaybackPosition (float time)
+    { csSkeletonAnimNodeSingle::SetPlaybackPosition (time); }
+    inline virtual float GetPlaybackPosition () const
+    { return csSkeletonAnimNodeSingle::GetPlaybackPosition (); }
 
-    virtual float GetPlaybackPosition () const;
-
-    virtual float GetDuration () const;
-
-    virtual void SetPlaybackSpeed (float speed);
-
-    virtual float GetPlaybackSpeed () const;
+    inline virtual float GetDuration () const
+    { return csSkeletonAnimNodeSingle::GetDuration (); }
+    inline virtual void SetPlaybackSpeed (float speed)
+    { csSkeletonAnimNodeSingle::SetPlaybackSpeed (speed); }
+    inline virtual float GetPlaybackSpeed () const
+    { return csSkeletonAnimNodeSingle::GetPlaybackSpeed (); }
 
     virtual void BlendState (CS::Animation::csSkeletalState* state,
 			     float baseWeight = 1.0f);
+    inline virtual void TickAnimation (float dt)
+    { csSkeletonAnimNodeSingle::TickAnimation (dt); }
 
-    virtual void TickAnimation (float dt);
-
-    virtual bool IsActive () const;
+    inline virtual bool IsActive () const
+    { return csSkeletonAnimNodeSingle::IsActive (); }
 
     virtual CS::Animation::iSkeletonAnimNodeFactory* GetFactory () const;
-
     virtual CS::Animation::iSkeletonAnimNode* FindNode (const char* name);
 
-    virtual void AddAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback);
-
-    virtual void RemoveAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback);
+    inline virtual void AddAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback)
+    { csSkeletonAnimNodeSingle::AddAnimationCallback (callback); }
+    inline virtual void RemoveAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback)
+    { csSkeletonAnimNodeSingle::RemoveAnimationCallback (callback); }
 
   private:
     enum ConstraintType
@@ -206,9 +181,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
   private:
     IKCCDNodeFactory* factory;
     csWeakRef<iSceneNode> sceneNode;
-    csWeakRef<CS::Animation::iSkeleton> skeleton;
-    csRef<CS::Animation::iSkeletonAnimNode> childNode;
-    bool isActive;
 
     csHash<ConstraintData, CS::Animation::EffectorID> constraints;
 
@@ -219,6 +191,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
       csVector3 boneOffset;
       csQuaternion boneRotation;
     };
+
+    friend class IKCCDNodeFactory;
   };
 
 }

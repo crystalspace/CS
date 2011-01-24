@@ -140,25 +140,10 @@ struct NameBoneMappingHelper
  * A class to manage the creation and deletion of 'Retarget' animation 
  * node factories.
  */
-struct iSkeletonRetargetNodeManager : public virtual iBase
+struct iSkeletonRetargetNodeManager
+  : public virtual CS::Animation::iSkeletonAnimNodeManager<CS::Animation::iSkeletonRetargetNodeFactory>
 {
   SCF_INTERFACE(CS::Animation::iSkeletonRetargetNodeManager, 1, 0, 0);
-
-  /**
-   * Create a new 'Retarget' animation node factory.
-   * \param name The name of the new factory.
-   */
-  virtual iSkeletonRetargetNodeFactory* CreateAnimNodeFactory (const char *name) = 0;
-
-  /**
-   * Find the specified 'Retarget' animation node factory.
-   */
-  virtual iSkeletonRetargetNodeFactory* FindAnimNodeFactory (const char* name) const = 0;
-
-  /**
-   * Delete all 'Retarget' animation node factories.
-   */
-  virtual void ClearAnimNodeFactories () = 0;
 };
 
 /**

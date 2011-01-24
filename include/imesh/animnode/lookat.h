@@ -35,21 +35,8 @@
 struct iMovable;
 struct iCamera;
 
-namespace CS
-{
-namespace Mesh
-{
-
-  struct iAnimatedMesh;
-
-} // namespace Mesh
-} // namespace CS
-
-
-namespace CS
-{
-namespace Animation
-{
+namespace CS {
+namespace Animation {
 
 struct iBodySkeleton;
 struct iSkeletonLookAtNodeFactory;
@@ -59,25 +46,10 @@ struct iSkeletonLookAtListener;
  * A class to manage the creation and deletion of 'LookAt' animation 
  * node factories.
  */
-struct iSkeletonLookAtNodeManager : public virtual iBase
+struct iSkeletonLookAtNodeManager
+  : public virtual CS::Animation::iSkeletonAnimNodeManager<CS::Animation::iSkeletonLookAtNodeFactory>
 {
   SCF_INTERFACE(CS::Animation::iSkeletonLookAtNodeManager, 1, 0, 0);
-
-  /**
-   * Create a new 'LookAt' animation node factory.
-   * \param name The name of the new factory.
-   */
-  virtual iSkeletonLookAtNodeFactory* CreateAnimNodeFactory (const char *name) = 0;
-
-  /**
-   * Find the specified 'LookAt' animation node factory.
-   */
-  virtual iSkeletonLookAtNodeFactory* FindAnimNodeFactory (const char* name) const = 0;
-
-  /**
-   * Delete all 'LookAt' animation node factories.
-   */
-  virtual void ClearAnimNodeFactories () = 0;
 };
 
 /**
@@ -142,18 +114,15 @@ struct iSkeletonLookAtNodeFactory : public iSkeletonAnimNodeFactory
    * add its control on top of the animation of the child node. The animation of
    * the bone made by the child node may still be used, for example when the node
    * is transitioning between targets, or when the target is not reachable.
+   *
+   * It is valid to set a null reference as node.
    */
   virtual void SetChildNode (iSkeletonAnimNodeFactory* node) = 0;
 
   /**
    * Return the child animation node of this node.
    */
-  virtual iSkeletonAnimNodeFactory* GetChildNode () = 0;
-
-  /**
-   * Clear the child animation node of this node.
-   */
-  virtual void ClearChildNode () = 0;
+  virtual iSkeletonAnimNodeFactory* GetChildNode () const = 0;
 };
 
 /**

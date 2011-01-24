@@ -48,24 +48,10 @@ struct iBodyChain;
  * A class to manage the creation and deletion of debug animation 
  * node factories.
  */
-struct iSkeletonDebugNodeManager : public virtual iBase
+struct iSkeletonDebugNodeManager
+  : public virtual CS::Animation::iSkeletonAnimNodeManager<CS::Animation::iSkeletonDebugNodeFactory>
 {
   SCF_INTERFACE(CS::Animation::iSkeletonDebugNodeManager, 1, 0, 0);
-
-  /**
-   * Create a 'debug' animation node factory of the given name.
-   */
-  virtual iSkeletonDebugNodeFactory* CreateAnimNodeFactory (const char* name) = 0;
-
-  /**
-   * Find the 'debug' animation node factory of the given name.
-   */
-  virtual iSkeletonDebugNodeFactory* FindAnimNodeFactory (const char* name) = 0;
-
-  /**
-   * Delete all 'debug' animation node factories.
-   */
-  virtual void ClearAnimNodeFactories () = 0;
 };
 
 // ----------------------------- iSkeletonDebugNode -----------------------------
@@ -122,7 +108,7 @@ struct iSkeletonDebugNodeFactory : public iSkeletonAnimNodeFactory
   virtual void SetLeafBonesDisplayed (bool displayed) = 0;
 
   /**
-   * Set the child animation node of this node.
+   * Set the child animation node of this node. It is valid to set a null reference as chid node.
    */
   virtual void SetChildNode (iSkeletonAnimNodeFactory* factory) = 0;
 

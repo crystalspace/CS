@@ -40,24 +40,10 @@ struct iSkeletonSpeedNodeFactory;
  * A class to manage the creation and deletion of speed animation 
  * node factories.
  */
-struct iSkeletonSpeedNodeManager : public virtual iBase
+struct iSkeletonSpeedNodeManager
+  : public virtual CS::Animation::iSkeletonAnimNodeManager<CS::Animation::iSkeletonSpeedNodeFactory>
 {
   SCF_INTERFACE(CS::Animation::iSkeletonSpeedNodeManager, 1, 0, 0);
-
-  /**
-   * Create a 'speed' animation node factory of the given name.
-   */
-  virtual iSkeletonSpeedNodeFactory* CreateAnimNodeFactory (const char* name) = 0;
-
-  /**
-   * Find the 'speed' animation node factory of the given name.
-   */
-  virtual iSkeletonSpeedNodeFactory* FindAnimNodeFactory (const char* name) = 0;
-
-  /**
-   * Delete all 'speed' animation node factories.
-   */
-  virtual void ClearAnimNodeFactories () = 0;
 };
 
 /**

@@ -22,39 +22,18 @@
 #define __CS_BASICNODES_H__
 
 #include "csutil/scf_implementation.h"
-#include "iutil/comp.h"
+#include "cstool/animnodetmpl.h"
 #include "csutil/leakguard.h"
 #include "csutil/weakref.h"
 #include "csutil/refarr.h"
 #include "csutil/csstring.h"
 #include "imesh/animnode/speed.h"
+#include "iutil/comp.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(SpeedNode)
 {
 
-  class SpeedNodeManager : public scfImplementation2<SpeedNodeManager,
-    CS::Animation::iSkeletonSpeedNodeManager, iComponent>
-  {
-  public:
-    CS_LEAKGUARD_DECLARE(BasicManager);
-
-    SpeedNodeManager (iBase* parent);
-
-    //-- CS::Animation::iSkeletonSpeedNodeManager
-    virtual CS::Animation::iSkeletonSpeedNodeFactory* CreateAnimNodeFactory (const char* name);
-    virtual CS::Animation::iSkeletonSpeedNodeFactory* FindAnimNodeFactory (const char* name);
-    virtual void ClearAnimNodeFactories ();
-
-    //-- iComponent
-    virtual bool Initialize (iObjectRegistry*);
-
-    // error reporting
-    void Report (int severity, const char* msg, ...) const;
-
-  private:
-    iObjectRegistry* object_reg;
-    csHash<csRef<CS::Animation::iSkeletonSpeedNodeFactory>, csString> speedFactories;
-  };
+  CS_DECLARE_ANIMNODE_MANAGER(SpeedNode, SpeedNode, CS::Animation::iSkeletonSpeedNodeFactory);
 
   class SpeedNodeFactory : public scfImplementation2<SpeedNodeFactory, 
     scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory>, CS::Animation::iSkeletonSpeedNodeFactory>
@@ -121,6 +100,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(SpeedNode)
     SpeedNodeFactory* factory;
     csWeakRef<CS::Animation::iSkeleton> skeleton;
     csRefArray<CS::Animation::iSkeletonAnimNode> subNodes;
+    float playbackSpeed;
     float speed;
     size_t slowNode, fastNode;
     float currentPosition;

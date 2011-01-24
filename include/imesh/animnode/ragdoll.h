@@ -49,25 +49,10 @@ struct iSkeletonRagdollNodeFactory;
  * A class to manage the creation and deletion of ragdoll animation 
  * node factories.
  */
-struct iSkeletonRagdollNodeManager : public virtual iBase
+struct iSkeletonRagdollNodeManager
+  : public virtual CS::Animation::iSkeletonAnimNodeManager<CS::Animation::iSkeletonRagdollNodeFactory>
 {
   SCF_INTERFACE(CS::Animation::iSkeletonRagdollNodeManager, 1, 0, 0);
-
-  /**
-   * Create a new ragdoll animation node factory.
-   */
-  virtual iSkeletonRagdollNodeFactory* CreateAnimNodeFactory (const char *name) = 0;
-
-  /**
-   * Find the ragdoll animation node factory with the given name.
-   */
-  virtual iSkeletonRagdollNodeFactory* FindAnimNodeFactory
-    (const char* name) const = 0;
-
-  /**
-   * Delete all ragdoll animation node factories.
-   */
-  virtual void ClearAnimNodeFactories () = 0;
 };
 
 /**
@@ -113,7 +98,7 @@ struct iSkeletonRagdollNodeFactory : public iSkeletonAnimNodeFactory
   virtual void RemoveBodyChain (iBodyChain* chain) = 0;
 
   /**
-   * Set the child animation node of this node. The ragdoll controller will
+   * Set the child animation node of this node. The ragdoll animation node will
    * add its control on top of the animation of the child node. This child
    * node is not mandatory.
    *
@@ -121,6 +106,8 @@ struct iSkeletonRagdollNodeFactory : public iSkeletonAnimNodeFactory
    * CS::Animation::STATE_INACTIVE or CS::Animation::STATE_KINEMATIC
    * will be read from the child node, while the bones in state
    * CS::Animation::STATE_DYNAMIC will be overwriten by this node.
+   *
+   * It is valid to set a null reference as chid node.
    */
   virtual void SetChildNode (iSkeletonAnimNodeFactory* node) = 0;
 
@@ -128,11 +115,6 @@ struct iSkeletonRagdollNodeFactory : public iSkeletonAnimNodeFactory
    * Return the child animation node of this node.
    */
   virtual iSkeletonAnimNodeFactory* GetChildNode () const = 0;
-
-  /**
-   * Clear the child animation node of this node.
-   */
-  virtual void ClearChildNode () = 0;
 };
 
 /**
