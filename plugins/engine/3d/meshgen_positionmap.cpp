@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2005-2006 by Jorrit Tyberghein
+	      (C) 2011 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,64 +20,87 @@
 #include "cssysdef.h"
 #include "meshgen_positionmap.h"
 
-#include "csgeom/box.h"
-
 CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 {
-  static int AreaCompare(csVector4 const& r, csVector4 const& k)
-  {
-    float a = (r.z - r.x) * (r.w - r.y);
-    float b = (k.z - k.x) * (k.w - k.y);
-    return (a < b) ? 1 : (a - b) > 0.01 ? -1 : 0;
-  }
-
-  PositionMap::PositionMap(const csBox2& box)
+  PositionMap::PositionMap (const float* minRadii, size_t numMinRadii,
+			    const csBox2& box)
   {
     posGen.Initialize();
-    freeAreas.Push(csVector4(box.MinX(), box.MinY(), box.MaxX(), box.MaxY()));
-  }
-
-  bool PositionMap::GetRandomPosition(float& xpos, float& zpos, float& radius, float& minRadius)
-  {
-    // Do a quick search.
-    for(size_t i=0; i<freeAreas.GetSize(); ++i)
+    
+    buckets.SetCapacity (numMinRadii);
+    for (size_t b = 0; b < numMinRadii; b++)
     {
-      csVector4 freeArea = freeAreas[i];
-
-      if(freeArea.z - freeArea.x < radius*2 ||
-	freeArea.w - freeArea.y < radius*2)
-      {
-	continue;
-      }
-
-      float xAvail = freeArea.x + radius * 0.5f;
-      float yAvail = freeArea.y + radius * 0.5f;
-      float zAvail = freeArea.z - radius * 0.5f;
-      float wAvail = freeArea.w - radius * 0.5f;
-
-      xpos = freeArea.x + radius + (zAvail - xAvail) * posGen.Get();
-      zpos = freeArea.y + radius + (wAvail - yAvail) * posGen.Get();
-
-      freeAreas.DeleteIndex(i);
-
-      if(minRadius*2 <= (zpos-radius) - freeArea.y)
-	freeAreas.InsertSorted(csVector4(freeArea.x, freeArea.y, xpos+radius, zpos-radius), AreaCompare);
-
-      if(minRadius*2 <= freeArea.z - (xpos+radius))
-	freeAreas.InsertSorted(csVector4(xpos+radius, freeArea.y, freeArea.z, zpos+radius), AreaCompare);
-
-      if(minRadius*2 <= freeArea.w - (zpos+radius))
-	freeAreas.InsertSorted(csVector4(xpos-radius, zpos+radius, freeArea.z, freeArea.w), AreaCompare);
-
-      if(minRadius*2 <= (xpos-radius) - freeArea.x)
-	freeAreas.InsertSorted(csVector4(freeArea.x, zpos-radius, xpos-radius, freeArea.w), AreaCompare);
-
-      return true;
+      Bucket bucket (minRadii[b]*2);
+      buckets.InsertSorted (bucket);
     }
-
-    // No space found.. we could do a more thorough search if this case happens often.
-    return false;
+    
+    InsertNewArea (box);
   }
 
+  bool PositionMap::GetRandomPosition (const float radius, float& xpos, float& zpos)
+  {
+    /* Collect candidates from areas from all buckets with a minRadius that
+       is larger or equal to radius */
+    size_t numAreas = 0;
+    for (size_t b = 0; b < buckets.GetSize(); b++)
+    {
+      if (buckets[b].minSide < radius*2) break;
+      numAreas += buckets[b].freeAreas.GetSize();
+    }
+    // No space found.
+    if (numAreas == 0) return false;
+    
+    /* Pick the area.
+       Note it's guaranteed to be at least as large as radius on it's smaller
+       side. */
+    csBox2 freeArea;
+    size_t areaIndex = size_t (numAreas * posGen.Get ());
+    for (size_t b = 0; b < buckets.GetSize(); b++)
+    {
+      if (areaIndex < buckets[b].freeAreas.GetSize())
+      {
+	freeArea = buckets[b].freeAreas[areaIndex];
+	buckets[b].freeAreas.DeleteIndexFast (areaIndex);
+	break;
+      }
+      else
+	areaIndex -= buckets[b].freeAreas.GetSize();
+    }
+    
+    CS_ASSERT ((freeArea.MaxX() - freeArea.MinX() >= radius*2) 
+	       && (freeArea.MaxY() - freeArea.MinY() >= radius*2));
+
+    float xAvail = freeArea.MinX() + radius * 0.5f;
+    float yAvail = freeArea.MinY() + radius * 0.5f;
+    float zAvail = freeArea.MaxX() - radius * 0.5f;
+    float wAvail = freeArea.MaxY() - radius * 0.5f;
+
+    xpos = freeArea.MinX() + radius + (zAvail - xAvail) * posGen.Get();
+    zpos = freeArea.MinY() + radius + (wAvail - yAvail) * posGen.Get();
+
+    InsertNewArea (csBox2 (freeArea.MinX(), freeArea.MinY(), xpos+radius, zpos-radius));
+    InsertNewArea (csBox2 (xpos+radius, freeArea.MinY(), freeArea.MaxX(), zpos+radius));
+    InsertNewArea (csBox2 (xpos-radius, zpos+radius, freeArea.MaxX(), freeArea.MaxY()));
+    InsertNewArea (csBox2 (freeArea.MinX(), zpos-radius, xpos-radius, freeArea.MaxY()));
+
+    return true;
+  }
+
+  void PositionMap::InsertNewArea (const csBox2& area)
+  {
+    float minSide = csMin (area.MaxX() - area.MinX(),
+			   area.MaxY() - area.MinY());
+
+    /* Insert area into bucket with the largest radius smaller or equal
+       to minSide */
+    for (size_t b = 0; b < buckets.GetSize(); b++)
+    {
+      if (minSide >= buckets[b].minSide)
+      {
+	buckets[b].freeAreas.Push (area);
+	break;
+      }
+    }
+  }
 }
 CS_PLUGIN_NAMESPACE_END(Engine)

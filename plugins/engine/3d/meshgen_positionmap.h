@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2005-2006 by Jorrit Tyberghein
+	      (C) 2011 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,11 +20,10 @@
 #ifndef __CS_MESHGEN_POSITIONMAP_H__
 #define __CS_MESHGEN_POSITIONMAP_H__
 
+#include "csgeom/box.h"
 #include "csgeom/vector4.h"
 #include "csutil/array.h"
 #include "csutil/randomgen.h"
-
-class csBox2;
 
 CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 {
@@ -33,7 +33,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
   class PositionMap
   {
   public:
-    PositionMap(const csBox2& box);
+    PositionMap(const float* minRadii, size_t numMinRadii,
+		const csBox2& box);
 
     /**
      * Get a random available position. 
@@ -42,11 +43,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
      * \param radius The radius from the (x, z) coordinates to mark off as used.
      * \param minRadius The minimum radius used by all geometries.
      */
-    bool GetRandomPosition(float& xpos, float& zpos, float& radius, float& minRadius);
+    bool GetRandomPosition (const float radius, float& xpos, float& zpos);
 
   private:
-    csArray<csVector4> freeAreas;
     csRandomGen posGen;
+    
+    /**
+     * A bucket of free areas.
+     * Each bucket contains all areas with their smallest side larger or equal
+     * to \c minSide, but smaller than the next larger bucket.
+     */
+    struct Bucket
+    {
+      float minSide;
+      csArray<csBox2> freeAreas;
+      
+      Bucket (float minSide) : minSide (minSide) {}
+      
+      bool operator< (const Bucket& other) const
+      { return minSide > other.minSide; }
+    };
+    csArray<Bucket> buckets;
+    // Insert an area into the right bucket (or discard if too small)
+    void InsertNewArea (const csBox2& area);
   };
 }
 CS_PLUGIN_NAMESPACE_END(Engine)

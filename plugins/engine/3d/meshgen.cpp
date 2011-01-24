@@ -655,7 +655,11 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
   const csBox2& box = cell.box;
   float box_area = box.Area ();
   
-  PositionMap positionMap (box);
+  CS_ALLOC_STACK_ARRAY(float, geoRadii, geometries.GetSize ());
+  for (size_t i = 0 ; i < geometries.GetSize () ; i++)
+    geoRadii[i] = geometries[i]->GetRadius();
+  PositionMap positionMap (geoRadii, geometries.GetSize (),
+			   box);
 
   if(minRadius < 0.0f)
   {
@@ -692,7 +696,7 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
       if (mpos_count == 0)
       {
         float r = geometries[g]->GetRadius();
-        if(!positionMap.GetRandomPosition(x, z, r, minRadius))
+        if(!positionMap.GetRandomPosition (r, x, z))
         {
           // Ran out of room in this cell.
           return;
