@@ -42,40 +42,47 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
   {
     /* Collect candidates from areas from all buckets with a minRadius that
        is larger or equal to radius */
-    size_t numAreas = 0;
+    float totalArea = 0;
     for (size_t b = 0; b < buckets.GetSize(); b++)
     {
       if (buckets[b].minSide < radius*2) break;
-      numAreas += buckets[b].freeAreas.GetSize();
+      totalArea += buckets[b].areaSum;
     }
     // No space found.
-    if (numAreas == 0) return false;
+    if (totalArea < SMALL_EPSILON) return false;
     
     /* Pick the area.
        Note it's guaranteed to be at least as large as radius on it's smaller
        side. */
     csBox2 freeArea;
-    size_t areaIndex = size_t (numAreas * posGen.Get ());
+    float theArea = totalArea * posGen.Get ();
     for (size_t b = 0; b < buckets.GetSize(); b++)
     {
-      if (areaIndex < buckets[b].freeAreas.GetSize())
+      const Bucket& bucket = buckets[b];
+      if (theArea < bucket.areaSum)
       {
-	freeArea = buckets[b].freeAreas[areaIndex];
+	size_t areaIndex = 0;
+	while (theArea > bucket.freeAreas[areaIndex].area)
+	{
+	  theArea -= bucket.freeAreas[areaIndex].area;
+	  areaIndex++;
+	}
+	freeArea = bucket.freeAreas[areaIndex].box;
 	area.first = b;
 	area.second = areaIndex;
 	break;
       }
       else
-	areaIndex -= buckets[b].freeAreas.GetSize();
+	theArea -= bucket.areaSum;
     }
     
     CS_ASSERT ((freeArea.MaxX() - freeArea.MinX() >= radius*2) 
 	       && (freeArea.MaxY() - freeArea.MinY() >= radius*2));
 
-    float xAvail = freeArea.MinX() + radius * 0.5f;
-    float yAvail = freeArea.MinY() + radius * 0.5f;
-    float zAvail = freeArea.MaxX() - radius * 0.5f;
-    float wAvail = freeArea.MaxY() - radius * 0.5f;
+    float xAvail = freeArea.MinX() + radius;
+    float yAvail = freeArea.MinY() + radius;
+    float zAvail = freeArea.MaxX() - radius;
+    float wAvail = freeArea.MaxY() - radius;
 
     xpos = freeArea.MinX() + radius + (zAvail - xAvail) * posGen.Get();
     zpos = freeArea.MinY() + radius + (wAvail - yAvail) * posGen.Get();
@@ -86,22 +93,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
   void PositionMap::MarkAreaUsed (const AreaID& area, 
 				  const float radius, const float xpos, const float zpos)
   {
+    // Don't bother with very small radii
+    if (radius < SMALL_EPSILON)
+      return;
+    
     size_t b = area.first;
     size_t areaIndex = area.second;
-    csBox2 freeArea (buckets[b].freeAreas[areaIndex]);
+    Bucket::Area freeArea (buckets[b].freeAreas[areaIndex]);
     
     buckets[b].freeAreas.DeleteIndexFast (areaIndex);
+    buckets[b].areaSum -= freeArea.area;
     
-    InsertNewArea (csBox2 (freeArea.MinX(), freeArea.MinY(), xpos+radius, zpos-radius));
-    InsertNewArea (csBox2 (xpos+radius, freeArea.MinY(), freeArea.MaxX(), zpos+radius));
-    InsertNewArea (csBox2 (xpos-radius, zpos+radius, freeArea.MaxX(), freeArea.MaxY()));
-    InsertNewArea (csBox2 (freeArea.MinX(), zpos-radius, xpos-radius, freeArea.MaxY()));
+    InsertNewArea (csBox2 (freeArea.box.MinX(), freeArea.box.MinY(), xpos+radius, zpos-radius));
+    InsertNewArea (csBox2 (xpos+radius, freeArea.box.MinY(), freeArea.box.MaxX(), zpos+radius));
+    InsertNewArea (csBox2 (xpos-radius, zpos+radius, freeArea.box.MaxX(), freeArea.box.MaxY()));
+    InsertNewArea (csBox2 (freeArea.box.MinX(), zpos-radius, xpos-radius, freeArea.box.MaxY()));
   }
 
-  void PositionMap::InsertNewArea (const csBox2& area)
+  void PositionMap::InsertNewArea (const csBox2& areaBox)
   {
-    float minSide = csMin (area.MaxX() - area.MinX(),
-			   area.MaxY() - area.MinY());
+    float side1 = areaBox.MaxX() - areaBox.MinX();
+    float side2 = areaBox.MaxY() - areaBox.MinY();
+    float minSide = csMin (side1, side2);
 
     /* Insert area into bucket with the largest radius smaller or equal
        to minSide */
@@ -109,7 +122,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
     {
       if (minSide >= buckets[b].minSide)
       {
-	buckets[b].freeAreas.Push (area);
+	Bucket::Area newArea;
+	newArea.area = side1*side2;
+	newArea.box = areaBox;
+	buckets[b].freeAreas.Push (newArea);
+	buckets[b].areaSum += newArea.area;
 	break;
       }
     }

@@ -61,9 +61,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
     struct Bucket
     {
       float minSide;
-      csArray<csBox2> freeAreas;
+      struct Area
+      {
+	csBox2 box;
+	float area;
+	
+	Area() : area (0) {}
+      };
+      csArray<Area> freeAreas;
+      float areaSum;
       
-      Bucket (float minSide) : minSide (minSide) {}
+      Bucket (float minSide) : minSide (minSide), areaSum (0) {}
       
       bool operator< (const Bucket& other) const
       { return minSide > other.minSide; }
