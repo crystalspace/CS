@@ -691,12 +691,13 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
     for (j = 0 ; j < count ; j++)
     {
       float pos_factor;
+      float r = geometries[g]->csMeshGeneratorGeometry::GetRadius();
       float x;
       float z;
+      PositionMap::AreaID area;
       if (mpos_count == 0)
       {
-        float r = geometries[g]->GetRadius();
-        if(!positionMap.GetRandomPosition (r, x, z))
+        if(!positionMap.GetRandomPosition (r, x, z, area))
         {
           // Ran out of room in this cell.
           return;
@@ -759,6 +760,9 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
             pos.rotation = rot;
             pos.random = random.Get ();
             block->positions.Push (pos);
+	    
+	    if (mpos_count == 0)
+	      positionMap.MarkAreaUsed (area, r, x, z);
           }
         }
       }

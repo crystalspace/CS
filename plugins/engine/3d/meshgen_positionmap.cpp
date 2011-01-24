@@ -37,7 +37,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
     InsertNewArea (box);
   }
 
-  bool PositionMap::GetRandomPosition (const float radius, float& xpos, float& zpos)
+  bool PositionMap::GetRandomPosition (const float radius, float& xpos, float& zpos,
+				       AreaID& area)
   {
     /* Collect candidates from areas from all buckets with a minRadius that
        is larger or equal to radius */
@@ -60,7 +61,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
       if (areaIndex < buckets[b].freeAreas.GetSize())
       {
 	freeArea = buckets[b].freeAreas[areaIndex];
-	buckets[b].freeAreas.DeleteIndexFast (areaIndex);
+	area.first = b;
+	area.second = areaIndex;
 	break;
       }
       else
@@ -78,12 +80,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
     xpos = freeArea.MinX() + radius + (zAvail - xAvail) * posGen.Get();
     zpos = freeArea.MinY() + radius + (wAvail - yAvail) * posGen.Get();
 
+    return true;
+  }
+
+  void PositionMap::MarkAreaUsed (const AreaID& area, 
+				  const float radius, const float xpos, const float zpos)
+  {
+    size_t b = area.first;
+    size_t areaIndex = area.second;
+    csBox2 freeArea (buckets[b].freeAreas[areaIndex]);
+    
+    buckets[b].freeAreas.DeleteIndexFast (areaIndex);
+    
     InsertNewArea (csBox2 (freeArea.MinX(), freeArea.MinY(), xpos+radius, zpos-radius));
     InsertNewArea (csBox2 (xpos+radius, freeArea.MinY(), freeArea.MaxX(), zpos+radius));
     InsertNewArea (csBox2 (xpos-radius, zpos+radius, freeArea.MaxX(), freeArea.MaxY()));
     InsertNewArea (csBox2 (freeArea.MinX(), zpos-radius, xpos-radius, freeArea.MaxY()));
-
-    return true;
   }
 
   void PositionMap::InsertNewArea (const csBox2& area)

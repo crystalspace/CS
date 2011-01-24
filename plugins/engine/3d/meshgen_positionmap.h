@@ -24,6 +24,7 @@
 #include "csgeom/vector4.h"
 #include "csutil/array.h"
 #include "csutil/randomgen.h"
+#include "csutil/tuple.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 {
@@ -36,6 +37,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
     PositionMap(const float* minRadii, size_t numMinRadii,
 		const csBox2& box);
 
+    typedef csTuple2<size_t, size_t> AreaID;
     /**
      * Get a random available position. 
      * \param xpos X position.
@@ -43,8 +45,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
      * \param radius The radius from the (x, z) coordinates to mark off as used.
      * \param minRadius The minimum radius used by all geometries.
      */
-    bool GetRandomPosition (const float radius, float& xpos, float& zpos);
+    bool GetRandomPosition (const float radius, float& xpos, float& zpos,
+			    AreaID& area);
 
+    void MarkAreaUsed (const AreaID& area, 
+		       const float radius, const float xpos, const float zpos);
   private:
     csRandomGen posGen;
     
