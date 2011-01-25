@@ -1039,6 +1039,7 @@ bool csXWindow::SetMouseCursor (csMouseCursorID iShape)
 
 Cursor csXWindow::CreateRGBACursor (iImage *image, int hotspotX, int hotspotY)
 {
+#ifdef HAVE_XRENDER
   int imgW = image->GetWidth();
   int imgH = image->GetHeight();
   
@@ -1093,13 +1094,16 @@ Cursor csXWindow::CreateRGBACursor (iImage *image, int hotspotX, int hotspotY)
 	     imgW, imgH);
   XFreeGC (dpy, gc);
   cs_free (dataARGB32);
-  
+
   XRenderPictFormat* pictFmt = XRenderFindStandardFormat (dpy, PictStandardARGB32);
   Picture pic = XRenderCreatePicture (dpy, pixm, pictFmt, 0, nullptr);
   XFreePixmap (dpy, pixm);
   Cursor cur = XRenderCreateCursor (dpy, pic, hotspotX, hotspotY);
   XRenderFreePicture (dpy, pic);
   return cur;
+#else
+  return None;
+#endif
 }
 
 bool csXWindow::SetMouseCursor (iImage *image, const csRGBcolor* keycolor,
