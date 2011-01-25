@@ -12313,95 +12313,6 @@ SWIGINTERN PyObject *iSkeletonFSMNode_swigregister(PyObject *SWIGUNUSEDPARM(self
   return SWIG_Py_Void();
 }
 
-SWIGINTERN PyObject *_wrap_iSkeletonIKNodeManager_CreateAnimNodeFactory(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CS::Animation::iSkeletonIKNodeManager *arg1 = (CS::Animation::iSkeletonIKNodeManager *) 0 ;
-  char *arg2 = (char *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  CS::Animation::iSkeletonIKNodeFactory *result = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonIKNodeManager_CreateAnimNodeFactory",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonIKNodeManager, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonIKNodeManager_CreateAnimNodeFactory" "', argument " "1"" of type '" "CS::Animation::iSkeletonIKNodeManager *""'"); 
-  }
-  arg1 = reinterpret_cast< CS::Animation::iSkeletonIKNodeManager * >(argp1);
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSkeletonIKNodeManager_CreateAnimNodeFactory" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  result = (CS::Animation::iSkeletonIKNodeFactory *)(arg1)->CreateAnimNodeFactory((char const *)arg2);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Animation__iSkeletonIKNodeFactory, 0 |  0 );
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return resultobj;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iSkeletonIKNodeManager_FindAnimNodeFactory(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CS::Animation::iSkeletonIKNodeManager *arg1 = (CS::Animation::iSkeletonIKNodeManager *) 0 ;
-  char *arg2 = (char *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  CS::Animation::iSkeletonIKNodeFactory *result = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonIKNodeManager_FindAnimNodeFactory",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonIKNodeManager, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonIKNodeManager_FindAnimNodeFactory" "', argument " "1"" of type '" "CS::Animation::iSkeletonIKNodeManager const *""'"); 
-  }
-  arg1 = reinterpret_cast< CS::Animation::iSkeletonIKNodeManager * >(argp1);
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSkeletonIKNodeManager_FindAnimNodeFactory" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  result = (CS::Animation::iSkeletonIKNodeFactory *)((CS::Animation::iSkeletonIKNodeManager const *)arg1)->FindAnimNodeFactory((char const *)arg2);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Animation__iSkeletonIKNodeFactory, 0 |  0 );
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return resultobj;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iSkeletonIKNodeManager_ClearAnimNodeFactories(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CS::Animation::iSkeletonIKNodeManager *arg1 = (CS::Animation::iSkeletonIKNodeManager *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonIKNodeManager_ClearAnimNodeFactories",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonIKNodeManager, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonIKNodeManager_ClearAnimNodeFactories" "', argument " "1"" of type '" "CS::Animation::iSkeletonIKNodeManager *""'"); 
-  }
-  arg1 = reinterpret_cast< CS::Animation::iSkeletonIKNodeManager * >(argp1);
-  (arg1)->ClearAnimNodeFactories();
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_iSkeletonIKNodeManager_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -12430,6 +12341,19 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonIKNodeManager(PyObject *SWIGUNUSEDPAR
   arg1 = reinterpret_cast< CS::Animation::iSkeletonIKNodeManager * >(argp1);
   delete_CS_Animation_iSkeletonIKNodeManager(arg1);
   resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_iSkeletonIKNodeManager(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::iSkeletonIKNodeManager *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"new_iSkeletonIKNodeManager",0,0)) SWIG_fail;
+  result = (CS::Animation::iSkeletonIKNodeManager *)new CS::Animation::iSkeletonIKNodeManager();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Animation__iSkeletonIKNodeManager, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -12541,27 +12465,6 @@ SWIGINTERN PyObject *_wrap_iSkeletonIKNodeFactory_GetChildNode(PyObject *SWIGUNU
   arg1 = reinterpret_cast< CS::Animation::iSkeletonIKNodeFactory * >(argp1);
   result = (CS::Animation::iSkeletonAnimNodeFactory *)((CS::Animation::iSkeletonIKNodeFactory const *)arg1)->GetChildNode();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Animation__iSkeletonAnimNodeFactory, 0 |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iSkeletonIKNodeFactory_ClearChildNode(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CS::Animation::iSkeletonIKNodeFactory *arg1 = (CS::Animation::iSkeletonIKNodeFactory *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonIKNodeFactory_ClearChildNode",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonIKNodeFactory, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonIKNodeFactory_ClearChildNode" "', argument " "1"" of type '" "CS::Animation::iSkeletonIKNodeFactory *""'"); 
-  }
-  arg1 = reinterpret_cast< CS::Animation::iSkeletonIKNodeFactory * >(argp1);
-  (arg1)->ClearChildNode();
-  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -13497,95 +13400,6 @@ SWIGINTERN PyObject *iSkeletonIKCCDNode_swigregister(PyObject *SWIGUNUSEDPARM(se
   return SWIG_Py_Void();
 }
 
-SWIGINTERN PyObject *_wrap_iSkeletonLookAtNodeManager_CreateAnimNodeFactory(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CS::Animation::iSkeletonLookAtNodeManager *arg1 = (CS::Animation::iSkeletonLookAtNodeManager *) 0 ;
-  char *arg2 = (char *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  CS::Animation::iSkeletonLookAtNodeFactory *result = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonLookAtNodeManager_CreateAnimNodeFactory",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonLookAtNodeManager, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonLookAtNodeManager_CreateAnimNodeFactory" "', argument " "1"" of type '" "CS::Animation::iSkeletonLookAtNodeManager *""'"); 
-  }
-  arg1 = reinterpret_cast< CS::Animation::iSkeletonLookAtNodeManager * >(argp1);
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSkeletonLookAtNodeManager_CreateAnimNodeFactory" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  result = (CS::Animation::iSkeletonLookAtNodeFactory *)(arg1)->CreateAnimNodeFactory((char const *)arg2);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Animation__iSkeletonLookAtNodeFactory, 0 |  0 );
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return resultobj;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iSkeletonLookAtNodeManager_FindAnimNodeFactory(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CS::Animation::iSkeletonLookAtNodeManager *arg1 = (CS::Animation::iSkeletonLookAtNodeManager *) 0 ;
-  char *arg2 = (char *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  CS::Animation::iSkeletonLookAtNodeFactory *result = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonLookAtNodeManager_FindAnimNodeFactory",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonLookAtNodeManager, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonLookAtNodeManager_FindAnimNodeFactory" "', argument " "1"" of type '" "CS::Animation::iSkeletonLookAtNodeManager const *""'"); 
-  }
-  arg1 = reinterpret_cast< CS::Animation::iSkeletonLookAtNodeManager * >(argp1);
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSkeletonLookAtNodeManager_FindAnimNodeFactory" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  result = (CS::Animation::iSkeletonLookAtNodeFactory *)((CS::Animation::iSkeletonLookAtNodeManager const *)arg1)->FindAnimNodeFactory((char const *)arg2);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Animation__iSkeletonLookAtNodeFactory, 0 |  0 );
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return resultobj;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iSkeletonLookAtNodeManager_ClearAnimNodeFactories(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CS::Animation::iSkeletonLookAtNodeManager *arg1 = (CS::Animation::iSkeletonLookAtNodeManager *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonLookAtNodeManager_ClearAnimNodeFactories",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonLookAtNodeManager, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonLookAtNodeManager_ClearAnimNodeFactories" "', argument " "1"" of type '" "CS::Animation::iSkeletonLookAtNodeManager *""'"); 
-  }
-  arg1 = reinterpret_cast< CS::Animation::iSkeletonLookAtNodeManager * >(argp1);
-  (arg1)->ClearAnimNodeFactories();
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_iSkeletonLookAtNodeManager_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -13614,6 +13428,19 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonLookAtNodeManager(PyObject *SWIGUNUSE
   arg1 = reinterpret_cast< CS::Animation::iSkeletonLookAtNodeManager * >(argp1);
   delete_CS_Animation_iSkeletonLookAtNodeManager(arg1);
   resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_iSkeletonLookAtNodeManager(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::iSkeletonLookAtNodeManager *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"new_iSkeletonLookAtNodeManager",0,0)) SWIG_fail;
+  result = (CS::Animation::iSkeletonLookAtNodeManager *)new CS::Animation::iSkeletonLookAtNodeManager();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Animation__iSkeletonLookAtNodeManager, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -13818,32 +13645,11 @@ SWIGINTERN PyObject *_wrap_iSkeletonLookAtNodeFactory_GetChildNode(PyObject *SWI
   if(!PyArg_UnpackTuple(args,(char *)"iSkeletonLookAtNodeFactory_GetChildNode",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonLookAtNodeFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonLookAtNodeFactory_GetChildNode" "', argument " "1"" of type '" "CS::Animation::iSkeletonLookAtNodeFactory *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonLookAtNodeFactory_GetChildNode" "', argument " "1"" of type '" "CS::Animation::iSkeletonLookAtNodeFactory const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Animation::iSkeletonLookAtNodeFactory * >(argp1);
-  result = (CS::Animation::iSkeletonAnimNodeFactory *)(arg1)->GetChildNode();
+  result = (CS::Animation::iSkeletonAnimNodeFactory *)((CS::Animation::iSkeletonLookAtNodeFactory const *)arg1)->GetChildNode();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Animation__iSkeletonAnimNodeFactory, 0 |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iSkeletonLookAtNodeFactory_ClearChildNode(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CS::Animation::iSkeletonLookAtNodeFactory *arg1 = (CS::Animation::iSkeletonLookAtNodeFactory *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonLookAtNodeFactory_ClearChildNode",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonLookAtNodeFactory, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonLookAtNodeFactory_ClearChildNode" "', argument " "1"" of type '" "CS::Animation::iSkeletonLookAtNodeFactory *""'"); 
-  }
-  arg1 = reinterpret_cast< CS::Animation::iSkeletonLookAtNodeFactory * >(argp1);
-  (arg1)->ClearChildNode();
-  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -14310,95 +14116,6 @@ SWIGINTERN PyObject *iSkeletonLookAtListener_swigregister(PyObject *SWIGUNUSEDPA
   return SWIG_Py_Void();
 }
 
-SWIGINTERN PyObject *_wrap_iSkeletonRagdollNodeManager_CreateAnimNodeFactory(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CS::Animation::iSkeletonRagdollNodeManager *arg1 = (CS::Animation::iSkeletonRagdollNodeManager *) 0 ;
-  char *arg2 = (char *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  CS::Animation::iSkeletonRagdollNodeFactory *result = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonRagdollNodeManager_CreateAnimNodeFactory",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonRagdollNodeManager, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonRagdollNodeManager_CreateAnimNodeFactory" "', argument " "1"" of type '" "CS::Animation::iSkeletonRagdollNodeManager *""'"); 
-  }
-  arg1 = reinterpret_cast< CS::Animation::iSkeletonRagdollNodeManager * >(argp1);
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSkeletonRagdollNodeManager_CreateAnimNodeFactory" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  result = (CS::Animation::iSkeletonRagdollNodeFactory *)(arg1)->CreateAnimNodeFactory((char const *)arg2);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Animation__iSkeletonRagdollNodeFactory, 0 |  0 );
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return resultobj;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iSkeletonRagdollNodeManager_FindAnimNodeFactory(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CS::Animation::iSkeletonRagdollNodeManager *arg1 = (CS::Animation::iSkeletonRagdollNodeManager *) 0 ;
-  char *arg2 = (char *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  CS::Animation::iSkeletonRagdollNodeFactory *result = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonRagdollNodeManager_FindAnimNodeFactory",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonRagdollNodeManager, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonRagdollNodeManager_FindAnimNodeFactory" "', argument " "1"" of type '" "CS::Animation::iSkeletonRagdollNodeManager const *""'"); 
-  }
-  arg1 = reinterpret_cast< CS::Animation::iSkeletonRagdollNodeManager * >(argp1);
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSkeletonRagdollNodeManager_FindAnimNodeFactory" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  result = (CS::Animation::iSkeletonRagdollNodeFactory *)((CS::Animation::iSkeletonRagdollNodeManager const *)arg1)->FindAnimNodeFactory((char const *)arg2);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Animation__iSkeletonRagdollNodeFactory, 0 |  0 );
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return resultobj;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iSkeletonRagdollNodeManager_ClearAnimNodeFactories(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CS::Animation::iSkeletonRagdollNodeManager *arg1 = (CS::Animation::iSkeletonRagdollNodeManager *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonRagdollNodeManager_ClearAnimNodeFactories",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonRagdollNodeManager, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonRagdollNodeManager_ClearAnimNodeFactories" "', argument " "1"" of type '" "CS::Animation::iSkeletonRagdollNodeManager *""'"); 
-  }
-  arg1 = reinterpret_cast< CS::Animation::iSkeletonRagdollNodeManager * >(argp1);
-  (arg1)->ClearAnimNodeFactories();
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_iSkeletonRagdollNodeManager_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -14427,6 +14144,19 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonRagdollNodeManager(PyObject *SWIGUNUS
   arg1 = reinterpret_cast< CS::Animation::iSkeletonRagdollNodeManager * >(argp1);
   delete_CS_Animation_iSkeletonRagdollNodeManager(arg1);
   resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_iSkeletonRagdollNodeManager(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::iSkeletonRagdollNodeManager *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"new_iSkeletonRagdollNodeManager",0,0)) SWIG_fail;
+  result = (CS::Animation::iSkeletonRagdollNodeManager *)new CS::Animation::iSkeletonRagdollNodeManager();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Animation__iSkeletonRagdollNodeManager, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -14691,27 +14421,6 @@ SWIGINTERN PyObject *_wrap_iSkeletonRagdollNodeFactory_GetChildNode(PyObject *SW
   arg1 = reinterpret_cast< CS::Animation::iSkeletonRagdollNodeFactory * >(argp1);
   result = (CS::Animation::iSkeletonAnimNodeFactory *)((CS::Animation::iSkeletonRagdollNodeFactory const *)arg1)->GetChildNode();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Animation__iSkeletonAnimNodeFactory, 0 |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iSkeletonRagdollNodeFactory_ClearChildNode(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CS::Animation::iSkeletonRagdollNodeFactory *arg1 = (CS::Animation::iSkeletonRagdollNodeFactory *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonRagdollNodeFactory_ClearChildNode",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonRagdollNodeFactory, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonRagdollNodeFactory_ClearChildNode" "', argument " "1"" of type '" "CS::Animation::iSkeletonRagdollNodeFactory *""'"); 
-  }
-  arg1 = reinterpret_cast< CS::Animation::iSkeletonRagdollNodeFactory * >(argp1);
-  (arg1)->ClearChildNode();
-  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -15116,95 +14825,6 @@ SWIGINTERN PyObject *iSkeletonRagdollNode_swigregister(PyObject *SWIGUNUSEDPARM(
   return SWIG_Py_Void();
 }
 
-SWIGINTERN PyObject *_wrap_iSkeletonSpeedNodeManager_CreateAnimNodeFactory(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CS::Animation::iSkeletonSpeedNodeManager *arg1 = (CS::Animation::iSkeletonSpeedNodeManager *) 0 ;
-  char *arg2 = (char *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  CS::Animation::iSkeletonSpeedNodeFactory *result = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonSpeedNodeManager_CreateAnimNodeFactory",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonSpeedNodeManager, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonSpeedNodeManager_CreateAnimNodeFactory" "', argument " "1"" of type '" "CS::Animation::iSkeletonSpeedNodeManager *""'"); 
-  }
-  arg1 = reinterpret_cast< CS::Animation::iSkeletonSpeedNodeManager * >(argp1);
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSkeletonSpeedNodeManager_CreateAnimNodeFactory" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  result = (CS::Animation::iSkeletonSpeedNodeFactory *)(arg1)->CreateAnimNodeFactory((char const *)arg2);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Animation__iSkeletonSpeedNodeFactory, 0 |  0 );
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return resultobj;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iSkeletonSpeedNodeManager_FindAnimNodeFactory(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CS::Animation::iSkeletonSpeedNodeManager *arg1 = (CS::Animation::iSkeletonSpeedNodeManager *) 0 ;
-  char *arg2 = (char *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  CS::Animation::iSkeletonSpeedNodeFactory *result = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonSpeedNodeManager_FindAnimNodeFactory",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonSpeedNodeManager, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonSpeedNodeManager_FindAnimNodeFactory" "', argument " "1"" of type '" "CS::Animation::iSkeletonSpeedNodeManager *""'"); 
-  }
-  arg1 = reinterpret_cast< CS::Animation::iSkeletonSpeedNodeManager * >(argp1);
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSkeletonSpeedNodeManager_FindAnimNodeFactory" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  result = (CS::Animation::iSkeletonSpeedNodeFactory *)(arg1)->FindAnimNodeFactory((char const *)arg2);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Animation__iSkeletonSpeedNodeFactory, 0 |  0 );
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return resultobj;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iSkeletonSpeedNodeManager_ClearAnimNodeFactories(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CS::Animation::iSkeletonSpeedNodeManager *arg1 = (CS::Animation::iSkeletonSpeedNodeManager *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonSpeedNodeManager_ClearAnimNodeFactories",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonSpeedNodeManager, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonSpeedNodeManager_ClearAnimNodeFactories" "', argument " "1"" of type '" "CS::Animation::iSkeletonSpeedNodeManager *""'"); 
-  }
-  arg1 = reinterpret_cast< CS::Animation::iSkeletonSpeedNodeManager * >(argp1);
-  (arg1)->ClearAnimNodeFactories();
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_iSkeletonSpeedNodeManager_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -15233,6 +14853,19 @@ SWIGINTERN PyObject *_wrap_delete_iSkeletonSpeedNodeManager(PyObject *SWIGUNUSED
   arg1 = reinterpret_cast< CS::Animation::iSkeletonSpeedNodeManager * >(argp1);
   delete_CS_Animation_iSkeletonSpeedNodeManager(arg1);
   resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_iSkeletonSpeedNodeManager(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::iSkeletonSpeedNodeManager *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"new_iSkeletonSpeedNodeManager",0,0)) SWIG_fail;
+  result = (CS::Animation::iSkeletonSpeedNodeManager *)new CS::Animation::iSkeletonSpeedNodeManager();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Animation__iSkeletonSpeedNodeManager, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -15722,17 +15355,14 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonFSMNode_scfGetVersion", _wrap_iSkeletonFSMNode_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonFSMNode", _wrap_delete_iSkeletonFSMNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFSMNode_swigregister", iSkeletonFSMNode_swigregister, METH_VARARGS, NULL},
-	 { (char *)"iSkeletonIKNodeManager_CreateAnimNodeFactory", _wrap_iSkeletonIKNodeManager_CreateAnimNodeFactory, METH_VARARGS, NULL},
-	 { (char *)"iSkeletonIKNodeManager_FindAnimNodeFactory", _wrap_iSkeletonIKNodeManager_FindAnimNodeFactory, METH_VARARGS, NULL},
-	 { (char *)"iSkeletonIKNodeManager_ClearAnimNodeFactories", _wrap_iSkeletonIKNodeManager_ClearAnimNodeFactories, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonIKNodeManager_scfGetVersion", _wrap_iSkeletonIKNodeManager_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonIKNodeManager", _wrap_delete_iSkeletonIKNodeManager, METH_VARARGS, NULL},
+	 { (char *)"new_iSkeletonIKNodeManager", _wrap_new_iSkeletonIKNodeManager, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonIKNodeManager_swigregister", iSkeletonIKNodeManager_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonIKNodeFactory_SetBodySkeleton", _wrap_iSkeletonIKNodeFactory_SetBodySkeleton, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonIKNodeFactory_GetBodySkeleton", _wrap_iSkeletonIKNodeFactory_GetBodySkeleton, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonIKNodeFactory_SetChildNode", _wrap_iSkeletonIKNodeFactory_SetChildNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonIKNodeFactory_GetChildNode", _wrap_iSkeletonIKNodeFactory_GetChildNode, METH_VARARGS, NULL},
-	 { (char *)"iSkeletonIKNodeFactory_ClearChildNode", _wrap_iSkeletonIKNodeFactory_ClearChildNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonIKNodeFactory_AddEffector", _wrap_iSkeletonIKNodeFactory_AddEffector, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonIKNodeFactory_RemoveEffector", _wrap_iSkeletonIKNodeFactory_RemoveEffector, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonIKNodeFactory_scfGetVersion", _wrap_iSkeletonIKNodeFactory_scfGetVersion, METH_VARARGS, NULL},
@@ -15767,11 +15397,9 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonIKCCDNodeFactory_swigregister", iSkeletonIKCCDNodeFactory_swigregister, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonIKCCDNode", _wrap_delete_iSkeletonIKCCDNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonIKCCDNode_swigregister", iSkeletonIKCCDNode_swigregister, METH_VARARGS, NULL},
-	 { (char *)"iSkeletonLookAtNodeManager_CreateAnimNodeFactory", _wrap_iSkeletonLookAtNodeManager_CreateAnimNodeFactory, METH_VARARGS, NULL},
-	 { (char *)"iSkeletonLookAtNodeManager_FindAnimNodeFactory", _wrap_iSkeletonLookAtNodeManager_FindAnimNodeFactory, METH_VARARGS, NULL},
-	 { (char *)"iSkeletonLookAtNodeManager_ClearAnimNodeFactories", _wrap_iSkeletonLookAtNodeManager_ClearAnimNodeFactories, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonLookAtNodeManager_scfGetVersion", _wrap_iSkeletonLookAtNodeManager_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonLookAtNodeManager", _wrap_delete_iSkeletonLookAtNodeManager, METH_VARARGS, NULL},
+	 { (char *)"new_iSkeletonLookAtNodeManager", _wrap_new_iSkeletonLookAtNodeManager, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonLookAtNodeManager_swigregister", iSkeletonLookAtNodeManager_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonLookAtNodeFactory_SetBodySkeleton", _wrap_iSkeletonLookAtNodeFactory_SetBodySkeleton, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonLookAtNodeFactory_SetBone", _wrap_iSkeletonLookAtNodeFactory_SetBone, METH_VARARGS, NULL},
@@ -15780,7 +15408,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonLookAtNodeFactory_SetListenerDelay", _wrap_iSkeletonLookAtNodeFactory_SetListenerDelay, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonLookAtNodeFactory_SetChildNode", _wrap_iSkeletonLookAtNodeFactory_SetChildNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonLookAtNodeFactory_GetChildNode", _wrap_iSkeletonLookAtNodeFactory_GetChildNode, METH_VARARGS, NULL},
-	 { (char *)"iSkeletonLookAtNodeFactory_ClearChildNode", _wrap_iSkeletonLookAtNodeFactory_ClearChildNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonLookAtNodeFactory_scfGetVersion", _wrap_iSkeletonLookAtNodeFactory_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonLookAtNodeFactory", _wrap_delete_iSkeletonLookAtNodeFactory, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonLookAtNodeFactory_swigregister", iSkeletonLookAtNodeFactory_swigregister, METH_VARARGS, NULL},
@@ -15797,11 +15424,9 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonLookAtListener_scfGetVersion", _wrap_iSkeletonLookAtListener_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonLookAtListener", _wrap_delete_iSkeletonLookAtListener, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonLookAtListener_swigregister", iSkeletonLookAtListener_swigregister, METH_VARARGS, NULL},
-	 { (char *)"iSkeletonRagdollNodeManager_CreateAnimNodeFactory", _wrap_iSkeletonRagdollNodeManager_CreateAnimNodeFactory, METH_VARARGS, NULL},
-	 { (char *)"iSkeletonRagdollNodeManager_FindAnimNodeFactory", _wrap_iSkeletonRagdollNodeManager_FindAnimNodeFactory, METH_VARARGS, NULL},
-	 { (char *)"iSkeletonRagdollNodeManager_ClearAnimNodeFactories", _wrap_iSkeletonRagdollNodeManager_ClearAnimNodeFactories, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonRagdollNodeManager_scfGetVersion", _wrap_iSkeletonRagdollNodeManager_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonRagdollNodeManager", _wrap_delete_iSkeletonRagdollNodeManager, METH_VARARGS, NULL},
+	 { (char *)"new_iSkeletonRagdollNodeManager", _wrap_new_iSkeletonRagdollNodeManager, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonRagdollNodeManager_swigregister", iSkeletonRagdollNodeManager_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonRagdollNodeFactory_SetBodySkeleton", _wrap_iSkeletonRagdollNodeFactory_SetBodySkeleton, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonRagdollNodeFactory_GetBodySkeleton", _wrap_iSkeletonRagdollNodeFactory_GetBodySkeleton, METH_VARARGS, NULL},
@@ -15809,7 +15434,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonRagdollNodeFactory_RemoveBodyChain", _wrap_iSkeletonRagdollNodeFactory_RemoveBodyChain, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonRagdollNodeFactory_SetChildNode", _wrap_iSkeletonRagdollNodeFactory_SetChildNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonRagdollNodeFactory_GetChildNode", _wrap_iSkeletonRagdollNodeFactory_GetChildNode, METH_VARARGS, NULL},
-	 { (char *)"iSkeletonRagdollNodeFactory_ClearChildNode", _wrap_iSkeletonRagdollNodeFactory_ClearChildNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonRagdollNodeFactory_scfGetVersion", _wrap_iSkeletonRagdollNodeFactory_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonRagdollNodeFactory", _wrap_delete_iSkeletonRagdollNodeFactory, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonRagdollNodeFactory_swigregister", iSkeletonRagdollNodeFactory_swigregister, METH_VARARGS, NULL},
@@ -15826,11 +15450,9 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonRagdollNode_scfGetVersion", _wrap_iSkeletonRagdollNode_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonRagdollNode", _wrap_delete_iSkeletonRagdollNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonRagdollNode_swigregister", iSkeletonRagdollNode_swigregister, METH_VARARGS, NULL},
-	 { (char *)"iSkeletonSpeedNodeManager_CreateAnimNodeFactory", _wrap_iSkeletonSpeedNodeManager_CreateAnimNodeFactory, METH_VARARGS, NULL},
-	 { (char *)"iSkeletonSpeedNodeManager_FindAnimNodeFactory", _wrap_iSkeletonSpeedNodeManager_FindAnimNodeFactory, METH_VARARGS, NULL},
-	 { (char *)"iSkeletonSpeedNodeManager_ClearAnimNodeFactories", _wrap_iSkeletonSpeedNodeManager_ClearAnimNodeFactories, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonSpeedNodeManager_scfGetVersion", _wrap_iSkeletonSpeedNodeManager_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonSpeedNodeManager", _wrap_delete_iSkeletonSpeedNodeManager, METH_VARARGS, NULL},
+	 { (char *)"new_iSkeletonSpeedNodeManager", _wrap_new_iSkeletonSpeedNodeManager, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonSpeedNodeManager_swigregister", iSkeletonSpeedNodeManager_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonSpeedNodeFactory_AddNode", _wrap_iSkeletonSpeedNodeFactory_AddNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonSpeedNodeFactory_scfGetVersion", _wrap_iSkeletonSpeedNodeFactory_scfGetVersion, METH_VARARGS, NULL},
@@ -16142,18 +15764,6 @@ static void *_p_CS__Animation__iBodySkeletonTo_p_iBase(void *x, int *SWIGUNUSEDP
 }
 static void *_p_CS__Animation__iSkeletonTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iBase *)  ((CS::Animation::iSkeleton *) x));
-}
-static void *_p_CS__Animation__iSkeletonIKNodeManagerTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iBase *)  ((CS::Animation::iSkeletonIKNodeManager *) x));
-}
-static void *_p_CS__Animation__iSkeletonLookAtNodeManagerTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iBase *)  ((CS::Animation::iSkeletonLookAtNodeManager *) x));
-}
-static void *_p_CS__Animation__iSkeletonRagdollNodeManagerTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iBase *)  ((CS::Animation::iSkeletonRagdollNodeManager *) x));
-}
-static void *_p_CS__Animation__iSkeletonSpeedNodeManagerTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iBase *)  ((CS::Animation::iSkeletonSpeedNodeManager *) x));
 }
 static void *_p_CS__Animation__iBodyBoneTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iBase *)  ((CS::Animation::iBodyBone *) x));
@@ -16703,7 +16313,7 @@ static swig_cast_info _swigc__p_iReporterListener[] = {{&_swigt__p_iReporterList
 static swig_cast_info _swigc__p_iObjectNameChangeListener[] = {{&_swigt__p_iObjectNameChangeListener, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iFile[] = {{&_swigt__p_iFile, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iDocumentAttribute[] = {{&_swigt__p_iDocumentAttribute, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_iBase[] = {  {&_swigt__p_CS__Animation__iSkeletonAnimationNode, _p_CS__Animation__iSkeletonAnimationNodeTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNodeIterator, _p_iDocumentNodeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttributeIterator, _p_iDocumentAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iConfigIterator, _p_iConfigIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iReporterIterator, _p_iReporterIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectIterator, _p_iObjectIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistryIterator, _p_iObjectRegistryIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iEventAttributeIterator, _p_iEventAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iPluginIterator, _p_iPluginIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocument, _p_iDocumentTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iBodyBoneCollider, _p_CS__Animation__iBodyBoneColliderTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNode, _p_iDocumentNodeTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistry, _p_iObjectRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iEventNameRegistry, _p_iEventNameRegistryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonAnimPacket, _p_CS__Animation__iSkeletonAnimPacketTo_p_iBase, 0, 0},  {&_swigt__p_iEventCord, _p_iEventCordTo_p_iBase, 0, 0},  {&_swigt__p_iStringSet, _p_iStringSetTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementationExt1T_csPath_csObject_iPath_t, _p_scfImplementationExt1T_csPath_csObject_iPath_tTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonAnimationNodeFactory, _p_CS__Animation__iSkeletonAnimationNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonAnimNodeFactory, _p_CS__Animation__iSkeletonAnimNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonBlendNodeFactory, _p_CS__Animation__iSkeletonBlendNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonPriorityNodeFactory, _p_CS__Animation__iSkeletonPriorityNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonRandomNodeFactory, _p_CS__Animation__iSkeletonRandomNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonFSMNodeFactory, _p_CS__Animation__iSkeletonFSMNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonIKNodeFactory, _p_CS__Animation__iSkeletonIKNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonIKPhysicalNodeFactory, _p_CS__Animation__iSkeletonIKPhysicalNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonIKCCDNodeFactory, _p_CS__Animation__iSkeletonIKCCDNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonLookAtNodeFactory, _p_CS__Animation__iSkeletonLookAtNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonRagdollNodeFactory, _p_CS__Animation__iSkeletonRagdollNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonSpeedNodeFactory, _p_CS__Animation__iSkeletonSpeedNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonAnimPacketFactory, _p_CS__Animation__iSkeletonAnimPacketFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonFactory, _p_CS__Animation__iSkeletonFactoryTo_p_iBase, 0, 0},  {&_swigt__p_iFactory, _p_iFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iBodyChainNode, _p_CS__Animation__iBodyChainNodeTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonIKCCDNode, _p_CS__Animation__iSkeletonIKCCDNodeTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonIKNode, _p_CS__Animation__iSkeletonIKNodeTo_p_iBase, 0, 0},  {&_swigt__p_iClipper2D, _p_iClipper2DTo_p_iBase, 0, 0},  {&_swigt__p_csConfigFile, _p_csConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_iConfigFile, _p_iConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_iDebugHelper, _p_iDebugHelperTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentSystem, _p_iDocumentSystemTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonBlendNode, _p_CS__Animation__iSkeletonBlendNodeTo_p_iBase, 0, 0},  {&_swigt__p_iKeyComposer, _p_iKeyComposerTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iBodyChain, _p_CS__Animation__iBodyChainTo_p_iBase, 0, 0},  {&_swigt__p_iThreadReturn, _p_iThreadReturnTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iBodyBoneProperties, _p_CS__Animation__iBodyBonePropertiesTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonLookAtNode, _p_CS__Animation__iSkeletonLookAtNodeTo_p_iBase, 0, 0},  {&_swigt__p_iEventOutlet, _p_iEventOutletTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1T_csConfigFile_iConfigFile_t, _p_scfImplementation1T_csConfigFile_iConfigFile_tTo_p_iBase, 0, 0},  {&_swigt__p_iVirtualClock, _p_iVirtualClockTo_p_iBase, 0, 0},  {&_swigt__p_iPath, _p_iPathTo_p_iBase, 0, 0},  {&_swigt__p_iReporter, _p_iReporterTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonSpeedNode, _p_CS__Animation__iSkeletonSpeedNodeTo_p_iBase, 0, 0},  {&_swigt__p_iObject, _p_iObjectTo_p_iBase, 0, 0},  {&_swigt__p_csObject, _p_csObjectTo_p_iBase, 0, 0},  {&_swigt__p_iSCF, _p_iSCFTo_p_iBase, 0, 0},  {&_swigt__p_iEventQueue, _p_iEventQueueTo_p_iBase, 0, 0},  {&_swigt__p_iEvent, _p_iEventTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iBodyBoneJoint, _p_CS__Animation__iBodyBoneJointTo_p_iBase, 0, 0},  {&_swigt__p_iString, _p_iStringTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonPriorityNode, _p_CS__Animation__iSkeletonPriorityNodeTo_p_iBase, 0, 0},  {&_swigt__p_iComponent, _p_iComponentTo_p_iBase, 0, 0},  {&_swigt__p_iCommandLineParser, _p_iCommandLineParserTo_p_iBase, 0, 0},  {&_swigt__p_iJoystickDriver, _p_iJoystickDriverTo_p_iBase, 0, 0},  {&_swigt__p_iMouseDriver, _p_iMouseDriverTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonRandomNode, _p_CS__Animation__iSkeletonRandomNodeTo_p_iBase, 0, 0},  {&_swigt__p_iStringArray, _p_iStringArrayTo_p_iBase, 0, 0},  {&_swigt__p_iEventHandler, _p_iEventHandlerTo_p_iBase, 0, 0},  {&_swigt__p_iEventPlug, _p_iEventPlugTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonAnimNode, _p_CS__Animation__iSkeletonAnimNodeTo_p_iBase, 0, 0},  {&_swigt__p_iVFS, _p_iVFSTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonIKPhysicalNode, _p_CS__Animation__iSkeletonIKPhysicalNodeTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonAnimCallback, _p_CS__Animation__iSkeletonAnimCallbackTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iBodyManager, _p_CS__Animation__iBodyManagerTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonManager, _p_CS__Animation__iSkeletonManagerTo_p_iBase, 0, 0},  {&_swigt__p_iConfigManager, _p_iConfigManagerTo_p_iBase, 0, 0},  {&_swigt__p_iCacheManager, _p_iCacheManagerTo_p_iBase, 0, 0},  {&_swigt__p_iThreadManager, _p_iThreadManagerTo_p_iBase, 0, 0},  {&_swigt__p_iPluginManager, _p_iPluginManagerTo_p_iBase, 0, 0},  {&_swigt__p_iTriangleMesh, _p_iTriangleMeshTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iBodySkeleton, _p_CS__Animation__iBodySkeletonTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeleton, _p_CS__Animation__iSkeletonTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonIKNodeManager, _p_CS__Animation__iSkeletonIKNodeManagerTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonLookAtNodeManager, _p_CS__Animation__iSkeletonLookAtNodeManagerTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonRagdollNodeManager, _p_CS__Animation__iSkeletonRagdollNodeManagerTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonSpeedNodeManager, _p_CS__Animation__iSkeletonSpeedNodeManagerTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iBodyBone, _p_CS__Animation__iBodyBoneTo_p_iBase, 0, 0},  {&_swigt__p_iFrameEventSignpost, _p_iFrameEventSignpostTo_p_iBase, 0, 0},  {&_swigt__p_iDataBuffer, _p_iDataBufferTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonFSMNode, _p_CS__Animation__iSkeletonFSMNodeTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonRagdollNode, _p_CS__Animation__iSkeletonRagdollNodeTo_p_iBase, 0, 0},  {&_swigt__p_iStringSetBaseT_CS__StringSetTag__General_t, _p_iStringSetBaseT_CS__StringSetTag__General_tTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonAnimation, _p_CS__Animation__iSkeletonAnimationTo_p_iBase, 0, 0},  {&_swigt__p_iKeyboardDriver, _p_iKeyboardDriverTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1T_csObject_iObject_t, _p_scfImplementation1T_csObject_iObject_tTo_p_iBase, 0, 0},  {&_swigt__p_iReporterListener, _p_iReporterListenerTo_p_iBase, 0, 0},  {&_swigt__p_iObjectNameChangeListener, _p_iObjectNameChangeListenerTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonLookAtListener, _p_CS__Animation__iSkeletonLookAtListenerTo_p_iBase, 0, 0},  {&_swigt__p_iBase, 0, 0, 0},  {&_swigt__p_iFile, _p_iFileTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttribute, _p_iDocumentAttributeTo_p_iBase, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_iBase[] = {  {&_swigt__p_CS__Animation__iSkeletonAnimationNode, _p_CS__Animation__iSkeletonAnimationNodeTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNodeIterator, _p_iDocumentNodeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttributeIterator, _p_iDocumentAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iConfigIterator, _p_iConfigIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iReporterIterator, _p_iReporterIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectIterator, _p_iObjectIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistryIterator, _p_iObjectRegistryIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iEventAttributeIterator, _p_iEventAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iPluginIterator, _p_iPluginIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocument, _p_iDocumentTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iBodyBoneCollider, _p_CS__Animation__iBodyBoneColliderTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNode, _p_iDocumentNodeTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistry, _p_iObjectRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iEventNameRegistry, _p_iEventNameRegistryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonAnimPacket, _p_CS__Animation__iSkeletonAnimPacketTo_p_iBase, 0, 0},  {&_swigt__p_iEventCord, _p_iEventCordTo_p_iBase, 0, 0},  {&_swigt__p_iStringSet, _p_iStringSetTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementationExt1T_csPath_csObject_iPath_t, _p_scfImplementationExt1T_csPath_csObject_iPath_tTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonAnimationNodeFactory, _p_CS__Animation__iSkeletonAnimationNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonAnimNodeFactory, _p_CS__Animation__iSkeletonAnimNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonBlendNodeFactory, _p_CS__Animation__iSkeletonBlendNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonPriorityNodeFactory, _p_CS__Animation__iSkeletonPriorityNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonRandomNodeFactory, _p_CS__Animation__iSkeletonRandomNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonFSMNodeFactory, _p_CS__Animation__iSkeletonFSMNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonIKNodeFactory, _p_CS__Animation__iSkeletonIKNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonIKPhysicalNodeFactory, _p_CS__Animation__iSkeletonIKPhysicalNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonIKCCDNodeFactory, _p_CS__Animation__iSkeletonIKCCDNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonLookAtNodeFactory, _p_CS__Animation__iSkeletonLookAtNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonRagdollNodeFactory, _p_CS__Animation__iSkeletonRagdollNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonSpeedNodeFactory, _p_CS__Animation__iSkeletonSpeedNodeFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonAnimPacketFactory, _p_CS__Animation__iSkeletonAnimPacketFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonFactory, _p_CS__Animation__iSkeletonFactoryTo_p_iBase, 0, 0},  {&_swigt__p_iFactory, _p_iFactoryTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iBodyChainNode, _p_CS__Animation__iBodyChainNodeTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonIKCCDNode, _p_CS__Animation__iSkeletonIKCCDNodeTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonIKNode, _p_CS__Animation__iSkeletonIKNodeTo_p_iBase, 0, 0},  {&_swigt__p_iClipper2D, _p_iClipper2DTo_p_iBase, 0, 0},  {&_swigt__p_csConfigFile, _p_csConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_iConfigFile, _p_iConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_iDebugHelper, _p_iDebugHelperTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentSystem, _p_iDocumentSystemTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonBlendNode, _p_CS__Animation__iSkeletonBlendNodeTo_p_iBase, 0, 0},  {&_swigt__p_iKeyComposer, _p_iKeyComposerTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iBodyChain, _p_CS__Animation__iBodyChainTo_p_iBase, 0, 0},  {&_swigt__p_iThreadReturn, _p_iThreadReturnTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iBodyBoneProperties, _p_CS__Animation__iBodyBonePropertiesTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonLookAtNode, _p_CS__Animation__iSkeletonLookAtNodeTo_p_iBase, 0, 0},  {&_swigt__p_iEventOutlet, _p_iEventOutletTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1T_csConfigFile_iConfigFile_t, _p_scfImplementation1T_csConfigFile_iConfigFile_tTo_p_iBase, 0, 0},  {&_swigt__p_iVirtualClock, _p_iVirtualClockTo_p_iBase, 0, 0},  {&_swigt__p_iPath, _p_iPathTo_p_iBase, 0, 0},  {&_swigt__p_iReporter, _p_iReporterTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonSpeedNode, _p_CS__Animation__iSkeletonSpeedNodeTo_p_iBase, 0, 0},  {&_swigt__p_iObject, _p_iObjectTo_p_iBase, 0, 0},  {&_swigt__p_csObject, _p_csObjectTo_p_iBase, 0, 0},  {&_swigt__p_iSCF, _p_iSCFTo_p_iBase, 0, 0},  {&_swigt__p_iEventQueue, _p_iEventQueueTo_p_iBase, 0, 0},  {&_swigt__p_iEvent, _p_iEventTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iBodyBoneJoint, _p_CS__Animation__iBodyBoneJointTo_p_iBase, 0, 0},  {&_swigt__p_iString, _p_iStringTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonPriorityNode, _p_CS__Animation__iSkeletonPriorityNodeTo_p_iBase, 0, 0},  {&_swigt__p_iComponent, _p_iComponentTo_p_iBase, 0, 0},  {&_swigt__p_iCommandLineParser, _p_iCommandLineParserTo_p_iBase, 0, 0},  {&_swigt__p_iJoystickDriver, _p_iJoystickDriverTo_p_iBase, 0, 0},  {&_swigt__p_iMouseDriver, _p_iMouseDriverTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonRandomNode, _p_CS__Animation__iSkeletonRandomNodeTo_p_iBase, 0, 0},  {&_swigt__p_iStringArray, _p_iStringArrayTo_p_iBase, 0, 0},  {&_swigt__p_iEventHandler, _p_iEventHandlerTo_p_iBase, 0, 0},  {&_swigt__p_iEventPlug, _p_iEventPlugTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonAnimNode, _p_CS__Animation__iSkeletonAnimNodeTo_p_iBase, 0, 0},  {&_swigt__p_iVFS, _p_iVFSTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonIKPhysicalNode, _p_CS__Animation__iSkeletonIKPhysicalNodeTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonAnimCallback, _p_CS__Animation__iSkeletonAnimCallbackTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iBodyManager, _p_CS__Animation__iBodyManagerTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonManager, _p_CS__Animation__iSkeletonManagerTo_p_iBase, 0, 0},  {&_swigt__p_iConfigManager, _p_iConfigManagerTo_p_iBase, 0, 0},  {&_swigt__p_iCacheManager, _p_iCacheManagerTo_p_iBase, 0, 0},  {&_swigt__p_iThreadManager, _p_iThreadManagerTo_p_iBase, 0, 0},  {&_swigt__p_iPluginManager, _p_iPluginManagerTo_p_iBase, 0, 0},  {&_swigt__p_iTriangleMesh, _p_iTriangleMeshTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iBodySkeleton, _p_CS__Animation__iBodySkeletonTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeleton, _p_CS__Animation__iSkeletonTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iBodyBone, _p_CS__Animation__iBodyBoneTo_p_iBase, 0, 0},  {&_swigt__p_iFrameEventSignpost, _p_iFrameEventSignpostTo_p_iBase, 0, 0},  {&_swigt__p_iDataBuffer, _p_iDataBufferTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonFSMNode, _p_CS__Animation__iSkeletonFSMNodeTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonRagdollNode, _p_CS__Animation__iSkeletonRagdollNodeTo_p_iBase, 0, 0},  {&_swigt__p_iStringSetBaseT_CS__StringSetTag__General_t, _p_iStringSetBaseT_CS__StringSetTag__General_tTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonAnimation, _p_CS__Animation__iSkeletonAnimationTo_p_iBase, 0, 0},  {&_swigt__p_iKeyboardDriver, _p_iKeyboardDriverTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1T_csObject_iObject_t, _p_scfImplementation1T_csObject_iObject_tTo_p_iBase, 0, 0},  {&_swigt__p_iReporterListener, _p_iReporterListenerTo_p_iBase, 0, 0},  {&_swigt__p_iObjectNameChangeListener, _p_iObjectNameChangeListenerTo_p_iBase, 0, 0},  {&_swigt__p_CS__Animation__iSkeletonLookAtListener, _p_CS__Animation__iSkeletonLookAtListenerTo_p_iBase, 0, 0},  {&_swigt__p_iBase, 0, 0, 0},  {&_swigt__p_iFile, _p_iFileTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttribute, _p_iDocumentAttributeTo_p_iBase, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iCamera[] = {  {&_swigt__p_iCamera, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iDynamicSystem[] = {  {&_swigt__p_iDynamicSystem, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iJoint[] = {  {&_swigt__p_iJoint, 0, 0, 0},{0, 0, 0, 0}};

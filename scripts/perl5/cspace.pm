@@ -407,6 +407,7 @@ sub new {
 
 *GetArray = *cspacec::Vector2DirtyAccessArray_GetArray;
 *GetArrayCopy = *cspacec::Vector2DirtyAccessArray_GetArrayCopy;
+*Detach = *cspacec::Vector2DirtyAccessArray_Detach;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -509,6 +510,7 @@ sub new {
 
 *GetArray = *cspacec::Vector3DirtyAccessArray_GetArray;
 *GetArrayCopy = *cspacec::Vector3DirtyAccessArray_GetArrayCopy;
+*Detach = *cspacec::Vector3DirtyAccessArray_Detach;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -611,6 +613,7 @@ sub new {
 
 *GetArray = *cspacec::Vector4DirtyAccessArray_GetArray;
 *GetArrayCopy = *cspacec::Vector4DirtyAccessArray_GetArrayCopy;
+*Detach = *cspacec::Vector4DirtyAccessArray_Detach;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -713,6 +716,7 @@ sub new {
 
 *GetArray = *cspacec::UIntDirtyAccessArray_GetArray;
 *GetArrayCopy = *cspacec::UIntDirtyAccessArray_GetArrayCopy;
+*Detach = *cspacec::UIntDirtyAccessArray_Detach;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -20074,8 +20078,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *swig_polygon_idx_set = *cspacec::csHitBeamResult_polygon_idx_set;
 *swig_material_get = *cspacec::csHitBeamResult_material_get;
 *swig_material_set = *cspacec::csHitBeamResult_material_set;
-*swig_materials_get = *cspacec::csHitBeamResult_materials_get;
-*swig_materials_set = *cspacec::csHitBeamResult_materials_set;
 *swig_facehit_get = *cspacec::csHitBeamResult_facehit_get;
 *swig_facehit_set = *cspacec::csHitBeamResult_facehit_set;
 *swig_hit_get = *cspacec::csHitBeamResult_hit_get;

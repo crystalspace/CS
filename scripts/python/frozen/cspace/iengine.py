@@ -903,7 +903,6 @@ class csHitBeamResult(object):
     r = _swig_property(_iengine.csHitBeamResult_r_get, _iengine.csHitBeamResult_r_set)
     polygon_idx = _swig_property(_iengine.csHitBeamResult_polygon_idx_get, _iengine.csHitBeamResult_polygon_idx_set)
     material = _swig_property(_iengine.csHitBeamResult_material_get, _iengine.csHitBeamResult_material_set)
-    materials = _swig_property(_iengine.csHitBeamResult_materials_get, _iengine.csHitBeamResult_materials_set)
     facehit = _swig_property(_iengine.csHitBeamResult_facehit_get, _iengine.csHitBeamResult_facehit_set)
     hit = _swig_property(_iengine.csHitBeamResult_hit_get, _iengine.csHitBeamResult_hit_set)
     def __init__(self, *args): 

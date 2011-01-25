@@ -22,6 +22,7 @@
  * subdirectory of the top Crystal Space include directory.
  */
 #include "cssysdef.h"
+#include "cstool/animnodetmpl.h"
 #include "cstool/basetexfact.h"
 #include "cstool/bitmasktostr.h"
 #include "cstool/collider.h"

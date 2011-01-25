@@ -27327,7 +27327,6 @@ SWIGINTERN PyObject *_wrap_iMeshObject_HitBeamObject(PyObject *SWIGUNUSEDPARM(se
   float *arg5 = (float *) 0 ;
   int *arg6 = (int *) 0 ;
   iMaterialWrapper **arg7 = (iMaterialWrapper **) 0 ;
-  iMaterialArray *arg8 = (iMaterialArray *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -27342,19 +27341,16 @@ SWIGINTERN PyObject *_wrap_iMeshObject_HitBeamObject(PyObject *SWIGUNUSEDPARM(se
   int res6 = SWIG_TMPOBJ ;
   void *argp7 = 0 ;
   int res7 = 0 ;
-  void *argp8 = 0 ;
-  int res8 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
-  PyObject * obj5 = 0 ;
   bool result;
   
   arg5 = &temp5;
   arg6 = &temp6;
-  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_HitBeamObject",4,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_HitBeamObject",4,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_HitBeamObject" "', argument " "1"" of type '" "iMeshObject *""'"); 
@@ -27391,14 +27387,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_HitBeamObject(PyObject *SWIGUNUSEDPARM(se
     }
     arg7 = reinterpret_cast< iMaterialWrapper ** >(argp7);
   }
-  if (obj5) {
-    res8 = SWIG_ConvertPtr(obj5, &argp8,SWIGTYPE_p_iMaterialArray, 0 |  0 );
-    if (!SWIG_IsOK(res8)) {
-      SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "iMeshObject_HitBeamObject" "', argument " "8"" of type '" "iMaterialArray *""'"); 
-    }
-    arg8 = reinterpret_cast< iMaterialArray * >(argp8);
-  }
-  result = (bool)(arg1)->HitBeamObject((csVector3 const &)*arg2,(csVector3 const &)*arg3,*arg4,arg5,arg6,arg7,arg8);
+  result = (bool)(arg1)->HitBeamObject((csVector3 const &)*arg2,(csVector3 const &)*arg3,*arg4,arg5,arg6,arg7);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   if (SWIG_IsTmpObj(res5)) {
     resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_float((*arg5)));
@@ -33158,6 +33147,73 @@ SWIGINTERN PyObject *_wrap_iTerrainCollider_CollideSegment__SWIG_1(PyObject *SWI
   iTerrainCell *arg2 = (iTerrainCell *) 0 ;
   csVector3 *arg3 = 0 ;
   csVector3 *arg4 = 0 ;
+  csVector3 *arg5 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCollider_CollideSegment",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCollider, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCollider_CollideSegment" "', argument " "1"" of type '" "iTerrainCollider *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainCollider * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iTerrainCell, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTerrainCollider_CollideSegment" "', argument " "2"" of type '" "iTerrainCell *""'"); 
+  }
+  arg2 = reinterpret_cast< iTerrainCell * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iTerrainCollider_CollideSegment" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainCollider_CollideSegment" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  arg3 = reinterpret_cast< csVector3 * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iTerrainCollider_CollideSegment" "', argument " "4"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainCollider_CollideSegment" "', argument " "4"" of type '" "csVector3 const &""'"); 
+  }
+  arg4 = reinterpret_cast< csVector3 * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csVector3,  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iTerrainCollider_CollideSegment" "', argument " "5"" of type '" "csVector3 &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainCollider_CollideSegment" "', argument " "5"" of type '" "csVector3 &""'"); 
+  }
+  arg5 = reinterpret_cast< csVector3 * >(argp5);
+  result = (bool)(arg1)->CollideSegment(arg2,(csVector3 const &)*arg3,(csVector3 const &)*arg4,*arg5);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainCollider_CollideSegment__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainCollider *arg1 = (iTerrainCollider *) 0 ;
+  iTerrainCell *arg2 = (iTerrainCell *) 0 ;
+  csVector3 *arg3 = 0 ;
+  csVector3 *arg4 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -33233,7 +33289,34 @@ SWIGINTERN PyObject *_wrap_iTerrainCollider_CollideSegment(PyObject *self, PyObj
           int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csVector3, 0);
           _v = SWIG_CheckState(res);
           if (_v) {
-            return _wrap_iTerrainCollider_CollideSegment__SWIG_1(self, args);
+            return _wrap_iTerrainCollider_CollideSegment__SWIG_2(self, args);
+          }
+        }
+      }
+    }
+  }
+  if (argc == 5) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iTerrainCollider, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iTerrainCell, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_csVector3, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csVector3, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            void *vptr = 0;
+            int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_csVector3, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              return _wrap_iTerrainCollider_CollideSegment__SWIG_1(self, args);
+            }
           }
         }
       }
@@ -33277,6 +33360,7 @@ fail:
   SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iTerrainCollider_CollideSegment'.\n"
     "  Possible C/C++ prototypes are:\n"
     "    CollideSegment(iTerrainCollider *,iTerrainCell *,csVector3 const &,csVector3 const &,bool,iTerrainVector3Array *)\n"
+    "    CollideSegment(iTerrainCollider *,iTerrainCell *,csVector3 const &,csVector3 const &,csVector3 &)\n"
     "    CollideSegment(iTerrainCollider *,iTerrainCell *,csVector3 const &,csVector3 const &)\n");
   return NULL;
 }
@@ -34720,6 +34804,73 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideSegment__SWIG_1(PyObject *SWIGU
   iTerrainSystem *arg1 = (iTerrainSystem *) 0 ;
   csVector3 *arg2 = 0 ;
   csVector3 *arg3 = 0 ;
+  csVector3 *arg4 = 0 ;
+  iMaterialWrapper **arg5 = (iMaterialWrapper **) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_CollideSegment",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_CollideSegment" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainSystem * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTerrainSystem_CollideSegment" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainSystem_CollideSegment" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  arg2 = reinterpret_cast< csVector3 * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iTerrainSystem_CollideSegment" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainSystem_CollideSegment" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  arg3 = reinterpret_cast< csVector3 * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iTerrainSystem_CollideSegment" "', argument " "4"" of type '" "csVector3 &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainSystem_CollideSegment" "', argument " "4"" of type '" "csVector3 &""'"); 
+  }
+  arg4 = reinterpret_cast< csVector3 * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5,SWIGTYPE_p_p_iMaterialWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iTerrainSystem_CollideSegment" "', argument " "5"" of type '" "iMaterialWrapper **""'"); 
+  }
+  arg5 = reinterpret_cast< iMaterialWrapper ** >(argp5);
+  result = (bool)(arg1)->CollideSegment((csVector3 const &)*arg2,(csVector3 const &)*arg3,*arg4,arg5);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideSegment__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainSystem *arg1 = (iTerrainSystem *) 0 ;
+  csVector3 *arg2 = 0 ;
+  csVector3 *arg3 = 0 ;
   bool arg4 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -34770,7 +34921,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideSegment__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideSegment__SWIG_3(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iTerrainSystem *arg1 = (iTerrainSystem *) 0 ;
   csVector3 *arg2 = 0 ;
@@ -34838,7 +34989,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideSegment(PyObject *self, PyObjec
         int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_csVector3, 0);
         _v = SWIG_CheckState(res);
         if (_v) {
-          return _wrap_iTerrainSystem_CollideSegment__SWIG_2(self, args);
+          return _wrap_iTerrainSystem_CollideSegment__SWIG_3(self, args);
         }
       }
     }
@@ -34860,7 +35011,34 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideSegment(PyObject *self, PyObjec
             _v = SWIG_CheckState(res);
           }
           if (_v) {
-            return _wrap_iTerrainSystem_CollideSegment__SWIG_1(self, args);
+            return _wrap_iTerrainSystem_CollideSegment__SWIG_2(self, args);
+          }
+        }
+      }
+    }
+  }
+  if (argc == 5) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iTerrainSystem, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csVector3, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_csVector3, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          void *vptr = 0;
+          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_csVector3, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            void *vptr = 0;
+            int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_p_iMaterialWrapper, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              return _wrap_iTerrainSystem_CollideSegment__SWIG_1(self, args);
+            }
           }
         }
       }
@@ -34904,6 +35082,7 @@ fail:
   SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iTerrainSystem_CollideSegment'.\n"
     "  Possible C/C++ prototypes are:\n"
     "    CollideSegment(iTerrainSystem *,csVector3 const &,csVector3 const &,bool,iTerrainVector3Array *,iMaterialArray *)\n"
+    "    CollideSegment(iTerrainSystem *,csVector3 const &,csVector3 const &,csVector3 &,iMaterialWrapper **)\n"
     "    CollideSegment(iTerrainSystem *,csVector3 const &,csVector3 const &,bool)\n"
     "    CollideSegment(iTerrainSystem *,csVector3 const &,csVector3 const &)\n");
   return NULL;
@@ -36505,7 +36684,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iTerrainCell_CollideSegment(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iTerrainCell_CollideSegment__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iTerrainCell *arg1 = (iTerrainCell *) 0 ;
   csVector3 *arg2 = 0 ;
@@ -36565,6 +36744,134 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_CollideSegment(PyObject *SWIGUNUSEDPARM(
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainCell_CollideSegment__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainCell *arg1 = (iTerrainCell *) 0 ;
+  csVector3 *arg2 = 0 ;
+  csVector3 *arg3 = 0 ;
+  csVector3 *arg4 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_CollideSegment",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_CollideSegment" "', argument " "1"" of type '" "iTerrainCell *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainCell * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTerrainCell_CollideSegment" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainCell_CollideSegment" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  arg2 = reinterpret_cast< csVector3 * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iTerrainCell_CollideSegment" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainCell_CollideSegment" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  arg3 = reinterpret_cast< csVector3 * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iTerrainCell_CollideSegment" "', argument " "4"" of type '" "csVector3 &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainCell_CollideSegment" "', argument " "4"" of type '" "csVector3 &""'"); 
+  }
+  arg4 = reinterpret_cast< csVector3 * >(argp4);
+  result = (bool)(arg1)->CollideSegment((csVector3 const &)*arg2,(csVector3 const &)*arg3,*arg4);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainCell_CollideSegment(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[6];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 5); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 4) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iTerrainCell, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csVector3, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_csVector3, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          void *vptr = 0;
+          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_csVector3, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            return _wrap_iTerrainCell_CollideSegment__SWIG_1(self, args);
+          }
+        }
+      }
+    }
+  }
+  if (argc == 5) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iTerrainCell, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csVector3, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_csVector3, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          {
+            int res = SWIG_AsVal_bool(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            void *vptr = 0;
+            int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_iTerrainVector3Array, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              return _wrap_iTerrainCell_CollideSegment__SWIG_0(self, args);
+            }
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iTerrainCell_CollideSegment'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    CollideSegment(iTerrainCell *,csVector3 const &,csVector3 const &,bool,iTerrainVector3Array *)\n"
+    "    CollideSegment(iTerrainCell *,csVector3 const &,csVector3 const &,csVector3 &)\n");
   return NULL;
 }
 

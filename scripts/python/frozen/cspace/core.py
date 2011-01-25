@@ -184,6 +184,7 @@ class Vector2DirtyAccessArray(object):
         except: self.this = this
     def GetArray(*args): return _core.Vector2DirtyAccessArray_GetArray(*args)
     def GetArrayCopy(*args): return _core.Vector2DirtyAccessArray_GetArrayCopy(*args)
+    def Detach(*args): return _core.Vector2DirtyAccessArray_Detach(*args)
     __swig_destroy__ = _core.delete_Vector2DirtyAccessArray
     __del__ = lambda self : None;
 Vector2DirtyAccessArray_swigregister = _core.Vector2DirtyAccessArray_swigregister
@@ -231,6 +232,7 @@ class Vector3DirtyAccessArray(object):
         except: self.this = this
     def GetArray(*args): return _core.Vector3DirtyAccessArray_GetArray(*args)
     def GetArrayCopy(*args): return _core.Vector3DirtyAccessArray_GetArrayCopy(*args)
+    def Detach(*args): return _core.Vector3DirtyAccessArray_Detach(*args)
     __swig_destroy__ = _core.delete_Vector3DirtyAccessArray
     __del__ = lambda self : None;
 Vector3DirtyAccessArray_swigregister = _core.Vector3DirtyAccessArray_swigregister
@@ -278,6 +280,7 @@ class Vector4DirtyAccessArray(object):
         except: self.this = this
     def GetArray(*args): return _core.Vector4DirtyAccessArray_GetArray(*args)
     def GetArrayCopy(*args): return _core.Vector4DirtyAccessArray_GetArrayCopy(*args)
+    def Detach(*args): return _core.Vector4DirtyAccessArray_Detach(*args)
     __swig_destroy__ = _core.delete_Vector4DirtyAccessArray
     __del__ = lambda self : None;
 Vector4DirtyAccessArray_swigregister = _core.Vector4DirtyAccessArray_swigregister
@@ -325,6 +328,7 @@ class UIntDirtyAccessArray(object):
         except: self.this = this
     def GetArray(*args): return _core.UIntDirtyAccessArray_GetArray(*args)
     def GetArrayCopy(*args): return _core.UIntDirtyAccessArray_GetArrayCopy(*args)
+    def Detach(*args): return _core.UIntDirtyAccessArray_Detach(*args)
     __swig_destroy__ = _core.delete_UIntDirtyAccessArray
     __del__ = lambda self : None;
 UIntDirtyAccessArray_swigregister = _core.UIntDirtyAccessArray_swigregister

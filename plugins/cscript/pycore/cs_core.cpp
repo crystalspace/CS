@@ -5846,6 +5846,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_Vector2DirtyAccessArray_Detach(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csDirtyAccessArray< csVector2 > *arg1 = (csDirtyAccessArray< csVector2 > *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  csVector2 *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"Vector2DirtyAccessArray_Detach",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Vector2DirtyAccessArray_Detach" "', argument " "1"" of type '" "csDirtyAccessArray< csVector2 > *""'"); 
+  }
+  arg1 = reinterpret_cast< csDirtyAccessArray< csVector2 > * >(argp1);
+  result = (csVector2 *)(arg1)->Detach();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csVector2, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_Vector2DirtyAccessArray(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csDirtyAccessArray< csVector2 > *arg1 = (csDirtyAccessArray< csVector2 > *) 0 ;
@@ -7120,6 +7142,28 @@ SWIGINTERN PyObject *_wrap_Vector3DirtyAccessArray_GetArrayCopy(PyObject *SWIGUN
   }
   arg1 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp1);
   result = (csVector3 *)(arg1)->GetArrayCopy();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csVector3, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Vector3DirtyAccessArray_Detach(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csDirtyAccessArray< csVector3 > *arg1 = (csDirtyAccessArray< csVector3 > *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  csVector3 *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"Vector3DirtyAccessArray_Detach",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Vector3DirtyAccessArray_Detach" "', argument " "1"" of type '" "csDirtyAccessArray< csVector3 > *""'"); 
+  }
+  arg1 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp1);
+  result = (csVector3 *)(arg1)->Detach();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csVector3, 0 |  0 );
   return resultobj;
 fail:
@@ -8408,6 +8452,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_Vector4DirtyAccessArray_Detach(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csDirtyAccessArray< csVector4 > *arg1 = (csDirtyAccessArray< csVector4 > *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  csVector4 *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"Vector4DirtyAccessArray_Detach",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csDirtyAccessArrayT_csVector4_csArrayElementHandlerT_csVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Vector4DirtyAccessArray_Detach" "', argument " "1"" of type '" "csDirtyAccessArray< csVector4 > *""'"); 
+  }
+  arg1 = reinterpret_cast< csDirtyAccessArray< csVector4 > * >(argp1);
+  result = (csVector4 *)(arg1)->Detach();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csVector4, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_Vector4DirtyAccessArray(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csDirtyAccessArray< csVector4 > *arg1 = (csDirtyAccessArray< csVector4 > *) 0 ;
@@ -9678,6 +9744,28 @@ SWIGINTERN PyObject *_wrap_UIntDirtyAccessArray_GetArrayCopy(PyObject *SWIGUNUSE
   }
   arg1 = reinterpret_cast< csDirtyAccessArray< unsigned int > * >(argp1);
   result = (unsigned int *)(arg1)->GetArrayCopy();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_unsigned_int, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_UIntDirtyAccessArray_Detach(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csDirtyAccessArray< unsigned int > *arg1 = (csDirtyAccessArray< unsigned int > *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  unsigned int *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"UIntDirtyAccessArray_Detach",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csDirtyAccessArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "UIntDirtyAccessArray_Detach" "', argument " "1"" of type '" "csDirtyAccessArray< unsigned int > *""'"); 
+  }
+  arg1 = reinterpret_cast< csDirtyAccessArray< unsigned int > * >(argp1);
+  result = (unsigned int *)(arg1)->Detach();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_unsigned_int, 0 |  0 );
   return resultobj;
 fail:
@@ -59367,6 +59455,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"new_Vector2DirtyAccessArray", _wrap_new_Vector2DirtyAccessArray, METH_VARARGS, NULL},
 	 { (char *)"Vector2DirtyAccessArray_GetArray", _wrap_Vector2DirtyAccessArray_GetArray, METH_VARARGS, NULL},
 	 { (char *)"Vector2DirtyAccessArray_GetArrayCopy", _wrap_Vector2DirtyAccessArray_GetArrayCopy, METH_VARARGS, NULL},
+	 { (char *)"Vector2DirtyAccessArray_Detach", _wrap_Vector2DirtyAccessArray_Detach, METH_VARARGS, NULL},
 	 { (char *)"delete_Vector2DirtyAccessArray", _wrap_delete_Vector2DirtyAccessArray, METH_VARARGS, NULL},
 	 { (char *)"Vector2DirtyAccessArray_swigregister", Vector2DirtyAccessArray_swigregister, METH_VARARGS, NULL},
 	 { (char *)"delete_Vector3Array", _wrap_delete_Vector3Array, METH_VARARGS, NULL},
@@ -59396,6 +59485,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"new_Vector3DirtyAccessArray", _wrap_new_Vector3DirtyAccessArray, METH_VARARGS, NULL},
 	 { (char *)"Vector3DirtyAccessArray_GetArray", _wrap_Vector3DirtyAccessArray_GetArray, METH_VARARGS, NULL},
 	 { (char *)"Vector3DirtyAccessArray_GetArrayCopy", _wrap_Vector3DirtyAccessArray_GetArrayCopy, METH_VARARGS, NULL},
+	 { (char *)"Vector3DirtyAccessArray_Detach", _wrap_Vector3DirtyAccessArray_Detach, METH_VARARGS, NULL},
 	 { (char *)"delete_Vector3DirtyAccessArray", _wrap_delete_Vector3DirtyAccessArray, METH_VARARGS, NULL},
 	 { (char *)"Vector3DirtyAccessArray_swigregister", Vector3DirtyAccessArray_swigregister, METH_VARARGS, NULL},
 	 { (char *)"delete_Vector4Array", _wrap_delete_Vector4Array, METH_VARARGS, NULL},
@@ -59425,6 +59515,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"new_Vector4DirtyAccessArray", _wrap_new_Vector4DirtyAccessArray, METH_VARARGS, NULL},
 	 { (char *)"Vector4DirtyAccessArray_GetArray", _wrap_Vector4DirtyAccessArray_GetArray, METH_VARARGS, NULL},
 	 { (char *)"Vector4DirtyAccessArray_GetArrayCopy", _wrap_Vector4DirtyAccessArray_GetArrayCopy, METH_VARARGS, NULL},
+	 { (char *)"Vector4DirtyAccessArray_Detach", _wrap_Vector4DirtyAccessArray_Detach, METH_VARARGS, NULL},
 	 { (char *)"delete_Vector4DirtyAccessArray", _wrap_delete_Vector4DirtyAccessArray, METH_VARARGS, NULL},
 	 { (char *)"Vector4DirtyAccessArray_swigregister", Vector4DirtyAccessArray_swigregister, METH_VARARGS, NULL},
 	 { (char *)"delete_UIntArray", _wrap_delete_UIntArray, METH_VARARGS, NULL},
@@ -59454,6 +59545,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"new_UIntDirtyAccessArray", _wrap_new_UIntDirtyAccessArray, METH_VARARGS, NULL},
 	 { (char *)"UIntDirtyAccessArray_GetArray", _wrap_UIntDirtyAccessArray_GetArray, METH_VARARGS, NULL},
 	 { (char *)"UIntDirtyAccessArray_GetArrayCopy", _wrap_UIntDirtyAccessArray_GetArrayCopy, METH_VARARGS, NULL},
+	 { (char *)"UIntDirtyAccessArray_Detach", _wrap_UIntDirtyAccessArray_Detach, METH_VARARGS, NULL},
 	 { (char *)"delete_UIntDirtyAccessArray", _wrap_delete_UIntDirtyAccessArray, METH_VARARGS, NULL},
 	 { (char *)"UIntDirtyAccessArray_swigregister", UIntDirtyAccessArray_swigregister, METH_VARARGS, NULL},
 	 { (char *)"SetCoreSCFPointer", _wrap_SetCoreSCFPointer, METH_VARARGS, NULL},
