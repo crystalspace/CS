@@ -1052,6 +1052,24 @@ struct iSkeletonFSMNode : public iSkeletonAnimNode
   virtual iSkeletonAnimNode* GetStateNode (StateID state) const = 0;
 };
 
+template <class T>
+struct iSkeletonAnimNodeManager : public virtual iBase
+{
+  SCF_INTERFACE(CS::Animation::iSkeletonAnimNodeManager<T>, 1, 0, 0);
+
+  /// Create an animation node factory with the given name
+  virtual T* CreateAnimNodeFactory (const char* name) = 0;
+
+  /// Find the animation node factory with the given name
+  virtual T* FindAnimNodeFactory (const char* name) = 0;
+
+  /// Remove the animation node factory with the given name
+  virtual void RemoveAnimNodeFactory (const char* name) = 0;
+
+  /// Remove all animation node factories
+  virtual void ClearAnimNodeFactories () = 0;
+};
+
 } // namespace Animation
 } // namespace CS
 
