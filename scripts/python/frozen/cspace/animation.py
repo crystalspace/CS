@@ -618,16 +618,26 @@ iSkeletonFSMNode_swigregister = _animation.iSkeletonFSMNode_swigregister
 iSkeletonFSMNode_swigregister(iSkeletonFSMNode)
 iSkeletonFSMNode_scfGetVersion = _animation.iSkeletonFSMNode_scfGetVersion
 
-class iSkeletonIKNodeManager(object):
+class SkeletonIKNodeManager(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def CreateAnimNodeFactory(*args): return _animation.SkeletonIKNodeManager_CreateAnimNodeFactory(*args)
+    def FindAnimNodeFactory(*args): return _animation.SkeletonIKNodeManager_FindAnimNodeFactory(*args)
+    def RemoveAnimNodeFactory(*args): return _animation.SkeletonIKNodeManager_RemoveAnimNodeFactory(*args)
+    def ClearAnimNodeFactories(*args): return _animation.SkeletonIKNodeManager_ClearAnimNodeFactories(*args)
+    __swig_destroy__ = _animation.delete_SkeletonIKNodeManager
+    __del__ = lambda self : None;
+SkeletonIKNodeManager_swigregister = _animation.SkeletonIKNodeManager_swigregister
+SkeletonIKNodeManager_swigregister(SkeletonIKNodeManager)
+
+class iSkeletonIKNodeManager(SkeletonIKNodeManager):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     scfGetVersion = staticmethod(_animation.iSkeletonIKNodeManager_scfGetVersion)
     __swig_destroy__ = _animation.delete_iSkeletonIKNodeManager
     __del__ = lambda self : None;
-    def __init__(self, *args): 
-        this = _animation.new_iSkeletonIKNodeManager(*args)
-        try: self.this.append(this)
-        except: self.this = this
 iSkeletonIKNodeManager_swigregister = _animation.iSkeletonIKNodeManager_swigregister
 iSkeletonIKNodeManager_swigregister(iSkeletonIKNodeManager)
 iSkeletonIKNodeManager_scfGetVersion = _animation.iSkeletonIKNodeManager_scfGetVersion
@@ -716,16 +726,26 @@ class iSkeletonIKCCDNode(iSkeletonIKNode):
 iSkeletonIKCCDNode_swigregister = _animation.iSkeletonIKCCDNode_swigregister
 iSkeletonIKCCDNode_swigregister(iSkeletonIKCCDNode)
 
-class iSkeletonLookAtNodeManager(object):
+class SkeletonLookAtNodeManager(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def CreateAnimNodeFactory(*args): return _animation.SkeletonLookAtNodeManager_CreateAnimNodeFactory(*args)
+    def FindAnimNodeFactory(*args): return _animation.SkeletonLookAtNodeManager_FindAnimNodeFactory(*args)
+    def RemoveAnimNodeFactory(*args): return _animation.SkeletonLookAtNodeManager_RemoveAnimNodeFactory(*args)
+    def ClearAnimNodeFactories(*args): return _animation.SkeletonLookAtNodeManager_ClearAnimNodeFactories(*args)
+    __swig_destroy__ = _animation.delete_SkeletonLookAtNodeManager
+    __del__ = lambda self : None;
+SkeletonLookAtNodeManager_swigregister = _animation.SkeletonLookAtNodeManager_swigregister
+SkeletonLookAtNodeManager_swigregister(SkeletonLookAtNodeManager)
+
+class iSkeletonLookAtNodeManager(SkeletonLookAtNodeManager):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     scfGetVersion = staticmethod(_animation.iSkeletonLookAtNodeManager_scfGetVersion)
     __swig_destroy__ = _animation.delete_iSkeletonLookAtNodeManager
     __del__ = lambda self : None;
-    def __init__(self, *args): 
-        this = _animation.new_iSkeletonLookAtNodeManager(*args)
-        try: self.this.append(this)
-        except: self.this = this
 iSkeletonLookAtNodeManager_swigregister = _animation.iSkeletonLookAtNodeManager_swigregister
 iSkeletonLookAtNodeManager_swigregister(iSkeletonLookAtNodeManager)
 iSkeletonLookAtNodeManager_scfGetVersion = _animation.iSkeletonLookAtNodeManager_scfGetVersion
@@ -777,16 +797,26 @@ iSkeletonLookAtListener_swigregister = _animation.iSkeletonLookAtListener_swigre
 iSkeletonLookAtListener_swigregister(iSkeletonLookAtListener)
 iSkeletonLookAtListener_scfGetVersion = _animation.iSkeletonLookAtListener_scfGetVersion
 
-class iSkeletonRagdollNodeManager(object):
+class SkeletonRagdollNodeManager(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def CreateAnimNodeFactory(*args): return _animation.SkeletonRagdollNodeManager_CreateAnimNodeFactory(*args)
+    def FindAnimNodeFactory(*args): return _animation.SkeletonRagdollNodeManager_FindAnimNodeFactory(*args)
+    def RemoveAnimNodeFactory(*args): return _animation.SkeletonRagdollNodeManager_RemoveAnimNodeFactory(*args)
+    def ClearAnimNodeFactories(*args): return _animation.SkeletonRagdollNodeManager_ClearAnimNodeFactories(*args)
+    __swig_destroy__ = _animation.delete_SkeletonRagdollNodeManager
+    __del__ = lambda self : None;
+SkeletonRagdollNodeManager_swigregister = _animation.SkeletonRagdollNodeManager_swigregister
+SkeletonRagdollNodeManager_swigregister(SkeletonRagdollNodeManager)
+
+class iSkeletonRagdollNodeManager(SkeletonRagdollNodeManager):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     scfGetVersion = staticmethod(_animation.iSkeletonRagdollNodeManager_scfGetVersion)
     __swig_destroy__ = _animation.delete_iSkeletonRagdollNodeManager
     __del__ = lambda self : None;
-    def __init__(self, *args): 
-        this = _animation.new_iSkeletonRagdollNodeManager(*args)
-        try: self.this.append(this)
-        except: self.this = this
 iSkeletonRagdollNodeManager_swigregister = _animation.iSkeletonRagdollNodeManager_swigregister
 iSkeletonRagdollNodeManager_swigregister(iSkeletonRagdollNodeManager)
 iSkeletonRagdollNodeManager_scfGetVersion = _animation.iSkeletonRagdollNodeManager_scfGetVersion
@@ -832,16 +862,26 @@ iSkeletonRagdollNode_swigregister = _animation.iSkeletonRagdollNode_swigregister
 iSkeletonRagdollNode_swigregister(iSkeletonRagdollNode)
 iSkeletonRagdollNode_scfGetVersion = _animation.iSkeletonRagdollNode_scfGetVersion
 
-class iSkeletonSpeedNodeManager(object):
+class SkeletonSpeedNodeManager(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def CreateAnimNodeFactory(*args): return _animation.SkeletonSpeedNodeManager_CreateAnimNodeFactory(*args)
+    def FindAnimNodeFactory(*args): return _animation.SkeletonSpeedNodeManager_FindAnimNodeFactory(*args)
+    def RemoveAnimNodeFactory(*args): return _animation.SkeletonSpeedNodeManager_RemoveAnimNodeFactory(*args)
+    def ClearAnimNodeFactories(*args): return _animation.SkeletonSpeedNodeManager_ClearAnimNodeFactories(*args)
+    __swig_destroy__ = _animation.delete_SkeletonSpeedNodeManager
+    __del__ = lambda self : None;
+SkeletonSpeedNodeManager_swigregister = _animation.SkeletonSpeedNodeManager_swigregister
+SkeletonSpeedNodeManager_swigregister(SkeletonSpeedNodeManager)
+
+class iSkeletonSpeedNodeManager(SkeletonSpeedNodeManager):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     scfGetVersion = staticmethod(_animation.iSkeletonSpeedNodeManager_scfGetVersion)
     __swig_destroy__ = _animation.delete_iSkeletonSpeedNodeManager
     __del__ = lambda self : None;
-    def __init__(self, *args): 
-        this = _animation.new_iSkeletonSpeedNodeManager(*args)
-        try: self.this.append(this)
-        except: self.this = this
 iSkeletonSpeedNodeManager_swigregister = _animation.iSkeletonSpeedNodeManager_swigregister
 iSkeletonSpeedNodeManager_swigregister(iSkeletonSpeedNodeManager)
 iSkeletonSpeedNodeManager_scfGetVersion = _animation.iSkeletonSpeedNodeManager_scfGetVersion
