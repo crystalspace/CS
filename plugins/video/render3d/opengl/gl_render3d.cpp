@@ -914,6 +914,10 @@ bool csGLGraphics3D::Open ()
   ext->InitGL_AMD_seamless_cubemap_per_texture ();
   ext->InitGL_ARB_half_float_vertex ();
   
+  /* Some of the exts checked for above affect the state cache,
+     so let it grab the state again */
+  statecache->currentContext->InitCache();
+  
   // Some 'assumed state' is for extensions, so set again
   CS::PluginCommon::GL::SetAssumedState (statecache, ext);
   
