@@ -277,11 +277,11 @@ public:
 
   /// Returns n-th component of the color.
   inline float operator[] (size_t n) const
-  { if (n == 3) { return alpha; } else { return csColor::operator[] (n); } }
+  { return (n == 3) ? alpha : csColor::operator[] (n); }
 
   /// Returns n-th component of the color.
   inline float & operator[] (size_t n)
-  { if (n == 3) { return alpha; } else { return csColor::operator[] (n); } }
+  { return (n == 3) ? alpha : csColor::operator[] (n); }
 };
 
 
