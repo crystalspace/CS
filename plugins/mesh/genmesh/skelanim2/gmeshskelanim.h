@@ -150,6 +150,7 @@ public:
   virtual bool AnimatesColors () const { return animates_colors; }
   virtual bool AnimatesTangents () const { return animates_tangents; }
   virtual bool AnimatesBiTangents () const { return animates_bitangents; }
+  virtual bool AnimatesBBoxRadius () const { return false; }
   virtual void Update (csTicks current, int, uint32);
   virtual const csVector3* UpdateVertices (csTicks current,
   	const csVector3* verts, int num_verts, uint32 version_id);
@@ -163,6 +164,12 @@ public:
   	const csVector3* tangents, int num_tangents, uint32 version_id);
   virtual const csVector3* UpdateBiTangents (csTicks current,
   	const csVector3* bitangents, int num_bitangents, uint32 version_id);
+  virtual const csBox3& UpdateBoundingBox (csTicks current, uint32 version_id,
+	const csBox3& bbox) { return bbox; }
+  virtual const float UpdateRadius (csTicks current, uint32 version_id,
+	const float radius) { return radius; }
+  virtual const csBox3* UpdateBoundingBoxes (csTicks current, uint32 version_id)
+  { return nullptr; }
 
   virtual int GetAnimatedVerticesCount()
   { return num_animated_verts; }
