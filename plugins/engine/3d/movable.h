@@ -254,7 +254,7 @@ public:
   csReversibleTransform& GetTransform () { return obj; }
 
   /**
-   * Get the local world to object tranformation.
+   * Get the local world to object transformation.
    */
   const csReversibleTransform& GetTransform () const { return obj; }
 
@@ -276,6 +276,11 @@ public:
    * Set the world to object transformation.
    */
   virtual void SetFullTransform (const csReversibleTransform& t);
+
+  /**
+   * Set the transformation vector.
+   */
+  virtual void SetFullPosition (const csVector3& v);
 
   /**
    * Relative move.

@@ -135,6 +135,14 @@ void csMovable::SetFullTransform (const csReversibleTransform& t)
     obj = t * parent->GetFullTransform ().GetInverse ();
 }
 
+void csMovable::SetFullPosition (const csVector3& v)
+{
+  if (parent == (csMovable*)nullptr)
+    obj.SetOrigin (v);
+  else
+    obj.SetOrigin (parent->GetFullTransform ().Other2This (v));
+}
+
 void csMovable::MovePosition (const csVector3 &rel)
 {
   obj.Translate (rel);
