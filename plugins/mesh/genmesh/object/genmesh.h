@@ -189,9 +189,10 @@ private:
   void SetupObject ();
 
   /// Get positions buffer
-  iRenderBuffer* GetPositions();
+  iRenderBuffer* GetPositions ();
+  const csVector3* GetVertices ();
   
-  int ComputeProgLODLevel(const SubMeshProxy& subMesh, const csVector3& camera_pos);
+  int ComputeProgLODLevel (const SubMeshProxy& subMesh, const csVector3& camera_pos);
   
 public:
   /// Constructor.
@@ -219,15 +220,29 @@ public:
   bool IsLighting () const { return false; }
   void SetManualColors (bool m) { do_manual_colors = m; }
   bool IsManualColors () const { return do_manual_colors; }
-  const csBox3& GetObjectBoundingBox ();
-  void SetObjectBoundingBox (const csBox3& bbox);
-  void GetRadius (float& rad, csVector3& cent);
   void SetShadowCasting (bool m) { }
   bool IsShadowCasting () const { return true; }
   void SetShadowReceiving (bool m) { }
   bool IsShadowReceiving () const { return false; }
   iGeneralMeshSubMesh* FindSubMesh (const char* name) const; 
   /** @} */
+
+  class csAnimatedModel : public scfImplementationExt0<csAnimatedModel, 
+                                                              csObjectModel>
+  {
+    csGenmeshMeshObject* object;
+
+  public:
+    csAnimatedModel (csGenmeshMeshObject* object);
+    virtual ~csAnimatedModel ();
+
+    /**\name iObjectModel implementation
+     * @{ */
+    const csBox3& GetObjectBoundingBox ();
+    void SetObjectBoundingBox (const csBox3& bbox);
+    void GetRadius (float& rad, csVector3& cent);
+  };
+  csRef<iObjectModel> objectModel;
 
   iVirtualClock* vc;
   csRef<iGenMeshAnimationControl> anim_ctrl;
@@ -237,10 +252,14 @@ public:
   const csVector2* AnimControlGetTexels ();
   const csVector3* AnimControlGetNormals ();
   const csColor4* AnimControlGetColors (csColor4* source);
+  const csBox3& AnimControlGetBbox ();
+  const csBox3* AnimControlGetBboxes ();
+  const float AnimControlGetRadius ();
   bool anim_ctrl_verts;
   bool anim_ctrl_texels;
   bool anim_ctrl_normals;
   bool anim_ctrl_colors;
+  bool anim_ctrl_bbox;
   struct AnimBuffers
   {
     csRef<iRenderBuffer> position;
