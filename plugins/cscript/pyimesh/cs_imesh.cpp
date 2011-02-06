@@ -3407,15 +3407,6 @@ SWIGINTERN PyObject *iGeneralFactoryState_GetTrianglesAsBuffer(iGeneralFactorySt
     }
 SWIGINTERN int iGeneralFactoryState_scfGetVersion(){ return scfInterfaceTraits<iGeneralFactoryState>::GetVersion(); }
 SWIGINTERN void delete_iGeneralFactoryState(iGeneralFactoryState *self){ if (self) self->DecRef (); }
-SWIGINTERN int iSkeletonBone_scfGetVersion(){ return scfInterfaceTraits<iSkeletonBone>::GetVersion(); }
-SWIGINTERN void delete_iSkeletonBone(iSkeletonBone *self){ if (self) self->DecRef (); }
-
-SWIGINTERNINLINE PyObject *
-SWIG_From_unsigned_SS_int  (unsigned int value)
-{    
-  return SWIG_From_unsigned_SS_long  (value);
-}
-
 
   #define SWIG_From_double   PyFloat_FromDouble 
 
@@ -3424,6 +3415,15 @@ SWIGINTERNINLINE PyObject *
 SWIG_From_float  (float value)
 {    
   return SWIG_From_double  (value);
+}
+
+SWIGINTERN int iSkeletonBone_scfGetVersion(){ return scfInterfaceTraits<iSkeletonBone>::GetVersion(); }
+SWIGINTERN void delete_iSkeletonBone(iSkeletonBone *self){ if (self) self->DecRef (); }
+
+SWIGINTERNINLINE PyObject *
+SWIG_From_unsigned_SS_int  (unsigned int value)
+{    
+  return SWIG_From_unsigned_SS_long  (value);
 }
 
 SWIGINTERN int iSkeleton_scfGetVersion(){ return scfInterfaceTraits<iSkeleton>::GetVersion(); }
@@ -7885,6 +7885,172 @@ SWIGINTERN PyObject *_wrap_iGenMeshAnimationControl_UpdateColors(PyObject *SWIGU
   arg5 = static_cast< uint32 >(val5);
   result = (csColor4 *)(arg1)->UpdateColors(arg2,(csColor4 const *)arg3,arg4,arg5);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csColor4, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGenMeshAnimationControl_AnimatesBBoxRadius(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGenMeshAnimationControl *arg1 = (iGenMeshAnimationControl *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshAnimationControl_AnimatesBBoxRadius",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControl, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshAnimationControl_AnimatesBBoxRadius" "', argument " "1"" of type '" "iGenMeshAnimationControl const *""'"); 
+  }
+  arg1 = reinterpret_cast< iGenMeshAnimationControl * >(argp1);
+  result = (bool)((iGenMeshAnimationControl const *)arg1)->AnimatesBBoxRadius();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGenMeshAnimationControl_UpdateBoundingBox(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGenMeshAnimationControl *arg1 = (iGenMeshAnimationControl *) 0 ;
+  csTicks arg2 ;
+  uint32 arg3 ;
+  csBox3 *arg4 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  unsigned int val2 ;
+  int ecode2 = 0 ;
+  unsigned long val3 ;
+  int ecode3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  csBox3 *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshAnimationControl_UpdateBoundingBox",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControl, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshAnimationControl_UpdateBoundingBox" "', argument " "1"" of type '" "iGenMeshAnimationControl *""'"); 
+  }
+  arg1 = reinterpret_cast< iGenMeshAnimationControl * >(argp1);
+  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iGenMeshAnimationControl_UpdateBoundingBox" "', argument " "2"" of type '" "csTicks""'");
+  } 
+  arg2 = static_cast< csTicks >(val2);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iGenMeshAnimationControl_UpdateBoundingBox" "', argument " "3"" of type '" "uint32""'");
+  } 
+  arg3 = static_cast< uint32 >(val3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csBox3,  0  | 0);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iGenMeshAnimationControl_UpdateBoundingBox" "', argument " "4"" of type '" "csBox3 const &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iGenMeshAnimationControl_UpdateBoundingBox" "', argument " "4"" of type '" "csBox3 const &""'"); 
+  }
+  arg4 = reinterpret_cast< csBox3 * >(argp4);
+  {
+    csBox3 const &_result_ref = (arg1)->UpdateBoundingBox(arg2,arg3,(csBox3 const &)*arg4);
+    result = (csBox3 *) &_result_ref;
+  }
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csBox3, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGenMeshAnimationControl_UpdateRadius(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGenMeshAnimationControl *arg1 = (iGenMeshAnimationControl *) 0 ;
+  csTicks arg2 ;
+  uint32 arg3 ;
+  float arg4 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  unsigned int val2 ;
+  int ecode2 = 0 ;
+  unsigned long val3 ;
+  int ecode3 = 0 ;
+  float val4 ;
+  int ecode4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  float result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshAnimationControl_UpdateRadius",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControl, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshAnimationControl_UpdateRadius" "', argument " "1"" of type '" "iGenMeshAnimationControl *""'"); 
+  }
+  arg1 = reinterpret_cast< iGenMeshAnimationControl * >(argp1);
+  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iGenMeshAnimationControl_UpdateRadius" "', argument " "2"" of type '" "csTicks""'");
+  } 
+  arg2 = static_cast< csTicks >(val2);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iGenMeshAnimationControl_UpdateRadius" "', argument " "3"" of type '" "uint32""'");
+  } 
+  arg3 = static_cast< uint32 >(val3);
+  ecode4 = SWIG_AsVal_float(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iGenMeshAnimationControl_UpdateRadius" "', argument " "4"" of type '" "float""'");
+  } 
+  arg4 = static_cast< float >(val4);
+  result = (float)(arg1)->UpdateRadius(arg2,arg3,arg4);
+  resultobj = SWIG_From_float(static_cast< float >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGenMeshAnimationControl_UpdateBoundingBoxes(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGenMeshAnimationControl *arg1 = (iGenMeshAnimationControl *) 0 ;
+  csTicks arg2 ;
+  uint32 arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  unsigned int val2 ;
+  int ecode2 = 0 ;
+  unsigned long val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  csBox3 *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshAnimationControl_UpdateBoundingBoxes",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControl, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshAnimationControl_UpdateBoundingBoxes" "', argument " "1"" of type '" "iGenMeshAnimationControl *""'"); 
+  }
+  arg1 = reinterpret_cast< iGenMeshAnimationControl * >(argp1);
+  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iGenMeshAnimationControl_UpdateBoundingBoxes" "', argument " "2"" of type '" "csTicks""'");
+  } 
+  arg2 = static_cast< csTicks >(val2);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iGenMeshAnimationControl_UpdateBoundingBoxes" "', argument " "3"" of type '" "uint32""'");
+  } 
+  arg3 = static_cast< uint32 >(val3);
+  result = (csBox3 *)(arg1)->UpdateBoundingBoxes(arg2,arg3);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csBox3, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -45001,6 +45167,10 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iGenMeshAnimationControl_UpdateTexels", _wrap_iGenMeshAnimationControl_UpdateTexels, METH_VARARGS, NULL},
 	 { (char *)"iGenMeshAnimationControl_UpdateNormals", _wrap_iGenMeshAnimationControl_UpdateNormals, METH_VARARGS, NULL},
 	 { (char *)"iGenMeshAnimationControl_UpdateColors", _wrap_iGenMeshAnimationControl_UpdateColors, METH_VARARGS, NULL},
+	 { (char *)"iGenMeshAnimationControl_AnimatesBBoxRadius", _wrap_iGenMeshAnimationControl_AnimatesBBoxRadius, METH_VARARGS, NULL},
+	 { (char *)"iGenMeshAnimationControl_UpdateBoundingBox", _wrap_iGenMeshAnimationControl_UpdateBoundingBox, METH_VARARGS, NULL},
+	 { (char *)"iGenMeshAnimationControl_UpdateRadius", _wrap_iGenMeshAnimationControl_UpdateRadius, METH_VARARGS, NULL},
+	 { (char *)"iGenMeshAnimationControl_UpdateBoundingBoxes", _wrap_iGenMeshAnimationControl_UpdateBoundingBoxes, METH_VARARGS, NULL},
 	 { (char *)"delete_iGenMeshAnimationControl", _wrap_delete_iGenMeshAnimationControl, METH_VARARGS, NULL},
 	 { (char *)"iGenMeshAnimationControl_swigregister", iGenMeshAnimationControl_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iGenMeshAnimationControlFactory_CreateAnimationControl", _wrap_iGenMeshAnimationControlFactory_CreateAnimationControl, METH_VARARGS, NULL},

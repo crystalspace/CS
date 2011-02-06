@@ -285,6 +285,10 @@ class iGenMeshAnimationControl(core.iBase):
     def UpdateTexels(*args): return _imesh.iGenMeshAnimationControl_UpdateTexels(*args)
     def UpdateNormals(*args): return _imesh.iGenMeshAnimationControl_UpdateNormals(*args)
     def UpdateColors(*args): return _imesh.iGenMeshAnimationControl_UpdateColors(*args)
+    def AnimatesBBoxRadius(*args): return _imesh.iGenMeshAnimationControl_AnimatesBBoxRadius(*args)
+    def UpdateBoundingBox(*args): return _imesh.iGenMeshAnimationControl_UpdateBoundingBox(*args)
+    def UpdateRadius(*args): return _imesh.iGenMeshAnimationControl_UpdateRadius(*args)
+    def UpdateBoundingBoxes(*args): return _imesh.iGenMeshAnimationControl_UpdateBoundingBoxes(*args)
     __swig_destroy__ = _imesh.delete_iGenMeshAnimationControl
     __del__ = lambda self : None;
 iGenMeshAnimationControl_swigregister = _imesh.iGenMeshAnimationControl_swigregister

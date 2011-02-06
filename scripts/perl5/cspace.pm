@@ -14786,6 +14786,10 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *UpdateTexels = *cspacec::iGenMeshAnimationControl_UpdateTexels;
 *UpdateNormals = *cspacec::iGenMeshAnimationControl_UpdateNormals;
 *UpdateColors = *cspacec::iGenMeshAnimationControl_UpdateColors;
+*AnimatesBBoxRadius = *cspacec::iGenMeshAnimationControl_AnimatesBBoxRadius;
+*UpdateBoundingBox = *cspacec::iGenMeshAnimationControl_UpdateBoundingBox;
+*UpdateRadius = *cspacec::iGenMeshAnimationControl_UpdateRadius;
+*UpdateBoundingBoxes = *cspacec::iGenMeshAnimationControl_UpdateBoundingBoxes;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -20509,6 +20513,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *IsFullTransformIdentity = *cspacec::iMovable_IsFullTransformIdentity;
 *TransformIdentity = *cspacec::iMovable_TransformIdentity;
 *SetFullTransform = *cspacec::iMovable_SetFullTransform;
+*SetFullPosition = *cspacec::iMovable_SetFullPosition;
 *scfGetVersion = *cspacec::iMovable_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
