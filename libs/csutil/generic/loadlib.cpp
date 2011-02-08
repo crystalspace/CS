@@ -26,6 +26,13 @@
 #include "csutil/csstring.h"
 #include "csutil/sysfunc.h"
 
+#ifndef CS_PLUGIN_META_EXT
+#  define CS_PLUGIN_META_EXT ".csplugin"
+#endif
+#ifndef CS_PLUGIN_EXT
+#  define CS_PLUGIN_EXT ".so"
+#endif
+
 #ifdef CS_DEBUG
 #  ifdef CS_HAVE_RTLD_NOW
 #    define DLOPEN_MODE   RTLD_NOW | RTLD_GLOBAL	// handy for debugging
@@ -39,19 +46,21 @@
 csLibraryHandle csLoadLibrary (const char* iName)
 {
   // iName will have an ".csplugin" suffix
+  size_t metaLen = strlen (CS_PLUGIN_META_EXT);
+  size_t extLen = strlen (CS_PLUGIN_EXT);
   size_t nameLen = strlen (iName);
-  char* binName = new char[nameLen + 4];
+  char* binName = new char[nameLen + extLen + 1];
   strcpy (binName, iName);
   
-  if ((nameLen >= 9) && 
-    (strcasecmp (binName + nameLen - 9, ".csplugin") == 0))
+  if ((nameLen >= metaLen) && 
+    (strcasecmp (binName + nameLen - metaLen, CS_PLUGIN_META_EXT) == 0))
   {
-    strcpy (binName + nameLen - 9, ".so");
+    strcpy (binName + nameLen - metaLen, CS_PLUGIN_EXT);
   }
-  else if ((nameLen >= 3) && 
-    (strcasecmp (binName + nameLen - 3, ".so") != 0))
+  else if ((nameLen >= extLen) && 
+    (strcasecmp (binName + nameLen - extLen, CS_PLUGIN_EXT) != 0))
   {
-    strcat (binName, ".so");
+    strcat (binName, CS_PLUGIN_EXT);
   }
   
   csLibraryHandle lib = dlopen (binName, DLOPEN_MODE);
