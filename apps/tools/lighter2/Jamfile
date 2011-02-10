@@ -32,12 +32,14 @@ LIGHTER2.PLUGINLIST =
   csparser
   cssynldr
   dsplex
+  dynavis
   particles
   particlesldr
   ptpdlight
   emit
   emitldr
   engine
+  frustvis
   genmesh
   gmeshanim
   gmeshldr
