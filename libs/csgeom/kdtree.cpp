@@ -93,8 +93,11 @@ void csKDTreeChild::RemoveLeaf (csKDTree* leaf)
   }
   // We shouldn't be able to come here.
   csPrintfErr ("Something bad happened in csKDTreeChild::RemoveLeaf!\n");
-  if (leaf) leaf->DumpObject (this, "  Trying to remove leaf for: %s!\n");
-  leaf->DebugExit ();
+  if (leaf)
+  {
+    leaf->DumpObject (this, "  Trying to remove leaf for: %s!\n");
+    leaf->DebugExit ();
+  }
 }
 
 void csKDTreeChild::ReplaceLeaf (csKDTree* old_leaf, csKDTree* new_leaf)
