@@ -389,6 +389,7 @@ bool csShaderExpression::Parse (iDocumentNode* node)
     obj_reg, "crystalspace.shader.variablenameset");
   if (!strset) 
   {
+    destruct_cons (head);
     ParseError ("Can't find string registry.");
 
     return false;
