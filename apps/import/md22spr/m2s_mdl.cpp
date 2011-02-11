@@ -318,6 +318,8 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
   }
 
   fclose(f);
+  delete [] BS_verts;
+  delete [] verts;
   return true;
 }
 
