@@ -1013,8 +1013,8 @@ iSoftBody* csBulletDynamicsSystem::CreateSoftBody
   body->m_cfg.collisions |= btSoftBody::fCollision::VF_SS;
   body->m_materials[0]->m_kLST = 1;
 
-  delete btVertices;
-  delete btTriangles;
+  delete [] btVertices;
+  delete [] btTriangles;
 
   btSoftRigidDynamicsWorld* softWorld =
     static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
