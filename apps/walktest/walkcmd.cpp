@@ -92,8 +92,8 @@ double ParseScaleFactor(iObjectIterator* it);
 void WalkTest::SaveCamera (const char *fName)
 {
   iCamera *c = views->GetCamera ();
-  csOrthoTransform& camtrans = c->GetTransform ();
   if (!c) return;
+  csOrthoTransform& camtrans = c->GetTransform ();
   const csMatrix3& m_o2t = camtrans.GetO2T ();
   const csVector3& v_o2t = camtrans.GetOrigin ();
   csString s;
