@@ -1209,6 +1209,8 @@ char *basename(const char *path, char *base)
   }
   memcpy (base, file, sz);
   base[sz] = '\0';
+  delete [] dir;
+  delete [] file;
   return base;
 }
 
