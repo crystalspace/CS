@@ -148,10 +148,10 @@ public:
   static uint GetNumber(const iEvent *event);
   /// retrieve X value of mouse #0
   static int GetX(const iEvent *event)
-  { return csMouseEventHelper::GetAxis(event, 0); }
+  { return GetAxis(event, 0); }
   /// Retrieve Y value of mouse #0
   static int GetY(const iEvent *event)
-  { return csMouseEventHelper::GetAxis(event, 1); }
+  { return GetAxis(event, 1); }
   /// retrieve any axis (basis 0) value
   static int GetAxis(const iEvent *event, uint axis);
   /// retrieve number of axes
