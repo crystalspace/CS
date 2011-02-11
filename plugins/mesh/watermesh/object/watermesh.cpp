@@ -646,7 +646,7 @@ void csWaterMeshObject::PreGetBuffer (csRenderBufferHolder *holder,
       // Copy the data into the render buffer
       // since we don't keep a local copy of the color buffer here.
       color_buffer->CopyInto (colors, factory->numVerts);
-      delete colors;
+      delete [] colors;
     }
     holder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
   } 
@@ -975,7 +975,7 @@ csRef<iTextureWrapper> csWaterMeshObjectFactory::MakeFresnelTex(int size)
   csRef<iTextureWrapper> fresnelTexWrapper;
   // fresnelTexWrapper->SetTextureHandle(texHandle);
 
-  delete buf;
+  delete [] buf;
 
   return fresnelTexWrapper;
 }
