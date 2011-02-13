@@ -46,7 +46,7 @@ CS_LEAKGUARD_IMPLEMENT (csXMLShaderTech);
 /* Magic value for tech + pass cache files.
  * The most significant byte serves as a "version", increase when the
  * cache file format changes. */
-static const uint32 cacheFileMagic = 0x08747863;
+static const uint32 cacheFileMagic = 0x09747863;
 
 //---------------------------------------------------------------------------
 
@@ -344,6 +344,16 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
     }
   }
   pass->instances_binds.ShrinkBestFit ();
+  // Read number of instances SV
+  {
+    csRef<iDocumentNode> instancesNumNode = node->GetNode (xmltokens.Request (
+      csXMLShaderCompiler::XMLTOKEN_INSTANCESNUM));
+    if (instancesNumNode && (instancesNumNode->GetType() == CS_NODE_ELEMENT))
+    {
+      const char* source = instancesNumNode->GetContentsValue();
+      pass->instancesNumVar = hlp.stringsSvName->Request (source);
+    }
+  }
   
   if (cacheTo)
   {
@@ -1069,6 +1079,8 @@ bool csXMLShaderTech::WritePassPerTag (const ShaderPassPerTag& pass,
     if (cacheFile->Write ((char*)&diskAttr, sizeof (diskAttr))
 	!= sizeof (diskAttr)) return false;
   }
+  if (!WriteShadervarName (pass.instancesNumVar, cacheFile))
+    return false;
 
   return true;
 }
@@ -1326,6 +1338,7 @@ bool csXMLShaderTech::ReadPassPerTag (ShaderPassPerTag& pass,
     }
     pass.instances_binds.ShrinkBestFit();
   }
+  pass.instancesNumVar = ReadShadervarName (cacheFile);
 
   return true;
 }
@@ -2057,6 +2070,16 @@ void csXMLShaderTech::SetupInstances (csRenderMeshModes& modes,
   size_t numInsts = 0;
   GetInstParamsTargets().Empty ();
   GetInstOuterVars().Empty ();
+  
+  {
+    csShaderVariable* instsNumSV = csGetShaderVariableFromStack (stack, thispass->instancesNumVar);
+    if (instsNumSV)
+    {
+      int n;
+      instsNumSV->GetValue (n);
+      numInsts = n;
+    }
+  }
 
   // Pass one: collect number of instances, SVs per instance
   for (size_t i = 0; i < instances_binds.GetSize(); i++)
