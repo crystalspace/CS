@@ -890,6 +890,7 @@ bool csGLGraphics3D::Open ()
   ext->InitGL_ARB_seamless_cube_map ();
   ext->InitGL_AMD_seamless_cubemap_per_texture ();
   ext->InitGL_ARB_half_float_vertex ();
+  ext->InitGL_ARB_instanced_arrays ();
   
   /* Some of the exts checked for above affect the state cache,
      so let it grab the state again */

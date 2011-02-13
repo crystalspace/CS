@@ -36,6 +36,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
     size_t instNum;
     size_t numInstances;
     
+    bool useInstancedArrays;
+    iRenderBuffer** instancedArraysBuffers;
+    
     enum
     {
       maxInstParamNum = CS_VATTRIB_SPECIFIC_NUM + CS_VATTRIB_GENERIC_NUM + CS_IATTRIB_NUM

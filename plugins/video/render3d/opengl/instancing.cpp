@@ -54,57 +54,88 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
      numSVAttrs (0), numSpecialTeardownAttrs (0),
      numBufferAttrs (0), numTransformAttrs (0)
   {
-    for (size_t p = 0; p < paramNum; p++)
+    if (g3d->ext->CS_GL_ARB_instanced_arrays)
     {
-      if (p >= maxInstParamNum) break;
+      useInstancedArrays = true;
       
-      iRenderBuffer* buffer = paramBuffers ? paramBuffers[p] : nullptr;
-      if (buffer)
+      /* Apart from the ext, it's also necessary that all
+         parameters are passed as render buffers and bound
+         to generic vertex attribs. */
+      for (size_t p = 0; p < paramNum; p++)
       {
-	if (buffer->GetComponentCount() <= 4)
+	iRenderBuffer* buffer = paramBuffers ? paramBuffers[p] : nullptr;
+	if (!buffer || !CS_VATTRIB_IS_GENERIC(paramsTargets[p]))
 	{
-	  void* ptr = WalkerAlloc().Alloc ();
-	  InstBufferWalker* walker = new (ptr) InstBufferWalker (buffer, 4, nullptr);
-	  bufferAttrs[numBufferAttrs++] = BufferAttr (walker, paramsTargets[p]);
+	  useInstancedArrays = false;
+	  break;
+	}
+      }
+    }
+    else
+      useInstancedArrays = false;
+    
+    if (useInstancedArrays)
+    {
+      numBufferAttrs = paramNum;
+      instancedArraysBuffers = paramBuffers;
+    }
+    else
+    {
+      for (size_t p = 0; p < paramNum; p++)
+      {
+	if (p >= maxInstParamNum) break;
+	
+	iRenderBuffer* buffer = paramBuffers ? paramBuffers[p] : nullptr;
+	if (buffer)
+	{
+	  if (buffer->GetComponentCount() <= 4)
+	  {
+	    void* ptr = WalkerAlloc().Alloc ();
+	    InstBufferWalker* walker = new (ptr) InstBufferWalker (buffer, 4, nullptr);
+	    bufferAttrs[numBufferAttrs++] = BufferAttr (walker, paramsTargets[p]);
+	  }
+	  else
+	  {
+	    static const float defaultTransform[16] = {0};
+	    
+	    TransformAttr attr;
+	    attr.numVec4s = csMin ((buffer->GetComponentCount()+3) / 4, 4);
+	    void* ptr = TransformWalkerAlloc().Alloc ();
+	    attr.walker = new (ptr) InstTransformBufferWalker (buffer, attr.numVec4s*4, defaultTransform);
+	    attr.attr = paramsTargets[p];
+	    transformAttrs[numTransformAttrs++] = attr;
+	  }
 	}
 	else
 	{
-	  static const float defaultTransform[16] = {0};
-	  
-	  TransformAttr attr;
-	  attr.numVec4s = csMin ((buffer->GetComponentCount()+3) / 4, 4);
-	  void* ptr = TransformWalkerAlloc().Alloc ();
-	  attr.walker = new (ptr) InstTransformBufferWalker (buffer, attr.numVec4s*4, defaultTransform);
-	  attr.attr = paramsTargets[p];
-	  transformAttrs[numTransformAttrs++] = attr;
+	  svAttrs[numSVAttrs++] = p;
 	}
-      }
-      else
-      {
-	svAttrs[numSVAttrs++] = p;
-      }
-      
-      // Target needs special instance teardown
-      csVertexAttrib target = paramsTargets[p];
-      if ((target >= CS_IATTRIB_FIRST) && (target <= CS_IATTRIB_LAST))
-      {
-	CS_ASSERT (numSpecialTeardownAttrs < CS_IATTRIB_NUM);
-	specialTeardownAttrs[numSpecialTeardownAttrs++] = p;
+	
+	// Target needs special instance teardown
+	csVertexAttrib target = paramsTargets[p];
+	if ((target >= CS_IATTRIB_FIRST) && (target <= CS_IATTRIB_LAST))
+	{
+	  CS_ASSERT (numSpecialTeardownAttrs < CS_IATTRIB_NUM);
+	  specialTeardownAttrs[numSpecialTeardownAttrs++] = p;
+	}
       }
     }
   }
 
   InstancingHelper::~InstancingHelper ()
   {
-    for (uint b = 0; b < numBufferAttrs; b++)
+    if (!useInstancedArrays)
     {
-      bufferAttrs[b].first->~InstBufferWalker();
-      WalkerAlloc().Free (bufferAttrs[b].first);
-    }
-    for (uint b = 0; b < numTransformAttrs; b++)
-    {
-      transformAttrs[b].walker->~InstTransformBufferWalker();
-      TransformWalkerAlloc().Free (transformAttrs[b].walker);
+      for (uint b = 0; b < numBufferAttrs; b++)
+      {
+	bufferAttrs[b].first->~InstBufferWalker();
+	WalkerAlloc().Free (bufferAttrs[b].first);
+      }
+      for (uint b = 0; b < numTransformAttrs; b++)
+      {
+	transformAttrs[b].walker->~InstTransformBufferWalker();
+	TransformWalkerAlloc().Free (transformAttrs[b].walker);
+      }
     }
   }
        
@@ -310,6 +341,63 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
   void InstancingHelper::DrawAllInstances (GLenum mode, GLuint start, GLuint end,
 					   GLsizei count, GLenum type, const GLvoid* indices)
   {
+    if (useInstancedArrays)
+    {
+      // Woo, fast path!
+      
+      // Bind all buffers with instance data
+      for (size_t p = 0; p < numBufferAttrs; p++)
+      {
+	GLuint attrIndex = targets[p] - CS_VATTRIB_GENERIC_FIRST;
+	iRenderBuffer* buffer = instancedArraysBuffers[p];
+	// @@@ Lost of copy and paste from ApplyBufferChanges(); somehow share the buffer binding code?
+	csRenderBufferComponentType compType = buffer->GetComponentType();
+      csRenderBufferComponentType compTypeBase = csRenderBufferComponentType(compType & ~CS_BUFCOMP_NORMALIZED);
+	bool isFloat = (compType == CS_BUFCOMP_FLOAT) 
+	  || (compType == CS_BUFCOMP_DOUBLE)
+	  || (compType == CS_BUFCOMP_HALF);
+	bool normalized = !isFloat && (compType & CS_BUFCOMP_NORMALIZED);
+	GLenum compGLType = compGLtypes[compTypeBase];
+
+	void *data = g3d->RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY);
+	g3d->statecache->ApplyBufferBinding (csGLStateCacheContext::boElementArray);
+	
+	/* Split buffers with more than 4 components over multiple attribs
+	   (Those buffers are usually transforms ...) */
+	uint numBinds = (buffer->GetComponentCount() + 3) / 4;
+	for (uint b = 0; b < numBinds; b++)
+	{
+	  g3d->ext->glEnableVertexAttribArrayARB (attrIndex+b);
+	  uint ncomps = csMin (buffer->GetComponentCount () - b*4, 4u);
+	  unsigned char* compsData = (unsigned char*)data + b*4*csRenderBufferComponentSizes[compTypeBase];
+	  g3d->ext->glVertexAttribPointerARB (attrIndex+b,
+					      ncomps,
+					      compGLType,
+					      normalized,
+					      (GLsizei)buffer->GetElementDistance (),
+					      compsData);
+	  g3d->ext->glVertexAttribDivisorARB (attrIndex+b, 1);
+	}
+      }
+      
+      g3d->ext->glDrawElementsInstancedARB (mode, count, type, indices, numInstances);
+      
+      // ...and unbind.
+      for (size_t p = 0; p < numBufferAttrs; p++)
+      {
+	GLuint attrIndex = targets[p] - CS_VATTRIB_GENERIC_FIRST;
+	iRenderBuffer* buffer = instancedArraysBuffers[p];
+	uint numBinds = (buffer->GetComponentCount() + 3) / 4;
+	for (uint b = 0; b < numBinds; b++)
+	{
+	  g3d->ext->glVertexAttribDivisorARB (attrIndex+b, 0);
+	  g3d->ext->glDisableVertexAttribArrayARB (attrIndex+b);
+	}
+	g3d->RenderRelease (buffer);
+      }
+      return;
+    }
+    
     while (instNum < numInstances)
     {
       SetupNextInstance ();

@@ -439,9 +439,6 @@ private:
     gen_renderBuffers[attr] = buffer;
   }
 
-  void* RenderLock (iRenderBuffer* buffer, csGLRenderBufferLockType type);
-  void RenderRelease (iRenderBuffer* buffer);
-
   struct ImageUnit : public CS::Memory::CustomAllocated
   {
     csGLBasicTextureHandle* texture;
@@ -533,6 +530,10 @@ public:
   /* glDrawRangeElements, wrapping either the extension function, or
      a backwards compatibility drawing function. */
   csGLDRAWRANGEELEMENTS glDrawRangeElements;
+  
+  // Also used by instancing helper
+  void* RenderLock (iRenderBuffer* buffer, csGLRenderBufferLockType type);
+  void RenderRelease (iRenderBuffer* buffer);
 
   ////////////////////////////////////////////////////////////////////
   //                            iGraphics3D
