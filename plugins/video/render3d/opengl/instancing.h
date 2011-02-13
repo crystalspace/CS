@@ -20,6 +20,8 @@
 #define __INSTANCING_H__
 
 #include "ivideo/graph3d.h"
+#include "csgfx/vertexlistwalker.h"
+#include "csutil/blockallocator.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
@@ -28,12 +30,45 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
   class InstancingHelper
   {
     csGLGraphics3D* g3d;
-    size_t instParamNum;
     const csVertexAttrib* targets;
     csShaderVariable** const * allParams;
     
     size_t instNum;
     size_t numInstances;
+    
+    enum
+    {
+      maxInstParamNum = CS_VATTRIB_SPECIFIC_NUM + CS_VATTRIB_GENERIC_NUM + CS_IATTRIB_NUM
+    };
+    uint numSVAttrs;
+    uint svAttrs[maxInstParamNum];
+    uint numSpecialTeardownAttrs;
+    uint specialTeardownAttrs[CS_IATTRIB_NUM];
+    
+    typedef csVertexListWalker<float, csVector4> InstBufferWalker;
+    typedef csFixedSizeAllocator<sizeof (InstBufferWalker)> WalkerAllocType;
+    CS_DECLARE_STATIC_CLASSVAR_REF(walkerAlloc, WalkerAlloc, WalkerAllocType)
+    uint numBufferAttrs;
+    typedef csTuple2<InstBufferWalker*, csVertexAttrib> BufferAttr;
+    BufferAttr bufferAttrs[maxInstParamNum];
+    
+    typedef float TransformParam[16];
+    typedef csVertexListWalker<float, TransformParam> InstTransformBufferWalker;
+    typedef csFixedSizeAllocator<sizeof (InstTransformBufferWalker)> TransformWalkerAllocType;
+    CS_DECLARE_STATIC_CLASSVAR_REF(transformWalkerAlloc, TransformWalkerAlloc,
+				   TransformWalkerAllocType)
+    uint numTransformAttrs;
+    struct TransformAttr
+    {
+      InstTransformBufferWalker* walker;
+      csVertexAttrib attr;
+      uint numVec4s;
+    };
+    TransformAttr transformAttrs[maxInstParamNum];
+    
+    void SetAttribute (csVertexAttrib target, const float* v);
+    void SetMatrixAttribute (csVertexAttrib target, const float* v, uint vec4s);
+    void SetParamFromSV (csShaderVariable* param, csVertexAttrib target);
 
     void SetupNextInstance ();
     void TeardownInstance ();
@@ -41,7 +76,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
     InstancingHelper (csGLGraphics3D* g3d,
 		      size_t numInstances,
 		      size_t paramNum, const csVertexAttrib* paramsTargets,
- 		      csShaderVariable** const * params);
+ 		      csShaderVariable** const * params,
+		      iRenderBuffer** paramBuffers);
+    ~InstancingHelper ();
     
     void DrawAllInstances (GLenum mode, GLuint start, 
       GLuint end, GLsizei count, GLenum type, const GLvoid* indices);

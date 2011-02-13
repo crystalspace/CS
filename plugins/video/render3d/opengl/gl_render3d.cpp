@@ -2279,7 +2279,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 	  InstancingHelper instHelper (this, modes.instanceNum,
 				       modes.instParamNum,
 				       modes.instParamsTargets,
-				       modes.instParams);
+				       modes.instParams,
+				       modes.instParamBuffers);
 	  instHelper.DrawAllInstances (primitivetype, (GLuint)iIndexbuf->GetRangeStart(),
               (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
               compType, 
@@ -4431,7 +4432,8 @@ void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
 	  InstancingHelper instHelper (this, modes.instanceNum,
 				       modes.instParamNum,
 				       modes.instParamsTargets,
-				       modes.instParams);
+				       modes.instParams,
+				       modes.instParamBuffers);
 	  instHelper.DrawAllInstances (primitivetype, (GLuint)iIndexbuf->GetRangeStart(),
               (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
               compType, 
