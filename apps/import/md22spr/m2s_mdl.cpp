@@ -318,8 +318,6 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
   }
 
   fclose(f);
-  delete [] BS_verts;
-  delete [] verts;
   return true;
 }
 
@@ -665,5 +663,7 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
 
   csFPrintf(f, "\t</params>\n</meshfact>\n");
   fclose(f);
+  delete [] BS_verts;
+  delete [] verts;
   return true;
 }
