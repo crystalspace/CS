@@ -162,6 +162,8 @@ enum csZBufMode
   (CS_VATTRIB_GENERIC_LAST - CS_VATTRIB_GENERIC_FIRST + 1)
 #define CS_IATTRIB_FIRST           200 
 #define CS_IATTRIB_LAST            (CS_IATTRIB_FIRST + 0) 
+#define CS_IATTRIB_NUM             \
+  (CS_IATTRIB_LAST - CS_IATTRIB_FIRST + 1)
 
 
 #define CS_VATTRIB_IS_GENERIC(va)   \
