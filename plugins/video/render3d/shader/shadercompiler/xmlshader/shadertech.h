@@ -150,6 +150,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       csDirtyAccessArray<csShaderVariable**>); 
     CS_DECLARE_STATIC_CLASSVAR_REF(instOuterVar, GetInstOuterVars, 
       csArray<csShaderVariable*>); 
+    CS_DECLARE_STATIC_CLASSVAR_REF(instParamBuffers, GetInstParamBuffers, 
+      csDirtyAccessArray<iRenderBuffer*>); 
 
     void SetupInstances (csRenderMeshModes& modes, ShaderPass *thispass, 
       const csShaderVariableStack& stack); 
