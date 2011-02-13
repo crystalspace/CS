@@ -365,7 +365,6 @@ private:
 
   /// Should we use special buffertype (VBO) or just system memory
   bool use_hw_render_buffers;
-  csGLDRAWRANGEELEMENTS glDrawRangeElements;
   static GLvoid csAPIENTRY myDrawRangeElements (GLenum mode, GLuint start, 
     GLuint end, GLsizei count, GLenum type, const GLvoid* indices);
 
@@ -527,6 +526,13 @@ public:
   
   inline bool GetMultisampleEnabled() const
   { return multisampleEnabled; }
+  
+  inline GLint GetNumTCUnits() const
+  { return numTCUnits; }
+  
+  /* glDrawRangeElements, wrapping either the extension function, or
+     a backwards compatibility drawing function. */
+  csGLDRAWRANGEELEMENTS glDrawRangeElements;
 
   ////////////////////////////////////////////////////////////////////
   //                            iGraphics3D
@@ -675,11 +681,6 @@ public:
 
   /// Do backbuffer printing
   void Print (csRect const* area);
-
-  /// Pseudo-instancing 
-  void SetupInstance (size_t instParamNum, const csVertexAttrib targets[],  
-    csShaderVariable* const params[]); 
-  void TeardownInstance (size_t instParamNum, const csVertexAttrib targets[]); 
 
   /// Drawroutine. Only way to draw stuff
   void DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
