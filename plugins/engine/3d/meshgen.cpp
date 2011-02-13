@@ -20,11 +20,11 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
 #include "csutil/randomgen.h"
-#include "plugins/engine/3d/engine.h"
-#include "plugins/engine/3d/meshgen.h"
 #include "iengine/material.h"
 #include "igraphic/image.h"
 
+#include "engine.h"
+#include "meshgen.h"
 #include "meshgen_positionmap.h"
 
 
@@ -219,48 +219,58 @@ void csMeshGeneratorGeometry::SetDensity (float density)
   csMeshGeneratorGeometry::density = density;
 }
 
-iMeshWrapper* csMeshGeneratorGeometry::AllocMesh (
+bool csMeshGeneratorGeometry::AllocMesh (
   int cidx, const csMGCell& cell, float sqdist,
-  size_t& lod, csMGInstVertexInfo& vertexInfo) 
+  csMGPosition& pos)
 {
-  lod = GetLODLevel (sqdist);
-  if (lod == csArrayItemNotFound) return 0;
+  size_t lod = GetLODLevel (sqdist);
+  if (lod == csArrayItemNotFound) return false;
+  pos.lod = lod;
 
   csMGGeom& geom = factories[lod];
-  if (geom.vertexinfo_setaside.GetSize () > 0)
-  {
-    vertexInfo = geom.vertexinfo_setaside.Pop();
-    return geom.mesh; 
+  if (geom.vertexInfoArray.transformVar->GetArraySize() == 0) 
+  { 
+    geom.mesh->GetMovable ()->SetSector (generator->GetSector ()); 
+    geom.mesh->GetMovable ()->UpdateMove ();
   }
-  else
-  {
-    if (geom.vertexInfoArray.transformVar->GetArraySize() == 0) 
-    { 
-      geom.mesh->GetMovable ()->SetSector (generator->GetSector ()); 
-      geom.mesh->GetMovable ()->UpdateMove ();
-    }
-    vertexInfo.transformVar.AttachNew (new csShaderVariable);
-  	vertexInfo.fadeFactorVar.AttachNew (new csShaderVariable);
-    vertexInfo.windRandVar.AttachNew (new csShaderVariable);
- 	  geom.vertexInfoArray.transformVar->AddVariableToArray (vertexInfo.transformVar);
- 	  geom.vertexInfoArray.fadeFactorVar->AddVariableToArray (vertexInfo.fadeFactorVar);
-    geom.vertexInfoArray.windRandVar->AddVariableToArray (vertexInfo.windRandVar);
-    vertexInfo.fadeFactorVar->SetValue(1.0f);
-    vertexInfo.windRandVar->SetValue(rng.Get());
-
-    return geom.mesh;
-  }
+  
+  size_t i = geom.allPositions.GetSize();
+  pos.idInGeometry = i;
+  csMGPosition*& newPos = geom.allPositions.GetExtend (i);
+  newPos = &pos;
+  
+  csMGInstVertexInfo& vertexInfo = geom.allVertexInfo.GetExtend (i);
+  vertexInfo.transformVar.AttachNew (new csShaderVariable);
+  vertexInfo.fadeFactorVar.AttachNew (new csShaderVariable);
+  vertexInfo.windRandVar.AttachNew (new csShaderVariable);
+  geom.vertexInfoArray.transformVar->AddVariableToArray (vertexInfo.transformVar);
+  geom.vertexInfoArray.fadeFactorVar->AddVariableToArray (vertexInfo.fadeFactorVar);
+  geom.vertexInfoArray.windRandVar->AddVariableToArray (vertexInfo.windRandVar);
+  vertexInfo.fadeFactorVar->SetValue(1.0f);
+  vertexInfo.windRandVar->SetValue(rng.Get());
+  
+  return true;
 }
 
-void csMeshGeneratorGeometry::MoveMesh (int cidx, iMeshWrapper* mesh,
-                                        size_t lod, csMGInstVertexInfo& vertexInfo, 
+void csMeshGeneratorGeometry::MoveMesh (int cidx,
+                                        const csMGPosition& pos,
                                         const csVector3& position,
                                         const csMatrix3& matrix)
 {
+  csMGGeom& geom = factories[pos.lod];
+  csMGInstVertexInfo& vertexInfo = geom.allVertexInfo[pos.idInGeometry];
+  iMeshWrapper* mesh = geom.mesh;
   csVector3 meshpos = mesh->GetMovable ()->GetFullPosition ();
-  csVector3 pos = position - meshpos;
-  csReversibleTransform tr (matrix, pos);
+  csVector3 relPos = position - meshpos;
+  csReversibleTransform tr (matrix, relPos);
   vertexInfo.transformVar->SetValue (tr);
+}
+
+void csMeshGeneratorGeometry::SetFade (csMGPosition& p, float factor)
+{
+  csMGGeom& geom = factories[p.lod];
+  csMGInstVertexInfo& vertexInfo = geom.allVertexInfo[p.idInGeometry];
+  vertexInfo.fadeFactorVar->SetValue (factor);
 }
 
 void csMeshGeneratorGeometry::SetWindDirection (float x, float z)
@@ -297,45 +307,34 @@ void csMeshGeneratorGeometry::SetWindSpeed (float speed)
   }
 }
 
-void csMeshGeneratorGeometry::SetAsideMesh (int cidx, iMeshWrapper* mesh,
-                                            size_t lod, csMGInstVertexInfo& vertexInfo)
+void csMeshGeneratorGeometry::FreeMesh (int cidx, csMGPosition& pos)
 {
-  csMGGeom& geom = factories[lod];
-  geom.vertexinfo_setaside.Push (vertexInfo);
+  csMGGeom& geom = factories[pos.lod];
+  
+  size_t index = pos.idInGeometry;
+  geom.allPositions.DeleteIndexFast (index);
+  if (index < geom.allPositions.GetSize())
+  {
+    csMGPosition*& newPos = geom.allPositions[index];
+    newPos->idInGeometry = index;
+  
+    csMGInstVertexInfo& vertexInfo = geom.allVertexInfo[index];
+    geom.vertexInfoArray.transformVar->SetArrayElement (index, vertexInfo.transformVar);
+    geom.vertexInfoArray.fadeFactorVar->SetArrayElement (index, vertexInfo.fadeFactorVar);
+    geom.vertexInfoArray.windRandVar->SetArrayElement (index, vertexInfo.windRandVar);
+  }
+  geom.vertexInfoArray.transformVar->SetArraySize (geom.allPositions.GetSize ());
+  geom.vertexInfoArray.fadeFactorVar->SetArraySize (geom.allPositions.GetSize ());
+  geom.vertexInfoArray.windRandVar->SetArraySize (geom.allPositions.GetSize ());
 }
 
-void csMeshGeneratorGeometry::FreeSetAsideMeshes ()
+void csMeshGeneratorGeometry::UnusedMeshesCleanup ()
 {
   size_t lod;
   for (lod = 0 ; lod < factories.GetSize () ; lod++)
   {
     csMGGeom& geom = factories[lod];
-    bool varRemoved = false; 
-    while (geom.vertexinfo_setaside.GetSize() > 0) 
-    { 
-      csMGInstVertexInfo vertexInfo = geom.vertexinfo_setaside.Pop (); 
-      size_t idx = geom.vertexInfoArray.transformVar->FindArrayElement (vertexInfo.transformVar); 
-      if (idx != csArrayItemNotFound) 
-      { 
-        geom.vertexInfoArray.transformVar->RemoveFromArray (idx); 
-        varRemoved = true; 
-      } 
-
-      idx = geom.vertexInfoArray.fadeFactorVar->FindArrayElement (vertexInfo.fadeFactorVar); 
-      if (idx != csArrayItemNotFound) 
-      { 
-        geom.vertexInfoArray.fadeFactorVar->RemoveFromArray (idx); 
-        varRemoved = true; 
-      } 
-
-      idx = geom.vertexInfoArray.windRandVar->FindArrayElement (vertexInfo.windRandVar); 
-      if (idx != csArrayItemNotFound) 
-      { 
-        geom.vertexInfoArray.windRandVar->RemoveFromArray (idx); 
-        varRemoved = true; 
-      } 
-    } 
-    if (varRemoved && (geom.vertexInfoArray.transformVar->GetArraySize() == 0)) 
+    if (geom.vertexInfoArray.transformVar->GetArraySize() == 0)
       geom.mesh->GetMovable()->ClearSectors (); 
   }
 }
@@ -759,7 +758,7 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
             else if (rot >= CS_GEOM_MAX_ROTATIONS) rot = CS_GEOM_MAX_ROTATIONS-1;
             pos.rotation = rot;
             pos.random = random.Get ();
-            block->positions.Push (pos);
+            block->positions.Push (new csMGPosition (pos));
 	    
 	    if (mpos_count == 0)
 	      positionMap.MarkAreaUsed (area, r, x, z);
@@ -839,39 +838,23 @@ void csMeshGenerator::AllocateBlock (int cidx, csMGCell& cell)
   }
 }
 
-void csMeshGenerator::SetFade (iMeshWrapper* mesh, uint mode)
-{
-  if (!mesh) return;
-  mesh->GetMeshObject ()->SetMixMode (mode);
-  iSceneNode* sn = mesh->QuerySceneNode ();
-  const csRef<iSceneNodeArray> children = sn->GetChildrenArray ();
-  size_t i;
-  for (i = 0 ; i < children->GetSize(); i++)
-    SetFade (children->Get (i)->QueryMesh (), mode);
-}
-
-void csMeshGenerator::SetFade (csMGPosition& p, float factor)
-{
-  p.vertexInfo.fadeFactorVar->SetValue (factor);
-}
-
 void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
                                       const csVector3& pos,
                                       const csVector3& delta)
 {
   CS_ASSERT (cell.block != 0);
   CS_ASSERT (sector != 0);
-  csArray<csMGPosition>& positions = cell.block->positions;
+  csArray<csMGPosition*>& positions = cell.block->positions;
   GetTotalMaxDist ();
   size_t i;
   for (i = 0 ; i < positions.GetSize () ; i++)
   {
-    csMGPosition& p = positions[i];
+    csMGPosition& p = *(positions[i]);
 
     float sqdist = csSquaredDist::PointPoint (pos, p.position);
     if (sqdist < sq_total_max_dist)
     {
-      if (!p.mesh)
+      if (p.idInGeometry == csArrayItemNotFound)
       {
         // We didn't have a mesh here so we allocate one.
         // But first we test if we have density scaling.
@@ -891,14 +874,11 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
 
         if (show)
         {
-          iMeshWrapper* mesh = geometries[p.geom_type]->AllocMesh (
-            cidx, cell, sqdist, p.lod, p.vertexInfo);
-          if (mesh)
+          if (geometries[p.geom_type]->AllocMesh (cidx, cell, sqdist, p))
           {
-            p.mesh = mesh;
             p.last_mixmode = ~0;
-            geometries[p.geom_type]->MoveMesh (cidx, mesh, p.lod,
-              p.vertexInfo, p.position, rotation_matrices[p.rotation]);
+            geometries[p.geom_type]->MoveMesh (cidx, p,
+					       p.position, rotation_matrices[p.rotation]);
           }
         }
       }
@@ -908,27 +888,23 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
         if (!geometries[p.geom_type]->IsRightLOD (sqdist, p.lod))
         {
           // We need a different mesh here.
-          geometries[p.geom_type]->SetAsideMesh (cidx, p.mesh, p.lod,
-            p.vertexInfo);
-          iMeshWrapper* mesh = geometries[p.geom_type]->AllocMesh (
-            cidx, cell, sqdist, p.lod, p.vertexInfo);
-          p.mesh = mesh;
-          if (mesh)
+          geometries[p.geom_type]->FreeMesh (cidx, p);
+          if (geometries[p.geom_type]->AllocMesh (cidx, cell, sqdist, p))
           {
             p.last_mixmode = ~0;
-            geometries[p.geom_type]->MoveMesh (cidx, mesh, p.lod, p.vertexInfo,
+            geometries[p.geom_type]->MoveMesh (cidx, p,
               p.position, rotation_matrices[p.rotation]);
           }
         }
         else if(!delta.IsZero())
         { 
           // LOD level is fine, adjust for new pos 
-          geometries[p.geom_type]->MoveMesh (cidx, p.mesh, p.lod, p.vertexInfo, 
+          geometries[p.geom_type]->MoveMesh (cidx, p, 
             p.position, rotation_matrices[p.rotation]); 
         } 
       }
 
-      if (!delta.IsZero() && p.mesh && use_alpha_scaling)
+      if (!delta.IsZero() && (p.idInGeometry != csArrayItemNotFound) && use_alpha_scaling)
       {
         // These are used when we have both density and alpha scaling.
         // The alpha limits are adjusted for the density added mesh.
@@ -957,16 +933,15 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
             p.addedDist = 0;
         }
  
-        SetFade (p, factor);
+        geometries[p.geom_type]->SetFade (p, factor);
       }
     }
     else
     {
-      if (p.mesh)
+      if (p.idInGeometry != csArrayItemNotFound)
       {
-        geometries[p.geom_type]->SetAsideMesh (cidx, p.mesh, p.lod,
-          p.vertexInfo);
-        p.mesh = 0;
+        geometries[p.geom_type]->FreeMesh (cidx, p);
+        p.idInGeometry = csArrayItemNotFound;
         p.addedDist = 0;
       }
     }
@@ -1073,11 +1048,11 @@ void csMeshGenerator::UpdateForPosition (const csVector3& pos)
     }
   }
 
-  // Now really free the meshes we didn't reuse.
+  // Final cleanup
   size_t i;
   for (i = 0 ; i < geometries.GetSize () ; i++)
   {
-    geometries[i]->FreeSetAsideMeshes ();
+    geometries[i]->UnusedMeshesCleanup ();
   }
 }
 
@@ -1085,17 +1060,17 @@ void csMeshGenerator::FreeMeshesInBlock (int cidx, csMGCell& cell)
 {
   if (cell.block)
   {
-    csArray<csMGPosition>& positions = cell.block->positions;
+    csArray<csMGPosition*>& positions = cell.block->positions;
     size_t i;
     for (i = 0 ; i < positions.GetSize () ; i++)
     {
-      if (positions[i].mesh)
+      if (positions[i]->idInGeometry != csArrayItemNotFound)
       {
-        CS_ASSERT (positions[i].geom_type >= 0);
-        CS_ASSERT (positions[i].geom_type < geometries.GetSize ());
-        geometries[positions[i].geom_type]->SetAsideMesh (cidx,
-          positions[i].mesh, positions[i].lod, positions[i].vertexInfo);
-        positions[i].mesh = 0;
+        CS_ASSERT (positions[i]->geom_type >= 0);
+        CS_ASSERT (positions[i]->geom_type < geometries.GetSize ());
+        geometries[positions[i]->geom_type]->FreeMesh (cidx,
+          *(positions[i]));
+        positions[i]->idInGeometry = csArrayItemNotFound;
       }
     }
   }

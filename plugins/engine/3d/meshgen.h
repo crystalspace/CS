@@ -55,6 +55,8 @@ struct csMGInstVertexInfo
   csRef<csShaderVariable> windRandVar;
 };
 
+struct csMGPosition;
+
 /**
  * A single geometry (for a single lod level).
  */
@@ -67,7 +69,9 @@ struct csMGGeom
   csMGInstVertexInfo vertexInfoArray;
   csRef<csShaderVariable> windDataVar;
   csRef<iMeshWrapper> mesh;
-  csArray<csMGInstVertexInfo> vertexinfo_setaside;
+
+  csArray<csMGPosition*> allPositions;
+  csArray<csMGInstVertexInfo> allVertexInfo;
 };
 
 struct csMGDensityMaterialFactor
@@ -179,37 +183,28 @@ public:
   /**
    * Allocate a new mesh for the given distance. Possibly from the
    * cache if possible. If the distance is too large it will return 0.
-   * It will also return an instance_id if the mesh represents an
-   * instance from an instmesh.
    */
-  iMeshWrapper* AllocMesh (int cidx, const csMGCell& cell,
-      float sqdist, size_t& lod, csMGInstVertexInfo& vertexInfo);
+  bool AllocMesh (int cidx, const csMGCell& cell,
+      float sqdist, csMGPosition& pos);
 
   /**
-   * Set aside the mesh temporarily. This is called if we have a mesh that
-   * we want to free but we don't free it yet because we might want to allocate
-   * it again. Meshes that are put aside are not removed from the sector (that
-   * is a rather expensive operation) but they are only put in a queue.
-   * AllocMesh() will first check that queue. At the end of the frame you have
-   * to call FreeSetAsideMeshes() to really free the remaining meshes that
-   * haven't been reused.
+   * Free a mesh instance.
    */
-  void SetAsideMesh (int cidx, iMeshWrapper* mesh,
-      size_t lod, csMGInstVertexInfo& vertexInfo);
+  void FreeMesh (int cidx, csMGPosition& pos);
 
   /**
-   * Free all meshes that were put aside and that were not reused by
-   * AllocMesh().
+   * Cleanup on meshes that are not used.
    */
-  void FreeSetAsideMeshes ();
+  void UnusedMeshesCleanup ();
 
   /**
    * Move the mesh to some position.
    */
-  void MoveMesh (int cidx, iMeshWrapper* mesh, size_t lod,  
-    csMGInstVertexInfo& vertexInfo, const csVector3& position,  
-    const csMatrix3& matrix); 
+  void MoveMesh (int cidx, const csMGPosition& pos,
+		 const csVector3& position, const csMatrix3& matrix); 
 
+  /// Set the fade for a mesh.
+  void SetFade (csMGPosition& p, float factor);
 
   /**
    * Get the right lod level for the given squared distance.
@@ -260,15 +255,14 @@ struct csMGPosition
    */
   uint last_mixmode;
 
-  /// An optional mesh for this position. Can be 0.
-  iMeshWrapper* mesh;
   /// The LOD level for the mesh above.
   size_t lod;
 
-  /// Vertex info for instancing.
-  csMGInstVertexInfo vertexInfo;
+  /// Index of geometry in csMGGeom.
+  size_t idInGeometry;
 
-  csMGPosition () : last_mixmode (CS_FX_COPY), mesh (0) { } 
+  csMGPosition () : last_mixmode (CS_FX_COPY), //mesh (0),
+    idInGeometry (csArrayItemNotFound) { } 
 
 };
 
@@ -285,7 +279,7 @@ struct csMGPositionBlock
   /// Used when block is in 'inuse_blocks'.
   csMGPositionBlock* next, * prev;
 
-  csArray<csMGPosition> positions;
+  csArray<csMGPosition*> positions;
 
   /// An index back to the cell that holds this block (or ~0).
   size_t parent_cell;
@@ -442,10 +436,6 @@ private:
   float GetWorldX (int x) { return samplebox.MinX () + x * samplecellwidth_x; }
   /// Cell coordinate to world Z.
   float GetWorldZ (int z) { return samplebox.MinZ () + z * samplecellheight_z; }
-
-  /// Set the fade for a mesh.
-  void SetFade (csMGPosition& p, float factor);
-  void SetFade (iMeshWrapper* mesh, uint mode);
 
   /// Statistics.
   size_t CountPositions (int cidx, csMGCell& cell);
