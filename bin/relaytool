@@ -503,6 +503,11 @@ while (( i <= $# )); do
         # libdl won't ever be supported by relaytool, so just pass it to stdout
         echo -n "$a "
 
+    elif [ "$a" == "-framework" ]; then
+	# It seems we're on OS/X. Just pass -framework args through...
+        (( i++ ))
+	echo -n " -framework ${!i} "
+
     elif [ "${a:0:2}" == "-l" ]; then
         lib="${a:2}"
         
