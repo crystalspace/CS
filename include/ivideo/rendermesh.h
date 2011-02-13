@@ -221,10 +221,21 @@ namespace Graphics
     /// Holder of default render buffers
     csRef<csRenderBufferHolder> buffers;
 
+    /// Whether to enable instancing.
     bool doInstancing; 
+    /// Number of instance parameters.
     size_t instParamNum; 
+    /// Targets of instance parameters.
     const csVertexAttrib* instParamsTargets; 
-    size_t instanceNum; 
+    /// Number of instances.
+    size_t instanceNum;
+    /**
+     * Instance parameters.
+     * The "instance" array (elements of type csShaderVariable**) has one
+     * "parameter" array for each instance. The parameter array (elements of
+     * type csShaderVariable*) has one shader variable for each instance
+     * parameter.
+     */
     csShaderVariable** const * instParams;
   };
 
