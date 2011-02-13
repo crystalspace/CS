@@ -46,20 +46,6 @@ struct csMGCell;
 #define CS_GEOM_MAX_ROTATIONS 16
 
 /**
- * A representation of a single mesh. Can be either a stand-alone
- * mesh or else an instance of a mesh.
- */
-struct csMGMesh
-{
-  // A reference to either the standalone mesh or else the instmesh
-  // of which we represent a single instance.
-  csRef<iMeshWrapper> mesh;
-  // If this is equal to csArrayItemNotFound then we are a single mesh.
-  // Otherwise this is the id of the instance.
-  size_t instance_id;
-};
-
-/**
  * Per-instance information.
  */
 struct csMGInstVertexInfo
