@@ -39,6 +39,7 @@
 #include "csgfx/imagememory.h"
 #include "csgfx/renderbuffer.h"
 #include "csplugincommon/opengl/assumedstate.h"
+#include "csplugincommon/opengl/glenum_identstrs.h"
 #include "csplugincommon/opengl/glhelper.h"
 #include "csplugincommon/opengl/glstates.h"
 #include "csplugincommon/render3d/normalizationcube.h"
@@ -58,7 +59,6 @@ const int CS_CLIPPER_EMPTY = 0xf008412;
 
 // uses CS_CLIPPER_EMPTY
 #include "gl_stringlists.h"
-#include <csplugincommon/opengl/glenum_identstrs.h>
 
 
 
