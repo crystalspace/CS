@@ -45,16 +45,6 @@ struct csMGCell;
 
 #define CS_GEOM_MAX_ROTATIONS 16
 
-/**
- * Per-instance information.
- */
-struct csMGInstVertexInfo
-{
-  csRef<csShaderVariable> transformVar;
-  csRef<csShaderVariable> fadeFactorVar;
-  csRef<csShaderVariable> windRandVar;
-};
-
 struct csMGPosition;
 
 /**
@@ -66,12 +56,30 @@ struct csMGGeom
   float maxdistance;
   float sqmaxdistance;
 
-  csMGInstVertexInfo vertexInfoArray;
   csRef<csShaderVariable> windDataVar;
+  csRef<csShaderVariable> instancesNumVar;
   csRef<iMeshWrapper> mesh;
 
+  // All instances of this geometry
   csArray<csMGPosition*> allPositions;
-  csArray<csMGInstVertexInfo> allVertexInfo;
+  struct Transform
+  {
+    float m[12];
+  };
+  csDirtyAccessArray<Transform> allTransforms;
+  csDirtyAccessArray<float> allFade;
+  csDirtyAccessArray<float> allWindRand;
+  
+  // Buffers/SVs for rendering
+  bool dataDirty;
+  csRef<iRenderBuffer> transformBuffer;
+  csRef<iRenderBuffer> fadeBuffer;
+  csRef<iRenderBuffer> windRandBuffer;
+  csRef<csShaderVariable> transformVar;
+  csRef<csShaderVariable> fadeFactorVar;
+  csRef<csShaderVariable> windRandVar;
+  
+  csMGGeom() : dataDirty (true) {}
 };
 
 struct csMGDensityMaterialFactor
@@ -193,9 +201,11 @@ public:
   void FreeMesh (int cidx, csMGPosition& pos);
 
   /**
-   * Cleanup on meshes that are not used.
+   * Perform housekeeping on geometry after an update for a position.
+   * Takes care of updating buffers for new instancing data or removing
+   * a mesh from all sectors if not used.
    */
-  void UnusedMeshesCleanup ();
+  void FinishUpdate ();
 
   /**
    * Move the mesh to some position.
@@ -448,6 +458,7 @@ public:
   csEngine* engine;
   csRef<iStringSet> strings;
   csRef<iShaderVarStringSet> SVstrings;
+  CS::ShaderVarStringID varInstancesNum;
   CS::ShaderVarStringID varTransform;
   CS::ShaderVarStringID varFadeFactor;
   CS::ShaderVarStringID varWindData;

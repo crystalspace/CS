@@ -19,6 +19,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
+#include "csgfx/renderbuffer.h"
 #include "csutil/randomgen.h"
 #include "iengine/material.h"
 #include "igraphic/image.h"
@@ -181,19 +182,15 @@ void csMeshGeneratorGeometry::AddFactory (iMeshFactoryWrapper* factory,
   g.mesh->SetZBufModeRecursive (CS_ZBUF_USE); 
   g.windDataVar.AttachNew (new csShaderVariable (generator->varWindData));
   g.windDataVar->SetType (csShaderVariable::VECTOR3);
-  g.vertexInfoArray.transformVar.AttachNew (new csShaderVariable (generator->varTransform)); 
-  g.vertexInfoArray.transformVar->SetType (csShaderVariable::ARRAY); 
-  g.vertexInfoArray.transformVar->SetArraySize (0); 
-  g.vertexInfoArray.fadeFactorVar.AttachNew (new csShaderVariable (generator->varFadeFactor)); 
-  g.vertexInfoArray.fadeFactorVar->SetType (csShaderVariable::ARRAY);
-  g.vertexInfoArray.fadeFactorVar->SetArraySize (0);
-  g.vertexInfoArray.windRandVar.AttachNew (new csShaderVariable (generator->varWindRand)); 
-  g.vertexInfoArray.windRandVar->SetType (csShaderVariable::ARRAY);
-  g.vertexInfoArray.windRandVar->SetArraySize (0); 
+  g.instancesNumVar.AttachNew (new csShaderVariable (generator->varInstancesNum));
+  g.transformVar.AttachNew (new csShaderVariable (generator->varTransform)); 
+  g.fadeFactorVar.AttachNew (new csShaderVariable (generator->varFadeFactor)); 
+  g.windRandVar.AttachNew (new csShaderVariable (generator->varWindRand)); 
   AddSVToMesh (g.mesh, g.windDataVar);
-  AddSVToMesh (g.mesh, g.vertexInfoArray.transformVar); 
-  AddSVToMesh (g.mesh, g.vertexInfoArray.fadeFactorVar); 
-  AddSVToMesh (g.mesh, g.vertexInfoArray.windRandVar);
+  AddSVToMesh (g.mesh, g.instancesNumVar);
+  AddSVToMesh (g.mesh, g.transformVar); 
+  AddSVToMesh (g.mesh, g.fadeFactorVar); 
+  AddSVToMesh (g.mesh, g.windRandVar);
 
   csBox3 bbox;
   bbox.SetSize (csVector3 (maxdist, maxdist, maxdist));
@@ -228,26 +225,16 @@ bool csMeshGeneratorGeometry::AllocMesh (
   pos.lod = lod;
 
   csMGGeom& geom = factories[lod];
-  if (geom.vertexInfoArray.transformVar->GetArraySize() == 0) 
-  { 
-    geom.mesh->GetMovable ()->SetSector (generator->GetSector ()); 
-    geom.mesh->GetMovable ()->UpdateMove ();
-  }
-  
   size_t i = geom.allPositions.GetSize();
   pos.idInGeometry = i;
   csMGPosition*& newPos = geom.allPositions.GetExtend (i);
   newPos = &pos;
   
-  csMGInstVertexInfo& vertexInfo = geom.allVertexInfo.GetExtend (i);
-  vertexInfo.transformVar.AttachNew (new csShaderVariable);
-  vertexInfo.fadeFactorVar.AttachNew (new csShaderVariable);
-  vertexInfo.windRandVar.AttachNew (new csShaderVariable);
-  geom.vertexInfoArray.transformVar->AddVariableToArray (vertexInfo.transformVar);
-  geom.vertexInfoArray.fadeFactorVar->AddVariableToArray (vertexInfo.fadeFactorVar);
-  geom.vertexInfoArray.windRandVar->AddVariableToArray (vertexInfo.windRandVar);
-  vertexInfo.fadeFactorVar->SetValue(1.0f);
-  vertexInfo.windRandVar->SetValue(rng.Get());
+  geom.allTransforms.GetExtend (i);
+  geom.allFade.GetExtend (i) = 1.0f;
+  geom.allWindRand.GetExtend (i) = rng.Get();
+
+  geom.dataDirty = true;
   
   return true;
 }
@@ -258,19 +245,38 @@ void csMeshGeneratorGeometry::MoveMesh (int cidx,
                                         const csMatrix3& matrix)
 {
   csMGGeom& geom = factories[pos.lod];
-  csMGInstVertexInfo& vertexInfo = geom.allVertexInfo[pos.idInGeometry];
-  iMeshWrapper* mesh = geom.mesh;
-  csVector3 meshpos = mesh->GetMovable ()->GetFullPosition ();
+  csVector3 meshpos = geom.mesh->GetMovable ()->GetFullPosition ();
   csVector3 relPos = position - meshpos;
-  csReversibleTransform tr (matrix, relPos);
-  vertexInfo.transformVar->SetValue (tr);
+  csMGGeom::Transform& tf = geom.allTransforms[pos.idInGeometry];
+
+  /* Based on makeGLMatrix()
+     (Transposition 'inherited' from there ...) */
+  tf.m[0] = matrix.m11;
+  tf.m[4] = matrix.m12;
+  tf.m[8] = matrix.m13;
+
+  tf.m[1] = matrix.m21;
+  tf.m[5] = matrix.m22;
+  tf.m[9] = matrix.m23;
+
+  tf.m[2] = matrix.m31;
+  tf.m[6] = matrix.m32;
+  tf.m[10] = matrix.m33;
+
+  tf.m[3] = relPos.x;
+  tf.m[7] = relPos.y;
+  tf.m[11] = relPos.z;
+
+  geom.dataDirty = true;
 }
 
 void csMeshGeneratorGeometry::SetFade (csMGPosition& p, float factor)
 {
   csMGGeom& geom = factories[p.lod];
-  csMGInstVertexInfo& vertexInfo = geom.allVertexInfo[p.idInGeometry];
-  vertexInfo.fadeFactorVar->SetValue (factor);
+  float& fade = geom.allFade[p.idInGeometry];
+  fade = factor;
+
+  geom.dataDirty = true;
 }
 
 void csMeshGeneratorGeometry::SetWindDirection (float x, float z)
@@ -313,29 +319,73 @@ void csMeshGeneratorGeometry::FreeMesh (int cidx, csMGPosition& pos)
   
   size_t index = pos.idInGeometry;
   geom.allPositions.DeleteIndexFast (index);
+  geom.allTransforms.DeleteIndexFast (index);
+  geom.allFade.DeleteIndexFast (index);
+  geom.allWindRand.DeleteIndexFast (index);
+  geom.dataDirty = true;
   if (index < geom.allPositions.GetSize())
   {
     csMGPosition*& newPos = geom.allPositions[index];
     newPos->idInGeometry = index;
-  
-    csMGInstVertexInfo& vertexInfo = geom.allVertexInfo[index];
-    geom.vertexInfoArray.transformVar->SetArrayElement (index, vertexInfo.transformVar);
-    geom.vertexInfoArray.fadeFactorVar->SetArrayElement (index, vertexInfo.fadeFactorVar);
-    geom.vertexInfoArray.windRandVar->SetArrayElement (index, vertexInfo.windRandVar);
   }
-  geom.vertexInfoArray.transformVar->SetArraySize (geom.allPositions.GetSize ());
-  geom.vertexInfoArray.fadeFactorVar->SetArraySize (geom.allPositions.GetSize ());
-  geom.vertexInfoArray.windRandVar->SetArraySize (geom.allPositions.GetSize ());
 }
 
-void csMeshGeneratorGeometry::UnusedMeshesCleanup ()
+void csMeshGeneratorGeometry::FinishUpdate ()
 {
   size_t lod;
   for (lod = 0 ; lod < factories.GetSize () ; lod++)
   {
     csMGGeom& geom = factories[lod];
-    if (geom.vertexInfoArray.transformVar->GetArraySize() == 0)
-      geom.mesh->GetMovable()->ClearSectors (); 
+    if (geom.allPositions.GetSize() == 0)
+    {
+      // No instances
+      geom.mesh->GetMovable()->ClearSectors ();
+    }
+    else
+    {
+      geom.mesh->GetMovable ()->SetSector (generator->GetSector ()); 
+      geom.mesh->GetMovable ()->UpdateMove ();
+      
+      geom.instancesNumVar->SetValue (int (geom.allPositions.GetSize()));
+
+      /* Update buffers
+         (Compare capacity instead of size so a buffer is kept if the number of
+         elements changes only slightly.) */
+      bool updateTransformData = geom.dataDirty;
+      if (!geom.transformBuffer
+	|| (geom.transformBuffer->GetElementCount() != geom.allTransforms.Capacity()))
+      {
+	geom.transformBuffer = csRenderBuffer::CreateRenderBuffer (geom.allTransforms.Capacity(),
+								   CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 12);
+	geom.transformVar->SetValue (geom.transformBuffer);
+	updateTransformData = true;
+      }
+      if (updateTransformData) geom.transformBuffer->SetData (geom.allTransforms.GetArray());
+
+      bool updateFadeData = geom.dataDirty;
+      if (!geom.fadeBuffer
+	|| (geom.fadeBuffer->GetElementCount() != geom.allFade.Capacity()))
+      {
+	geom.fadeBuffer = csRenderBuffer::CreateRenderBuffer (geom.allFade.Capacity(),
+							      CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 1);
+	geom.fadeFactorVar->SetValue (geom.fadeBuffer);
+	updateFadeData = true;
+      }
+      if (updateFadeData) geom.fadeBuffer->SetData (geom.allFade.GetArray());
+
+      bool updateWindData = geom.dataDirty;
+      if (!geom.windRandBuffer
+	|| (geom.windRandBuffer->GetElementCount() != geom.allWindRand.Capacity()))
+      {
+	geom.windRandBuffer = csRenderBuffer::CreateRenderBuffer (geom.allWindRand.Capacity(),
+								  CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 1);
+	geom.windRandVar->SetValue (geom.windRandBuffer);
+	updateWindData = true;
+      }
+      if (updateWindData) geom.windRandBuffer->SetData (geom.allWindRand.GetArray());
+      
+      geom.dataDirty = false;
+    }
   }
 }
 
@@ -402,6 +452,7 @@ csMeshGenerator::csMeshGenerator (csEngine* engine) :
     engine->objectRegistry, "crystalspace.shared.stringset");
   SVstrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
     engine->objectRegistry, "crystalspace.shader.variablenameset");
+  varInstancesNum = SVstrings->Request ("instances num");
   varTransform = SVstrings->Request ("instancing transforms");
   varFadeFactor = SVstrings->Request ("alpha factor");
   varWindData = SVstrings->Request ("wind data");
@@ -1048,11 +1099,11 @@ void csMeshGenerator::UpdateForPosition (const csVector3& pos)
     }
   }
 
-  // Final cleanup
+  // Housekeeping
   size_t i;
   for (i = 0 ; i < geometries.GetSize () ; i++)
   {
-    geometries[i]->UnusedMeshesCleanup ();
+    geometries[i]->FinishUpdate ();
   }
 }
 
