@@ -192,6 +192,8 @@ public:
 // To silence EnableZOffset/DisableZOffset
 #include "csutil/deprecated_warn_off.h"
 
+class ProfileScope;
+
 class csGLGraphics3D : public scfImplementation3<csGLGraphics3D, 
 						 iGraphics3D,
 						 iComponent,
@@ -210,6 +212,7 @@ private:
   bool isOpen;
   uint frameNum;
   
+  friend class ProfileScope;
   QueryPool queryPool;
   bool glProfiling;
   ProfilingHelper profileHelper;
@@ -503,17 +506,6 @@ public:
   csRef<csGLTextureManager> txtmgr;
   bool verbose;
   
-  class ProfileScope
-  {
-    csGLGraphics3D* renderer;
-    const char* descr;
-    int64 startStamp;
-    GLuint startQuery, endQuery;
-  public:
-    ProfileScope (csGLGraphics3D* renderer, const char* descr);
-    ~ProfileScope ();
-  };
-
   csGLGraphics3D (iBase *parent);
   virtual ~csGLGraphics3D ();
 

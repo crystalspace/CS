@@ -23,6 +23,7 @@
 
 #include "gl_render3d.h"
 #include "gl_renderbuffer.h"
+#include "profilescope.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
@@ -241,7 +242,7 @@ csGLVBOBufferManager::VBOSlot* csGLVBOBufferManager::GetVBOSlot (
 
     if (slot->bufferVersion != buffer->GetVersion ())
     {
-      csGLGraphics3D::ProfileScope _profile (G3D, "Buffer update");
+      ProfileScope _profile (G3D, "Buffer update");
       
       GLuint vboID;
       size_t offset;

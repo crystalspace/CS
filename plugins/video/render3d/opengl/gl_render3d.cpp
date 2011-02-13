@@ -54,6 +54,7 @@
 #include "gl_r2t_framebuf.h"
 #include "gl_render3d.h"
 #include "gl_txtmgr_basictex.h"
+#include "profilescope.h"
 
 const int CS_CLIPPER_EMPTY = 0xf008412;
 
@@ -164,31 +165,6 @@ void csGLGraphics3D::OutputMarkerString (const char* function,
   ext->glStringMarkerGREMEDY ((GLsizei)marker.Length (), marker);
 }
 
-
-csGLGraphics3D::ProfileScope::ProfileScope (csGLGraphics3D* renderer, const char* descr)
- : renderer (renderer), descr (descr), startStamp (0),
-   startQuery (0), endQuery (0)   
-{
-  if (renderer->glProfiling)
-  {
-    startQuery = renderer->queryPool.AllocQuery ();
-    endQuery = renderer->queryPool.AllocQuery ();
-    startStamp = csGetMicroTicks();
-    csGLGraphics3D::ext->glQueryCounter (startQuery, GL_TIMESTAMP);
-  }
-}
-
-csGLGraphics3D::ProfileScope::~ProfileScope ()
-{
-  if (startQuery != 0)
-  {
-    csGLGraphics3D::ext->glQueryCounter (endQuery, GL_TIMESTAMP);
-    renderer->profileHelper.RecordTimeSpan (renderer->frameNum,
-					    startStamp,
-					    startQuery, endQuery,
-					    descr);
-  }
-}
 
 void csGLGraphics3D::RecordProfileEvent (const char* descr)
 {
