@@ -10396,6 +10396,8 @@ sub DESTROY {
 *swig_instanceNum_set = *cspacec::RenderMeshModes_instanceNum_set;
 *swig_instParams_get = *cspacec::RenderMeshModes_instParams_get;
 *swig_instParams_set = *cspacec::RenderMeshModes_instParams_set;
+*swig_instParamBuffers_get = *cspacec::RenderMeshModes_instParamBuffers_get;
+*swig_instParamBuffers_set = *cspacec::RenderMeshModes_instParamBuffers_set;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -22829,6 +22831,7 @@ sub CS_VATTRIB_GENERIC_LAST () { $cspacec::CS_VATTRIB_GENERIC_LAST }
 sub CS_VATTRIB_GENERIC_NUM () { $cspacec::CS_VATTRIB_GENERIC_NUM }
 sub CS_IATTRIB_FIRST () { $cspacec::CS_IATTRIB_FIRST }
 sub CS_IATTRIB_LAST () { $cspacec::CS_IATTRIB_LAST }
+sub CS_IATTRIB_NUM () { $cspacec::CS_IATTRIB_NUM }
 sub CS_VATTRIB_UNUSED () { $cspacec::CS_VATTRIB_UNUSED }
 sub CS_VATTRIB_INVALID () { $cspacec::CS_VATTRIB_INVALID }
 sub CS_VATTRIB_POSITION () { $cspacec::CS_VATTRIB_POSITION }

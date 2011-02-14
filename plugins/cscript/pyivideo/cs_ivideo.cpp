@@ -13650,6 +13650,58 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_RenderMeshModes_instParamBuffers_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
+  iRenderBuffer **arg2 = (iRenderBuffer **) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_instParamBuffers_set",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instParamBuffers_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_p_iRenderBuffer, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "RenderMeshModes_instParamBuffers_set" "', argument " "2"" of type '" "iRenderBuffer **""'"); 
+  }
+  arg2 = reinterpret_cast< iRenderBuffer ** >(argp2);
+  if (arg1) (arg1)->instParamBuffers = arg2;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_RenderMeshModes_instParamBuffers_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  iRenderBuffer **result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_instParamBuffers_get",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instParamBuffers_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
+  result = (iRenderBuffer **) ((arg1)->instParamBuffers);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_p_iRenderBuffer, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *RenderMeshModes_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
@@ -25117,6 +25169,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"RenderMeshModes_instanceNum_get", _wrap_RenderMeshModes_instanceNum_get, METH_VARARGS, NULL},
 	 { (char *)"RenderMeshModes_instParams_set", _wrap_RenderMeshModes_instParams_set, METH_VARARGS, NULL},
 	 { (char *)"RenderMeshModes_instParams_get", _wrap_RenderMeshModes_instParams_get, METH_VARARGS, NULL},
+	 { (char *)"RenderMeshModes_instParamBuffers_set", _wrap_RenderMeshModes_instParamBuffers_set, METH_VARARGS, NULL},
+	 { (char *)"RenderMeshModes_instParamBuffers_get", _wrap_RenderMeshModes_instParamBuffers_get, METH_VARARGS, NULL},
 	 { (char *)"RenderMeshModes_swigregister", RenderMeshModes_swigregister, METH_VARARGS, NULL},
 	 { (char *)"RenderMeshIndexRange_start_set", _wrap_RenderMeshIndexRange_start_set, METH_VARARGS, NULL},
 	 { (char *)"RenderMeshIndexRange_start_get", _wrap_RenderMeshIndexRange_start_get, METH_VARARGS, NULL},
@@ -27030,6 +27084,7 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CS_VATTRIB_GENERIC_NUM",SWIG_From_int(static_cast< int >(((100+15) -100+1))));
   SWIG_Python_SetConstant(d, "CS_IATTRIB_FIRST",SWIG_From_int(static_cast< int >(200)));
   SWIG_Python_SetConstant(d, "CS_IATTRIB_LAST",SWIG_From_int(static_cast< int >((200+0))));
+  SWIG_Python_SetConstant(d, "CS_IATTRIB_NUM",SWIG_From_int(static_cast< int >(((200+0) -200+1))));
   SWIG_Python_SetConstant(d, "CS_VATTRIB_UNUSED",SWIG_From_int(static_cast< int >(CS_VATTRIB_UNUSED)));
   SWIG_Python_SetConstant(d, "CS_VATTRIB_INVALID",SWIG_From_int(static_cast< int >(CS_VATTRIB_INVALID)));
   SWIG_Python_SetConstant(d, "CS_VATTRIB_POSITION",SWIG_From_int(static_cast< int >(CS_VATTRIB_POSITION)));
