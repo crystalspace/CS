@@ -343,8 +343,10 @@ void csMeshGeneratorGeometry::FinishUpdate ()
     }
     else
     {
-      geom.mesh->GetMovable ()->SetSector (generator->GetSector ()); 
-      geom.mesh->GetMovable ()->UpdateMove ();
+      if (geom.mesh->GetMovable ()->GetSectors()->GetCount() == 0)
+      {
+	geom.mesh->GetMovable ()->SetSector (generator->GetSector ()); 
+      }
       
       geom.instancesNumVar->SetValue (int (geom.allPositions.GetSize()));
 
@@ -386,6 +388,7 @@ void csMeshGeneratorGeometry::FinishUpdate ()
       
       geom.dataDirty = false;
     }
+    geom.mesh->GetMovable ()->UpdateMove ();
   }
 }
 
@@ -419,7 +422,6 @@ void csMeshGeneratorGeometry::UpdatePosition (const csVector3& pos)
   for (size_t f = 0; f < factories.GetSize(); f++) 
   { 
     factories[f].mesh->GetMovable()->SetPosition (pos); 
-    factories[f].mesh->GetMovable()->UpdateMove (); 
   } 
 } 
 
