@@ -21,27 +21,14 @@
       <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 
     <input name="inputColor" type="rgba" />
-
-    <input name="alpha_factor" type="float" default="complex" private="yes">
-      <block location="cg:vertexIn">
-	<varying type="float" name="alpha_factor" />
-      </block>
-
-      <block location="cg:vertexMain">
-	alpha_factor = vertexIn.alpha_factor;
-      </block>
-
-      <block location="pass">
-	<instanceparam source="alpha factor" destination="vertexIn.alpha_factor" />
-      </block>
-    </input>
+    <input file="/shader-snippets/meshgen-extra.inp" private="yes" />
 
     <block location="cg:vertexToFragment">
       <varying type="float" name="alpha_color" />
     </block>
 
     <block location="cg:vertexMain">
-      alpha_color = alpha_factor;
+      alpha_color = meshgenPerInstanceExtra.y;
       outputColor.rgb = inputColor.rgb;
       outputColor.a = inputColor.a * alpha_color;
     </block>

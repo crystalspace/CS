@@ -184,13 +184,11 @@ void csMeshGeneratorGeometry::AddFactory (iMeshFactoryWrapper* factory,
   g.windDataVar->SetType (csShaderVariable::VECTOR3);
   g.instancesNumVar.AttachNew (new csShaderVariable (generator->varInstancesNum));
   g.transformVar.AttachNew (new csShaderVariable (generator->varTransform)); 
-  g.fadeFactorVar.AttachNew (new csShaderVariable (generator->varFadeFactor)); 
-  g.windRandVar.AttachNew (new csShaderVariable (generator->varWindRand)); 
+  g.instanceExtraVar.AttachNew (new csShaderVariable (generator->varInstanceExtra)); 
   AddSVToMesh (g.mesh, g.windDataVar);
   AddSVToMesh (g.mesh, g.instancesNumVar);
   AddSVToMesh (g.mesh, g.transformVar); 
-  AddSVToMesh (g.mesh, g.fadeFactorVar); 
-  AddSVToMesh (g.mesh, g.windRandVar);
+  AddSVToMesh (g.mesh, g.instanceExtraVar); 
 
   csBox3 bbox;
   bbox.SetSize (csVector3 (maxdist, maxdist, maxdist));
@@ -231,8 +229,7 @@ bool csMeshGeneratorGeometry::AllocMesh (
   newPos = &pos;
   
   geom.allTransforms.GetExtend (i);
-  geom.allFade.GetExtend (i) = 1.0f;
-  geom.allWindRand.GetExtend (i) = rng.Get();
+  geom.allInstanceExtra.GetExtend (i).Set (rng.Get(), 1.0f);
 
   geom.dataDirty = true;
   
@@ -273,8 +270,8 @@ void csMeshGeneratorGeometry::MoveMesh (int cidx,
 void csMeshGeneratorGeometry::SetFade (csMGPosition& p, float factor)
 {
   csMGGeom& geom = factories[p.lod];
-  float& fade = geom.allFade[p.idInGeometry];
-  fade = factor;
+  csMGGeom::InstanceExtra& extra = geom.allInstanceExtra[p.idInGeometry];
+  extra.fade = factor;
 
   geom.dataDirty = true;
 }
@@ -320,8 +317,7 @@ void csMeshGeneratorGeometry::FreeMesh (int cidx, csMGPosition& pos)
   size_t index = pos.idInGeometry;
   geom.allPositions.DeleteIndexFast (index);
   geom.allTransforms.DeleteIndexFast (index);
-  geom.allFade.DeleteIndexFast (index);
-  geom.allWindRand.DeleteIndexFast (index);
+  geom.allInstanceExtra.DeleteIndexFast (index);
   geom.dataDirty = true;
   if (index < geom.allPositions.GetSize())
   {
@@ -358,34 +354,25 @@ void csMeshGeneratorGeometry::FinishUpdate ()
 	|| (geom.transformBuffer->GetElementCount() != geom.allTransforms.Capacity()))
       {
 	geom.transformBuffer = csRenderBuffer::CreateRenderBuffer (geom.allTransforms.Capacity(),
-								   CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 12);
+								   CS_BUF_STREAM, CS_BUFCOMP_FLOAT,
+								   sizeof (csMGGeom::Transform) / sizeof(float));
 	geom.transformVar->SetValue (geom.transformBuffer);
 	updateTransformData = true;
       }
       if (updateTransformData) geom.transformBuffer->SetData (geom.allTransforms.GetArray());
 
-      bool updateFadeData = geom.dataDirty;
-      if (!geom.fadeBuffer
-	|| (geom.fadeBuffer->GetElementCount() != geom.allFade.Capacity()))
+      bool updateExtraData = geom.dataDirty;
+      if (!geom.instanceExtraBuffer
+	|| (geom.instanceExtraBuffer->GetElementCount() != geom.allInstanceExtra.Capacity()))
       {
-	geom.fadeBuffer = csRenderBuffer::CreateRenderBuffer (geom.allFade.Capacity(),
-							      CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 1);
-	geom.fadeFactorVar->SetValue (geom.fadeBuffer);
-	updateFadeData = true;
+	geom.instanceExtraBuffer = csRenderBuffer::CreateRenderBuffer (geom.allInstanceExtra.Capacity(),
+								       CS_BUF_STREAM, CS_BUFCOMP_FLOAT,
+								       sizeof (csMGGeom::InstanceExtra) / sizeof(float));
+	geom.instanceExtraVar->SetValue (geom.instanceExtraBuffer);
+	updateExtraData = true;
       }
-      if (updateFadeData) geom.fadeBuffer->SetData (geom.allFade.GetArray());
+      if (updateExtraData) geom.instanceExtraBuffer->SetData (geom.allInstanceExtra.GetArray());
 
-      bool updateWindData = geom.dataDirty;
-      if (!geom.windRandBuffer
-	|| (geom.windRandBuffer->GetElementCount() != geom.allWindRand.Capacity()))
-      {
-	geom.windRandBuffer = csRenderBuffer::CreateRenderBuffer (geom.allWindRand.Capacity(),
-								  CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 1);
-	geom.windRandVar->SetValue (geom.windRandBuffer);
-	updateWindData = true;
-      }
-      if (updateWindData) geom.windRandBuffer->SetData (geom.allWindRand.GetArray());
-      
       geom.dataDirty = false;
     }
     geom.mesh->GetMovable ()->UpdateMove ();
@@ -456,9 +443,8 @@ csMeshGenerator::csMeshGenerator (csEngine* engine) :
     engine->objectRegistry, "crystalspace.shader.variablenameset");
   varInstancesNum = SVstrings->Request ("instances num");
   varTransform = SVstrings->Request ("instancing transforms");
-  varFadeFactor = SVstrings->Request ("alpha factor");
+  varInstanceExtra = SVstrings->Request ("instance extra");
   varWindData = SVstrings->Request ("wind data");
-  varWindRand = SVstrings->Request ("wind seed");
 }
 
 csMeshGenerator::~csMeshGenerator ()

@@ -67,17 +67,25 @@ struct csMGGeom
     float m[12];
   };
   csDirtyAccessArray<Transform> allTransforms;
-  csDirtyAccessArray<float> allFade;
-  csDirtyAccessArray<float> allWindRand;
+  struct InstanceExtra
+  {
+    float windRand;
+    float fade;
+    
+    void Set (float windRand, float fade)
+    {
+      this->windRand = windRand;
+      this->fade = fade;
+    }
+  };
+  csDirtyAccessArray<InstanceExtra> allInstanceExtra;
   
   // Buffers/SVs for rendering
   bool dataDirty;
   csRef<iRenderBuffer> transformBuffer;
-  csRef<iRenderBuffer> fadeBuffer;
-  csRef<iRenderBuffer> windRandBuffer;
+  csRef<iRenderBuffer> instanceExtraBuffer;
   csRef<csShaderVariable> transformVar;
-  csRef<csShaderVariable> fadeFactorVar;
-  csRef<csShaderVariable> windRandVar;
+  csRef<csShaderVariable> instanceExtraVar;
   
   csMGGeom() : dataDirty (true) {}
 };
@@ -460,9 +468,8 @@ public:
   csRef<iShaderVarStringSet> SVstrings;
   CS::ShaderVarStringID varInstancesNum;
   CS::ShaderVarStringID varTransform;
-  CS::ShaderVarStringID varFadeFactor;
+  CS::ShaderVarStringID varInstanceExtra;
   CS::ShaderVarStringID varWindData;
-  CS::ShaderVarStringID varWindRand;
 
   csMeshGenerator (csEngine* engine);
   virtual ~csMeshGenerator ();
