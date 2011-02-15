@@ -279,7 +279,7 @@ struct csMGPosition
   /// Index of geometry in csMGGeom.
   size_t idInGeometry;
 
-  csMGPosition () : last_mixmode (CS_FX_COPY), //mesh (0),
+  csMGPosition () : last_mixmode (CS_FX_COPY),
     idInGeometry (csArrayItemNotFound) { } 
 
 };
