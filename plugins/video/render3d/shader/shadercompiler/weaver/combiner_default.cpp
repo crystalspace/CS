@@ -142,6 +142,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                 node->GetAttributeValue ("name")));
             }
             break;
+          case WeaverCompiler::XMLTOKEN_INSTANCEPARAM:
+            {
+              // For now only support 1 tag...
+              if (hasTag) return 0;
+              hasTag = true;
+              result.AttachNew (new scfString (
+                node->GetAttributeValue ("source")));
+            }
+            break;
           default:
             break;
         }
