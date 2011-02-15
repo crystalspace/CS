@@ -22,13 +22,22 @@
 
     <input name="inputColor" type="rgba" />
     <input file="/shader-snippets/meshgen-extra.inp" private="yes" />
+    <input file="/shader-snippets/instancingTransforms.inp" private="yes" />
+    <input file="/shader-snippets/ModelView.inp" private="yes" />
 
     <block location="cg:vertexToFragment">
       <varying type="float" name="alpha_color" />
     </block>
 
     <block location="cg:vertexMain">
-      alpha_color = meshgenPerInstanceExtra.y;
+      // Compute alpha at instance origin
+      float4 origin_obj = mul (instancingTransforms, float4 (0, 0, 0, 1));
+      float4 origin_eye = mul (ModelView, origin_obj);
+      float dist = length (origin_eye.xyz);
+      float fadeOpaqueDist = meshgenPerInstanceExtra.y;
+      float fadeScale = meshgenPerInstanceExtra.z;
+      alpha_color = saturate (1 - (dist-fadeOpaqueDist)*fadeScale);
+      
       outputColor.rgb = inputColor.rgb;
       outputColor.a = inputColor.a * alpha_color;
     </block>

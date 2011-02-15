@@ -229,7 +229,11 @@ bool csMeshGeneratorGeometry::AllocMesh (
   newPos = &pos;
   
   geom.allTransforms.GetExtend (i);
-  geom.allInstanceExtra.GetExtend (i).Set (rng.Get(), 1.0f);
+  float fadeOpaqueDist =
+    generator->use_alpha_scaling ? generator->alpha_mindist : generator->total_max_dist;
+  float fadeDistScale =
+    generator->use_alpha_scaling ? generator->alpha_scale : 0;
+  geom.allInstanceExtra.GetExtend (i).Set (rng.Get(), fadeOpaqueDist, fadeDistScale);
 
   geom.dataDirty = true;
   
@@ -267,11 +271,12 @@ void csMeshGeneratorGeometry::MoveMesh (int cidx,
   geom.dataDirty = true;
 }
 
-void csMeshGeneratorGeometry::SetFade (csMGPosition& p, float factor)
+void csMeshGeneratorGeometry::SetFadeParams (csMGPosition& p, float opaqueDist, float scale)
 {
   csMGGeom& geom = factories[p.lod];
   csMGGeom::InstanceExtra& extra = geom.allInstanceExtra[p.idInGeometry];
-  extra.fade = factor;
+  extra.fadeOpaqueDist = opaqueDist;
+  extra.fadeDistScale = scale;
 
   geom.dataDirty = true;
 }
@@ -918,6 +923,14 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
             p.last_mixmode = ~0;
             geometries[p.geom_type]->MoveMesh (cidx, p,
 					       p.position, rotation_matrices[p.rotation]);
+
+	    if (use_density_scaling && (p.addedDist > 0))
+	    {
+	      float correct_alpha_maxdist = p.addedDist;
+	      float correct_alpha_mindist = p.addedDist*(alpha_mindist/alpha_maxdist);
+	      float correct_scale = 1.0f/(correct_alpha_maxdist-correct_alpha_mindist);
+	      geometries[p.geom_type]->SetFadeParams (p, correct_alpha_mindist, correct_scale);
+	    }
           }
         }
       }
@@ -941,38 +954,6 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
           geometries[p.geom_type]->MoveMesh (cidx, p, 
             p.position, rotation_matrices[p.rotation]); 
         } 
-      }
-
-      if (!delta.IsZero() && (p.idInGeometry != csArrayItemNotFound) && use_alpha_scaling)
-      {
-        // These are used when we have both density and alpha scaling.
-        // The alpha limits are adjusted for the density added mesh.
-        float correct_alpha_maxdist = alpha_maxdist;
-        float correct_sq_alpha_mindist = sq_alpha_mindist;
-        float correct_scale = alpha_scale;
-
-        if (use_density_scaling && p.addedDist > 0)
-        {
-          correct_alpha_maxdist = p.addedDist;
-          float correct_alpha_mindist = p.addedDist*(alpha_mindist/alpha_maxdist);
-          correct_sq_alpha_mindist = correct_alpha_mindist*correct_alpha_mindist;
-          correct_scale = 1.0f/(correct_alpha_maxdist-correct_alpha_mindist);
-        }
-
-        float factor = 1.0;
-        if (sqdist > correct_sq_alpha_mindist)
-        {
-          float dist = sqrt (sqdist);
-          factor = (correct_alpha_maxdist - dist) * correct_scale;
-          if(factor < 0) factor = 0.0f;
-        }
-
-        if(use_density_scaling && p.addedDist > 0 && (1.0f - factor) < 0.01)
-        {
-            p.addedDist = 0;
-        }
- 
-        geometries[p.geom_type]->SetFade (p, factor);
       }
     }
     else

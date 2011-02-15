@@ -70,12 +70,14 @@ struct csMGGeom
   struct InstanceExtra
   {
     float windRand;
-    float fade;
+    float fadeOpaqueDist;
+    float fadeDistScale;
     
-    void Set (float windRand, float fade)
+    void Set (float windRand, float fadeOpaqueDist, float fadeDistScale)
     {
       this->windRand = windRand;
-      this->fade = fade;
+      this->fadeOpaqueDist = fadeOpaqueDist;
+      this->fadeDistScale = fadeDistScale;
     }
   };
   csDirtyAccessArray<InstanceExtra> allInstanceExtra;
@@ -221,8 +223,8 @@ public:
   void MoveMesh (int cidx, const csMGPosition& pos,
 		 const csVector3& position, const csMatrix3& matrix); 
 
-  /// Set the fade for a mesh.
-  void SetFade (csMGPosition& p, float factor);
+  /// Set the fade params for a mesh.
+  void SetFadeParams (csMGPosition& p, float opaqueDist, float scale);
 
   /**
    * Get the right lod level for the given squared distance.
@@ -341,6 +343,8 @@ class csMeshGenerator : public scfImplementationExt2<csMeshGenerator,
 						     iSelfDestruct>
 {
 private:
+  friend class csMeshGeneratorGeometry;
+  
   /// All geometries.
   csRefArray<csMeshGeneratorGeometry> geometries;
   /// The maximum radius for all geometries.
