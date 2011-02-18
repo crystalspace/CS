@@ -42,7 +42,7 @@
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/material.h"
 #include "plugins/engine/3d/sector.h"
-#include "plugins/engine/3d/meshgen.h"
+#include "meshgen/meshgen.h"
 #include "plugins/engine/3d/meshobj.h"
 
 //--------------------------------------------------------------------------
@@ -1225,6 +1225,11 @@ iMeshGenerator* csSector::CreateMeshGenerator (const char* name)
   meshgen->QueryObject ()->SetName (name);
   meshGenerators.Push (meshgen);
   return (iMeshGenerator*)meshgen;
+}
+
+iMeshGenerator* csSector::GetMeshGenerator (size_t idx)
+{
+  return meshGenerators[idx];
 }
 
 iMeshGenerator* csSector::GetMeshGeneratorByName (const char* name)

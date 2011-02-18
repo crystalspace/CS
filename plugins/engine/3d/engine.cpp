@@ -78,7 +78,7 @@
 #include "plugins/engine/3d/portalcontainer.h"
 #include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/texture.h"
-#include "plugins/engine/3d/meshgen.h"
+#include "meshgen/meshgen.h"
 
 using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
 

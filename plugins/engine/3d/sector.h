@@ -44,7 +44,6 @@
 
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/meshobj.h"
-#include "plugins/engine/3d/meshgen.h"
 
 class csEngine;
 class csProgressPulse;
@@ -54,6 +53,7 @@ struct iMeshWrapper;
 
 CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 {
+  class csMeshGenerator;
   class csMeshWrapper;
 }
 CS_PLUGIN_NAMESPACE_END(Engine)
@@ -354,10 +354,7 @@ public:
   {
     return meshGenerators.GetSize ();
   }
-  iMeshGenerator* GetMeshGenerator (size_t idx)
-  {
-    return meshGenerators[idx];
-  }
+  iMeshGenerator* GetMeshGenerator (size_t idx);
   iMeshGenerator* GetMeshGeneratorByName (const char* name);
   void RemoveMeshGenerator (size_t idx);
   void RemoveMeshGenerator (const char* name);

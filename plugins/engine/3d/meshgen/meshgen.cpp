@@ -24,7 +24,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iengine/material.h"
 #include "igraphic/image.h"
 
-#include "engine.h"
+#include "../engine.h"
 #include "meshgen.h"
 #include "meshgen_positionmap.h"
 
