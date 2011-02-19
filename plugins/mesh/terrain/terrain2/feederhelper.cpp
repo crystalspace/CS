@@ -208,12 +208,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
         }
         break;
       case HEIGHT_SOURCE_RAW16BE:
-        break;
         {
           RawHeightmapReader<GetterUint16<csBigEndian> > reader;
           return reader.ReadData (outputBuffer, outputWidth, outputHeight, 
             outputPitch, heightScale, offset, buf->GetData ());
         }
+        break;
       case HEIGHT_SOURCE_RAW32LE:
         {
           RawHeightmapReader<GetterUint32<csLittleEndian> > reader;
