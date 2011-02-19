@@ -163,11 +163,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
     // Handle loading from all other (raw) formats
     if (!vfs)
       return false;
+    
+    size_t valueSize = 0;
+    switch (sourceFormat)
+    {
+    case HEIGHT_SOURCE_RAW8:
+      valueSize = sizeof (uint8);
+      break;
+    case HEIGHT_SOURCE_RAW16LE:
+    case HEIGHT_SOURCE_RAW16BE:
+      valueSize = sizeof (uint16);
+      break;
+    case HEIGHT_SOURCE_RAW32LE:
+    case HEIGHT_SOURCE_RAW32BE:
+    case HEIGHT_SOURCE_RAWFLOATLE:
+    case HEIGHT_SOURCE_RAWFLOATBE:
+      valueSize = sizeof (uint32);
+      break;
+    case HEIGHT_SOURCE_IMAGE:
+      // Can not happen.
+      CS_ASSERT (false);
+    }
 
     csRef<iDataBuffer> buf = vfs->ReadFile (sourceLocation.GetDataSafe (),
 	false);
     if (!buf ||
-      outputHeight * outputWidth != buf->GetSize ())
+	((outputHeight * outputWidth * valueSize) != buf->GetSize ()))
       return false;
 
     switch (sourceFormat)
@@ -187,12 +208,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
         }
         break;
       case HEIGHT_SOURCE_RAW16BE:
-        break;
         {
           RawHeightmapReader<GetterUint16<csBigEndian> > reader;
           return reader.ReadData (outputBuffer, outputWidth, outputHeight, 
             outputPitch, heightScale, offset, buf->GetData ());
         }
+        break;
       case HEIGHT_SOURCE_RAW32LE:
         {
           RawHeightmapReader<GetterUint32<csLittleEndian> > reader;
