@@ -305,8 +305,8 @@
             <geometry>
                 <factory maxdist="10" name="Grass" />
                 <factory maxdist="30" name="GrassLow" />
-                <radius>0.1</radius>
-                <density>1</density>
+                <radius>0</radius>
+                <density>5</density>
 		<densityfactormap factor=".01">stone</densityfactormap>
 		<densityfactormap factor=".01">road</densityfactormap>
 		<densityfactormap factor="1">fertile</densityfactormap>
