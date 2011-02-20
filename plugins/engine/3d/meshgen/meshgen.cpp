@@ -757,6 +757,14 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
 
     size_t count = (mpos_count > 0)? mpos_count : size_t (density * box_area);
 
+    /* Estimation of actual number of generated positions
+     * Count how many of the generated positions have actually caused a mesh
+     * to be placed (densities < 1 will cause some position to be rejected...).
+     * After generating minSamples positions, estimate the total number
+     * of actually used positions, and break if that is reached. */
+    size_t minSamples = ceil (sqrtf (count));
+    size_t positionsUsed = 0;
+
     const csArray<csMGDensityMaterialFactor>& mftable
       = geometries[g]->GetDensityMaterialFactors ();
     float default_material_factor
@@ -834,11 +842,23 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
             pos.rotation = rot;
             pos.random = random.Get ();
             block->positions.Push (new csMGPosition (pos));
+	    positionsUsed++;
 	    
 	    if (mpos_count == 0)
 	      positionMap.MarkAreaUsed (area, r, x, z);
           }
         }
+      }
+
+      /* Estimate how many positions will actually be used based on the
+       * running count of used positions. */
+      size_t estimatedCount = ceil (count * (float (positionsUsed) / (j+1)));
+      // If enough samples have been collected...
+      if (j >= minSamples)
+      {
+	// ... and the estimated count has been hit, exit early.
+	if (positionsUsed >= estimatedCount)
+	  break;
       }
     }
   }
