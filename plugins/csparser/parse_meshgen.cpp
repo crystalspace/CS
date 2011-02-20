@@ -23,6 +23,7 @@
 
 #include "iengine/meshgen.h"
 #include "imap/services.h"
+#include "iutil/vfs.h"
 #include "ivaria/terraform.h"
 
 #include "csutil/stringquote.h"
@@ -93,6 +94,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           meshgen->SetSampleBox (b);
         }
         break;
+      case XMLTOKEN_DENSITYFACTORMAP:
+	{
+	  if (!LoadMeshGenDensityFactorMap (child, meshgen))
+	    return false;
+	}
+	break;
       default:
         SyntaxService->ReportBadToken (child);
         return false;
@@ -181,6 +188,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           geom->SetDensityMap (map_tf, factor, strings->Request ("densitymap"));
         }
         break;
+      case XMLTOKEN_DENSITYFACTORMAP:
+        {
+	  const char* mapID = child->GetContentsValue();
+	  if (!mapID || !*mapID)
+	  {
+	    ReportWarning (
+	      "crystalspace.maploader.parse.meshgen",
+	      child, "No name of the density factor map to use was given.");
+	    return false;
+	  }
+	  float factor = 1;
+	  csRef<iDocumentAttribute> factorAttr (child->GetAttribute ("factor"));
+	  if (factorAttr) factor  = factorAttr->GetValueAsFloat();
+	  if (!geom->UseDensityFactorMap (mapID, factor))
+	  {
+	    ReportWarning (
+	      "crystalspace.maploader.parse.meshgen",
+	      child, "Could not use density factor map %s. Invalid name?",
+	      CS::Quote::Single (mapID));
+	    return false;
+	  }
+	}
+	break;
       case XMLTOKEN_MATERIALFACTOR:
         {
           const char* matname = child->GetAttributeValue ("material");
@@ -234,5 +264,75 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return true;
   }
 
+  bool csThreadedLoader::LoadMeshGenDensityFactorMap (iDocumentNode* mapNode,
+						      iMeshGenerator* meshgen)
+  {
+    const char* mapID = mapNode->GetAttributeValue ("name");
+    if (!mapID || !*mapID)
+    {
+      ReportWarning (
+	"crystalspace.maploader.parse.meshgen",
+	mapNode, "%s atttribute required",
+	CS::Quote::Single ("name"));
+      return false;
+    }
+    
+    csRef<iImage> image;
+    CS::Math::Matrix4 world2map;
+    bool world2map_given = false;
+
+    csRef<iDocumentNodeIterator> it = mapNode->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+      case XMLTOKEN_IMAGE:
+	{
+	  const char* imageFile = child->GetContentsValue();
+	  csRef<iThreadReturn> itr;
+	  itr.AttachNew (new csLoaderReturn (threadman));
+	  LoadImageTC (itr, false, vfs->GetCwd(), imageFile, CS_IMGFMT_ANY, true);
+	  image = scfQueryInterfaceSafe<iImage> (itr->GetResultRefPtr());
+	  if (!image)
+	    // LoadImageTC reported error
+	    return false;
+	}
+	break;
+      case XMLTOKEN_WORLD2IMAGE:
+	{
+	  if (!SyntaxService->ParseMatrix (child, world2map))
+	    // ParseMatrix reported error
+	    return false;
+	  world2map_given = true;
+	}
+	break;
+      default:
+        SyntaxService->ReportBadToken (child);
+        return false;
+      }
+    }
+    
+    if (!image)
+    {
+      ReportWarning ("crystalspace.maploader.parse.meshgen",
+		     mapNode,
+		     "An <image> node is required.");
+      return false;
+    }
+    if (!world2map_given)
+    {
+      ReportWarning ("crystalspace.maploader.parse.meshgen",
+		     mapNode,
+		     "No <world2map> matrix given. Probably not what you want.");
+    }
+    
+    meshgen->AddDensityFactorMap (mapID, image, world2map);
+    
+    return true;
+  }
 }
 CS_PLUGIN_NAMESPACE_END(csparser)

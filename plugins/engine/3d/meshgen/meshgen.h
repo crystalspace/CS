@@ -42,6 +42,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 
 class csMeshGenerator;
 struct csMGCell;
+class DensityFactorMap;
 
 #define CS_GEOM_MAX_ROTATIONS 16
 
@@ -119,6 +120,8 @@ private:
   csRef<iTerraFormer> density_map;
   float density_map_factor;
   csStringID density_map_type;
+  typedef csTuple2<csRef<DensityFactorMap>, float> DensityFactorMapScalePair;
+  csArray<DensityFactorMapScalePair> densityFactorMaps;
 
   // Table with density material factors.
   csArray<csMGDensityMaterialFactor> material_factors;
@@ -183,6 +186,8 @@ public:
   {
     default_material_factor = factor;
   }
+  virtual bool UseDensityFactorMap (const char* factorMapID,
+				    float factor);
 
   const csVector2& GetWindDirection() const { return wind_direction; }
   virtual void SetWindDirection (float x, float z);
@@ -387,6 +392,9 @@ private:
   bool use_alpha_scaling;
   float alpha_mindist, sq_alpha_mindist, alpha_maxdist;
   float alpha_scale;
+  
+  /// Density factor maps
+  csHash<csRef<DensityFactorMap>, csString> densityFactorMaps;
 
   csVector3 last_pos;
 
@@ -496,6 +504,9 @@ public:
    * Make sure that the sample box dependend data is correctly set up.
    */
   void SetupSampleBox ();
+  
+  /// Query a density factor map from the generator.
+  DensityFactorMap* GetDensityFactorMap (const char* id) const;
 
   virtual iObject *QueryObject () { return (iObject*)this; }
 
@@ -527,6 +538,10 @@ public:
   virtual void RemoveMesh (size_t idx);
 
   virtual void ClearPosition (const csVector3& pos);
+  
+  virtual void AddDensityFactorMap (const char* factorMapID,
+				    iImage* mapImage,
+				    const CS::Math::Matrix4& worldToMap);
 
   //--------------------- iSelfDestruct implementation -------------------//
 

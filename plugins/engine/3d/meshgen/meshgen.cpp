@@ -24,6 +24,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iengine/material.h"
 #include "igraphic/image.h"
 
+#include "densityfactormap.h"
 #include "../engine.h"
 #include "meshgen.h"
 #include "meshgen_positionmap.h"
@@ -82,19 +83,44 @@ void csMeshGeneratorGeometry::SetMeshBBox (iMeshWrapper* mesh,
 void csMeshGeneratorGeometry::GetDensityMapFactor (float x, float z,
                                                    float &data)
 {
+  float factorMapScale = 1.0f;
   if (density_map)
   {
-    density_map->SampleFloat (density_map_type, x, z, data); 
-    data *= density_map_factor;  
+    density_map->SampleFloat (density_map_type, x, z, factorMapScale); 
+    factorMapScale *= density_map_factor;  
   }
-  else data = 1.0f;
+  data = factorMapScale;
+
+  // Sum up all density factor maps
+  if (densityFactorMaps.GetSize() > 0)
+  {
+    csVector3 worldCoord (x, 0, z);
+    float factorMapSum = 0;
+    for (size_t i = 0; i < densityFactorMaps.GetSize(); i++)
+    {
+      factorMapSum += densityFactorMaps[i].first->GetDensity (worldCoord)
+	* densityFactorMaps[i].second;
+    }    
+    
+    data *= factorMapSum;
+  }
 }
+
 void csMeshGeneratorGeometry::SetDensityMap (iTerraFormer* map, float factor, 
                                              const csStringID &type)
 {
   density_map = map;
   density_map_factor = factor;
   density_map_type = type;
+}
+
+bool csMeshGeneratorGeometry::UseDensityFactorMap (const char* factorMapID,
+						   float factor)
+{
+  DensityFactorMap* factorMap = generator->GetDensityFactorMap (factorMapID);
+  if (!factorMap) return false;
+  densityFactorMaps.Push (DensityFactorMapScalePair (factorMap, factor));
+  return true;
 }
 
 void csMeshGeneratorGeometry::AddPositionsFromMap (iTerraFormer* map,
@@ -624,6 +650,11 @@ void csMeshGenerator::SetupSampleBox ()
     geometries[g]->ResetManualPositions (cell_dim);
 }
 
+DensityFactorMap* csMeshGenerator::GetDensityFactorMap (const char* id) const
+{
+  return densityFactorMaps.Get (id, (DensityFactorMap*)nullptr);
+}
+
 int csMeshGenerator::GetCellId (const csVector2& pos)
 {
   SetupSampleBox ();
@@ -1114,6 +1145,18 @@ void csMeshGenerator::RemoveGeometry (size_t idx)
 void csMeshGenerator::RemoveMesh (size_t idx)
 {
   meshes.DeleteIndex (idx);
+}
+
+void csMeshGenerator::AddDensityFactorMap (const char* factorMapID,
+					   iImage* mapImage,
+					   const CS::Math::Matrix4& worldToMap)
+{
+  csRef<DensityFactorMap> factorMap;
+  factorMap.AttachNew (new DensityFactorMap);
+  factorMap->SetImage (mapImage);
+  factorMap->SetWorldToMapTransform (worldToMap);
+  if (!factorMap->IsValid()) return;
+  densityFactorMaps.PutUnique (factorMapID, factorMap);
 }
 
 }
