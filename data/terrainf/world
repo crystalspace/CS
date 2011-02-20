@@ -251,66 +251,98 @@
         </meshobj>
         <key name="cmd_AnimateSky" value="clouds,y,.005" />
         <meshgen name="grass">
+	    <densityfactormap name="fertile">
+		<image>/lev/terrain/density_fertile.png</image>
+		<world2image>
+		    <m11>0.00390625</m11><m12>0</m12><m13>0</m13><m14>0.49609375</m14>
+		    <m21>0</m21><m22>0</m22><m23>-0.00390625</m23><m24>0.50390625</m24>
+		    <m31>0</m31><m32>0</m32><m33>0</m33><m34>0</m34>
+		    <m41>0</m41><m42>0</m42><m43>0</m43><m44>0</m44>
+		</world2image>
+	    </densityfactormap>
+	    <densityfactormap name="stone">
+		<image>/lev/terrain/density_stone.png</image>
+		<world2image>
+		    <m11>0.00390625</m11><m12>0</m12><m13>0</m13><m14>0.49609375</m14>
+		    <m21>0</m21><m22>0</m22><m23>-0.00390625</m23><m24>0.50390625</m24>
+		    <m31>0</m31><m32>0</m32><m33>0</m33><m34>0</m34>
+		    <m41>0</m41><m42>0</m42><m43>0</m43><m44>0</m44>
+		</world2image>
+	    </densityfactormap>
+	    <densityfactormap name="road">
+		<image>/lev/terrain/density_road.png</image>
+		<world2image>
+		    <m11>0.00390625</m11><m12>0</m12><m13>0</m13><m14>0.49609375</m14>
+		    <m21>0</m21><m22>0</m22><m23>-0.00390625</m23><m24>0.50390625</m24>
+		    <m31>0</m31><m32>0</m32><m33>0</m33><m34>0</m34>
+		    <m41>0</m41><m42>0</m42><m43>0</m43><m44>0</m44>
+		</world2image>
+	    </densityfactormap>
             <geometry>
                 <factory maxdist="30" name="treebark_bare" />
                 <radius>.3</radius>
                 <density>0.02</density>
-                <materialfactor material="Grass" factor=".4" />
-                <defaultmaterialfactor>.7</defaultmaterialfactor>
+		<densityfactormap factor=".7">stone</densityfactormap>
+		<densityfactormap factor=".7">road</densityfactormap>
+		<densityfactormap factor=".4">fertile</densityfactormap>
             </geometry>
             <geometry>
                 <factory maxdist="30" name="tree" />
                 <radius>.3</radius>
                 <density>0.02</density>
-                <materialfactor material="Grass" factor="1" />
-                <defaultmaterialfactor>.1</defaultmaterialfactor>
+		<densityfactormap factor=".1">stone</densityfactormap>
+		<densityfactormap factor=".1">road</densityfactormap>
+		<densityfactormap factor="1">fertile</densityfactormap>
             </geometry>
             <geometry>
                 <factory maxdist="30" name="tree_skimp" />
                 <radius>.3</radius>
                 <density>0.01</density>
-                <materialfactor material="Grass" factor="1" />
-                <defaultmaterialfactor>.1</defaultmaterialfactor>
+		<densityfactormap factor=".1">stone</densityfactormap>
+		<densityfactormap factor=".1">road</densityfactormap>
+		<densityfactormap factor="1">fertile</densityfactormap>
             </geometry>
             <geometry>
                 <factory maxdist="10" name="Grass" />
                 <factory maxdist="30" name="GrassLow" />
                 <radius>0.1</radius>
                 <density>1</density>
-                <materialfactor material="Grass" factor="1" />
-                <defaultmaterialfactor>.01</defaultmaterialfactor>
+		<densityfactormap factor=".01">stone</densityfactormap>
+		<densityfactormap factor=".01">road</densityfactormap>
+		<densityfactormap factor="1">fertile</densityfactormap>
             </geometry>
             <geometry>
                 <factory maxdist="30" name="bush2" />
                 <radius>0.1</radius>
                 <density>0.4</density>
-                <materialfactor material="Marble" factor="1" />
-                <materialfactor material="Stone" factor="1" />
-                <defaultmaterialfactor>.1</defaultmaterialfactor>
+		<densityfactormap factor="1">stone</densityfactormap>
+		<densityfactormap factor="1">road</densityfactormap>
+		<densityfactormap factor=".1">fertile</densityfactormap>
             </geometry>
             <geometry>
                 <factory maxdist="10" name="TallGrass" />
                 <factory maxdist="30" name="TallGrassLow" />
                 <radius>0.1</radius>
                 <density>.1</density>
-                <materialfactor material="Grass" factor="1" />
-                <defaultmaterialfactor>.1</defaultmaterialfactor>
+		<densityfactormap factor=".1">stone</densityfactormap>
+		<densityfactormap factor=".1">road</densityfactormap>
+		<densityfactormap factor="1">fertile</densityfactormap>
             </geometry>
             <geometry>
                 <factory maxdist="30" name="Rock" />
                 <radius>0.1</radius>
                 <density>.01</density>
-                <materialfactor material="Marble" factor="1" />
-                <materialfactor material="Stone" factor="0" />
-                <defaultmaterialfactor>.3</defaultmaterialfactor>
+		<densityfactormap factor="1">stone</densityfactormap>
+		<densityfactormap factor="0">road</densityfactormap>
+		<densityfactormap factor=".3">fertile</densityfactormap>
             </geometry>
             <geometry>
                 <factory maxdist="30" name="RockSmall" />
                 <radius>0.1</radius>
                 <density>.10</density>
-                <materialfactor material="Marble" factor="1" />
-                <materialfactor material="Stone" factor="0" />
-                <defaultmaterialfactor>.3</defaultmaterialfactor>
+		<densityfactormap factor="1">stone</densityfactormap>
+		<densityfactormap factor="0">road</densityfactormap>
+		<densityfactormap factor=".3">fertile</densityfactormap>
             </geometry>
             <!--<densityscale mindist="26" maxdist="30" maxfactor="0" />-->
             <alphascale mindist="22" maxdist="30" />
