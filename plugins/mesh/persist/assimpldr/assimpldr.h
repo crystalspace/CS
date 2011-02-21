@@ -76,39 +76,16 @@ class AssimpLoader :
 			    iModelLoader,
 			    iComponent>
 {
-private:
-  iObjectRegistry* object_reg;
-
-  csRef<iEngine> engine;
-  csRef<iGraphics3D> g3d;
-  csRef<iTextureManager> textureManager;
-  csRef<iLoaderContext> loaderContext;
-  csRef<iImageIO> imageLoader;
-
-  csRefArray<iTextureWrapper> textures;
-  csRefArray<iMaterialWrapper> materials;
-
-  const aiScene* scene;
-
-  bool Load (iLoaderContext* loaderContext,
-	     iGeneralFactoryState* gmstate, uint8* buffer, size_t size);
-  iMeshFactoryWrapper* Load (const char* factname, const char* filename,
-			     iDataBuffer* buffer);
-
 public:
-  /// Constructor.
-  AssimpLoader (iBase*);
 
-  /// Destructor.
+  AssimpLoader (iBase*);
   virtual ~AssimpLoader ();
 
   //-- iComponent
   virtual bool Initialize (iObjectRegistry *object_reg);
 
-  // TODO: what?
-  virtual bool IsThreadSafe() { return true; }
-
   //-- iBinaryLoaderPlugin
+  virtual bool IsThreadSafe () { return true; }
   virtual csPtr<iBase> Parse (iDataBuffer* buf, iStreamSource*,
     iLoaderContext* ldr_context, iBase* context, iStringArray*);
 
@@ -119,6 +96,8 @@ public:
   virtual bool IsRecognized (iDataBuffer* buffer);
 
  private:
+  void ImportScene ();
+
   iTextureWrapper* FindTexture (const char* filename);
   iTextureWrapper* LoadTexture (iDataBuffer* buffer, const char* filename);
 
@@ -132,6 +111,23 @@ public:
   void PreProcessAnimeshSubMesh (AnimeshData* animeshData, aiNode* node);
   void ImportAnimeshSubMesh (AnimeshData* animeshData, aiNode* node);
   void ImportAnimation (aiAnimation* animation);
+
+private:
+  iObjectRegistry* object_reg;
+
+  csRef<iEngine> engine;
+  csRef<iGraphics3D> g3d;
+  csRef<iTextureManager> textureManager;
+  csRef<iLoaderContext> loaderContext;
+  csRef<iImageIO> imageLoader;
+
+  csRefArray<iTextureWrapper> textures;
+  csRefArray<iMaterialWrapper> materials;
+
+  const aiScene* scene;
+  unsigned int importFlags;
+
+  csRef<iMeshFactoryWrapper> firstMesh;
 };
 
 }

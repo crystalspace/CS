@@ -158,6 +158,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
   AssimpLoader::AssimpLoader (iBase* pParent) :
     scfImplementationType (this, pParent)
   {
+    importFlags = aiProcess_CalcTangentSpace
+      | aiProcess_Triangulate
+      | aiProcess_ValidateDataStructure
+      | aiProcess_GenUVCoords
+      | aiProcess_FlipUVs
+      | aiProcess_SortByPType
+      | aiProcess_LimitBoneWeights
+      //| aiProcess_OptimizeGraph
+      //| aiProcess_OptimizeMeshes
+      | aiProcess_SplitLargeMeshes
+      | aiProcess_SortByPType;
   }
 
   AssimpLoader::~AssimpLoader ()
@@ -167,13 +178,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
   bool AssimpLoader::Initialize (iObjectRegistry* object_reg)
   {
     AssimpLoader::object_reg = object_reg;
-    return true;
-  }
-
-  bool AssimpLoader::Load (iLoaderContext* loaderContext,
-			   iGeneralFactoryState* gmstate,
-			   uint8* buffer, size_t size)
-  {
     return true;
   }
 
@@ -189,93 +193,81 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     return true;
   }
 
-  csPtr<iBase> AssimpLoader::Parse (iDataBuffer* buf, iStreamSource*,
-				    iLoaderContext* ldr_context, iBase* context, iStringArray*)
+  csPtr<iBase> AssimpLoader::Parse (iDataBuffer* buffer, iStreamSource*,
+				    iLoaderContext* ldr_context, iBase* context, iStringArray* failed)
   {
-    // TODO
-    return 0;
-  }
+    loaderContext = ldr_context;
 
-  iMeshFactoryWrapper* AssimpLoader::Load (const char* factname,
-					   const char* filename, iDataBuffer* buffer)
-  {
-    // TODO
+    // Create an Assimp importer and parse the file
+    Assimp::Importer importer;
+    scene = importer.ReadFileFromMemory (**buffer, buffer->GetSize (), importFlags, "");
+
+    // If the import failed, report it
+    if (!scene)
+    {
+      ReportError (object_reg, "Failed to load binary file: %s!", importer.GetErrorString());
+      return 0;
+    }
+
+    // Import the scene into CS
+    ImportScene ();
+
+    // TODO: list of failed factories
+
     return 0;
   }
 
   iMeshFactoryWrapper* AssimpLoader::Load (const char* factname,
 					   iDataBuffer* buffer)
   {
-    // TODO
-    return Load (factname, 0, buffer);
+    // Create an Assimp importer and parse the file
+    Assimp::Importer importer;
+    scene = importer.ReadFileFromMemory (**buffer, buffer->GetSize (), importFlags, "");
+
+    // If the import failed, report it
+    if (!scene)
+    {
+      ReportError (object_reg, "Failed to load factory %s: %s!",
+		   CS::Quote::Single (factname), importer.GetErrorString());
+      return 0;
+    }
+
+    // Import the scene into CS
+    ImportScene ();
+
+    return firstMesh;
   }
 
   iMeshFactoryWrapper* AssimpLoader::Load (const char* factname,
 					   const char* filename)
   {
-    textures.DeleteAll ();
-    materials.DeleteAll ();
-
-    /// Find pointers to engine data
-    engine = csQueryRegistry<iEngine> (object_reg);
-    if (!engine)
-    {
-      ReportError (object_reg, "Could not find the engine");
-      return 0;
-    }
-
-    g3d = csQueryRegistry<iGraphics3D> (object_reg);
-    if (!g3d)
-    {
-      ReportError (object_reg, "Could not find the 3D graphics");
-      return 0;
-    }
-
-    textureManager = g3d->GetTextureManager();
-    if (!textureManager)
-    {
-      ReportError (object_reg, "Could not find the texture manager");
-      return 0;
-    }
-
-    imageLoader = csQueryRegistry<iImageIO> (object_reg);
-    if (!imageLoader)
-    {
-      ReportError (object_reg, "Failed to find an image loader!");
-      return 0;
-    }
-
-    loaderContext = engine->CreateLoaderContext ();
+    // TODO: custom options: scale, genmesh/animesh/scene/factories, find duplicates/optimize
+    // TODO: if forced to be a genmesh then don't read animations, weights, etc
 
     // TODO: use ASSIMP::IOStream
     csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
     csRef<iDataBuffer> path = vfs->GetRealPath (filename);
 
-    // Create an instance of the Importer class
-    // And have it read the given file with some postprocessing
+    // Create an Assimp importer and parse the file
     Assimp::Importer importer;
-    // TODO: custom options: scale, genmesh/animesh/scene/factories, find duplicates/optimize
-    // TODO: if forced to be a genmesh then don't read animations, weights, etc
-    scene = importer.ReadFile (path->GetData (), 
-			       aiProcess_CalcTangentSpace
-			       | aiProcess_Triangulate
-			       | aiProcess_ValidateDataStructure
-			       | aiProcess_GenUVCoords
-			       | aiProcess_FlipUVs
-			       | aiProcess_SortByPType
-			       | aiProcess_LimitBoneWeights
-			       //| aiProcess_OptimizeGraph
-			       //| aiProcess_OptimizeMeshes
-			       | aiProcess_SplitLargeMeshes
-			       | aiProcess_SortByPType);  
+    scene = importer.ReadFile (path->GetData (), importFlags);
 
     // If the import failed, report it
     if (!scene)
     {
-      ReportError (object_reg, "Failed to load file %s: %s!", filename, importer.GetErrorString());
+      ReportError (object_reg, "Failed to load factory %s from file %s: %s!",
+		   CS::Quote::Single (factname), CS::Quote::Single (filename), importer.GetErrorString());
       return 0;
     }
 
+    // Import the scene into CS
+    ImportScene ();
+
+    return firstMesh;
+  }
+
+  void AssimpLoader::ImportScene ()
+  {
     printf ("Loading OK!\n");
     printf ("animations: %i\n", scene->mNumAnimations);
     printf ("meshes: %i\n", scene->mNumMeshes);
@@ -285,6 +277,42 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     printf ("lights: %i\n\n", scene->mNumLights);
 
     PrintNode (scene, scene->mRootNode, "");
+
+    textures.DeleteAll ();
+    materials.DeleteAll ();
+
+    /// Find pointers to engine data
+    engine = csQueryRegistry<iEngine> (object_reg);
+    if (!engine)
+    {
+      ReportError (object_reg, "Could not find the engine");
+      return;
+    }
+
+    g3d = csQueryRegistry<iGraphics3D> (object_reg);
+    if (!g3d)
+    {
+      ReportError (object_reg, "Could not find the 3D graphics");
+      return;
+    }
+
+    textureManager = g3d->GetTextureManager();
+    if (!textureManager)
+    {
+      ReportError (object_reg, "Could not find the texture manager");
+      return;
+    }
+
+    imageLoader = csQueryRegistry<iImageIO> (object_reg);
+    if (!imageLoader)
+    {
+      ReportError (object_reg, "Failed to find an image loader!");
+      return;
+    }
+
+    // Create the loader context if needed
+    if (!loaderContext)
+      loaderContext = engine->CreateLoaderContext ();
 
     // Import all textures
     textures.SetSize (scene->mNumTextures);
@@ -324,27 +352,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       aiAnimation*& animation = scene->mAnimations[i];
       ImportAnimation (animation);
     }
-
-    return 0;
   }
 
   iTextureWrapper* AssimpLoader::FindTexture (const char* filename)
   {
-    // TODO: CS needs a mechanism to know where to find the external files -> current VFS path in iLoaderContext?
-    csString path ("/lib/face/");
-    path += filename;
+    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
 
     // Search in the loading context
-    iTextureWrapper* texture = loaderContext->FindTexture (path.GetData (), true);    
+    iTextureWrapper* texture = loaderContext->FindTexture (filename, true);    
     if (texture)
       return texture;
 
     // Load manually the file
-    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
-    csRef<iDataBuffer> buffer = vfs->ReadFile (path);
+    csRef<iDataBuffer> buffer = vfs->ReadFile (filename);
     if (!buffer)
     {
-      ReportError (object_reg, "Could not load image file %s!", CS::Quote::Single (filename));
+      ReportWarning (object_reg, "Could not load image file %s!", CS::Quote::Single (filename));
       return 0;
     }
 
@@ -358,7 +381,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     csRef<iImage> image (imageLoader->Load (buffer, format));
     if (!image)
     {
-      ReportError (object_reg, "Could not load image %s. Unknown format!",
+      ReportWarning (object_reg, "Could not load image %s. Unknown format!",
 		   CS::Quote::Single (filename));
       return 0;
     }
@@ -452,6 +475,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     csRef<iGeneralFactoryState> gmstate =
       scfQueryInterface<iGeneralFactoryState> (factoryWrapper->GetMeshObjectFactory ());
 
+    if (!firstMesh)
+      firstMesh = factoryWrapper;
+
     // Import all submeshes
     ImportGenmeshSubMesh (gmstate, node);
   }
@@ -529,6 +555,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     loaderContext->AddToCollection (factoryWrapper->QueryObject ());
     animeshData.factory =
       scfQueryInterface<CS::Mesh::iAnimatedMeshFactory> (factoryWrapper->GetMeshObjectFactory ());
+
+    if (!firstMesh)
+      firstMesh = factoryWrapper;
 
     // Import all submeshes
     PreProcessAnimeshSubMesh (&animeshData, node);
