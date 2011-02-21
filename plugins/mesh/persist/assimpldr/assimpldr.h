@@ -21,6 +21,7 @@
 #ifndef __CS_ASSIMPLOADER_H__
 #define __CS_ASSIMPLOADER_H__
 
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/refarr.h"
 #include "imap/reader.h"
 #include "imap/modelload.h"
@@ -37,12 +38,38 @@ struct iPluginManager;
 struct iReporter;
 struct iTextureWrapper;
 
+namespace CS {
+namespace Mesh {
+  struct iAnimatedMeshFactory;
+}
+}
+
 CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 {
 
 /**
  * Open Asset Import Library loader for Crystal Space
  */
+
+struct AnimeshData
+{
+  csRef<CS::Mesh::iAnimatedMeshFactory> factory;
+  csDirtyAccessArray<float> vertices;
+  csDirtyAccessArray<float> texels;
+  csDirtyAccessArray<float> normals;
+  csDirtyAccessArray<float> tangents;
+  csDirtyAccessArray<float> binormals;
+  csDirtyAccessArray<float> colors;
+  bool hasNormals;
+  bool hasTexels;
+  bool hasTangents;
+  bool hasColors;
+
+  AnimeshData ()
+  : hasNormals (false), hasTexels (false), hasTangents (false), hasColors (false)
+  {}
+};
+
 class AssimpLoader : 
   public scfImplementation3<AssimpLoader,
 			    iBinaryLoaderPlugin,
@@ -101,6 +128,9 @@ public:
   void ImportGenmesh (aiNode* node);
   void ImportGenmeshSubMesh (iGeneralFactoryState* gmstate, aiNode* node);
 
+  void ImportAnimesh (aiNode* node);
+  void PreProcessAnimeshSubMesh (AnimeshData* animeshData, aiNode* node);
+  void ImportAnimeshSubMesh (AnimeshData* animeshData, aiNode* node);
   void ImportAnimation (aiAnimation* animation);
 };
 
