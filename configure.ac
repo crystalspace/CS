@@ -1875,6 +1875,18 @@ AS_IF([test $cs_host_family != windows],
 
 
 #------------------------------------------------------------------------------
+# Check for Open Asset Import Library (Assimp)
+#------------------------------------------------------------------------------
+CS_CHECK_LIB_WITH([assimp],
+    [AC_LANG_PROGRAM(
+        [[#include <assimp/assimp.h>
+          #include <assimp/aiScene.h>]],
+        [])],
+    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libassimp], [ASSIMP])])
+
+
+
+#------------------------------------------------------------------------------
 # Check if regular expressions are available.
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD([for regexp support], [cs_cv_regexp],
