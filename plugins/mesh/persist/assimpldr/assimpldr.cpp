@@ -22,6 +22,8 @@
 #include "cssysdef.h"
 
 #include "csgeom/tri.h"
+#include "csgfx/renderbuffer.h"
+#include "cstool/rbuflock.h"
 #include "csutil/cscolor.h"
 #include "csutil/csstring.h"
 #include "csutil/databuf.h"
@@ -42,14 +44,29 @@
 #include "ivaria/reporter.h"
 #include "ivideo/txtmgr.h"
 
-#include "assimp/assimp.hpp"      // C++ importer interface
-#include "assimp/aiScene.h"       // Output data structure
-#include "assimp/aiPostProcess.h" // Post processing flags
-
 #include "assimpldr.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 {
+
+  void PrintMesh (aiMesh* mesh, const char* prefix)
+  {
+    printf ("%s  mesh [%s]: %i vertices %i triangles %i bones\n", prefix, mesh->mName.data, mesh->mNumVertices, mesh->mNumFaces, mesh->mNumBones);
+  }
+
+  void PrintNode (const aiScene* scene, aiNode* node, const char* prefix)
+  {
+    printf ("%s+ node [%s] [%s]\n", prefix, node->mName.data, node->mTransformation.IsIdentity () ? "unmoved" : "moved");
+
+    for (unsigned int i = 0; i < node->mNumMeshes; i++)
+      PrintMesh (scene->mMeshes[node->mMeshes[i]], prefix);
+
+    csString pref = prefix;
+    pref += " ";
+
+    for (unsigned int i = 0; i < node->mNumChildren; i++)
+      PrintNode (scene, node->mChildren[i], pref.GetData ());
+  }
 
   inline csVector3 Assimp2CS (aiVector3D v)
   {
@@ -186,15 +203,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     // Create an instance of the Importer class
     // And have it read the given file with some postprocessing
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile (path->GetData (), 
-					      aiProcess_CalcTangentSpace
-					      | aiProcess_Triangulate
-					      | aiProcess_ValidateDataStructure
-					      | aiProcess_GenUVCoords
-					      | aiProcess_FlipUVs
-					      //| aiProcess_JoinIdenticalVertices
-					      | aiProcess_SortByPType);
-  
+    // TODO: custom options: scale, genmesh/animesh/scene/factories, find duplicates/optimize
+    // TODO: if forced to be a genmesh then don't read animations, weights, etc
+    scene = importer.ReadFile (path->GetData (), 
+			       aiProcess_CalcTangentSpace
+			       | aiProcess_Triangulate
+			       | aiProcess_ValidateDataStructure
+			       | aiProcess_GenUVCoords
+			       | aiProcess_FlipUVs
+			       | aiProcess_SortByPType
+			       | aiProcess_LimitBoneWeights
+			       //| aiProcess_OptimizeGraph
+			       //| aiProcess_OptimizeMeshes
+			       | aiProcess_SplitLargeMeshes
+			       | aiProcess_SortByPType);  
+
     // If the import failed, report it
     if (!scene)
     {
@@ -202,13 +225,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       return 0;
     }
 
-    printf ("OK!\n");
+    printf ("Loading OK!\n");
     printf ("animations: %i\n", scene->mNumAnimations);
     printf ("meshes: %i\n", scene->mNumMeshes);
     printf ("materials: %i\n", scene->mNumMaterials);
     printf ("camera: %i\n", scene->mNumCameras);
     printf ("textures: %i\n", scene->mNumTextures);
-    printf ("lights: %i\n", scene->mNumLights);
+    printf ("lights: %i\n\n", scene->mNumLights);
+
+    PrintNode (scene, scene->mRootNode, "");
 
     // Import all textures
     textures.SetSize (scene->mNumTextures);
@@ -227,22 +252,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     }
 
     // Import all meshes
-    for (unsigned int i = 0; i < scene->mNumMeshes; i++)
+    if (scene->mRootNode)
+      ImportGenmesh (scene->mRootNode);
+    /*
+    for (unsigned int i = 0; i < scene->mRootNode->mNumChildren; i++)
     {
-      aiMesh*& mesh = scene->mMeshes[i];
-
-      // Check the validity of the mesh
-      if (!mesh->HasFaces ()
-	  || !mesh->HasPositions ())
-      {
-	ReportWarning (object_reg, "Skipping mesh %s for lack of vertices or triangles!",
-		       CS::Quote::Single (mesh->mName.data));
-	continue;
-      }
-
       // Check the type of the mesh then import it
-      // TODO: animeshes, terrains
-      ImportGenmesh (mesh);
+      // TODO: animeshes, terrains, whole scene (lights, cameras)
+      aiNode*& node = scene->mRootNode->mChildren[i];
+      ImportGenmesh (node);
+    }
+    */
+    // Import all animations
+    for (unsigned int i = 0; i < scene->mNumAnimations; i++)
+    {
+      aiAnimation*& animation = scene->mAnimations[i];
+      ImportAnimation (animation);
     }
 
     return 0;
@@ -298,6 +323,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     csRef<iTextureWrapper> textureWrapper = engine->GetTextureList ()->CreateTexture (textureHandle);
     engine->GetTextureList ()->Add (textureWrapper);
     textureWrapper->SetImageFile(image);
+    loaderContext->AddToCollection (textureWrapper->QueryObject ());
+
+    // TODO: default texture in case of problem
 
     return textureWrapper;
   }
@@ -355,49 +383,96 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       }
     }
 
-    csRef<iMaterialWrapper> csmaterial = engine->CreateMaterial (name.data, texture);
-    materials.Put (index, csmaterial);
+    csRef<iMaterialWrapper> materialWrapper = engine->CreateMaterial (name.data, texture);
+    materials.Put (index, materialWrapper);
+    loaderContext->AddToCollection (materialWrapper->QueryObject ());
   }
 
-  void AssimpLoader::ImportGenmesh (aiMesh* mesh)
+  void AssimpLoader::ImportGenmesh (aiNode* node)
   {
     // Create the genmesh factory
     csRef<iMeshFactoryWrapper> factoryWrapper = engine->CreateMeshFactory
-      ("crystalspace.mesh.object.genmesh", mesh->mName.data);
+      ("crystalspace.mesh.object.genmesh", node->mName.data);
+    loaderContext->AddToCollection (factoryWrapper->QueryObject ());
     csRef<iGeneralFactoryState> gmstate =
       scfQueryInterface<iGeneralFactoryState> (factoryWrapper->GetMeshObjectFactory ());
 
-    // Add all vertices
-    aiVector3D* aiuvs = mesh->mTextureCoords[0];
-    aiColor4D* aicolors = mesh->mColors[0];
+    // Import all submeshes
+    ImportGenmeshSubMesh (gmstate, node);
+  }
 
-    for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+  void AssimpLoader::ImportGenmeshSubMesh (iGeneralFactoryState* gmstate, aiNode* node)
+  {
+    // TODO: node position
+
+    // Import all meshes of this node
+    for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
-      csVector3 vertex = Assimp2CS (mesh->mVertices[i]);
-      csVector2 uv = mesh->HasTextureCoords (0) ? csVector2 (aiuvs[i].x, aiuvs[i].y) : csVector2 (0.0f);
-      csVector3 normal = Assimp2CS (mesh->mNormals[i]);
-      csColor4 color = mesh->HasVertexColors (0) ? Assimp2CS (aicolors[i]) : csColor4 (1.0f);
+      aiMesh*& mesh = scene->mMeshes[node->mMeshes[i]];
+      
+      // Check the validity of the mesh
+      if (!mesh->HasFaces ()
+	  || !mesh->HasPositions ())
+      {
+	ReportWarning (object_reg, "Skipping mesh %s for lack of vertices or triangles!",
+		       CS::Quote::Single (mesh->mName.data));
+	continue;
+      }
 
-      gmstate->AddVertex (vertex, uv, normal, color);
+      // Save the current count of vertices of the genmesh
+      size_t currentVertices = gmstate->GetVertexCount ();
+
+      // Add all vertices
+      aiVector3D* aiuvs = mesh->mTextureCoords[0];
+      aiColor4D* aicolors = mesh->mColors[0];
+
+      for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+      {
+	csVector3 vertex = Assimp2CS (mesh->mVertices[i]);
+	csVector2 uv = mesh->HasTextureCoords (0) ? csVector2 (aiuvs[i].x, aiuvs[i].y) : csVector2 (0.0f);
+	csVector3 normal = Assimp2CS (mesh->mNormals[i]);
+	csColor4 color = mesh->HasVertexColors (0) ? Assimp2CS (aicolors[i]) : csColor4 (1.0f);
+
+	gmstate->AddVertex (vertex, uv, normal, color);
+      }
+
+      // Create a render buffer for all faces
+      csRef<csRenderBuffer> buffer = csRenderBuffer::CreateIndexRenderBuffer
+	(mesh->mNumFaces * 3, CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, gmstate->GetVertexCount () - 1);
+      //csRenderBuffer::CreateRenderBuffer (mesh->mNumFaces, CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 3);
+
+      csTriangle* triangleData = (csTriangle*) buffer->Lock (CS_BUF_LOCK_NORMAL);
+      for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+      {
+	aiFace& face = mesh->mFaces[i];
+	triangleData[i] = csTriangle (currentVertices + face.mIndices[0],
+				      currentVertices + face.mIndices[1],
+				      currentVertices + face.mIndices[2]);
+      }
+      buffer->Release ();
+
+      // Setup the material
+      csRef<iMaterialWrapper> material;
+      if (mesh->mMaterialIndex < materials.GetSize ())
+	   material = materials[mesh->mMaterialIndex];
+
+      // Add the submesh
+      gmstate->AddSubMesh (buffer, material, mesh->mName.data);
     }
 
-    // Add all faces
-    for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+    // Import all subnodes
+    for (unsigned int i = 0; i < node->mNumChildren; i++)
     {
-      aiFace& face = mesh->mFaces[i];
-      if (face.mNumIndices == 3)
-	gmstate->AddTriangle (Assimp2CS (face.mIndices));
-    }    
-
-    // Setup the material
-    if (mesh->mMaterialIndex < materials.GetSize ())
-    {
-      csRef<iMaterialWrapper> material = materials[mesh->mMaterialIndex];
-      if (material)
-	factoryWrapper->GetMeshObjectFactory ()->SetMaterialWrapper (material);
+      aiNode*& subnode = node->mChildren[i];
+      ImportGenmeshSubMesh (gmstate, subnode);
     }
+  }
 
-    // TODO: submeshes
+  void AssimpLoader::ImportAnimation (aiAnimation* animation)
+  {
+    printf ("Animation [%s]:\n", animation->mName.data);
+    for (unsigned int i = 0; i < animation->mNumChannels; i++)
+      printf (" anim [%s]\n", animation->mChannels[i]->mNodeName.data);
   }
 
 }

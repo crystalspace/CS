@@ -25,6 +25,10 @@
 #include "imap/reader.h"
 #include "imap/modelload.h"
 
+#include "assimp/assimp.hpp"      // C++ importer interface
+#include "assimp/aiScene.h"       // Output data structure
+#include "assimp/aiPostProcess.h" // Post processing flags
+
 struct iEngine;
 struct iImageIO;
 struct iMaterialWrapper;
@@ -32,10 +36,6 @@ struct iObjectRegistry;
 struct iPluginManager;
 struct iReporter;
 struct iTextureWrapper;
-
-class aiMaterial;
-class aiMesh;
-class aiTexture;
 
 CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 {
@@ -60,6 +60,8 @@ private:
 
   csRefArray<iTextureWrapper> textures;
   csRefArray<iMaterialWrapper> materials;
+
+  const aiScene* scene;
 
   bool Load (iLoaderContext* loaderContext,
 	     iGeneralFactoryState* gmstate, uint8* buffer, size_t size);
@@ -95,7 +97,11 @@ public:
 
   void ImportTexture (aiTexture* texture, size_t index);
   void ImportMaterial (aiMaterial* material, size_t index);
-  void ImportGenmesh (aiMesh* mesh);
+
+  void ImportGenmesh (aiNode* node);
+  void ImportGenmeshSubMesh (iGeneralFactoryState* gmstate, aiNode* node);
+
+  void ImportAnimation (aiAnimation* animation);
 };
 
 }
