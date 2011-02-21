@@ -42,9 +42,9 @@
 #include "ivaria/reporter.h"
 #include "ivideo/txtmgr.h"
 
-#include "include/assimp.hpp"      // C++ importer interface
-#include "include/aiScene.h"       // Output data structure
-#include "include/aiPostProcess.h" // Post processing flags
+#include "assimp/assimp.hpp"      // C++ importer interface
+#include "assimp/aiScene.h"       // Output data structure
+#include "assimp/aiPostProcess.h" // Post processing flags
 
 #include "assimpldr.h"
 
