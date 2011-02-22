@@ -214,7 +214,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
     // TODO: list of failed factories
 
-    return 0;
+    firstMesh->IncRef ();
+    return csPtr<iBase> (firstMesh);
   }
 
   iMeshFactoryWrapper* AssimpLoader::Load (const char* factname,
@@ -423,7 +424,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
       // Create the data buffer
       csRef<iDataBuffer> buffer;
-      buffer.AttachNew (new CS::DataBuffer<> ((char*) texture->pcData, texture->mWidth * sizeof (texture->pcData), false));
+      buffer.AttachNew (new CS::DataBuffer<> ((char*) texture->pcData, texture->mWidth * sizeof (aiTexel), false));
 
       // Load the texture
       csRef<iTextureWrapper> textureWrapper = LoadTexture (buffer, "<unknown>");
