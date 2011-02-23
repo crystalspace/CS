@@ -70,6 +70,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
                               iSaverPlugin,
                               iComponent>
   {
+  private:
+    iObjectRegistry* object_reg;
+    csRef<iReporter> reporter;
+    csRef<iSyntaxService> synldr;
+    csRef<iEngine> engine;
+
   public:
     AnimeshFactorySaver (iBase* parent);
 

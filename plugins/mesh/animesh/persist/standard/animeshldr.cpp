@@ -19,19 +19,21 @@
 
 #include "cssysdef.h"
 
-#include "csutil/ref.h"
 #include "iengine/engine.h"
+#include "iengine/mesh.h"
+#include "imap/ldrctxt.h"
 #include "imap/services.h"
 #include "imesh/animesh.h"
-#include "imesh/object.h"
-#include "iutil/stringarray.h"
-#include "iutil/document.h"
-#include "iutil/plugin.h"
-#include "ivaria/reporter.h"
-#include "imap/ldrctxt.h"
-#include "iengine/mesh.h"
-#include "imesh/skeleton2.h"
 #include "imesh/animnode/skeleton2anim.h"
+#include "imesh/skeleton2.h"
+#include "imesh/object.h"
+#include "iutil/document.h"
+#include "iutil/object.h"
+#include "iutil/plugin.h"
+#include "iutil/stringarray.h"
+#include "ivaria/reporter.h"
+
+#include "csutil/ref.h"
 
 #include "animeshldr.h"
 
@@ -410,18 +412,206 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
     : scfImplementationType (this, parent)
   {}
 
+  bool AnimeshFactorySaver::Initialize (iObjectRegistry* object_reg)
+  {
+    AnimeshFactorySaver::object_reg = object_reg;
+    reporter = csQueryRegistry<iReporter> (object_reg);
+    synldr = csQueryRegistry<iSyntaxService> (object_reg);
+    engine = csQueryRegistry<iEngine> (object_reg);
+
+    return true;
+  }
+
   bool AnimeshFactorySaver::WriteDown (iBase *obj, iDocumentNode* parent,
     iStreamSource*)
   {
-    return false;
+    if (!parent) return false; //you never know...
+
+    csRef<iDocumentNode> paramsNode = 
+      parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    paramsNode->SetValue("params");
+
+    if (obj)
+    {
+      csRef<CS::Mesh::iAnimatedMeshFactory> factory = 
+	scfQueryInterface<CS::Mesh::iAnimatedMeshFactory> (obj);
+      csRef<iMeshObjectFactory> meshfact = 
+	scfQueryInterface<iMeshObjectFactory> (obj);
+      if (!factory) return false;
+      if (!meshfact) return false;
+
+      iMaterialWrapper* material = nullptr;
+      for (size_t i = 0; i < factory->GetSubMeshCount (); i++)
+      {
+	CS::Mesh::iAnimatedMeshSubMeshFactory* submesh = factory->GetSubMesh (i);
+
+	iMaterialWrapper* submeshMaterial = submesh->GetMaterial ();
+	if (submeshMaterial)
+	{
+	  material = submeshMaterial;
+	  break;
+	}
+      }
+
+      if (material)
+      {
+	csRef<iDocumentNode> materialNode = 
+	  paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	materialNode->SetValue ("material");
+	csRef<iDocumentNode> materialNameNode = 
+	  materialNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+	materialNameNode->SetValue (material->QueryObject()->GetName());
+      }
+
+      // Write vertices render buffer
+      {
+	iRenderBuffer* buffer = factory->GetVertices ();
+	if (buffer)
+	{
+	  csRef<iDocumentNode> rbufNode = 
+	    paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	  rbufNode->SetValue ("vertex");
+	  /* Disabled checking on this buffer b/c no vertex count is available
+	   * when loading it */
+	  rbufNode->SetAttribute ("checkelementcount", "no");
+	  synldr->WriteRenderBuffer (rbufNode, buffer);
+	}
+      }
+      
+      // Write normals render buffer
+      {
+	iRenderBuffer* buffer = factory->GetNormals ();
+	if (buffer)
+	{
+	  csRef<iDocumentNode> rbufNode = 
+	    paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	  rbufNode->SetValue ("normal");
+	  synldr->WriteRenderBuffer (rbufNode, buffer);
+	}
+      }
+
+      // Write texture coordinates render buffer
+      {
+	iRenderBuffer* buffer = factory->GetTexCoords ();
+	if (buffer)
+	{
+	  csRef<iDocumentNode> rbufNode = 
+	    paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	  rbufNode->SetValue ("texcoord");
+	  synldr->WriteRenderBuffer (rbufNode, buffer);
+	}
+      }
+
+      // Write tangents render buffer
+      {
+	iRenderBuffer* buffer = factory->GetTangents ();
+	if (buffer)
+	{
+	  csRef<iDocumentNode> rbufNode = 
+	    paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	  rbufNode->SetValue ("tangent");
+	  synldr->WriteRenderBuffer (rbufNode, buffer);
+	}
+      }
+      
+      // Write binormals render buffer
+      {
+	iRenderBuffer* buffer = factory->GetBinormals ();
+	if (buffer)
+	{
+	  csRef<iDocumentNode> rbufNode = 
+	    paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	  rbufNode->SetValue ("binormal");
+	  synldr->WriteRenderBuffer (rbufNode, buffer);
+	}
+      }
+      
+      // Write colors render buffer
+      {
+	iRenderBuffer* buffer = factory->GetColors ();
+	if (buffer)
+	{
+	  csRef<iDocumentNode> rbufNode = 
+	    paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	  rbufNode->SetValue ("color");
+	  synldr->WriteRenderBuffer (rbufNode, buffer);
+	}
+      }
+      
+      // Write bone influences
+      CS::Mesh::csAnimatedMeshBoneInfluence* influences = factory->GetBoneInfluences ();
+      if (influences)
+      {
+	csRef<iDocumentNode> influenceNode = 
+	  paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	influenceNode->SetValue ("boneinfluences");
+
+	size_t count = factory->GetBoneInfluencesPerVertex () * factory->GetVertexCount ();
+	for (size_t i = 0; i < count; i++)
+	{
+	  csRef<iDocumentNode> node = 
+	    influenceNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	  node->SetValue ("bi");
+	  node->SetAttributeAsInt ("bone", influences[i].bone);
+	  node->SetAttributeAsFloat ("weight", influences[i].influenceWeight);
+	}
+      }
+
+      // Write submeshes
+      for (size_t i = 0; i < factory->GetSubMeshCount (); i++)
+      {
+	CS::Mesh::iAnimatedMeshSubMeshFactory* submesh = factory->GetSubMesh (i);
+
+	csRef<iDocumentNode> submeshNode = 
+	  paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	submeshNode->SetValue ("submesh");
+
+	if (submesh->GetIndexSetCount () == 0) continue;
+	iRenderBuffer* buffer = submesh->GetIndices (0);
+	// TODO: missing indice sets in loader and saver
+	if (!buffer) continue;
+
+	csRef<iDocumentNode> indexNode = 
+	  submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	indexNode->SetValue ("index");
+	indexNode->SetAttribute ("indices", "yes");
+	synldr->WriteRenderBuffer (indexNode, buffer);
+
+	iMaterialWrapper* material = submesh->GetMaterial ();
+	if (material)
+	{
+	  csRef<iDocumentNode> materialNode = 
+	    submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	  materialNode->SetValue ("material");
+	  csRef<iDocumentNode> materialNameNode = 
+	    materialNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+	  materialNameNode->SetValue (material->QueryObject()->GetName());
+	}
+      }
+
+      // Write morph targets
+      for (size_t i = 0; i < factory->GetMorphTargetCount (); i++)
+      {
+	CS::Mesh::iAnimatedMeshMorphTarget* target = factory->GetMorphTarget (i);
+
+	csRef<iDocumentNode> targetNode = 
+	  paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	targetNode->SetValue ("morphtarget");
+	targetNode->SetAttribute ("name", target->GetName ());
+
+	iRenderBuffer* buffer = target->GetVertexOffsets ();
+	if (!buffer) continue;
+
+	csRef<iDocumentNode> offsetsNode = 
+	  targetNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	offsetsNode->SetValue ("offsets");
+	synldr->WriteRenderBuffer (offsetsNode, buffer);
+      }
+    }
+
+    return true;
   }
   
-  bool AnimeshFactorySaver::Initialize (iObjectRegistry*)
-  {
-    return false;
-  }
-
-
 
 
   AnimeshObjectLoader::AnimeshObjectLoader (iBase* parent)
