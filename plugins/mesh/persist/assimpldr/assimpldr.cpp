@@ -281,6 +281,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
     textures.DeleteAll ();
     materials.DeleteAll ();
+    firstMesh = nullptr;
 
     /// Find pointers to engine data
     engine = csQueryRegistry<iEngine> (object_reg);
@@ -510,7 +511,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       {
 	csVector3 vertex = Assimp2CS (mesh->mVertices[i]);
 	csVector2 uv = mesh->HasTextureCoords (0) ? csVector2 (aiuvs[i].x, aiuvs[i].y) : csVector2 (0.0f);
-	csVector3 normal = Assimp2CS (mesh->mNormals[i]);
+	csVector3 normal = mesh->HasNormals () ? Assimp2CS (mesh->mNormals[i]) : csVector3 (1.0f, 0.0f, 0.0f);
 	csColor4 color = mesh->HasVertexColors (0) ? Assimp2CS (aicolors[i]) : csColor4 (1.0f);
 
 	gmstate->AddVertex (vertex, uv, normal, color);
