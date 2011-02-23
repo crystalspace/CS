@@ -183,21 +183,34 @@ bool AnimatedMeshTools::ImportMorphMesh
   }
 
   // Setup the offsets of the morph target
-  csRef<iRenderBuffer> baseBuffer = baseMesh->GetVertices ();
-  csVector3* baseIndices = (csVector3*) baseBuffer->Lock (CS_BUF_LOCK_NORMAL);
+  iRenderBuffer* baseBuffer = baseMesh->GetVertices ();
+  csVector3* baseIndices = (csVector3*) baseBuffer->Lock (CS_BUF_LOCK_READ);
 
   csRef<iRenderBuffer> morphBuffer;
+  csRef<iRenderBuffer> initialMorphBuffer;
+  csVector3* initialMorphIndices;
+
   if (deleteMesh)
     morphBuffer = morphMesh->GetVertices ();
   else
+  {
+    initialMorphBuffer = morphMesh->GetVertices ();
+    initialMorphIndices = (csVector3*) initialMorphBuffer->Lock (CS_BUF_LOCK_READ);
     morphBuffer = csRenderBuffer::CreateRenderBuffer
       (morphMesh->GetVertexCount (), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+  }
   csVector3* morphIndices = (csVector3*) morphBuffer->Lock (CS_BUF_LOCK_NORMAL);
 
   for (size_t i = 0; i < baseMesh->GetVertexCount (); i++)
-    morphIndices[i] = morphIndices[i] - baseIndices[i];
+    if (deleteMesh)
+      morphIndices[i] = morphIndices[i] - baseIndices[i];
+    else
+      morphIndices[i] = initialMorphIndices[i] - baseIndices[i];
+
   baseBuffer->Release ();
   morphBuffer->Release ();
+  if (!deleteMesh)
+    initialMorphBuffer->Release ();
 
   // Create the morph target
   iAnimatedMeshMorphTarget* target =
