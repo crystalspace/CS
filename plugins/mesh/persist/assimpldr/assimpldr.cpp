@@ -45,16 +45,17 @@
 #include "ivaria/reporter.h"
 #include "ivideo/txtmgr.h"
 
+#include <iutil/stringarray.h>
+
 #include "assimpldr.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 {
 
   template<typename T>
-    static csRef<iRenderBuffer> FillBuffer (csDirtyAccessArray<T>& buf,
-					    csRenderBufferComponentType compType,
-					    int componentNum,
-					    bool indexBuf)
+  static csRef<iRenderBuffer> FillBuffer
+    (csDirtyAccessArray<T>& buf, csRenderBufferComponentType compType,
+     int componentNum, bool indexBuf)
   {
     csRef<iRenderBuffer> buffer;
     size_t bufElems = buf.GetSize() / componentNum;
@@ -88,26 +89,33 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 	  max = csMax (max, a);
 	}
       }
-      buffer = csRenderBuffer::CreateIndexRenderBuffer (bufElems, CS_BUF_STATIC,
-							compType, size_t (min), size_t (max));
+      buffer = csRenderBuffer::CreateIndexRenderBuffer
+	(bufElems, CS_BUF_STATIC, compType,
+	 size_t (min), size_t (max));
     }
     else
     {
-      buffer = csRenderBuffer::CreateRenderBuffer (bufElems,
-						   CS_BUF_STATIC, compType, (uint)componentNum);
+      buffer = csRenderBuffer::CreateRenderBuffer
+	(bufElems, CS_BUF_STATIC, compType, (uint)componentNum);
     }
     buffer->CopyInto (buf.GetArray(), bufElems);
+
     return buffer;
   }
  
   void PrintMesh (aiMesh* mesh, const char* prefix)
   {
-    printf ("%s  mesh [%s]: %i vertices %i triangles %i bones\n", prefix, mesh->mName.data, mesh->mNumVertices, mesh->mNumFaces, mesh->mNumBones);
+    printf ("%s  mesh [%s]: %i vertices %i triangles %i bones\n",
+	    prefix, mesh->mName.data, mesh->mNumVertices,
+	    mesh->mNumFaces, mesh->mNumBones);
   }
 
-  void PrintNode (const aiScene* scene, aiNode* node, const char* prefix)
+  void PrintNode (const aiScene* scene, aiNode* node,
+		  const char* prefix)
   {
-    printf ("%s+ node [%s] [%s]\n", prefix, node->mName.data, node->mTransformation.IsIdentity () ? "unmoved" : "moved");
+    printf ("%s+ node [%s] [%s]\n", prefix, node->mName.data,
+	    node->mTransformation.IsIdentity ()
+	    ? "unmoved" : "moved");
 
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
       PrintMesh (scene->mMeshes[node->mMeshes[i]], prefix);
@@ -137,19 +145,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
   /**
    * Error reporting
    */
-  static void ReportError (iObjectRegistry* objreg, const char* description, ...)
+  static void ReportError (iObjectRegistry* objreg,
+			   const char* description, ...)
   {
     va_list arg;
     va_start (arg, description);
-    csReportV (objreg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.mesh.loader.factory.assimp", description, arg);
+    csReportV (objreg, CS_REPORTER_SEVERITY_ERROR,
+	       "crystalspace.mesh.loader.factory.assimp",
+	       description, arg);
     va_end (arg);
   }
 
-  static void ReportWarning (iObjectRegistry* objreg, const char* description, ...)
+  static void ReportWarning (iObjectRegistry* objreg,
+			     const char* description, ...)
   {
     va_list arg;
     va_start (arg, description);
-    csReportV (objreg, CS_REPORTER_SEVERITY_WARNING, "crystalspace.mesh.loader.factory.assimp", description, arg);
+    csReportV (objreg, CS_REPORTER_SEVERITY_WARNING,
+	       "crystalspace.mesh.loader.factory.assimp",
+	       description, arg);
     va_end (arg);
   }
 
@@ -193,20 +207,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     return true;
   }
 
-  csPtr<iBase> AssimpLoader::Parse (iDataBuffer* buffer, iStreamSource*,
-				    iLoaderContext* ldr_context, iBase* context, iStringArray* failed)
+  csPtr<iBase> AssimpLoader::Parse
+    (iDataBuffer* buffer, iStreamSource*,
+     iLoaderContext* ldr_context, iBase* context,
+     iStringArray* failed)
   {
     loaderContext = ldr_context;
 
     // Create an Assimp importer and parse the file
     Assimp::Importer importer;
-    scene = importer.ReadFileFromMemory (**buffer, buffer->GetSize (), importFlags, "");
+    scene = importer.ReadFileFromMemory
+      (**buffer, buffer->GetSize (), importFlags, "");
 
     // If the import failed, report it
     if (!scene)
     {
-      ReportError (object_reg, "Failed to load binary file: %s!", importer.GetErrorString());
-      return 0;
+      ReportError (object_reg, "Failed to load binary file: %s!",
+		   importer.GetErrorString());
+      return (iBase*) nullptr;
     }
 
     // Import the scene into CS
@@ -223,14 +241,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
   {
     // Create an Assimp importer and parse the file
     Assimp::Importer importer;
-    scene = importer.ReadFileFromMemory (**buffer, buffer->GetSize (), importFlags, "");
+    scene = importer.ReadFileFromMemory
+      (**buffer, buffer->GetSize (), importFlags, "");
 
     // If the import failed, report it
     if (!scene)
     {
       ReportError (object_reg, "Failed to load factory %s: %s!",
-		   CS::Quote::Single (factname), importer.GetErrorString());
-      return 0;
+		   CS::Quote::Single (factname),
+		   importer.GetErrorString());
+      return nullptr;
     }
 
     // Import the scene into CS
@@ -242,8 +262,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
   iMeshFactoryWrapper* AssimpLoader::Load (const char* factname,
 					   const char* filename)
   {
-    // TODO: custom options: scale, genmesh/animesh/scene/factories, find duplicates/optimize
-    // TODO: if forced to be a genmesh then don't read animations, weights, etc
+    // TODO: custom options: scale, genmesh/animesh/scene/factories,
+    //   find duplicates/optimize
+    // TODO: if forced to be a genmesh then don't read animations,
+    //   weights, etc
 
     // TODO: use ASSIMP::IOStream
     csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
@@ -256,9 +278,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     // If the import failed, report it
     if (!scene)
     {
-      ReportError (object_reg, "Failed to load factory %s from file %s: %s!",
-		   CS::Quote::Single (factname), CS::Quote::Single (filename), importer.GetErrorString());
-      return 0;
+      ReportError (object_reg,
+		   "Failed to load factory %s from file %s: %s!",
+		   CS::Quote::Single (factname),
+		   CS::Quote::Single (filename),
+		   importer.GetErrorString());
+      return nullptr;
     }
 
     // Import the scene into CS
@@ -301,14 +326,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     textureManager = g3d->GetTextureManager();
     if (!textureManager)
     {
-      ReportError (object_reg, "Could not find the texture manager");
+      ReportError (object_reg,
+		   "Could not find the texture manager");
       return;
     }
 
     imageLoader = csQueryRegistry<iImageIO> (object_reg);
     if (!imageLoader)
     {
-      ReportError (object_reg, "Failed to find an image loader!");
+      ReportError (object_reg,
+		   "Failed to find an image loader!");
       return;
     }
 
@@ -361,46 +388,54 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
 
     // Search in the loading context
-    iTextureWrapper* texture = loaderContext->FindTexture (filename, true);    
+    iTextureWrapper* texture =
+      loaderContext->FindTexture (filename, true);    
     if (texture)
       return texture;
 
     // Load manually the file
-    csRef<iDataBuffer> buffer = vfs->ReadFile (filename);
+    csRef<iDataBuffer> buffer = vfs->ReadFile (filename, false);
     if (!buffer)
     {
-      ReportWarning (object_reg, "Could not load image file %s!", CS::Quote::Single (filename));
-      return 0;
+      ReportWarning (object_reg, "Could not find image file %s!",
+		     CS::Quote::Single (filename));
+      return nullptr;
     }
 
     return LoadTexture (buffer, filename);
   }
 
-  iTextureWrapper* AssimpLoader::LoadTexture (iDataBuffer* buffer, const char* filename)
+  iTextureWrapper* AssimpLoader::LoadTexture (iDataBuffer* buffer,
+					      const char* filename)
   {
     // Load the image data
     int format = engine->GetTextureFormat ();
     csRef<iImage> image (imageLoader->Load (buffer, format));
     if (!image)
     {
-      ReportWarning (object_reg, "Could not load image %s. Unknown format!",
-		   CS::Quote::Single (filename));
-      return 0;
+      ReportWarning (object_reg,
+		     "Could not load image %s. Unknown format!",
+		     CS::Quote::Single (filename));
+      return nullptr;
     }
 
     // Create the texture handle
     csRef<scfString> fail_reason;
     fail_reason.AttachNew (new scfString ());
-    csRef<iTextureHandle> textureHandle (textureManager->RegisterTexture (image, CS_TEXTURE_2D, fail_reason));
+    csRef<iTextureHandle> textureHandle
+      (textureManager->RegisterTexture
+       (image, CS_TEXTURE_2D, fail_reason));
     if (!textureHandle)
     {
       ReportError (object_reg, "crystalspace.imagetextureloader",
-		   "Error creating texture", fail_reason->GetData ());
-      return 0;
+		   "Error creating texture",
+		   fail_reason->GetData ());
+      return nullptr;
     }
 
     // Create the texture wrapper
-    csRef<iTextureWrapper> textureWrapper = engine->GetTextureList ()->CreateTexture (textureHandle);
+    csRef<iTextureWrapper> textureWrapper =
+      engine->GetTextureList ()->CreateTexture (textureHandle);
     engine->GetTextureList ()->Add (textureWrapper);
     textureWrapper->SetImageFile(image);
     loaderContext->AddToCollection (textureWrapper->QueryObject ());
@@ -410,7 +445,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     return textureWrapper;
   }
 
-  void AssimpLoader::ImportTexture (aiTexture* texture, size_t index)
+  void AssimpLoader::ImportTexture (aiTexture* texture,
+				    size_t index)
   {
     // Check the type of the image
     if (texture->mHeight != 0)
@@ -425,16 +461,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
       // Create the data buffer
       csRef<iDataBuffer> buffer;
-      buffer.AttachNew (new CS::DataBuffer<> ((char*) texture->pcData, texture->mWidth * sizeof (aiTexel), false));
+      buffer.AttachNew (new CS::DataBuffer<>
+			((char*) texture->pcData,
+			 texture->mWidth * sizeof (aiTexel),
+			 false));
 
       // Load the texture
-      csRef<iTextureWrapper> textureWrapper = LoadTexture (buffer, "<unknown>");
+      csRef<iTextureWrapper> textureWrapper =
+	LoadTexture (buffer, "<unknown>");
       if (textureWrapper)
 	textures.Put (index, textureWrapper);
     }
   }
 
-  void AssimpLoader::ImportMaterial (aiMaterial* material, size_t index)
+  void AssimpLoader::ImportMaterial (aiMaterial* material,
+				     size_t index)
   {
     // TODO: import all other material properties
 
@@ -463,19 +504,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       }
     }
 
-    csRef<iMaterialWrapper> materialWrapper = engine->CreateMaterial (name.data, texture);
+    csRef<iMaterialWrapper> materialWrapper =
+      engine->CreateMaterial (name.data, texture);
     materials.Put (index, materialWrapper);
-    loaderContext->AddToCollection (materialWrapper->QueryObject ());
+    loaderContext->AddToCollection
+      (materialWrapper->QueryObject ());
   }
 
   void AssimpLoader::ImportGenmesh (aiNode* node)
   {
     // Create the genmesh factory
-    csRef<iMeshFactoryWrapper> factoryWrapper = engine->CreateMeshFactory
+    csRef<iMeshFactoryWrapper> factoryWrapper =
+      engine->CreateMeshFactory
       ("crystalspace.mesh.object.genmesh", node->mName.data);
     loaderContext->AddToCollection (factoryWrapper->QueryObject ());
     csRef<iGeneralFactoryState> gmstate =
-      scfQueryInterface<iGeneralFactoryState> (factoryWrapper->GetMeshObjectFactory ());
+      scfQueryInterface<iGeneralFactoryState>
+      (factoryWrapper->GetMeshObjectFactory ());
 
     if (!firstMesh)
       firstMesh = factoryWrapper;
@@ -484,7 +529,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     ImportGenmeshSubMesh (gmstate, node);
   }
 
-  void AssimpLoader::ImportGenmeshSubMesh (iGeneralFactoryState* gmstate, aiNode* node)
+  void AssimpLoader::ImportGenmeshSubMesh
+    (iGeneralFactoryState* gmstate, aiNode* node)
   {
     // Import all meshes of this node
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
@@ -495,7 +541,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       if (!mesh->HasFaces ()
 	  || !mesh->HasPositions ())
       {
-	ReportWarning (object_reg, "Skipping mesh %s for lack of vertices or triangles!",
+	ReportWarning (object_reg,
+		       "Skipping mesh %s for lack of vertices or triangles!",
 		       CS::Quote::Single (mesh->mName.data));
 	continue;
       }
@@ -510,24 +557,33 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       for (unsigned int i = 0; i < mesh->mNumVertices; i++)
       {
 	csVector3 vertex = Assimp2CS (mesh->mVertices[i]);
-	csVector2 uv = mesh->HasTextureCoords (0) ? csVector2 (aiuvs[i].x, aiuvs[i].y) : csVector2 (0.0f);
-	csVector3 normal = mesh->HasNormals () ? Assimp2CS (mesh->mNormals[i]) : csVector3 (1.0f, 0.0f, 0.0f);
-	csColor4 color = mesh->HasVertexColors (0) ? Assimp2CS (aicolors[i]) : csColor4 (1.0f);
+	csVector2 uv = mesh->HasTextureCoords (0)
+	  ? csVector2 (aiuvs[i].x, aiuvs[i].y) : csVector2 (0.0f);
+	csVector3 normal = mesh->HasNormals ()
+	  ? Assimp2CS (mesh->mNormals[i])
+	  : csVector3 (1.0f, 0.0f, 0.0f);
+	csColor4 color = mesh->HasVertexColors (0)
+	  ? Assimp2CS (aicolors[i]) : csColor4 (1.0f);
 
 	gmstate->AddVertex (vertex, uv, normal, color);
       }
 
       // Create a render buffer for all faces
-      csRef<csRenderBuffer> buffer = csRenderBuffer::CreateIndexRenderBuffer
-	(mesh->mNumFaces * 3, CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, currentVertices, gmstate->GetVertexCount () - 1);
+      csRef<csRenderBuffer> buffer =
+	csRenderBuffer::CreateIndexRenderBuffer
+	(mesh->mNumFaces * 3, CS_BUF_STATIC,
+	 CS_BUFCOMP_UNSIGNED_INT, currentVertices,
+	 gmstate->GetVertexCount () - 1);
 
-      csTriangle* triangleData = (csTriangle*) buffer->Lock (CS_BUF_LOCK_NORMAL);
+      csTriangle* triangleData =
+	(csTriangle*) buffer->Lock (CS_BUF_LOCK_NORMAL);
       for (unsigned int i = 0; i < mesh->mNumFaces; i++)
       {
 	aiFace& face = mesh->mFaces[i];
-	triangleData[i] = csTriangle (currentVertices + face.mIndices[0],
-				      currentVertices + face.mIndices[1],
-				      currentVertices + face.mIndices[2]);
+	triangleData[i] =
+	  csTriangle (currentVertices + face.mIndices[0],
+		      currentVertices + face.mIndices[1],
+		      currentVertices + face.mIndices[2]);
       }
       buffer->Release ();
 
@@ -552,11 +608,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
   {
     // Create the animesh factory
     AnimeshData animeshData;
-    csRef<iMeshFactoryWrapper> factoryWrapper = engine->CreateMeshFactory
+    csRef<iMeshFactoryWrapper> factoryWrapper =
+      engine->CreateMeshFactory
       ("crystalspace.mesh.object.animesh", node->mName.data);
-    loaderContext->AddToCollection (factoryWrapper->QueryObject ());
+    loaderContext->AddToCollection
+      (factoryWrapper->QueryObject ());
     animeshData.factory =
-      scfQueryInterface<CS::Mesh::iAnimatedMeshFactory> (factoryWrapper->GetMeshObjectFactory ());
+      scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
+      (factoryWrapper->GetMeshObjectFactory ());
 
     if (!firstMesh)
       firstMesh = factoryWrapper;
@@ -567,42 +626,53 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
     // Create a render buffer for all types of parameters
     csRef<iRenderBuffer> buffer;
-    buffer = FillBuffer<float> (animeshData.vertices, CS_BUFCOMP_FLOAT, 3, false);
+    buffer = FillBuffer<float> (animeshData.vertices,
+				CS_BUFCOMP_FLOAT, 3, false);
     animeshData.factory->SetVertices (buffer);
 
     if (animeshData.hasColors)
     {
-      buffer = FillBuffer<float> (animeshData.colors, CS_BUFCOMP_FLOAT, 4, false);
+      buffer = FillBuffer<float> (animeshData.colors,
+				  CS_BUFCOMP_FLOAT, 4, false);
       animeshData.factory->SetColors (buffer);
     }
 
     if (animeshData.hasNormals)
     {
-      buffer = FillBuffer<float> (animeshData.normals, CS_BUFCOMP_FLOAT, 3, false);
+      buffer = FillBuffer<float> (animeshData.normals,
+				  CS_BUFCOMP_FLOAT, 3, false);
       animeshData.factory->SetNormals (buffer);
     }
 
     if (animeshData.hasTangents)
     {
-      buffer = FillBuffer<float> (animeshData.tangents, CS_BUFCOMP_FLOAT, 3, false);
+      buffer = FillBuffer<float> (animeshData.tangents,
+				  CS_BUFCOMP_FLOAT, 3, false);
       animeshData.factory->SetTangents (buffer);
-      buffer = FillBuffer<float> (animeshData.binormals, CS_BUFCOMP_FLOAT, 3, false);
+
+      buffer = FillBuffer<float> (animeshData.binormals,
+				  CS_BUFCOMP_FLOAT, 3, false);
       animeshData.factory->SetBinormals (buffer);
     }
 
     if (animeshData.hasTexels)
     {
-      buffer = FillBuffer<float> (animeshData.texels, CS_BUFCOMP_FLOAT, 2, false);
+      buffer = FillBuffer<float> (animeshData.texels,
+				  CS_BUFCOMP_FLOAT, 2, false);
       animeshData.factory->SetTexCoords (buffer);
     }
 
-    // Setup the material of the animesh as the first material encountered in the submeshes
-    for (size_t i = 0; i < animeshData.factory->GetSubMeshCount (); i++)
+    // Setup the material of the animesh as the first material
+    // encountered in the submeshes
+    for (size_t i = 0;
+	 i < animeshData.factory->GetSubMeshCount (); i++)
     {
-      iMaterialWrapper* material = animeshData.factory->GetSubMesh (i)->GetMaterial ();
+      iMaterialWrapper* material =
+	animeshData.factory->GetSubMesh (i)->GetMaterial ();
       if (material)
       {
-	factoryWrapper->GetMeshObjectFactory ()->SetMaterialWrapper (material);
+	factoryWrapper->GetMeshObjectFactory ()
+	  ->SetMaterialWrapper (material);
 	break;
       }
     }
@@ -611,7 +681,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     animeshData.factory->Invalidate ();
   }
 
-  void AssimpLoader::PreProcessAnimeshSubMesh (AnimeshData* animeshData, aiNode* node)
+  void AssimpLoader::PreProcessAnimeshSubMesh
+    (AnimeshData* animeshData, aiNode* node)
   {
     // Check for the data of all meshes
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
@@ -624,10 +695,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 	continue;
 
       // Process the mesh
-      if (mesh->HasTextureCoords (0)) animeshData->hasTexels = true;
-      if (mesh->HasNormals ()) animeshData->hasNormals = true;
-      if (mesh->HasTangentsAndBitangents ()) animeshData->hasTangents = true;
-      if (mesh->HasVertexColors (0)) animeshData->hasColors = true;
+      if (mesh->HasTextureCoords (0))
+	animeshData->hasTexels = true;
+      if (mesh->HasNormals ())
+	animeshData->hasNormals = true;
+      if (mesh->HasTangentsAndBitangents ())
+	animeshData->hasTangents = true;
+      if (mesh->HasVertexColors (0))
+	animeshData->hasColors = true;
     }
 
     // Pre-process the child nodes
@@ -638,7 +713,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     }
   }
 
-  void AssimpLoader::ImportAnimeshSubMesh (AnimeshData* animeshData, aiNode* node)
+  void AssimpLoader::ImportAnimeshSubMesh (AnimeshData* animeshData,
+					   aiNode* node)
   {
     // Import all meshes of this node
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
@@ -649,7 +725,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       if (!mesh->HasFaces ()
 	  || !mesh->HasPositions ())
       {
-	ReportWarning (object_reg, "Skipping mesh %s for lack of vertices or triangles!",
+	ReportWarning (object_reg,
+		       "Skipping mesh %s for lack of vertices or triangles!",
 		       CS::Quote::Single (mesh->mName.data));
 	continue;
       }
@@ -727,22 +804,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       }
 
       // Create a render buffer for all faces
-      csRef<csRenderBuffer> buffer = csRenderBuffer::CreateIndexRenderBuffer
-	(mesh->mNumFaces * 3, CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, currentVertices, animeshData->vertices.GetSize () - 1);
+      csRef<csRenderBuffer> buffer =
+	csRenderBuffer::CreateIndexRenderBuffer
+	(mesh->mNumFaces * 3, CS_BUF_STATIC,
+	 CS_BUFCOMP_UNSIGNED_INT, currentVertices,
+	 animeshData->vertices.GetSize () - 1);
 
-      csTriangle* triangleData = (csTriangle*) buffer->Lock (CS_BUF_LOCK_NORMAL);
+      csTriangle* triangleData =
+	(csTriangle*) buffer->Lock (CS_BUF_LOCK_NORMAL);
       for (unsigned int i = 0; i < mesh->mNumFaces; i++)
       {
 	aiFace& face = mesh->mFaces[i];
-	triangleData[i] = csTriangle (currentVertices + face.mIndices[0],
-				      currentVertices + face.mIndices[1],
-				      currentVertices + face.mIndices[2]);
+	triangleData[i] =
+	  csTriangle (currentVertices + face.mIndices[0],
+		      currentVertices + face.mIndices[1],
+		      currentVertices + face.mIndices[2]);
       }
       buffer->Release ();
 
       // Create the submesh
       CS::Mesh::iAnimatedMeshSubMeshFactory* submesh =
-	animeshData->factory->CreateSubMesh (buffer, mesh->mName.data, true);
+	animeshData->factory->CreateSubMesh
+	(buffer, mesh->mName.data, true);
 
       // Setup the material
       if (mesh->mMaterialIndex < materials.GetSize ())

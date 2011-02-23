@@ -66,7 +66,8 @@ struct AnimeshData
   bool hasColors;
 
   AnimeshData ()
-  : hasNormals (false), hasTexels (false), hasTangents (false), hasColors (false)
+  : hasNormals (false), hasTexels (false),
+    hasTangents (false), hasColors (false)
   {}
 };
 
@@ -90,8 +91,10 @@ public:
     iLoaderContext* ldr_context, iBase* context, iStringArray*);
 
   //-- iModelLoader
-  virtual iMeshFactoryWrapper* Load (const char* factname, const char* filename);
-  virtual iMeshFactoryWrapper* Load (const char* factname, iDataBuffer* buffer);
+  virtual iMeshFactoryWrapper* Load (const char* factname,
+				     const char* filename);
+  virtual iMeshFactoryWrapper* Load (const char* factname,
+				     iDataBuffer* buffer);
   virtual bool IsRecognized (const char* filename);
   virtual bool IsRecognized (iDataBuffer* buffer);
 
@@ -99,17 +102,21 @@ public:
   void ImportScene ();
 
   iTextureWrapper* FindTexture (const char* filename);
-  iTextureWrapper* LoadTexture (iDataBuffer* buffer, const char* filename);
+  iTextureWrapper* LoadTexture (iDataBuffer* buffer,
+				const char* filename);
 
   void ImportTexture (aiTexture* texture, size_t index);
   void ImportMaterial (aiMaterial* material, size_t index);
 
   void ImportGenmesh (aiNode* node);
-  void ImportGenmeshSubMesh (iGeneralFactoryState* gmstate, aiNode* node);
+  void ImportGenmeshSubMesh (iGeneralFactoryState* gmstate,
+			     aiNode* node);
 
   void ImportAnimesh (aiNode* node);
-  void PreProcessAnimeshSubMesh (AnimeshData* animeshData, aiNode* node);
-  void ImportAnimeshSubMesh (AnimeshData* animeshData, aiNode* node);
+  void PreProcessAnimeshSubMesh (AnimeshData* animeshData,
+				 aiNode* node);
+  void ImportAnimeshSubMesh (AnimeshData* animeshData,
+			     aiNode* node);
   void ImportAnimation (aiAnimation* animation);
 
 private:
