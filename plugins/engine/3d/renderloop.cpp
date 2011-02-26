@@ -163,6 +163,11 @@ bool csRenderLoopManager::Register (const char* name, iRenderLoop* loop,
  
 iRenderLoop* csRenderLoopManager::Retrieve (const char* name)
 {
+  if (name && (strcmp (name, CS_DEFAULT_RENDERLOOP_NAME) == 0))
+  {
+    // Special case to ensure it's loaded
+    engine->GetCurrentDefaultRenderloop();
+  }
   return (loops.Get (name, (iRenderLoop*)0));
 }
 

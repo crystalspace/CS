@@ -961,6 +961,7 @@ private:
 
   /// Default render loop
   csRef<iRenderLoop> defaultRenderLoop;
+  bool defaultRenderLoopTried;
   csString override_renderloop;
   /// Render loop manager
   csRenderLoopManager* renderLoopManager;

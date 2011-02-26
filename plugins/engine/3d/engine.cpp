@@ -513,7 +513,8 @@ csEngine::csEngine (iBase *iParent) :
   lightAmbientBlue (CS_DEFAULT_LIGHT_LEVEL),
   sectors (this), textures (new csTextureList (this)), 
   materials (new csMaterialList), sharedVariables (new csSharedVariableList),
-  renderLoopManager (0), topLevelClipper (0), resize (false),
+  defaultRenderLoopTried (false), renderLoopManager (0),
+  topLevelClipper (0), resize (false),
   worldSaveable (false), defaultKeepImage (false), maxAspectRatio (0),
   nextframePending (0), currentFrameNumber (0), 
   currentRenderContext (0), weakEventHandler(0),
@@ -825,35 +826,9 @@ THREADED_CALLABLE_IMPL(csEngine, DeleteAll)
     csRef<iMaterialWrapper> portalMaterialWrapper;
     portalMaterialWrapper = materials->NewMaterial (portalMat, 0);
     defaultPortalMaterial = portalMaterialWrapper;
-
-    // Now, try to load the user-specified default render loop.
-    const char* configLoop = cfg->GetStr ("Engine.RenderLoop.Default", 0);
-    if (!override_renderloop.IsEmpty ())
-    {
-      defaultRenderLoop = renderLoopManager->Load (override_renderloop);
-      if (!defaultRenderLoop)
-      {
-        Warn ("Default renderloop couldn't be created!");
-        return false;
-      }
-    }
-    else if (!configLoop)
-    {
-      defaultRenderLoop = CreateDefaultRenderLoop ();
-    }
-    else
-    {
-      defaultRenderLoop = renderLoopManager->Load (configLoop);
-      if (!defaultRenderLoop)
-      {
-        Warn ("Default renderloop couldn't be created!");
-        return false;
-      }
-    }
-
-    // Register it.
-    renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, 
-      defaultRenderLoop);
+    
+    defaultRenderLoop.Invalidate ();
+    defaultRenderLoopTried = false;
   }
 
   return true;
@@ -1218,7 +1193,7 @@ void csEngine::Draw (iCamera *c, iClipper2D *view, iMeshWrapper* mesh)
     varStack.Setup (shaderManager->GetSVNameStringset ()->GetSize ());
 
     iRenderLoop* rl = s->GetRenderLoop ();
-    if (!rl) rl = defaultRenderLoop;
+    if (!rl) rl = this->csEngine::GetCurrentDefaultRenderloop ();
     rl->Draw (rview, s, mesh);
 
     varStack.Setup (0);
@@ -3218,6 +3193,42 @@ iRenderLoopManager* csEngine::GetRenderLoopManager ()
 
 iRenderLoop* csEngine::GetCurrentDefaultRenderloop ()
 {
+  // Lazily obtain the default render loop
+  if (!defaultRenderLoop && !defaultRenderLoopTried)
+  {
+    csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
+    // Try to load the user-specified default render loop.
+    const char* configLoop = cfg->GetStr ("Engine.RenderLoop.Default", 0);
+    if (!override_renderloop.IsEmpty ())
+    {
+      defaultRenderLoop = renderLoopManager->Load (override_renderloop);
+      if (!defaultRenderLoop)
+      {
+        Warn ("Default renderloop couldn't be created!");
+      }
+    }
+    else if (!configLoop)
+    {
+      defaultRenderLoop = CreateDefaultRenderLoop ();
+    }
+    else
+    {
+      defaultRenderLoop = renderLoopManager->Load (configLoop);
+      if (!defaultRenderLoop)
+      {
+        Warn ("Default renderloop couldn't be created!");
+      }
+    }
+
+    if (defaultRenderLoop)
+    {
+      // Register it.
+      renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, 
+	defaultRenderLoop);
+    }
+    
+    defaultRenderLoopTried = true;
+  }
 
   return defaultRenderLoop;
 }
@@ -3225,6 +3236,10 @@ iRenderLoop* csEngine::GetCurrentDefaultRenderloop ()
 bool csEngine::SetCurrentDefaultRenderloop (iRenderLoop* loop)
 {
   if (loop == 0) return false;
+  
+  // Hack: ensure that a config-set loop is registered as CS_DEFAULT_RENDERLOOP_NAME
+  csEngine::GetCurrentDefaultRenderloop ();
+  
   defaultRenderLoop = loop;
   return true;
 }
