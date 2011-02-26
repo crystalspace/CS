@@ -21,14 +21,20 @@
 #ifndef __CS_ASSIMPLOADER_H__
 #define __CS_ASSIMPLOADER_H__
 
+#include "csgeom/quaternion.h"
+#include "csgeom/vector3.h"
 #include "csutil/dirtyaccessarray.h"
+#include "csutil/hash.h"
 #include "csutil/refarr.h"
 #include "imap/reader.h"
 #include "imap/modelload.h"
+#include "imesh/skeleton2.h"
 
 #include "assimp/assimp.hpp"      // C++ importer interface
 #include "assimp/aiScene.h"       // Output data structure
 #include "assimp/aiPostProcess.h" // Post processing flags
+
+#include "common.h"
 
 struct iEngine;
 struct iImageIO;
@@ -51,9 +57,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
  * Open Asset Import Library loader for Crystal Space
  */
 
+struct BoneData
+{
+  bool isBone;
+  aiNode* node;
+  size_t vertexIndex;
+  CS::Animation::BoneID boneID;
+};
+
 struct AnimeshData
 {
   csRef<CS::Mesh::iAnimatedMeshFactory> factory;
+
   csDirtyAccessArray<float> vertices;
   csDirtyAccessArray<float> texels;
   csDirtyAccessArray<float> normals;
@@ -69,6 +84,9 @@ struct AnimeshData
   : hasNormals (false), hasTexels (false),
     hasTangents (false), hasColors (false)
   {}
+
+  aiNode* rootNode;
+  csHash<BoneData, csString> boneNodes;
 };
 
 class AssimpLoader : 
@@ -86,7 +104,7 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   //-- iBinaryLoaderPlugin
-  virtual bool IsThreadSafe () { return true; }
+  virtual bool IsThreadSafe () { return false; }
   virtual csPtr<iBase> Parse (iDataBuffer* buf, iStreamSource*,
     iLoaderContext* ldr_context, iBase* context, iStringArray*);
 
@@ -113,10 +131,15 @@ public:
 			     aiNode* node);
 
   void ImportAnimesh (aiNode* node);
-  void PreProcessAnimeshSubMesh (AnimeshData* animeshData,
-				 aiNode* node);
-  void ImportAnimeshSubMesh (AnimeshData* animeshData,
-			     aiNode* node);
+
+  void InitBoneNode (AnimeshData* animeshData, aiNode* node);
+  void PreProcessAnimesh (AnimeshData* animeshData,
+			  aiNode* node);
+  void ImportAnimeshSubMesh (AnimeshData* animeshData, aiNode* node);
+  void ImportAnimeshSkeleton (AnimeshData* animeshData, aiNode* node,
+			      CS::Animation::BoneID parent,
+			      csQuaternion rotation, csVector3 offset);
+
   void ImportAnimation (aiAnimation* animation);
 
 private:
