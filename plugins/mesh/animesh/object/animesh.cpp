@@ -35,7 +35,7 @@
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
-#include "imesh/skeleton2.h"
+//#include "imesh/skeleton2.h"
 #include "imesh/animnode/skeleton2anim.h"
 #include "iutil/strset.h"
 #include "ivideo/rendermesh.h"
@@ -204,6 +204,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     vertexCount = (uint)vertexBuffer->GetElementCount ();
 
     //Update the number of bone influences
+    // TODO: don't allocate them until needed
     boneInfluences.SetSize (vertexCount*4);//@@TODO handle
 
     return true;
@@ -575,25 +576,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     // Compute the tangents
     int vertCount = GetVertexCount();
-    csVector3* tangentData = (csVector3*)cs_malloc (
-      sizeof (csVector3) * vertCount * 2);
-    csVector3* bitangentData = tangentData + vertCount;
+    if (vertCount > 0 && normalBuffer && texcoordBuffer)
+    {
+      csVector3* tangentData = (csVector3*) cs_malloc
+	(sizeof (csVector3) * vertCount * 2);
+      csVector3* bitangentData = tangentData + vertCount;
 
-    csNormalMappingTools::CalculateTangents
-      (triNum, tris, vertCount,
-       (csVector3*) vertexBuffer->Lock (CS_BUF_LOCK_READ), 
-       (csVector3*) normalBuffer->Lock (CS_BUF_LOCK_READ),
-       (csVector2*) texcoordBuffer->Lock (CS_BUF_LOCK_READ),
-       tangentData, bitangentData);
+      csNormalMappingTools::CalculateTangents
+	(triNum, tris, vertCount,
+	 (csVector3*) vertexBuffer->Lock (CS_BUF_LOCK_READ), 
+	 (csVector3*) normalBuffer->Lock (CS_BUF_LOCK_READ),
+	 (csVector2*) texcoordBuffer->Lock (CS_BUF_LOCK_READ),
+	 tangentData, bitangentData);
   
-    vertexBuffer->Release ();
-    normalBuffer->Release ();
-    texcoordBuffer->Release ();
+      vertexBuffer->Release ();
+      normalBuffer->Release ();
+      texcoordBuffer->Release ();
 
-    tangentBuffer->CopyInto (tangentData, vertCount);
-    binormalBuffer->CopyInto (bitangentData, vertCount);
+      tangentBuffer->CopyInto (tangentData, vertCount);
+      binormalBuffer->CopyInto (bitangentData, vertCount);
   
-    cs_free (tangentData);
+      cs_free (tangentData);
+    }
   }
 
   FactorySocket::FactorySocket (AnimeshObjectFactory* factory, CS::Animation::BoneID bone, 
