@@ -19,7 +19,7 @@
 #==============================================================================
 SHELL ?= "/bin/sh" ;
 
-MACOSX_ENVIRONMENT = "export MACOSX_DEPLOYMENT_TARGET=10.2" ;
+MACOSX_ENVIRONMENT = "export MACOSX_DEPLOYMENT_TARGET=10.4" ;
 
 PLUGIN.LFLAGS += "" ;
 
