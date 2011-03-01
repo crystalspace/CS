@@ -178,7 +178,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     
     if (channelId == InvalidChannelID)
     {
-      AnimationChannel* channel = new AnimationChannel (bone);      
+      AnimationChannel* channel = new AnimationChannel (bone);
 
       channelId = (ChannelID)channels.Push (channel);
     }
@@ -257,6 +257,44 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     KeyFrame& k = ch->keyFrames[keyframe];
     k.rotation = rotation;
     k.offset = offset;
+  }
+
+  void Animation::AddOrSetKeyFrame (ChannelID channel, float time, 
+				    const csQuaternion& rotation)
+  {
+    CS_ASSERT(channel < channels.GetSize ());
+
+    AnimationChannel* ch = channels[channel];
+
+    // Search for any keyframe with that time value
+    for (size_t i = 0; i < ch->keyFrames.GetSize (); i++)
+      if (fabs (ch->keyFrames[i].time - time) < SMALL_EPSILON)
+      {
+	ch->keyFrames[i].rotation = rotation;
+	return;
+      }
+
+    // Insert the new key
+    AddKeyFrame (channel, time, rotation, csVector3 (0.0f));
+  }
+
+  void Animation::AddOrSetKeyFrame (ChannelID channel, float time, 
+				    const csVector3& offset)
+  {
+    CS_ASSERT(channel < channels.GetSize ());
+
+    AnimationChannel* ch = channels[channel];
+
+    // Search for any keyframe with that time value
+    for (size_t i = 0; i < ch->keyFrames.GetSize (); i++)
+      if (fabs (ch->keyFrames[i].time - time) < SMALL_EPSILON)
+      {
+	ch->keyFrames[i].offset = offset;
+	return;
+      }
+
+    // Insert the new key
+    AddKeyFrame (channel, time, csQuaternion (), offset);
   }
 
   size_t Animation::GetKeyFrameCount (ChannelID channel) const

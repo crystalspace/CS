@@ -113,6 +113,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 			      CS::Animation::KeyFrameID keyframe,
 			      const csQuaternion& rotation, const csVector3& offset);
 
+    virtual void AddOrSetKeyFrame (CS::Animation::ChannelID channel, float time, 
+				   const csQuaternion& rotation);
+    virtual void AddOrSetKeyFrame (CS::Animation::ChannelID channel, float time, 
+				   const csVector3& offset);
+
     virtual size_t GetKeyFrameCount (CS::Animation::ChannelID channel) const;
 
     virtual void GetKeyFrame (CS::Animation::ChannelID channel, CS::Animation::KeyFrameID keyframe, 

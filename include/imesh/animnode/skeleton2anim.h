@@ -229,7 +229,7 @@ struct iSkeletonAnimPacket : public virtual iBase
  */
 struct iSkeletonAnimation : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonAnimation, 2, 0, 3);
+  SCF_INTERFACE(CS::Animation::iSkeletonAnimation, 2, 0, 4);
 
   /**
    * Get the name of the animation.
@@ -368,6 +368,28 @@ struct iSkeletonAnimation : public virtual iBase
    * \warning This will alter the ID of the successive channels.
    */
   virtual void RemoveChannel (ChannelID channel) = 0;
+
+  /**
+   * Add or reset the rotation at the given time within the given channel.
+   * \param channel Id of the channel.
+   * \param time The time of the key frame.
+   * \param rotation The rotation of the bone for the key frame.
+   * \remark The rotation must be in the space defined by
+   * GetFramesInBoneSpace().
+   */
+  virtual void AddOrSetKeyFrame (ChannelID channel, float time, 
+    const csQuaternion& rotation) = 0;
+
+  /**
+   * Add or reset the position at the given time within the given channel.
+   * \param channel Id of the channel.
+   * \param time The time of the key frame.
+   * \param offset The position of the bone for the key frame.
+   * \remark The offset must be in the space defined by
+   * GetFramesInBoneSpace().
+   */
+  virtual void AddOrSetKeyFrame (ChannelID channel, float time, 
+    const csVector3& offset) = 0;
 };
 
 
