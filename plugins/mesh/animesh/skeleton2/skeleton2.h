@@ -134,7 +134,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     csSafeCopyArray<csString> boneNames;
 
     csArray<CS::Animation::BoneID> boneOrderList;
-    csRef<CS::Animation::iSkeletonAnimPacketFactory> animationPacket;    
+    csRef<CS::Animation::iSkeletonAnimPacketFactory> animationPacket;
 
     bool autostart;
 

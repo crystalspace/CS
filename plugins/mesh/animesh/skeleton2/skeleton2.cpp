@@ -139,18 +139,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   {
     CS_ASSERT(bone < allBones.GetSize () && allBones[bone].created);
 
+    // If the bone is the last of the list then resize the list
     if (bone == allBones.GetSize ()-1)
     {
       allBones.SetSize (bone);
       boneNames.SetSize (bone);
     }
+
+    // Else mark the bone as deleted
     else
     {
       allBones[bone].created = false;
       boneNames[bone] = "DELETED";
     }
 
-    // Handle bones parented to bone...
+    // Invalidate the data structures
     cachedTransformsDirty = true;
     orderListDirty = true;
   }
@@ -250,6 +253,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     {
       boneRef.boneRotation = rot;
       boneRef.boneOffset = offset;
+      cachedTransformsDirty = true;
       return;
     }
 
@@ -265,6 +269,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   csPtr<CS::Animation::iSkeleton> SkeletonFactory::CreateSkeleton ()
   {
+    UpdateCachedTransforms ();
     csRef<CS::Animation::iSkeleton> ref;
     ref.AttachNew (new Skeleton (this));
     return csPtr<CS::Animation::iSkeleton> (ref);
@@ -352,7 +357,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
         TransformQVFrame (boneParentRef.absRotation, boneParentRef.absOffset, 
           boneRef.boneRotation, boneRef.boneOffset, 
-          boneRef.absRotation , boneRef.absOffset);
+          boneRef.absRotation, boneRef.absOffset);
       }
     }
 
@@ -478,7 +483,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     {
       boneRef.boneRotation = rot;
       boneRef.boneOffset = offset;
-      // TODO: no need for cachedTransformsDirty = true; ?
+      cachedTransformsDirty = true;
       return;
     }
 
@@ -671,6 +676,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
         if (boneRef.created && finalState->IsBoneUsed ((CS::Animation::BoneID) i))
         {
 	  changed = true;
+	  // TODO: use bind space instead
 
 	  csQuaternion skeletonRotation;
 	  csVector3 skeletonOffset;
@@ -767,12 +773,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
         TransformQVFrame (boneParentRef.absRotation, boneParentRef.absOffset, 
           boneRef.boneRotation, boneRef.boneOffset, 
-          boneRef.absRotation , boneRef.absOffset);
+          boneRef.absRotation, boneRef.absOffset);
       }
 
+      // TODO: this new value in bind space don't seem correct...
       SkeletonFactory::Bone& factoryBone = factory->allBones[orderList[i]];
-      TransformQVFrameInv (factoryBone.absRotation, factoryBone.absOffset,
-        boneRef.absRotation , boneRef.absOffset,
+      TransformQVFrameInv2 (factoryBone.absRotation, factoryBone.absOffset,
+        boneRef.absRotation, boneRef.absOffset,
         boneRef.bindRotation, boneRef.bindOffset);
     }
 
