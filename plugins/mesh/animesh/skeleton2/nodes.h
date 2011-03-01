@@ -197,7 +197,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     csRef<CS::Animation::iSkeletonAnimation> animation;
     bool cyclic, automaticReset, automaticStop;
-    float playbackSpeed, animationDuration;
+    float playbackSpeed;
 
     friend class AnimationNode;
   };
