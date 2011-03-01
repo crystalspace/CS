@@ -61,8 +61,12 @@ struct BoneData
 {
   bool isBone;
   aiNode* node;
-  size_t vertexIndex;
   CS::Animation::BoneID boneID;
+  aiMatrix4x4 transform;
+
+  BoneData ()
+  : isBone (false), node (nullptr), boneID (0)
+  {}
 };
 
 struct AnimeshData
@@ -87,6 +91,12 @@ struct AnimeshData
 
   aiNode* rootNode;
   csHash<BoneData, csString> boneNodes;
+
+  struct AnimeshSubmesh
+  {
+    size_t vertexIndex;
+  };
+  csHash<AnimeshSubmesh, aiMesh*> submeshes;
 };
 
 class AssimpLoader : 
@@ -138,7 +148,8 @@ public:
   void ImportAnimeshSubMesh (AnimeshData* animeshData, aiNode* node);
   void ImportAnimeshSkeleton (AnimeshData* animeshData, aiNode* node,
 			      CS::Animation::BoneID parent,
-			      csQuaternion rotation, csVector3 offset);
+			      aiMatrix4x4 transform);
+  void ImportBoneInfluences (AnimeshData* animeshData, aiNode* node);
 
   void ImportAnimation (aiAnimation* animation);
 
@@ -150,6 +161,7 @@ private:
   csRef<iTextureManager> textureManager;
   csRef<iLoaderContext> loaderContext;
   csRef<iImageIO> imageLoader;
+  csRef<CS::Animation::iSkeletonManager> skeletonManager;
 
   csRefArray<iTextureWrapper> textures;
   csRefArray<iMaterialWrapper> materials;
@@ -158,6 +170,14 @@ private:
   unsigned int importFlags;
 
   csRef<iMeshFactoryWrapper> firstMesh;
+
+  struct AnimeshNode
+  {
+    CS::Mesh::iAnimatedMeshFactory* factory;
+    CS::Animation::BoneID boneID;
+  };
+  csHash<AnimeshNode, csString> nodeData;
+
 };
 
 }

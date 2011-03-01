@@ -35,8 +35,11 @@
 #include "igraphic/imageio.h"
 #include "imap/ldrctxt.h"
 #include "imesh/animesh.h"
+#include "imesh/animnode/debug.h"
+#include "imesh/animnode/skeleton2anim.h"
 #include "imesh/genmesh.h"
 #include "iutil/document.h"
+#include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
@@ -144,47 +147,36 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       }
     }
 
-    // Create the skeleton if needed
-    if (hasBones)
+    // Import the skeleton and the bone influences
+    if (hasBones && skeletonManager)
     {
-      // Find the skeleton manager
-      csRef<CS::Animation::iSkeletonManager> skeletonManager =
-	csQueryRegistryOrLoad<CS::Animation::iSkeletonManager>
-	(object_reg, "crystalspace.skeletalanimation");
-      if (!skeletonManager)
-	ReportWarning (object_reg, "Could not find the skeleton manager");
+      // Create the skeleton then import it
+      CS::Animation::iSkeletonFactory* skeletonFactory =
+	skeletonManager->CreateSkeletonFactory (animeshData.rootNode->mName.data);
+      animeshData.factory->SetSkeletonFactory (skeletonFactory);
 
-      else
-      {
-	// Create the skeleton
-	CS::Animation::iSkeletonFactory* skeletonFactory =
-	  skeletonManager->CreateSkeletonFactory (animeshData.rootNode->mName.data);
-	animeshData.factory->SetSkeletonFactory (skeletonFactory);
-      }
-    }
-
-    // Import the skeleton
-    if (hasBones)
-    {
-      // Initialize the bone influences
-      CS::Mesh::csAnimatedMeshBoneInfluence* influences =
-	animeshData.factory->GetBoneInfluences ();
-      for (size_t i = 0; i < animeshData.factory->GetVertexCount ()
-	     * animeshData.factory->GetBoneInfluencesPerVertex (); i++)
-      {
-	influences[i].bone = 0;
-	influences[i].influenceWeight = 0.0f;
-      }
-
-      // Import the skeleton
-      csQuaternion rotation;
-      csVector3 offset (0.0f);
       ImportAnimeshSkeleton
-	(&animeshData, node, CS::Animation::InvalidBoneID, rotation, offset);
+	(&animeshData, node, CS::Animation::InvalidBoneID, aiMatrix4x4 ());
 
       printf ("Skeleton: %i bones:\n%s\n",
 	      animeshData.factory->GetSkeletonFactory()->GetTopBoneID (),
 	      animeshData.factory->GetSkeletonFactory()->Description().GetData());
+      
+      if (animeshData.factory->GetVertexCount () > 0)
+      {
+	// Initialize the bone influences
+	CS::Mesh::csAnimatedMeshBoneInfluence* influences =
+	  animeshData.factory->GetBoneInfluences ();
+	for (size_t i = 0; i < animeshData.factory->GetVertexCount ()
+	       * animeshData.factory->GetBoneInfluencesPerVertex (); i++)
+	{
+	  influences[i].bone = 0;
+	  influences[i].influenceWeight = 0.0f;
+	}
+
+	// Import the bone influences
+	ImportBoneInfluences (&animeshData, node);
+      }
     }
 
     // Invalidate the data of the factory
@@ -195,7 +187,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
   {
     // Add an entry in the registered bone nodes
     BoneData boneData;
-    boneData.isBone = false;
     boneData.node = node;
     animeshData->boneNodes.PutUnique (node->mName.data, boneData);
 
@@ -241,21 +232,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 	  continue;
 	boneData->isBone = true;
 
+	// Save the bone transform
+	boneData->transform = bone->mOffsetMatrix;
+
 	// Mark the parents of this node as bones
 	aiNode* nodeIterator = boneData->node->mParent;
 	while (nodeIterator)
 	{
+	  // TODO: really needed? only nodes marked as bones?
 	  // Find the node corresponding to this bone and mark it as a bone
 	  BoneData* boneData = animeshData->boneNodes[nodeIterator->mName.data];
 	  if (!boneData)
 	    break;
-	  boneData->isBone = true;
 
 	  // Check for the end of the iteration
-	  nodeIterator = nodeIterator->mParent;
-	  if (nodeIterator == animeshData->rootNode
-	      || nodeIterator == animeshData->rootNode->mParent)
+	  if (nodeIterator->mParent == animeshData->rootNode
+	      || nodeIterator->mParent == animeshData->rootNode->mParent)
 	    break;
+
+	  boneData->isBone = true;
+	  nodeIterator = nodeIterator->mParent;
 	}
       }
     }
@@ -287,14 +283,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
       // Save the current count of vertices of the animesh
       size_t currentVertices = animeshData->vertices.GetSize () / 3;
-      for (unsigned int i = 0; i < mesh->mNumBones; i++)
-      {
-	aiBone*& bone = mesh->mBones[i];
 
-	BoneData* boneData = animeshData->boneNodes[bone->mName.data];
-	if (boneData)
-	  boneData->vertexIndex = currentVertices;
-      }
+      // Save the submesh state
+      AnimeshData::AnimeshSubmesh animeshSubmesh;
+      animeshSubmesh.vertexIndex = currentVertices;
+      animeshData->submeshes.Put (mesh, animeshSubmesh);
 
       // Add all vertices
       aiVector3D* aiuvs = mesh->mTextureCoords[0];
@@ -408,14 +401,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
   void AssimpLoader::ImportAnimeshSkeleton (AnimeshData* animeshData, aiNode* node,
 					    CS::Animation::BoneID parent,
-					    csQuaternion rotation, csVector3 offset)
+					    aiMatrix4x4 transform)
   {
     // Accumulate the transform from the parent bone
-    aiQuaternion aiquaternion;
-    aiVector3D aivector;
-    node->mTransformation.DecomposeNoScaling (aiquaternion, aivector);
-    offset = offset + rotation.Rotate (Assimp2CS (aivector));
-    rotation = rotation * Assimp2CS (aiquaternion);
+    transform = transform * node->mTransformation;
 
     // Create a bone if needed
     BoneData* boneData = animeshData->boneNodes[node->mName.data];
@@ -427,49 +416,80 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       boneData->boneID = skeletonFactory->CreateBone (parent);
       parent = boneData->boneID;
       skeletonFactory->SetBoneName (boneData->boneID, node->mName.data);
-      skeletonFactory->SetTransformBoneSpace (boneData->boneID, rotation, offset);
 
-      // Reset the transform from the parent bone
-      rotation.SetIdentity ();
-      offset.Set (0.0f);
+      // Compute the bone transform
+      // TODO: missing inverse mesh transform
+      aiMatrix4x4 boneTransform = transform * boneData->transform;
+      boneTransform = boneTransform.Inverse() * transform;
+
+      // Convert it to a CS transform
+      aiQuaternion aiquaternion;
+      aiVector3D aivector;
+      aiVector3D aiscale;
+      boneTransform.Decompose (aiscale, aiquaternion, aivector);
+
+      csQuaternion rotation = Assimp2CS (aiquaternion);
+      csVector3 offset = Assimp2CS (aivector);
+      offset[0] /= aiscale.x;
+      offset[1] /= aiscale.y;
+      offset[2] /= aiscale.z;
+
+      // Apply the transform
+      skeletonFactory->SetTransformAbsSpace (boneData->boneID, rotation, offset);
+
+      // Register the node information
+      AnimeshNode animeshNode;
+      animeshNode.factory = animeshData->factory;
+      animeshNode.boneID = boneData->boneID;
+      nodeData.Put (node->mName.data, animeshNode);
     }
 
+    // TODO: else skip branch
 
-    // Import the bone influences fo all submeshes
-    if (animeshData->vertices.GetSize () > 0)
+    // Import all subnodes
+    for (unsigned int i = 0; i < node->mNumChildren; i++)
     {
-      CS::Mesh::csAnimatedMeshBoneInfluence* influences =
-	animeshData->factory->GetBoneInfluences ();
+      aiNode*& subnode = node->mChildren[i];
+      ImportAnimeshSkeleton (animeshData, subnode, parent, transform);
+    }
+  }
 
-      // Iterate on all meshes
-      for (unsigned int i = 0; i < node->mNumMeshes; i++)
+  void AssimpLoader::ImportBoneInfluences (AnimeshData* animeshData, aiNode* node)
+  {
+    // Import the bone influences fo all submeshes
+    CS::Mesh::csAnimatedMeshBoneInfluence* influences =
+      animeshData->factory->GetBoneInfluences ();
+
+    // Iterate on all meshes
+    for (unsigned int i = 0; i < node->mNumMeshes; i++)
+    {
+      aiMesh*& mesh = scene->mMeshes[node->mMeshes[i]];
+      size_t submeshVertexIndex = animeshData->submeshes[mesh]->vertexIndex;
+
+      // Iterate on all bones
+      for (unsigned int i = 0; i < mesh->mNumBones; i++)
       {
-	aiMesh*& mesh = scene->mMeshes[node->mMeshes[i]];
+	aiBone*& bone = mesh->mBones[i];
 
-	// Iterate on all bones
-	for (unsigned int i = 0; i < mesh->mNumBones; i++)
+	BoneData* boneData = animeshData->boneNodes[bone->mName.data];
+	CS_ASSERT (boneData);
+
+	// Iterate on all bone weight
+	for (unsigned int i = 0; i < bone->mNumWeights; i++)
 	{
-	  aiBone*& bone = mesh->mBones[i];
+	  aiVertexWeight& weight = bone->mWeights[i];
+	  size_t vertexIndex = (submeshVertexIndex + weight.mVertexId)
+	    * animeshData->factory->GetBoneInfluencesPerVertex ();
 
-	  BoneData* boneData = animeshData->boneNodes[bone->mName.data];
-	  CS_ASSERT (boneData);
-
-	  // Iterate on all bone weight
-	  for (unsigned int i = 0; i < bone->mNumWeights; i++)
+	  // Check for the first bone influence not yet used
+	  for (uint i = 0; i < animeshData->factory->GetBoneInfluencesPerVertex ();
+	       i++)
 	  {
-	    aiVertexWeight& weight = bone->mWeights[i];
-	    size_t vertexIndex = boneData->vertexIndex + weight.mVertexId;
-
-	    // Check for the first bone influence not yet used
-	    for (uint i = 0; i < animeshData->factory->GetBoneInfluencesPerVertex ();
-		 i++)
+	    if (influences[vertexIndex + i].influenceWeight < SMALL_EPSILON)
 	    {
-	      if (influences[vertexIndex].influenceWeight > SMALL_EPSILON)
-	      {
-		influences[vertexIndex].bone = boneData->boneID;
-		influences[vertexIndex].influenceWeight = weight.mWeight;
-		break;
-	      }
+	      influences[vertexIndex + i].bone = boneData->boneID;
+	      influences[vertexIndex + i].influenceWeight = weight.mWeight;
+	      break;
 	    }
 	  }
 	}
@@ -480,15 +500,122 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     for (unsigned int i = 0; i < node->mNumChildren; i++)
     {
       aiNode*& subnode = node->mChildren[i];
-      ImportAnimeshSkeleton (animeshData, subnode, parent, rotation, offset);
+      ImportBoneInfluences (animeshData, subnode);
     }
   }
 
   void AssimpLoader::ImportAnimation (aiAnimation* animation)
   {
-    printf ("Animation [%s]:\n", animation->mName.data);
+    if (!skeletonManager)
+      return;
+
     for (unsigned int i = 0; i < animation->mNumChannels; i++)
-      printf (" anim [%s]\n", animation->mChannels[i]->mNodeName.data);
+    {
+      aiNodeAnim* channel = animation->mChannels[i];
+
+      // Search the animesh and bone ID for this animation channel
+      AnimeshNode* animeshNode = nodeData[channel->mNodeName.data];
+      if (!animeshNode)
+	continue;
+
+      // Create the animation packet if not yet made
+      CS::Animation::iSkeletonFactory* skeletonFactory = animeshNode->factory->GetSkeletonFactory ();
+      if (!skeletonFactory)
+	continue;
+
+      CS::Animation::iSkeletonAnimPacketFactory* animationPacket =
+	skeletonFactory->GetAnimationPacket ();
+
+      if (!animationPacket)
+      {
+	// Get the name of the animesh
+	csRef<iMeshObjectFactory> meshFactory =
+	  scfQueryInterface<iMeshObjectFactory> (animeshNode->factory);
+	const char* name = meshFactory->GetMeshFactoryWrapper ()->QueryObject ()->GetName ();
+
+	animationPacket = skeletonManager->CreateAnimPacketFactory (name);
+	skeletonFactory->SetAnimationPacket (animationPacket);
+      }
+
+      // Create the animation if not yet made
+      CS::Animation::iSkeletonAnimation* skeletonAnimation =
+	animationPacket->FindAnimation (animation->mName.data);
+
+      if (!skeletonAnimation)
+      {
+	skeletonAnimation = animationPacket->CreateAnimation (animation->mName.data);
+	// TODO: still a problem with BVH type that are found in bind frame
+	//skeletonAnimation->SetFramesInBindSpace (true);
+
+	// create an animation node for this animation
+	// TODO: transition type + all nodes in a FSM?
+	csRef<CS::Animation::iSkeletonAnimationNodeFactory> animationNode =
+	  animationPacket->CreateAnimationNode (animation->mName.data);
+	animationNode->SetAnimation (skeletonAnimation);
+	animationNode->SetCyclic (true);
+
+	// Temporary debug: set a debug node as the root of the animation tree
+	csRef<CS::Animation::iSkeletonDebugNodeManager> debugNodeManager =
+	  csQueryRegistryOrLoad<CS::Animation::iSkeletonDebugNodeManager>
+	  (object_reg, "crystalspace.mesh.animesh.animnode.debug");
+	if (!debugNodeManager)
+	{
+	  ReportWarning (object_reg, "Failed to locate debug node plugin!");
+	  animationPacket->SetAnimationRoot (animationNode);
+	}
+
+	else
+	{
+	  csRef<CS::Animation::iSkeletonDebugNodeFactory> debugNode =
+	    debugNodeManager->CreateAnimNodeFactory ("debug");
+	  debugNode->SetDebugModes
+	    ((CS::Animation::SkeletonDebugMode) (CS::Animation::DEBUG_2DLINES
+						 | CS::Animation::DEBUG_SQUARES));
+	  debugNode->SetChildNode (animationNode);
+	  animationPacket->SetAnimationRoot (debugNode);
+	}
+      }
+
+      // Create the animation channel
+      CS::Animation::ChannelID channelID = skeletonAnimation->AddChannel (animeshNode->boneID);
+
+      // Add all rotation keyframes
+      for (unsigned int i = 0; i < channel->mNumRotationKeys; i++)
+      {
+	aiQuatKey& key = channel->mRotationKeys[i];
+
+	// Don't accept negative time values
+	if (key.mTime < 0.0f)
+	  continue;
+
+	// Check ticks are not null
+	float time = animation->mTicksPerSecond > SMALL_EPSILON ?
+	  key.mTime / animation->mTicksPerSecond : key.mTime;
+
+	// Add the keyframe
+	skeletonAnimation->AddOrSetKeyFrame (channelID, time, Assimp2CS (key.mValue));
+      }
+
+      // Add all position keyframes
+      for (unsigned int i = 0; i < channel->mNumPositionKeys; i++)
+      {
+	aiVectorKey& key = channel->mPositionKeys[i];
+
+	// Don't accept negative time values
+	if (key.mTime < 0.0f)
+	  continue;
+
+	// Check ticks are not null
+	float time = animation->mTicksPerSecond > SMALL_EPSILON ?
+	  key.mTime / animation->mTicksPerSecond : key.mTime;
+
+	// Add the keyframe
+	// TODO: really need to scale the offset?
+	skeletonAnimation->AddOrSetKeyFrame (channelID, time, Assimp2CS (key.mValue));
+      }
+    }
+
+    // TODO: convert animations in bind space
   }
 
 }

@@ -59,9 +59,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       | aiProcess_Triangulate
       | aiProcess_ValidateDataStructure
       | aiProcess_GenUVCoords
-      | aiProcess_FlipUVs
       | aiProcess_SortByPType
       | aiProcess_LimitBoneWeights
+      | aiProcess_ConvertToLeftHanded
+      //| aiProcess_GenNormals 
+      | aiProcess_GenSmoothNormals 
       //| aiProcess_OptimizeGraph
       //| aiProcess_OptimizeMeshes
       | aiProcess_SplitLargeMeshes
@@ -189,11 +191,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     PrintNode (scene, scene->mRootNode, "");
     printf ("\n");
 
+    // Clear previous import data
     textures.DeleteAll ();
     materials.DeleteAll ();
     firstMesh = nullptr;
+    nodeData.DeleteAll ();
 
-    /// Find pointers to engine data
+    // Find pointers to engine data
     engine = csQueryRegistry<iEngine> (object_reg);
     if (!engine)
     {
@@ -224,6 +228,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       return;
     }
 
+    // Find the skeleton manager
+    skeletonManager = csQueryRegistryOrLoad<CS::Animation::iSkeletonManager>
+      (object_reg, "crystalspace.skeletalanimation");
+    if (!skeletonManager)
+      ReportWarning (object_reg,
+		     "Could not find the skeleton manager. Importing animesh skeletons and animations won't be possible");
+
     // Create the loader context if needed
     if (!loaderContext)
       loaderContext = engine->CreateLoaderContext ();
@@ -246,19 +257,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
     // Import all meshes
     if (scene->mRootNode)
+      // TODO: Check the type of the mesh then import it
+      // TODO: terrains, other primitives than triangles, whole scene (lights, cameras)
       //ImportGenmesh (scene->mRootNode);
       ImportAnimesh (scene->mRootNode);
-
-    /*
-    for (unsigned int i = 0; i < scene->mRootNode->mNumChildren; i++)
-    {
-      // Check the type of the mesh then import it
-      // TODO: animeshes, terrains, whole scene (lights, cameras)
-      aiNode*& node = scene->mRootNode->mChildren[i];
-      //ImportGenmesh (node);
-      ImportAnimesh (node);
-    }
-    */
 
     // Import all animations
     for (unsigned int i = 0; i < scene->mNumAnimations; i++)
