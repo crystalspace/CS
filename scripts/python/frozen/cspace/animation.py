@@ -399,6 +399,7 @@ class iSkeletonAnimation(core.iBase):
     def GetChannelBone(*args): return _animation.iSkeletonAnimation_GetChannelBone(*args)
     def SetChannelBone(*args): return _animation.iSkeletonAnimation_SetChannelBone(*args)
     def RemoveChannel(*args): return _animation.iSkeletonAnimation_RemoveChannel(*args)
+    def AddOrSetKeyFrame(*args): return _animation.iSkeletonAnimation_AddOrSetKeyFrame(*args)
     scfGetVersion = staticmethod(_animation.iSkeletonAnimation_scfGetVersion)
     __swig_destroy__ = _animation.delete_iSkeletonAnimation
     __del__ = lambda self : None;

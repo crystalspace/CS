@@ -9491,6 +9491,178 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSkeletonAnimation_AddOrSetKeyFrame__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::iSkeletonAnimation *arg1 = (CS::Animation::iSkeletonAnimation *) 0 ;
+  CS::Animation::ChannelID arg2 ;
+  float arg3 ;
+  csQuaternion *arg4 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  unsigned int val2 ;
+  int ecode2 = 0 ;
+  float val3 ;
+  int ecode3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation_AddOrSetKeyFrame",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonAnimation, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation_AddOrSetKeyFrame" "', argument " "1"" of type '" "CS::Animation::iSkeletonAnimation *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Animation::iSkeletonAnimation * >(argp1);
+  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonAnimation_AddOrSetKeyFrame" "', argument " "2"" of type '" "CS::Animation::ChannelID""'");
+  } 
+  arg2 = static_cast< CS::Animation::ChannelID >(val2);
+  ecode3 = SWIG_AsVal_float(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iSkeletonAnimation_AddOrSetKeyFrame" "', argument " "3"" of type '" "float""'");
+  } 
+  arg3 = static_cast< float >(val3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csQuaternion,  0  | 0);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iSkeletonAnimation_AddOrSetKeyFrame" "', argument " "4"" of type '" "csQuaternion const &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeletonAnimation_AddOrSetKeyFrame" "', argument " "4"" of type '" "csQuaternion const &""'"); 
+  }
+  arg4 = reinterpret_cast< csQuaternion * >(argp4);
+  (arg1)->AddOrSetKeyFrame(arg2,arg3,(csQuaternion const &)*arg4);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSkeletonAnimation_AddOrSetKeyFrame__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::iSkeletonAnimation *arg1 = (CS::Animation::iSkeletonAnimation *) 0 ;
+  CS::Animation::ChannelID arg2 ;
+  float arg3 ;
+  csVector3 *arg4 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  unsigned int val2 ;
+  int ecode2 = 0 ;
+  float val3 ;
+  int ecode3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation_AddOrSetKeyFrame",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonAnimation, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation_AddOrSetKeyFrame" "', argument " "1"" of type '" "CS::Animation::iSkeletonAnimation *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Animation::iSkeletonAnimation * >(argp1);
+  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonAnimation_AddOrSetKeyFrame" "', argument " "2"" of type '" "CS::Animation::ChannelID""'");
+  } 
+  arg2 = static_cast< CS::Animation::ChannelID >(val2);
+  ecode3 = SWIG_AsVal_float(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iSkeletonAnimation_AddOrSetKeyFrame" "', argument " "3"" of type '" "float""'");
+  } 
+  arg3 = static_cast< float >(val3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iSkeletonAnimation_AddOrSetKeyFrame" "', argument " "4"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSkeletonAnimation_AddOrSetKeyFrame" "', argument " "4"" of type '" "csVector3 const &""'"); 
+  }
+  arg4 = reinterpret_cast< csVector3 * >(argp4);
+  (arg1)->AddOrSetKeyFrame(arg2,arg3,(csVector3 const &)*arg4);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSkeletonAnimation_AddOrSetKeyFrame(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[5];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 4); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 4) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_CS__Animation__iSkeletonAnimation, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_float(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csQuaternion, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            return _wrap_iSkeletonAnimation_AddOrSetKeyFrame__SWIG_0(self, args);
+          }
+        }
+      }
+    }
+  }
+  if (argc == 4) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_CS__Animation__iSkeletonAnimation, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_float(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csVector3, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            return _wrap_iSkeletonAnimation_AddOrSetKeyFrame__SWIG_1(self, args);
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iSkeletonAnimation_AddOrSetKeyFrame'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    AddOrSetKeyFrame(CS::Animation::iSkeletonAnimation *,CS::Animation::ChannelID,float,csQuaternion const &)\n"
+    "    AddOrSetKeyFrame(CS::Animation::iSkeletonAnimation *,CS::Animation::ChannelID,float,csVector3 const &)\n");
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iSkeletonAnimation_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -15795,6 +15967,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonAnimation_GetChannelBone", _wrap_iSkeletonAnimation_GetChannelBone, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimation_SetChannelBone", _wrap_iSkeletonAnimation_SetChannelBone, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimation_RemoveChannel", _wrap_iSkeletonAnimation_RemoveChannel, METH_VARARGS, NULL},
+	 { (char *)"iSkeletonAnimation_AddOrSetKeyFrame", _wrap_iSkeletonAnimation_AddOrSetKeyFrame, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimation_scfGetVersion", _wrap_iSkeletonAnimation_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonAnimation", _wrap_delete_iSkeletonAnimation, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimation_swigregister", iSkeletonAnimation_swigregister, METH_VARARGS, NULL},
