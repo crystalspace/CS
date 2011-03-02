@@ -100,7 +100,9 @@ bool Monster::Initialize(iMeshWrapper* spawn)
       fsmNodeFactory = fsmNode ? (CS::Animation::iSkeletonFSMNodeFactory*) fsmNode->GetFactory () : 0;
 
     // Find the LookAt animation node
-    lookAtNode = (CS::Animation::iSkeletonLookAtNode*) rootNode->FindNode ("lookat");
+    csRef<CS::Animation::iSkeletonLookAtNode> lookAtNodeRef;
+    lookAtNodeRef = scfQueryInterfaceSafe<CS::Animation::iSkeletonLookAtNode> (rootNode->FindNode ("lookat"));
+    lookAtNode = lookAtNodeRef;
   }
 
   // If this is the 'knight' monster then create and attach a sword in his hand
