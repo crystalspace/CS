@@ -36,8 +36,7 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
 {
-
-  CS_DECLARE_ANIMNODE_MANAGER(DebugNode, DebugNode, CS::Animation::iSkeletonDebugNodeFactory);
+  class DebugNodeManager;
 
   class DebugNodeFactory
     : public scfImplementation2<DebugNodeFactory, 
@@ -136,6 +135,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     csRef<DebugNodeFactory> factory;
 
     friend class DebugNodeFactory;
+  };
+
+  class DebugNodeManager
+    : public CS::Animation::AnimNodeManagerCommon<DebugNodeManager,
+						  CS::Animation::iSkeletonDebugNodeManager,
+						  DebugNodeFactory>
+  {
+  public:
+    DebugNodeManager (iBase* parent)
+     : AnimNodeManagerCommonType (parent) {}
   };
 
 }

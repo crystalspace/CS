@@ -28,8 +28,7 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(SpeedNode)
 {
-
-  CS_IMPLEMENT_ANIMNODE_MANAGER(SpeedNode, CS::Animation::iSkeletonSpeedNodeFactory, "speed");
+  SCF_IMPLEMENT_FACTORY(SpeedNodeManager);
 
   // --------------------------  SpeedNodeFactory  --------------------------
 

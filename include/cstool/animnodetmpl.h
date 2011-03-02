@@ -28,95 +28,71 @@
 #include "csextern.h"
 #include "csutil/csstring.h"
 #include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/weakref.h"
 #include "imesh/animnode/skeleton2anim.h"
+#include "iutil/comp.h"
 
 namespace CS {
 namespace Animation {
 
-/// This macro defines the implementation of an animation node plugin manager
-#define CS_DECLARE_ANIMNODE_MANAGER(nodename, nodeinterface, nodetype)			\
-  class nodename##Manager : public scfImplementation2<nodename##Manager, \
-    CS::Animation::iSkeleton##nodeinterface##Manager,			\
-    iComponent>								\
-      {									\
-      public:								\
-	CS_LEAKGUARD_DECLARE(nodename##Manager);			\
-									\
-	nodename##Manager (iBase* parent);				\
-									\
-	virtual nodetype* CreateAnimNodeFactory (const char* name);	\
-	virtual nodetype* FindAnimNodeFactory (const char* name);	\
-	virtual void RemoveAnimNodeFactory (const char* name);		\
-	virtual void ClearAnimNodeFactories ();				\
-									\
-	virtual bool Initialize (iObjectRegistry*);			\
-									\
-	void Report (int severity, const char* msg, ...) const;		\
-									\
-      private:								\
-	iObjectRegistry* object_reg;					\
-	csHash<csRef<nodetype>, csString> nodeFactories;		\
-									\
-	friend class nodename##Factory;					\
-	friend class nodename;						\
-      };
-
-
-/// This macro implements the implementation of an animation node plugin manager
-#define CS_IMPLEMENT_ANIMNODE_MANAGER(nodename, nodetype, id)		\
-  SCF_IMPLEMENT_FACTORY(nodename##Manager);				\
-  CS_LEAKGUARD_IMPLEMENT(nodename##Manager);				\
-									\
-  nodename##Manager::nodename##Manager (iBase* parent)			\
-    : scfImplementationType (this, parent)				\
-    {}									\
-									\
-  nodetype* nodename##Manager::CreateAnimNodeFactory (const char* name)	\
-    {									\
-      csRef<nodetype> newFact;						\
-      newFact.AttachNew (new nodename##Factory (this, name));		\
-									\
-      return nodeFactories.PutUnique (name, newFact);			\
-    }									\
-									\
-  nodetype* nodename##Manager::FindAnimNodeFactory (const char* name)	\
-    {									\
-      return nodeFactories.Get (name, 0);				\
-    }									\
-									\
-  void nodename##Manager::RemoveAnimNodeFactory (const char* name)	\
-    {									\
-      nodeFactories.DeleteAll (name);					\
-    }									\
-									\
-  void nodename##Manager::ClearAnimNodeFactories ()			\
-  {									\
-    nodeFactories.DeleteAll ();						\
-  }									\
-									\
-  bool nodename##Manager::Initialize (iObjectRegistry* object_reg)	\
-  {									\
-    this->object_reg = object_reg;					\
-    return true;							\
-  }									\
-									\
-  void nodename##Manager::Report (int severity, const char* msg, ...) const \
-  {									\
-    va_list arg;							\
-    va_start (arg, msg);						\
-    csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));	\
-    if (rep)								\
-      rep->ReportV (severity,						\
-		    "crystalspace.mesh.animesh.animnode.##id",		\
-		    msg, arg);						\
-    else								\
-      {									\
-	csPrintfV (msg, arg);						\
-	csPrintf ("\n");						\
-      }									\
-    va_end (arg);							\
-  }
+  /**
+   * Template class for animation node plugin managers.
+   * Usage:
+   * - Your "node manager" class must descend from AnimNodeManagerCommon.
+   * - \a ThisType must be the name of the "node manager" class.
+   * - \a ManagerInterface must be the interface type for your node manager.
+   * - \a FactoryType is the node factory to be used by this manager.
+   */
+  template<typename ThisType,
+	   typename ManagerInterface,
+	   typename FactoryType>
+  class AnimNodeManagerCommon
+    : public scfImplementation2<AnimNodeManagerCommon<ThisType, ManagerInterface, FactoryType>,
+				ManagerInterface,
+				iComponent>
+  {
+    typedef typename ManagerInterface::FactoryInterfaceType FactoryInterfaceType;
+    typedef scfImplementation2<AnimNodeManagerCommon<ThisType, ManagerInterface, FactoryType>,
+				ManagerInterface,
+				iComponent> scfImplementationType;
+  public:
+    typedef AnimNodeManagerCommon<ThisType, ManagerInterface, FactoryType> AnimNodeManagerCommonType;
+    
+    AnimNodeManagerCommon (iBase* parent)
+      : scfImplementationType (this, parent), object_reg (nullptr)
+    {}      
+    
+    FactoryInterfaceType* CreateAnimNodeFactory (const char* name)
+    {
+      csRef<FactoryInterfaceType> newFact;
+      newFact.AttachNew (new FactoryType (static_cast<ThisType*> (this), name));
+      return nodeFactories.PutUnique (name, newFact);
+    }
+    FactoryInterfaceType* FindAnimNodeFactory (const char* name)
+    {
+      return nodeFactories.Get (name, 0);
+    }
+    void RemoveAnimNodeFactory (const char* name)
+    {
+      nodeFactories.DeleteAll (name);
+    }
+    void ClearAnimNodeFactories ()
+    {
+      nodeFactories.DeleteAll ();
+    }
+    
+    /**\name iComponent implementation
+     * @{ */
+    bool Initialize (iObjectRegistry* object_reg)
+    { this->object_reg = object_reg; return true; }
+    /** @} */
+    
+    iObjectRegistry* GetObjectRegistry() const { return object_reg; }
+  protected:
+    iObjectRegistry* object_reg;
+    csHash<csRef<FactoryInterfaceType>, csString> nodeFactories;
+  };
 
 /// This macro implements the CreateInstance and FindNode methods of an animation node factory
 /// with a single child

@@ -46,8 +46,7 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 {
-
-  CS_IMPLEMENT_ANIMNODE_MANAGER(LookAtNode, CS::Animation::iSkeletonLookAtNodeFactory, "lookat");
+  SCF_IMPLEMENT_FACTORY(LookAtNodeManager);
 
   // --------------------------  LookAtNodeFactory  --------------------------
 

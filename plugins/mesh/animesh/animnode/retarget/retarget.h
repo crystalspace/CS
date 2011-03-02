@@ -33,7 +33,7 @@
 CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
 {
 
-  CS_DECLARE_ANIMNODE_MANAGER(RetargetNode, RetargetNode, CS::Animation::iSkeletonRetargetNodeFactory);
+  class RetargetNodeManager;
 
   class RetargetNodeFactory : public scfImplementation2<RetargetNodeFactory, 
     scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory>, CS::Animation::iSkeletonRetargetNodeFactory>
@@ -150,6 +150,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
       CS::Animation::iSkeletonFactory* skeletonFactory;
       csHash<csQuaternion, CS::Animation::BoneID> rotations;
     };
+  };
+
+  class RetargetNodeManager
+    : public CS::Animation::AnimNodeManagerCommon<RetargetNodeManager,
+						  CS::Animation::iSkeletonRetargetNodeManager,
+						  RetargetNodeFactory>
+  {
+  public:
+    RetargetNodeManager (iBase* parent)
+     : AnimNodeManagerCommonType (parent) {}
   };
 
 }

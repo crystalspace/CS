@@ -1078,6 +1078,8 @@ template <class T>
 struct iSkeletonAnimNodeManager : public virtual iBase
 {
   SCF_INTERFACE(CS::Animation::iSkeletonAnimNodeManager<T>, 1, 0, 0);
+  
+  typedef T FactoryInterfaceType;
 
   /// Create an animation node factory with the given name
   virtual T* CreateAnimNodeFactory (const char* name) = 0;

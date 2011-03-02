@@ -40,8 +40,7 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
 {
-
-  CS_IMPLEMENT_ANIMNODE_MANAGER(DebugNode, CS::Animation::iSkeletonDebugNodeFactory, "debug");
+  SCF_IMPLEMENT_FACTORY(DebugNodeManager);
 
   // --------------------------  IKDebugNodeFactory  --------------------------
 
@@ -101,8 +100,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     if (!factory->modes)
       return;
 
-    csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (factory->manager->object_reg);
-    csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (factory->manager->object_reg);
+    csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (factory->manager->GetObjectRegistry());
+    csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (factory->manager->GetObjectRegistry());
     CS_ASSERT(g3d && g2d);
 
     // Tell the 3D driver we're going to display 2D things.

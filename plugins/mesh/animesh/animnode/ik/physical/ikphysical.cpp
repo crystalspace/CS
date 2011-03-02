@@ -31,8 +31,17 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
 {
+  SCF_IMPLEMENT_FACTORY(IKPhysicalNodeManager);
 
-  CS_IMPLEMENT_ANIMNODE_MANAGER(IKPhysicalNode, CS::Animation::iSkeletonIKPhysicalNodeFactory, "ik.physical");
+  void IKPhysicalNodeManager::Report (int severity, const char* msg, ...) const
+  {
+    va_list arg;
+    va_start (arg, msg);
+    csReportV (object_reg, severity, 
+	       "crystalspace.mesh.animesh.animnode.ik.physical",
+	       msg, arg);
+    va_end (arg);
+  }
 
   // --------------------------  IKPhysicalNodeFactory  --------------------------
 

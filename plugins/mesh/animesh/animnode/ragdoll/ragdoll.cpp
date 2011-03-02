@@ -35,8 +35,19 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 {
+  SCF_IMPLEMENT_FACTORY(RagdollNodeManager);
 
-  CS_IMPLEMENT_ANIMNODE_MANAGER(RagdollNode, CS::Animation::iSkeletonRagdollNodeFactory, "ragdoll");
+  void RagdollNodeManager::Report (int severity, const char* msg, ...) const
+  {
+    va_list arg;
+    va_start (arg, msg);
+    csReportV (object_reg, severity, 
+	       "crystalspace.mesh.animesh.animnode.ragdoll",
+	       msg, arg);
+    va_end (arg);
+  }
+
+  // ------------------------------------------------------------------------
 
   size_t GetChainIndex (csArray<ChainData>& chains, CS::Animation::iBodyChain*& chain)
   {

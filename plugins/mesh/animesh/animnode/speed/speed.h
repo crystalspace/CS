@@ -33,7 +33,7 @@
 CS_PLUGIN_NAMESPACE_BEGIN(SpeedNode)
 {
 
-  CS_DECLARE_ANIMNODE_MANAGER(SpeedNode, SpeedNode, CS::Animation::iSkeletonSpeedNodeFactory);
+  class SpeedNodeManager;
 
   class SpeedNodeFactory : public scfImplementation2<SpeedNodeFactory, 
     scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory>, CS::Animation::iSkeletonSpeedNodeFactory>
@@ -109,6 +109,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(SpeedNode)
     bool isPlaying;
 
     friend class SpeedNodeFactory;
+  };
+
+  class SpeedNodeManager
+    : public CS::Animation::AnimNodeManagerCommon<SpeedNodeManager,
+						  CS::Animation::iSkeletonSpeedNodeManager,
+						  SpeedNodeFactory>
+  {
+  public:
+    SpeedNodeManager (iBase* parent)
+     : AnimNodeManagerCommonType (parent) {}
   };
 
 }

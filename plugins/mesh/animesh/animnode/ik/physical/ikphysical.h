@@ -35,7 +35,7 @@
 CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
 {
 
-  CS_DECLARE_ANIMNODE_MANAGER(IKPhysicalNode, IKNode, CS::Animation::iSkeletonIKPhysicalNodeFactory);
+  class IKPhysicalNodeManager;
 
   struct EffectorData
   {
@@ -189,6 +189,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
     friend class IKPhysicalNodeFactory;
   };
 
+
+  class IKPhysicalNodeManager
+    : public CS::Animation::AnimNodeManagerCommon<IKPhysicalNodeManager,
+						  CS::Animation::iSkeletonIKNodeManager,
+						  IKPhysicalNodeFactory>
+  {
+  public:
+    IKPhysicalNodeManager (iBase* parent)
+     : AnimNodeManagerCommonType (parent) {}
+     
+    void Report (int severity, const char* msg, ...) const;
+  };
 }
 CS_PLUGIN_NAMESPACE_END(IKPhysical)
 

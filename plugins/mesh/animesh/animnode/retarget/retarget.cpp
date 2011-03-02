@@ -29,8 +29,7 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
 {
-
-  CS_IMPLEMENT_ANIMNODE_MANAGER(RetargetNode, CS::Animation::iSkeletonRetargetNodeFactory, "retarget");
+  SCF_IMPLEMENT_FACTORY(RetargetNodeManager);
 
   // --------------------------  RetargetNodeFactory  --------------------------
 

@@ -40,9 +40,8 @@ struct iBodyBoneJoint;
 
 CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 {
-
-  CS_DECLARE_ANIMNODE_MANAGER(LookAtNode, LookAtNode, CS::Animation::iSkeletonLookAtNodeFactory);
-
+  class LookAtNodeManager;
+  
   class LookAtNodeFactory :
   public scfImplementation2<LookAtNodeFactory,
     scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory>,
@@ -154,6 +153,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     csRefArray<CS::Animation::iSkeletonLookAtListener> listeners;
 
     friend class LookAtNodeFactory;
+  };
+
+  class LookAtNodeManager
+    : public CS::Animation::AnimNodeManagerCommon<LookAtNodeManager,
+						  CS::Animation::iSkeletonLookAtNodeManager,
+						  LookAtNodeFactory>
+  {
+  public:
+    LookAtNodeManager (iBase* parent)
+     : AnimNodeManagerCommonType (parent) {}
   };
 
 }

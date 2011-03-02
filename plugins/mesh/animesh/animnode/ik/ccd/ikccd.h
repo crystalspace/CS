@@ -34,7 +34,7 @@
 CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
 {
 
-  CS_DECLARE_ANIMNODE_MANAGER(IKCCDNode, IKNode, CS::Animation::iSkeletonIKCCDNodeFactory);
+  class IKCCDNodeManager;
 
   struct EffectorData
   {
@@ -193,6 +193,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
     };
 
     friend class IKCCDNodeFactory;
+  };
+
+  class IKCCDNodeManager
+    : public CS::Animation::AnimNodeManagerCommon<IKCCDNodeManager,
+						  CS::Animation::iSkeletonIKNodeManager,
+						  IKCCDNodeFactory>
+  {
+  public:
+    IKCCDNodeManager (iBase* parent)
+     : AnimNodeManagerCommonType (parent) {}
   };
 
 }

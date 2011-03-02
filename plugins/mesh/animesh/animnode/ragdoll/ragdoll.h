@@ -33,7 +33,7 @@
 CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 {
 
-  CS_DECLARE_ANIMNODE_MANAGER(RagdollNode, RagdollNode, CS::Animation::iSkeletonRagdollNodeFactory);
+  class RagdollNodeManager;
 
   struct ChainData
   {
@@ -189,6 +189,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   private:
     RagdollNode* ragdollNode;
     CS::Animation::BoneID boneID;
+  };
+
+  class RagdollNodeManager
+    : public CS::Animation::AnimNodeManagerCommon<RagdollNodeManager,
+						  CS::Animation::iSkeletonRagdollNodeManager,
+						  RagdollNodeFactory>
+  {
+  public:
+    RagdollNodeManager (iBase* parent)
+     : AnimNodeManagerCommonType (parent) {}
+     
+    void Report (int severity, const char* msg, ...) const;
   };
 
 }

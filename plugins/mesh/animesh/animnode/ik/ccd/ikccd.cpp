@@ -31,8 +31,7 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
 {
-
-  CS_IMPLEMENT_ANIMNODE_MANAGER(IKCCDNode, CS::Animation::iSkeletonIKCCDNodeFactory, "ik.ccd");
+  SCF_IMPLEMENT_FACTORY(IKCCDNodeManager);
 
   // --------------------------  IKCCDNodeFactory  --------------------------
 
