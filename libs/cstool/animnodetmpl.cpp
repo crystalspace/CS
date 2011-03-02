@@ -37,18 +37,44 @@ const char* SkeletonAnimNodeFactory::GetNodeName () const
 
 // ------------------------------   csSkeletonAnimNodeFactorySingle   ------------------------------
 
-csSkeletonAnimNodeFactorySingle::csSkeletonAnimNodeFactorySingle (const char* name)
+SkeletonAnimNodeFactorySingle::SkeletonAnimNodeFactorySingle (const char* name)
   : SkeletonAnimNodeFactory (name)
 {}
 
-void csSkeletonAnimNodeFactorySingle::SetChildNode (iSkeletonAnimNodeFactory* factory)
+void SkeletonAnimNodeFactorySingle::SetChildNode (iSkeletonAnimNodeFactory* factory)
 {
   childNodeFactory = factory;
 }
 
-iSkeletonAnimNodeFactory* csSkeletonAnimNodeFactorySingle::GetChildNode () const
+iSkeletonAnimNodeFactory* SkeletonAnimNodeFactorySingle::GetChildNode () const
 {
   return childNodeFactory;
+}
+
+csPtr<iSkeletonAnimNode> SkeletonAnimNodeFactorySingle::CreateInstance (iSkeletonAnimPacket* packet,
+									iSkeleton* skeleton)
+{
+  csRef<SkeletonAnimNodeSingleBase> newP (ActualCreateInstance (packet, skeleton));
+
+  if (childNodeFactory)
+  {
+    csRef<CS::Animation::iSkeletonAnimNode> node =
+      childNodeFactory->CreateInstance (packet, skeleton);
+    newP->childNode = node;
+  }
+
+  return csPtr<CS::Animation::iSkeletonAnimNode> (newP);
+}
+
+iSkeletonAnimNodeFactory* SkeletonAnimNodeFactorySingle::FindNode (const char* name)
+{
+  if (this->name == name)
+    return this;
+
+  if (childNodeFactory)
+    return childNodeFactory->FindNode (name);
+
+  return nullptr;
 }
 
 // ------------------------------   csSkeletonAnimNodeSingle   ------------------------------

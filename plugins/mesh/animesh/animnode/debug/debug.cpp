@@ -47,7 +47,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
   CS_LEAKGUARD_IMPLEMENT(DebugNodeFactory);
 
   DebugNodeFactory::DebugNodeFactory (DebugNodeManager* manager, const char *name)
-    : scfImplementationType (this), CS::Animation::csSkeletonAnimNodeFactorySingle (name),
+    : scfImplementationType (this), CS::Animation::SkeletonAnimNodeFactorySingle (name),
     manager (manager), modes (CS::Animation::DEBUG_SQUARES), image (nullptr), boneMaskUsed (false),
     leafBonesDisplayed (true)
   {
@@ -84,7 +84,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     leafBonesDisplayed = displayed;
   }
 
-  CS_IMPLEMENT_ANIMNODE_FACTORY_SINGLE(DebugNode);
+  csPtr<CS::Animation::SkeletonAnimNodeSingleBase> DebugNodeFactory::ActualCreateInstance (
+    CS::Animation::iSkeletonAnimPacket* packet,
+    CS::Animation::iSkeleton* skeleton)
+  {
+    return csPtr<CS::Animation::SkeletonAnimNodeSingleBase> (new DebugNode (this, skeleton));
+  }
 
   // --------------------------  IKDebugNode  --------------------------
 

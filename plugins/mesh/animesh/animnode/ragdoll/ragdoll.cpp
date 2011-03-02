@@ -78,7 +78,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
   CS_LEAKGUARD_IMPLEMENT(RagdollNodeFactory);
 
   RagdollNodeFactory::RagdollNodeFactory (RagdollNodeManager* manager, const char *name)
-    : scfImplementationType (this), CS::Animation::csSkeletonAnimNodeFactorySingle (name),
+    : scfImplementationType (this), CS::Animation::SkeletonAnimNodeFactorySingle (name),
     manager (manager)
   {
   }
@@ -109,7 +109,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       chains.DeleteIndexFast (index);
   }
 
-  CS_IMPLEMENT_ANIMNODE_FACTORY_SINGLE(RagdollNode);
+  csPtr<CS::Animation::SkeletonAnimNodeSingleBase> RagdollNodeFactory::ActualCreateInstance (
+    CS::Animation::iSkeletonAnimPacket* packet,
+    CS::Animation::iSkeleton* skeleton)
+  {
+    return csPtr<CS::Animation::SkeletonAnimNodeSingleBase> (new RagdollNode (this, skeleton));
+  }
 
   // --------------------------  RagdollNode  --------------------------
 

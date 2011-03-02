@@ -38,7 +38,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
   CS_LEAKGUARD_IMPLEMENT(IKCCDNodeFactory);
 
   IKCCDNodeFactory::IKCCDNodeFactory (IKCCDNodeManager* manager, const char *name)
-    : scfImplementationType (this), CS::Animation::csSkeletonAnimNodeFactorySingle (name),
+    : scfImplementationType (this), CS::Animation::SkeletonAnimNodeFactorySingle (name),
     manager (manager), maxEffectorID (0), maximumIterations (50), targetDistance (0.001f),
     motionRatio (0.1f), jointInitialized (true), upwardIterations (true)
   {
@@ -124,7 +124,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
     return upwardIterations;
   }
 
-  CS_IMPLEMENT_ANIMNODE_FACTORY_SINGLE(IKCCDNode);
+  csPtr<CS::Animation::SkeletonAnimNodeSingleBase> IKCCDNodeFactory::ActualCreateInstance (
+    CS::Animation::iSkeletonAnimPacket* packet,
+    CS::Animation::iSkeleton* skeleton)
+  {
+    return csPtr<CS::Animation::SkeletonAnimNodeSingleBase> (new IKCCDNode (this, skeleton));
+  }
 
   // --------------------------  IKCCDNode  --------------------------
 

@@ -48,7 +48,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
     scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory>,
     scfFakeInterface<CS::Animation::iSkeletonIKNodeFactory>,
     CS::Animation::iSkeletonIKCCDNodeFactory>,
-    public CS::Animation::csSkeletonAnimNodeFactorySingle
+    public CS::Animation::SkeletonAnimNodeFactorySingle
   {
   public:
     CS_LEAKGUARD_DECLARE(IKCCDNodeFactory);
@@ -64,9 +64,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
     virtual void RemoveEffector (CS::Animation::EffectorID effector);
 
     inline virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* factory)
-    { CS::Animation::csSkeletonAnimNodeFactorySingle::SetChildNode (factory); }
+    { CS::Animation::SkeletonAnimNodeFactorySingle::SetChildNode (factory); }
     inline virtual iSkeletonAnimNodeFactory* GetChildNode () const
-    { return CS::Animation::csSkeletonAnimNodeFactorySingle::GetChildNode (); }
+    { return CS::Animation::SkeletonAnimNodeFactorySingle::GetChildNode (); }
 
     //-- CS::Animation::iSkeletonIKCCDNodeFactory
     virtual void SetMaximumIterations (size_t max);
@@ -81,11 +81,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
     virtual bool GetUpwardIterations ();
 
     //-- CS::Animation::iSkeletonAnimNodeFactory
-    virtual csPtr<CS::Animation::iSkeletonAnimNode> CreateInstance
-      (CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton);
-    inline virtual const char* GetNodeName () const
-      { return csSkeletonAnimNodeFactorySingle::GetNodeName (); }
-    virtual CS::Animation::iSkeletonAnimNodeFactory* FindNode (const char* name);
+    csPtr<CS::Animation::SkeletonAnimNodeSingleBase> ActualCreateInstance (
+      CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton);
 
   protected:
     IKCCDNodeManager* manager;

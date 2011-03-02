@@ -49,7 +49,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
 
   IKPhysicalNodeFactory::IKPhysicalNodeFactory
     (IKPhysicalNodeManager* manager, const char *name)
-    : scfImplementationType (this), CS::Animation::csSkeletonAnimNodeFactorySingle (name),
+    : scfImplementationType (this), CS::Animation::SkeletonAnimNodeFactorySingle (name),
     manager (manager), resetChain (true)
   {
   }
@@ -94,7 +94,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
     return resetChain;
   }
 
-  CS_IMPLEMENT_ANIMNODE_FACTORY_SINGLE(IKPhysicalNode);
+  csPtr<CS::Animation::SkeletonAnimNodeSingleBase> IKPhysicalNodeFactory::ActualCreateInstance (
+    CS::Animation::iSkeletonAnimPacket* packet,
+    CS::Animation::iSkeleton* skeleton)
+  {
+    return csPtr<CS::Animation::SkeletonAnimNodeSingleBase> (new IKPhysicalNode (this, skeleton));
+  }
 
   // --------------------------  IKPhysicalNode  --------------------------
 

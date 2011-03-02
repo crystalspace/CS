@@ -46,7 +46,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
   public scfImplementation2<LookAtNodeFactory,
     scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory>,
     CS::Animation::iSkeletonLookAtNodeFactory>,
-    public CS::Animation::csSkeletonAnimNodeFactorySingle
+    public CS::Animation::SkeletonAnimNodeFactorySingle
   {
   public:
     CS_LEAKGUARD_DECLARE(LookAtNodeFactory);
@@ -61,17 +61,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     virtual void SetListenerDelay (float delay);
 
     inline virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* factory)
-    { CS::Animation::csSkeletonAnimNodeFactorySingle::SetChildNode (factory); }
+    { CS::Animation::SkeletonAnimNodeFactorySingle::SetChildNode (factory); }
     inline virtual iSkeletonAnimNodeFactory* GetChildNode () const
-    { return CS::Animation::csSkeletonAnimNodeFactorySingle::GetChildNode (); }
+    { return CS::Animation::SkeletonAnimNodeFactorySingle::GetChildNode (); }
 
     //-- CS::Animation::iSkeletonAnimNodeFactory
-    virtual csPtr<CS::Animation::iSkeletonAnimNode> CreateInstance (
-	       CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton);
-    inline virtual const char* GetNodeName () const
-      { return csSkeletonAnimNodeFactorySingle::GetNodeName (); }
-    virtual CS::Animation::iSkeletonAnimNodeFactory* FindNode (const char* name);
-
+    csPtr<CS::Animation::SkeletonAnimNodeSingleBase> ActualCreateInstance (
+      CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton);
   protected:
     LookAtNodeManager* manager;
     csRef<CS::Animation::iBodySkeleton> skeleton;

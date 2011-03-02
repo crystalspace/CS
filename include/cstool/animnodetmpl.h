@@ -94,36 +94,6 @@ namespace Animation {
     csHash<csRef<FactoryInterfaceType>, csString> nodeFactories;
   };
 
-/// This macro implements the CreateInstance and FindNode methods of an animation node factory
-/// with a single child
-#define CS_IMPLEMENT_ANIMNODE_FACTORY_SINGLE(nodename)			\
-  csPtr<CS::Animation::iSkeletonAnimNode> nodename##Factory::CreateInstance \
-    (CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton) \
-    {									\
-      csRef<nodename> newP;						\
-      newP.AttachNew (new nodename (this, skeleton));			\
-									\
-      if (childNodeFactory)						\
-	{								\
-	  csRef<CS::Animation::iSkeletonAnimNode> node =		\
-	    childNodeFactory->CreateInstance (packet, skeleton);	\
-	  newP->childNode = node;					\
-	}								\
-									\
-      return csPtr<CS::Animation::iSkeletonAnimNode> (newP);		\
-    }									\
-									\
-  CS::Animation::iSkeletonAnimNodeFactory* nodename##Factory::FindNode (const char* name) \
-    {									\
-      if (this->name == name)						\
-	return this;							\
-									\
-      if (childNodeFactory)						\
-	return childNodeFactory->FindNode (name);			\
-									\
-      return nullptr;							\
-    }
-
 /**
  * Base implementation of a CS::Animation::iSkeletonAnimNodeFactory
  */
@@ -152,22 +122,24 @@ class CS_CRYSTALSPACE_EXPORT SkeletonAnimNodeFactory
   csString name;
 };
 
+class SkeletonAnimNodeSingleBase;
+
 /**
  * Base implementation of a CS::Animation::iSkeletonAnimNodeFactory with a single child
  */
-class CS_CRYSTALSPACE_EXPORT csSkeletonAnimNodeFactorySingle
+class CS_CRYSTALSPACE_EXPORT SkeletonAnimNodeFactorySingle
   : public SkeletonAnimNodeFactory
 {
  public:
   /**
    * Constructor
    */
-  csSkeletonAnimNodeFactorySingle (const char* name);
+  SkeletonAnimNodeFactorySingle (const char* name);
 
   /**
    * Destructor
    */
-  virtual ~csSkeletonAnimNodeFactorySingle () {}
+  virtual ~SkeletonAnimNodeFactorySingle () {}
 
   /**
    * Set the child animation node of this node. It is valid to provide a null pointer.
@@ -179,8 +151,15 @@ class CS_CRYSTALSPACE_EXPORT csSkeletonAnimNodeFactorySingle
    */
   virtual iSkeletonAnimNodeFactory* GetChildNode () const;
 
+  csPtr<iSkeletonAnimNode> CreateInstance (iSkeletonAnimPacket* packet, iSkeleton* skeleton);
+  iSkeletonAnimNodeFactory* FindNode (const char* name);
  protected:
   csRef<CS::Animation::iSkeletonAnimNodeFactory> childNodeFactory;
+  
+  /// To be overridden by derived classes: create actual instance of a node
+  virtual csPtr<SkeletonAnimNodeSingleBase> ActualCreateInstance (iSkeletonAnimPacket* packet,
+								  iSkeleton* skeleton) = 0;
+  
 };
 
 class CS_CRYSTALSPACE_EXPORT SkeletonAnimNodeSingleBase : public virtual iSkeletonAnimNode
@@ -269,6 +248,7 @@ class CS_CRYSTALSPACE_EXPORT SkeletonAnimNodeSingleBase : public virtual iSkelet
   virtual void RemoveAnimationCallback (iSkeletonAnimCallback* callback);
 
 protected:
+  friend class SkeletonAnimNodeFactorySingle;
   csWeakRef<CS::Animation::iSkeleton> skeleton;
   csRef<CS::Animation::iSkeletonAnimNode> childNode;
   bool isPlaying;

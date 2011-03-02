@@ -49,7 +49,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
     scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory>,
     scfFakeInterface<CS::Animation::iSkeletonIKNodeFactory>,
     CS::Animation::iSkeletonIKPhysicalNodeFactory>,
-    public CS::Animation::csSkeletonAnimNodeFactorySingle
+    public CS::Animation::SkeletonAnimNodeFactorySingle
   {
   public:
     CS_LEAKGUARD_DECLARE(IKPhysicalNodeFactory);
@@ -65,21 +65,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
     virtual void RemoveEffector (CS::Animation::EffectorID effector);
 
     inline virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* factory)
-    { CS::Animation::csSkeletonAnimNodeFactorySingle::SetChildNode (factory); }
+    { CS::Animation::SkeletonAnimNodeFactorySingle::SetChildNode (factory); }
     inline virtual iSkeletonAnimNodeFactory* GetChildNode () const
-    { return CS::Animation::csSkeletonAnimNodeFactorySingle::GetChildNode (); }
+    { return CS::Animation::SkeletonAnimNodeFactorySingle::GetChildNode (); }
 
     //-- CS::Animation::iSkeletonIKPhysicalNodeFactory
     virtual void SetChainAutoReset (bool reset);
     virtual bool GetChainAutoReset () const;
 
     //-- CS::Animation::iSkeletonAnimNodeFactory
-    virtual csPtr<CS::Animation::iSkeletonAnimNode> CreateInstance
-      (CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton);
-    inline virtual const char* GetNodeName () const
-      { return csSkeletonAnimNodeFactorySingle::GetNodeName (); }
-    virtual CS::Animation::iSkeletonAnimNodeFactory* FindNode (const char* name);
-
+    csPtr<CS::Animation::SkeletonAnimNodeSingleBase> ActualCreateInstance (
+      CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton);
   protected:
     IKPhysicalNodeManager* manager;
     csRef<CS::Animation::iBodySkeleton> bodySkeleton;

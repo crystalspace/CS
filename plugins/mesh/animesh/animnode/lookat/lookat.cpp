@@ -53,7 +53,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
   CS_LEAKGUARD_IMPLEMENT(LookAtNodeFactory);
 
   LookAtNodeFactory::LookAtNodeFactory (LookAtNodeManager* manager, const char *name)
-    : scfImplementationType (this), CS::Animation::csSkeletonAnimNodeFactorySingle (name),
+    : scfImplementationType (this), CS::Animation::SkeletonAnimNodeFactorySingle (name),
     manager (manager), boneID (CS::Animation::InvalidBoneID), maximumSpeed (PI), alwaysRotate (false),
     listenerMinimumDelay (0.1f)
   {
@@ -100,7 +100,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     listenerMinimumDelay = delay;
   }
 
-  CS_IMPLEMENT_ANIMNODE_FACTORY_SINGLE(LookAtNode);
+  csPtr<CS::Animation::SkeletonAnimNodeSingleBase> LookAtNodeFactory::ActualCreateInstance (
+    CS::Animation::iSkeletonAnimPacket* packet,
+    CS::Animation::iSkeleton* skeleton)
+  {
+    return csPtr<CS::Animation::SkeletonAnimNodeSingleBase> (new LookAtNode (this, skeleton));
+  }
 
   // --------------------------  LookAtNode  --------------------------
 
