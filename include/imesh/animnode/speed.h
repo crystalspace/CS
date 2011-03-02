@@ -43,7 +43,7 @@ struct iSkeletonSpeedNodeFactory;
 struct iSkeletonSpeedNodeManager
   : public virtual CS::Animation::iSkeletonAnimNodeManager<CS::Animation::iSkeletonSpeedNodeFactory>
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonSpeedNodeManager, 1, 0, 0);
+  SCF_ISKELETONANIMNODEMANAGER_INTERFACE (CS::Animation::iSkeletonSpeedNodeManager, 1, 0, 0);
 };
 
 /**

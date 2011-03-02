@@ -143,7 +143,7 @@ struct NameBoneMappingHelper
 struct iSkeletonRetargetNodeManager
   : public virtual CS::Animation::iSkeletonAnimNodeManager<CS::Animation::iSkeletonRetargetNodeFactory>
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonRetargetNodeManager, 1, 0, 0);
+  SCF_ISKELETONANIMNODEMANAGER_INTERFACE (CS::Animation::iSkeletonRetargetNodeManager, 1, 0, 0);
 };
 
 /**

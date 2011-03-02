@@ -1074,18 +1074,30 @@ struct iSkeletonFSMNode : public iSkeletonAnimNode
   virtual iSkeletonAnimNode* GetStateNode (StateID state) const = 0;
 };
 
-template <class T>
+/**
+ * Template for an animation node manager.
+ * \a FactoryInterface is the interface type for the node factory.
+ * Usage example:
+ * \code
+ * struct iSkeletonFooNodeManager :
+ *   public CS::Animation::iSkeletonAnimNodeManager<iSkeletonFooNodeFactory>
+ * {
+ *   SCF_ISKELETONANIMNODEMANAGER_INTERFACE(iSkeletonFooNodeManager, 1, 0, 0);
+ * };
+ * \endcode
+ */
+/* Implementation note: bump number before '*10' in
+ * SCF_ISKELETONANIMNODEMANAGER_INTERFACE when changing this interface. */
+template <class FactoryInterface>
 struct iSkeletonAnimNodeManager : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonAnimNodeManager<T>, 1, 0, 0);
-  
-  typedef T FactoryInterfaceType;
+  typedef FactoryInterface FactoryInterfaceType;
 
   /// Create an animation node factory with the given name
-  virtual T* CreateAnimNodeFactory (const char* name) = 0;
+  virtual FactoryInterface* CreateAnimNodeFactory (const char* name) = 0;
 
   /// Find the animation node factory with the given name
-  virtual T* FindAnimNodeFactory (const char* name) = 0;
+  virtual FactoryInterface* FindAnimNodeFactory (const char* name) = 0;
 
   /// Remove the animation node factory with the given name
   virtual void RemoveAnimNodeFactory (const char* name) = 0;
@@ -1093,6 +1105,10 @@ struct iSkeletonAnimNodeManager : public virtual iBase
   /// Remove all animation node factories
   virtual void ClearAnimNodeFactories () = 0;
 };
+
+#define SCF_ISKELETONANIMNODEMANAGER_INTERFACE(Name, a, b, c)	\
+  SCF_INTERFACE (Name, ((0*10)+(a)), (b), (c))
+
 
 } // namespace Animation
 } // namespace CS

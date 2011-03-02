@@ -52,7 +52,7 @@ struct iSkeletonRagdollNodeFactory;
 struct iSkeletonRagdollNodeManager
   : public virtual CS::Animation::iSkeletonAnimNodeManager<CS::Animation::iSkeletonRagdollNodeFactory>
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonRagdollNodeManager, 1, 0, 0);
+  SCF_ISKELETONANIMNODEMANAGER_INTERFACE (CS::Animation::iSkeletonRagdollNodeManager, 1, 0, 0);
 };
 
 /**

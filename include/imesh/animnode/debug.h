@@ -51,7 +51,7 @@ struct iBodyChain;
 struct iSkeletonDebugNodeManager
   : public virtual CS::Animation::iSkeletonAnimNodeManager<CS::Animation::iSkeletonDebugNodeFactory>
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonDebugNodeManager, 1, 0, 0);
+  SCF_ISKELETONANIMNODEMANAGER_INTERFACE (CS::Animation::iSkeletonDebugNodeManager, 1, 0, 0);
 };
 
 // ----------------------------- iSkeletonDebugNode -----------------------------

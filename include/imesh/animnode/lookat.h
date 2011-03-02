@@ -49,7 +49,7 @@ struct iSkeletonLookAtListener;
 struct iSkeletonLookAtNodeManager
   : public virtual CS::Animation::iSkeletonAnimNodeManager<CS::Animation::iSkeletonLookAtNodeFactory>
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonLookAtNodeManager, 1, 0, 0);
+  SCF_ISKELETONANIMNODEMANAGER_INTERFACE (CS::Animation::iSkeletonLookAtNodeManager, 1, 0, 0);
 };
 
 /**

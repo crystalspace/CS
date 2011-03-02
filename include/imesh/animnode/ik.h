@@ -62,7 +62,7 @@ struct iSkeletonIKNodeFactory;
 struct iSkeletonIKNodeManager
   : public virtual CS::Animation::iSkeletonAnimNodeManager<CS::Animation::iSkeletonIKNodeFactory>
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonIKNodeManager, 1, 0, 0);
+  SCF_ISKELETONANIMNODEMANAGER_INTERFACE (CS::Animation::iSkeletonIKNodeManager, 1, 0, 0);
 };
 
 /**
