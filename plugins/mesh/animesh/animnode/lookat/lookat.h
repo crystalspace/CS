@@ -46,7 +46,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
   public scfImplementation2<LookAtNodeFactory,
     scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory>,
     CS::Animation::iSkeletonLookAtNodeFactory>,
-    CS::Animation::csSkeletonAnimNodeFactorySingle
+    public CS::Animation::csSkeletonAnimNodeFactorySingle
   {
   public:
     CS_LEAKGUARD_DECLARE(LookAtNodeFactory);
@@ -88,7 +88,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     : public scfImplementation2<LookAtNode,
 				scfFakeInterface<CS::Animation::iSkeletonAnimNode>,
 				CS::Animation::iSkeletonLookAtNode>,
-      CS::Animation::SkeletonAnimNodeSingle
+      CS::Animation::SkeletonAnimNodeSingle<LookAtNodeFactory>
   {
   public:
     CS_LEAKGUARD_DECLARE(LookAtNode);
@@ -112,11 +112,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 				    float baseWeight = 1.0f);
     virtual void TickAnimation (float dt);
 
-    virtual CS::Animation::iSkeletonAnimNodeFactory* GetFactory () const;
-    virtual CS::Animation::iSkeletonAnimNode* FindNode (const char* name);
-
   private:
-    LookAtNodeFactory* factory;
     char targetMode;
     char trackingStatus;
     csVector3 targetPosition;

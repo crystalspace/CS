@@ -49,7 +49,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
     scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory>,
     scfFakeInterface<CS::Animation::iSkeletonIKNodeFactory>,
     CS::Animation::iSkeletonIKPhysicalNodeFactory>,
-    CS::Animation::csSkeletonAnimNodeFactorySingle
+    public CS::Animation::csSkeletonAnimNodeFactorySingle
   {
   public:
     CS_LEAKGUARD_DECLARE(IKPhysicalNodeFactory);
@@ -95,7 +95,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
 				scfFakeInterface<CS::Animation::iSkeletonAnimNode>,
 				scfFakeInterface<CS::Animation::iSkeletonIKNode>,
 				CS::Animation::iSkeletonIKPhysicalNode>,
-      CS::Animation::SkeletonAnimNodeSingle
+      CS::Animation::SkeletonAnimNodeSingle<IKPhysicalNodeFactory>
   {
   public:
     CS_LEAKGUARD_DECLARE(IKPhysicalNode);
@@ -125,9 +125,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
     virtual void BlendState (CS::Animation::csSkeletalState* state,
 			     float baseWeight = 1.0f);
     virtual void TickAnimation (float dt);
-
-    virtual CS::Animation::iSkeletonAnimNodeFactory* GetFactory () const;
-    virtual CS::Animation::iSkeletonAnimNode* FindNode (const char* name);
   private:
     enum ConstraintType
     {
@@ -150,7 +147,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
     void AddConstraint (CS::Animation::EffectorID effectorID, ConstraintData& constraint);
 
   private:
-    IKPhysicalNodeFactory* factory;
     csWeakRef<iSceneNode> sceneNode;
     csWeakRef<CS::Animation::iSkeletonRagdollNode> ragdollNode;
 

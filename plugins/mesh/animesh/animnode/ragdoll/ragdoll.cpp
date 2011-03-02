@@ -117,7 +117,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
   RagdollNode::RagdollNode (RagdollNodeFactory* factory, 
 			    CS::Animation::iSkeleton* skeleton)
-    : scfImplementationType (this), SkeletonAnimNodeSingle (skeleton), factory (factory),
+    : scfImplementationType (this), SkeletonAnimNodeSingle (factory, skeleton),
     sceneNode (nullptr), maxBoneID (0)
   {
     // copy body chains
@@ -501,8 +501,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       }
     }
   }
-
-  CS_IMPLEMENT_ANIMNODE_SINGLE(RagdollNode);
 
   void RagdollNode::UpdateBoneState (BoneData* boneData)
   {

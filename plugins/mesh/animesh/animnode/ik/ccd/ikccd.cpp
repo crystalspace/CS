@@ -132,7 +132,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
 
   IKCCDNode::IKCCDNode (IKCCDNodeFactory* factory, 
 			CS::Animation::iSkeleton* skeleton)
-    : scfImplementationType (this), SkeletonAnimNodeSingle (skeleton), factory (factory),
+    : scfImplementationType (this), SkeletonAnimNodeSingle (factory, skeleton),
     sceneNode (nullptr)
   {
   }
@@ -412,8 +412,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
       // TODO: events for target lost/reached
     }
   }
-
-  CS_IMPLEMENT_ANIMNODE_SINGLE(IKCCDNode);
 
 }
 CS_PLUGIN_NAMESPACE_END(IKCCD)

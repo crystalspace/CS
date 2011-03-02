@@ -48,7 +48,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
     scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory>,
     scfFakeInterface<CS::Animation::iSkeletonIKNodeFactory>,
     CS::Animation::iSkeletonIKCCDNodeFactory>,
-    CS::Animation::csSkeletonAnimNodeFactorySingle
+    public CS::Animation::csSkeletonAnimNodeFactorySingle
   {
   public:
     CS_LEAKGUARD_DECLARE(IKCCDNodeFactory);
@@ -106,7 +106,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
 				scfFakeInterface<CS::Animation::iSkeletonAnimNode>,
 				scfFakeInterface<CS::Animation::iSkeletonIKNode>,
 				CS::Animation::iSkeletonIKCCDNode>,
-    CS::Animation::SkeletonAnimNodeSingle
+    CS::Animation::SkeletonAnimNodeSingle<IKCCDNodeFactory>
   {
   public:
     CS_LEAKGUARD_DECLARE(IKCCDNode);
@@ -131,8 +131,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
     virtual void Play();
     virtual void Stop();
     virtual void BlendState (CS::Animation::csSkeletalState* state, float baseWeight = 1.0f);
-    virtual CS::Animation::iSkeletonAnimNodeFactory* GetFactory () const;
-    virtual CS::Animation::iSkeletonAnimNode* FindNode (const char* name);
   private:
     enum ConstraintType
     {
@@ -153,7 +151,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
     };
 
   private:
-    IKCCDNodeFactory* factory;
     csWeakRef<iSceneNode> sceneNode;
 
     csHash<ConstraintData, CS::Animation::EffectorID> constraints;

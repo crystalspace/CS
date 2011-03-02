@@ -45,7 +45,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     : public scfImplementation2<RagdollNodeFactory,
     scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory>,
     CS::Animation::iSkeletonRagdollNodeFactory>,
-    CS::Animation::csSkeletonAnimNodeFactorySingle
+    public CS::Animation::csSkeletonAnimNodeFactorySingle
   {
   public:
     CS_LEAKGUARD_DECLARE(RagdollNodeFactory);
@@ -86,7 +86,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     : public scfImplementation2<RagdollNode,
 				scfFakeInterface<CS::Animation::iSkeletonAnimNode>,
 				CS::Animation::iSkeletonRagdollNode>,
-      CS::Animation::SkeletonAnimNodeSingle
+      CS::Animation::SkeletonAnimNodeSingle<RagdollNodeFactory>
   {
   public:
     CS_LEAKGUARD_DECLARE(RagdollNode);
@@ -116,9 +116,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
     virtual void BlendState (CS::Animation::csSkeletalState* state,
 			     float baseWeight = 1.0f);
-
-    virtual CS::Animation::iSkeletonAnimNodeFactory* GetFactory () const;
-    virtual CS::Animation::iSkeletonAnimNode* FindNode (const char* name);
   private:
     struct BoneData
     {
@@ -142,7 +139,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     void ResetChainNodeTransform (CS::Animation::iBodyChainNode* chainNode);
 
   private:
-    RagdollNodeFactory* factory;
     csWeakRef<iSceneNode> sceneNode;
     csWeakRef<iDynamicSystem> dynamicSystem;
     csArray<ChainData> chains;

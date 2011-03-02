@@ -53,16 +53,16 @@ iSkeletonAnimNodeFactory* csSkeletonAnimNodeFactorySingle::GetChildNode () const
 
 // ------------------------------   csSkeletonAnimNodeSingle   ------------------------------
 
-SkeletonAnimNodeSingle::SkeletonAnimNodeSingle (iSkeleton* skeleton)
+SkeletonAnimNodeSingleBase::SkeletonAnimNodeSingleBase (iSkeleton* skeleton)
   : skeleton (skeleton), isPlaying (false), playbackSpeed (1.0f)
 {}
 
-iSkeletonAnimNode* SkeletonAnimNodeSingle::GetChildNode () const
+iSkeletonAnimNode* SkeletonAnimNodeSingleBase::GetChildNode () const
 {
   return childNode;
 }
 
-void SkeletonAnimNodeSingle::Play ()
+void SkeletonAnimNodeSingleBase::Play ()
 {
   if (isPlaying)
     return;
@@ -73,7 +73,7 @@ void SkeletonAnimNodeSingle::Play ()
   isPlaying = true;
 }
 
-void SkeletonAnimNodeSingle::Stop ()
+void SkeletonAnimNodeSingleBase::Stop ()
 {
   if (!isPlaying)
     return;
@@ -84,13 +84,13 @@ void SkeletonAnimNodeSingle::Stop ()
   isPlaying = false;
 }
 
-void SkeletonAnimNodeSingle::SetPlaybackPosition (float time)
+void SkeletonAnimNodeSingleBase::SetPlaybackPosition (float time)
 {
   if (childNode)
     childNode->SetPlaybackPosition (time);
 }
 
-float SkeletonAnimNodeSingle::GetPlaybackPosition () const
+float SkeletonAnimNodeSingleBase::GetPlaybackPosition () const
 {
   if (childNode)
     return childNode->GetPlaybackPosition ();
@@ -98,7 +98,7 @@ float SkeletonAnimNodeSingle::GetPlaybackPosition () const
   return 0.0f;
 }
 
-float SkeletonAnimNodeSingle::GetDuration () const
+float SkeletonAnimNodeSingleBase::GetDuration () const
 {
   if (childNode)
     return childNode->GetDuration ();
@@ -106,7 +106,7 @@ float SkeletonAnimNodeSingle::GetDuration () const
   return 0.0f;
 }
 
-void SkeletonAnimNodeSingle::SetPlaybackSpeed (float speed)
+void SkeletonAnimNodeSingleBase::SetPlaybackSpeed (float speed)
 {
   playbackSpeed = speed;
 
@@ -114,36 +114,36 @@ void SkeletonAnimNodeSingle::SetPlaybackSpeed (float speed)
     childNode->SetPlaybackSpeed (speed);
 }
 
-float SkeletonAnimNodeSingle::GetPlaybackSpeed () const
+float SkeletonAnimNodeSingleBase::GetPlaybackSpeed () const
 {
   return playbackSpeed;
 }
 
-void SkeletonAnimNodeSingle::BlendState (csSkeletalState* state,
+void SkeletonAnimNodeSingleBase::BlendState (csSkeletalState* state,
 					   float baseWeight)
 {
   if (childNode)
     childNode->BlendState (state, baseWeight);
 }
 
-void SkeletonAnimNodeSingle::TickAnimation (float dt)
+void SkeletonAnimNodeSingleBase::TickAnimation (float dt)
 {
   if (childNode)
     childNode->TickAnimation (dt);
 }
 
-bool SkeletonAnimNodeSingle::IsActive () const
+bool SkeletonAnimNodeSingleBase::IsActive () const
 {
   return isPlaying;
 }
 
-void SkeletonAnimNodeSingle::AddAnimationCallback (iSkeletonAnimCallback* callback)
+void SkeletonAnimNodeSingleBase::AddAnimationCallback (iSkeletonAnimCallback* callback)
 {
   if (childNode)
     childNode->AddAnimationCallback (callback);
 }
 
-void SkeletonAnimNodeSingle::RemoveAnimationCallback (iSkeletonAnimCallback* callback)
+void SkeletonAnimNodeSingleBase::RemoveAnimationCallback (iSkeletonAnimCallback* callback)
 {
   if (childNode)
     childNode->RemoveAnimationCallback (callback);

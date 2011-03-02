@@ -42,7 +42,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     : public scfImplementation2<DebugNodeFactory, 
     scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory>,
     CS::Animation::iSkeletonDebugNodeFactory>,
-    CS::Animation::csSkeletonAnimNodeFactorySingle
+    public CS::Animation::csSkeletonAnimNodeFactorySingle
   {
   public:
     CS_LEAKGUARD_DECLARE(DebugAnimNodeFactory);
@@ -85,7 +85,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     : public scfImplementation2<DebugNode, 
 				scfFakeInterface<CS::Animation::iSkeletonAnimNode>,
 				CS::Animation::iSkeletonDebugNode>,
-      CS::Animation::SkeletonAnimNodeSingle
+      public CS::Animation::SkeletonAnimNodeSingle<DebugNodeFactory>
   {
   public:
     CS_LEAKGUARD_DECLARE(DebugNode);
@@ -95,13 +95,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
 
     //-- CS::Animation::iSkeletonDebugNode
     virtual void Draw (iCamera* camera, csColor color = csColor (255, 0, 255));
-
-    //-- CS::Animation::iSkeletonAnimNode
-    virtual CS::Animation::iSkeletonAnimNodeFactory* GetFactory () const;
-    virtual CS::Animation::iSkeletonAnimNode* FindNode (const char* name);
   private:
-    csRef<DebugNodeFactory> factory;
-
     friend class DebugNodeFactory;
   };
 

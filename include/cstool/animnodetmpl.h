@@ -124,24 +124,6 @@ namespace Animation {
       return nullptr;							\
     }
 
-/// This macro implements the GetFactory and FindNode methods of an animation node with a single child
-#define CS_IMPLEMENT_ANIMNODE_SINGLE(nodename)				\
-  CS::Animation::iSkeletonAnimNodeFactory* nodename::GetFactory () const \
-    {									\
-      return factory;							\
-    }									\
-									\
-  CS::Animation::iSkeletonAnimNode* nodename::FindNode (const char* name) \
-    {									\
-      if (factory->name == name)					\
-	return this;							\
-									\
-      if (childNode)							\
-	return childNode->FindNode (name);				\
-									\
-      return nullptr;							\
-    }
-
 /**
  * Base implementation of a CS::Animation::iSkeletonAnimNodeFactory
  */
@@ -164,6 +146,8 @@ class CS_CRYSTALSPACE_EXPORT SkeletonAnimNodeFactory
    */
   virtual const char* GetNodeName () const;
 
+  /// Get the name of this factory
+  const csString& GetName() const { return name; }
  protected:
   csString name;
 };
@@ -199,21 +183,18 @@ class CS_CRYSTALSPACE_EXPORT csSkeletonAnimNodeFactorySingle
   csRef<CS::Animation::iSkeletonAnimNodeFactory> childNodeFactory;
 };
 
-/**
- * Base implementation of a CS::Animation::iSkeletonAnimNode with a single child
- */
-class CS_CRYSTALSPACE_EXPORT SkeletonAnimNodeSingle : public virtual iSkeletonAnimNode
+class CS_CRYSTALSPACE_EXPORT SkeletonAnimNodeSingleBase : public virtual iSkeletonAnimNode
 {
  public:
   /**
    * Constructor
    */
-  SkeletonAnimNodeSingle (CS::Animation::iSkeleton* skeleton);
+  SkeletonAnimNodeSingleBase (CS::Animation::iSkeleton* skeleton);
 
   /**
    * Destructor
    */
-  virtual ~SkeletonAnimNodeSingle () {}
+  virtual ~SkeletonAnimNodeSingleBase () {}
 
   /**
    * Get the child node of this node, or nullptr if there are none.
@@ -287,11 +268,43 @@ class CS_CRYSTALSPACE_EXPORT SkeletonAnimNodeSingle : public virtual iSkeletonAn
    */
   virtual void RemoveAnimationCallback (iSkeletonAnimCallback* callback);
 
- protected:
+protected:
   csWeakRef<CS::Animation::iSkeleton> skeleton;
   csRef<CS::Animation::iSkeletonAnimNode> childNode;
   bool isPlaying;
   float playbackSpeed;
+};
+
+/**
+ * Base implementation of a CS::Animation::iSkeletonAnimNode with a single child.
+ * \a FactoryType is the the of the node factory; it must be (publicly) derived
+ * from SkeletonAnimNodeFactory.
+ */
+template<typename FactoryType>
+class SkeletonAnimNodeSingle : public SkeletonAnimNodeSingleBase
+{
+public:
+  SkeletonAnimNodeSingle (FactoryType* factory,
+			  CS::Animation::iSkeleton* skeleton)
+   : SkeletonAnimNodeSingleBase (skeleton), factory (factory) {}
+  
+  iSkeletonAnimNodeFactory* GetFactory () const
+  {
+    return factory;
+  }
+
+  iSkeletonAnimNode* FindNode (const char* name)
+  {
+    if (factory->GetName() == name)
+	return this;
+
+    if (childNode)
+      return childNode->FindNode (name);
+    return nullptr;
+  }
+
+protected:
+  csRef<FactoryType> factory;
 };
 
 /**

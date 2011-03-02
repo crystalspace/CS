@@ -102,7 +102,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
 
   IKPhysicalNode::IKPhysicalNode (IKPhysicalNodeFactory* factory, 
 				  CS::Animation::iSkeleton* skeleton)
-    : scfImplementationType (this), SkeletonAnimNodeSingle (skeleton), factory (factory),
+    : scfImplementationType (this), SkeletonAnimNodeSingle (factory, skeleton),
     sceneNode (nullptr)
   {
   }
@@ -345,8 +345,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
       }
     }
   }
-
-  CS_IMPLEMENT_ANIMNODE_SINGLE(IKPhysicalNode);
 
 }
 CS_PLUGIN_NAMESPACE_END(IKPhysical)

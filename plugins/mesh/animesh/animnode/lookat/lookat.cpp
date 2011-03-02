@@ -107,8 +107,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
   CS_LEAKGUARD_IMPLEMENT(LookAtNode);
 
   LookAtNode::LookAtNode (LookAtNodeFactory* factory, 
-				  CS::Animation::iSkeleton* skeleton)
-    : scfImplementationType (this), SkeletonAnimNodeSingle (skeleton), factory (factory),
+			  CS::Animation::iSkeleton* skeleton)
+    : scfImplementationType (this), SkeletonAnimNodeSingle (factory, skeleton),
     targetMode (TARGET_NONE), trackingInitialized (true)    
   {
   }
@@ -544,8 +544,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     if (childNode)
       childNode->TickAnimation (dt);
   }
-
-  CS_IMPLEMENT_ANIMNODE_SINGLE(LookAtNode);
 
 }
 CS_PLUGIN_NAMESPACE_END(LookAt)
