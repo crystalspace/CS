@@ -201,18 +201,18 @@ class CS_CRYSTALSPACE_EXPORT csSkeletonAnimNodeFactorySingle
 /**
  * Base implementation of a CS::Animation::iSkeletonAnimNode with a single child
  */
-class CS_CRYSTALSPACE_EXPORT csSkeletonAnimNodeSingle
+class CS_CRYSTALSPACE_EXPORT SkeletonAnimNodeSingle : public virtual iSkeletonAnimNode
 {
  public:
   /**
    * Constructor
    */
-  csSkeletonAnimNodeSingle (CS::Animation::iSkeleton* skeleton);
+  SkeletonAnimNodeSingle (CS::Animation::iSkeleton* skeleton);
 
   /**
    * Destructor
    */
-  virtual ~csSkeletonAnimNodeSingle () {}
+  virtual ~SkeletonAnimNodeSingle () {}
 
   /**
    * Get the child node of this node, or nullptr if there are none.

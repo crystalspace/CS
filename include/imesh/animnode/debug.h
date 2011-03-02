@@ -127,9 +127,9 @@ struct iSkeletonDebugNodeFactory : public iSkeletonAnimNodeFactory
  * \warning You have to call Draw() at each frame if you want the 2D information
  * displayed by this node.
  */
-struct iSkeletonDebugNode : public iSkeletonAnimNode
+struct iSkeletonDebugNode : public virtual iSkeletonAnimNode
 {
-  SCF_INTERFACE(iSkeletonDebugNode, 1, 0, 0);
+  SCF_INTERFACE(iSkeletonDebugNode, 2, 0, 0);
 
   /**
    * Draw the 2D visual information

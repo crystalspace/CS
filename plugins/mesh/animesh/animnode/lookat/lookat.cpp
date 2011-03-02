@@ -108,7 +108,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 
   LookAtNode::LookAtNode (LookAtNodeFactory* factory, 
 				  CS::Animation::iSkeleton* skeleton)
-    : scfImplementationType (this), csSkeletonAnimNodeSingle (skeleton), factory (factory),
+    : scfImplementationType (this), SkeletonAnimNodeSingle (skeleton), factory (factory),
     targetMode (TARGET_NONE), trackingInitialized (true)    
   {
   }

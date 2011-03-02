@@ -92,10 +92,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
 
   class IKPhysicalNode
     : public scfImplementation3<IKPhysicalNode,
-    scfFakeInterface<CS::Animation::iSkeletonAnimNode>,
-    scfFakeInterface<CS::Animation::iSkeletonIKNode>,
-    CS::Animation::iSkeletonIKPhysicalNode>,
-    CS::Animation::csSkeletonAnimNodeSingle
+				scfFakeInterface<CS::Animation::iSkeletonAnimNode>,
+				scfFakeInterface<CS::Animation::iSkeletonIKNode>,
+				CS::Animation::iSkeletonIKPhysicalNode>,
+      CS::Animation::SkeletonAnimNodeSingle
   {
   public:
     CS_LEAKGUARD_DECLARE(IKPhysicalNode);
@@ -122,33 +122,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
     virtual void Play ();
     virtual void Stop ();
 
-    inline virtual void SetPlaybackPosition (float time)
-    { csSkeletonAnimNodeSingle::SetPlaybackPosition (time); }
-    inline virtual float GetPlaybackPosition () const
-    { return csSkeletonAnimNodeSingle::GetPlaybackPosition (); }
-
-    inline virtual float GetDuration () const
-    { return csSkeletonAnimNodeSingle::GetDuration (); }
-    inline virtual void SetPlaybackSpeed (float speed)
-    { csSkeletonAnimNodeSingle::SetPlaybackSpeed (speed); }
-    inline virtual float GetPlaybackSpeed () const
-    { return csSkeletonAnimNodeSingle::GetPlaybackSpeed (); }
-
     virtual void BlendState (CS::Animation::csSkeletalState* state,
 			     float baseWeight = 1.0f);
     virtual void TickAnimation (float dt);
 
-    inline virtual bool IsActive () const
-    { return csSkeletonAnimNodeSingle::IsActive (); }
-
     virtual CS::Animation::iSkeletonAnimNodeFactory* GetFactory () const;
     virtual CS::Animation::iSkeletonAnimNode* FindNode (const char* name);
-
-    inline virtual void AddAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback)
-    { csSkeletonAnimNodeSingle::AddAnimationCallback (callback); }
-    inline virtual void RemoveAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback)
-    { csSkeletonAnimNodeSingle::RemoveAnimationCallback (callback); }
-
   private:
     enum ConstraintType
     {

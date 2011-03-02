@@ -86,9 +86,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 
   class LookAtNode
     : public scfImplementation2<LookAtNode,
-    scfFakeInterface<CS::Animation::iSkeletonAnimNode>,
-    CS::Animation::iSkeletonLookAtNode>,
-    CS::Animation::csSkeletonAnimNodeSingle
+				scfFakeInterface<CS::Animation::iSkeletonAnimNode>,
+				CS::Animation::iSkeletonLookAtNode>,
+      CS::Animation::SkeletonAnimNodeSingle
   {
   public:
     CS_LEAKGUARD_DECLARE(LookAtNode);
@@ -107,35 +107,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 
     //-- CS::Animation::iSkeletonAnimNode
     virtual void Play ();
-    inline virtual void Stop ()
-    { csSkeletonAnimNodeSingle::Stop (); }
-
-    inline virtual void SetPlaybackPosition (float time)
-    { csSkeletonAnimNodeSingle::SetPlaybackPosition (time); }
-    inline virtual float GetPlaybackPosition () const
-    { return csSkeletonAnimNodeSingle::GetPlaybackPosition (); }
-
-    inline virtual float GetDuration () const
-    { return csSkeletonAnimNodeSingle::GetDuration (); }
-    inline virtual void SetPlaybackSpeed (float speed)
-    { csSkeletonAnimNodeSingle::SetPlaybackSpeed (speed); }
-    inline virtual float GetPlaybackSpeed () const
-    { return csSkeletonAnimNodeSingle::GetPlaybackSpeed (); }
 
     virtual void BlendState (CS::Animation::csSkeletalState* state,
 				    float baseWeight = 1.0f);
     virtual void TickAnimation (float dt);
 
-    inline virtual bool IsActive () const
-    { return csSkeletonAnimNodeSingle::IsActive (); }
-
     virtual CS::Animation::iSkeletonAnimNodeFactory* GetFactory () const;
     virtual CS::Animation::iSkeletonAnimNode* FindNode (const char* name);
-
-    inline virtual void AddAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback)
-    { csSkeletonAnimNodeSingle::AddAnimationCallback (callback); }
-    inline virtual void RemoveAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback)
-    { csSkeletonAnimNodeSingle::RemoveAnimationCallback (callback); }
 
   private:
     LookAtNodeFactory* factory;

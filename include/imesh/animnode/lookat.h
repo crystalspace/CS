@@ -129,9 +129,9 @@ struct iSkeletonLookAtNodeFactory : public iSkeletonAnimNodeFactory
  * An animation node that controls a bone of an animesh in order to make it look
  * at a target.
  */
-struct iSkeletonLookAtNode : public iSkeletonAnimNode
+struct iSkeletonLookAtNode : public virtual iSkeletonAnimNode
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonLookAtNode, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonLookAtNode, 2, 0, 0);
 
   /**
    * Return whether or not there is currently a target defined

@@ -83,9 +83,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
 
   class DebugNode
     : public scfImplementation2<DebugNode, 
-    scfFakeInterface<CS::Animation::iSkeletonAnimNode>,
-    CS::Animation::iSkeletonDebugNode>,
-    CS::Animation::csSkeletonAnimNodeSingle
+				scfFakeInterface<CS::Animation::iSkeletonAnimNode>,
+				CS::Animation::iSkeletonDebugNode>,
+      CS::Animation::SkeletonAnimNodeSingle
   {
   public:
     CS_LEAKGUARD_DECLARE(DebugNode);
@@ -97,40 +97,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     virtual void Draw (iCamera* camera, csColor color = csColor (255, 0, 255));
 
     //-- CS::Animation::iSkeletonAnimNode
-    inline virtual void Play ()
-    { csSkeletonAnimNodeSingle::Play (); }
-    inline virtual void Stop ()
-    { csSkeletonAnimNodeSingle::Stop (); }
-
-    inline virtual void SetPlaybackPosition (float time)
-    { csSkeletonAnimNodeSingle::SetPlaybackPosition (time); }
-    inline virtual float GetPlaybackPosition () const
-    { return csSkeletonAnimNodeSingle::GetPlaybackPosition (); }
-
-    inline virtual float GetDuration () const
-    { return csSkeletonAnimNodeSingle::GetDuration (); }
-    inline virtual void SetPlaybackSpeed (float speed)
-    { csSkeletonAnimNodeSingle::SetPlaybackSpeed (speed); }
-    inline virtual float GetPlaybackSpeed () const
-    { return csSkeletonAnimNodeSingle::GetPlaybackSpeed (); }
-
-    inline virtual void BlendState (CS::Animation::csSkeletalState* state,
-				    float baseWeight = 1.0f)
-    { csSkeletonAnimNodeSingle::BlendState (state, baseWeight); }
-    inline virtual void TickAnimation (float dt)
-    { csSkeletonAnimNodeSingle::TickAnimation (dt); }
-
-    inline virtual bool IsActive () const
-    { return csSkeletonAnimNodeSingle::IsActive (); }
-
     virtual CS::Animation::iSkeletonAnimNodeFactory* GetFactory () const;
     virtual CS::Animation::iSkeletonAnimNode* FindNode (const char* name);
-
-    inline virtual void AddAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback)
-    { csSkeletonAnimNodeSingle::AddAnimationCallback (callback); }
-    inline virtual void RemoveAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback)
-    { csSkeletonAnimNodeSingle::RemoveAnimationCallback (callback); }
-
   private:
     csRef<DebugNodeFactory> factory;
 

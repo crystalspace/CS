@@ -103,10 +103,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
 
   class IKCCDNode
     : public scfImplementation3<IKCCDNode,
-    scfFakeInterface<CS::Animation::iSkeletonAnimNode>,
-    scfFakeInterface<CS::Animation::iSkeletonIKNode>,
-    CS::Animation::iSkeletonIKCCDNode>,
-    CS::Animation::csSkeletonAnimNodeSingle
+				scfFakeInterface<CS::Animation::iSkeletonAnimNode>,
+				scfFakeInterface<CS::Animation::iSkeletonIKNode>,
+				CS::Animation::iSkeletonIKCCDNode>,
+    CS::Animation::SkeletonAnimNodeSingle
   {
   public:
     CS_LEAKGUARD_DECLARE(IKCCDNode);
@@ -128,37 +128,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
     virtual void RemoveConstraint (CS::Animation::EffectorID effector);
 
     //-- CS::Animation::iSkeletonAnimNode
-    virtual void Play ();
-    virtual void Stop ();
-
-    inline virtual void SetPlaybackPosition (float time)
-    { csSkeletonAnimNodeSingle::SetPlaybackPosition (time); }
-    inline virtual float GetPlaybackPosition () const
-    { return csSkeletonAnimNodeSingle::GetPlaybackPosition (); }
-
-    inline virtual float GetDuration () const
-    { return csSkeletonAnimNodeSingle::GetDuration (); }
-    inline virtual void SetPlaybackSpeed (float speed)
-    { csSkeletonAnimNodeSingle::SetPlaybackSpeed (speed); }
-    inline virtual float GetPlaybackSpeed () const
-    { return csSkeletonAnimNodeSingle::GetPlaybackSpeed (); }
-
-    virtual void BlendState (CS::Animation::csSkeletalState* state,
-			     float baseWeight = 1.0f);
-    inline virtual void TickAnimation (float dt)
-    { csSkeletonAnimNodeSingle::TickAnimation (dt); }
-
-    inline virtual bool IsActive () const
-    { return csSkeletonAnimNodeSingle::IsActive (); }
-
+    virtual void Play();
+    virtual void Stop();
+    virtual void BlendState (CS::Animation::csSkeletalState* state, float baseWeight = 1.0f);
     virtual CS::Animation::iSkeletonAnimNodeFactory* GetFactory () const;
     virtual CS::Animation::iSkeletonAnimNode* FindNode (const char* name);
-
-    inline virtual void AddAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback)
-    { csSkeletonAnimNodeSingle::AddAnimationCallback (callback); }
-    inline virtual void RemoveAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback)
-    { csSkeletonAnimNodeSingle::RemoveAnimationCallback (callback); }
-
   private:
     enum ConstraintType
     {

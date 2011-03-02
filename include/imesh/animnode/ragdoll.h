@@ -122,9 +122,9 @@ struct iSkeletonRagdollNodeFactory : public iSkeletonAnimNodeFactory
  * control the animation of the animated mesh, and/or in order to make the mesh
  * collide with the rigid bodies of the simulation.
  */
-struct iSkeletonRagdollNode : public iSkeletonAnimNode
+struct iSkeletonRagdollNode : public virtual iSkeletonAnimNode
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonRagdollNode, 1, 0, 2);
+  SCF_INTERFACE(CS::Animation::iSkeletonRagdollNode, 2, 0, 0);
 
   /**
    * Set the dynamic system where the rigid bodies are evolving. It is valid to provide a

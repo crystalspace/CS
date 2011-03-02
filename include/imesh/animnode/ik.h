@@ -135,9 +135,9 @@ struct iSkeletonIKNodeFactory : public iSkeletonAnimNodeFactory
  *
  * \sa iSkeletonIKPhysicalNode
  */
-struct iSkeletonIKNode : public iSkeletonAnimNode
+struct iSkeletonIKNode : public virtual iSkeletonAnimNode
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonIKNode, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonIKNode, 2, 0, 0);
 
   /**
    * Add a constraint on the given effector so that it sticks to the given world transform.

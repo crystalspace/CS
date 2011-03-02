@@ -84,9 +84,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
   class RagdollNode
     : public scfImplementation2<RagdollNode,
-    scfFakeInterface<CS::Animation::iSkeletonAnimNode>,
-    CS::Animation::iSkeletonRagdollNode>,
-    CS::Animation::csSkeletonAnimNodeSingle
+				scfFakeInterface<CS::Animation::iSkeletonAnimNode>,
+				CS::Animation::iSkeletonRagdollNode>,
+      CS::Animation::SkeletonAnimNodeSingle
   {
   public:
     CS_LEAKGUARD_DECLARE(RagdollNode);
@@ -114,34 +114,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     virtual void Play ();
     virtual void Stop ();
 
-    inline virtual void SetPlaybackPosition (float time)
-    { csSkeletonAnimNodeSingle::SetPlaybackPosition (time); }
-    inline virtual float GetPlaybackPosition () const
-    { return csSkeletonAnimNodeSingle::GetPlaybackPosition (); }
-
-    inline virtual float GetDuration () const
-    { return csSkeletonAnimNodeSingle::GetDuration (); }
-    inline virtual void SetPlaybackSpeed (float speed)
-    { csSkeletonAnimNodeSingle::SetPlaybackSpeed (speed); }
-    inline virtual float GetPlaybackSpeed () const
-    { return csSkeletonAnimNodeSingle::GetPlaybackSpeed (); }
-
     virtual void BlendState (CS::Animation::csSkeletalState* state,
 			     float baseWeight = 1.0f);
-    inline virtual void TickAnimation (float dt)
-    { csSkeletonAnimNodeSingle::TickAnimation (dt); }
-
-    inline virtual bool IsActive () const
-    { return csSkeletonAnimNodeSingle::IsActive (); }
 
     virtual CS::Animation::iSkeletonAnimNodeFactory* GetFactory () const;
     virtual CS::Animation::iSkeletonAnimNode* FindNode (const char* name);
-
-    inline virtual void AddAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback)
-    { csSkeletonAnimNodeSingle::AddAnimationCallback (callback); }
-    inline virtual void RemoveAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback)
-    { csSkeletonAnimNodeSingle::RemoveAnimationCallback (callback); }
-
   private:
     struct BoneData
     {

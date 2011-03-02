@@ -91,7 +91,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
   CS_LEAKGUARD_IMPLEMENT(DebugNode);
 
   DebugNode::DebugNode (DebugNodeFactory* factory, CS::Animation::iSkeleton* skeleton)
-    : scfImplementationType (this), csSkeletonAnimNodeSingle (skeleton), factory (factory)
+    : scfImplementationType (this), SkeletonAnimNodeSingle (skeleton), factory (factory)
   {
   }
 
