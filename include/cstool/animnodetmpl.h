@@ -145,18 +145,19 @@ namespace Animation {
 /**
  * Base implementation of a CS::Animation::iSkeletonAnimNodeFactory
  */
-class CS_CRYSTALSPACE_EXPORT csSkeletonAnimNodeFactory
+class CS_CRYSTALSPACE_EXPORT SkeletonAnimNodeFactory
+  : public virtual iSkeletonAnimNodeFactory
 {
  public:
   /**
    * Constructor
    */
-  csSkeletonAnimNodeFactory (const char* name);
+  SkeletonAnimNodeFactory (const char* name);
 
   /**
    * Destructor
    */
-  virtual ~csSkeletonAnimNodeFactory () {}
+  virtual ~SkeletonAnimNodeFactory () {}
 
   /**
    * Get the name of this factory
@@ -171,7 +172,7 @@ class CS_CRYSTALSPACE_EXPORT csSkeletonAnimNodeFactory
  * Base implementation of a CS::Animation::iSkeletonAnimNodeFactory with a single child
  */
 class CS_CRYSTALSPACE_EXPORT csSkeletonAnimNodeFactorySingle
-  : public csSkeletonAnimNodeFactory
+  : public SkeletonAnimNodeFactory
 {
  public:
   /**
@@ -297,7 +298,7 @@ class CS_CRYSTALSPACE_EXPORT SkeletonAnimNodeSingle : public virtual iSkeletonAn
  * Base implementation of a CS::Animation::iSkeletonAnimNodeFactory with more than one child
  */
 class CS_CRYSTALSPACE_EXPORT csSkeletonAnimNodeFactoryMulti
-  : public csSkeletonAnimNodeFactory
+  : public SkeletonAnimNodeFactory
 {
  public:
   /**

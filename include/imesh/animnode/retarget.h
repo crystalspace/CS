@@ -162,9 +162,9 @@ struct iSkeletonRetargetNodeManager
  * In all cases, this node will only be able to retarget the animations of the bones covered by the
  * bone mapping provided by the user (see SetBoneMapping()).
  */
-struct iSkeletonRetargetNodeFactory : public iSkeletonAnimNodeFactory
+struct iSkeletonRetargetNodeFactory : public virtual iSkeletonAnimNodeFactory
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonRetargetNodeFactory, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonRetargetNodeFactory, 2, 0, 0);
 
   /**
    * Set the child animation node of this node. This child node plays the animation for the source skeleton.

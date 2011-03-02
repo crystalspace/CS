@@ -51,9 +51,9 @@ struct iSkeletonSpeedNodeManager
  * This animation node takes some animations of the animesh moving at different speed
  * (eg idle, walking, running), and blend them to achieve any custom speed.
  */
-struct iSkeletonSpeedNodeFactory : public iSkeletonAnimNodeFactory
+struct iSkeletonSpeedNodeFactory : public virtual iSkeletonAnimNodeFactory
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonSpeedNodeFactory, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonSpeedNodeFactory, 2, 0, 0);
 
   /**
    * Add a child animation node to this node. This child node should provide the

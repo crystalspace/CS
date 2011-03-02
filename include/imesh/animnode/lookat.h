@@ -68,9 +68,9 @@ struct iSkeletonLookAtNodeManager
  * This animation node uses only the pitch and yaw (ie rotations around X and Y axis)
  * in order to achieve the look at the target, the roll is not used.
  */
-struct iSkeletonLookAtNodeFactory : public iSkeletonAnimNodeFactory
+struct iSkeletonLookAtNodeFactory : public virtual iSkeletonAnimNodeFactory
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonLookAtNodeFactory, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonLookAtNodeFactory, 2, 0, 0);
 
   /**
    * Set the body skeleton that is used to specify the geometrical constraints of the animated

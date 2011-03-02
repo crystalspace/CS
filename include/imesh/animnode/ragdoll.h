@@ -71,9 +71,9 @@ enum RagdollState
 /**
  * Factory for the ragdoll animation node.
  */
-struct iSkeletonRagdollNodeFactory : public iSkeletonAnimNodeFactory
+struct iSkeletonRagdollNodeFactory : public virtual iSkeletonAnimNodeFactory
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonRagdollNodeFactory, 1, 0, 3);
+  SCF_INTERFACE(CS::Animation::iSkeletonRagdollNodeFactory, 2, 0, 0);
 
   /**
    * Set the physical description of the skeleton.

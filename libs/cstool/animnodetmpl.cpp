@@ -26,11 +26,11 @@ using namespace CS::Animation;
 
 // ------------------------------   csSkeletonAnimNodeFactory   ------------------------------
 
-csSkeletonAnimNodeFactory::csSkeletonAnimNodeFactory (const char* name)
+SkeletonAnimNodeFactory::SkeletonAnimNodeFactory (const char* name)
   : name (name)
 {}
 
-const char* csSkeletonAnimNodeFactory::GetNodeName () const
+const char* SkeletonAnimNodeFactory::GetNodeName () const
 {
   return name;
 }
@@ -38,7 +38,7 @@ const char* csSkeletonAnimNodeFactory::GetNodeName () const
 // ------------------------------   csSkeletonAnimNodeFactorySingle   ------------------------------
 
 csSkeletonAnimNodeFactorySingle::csSkeletonAnimNodeFactorySingle (const char* name)
-  : csSkeletonAnimNodeFactory (name)
+  : SkeletonAnimNodeFactory (name)
 {}
 
 void csSkeletonAnimNodeFactorySingle::SetChildNode (iSkeletonAnimNodeFactory* factory)
@@ -152,7 +152,7 @@ void SkeletonAnimNodeSingle::RemoveAnimationCallback (iSkeletonAnimCallback* cal
 // ------------------------------   csSkeletonAnimNodeFactoryMulti   ------------------------------
 
 csSkeletonAnimNodeFactoryMulti::csSkeletonAnimNodeFactoryMulti (const char* name)
-  : csSkeletonAnimNodeFactory (name)
+  : SkeletonAnimNodeFactory (name)
 {}
 
 void csSkeletonAnimNodeFactoryMulti::AddChildNode (iSkeletonAnimNodeFactory* factory)

@@ -78,9 +78,9 @@ struct iSkeletonIKNodeManager
  *
  * \sa iSkeletonIKPhysicalNodeFactory
  */
-struct iSkeletonIKNodeFactory : public iSkeletonAnimNodeFactory
+struct iSkeletonIKNodeFactory : public virtual iSkeletonAnimNodeFactory
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonIKNodeFactory, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonIKNodeFactory, 2, 0, 0);
 
   /**
    * Set the physical description of the skeleton.

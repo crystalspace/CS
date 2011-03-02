@@ -71,9 +71,9 @@ enum SkeletonDebugMode
 /**
  * Factory for the 'debug' animation node (see CS::Animation::iSkeletonDebugNode).
  */
-struct iSkeletonDebugNodeFactory : public iSkeletonAnimNodeFactory
+struct iSkeletonDebugNodeFactory : public virtual iSkeletonAnimNodeFactory
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonDebugNodeFactory, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonDebugNodeFactory, 2, 0, 0);
 
   /**
    * Set the combination of visualization modes to be used for displaying the animation.
