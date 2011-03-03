@@ -88,21 +88,19 @@ bool Monster::Initialize(iMeshWrapper* spawn)
 
   weapon->mesh = mesh;
 
-  csRef<CS::Mesh::iAnimatedMesh> animesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (mesh->GetMeshObject ());
+  csRef<CS::Mesh::iAnimatedMesh> animesh = scfQueryInterfaceSafe<CS::Mesh::iAnimatedMesh> (mesh->GetMeshObject ());
   if (animesh)
   {
     // Start the root animation node
     rootNode = animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
 
     // Find the FSM animation node
-    weapon->fsmNode = fsmNode = static_cast<CS::Animation::iSkeletonFSMNode*> (rootNode->FindNode ("fsm"));
+    weapon->fsmNode = fsmNode = scfQueryInterfaceSafe<CS::Animation::iSkeletonFSMNode> (rootNode->FindNode ("fsm"));
     weapon->fsmNodeFactory =
-      fsmNodeFactory = fsmNode ? (CS::Animation::iSkeletonFSMNodeFactory*) fsmNode->GetFactory () : 0;
+      fsmNodeFactory = fsmNode ? scfQueryInterface<CS::Animation::iSkeletonFSMNodeFactory> (fsmNode->GetFactory ()) : 0;
 
     // Find the LookAt animation node
-    csRef<CS::Animation::iSkeletonLookAtNode> lookAtNodeRef;
-    lookAtNodeRef = scfQueryInterfaceSafe<CS::Animation::iSkeletonLookAtNode> (rootNode->FindNode ("lookat"));
-    lookAtNode = lookAtNodeRef;
+    lookAtNode = scfQueryInterfaceSafe<CS::Animation::iSkeletonLookAtNode> (rootNode->FindNode ("lookat"));
   }
 
   // If this is the 'knight' monster then create and attach a sword in his hand

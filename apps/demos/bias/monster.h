@@ -32,10 +32,10 @@ private:
   csRef<iMeshWrapper> mesh;
   csRef<iMeshWrapper> sword;
 
-  CS::Animation::iSkeletonAnimNode* rootNode;
-  CS::Animation::iSkeletonFSMNode* fsmNode;
-  CS::Animation::iSkeletonFSMNodeFactory* fsmNodeFactory;
-  CS::Animation::iSkeletonLookAtNode* lookAtNode;
+  csRef<CS::Animation::iSkeletonAnimNode> rootNode;
+  csRef<CS::Animation::iSkeletonFSMNode> fsmNode;
+  csRef<CS::Animation::iSkeletonFSMNodeFactory> fsmNodeFactory;
+  csRef<CS::Animation::iSkeletonLookAtNode> lookAtNode;
 
 public:
   float awareRadius, curAwareRadius;

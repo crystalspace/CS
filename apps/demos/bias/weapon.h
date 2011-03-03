@@ -51,8 +51,8 @@ private:
 
 public:
   csRef<iMeshWrapper> mesh;
-  CS::Animation::iSkeletonFSMNode* fsmNode;
-  CS::Animation::iSkeletonFSMNodeFactory* fsmNodeFactory;
+  csRef<CS::Animation::iSkeletonFSMNode> fsmNode;
+  csRef<CS::Animation::iSkeletonFSMNodeFactory> fsmNodeFactory;
   csString attackAnimation;
 
 public:
