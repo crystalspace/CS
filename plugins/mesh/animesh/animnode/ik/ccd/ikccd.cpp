@@ -137,7 +137,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
 
   IKCCDNode::IKCCDNode (IKCCDNodeFactory* factory, 
 			CS::Animation::iSkeleton* skeleton)
-    : scfImplementationType (this), SkeletonAnimNodeSingle (factory, skeleton),
+    : scfImplementationType (this),
+    CS::Animation::SkeletonAnimNodeSingle<IKCCDNodeFactory> (factory, skeleton),
     sceneNode (nullptr)
   {
   }

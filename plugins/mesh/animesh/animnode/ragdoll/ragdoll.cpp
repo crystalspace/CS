@@ -122,7 +122,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
   RagdollNode::RagdollNode (RagdollNodeFactory* factory, 
 			    CS::Animation::iSkeleton* skeleton)
-    : scfImplementationType (this), SkeletonAnimNodeSingle (factory, skeleton),
+    : scfImplementationType (this),
+    CS::Animation::SkeletonAnimNodeSingle<RagdollNodeFactory> (factory, skeleton),
     sceneNode (nullptr), maxBoneID (0)
   {
     // copy body chains
