@@ -303,7 +303,6 @@ void csMeshFactoryWrapper::AddInstance(csVector3& position, csMatrix3& rotation)
 
 size_t csMeshFactoryWrapper::AddExtraRenderMesh (CS::Graphics::RenderMesh* renderMesh)
 {
-  // TODO: doc API on deletion
   return extraRenderMeshes.Push (renderMesh);
 }
 
