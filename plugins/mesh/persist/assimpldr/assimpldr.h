@@ -165,6 +165,7 @@ private:
   csRef<iTextureManager> textureManager;
   csRef<iLoaderContext> loaderContext;
   csRef<iImageIO> imageLoader;
+  csRef<iShaderVarStringSet> shaderVariableNames;
   csRef<CS::Animation::iSkeletonManager> skeletonManager;
 
   csRefArray<iTextureWrapper> textures;

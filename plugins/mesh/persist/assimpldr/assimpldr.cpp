@@ -229,6 +229,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       return;
     }
 
+    shaderVariableNames = csQueryRegistryTagInterface<iShaderVarStringSet>
+      (object_reg, "crystalspace.shader.variablenameset");
+    if (!shaderVariableNames)
+      ReportWarning (object_reg,
+		     "Could not find the shader variable set. Import of materials will be limited");
+
     // Find the skeleton manager
     skeletonManager = csQueryRegistryOrLoad<CS::Animation::iSkeletonManager>
       (object_reg, "crystalspace.skeletalanimation");
@@ -273,6 +279,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
   iTextureWrapper* AssimpLoader::FindTexture (const char* filename)
   {
+    // Check if it is an imported texture
+    if ('*' == *filename)
+    {
+      int iIndex = atoi (filename + 1);
+      if (iIndex > 0 && iIndex < (int) textures.GetSize ())
+	return textures[iIndex];
+    }
+
+    // Search for an external file
     csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
 
     // Search in the loading context
@@ -365,38 +380,77 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
   void AssimpLoader::ImportMaterial (aiMaterial* material,
 				     size_t index)
   {
-    // TODO: import all other material properties
-
+    // Find the name of the material
     aiString name;
     material->Get (AI_MATKEY_NAME, name);
 
-    //csRef<iTextureWrapper> texture;
+    // Find the base texture
     iTextureWrapper* texture = nullptr;
+    aiString path;
     if (material->GetTextureCount (aiTextureType_DIFFUSE) > 0)
     {
-      aiString path;
       material->GetTexture (aiTextureType_DIFFUSE, 0, &path);
+      texture = FindTexture (path.data);
+    }
 
-      if ('*' == *path.data)
-      {
-	// This is an imported texture
-	int iIndex = atoi (path.data + 1);
-	if (iIndex > 0 && iIndex < (int) textures.GetSize ())
-	  texture = textures[iIndex];
-      }
+    // Create the material
+    csRef<iMaterialWrapper> materialWrapper = engine->CreateMaterial (name.data, texture);
+    materials.Put (index, materialWrapper);
+    loaderContext->AddToCollection (materialWrapper->QueryObject ());
 
-      else
+    if (!shaderVariableNames)
+      return;
+
+    // Check for a specular texture
+    csRefArray<csShaderVariable> shaderVariables;
+    if (material->GetTextureCount (aiTextureType_SPECULAR) > 0)
+    {
+      material->GetTexture (aiTextureType_SPECULAR, 0, &path);
+      texture = FindTexture (path.data);
+      if (texture)
       {
-	// This is an external file
-	texture = FindTexture (path.data);
+	csRef<csShaderVariable> variable;
+	variable.AttachNew (new csShaderVariable);
+	variable->SetName (shaderVariableNames->Request ("tex specular"));
+	variable->SetValue (texture);
+	shaderVariables.Push (variable);
       }
     }
 
-    csRef<iMaterialWrapper> materialWrapper =
-      engine->CreateMaterial (name.data, texture);
-    materials.Put (index, materialWrapper);
-    loaderContext->AddToCollection
-      (materialWrapper->QueryObject ());
+    // Check for a normals texture
+    if (material->GetTextureCount (aiTextureType_NORMALS) > 0)
+    {
+      material->GetTexture (aiTextureType_NORMALS, 0, &path);
+      texture = FindTexture (path.data);
+      if (texture)
+      {
+	csRef<csShaderVariable> variable;
+	variable.AttachNew (new csShaderVariable);
+	variable->SetName (shaderVariableNames->Request ("tex normal"));
+	variable->SetValue (texture);
+	shaderVariables.Push (variable);
+      }
+    }
+
+    // Check for an ambient texture
+    if (material->GetTextureCount (aiTextureType_AMBIENT) > 0)
+    {
+      material->GetTexture (aiTextureType_AMBIENT, 0, &path);
+      texture = FindTexture (path.data);
+      if (texture)
+      {
+	csRef<csShaderVariable> variable;
+	variable.AttachNew (new csShaderVariable);
+	variable->SetName (shaderVariableNames->Request ("tex dynamic ambient"));
+	variable->SetValue (texture);
+	shaderVariables.Push (variable);
+      }
+    }
+
+    for (size_t i = 0; i < shaderVariables.GetSize (); i++)
+      materialWrapper->GetMaterial ()->AddVariable (shaderVariables[i]);
+
+    // TODO: import all other material properties
   }
 
   void AssimpLoader::ImportExtraRenderMesh (iMeshFactoryWrapper* factoryWrapper, aiMesh* mesh)

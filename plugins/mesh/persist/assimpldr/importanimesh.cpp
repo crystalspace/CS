@@ -273,7 +273,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 	  || !mesh->HasPositions ())
       {
 	ReportWarning (object_reg,
-		       "Skipping mesh %s for lack of vertices or triangles!",
+		       "Skipping mesh %s for lack of vertices or faces!",
 		       CS::Quote::Single (mesh->mName.data));
 	continue;
       }
