@@ -262,7 +262,7 @@ struct csScreenBoxResult
  */
 struct iMeshWrapper : public virtual iBase
 {
-  SCF_INTERFACE(iMeshWrapper, 4, 0, 0);
+  SCF_INTERFACE(iMeshWrapper, 5, 0, 0);
 
   /**
    * Get the iObject for this mesh object. This can be used to get the
@@ -617,52 +617,56 @@ struct iMeshWrapper : public virtual iBase
 
   /**
    * Adds a render mesh to the list of extra render meshes.
-   * This list is used for special cases (like decals) where additional
+   * This list is used for special cases (like decals or lines) where additional
    * things need to be renderered for the mesh in an abstract way.
+   * \warning: you must keep the memory ownership of the render mesh, ie you must call
+   * \a delete on the object once you have done using it.
    */
-  virtual size_t AddExtraRenderMesh(CS::Graphics::RenderMesh* renderMesh, 
+  virtual size_t AddExtraRenderMesh (CS::Graphics::RenderMesh* renderMesh) = 0;
+
+  /**
+   * Adds a render mesh to the list of extra render meshes.
+   * This list is used for special cases (like decals or lines) where additional
+   * things need to be renderered for the mesh in an abstract way.
+   * \warning: you must keep the memory ownership of the render mesh, ie you must do
+   * \a delete on the object once you don't use it anymore.
+   * \deprecated Deprecated in 2.1. Pass zbuf mode in render mesh
+   */
+  CS_DEPRECATED_METHOD_MSG("Pass zbuf mode in render mesh")
+  virtual size_t AddExtraRenderMesh (CS::Graphics::RenderMesh* renderMesh, 
     csZBufMode zBufMode) = 0;
-  /// \deprecated Deprecated in 1.3. Pass render priority in render mesh
-  CS_DEPRECATED_METHOD_MSG("Pass render priority in render mesh")
-  virtual void AddExtraRenderMesh(CS::Graphics::RenderMesh* renderMesh, 
-    CS::Graphics::RenderPriority priority, csZBufMode zBufMode) = 0;
           
   /// Get a specific extra render mesh.
   virtual CS::Graphics::RenderMesh* GetExtraRenderMesh (size_t idx) const = 0;
 
-  /// Get number of extra render meshes.
+  /// Get the number of extra render meshes.
   virtual size_t GetExtraRenderMeshCount () const = 0;
-
-  /** 
-   * Gets the priority of a specific extra rendermesh.
-   * \deprecated Deprecated in 1.3. Obtain render priority from render mesh
-   */
-  CS_DEPRECATED_METHOD_MSG("Obtain render priority from render mesh")
-  virtual CS::Graphics::RenderPriority GetExtraRenderMeshPriority(size_t idx) const = 0;
 
   /**
    * Gets the z-buffer mode of a specific extra rendermesh
+   * \deprecated Deprecated in 2.1. Obtain zbuf mode from render mesh
    */
-  virtual csZBufMode GetExtraRenderMeshZBufMode(size_t idx) const = 0;
+  CS_DEPRECATED_METHOD_MSG("Obtain zbuf mode from render mesh")
+  virtual csZBufMode GetExtraRenderMeshZBufMode (size_t idx) const = 0;
 
   //@{
   /**
    * Deletes a specific extra rendermesh
    */
-  virtual void RemoveExtraRenderMesh(CS::Graphics::RenderMesh* renderMesh) = 0;
-  virtual void RemoveExtraRenderMesh(size_t idx) = 0;
+  virtual void RemoveExtraRenderMesh (CS::Graphics::RenderMesh* renderMesh) = 0;
+  virtual void RemoveExtraRenderMesh (size_t idx) = 0;
   //@}
 
   /**
    * Adds a (pseudo-)instance at the given position.
    * Returns the instance transform shadervar.
    */
-  virtual csShaderVariable* AddInstance(csVector3& position, csMatrix3& rotation) = 0;
+  virtual csShaderVariable* AddInstance (csVector3& position, csMatrix3& rotation) = 0;
 
   /**
    * Removes a (pseudo-)instance of the mesh.
    */
-  virtual void RemoveInstance(csShaderVariable* instance) = 0;
+  virtual void RemoveInstance (csShaderVariable* instance) = 0;
 };
 
 /**

@@ -635,14 +635,16 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
   return rmeshes;
 }
 
-size_t csMeshWrapper::AddExtraRenderMesh(CS::Graphics::RenderMesh* renderMesh, 
+size_t csMeshWrapper::AddExtraRenderMesh (CS::Graphics::RenderMesh* renderMesh)
+{
+  return extraRenderMeshes.Push (renderMesh);
+}
+
+size_t csMeshWrapper::AddExtraRenderMesh (CS::Graphics::RenderMesh* renderMesh, 
 					 csZBufMode zBufMode)
 {
-  ExtraRenderMeshData data;
-  extraRenderMeshes.Push(renderMesh);
-
-  data.zBufMode = zBufMode;
-  return extraRenderMeshData.Push(data);
+  renderMesh->z_buf_mode = zBufMode;
+  return extraRenderMeshes.Push (renderMesh);
 }
 
 CS::Graphics::RenderMesh** csMeshWrapper::GetExtraRenderMeshes (size_t& num, 
@@ -701,35 +703,28 @@ CS::Graphics::RenderMesh* csMeshWrapper::GetExtraRenderMesh (size_t idx) const
   return extraRenderMeshes[idx];
 }
 
-CS::Graphics::RenderPriority csMeshWrapper::GetExtraRenderMeshPriority(size_t idx) const
+csZBufMode csMeshWrapper::GetExtraRenderMeshZBufMode (size_t idx) const
 {
-    return extraRenderMeshes[idx]->renderPrio;
+    return extraRenderMeshes[idx]->z_buf_mode;
 }
 
-csZBufMode csMeshWrapper::GetExtraRenderMeshZBufMode(size_t idx) const
+void csMeshWrapper::RemoveExtraRenderMesh (csRenderMesh* renderMesh)
 {
-    return extraRenderMeshData[idx].zBufMode;
-}
-
-void csMeshWrapper::RemoveExtraRenderMesh(csRenderMesh* renderMesh)
-{
-    size_t len = extraRenderMeshes.GetSize();
+    size_t len = extraRenderMeshes.GetSize ();
     for (size_t a=0; a<len; ++a)
     {
         if (extraRenderMeshes[a] != renderMesh)
             continue;
 
-        extraRenderMeshes.DeleteIndexFast(a);
-        extraRenderMeshData.DeleteIndexFast(a);
+        extraRenderMeshes.DeleteIndexFast (a);
 
         return;
     }
 }
 
-void csMeshWrapper::RemoveExtraRenderMesh(size_t index)
+void csMeshWrapper::RemoveExtraRenderMesh (size_t index)
 {
-  extraRenderMeshes.DeleteIndexFast(index);
-  extraRenderMeshData.DeleteIndexFast(index);
+  extraRenderMeshes.DeleteIndexFast (index);
 }
 
 //----- Min/Max Distance Range ----------------------------------------------
