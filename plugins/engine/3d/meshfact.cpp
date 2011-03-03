@@ -89,6 +89,10 @@ csMeshFactoryWrapper::~csMeshFactoryWrapper ()
   // This line MUST be here to ensure that the children are not
   // removed after the destructor has already finished.
   children.RemoveAll ();
+
+  // The factory has the memory ownership of the extra render buffers
+  for (size_t i = 0; i < extraRenderMeshes.GetSize (); i++)
+    delete extraRenderMeshes[i];
 }
 
 void csMeshFactoryWrapper::SelfDestruct ()
@@ -184,6 +188,9 @@ csPtr<iMeshWrapper> csMeshFactoryWrapper::CreateMeshWrapper ()
       }
     }
   }
+
+  for (size_t i = 0; i < extraRenderMeshes.GetSize (); i++)
+    mesh->AddExtraRenderMesh (extraRenderMeshes[i]);
 
   return csPtr<iMeshWrapper> (mesh);
 }
@@ -294,6 +301,35 @@ void csMeshFactoryWrapper::AddInstance(csVector3& position, csMatrix3& rotation)
   transformVars->AddVariableToArray(transformVar);
 }
 
+size_t csMeshFactoryWrapper::AddExtraRenderMesh (CS::Graphics::RenderMesh* renderMesh)
+{
+  // TODO: doc API on deletion
+  return extraRenderMeshes.Push (renderMesh);
+}
+
+CS::Graphics::RenderMesh* csMeshFactoryWrapper::GetExtraRenderMesh (size_t idx) const
+{
+  return extraRenderMeshes[idx];
+}
+
+void csMeshFactoryWrapper::RemoveExtraRenderMesh (csRenderMesh* renderMesh)
+{
+    size_t len = extraRenderMeshes.GetSize ();
+    for (size_t a=0; a<len; ++a)
+    {
+        if (extraRenderMeshes[a] != renderMesh)
+            continue;
+
+        extraRenderMeshes.DeleteIndexFast (a);
+
+        return;
+    }
+}
+
+void csMeshFactoryWrapper::RemoveExtraRenderMesh (size_t index)
+{
+  extraRenderMeshes.DeleteIndexFast (index);
+}
 
 //--------------------------------------------------------------------------
 // csMeshFactoryList

@@ -696,7 +696,7 @@ struct iMeshWrapper : public virtual iBase
  */
 struct iMeshFactoryWrapper : public virtual iBase
 {
-  SCF_INTERFACE(iMeshFactoryWrapper, 3, 0, 0);
+  SCF_INTERFACE(iMeshFactoryWrapper, 3, 0, 1);
   /// Get the iObject for this mesh factory.
   virtual iObject *QueryObject () = 0;
   /// Get the iMeshObjectFactory.
@@ -883,6 +883,29 @@ struct iMeshFactoryWrapper : public virtual iBase
    * Returns the instancing transforms array shadervar.
    */
   virtual csShaderVariable* GetInstances() const = 0;
+
+  /**
+   * Adds a render mesh to the list of extra render meshes.
+   * This list is used for special cases (like decals or lines) where additional
+   * things need to be renderered for the mesh in an abstract way.
+   * \warning: the factory will take the memory ownership of the render mesh, ie you cannot
+   * call \a delete anymore on the object.
+   */
+  virtual size_t AddExtraRenderMesh (CS::Graphics::RenderMesh* renderMesh) = 0;
+
+  /// Get a specific extra render mesh.
+  virtual CS::Graphics::RenderMesh* GetExtraRenderMesh (size_t idx) const = 0;
+
+  /// Get the number of extra render meshes.
+  virtual size_t GetExtraRenderMeshCount () const = 0;
+
+  //@{
+  /**
+   * Deletes a specific extra rendermesh
+   */
+  virtual void RemoveExtraRenderMesh (CS::Graphics::RenderMesh* renderMesh) = 0;
+  virtual void RemoveExtraRenderMesh (size_t idx) = 0;
+  //@}
 };
 
 /**

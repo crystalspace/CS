@@ -198,6 +198,10 @@ private:
   // Instance transform shadervar.
   CS::ShaderVarStringID varTransform;
 
+  // Used to store extra rendermeshes that something might attach to this
+  // mesh (ie, for decals or lines)
+  csDirtyAccessArray<csRenderMesh*> extraRenderMeshes;
+
 protected:
   virtual void InternalRemove() { SelfDestruct(); }
 
@@ -412,6 +416,28 @@ public:
   //--------------------- iSelfDestruct implementation -------------------//
 
   virtual void SelfDestruct ();
+
+  //---------- Extra Render Meshes Functions -----------------//
+
+  /**
+   * Adds a render mesh to the list of extra render meshes.
+   * This list is used for special cases (like decals) where additional
+   * things need to be renderered for the mesh in an abstract way.
+   */
+  virtual size_t AddExtraRenderMesh(CS::Graphics::RenderMesh* renderMesh);
+
+  /// Get a specific extra render mesh.
+  virtual CS::Graphics::RenderMesh* GetExtraRenderMesh (size_t idx) const;
+  
+  /// Get number of extra render meshes.
+  virtual size_t GetExtraRenderMeshCount () const
+  { return extraRenderMeshes.GetSize(); }
+
+  /**
+   * Deletes a specific extra rendermesh
+   */
+  virtual void RemoveExtraRenderMesh(CS::Graphics::RenderMesh* renderMesh);
+  virtual void RemoveExtraRenderMesh(size_t idx);
 };
 
 #endif // __CS_MESHFACT_H__
