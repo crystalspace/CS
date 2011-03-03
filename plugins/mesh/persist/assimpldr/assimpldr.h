@@ -72,6 +72,7 @@ struct BoneData
 struct AnimeshData
 {
   csRef<CS::Mesh::iAnimatedMeshFactory> factory;
+  csRef<iMeshFactoryWrapper> factoryWrapper;
 
   csDirtyAccessArray<float> vertices;
   csDirtyAccessArray<float> texels;
@@ -136,8 +137,11 @@ public:
   void ImportTexture (aiTexture* texture, size_t index);
   void ImportMaterial (aiMaterial* material, size_t index);
 
+  void ImportExtraRenderMesh (iMeshFactoryWrapper* factoryWrapper, aiMesh* mesh);
+
   void ImportGenmesh (aiNode* node);
-  void ImportGenmeshSubMesh (iGeneralFactoryState* gmstate,
+  void ImportGenmeshSubMesh (iMeshFactoryWrapper* factoryWrapper,
+			     iGeneralFactoryState* gmstate,
 			     aiNode* node);
 
   void ImportAnimesh (aiNode* node);

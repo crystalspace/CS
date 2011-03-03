@@ -60,17 +60,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     animeshData.rootNode = node;
 
     // Create the animesh factory
-    csRef<iMeshFactoryWrapper> factoryWrapper =
-      engine->CreateMeshFactory
+    animeshData.factoryWrapper = engine->CreateMeshFactory
       ("crystalspace.mesh.object.animesh", node->mName.data);
-    loaderContext->AddToCollection
-      (factoryWrapper->QueryObject ());
-    animeshData.factory =
-      scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
-      (factoryWrapper->GetMeshObjectFactory ());
+    loaderContext->AddToCollection (animeshData.factoryWrapper->QueryObject ());
+    animeshData.factory = scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
+      (animeshData.factoryWrapper->GetMeshObjectFactory ());
 
     if (!firstMesh)
-      firstMesh = factoryWrapper;
+      firstMesh = animeshData.factoryWrapper;
 
     // Register the bone nodes
     InitBoneNode (&animeshData, node);
@@ -128,7 +125,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 	animeshData.factory->GetSubMesh (i)->GetMaterial ();
       if (material)
       {
-	factoryWrapper->GetMeshObjectFactory ()
+	animeshData.factoryWrapper->GetMeshObjectFactory ()
 	  ->SetMaterialWrapper (material);
 	break;
       }
@@ -278,6 +275,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 	ReportWarning (object_reg,
 		       "Skipping mesh %s for lack of vertices or triangles!",
 		       CS::Quote::Single (mesh->mName.data));
+	continue;
+      }
+
+      // Check the type of the primitives
+      if (!(mesh->mPrimitiveTypes & aiPrimitiveType_TRIANGLE))
+      {
+	// If these are not triangles then export them in an extra render mesh
+	if (mesh->mPrimitiveTypes & aiPrimitiveType_POINT
+	    || mesh->mPrimitiveTypes & aiPrimitiveType_LINE)
+	  ImportExtraRenderMesh (animeshData->factoryWrapper, mesh);
+
+	else ReportWarning (object_reg,
+			    "Skipping mesh %s for lack of points, lines or triangles!",
+			    CS::Quote::Single (mesh->mName.data));
+
 	continue;
       }
 
@@ -613,9 +625,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 	// TODO: really need to scale the offset?
 	skeletonAnimation->AddOrSetKeyFrame (channelID, time, Assimp2CS (key.mValue));
       }
-    }
 
-    // TODO: convert animations in bind space
+      // TODO: Convert the animation in bind space
+      //skeletonAnimation->ConvertFrameSpace (skeletonFactory);
+    }
   }
 
 }

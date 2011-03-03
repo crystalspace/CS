@@ -108,9 +108,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
    */
   static void PrintMesh (aiMesh* mesh, const char* prefix)
   {
-    printf ("%s  mesh [%s]: %i vertices %i triangles %i bones %i anims\n",
+    printf ("%s  mesh [%s]: %i vertices %i faces %i bones %i anims %s%s%s%s\n",
 	    prefix, mesh->mName.data, mesh->mNumVertices,
-	    mesh->mNumFaces, mesh->mNumBones, mesh->mNumAnimMeshes);
+	    mesh->mNumFaces, mesh->mNumBones, mesh->mNumAnimMeshes,
+	    mesh->mPrimitiveTypes & aiPrimitiveType_POINT ? "p" : "-",
+	    mesh->mPrimitiveTypes & aiPrimitiveType_LINE ? "l" : "-",
+	    mesh->mPrimitiveTypes & aiPrimitiveType_TRIANGLE ? "t" : "-",
+	    mesh->mPrimitiveTypes & aiPrimitiveType_POLYGON ? "p" : "-");
   }
 
   static void PrintNode (const aiScene* scene, aiNode* node,

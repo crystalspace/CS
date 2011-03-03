@@ -55,19 +55,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
   AssimpLoader::AssimpLoader (iBase* pParent) :
     scfImplementationType (this, pParent)
   {
-    importFlags = aiProcess_CalcTangentSpace
-      | aiProcess_Triangulate
-      | aiProcess_ValidateDataStructure
-      | aiProcess_GenUVCoords
-      | aiProcess_SortByPType
-      | aiProcess_LimitBoneWeights
+    importFlags =
+      aiProcess_CalcTangentSpace
       | aiProcess_ConvertToLeftHanded
       //| aiProcess_GenNormals 
       | aiProcess_GenSmoothNormals 
+      | aiProcess_GenUVCoords
+      | aiProcess_JoinIdenticalVertices
+      | aiProcess_LimitBoneWeights
       //| aiProcess_OptimizeGraph
       //| aiProcess_OptimizeMeshes
+      | aiProcess_SortByPType
       | aiProcess_SplitLargeMeshes
-      | aiProcess_SortByPType;
+      | aiProcess_Triangulate
+      | aiProcess_ValidateDataStructure;
   }
 
   AssimpLoader::~AssimpLoader ()
@@ -398,6 +399,71 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       (materialWrapper->QueryObject ());
   }
 
+  void AssimpLoader::ImportExtraRenderMesh (iMeshFactoryWrapper* factoryWrapper, aiMesh* mesh)
+  {
+    // Create the extra render mesh and the render buffer holder
+    CS::Graphics::RenderMesh* renderMesh = new CS::Graphics::RenderMesh ();
+    renderMesh->buffers.AttachNew (new csRenderBufferHolder);
+    renderMesh->meshtype = mesh->mPrimitiveTypes & aiPrimitiveType_POINT ?
+      CS_MESHTYPE_POINTS : CS_MESHTYPE_LINES;
+    renderMesh->indexstart = 0;
+    renderMesh->indexend = mesh->mNumFaces;
+    renderMesh->bbox.StartBoundingBox ();
+
+    // Setup the vertex buffer
+    csDirtyAccessArray<float> vertices (mesh->mNumVertices * 3);
+    for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+    {
+      vertices.Push (mesh->mVertices[i][0]);
+      vertices.Push (mesh->mVertices[i][1]);
+      vertices.Push (mesh->mVertices[i][2]);
+      renderMesh->bbox.AddBoundingVertex (Assimp2CS (mesh->mVertices[i]));
+    }
+
+    csRef<iRenderBuffer> buffer;
+    buffer = FillBuffer<float> (vertices, CS_BUFCOMP_FLOAT, 3, false);
+    renderMesh->buffers->SetRenderBuffer (CS_BUFFER_POSITION, buffer);
+
+    // Setup the index buffer
+    // TODO: no need of an index buffer for points...
+    csDirtyAccessArray<uint> indices (mesh->mNumFaces *
+				      mesh->mPrimitiveTypes & aiPrimitiveType_POINT ? 1 : 2);
+    for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+    {
+      aiFace& face = mesh->mFaces[i];
+
+      indices.Push (face.mIndices[0]);
+      indices.Push (face.mIndices[1]);
+    }
+
+    buffer = FillBuffer<uint> (indices, CS_BUFCOMP_UNSIGNED_INT,
+			       mesh->mPrimitiveTypes & aiPrimitiveType_POINT ? 1 : 2, true);
+    renderMesh->buffers->SetRenderBuffer (CS_BUFFER_INDEX, buffer);
+
+    // Setup the color buffer
+    if (mesh->HasVertexColors (0))
+    {
+      csDirtyAccessArray<float> colors (mesh->mNumVertices * 4);
+      aiColor4D* aicolors = mesh->mColors[0];
+      for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+      {
+	colors.Push (aicolors[i].r);
+	colors.Push (aicolors[i].g);
+	colors.Push (aicolors[i].b);
+	colors.Push (aicolors[i].a);
+      }
+
+      buffer = FillBuffer<float> (colors, CS_BUFCOMP_FLOAT, 4, false);
+      renderMesh->buffers->SetRenderBuffer (CS_BUFFER_COLOR, buffer);
+    }
+
+    // Setup the material
+    if (mesh->mMaterialIndex < materials.GetSize ())
+      renderMesh->material = materials[mesh->mMaterialIndex];
+
+    factoryWrapper->AddExtraRenderMesh (renderMesh);
+  }
+
   void AssimpLoader::ImportGenmesh (aiNode* node)
   {
     // Create the genmesh factory
@@ -413,11 +479,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       firstMesh = factoryWrapper;
 
     // Import all submeshes
-    ImportGenmeshSubMesh (gmstate, node);
+    ImportGenmeshSubMesh (factoryWrapper, gmstate, node);
   }
 
   void AssimpLoader::ImportGenmeshSubMesh
-    (iGeneralFactoryState* gmstate, aiNode* node)
+    (iMeshFactoryWrapper* factoryWrapper, iGeneralFactoryState* gmstate, aiNode* node)
   {
     // Import all meshes of this node
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
@@ -429,8 +495,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 	  || !mesh->HasPositions ())
       {
 	ReportWarning (object_reg,
-		       "Skipping mesh %s for lack of vertices or triangles!",
+		       "Skipping mesh %s for lack of vertices or faces!",
 		       CS::Quote::Single (mesh->mName.data));
+	continue;
+      }
+
+      // Check the type of the primitives
+      if (!(mesh->mPrimitiveTypes & aiPrimitiveType_TRIANGLE))
+      {
+	// If these are not triangles then export them in an extra render mesh
+	if (mesh->mPrimitiveTypes & aiPrimitiveType_POINT
+	    || mesh->mPrimitiveTypes & aiPrimitiveType_LINE)
+	  ImportExtraRenderMesh (factoryWrapper, mesh);
+
+	else ReportWarning (object_reg,
+			    "Skipping mesh %s for lack of points, lines or triangles!",
+			    CS::Quote::Single (mesh->mName.data));
+
 	continue;
       }
 
@@ -458,9 +539,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       // Create a render buffer for all faces
       csRef<csRenderBuffer> buffer =
 	csRenderBuffer::CreateIndexRenderBuffer
-	(mesh->mNumFaces * 3, CS_BUF_STATIC,
-	 CS_BUFCOMP_UNSIGNED_INT, currentVertices,
-	 gmstate->GetVertexCount () - 1);
+	(mesh->mNumFaces * 3, CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT,
+	 currentVertices, gmstate->GetVertexCount () - 1);
 
       csTriangle* triangleData =
 	(csTriangle*) buffer->Lock (CS_BUF_LOCK_NORMAL);
@@ -487,7 +567,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     for (unsigned int i = 0; i < node->mNumChildren; i++)
     {
       aiNode*& subnode = node->mChildren[i];
-      ImportGenmeshSubMesh (gmstate, subnode);
+      ImportGenmeshSubMesh (factoryWrapper, gmstate, subnode);
     }
   }
 
