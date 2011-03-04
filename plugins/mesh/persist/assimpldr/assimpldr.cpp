@@ -100,15 +100,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
   {
     loaderContext = ldr_context;
 
+    // Find the VFS
+    vfs = csQueryRegistry<iVFS> (object_reg);
+    if (!vfs)
+    {
+      ReportError (object_reg, "Could not load VFS system!");
+      return (iBase*) nullptr;
+    }
+
     // Create an Assimp importer and parse the file
     Assimp::Importer importer;
+    importer.SetIOHandler (new csIOSystem (vfs, nullptr));
     scene = importer.ReadFileFromMemory
       (**buffer, buffer->GetSize (), importFlags, "");
 
     // If the import failed, report it
     if (!scene)
     {
-      ReportError (object_reg, "Failed to load binary file: %s!",
+      ReportError (object_reg, "Failed to load binary file: %s",
 		   importer.GetErrorString());
       return (iBase*) nullptr;
     }
@@ -125,15 +134,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
   iMeshFactoryWrapper* AssimpLoader::Load (const char* factname,
 					   iDataBuffer* buffer)
   {
+    // Find the VFS
+    vfs = csQueryRegistry<iVFS> (object_reg);
+    if (!vfs)
+    {
+      ReportError (object_reg, "Could not load VFS system!");
+      return nullptr;
+    }
+
     // Create an Assimp importer and parse the file
     Assimp::Importer importer;
+    importer.SetIOHandler (new csIOSystem (vfs, nullptr));
     scene = importer.ReadFileFromMemory
       (**buffer, buffer->GetSize (), importFlags, "");
 
     // If the import failed, report it
     if (!scene)
     {
-      ReportError (object_reg, "Failed to load factory %s: %s!",
+      ReportError (object_reg, "Failed to load factory %s: %s",
 		   CS::Quote::Single (factname),
 		   importer.GetErrorString());
       return nullptr;
@@ -153,19 +171,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     // TODO: if forced to be a genmesh then don't read animations,
     //   weights, etc
 
-    // TODO: use ASSIMP::IOStream
-    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
-    csRef<iDataBuffer> path = vfs->GetRealPath (filename);
+    // Find the VFS
+    vfs = csQueryRegistry<iVFS> (object_reg);
+    if (!vfs)
+    {
+      ReportError (object_reg, "Could not load VFS system!");
+      return nullptr;
+    }
 
     // Create an Assimp importer and parse the file
     Assimp::Importer importer;
-    scene = importer.ReadFile (path->GetData (), importFlags);
+    importer.SetIOHandler (new csIOSystem (vfs, filename));
+    scene = importer.ReadFile (filename, importFlags);
 
     // If the import failed, report it
     if (!scene)
     {
       ReportError (object_reg,
-		   "Failed to load factory %s from file %s: %s!",
+		   "Failed to load factory %s from file %s: %s",
 		   CS::Quote::Single (factname),
 		   CS::Quote::Single (filename),
 		   importer.GetErrorString());
@@ -287,10 +310,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 	return textures[iIndex];
     }
 
-    // Search for an external file
-    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
-
-    // Search in the loading context
+    // This is an external file, check at first in the loading context if it was
+    // already loaded
     iTextureWrapper* texture =
       loaderContext->FindTexture (filename, true);    
     if (texture)

@@ -31,24 +31,8 @@
 #include "csutil/databuf.h"
 #include "csutil/scfstr.h"
 
-#include "iengine/engine.h"
-#include "iengine/material.h"
-#include "iengine/mesh.h"
-#include "igraphic/imageio.h"
-#include "imap/ldrctxt.h"
-#include "imesh/animesh.h"
-#include "imesh/genmesh.h"
-//#include "imesh/skeleton2.h"
-#include "iutil/document.h"
 #include "iutil/objreg.h"
-#include "iutil/plugin.h"
-#include "iutil/vfs.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/material.h"
 #include "ivaria/reporter.h"
-#include "ivideo/txtmgr.h"
-
-#include <iutil/stringarray.h>
 
 #include "assimpldr.h"
 

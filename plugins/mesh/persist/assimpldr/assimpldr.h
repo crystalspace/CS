@@ -23,6 +23,7 @@
 
 #include "csgeom/quaternion.h"
 #include "csgeom/vector3.h"
+#include "cstool/vfsdirchange.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/hash.h"
 #include "csutil/refarr.h"
@@ -33,6 +34,8 @@
 #include "assimp/assimp.hpp"      // C++ importer interface
 #include "assimp/aiScene.h"       // Output data structure
 #include "assimp/aiPostProcess.h" // Post processing flags
+#include "assimp/IOStream.h"
+#include "assimp/IOSystem.h"
 
 #include "common.h"
 
@@ -160,6 +163,7 @@ public:
 private:
   iObjectRegistry* object_reg;
 
+  csRef<iVFS> vfs;
   csRef<iEngine> engine;
   csRef<iGraphics3D> g3d;
   csRef<iTextureManager> textureManager;
@@ -183,6 +187,97 @@ private:
   };
   csHash<AnimeshNode, csString> nodeData;
 
+};
+
+/**
+ * IO stream handling
+ */
+
+class csIOStream : public Assimp::IOStream
+{
+ public:
+  csIOStream (iFile* file)
+    : file (file) {}
+  ~csIOStream () {}
+
+  size_t Read (void* pvBuffer, size_t pSize, size_t pCount)
+  { return file ? file->Read ((char*) pvBuffer, pSize * pCount) : 0; }
+
+  size_t Write (const void* pvBuffer, size_t pSize, size_t pCount)
+  { return file ? file->Write ((char*) pvBuffer, pSize * pCount) : 0; }
+
+  aiReturn Seek (size_t pOffset, aiOrigin pOrigin)
+  {
+    if (!file)
+      return aiReturn_FAILURE;
+
+    switch (pOrigin)
+      {
+      case aiOrigin_SET:
+	return file->SetPos (pOffset) ? aiReturn_SUCCESS : aiReturn_FAILURE;
+
+      case aiOrigin_CUR:
+	return file->SetPos (file->GetPos () + pOffset)
+	  ? aiReturn_SUCCESS : aiReturn_FAILURE;
+
+      case aiOrigin_END:
+	return file->SetPos (file->GetSize () + pOffset)
+	  ? aiReturn_SUCCESS : aiReturn_FAILURE;
+
+      default:
+	break;
+      }
+
+    return aiReturn_FAILURE;
+  }
+
+  size_t Tell () const
+  { return file ? file->GetPos () : 0; }
+
+  size_t FileSize () const
+  { return file ? file->GetSize () : 0; }
+
+  void Flush ()
+  { if (file) file->Flush (); }
+
+ private:
+  csRef<iFile> file;
+};
+
+class csIOSystem : public Assimp::IOSystem
+{
+ public:
+  csIOSystem (iVFS* vfs, const char* filename)
+    : vfs (vfs), changer (vfs)
+  {
+    csString file = filename;
+    if (filename && file.FindFirst ('/') != (size_t) -1)
+      changer.ChangeTo (filename);
+  }
+
+  ~csIOSystem () {}
+
+  bool Exists (const char *pFile) const
+  { printf ("Exists [%s]\n", pFile); return vfs->Exists (pFile);}
+
+  char getOsSeparator () const
+  { return '/'; }
+
+  Assimp::IOStream* Open (const char *pFile, const char *pMode="rb")
+  {
+    printf ("Open [%s]\n", pFile); 
+    csRef<iFile> file = vfs->Open (pFile,
+				   *pMode == 'w' ? VFS_FILE_WRITE : VFS_FILE_READ);
+    if (!file) printf ("failed!!\n");
+    return new csIOStream (file);
+  }
+
+  void Close (Assimp::IOStream* pFile)
+  { delete pFile; }
+
+ private:
+  csRef<iVFS> vfs;
+  csVfsDirectoryChanger changer;
 };
 
 }
