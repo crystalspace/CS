@@ -27,6 +27,7 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/hash.h"
 #include "csutil/refarr.h"
+#include "imap/loader.h"
 #include "imap/reader.h"
 #include "imap/modelload.h"
 #include "imesh/skeleton2.h"
@@ -134,8 +135,6 @@ public:
   void ImportScene ();
 
   iTextureWrapper* FindTexture (const char* filename);
-  iTextureWrapper* LoadTexture (iDataBuffer* buffer,
-				const char* filename);
 
   void ImportTexture (aiTexture* texture, size_t index);
   void ImportMaterial (aiMaterial* material, size_t index);
@@ -167,6 +166,7 @@ private:
   csRef<iEngine> engine;
   csRef<iGraphics3D> g3d;
   csRef<iTextureManager> textureManager;
+  csRef<iLoader> loader;
   csRef<iLoaderContext> loaderContext;
   csRef<iImageIO> imageLoader;
   csRef<iShaderVarStringSet> shaderVariableNames;
@@ -258,7 +258,11 @@ class csIOSystem : public Assimp::IOSystem
   ~csIOSystem () {}
 
   bool Exists (const char *pFile) const
-  { printf ("Exists [%s]\n", pFile); return vfs->Exists (pFile);}
+  {
+    printf ("Exists [%s]: %s\n", pFile,
+	    vfs->Exists (pFile) ? "true" : "false");
+    return vfs->Exists (pFile);
+  }
 
   char getOsSeparator () const
   { return '/'; }

@@ -244,6 +244,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       return;
     }
 
+    loader = csQueryRegistry<iLoader> (object_reg);
+    if (!loader)
+    {
+      ReportError (object_reg, "Could not find the main loader!");
+      return;
+    }
+
     imageLoader = csQueryRegistry<iImageIO> (object_reg);
     if (!imageLoader)
     {
@@ -302,7 +309,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
   iTextureWrapper* AssimpLoader::FindTexture (const char* filename)
   {
-    // Check if it is an imported texture
+    // Check if it is a texture which has been imported from Assimp
     if ('*' == *filename)
     {
       int iIndex = atoi (filename + 1);
@@ -312,90 +319,59 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
     // This is an external file, check at first in the loading context if it was
     // already loaded
-    iTextureWrapper* texture =
+    csRef<iTextureWrapper> texture =
       loaderContext->FindTexture (filename, true);    
     if (texture)
       return texture;
 
+    // Reformat the file name
+    csString file = filename;
+    if (file.StartsWith ("//"))
+      file = file.Slice (2);
+    file.FindReplace ("\\", "/");
+
     // Load manually the file
-    csRef<iDataBuffer> buffer = vfs->ReadFile (filename, false);
-    if (!buffer)
-    {
-      ReportWarning (object_reg, "Could not find image file %s!",
-		     CS::Quote::Single (filename));
-      return nullptr;
-    }
+    csRef<iTextureHandle> textureHandle =
+      loader->LoadTexture (file.GetData (), CS_TEXTURE_2D);
+    texture = engine->GetTextureList ()->CreateTexture (textureHandle);
+    engine->GetTextureList ()->Add (texture);
+    loaderContext->AddToCollection (texture->QueryObject ());
 
-    return LoadTexture (buffer, filename);
-  }
-
-  iTextureWrapper* AssimpLoader::LoadTexture (iDataBuffer* buffer,
-					      const char* filename)
-  {
-    // Load the image data
-    int format = engine->GetTextureFormat ();
-    csRef<iImage> image (imageLoader->Load (buffer, format));
-    if (!image)
-    {
-      ReportWarning (object_reg,
-		     "Could not load image %s. Unknown format!",
-		     CS::Quote::Single (filename));
-      return nullptr;
-    }
-
-    // Create the texture handle
-    csRef<scfString> fail_reason;
-    fail_reason.AttachNew (new scfString ());
-    csRef<iTextureHandle> textureHandle
-      (textureManager->RegisterTexture
-       (image, CS_TEXTURE_2D, fail_reason));
-    if (!textureHandle)
-    {
-      ReportError (object_reg, "crystalspace.imagetextureloader",
-		   "Error creating texture",
-		   fail_reason->GetData ());
-      return nullptr;
-    }
-
-    // Create the texture wrapper
-    csRef<iTextureWrapper> textureWrapper =
-      engine->GetTextureList ()->CreateTexture (textureHandle);
-    engine->GetTextureList ()->Add (textureWrapper);
-    textureWrapper->SetImageFile(image);
-    loaderContext->AddToCollection (textureWrapper->QueryObject ());
-
-    // TODO: default texture in case of problem
-
-    return textureWrapper;
+    return texture;
   }
 
   void AssimpLoader::ImportTexture (aiTexture* texture,
 				    size_t index)
   {
+    csRef<iDataBuffer> buffer;
+
     // Check the type of the image
     if (texture->mHeight != 0)
     {
       // This is a raw image
-      // TODO
+      // TODO: this is still untested
+      buffer.AttachNew
+	(new CS::DataBuffer<>
+	 ((char*) texture->pcData,
+	  texture->mWidth * texture->mHeight * sizeof (aiTexel),
+	  false));
     }
 
     else
     {
       // This is a compressed image
-
-      // Create the data buffer
-      csRef<iDataBuffer> buffer;
       buffer.AttachNew (new CS::DataBuffer<>
 			((char*) texture->pcData,
 			 texture->mWidth * sizeof (aiTexel),
 			 false));
-
-      // Load the texture
-      csRef<iTextureWrapper> textureWrapper =
-	LoadTexture (buffer, "<unknown>");
-      if (textureWrapper)
-	textures.Put (index, textureWrapper);
     }
+
+    // Load the texture
+    // TODO: need to specify the context to the loader
+    csRef<iTextureWrapper> textureWrapper =
+      loader->LoadTexture ("<unknown>", buffer, CS_TEXTURE_2D);
+    if (textureWrapper)
+      textures.Put (index, textureWrapper);
   }
 
   void AssimpLoader::ImportMaterial (aiMaterial* material,

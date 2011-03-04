@@ -156,7 +156,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 	(&animeshData, node, CS::Animation::InvalidBoneID, aiMatrix4x4 ());
 
       printf ("Skeleton: %i bones:\n%s\n",
-	      animeshData.factory->GetSkeletonFactory()->GetTopBoneID (),
+	      (int) animeshData.factory->GetSkeletonFactory()->GetTopBoneID (),
 	      animeshData.factory->GetSkeletonFactory()->Description().GetData());
       
       if (animeshData.factory->GetVertexCount () > 0)
