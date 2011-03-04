@@ -20218,7 +20218,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *AddExtraRenderMesh = *cspacec::iMeshWrapper_AddExtraRenderMesh;
 *GetExtraRenderMesh = *cspacec::iMeshWrapper_GetExtraRenderMesh;
 *GetExtraRenderMeshCount = *cspacec::iMeshWrapper_GetExtraRenderMeshCount;
-*GetExtraRenderMeshPriority = *cspacec::iMeshWrapper_GetExtraRenderMeshPriority;
 *GetExtraRenderMeshZBufMode = *cspacec::iMeshWrapper_GetExtraRenderMeshZBufMode;
 *RemoveExtraRenderMesh = *cspacec::iMeshWrapper_RemoveExtraRenderMesh;
 *AddInstance = *cspacec::iMeshWrapper_AddInstance;
@@ -20283,6 +20282,10 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetInstanceFactory = *cspacec::iMeshFactoryWrapper_GetInstanceFactory;
 *AddInstance = *cspacec::iMeshFactoryWrapper_AddInstance;
 *GetInstances = *cspacec::iMeshFactoryWrapper_GetInstances;
+*AddExtraRenderMesh = *cspacec::iMeshFactoryWrapper_AddExtraRenderMesh;
+*GetExtraRenderMesh = *cspacec::iMeshFactoryWrapper_GetExtraRenderMesh;
+*GetExtraRenderMeshCount = *cspacec::iMeshFactoryWrapper_GetExtraRenderMeshCount;
+*RemoveExtraRenderMesh = *cspacec::iMeshFactoryWrapper_RemoveExtraRenderMesh;
 *scfGetVersion = *cspacec::iMeshFactoryWrapper_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

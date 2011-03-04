@@ -28313,6 +28313,37 @@ SWIGINTERN PyObject *_wrap_iMeshWrapper_AddExtraRenderMesh__SWIG_0(PyObject *SWI
   PyObject *resultobj = 0;
   iMeshWrapper *arg1 = (iMeshWrapper *) 0 ;
   CS::Graphics::RenderMesh *arg2 = (CS::Graphics::RenderMesh *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  size_t result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshWrapper_AddExtraRenderMesh",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshWrapper_AddExtraRenderMesh" "', argument " "1"" of type '" "iMeshWrapper *""'"); 
+  }
+  arg1 = reinterpret_cast< iMeshWrapper * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_CS__Graphics__RenderMesh, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iMeshWrapper_AddExtraRenderMesh" "', argument " "2"" of type '" "CS::Graphics::RenderMesh *""'"); 
+  }
+  arg2 = reinterpret_cast< CS::Graphics::RenderMesh * >(argp2);
+  result = (arg1)->AddExtraRenderMesh(arg2);
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iMeshWrapper_AddExtraRenderMesh__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iMeshWrapper *arg1 = (iMeshWrapper *) 0 ;
+  CS::Graphics::RenderMesh *arg2 = (CS::Graphics::RenderMesh *) 0 ;
   csZBufMode arg3 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -28349,71 +28380,29 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iMeshWrapper_AddExtraRenderMesh__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iMeshWrapper *arg1 = (iMeshWrapper *) 0 ;
-  CS::Graphics::RenderMesh *arg2 = (CS::Graphics::RenderMesh *) 0 ;
-  CS::Graphics::RenderPriority arg3 ;
-  csZBufMode arg4 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  void *argp3 ;
-  int res3 = 0 ;
-  int val4 ;
-  int ecode4 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iMeshWrapper_AddExtraRenderMesh",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshWrapper, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshWrapper_AddExtraRenderMesh" "', argument " "1"" of type '" "iMeshWrapper *""'"); 
-  }
-  arg1 = reinterpret_cast< iMeshWrapper * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_CS__Graphics__RenderMesh, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iMeshWrapper_AddExtraRenderMesh" "', argument " "2"" of type '" "CS::Graphics::RenderMesh *""'"); 
-  }
-  arg2 = reinterpret_cast< CS::Graphics::RenderMesh * >(argp2);
-  {
-    res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_CS__Graphics__RenderPriority,  0  | 0);
-    if (!SWIG_IsOK(res3)) {
-      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iMeshWrapper_AddExtraRenderMesh" "', argument " "3"" of type '" "CS::Graphics::RenderPriority""'"); 
-    }  
-    if (!argp3) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iMeshWrapper_AddExtraRenderMesh" "', argument " "3"" of type '" "CS::Graphics::RenderPriority""'");
-    } else {
-      CS::Graphics::RenderPriority * temp = reinterpret_cast< CS::Graphics::RenderPriority * >(argp3);
-      arg3 = *temp;
-      if (SWIG_IsNewObj(res3)) delete temp;
-    }
-  }
-  ecode4 = SWIG_AsVal_int(obj3, &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iMeshWrapper_AddExtraRenderMesh" "', argument " "4"" of type '" "csZBufMode""'");
-  } 
-  arg4 = static_cast< csZBufMode >(val4);
-  (arg1)->AddExtraRenderMesh(arg2,arg3,arg4);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_iMeshWrapper_AddExtraRenderMesh(PyObject *self, PyObject *args) {
   int argc;
-  PyObject *argv[5];
+  PyObject *argv[4];
   int ii;
   
   if (!PyTuple_Check(args)) SWIG_fail;
   argc = (int)PyObject_Length(args);
-  for (ii = 0; (ii < argc) && (ii < 4); ii++) {
+  for (ii = 0; (ii < argc) && (ii < 3); ii++) {
     argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iMeshWrapper, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_CS__Graphics__RenderMesh, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_iMeshWrapper_AddExtraRenderMesh__SWIG_0(self, args);
+      }
+    }
   }
   if (argc == 3) {
     int _v;
@@ -28430,31 +28419,7 @@ SWIGINTERN PyObject *_wrap_iMeshWrapper_AddExtraRenderMesh(PyObject *self, PyObj
           _v = SWIG_CheckState(res);
         }
         if (_v) {
-          return _wrap_iMeshWrapper_AddExtraRenderMesh__SWIG_0(self, args);
-        }
-      }
-    }
-  }
-  if (argc == 4) {
-    int _v;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iMeshWrapper, 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      void *vptr = 0;
-      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_CS__Graphics__RenderMesh, 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_CS__Graphics__RenderPriority, 0);
-        _v = SWIG_CheckState(res);
-        if (_v) {
-          {
-            int res = SWIG_AsVal_int(argv[3], NULL);
-            _v = SWIG_CheckState(res);
-          }
-          if (_v) {
-            return _wrap_iMeshWrapper_AddExtraRenderMesh__SWIG_1(self, args);
-          }
+          return _wrap_iMeshWrapper_AddExtraRenderMesh__SWIG_1(self, args);
         }
       }
     }
@@ -28463,8 +28428,8 @@ SWIGINTERN PyObject *_wrap_iMeshWrapper_AddExtraRenderMesh(PyObject *self, PyObj
 fail:
   SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iMeshWrapper_AddExtraRenderMesh'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    AddExtraRenderMesh(iMeshWrapper *,CS::Graphics::RenderMesh *,csZBufMode)\n"
-    "    AddExtraRenderMesh(iMeshWrapper *,CS::Graphics::RenderMesh *,CS::Graphics::RenderPriority,csZBufMode)\n");
+    "    AddExtraRenderMesh(iMeshWrapper *,CS::Graphics::RenderMesh *)\n"
+    "    AddExtraRenderMesh(iMeshWrapper *,CS::Graphics::RenderMesh *,csZBufMode)\n");
   return NULL;
 }
 
@@ -28516,37 +28481,6 @@ SWIGINTERN PyObject *_wrap_iMeshWrapper_GetExtraRenderMeshCount(PyObject *SWIGUN
   arg1 = reinterpret_cast< iMeshWrapper * >(argp1);
   result = ((iMeshWrapper const *)arg1)->GetExtraRenderMeshCount();
   resultobj = SWIG_From_size_t(static_cast< size_t >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iMeshWrapper_GetExtraRenderMeshPriority(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iMeshWrapper *arg1 = (iMeshWrapper *) 0 ;
-  size_t arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  size_t val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  CS::Graphics::RenderPriority result;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iMeshWrapper_GetExtraRenderMeshPriority",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshWrapper, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshWrapper_GetExtraRenderMeshPriority" "', argument " "1"" of type '" "iMeshWrapper const *""'"); 
-  }
-  arg1 = reinterpret_cast< iMeshWrapper * >(argp1);
-  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iMeshWrapper_GetExtraRenderMeshPriority" "', argument " "2"" of type '" "size_t""'");
-  } 
-  arg2 = static_cast< size_t >(val2);
-  result = ((iMeshWrapper const *)arg1)->GetExtraRenderMeshPriority(arg2);
-  resultobj = SWIG_NewPointerObj((new CS::Graphics::RenderPriority(static_cast< const CS::Graphics::RenderPriority& >(result))), SWIGTYPE_p_CS__Graphics__RenderPriority, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -29682,6 +29616,199 @@ SWIGINTERN PyObject *_wrap_iMeshFactoryWrapper_GetInstances(PyObject *SWIGUNUSED
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csShaderVariable, 0 |  0 );
   return resultobj;
 fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iMeshFactoryWrapper_AddExtraRenderMesh(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iMeshFactoryWrapper *arg1 = (iMeshFactoryWrapper *) 0 ;
+  CS::Graphics::RenderMesh *arg2 = (CS::Graphics::RenderMesh *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  size_t result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshFactoryWrapper_AddExtraRenderMesh",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshFactoryWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshFactoryWrapper_AddExtraRenderMesh" "', argument " "1"" of type '" "iMeshFactoryWrapper *""'"); 
+  }
+  arg1 = reinterpret_cast< iMeshFactoryWrapper * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_CS__Graphics__RenderMesh, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iMeshFactoryWrapper_AddExtraRenderMesh" "', argument " "2"" of type '" "CS::Graphics::RenderMesh *""'"); 
+  }
+  arg2 = reinterpret_cast< CS::Graphics::RenderMesh * >(argp2);
+  result = (arg1)->AddExtraRenderMesh(arg2);
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iMeshFactoryWrapper_GetExtraRenderMesh(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iMeshFactoryWrapper *arg1 = (iMeshFactoryWrapper *) 0 ;
+  size_t arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  CS::Graphics::RenderMesh *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshFactoryWrapper_GetExtraRenderMesh",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshFactoryWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshFactoryWrapper_GetExtraRenderMesh" "', argument " "1"" of type '" "iMeshFactoryWrapper const *""'"); 
+  }
+  arg1 = reinterpret_cast< iMeshFactoryWrapper * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iMeshFactoryWrapper_GetExtraRenderMesh" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  result = (CS::Graphics::RenderMesh *)((iMeshFactoryWrapper const *)arg1)->GetExtraRenderMesh(arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Graphics__RenderMesh, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iMeshFactoryWrapper_GetExtraRenderMeshCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iMeshFactoryWrapper *arg1 = (iMeshFactoryWrapper *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  size_t result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshFactoryWrapper_GetExtraRenderMeshCount",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshFactoryWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshFactoryWrapper_GetExtraRenderMeshCount" "', argument " "1"" of type '" "iMeshFactoryWrapper const *""'"); 
+  }
+  arg1 = reinterpret_cast< iMeshFactoryWrapper * >(argp1);
+  result = ((iMeshFactoryWrapper const *)arg1)->GetExtraRenderMeshCount();
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iMeshFactoryWrapper_RemoveExtraRenderMesh__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iMeshFactoryWrapper *arg1 = (iMeshFactoryWrapper *) 0 ;
+  CS::Graphics::RenderMesh *arg2 = (CS::Graphics::RenderMesh *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshFactoryWrapper_RemoveExtraRenderMesh",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshFactoryWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshFactoryWrapper_RemoveExtraRenderMesh" "', argument " "1"" of type '" "iMeshFactoryWrapper *""'"); 
+  }
+  arg1 = reinterpret_cast< iMeshFactoryWrapper * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_CS__Graphics__RenderMesh, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iMeshFactoryWrapper_RemoveExtraRenderMesh" "', argument " "2"" of type '" "CS::Graphics::RenderMesh *""'"); 
+  }
+  arg2 = reinterpret_cast< CS::Graphics::RenderMesh * >(argp2);
+  (arg1)->RemoveExtraRenderMesh(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iMeshFactoryWrapper_RemoveExtraRenderMesh__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iMeshFactoryWrapper *arg1 = (iMeshFactoryWrapper *) 0 ;
+  size_t arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshFactoryWrapper_RemoveExtraRenderMesh",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshFactoryWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshFactoryWrapper_RemoveExtraRenderMesh" "', argument " "1"" of type '" "iMeshFactoryWrapper *""'"); 
+  }
+  arg1 = reinterpret_cast< iMeshFactoryWrapper * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iMeshFactoryWrapper_RemoveExtraRenderMesh" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  (arg1)->RemoveExtraRenderMesh(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iMeshFactoryWrapper_RemoveExtraRenderMesh(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[3];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 2); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iMeshFactoryWrapper, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_CS__Graphics__RenderMesh, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_iMeshFactoryWrapper_RemoveExtraRenderMesh__SWIG_0(self, args);
+      }
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iMeshFactoryWrapper, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        return _wrap_iMeshFactoryWrapper_RemoveExtraRenderMesh__SWIG_1(self, args);
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iMeshFactoryWrapper_RemoveExtraRenderMesh'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    RemoveExtraRenderMesh(iMeshFactoryWrapper *,CS::Graphics::RenderMesh *)\n"
+    "    RemoveExtraRenderMesh(iMeshFactoryWrapper *,size_t)\n");
   return NULL;
 }
 
@@ -38472,7 +38599,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iMeshWrapper_AddExtraRenderMesh", _wrap_iMeshWrapper_AddExtraRenderMesh, METH_VARARGS, NULL},
 	 { (char *)"iMeshWrapper_GetExtraRenderMesh", _wrap_iMeshWrapper_GetExtraRenderMesh, METH_VARARGS, NULL},
 	 { (char *)"iMeshWrapper_GetExtraRenderMeshCount", _wrap_iMeshWrapper_GetExtraRenderMeshCount, METH_VARARGS, NULL},
-	 { (char *)"iMeshWrapper_GetExtraRenderMeshPriority", _wrap_iMeshWrapper_GetExtraRenderMeshPriority, METH_VARARGS, NULL},
 	 { (char *)"iMeshWrapper_GetExtraRenderMeshZBufMode", _wrap_iMeshWrapper_GetExtraRenderMeshZBufMode, METH_VARARGS, NULL},
 	 { (char *)"iMeshWrapper_RemoveExtraRenderMesh", _wrap_iMeshWrapper_RemoveExtraRenderMesh, METH_VARARGS, NULL},
 	 { (char *)"iMeshWrapper_AddInstance", _wrap_iMeshWrapper_AddInstance, METH_VARARGS, NULL},
@@ -38508,6 +38634,10 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iMeshFactoryWrapper_GetInstanceFactory", _wrap_iMeshFactoryWrapper_GetInstanceFactory, METH_VARARGS, NULL},
 	 { (char *)"iMeshFactoryWrapper_AddInstance", _wrap_iMeshFactoryWrapper_AddInstance, METH_VARARGS, NULL},
 	 { (char *)"iMeshFactoryWrapper_GetInstances", _wrap_iMeshFactoryWrapper_GetInstances, METH_VARARGS, NULL},
+	 { (char *)"iMeshFactoryWrapper_AddExtraRenderMesh", _wrap_iMeshFactoryWrapper_AddExtraRenderMesh, METH_VARARGS, NULL},
+	 { (char *)"iMeshFactoryWrapper_GetExtraRenderMesh", _wrap_iMeshFactoryWrapper_GetExtraRenderMesh, METH_VARARGS, NULL},
+	 { (char *)"iMeshFactoryWrapper_GetExtraRenderMeshCount", _wrap_iMeshFactoryWrapper_GetExtraRenderMeshCount, METH_VARARGS, NULL},
+	 { (char *)"iMeshFactoryWrapper_RemoveExtraRenderMesh", _wrap_iMeshFactoryWrapper_RemoveExtraRenderMesh, METH_VARARGS, NULL},
 	 { (char *)"iMeshFactoryWrapper_scfGetVersion", _wrap_iMeshFactoryWrapper_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iMeshFactoryWrapper", _wrap_delete_iMeshFactoryWrapper, METH_VARARGS, NULL},
 	 { (char *)"iMeshFactoryWrapper_swigregister", iMeshFactoryWrapper_swigregister, METH_VARARGS, NULL},

@@ -983,7 +983,6 @@ class iMeshWrapper(core.iBase):
     def AddExtraRenderMesh(*args): return _iengine.iMeshWrapper_AddExtraRenderMesh(*args)
     def GetExtraRenderMesh(*args): return _iengine.iMeshWrapper_GetExtraRenderMesh(*args)
     def GetExtraRenderMeshCount(*args): return _iengine.iMeshWrapper_GetExtraRenderMeshCount(*args)
-    def GetExtraRenderMeshPriority(*args): return _iengine.iMeshWrapper_GetExtraRenderMeshPriority(*args)
     def GetExtraRenderMeshZBufMode(*args): return _iengine.iMeshWrapper_GetExtraRenderMeshZBufMode(*args)
     def RemoveExtraRenderMesh(*args): return _iengine.iMeshWrapper_RemoveExtraRenderMesh(*args)
     def AddInstance(*args): return _iengine.iMeshWrapper_AddInstance(*args)
@@ -1027,6 +1026,10 @@ class iMeshFactoryWrapper(core.iBase):
     def GetInstanceFactory(*args): return _iengine.iMeshFactoryWrapper_GetInstanceFactory(*args)
     def AddInstance(*args): return _iengine.iMeshFactoryWrapper_AddInstance(*args)
     def GetInstances(*args): return _iengine.iMeshFactoryWrapper_GetInstances(*args)
+    def AddExtraRenderMesh(*args): return _iengine.iMeshFactoryWrapper_AddExtraRenderMesh(*args)
+    def GetExtraRenderMesh(*args): return _iengine.iMeshFactoryWrapper_GetExtraRenderMesh(*args)
+    def GetExtraRenderMeshCount(*args): return _iengine.iMeshFactoryWrapper_GetExtraRenderMeshCount(*args)
+    def RemoveExtraRenderMesh(*args): return _iengine.iMeshFactoryWrapper_RemoveExtraRenderMesh(*args)
     scfGetVersion = staticmethod(_iengine.iMeshFactoryWrapper_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iMeshFactoryWrapper
     __del__ = lambda self : None;
