@@ -494,8 +494,8 @@ public:
       for (size_t i = 0; i < numExtra; ++i)
       {
           privMeshlist->AddRenderMeshes (&extraMeshes[i], 1,
-                  cmesh->csMeshWrapper::GetExtraRenderMeshPriority(i),
-                  cmesh->csMeshWrapper::GetExtraRenderMeshZBufMode(i),
+                  cmesh->csMeshWrapper::GetExtraRenderMesh (i)->renderPrio,
+                  cmesh->csMeshWrapper::GetExtraRenderMesh (i)->z_buf_mode,
                   (iMeshWrapper*)cmesh);
       }
     }
