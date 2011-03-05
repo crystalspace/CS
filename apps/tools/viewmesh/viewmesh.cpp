@@ -383,7 +383,7 @@ void ViewMesh::Help ()
   csPrintf ("\n");
   csPrintf ("Examples:\n");
   csPrintf ("  viewmesh data/frankie/frankie.xml\n");
-  csPrintf ("  viewmesh -C=data/kwartz.zip kwartz.lib\n");
+  csPrintf ("  viewmesh -R=data/kwartz.zip kwartz.lib\n");
   csPrintf ("\n");
 }
 
