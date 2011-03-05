@@ -586,7 +586,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csVfsDirectoryChanger dirChange(vfs);
     dirChange.ChangeToFull(cwd);
 
-    bool res = Load(ret, buffer, 0, collection, ssource, missingdata, keepFlags, do_verbose);
+    bool res = Load (ret, buffer, 0, collection, ssource, missingdata, keepFlags, do_verbose);
 
     if(sync && res)
     {
@@ -1189,7 +1189,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             return false;
           break;
         }
-      case  XMLTOKEN_VARIABLES:
+      case XMLTOKEN_VARIABLES:
         if (!ParseVariableList (ldr_context, child))
           return false;
         break;
@@ -4355,6 +4355,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if (!dataSize)
       return false;
 
+    // TODO: Check binary CS files
     const char* b = data;
 
     // Go to first character
@@ -4406,14 +4407,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     // Check for a 'world' or 'library' tag
     const char* start = b;
-    while (*b != '>')
+    while (*b != '>' && !isspace (*b))
     {
       b++;
       if (b - data >= dataSize) return false;
     }
     csString tag (start, b - start);
 
-    return tag.CompareNoCase ("world") || tag.CompareNoCase ("library");
+    return tag.CompareNoCase ("world")
+      || tag.CompareNoCase ("library")
+      || tag.CompareNoCase ("texture")
+      || tag.CompareNoCase ("meshfact")
+      || tag.CompareNoCase ("meshgen")
+      || tag.CompareNoCase ("meshobj")
+      || tag.CompareNoCase ("trimesh")
+      || tag.CompareNoCase ("world")
+      || tag.CompareNoCase ("library")
+      || tag.CompareNoCase ("portals")
+      || tag.CompareNoCase ("light")
+      || tag.CompareNoCase ("meshref")
+      || tag.CompareNoCase ("plugins")
+      || tag.CompareNoCase ("sequence")
+      || tag.CompareNoCase ("trigger");
   }
 
   bool csThreadedLoader::Load (iThreadReturn* ret, iDataBuffer* buffer, const char* fname, iCollection* collection,
