@@ -930,8 +930,7 @@ iGeneralMeshSubMesh* csGenmeshMeshObjectFactory::AddSubMesh (
 {
   if (polyMeshType != Submeshes) SetPolyMeshSubmeshes();
   return subMeshes.AddSubMesh (indices, material, 
-    genmesh_type->submeshNamePool.Register (name), 
-    mixmode);
+    genmesh_type->StoreName (name), mixmode);
 }
 
 void csGenmeshMeshObjectFactory::SetAnimationControlFactory (
@@ -1849,7 +1848,7 @@ csPtr<iMeshObject> csGenmeshMeshObjectFactory::NewInstance ()
 SCF_IMPLEMENT_FACTORY (csGenmeshMeshObjectType)
 
 csGenmeshMeshObjectType::csGenmeshMeshObjectType (iBase* pParent) :
-  scfImplementationType (this, pParent), do_verbose (false)
+  scfImplementationType (this, pParent)
 {
 }
 
@@ -1875,10 +1874,14 @@ bool csGenmeshMeshObjectType::Initialize (iObjectRegistry* object_reg)
   base_id = strset->Request ("base");
   csRef<iVerbosityManager> verbosemgr (
     csQueryRegistry<iVerbosityManager> (object_reg));
-  if (verbosemgr) 
-    do_verbose = verbosemgr->Enabled ("genmesh");
 
   return true;
+}
+
+const char* csGenmeshMeshObjectType::StoreName (const char* name)
+{
+  CS::Threading::ScopedLock<CS::Threading::Mutex> lock (m);
+  return submeshNamePool.Register (name);
 }
 
 }

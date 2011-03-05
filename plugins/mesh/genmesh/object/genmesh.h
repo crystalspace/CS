@@ -757,11 +757,13 @@ class csGenmeshMeshObjectType :
                             iMeshObjectType,
                             iComponent>
 {
-public:
+private:
   iObjectRegistry* object_reg;
-  bool do_verbose;
-  MergedSVContext::Pool mergedSVContextPool;
+  CS::Threading::Mutex m;
   csStringHash submeshNamePool;
+
+public:
+  MergedSVContext::Pool mergedSVContextPool;
   csStringID base_id;
 
   /// Constructor.
@@ -772,6 +774,8 @@ public:
   virtual csPtr<iMeshObjectFactory> NewFactory ();
   /// Initialize.
   bool Initialize (iObjectRegistry* object_reg);
+  /// Thread safe duplicate-free store of a name.
+  const char* StoreName (const char* name);
 };
 
 }
