@@ -4349,36 +4349,77 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return true;
   }
 
-  static bool TestXML (const char* b)
+  // TODO: add a CS tag at the start of each file, eg "<CRYSTALSPACE version="2.0">"
+  static bool TestCrystalFile (const char* data, int dataSize)
   {
-    while (*b && isspace (*b)) b++;
+    if (!dataSize)
+      return false;
+
+    const char* b = data;
+
+    // Go to first character
+    while (isspace (*b))
+    {
+      b++;
+      if (b - data >= dataSize) return false;
+    }
+
+    // Check for a '?xml' or '!--' tag
     if (*b != '<') return false;
     b++;
-    if (*b == '?')
+    if (b - data + 4 >= dataSize) return false;
+    if (*b == '?' || *b == '!')
     {
-      return (b[1] == 'x' && b[2] == 'm' && b[3] == 'l' && isspace (b[4]));
+      if (*b == '?' && !(b[1] == 'x' && b[2] == 'm' && b[3] == 'l' && isspace (b[4])))
+	return false;
+
+      if (*b == '!' && !(b[1] == '-' && b[2] == '-'))
+	return false;
+
+      // Go to the next '>'
+      while (*b != '>')
+      {
+	b++;
+	if (b - data >= dataSize) return false;
+      }
+
+      b++;
+      if (b - data >= dataSize) return false;
+
+      // Go to the next '<'
+      while (isspace (*b))
+      {
+	b++;
+	if (b - data >= dataSize) return false;
+      }
+
+      if (*b != '<')
+	return false;
+
+      b++;
+      if (b - data >= dataSize) return false;
     }
-    else if (*b == '!')
-    {
-      return (b[1] == '-' && b[2] == '-');
-    }
-    else
+
+    // Check for a valid character
+    if (!isalpha (*b) && *b != '_')
+      return false;
+
+    // Check for a 'world' or 'library' tag
+    const char* start = b;
+    while (*b != '>')
     {
       b++;
-      if (!isalpha (*b) && *b != '_')
-        return false;
-      b++;
-      while (isalnum (*b)) b++;
-      if (!isspace (*b) && *b != '>')
-        return false;
-      return true;
+      if (b - data >= dataSize) return false;
     }
+    csString tag (start, b - start);
+
+    return tag.CompareNoCase ("world") || tag.CompareNoCase ("library");
   }
 
   bool csThreadedLoader::Load (iThreadReturn* ret, iDataBuffer* buffer, const char* fname, iCollection* collection,
     iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags, bool do_verbose)
   {
-    if (TestXML (buffer->GetData ()))
+    if (TestCrystalFile (buffer->GetData (), buffer->GetSize ()))
     {
       csRef<iDocument> doc;
       bool er = LoadStructuredDoc (fname, buffer, doc);
