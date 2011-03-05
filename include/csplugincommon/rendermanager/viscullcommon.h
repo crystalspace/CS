@@ -35,6 +35,7 @@ namespace CS
     {
     protected:
       bool occluvisEnabled;
+      csString defaultOccluvisShaderName;
       iObjectRegistry* objReg;
     public:
       RMViscullCommon();

@@ -75,7 +75,12 @@ namespace CS
     }
 
     template<bool bQueryVisibility>
-    void csOccluvis::RenderMeshes(AABBVisTreeNode* node, iRenderView* rview, NodeMeshList*& nodeMeshList)
+    void csOccluvis::RenderMeshes(AABBVisTreeNode* node,
+                                  iRenderView* rview,
+                                  size_t& lastTicket,
+                                  iShader*& lastShader,
+                                  iShaderVariableContext* shadervars,
+                                  NodeMeshList*& nodeMeshList)
     {
       if (bQueryVisibility)
       {
@@ -127,6 +132,15 @@ namespace CS
                 depthShader = mat->GetShader (fbDepthWriteID);
               }
             }
+
+            if (!depthShader)
+            {
+              // TODO: Come up with some better check or remove check when shader setup perf is better.
+              if (rm->do_mirror)
+              {
+                depthShader = shaderMgr->GetShader (defaultShader);
+              }
+            }
           }
 
           // Disable the alpha test (since alpha test disables fast GPU depth writing paths).
@@ -140,34 +154,44 @@ namespace CS
           {
             if (!depthShader)
             {
-              // Render 'unshaded'.
               csVertexAttrib vA = CS_VATTRIB_POSITION;
               iRenderBuffer *rB = rm->buffers->GetRenderBuffer (CS_BUFFER_POSITION);
               g3d->ActivateBuffers (&vA, &rB, 1);
               g3d->DrawMeshBasic (rm, modes);
               g3d->DeactivateBuffers (&vA, 1);
             }
-            else // Render with a depth test/write shader.
+            else
             {
               // Set up the shadervar stack.
               mw->GetSVContext ()->PushVariables (shaderVarStack);
+              if (shadervars) shadervars->PushVariables (shaderVarStack);
 
-              // Get a shader ticket.
+              // Get the shader ticket.
               size_t ticket = depthShader->GetTicket (modes, shaderVarStack);
 
-              // For each pass, render the mesh (more than 1 really needed?)
-              const size_t numPasses = depthShader->GetNumberOfPasses (ticket);
-              for (size_t p = 0; p < numPasses; ++p)
+              // Check whether we need to change the shader.
+              if (depthShader != lastShader || ticket != lastTicket)
               {
-                if (!depthShader->ActivatePass (ticket, p)) continue;
-                if (!depthShader->SetupPass (ticket, rm, modes, shaderVarStack)) continue;
+                if (lastShader)
+                  lastShader->DeactivatePass (lastTicket);
 
-                g3d->DrawMesh (rm, modes, shaderVarStack);
+                // We only support single-pass here (hence the 0).
+                if (!depthShader->ActivatePass (ticket, 0))
+                  continue;
 
-                depthShader->TeardownPass (ticket);
-                depthShader->DeactivatePass (ticket);
+                lastShader = depthShader;
+                lastTicket = ticket;
               }
 
+              // Set up the pass for this mesh.
+              if (!depthShader->SetupPass (ticket, rm, modes, shaderVarStack))
+                continue;
+
+              // Draw the mesh.
+              g3d->DrawMesh (rm, modes, shaderVarStack);
+
+              // Prepare for the next mesh.
+              depthShader->TeardownPass (ticket);
               shaderVarStack.Clear ();
             }
           }
@@ -297,8 +321,12 @@ namespace CS
               visobjMeshHash.Put (visobj, meshes);
             }
 
-            // Free old data.
-            if (meshes->meshList)
+            // Update the meshes data.
+            meshes->node = node;
+            meshes->framePassed = engine->GetCurrentFrameNumber ();
+
+            // Resize the meshlist if needed.
+            if (!meshes->meshList || meshes->numMeshes != numMeshes)
             {
               for (int m = 0; m < meshes->numMeshes; ++m)
               {
@@ -306,13 +334,35 @@ namespace CS
               }
 
               delete[] meshes->meshList;
-            }
+              meshes->meshList = new csSectorVisibleRenderMeshes[numMeshes];
+              meshes->numMeshes = numMeshes;
 
-            // Update the meshes data.
-            meshes->node = node;
-            meshes->numMeshes = numMeshes;
-            meshes->framePassed = engine->GetCurrentFrameNumber ();
-            meshes->meshList = new csSectorVisibleRenderMeshes[numMeshes];
+              for (int m = 0; m < numMeshes; ++m)
+              {
+                // Do a semi-deep copy.
+                meshes->meshList[m].imesh = sectorMeshList[m].imesh;
+                meshes->meshList[m].num = sectorMeshList[m].num;
+                meshes->meshList[m].rmeshes = new csRenderMesh*[sectorMeshList[m].num];
+                memcpy (meshes->meshList[m].rmeshes, sectorMeshList[m].rmeshes, sizeof (csRenderMesh*) * sectorMeshList[m].num);
+              }
+            }
+            else
+            {
+              // Resize the rendermeshes if needed, else just copy.
+              for (int m = 0; m < numMeshes; ++m)
+              {
+                // Do a semi-deep copy.
+                if (meshes->meshList[m].num != sectorMeshList[m].num)
+                {
+                  meshes->meshList[m].num = sectorMeshList[m].num;
+                  delete[] meshes->meshList[m].rmeshes;
+                  meshes->meshList[m].rmeshes = new csRenderMesh*[sectorMeshList[m].num];
+                }
+
+                meshes->meshList[m].imesh = sectorMeshList[m].imesh;
+                memcpy (meshes->meshList[m].rmeshes, sectorMeshList[m].rmeshes, sizeof (csRenderMesh*) * sectorMeshList[m].num);
+              }
+            }
 
             // We will store per-rendermesh data.
             size_t numRenderMeshes = 0;
@@ -357,12 +407,6 @@ namespace CS
             // Check the 'never draw' state of each render mesh.
             for (int iCurrRenderMesh = 0, m = 0; m < numMeshes; ++m)
             {
-              // Do a semi-deep copy.
-              meshes->meshList[m].imesh = sectorMeshList[m].imesh;
-              meshes->meshList[m].num = sectorMeshList[m].num;
-              meshes->meshList[m].rmeshes = new csRenderMesh*[sectorMeshList[m].num];
-              memcpy (meshes->meshList[m].rmeshes, sectorMeshList[m].rmeshes, sizeof (csRenderMesh*) * sectorMeshList[m].num);
-
               // For each render mesh; check if there is a depth-test shader - only test the z-buffer.
               for (int r = 0; r < sectorMeshList[m].num; ++r, ++iCurrRenderMesh)
               {
@@ -498,6 +542,14 @@ namespace CS
       }
     }
 
+    void csOccluvis::Setup (const char* defaultShaderName)
+    {
+      defaultShader = defaultShaderName;
+      depthWriteID = stringSet->Request ("oc_depthwrite");
+      depthTestID = stringSet->Request ("oc_depthtest");
+      fbDepthWriteID = stringSet->Request ("depthwrite");
+    }
+
     void csOccluvis::RegisterVisObject (iVisibilityObject* visobj)
     {
       csRef<csVisibilityObjectWrapper> visobj_wrap;
@@ -630,9 +682,6 @@ namespace CS
 
       // Set up the shader variable stack and IDs
       shaderVarStack.Setup (svStrings->GetSize ());
-      depthWriteID = stringSet->Request ("oc_depthwrite");
-      depthTestID = stringSet->Request ("oc_depthtest");
-      fbDepthWriteID = stringSet->Request ("depthwrite");
 
       /**
        * If the 'all visible' flag is set, render everything without any culling.
@@ -693,7 +742,7 @@ namespace CS
       return true;
     }
 
-    void csOccluvis::RenderViscull (iRenderView* rview)
+    void csOccluvis::RenderViscull (iRenderView* rview, iShaderVariableContext* shadervars)
     {
       // If we're marking all visible this frame, just return.
       if (bAllVisible)
@@ -713,6 +762,12 @@ namespace CS
       // Set up g3d for rendering a z-only pass.
       g3d->SetWriteMask (false, false, false, false);
 
+      // The last shader used for occlusion rendering
+      iShader* lastShader = 0;
+
+      // The last ticket used for occlusion rendering.
+      size_t lastTicket = 0;
+
       /**
        * Iterate over the node list (F2B) rendering the z-only pass
        * and any occlusion queries.
@@ -729,15 +784,19 @@ namespace CS
               CheckNodeVisibility (nodeMeshList->node, rview))
           {
             // Render with occlusion queries.
-            RenderMeshes<true> (nodeMeshList->node, rview, nodeMeshList);
+            RenderMeshes<true> (nodeMeshList->node, rview, lastTicket, lastShader, shadervars, nodeMeshList);
           }
           else
           {
             // Render without occlusion queries.
-            RenderMeshes<false> (nodeMeshList->node, rview, nodeMeshList);
+            RenderMeshes<false> (nodeMeshList->node, rview, lastTicket, lastShader, shadervars, nodeMeshList);
           }
         }
       }
+
+      // Deactivate the last shader+ticket.
+      if (lastShader)
+        lastShader->DeactivatePass (lastTicket);
 
       // Reset rendering settings.
       g3d->SetWriteMask (true, true, true, true);

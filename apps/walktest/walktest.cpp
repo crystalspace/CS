@@ -1001,7 +1001,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // Check the map and mount it if required.
   int i;
   csMapToLoad* map = first_map;
-  Engine->DeleteAll ();
   csTicks start_time = csGetTicks ();
   for (i = 0 ; i < num_maps ; i++, map = map->next_map)
   {

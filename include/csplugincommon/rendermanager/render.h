@@ -414,7 +414,7 @@ namespace RenderManager
           g3d->SetWorldToCamera (context->cameraTransform.GetInverse ());
           // Do any rendering required for visculling in the first layer.
           if (layer == 0)
-            context->sector->GetVisibilityCuller ()->RenderViscull (rview);
+            context->sector->GetVisibilityCuller ()->RenderViscull (rview, context->shadervars);
 
           ForEachMeshNode (*context, meshRender);
         }
@@ -430,7 +430,7 @@ namespace RenderManager
         // Warp portals may change the context rview but not the target
         g3d->SetWorldToCamera (context->cameraTransform.GetInverse ());
         // Do any rendering required for visculling
-        context->sector->GetVisibilityCuller ()->RenderViscull (rview);
+        context->sector->GetVisibilityCuller ()->RenderViscull (rview, context->shadervars);
 
         ForEachMeshNode (*context, meshRenderByMesh);
       }

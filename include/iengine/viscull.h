@@ -222,7 +222,7 @@ struct iVisibilityCuller : public virtual iBase
   /**
    * Prepare culling for the next frame.
    */
-  virtual void RenderViscull (iRenderView* rview) = 0;
+  virtual void RenderViscull (iRenderView* rview, iShaderVariableContext* shadervars) = 0;
 };
 
 /** \name GetCullerFlags() flags

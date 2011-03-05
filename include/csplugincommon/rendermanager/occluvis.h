@@ -184,7 +184,7 @@ namespace CS
 
       struct NodeMeshList : public csRefCount
       {
-        NodeMeshList () : meshList (nullptr)
+        NodeMeshList () : numMeshes (0), meshList (nullptr)
         {
         }
 
@@ -257,6 +257,9 @@ namespace CS
       // Fallback depth write shader type ID.
       csStringID fbDepthWriteID;
 
+      // Name of the default depth write/test shader.
+      csString defaultShader;
+
       // Shader variable stack for depth rendering.
       csShaderVariableStack shaderVarStack;
 
@@ -269,6 +272,9 @@ namespace CS
       template<bool bQueryVisibility>
       void RenderMeshes (AABBVisTreeNode* node,
                          iRenderView* rview,
+                         size_t& lastTicket,
+                         iShader*& lastShader,
+                         iShaderVariableContext* shadervars,
                          NodeMeshList*& nodeMeshList);
 
       /**
@@ -362,7 +368,7 @@ namespace CS
       csOccluvis (iObjectRegistry *object_reg);
       virtual ~csOccluvis ();
 
-      virtual void Setup (const char*) {}
+      virtual void Setup (const char* defaultShaderName);
 
      /**
       * Register a visibility object with this culler.
@@ -405,7 +411,7 @@ namespace CS
       /**
        * Prepare culling for the next frame.
        */
-      virtual void RenderViscull (iRenderView* rview);
+      virtual void RenderViscull (iRenderView* rview, iShaderVariableContext* shadervars);
 
      /**
       * Mark that we're about to perform precache visibility culling.
