@@ -4349,7 +4349,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return true;
   }
 
-  // TODO: add a CS tag at the start of each file, eg "<CRYSTALSPACE version="2.0">"
+  // TODO?: add a CS tag at the start of each file, eg "<CRYSTALSPACE version="2.0">"
   static bool TestCrystalFile (const char* data, int dataSize)
   {
     if (!dataSize)
