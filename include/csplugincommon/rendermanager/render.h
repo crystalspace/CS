@@ -359,21 +359,21 @@ namespace RenderManager
       CS::RenderPriorityGrouping lastGrouping = CS::rpgByLayer;
       for (size_t c = 0; c < contextStack.GetSize (); ++c)
       {
-	if (contextStack[c]->renderGrouping != lastGrouping)
-	{
-	  // Render context 'stretches' with same grouping
-	  if (lastGrouping == CS::rpgByMesh)
-	    RenderGroupedByMesh (rview, firstContext, c);
-	  else
-	    RenderGroupedByLayer (rview, firstContext, c);
-	  firstContext = c;
-	  lastGrouping = contextStack[c]->renderGrouping;
-	}
+        if (contextStack[c]->renderGrouping != lastGrouping)
+        {
+          // Render context 'stretches' with same grouping
+          if (lastGrouping == CS::rpgByMesh)
+            RenderGroupedByMesh (rview, firstContext, c);
+          else
+            RenderGroupedByLayer (rview, firstContext, c);
+          firstContext = c;
+          lastGrouping = contextStack[c]->renderGrouping;
+        }
       }
       if (lastGrouping == CS::rpgByMesh)
-	RenderGroupedByMesh (rview, firstContext, contextStack.GetSize ());
+        RenderGroupedByMesh (rview, firstContext, contextStack.GetSize ());
       else
-	RenderGroupedByLayer (rview, firstContext, contextStack.GetSize ());
+        RenderGroupedByLayer (rview, firstContext, contextStack.GetSize ());
 
       /* @@@ FIXME: When switching from RT to screen with a clipper set
          the clip rect gets wrong (stays at RT size). This workaround ensures
@@ -407,15 +407,15 @@ namespace RenderManager
         {
           typename RenderTree::ContextNode* context = contextStack.Get (i);
           /* Bail out if layer index is above the actual layer count in the
-           * context */
+          * context */
           if (layer >= context->svArrays.GetNumLayers()) continue;
 
-	  // Warp portals may change the context rview but not the target
-	  g3d->SetWorldToCamera (context->cameraTransform.GetInverse ());
-	  // Do any rendering required for visculling in the first layer.
-	  if (layer == 0)
-	    context->sector->GetVisibilityCuller ()->RenderViscull (rview);
-	  
+          // Warp portals may change the context rview but not the target
+          g3d->SetWorldToCamera (context->cameraTransform.GetInverse ());
+          // Do any rendering required for visculling in the first layer.
+          if (layer == 0)
+            context->sector->GetVisibilityCuller ()->RenderViscull (rview);
+
           ForEachMeshNode (*context, meshRender);
         }
       }
@@ -427,11 +427,11 @@ namespace RenderManager
       {
         typename RenderTree::ContextNode* context = contextStack.Get (i);
 
-	// Warp portals may change the context rview but not the target
-	g3d->SetWorldToCamera (context->cameraTransform.GetInverse ());
-	// Do any rendering required for visculling
-	context->sector->GetVisibilityCuller ()->RenderViscull (rview);
-	
+        // Warp portals may change the context rview but not the target
+        g3d->SetWorldToCamera (context->cameraTransform.GetInverse ());
+        // Do any rendering required for visculling
+        context->sector->GetVisibilityCuller ()->RenderViscull (rview);
+
         ForEachMeshNode (*context, meshRenderByMesh);
       }
     }
