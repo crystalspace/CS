@@ -26,6 +26,7 @@
 #include "csutil/scanstr.h"
 #include "csutil/scfstr.h"
 #include "csutil/stringconv.h"
+#include "imap/modelload.h"
 #include "imesh/animesh.h"
 #include "imesh/object.h"
 #include "imesh/animnode/skeleton2anim.h"
@@ -384,6 +385,7 @@ void ViewMesh::Help ()
   csPrintf ("Examples:\n");
   csPrintf ("  viewmesh data/frankie/frankie.xml\n");
   csPrintf ("  viewmesh -R=data/kwartz.zip kwartz.lib\n");
+  csPrintf ("  viewmesh -R=data/seymour.zip Seymour.dae\n");
   csPrintf ("\n");
 }
 
@@ -504,6 +506,7 @@ bool ViewMesh::OnInitialize(int /*argc*/, char* /*argv*/ [])
     CS_REQUEST_REPORTER,
     CS_REQUEST_REPORTERLISTENER,
     CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
+    CS_REQUEST_PLUGIN ("crystalspace.mesh.loader.factory.assimp", iModelLoader),
     CS_REQUEST_END))
     return ReportError("Failed to initialize plugins!");
 
