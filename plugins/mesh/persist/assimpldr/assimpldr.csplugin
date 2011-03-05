@@ -4,7 +4,7 @@
   <scf>
     <classes>
       <class>
-        <name>crystalspace.mesh.loader.assimp</name>
+        <name>crystalspace.mesh.loader.factory.assimp</name>
         <implementation>AssimpLoader</implementation>
         <description>Open Asset Import Library loader for Crystal Space</description>
       </class>
