@@ -289,6 +289,7 @@ namespace CS
 
           if (hasMeshes)
           {
+            VisObjMeshHash& visobjMeshHash = visobjMeshHashes.GetOrCreate (f2bData.rview);
             csRef<NodeMeshList> meshes = visobjMeshHash.Get (csPtrKey<iVisibilityObject> (visobj), csRef<NodeMeshList> ());
             if (!meshes.IsValid ())
             {
@@ -296,12 +297,21 @@ namespace CS
               visobjMeshHash.Put (visobj, meshes);
             }
 
+            // Free old data.
+            if (meshes->meshList)
+            {
+              for (int m = 0; m < meshes->numMeshes; ++m)
+              {
+                delete[] meshes->meshList[m].rmeshes;
+              }
+
+              delete[] meshes->meshList;
+            }
+
             // Update the meshes data.
             meshes->node = node;
             meshes->numMeshes = numMeshes;
             meshes->framePassed = engine->GetCurrentFrameNumber ();
-
-            delete[] meshes->meshList;
             meshes->meshList = new csSectorVisibleRenderMeshes[numMeshes];
 
             // We will store per-rendermesh data.
@@ -347,7 +357,11 @@ namespace CS
             // Check the 'never draw' state of each render mesh.
             for (int iCurrRenderMesh = 0, m = 0; m < numMeshes; ++m)
             {
-              meshes->meshList[m] = sectorMeshList[m];
+              // Do a semi-deep copy.
+              meshes->meshList[m].imesh = sectorMeshList[m].imesh;
+              meshes->meshList[m].num = sectorMeshList[m].num;
+              meshes->meshList[m].rmeshes = new csRenderMesh*[sectorMeshList[m].num];
+              memcpy (meshes->meshList[m].rmeshes, sectorMeshList[m].rmeshes, sizeof (csRenderMesh*) * sectorMeshList[m].num);
 
               // For each render mesh; check if there is a depth-test shader - only test the z-buffer.
               for (int r = 0; r < sectorMeshList[m].num; ++r, ++iCurrRenderMesh)
@@ -522,16 +536,22 @@ namespace CS
       }
 
       csArray<csRefArray<NodeMeshList>*> nodeMeshLists = nodeMeshHash.GetAll ();
-      csArray<NodeMeshList*> meshLists = visobjMeshHash.GetAll(csPtrKey<iVisibilityObject> (visobj));
-      for(size_t i = 0; i < nodeMeshLists.GetSize(); ++i)
-      {
-        for(size_t j = 0; j < meshLists.GetSize(); ++j)
-        {
-          nodeMeshLists[i]->Delete(meshLists[j]);
-        }
-      }
 
-      visobjMeshHash.DeleteAll (csPtrKey<iVisibilityObject> (visobj));
+      VisObjMeshHashes::GlobalIterator itr = visobjMeshHashes.GetIterator ();
+      while (itr.HasNext ())
+      {
+        VisObjMeshHash& visobjMeshHash = itr.Next ();
+        csArray<NodeMeshList*> meshLists = visobjMeshHash.GetAll(csPtrKey<iVisibilityObject> (visobj));
+        for(size_t i = 0; i < nodeMeshLists.GetSize(); ++i)
+        {
+          for(size_t j = 0; j < meshLists.GetSize(); ++j)
+          {
+            nodeMeshLists[i]->Delete(meshLists[j]);
+          }
+        }
+
+        visobjMeshHash.DeleteAll (csPtrKey<iVisibilityObject> (visobj));
+      }
 
       RemoveObject (visobj);
     }

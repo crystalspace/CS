@@ -239,8 +239,10 @@ namespace CS
       // Hash of mesh nodes for a render view.
       csHash<csRefArray<NodeMeshList>*, csPtrKey<iRenderView> > nodeMeshHash;
 
-      // Hash of MeshList objects for visibility objects.
-      csHash<NodeMeshList*, csPtrKey<iVisibilityObject> > visobjMeshHash;
+      // Hashes of MeshList objects for visibility objects.
+      typedef csHash<NodeMeshList*, csPtrKey<iVisibilityObject> > VisObjMeshHash;
+      typedef csHash<VisObjMeshHash, csPtrKey<iRenderView> > VisObjMeshHashes;
+      VisObjMeshHashes visobjMeshHashes;
 
       // Vector of vistest objects (used in the box/sphere/etc. tests).
       VistestObjectsArray vistest_objects;
