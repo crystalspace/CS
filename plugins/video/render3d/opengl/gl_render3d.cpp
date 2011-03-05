@@ -4460,7 +4460,7 @@ void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
   //indexbuf->RenderRelease ();
   RenderRelease (iIndexbuf);
   // Restore cull mode
-  //if (cullMode == CS::Graphics::cullFlipped) statecache->SetCullFace (cullFace);
+  if (cullMode == CS::Graphics::cullFlipped) statecache->SetCullFace (cullFace);
   //statecache->Disable_GL_POLYGON_OFFSET_FILL ();
 }
 }
