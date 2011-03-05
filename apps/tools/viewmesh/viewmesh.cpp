@@ -261,7 +261,7 @@ bool ViewMesh::OnKeyboard(iEvent& ev)
 	&& !auto_lod
 	&& lod_level < max_lod_level)
     {
-      lod_level += 1;
+      lod_level += max_lod_level / 20;
       needLODUpdate = true;
     }
 
@@ -269,7 +269,7 @@ bool ViewMesh::OnKeyboard(iEvent& ev)
 	&& !auto_lod
 	&& lod_level > 0)
     {
-      lod_level -= 1;
+      lod_level -= max_lod_level / 20;
       needLODUpdate = true;
     }
 
@@ -377,12 +377,13 @@ void ViewMesh::Help ()
   csPrintf ("  -L=<file>          Load a library file (for textures/materials)\n");
   csPrintf ("  -Scale=<ratio>     Scale the Object\n");
   csPrintf ("  -RoomSize=<units>  Radius and height (4*) of the room (default 5)\n");
-  csPrintf ("  -R=<realpath>      Real path from where to load the model\n");
+  csPrintf ("  -R=<realpath>      Real path to be mounted in VFS\n");
   csPrintf ("  -C=<vfsdir>        Current VFS directory\n");
   csPrintf ("  <file>             Load the specified mesh object from the VFS path (meshfact or library)\n");
   csPrintf ("\n");
-  csPrintf ("Example:\n");
-  csPrintf ("  viewmesh -C=data/frankie/ frankie.xml\n");
+  csPrintf ("Examples:\n");
+  csPrintf ("  viewmesh data/frankie/frankie.xml\n");
+  csPrintf ("  viewmesh -C=data/kwartz.zip kwartz.lib\n");
   csPrintf ("\n");
 }
 
@@ -400,7 +401,7 @@ void ViewMesh::HandleCommandLine()
     }
   }
 
-  const char* meshfilename = cmdline->GetName (0);
+  csString meshfilename = cmdline->GetName (0);
   const char* texturefilename = cmdline->GetName (1);
   const char* texturename = cmdline->GetName (2);
   const char* scaleTxt = cmdline->GetOption("Scale");
@@ -415,14 +416,19 @@ void ViewMesh::HandleCommandLine()
     vfs->ChDir ("/tmp/viewmesh");
   }
 
-  if(vfsDir.IsEmpty() && meshfilename)
+  if (vfsDir.IsEmpty() && meshfilename)
   {
-    vfsDir = csString(meshfilename).Slice(0, csString(meshfilename).FindLast('/'));
+    size_t index = meshfilename.FindLast ('/');
+    if (index != (size_t) -1)
+    {
+      vfsDir = meshfilename.Slice (0, index);
+      meshfilename = meshfilename.Slice (index + 1);
+    }
   }
 
   if (!vfsDir.IsEmpty())
   {
-    if(!vfs->ChDir (vfsDir))
+    if (!vfs->ChDir (vfsDir))
     {
       ReportError("Cannot change to path: %s\n", vfsDir.GetData ());
     }
@@ -768,6 +774,7 @@ void ViewMesh::LoadSprite (const char* filename, const char* path)
     csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(factwrap->GetMeshObjectFactory());
     if (fstate)
     {
+      lod_level = 0;
       max_lod_level = fstate->GetNumProgLODLevels();
     }
 
