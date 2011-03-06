@@ -48,6 +48,24 @@ AnimeshAsset::AnimeshAsset(iObjectRegistry* obj_reg, iMeshWrapper* mesh)
   // start automatically the animation
   animeshsprite->GetSkeletonFactory()->SetAutoStart (true);
 
+  RebuildAnimationTree ();
+}
+
+AnimeshAsset::~AnimeshAsset()
+{
+  DetachAll();
+  csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
+  engine->RemoveObject(spritewrapper);
+  engine->RemoveObject(spritewrapper->GetFactory());
+  spritewrapper.Invalidate();
+  animeshstate.Invalidate();
+  animeshsprite.Invalidate();
+}
+
+// Animations
+
+void AnimeshAsset::RebuildAnimationTree ()
+{
   // create a new animation tree with a FSM node to control separately each animation
   CS::Animation::iSkeletonAnimPacketFactory* packetFactory = animeshsprite->GetSkeletonFactory()->GetAnimationPacket();
   if (!packetFactory)
@@ -70,19 +88,6 @@ AnimeshAsset::AnimeshAsset(iObjectRegistry* obj_reg, iMeshWrapper* mesh)
   csRef<CS::Animation::iSkeletonAnimPacket> packet = packetFactory->CreateInstance (animeshstate->GetSkeleton ());
   animeshstate->GetSkeleton ()->SetAnimationPacket (packet);
 }
-
-AnimeshAsset::~AnimeshAsset()
-{
-  DetachAll();
-  csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
-  engine->RemoveObject(spritewrapper);
-  engine->RemoveObject(spritewrapper->GetFactory());
-  spritewrapper.Invalidate();
-  animeshstate.Invalidate();
-  animeshsprite.Invalidate();
-}
-
-// Animations
 
 bool AnimeshAsset::SupportsAnimations() 
 { 
@@ -148,10 +153,28 @@ bool AnimeshAsset::StopAnimation(const char* animationName)
 
   csRef<CS::Animation::iSkeletonFSMNode> node = scfQueryInterfaceSafe<CS::Animation::iSkeletonFSMNode>
     (packet->GetAnimationRoot()->FindNode ("fsm"));
+
   if (node->IsActive ())
     node->Stop ();
 
   return true;
+}
+
+bool AnimeshAsset::RemoveAnimation(const char* animationName)
+{
+  if (!animeshstate->GetSkeleton())
+    return false;
+
+  CS::Animation::iSkeletonAnimPacketFactory* packetFactory =
+    animeshstate->GetSkeleton()->GetAnimationPacket()->GetFactory ();
+  if (!packetFactory)
+    return false;
+
+  size_t animCount = packetFactory->GetAnimationCount ();
+  packetFactory->RemoveAnimation (animationName);
+  RebuildAnimationTree ();
+
+  return animCount != packetFactory->GetAnimationCount ();
 }
 
 bool AnimeshAsset::GetReverseAction()
@@ -180,6 +203,23 @@ void AnimeshAsset::SetReverseAction(bool value)
     node->GetStateNode (node->GetCurrentState ())->SetPlaybackSpeed (reverseAction ? -1.00f : 1.00f);
 }
 
+void AnimeshAsset::SetAnimationSpeed(float speed)
+{
+  if (!animeshstate->GetSkeleton())
+    return;
+
+  CS::Animation::iSkeletonAnimPacket* packet = animeshstate->GetSkeleton()->GetAnimationPacket();
+  if (!packet)
+    return;
+
+  csRef<CS::Animation::iSkeletonFSMNode> node = scfQueryInterfaceSafe<CS::Animation::iSkeletonFSMNode>
+    (packet->GetAnimationRoot()->FindNode ("fsm"));
+
+  node->SetPlaybackSpeed (speed);
+
+  if (!node->IsActive ())
+    node->Play ();
+}
 
 // Sockets
 bool AnimeshAsset::SupportsSockets() 

@@ -27,7 +27,7 @@
 class AnimationTab : public TabBase
 {
 private:
-  bool ReversAnimation (const CEGUI::EventArgs& e);
+  bool ReverseAnimation (const CEGUI::EventArgs& e);
   bool StopAnimation (const CEGUI::EventArgs& e);
   bool SlowerAnimation (const CEGUI::EventArgs& e);
   bool AddAnimation (const CEGUI::EventArgs& e);
@@ -37,6 +37,8 @@ private:
   bool ClearAnimation (const CEGUI::EventArgs& e);
   bool SelAnimation (const CEGUI::EventArgs& e);
 
+  float animationSpeed;
+
 public:
   AnimationTab(iObjectRegistry* obj_reg, AssetBase* ass);
   virtual ~AnimationTab();
@@ -45,7 +47,7 @@ public:
 //-------------------------------------------------------
 
 AnimationTab::AnimationTab(iObjectRegistry* obj_reg, AssetBase* ass) 
-  : TabBase(obj_reg, ass) 
+: TabBase(obj_reg, ass), animationSpeed (1.0f)
 {
   LoadLayout("animationtab.layout");
   AddToTabs();
@@ -58,7 +60,7 @@ AnimationTab::AnimationTab(iObjectRegistry* obj_reg, AssetBase* ass)
 
   btn = winMgr->getWindow("Animations/ReverseAnimation");
   btn->subscribeEvent(CEGUI::PushButton::EventClicked,
-    CEGUI::Event::Subscriber(&AnimationTab::ReversAnimation, this));
+    CEGUI::Event::Subscriber(&AnimationTab::ReverseAnimation, this));
 
   btn = winMgr->getWindow("Animations/StopAnimation");
   btn->subscribeEvent(CEGUI::PushButton::EventClicked,
@@ -97,21 +99,25 @@ AnimationTab::~AnimationTab()
 {
 }
 
-bool AnimationTab::ReversAnimation (const CEGUI::EventArgs& e)
+bool AnimationTab::ReverseAnimation (const CEGUI::EventArgs& e)
 {
   asset->SetReverseAction(!asset->GetReverseAction());
+
   return true;
 }
 
 bool AnimationTab::StopAnimation (const CEGUI::EventArgs& e)
 {
-  //move_sprite_speed = 0;
+  asset->StopAnimation(asset->GetSelectedAnimation());
+
   return true;
 }
 
 bool AnimationTab::SlowerAnimation (const CEGUI::EventArgs& e)
 {
-  //move_sprite_speed -= 0.5f;
+  animationSpeed -= 0.5f;
+  asset->SetAnimationSpeed(animationSpeed);
+
   return true;
 }
 
@@ -124,7 +130,9 @@ bool AnimationTab::AddAnimation (const CEGUI::EventArgs& e)
 
 bool AnimationTab::FasterAnimation (const CEGUI::EventArgs& e)
 {
-  //move_sprite_speed += 0.5f;
+  animationSpeed += 0.5f;
+  asset->SetAnimationSpeed(animationSpeed);
+
   return true;
 }
 
@@ -137,9 +145,12 @@ bool AnimationTab::SetAnimation (const CEGUI::EventArgs& e)
 
 bool AnimationTab::RemoveAnimation (const CEGUI::EventArgs& e)
 {
-  //TODO: Implement it.
+  asset->RemoveAnimation(asset->GetSelectedAnimation());
 
-  csReporterHelper::Report(object_reg, CS_REPORTER_SEVERITY_WARNING,"", "Removal of Animation is not yet implemented");
+  csRef<iStringArray> arr = asset->GetAnimations();
+  UpdateList(arr, "Animations/List");
+  if (arr->GetSize()) asset->SetSelectedAnimation(arr->Get(0));
+
   return true;
 }
 
