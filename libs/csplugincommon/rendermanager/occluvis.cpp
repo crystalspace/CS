@@ -136,7 +136,7 @@ namespace CS
             if (!depthShader)
             {
               // TODO: Come up with some better check or remove check when shader setup perf is better.
-              if (rm->do_mirror)
+              if (shadervars)
               {
                 depthShader = shaderMgr->GetShader (defaultShader);
               }
