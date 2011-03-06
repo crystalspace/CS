@@ -45,6 +45,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     virtual CS::Animation::iSkeletonAnimation* CreateAnimation (const char* name);
     virtual CS::Animation::iSkeletonAnimation* FindAnimation (const char* name);
+    virtual void RemoveAnimation (const char* name);
+    virtual void RemoveAnimation (size_t index);
     virtual void ClearAnimations ();
     virtual CS::Animation::iSkeletonAnimation* GetAnimation (size_t index);
     virtual size_t GetAnimationCount () const;

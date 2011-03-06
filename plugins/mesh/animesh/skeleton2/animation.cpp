@@ -73,6 +73,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return 0;
   }
 
+  void AnimationPacketFactory::RemoveAnimation (const char* name)
+  {
+    for (size_t i = 0; i < animationList.GetSize (); ++i)
+      if (strcmp (animationList[i]->GetName (), name) == 0)
+      {
+	animationList.DeleteIndex (i);
+	return;
+      }
+  }
+
+  void AnimationPacketFactory::RemoveAnimation (size_t index)
+  {
+    animationList.DeleteIndex (index);
+  }
+
   void AnimationPacketFactory::ClearAnimations ()
   {
     animationList.DeleteAll ();

@@ -116,7 +116,7 @@ enum SynchronizationMode
  */
 struct iSkeletonAnimPacketFactory : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonAnimPacketFactory, 2, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonAnimPacketFactory, 2, 0, 1);
   
   /**
    * Create an instance of this animation packet
@@ -182,6 +182,16 @@ struct iSkeletonAnimPacketFactory : public virtual iBase
    * Create a FSM node
    */
   virtual csPtr<iSkeletonFSMNodeFactory> CreateFSMNode (const char* name) = 0;
+
+  /**
+   * Remove the animation of the given name
+   */
+  virtual void RemoveAnimation (const char* name) = 0;
+
+  /**
+   * Remove the animation of the given index
+   */
+  virtual void RemoveAnimation (size_t index) = 0;
 };
 
 /**
