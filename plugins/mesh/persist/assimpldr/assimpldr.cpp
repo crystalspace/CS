@@ -83,13 +83,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
   bool AssimpLoader::IsRecognized (const char* filename)
   {
-    // TODO
-    return true;
+    csString format = filename;
+    format = format.Slice (format.FindLast ('.'));
+    Assimp::Importer importer;
+    return importer.IsExtensionSupported (format.GetData ());
   }
 
   bool AssimpLoader::IsRecognized (iDataBuffer* buffer)
   {
-    // TODO
     return true;
   }
 
@@ -295,7 +296,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     // Import all meshes
     if (scene->mRootNode)
       // TODO: Check the type of the mesh then import it
-      // TODO: terrains, other primitives than triangles, whole scene (lights, cameras)
+      // TODO: terrains, whole scene (lights, cameras)
       //ImportGenmesh (scene->mRootNode);
       ImportAnimesh (scene->mRootNode);
 
@@ -303,8 +304,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     for (unsigned int i = 0; i < scene->mNumAnimations; i++)
     {
       aiAnimation*& animation = scene->mAnimations[i];
-      ImportAnimation (animation);
+      ImportAnimation (animation, i);
     }
+
+    // Convert the animations in bind space
+    ConvertAnimationFrames ();
   }
 
   iTextureWrapper* AssimpLoader::FindTexture (const char* filename)
@@ -452,11 +456,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
   void AssimpLoader::ImportExtraRenderMesh (iMeshFactoryWrapper* factoryWrapper, aiMesh* mesh)
   {
+    bool isPoint = mesh->mPrimitiveTypes & aiPrimitiveType_POINT;
+
     // Create the extra render mesh and the render buffer holder
     CS::Graphics::RenderMesh* renderMesh = new CS::Graphics::RenderMesh ();
     renderMesh->buffers.AttachNew (new csRenderBufferHolder);
-    renderMesh->meshtype = mesh->mPrimitiveTypes & aiPrimitiveType_POINT ?
-      CS_MESHTYPE_POINTS : CS_MESHTYPE_LINES;
+    renderMesh->meshtype = isPoint ? CS_MESHTYPE_POINTS : CS_MESHTYPE_LINES;
     renderMesh->indexstart = 0;
     renderMesh->indexend = mesh->mNumFaces;
     renderMesh->bbox.StartBoundingBox ();
@@ -477,18 +482,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
     // Setup the index buffer
     // TODO: no need of an index buffer for points...
-    csDirtyAccessArray<uint> indices (mesh->mNumFaces *
-				      mesh->mPrimitiveTypes & aiPrimitiveType_POINT ? 1 : 2);
+    csDirtyAccessArray<uint> indices (mesh->mNumFaces * isPoint ? 1 : 1);
     for (unsigned int i = 0; i < mesh->mNumFaces; i++)
     {
       aiFace& face = mesh->mFaces[i];
 
       indices.Push (face.mIndices[0]);
-      indices.Push (face.mIndices[1]);
+      if (!isPoint)
+	indices.Push (face.mIndices[1]);
     }
 
     buffer = FillBuffer<uint> (indices, CS_BUFCOMP_UNSIGNED_INT,
-			       mesh->mPrimitiveTypes & aiPrimitiveType_POINT ? 1 : 2, true);
+			       isPoint ? 1 : 1, true);
     renderMesh->buffers->SetRenderBuffer (CS_BUFFER_INDEX, buffer);
 
     // Setup the color buffer

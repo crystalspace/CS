@@ -157,7 +157,8 @@ public:
 			      aiMatrix4x4 transform);
   void ImportBoneInfluences (AnimeshData* animeshData, aiNode* node);
 
-  void ImportAnimation (aiAnimation* animation);
+  void ImportAnimation (aiAnimation* animation, size_t index);
+  void ConvertAnimationFrames ();
 
 private:
   iObjectRegistry* object_reg;

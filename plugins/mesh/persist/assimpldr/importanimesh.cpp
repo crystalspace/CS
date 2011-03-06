@@ -236,7 +236,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 	aiNode* nodeIterator = boneData->node->mParent;
 	while (nodeIterator)
 	{
-	  // TODO: really needed? only nodes marked as bones?
+	  // TODO: only nodes marked as bones (but then need to update the animations)
 	  // Find the node corresponding to this bone and mark it as a bone
 	  BoneData* boneData = animeshData->boneNodes[nodeIterator->mName.data];
 	  if (!boneData)
@@ -431,8 +431,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
       // Compute the bone transform
       // TODO: missing inverse mesh transform
-      aiMatrix4x4 boneTransform = transform * boneData->transform;
-      boneTransform = boneTransform.Inverse() * transform;
+      aiMatrix4x4 boneTransform = boneData->transform.Inverse ();
 
       // Convert it to a CS transform
       aiQuaternion aiquaternion;
@@ -516,10 +515,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     }
   }
 
-  void AssimpLoader::ImportAnimation (aiAnimation* animation)
+  void AssimpLoader::ImportAnimation (aiAnimation* animation, size_t index)
   {
     if (!skeletonManager)
       return;
+
+    // Give a unique name (let's hope non empty names are unique)
+    csString animationName = animation->mName.data;
+    if (!strlen (animation->mName.data))
+    {
+      animationName = "animation ";
+      animationName += index + 1;
+    }
 
     for (unsigned int i = 0; i < animation->mNumChannels; i++)
     {
@@ -531,7 +538,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 	continue;
 
       // Create the animation packet if not yet made
-      CS::Animation::iSkeletonFactory* skeletonFactory = animeshNode->factory->GetSkeletonFactory ();
+      CS::Animation::iSkeletonFactory* skeletonFactory =
+	animeshNode->factory->GetSkeletonFactory ();
       if (!skeletonFactory)
 	continue;
 
@@ -551,18 +559,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
       // Create the animation if not yet made
       CS::Animation::iSkeletonAnimation* skeletonAnimation =
-	animationPacket->FindAnimation (animation->mName.data);
+	animationPacket->FindAnimation (animationName);
 
       if (!skeletonAnimation)
       {
-	skeletonAnimation = animationPacket->CreateAnimation (animation->mName.data);
-	// TODO: still a problem with BVH type that are found in bind frame
-	//skeletonAnimation->SetFramesInBindSpace (true);
+	skeletonAnimation = animationPacket->CreateAnimation (animationName);
 
 	// create an animation node for this animation
-	// TODO: transition type + all nodes in a FSM?
 	csRef<CS::Animation::iSkeletonAnimationNodeFactory> animationNode =
-	  animationPacket->CreateAnimationNode (animation->mName.data);
+	  animationPacket->CreateAnimationNode (animationName);
 	animationNode->SetAnimation (skeletonAnimation);
 	animationNode->SetCyclic (true);
 
@@ -606,6 +611,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
 	// Add the keyframe
 	skeletonAnimation->AddOrSetKeyFrame (channelID, time, Assimp2CS (key.mValue));
+	// TODO: the frames without position component are invalid
       }
 
       // Add all position keyframes
@@ -625,11 +631,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 	// TODO: really need to scale the offset?
 	skeletonAnimation->AddOrSetKeyFrame (channelID, time, Assimp2CS (key.mValue));
       }
-
-      // TODO: Convert the animation in bind space
-      //skeletonAnimation->ConvertFrameSpace (skeletonFactory);
     }
   }
 
+  void AssimpLoader::ConvertAnimationFrames ()
+  {
+    for (csHash<AnimeshNode, csString>::GlobalIterator it = nodeData.GetIterator ();
+	 it.HasNext (); )
+    {
+      AnimeshNode& animeshNode = it.Next ();
+
+      CS::Animation::iSkeletonFactory* skeletonFactory =
+	animeshNode.factory->GetSkeletonFactory ();
+      if (!skeletonFactory)
+	continue;
+
+      CS::Animation::iSkeletonAnimPacketFactory* animationPacket =
+	skeletonFactory->GetAnimationPacket ();
+      if (!animationPacket)
+	continue;
+
+      for (size_t i = 0; i < animationPacket->GetAnimationCount (); i++)
+	animationPacket->GetAnimation (i)->ConvertFrameSpace (skeletonFactory);
+    }
+  }
 }
 CS_PLUGIN_NAMESPACE_END(AssimpLoader)
