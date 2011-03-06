@@ -33431,14 +33431,18 @@ SWIGINTERN PyObject *_wrap_iVisibilityCuller_RenderViscull(PyObject *SWIGUNUSEDP
   PyObject *resultobj = 0;
   iVisibilityCuller *arg1 = (iVisibilityCuller *) 0 ;
   iRenderView *arg2 = (iRenderView *) 0 ;
+  iShaderVariableContext *arg3 = (iShaderVariableContext *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"iVisibilityCuller_RenderViscull",2,2,&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iVisibilityCuller_RenderViscull",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iVisibilityCuller, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iVisibilityCuller_RenderViscull" "', argument " "1"" of type '" "iVisibilityCuller *""'"); 
@@ -33449,7 +33453,12 @@ SWIGINTERN PyObject *_wrap_iVisibilityCuller_RenderViscull(PyObject *SWIGUNUSEDP
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iVisibilityCuller_RenderViscull" "', argument " "2"" of type '" "iRenderView *""'"); 
   }
   arg2 = reinterpret_cast< iRenderView * >(argp2);
-  (arg1)->RenderViscull(arg2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_iShaderVariableContext, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iVisibilityCuller_RenderViscull" "', argument " "3"" of type '" "iShaderVariableContext *""'"); 
+  }
+  arg3 = reinterpret_cast< iShaderVariableContext * >(argp3);
+  (arg1)->RenderViscull(arg2,arg3);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
