@@ -54,6 +54,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       currentState = STATE_PLAYING;
       currentAnimation = instructions.PopTop ();
       currentAnimation.node->Play ();
+
+      if (cb)
+	cb->NewAnimation (currentAnimation.cbData);
     }
   }
 
@@ -121,6 +124,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
               currentState = STATE_BLENDING;
               blendTime = 0;
               top.node->Play ();
+
+              if (cb)
+                cb->NewAnimation (top.cbData);
             }
             else
             {
@@ -131,9 +137,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
               currentAnimation.node->Play ();
 
               if (cb)
-              {
                 cb->NewAnimation (currentAnimation.cbData);
-              }
             }
           }
         }
