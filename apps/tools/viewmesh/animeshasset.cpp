@@ -125,6 +125,9 @@ bool AnimeshAsset::PlayAnimation(const char* animationName, bool cycle)
   if (id == CS::Animation::InvalidKeyframeID)
     return false;
 
+  if (!node->IsActive ())
+    node->Play ();
+
   node->SwitchToState (id);
   csRef<CS::Animation::iSkeletonAnimationNodeFactory> animfactory = scfQueryInterfaceSafe<CS::Animation::iSkeletonAnimationNodeFactory>
     (node->GetStateNode (id)->GetFactory ());
@@ -169,7 +172,12 @@ void AnimeshAsset::SetReverseAction(bool value)
 
   csRef<CS::Animation::iSkeletonFSMNode> node = scfQueryInterfaceSafe<CS::Animation::iSkeletonFSMNode>
     (packet->GetAnimationRoot()->FindNode ("fsm"));
-  node->GetStateNode (node->GetCurrentState ())->SetPlaybackSpeed (reverseAction ? -1.00f : 1.00f);
+
+  if (!node->IsActive ())
+    node->Play ();
+
+  if (node->GetCurrentState ())
+    node->GetStateNode (node->GetCurrentState ())->SetPlaybackSpeed (reverseAction ? -1.00f : 1.00f);
 }
 
 
