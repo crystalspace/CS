@@ -8632,6 +8632,117 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSkeletonAnimPacketFactory_RemoveAnimation__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::iSkeletonAnimPacketFactory *arg1 = (CS::Animation::iSkeletonAnimPacketFactory *) 0 ;
+  char *arg2 = (char *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimPacketFactory_RemoveAnimation",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonAnimPacketFactory, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimPacketFactory_RemoveAnimation" "', argument " "1"" of type '" "CS::Animation::iSkeletonAnimPacketFactory *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Animation::iSkeletonAnimPacketFactory * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSkeletonAnimPacketFactory_RemoveAnimation" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  (arg1)->RemoveAnimation((char const *)arg2);
+  resultobj = SWIG_Py_Void();
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSkeletonAnimPacketFactory_RemoveAnimation__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::iSkeletonAnimPacketFactory *arg1 = (CS::Animation::iSkeletonAnimPacketFactory *) 0 ;
+  size_t arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimPacketFactory_RemoveAnimation",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonAnimPacketFactory, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimPacketFactory_RemoveAnimation" "', argument " "1"" of type '" "CS::Animation::iSkeletonAnimPacketFactory *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Animation::iSkeletonAnimPacketFactory * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonAnimPacketFactory_RemoveAnimation" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  (arg1)->RemoveAnimation(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSkeletonAnimPacketFactory_RemoveAnimation(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[3];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 2); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_CS__Animation__iSkeletonAnimPacketFactory, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        return _wrap_iSkeletonAnimPacketFactory_RemoveAnimation__SWIG_1(self, args);
+      }
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_CS__Animation__iSkeletonAnimPacketFactory, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_iSkeletonAnimPacketFactory_RemoveAnimation__SWIG_0(self, args);
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iSkeletonAnimPacketFactory_RemoveAnimation'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    RemoveAnimation(CS::Animation::iSkeletonAnimPacketFactory *,char const *)\n"
+    "    RemoveAnimation(CS::Animation::iSkeletonAnimPacketFactory *,size_t)\n");
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iSkeletonAnimPacketFactory_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -15943,6 +16054,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonAnimPacketFactory_CreatePriorityNode", _wrap_iSkeletonAnimPacketFactory_CreatePriorityNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimPacketFactory_CreateRandomNode", _wrap_iSkeletonAnimPacketFactory_CreateRandomNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimPacketFactory_CreateFSMNode", _wrap_iSkeletonAnimPacketFactory_CreateFSMNode, METH_VARARGS, NULL},
+	 { (char *)"iSkeletonAnimPacketFactory_RemoveAnimation", _wrap_iSkeletonAnimPacketFactory_RemoveAnimation, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimPacketFactory_scfGetVersion", _wrap_iSkeletonAnimPacketFactory_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonAnimPacketFactory", _wrap_delete_iSkeletonAnimPacketFactory, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimPacketFactory_swigregister", iSkeletonAnimPacketFactory_swigregister, METH_VARARGS, NULL},
