@@ -354,6 +354,12 @@ namespace RenderManager
 
       BeginFinishDrawScope bd (g3d, drawFlags);
 
+      // All the contexts in the stack use the same rview, so only set W2C once.
+      g3d->SetWorldToCamera (context->cameraTransform.GetInverse ());
+
+      // Likewise, any rendering required for visculling can be done once only.
+      context->sector->GetVisibilityCuller ()->RenderViscull (rview, context->shadervars);
+
       // Detect subsequent contexts with same grouping
       size_t firstContext = 0;
       CS::RenderPriorityGrouping lastGrouping = CS::rpgByLayer;
@@ -409,13 +415,6 @@ namespace RenderManager
           /* Bail out if layer index is above the actual layer count in the
           * context */
           if (layer >= context->svArrays.GetNumLayers()) continue;
-
-          // Warp portals may change the context rview but not the target
-          g3d->SetWorldToCamera (context->cameraTransform.GetInverse ());
-          // Do any rendering required for visculling in the first layer.
-          if (layer == 0)
-            context->sector->GetVisibilityCuller ()->RenderViscull (rview, context->shadervars);
-
           ForEachMeshNode (*context, meshRender);
         }
       }
@@ -426,12 +425,6 @@ namespace RenderManager
       for (size_t i = firstContext; i < lastContext; ++i)
       {
         typename RenderTree::ContextNode* context = contextStack.Get (i);
-
-        // Warp portals may change the context rview but not the target
-        g3d->SetWorldToCamera (context->cameraTransform.GetInverse ());
-        // Do any rendering required for visculling
-        context->sector->GetVisibilityCuller ()->RenderViscull (rview, context->shadervars);
-
         ForEachMeshNode (*context, meshRenderByMesh);
       }
     }
