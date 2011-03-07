@@ -35,7 +35,6 @@
 
 class csVector3;
 class csMatrix3;
-class csMovable;
 class csMeshFactoryWrapper;
 class csImposterMesh;
 class csEngine;
@@ -45,6 +44,7 @@ struct iRenderView;
 CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 {
   class csMeshWrapper;
+  class csMovable;
 }
 CS_PLUGIN_NAMESPACE_END(Engine)
 
