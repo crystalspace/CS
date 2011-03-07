@@ -1487,7 +1487,7 @@ bool VfsNode::SetFileTime (const char *Suffix, const csFileTime &iTime)
     ASSIGN_FROMFILETIME (iTime, curtm);
     times.actime = mktime(&curtm);     /* access time */
     times.modtime = times.actime;      /* modification time */
-    utime(fname, &times);
+    return (utime(fname, &times) == 0);
   }
   return true;
 }
