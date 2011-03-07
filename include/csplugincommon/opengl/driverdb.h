@@ -68,6 +68,8 @@ protected:
     Relation rel);
   
   void Report (int severity, const char* msg, ...);
+  void Report (int severity, iDocumentNode* node, const char* msg, ...);
+  void ReportBadToken (iDocumentNode* badtokennode);
 public:
   CS_LEAKGUARD_DECLARE (csGLDriverDatabase);
 
