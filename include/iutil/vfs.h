@@ -61,6 +61,15 @@ struct csFileTime
   (ft).mon = (tm).tm_mon;	\
   (ft).year = (tm).tm_year + 1900;
 
+/// This macro can be used to assign a csFileTime to a "struct tm"
+#define ASSIGN_FROMFILETIME(ft,tm)	\
+  (tm).tm_sec = (ft).sec;	\
+  (tm).tm_min = (ft).min;	\
+  (tm).tm_hour = (ft).hour;	\
+  (tm).tm_mday = (ft).day;	\
+  (tm).tm_mon = (ft).mon;	\
+  (tm).tm_year = (ft).year - 1900;
+
 /// Composite path divider
 #define VFS_PATH_DIVIDER        ','
 /// The "virtual" path separator

@@ -23,6 +23,14 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#ifdef CS_PLATFORM_WIN32
+#include <sys/utime.h>
+#define utime(a,b) _utime(a,b)
+#define utimbuf _utimbuf
+#else
+#include <utime.h>
+#endif
+
 #include "vfs.h"
 #include "csutil/archive.h"
 #include "csutil/cmdline.h"
@@ -1471,8 +1479,15 @@ bool VfsNode::SetFileTime (const char *Suffix, const csFileTime &iTime)
   }
   else
   {
-    // Not supported for now since there's no portable way of doing that - A.Z.
-    return false;
+    //for now we set the access time the same as the modification time
+    //as we have only a time setter function (and zip support only file
+    //modification) TODO?: separate version for access time
+    struct tm curtm;
+    struct utimbuf times;
+    ASSIGN_FROMFILETIME (iTime, curtm);
+    times.actime = mktime(&curtm);     /* access time */
+    times.modtime = times.actime;      /* modification time */
+    utime(fname, &times);
   }
   return true;
 }
