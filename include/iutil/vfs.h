@@ -27,6 +27,7 @@
  * @{ */
 #include "csutil/scf.h"
 #include "iutil/databuff.h"
+#include <time.h>
 
 struct iConfigFile;
 
@@ -50,25 +51,55 @@ struct csFileTime
   int mon;
   /// Year, 1768, 1900, 2001, ...
   int year;
+
+  /** Used to allow assignment of a struct tm to this
+   *  @param A struct tm filled with the data to assign to this class
+   */
+  void operator=(struct tm time)
+  {
+    sec  = time.tm_sec;
+    min  = time.tm_sec;
+    hour = time.tm_hour;
+    day  = time.tm_mday;
+    mon  = time.tm_mon;
+    year = time.tm_year + 1900;
+  }
+  /** Used to allow assignment of this to a struct tm
+   *  @return A struct tm filled with the data of this class.
+   */
+  operator struct tm() const
+  {
+    struct tm time;
+    time.tm_sec = sec;
+    time.tm_min = min;
+    time.tm_hour = hour;
+    time.tm_mday = day;
+    time.tm_mon = mon;
+    time.tm_year = year - 1900;
+    return time;
+  }
 };
 
-/// This macro can be used to assign a "struct tm" to a csFileTime
+namespace CS
+{
+  namespace Deprecated
+  {
+    void static inline __attribute__((deprecated)) AssignFileTime(csFileTime &ft, struct tm &time)
+    {
+      ft.sec = time.tm_sec;
+      ft.min = time.tm_min;
+      ft.hour = time.tm_hour;
+      ft.day = time.tm_mday;
+      ft.mon = time.tm_mon;
+      ft.year = time.tm_year + 1900;
+    }
+  }
+}
+/** This macro can be used to assign a "struct tm" to a csFileTime
+ *  This is deprecated use csFileTime = struct tm
+ */
 #define ASSIGN_FILETIME(ft,tm)	\
-  (ft).sec = (tm).tm_sec;	\
-  (ft).min = (tm).tm_min;	\
-  (ft).hour = (tm).tm_hour;	\
-  (ft).day = (tm).tm_mday;	\
-  (ft).mon = (tm).tm_mon;	\
-  (ft).year = (tm).tm_year + 1900;
-
-/// This macro can be used to assign a csFileTime to a "struct tm"
-#define ASSIGN_FROMFILETIME(ft,tm)	\
-  (tm).tm_sec = (ft).sec;	\
-  (tm).tm_min = (ft).min;	\
-  (tm).tm_hour = (ft).hour;	\
-  (tm).tm_mday = (ft).day;	\
-  (tm).tm_mon = (ft).mon;	\
-  (tm).tm_year = (ft).year - 1900;
+  CS::Deprecated::AssignFileTime(ft, tm);
 
 /// Composite path divider
 #define VFS_PATH_DIVIDER        ','
