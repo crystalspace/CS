@@ -48,6 +48,12 @@ class CS_CSPLUGINCOMMON_GL_EXPORT csGLDriverDatabase
 protected:
   friend class csDriverDBReader;
   
+  csGraphics2DGLCommon* ogl2d;
+  csRefArray<iConfigFile> addedConfigs;
+  const char* rulePhase;
+
+  csStringHash tokens;
+
   enum Relation
   {
     eq = 0,
@@ -60,19 +66,13 @@ protected:
   static bool Compare (int a, int b, Relation rel);
   static bool VersionCompare (const char* verStr1, const char* verStr2,
     Relation rel);
+  
+  void Report (int severity, const char* msg, ...);
 public:
   CS_LEAKGUARD_DECLARE (csGLDriverDatabase);
 
-  csGraphics2DGLCommon* ogl2d;
-  csRefArray<iConfigFile> addedConfigs;
-  const char* rulePhase;
-
-  csStringHash tokens;
-
   csGLDriverDatabase ();
   ~csGLDriverDatabase ();
-
-  void Report (int severity, const char* msg, ...);
 
   void Open (csGraphics2DGLCommon* ogl2d, iDocumentNode* dbRoot, 
     const char* phase, int configPriority);
