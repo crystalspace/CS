@@ -951,6 +951,7 @@ class csFileTime(object):
     day = _swig_property(_core.csFileTime_day_get, _core.csFileTime_day_set)
     mon = _swig_property(_core.csFileTime_mon_get, _core.csFileTime_mon_set)
     year = _swig_property(_core.csFileTime_year_get, _core.csFileTime_year_set)
+    def assign(*args): return _core.csFileTime_assign(*args)
     def __init__(self, *args): 
         this = _core.new_csFileTime(*args)
         try: self.this.append(this)
@@ -960,6 +961,7 @@ class csFileTime(object):
 csFileTime_swigregister = _core.csFileTime_swigregister
 csFileTime_swigregister(csFileTime)
 
+ASSIGN_FILETIME = _core.ASSIGN_FILETIME
 VFS_PATH_DIVIDER = _core.VFS_PATH_DIVIDER
 VFS_PATH_SEPARATOR = _core.VFS_PATH_SEPARATOR
 VFS_MAX_PATH_LEN = _core.VFS_MAX_PATH_LEN

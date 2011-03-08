@@ -64,6 +64,7 @@ package cspace;
 *csSleep = *cspacec::csSleep;
 *csGetUsername = *cspacec::csGetUsername;
 *csGetPlatformConfigPath = *cspacec::csGetPlatformConfigPath;
+*ASSIGN_FILETIME = *cspacec::ASSIGN_FILETIME;
 *csQueryRegistryTag = *cspacec::csQueryRegistryTag;
 *RegisterWeakListener = *cspacec::RegisterWeakListener;
 *RemoveWeakListener = *cspacec::RemoveWeakListener;

@@ -2756,17 +2756,18 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_scfInterfaceMetadata swig_types[233]
 #define SWIGTYPE_p_scfInterfaceMetadataList swig_types[234]
 #define SWIGTYPE_p_size_t swig_types[235]
-#define SWIGTYPE_p_uint16_t swig_types[236]
-#define SWIGTYPE_p_uint32_t swig_types[237]
-#define SWIGTYPE_p_uint64_t swig_types[238]
-#define SWIGTYPE_p_uint8_t swig_types[239]
-#define SWIGTYPE_p_unsigned_int swig_types[240]
-#define SWIGTYPE_p_unsigned_long swig_types[241]
-#define SWIGTYPE_p_unsigned_long_long swig_types[242]
-#define SWIGTYPE_p_utf32_char swig_types[243]
-#define SWIGTYPE_p_void swig_types[244]
-static swig_type_info *swig_types[246];
-static swig_module_info swig_module = {swig_types, 245, 0, 0, 0, 0};
+#define SWIGTYPE_p_tm swig_types[236]
+#define SWIGTYPE_p_uint16_t swig_types[237]
+#define SWIGTYPE_p_uint32_t swig_types[238]
+#define SWIGTYPE_p_uint64_t swig_types[239]
+#define SWIGTYPE_p_uint8_t swig_types[240]
+#define SWIGTYPE_p_unsigned_int swig_types[241]
+#define SWIGTYPE_p_unsigned_long swig_types[242]
+#define SWIGTYPE_p_unsigned_long_long swig_types[243]
+#define SWIGTYPE_p_utf32_char swig_types[244]
+#define SWIGTYPE_p_void swig_types[245]
+static swig_type_info *swig_types[247];
+static swig_module_info swig_module = {swig_types, 246, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -23633,6 +23634,39 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csFileTime_assign(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csFileTime *arg1 = (csFileTime *) 0 ;
+  tm *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csFileTime_assign",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csFileTime, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csFileTime_assign" "', argument " "1"" of type '" "csFileTime *""'"); 
+  }
+  arg1 = reinterpret_cast< csFileTime * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_tm,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csFileTime_assign" "', argument " "2"" of type '" "tm const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csFileTime_assign" "', argument " "2"" of type '" "tm const &""'"); 
+  }
+  arg2 = reinterpret_cast< tm * >(argp2);
+  (arg1)->operator =((tm const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_new_csFileTime(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csFileTime *result = 0 ;
@@ -23673,6 +23707,42 @@ SWIGINTERN PyObject *csFileTime_swigregister(PyObject *SWIGUNUSEDPARM(self), PyO
   SWIG_TypeNewClientData(SWIGTYPE_p_csFileTime, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
+
+SWIGINTERN PyObject *_wrap_ASSIGN_FILETIME(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csFileTime *arg1 = 0 ;
+  tm *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"ASSIGN_FILETIME",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csFileTime,  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ASSIGN_FILETIME" "', argument " "1"" of type '" "csFileTime &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ASSIGN_FILETIME" "', argument " "1"" of type '" "csFileTime &""'"); 
+  }
+  arg1 = reinterpret_cast< csFileTime * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_tm,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ASSIGN_FILETIME" "', argument " "2"" of type '" "tm const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ASSIGN_FILETIME" "', argument " "2"" of type '" "tm const &""'"); 
+  }
+  arg2 = reinterpret_cast< tm * >(argp2);
+  CS::Deprecated::ASSIGN_FILETIME(*arg1,(tm const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
 
 SWIGINTERN PyObject *_wrap_iFile_GetName(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
@@ -59886,9 +59956,11 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csFileTime_mon_get", _wrap_csFileTime_mon_get, METH_VARARGS, NULL},
 	 { (char *)"csFileTime_year_set", _wrap_csFileTime_year_set, METH_VARARGS, NULL},
 	 { (char *)"csFileTime_year_get", _wrap_csFileTime_year_get, METH_VARARGS, NULL},
+	 { (char *)"csFileTime_assign", _wrap_csFileTime_assign, METH_VARARGS, NULL},
 	 { (char *)"new_csFileTime", _wrap_new_csFileTime, METH_VARARGS, NULL},
 	 { (char *)"delete_csFileTime", _wrap_delete_csFileTime, METH_VARARGS, NULL},
 	 { (char *)"csFileTime_swigregister", csFileTime_swigregister, METH_VARARGS, NULL},
+	 { (char *)"ASSIGN_FILETIME", _wrap_ASSIGN_FILETIME, METH_VARARGS, NULL},
 	 { (char *)"iFile_GetName", _wrap_iFile_GetName, METH_VARARGS, NULL},
 	 { (char *)"iFile_GetSize", _wrap_iFile_GetSize, METH_VARARGS, NULL},
 	 { (char *)"iFile_GetStatus", _wrap_iFile_GetStatus, METH_VARARGS, NULL},
@@ -61408,6 +61480,7 @@ static swig_type_info _swigt__p_scfImplementationExt1T_csPath_csObject_iPath_t =
 static swig_type_info _swigt__p_scfInterfaceMetadata = {"_p_scfInterfaceMetadata", "scfInterfaceMetadata *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_scfInterfaceMetadataList = {"_p_scfInterfaceMetadataList", "scfInterfaceMetadataList *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_size_t = {"_p_size_t", "size_t *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_tm = {"_p_tm", "tm *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint16_t = {"_p_uint16_t", "uint16 *|uint16_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint32_t = {"_p_uint32_t", "uint32_t *|uint32 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint64_t = {"_p_uint64_t", "uint64_t *|uint64 *", 0, 0, (void*)0, 0};
@@ -61655,6 +61728,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_scfInterfaceMetadata,
   &_swigt__p_scfInterfaceMetadataList,
   &_swigt__p_size_t,
+  &_swigt__p_tm,
   &_swigt__p_uint16_t,
   &_swigt__p_uint32_t,
   &_swigt__p_uint64_t,
@@ -61902,6 +61976,7 @@ static swig_cast_info _swigc__p_scfImplementationExt1T_csPath_csObject_iPath_t[]
 static swig_cast_info _swigc__p_scfInterfaceMetadata[] = {  {&_swigt__p_scfInterfaceMetadata, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_scfInterfaceMetadataList[] = {  {&_swigt__p_scfInterfaceMetadataList, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_size_t[] = {  {&_swigt__p_size_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_tm[] = {  {&_swigt__p_tm, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint16_t[] = {  {&_swigt__p_uint16_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint32_t[] = {  {&_swigt__p_uint32_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint64_t[] = {  {&_swigt__p_uint64_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -62149,6 +62224,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_scfInterfaceMetadata,
   _swigc__p_scfInterfaceMetadataList,
   _swigc__p_size_t,
+  _swigc__p_tm,
   _swigc__p_uint16_t,
   _swigc__p_uint32_t,
   _swigc__p_uint64_t,
