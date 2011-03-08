@@ -23,6 +23,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+//MSVC and MINGW define utime as _utime
+//and utimbuf as _utimbuf. plus their headers
+//are in a different place than unix like os.
 #ifdef CS_PLATFORM_WIN32
 #include <sys/utime.h>
 #define utime(a,b) _utime(a,b)
