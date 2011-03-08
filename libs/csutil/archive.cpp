@@ -110,7 +110,7 @@ void csArchive::ResetArchiveEntry (ArchiveEntry *f, size_t size, bool pack)
   time_t curtime = time (0);
   struct tm *curtm = localtime (&curtime);
   csFileTime ft;
-  ASSIGN_FILETIME (ft, *curtm);
+  ft = *curtm;
   SetFileTime ((void *)f, ft);
 }
 
