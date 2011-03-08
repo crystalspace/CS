@@ -52,9 +52,7 @@ struct csFileTime
   /// Year, 1768, 1900, 2001, ...
   int year;
 
-  /** Used to allow assignment of a struct tm to this
-   *  @param A struct tm filled with the data to assign to this class
-   */
+  /// Assign a <tt>struct tm</tt>.
   void operator=(const struct tm& time)
   {
     sec  = time.tm_sec;
@@ -64,9 +62,7 @@ struct csFileTime
     mon  = time.tm_mon;
     year = time.tm_year + 1900;
   }
-  /** Used to allow assignment of this to a struct tm
-   *  @return A struct tm filled with the data of this class.
-   */
+  /// Create a <tt>struct tm</tt> from object.
   operator struct tm() const
   {
     struct tm time;
