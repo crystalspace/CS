@@ -52,6 +52,15 @@ struct csFileTime
   /// Year, 1768, 1900, 2001, ...
   int year;
 
+  ///empty constructor.
+  csFileTime() {}
+
+  /// Construct a csFileTime item from a <tt>struct tm</tt>
+  csFileTime(const struct tm& time)
+  {
+      *this = time;
+  }
+
   /// Assign a <tt>struct tm</tt>.
   void operator=(const struct tm& time)
   {
@@ -62,6 +71,7 @@ struct csFileTime
     mon  = time.tm_mon;
     year = time.tm_year + 1900;
   }
+
   /// Create a <tt>struct tm</tt> from object.
   operator struct tm() const
   {

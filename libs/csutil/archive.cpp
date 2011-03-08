@@ -108,9 +108,7 @@ void csArchive::ResetArchiveEntry (ArchiveEntry *f, size_t size, bool pack)
   f->buffer_pos = 0;
 
   time_t curtime = time (0);
-  struct tm *curtm = localtime (&curtime);
-  csFileTime ft;
-  ft = *curtm;
+  csFileTime ft = *localtime (&curtime);
   SetFileTime ((void *)f, ft);
 }
 

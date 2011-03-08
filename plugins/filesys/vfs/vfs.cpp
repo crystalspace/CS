@@ -1485,7 +1485,7 @@ bool VfsNode::SetFileTime (const char *Suffix, const csFileTime &iTime)
     //for now we set the access time the same as the modification time
     //as we have only a time setter function (and zip support only file
     //modification) TODO?: separate version for access time
-    struct tm curtm = (struct tm)iTime;
+    struct tm curtm = iTime;
     struct utimbuf times;
     times.actime = mktime(&curtm);     /* access time */
     times.modtime = times.actime;      /* modification time */
