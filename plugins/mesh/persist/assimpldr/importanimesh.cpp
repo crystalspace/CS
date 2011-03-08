@@ -60,14 +60,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     animeshData.rootNode = node;
 
     // Create the animesh factory
-    animeshData.factoryWrapper = engine->CreateMeshFactory
+    csRef<iMeshFactoryWrapper> factoryWrapper = engine->CreateMeshFactory
       ("crystalspace.mesh.object.animesh", node->mName.data);
-    loaderContext->AddToCollection (animeshData.factoryWrapper->QueryObject ());
+    loaderContext->AddToCollection (factoryWrapper->QueryObject ());
     animeshData.factory = scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
-      (animeshData.factoryWrapper->GetMeshObjectFactory ());
+      (factoryWrapper->GetMeshObjectFactory ());
 
+    // Create an entry in the list of imported meshes
+    ImportedMesh importedMesh;
+    importedMesh.factoryWrapper = factoryWrapper;
+    importedMeshes.Push (importedMesh);
+    animeshData.importedMesh = &importedMeshes[importedMeshes.GetSize () - 1];
+
+    // Check if there is not yet any 'first mesh' defined
     if (!firstMesh)
-      firstMesh = animeshData.factoryWrapper;
+      firstMesh = factoryWrapper;
 
     // Register the bone nodes
     InitBoneNode (&animeshData, node);
@@ -125,7 +132,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 	animeshData.factory->GetSubMesh (i)->GetMaterial ();
       if (material)
       {
-	animeshData.factoryWrapper->GetMeshObjectFactory ()
+	animeshData.importedMesh->factoryWrapper->GetMeshObjectFactory ()
 	  ->SetMaterialWrapper (material);
 	break;
       }
@@ -272,8 +279,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       if (!mesh->HasFaces ()
 	  || !mesh->HasPositions ())
       {
-	ReportWarning (object_reg,
-		       "Skipping mesh %s for lack of vertices or faces!",
+	ReportWarning ("Skipping mesh %s for lack of vertices or faces!",
 		       CS::Quote::Single (mesh->mName.data));
 	continue;
       }
@@ -284,10 +290,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 	// If these are not triangles then export them in an extra render mesh
 	if (mesh->mPrimitiveTypes & aiPrimitiveType_POINT
 	    || mesh->mPrimitiveTypes & aiPrimitiveType_LINE)
-	  ImportExtraRenderMesh (animeshData->factoryWrapper, mesh);
+	  ImportExtraRenderMesh (animeshData->importedMesh, mesh);
 
-	else ReportWarning (object_reg,
-			    "Skipping mesh %s for lack of points, lines or triangles!",
+	else ReportWarning ("Skipping mesh %s for lack of points, lines or triangles!",
 			    CS::Quote::Single (mesh->mName.data));
 
 	continue;
@@ -393,6 +398,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       CS::Mesh::iAnimatedMeshSubMeshFactory* submesh =
 	animeshData->factory->CreateSubMesh
 	(buffer, mesh->mName.data, true);
+      animeshData->importedMesh->meshes.Push (mesh);
 
       // Setup the material
       if (mesh->mMaterialIndex < materials.GetSize ())
@@ -452,7 +458,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       AnimeshNode animeshNode;
       animeshNode.factory = animeshData->factory;
       animeshNode.boneID = boneData->boneID;
-      nodeData.Put (node->mName.data, animeshNode);
+      animeshNodes.Put (node->mName.data, animeshNode);
     }
 
     // TODO: else skip branch
@@ -533,7 +539,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       aiNodeAnim* channel = animation->mChannels[i];
 
       // Search the animesh and bone ID for this animation channel
-      AnimeshNode* animeshNode = nodeData[channel->mNodeName.data];
+      AnimeshNode* animeshNode = animeshNodes[channel->mNodeName.data];
       if (!animeshNode)
 	continue;
 
@@ -577,7 +583,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 	  (object_reg, "crystalspace.mesh.animesh.animnode.debug");
 	if (!debugNodeManager)
 	{
-	  ReportWarning (object_reg, "Failed to locate debug node plugin!");
+	  ReportWarning ("Failed to locate debug node plugin!");
 	  animationPacket->SetAnimationRoot (animationNode);
 	}
 
@@ -636,7 +642,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
   void AssimpLoader::ConvertAnimationFrames ()
   {
-    for (csHash<AnimeshNode, csString>::GlobalIterator it = nodeData.GetIterator ();
+    for (csHash<AnimeshNode, csString>::GlobalIterator it = animeshNodes.GetIterator ();
 	 it.HasNext (); )
     {
       AnimeshNode& animeshNode = it.Next ();

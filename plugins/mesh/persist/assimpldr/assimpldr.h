@@ -31,6 +31,7 @@
 #include "imap/reader.h"
 #include "imap/modelload.h"
 #include "imesh/skeleton2.h"
+#include "iutil/comp.h"
 
 #include "assimp/assimp.hpp"      // C++ importer interface
 #include "assimp/aiScene.h"       // Output data structure
@@ -61,6 +62,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
  * Open Asset Import Library loader for Crystal Space
  */
 
+enum NodeType
+{
+  NODE_UNDEFINED = 0,
+  NODE_GENMESH,
+  NODE_ANIMESH
+};
+
+struct NodeData
+{
+  aiNode* node;
+  NodeType type;
+
+  NodeData (aiNode* node)
+  : node (node), type (NODE_UNDEFINED) {}
+};
+
+struct ImportedMesh
+{
+  iMeshFactoryWrapper* factoryWrapper;
+  csArray<aiMesh*> meshes;
+};
+
 struct BoneData
 {
   bool isBone;
@@ -76,7 +99,7 @@ struct BoneData
 struct AnimeshData
 {
   csRef<CS::Mesh::iAnimatedMeshFactory> factory;
-  csRef<iMeshFactoryWrapper> factoryWrapper;
+  ImportedMesh* importedMesh;
 
   csDirtyAccessArray<float> vertices;
   csDirtyAccessArray<float> texels;
@@ -139,10 +162,17 @@ public:
   void ImportTexture (aiTexture* texture, size_t index);
   void ImportMaterial (aiMaterial* material, size_t index);
 
-  void ImportExtraRenderMesh (iMeshFactoryWrapper* factoryWrapper, aiMesh* mesh);
+  void InitSceneNode (aiNode* node);
+  void AnalyzeSceneNode (aiNode* node, aiNode* animeshNode);
+
+  void ImportSceneNode (aiNode* node);
+  bool IsInstancedMesh (aiNode* node);
+  bool ContainsAllMeshes (csArray<aiMesh*>& meshes, aiNode* node);
+
+  void ImportExtraRenderMesh (ImportedMesh* importedMesh, aiMesh* mesh);
 
   void ImportGenmesh (aiNode* node);
-  void ImportGenmeshSubMesh (iMeshFactoryWrapper* factoryWrapper,
+  void ImportGenmeshSubMesh (ImportedMesh* importedMesh,
 			     iGeneralFactoryState* gmstate,
 			     aiNode* node);
 
@@ -160,6 +190,14 @@ public:
   void ImportAnimation (aiAnimation* animation, size_t index);
   void ConvertAnimationFrames ();
 
+  void ReportError (const char* description, ...);
+  void ReportWarning (const char* description, ...);
+
+  void PrintMesh (aiMesh* mesh, const char* prefix);
+  void PrintNode (const aiScene* scene, aiNode* node,
+		  const char* prefix);
+  void PrintImportNode (aiNode* node, const char* prefix);
+
 private:
   iObjectRegistry* object_reg;
 
@@ -176,113 +214,27 @@ private:
   csRefArray<iTextureWrapper> textures;
   csRefArray<iMaterialWrapper> materials;
 
+  // The first mesh factory encountered is used as the return value when needed
+  csRef<iMeshFactoryWrapper> firstMesh;
+
+  // Assimp specific objects
   const aiScene* scene;
   unsigned int importFlags;
 
-  csRef<iMeshFactoryWrapper> firstMesh;
+  // These are used to analyze the scene tree
+  csHash<NodeData, aiNode*> sceneNodes;
+  csHash<NodeData*, csString> sceneNodesByName;
 
+  // This is used to find whether some meshes are instanciated
+  csArray<ImportedMesh> importedMeshes;
+
+  // This is used to find the corresponding bone data when importing animations
   struct AnimeshNode
   {
     CS::Mesh::iAnimatedMeshFactory* factory;
     CS::Animation::BoneID boneID;
   };
-  csHash<AnimeshNode, csString> nodeData;
-
-};
-
-/**
- * IO stream handling
- */
-
-class csIOStream : public Assimp::IOStream
-{
- public:
-  csIOStream (iFile* file)
-    : file (file) {}
-  ~csIOStream () {}
-
-  size_t Read (void* pvBuffer, size_t pSize, size_t pCount)
-  { return file ? file->Read ((char*) pvBuffer, pSize * pCount) : 0; }
-
-  size_t Write (const void* pvBuffer, size_t pSize, size_t pCount)
-  { return file ? file->Write ((char*) pvBuffer, pSize * pCount) : 0; }
-
-  aiReturn Seek (size_t pOffset, aiOrigin pOrigin)
-  {
-    if (!file)
-      return aiReturn_FAILURE;
-
-    switch (pOrigin)
-      {
-      case aiOrigin_SET:
-	return file->SetPos (pOffset) ? aiReturn_SUCCESS : aiReturn_FAILURE;
-
-      case aiOrigin_CUR:
-	return file->SetPos (file->GetPos () + pOffset)
-	  ? aiReturn_SUCCESS : aiReturn_FAILURE;
-
-      case aiOrigin_END:
-	return file->SetPos (file->GetSize () + pOffset)
-	  ? aiReturn_SUCCESS : aiReturn_FAILURE;
-
-      default:
-	break;
-      }
-
-    return aiReturn_FAILURE;
-  }
-
-  size_t Tell () const
-  { return file ? file->GetPos () : 0; }
-
-  size_t FileSize () const
-  { return file ? file->GetSize () : 0; }
-
-  void Flush ()
-  { if (file) file->Flush (); }
-
- private:
-  csRef<iFile> file;
-};
-
-class csIOSystem : public Assimp::IOSystem
-{
- public:
-  csIOSystem (iVFS* vfs, const char* filename)
-    : vfs (vfs), changer (vfs)
-  {
-    csString file = filename;
-    if (filename && file.FindFirst ('/') != (size_t) -1)
-      changer.ChangeTo (filename);
-  }
-
-  ~csIOSystem () {}
-
-  bool Exists (const char *pFile) const
-  {
-    printf ("Exists [%s]: %s\n", pFile,
-	    vfs->Exists (pFile) ? "true" : "false");
-    return vfs->Exists (pFile);
-  }
-
-  char getOsSeparator () const
-  { return '/'; }
-
-  Assimp::IOStream* Open (const char *pFile, const char *pMode="rb")
-  {
-    printf ("Open [%s]\n", pFile); 
-    csRef<iFile> file = vfs->Open (pFile,
-				   *pMode == 'w' ? VFS_FILE_WRITE : VFS_FILE_READ);
-    if (!file) printf ("failed!!\n");
-    return new csIOStream (file);
-  }
-
-  void Close (Assimp::IOStream* pFile)
-  { delete pFile; }
-
- private:
-  csRef<iVFS> vfs;
-  csVfsDirectoryChanger changer;
+  csHash<AnimeshNode, csString> animeshNodes;
 };
 
 }

@@ -63,62 +63,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
   }
 
   /**
-   * Error reporting
-   */
-  static void ReportError (iObjectRegistry* objreg,
-			   const char* description, ...)
-  {
-    va_list arg;
-    va_start (arg, description);
-    csReportV (objreg, CS_REPORTER_SEVERITY_ERROR,
-	       "crystalspace.mesh.loader.factory.assimp",
-	       description, arg);
-    va_end (arg);
-  }
-
-  static void ReportWarning (iObjectRegistry* objreg,
-			     const char* description, ...)
-  {
-    va_list arg;
-    va_start (arg, description);
-    csReportV (objreg, CS_REPORTER_SEVERITY_WARNING,
-	       "crystalspace.mesh.loader.factory.assimp",
-	       description, arg);
-    va_end (arg);
-  }
-
-  /**
-   * Printing of scene tree
-   */
-  static void PrintMesh (aiMesh* mesh, const char* prefix)
-  {
-    printf ("%s  mesh [%s]: %i vertices %i faces %i bones %i anims %s%s%s%s\n",
-	    prefix, mesh->mName.data, mesh->mNumVertices,
-	    mesh->mNumFaces, mesh->mNumBones, mesh->mNumAnimMeshes,
-	    mesh->mPrimitiveTypes & aiPrimitiveType_POINT ? "p" : "-",
-	    mesh->mPrimitiveTypes & aiPrimitiveType_LINE ? "l" : "-",
-	    mesh->mPrimitiveTypes & aiPrimitiveType_TRIANGLE ? "t" : "-",
-	    mesh->mPrimitiveTypes & aiPrimitiveType_POLYGON ? "p" : "-");
-  }
-
-  static void PrintNode (const aiScene* scene, aiNode* node,
-		  const char* prefix)
-  {
-    printf ("%s+ node [%s] [%s]\n", prefix, node->mName.data,
-	    node->mTransformation.IsIdentity ()
-	    ? "unmoved" : "moved");
-
-    for (unsigned int i = 0; i < node->mNumMeshes; i++)
-      PrintMesh (scene->mMeshes[node->mMeshes[i]], prefix);
-
-    csString pref = prefix;
-    pref += " ";
-
-    for (unsigned int i = 0; i < node->mNumChildren; i++)
-      PrintNode (scene, node->mChildren[i], pref.GetData ());
-  }
-
-  /**
    * Render buffer creation
    */
   template<typename T>
@@ -172,6 +116,100 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     return buffer;
   }
  
+
+  /**
+   * IO stream handling
+   */
+
+  class csIOStream : public Assimp::IOStream
+  {
+  public:
+    csIOStream (iFile* file)
+      : file (file) {}
+    ~csIOStream () {}
+
+    size_t Read (void* pvBuffer, size_t pSize, size_t pCount)
+    { return file ? file->Read ((char*) pvBuffer, pSize * pCount) : 0; }
+
+    size_t Write (const void* pvBuffer, size_t pSize, size_t pCount)
+    { return file ? file->Write ((char*) pvBuffer, pSize * pCount) : 0; }
+
+    aiReturn Seek (size_t pOffset, aiOrigin pOrigin)
+    {
+      if (!file)
+	return aiReturn_FAILURE;
+
+      switch (pOrigin)
+	{
+	case aiOrigin_SET:
+	  return file->SetPos (pOffset) ? aiReturn_SUCCESS : aiReturn_FAILURE;
+
+	case aiOrigin_CUR:
+	  return file->SetPos (file->GetPos () + pOffset)
+	    ? aiReturn_SUCCESS : aiReturn_FAILURE;
+
+	case aiOrigin_END:
+	  return file->SetPos (file->GetSize () + pOffset)
+	    ? aiReturn_SUCCESS : aiReturn_FAILURE;
+
+	default:
+	  break;
+	}
+
+      return aiReturn_FAILURE;
+    }
+
+    size_t Tell () const
+    { return file ? file->GetPos () : 0; }
+
+    size_t FileSize () const
+    { return file ? file->GetSize () : 0; }
+
+    void Flush ()
+    { if (file) file->Flush (); }
+
+  private:
+    csRef<iFile> file;
+  };
+
+  class csIOSystem : public Assimp::IOSystem
+  {
+  public:
+    csIOSystem (iVFS* vfs, const char* filename)
+      : vfs (vfs), changer (vfs)
+    {
+      csString file = filename;
+      if (filename && file.FindFirst ('/') != (size_t) -1)
+	changer.ChangeTo (filename);
+    }
+
+    ~csIOSystem () {}
+
+    bool Exists (const char *pFile) const
+    {
+      return vfs->Exists (pFile);
+    }
+
+    char getOsSeparator () const
+    { return '/'; }
+
+    Assimp::IOStream* Open (const char *pFile, const char *pMode="rb")
+    {
+      printf ("Opening file [%s]...", pFile); 
+      csRef<iFile> file = vfs->Open (pFile,
+				     *pMode == 'w' ? VFS_FILE_WRITE : VFS_FILE_READ);
+      printf (file ? "Success\n" : "Failed!\n");
+      return new csIOStream (file);
+    }
+
+    void Close (Assimp::IOStream* pFile)
+    { delete pFile; }
+
+  private:
+    csRef<iVFS> vfs;
+    csVfsDirectoryChanger changer;
+  };
+
 }
 CS_PLUGIN_NAMESPACE_END(AssimpLoader)
 

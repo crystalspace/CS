@@ -63,7 +63,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       | aiProcess_GenUVCoords
       | aiProcess_JoinIdenticalVertices
       | aiProcess_LimitBoneWeights
-      //| aiProcess_OptimizeGraph
+      | aiProcess_OptimizeGraph
       //| aiProcess_OptimizeMeshes
       | aiProcess_SortByPType
       | aiProcess_SplitLargeMeshes
@@ -91,6 +91,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
   bool AssimpLoader::IsRecognized (iDataBuffer* buffer)
   {
+    // TODO: this is dangerous...
     return true;
   }
 
@@ -105,7 +106,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     vfs = csQueryRegistry<iVFS> (object_reg);
     if (!vfs)
     {
-      ReportError (object_reg, "Could not load VFS system!");
+      ReportError ("Could not load VFS system!");
       return (iBase*) nullptr;
     }
 
@@ -118,7 +119,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     // If the import failed, report it
     if (!scene)
     {
-      ReportError (object_reg, "Failed to load binary file: %s",
+      ReportError ("Failed to load binary file: %s",
 		   importer.GetErrorString());
       return (iBase*) nullptr;
     }
@@ -139,7 +140,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     vfs = csQueryRegistry<iVFS> (object_reg);
     if (!vfs)
     {
-      ReportError (object_reg, "Could not load VFS system!");
+      ReportError ("Could not load VFS system!");
       return nullptr;
     }
 
@@ -152,7 +153,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     // If the import failed, report it
     if (!scene)
     {
-      ReportError (object_reg, "Failed to load factory %s: %s",
+      ReportError ("Failed to load factory %s: %s",
 		   CS::Quote::Single (factname),
 		   importer.GetErrorString());
       return nullptr;
@@ -167,16 +168,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
   iMeshFactoryWrapper* AssimpLoader::Load (const char* factname,
 					   const char* filename)
   {
+    // TODO: implement iPluginConfig, use iVerbosityManager, csProgressPulse
     // TODO: custom options: scale, genmesh/animesh/scene/factories,
-    //   find duplicates/optimize
+    //   find duplicates/optimize, save default animesh pose
     // TODO: if forced to be a genmesh then don't read animations,
     //   weights, etc
+    // TODO: if forced to be a mesh then load only the textures/materials needed for it
 
     // Find the VFS
     vfs = csQueryRegistry<iVFS> (object_reg);
     if (!vfs)
     {
-      ReportError (object_reg, "Could not load VFS system!");
+      ReportError ("Could not load VFS system!");
       return nullptr;
     }
 
@@ -188,8 +191,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     // If the import failed, report it
     if (!scene)
     {
-      ReportError (object_reg,
-		   "Failed to load factory %s from file %s: %s",
+      ReportError ("Failed to load factory %s from file %s: %s",
 		   CS::Quote::Single (factname),
 		   CS::Quote::Single (filename),
 		   importer.GetErrorString());
@@ -204,7 +206,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
   void AssimpLoader::ImportScene ()
   {
-    printf ("Loading OK!\n");
+    printf ("\nLoading OK!\n");
     printf ("animations: %i\n", scene->mNumAnimations);
     printf ("meshes: %i\n", scene->mNumMeshes);
     printf ("materials: %i\n", scene->mNumMaterials);
@@ -216,62 +218,55 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     PrintNode (scene, scene->mRootNode, "");
     printf ("\n");
 
-    // Clear previous import data
-    textures.DeleteAll ();
-    materials.DeleteAll ();
+    // Clear any previous imported first mesh
     firstMesh = nullptr;
-    nodeData.DeleteAll ();
 
     // Find pointers to engine data
     engine = csQueryRegistry<iEngine> (object_reg);
     if (!engine)
     {
-      ReportError (object_reg, "Could not find the engine");
+      ReportError ("Could not find the engine");
       return;
     }
 
     g3d = csQueryRegistry<iGraphics3D> (object_reg);
     if (!g3d)
     {
-      ReportError (object_reg, "Could not find the 3D graphics");
+      ReportError ("Could not find the 3D graphics");
       return;
     }
 
     textureManager = g3d->GetTextureManager();
     if (!textureManager)
     {
-      ReportError (object_reg,
-		   "Could not find the texture manager");
+      ReportError ("Could not find the texture manager");
       return;
     }
 
     loader = csQueryRegistry<iLoader> (object_reg);
     if (!loader)
     {
-      ReportError (object_reg, "Could not find the main loader!");
+      ReportError ("Could not find the main loader!");
       return;
     }
 
     imageLoader = csQueryRegistry<iImageIO> (object_reg);
     if (!imageLoader)
     {
-      ReportError (object_reg,
-		   "Failed to find an image loader!");
+      ReportError ("Failed to find an image loader!");
       return;
     }
 
     shaderVariableNames = csQueryRegistryTagInterface<iShaderVarStringSet>
       (object_reg, "crystalspace.shader.variablenameset");
     if (!shaderVariableNames)
-      ReportWarning (object_reg,
-		     "Could not find the shader variable set. Import of materials will be limited");
+      ReportWarning ("Could not find the shader variable set. Import of materials will be limited");
 
     // Find the skeleton manager
     skeletonManager = csQueryRegistryOrLoad<CS::Animation::iSkeletonManager>
       (object_reg, "crystalspace.skeletalanimation");
     if (!skeletonManager)
-      ReportWarning (object_reg,
-		     "Could not find the skeleton manager. Importing animesh skeletons and animations won't be possible");
+      ReportWarning ("Could not find the skeleton manager. Importing animesh skeletons and animations won't be possible");
 
     // Create the loader context if needed
     if (!loaderContext)
@@ -293,12 +288,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       ImportMaterial (material, i);
     }
 
-    // Import all meshes
-    if (scene->mRootNode)
-      // TODO: Check the type of the mesh then import it
-      // TODO: terrains, whole scene (lights, cameras)
-      //ImportGenmesh (scene->mRootNode);
-      ImportAnimesh (scene->mRootNode);
+    if (!scene->mRootNode)
+      return;
+
+    // Analyze the scene tree
+    InitSceneNode (scene->mRootNode);
+    AnalyzeSceneNode (scene->mRootNode, nullptr);
+
+    printf ("\nImported scene tree:\n");
+    PrintImportNode (scene->mRootNode, "");
+    printf ("\n");
+
+    // Import the whole scene
+    // TODO: terrains, lights, cameras
+    ImportSceneNode (scene->mRootNode);
 
     // Import all animations
     for (unsigned int i = 0; i < scene->mNumAnimations; i++)
@@ -309,6 +312,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
     // Convert the animations in bind space
     ConvertAnimationFrames ();
+
+    // Clear the internal import data
+    textures.DeleteAll ();
+    materials.DeleteAll ();
+    sceneNodes.DeleteAll ();
+    sceneNodesByName.DeleteAll ();
+    importedMeshes.DeleteAll ();
+    animeshNodes.DeleteAll ();
   }
 
   iTextureWrapper* AssimpLoader::FindTexture (const char* filename)
@@ -454,9 +465,168 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     // TODO: import all other material properties
   }
 
-  void AssimpLoader::ImportExtraRenderMesh (iMeshFactoryWrapper* factoryWrapper, aiMesh* mesh)
+  void AssimpLoader::InitSceneNode (aiNode* node)
+  {
+    // Add an entry in the registered scene nodes
+    NodeData nodeData (node);
+    if (node->mNumMeshes > 0)
+      nodeData.type = NODE_GENMESH;
+
+    NodeData& nodeRef = sceneNodes.PutUnique (node, nodeData);
+    if (strlen (node->mName.data))
+      sceneNodesByName.PutUnique (node->mName.data, &nodeRef);
+
+    // Init the child nodes
+    for (unsigned int i = 0; i < node->mNumChildren; i++)
+    {
+      aiNode*& subnode = node->mChildren[i];
+      InitSceneNode (subnode);
+    }
+  }
+
+  void AssimpLoader::AnalyzeSceneNode (aiNode* node, aiNode* animeshNode)
+  {
+    // Check for the data of all meshes
+    for (unsigned int i = 0; i < node->mNumMeshes; i++)
+    {
+      aiMesh*& mesh = scene->mMeshes[node->mMeshes[i]];
+
+      // Check the validity of the mesh
+      if (!mesh->HasFaces ()
+	  || !mesh->HasPositions ())
+	continue;
+
+      // Check if we found an animesh
+      if (!animeshNode && mesh->mNumBones > 0)
+      {
+	// Find the data of this node and mark it as an animesh
+	NodeData* nodeData = sceneNodes[node];
+	nodeData->type = NODE_ANIMESH;
+	animeshNode = node;
+      }
+
+      // Check for the bones of this submesh
+      for (unsigned int i = 0; i < mesh->mNumBones; i++)
+      {
+	aiBone*& bone = mesh->mBones[i];
+
+	// Find the node corresponding to this bone and mark it as a bone
+	NodeData* nodeData = *sceneNodesByName[bone->mName.data];
+
+	// Mark the parents of this node as bones
+	aiNode* nodeIterator = nodeData->node->mParent;
+	while (nodeIterator)
+	{
+	  // Find the node corresponding to this bone and mark it as a bone
+	  NodeData* nodeData = sceneNodes[nodeIterator];
+	  if (!nodeData)
+	    break;
+
+	  // Check for the root of the tree reached
+	  if (!nodeIterator->mParent)
+	  {
+	    // We found a new animesh node
+	    nodeData->type = NODE_ANIMESH;
+	    animeshNode = nodeIterator;
+	    break;
+	  }
+
+	  // Check for the parent reached
+	  if (nodeIterator->mParent == animeshNode)
+	    break;
+
+	  // Check for the grand parent reached
+	  if (animeshNode && nodeIterator->mParent == animeshNode->mParent)
+	  {
+	    NodeData* nodeData = sceneNodes[animeshNode->mParent];
+	    if (!nodeData)
+	      break;
+
+	    // We found a new animesh node
+	    nodeData->type = NODE_ANIMESH;
+	    animeshNode = animeshNode->mParent;
+	    break;
+	  }
+
+	  nodeIterator = nodeIterator->mParent;
+	}
+      }
+    }
+
+    // Analyze the child nodes
+    for (unsigned int i = 0; i < node->mNumChildren; i++)
+    {
+      aiNode*& subnode = node->mChildren[i];
+      AnalyzeSceneNode (subnode, animeshNode);
+    }
+  }
+
+  void AssimpLoader::ImportSceneNode (aiNode* node)
+  {
+    // Check if we found a genmesh or an animesh
+    NodeData* nodeData = sceneNodes[node];
+    if (nodeData->type == NODE_GENMESH)
+    {
+      if (!IsInstancedMesh (node))
+	ImportGenmesh (node);
+    }
+
+    else if (nodeData->type == NODE_ANIMESH)
+      ImportAnimesh (node);
+
+    // Otherwise import the children nodes
+    else for (unsigned int i = 0; i < node->mNumChildren; i++)
+    {
+      aiNode*& subnode = node->mChildren[i];
+      ImportSceneNode (subnode);
+    }
+  }
+
+  bool AssimpLoader::IsInstancedMesh (aiNode* node)
+  {
+    // Check in the list of imported meshes if this same list of Assimp meshes has already
+    // been used
+    for (size_t i = 0; i < importedMeshes.GetSize (); i++)
+      if (ContainsAllMeshes (importedMeshes[i].meshes, node))
+	return true;
+
+    return false;
+  }
+
+  bool AssimpLoader::ContainsAllMeshes (csArray<aiMesh*>& meshes, aiNode* node)
+  {
+    // Check if all the meshes of this node are in the mesh list
+    for (unsigned int i = 0; i < node->mNumMeshes; i++)
+    {
+      aiMesh*& mesh = scene->mMeshes[node->mMeshes[i]];
+      //if (!meshes.Contains (mesh))
+      //return false;
+      bool found = false;
+      for (size_t i = 0; i < meshes.GetSize (); i++)
+	if (meshes[i] == mesh)
+	{
+	  found = true;
+	  break;
+	}
+
+      if (!found) return false;
+    }
+
+    // Check all subnodes
+    for (unsigned int i = 0; i < node->mNumChildren; i++)
+    {
+      aiNode*& subnode = node->mChildren[i];
+      if (!ContainsAllMeshes (meshes, subnode))
+	return false;
+    }
+
+    return true;
+  }
+
+  void AssimpLoader::ImportExtraRenderMesh (ImportedMesh* importedMesh, aiMesh* mesh)
   {
     bool isPoint = mesh->mPrimitiveTypes & aiPrimitiveType_POINT;
+    // TODO: is_mirror
 
     // Create the extra render mesh and the render buffer holder
     CS::Graphics::RenderMesh* renderMesh = new CS::Graphics::RenderMesh ();
@@ -517,7 +687,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     if (mesh->mMaterialIndex < materials.GetSize ())
       renderMesh->material = materials[mesh->mMaterialIndex];
 
-    factoryWrapper->AddExtraRenderMesh (renderMesh);
+    importedMesh->factoryWrapper->AddExtraRenderMesh (renderMesh);
+    importedMesh->meshes.Push (mesh);
   }
 
   void AssimpLoader::ImportGenmesh (aiNode* node)
@@ -531,15 +702,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       scfQueryInterface<iGeneralFactoryState>
       (factoryWrapper->GetMeshObjectFactory ());
 
+    // Create an entry in the list of imported meshes
+    ImportedMesh importedMesh;
+    importedMesh.factoryWrapper = factoryWrapper;
+    importedMeshes.Push (importedMesh);
+
+    // Check if there is not yet any 'first mesh' defined
     if (!firstMesh)
       firstMesh = factoryWrapper;
 
     // Import all submeshes
-    ImportGenmeshSubMesh (factoryWrapper, gmstate, node);
+    ImportGenmeshSubMesh (&importedMeshes[importedMeshes.GetSize () - 1], gmstate, node);
   }
 
   void AssimpLoader::ImportGenmeshSubMesh
-    (iMeshFactoryWrapper* factoryWrapper, iGeneralFactoryState* gmstate, aiNode* node)
+    (ImportedMesh* importedMesh, iGeneralFactoryState* gmstate, aiNode* node)
   {
     // Import all meshes of this node
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
@@ -550,8 +727,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       if (!mesh->HasFaces ()
 	  || !mesh->HasPositions ())
       {
-	ReportWarning (object_reg,
-		       "Skipping mesh %s for lack of vertices or faces!",
+	ReportWarning ("Skipping mesh %s for lack of vertices or faces!",
 		       CS::Quote::Single (mesh->mName.data));
 	continue;
       }
@@ -562,10 +738,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 	// If these are not triangles then export them in an extra render mesh
 	if (mesh->mPrimitiveTypes & aiPrimitiveType_POINT
 	    || mesh->mPrimitiveTypes & aiPrimitiveType_LINE)
-	  ImportExtraRenderMesh (factoryWrapper, mesh);
+	  ImportExtraRenderMesh (importedMesh, mesh);
 
-	else ReportWarning (object_reg,
-			    "Skipping mesh %s for lack of points, lines or triangles!",
+	else ReportWarning ("Skipping mesh %s for lack of points, lines or triangles!",
 			    CS::Quote::Single (mesh->mName.data));
 
 	continue;
@@ -617,13 +792,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
       // Create the submesh
       gmstate->AddSubMesh (buffer, material, mesh->mName.data);
+      importedMesh->meshes.Push (mesh);
     }
 
     // Import all subnodes
     for (unsigned int i = 0; i < node->mNumChildren; i++)
     {
       aiNode*& subnode = node->mChildren[i];
-      ImportGenmeshSubMesh (factoryWrapper, gmstate, subnode);
+      ImportGenmeshSubMesh (importedMesh, gmstate, subnode);
     }
   }
 
