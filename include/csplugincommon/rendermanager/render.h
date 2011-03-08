@@ -358,7 +358,7 @@ namespace RenderManager
       csArray<iSector*> sectors;
       for (size_t c = 0; c < contextStack.GetSize (); ++c)
       {
-        RenderTree::ContextNode* ctx = contextStack[c];
+        typename RenderTree::ContextNode* ctx = contextStack[c];
 
         size_t numSectors = sectors.GetSize ();
         if (sectors.PushSmart (ctx->sector) == numSectors)
