@@ -55,7 +55,7 @@ struct csFileTime
   /** Used to allow assignment of a struct tm to this
    *  @param A struct tm filled with the data to assign to this class
    */
-  void operator=(struct tm time)
+  void operator=(const struct tm& time)
   {
     sec  = time.tm_sec;
     min  = time.tm_sec;
@@ -84,22 +84,18 @@ namespace CS
 {
   namespace Deprecated
   {
-    void static inline __attribute__((deprecated)) AssignFileTime(csFileTime &ft, struct tm &time)
+    CS_DEPRECATED_METHOD_MSG("Use assign operator of csFileTime.")
+    static inline void ASSIGN_FILETIME (csFileTime &ft, const struct tm &time)
     {
-      ft.sec = time.tm_sec;
-      ft.min = time.tm_min;
-      ft.hour = time.tm_hour;
-      ft.day = time.tm_mday;
-      ft.mon = time.tm_mon;
-      ft.year = time.tm_year + 1900;
+      ft = time;
     }
   }
 }
-/** This macro can be used to assign a "struct tm" to a csFileTime
- *  This is deprecated use csFileTime = struct tm
+/** 
+ * \deprecated Deprecated in 1.9. Use assign operator of csFileTime.
  */
 #define ASSIGN_FILETIME(ft,tm)	\
-  CS::Deprecated::AssignFileTime(ft, tm);
+  CS::Deprecated::ASSIGN_FILETIME(ft, tm);
 
 /// Composite path divider
 #define VFS_PATH_DIVIDER        ','
