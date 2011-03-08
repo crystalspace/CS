@@ -323,12 +323,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 
   iMaterialWrapper* SubMeshesContainer::GetMaterialWrapper() const
   {
-      if((subMeshes.GetSize() == 1) && (subMeshes[0] != defaultSubmesh))
-      {
-          return subMeshes[0]->GetMaterial();
-      }
+    iMaterialWrapper* mat = nullptr;
+    if((subMeshes.GetSize() == 1) && (subMeshes[0] != defaultSubmesh))
+    {
+        mat = subMeshes[0]->GetMaterial();
+    }
 
-      return defaultSubmesh->GetMaterial();
+    // Fallback to material of default submesh
+    if (!mat) mat = defaultSubmesh->GetMaterial();
+    return mat;
   }
 
   //-------------------------------------------------------------------------
@@ -432,12 +435,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 
   iMaterialWrapper* SubMeshProxiesContainer::GetMaterialWrapper() const
   {
-      if((subMeshes.GetSize() == 1) && (subMeshes[0] != defaultSubmesh))
-      {
-          return subMeshes[0]->GetMaterial();
-      }
+    iMaterialWrapper* mat = nullptr;
+    if((subMeshes.GetSize() == 1) && (subMeshes[0] != defaultSubmesh))
+    {
+      mat = subMeshes[0]->GetMaterial();
+    }
 
-      return defaultSubmesh->GetMaterial();
+    // Fallback to material of default submesh
+    if (!mat) mat = defaultSubmesh->GetMaterial();
+    return mat;
   }
 
   //-------------------------------------------------------------------------
