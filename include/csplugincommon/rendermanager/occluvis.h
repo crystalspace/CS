@@ -416,9 +416,9 @@ namespace CS
      /**
       * Mark that we're about to perform precache visibility culling.
       */
-      virtual void PrecacheCulling ()
+      virtual void PrecacheCulling (bool state)
       {
-        bAllVisible = true;
+        bAllVisible = state;
       }
 
       virtual const char* ParseCullerParameters (iDocumentNode* node) { return 0; }
@@ -427,15 +427,18 @@ namespace CS
     class F2BSorter
     {
     public:
-      F2BSorter (const csVector3& cameraOrigin)
+      F2BSorter (iEngine* engine, const csVector3& cameraOrigin)
         : cameraOrigin (cameraOrigin)
-      {}
+      {
+        portalPriority = engine->GetRenderPriority ("portal");
+      }
 
       bool operator() (csOccluvis::NodeMeshList* const& m1,
                        csOccluvis::NodeMeshList* const& m2);
 
     private:
       const csVector3& cameraOrigin;
+      CS::Graphics::RenderPriority portalPriority;
     };
 
     class csOccluvisObjIt :

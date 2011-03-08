@@ -354,11 +354,19 @@ namespace RenderManager
 
       BeginFinishDrawScope bd (g3d, drawFlags);
 
-      // All the contexts in the stack use the same rview, so only set W2C once.
-      g3d->SetWorldToCamera (context->cameraTransform.GetInverse ());
+      // Any rendering required for visculling needs to be done once only per sector.
+      csArray<iSector*> sectors;
+      for (size_t c = 0; c < contextStack.GetSize (); ++c)
+      {
+        RenderTree::ContextNode* ctx = contextStack[c];
 
-      // Likewise, any rendering required for visculling can be done once only.
-      context->sector->GetVisibilityCuller ()->RenderViscull (rview, context->shadervars);
+        size_t numSectors = sectors.GetSize ();
+        if (sectors.PushSmart (ctx->sector) == numSectors)
+        {
+          g3d->SetWorldToCamera (ctx->cameraTransform.GetInverse ());
+          ctx->sector->GetVisibilityCuller ()->RenderViscull (rview, ctx->shadervars);
+        }
+      }
 
       // Detect subsequent contexts with same grouping
       size_t firstContext = 0;
@@ -415,6 +423,7 @@ namespace RenderManager
           /* Bail out if layer index is above the actual layer count in the
           * context */
           if (layer >= context->svArrays.GetNumLayers()) continue;
+          g3d->SetWorldToCamera (context->cameraTransform.GetInverse ());
           ForEachMeshNode (*context, meshRender);
         }
       }
@@ -425,6 +434,7 @@ namespace RenderManager
       for (size_t i = firstContext; i < lastContext; ++i)
       {
         typename RenderTree::ContextNode* context = contextStack.Get (i);
+        g3d->SetWorldToCamera (context->cameraTransform.GetInverse ());
         ForEachMeshNode (*context, meshRenderByMesh);
       }
     }

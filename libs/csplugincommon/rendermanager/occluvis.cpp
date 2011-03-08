@@ -388,20 +388,30 @@ namespace CS
               }
             }
 
-            // Check for a mesh 'never draw' state.
+            // Check for a mesh 'never draw' Z state.
             bool bNeverDrawAny = false;
-            switch (visobj->GetMeshWrapper ()->GetZBufMode ())
+
+            // Portals are never drawn to Z.
+            if (visobj->GetMeshWrapper ()->GetPortalContainer ())
             {
-            case CS_ZBUF_NONE:
-            case CS_ZBUF_INVERT:
-            case CS_ZBUF_TEST:
-            case CS_ZBUF_EQUAL:
+              bNeverDrawAny = true;
+            }
+            else
+            {
+              // Check the z buffer mode of the mesh.
+              switch (visobj->GetMeshWrapper ()->GetZBufMode ())
               {
-                bNeverDrawAny = true;
+              case CS_ZBUF_NONE:
+              case CS_ZBUF_INVERT:
+              case CS_ZBUF_TEST:
+              case CS_ZBUF_EQUAL:
+                {
+                  bNeverDrawAny = true;
+                  break;
+                }
+              default:
                 break;
               }
-            default:
-              break;
             }
 
             // Check the 'never draw' state of each render mesh.
@@ -690,7 +700,6 @@ namespace CS
       {
         // Mark all visible.
         MarkAllVisible (rootNode, f2bData);
-        bAllVisible = false;
         return false;
       }
 
@@ -714,7 +723,7 @@ namespace CS
       /**
        * Sort the array F2B.
        */
-      F2BSorter sorter (f2bData.pos);
+      F2BSorter sorter (engine, f2bData.pos);
       nodeMeshLists.Sort (sorter);
 
       /**
@@ -808,6 +817,7 @@ namespace CS
       iMeshWrapper* mw1 = m1->meshList->imesh;
       iMeshWrapper* mw2 = m2->meshList->imesh;
 
+      // Equal priorities - check distance.
       if (mw1->GetRenderPriority () == mw2->GetRenderPriority ())
       {
         csBox3& m1box = m1->node->GetBBox ();
@@ -819,6 +829,13 @@ namespace CS
         return distSqRm1 < distSqRm2;
       }
 
+      // Portals get special treatment - always rendered last.
+      if (mw1->GetRenderPriority () == portalPriority)
+        return false;
+      if (mw2->GetRenderPriority () == portalPriority)
+        return true;
+
+      // Else order by priority.
       return (mw1->GetRenderPriority () < mw2->GetRenderPriority ());
     }
 

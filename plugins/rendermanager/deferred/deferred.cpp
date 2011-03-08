@@ -104,7 +104,8 @@ public:
   {}
 
   void operator()(typename RenderTreeType::ContextNode &context, 
-                  typename PortalSetupType::ContextSetupData &portalSetupData)
+    typename PortalSetupType::ContextSetupData &portalSetupData,
+    bool recursePortals = true)
   {
     CS::RenderManager::RenderView* rview = context.renderView;
     iSector* sector = rview->GetThisSector ();
@@ -123,6 +124,7 @@ public:
     Viscull<RenderTreeType> (context, rview, culler);
 
     // Set up all portals
+    if (recursePortals)
     {
       recurseCount++;
       PortalSetupType portalSetup (rmanager->portalPersistent, *this);      
@@ -332,7 +334,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
 }
 
 //----------------------------------------------------------------------
-bool RMDeferred::RenderView(iView *view)
+bool RMDeferred::RenderView(iView *view, bool recursePortals)
 {
   iGraphics3D *graphics3D = view->GetContext ();
 
@@ -395,7 +397,7 @@ bool RMDeferred::RenderView(iView *view)
       startContext->renderTargets[rtaColor0].subtexture = 0;
     }
 
-    contextSetup (*startContext, portalData);
+    contextSetup (*startContext, portalData, recursePortals);
   }
 
   // Render all contexts.
@@ -427,10 +429,15 @@ bool RMDeferred::RenderView(iView *view)
   return true;
 }
 
+bool RMDeferred::RenderView(iView *view)
+{
+  return RenderView (view, true);
+}
+
 //----------------------------------------------------------------------
 bool RMDeferred::PrecacheView(iView *view)
 {
-  return RenderView (view);
+  return RenderView (view, false);
 
   postEffects.ClearIntermediates ();
 }

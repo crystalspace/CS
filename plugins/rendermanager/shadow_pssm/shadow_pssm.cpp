@@ -112,7 +112,8 @@ public:
   }
   
   void operator() (typename RenderTreeType::ContextNode& context,
-    typename PortalSetupType::ContextSetupData& portalSetupData)
+    typename PortalSetupType::ContextSetupData& portalSetupData,
+    bool recursePortals = true)
   {
     CS::RenderManager::RenderView* rview = context.renderView;
     iSector* sector = rview->GetThisSector ();
@@ -132,6 +133,7 @@ public:
     Viscull<RenderTreeType> (context, rview, culler);
 
     // Set up all portals
+    if (recursePortals)
     {
       recurseCount++;
       PortalSetupType portalSetup (rmanager->portalPersistent, *this);
@@ -348,7 +350,7 @@ RMShadowedPSSM::RMShadowedPSSM (iBase* parent)
   SetTreePersistent (treePersistent);
 }
 
-bool RMShadowedPSSM::RenderView (iView* view)
+bool RMShadowedPSSM::RenderView (iView* view, bool recursePortals)
 {
   // Setup a rendering view
   view->UpdateClipper ();
@@ -407,7 +409,7 @@ bool RMShadowedPSSM::RenderView (iView* view)
     TargetManagerType::TargetSettings ts;
     targets.GetNextTarget (ts);
 
-    HandleTarget (renderTree, ts);
+    HandleTarget (renderTree, ts, recursePortals);
   }
 
   targets.FinishRendering ();
@@ -431,10 +433,14 @@ bool RMShadowedPSSM::RenderView (iView* view)
   return true;
 }
 
+bool RMShadowedPSSM::RenderView (iView* view)
+{
+  return RenderView (view, true);
+}
 
 bool RMShadowedPSSM::PrecacheView (iView* view)
 {
-  if (!RenderView (view)) return false;
+  if (!RenderView (view, false)) return false;
 
   postEffects.ClearIntermediates();
   hdr.GetHDRPostEffects().ClearIntermediates();
@@ -447,7 +453,8 @@ bool RMShadowedPSSM::PrecacheView (iView* view)
 }
 
 bool RMShadowedPSSM::HandleTarget (RenderTreeType& renderTree,
-                                 const TargetManagerType::TargetSettings& settings)
+                                 const TargetManagerType::TargetSettings& settings,
+                                 bool recursePortals)
 {
   // Prepare
   csRef<CS::RenderManager::RenderView> rview;
@@ -466,7 +473,7 @@ bool RMShadowedPSSM::HandleTarget (RenderTreeType& renderTree,
   ContextSetupType contextSetup (this, lightPersistent, renderLayer);
   ContextSetupType::PortalSetupType::ContextSetupData portalData (startContext);
 
-  contextSetup (*startContext, portalData);
+  contextSetup (*startContext, portalData, recursePortals);
   
   targets.EnqueueTargets (renderTree, shaderManager, renderLayer, contextsScannedForTargets);
 

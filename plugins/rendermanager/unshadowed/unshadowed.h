@@ -100,8 +100,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
   public:
     iObjectRegistry* objectReg;
 
+    bool RenderView (iView* view, bool recursePortals);
     bool HandleTarget (RenderTreeType& renderTree, 
-      const TargetManagerType::TargetSettings& settings);
+      const TargetManagerType::TargetSettings& settings,
+      bool recursePortals);
 
     RenderTreeType::PersistentData treePersistent;
     PortalSetupType::PersistentData portalPersistent;

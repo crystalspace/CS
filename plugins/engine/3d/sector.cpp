@@ -260,8 +260,6 @@ void csSector::RelinkMesh (iMeshWrapper *mesh)
 
 void csSector::PrecacheDraw ()
 {
-  GetVisibilityCuller ()->PrecacheCulling ();
-
   // First calculate the box of all objects in the level.
   csBox3 box;
   box.StartBoundingBox ();
@@ -292,12 +290,10 @@ void csSector::PrecacheDraw ()
   camera->GetTransform ().SetOrigin (pos);
   camera->GetTransform ().LookAt (lookat-pos, csVector3 (0, 0, 1));
 
-  // @@@ Ideally we would want to disable visibility culling
-  // here so that all objects are visible.
-  /*g3d->BeginDraw (CSDRAW_3DGRAPHICS);
-  view->Draw ();
-  g3d->FinishDraw ();*/
+  // Set the culler precache mode and precache the view.
+  GetVisibilityCuller ()->PrecacheCulling (true);
   engine->renderManager->PrecacheView (view);
+  GetVisibilityCuller ()->PrecacheCulling (false);
 }
 
 //----------------------------------------------------------------------
