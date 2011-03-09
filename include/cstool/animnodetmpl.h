@@ -22,7 +22,7 @@
 #define __CS_IMESH_ANIMNODE_TEMPLATE_H__
 
 /**\file
- * Base implementation of CS::Animation::iSkeletonAnimNode objects.
+ * Base implementation of CS::Animation::iSkeletonAnimNodeFactory and CS::Animation::iSkeletonAnimNode objects.
  */
 
 #include "csextern.h"
@@ -39,10 +39,24 @@ namespace Animation {
   /**
    * Template class for animation node plugin managers.
    * Usage:
-   * - Your "node manager" class must descend from AnimNodeManagerCommon.
-   * - \a ThisType must be the name of the "node manager" class.
-   * - \a ManagerInterface must be the interface type for your node manager.
-   * - \a FactoryType is the node factory to be used by this manager.
+   * - Your node manager class must descend from AnimNodeManagerCommon.
+   * - \a ThisType must be the name of your node manager class, eg \a DebugNodeManager.
+   * - \a ManagerInterface must be the interface type of your node manager, eg \a CS::Animation::iSkeletonDebugNodeManager.
+   * - \a FactoryType is the node factory to be manipulated by your node manager, eg \a DebugNodeFactory.
+   *
+   * Here is an example of definition and implementation:
+   * \code
+   * class DebugNodeManager
+   *   : public CS::Animation::AnimNodeManagerCommon
+   *               <DebugNodeManager,
+   *                CS::Animation::iSkeletonDebugNodeManager,
+   *                DebugNodeFactory>
+   * {
+   * public:
+   *   DebugNodeManager (iBase* parent)
+   *    : AnimNodeManagerCommonType (parent) {}
+   * };
+   * \endcode
    */
   template<typename ThisType,
 	   typename ManagerInterface,
@@ -116,9 +130,8 @@ class CS_CRYSTALSPACE_EXPORT SkeletonAnimNodeFactory
    */
   virtual const char* GetNodeName () const;
 
-  /// Get the name of this factory
-  const csString& GetName() const { return name; }
  protected:
+  /// The name of this factory
   csString name;
 };
 
@@ -153,23 +166,35 @@ class CS_CRYSTALSPACE_EXPORT SkeletonAnimNodeFactorySingle
 
   csPtr<iSkeletonAnimNode> CreateInstance (iSkeletonAnimPacket* packet, iSkeleton* skeleton);
   iSkeletonAnimNodeFactory* FindNode (const char* name);
+
  protected:
+  /// Factory of the child node
   csRef<CS::Animation::iSkeletonAnimNodeFactory> childNodeFactory;
   
   /// To be overridden by derived classes: create actual instance of a node
   virtual csPtr<SkeletonAnimNodeSingleBase> ActualCreateInstance (iSkeletonAnimPacket* packet,
 								  iSkeleton* skeleton) = 0;
-  
 };
 
 /// Methods of SkeletonAnimNodeSingle not dependent on the factory type.
 class CS_CRYSTALSPACE_EXPORT SkeletonAnimNodeSingleBase : public virtual iSkeletonAnimNode
 {
  public:
+  /**
+   * Constructor
+   */
   SkeletonAnimNodeSingleBase (CS::Animation::iSkeleton* skeleton);
+
+  /**
+   * Destructor
+   */
   virtual ~SkeletonAnimNodeSingleBase () {}
 
+  /** 
+   * Get the child node of this node, or nullptr if there are none. 
+   */ 
   virtual iSkeletonAnimNode* GetChildNode () const;
+
   virtual void Play ();
   virtual void Stop ();
   virtual void SetPlaybackPosition (float time);
@@ -184,11 +209,19 @@ class CS_CRYSTALSPACE_EXPORT SkeletonAnimNodeSingleBase : public virtual iSkelet
   virtual void RemoveAnimationCallback (iSkeletonAnimCallback* callback);
 
 protected:
-  friend class SkeletonAnimNodeFactorySingle;
+  /// Reference to the skeleton animated by this node
   csWeakRef<CS::Animation::iSkeleton> skeleton;
+
+  /// Reference to the child node of this node
   csRef<CS::Animation::iSkeletonAnimNode> childNode;
+
+  /// Whether or not iSkeletonAnimNode::Play() has been called
   bool isPlaying;
+
+  /// Speed of the animation of this node
   float playbackSpeed;
+
+  friend class SkeletonAnimNodeFactorySingle;
 };
 
 /**
@@ -211,16 +244,17 @@ public:
 
   iSkeletonAnimNode* FindNode (const char* name)
   {
-    if (factory->GetName() == name)
-	return this;
+    if (strcmp (factory->GetNodeName (), name) == 0)
+      return this;
 
     if (childNode)
       return childNode->FindNode (name);
+
     return nullptr;
   }
 
 protected:
-  /// Reference to the factory that instanced a node.
+  /// Reference to the factory that instanced this node.
   csRef<FactoryType> factory;
 };
 
@@ -262,6 +296,7 @@ class CS_CRYSTALSPACE_EXPORT SkeletonAnimNodeFactoryMulti
   virtual iSkeletonAnimNodeFactory* GetChildNode (size_t index) const;
 
  protected:
+  /// Array of child node factories
   csRefArray<CS::Animation::iSkeletonAnimNodeFactory> childNodeFactories;
 };
 
