@@ -53,7 +53,7 @@ Simple::Simple ()
   commandLineHelper.AddCommandLineOption
     ("phys_engine=<name>", "Specify which physics plugin to use (ode, bullet)");
   commandLineHelper.AddCommandLineOption
-    ("disable_soft", "Disable the soft bodies");
+    ("nosoft", "Disable the soft bodies");
   commandLineHelper.AddCommandLineOption
     ("terrain", "Start with the terrain environment");
 }
@@ -807,7 +807,7 @@ bool Simple::OnInitialize (int argc, char* argv[])
     dynamics = csLoadPlugin<iDynamics> (plugmgr, "crystalspace.dynamics.bullet");
 
     // Check whether the soft bodies are enabled or not
-    isSoftBodyWorld = !clp->GetBoolOption ("disable_soft", false);
+    isSoftBodyWorld = !clp->GetBoolOption ("nosoft", false);
 
     // Load the soft body animation control plugin & factory
     if (isSoftBodyWorld)

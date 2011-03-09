@@ -47,9 +47,9 @@ AvatarTest::AvatarTest ()
   commandLineHelper.AddCommandLineOption
     ("scene=<name>", "Set the starting scene (frankie, krystal, sintel)");
   commandLineHelper.AddCommandLineOption
-    ("disable-physics", "Disable the physical animations");
+    ("nophysics", "Disable the physical animations");
   commandLineHelper.AddCommandLineOption
-    ("disable-soft", "Disable the soft bodies");
+    ("nosoft", "Disable the soft bodies");
 }
 
 AvatarTest::~AvatarTest ()
@@ -271,7 +271,7 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
   // Check if physical effects are enabled
   csRef<iCommandLineParser> clp =
     csQueryRegistry<iCommandLineParser> (GetObjectRegistry ());
-  physicsEnabled = !clp->GetBoolOption ("disable-physics", false);
+  physicsEnabled = !clp->GetBoolOption ("nophysics", false);
 
   while (physicsEnabled)
   {
@@ -313,7 +313,7 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
     }
 
     // Check whether the soft bodies are enabled or not
-    softBodiesEnabled = !clp->GetBoolOption ("disable-soft", false);
+    softBodiesEnabled = !clp->GetBoolOption ("nosoft", false);
 
     // Load the soft body animation control plugin & factory
     if (softBodiesEnabled)
