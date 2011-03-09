@@ -23634,6 +23634,75 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_new_csFileTime__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csFileTime *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"new_csFileTime",0,0)) SWIG_fail;
+  result = (csFileTime *)new csFileTime();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csFileTime, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_csFileTime__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  tm *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  csFileTime *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"new_csFileTime",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_tm,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_csFileTime" "', argument " "1"" of type '" "tm const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_csFileTime" "', argument " "1"" of type '" "tm const &""'"); 
+  }
+  arg1 = reinterpret_cast< tm * >(argp1);
+  result = (csFileTime *)new csFileTime((tm const &)*arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csFileTime, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_csFileTime(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[2];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 1); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 0) {
+    return _wrap_new_csFileTime__SWIG_0(self, args);
+  }
+  if (argc == 1) {
+    int _v;
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_tm, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_new_csFileTime__SWIG_1(self, args);
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'new_csFileTime'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    csFileTime()\n"
+    "    csFileTime(tm const &)\n");
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csFileTime_assign(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csFileTime *arg1 = (csFileTime *) 0 ;
@@ -23667,19 +23736,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_new_csFileTime(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csFileTime *result = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"new_csFileTime",0,0)) SWIG_fail;
-  result = (csFileTime *)new csFileTime();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csFileTime, SWIG_POINTER_NEW |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_delete_csFileTime(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csFileTime *arg1 = (csFileTime *) 0 ;
@@ -23707,42 +23763,6 @@ SWIGINTERN PyObject *csFileTime_swigregister(PyObject *SWIGUNUSEDPARM(self), PyO
   SWIG_TypeNewClientData(SWIGTYPE_p_csFileTime, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
-
-SWIGINTERN PyObject *_wrap_ASSIGN_FILETIME(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csFileTime *arg1 = 0 ;
-  tm *arg2 = 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"ASSIGN_FILETIME",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csFileTime,  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ASSIGN_FILETIME" "', argument " "1"" of type '" "csFileTime &""'"); 
-  }
-  if (!argp1) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ASSIGN_FILETIME" "', argument " "1"" of type '" "csFileTime &""'"); 
-  }
-  arg1 = reinterpret_cast< csFileTime * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_tm,  0  | 0);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ASSIGN_FILETIME" "', argument " "2"" of type '" "tm const &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ASSIGN_FILETIME" "', argument " "2"" of type '" "tm const &""'"); 
-  }
-  arg2 = reinterpret_cast< tm * >(argp2);
-  CS::Deprecated::ASSIGN_FILETIME(*arg1,(tm const &)*arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
 
 SWIGINTERN PyObject *_wrap_iFile_GetName(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
@@ -59956,11 +59976,10 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csFileTime_mon_get", _wrap_csFileTime_mon_get, METH_VARARGS, NULL},
 	 { (char *)"csFileTime_year_set", _wrap_csFileTime_year_set, METH_VARARGS, NULL},
 	 { (char *)"csFileTime_year_get", _wrap_csFileTime_year_get, METH_VARARGS, NULL},
-	 { (char *)"csFileTime_assign", _wrap_csFileTime_assign, METH_VARARGS, NULL},
 	 { (char *)"new_csFileTime", _wrap_new_csFileTime, METH_VARARGS, NULL},
+	 { (char *)"csFileTime_assign", _wrap_csFileTime_assign, METH_VARARGS, NULL},
 	 { (char *)"delete_csFileTime", _wrap_delete_csFileTime, METH_VARARGS, NULL},
 	 { (char *)"csFileTime_swigregister", csFileTime_swigregister, METH_VARARGS, NULL},
-	 { (char *)"ASSIGN_FILETIME", _wrap_ASSIGN_FILETIME, METH_VARARGS, NULL},
 	 { (char *)"iFile_GetName", _wrap_iFile_GetName, METH_VARARGS, NULL},
 	 { (char *)"iFile_GetSize", _wrap_iFile_GetSize, METH_VARARGS, NULL},
 	 { (char *)"iFile_GetStatus", _wrap_iFile_GetStatus, METH_VARARGS, NULL},
