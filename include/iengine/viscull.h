@@ -112,7 +112,7 @@ struct iVisibilityCullerListener : public virtual iBase
  */
 struct iVisibilityCuller : public virtual iBase
 {
-  SCF_INTERFACE (iVisibilityCuller, 4, 1, 0);
+  SCF_INTERFACE (iVisibilityCuller, 5, 0, 0);
 
   /**
    * Setup all data for this visibility culler. This needs
@@ -143,10 +143,10 @@ struct iVisibilityCuller : public virtual iBase
    * Precache visibility culling. This can be useful in case you want
    * to ensure that render speed doesn't get any hickups as soon as a portal
    * to this sector becomes visible. iEngine->PrecacheDraw() will call this
-   * function.
-   * @param state Whether to enable or disable this culling mode.
+   * function..
    */
-  virtual void PrecacheCulling (bool state = true) = 0;
+  CS_DEPRECATED_METHOD_MSG("Use (Begin/End)PrecacheCulling methods!")
+  virtual void PrecacheCulling () = 0;
 
   /**
    * Mark all objects as visible that intersect with the given bounding
@@ -221,9 +221,19 @@ struct iVisibilityCuller : public virtual iBase
   virtual const char* ParseCullerParameters (iDocumentNode* node) = 0;
 
   /**
-   * Prepare culling for the next frame.
+   * Perform any rendering required by this culler.
    */
   virtual void RenderViscull (iRenderView* rview, iShaderVariableContext* shadervars) = 0;
+
+  /**
+   * Begins precache culling.
+   */
+  virtual void BeginPrecacheCulling () = 0;
+
+  /**
+   * Ends precache culling.
+   */
+  virtual void EndPrecacheCulling () = 0;
 };
 
 /** \name GetCullerFlags() flags

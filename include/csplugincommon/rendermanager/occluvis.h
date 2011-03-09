@@ -33,6 +33,8 @@ struct iGraphics3D;
 struct iMeshWrapper;
 struct iObjectRegistry;
 
+#include "csutil/deprecated_warn_off.h"
+
 namespace CS
 {
   namespace RenderManager
@@ -414,13 +416,22 @@ namespace CS
       virtual void RenderViscull (iRenderView* rview, iShaderVariableContext* shadervars);
 
      /**
-      * Mark that we're about to perform precache visibility culling.
+      * Mark that we're about to perform precaching.
       */
-      virtual void PrecacheCulling (bool state)
+      virtual void BeginPrecacheCulling ()
       {
-        bAllVisible = state;
+        bAllVisible = true;
       }
 
+      /**
+       * Mark that we've finished precaching.
+       */
+      virtual void EndPrecacheCulling ()
+      {
+        bAllVisible = false;
+      }
+
+      virtual void PrecacheCulling () { CS_ASSERT ("Call (Begin/End)PrecacheCulling!\n"); }
       virtual const char* ParseCullerParameters (iDocumentNode* node) { return 0; }
     };
 
@@ -495,5 +506,7 @@ namespace CS
     };
   }
 }
+
+#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_RENDERMANAGER_OCCLUVIS_H__

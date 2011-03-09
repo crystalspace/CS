@@ -170,6 +170,8 @@ public:
   int total_notoccluded;
 };
 
+#include "csutil/deprecated_warn_off.h"
+
 /**
  * A dynamic visisibility culling system.
  */
@@ -330,7 +332,7 @@ public:
   virtual void UnregisterVisObject (iVisibilityObject* visobj);
   virtual bool VisTest (iRenderView* rview, 
     iVisibilityCullerListener *viscallback, int w = 0, int h = 0);
-  virtual void PrecacheCulling (bool state) { VisTest ((iRenderView*)0, 0); }
+  virtual void PrecacheCulling () { BeginPrecacheCulling (); }
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csBox3& box);
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csSphere& sphere);
   virtual void VisTest (const csSphere& sphere,
@@ -349,6 +351,8 @@ public:
     bool accurate = true);
   virtual const char* ParseCullerParameters (iDocumentNode*) { return 0; }
   virtual void RenderViscull (iRenderView* rview, iShaderVariableContext* shaders) {}
+  virtual void BeginPrecacheCulling () { VisTest ((iRenderView*)0, 0); }
+  virtual void EndPrecacheCulling () {}
 
   // Debugging functions.
   csPtr<iString> UnitTest ();
@@ -371,5 +375,7 @@ public:
       CS_DBGHELP_GFXDUMP;
   }
 };
+
+#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_DYNAVIS_H__

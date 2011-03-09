@@ -290,10 +290,10 @@ void csSector::PrecacheDraw ()
   camera->GetTransform ().SetOrigin (pos);
   camera->GetTransform ().LookAt (lookat-pos, csVector3 (0, 0, 1));
 
-  // Set the culler precache mode and precache the view.
-  GetVisibilityCuller ()->PrecacheCulling (true);
+  // Begin culler precaching and precache the view.
+  GetVisibilityCuller ()->BeginPrecacheCulling ();
   engine->renderManager->PrecacheView (view);
-  GetVisibilityCuller ()->PrecacheCulling (false);
+  GetVisibilityCuller ()->EndPrecacheCulling ();
 }
 
 //----------------------------------------------------------------------
