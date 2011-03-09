@@ -290,19 +290,19 @@ protected:
 /**
  * Base implementation of a CS::Animation::iSkeletonAnimNodeFactory with more than one child
  */
-class CS_CRYSTALSPACE_EXPORT csSkeletonAnimNodeFactoryMulti
+class CS_CRYSTALSPACE_EXPORT SkeletonAnimNodeFactoryMulti
   : public SkeletonAnimNodeFactory
 {
  public:
   /**
    * Constructor
    */
-  csSkeletonAnimNodeFactoryMulti (const char* name);
+  SkeletonAnimNodeFactoryMulti (const char* name);
 
   /**
    * Destructor
    */
-  virtual ~csSkeletonAnimNodeFactoryMulti () {}
+  virtual ~SkeletonAnimNodeFactoryMulti () {}
 
   /**
    * Add a child animation node to this node. It is NOT valid to provide a null pointer.

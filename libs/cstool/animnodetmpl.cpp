@@ -175,28 +175,28 @@ void SkeletonAnimNodeSingleBase::RemoveAnimationCallback (iSkeletonAnimCallback*
     childNode->RemoveAnimationCallback (callback);
 }
 
-// ------------------------------   csSkeletonAnimNodeFactoryMulti   ------------------------------
+// ------------------------------   SkeletonAnimNodeFactoryMulti   ------------------------------
 
-csSkeletonAnimNodeFactoryMulti::csSkeletonAnimNodeFactoryMulti (const char* name)
+SkeletonAnimNodeFactoryMulti::SkeletonAnimNodeFactoryMulti (const char* name)
   : SkeletonAnimNodeFactory (name)
 {}
 
-void csSkeletonAnimNodeFactoryMulti::AddChildNode (iSkeletonAnimNodeFactory* factory)
+void SkeletonAnimNodeFactoryMulti::AddChildNode (iSkeletonAnimNodeFactory* factory)
 {
   childNodeFactories.Push (factory);
 }
 
-void csSkeletonAnimNodeFactoryMulti::RemoveChildNode (iSkeletonAnimNodeFactory* factory)
+void SkeletonAnimNodeFactoryMulti::RemoveChildNode (iSkeletonAnimNodeFactory* factory)
 {
   childNodeFactories.Delete (factory);
 }
 
-void csSkeletonAnimNodeFactoryMulti::ClearChildNodes ()
+void SkeletonAnimNodeFactoryMulti::ClearChildNodes ()
 {
   childNodeFactories.DeleteAll ();
 }
 
-iSkeletonAnimNodeFactory* csSkeletonAnimNodeFactoryMulti::GetChildNode (size_t index) const
+iSkeletonAnimNodeFactory* SkeletonAnimNodeFactoryMulti::GetChildNode (size_t index) const
 {
   CS_ASSERT (index < childNodeFactories.GetSize ());
 
