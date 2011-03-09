@@ -4349,13 +4349,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return true;
   }
 
-  // TODO?: add a CS tag at the start of each file, eg "<CRYSTALSPACE version="2.0">"
+  // TODO: add a CS namespace at the start of each CS & CEL file,
+  // eg "<crystalspace xmlns="http://www.crystalspace3d.org/docs/online/manual/">"
+  // Have a specific namspace for CEL?
   static bool TestCrystalFile (const char* data, int dataSize)
   {
     if (!dataSize)
       return false;
 
-    // TODO: Check binary CS files
+    // TODO: Check binary CS files, or instead add methods to iDocument:
+    // - to check whether they can or not manage the data to be loaded
+    // - to return the first tag met in the data (in order to be able to test for the tags
+    //   crystalspace, world, library, etc)
     const char* b = data;
 
     // Go to first character
@@ -4365,11 +4370,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       if (b - data >= dataSize) return false;
     }
 
-    // Check for a '?xml' or '!--' tag
+    // Check for '?xml' or '!--' tags
     if (*b != '<') return false;
     b++;
     if (b - data + 4 >= dataSize) return false;
-    if (*b == '?' || *b == '!')
+    while (*b == '?' || *b == '!')
     {
       if (*b == '?' && !(b[1] == 'x' && b[2] == 'm' && b[3] == 'l' && isspace (b[4])))
 	return false;
@@ -4444,8 +4449,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       if (doc)
       {
         csRef<iDocumentNode> node = doc->GetRoot ();
-	      csString cwd = vfs->GetCwd ();
-        return LoadNodeTC(ret, false, cwd, node, collection, 0, ssource, missingdata, keepFlags, do_verbose);
+	csString cwd = vfs->GetCwd ();
+        return LoadNodeTC (ret, false, cwd, node, collection, 0, ssource, missingdata, keepFlags, do_verbose);
       }
       else
       {
@@ -4456,6 +4461,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         return false;
       }
     }
+
     else
     {
       csRef<iPluginManager> plugin_mgr = csQueryRegistry<iPluginManager> (
