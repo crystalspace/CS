@@ -807,7 +807,7 @@ bool Simple::OnInitialize (int argc, char* argv[])
     dynamics = csLoadPlugin<iDynamics> (plugmgr, "crystalspace.dynamics.bullet");
 
     // Check whether the soft bodies are enabled or not
-    isSoftBodyWorld = !clp->GetBoolOption ("nosoft", false);
+    isSoftBodyWorld = clp->GetBoolOption ("soft", true);
 
     // Load the soft body animation control plugin & factory
     if (isSoftBodyWorld)

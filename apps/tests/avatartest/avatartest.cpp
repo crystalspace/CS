@@ -271,7 +271,7 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
   // Check if physical effects are enabled
   csRef<iCommandLineParser> clp =
     csQueryRegistry<iCommandLineParser> (GetObjectRegistry ());
-  physicsEnabled = !clp->GetBoolOption ("nophysics", false);
+  physicsEnabled = clp->GetBoolOption ("physics", true);
 
   while (physicsEnabled)
   {
@@ -313,7 +313,7 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
     }
 
     // Check whether the soft bodies are enabled or not
-    softBodiesEnabled = !clp->GetBoolOption ("nosoft", false);
+    softBodiesEnabled = clp->GetBoolOption ("soft", true);
 
     // Load the soft body animation control plugin & factory
     if (softBodiesEnabled)
