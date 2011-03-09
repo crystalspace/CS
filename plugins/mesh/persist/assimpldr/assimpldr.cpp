@@ -56,19 +56,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     scfImplementationType (this, pParent)
   {
     importFlags =
-      aiProcess_CalcTangentSpace
-      | aiProcess_ConvertToLeftHanded
-      //| aiProcess_GenNormals 
-      | aiProcess_GenSmoothNormals 
-      | aiProcess_GenUVCoords
-      | aiProcess_JoinIdenticalVertices
-      | aiProcess_LimitBoneWeights
-      | aiProcess_OptimizeGraph
-      //| aiProcess_OptimizeMeshes
-      | aiProcess_SortByPType
-      | aiProcess_SplitLargeMeshes
-      | aiProcess_Triangulate
-      | aiProcess_ValidateDataStructure;
+      aiProcess_CalcTangentSpace // needed only for advanced shaders
+      //| aiProcess_ConvertToLeftHanded // seems deprecated
+      //| aiProcess_FindDegenerates // optimization
+      | aiProcess_FindInvalidData // in all cases?
+      | aiProcess_FlipUVs // always needed for CS
+      | aiProcess_FlipWindingOrder // always needed for CS
+      //| aiProcess_GenNormals // for fast
+      | aiProcess_GenSmoothNormals // for optimized
+      | aiProcess_GenUVCoords // needed only for texture based materials
+      //| aiProcess_ImproveCacheLocality // optimization
+      | aiProcess_JoinIdenticalVertices // always needed
+      | aiProcess_LimitBoneWeights // Needed due to limitation of animeshes
+      | aiProcess_MakeLeftHanded // always needed for CS
+      | aiProcess_OptimizeGraph // only for models, not for scenes
+      | aiProcess_OptimizeMeshes // in all cases?
+      //| aiProcess_PreTransformVertices // can be useful for genmeshes
+      //| aiProcess_RemoveRedundantMaterials // in all cases?
+      | aiProcess_SortByPType // always needed
+      | aiProcess_SplitLargeMeshes // optimization
+      | aiProcess_Triangulate // always needed unless other primitives available in CS
+      | aiProcess_ValidateDataStructure; // always needed
   }
 
   AssimpLoader::~AssimpLoader ()
@@ -170,7 +178,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
   {
     // TODO: implement iPluginConfig, use iVerbosityManager, csProgressPulse
     // TODO: custom options: scale, genmesh/animesh/scene/factories,
-    //   find duplicates/optimize, save default animesh pose
+    //   find duplicates/optimize, save default animesh pose, fast/optimized
     // TODO: if forced to be a genmesh then don't read animations,
     //   weights, etc
     // TODO: if forced to be a mesh then load only the textures/materials needed for it
