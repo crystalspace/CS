@@ -27,12 +27,14 @@
 #include "cstool/meshobjtmpl.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/cmdline.h"
-#include "csutil/csbaseeventh.h"
 #include "csutil/common_handlers.h"
+#include "csutil/csbaseeventh.h"
 #include "csutil/evoutlet.h"
+#include "csutil/parray.h"
 #include "csutil/plugmgr.h"
 #include "csutil/virtclk.h"
 #include "csutil/xmltiny.h"
+
 #include "iengine/camera.h"
 #include "iengine/engine.h"
 #include "iengine/light.h"
@@ -45,14 +47,6 @@
 #include "imesh/sprite3d.h"
 #include "imesh/spritecal3d.h"
 #include "ivaria/icegui.h"
-
-#include "csutil/parray.h"
-
-struct iAnimatedMesh;
-struct iAnimatedMeshFactory;
-struct iAnimatedMeshSocket;
-struct iSkeletonAnimNode;
-struct iSkeletonAnimNodeFactory;
 
 #include "assetbase.h"
 #include "tabbase.h"
