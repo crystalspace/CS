@@ -1109,7 +1109,10 @@ struct iSkeletonAnimNodeManager : public virtual iBase
   /// Find the animation node factory with the given name
   virtual FactoryInterface* FindAnimNodeFactory (const char* name) = 0;
 
-  /// Remove the animation node factory with the given name
+  /**
+   * Remove the animation node factory of the given name. It will no longer
+   * hold any reference to this factory.
+   */
   virtual void RemoveAnimNodeFactory (const char* name) = 0;
 
   /// Remove all animation node factories
