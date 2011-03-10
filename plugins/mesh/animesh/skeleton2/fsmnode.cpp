@@ -70,7 +70,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     instructions.Delete (instruction);
   }
 
-  void AnimationFifo::BlendState (CS::Animation::csSkeletalState* state, float baseWeight /* = 1.0f */)
+  void AnimationFifo::BlendState (CS::Animation::AnimatedMeshState* state, float baseWeight /* = 1.0f */)
   {
     switch (currentState)
     {
@@ -506,7 +506,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return playbackSpeed;
   }
 
-  void FSMNode::BlendState (CS::Animation::csSkeletalState* state, float baseWeight)
+  void FSMNode::BlendState (CS::Animation::AnimatedMeshState* state, float baseWeight)
   {
     if (!isActive)
       return;

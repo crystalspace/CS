@@ -104,7 +104,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     //-- CS::Animation::iSkeletonAnimNode
     virtual void Play ();
 
-    virtual void BlendState (CS::Animation::csSkeletalState* state,
+    virtual void BlendState (CS::Animation::AnimatedMeshState* state,
 				    float baseWeight = 1.0f);
     virtual void TickAnimation (float dt);
 

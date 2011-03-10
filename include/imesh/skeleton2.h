@@ -48,7 +48,7 @@ namespace Animation {
 struct iSkeletonFactory;
 struct iSkeleton;
 
-class csSkeletalState;
+class AnimatedMeshState;
 
 struct iSkeletonAnimPacketFactory;
 struct iSkeletonAnimPacket;
@@ -340,17 +340,17 @@ struct iSkeleton : public virtual iBase
   /**
    * Get the state of the entire skeleton (ie all transforms) in absolute space
    */
-  virtual csPtr<csSkeletalState> GetStateAbsSpace () = 0;
+  virtual csPtr<AnimatedMeshState> GetStateAbsSpace () = 0;
 
   /**
    * Get the state of the entire skeleton (ie all transforms) in bone space
    */
-  virtual csPtr<csSkeletalState> GetStateBoneSpace () = 0;
+  virtual csPtr<AnimatedMeshState> GetStateBoneSpace () = 0;
 
   /**
    * Get the state of the entire skeleton (ie all transforms) in bind space
    */
-  virtual csPtr<csSkeletalState> GetStateBindSpace () = 0;
+  virtual csPtr<AnimatedMeshState> GetStateBindSpace () = 0;
 
   /** @} */
 
@@ -410,17 +410,17 @@ struct iSkeleton : public virtual iBase
  * and rotation of each bone of the skeleton. These transforms are in
  * bind space.
  */
-class csSkeletalState : public csRefCount
+class AnimatedMeshState : public csRefCount
 {
 public:
 
   /// Constructor
-  csSkeletalState ()
+  AnimatedMeshState ()
     : boneVecs (0), boneQuats (0), numberOfBones (0)
   {}
 
   /// Destructor
-  virtual inline ~csSkeletalState ()
+  virtual inline ~AnimatedMeshState ()
   {
     delete[] boneVecs;
     delete[] boneQuats;
@@ -528,8 +528,8 @@ protected:
 } // namespace Animation
 } // namespace CS
 
-CS_DEPRECATED_METHOD_MSG("Use CS::Animation::csSkeletalState instead")
-typedef CS::Animation::csSkeletalState csSkeletalState2;
+CS_DEPRECATED_METHOD_MSG("Use CS::Animation::AnimatedMeshState instead")
+typedef CS::Animation::AnimatedMeshState csSkeletalState2;
 CS_DEPRECATED_METHOD_MSG("Use CS::Animation::iSkeleton instead")
 typedef CS::Animation::iSkeleton iSkeleton2;
 CS_DEPRECATED_METHOD_MSG("Use CS::Animation::iSkeletonFactory instead")

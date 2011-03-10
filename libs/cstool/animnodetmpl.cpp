@@ -145,7 +145,7 @@ float SkeletonAnimNodeSingleBase::GetPlaybackSpeed () const
   return playbackSpeed;
 }
 
-void SkeletonAnimNodeSingleBase::BlendState (csSkeletalState* state,
+void SkeletonAnimNodeSingleBase::BlendState (AnimatedMeshState* state,
 					   float baseWeight)
 {
   if (childNode)

@@ -52,7 +52,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       float blendInTime = 0.0f, size_t cbData = ~0);
     void RemoveAnimations (size_t cbData);
 
-    void BlendState (CS::Animation::csSkeletalState* state, float baseWeight = 1.0f);
+    void BlendState (CS::Animation::AnimatedMeshState* state, float baseWeight = 1.0f);
     void TickAnimation (float dt);
 
     void Stop ();
@@ -188,7 +188,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual float GetDuration () const;
     virtual void SetPlaybackSpeed (float speed);
     virtual float GetPlaybackSpeed () const;
-    virtual void BlendState (CS::Animation::csSkeletalState* state, float baseWeight = 1.0f);
+    virtual void BlendState (CS::Animation::AnimatedMeshState* state, float baseWeight = 1.0f);
     virtual void TickAnimation (float dt);
     virtual bool IsActive () const;
     virtual CS::Animation::iSkeletonAnimNodeFactory* GetFactory () const;

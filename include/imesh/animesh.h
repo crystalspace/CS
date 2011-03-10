@@ -50,7 +50,7 @@ struct iAnimatedMeshMorphTarget;
 /**
  * Represent a single influence of a bone on a single vertex
  */
-struct csAnimatedMeshBoneInfluence
+struct AnimatedMeshBoneInfluence
 {
   /// The id of the bone
   CS::Animation::BoneID bone;
@@ -356,7 +356,7 @@ struct iAnimatedMeshFactory : public virtual iBase
    * Get the bone influences.
    * You must call Invalidate() after modifying it.
    */
-  virtual csAnimatedMeshBoneInfluence* GetBoneInfluences () = 0;
+  virtual AnimatedMeshBoneInfluence* GetBoneInfluences () = 0;
 
   /** @} */
 
@@ -653,8 +653,19 @@ struct iAnimatedMeshMorphTarget : public virtual iBase
 } // namespace Mesh
 } // namespace CS
 
+CS_DEPRECATED_METHOD_MSG("Use CS::Mesh::AnimatedMeshBoneInfluence instead")
+typedef CS::Mesh::AnimatedMeshBoneInfluence csAnimatedMeshBoneInfluence;
+CS_DEPRECATED_METHOD_MSG("Use CS::Mesh::iAnimatedMesh instead")
+typedef CS::Mesh::iAnimatedMesh iAnimatedMesh;
+CS_DEPRECATED_METHOD_MSG("Use CS::Mesh::iAnimatedMeshFactory instead")
+typedef CS::Mesh::iAnimatedMeshFactory iAnimatedMeshFactory;
+CS_DEPRECATED_METHOD_MSG("Use CS::Mesh::iAnimatedMeshSocketFactory instead")
+typedef CS::Mesh::iAnimatedMeshSocketFactory iAnimatedMeshSocketFactory;
+CS_DEPRECATED_METHOD_MSG("Use CS::Mesh::iAnimatedMeshSubMesh instead")
+typedef CS::Mesh::iAnimatedMeshSubMesh iAnimatedMeshSubMesh;
 CS_DEPRECATED_METHOD_MSG("Use CS::Mesh::iAnimatedMeshSubMeshFactory instead")
 typedef CS::Mesh::iAnimatedMeshSubMeshFactory iAnimatedMeshFactorySubMesh;
+CS_DEPRECATED_METHOD_MSG("Use CS::Mesh::iAnimatedMeshMorphTarget instead")
+typedef CS::Mesh::iAnimatedMeshMorphTarget iAnimatedMeshMorphTarget;
 
 #endif // __CS_IMESH_ANIMESH_H__
-

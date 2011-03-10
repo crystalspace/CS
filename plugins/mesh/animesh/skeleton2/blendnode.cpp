@@ -219,7 +219,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return playbackSpeed;
   }
 
-  void BlendNode::BlendState (CS::Animation::csSkeletalState* state, float baseWeight)
+  void BlendNode::BlendState (CS::Animation::AnimatedMeshState* state, float baseWeight)
   {
     float accWeight = 0.0f;
 

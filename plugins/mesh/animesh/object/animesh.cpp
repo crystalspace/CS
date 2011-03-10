@@ -391,7 +391,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return 4;
   }
 
-  CS::Mesh::csAnimatedMeshBoneInfluence* AnimeshObjectFactory::GetBoneInfluences ()
+  CS::Mesh::AnimatedMeshBoneInfluence* AnimeshObjectFactory::GetBoneInfluences ()
   {
     return boneInfluences.GetArray ();
   }

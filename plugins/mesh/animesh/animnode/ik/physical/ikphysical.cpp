@@ -306,7 +306,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKPhysical)
     }
   }
 
-  void IKPhysicalNode::BlendState (CS::Animation::csSkeletalState* state, float baseWeight)
+  void IKPhysicalNode::BlendState (CS::Animation::AnimatedMeshState* state, float baseWeight)
   {
     // Check that this node is active
     if (!isPlaying)

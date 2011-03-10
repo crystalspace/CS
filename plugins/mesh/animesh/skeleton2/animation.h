@@ -129,7 +129,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       float& timeBefore, csQuaternion& beforeRot, csVector3& beforeOffset,
       float& timeAfter, csQuaternion& afterRot, csVector3& afterOffset);
 
-    virtual void BlendState (CS::Animation::csSkeletalState* state, 
+    virtual void BlendState (CS::Animation::AnimatedMeshState* state, 
       float baseWeight, float playbackTime, bool isPlayingCyclic) const;
 
     virtual float GetDuration () const;

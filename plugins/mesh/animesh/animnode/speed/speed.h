@@ -83,7 +83,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(SpeedNode)
     virtual void SetPlaybackSpeed (float speed);
     virtual float GetPlaybackSpeed () const;
 
-    virtual void BlendState (CS::Animation::csSkeletalState* state,
+    virtual void BlendState (CS::Animation::AnimatedMeshState* state,
 			     float baseWeight = 1.0f);
     virtual void TickAnimation (float dt);
 

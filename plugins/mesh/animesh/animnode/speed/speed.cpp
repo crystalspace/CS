@@ -278,7 +278,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(SpeedNode)
     return playbackSpeed;
   }
 
-  void SpeedNode::BlendState (CS::Animation::csSkeletalState* state, float baseWeight)
+  void SpeedNode::BlendState (CS::Animation::AnimatedMeshState* state, float baseWeight)
   {
     if (!isPlaying)
       return;

@@ -229,7 +229,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
       childNode->Play ();
   }
 
-  void LookAtNode::BlendState (CS::Animation::csSkeletalState* state, float baseWeight)
+  void LookAtNode::BlendState (CS::Animation::AnimatedMeshState* state, float baseWeight)
   {
     // check that this node is active
     if (!isPlaying)

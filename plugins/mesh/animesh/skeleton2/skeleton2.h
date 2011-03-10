@@ -172,9 +172,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual void SetTransformBindSpace (CS::Animation::BoneID bone, const csQuaternion& rot, 
       const csVector3& offset);
 
-    virtual csPtr<CS::Animation::csSkeletalState> GetStateAbsSpace ();
-    virtual csPtr<CS::Animation::csSkeletalState> GetStateBoneSpace ();
-    virtual csPtr<CS::Animation::csSkeletalState> GetStateBindSpace ();
+    virtual csPtr<CS::Animation::AnimatedMeshState> GetStateAbsSpace ();
+    virtual csPtr<CS::Animation::AnimatedMeshState> GetStateBoneSpace ();
+    virtual csPtr<CS::Animation::AnimatedMeshState> GetStateBindSpace ();
 
     virtual CS::Animation::iSkeletonFactory* GetFactory () const;
 

@@ -95,7 +95,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
     virtual void SetPlaybackSpeed (float speed);
     virtual float GetPlaybackSpeed () const;
 
-    virtual void BlendState (CS::Animation::csSkeletalState* state,
+    virtual void BlendState (CS::Animation::AnimatedMeshState* state,
 			     float baseWeight = 1.0f);
     virtual void TickAnimation (float dt);
 
@@ -111,7 +111,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
     csWeakRef<CS::Animation::iSkeleton> skeleton;
     csRef<CS::Animation::iSkeletonAnimNode> childNode;
     bool isPlaying;
-    CS::Animation::csSkeletalState childState;
+    CS::Animation::AnimatedMeshState childState;
     csHash<csQuaternion, CS::Animation::BoneID> alignRotations;
 
     struct RotationCache

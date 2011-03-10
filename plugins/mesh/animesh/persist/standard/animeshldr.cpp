@@ -191,7 +191,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           int numVerts = amfact->GetVertexCount ();
           int currInfl = 0;
 
-          CS::Mesh::csAnimatedMeshBoneInfluence* bi = amfact->GetBoneInfluences ();
+          CS::Mesh::AnimatedMeshBoneInfluence* bi = amfact->GetBoneInfluences ();
 
           csRef<iDocumentNodeIterator> it = child->GetNodes ();
           while (it->HasNext ())
@@ -539,7 +539,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
       }
       
       // Write bone influences
-      CS::Mesh::csAnimatedMeshBoneInfluence* influences = factory->GetBoneInfluences ();
+      CS::Mesh::AnimatedMeshBoneInfluence* influences = factory->GetBoneInfluences ();
       if (influences)
       {
 	csRef<iDocumentNode> influenceNode = 

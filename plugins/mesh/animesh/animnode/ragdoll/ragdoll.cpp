@@ -409,7 +409,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
       childNode->Stop ();
   }
 
-  void RagdollNode::BlendState (CS::Animation::csSkeletalState* state, float baseWeight)
+  void RagdollNode::BlendState (CS::Animation::AnimatedMeshState* state, float baseWeight)
   {
     // TODO: use baseWeight
 
@@ -491,7 +491,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 	csReversibleTransform relativeTransform =
 	  bodyTransform * parentTransform.GetInverse ();
 
-	// apply the new transform to the CS::Animation::csSkeletalState
+	// apply the new transform to the CS::Animation::AnimatedMeshState
 	state->SetBoneUsed (boneData.boneID);
 	state->GetVector (boneData.boneID) = relativeTransform.GetOrigin () - skeletonOffset;
 	csQuaternion quaternion;

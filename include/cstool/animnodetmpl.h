@@ -202,7 +202,7 @@ class CS_CRYSTALSPACE_EXPORT SkeletonAnimNodeSingleBase : public virtual iSkelet
   virtual float GetDuration () const;
   virtual void SetPlaybackSpeed (float speed);
   virtual float GetPlaybackSpeed () const;
-  virtual void BlendState (csSkeletalState* state, float baseWeight = 1.0f);
+  virtual void BlendState (AnimatedMeshState* state, float baseWeight = 1.0f);
   virtual void TickAnimation (float dt);
   virtual bool IsActive () const;
   virtual void AddAnimationCallback (iSkeletonAnimCallback* callback);

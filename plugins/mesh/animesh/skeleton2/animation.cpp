@@ -374,7 +374,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     afterOffset = k2.offset;
   }  
 
-  void Animation::BlendState (CS::Animation::csSkeletalState* state, 
+  void Animation::BlendState (CS::Animation::AnimatedMeshState* state, 
     float baseWeight, float playbackTime, bool isPlayingCyclic) const
   {
     csArrayCmp<KeyFrame, float> cmp (playbackTime, KeyFrameTimeCompare);

@@ -234,7 +234,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(IKCCD)
     }
   }
 
-  void IKCCDNode::BlendState (CS::Animation::csSkeletalState* state, float baseWeight)
+  void IKCCDNode::BlendState (CS::Animation::AnimatedMeshState* state, float baseWeight)
   {
     // Check that this node is active
     if (!isPlaying)

@@ -541,13 +541,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     SetTransformAbsSpace (bone, newAbsRot, newAbsOffset);
   }
 
-  csPtr<CS::Animation::csSkeletalState> Skeleton::GetStateAbsSpace ()
+  csPtr<CS::Animation::AnimatedMeshState> Skeleton::GetStateAbsSpace ()
   {
     UpdateCachedTransforms ();
 
     // Use a pool for these...
-    csRef<CS::Animation::csSkeletalState> currState;
-    currState.AttachNew (new CS::Animation::csSkeletalState);
+    csRef<CS::Animation::AnimatedMeshState> currState;
+    currState.AttachNew (new CS::Animation::AnimatedMeshState);
     currState->Setup (allBones.GetSize ());
 
     for (CS::Animation::BoneID i = 0; i < allBones.GetSize (); ++i)
@@ -560,14 +560,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       }
     }
 
-    return csPtr<CS::Animation::csSkeletalState> (currState);
+    return csPtr<CS::Animation::AnimatedMeshState> (currState);
   }
 
-  csPtr<CS::Animation::csSkeletalState> Skeleton::GetStateBoneSpace ()
+  csPtr<CS::Animation::AnimatedMeshState> Skeleton::GetStateBoneSpace ()
   {
     // Use a pool for these...
-    csRef<CS::Animation::csSkeletalState> currState;
-    currState.AttachNew (new CS::Animation::csSkeletalState);
+    csRef<CS::Animation::AnimatedMeshState> currState;
+    currState.AttachNew (new CS::Animation::AnimatedMeshState);
     currState->Setup (allBones.GetSize ());
 
     for (size_t i = 0; i < allBones.GetSize (); ++i)
@@ -580,16 +580,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       }
     }
 
-    return csPtr<CS::Animation::csSkeletalState> (currState);
+    return csPtr<CS::Animation::AnimatedMeshState> (currState);
   }
 
-  csPtr<CS::Animation::csSkeletalState> Skeleton::GetStateBindSpace ()
+  csPtr<CS::Animation::AnimatedMeshState> Skeleton::GetStateBindSpace ()
   {
     UpdateCachedTransforms ();
 
     // Use a pool for these...
-    csRef<CS::Animation::csSkeletalState> currState;
-    currState.AttachNew (new CS::Animation::csSkeletalState);
+    csRef<CS::Animation::AnimatedMeshState> currState;
+    currState.AttachNew (new CS::Animation::AnimatedMeshState);
     currState->Setup (allBones.GetSize ());
 
     for (size_t i = 0; i < allBones.GetSize (); ++i)
@@ -602,7 +602,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       }
     }
 
-    return csPtr<CS::Animation::csSkeletalState> (currState);
+    return csPtr<CS::Animation::AnimatedMeshState> (currState);
   }
 
   CS::Animation::iSkeletonFactory* Skeleton::GetFactory () const
@@ -659,8 +659,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       rootNode->TickAnimation (dt);
 
       // TODO: Use a pool for these...
-      csRef<CS::Animation::csSkeletalState> finalState;
-      finalState.AttachNew (new CS::Animation::csSkeletalState);
+      csRef<CS::Animation::AnimatedMeshState> finalState;
+      finalState.AttachNew (new CS::Animation::AnimatedMeshState);
       finalState->Setup (allBones.GetSize ());
 
       // Blend the root node into the skeleton state

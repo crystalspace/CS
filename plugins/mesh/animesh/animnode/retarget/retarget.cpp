@@ -256,7 +256,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
     return 1.0f;
   }
 
-  void RetargetNode::BlendState (CS::Animation::csSkeletalState* state, float baseWeight)
+  void RetargetNode::BlendState (CS::Animation::AnimatedMeshState* state, float baseWeight)
   {
     // Check that this node is active
     if (!isPlaying || !childNode)

@@ -110,7 +110,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     virtual void Play ();
     virtual void Stop ();
 
-    virtual void BlendState (CS::Animation::csSkeletalState* state,
+    virtual void BlendState (CS::Animation::AnimatedMeshState* state,
 			     float baseWeight = 1.0f);
   private:
     struct BoneData
