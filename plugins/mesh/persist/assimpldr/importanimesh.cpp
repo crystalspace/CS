@@ -169,7 +169,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       if (animeshData.factory->GetVertexCount () > 0)
       {
 	// Initialize the bone influences
-	CS::Mesh::csAnimatedMeshBoneInfluence* influences =
+	CS::Mesh::AnimatedMeshBoneInfluence* influences =
 	  animeshData.factory->GetBoneInfluences ();
 	for (size_t i = 0; i < animeshData.factory->GetVertexCount ()
 	       * animeshData.factory->GetBoneInfluencesPerVertex (); i++)
@@ -474,7 +474,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
   void AssimpLoader::ImportBoneInfluences (AnimeshData* animeshData, aiNode* node)
   {
     // Import the bone influences fo all submeshes
-    CS::Mesh::csAnimatedMeshBoneInfluence* influences =
+    CS::Mesh::AnimatedMeshBoneInfluence* influences =
       animeshData->factory->GetBoneInfluences ();
 
     // Iterate on all meshes
