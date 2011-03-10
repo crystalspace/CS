@@ -22,7 +22,7 @@ A @sc{3ds} to Crystal Space map converter (work in progress!).
 @cindex @file{asndtest}
 @cindex Applications, @file{asndtest}
 @item sndtest
-todo
+@emph{OpenAL} sound test.
 
 @cindex @file{avatartest}
 @cindex Applications, @file{avatartest}
@@ -32,7 +32,7 @@ An application to test and demonstrate the animated mesh animations.
 @cindex @file{basemapgen}
 @cindex Applications, @file{basemapgen}
 @item basemapgen
-todo
+Base map generator for terrain2. For a given terrain, it will generate the global texture to be applied on it by combining the textures splatted on the terrain.
 
 @cindex @file{ceguitest}
 @cindex Applications, @file{ceguitest}
@@ -54,20 +54,15 @@ A Crystal Space console output testing application.
 @item csbench
 A Crystal Space benchmarking application.
 
-@cindex @file{csdemo}
+@cindex @file{csbias}
 @cindex Applications, @file{csdemo}
 @item csdemo
-A self-running space demo. It requires the @file{demodata.zip} file
-that you can get from:
+A demonstration of a medieval First Person Shooter showing several features of Crystal Space
 
-@noindent
-@ifnottex
-@url{http://www.crystalspace3d.org/support/release/cs099/maps/demodata.zip}
-@end ifnottex
-@iftex
-@code{http://www.crystalspace3d.org/support/release/cs099/maps/}@*
-@code{demodata.zip}
-@end iftex
+@cindex @file{csmocapviewer}
+@cindex Applications, @file{csmocapviewer}
+@item csmocapviewer
+A viewer for motion captured data
 
 @cindex @file{csfgen}
 @cindex Applications, @file{csfgen}
@@ -82,7 +77,7 @@ The Crystal Space image manipulator.
 @cindex @file{distfieldgen}
 @cindex Applications, @file{distfieldgen}
 @item distfieldgen
-todo
+Distance field generator for images (see @uref{http://www.valvesoftware.com/publications/2007/SIGGRAPH2007_AlphaTestedMagnification.pdf, here} for more information on the ways it can be used).
 
 @cindex @file{docconv}
 @cindex Applications, @file{docconv}
@@ -102,7 +97,7 @@ The Crystal Space canvas plugin test application.
 @cindex @file{genmeshify}
 @cindex Applications, @file{genmeshify}
 @item genmeshify
-todo
+A tool to convert from the old @emph{thing} mesh to a @emph{genmesh}.
 
 @cindex @file{heightmapgen}
 @cindex Applications, @file{heightmapgen}
@@ -153,7 +148,7 @@ Tool to compute static lighting for a CrystalSpace world. @xref{Using lighter2}.
 @cindex @file{maya2spr}
 @cindex Applications, @file{maya2spr}
 @item maya2spr
-todo
+A tool to convert models from @emph{Maya} into Crystal Space.
 
 @cindex @file{mazing}
 @cindex Applications, @file{mazing}
@@ -184,7 +179,7 @@ todo
 @cindex @file{pathtut}
 @cindex Applications, @file{pathtut}
 @item pathtut
-todo
+A demonstration on the way to use the sequencing system. @xref{Sequence Manager}.
 
 @cindex @file{phystut}
 @cindex Applications, @file{phystut}
@@ -209,12 +204,12 @@ todo
 @cindex @file{simdtest}
 @cindex Applications, @file{simdtest}
 @item simdtest
-todo
+Tests for the Single Instruction on Multiple Data available on your system.
 
 @cindex @file{simpcd}
 @cindex Applications, @file{simpcd}
 @item simpcd
-todo
+A demonstration on the way to use collision detection. @xref{Basic Collision Detection}.
 
 @cindex @file{simple1}
 @cindex Applications, @file{simple1}
@@ -229,7 +224,7 @@ A tutorial application. @xref{Tutorial Simple 2}. The code of this application i
 @cindex @file{simplept}
 @cindex Applications, @file{simplept}
 @item simplept
-todo
+A tutorial for procedural textures. @xref{ProcTextures}
 
 @cindex @file{simpmap}
 @cindex Applications, @file{simpmap}
@@ -244,7 +239,7 @@ todo
 @cindex @file{sndtest}
 @cindex Applications, @file{sndtest}
 @item sndtest
-An application for testing the Crystal Space @sc{sndsys} sound system.
+An application for testing the Crystal Space @emph{sndsys} sound system.
 
 @cindex @file{startme}
 @cindex Applications, @file{startme}
