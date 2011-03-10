@@ -183,7 +183,7 @@ namespace lighter
 	csArray<Lightmap*> pdLightLMs;
         for (size_t pdli = 0; pdli < PDLights.GetSize (); ++pdli)
         {
-          // Ger reference to this light's lightmap
+          // Get reference to this light's lightmap
           Lightmap* lm = sector->scene->GetLightmap (prim.GetGlobalLightmapID (),
             subLightmapNum, PDLights[pdli]);
 
