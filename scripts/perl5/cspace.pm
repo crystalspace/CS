@@ -20628,6 +20628,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *IntersectSegment = *cspacec::iVisibilityCuller_IntersectSegment;
 *ParseCullerParameters = *cspacec::iVisibilityCuller_ParseCullerParameters;
 *RenderViscull = *cspacec::iVisibilityCuller_RenderViscull;
+*BeginPrecacheCulling = *cspacec::iVisibilityCuller_BeginPrecacheCulling;
+*EndPrecacheCulling = *cspacec::iVisibilityCuller_EndPrecacheCulling;
 *scfGetVersion = *cspacec::iVisibilityCuller_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

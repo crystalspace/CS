@@ -1202,6 +1202,8 @@ class iVisibilityCuller(core.iBase):
     def IntersectSegment(*args): return _iengine.iVisibilityCuller_IntersectSegment(*args)
     def ParseCullerParameters(*args): return _iengine.iVisibilityCuller_ParseCullerParameters(*args)
     def RenderViscull(*args): return _iengine.iVisibilityCuller_RenderViscull(*args)
+    def BeginPrecacheCulling(*args): return _iengine.iVisibilityCuller_BeginPrecacheCulling(*args)
+    def EndPrecacheCulling(*args): return _iengine.iVisibilityCuller_EndPrecacheCulling(*args)
     scfGetVersion = staticmethod(_iengine.iVisibilityCuller_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iVisibilityCuller
     __del__ = lambda self : None;
