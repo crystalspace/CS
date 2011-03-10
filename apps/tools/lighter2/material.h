@@ -22,6 +22,8 @@
 #include "common.h"
 #include "swappable.h"
 
+#include <typeinfo>
+
 namespace lighter
 {
   template<typename T>
@@ -87,6 +89,8 @@ namespace lighter
       CS_ASSERT (colorArray == BogusPointer ());
       colorArray = (T*)data;
     }
+    const char* Describe() const
+    { return typeid(*this).name(); }
   protected:
     // The color data itself
     mutable T *colorArray;

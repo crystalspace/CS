@@ -118,7 +118,9 @@ namespace lighter
 
       colorArray = (csColor*)data;      
     }
-  
+    const char* Describe() const
+    { return "Lightmap"; }
+
     static csString GetTextureNameFromFilename (const csString& file);
   protected:
     // The color data itself
@@ -199,6 +201,8 @@ namespace lighter
       CS_ASSERT (maskData == BogusPointer ());
       maskData = (float*)data;
     }
+    const char* Describe() const
+    { return "LightmapMask"; }
   };
   typedef csPDelArray<LightmapMask> LightmapMaskPtrDelArray;
 
@@ -289,6 +293,8 @@ namespace lighter
       CS_ASSERT (mapData == BogusPointer ());
       mapData = (LightInfluence*)data;
     }
+    const char* Describe() const
+    { return "LightInfluences"; }
   };
   
 
@@ -355,6 +361,8 @@ namespace lighter
       CS_ASSERT (mapData == BogusPointer ());
       mapData = (csVector3*)data;
     }
+    const char* Describe() const
+    { return "DirectionMap"; }
   };
   typedef csPDelArray<DirectionMap> DirectionMapPtrDelArray;
   
