@@ -598,6 +598,8 @@ namespace lighter
   
   LightInfluences& Object::GetLightInfluences (uint groupID, Light* light)
   {
+    CS::Threading::ScopedLock<CS::Threading::Mutex> lock (lightInfluencesMutex);
+    
     if (!lightInfluences)
       lightInfluences = new LightInfluencesHash;
   
