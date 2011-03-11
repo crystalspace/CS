@@ -652,19 +652,19 @@ iGenMeshSkeletonControlState_swigregister = _imesh.iGenMeshSkeletonControlState_
 iGenMeshSkeletonControlState_swigregister(iGenMeshSkeletonControlState)
 iGenMeshSkeletonControlState_scfGetVersion = _imesh.iGenMeshSkeletonControlState_scfGetVersion
 
-class csAnimatedMeshBoneInfluence(object):
+class AnimatedMeshBoneInfluence(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    bone = _swig_property(_imesh.csAnimatedMeshBoneInfluence_bone_get, _imesh.csAnimatedMeshBoneInfluence_bone_set)
-    influenceWeight = _swig_property(_imesh.csAnimatedMeshBoneInfluence_influenceWeight_get, _imesh.csAnimatedMeshBoneInfluence_influenceWeight_set)
+    bone = _swig_property(_imesh.AnimatedMeshBoneInfluence_bone_get, _imesh.AnimatedMeshBoneInfluence_bone_set)
+    influenceWeight = _swig_property(_imesh.AnimatedMeshBoneInfluence_influenceWeight_get, _imesh.AnimatedMeshBoneInfluence_influenceWeight_set)
     def __init__(self, *args): 
-        this = _imesh.new_csAnimatedMeshBoneInfluence(*args)
+        this = _imesh.new_AnimatedMeshBoneInfluence(*args)
         try: self.this.append(this)
         except: self.this = this
-    __swig_destroy__ = _imesh.delete_csAnimatedMeshBoneInfluence
+    __swig_destroy__ = _imesh.delete_AnimatedMeshBoneInfluence
     __del__ = lambda self : None;
-csAnimatedMeshBoneInfluence_swigregister = _imesh.csAnimatedMeshBoneInfluence_swigregister
-csAnimatedMeshBoneInfluence_swigregister(csAnimatedMeshBoneInfluence)
+AnimatedMeshBoneInfluence_swigregister = _imesh.AnimatedMeshBoneInfluence_swigregister
+AnimatedMeshBoneInfluence_swigregister(AnimatedMeshBoneInfluence)
 
 class iAnimatedMeshSocketFactory(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')

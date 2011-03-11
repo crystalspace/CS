@@ -2530,7 +2530,7 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_CS__Graphics__RenderPriority swig_types[7]
 #define SWIGTYPE_p_CS__Memory__AllocatorMalloc swig_types[8]
 #define SWIGTYPE_p_CS__Memory__CustomAllocated swig_types[9]
-#define SWIGTYPE_p_CS__Mesh__csAnimatedMeshBoneInfluence swig_types[10]
+#define SWIGTYPE_p_CS__Mesh__AnimatedMeshBoneInfluence swig_types[10]
 #define SWIGTYPE_p_CS__Mesh__iAnimatedMesh swig_types[11]
 #define SWIGTYPE_p_CS__Mesh__iAnimatedMeshFactory swig_types[12]
 #define SWIGTYPE_p_CS__Mesh__iAnimatedMeshMorphTarget swig_types[13]
@@ -14165,9 +14165,9 @@ SWIGINTERN PyObject *iGenMeshSkeletonControlState_swigregister(PyObject *SWIGUNU
   return SWIG_Py_Void();
 }
 
-SWIGINTERN PyObject *_wrap_csAnimatedMeshBoneInfluence_bone_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_AnimatedMeshBoneInfluence_bone_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  CS::Mesh::csAnimatedMeshBoneInfluence *arg1 = (CS::Mesh::csAnimatedMeshBoneInfluence *) 0 ;
+  CS::Mesh::AnimatedMeshBoneInfluence *arg1 = (CS::Mesh::AnimatedMeshBoneInfluence *) 0 ;
   CS::Animation::BoneID arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -14176,19 +14176,19 @@ SWIGINTERN PyObject *_wrap_csAnimatedMeshBoneInfluence_bone_set(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"csAnimatedMeshBoneInfluence_bone_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__csAnimatedMeshBoneInfluence, 0 |  0 );
+  if(!PyArg_UnpackTuple(args,(char *)"AnimatedMeshBoneInfluence_bone_set",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__AnimatedMeshBoneInfluence, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csAnimatedMeshBoneInfluence_bone_set" "', argument " "1"" of type '" "CS::Mesh::csAnimatedMeshBoneInfluence *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "AnimatedMeshBoneInfluence_bone_set" "', argument " "1"" of type '" "CS::Mesh::AnimatedMeshBoneInfluence *""'"); 
   }
-  arg1 = reinterpret_cast< CS::Mesh::csAnimatedMeshBoneInfluence * >(argp1);
+  arg1 = reinterpret_cast< CS::Mesh::AnimatedMeshBoneInfluence * >(argp1);
   {
     res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__Animation__BoneID,  0  | 0);
     if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csAnimatedMeshBoneInfluence_bone_set" "', argument " "2"" of type '" "CS::Animation::BoneID""'"); 
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "AnimatedMeshBoneInfluence_bone_set" "', argument " "2"" of type '" "CS::Animation::BoneID""'"); 
     }  
     if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csAnimatedMeshBoneInfluence_bone_set" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "AnimatedMeshBoneInfluence_bone_set" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
     } else {
       CS::Animation::BoneID * temp = reinterpret_cast< CS::Animation::BoneID * >(argp2);
       arg2 = *temp;
@@ -14203,20 +14203,20 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csAnimatedMeshBoneInfluence_bone_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_AnimatedMeshBoneInfluence_bone_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  CS::Mesh::csAnimatedMeshBoneInfluence *arg1 = (CS::Mesh::csAnimatedMeshBoneInfluence *) 0 ;
+  CS::Mesh::AnimatedMeshBoneInfluence *arg1 = (CS::Mesh::AnimatedMeshBoneInfluence *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   CS::Animation::BoneID result;
   
-  if(!PyArg_UnpackTuple(args,(char *)"csAnimatedMeshBoneInfluence_bone_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__csAnimatedMeshBoneInfluence, 0 |  0 );
+  if(!PyArg_UnpackTuple(args,(char *)"AnimatedMeshBoneInfluence_bone_get",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__AnimatedMeshBoneInfluence, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csAnimatedMeshBoneInfluence_bone_get" "', argument " "1"" of type '" "CS::Mesh::csAnimatedMeshBoneInfluence *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "AnimatedMeshBoneInfluence_bone_get" "', argument " "1"" of type '" "CS::Mesh::AnimatedMeshBoneInfluence *""'"); 
   }
-  arg1 = reinterpret_cast< CS::Mesh::csAnimatedMeshBoneInfluence * >(argp1);
+  arg1 = reinterpret_cast< CS::Mesh::AnimatedMeshBoneInfluence * >(argp1);
   result =  ((arg1)->bone);
   resultobj = SWIG_NewPointerObj((new CS::Animation::BoneID(static_cast< const CS::Animation::BoneID& >(result))), SWIGTYPE_p_CS__Animation__BoneID, SWIG_POINTER_OWN |  0 );
   return resultobj;
@@ -14225,9 +14225,9 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csAnimatedMeshBoneInfluence_influenceWeight_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_AnimatedMeshBoneInfluence_influenceWeight_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  CS::Mesh::csAnimatedMeshBoneInfluence *arg1 = (CS::Mesh::csAnimatedMeshBoneInfluence *) 0 ;
+  CS::Mesh::AnimatedMeshBoneInfluence *arg1 = (CS::Mesh::AnimatedMeshBoneInfluence *) 0 ;
   float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -14236,15 +14236,15 @@ SWIGINTERN PyObject *_wrap_csAnimatedMeshBoneInfluence_influenceWeight_set(PyObj
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"csAnimatedMeshBoneInfluence_influenceWeight_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__csAnimatedMeshBoneInfluence, 0 |  0 );
+  if(!PyArg_UnpackTuple(args,(char *)"AnimatedMeshBoneInfluence_influenceWeight_set",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__AnimatedMeshBoneInfluence, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csAnimatedMeshBoneInfluence_influenceWeight_set" "', argument " "1"" of type '" "CS::Mesh::csAnimatedMeshBoneInfluence *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "AnimatedMeshBoneInfluence_influenceWeight_set" "', argument " "1"" of type '" "CS::Mesh::AnimatedMeshBoneInfluence *""'"); 
   }
-  arg1 = reinterpret_cast< CS::Mesh::csAnimatedMeshBoneInfluence * >(argp1);
+  arg1 = reinterpret_cast< CS::Mesh::AnimatedMeshBoneInfluence * >(argp1);
   ecode2 = SWIG_AsVal_float(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csAnimatedMeshBoneInfluence_influenceWeight_set" "', argument " "2"" of type '" "float""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "AnimatedMeshBoneInfluence_influenceWeight_set" "', argument " "2"" of type '" "float""'");
   } 
   arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->influenceWeight = arg2;
@@ -14255,20 +14255,20 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csAnimatedMeshBoneInfluence_influenceWeight_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_AnimatedMeshBoneInfluence_influenceWeight_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  CS::Mesh::csAnimatedMeshBoneInfluence *arg1 = (CS::Mesh::csAnimatedMeshBoneInfluence *) 0 ;
+  CS::Mesh::AnimatedMeshBoneInfluence *arg1 = (CS::Mesh::AnimatedMeshBoneInfluence *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   float result;
   
-  if(!PyArg_UnpackTuple(args,(char *)"csAnimatedMeshBoneInfluence_influenceWeight_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__csAnimatedMeshBoneInfluence, 0 |  0 );
+  if(!PyArg_UnpackTuple(args,(char *)"AnimatedMeshBoneInfluence_influenceWeight_get",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__AnimatedMeshBoneInfluence, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csAnimatedMeshBoneInfluence_influenceWeight_get" "', argument " "1"" of type '" "CS::Mesh::csAnimatedMeshBoneInfluence *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "AnimatedMeshBoneInfluence_influenceWeight_get" "', argument " "1"" of type '" "CS::Mesh::AnimatedMeshBoneInfluence *""'"); 
   }
-  arg1 = reinterpret_cast< CS::Mesh::csAnimatedMeshBoneInfluence * >(argp1);
+  arg1 = reinterpret_cast< CS::Mesh::AnimatedMeshBoneInfluence * >(argp1);
   result = (float) ((arg1)->influenceWeight);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
@@ -14277,32 +14277,32 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_new_csAnimatedMeshBoneInfluence(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_new_AnimatedMeshBoneInfluence(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  CS::Mesh::csAnimatedMeshBoneInfluence *result = 0 ;
+  CS::Mesh::AnimatedMeshBoneInfluence *result = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"new_csAnimatedMeshBoneInfluence",0,0)) SWIG_fail;
-  result = (CS::Mesh::csAnimatedMeshBoneInfluence *)new CS::Mesh::csAnimatedMeshBoneInfluence();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Mesh__csAnimatedMeshBoneInfluence, SWIG_POINTER_NEW |  0 );
+  if(!PyArg_UnpackTuple(args,(char *)"new_AnimatedMeshBoneInfluence",0,0)) SWIG_fail;
+  result = (CS::Mesh::AnimatedMeshBoneInfluence *)new CS::Mesh::AnimatedMeshBoneInfluence();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Mesh__AnimatedMeshBoneInfluence, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
 }
 
 
-SWIGINTERN PyObject *_wrap_delete_csAnimatedMeshBoneInfluence(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_delete_AnimatedMeshBoneInfluence(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  CS::Mesh::csAnimatedMeshBoneInfluence *arg1 = (CS::Mesh::csAnimatedMeshBoneInfluence *) 0 ;
+  CS::Mesh::AnimatedMeshBoneInfluence *arg1 = (CS::Mesh::AnimatedMeshBoneInfluence *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"delete_csAnimatedMeshBoneInfluence",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__csAnimatedMeshBoneInfluence, SWIG_POINTER_DISOWN |  0 );
+  if(!PyArg_UnpackTuple(args,(char *)"delete_AnimatedMeshBoneInfluence",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__AnimatedMeshBoneInfluence, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csAnimatedMeshBoneInfluence" "', argument " "1"" of type '" "CS::Mesh::csAnimatedMeshBoneInfluence *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_AnimatedMeshBoneInfluence" "', argument " "1"" of type '" "CS::Mesh::AnimatedMeshBoneInfluence *""'"); 
   }
-  arg1 = reinterpret_cast< CS::Mesh::csAnimatedMeshBoneInfluence * >(argp1);
+  arg1 = reinterpret_cast< CS::Mesh::AnimatedMeshBoneInfluence * >(argp1);
   delete arg1;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -14311,10 +14311,10 @@ fail:
 }
 
 
-SWIGINTERN PyObject *csAnimatedMeshBoneInfluence_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *AnimatedMeshBoneInfluence_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
-  SWIG_TypeNewClientData(SWIGTYPE_p_CS__Mesh__csAnimatedMeshBoneInfluence, SWIG_NewClientData(obj));
+  SWIG_TypeNewClientData(SWIGTYPE_p_CS__Mesh__AnimatedMeshBoneInfluence, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
 
@@ -15525,7 +15525,7 @@ SWIGINTERN PyObject *_wrap_iAnimatedMeshFactory_GetBoneInfluences(PyObject *SWIG
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  CS::Mesh::csAnimatedMeshBoneInfluence *result = 0 ;
+  CS::Mesh::AnimatedMeshBoneInfluence *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshFactory_GetBoneInfluences",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__iAnimatedMeshFactory, 0 |  0 );
@@ -15533,8 +15533,8 @@ SWIGINTERN PyObject *_wrap_iAnimatedMeshFactory_GetBoneInfluences(PyObject *SWIG
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMeshFactory_GetBoneInfluences" "', argument " "1"" of type '" "CS::Mesh::iAnimatedMeshFactory *""'"); 
   }
   arg1 = reinterpret_cast< CS::Mesh::iAnimatedMeshFactory * >(argp1);
-  result = (CS::Mesh::csAnimatedMeshBoneInfluence *)(arg1)->GetBoneInfluences();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Mesh__csAnimatedMeshBoneInfluence, 0 |  0 );
+  result = (CS::Mesh::AnimatedMeshBoneInfluence *)(arg1)->GetBoneInfluences();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Mesh__AnimatedMeshBoneInfluence, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -45396,13 +45396,13 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iGenMeshSkeletonControlState_scfGetVersion", _wrap_iGenMeshSkeletonControlState_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iGenMeshSkeletonControlState", _wrap_delete_iGenMeshSkeletonControlState, METH_VARARGS, NULL},
 	 { (char *)"iGenMeshSkeletonControlState_swigregister", iGenMeshSkeletonControlState_swigregister, METH_VARARGS, NULL},
-	 { (char *)"csAnimatedMeshBoneInfluence_bone_set", _wrap_csAnimatedMeshBoneInfluence_bone_set, METH_VARARGS, NULL},
-	 { (char *)"csAnimatedMeshBoneInfluence_bone_get", _wrap_csAnimatedMeshBoneInfluence_bone_get, METH_VARARGS, NULL},
-	 { (char *)"csAnimatedMeshBoneInfluence_influenceWeight_set", _wrap_csAnimatedMeshBoneInfluence_influenceWeight_set, METH_VARARGS, NULL},
-	 { (char *)"csAnimatedMeshBoneInfluence_influenceWeight_get", _wrap_csAnimatedMeshBoneInfluence_influenceWeight_get, METH_VARARGS, NULL},
-	 { (char *)"new_csAnimatedMeshBoneInfluence", _wrap_new_csAnimatedMeshBoneInfluence, METH_VARARGS, NULL},
-	 { (char *)"delete_csAnimatedMeshBoneInfluence", _wrap_delete_csAnimatedMeshBoneInfluence, METH_VARARGS, NULL},
-	 { (char *)"csAnimatedMeshBoneInfluence_swigregister", csAnimatedMeshBoneInfluence_swigregister, METH_VARARGS, NULL},
+	 { (char *)"AnimatedMeshBoneInfluence_bone_set", _wrap_AnimatedMeshBoneInfluence_bone_set, METH_VARARGS, NULL},
+	 { (char *)"AnimatedMeshBoneInfluence_bone_get", _wrap_AnimatedMeshBoneInfluence_bone_get, METH_VARARGS, NULL},
+	 { (char *)"AnimatedMeshBoneInfluence_influenceWeight_set", _wrap_AnimatedMeshBoneInfluence_influenceWeight_set, METH_VARARGS, NULL},
+	 { (char *)"AnimatedMeshBoneInfluence_influenceWeight_get", _wrap_AnimatedMeshBoneInfluence_influenceWeight_get, METH_VARARGS, NULL},
+	 { (char *)"new_AnimatedMeshBoneInfluence", _wrap_new_AnimatedMeshBoneInfluence, METH_VARARGS, NULL},
+	 { (char *)"delete_AnimatedMeshBoneInfluence", _wrap_delete_AnimatedMeshBoneInfluence, METH_VARARGS, NULL},
+	 { (char *)"AnimatedMeshBoneInfluence_swigregister", AnimatedMeshBoneInfluence_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSocketFactory_GetName", _wrap_iAnimatedMeshSocketFactory_GetName, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSocketFactory_SetName", _wrap_iAnimatedMeshSocketFactory_SetName, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSocketFactory_GetTransform", _wrap_iAnimatedMeshSocketFactory_GetTransform, METH_VARARGS, NULL},
@@ -47271,13 +47271,13 @@ static swig_type_info _swigt__p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT
 static swig_type_info _swigt__p_csArrayT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_csArrayElementHandlerT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t = {"_p_csArrayT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_csArrayElementHandlerT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_csArrayT_csPluginRequest_csArrayElementHandlerT_csPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t = {"_p_csArrayT_csPluginRequest_csArrayElementHandlerT_csPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_csTriangleMeshEdge = {"_p_csTriangleMeshEdge", 0, 0, 0, 0, 0};
-static swig_type_info _swigt__p_CS__Mesh__csAnimatedMeshBoneInfluence = {"_p_CS__Mesh__csAnimatedMeshBoneInfluence", "CS::Mesh::csAnimatedMeshBoneInfluence *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_CS__Mesh__iAnimatedMesh = {"_p_CS__Mesh__iAnimatedMesh", "CS::Mesh::iAnimatedMesh *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_CS__Mesh__iAnimatedMeshFactory = {"_p_CS__Mesh__iAnimatedMeshFactory", "CS::Mesh::iAnimatedMeshFactory *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_CS__Mesh__iAnimatedMeshMorphTarget = {"_p_CS__Mesh__iAnimatedMeshMorphTarget", "CS::Mesh::iAnimatedMeshMorphTarget *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_CS__Mesh__AnimatedMeshBoneInfluence = {"_p_CS__Mesh__AnimatedMeshBoneInfluence", "CS::Mesh::AnimatedMeshBoneInfluence *|csAnimatedMeshBoneInfluence *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_CS__Mesh__iAnimatedMesh = {"_p_CS__Mesh__iAnimatedMesh", "CS::Mesh::iAnimatedMesh *|iAnimatedMesh *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_CS__Mesh__iAnimatedMeshFactory = {"_p_CS__Mesh__iAnimatedMeshFactory", "CS::Mesh::iAnimatedMeshFactory *|iAnimatedMeshFactory *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_CS__Mesh__iAnimatedMeshMorphTarget = {"_p_CS__Mesh__iAnimatedMeshMorphTarget", "CS::Mesh::iAnimatedMeshMorphTarget *|iAnimatedMeshMorphTarget *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Mesh__iAnimatedMeshSocket = {"_p_CS__Mesh__iAnimatedMeshSocket", "CS::Mesh::iAnimatedMeshSocket *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_CS__Mesh__iAnimatedMeshSocketFactory = {"_p_CS__Mesh__iAnimatedMeshSocketFactory", "CS::Mesh::iAnimatedMeshSocketFactory *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_CS__Mesh__iAnimatedMeshSubMesh = {"_p_CS__Mesh__iAnimatedMeshSubMesh", "CS::Mesh::iAnimatedMeshSubMesh *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_CS__Mesh__iAnimatedMeshSocketFactory = {"_p_CS__Mesh__iAnimatedMeshSocketFactory", "CS::Mesh::iAnimatedMeshSocketFactory *|iAnimatedMeshSocketFactory *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_CS__Mesh__iAnimatedMeshSubMesh = {"_p_CS__Mesh__iAnimatedMeshSubMesh", "CS::Mesh::iAnimatedMeshSubMesh *|iAnimatedMeshSubMesh *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Mesh__iAnimatedMeshSubMeshFactory = {"_p_CS__Mesh__iAnimatedMeshSubMeshFactory", "CS::Mesh::iAnimatedMeshSubMeshFactory *|iAnimatedMeshFactorySubMesh *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__StringIDT_CS__StringSetTag__General_t = {"_p_CS__StringIDT_CS__StringSetTag__General_t", "csStringID *|csEventID *|CS::StringID< CS::StringSetTag::General > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__StringIDT_CS__StringSetTag__ShaderVar_t = {"_p_CS__StringIDT_CS__StringSetTag__ShaderVar_t", "CS::ShaderVarStringID *|CS::StringID< CS::StringSetTag::ShaderVar > *", 0, 0, (void*)0, 0};
@@ -47620,7 +47620,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_CS__Graphics__RenderPriority,
   &_swigt__p_CS__Memory__AllocatorMalloc,
   &_swigt__p_CS__Memory__CustomAllocated,
-  &_swigt__p_CS__Mesh__csAnimatedMeshBoneInfluence,
+  &_swigt__p_CS__Mesh__AnimatedMeshBoneInfluence,
   &_swigt__p_CS__Mesh__iAnimatedMesh,
   &_swigt__p_CS__Mesh__iAnimatedMeshFactory,
   &_swigt__p_CS__Mesh__iAnimatedMeshMorphTarget,
@@ -47985,7 +47985,7 @@ static swig_cast_info _swigc__p_csArrayT_csArrayT_int_csArrayElementHandlerT_int
 static swig_cast_info _swigc__p_csArrayT_csPluginRequest_csArrayElementHandlerT_csPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t[] = {{&_swigt__p_csArrayT_csPluginRequest_csArrayElementHandlerT_csPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csTriangleMeshEdge[] = {{&_swigt__p_csTriangleMeshEdge, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Memory__CustomAllocated[] = {  {&_swigt__p_CS__Memory__CustomAllocated, 0, 0, 0},  {&_swigt__p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csArrayT_char_csArrayElementHandlerT_char_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_csArrayElementHandlerT_csArrayT_char_csArrayElementHandlerT_char_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_csArrayT_char_csArrayElementHandlerT_char_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_csArrayElementHandlerT_csArrayT_char_csArrayElementHandlerT_char_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csVector4_csArrayElementHandlerT_csVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_csVector4_csArrayElementHandlerT_csVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_csArrayElementHandlerT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_csArrayElementHandlerT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csPluginRequest_csArrayElementHandlerT_csPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_csPluginRequest_csArrayElementHandlerT_csPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csTriangleMeshEdge, _p_csTriangleMeshEdgeTo_p_CS__Memory__CustomAllocated, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_CS__Mesh__csAnimatedMeshBoneInfluence[] = {  {&_swigt__p_CS__Mesh__csAnimatedMeshBoneInfluence, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_CS__Mesh__AnimatedMeshBoneInfluence[] = {  {&_swigt__p_CS__Mesh__AnimatedMeshBoneInfluence, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Mesh__iAnimatedMesh[] = {  {&_swigt__p_CS__Mesh__iAnimatedMesh, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Mesh__iAnimatedMeshFactory[] = {  {&_swigt__p_CS__Mesh__iAnimatedMeshFactory, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Mesh__iAnimatedMeshMorphTarget[] = {  {&_swigt__p_CS__Mesh__iAnimatedMeshMorphTarget, 0, 0, 0},{0, 0, 0, 0}};
@@ -48334,7 +48334,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_CS__Graphics__RenderPriority,
   _swigc__p_CS__Memory__AllocatorMalloc,
   _swigc__p_CS__Memory__CustomAllocated,
-  _swigc__p_CS__Mesh__csAnimatedMeshBoneInfluence,
+  _swigc__p_CS__Mesh__AnimatedMeshBoneInfluence,
   _swigc__p_CS__Mesh__iAnimatedMesh,
   _swigc__p_CS__Mesh__iAnimatedMeshFactory,
   _swigc__p_CS__Mesh__iAnimatedMeshMorphTarget,

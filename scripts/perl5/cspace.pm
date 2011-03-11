@@ -15532,20 +15532,20 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::csAnimatedMeshBoneInfluence ##############
+############# Class : cspace::AnimatedMeshBoneInfluence ##############
 
-package cspace::csAnimatedMeshBoneInfluence;
+package cspace::AnimatedMeshBoneInfluence;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-*swig_bone_get = *cspacec::csAnimatedMeshBoneInfluence_bone_get;
-*swig_bone_set = *cspacec::csAnimatedMeshBoneInfluence_bone_set;
-*swig_influenceWeight_get = *cspacec::csAnimatedMeshBoneInfluence_influenceWeight_get;
-*swig_influenceWeight_set = *cspacec::csAnimatedMeshBoneInfluence_influenceWeight_set;
+*swig_bone_get = *cspacec::AnimatedMeshBoneInfluence_bone_get;
+*swig_bone_set = *cspacec::AnimatedMeshBoneInfluence_bone_set;
+*swig_influenceWeight_get = *cspacec::AnimatedMeshBoneInfluence_influenceWeight_get;
+*swig_influenceWeight_set = *cspacec::AnimatedMeshBoneInfluence_influenceWeight_set;
 sub new {
     my $pkg = shift;
-    my $self = cspacec::new_csAnimatedMeshBoneInfluence(@_);
+    my $self = cspacec::new_AnimatedMeshBoneInfluence(@_);
     bless $self, $pkg if defined($self);
 }
 
@@ -15555,7 +15555,7 @@ sub DESTROY {
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_csAnimatedMeshBoneInfluence($self);
+        cspacec::delete_AnimatedMeshBoneInfluence($self);
         delete $OWNER{$self};
     }
 }
