@@ -472,6 +472,7 @@ class CS_CRYSTALSPACE_EXPORT CameraHelper
  * //--------------------------
  * // main.cpp
  *
+ * #include "cssysdef.h"
  * #include "example.h"
  *
  * CS_IMPLEMENT_APPLICATION
