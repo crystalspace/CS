@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2010 Christian Van Brussel, Communications and Remote
+  Copyright (C) 2010-11 Christian Van Brussel, Communications and Remote
       Sensing Laboratory of the School of Engineering at the 
       Universite catholique de Louvain, Belgium
       http://www.tele.ucl.ac.be
@@ -39,6 +39,7 @@
 #include "csutil/event.h"
 #include "csutil/hash.h"
 #include "csutil/stringarray.h"
+
 #include "iengine/camera.h"
 #include "iengine/scenenode.h"
 #include "iengine/sector.h"
@@ -164,40 +165,72 @@ class CS_CRYSTALSPACE_EXPORT CommandLineHelper
   CommandLineBlockID blockCount;
 };
 
-// ------------------------ HUDHelper ------------------------
+// ------------------------ HUDManager ------------------------
 
 /**
- * A generic tool managing the display of a HUD, eg for applications
- * implementing DemoApplication.
- * The HUD consists of the Crystal Space logo, the list of available keys
+ * A generic tool managing the display of a minimal text-based HUD, eg for applications
+ * implementing CS::Demo::DemoApplication or providing a user interface through the keyboard.
+ *
+ * The HUD consists of the Crystal Space logo, the list of available keyboard and mouse actions
  * that can be used to interact with the demo, and a list of strings
  * describing the current state of the application.
- * \warning SetContext() must be called before any other operation.
+ *
+ * You need to setup or update the list of keys and current states (keyDescriptions and
+ * stateDescriptions) whenever they change. The description of the state is augmented with
+ * informations such as the current Frames Per Second.
+ * \warning Initialize() must be called before any other operation.
  */
-class CS_CRYSTALSPACE_EXPORT HUDHelper
+class CS_CRYSTALSPACE_EXPORT HUDManager : public csBaseEventHandler
 {
  public:
   /**
    * Constructor.
    */
-  HUDHelper ();
+  HUDManager ();
   /**
    * Destructor.
    */
-  ~HUDHelper ();
+  ~HUDManager ();
 
   /**
-   * (Re-)set the various objects of the context of this HUDHelper.
+   * Initialize this HUD manager
    */
-  bool SetContext (csApplicationFramework* applicationFramework,
-		   iGraphics3D* g3d, iGraphics2D* g2d, iLoader* loader,
-		   iVirtualClock* vc);
+  void Initialize (iObjectRegistry* registry);
+
+  //-- csBaseEventHandler
+  void Frame ();
 
   /**
-   * Update the current state of the HUD depending on the keyboard events.
-   * This should be called automatically by DemoApplication.
+   * Switch to the next page describing the list of available keyboard keys. This is useful
+   * when the list of available keyboard keys is too big and needs to be split in several
+   * different pages.
    */
-  bool OnKeyboard (iEvent &event);
+  void SwitchKeysPage ();
+
+  /**
+   * Display a 2D text with a shadow. Additional parameters can be defined,
+   * they will be formated into the text string by using the cs_snprintf()-style
+   * formatting directives.
+   */
+  void WriteShadow (int x, int y, int color, const char *str,...);
+  /**
+   * Display a 2D text. Additional parameters can be defined,
+   * they will be formated into the text string by using the cs_snprintf()-style
+   * formatting directives.
+   */
+  void Write (int x, int y, int fg, int color, const char *str,...);
+
+  /**
+   * Set whether or not the HUD will be displayed. If not enabled, then this manager
+   * will not be active at all.
+   */
+  void SetEnabled (bool enabled);
+
+  /**
+   * Get whether or not the HUD is displayed. If not enabled, then this manager
+   * will not be active at all.
+   */
+  bool GetEnabled ();
 
   /**
    * Array of string describing the available user keys (eg 'd: toggle debug mode').
@@ -205,33 +238,13 @@ class CS_CRYSTALSPACE_EXPORT HUDHelper
    * can call csStringArray::DeleteAll() if you don't want these keys to be displayed.
    */
   csStringArray keyDescriptions;
+
   /**
    * Array of string describing the state of the application (eg 'Debug mode enabled').
    */
   csStringArray stateDescriptions;
 
-  /**
-   * Display of a 2D text with a shadow. Additional parameters can be defined,
-   * they will be formated into the text string by using the cs_snprintf()-style
-   * formatting directives.
-   */
-  void WriteShadow (int x, int y, int color, const char *str,...);
-  /**
-   * Display of a 2D text. Additional parameters can be defined,
-   * they will be formated into the text string by using the cs_snprintf()-style
-   * formatting directives.
-   */
-  void Write (int x, int y, int fg, int color, const char *str,...);
-
-  /**
-   * Display the HUD. This has to be called on each frame, after 3D drawings have
-   * been done. This should be done automatically within DemoApplication::Frame().
-   */
-  void DisplayHUD ();
-
  private:
-  // Reference to the application framework
-  csApplicationFramework* applicationFramework;
   // Reference to the 3D graphics
   csRef<iGraphics3D> g3d;
   // Reference to the 2D graphics
@@ -244,6 +257,9 @@ class CS_CRYSTALSPACE_EXPORT HUDHelper
   // Crystal Space logo
   csPixmap* cslogo;
 
+  // Whether or not the HUD is displayed
+  bool enabled;
+
   // Computing of frames per second
   uint frameCount;
   int frameTime;
@@ -254,87 +270,105 @@ class CS_CRYSTALSPACE_EXPORT HUDHelper
   uint maxKeys;
 };
 
-// ------------------------ CameraHelper ------------------------
+// ------------------------ CameraManager ------------------------
 
 /**
- * Various camera modes which can be used with CameraHelper.
+ * Various camera modes which can be used with CS::Demo::CameraManager.
  */
 enum CameraMode
 {
-  CSDEMO_CAMERA_NONE = 0,         /*!< The application will manage the camera by itself */
-  CSDEMO_CAMERA_MOVE_FREE,        /*!< The camera is free to move */
-  CSDEMO_CAMERA_MOVE_LOOKAT,      /*!< The camera is free to move but keeps looking at the target */
-  CSDEMO_CAMERA_ROTATE            /*!< The camera rotates around the target */
+  CAMERA_NO_MOVE = 0,     /*!< The application will manage the camera by itself */
+  CAMERA_MOVE_FREE,       /*!< The camera is free to move */
+  CAMERA_MOVE_LOOKAT,     /*!< The camera is free to move but keeps looking at the target */
+  CAMERA_ROTATE           /*!< The camera rotates around the target */
 };
 
 /**
- * An abstract class to be implemented in order to control the movement of
- * the camera managed by a CS::Demo::CameraHelper.
- */
-class CS_CRYSTALSPACE_EXPORT CameraManager
-{
- public:
-  /**
-   * Return the start position of the camera. This is used at start or
-   * when CameraHelper::ResetCamera() is called.
-   */
-  virtual csVector3 GetCameraStart ()
-  { return csVector3 (0.0f, 0.0f, -3.0f); }
-
-  /**
-   * Return the closest distance there can be between the camera and its
-   * target. This is relevant only for the CSDEMO_CAMERA_MOVE_LOOKAT and
-   * CSDEMO_CAMERA_ROTATE camera modes.
-   */
-  virtual float GetCameraMinimumDistance ()
-  { return 0.1f; }
-
-  /**
-   * Return the camera target, ie what it is looking at. This is relevant
-   * only for the CSDEMO_CAMERA_MOVE_LOOKAT and CSDEMO_CAMERA_ROTATE camera
-   * modes.
-   */
-  virtual csVector3 GetCameraTarget ()
-  { return csVector3 (0.0f); }
-
-  virtual ~CameraManager () {}
-};
-
-/**
- * A generic tool managing the movements of the camera with the keyboard
+ * A generic tool to control the motion of the camera through the keyboard
  * and/or the mouse.
- * \warning SetContext() must be called before any other operation.
+ *
+ * To use it, you need to create one CS::Demo::CameraManager, initialize it with
+ * Initialize(), specify the camera to be controlled with SetCamera(), and configure the
+ * behavior of the manager eg by defining the camera mode through SetCameraMode(). After that,
+ * the camera manager will remain active until it is destroyed.
+ *
+ * \warning Initialize() must be called before any other operation.
  */
-class CS_CRYSTALSPACE_EXPORT CameraHelper
+class CS_CRYSTALSPACE_EXPORT CameraManager : public csBaseEventHandler
 {
  public:
   /**
    * Constructor.
    */
-  CameraHelper ();
+  CameraManager ();
+  ~CameraManager ();
 
   /**
-   * (Re-)set the various objects of the context of this CameraHelper.
+   * Initialize this camera helper
    */
-  bool SetContext (CameraManager* manager, iKeyboardDriver* kbd, iVirtualClock* vc, iCamera* camera);
+  void Initialize (iObjectRegistry* registry);
 
-  /// Update the position of the camera. The behavior depends on the current camera mode.
-  void Frame ();
-  /// Update the position of the camera. The behavior depends on what was used for SetMouseMoveEnabled().
-  bool OnMouseDown (iEvent &event);
-  /// Update the position of the camera. The behavior depends on what was used for SetMouseMoveEnabled().
-  bool OnMouseUp (iEvent &event);
-  /// Update the position of the camera. The behavior depends on what was used for SetMouseMoveEnabled().
-  bool OnMouseMove (iEvent &event);
+  /// Set the camera to be controlled by this manager. This can be nullptr.
+  void SetCamera (iCamera* camera);
+  /// Get the camera controlled by this manager, or nullptr if there are none.
+  iCamera* GetCamera ();
 
-  /// Set the camera mode to be used. Default value is CSDEMO_CAMERA_MOVE_NORMAL.
+  /**
+   * Update the position of the camera. You don't need to call this, but it can be used
+   * to control the exact moment where the camera is updated (eg before the rendering of
+   * the view). If you don't call this, then the camera will still be updated automatically
+   * once per frame, but it may or not have a one frame delay depending on if it is updated
+   * after or before the rendering of the view.
+   */
+  void UpdateCamera ();
+
+  /// Set the camera mode to be used. The default value is CS::Demo::CAMERA_MOVE_NORMAL.
   void SetCameraMode (CameraMode cameraMode);
   /// Return the current camera mode.
   CameraMode GetCameraMode ();
 
   /**
+   * Set the start position of the camera. This position is used when ResetCamera() is called.
+   * The default value is 'csVector3 (0.0f, 0.0f, -3.0f)'.
+   */
+  void SetStartPosition (csVector3 position);
+
+  /**
+   * Get the start position of the camera. This position is used when ResetCamera() is called.
+   */
+  csVector3 GetStartPosition ();
+
+  /**
+   * Set the target of the camera, ie what it is looking at. This is relevant
+   * only for the CS::Demo::CAMERA_MOVE_LOOKAT and CS::Demo::CAMERA_ROTATE camera
+   * modes. The default value is 'csVector3 (0.0f, 0.0f, 0.0f)'.
+   */
+  void SetCameraTarget (csVector3 position);
+
+  /**
+   * Get the target of the camera, ie what it is looking at. This is relevant
+   * only for the CS::Demo::CAMERA_MOVE_LOOKAT and CS::Demo::CAMERA_ROTATE camera
+   * modes.
+   */
+  csVector3 GetCameraTarget ();
+
+  /**
+   * Set the closest distance there can be between the camera and its
+   * target. This is relevant only for the CS::Demo::CAMERA_MOVE_LOOKAT and
+   * CS::Demo::CAMERA_ROTATE camera modes. The default value is \a 0.1f.
+   */
+  void SetCameraMinimumDistance (float distance);
+
+  /**
+   * Get the closest distance there can be between the camera and its
+   * target. This is relevant only for the CS::Demo::CAMERA_MOVE_LOOKAT and
+   * CS::Demo::CAMERA_ROTATE camera modes.
+   */
+  float GetCameraMinimumDistance ();
+
+  /**
    * Set whether the camera can be moved or not through the mouse.
-   * Default value is true.
+   * The default value is true.
    * If enabled, then the camera will be moved when the user drags
    * the mouse while holding one of the following button:
    * - left button: the camera is moved sideways
@@ -344,6 +378,7 @@ class CS_CRYSTALSPACE_EXPORT CameraHelper
    * cannot get closer than CameraManager::GetCameraMinimumDistance().
    */
   void SetMouseMoveEnabled (bool enabled);
+
   /**
    * Return whether the camera can be moved or not through the mouse.
    */
@@ -351,7 +386,7 @@ class CS_CRYSTALSPACE_EXPORT CameraHelper
 
   /**
    * Reset the camera position to the position returned by
-   * CameraManager::GetCameraStart().
+   * CameraManager::GetStartPosition().
    */
   void ResetCamera ();
 
@@ -360,6 +395,7 @@ class CS_CRYSTALSPACE_EXPORT CameraHelper
    * Note that the camera moves ten times faster when the CTRL key is pressed. 
    */
   void SetMotionSpeed (float speed);
+
   /**
    * Get the speed of the camera's motion, in unit per second.
    */
@@ -370,28 +406,41 @@ class CS_CRYSTALSPACE_EXPORT CameraHelper
    * Note that the camera rotates five times faster when the CTRL key is pressed. 
    */
   void SetRotationSpeed (float speed);
+
   /**
-   * Get the speed of the camera's motion, in unit per second.
+   * Get the speed of the camera's motion, in radian per second.
    */
   float GetRotationSpeed ();
 
- private:
-  void UpdateCamera ();
-  void UpdateCameraOrigin (const csVector3& desiredOrigin);
+  //-- csBaseEventHandler
+  void Frame ();
+  bool OnMouseDown (iEvent &event);
+  bool OnMouseUp (iEvent &event);
+  bool OnMouseMove (iEvent &event);
 
-  // Reference to the camera manager
-  CameraManager* cameraManager;
+ private:
+  void UpdatePositionParameters (const csVector3& newPosition);
+  void ApplyPositionParameters ();
+
   // Reference to the keyboard driver
   csRef<iKeyboardDriver> kbd;
   // Reference to the virtual clock
   csRef<iVirtualClock> vc;
+  // Reference to the mouse driver
+  csRef<iMouseDriver> mouse;
+
   // Reference to the camera
   csRef<iCamera> camera;
 
   CameraMode cameraMode;
   bool mouseMoveEnabled;
+
+  csVector3 startPosition;
+  csVector3 cameraTarget;
+  float minimumDistance;
+
   csVector3 panCameraTarget;
-  float cameraDist;
+  float cameraDistance;
   float cameraYaw;
   float cameraPitch;
 
@@ -402,7 +451,9 @@ class CS_CRYSTALSPACE_EXPORT CameraHelper
   float motionSpeed;
   float rotationSpeed;
 
-  int lastMouseX, lastMouseY;
+  bool wasUpdated;
+
+  int previousMouseX, previousMouseY;
 };
 
 // ------------------------ DemoApplication ------------------------
@@ -417,9 +468,9 @@ class CS_CRYSTALSPACE_EXPORT CameraHelper
  * The basic functionalities provided by this class are:
  * - creation of the main objects of the engine
  * - default creation of the scene
- * - management of the camera (class CS::Demo::CameraHelper).
+ * - management of the camera (class CS::Demo::CameraManager).
  * - display of the available keys, Crystal Space logo and other informations
- * (class CS::Demo::HUDHelper).
+ * (class CS::Demo::HUDManager).
  * - management of the command line's help (class CS::Demo::CommandLineHelper).
  *
  * Here is an example for the most simple use of this class:
@@ -461,7 +512,7 @@ class CS_CRYSTALSPACE_EXPORT CameraHelper
  *   if (!CreateRoom ())
  *     return false;
  *
- *   // Create here the main objects of the scene
+ *   // Create here the main objects of your scene
  *
  *   // Run the application
  *   Run();
@@ -484,10 +535,11 @@ class CS_CRYSTALSPACE_EXPORT CameraHelper
  * \endcode
  */
 class CS_CRYSTALSPACE_EXPORT DemoApplication : public csApplicationFramework,
-  public csBaseEventHandler, public CameraManager
+  public csBaseEventHandler
 {
-  friend class HUDHelper;
-  friend class CameraHelper;
+ private:
+  /// Whether the previous mouse cusor position was initialized
+  bool mouseInitialized;
 
  protected:
   /// Reference to the engine
@@ -508,50 +560,52 @@ class CS_CRYSTALSPACE_EXPORT DemoApplication : public csApplicationFramework,
   csRef<FramePrinter> printer;
   /// Reference to the virtual file system
   csRef<iVFS> vfs;
+  /// Reference to the mouse driver
+  csRef<iMouseDriver> mouse;
+
+  /// Previous position of the mouse cursor during the last frame. It can be used to
+  /// know the distance travelled by comparing it to "mouse->GetLastX/Y".
+  csVector2 previousMouse;
 
   /// Reference to the main sector
   csRef<iSector> room;
 
-  /// Current mouse cursor X's position
-  int mouseX;
-  /// Current mouse cursor Y's position
-  int mouseY;
-
   /// Visual debugger
   csRef<CS::Debug::iVisualDebugger> visualDebugger;
 
-  /// Base implementation of the method inherited from csBaseEventHandler
+  //-- csBaseEventHandler
+  /**
+   * Base implementation of the method inherited from csBaseEventHandler. It initializes the
+   * previous position of the mouse cursor, update the camera manager, renders the view and
+   * displays the visual debugging information if any.
+   */
   virtual void Frame ();
-  /// Base implementation of the method inherited from csBaseEventHandler
+
+  /// Base implementation of the method inherited from csBaseEventHandler. It checks for the
+  /// "Help" or "Esc" keys.
   virtual bool OnKeyboard (iEvent &event);
-  /// Base implementation of the method inherited from csBaseEventHandler
-  virtual bool OnMouseDown (iEvent &event);
-  /// Base implementation of the method inherited from csBaseEventHandler
-  virtual bool OnMouseUp (iEvent &event);
-  /// Base implementation of the method inherited from csBaseEventHandler
+
+  /**
+   * Base implementation of the method inherited from csBaseEventHandler. It simply updates
+   * the \a previousMouse position.
+   */
   virtual bool OnMouseMove (iEvent &event);
 
   /**
    * Default initialization for the creation of the main sector (DemoApplication::room). It
-   * creates a grey uniform background far away, initializes the camera, and adds a few lights.
+   * creates a sector of name "room", adds a grey uniform background far away, initializes
+   * the camera and add some lights.
    */
   virtual bool CreateRoom ();
 
   /// Command line helper
   CommandLineHelper commandLineHelper;
 
-  /// HUD helper
-  HUDHelper hudHelper;
+  /// HUD manager
+  HUDManager hudManager;
 
-  /// Camera helper
-  CameraHelper cameraHelper;
-
-  /**
-   * Set whether or not the HUD must be displayed. Default value is true.
-   */
-  void SetHUDDisplayed (bool displayed);
-  /// Return whether or not the HUD is currently displayed.
-  bool GetHUDDisplayed ();
+  /// Camera manager
+  CameraManager cameraManager;
 
  public:
   /**
@@ -568,17 +622,26 @@ class CS_CRYSTALSPACE_EXPORT DemoApplication : public csApplicationFramework,
   DemoApplication (const char* applicationName, const char* applicationCommand,
 		   const char* applicationCommandUsage,
 		   const char* applicationDescription);
+  ~DemoApplication ();
 
-  /// Base implementation of the method inherited from csApplicationFramework
-  virtual void OnExit ();
-  /// Base implementation of the method inherited from csApplicationFramework
+  /**
+   * Base implementation of the method inherited from csApplicationFramework.
+   * It loads all base plugins, and registers itself to the event queue.
+   */
   virtual bool OnInitialize (int argc, char* argv[]);
-  /// Base implementation of the method inherited from csApplicationFramework
+
+  /**
+   * Base implementation of the method inherited from csApplicationFramework. It
+   * opens the main application, find references to the engine objects, creates the
+   * main view used for rendering, and initializes the HUD and the camera managers.
+   */
   virtual bool Application ();
 
- private:
-  // Whether the HUD should be displayed or not
-  bool hudDisplayed;
+  /**
+   * Base implementation of the method inherited from csApplicationFramework. It
+   * closes the frame printer.
+   */
+  virtual void OnExit ();
 };
 
 } // namespace Demo
