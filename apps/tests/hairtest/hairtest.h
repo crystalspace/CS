@@ -22,11 +22,16 @@
 #ifndef __HAIRTEST_H__
 #define __HAIRTEST_H__
 
-#include "crystalspace.h"
-
+#include "imesh/animesh.h"
+#include "imesh/animnode/ragdoll.h"
 #include "imesh/furmesh.h"
+#include "ivaria/dynamics.h"
+#include "ivaria/dynamicsdebug.h"
 #include "ivaria/icegui.h"
 
+#include "cstool/csdemoapplication.h"
+
+// Different states for the display of the physical objects
 #define DYNDEBUG_NONE 1
 #define DYNDEBUG_MIXED 2
 #define DYNDEBUG_COLLIDER 3

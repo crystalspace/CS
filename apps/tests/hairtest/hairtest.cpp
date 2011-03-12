@@ -608,7 +608,7 @@ void HairTest::SwitchScenes()
 
 void HairTest::SaveObject(iMeshWrapper* meshwrap, const char * filename)
 {
-  csPrintf("Saving object ...\n");
+  csPrintf("Saving object to file %s...\n", filename);
 
   csRef<iDocumentSystem> xml(new csTinyDocumentSystem());
   csRef<iDocument> doc = xml->CreateDocument();
@@ -663,7 +663,7 @@ void HairTest::SaveObject(iMeshWrapper* meshwrap, const char * filename)
 
 void HairTest::SaveFactory(iMeshFactoryWrapper* meshfactwrap, const char * filename)
 {
-  csPrintf("Saving factory ...\n");
+  csPrintf("Saving factory to file %s...\n", filename);
 
   csRef<iDocumentSystem> xml(new csTinyDocumentSystem());
   csRef<iDocument> doc = xml->CreateDocument();
@@ -1011,7 +1011,7 @@ bool HairTest::Application ()
     CEGUI::Event::Subscriber(&HairTest::StdDlgDirChange, this));
 
   // ------------------------------------------------------------------------
-  vfs->ChDir ("/lib/krystal/");
+  vfs->ChDir ("/lib/hairtest/");
   btn = winMgr->getWindow("HairTest/StdDlg/Path");
   btn->setProperty("Text", vfs->GetCwd());
   StdDlgUpdateLists(vfs->GetCwd());

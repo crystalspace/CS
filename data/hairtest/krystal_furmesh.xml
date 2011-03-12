@@ -12,6 +12,6 @@
       <file>/lib/krystal/krystal_skull_heightmap.png</file>
     </texture>	
   </textures>
-  <library>/lib/krystal/krystal_furmesh_factory</library>
-  <library>/lib/krystal/krystal_furmesh_object</library>
+  <library>/lib/hairtest/krystal_furmesh_factory</library>
+  <library>/lib/hairtest/krystal_furmesh_object</library>
 </library>  

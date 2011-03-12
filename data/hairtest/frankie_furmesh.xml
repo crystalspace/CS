@@ -12,6 +12,6 @@
       <file>/lib/frankie/frankie_heightmap.png</file>
     </texture>
   </textures>
-  <library>/lib/frankie/frankie_furmesh_factory</library>
-  <library>/lib/frankie/frankie_furmesh_object</library>
+  <library>/lib/hairtest/frankie_furmesh_factory</library>
+  <library>/lib/hairtest/frankie_furmesh_object</library>
 </library>  
