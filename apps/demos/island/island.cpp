@@ -33,8 +33,9 @@ IslandDemo::IslandDemo ()
   // Configure the options for DemoApplication
 
   // Set the camera mode
-  cameraHelper.SetCameraMode (CS::Demo::CSDEMO_CAMERA_MOVE_FREE);
-  cameraHelper.SetMotionSpeed (10.0f);
+  cameraManager.SetCameraMode (CS::Demo::CAMERA_MOVE_FREE);
+  cameraManager.SetStartPosition (csVector3 (500.0f, 200.0f, 500.0f));
+  cameraManager.SetMotionSpeed (10.0f);
 }
 
 void IslandDemo::Frame ()
@@ -91,11 +92,6 @@ bool IslandDemo::CreateScene ()
   printf ("Level loaded...\n");
 
   return true;
-}
-
-csVector3 IslandDemo::GetCameraStart ()
-{
-  return csVector3 (500.0f, 200.0f, 500.0f);
 }
 
 //---------------------------------------------------------------------------

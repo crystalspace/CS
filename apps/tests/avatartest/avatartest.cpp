@@ -41,7 +41,7 @@ AvatarTest::AvatarTest ()
   // Configure the options for DemoApplication
 
   // Set the camera mode
-  cameraHelper.SetCameraMode (CS::Demo::CSDEMO_CAMERA_ROTATE);
+  cameraManager.SetCameraMode (CS::Demo::CAMERA_ROTATE);
 
   // Command line options
   commandLineHelper.AddCommandLineOption
@@ -57,30 +57,6 @@ AvatarTest::~AvatarTest ()
   delete avatarScene;
 }
 
-csVector3 AvatarTest::GetCameraStart ()
-{
-  if (avatarScene)
-    return avatarScene->GetCameraStart ();
-
-  return csVector3 (0.0f);
-}
-
-csVector3 AvatarTest::GetCameraTarget ()
-{
-  if (avatarScene)
-    return avatarScene->GetCameraTarget ();
-
-  return csVector3 (0.0f);
-}
-
-float AvatarTest::GetCameraMinimumDistance ()
-{
-  if (avatarScene)
-    return avatarScene->GetCameraMinimumDistance ();
-
-  return 0.1f;
-}
-
 void AvatarTest::Frame ()
 {
   // First get elapsed time from the virtual clock.
@@ -93,6 +69,9 @@ void AvatarTest::Frame ()
 
   // Update the avatar
   avatarScene->Frame ();
+
+  // Update the target of the camera
+  cameraManager.SetCameraTarget (avatarScene->GetCameraTarget ());
 
   // Update the information on the current state of the application
   avatarScene->UpdateStateDescription ();
@@ -149,7 +128,8 @@ bool AvatarTest::OnKeyboard (iEvent &ev)
       }
 
       // Re-initialize camera position
-      cameraHelper.ResetCamera ();
+      cameraManager.SetCameraTarget (avatarScene->GetCameraTarget ());
+      cameraManager.ResetCamera ();
 
       // Toggle the debug mode of the dynamic system
       if (physicsEnabled)
@@ -226,7 +206,7 @@ bool AvatarTest::HitBeamAnimatedMesh (csVector3& isect, csVector3& direction, in
   if (!avatarScene)
     return false;
 
-  csVector2 v2d (mouseX, g2d->GetHeight () - mouseY);
+  csVector2 v2d (mouse->GetLastX (), g2d->GetHeight () - mouse->GetLastY ());
   iCamera* camera = view->GetCamera ();
   csVector3 v3d = camera->InvPerspective (v2d, 10000);
   csVector3 startBeam = camera->GetTransform ().GetOrigin ();
@@ -464,7 +444,8 @@ bool AvatarTest::Application ()
     return false;
 
   // Initialize the camera position
-  cameraHelper.ResetCamera ();
+  cameraManager.SetCameraTarget (avatarScene->GetCameraTarget ());
+  cameraManager.ResetCamera ();
 
   // Run the application
   Run();

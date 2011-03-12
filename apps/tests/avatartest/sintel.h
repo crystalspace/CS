@@ -30,8 +30,6 @@ class SintelScene : public AvatarScene
   ~SintelScene ();
 
   // Camera related
-  csVector3 GetCameraStart ();
-  float GetCameraMinimumDistance ();
   csVector3 GetCameraTarget ();
 
   // Dynamic simulation related
@@ -45,12 +43,6 @@ class SintelScene : public AvatarScene
 
   // Creation of objects
   bool CreateAvatar ();
-
-  // User interaction with the scene
-  void ResetScene ();
-
-  // Display of information on the state of the scene
-  void UpdateStateDescription ();
 
  private:
   AvatarTest* avatarTest;

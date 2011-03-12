@@ -46,8 +46,8 @@ Simple::Simple ()
   // Configure the options for DemoApplication
 
   // We manage the camera by ourselves
-  cameraHelper.SetCameraMode (CS::Demo::CSDEMO_CAMERA_NONE);
-  cameraHelper.SetMouseMoveEnabled (false);
+  cameraManager.SetCameraMode (CS::Demo::CAMERA_NO_MOVE);
+  cameraManager.SetMouseMoveEnabled (false);
 
   // Command line options
   commandLineHelper.AddCommandLineOption
@@ -144,7 +144,7 @@ void Simple::Frame ()
   {
     // Keep the drag joint at the same distance to the camera
     csRef<iCamera> camera = view->GetCamera ();
-    csVector2 v2d (mouseX, g2d->GetHeight () - mouseY);
+    csVector2 v2d (mouse->GetLastX (), g2d->GetHeight () - mouse->GetLastY ());
     csVector3 v3d = camera->InvPerspective (v2d, 10000);
     csVector3 startBeam = camera->GetTransform ().GetOrigin ();
     csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
@@ -187,47 +187,47 @@ void Simple::Frame ()
       (cameraBody->GetTransform ().GetOrigin ());
 
   // Update the demo's state information
-  hudHelper.stateDescriptions.DeleteAll ();
+  hudManager.stateDescriptions.DeleteAll ();
   csString txt;
 
-  hudHelper.stateDescriptions.Push (csString ("Physics engine: ") + phys_engine_name);
+  hudManager.stateDescriptions.Push (csString ("Physics engine: ") + phys_engine_name);
 
   txt.Format ("Rigid bodies count: %d", dynamicSystem->GetBodysCount ());
-  hudHelper.stateDescriptions.Push (txt);
+  hudManager.stateDescriptions.Push (txt);
 
   if (isSoftBodyWorld)
   {
     txt.Format ("Soft bodies count: %d", (int) bulletDynamicSystem->GetSoftBodyCount ());
-    hudHelper.stateDescriptions.Push (txt);
+    hudManager.stateDescriptions.Push (txt);
   }
 
   if (phys_engine_id == ODE_ID)
   {
     if (solver==0)
-      hudHelper.stateDescriptions.Push (csString ("Solver: WorldStep"));
+      hudManager.stateDescriptions.Push (csString ("Solver: WorldStep"));
     else if (solver==1)
-      hudHelper.stateDescriptions.Push (csString ("Solver: StepFast"));
+      hudManager.stateDescriptions.Push (csString ("Solver: StepFast"));
     else if (solver==2)
-      hudHelper.stateDescriptions.Push (csString ("Solver: QuickStep"));
+      hudManager.stateDescriptions.Push (csString ("Solver: QuickStep"));
   }
 
   if (autodisable)
-    hudHelper.stateDescriptions.Push (csString ("AutoDisable: ON"));
+    hudManager.stateDescriptions.Push (csString ("AutoDisable: ON"));
   else
-    hudHelper.stateDescriptions.Push (csString ("AutoDisable: OFF"));
+    hudManager.stateDescriptions.Push (csString ("AutoDisable: OFF"));
 
   switch (physicalCameraMode)
     {
     case CAMERA_DYNAMIC:
-      hudHelper.stateDescriptions.Push (csString ("Camera mode: dynamic"));
+      hudManager.stateDescriptions.Push (csString ("Camera mode: dynamic"));
       break;
 
     case CAMERA_FREE:
-      hudHelper.stateDescriptions.Push (csString ("Camera mode: free"));
+      hudManager.stateDescriptions.Push (csString ("Camera mode: free"));
       break;
 
     case CAMERA_KINEMATIC:
-      hudHelper.stateDescriptions.Push (csString ("Camera mode: kinematic"));
+      hudManager.stateDescriptions.Push (csString ("Camera mode: kinematic"));
       break;
 
     default:
@@ -511,7 +511,7 @@ bool Simple::OnKeyboard (iEvent &ev)
     {
       // Trace a beam to find if a rigid body was under the mouse cursor
       csRef<iCamera> camera = view->GetCamera ();
-      csVector2 v2d (mouseX, g2d->GetHeight () - mouseY);
+      csVector2 v2d (mouse->GetLastX (), g2d->GetHeight () - mouse->GetLastY ());
       csVector3 v3d = camera->InvPerspective (v2d, 10000);
       csVector3 startBeam = camera->GetTransform ().GetOrigin ();
       csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
@@ -541,7 +541,7 @@ bool Simple::OnKeyboard (iEvent &ev)
     {
       // Compute the new position of the body
       csRef<iCamera> camera = view->GetCamera ();
-      csVector2 v2d (mouseX, g2d->GetHeight () - mouseY);
+      csVector2 v2d (mouse->GetLastX (), g2d->GetHeight () - mouse->GetLastY ());
       csVector3 v3d = camera->InvPerspective (v2d, 10000);
       csVector3 startBeam = camera->GetTransform ().GetOrigin ();
       csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
@@ -621,7 +621,7 @@ csVector3 MouseAnchorAnimationControl::GetAnchorPosition () const
 {
   // Keep the drag joint at the same distance to the camera
   csRef<iCamera> camera = simple->view->GetCamera ();
-  csVector2 v2d (simple->mouseX, simple->g2d->GetHeight () - simple->mouseY);
+  csVector2 v2d (simple->mouse->GetLastX (), simple->g2d->GetHeight () - simple->mouse->GetLastY ());
   csVector3 v3d = camera->InvPerspective (v2d, 10000);
   csVector3 startBeam = camera->GetTransform ().GetOrigin ();
   csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
@@ -641,7 +641,7 @@ bool Simple::OnMouseDown (iEvent& ev)
     // Find the rigid body that was clicked on
     // Compute the end beam points
     csRef<iCamera> camera = view->GetCamera ();
-    csVector2 v2d (mouseX, g2d->GetHeight () - mouseY);
+    csVector2 v2d (mouse->GetLastX (), g2d->GetHeight () - mouse->GetLastY ());
     csVector3 v3d = camera->InvPerspective (v2d, 10000);
     csVector3 startBeam = camera->GetTransform ().GetOrigin ();
     csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
@@ -691,7 +691,7 @@ bool Simple::OnMouseDown (iEvent& ev)
     // Find the rigid body that was clicked on
     // Compute the end beam points
     csRef<iCamera> camera = view->GetCamera ();
-    csVector2 v2d (mouseX, g2d->GetHeight () - mouseY);
+    csVector2 v2d (mouse->GetLastX (), g2d->GetHeight () - mouse->GetLastY ());
     csVector3 v3d = camera->InvPerspective (v2d, 10000);
     csVector3 startBeam = camera->GetTransform ().GetOrigin ();
     csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
@@ -839,67 +839,67 @@ bool Simple::OnInitialize (int argc, char* argv[])
     return ReportError ("No iDynamics plugin!");
 
   // Now that we know the physical plugin in use, we can define the available keys
-  hudHelper.keyDescriptions.DeleteAll ();
-  hudHelper.keyDescriptions.Push ("b: spawn a box");
-  hudHelper.keyDescriptions.Push ("s: spawn a sphere");
+  hudManager.keyDescriptions.DeleteAll ();
+  hudManager.keyDescriptions.Push ("b: spawn a box");
+  hudManager.keyDescriptions.Push ("s: spawn a sphere");
   if (phys_engine_id == BULLET_ID)
   {
-    hudHelper.keyDescriptions.Push ("c: spawn a cylinder");
-    hudHelper.keyDescriptions.Push ("a: spawn a capsule");
+    hudManager.keyDescriptions.Push ("c: spawn a cylinder");
+    hudManager.keyDescriptions.Push ("a: spawn a capsule");
   }
-  hudHelper.keyDescriptions.Push ("v: spawn a convex mesh");
-  hudHelper.keyDescriptions.Push ("m: spawn a concave mesh");
-  hudHelper.keyDescriptions.Push ("*: spawn a static concave mesh");
+  hudManager.keyDescriptions.Push ("v: spawn a convex mesh");
+  hudManager.keyDescriptions.Push ("m: spawn a concave mesh");
+  hudManager.keyDescriptions.Push ("*: spawn a static concave mesh");
   if (phys_engine_id == BULLET_ID)
-    hudHelper.keyDescriptions.Push ("q: spawn a compound body");
-  hudHelper.keyDescriptions.Push ("j: spawn a joint with motor");
+    hudManager.keyDescriptions.Push ("q: spawn a compound body");
+  hudManager.keyDescriptions.Push ("j: spawn a joint with motor");
   if (phys_engine_id == BULLET_ID)
   {
-    hudHelper.keyDescriptions.Push ("h: spawn a chain");
-    hudHelper.keyDescriptions.Push ("r: spawn a Frankie's ragdoll");
+    hudManager.keyDescriptions.Push ("h: spawn a chain");
+    hudManager.keyDescriptions.Push ("r: spawn a Frankie's ragdoll");
   }
   if (isSoftBodyWorld)
   {
-    hudHelper.keyDescriptions.Push ("y: spawn a rope");
-    hudHelper.keyDescriptions.Push ("u: spawn a cloth");
-    hudHelper.keyDescriptions.Push ("i: spawn a soft body");
+    hudManager.keyDescriptions.Push ("y: spawn a rope");
+    hudManager.keyDescriptions.Push ("u: spawn a cloth");
+    hudManager.keyDescriptions.Push ("i: spawn a soft body");
   }
-  hudHelper.keyDescriptions.Push ("SPACE: spawn random object");
+  hudManager.keyDescriptions.Push ("SPACE: spawn random object");
   if (phys_engine_id == BULLET_ID)
   {
-    hudHelper.keyDescriptions.Push ("left mouse: fire!");
-    hudHelper.keyDescriptions.Push ("right mouse: drag object");
-    hudHelper.keyDescriptions.Push ("CTRL-x: cut selected object");
-    hudHelper.keyDescriptions.Push ("CTRL-v: paste object");
+    hudManager.keyDescriptions.Push ("left mouse: fire!");
+    hudManager.keyDescriptions.Push ("right mouse: drag object");
+    hudManager.keyDescriptions.Push ("CTRL-x: cut selected object");
+    hudManager.keyDescriptions.Push ("CTRL-v: paste object");
   }
-  hudHelper.keyDescriptions.Push ("f: toggle camera modes");
-  hudHelper.keyDescriptions.Push ("t: toggle all bodies dynamic/static");
-  hudHelper.keyDescriptions.Push ("p: pause the simulation");
-  hudHelper.keyDescriptions.Push ("o: toggle speed of simulation");
-  hudHelper.keyDescriptions.Push ("d: toggle Bullet debug display");
+  hudManager.keyDescriptions.Push ("f: toggle camera modes");
+  hudManager.keyDescriptions.Push ("t: toggle all bodies dynamic/static");
+  hudManager.keyDescriptions.Push ("p: pause the simulation");
+  hudManager.keyDescriptions.Push ("o: toggle speed of simulation");
+  hudManager.keyDescriptions.Push ("d: toggle Bullet debug display");
   if (phys_engine_id == BULLET_ID)
-    hudHelper.keyDescriptions.Push ("?: toggle display of collisions");
-  hudHelper.keyDescriptions.Push ("g: toggle gravity");
-  hudHelper.keyDescriptions.Push ("I: toggle autodisable");
+    hudManager.keyDescriptions.Push ("?: toggle display of collisions");
+  hudManager.keyDescriptions.Push ("g: toggle gravity");
+  hudManager.keyDescriptions.Push ("I: toggle autodisable");
   if (phys_engine_id == ODE_ID)
   {
-    hudHelper.keyDescriptions.Push ("1: enable StepFast solver");
-    hudHelper.keyDescriptions.Push ("2: disable StepFast solver");
-    hudHelper.keyDescriptions.Push ("3: enable QuickStep solver");
+    hudManager.keyDescriptions.Push ("1: enable StepFast solver");
+    hudManager.keyDescriptions.Push ("2: disable StepFast solver");
+    hudManager.keyDescriptions.Push ("3: enable QuickStep solver");
   }
 #ifdef CS_HAVE_BULLET_SERIALIZER
   if (phys_engine_id == BULLET_ID)
-    hudHelper.keyDescriptions.Push ("CTRL-s: save the dynamic world");
+    hudManager.keyDescriptions.Push ("CTRL-s: save the dynamic world");
 #endif
   /*
   if (phys_engine_id == BULLET_ID)
-    hudHelper.keyDescriptions.Push ("CTRL-n: next environment");
+    hudManager.keyDescriptions.Push ("CTRL-n: next environment");
   */
   if (phys_engine_id == BULLET_ID)
   {
-    hudHelper.keyDescriptions.Push ("CTRL-i: start profiling");
-    hudHelper.keyDescriptions.Push ("CTRL-o: stop profiling");
-    hudHelper.keyDescriptions.Push ("CTRL-p: dump profile");
+    hudManager.keyDescriptions.Push ("CTRL-i: start profiling");
+    hudManager.keyDescriptions.Push ("CTRL-o: stop profiling");
+    hudManager.keyDescriptions.Push ("CTRL-p: dump profile");
   }
 
   return true;

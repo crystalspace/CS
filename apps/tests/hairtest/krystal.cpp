@@ -28,15 +28,13 @@
 KrystalScene::KrystalScene (HairTest* hairTest)
 : hairTest (hairTest), hairPhysicsEnabled(true), isDead(false)
 {
-  // Define the available keys
-  hairTest->hudHelper.keyDescriptions.DeleteAll ();
-  hairTest->hudHelper.keyDescriptions.Push ("arrow keys: move camera");
-  hairTest->hudHelper.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
-  
-  if (hairTest->physicsEnabled)
-    hairTest->hudHelper.keyDescriptions.Push ("d: display active colliders");
+  // Setup the parameters of the camera manager
+  hairTest->cameraManager.SetStartPosition (csVector3 (0.0f, 1.0f, -2.5f));
+  hairTest->cameraManager.SetCameraMinimumDistance (CAMERA_MINIMUM_DISTANCE);
 
-  hairTest->hudHelper.keyDescriptions.Push ("e: stop/start fur physics");
+  // Define the available keys
+  hairTest->hudManager.keyDescriptions.DeleteAll ();
+  hairTest->hudManager.stateDescriptions.DeleteAll ();
 }
 
 KrystalScene::~KrystalScene ()
@@ -54,16 +52,6 @@ KrystalScene::~KrystalScene ()
     csRef<iMeshObject> furMeshObject = scfQueryInterface<iMeshObject> (furMesh);
     hairTest->engine->RemoveObject (furMeshObject->GetMeshWrapper ());
   }
-}
-
-csVector3 KrystalScene::GetCameraStart ()
-{
-  return csVector3 (0.0f, 1.0f, -2.5f);
-}
-
-float KrystalScene::GetCameraMinimumDistance ()
-{
-  return CAMERA_MINIMUM_DISTANCE;
 }
 
 csVector3 KrystalScene::GetCameraTarget ()
@@ -470,9 +458,4 @@ void KrystalScene::ResetScene ()
   }
 
   isDead = false;
-}
-
-void KrystalScene::UpdateStateDescription ()
-{
-  hairTest->hudHelper.stateDescriptions.DeleteAll ();
 }

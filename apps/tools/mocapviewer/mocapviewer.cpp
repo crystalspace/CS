@@ -71,7 +71,7 @@ MocapViewer::MocapViewer ()
 {
   // Configure the options for DemoApplication
   // Set the camera mode
-  cameraHelper.SetCameraMode (CS::Demo::CSDEMO_CAMERA_MOVE_FREE);
+  cameraManager.SetCameraMode (CS::Demo::CAMERA_MOVE_FREE);
 
   // Command line options
   commandLineHelper.AddCommandLineOption
@@ -178,12 +178,12 @@ void MocapViewer::Frame ()
   }
 
   // Update the HUD
-  hudHelper.stateDescriptions.DeleteIndex (0);
+  hudManager.stateDescriptions.DeleteIndex (0);
   csString txt;
   txt.Format ("Frame: %i on %u",
 	      (int) (animNode->GetPlaybackPosition () / parsingResult.frameDuration),
 	      (unsigned int) parsingResult.frameCount);
-  hudHelper.stateDescriptions.Insert (0, txt);
+  hudManager.stateDescriptions.Insert (0, txt);
 }
 
 bool MocapViewer::OnInitialize (int argc, char* argv[])
@@ -540,12 +540,12 @@ bool MocapViewer::CreateAvatar ()
     animNode->AddAnimationCallback (this);
 
   // Initialize the HUD
-  hudHelper.stateDescriptions.Push ("Frame:");
+  hudManager.stateDescriptions.Push ("Frame:");
   csString hudTxt;
   hudTxt.Format ("Mocap FPS: %.2f", 1.0f / parsingResult.frameDuration);
-  hudHelper.stateDescriptions.Push (hudTxt);
+  hudManager.stateDescriptions.Push (hudTxt);
   hudTxt.Format ("Total length: %.2f seconds", animNode->GetDuration ());
-  hudHelper.stateDescriptions.Push (hudTxt);
+  hudManager.stateDescriptions.Push (hudTxt);
 
   // Setup the noise points
   txt = clp->GetOption ("ncount", 0);
@@ -825,10 +825,10 @@ bool MocapViewer::CreateAvatar ()
       movieRecorder->SetFilenameFormat (videoFormat.GetData ());
 
     // Disable the display of the HUD
-    SetHUDDisplayed (false);
+    hudManager.SetEnabled (false);
 
-    // Disable the movements of the camera
-    cameraHelper.SetCameraMode (CS::Demo::CSDEMO_CAMERA_NONE);
+    // Disable the motion of the camera
+    cameraManager.SetCameraMode (CS::Demo::CAMERA_NO_MOVE);
 
     // Start the movie recording
     movieRecorder->Start ();

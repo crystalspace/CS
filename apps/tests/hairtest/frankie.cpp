@@ -25,13 +25,13 @@
 FrankieScene::FrankieScene (HairTest* hairTest)
   : hairTest (hairTest), furPhysicsEnabled(false)
 {
+  // Setup the parameters of the camera manager
+  hairTest->cameraManager.SetStartPosition (csVector3 (0.0f, 0.25f, -1.25f));
+  hairTest->cameraManager.SetCameraMinimumDistance (0.75f);
+
   // Define the available keys
-  hairTest->hudHelper.keyDescriptions.DeleteAll ();
-  hairTest->hudHelper.keyDescriptions.Push ("arrow keys: move camera");
-  hairTest->hudHelper.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
- 
-  if (hairTest->physicsEnabled)
-    hairTest->hudHelper.keyDescriptions.Push ("d: display active colliders");
+  hairTest->hudManager.keyDescriptions.DeleteAll ();
+  hairTest->hudManager.stateDescriptions.DeleteAll ();
 }
 
 FrankieScene::~FrankieScene ()
@@ -49,16 +49,6 @@ FrankieScene::~FrankieScene ()
     csRef<iMeshObject> furMeshObject = scfQueryInterface<iMeshObject> (furMesh);
     hairTest->engine->RemoveObject (furMeshObject->GetMeshWrapper ());
   }
-}
-
-csVector3 FrankieScene::GetCameraStart ()
-{
-  return csVector3 (0.0f, 0.0f, -1.25f);
-}
-
-float FrankieScene::GetCameraMinimumDistance ()
-{
-  return 0.75f;
 }
 
 csVector3 FrankieScene::GetCameraTarget ()
@@ -401,11 +391,6 @@ void FrankieScene::ResetScene ()
 
   if (furMesh)
     furMesh->ResetMesh();
-}
-
-void FrankieScene::UpdateStateDescription ()
-{
-  hairTest->hudHelper.stateDescriptions.DeleteAll ();
 }
 
 

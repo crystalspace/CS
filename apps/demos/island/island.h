@@ -37,9 +37,6 @@ class IslandDemo : public CS::Demo::DemoApplication
   //-- csBaseEventHandler
   void Frame ();
 
-  //-- CS::Demo::CameraManager
-  csVector3 GetCameraStart ();
-
   //-- csApplicationFramework
   bool Application ();
 };

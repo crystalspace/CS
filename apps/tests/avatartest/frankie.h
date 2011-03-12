@@ -32,8 +32,6 @@ class FrankieScene : public AvatarScene
   ~FrankieScene ();
 
   // Camera related
-  csVector3 GetCameraStart ();
-  float GetCameraMinimumDistance ();
   csVector3 GetCameraTarget ();
 
   // Dynamic simulation related

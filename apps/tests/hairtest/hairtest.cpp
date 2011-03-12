@@ -39,8 +39,10 @@ HairTest::HairTest ()
                      furMeshEnabled (true), dynamicsDebugMode (DYNDEBUG_NONE)
 {
   // Use a default rotate camera
-  cameraHelper.SetCameraMode (CS::Demo::CSDEMO_CAMERA_ROTATE);
-  SetHUDDisplayed(false);
+  cameraManager.SetCameraMode (CS::Demo::CAMERA_ROTATE);
+
+  // Don't display the available keys
+  hudManager.keyDescriptions.DeleteAll ();
 
   // Command line options
   commandLineHelper.AddCommandLineOption
@@ -50,30 +52,6 @@ HairTest::HairTest ()
 HairTest::~HairTest ()
 {
   delete avatarScene;
-}
-
-csVector3 HairTest::GetCameraStart ()
-{
-  if (avatarScene)
-    return avatarScene->GetCameraStart ();
-
-  return csVector3 (0.0f);
-}
-
-csVector3 HairTest::GetCameraTarget ()
-{
-  if (avatarScene)
-    return avatarScene->GetCameraTarget ();
-
-  return csVector3 (0.0f);
-}
-
-float HairTest::GetCameraMinimumDistance ()
-{
-  if (avatarScene)
-    return avatarScene->GetCameraMinimumDistance ();
-
-  return 0.1f;
 }
 
 void HairTest::Frame ()
@@ -88,6 +66,9 @@ void HairTest::Frame ()
   // order to achieve a 'slow motion' effect)
   if (physicsEnabled)
     dynamics->Step (speed * avatarScene->GetSimulationSpeed ());
+
+  // Update the target of the camera
+  cameraManager.SetCameraTarget (avatarScene->GetCameraTarget ());
 
   // Update the information on the current state of the application
   avatarScene->UpdateStateDescription ();
@@ -601,7 +582,8 @@ void HairTest::SwitchScenes()
   }
 
   // Re-initialize camera position
-  cameraHelper.ResetCamera ();
+  cameraManager.SetCameraTarget (avatarScene->GetCameraTarget ());
+  cameraManager.ResetCamera ();
 
   furMeshEnabled = true;
 }
@@ -1237,7 +1219,8 @@ bool HairTest::Application ()
     CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedOverallLOD, this)); 
 
   // Initialize camera position
-  cameraHelper.ResetCamera ();
+  cameraManager.SetCameraTarget (avatarScene->GetCameraTarget ());
+  cameraManager.ResetCamera ();
 
   // Run the application
   Run();

@@ -31,8 +31,6 @@ public:
   ~FrankieScene ();
 
   // Camera related
-  csVector3 GetCameraStart ();
-  float GetCameraMinimumDistance ();
   csVector3 GetCameraTarget ();
 
   // Dynamic simulation related
@@ -47,9 +45,6 @@ public:
 
   // User interaction with the scene
   void ResetScene ();
-
-  // Display of information on the state of the scene
-  void UpdateStateDescription ();
 
   // Switch Fur Physics
   void SwitchFurPhysics();

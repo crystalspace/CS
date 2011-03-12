@@ -44,8 +44,6 @@ public:
   virtual ~AvatarScene () {}
 
   // Camera related
-  virtual csVector3 GetCameraStart () = 0;
-  virtual float GetCameraMinimumDistance () = 0;
   virtual csVector3 GetCameraTarget () = 0;
 
   // Dynamic simuation related
@@ -62,7 +60,7 @@ public:
   virtual void KillAvatar () = 0;
 
   // Display of information on the state of the scene
-  virtual void UpdateStateDescription () = 0;
+  virtual void UpdateStateDescription () {}
 
   // Switch fur dynamics
   virtual void SwitchFurPhysics() = 0;
@@ -148,11 +146,6 @@ private:
 
   // Switch Active Colliders displayed
   void SwitchDynamics();
-
-  //-- csDemoApplication
-  csVector3 GetCameraStart ();
-  float GetCameraMinimumDistance ();
-  csVector3 GetCameraTarget ();
 
 public:
   HairTest ();
