@@ -88,6 +88,7 @@ bool IslandDemo::CreateScene ()
   // Setup the the sector and the camera
   room = engine->FindSector ("TerrainSector");
   view->GetCamera ()->SetSector (room);
+  cameraManager.SetCamera (view->GetCamera ());
 
   printf ("Level loaded...\n");
 
