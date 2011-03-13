@@ -48,72 +48,6 @@ void ReportWarning (iObjectRegistry* registry, const char* objectId, const char*
 namespace CS {
 namespace Demo {
 
-// ------------------------ CommandLineHelper ------------------------
-
-CommandLineHelper::CommandLineHelper (const char* applicationCommand,
-				      const char* applicationCommandUsage,
-				      const char* applicationDescription)
-  : applicationCommand (applicationCommand),
-    applicationCommandUsage (applicationCommandUsage),
-    applicationDescription (applicationDescription),
-    blockCount (0)
-{
-  // Create the default 'application' block
-  CommandBlock block ("");
-  commandBlocks.Push (block);
-}
-
-CommandLineBlockID CommandLineHelper::AddCommandLineBlock (const char* name)
-{
-  CommandBlock block (name);
-  commandBlocks.Push (block);
-  return ++blockCount;
-}
-
-void CommandLineHelper::AddCommandLineOption (const char* option,
-					      const char* description,
-					      CommandLineBlockID block)
-{
-  CS_ASSERT (block <= blockCount);
-  CommandBlock& cblock = commandBlocks[block];
-  cblock.commandOptions.Push (CommandOption (option, description));
-}
-
-void CommandLineHelper::WriteHelp (iObjectRegistry* registry) const
-{
-  csPrintf ("%s\n\n", applicationDescription.GetData ());
-  csPrintf ("Usage: %s\n\n", applicationCommandUsage.GetData ());
-  csPrintf ("Available options:\n\n");
-
-  for (csArray<CommandBlock>::ReverseConstIterator it = commandBlocks.GetReverseIterator (); it.HasNext (); )
-  {
-    const CommandBlock& block = it.Next ();
-
-    if (block.commandOptions.GetSize ())
-    {
-      if (!it.HasNext ())
-	csPrintf ("Specific options for %s:\n", applicationCommand.GetData ());
-      else
-	csPrintf ("%s-specific options\n", block.name.GetData ());
-    }
-
-    for (csArray<CommandOption>::ConstIterator it = block.commandOptions.GetIterator ();
-	 it.HasNext (); )
-    {
-      //const csTuple2<CommandOption, CommandLineBlockID>& tuple = it.NextTuple ();
-      CommandOption commandOption = it.Next ();
-      //const CommandOption& commandOption = tuple.first;
-      csPrintf ("  -%-*s%s\n", 18, commandOption.option.GetData (),
-		commandOption.description.GetData ());
-    }
-
-    if (block.commandOptions.GetSize ())
-      csPrintf ("\n");
-  }
-
-  csCommandLineHelper::Help (registry);
-}
-
 // ------------------------ HUDManager ------------------------
 
 HUDManager::HUDManager ()
@@ -753,11 +687,8 @@ void CameraManager::ApplyPositionParameters ()
 
 // ------------------------ DemoApplication ------------------------
 
-DemoApplication::DemoApplication (const char* applicationName,
-				  const char* applicationCommand,
-				  const char* applicationCommandUsage,
-				  const char* applicationDescription)
-  : mouseInitialized (false), commandLineHelper (applicationCommand, applicationCommandUsage, applicationDescription)
+DemoApplication::DemoApplication (const char* applicationName)
+  : mouseInitialized (false)
 {
   SetApplicationName (applicationName);
 }
@@ -773,7 +704,7 @@ bool DemoApplication::OnInitialize (int argc, char* argv[])
   // Check for commandline help.
   if (csCommandLineHelper::CheckHelp (GetObjectRegistry ()))
   {
-    commandLineHelper.WriteHelp (GetObjectRegistry ());
+    PrintHelp ();
     return false;
   }
 
@@ -844,6 +775,11 @@ bool DemoApplication::Application ()
   cameraManager.Initialize (GetObjectRegistry ());
 
   return true;
+}
+
+void DemoApplication::PrintHelp ()
+{
+  csCommandLineHelper::Help (GetObjectRegistry ());  
 }
 
 bool DemoApplication::CreateRoom ()

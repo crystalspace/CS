@@ -57,114 +57,6 @@ class csPixmap;
 namespace CS {
 namespace Demo {
 
-// ------------------------ CommandLineHelper ------------------------
-
-/**
- * Identifier for a command line block (see CS::Demo::CommandLineHelper::AddCommandLineBlock()).
- */
-typedef size_t CommandLineBlockID;
-
-/**
- * A generic tool to print the command line help when the '-help' option is used
- * on a demo application.
- * To use this tool, you should define the applicationCommand,
- * applicationCommandUsage and applicationDescription variables (to be defined in
- * the constructor CommandLineHelper()), and add the needed command line
- * options through AddCommandLineOption(). Separate blocks of options can be defined
- * through AddCommandLineBlock().
- * 
- * When the WriteHelp() method is called, this tool will write to the standard
- * output a help text of the following structure:
- * \verbatim
-<applicationDescription>
-
-Usage: <applicationCommandUsage>
-
-Available options:
-
-Specific options for <applicationCommand>:
-<list of options>
-
-<block name>-specific options:
-<list of options>
-
-General options:
-<list of CS general options>
-\endverbatim
-\sa csCommandLineHelper
- */
-class CS_CRYSTALSPACE_EXPORT CommandLineHelper
-{
- public:
-  /**
-   * Constructor.
-   * \param applicationCommand Name of the executable (eg "myapp").
-   * \param applicationCommandUsage Syntax to use the executable (eg "myapp
-   * <OPTIONS> filename"). Additional lines of text with examples of use can also
-   * be added.
-   * \param applicationDescription User friendly description of the application.
-   */
-  CommandLineHelper (const char* applicationCommand,
-		     const char* applicationCommandUsage,
-		     const char* applicationDescription);
-
-  /**
-   * Add a new block of options
-   */
-  CommandLineBlockID AddCommandLineBlock (const char* name);
-
-  /**
-   * Add a command option to be described in the help text.
-   * \param option The name of the option, eg 'enable-debug'.
-   * \param description A user friendly description of the option, eg 'Enable
-   * output of debug information'.
-   * \param option Name of the option
-   * \param description Description of the option
-   * \param block The block of the option. A value of 0
-   * means the default 'application' block.
-   */
-  void AddCommandLineOption (const char* option, const char* description,
-			     CommandLineBlockID block = 0);
-
-  /**
-   * Print to standard output all command options and usages of this executable.
-   */
-  void WriteHelp (iObjectRegistry* registry) const;
-
- private:
-  struct CommandOption
-  {
-    // Constructor
-    CommandOption (const char* option, const char* description)
-    : option (option), description (description) {}
-
-    // Name of the option
-    csString option;
-    // User friendly description of the option
-    csString description;
-  };
-
-  struct CommandBlock
-  {
-    // Constructor
-    CommandBlock (const char* name)
-    : name (name) {}
-
-    // Name of the block
-    csString name;
-    // Array of options
-    csArray<CommandOption> commandOptions;
-  };
-
-  // Command line help
-  csString applicationCommand;
-  csString applicationCommandUsage;
-  csString applicationDescription;
-  // Array of command line blocks
-  csArray<CommandBlock> commandBlocks;
-  CommandLineBlockID blockCount;
-};
-
 // ------------------------ HUDManager ------------------------
 
 /**
@@ -598,8 +490,11 @@ class CS_CRYSTALSPACE_EXPORT DemoApplication : public csApplicationFramework,
    */
   virtual bool CreateRoom ();
 
-  /// Command line helper
-  CommandLineHelper commandLineHelper;
+  /**
+   * Print the help message for this application on standard output. You may need to implement
+   * this method in order to print out the commanline options of your application.
+   */
+  virtual void PrintHelp ();
 
   /// HUD manager
   HUDManager hudManager;
@@ -609,19 +504,11 @@ class CS_CRYSTALSPACE_EXPORT DemoApplication : public csApplicationFramework,
 
  public:
   /**
-   * Constructor. The parameters of this constructor are used mainly to display
-   * information when the '-help' option is used.
+   * Constructor.
    * \param applicationName Name of the application, used to set
    * csApplicationFramework::SetApplicationName().
-   * \param applicationCommand Name of the executable (eg "myapp").
-   * \param applicationCommandUsage Syntax to use the executable (eg "myapp
-   * <OPTIONS> filename"). Additional lines of text with examples of use can also
-   * be added.
-   * \param applicationDescription User friendly description of the application.
    */
-  DemoApplication (const char* applicationName, const char* applicationCommand,
-		   const char* applicationCommandUsage,
-		   const char* applicationDescription);
+  DemoApplication (const char* applicationName);
   ~DemoApplication ();
 
   /**
