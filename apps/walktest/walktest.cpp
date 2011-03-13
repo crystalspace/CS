@@ -242,22 +242,44 @@ void WalkTest::SetDefaults ()
 
 void WalkTest::Help ()
 {
+  csCommandLineHelper commandLineHelper;
+
   csRef<iConfigManager> cfg (csQueryRegistry<iConfigManager> (object_reg));
-  csPrintf ("Options for WalkTest:\n");
-  csPrintf ("  -exec=<script>     execute given script at startup\n");
-  csPrintf ("  -threaded          use threaded loading (default yes)\n");
-  csPrintf ("  -[no]colldet       collision detection system (default %s)\n", collider_actor.HasCD () ? "yes" : "no");
-  csPrintf ("  -[no]logo          draw logo (default %s)\n", do_logo ? "yes" : "no");
-  csPrintf ("  -[no]collections   load every map in a separate collection (default no)\n");
-  csPrintf ("  -[no]dupes         check for duplicate objects in multiple maps (default yes)\n");
-  csPrintf ("  -noprecache        after loading don't precache to speed up rendering\n");
-  csPrintf ("  -bots              allow random generation of bots\n");
-  csPrintf ("  -[no]saveable      enable/disable engine %s flag\n",
-	    CS::Quote::Single ("saveable"));
-  csPrintf ("  -world=<file>      use given world file instead of %s\n",
-	    CS::Quote::Single ("world"));
-  csPrintf ("  <path>             load map from VFS <path> (default %s)\n",
-        CS::Quote::Single (cfg->GetStr ("Walktest.Settings.WorldFile", "world")));
+
+  // Command line options
+  commandLineHelper.AddCommandLineOption ("exec", "Execute given script at startup", csVariant (""));
+  commandLineHelper.AddCommandLineOption ("threaded", "Use threaded loading", csVariant (true));
+  commandLineHelper.AddCommandLineOption ("colldet", "Enable collision detection system",
+					  csVariant (collider_actor.HasCD () ? true : false));
+  commandLineHelper.AddCommandLineOption ("logo", "Draw logo", csVariant (do_logo ? true : false));
+  commandLineHelper.AddCommandLineOption ("collections", "Load every map in a separate collection",
+					  csVariant (false));
+  commandLineHelper.AddCommandLineOption ("dupes", "Check for duplicate objects in multiple maps",
+					  csVariant (true));
+  commandLineHelper.AddCommandLineOption ("noprecache", "After loading don't precache to speed up rendering",
+					  csVariant ());
+  commandLineHelper.AddCommandLineOption ("bots", "Allow random generation of bots", csVariant ());
+  commandLineHelper.AddCommandLineOption ("saveable", csString ().Format ("Enable engine %s flag",
+									  CS::Quote::Single ("saveable")), csVariant ());
+  /*
+  // TODO: this line won't work if it is the last one...
+  commandLineHelper.AddCommandLineOption ("world", csString ().Format ("Use given world file instead of %s",
+								       CS::Quote::Single ("world")).GetData (), csVariant (""));
+  */
+  csString txt;
+  txt.Format ("Use given world file instead of %s", CS::Quote::Single ("world"));
+  commandLineHelper.AddCommandLineOption ("world", txt, csVariant (""));
+
+  // Printing help
+  commandLineHelper.PrintApplicationHelp
+    (object_reg, "walktest", "walktest [OPTIONS] [filename]", csString().Format
+     ("This is the quintessential test application for the project, and the application most"
+      " likely to be up-to-date any time a change is made to any part of the project. Developers"
+      " probably should not use this application as a guide for developing their own programs, as"
+      " it is not the best example in clean coding.\n\n"
+      "More information is available on the usages of walktest in the Crystal Space manual\n\n"
+      "If specified, walktest will load the map from the given VFS path instead of the default %s",
+      CS::Quote::Single (cfg->GetStr ("Walktest.Settings.WorldFile", "world"))));
 }
 
 //-----------------------------------------------------------------------------
@@ -720,15 +742,7 @@ static bool WalkEventHandler (iEvent& ev)
   if (!Sys)
     return false;
 
-  if (ev.Name == Sys->CommandLineHelp)
-  {
-    Sys->Help ();
-    return true;
-  }
-  else
-  {
-    return Sys->WalkHandleEvent (ev);
-  }
+  return Sys->WalkHandleEvent (ev);
 }
 
 bool WalkTest::SetMapDir (const char* map_dir, csString& map_file)
@@ -811,7 +825,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // Check for commandline help.
   if (csCommandLineHelper::CheckHelp (object_reg))
   {
-    csCommandLineHelper::Help (object_reg);
+    Help ();
     csInitializer::DestroyApplication (object_reg);
     exit (0);
   }
