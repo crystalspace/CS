@@ -20,32 +20,32 @@
 #define __CS_IUTIL_PLUGINCONFIG_H__
 
 /**\file
- * Configurator interface
+ * Plugin configuration interface and variant types
  */
 /**\addtogroup util
  * @{ */
 #include "csutil/scf.h"
 #include "csutil/scfstr.h"
 
-/// Types that can be contained within a variant.
+/// Type of the values that can be contained within a csVariant.
 enum csVariantType
 {
-  /// long
+  /// Long type, obviously also valid for integers
   CSVAR_LONG,
-  /// bool
+  /// Boolean type
   CSVAR_BOOL,
-  /// a command
+  /// A command. A command has no value, it is just a flag which can be set or not.
   CSVAR_CMD,
-  /// float
+  /// Float type
   CSVAR_FLOAT,
-  /// string
+  /// String type
   CSVAR_STRING
 };
 
 /**
- * Variant, means that type of contained data is set at runtime.
- * Be aware that requesting another type than the containing one
- * will trigger an assertion!
+ * Variant, ie a value whose type is set at runtime.
+ * \warning Requesting another type than the contained one
+ * will trigger an assertion
  */
 struct csVariant
 {
@@ -63,10 +63,20 @@ private:
     if ((type == CSVAR_STRING) && (v.s != 0)) v.s->DecRef();
   }
 public:
-  csVariant () { type = CSVAR_LONG; memset (&v, 0, sizeof (v)); }
-  ~csVariant () { Clear(); }
+  /// Constructor initialized with a value of type CSVAR_CMD
+  csVariant () { type = CSVAR_CMD; memset (&v, 0, sizeof (v)); }
+  /// Constructor initialized with a value of type CSVAR_LONG
+  csVariant (int i) { type = CSVAR_LONG; v.l = i; }
+  /// Constructor initialized with a value of type CSVAR_LONG
+  csVariant (long l) { type = CSVAR_LONG; v.l = l; }
+  /// Constructor initialized with a value of type CSVAR_BOOL
+  csVariant (bool b) { type = CSVAR_BOOL; v.b = b; }
+  /// Constructor initialized with a value of type CSVAR_FLOAT
+  csVariant (float f) { type = CSVAR_FLOAT; v.f = f; }
+  /// Constructor initialized with a value of type CSVAR_STRING
+  csVariant (const char* s) { type = CSVAR_STRING; v.s = s ? new scfString (s) : nullptr; }
 
-  /// Copy constructor - only IncRef's the String, should our type be a string
+  /// Copy constructor.
   csVariant (const csVariant& var)
   {
     memset (&v, 0, sizeof (v));
@@ -76,7 +86,9 @@ public:
     if ((type == CSVAR_STRING) && (v.s != 0)) v.s->IncRef(); 
   }
 
-  /// Assignment operator. As with the copy-ctor, only IncRef's the string
+  ~csVariant () { Clear(); }
+
+  /// Assignment operator.
   const csVariant& operator = (const csVariant& var)
   {
     Clear ();
@@ -117,7 +129,7 @@ public:
     else
       v.s = 0;
   }
-  /// Assign a command
+  /// Assign a command. A command has no value, it is just a flag which can be set or not.
   void SetCommand ()
   {
     Clear();
@@ -148,32 +160,59 @@ public:
     CS_ASSERT (type == CSVAR_STRING);
     return v.s->GetData();
   }
+
+  /// Get the type of the contained value. The default value is CSVAR_LONG.
   csVariantType GetType () const { return type; }
 };
 
-/// Configuration option description.
+/// Description of a configuration option, to be used by the iPluginConfig interfaces
 struct csOptionDescription
 {
-  /// Description ID.
+  /// Description index (or ID)
   int id;
   /// Short name of this option.
-  const char* name;		
+  const char* name;
   /// Description for this option.
-  const char* description;	
+  const char* description;
   /// Type to use for this option.
-  csVariantType type;	
+  csVariantType type;
+
+  /// Constructor
+  csOptionDescription () {}
+
+  /**
+   * Constructor
+   * \param id Description index (or ID)
+   * \param name Short name of this option.
+   * \param description Description for this option.
+   * \param type Type to use for this option.
+   */
+  csOptionDescription (int id, const char* name, const char* description, csVariantType type)
+  : id (id), name (name), description (description), type (type) {}
+
+  /**
+   * Constructor
+   * \param name Short name of this option.
+   * \param description Description for this option.
+   * \param type Type to use for this option.
+   * \warning The \a id is initialized to 0 in this constructor!
+   */
+  csOptionDescription (const char* name, const char* description, csVariantType type)
+  : id (0), name (name), description (description), type (type) {}
+
+  ~csOptionDescription () {}
 };
 
 /**
  * Interface to a configurator object. If a SCF module
  * has an object implementing this interface then this can
- * be used to query/set configuration options.
+ * be used to query or set configuration options.
  *
  * Main creators of instances implementing this interface:
  * - Some plugins implement this.
  * 
  * Main ways to get pointers to this interface:
- * - scgQueryInterface() from a plugin instance.
+ * - scfQueryInterface() from a plugin instance.
  * 
  * Main users of this interface:
  * - csCommandLineHelper
@@ -181,13 +220,31 @@ struct csOptionDescription
  */
 struct iPluginConfig : public virtual iBase
 {
-  SCF_INTERFACE(iPluginConfig,2,1,0);
-  /// Get option description; return FALSE if there is no such option
-  virtual bool GetOptionDescription (int idx, csOptionDescription *option) = 0;
-  /// Set option
-  virtual bool SetOption (int id, csVariant* value) = 0;
-  /// Get option
-  virtual bool GetOption (int id, csVariant* value) = 0;
+  SCF_INTERFACE (iPluginConfig,2,1,0);
+
+  /**
+   * Get the description of the option of index \a idx. Return \a false if this
+   * option does not exist, true otherwise.
+   * \param index The index of the option
+   * \param option The returned description of the option
+   */
+  virtual bool GetOptionDescription (int index, csOptionDescription* option) = 0;
+
+  /**
+   * Set the value of the option of index \a idx. Return \a false if this
+   * option does not exist, true otherwise.
+   * \param index The index of the option
+   * \param value The new value to be set for the option
+   */
+  virtual bool SetOption (int index, csVariant* value) = 0;
+
+  /**
+   * Get the value of the option of index \a idx. Return \a false if this
+   * option does not exist, true otherwise.
+   * \param index The index of the option
+   * \param value A variant where to store the value of the option
+   */
+  virtual bool GetOption (int index, csVariant* value) = 0;
 };
 /** @} */
 
