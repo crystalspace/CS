@@ -32,26 +32,33 @@
 #define CS_EVENT_UNHANDLED false
 
 HairTest::HairTest ()
-: DemoApplication ("CrystalSpace.HairTest", "hairtest",
-                     "hairtest <OPTIONS>",
-                     "Tests on the animation of objects CS::Mesh::iAnimatedMesh."),
-                     avatarScene (0), avatarSceneType(MODEL_KRYSTAL), 
-                     furMeshEnabled (true), dynamicsDebugMode (DYNDEBUG_NONE)
+: DemoApplication ("CrystalSpace.HairTest"),
+  avatarScene (0), avatarSceneType(MODEL_KRYSTAL), 
+  furMeshEnabled (true), dynamicsDebugMode (DYNDEBUG_NONE)
 {
   // Use a default rotate camera
   cameraManager.SetCameraMode (CS::Demo::CAMERA_ROTATE);
 
   // Don't display the available keys
   hudManager.keyDescriptions.DeleteAll ();
-
-  // Command line options
-  commandLineHelper.AddCommandLineOption
-    ("scene=<name>", "Set the starting scene (krystal, frankie)");
 }
 
 HairTest::~HairTest ()
 {
   delete avatarScene;
+}
+
+void HairTest::PrintHelp ()
+{
+  csCommandLineHelper commandLineHelper;
+
+  // Command line options
+  commandLineHelper.AddCommandLineOption
+    ("scene", "Set the starting scene", csVariant ("krystal"));
+
+  // Printing help
+  commandLineHelper.PrintApplicationHelp
+    (GetObjectRegistry (), "hairtest", "hairtest <OPTIONS>", "Tests on the fur mesh.");
 }
 
 void HairTest::Frame ()

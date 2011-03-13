@@ -27,9 +27,7 @@
 
 CS_IMPLEMENT_APPLICATION
 
-CSCEGUIConfTest::CSCEGUIConfTest() : DemoApplication ("CrystalSpace.CSCEGUIConfTest", "csceguiconftest",
-		       "csceguiconftest <OPTIONS>",
-		       "")
+CSCEGUIConfTest::CSCEGUIConfTest() : DemoApplication ("CrystalSpace.CSCEGUIConfTest")
 {
   myBool = false;
   myInt = 0;
@@ -39,6 +37,16 @@ CSCEGUIConfTest::CSCEGUIConfTest() : DemoApplication ("CrystalSpace.CSCEGUIConfT
 
 CSCEGUIConfTest::~CSCEGUIConfTest()
 {
+}
+
+void CSCEGUIConfTest::PrintHelp ()
+{
+  csCommandLineHelper commandLineHelper;
+
+  // Printing help
+  commandLineHelper.PrintApplicationHelp
+    (GetObjectRegistry (), "csceguiconftest", "csceguiconftest",
+     "Application configuration test for CeGUI");
 }
 
 void CSCEGUIConfTest::Frame()

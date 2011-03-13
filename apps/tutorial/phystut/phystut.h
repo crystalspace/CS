@@ -119,7 +119,8 @@ public:
   Simple ();
   ~Simple ();
 
-  //-- csApplicationFramework
+  //-- CS::Demo::DemoApplication
+  void PrintHelp ();
   bool OnInitialize (int argc, char* argv[]);
   bool Application ();
 

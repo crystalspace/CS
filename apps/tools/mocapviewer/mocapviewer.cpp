@@ -31,105 +31,124 @@
 #include "ivaria/movierecorder.h"
 
 MocapViewer::MocapViewer ()
-  : DemoApplication ("CrystalSpace.MocapViewer", "csmocapviewer",
-		     "csmocapviewer [OPTIONS] [filename]"
-		     "\n\nUsage examples:\n"
-		     "\tcsmocapviewer idle01.bvh\n"
-		     "\tcsmocapviewer /lib/krystal/mocap/idle01.bvh\n"
-		     "\tcsmocapviewer C:\\CS\\data\\krystal\\mocap\\idle01.bvh\n"
-		     "\tcsmocapviewer -start=20 -end=60 -scale=0.1 idle01.bvh\n"
-		     "\tcsmocapviewer -rootmask=Hips idle01.bvh\n"
-		     "\tcsmocapviewer -rootmask=Hips -childmask=Head -childmask=LeftHand idle01.bvh\n"
-		     "\tcsmocapviewer -rootmask=Hips -childall idle01.bvh\n"
-		     "\tcsmocapviewer -pld -record -recordfile=mocap.nuv idle01.bvh\n"
-		     "\tcsmocapviewer -rotcamera=-90 idle01.bvh\n"
-		     "\tcsmocapviewer idle01.bvh -pld -ncount=200 -nfrequency=0.4 -poscamera=0.7\n"
-		     "\tcsmocapviewer -targetfile=data/krystal/krystal.xml -targetname=krystal -nobone idle01.bvh\n",
-		     csString().Format (
-		     "Crystal Space's viewer for motion captured data. This viewer supports currently"
-		     " only the Biovision Hierarchical data file format (BVH).\n\n"
-		     "The animation can be retargeted automatically to an animesh. Use either the -targetfile and"
-		     " -targetname options for that. The results will depend on the actual similitudes between the"
-		     " two skeletons.\n\n"
-		     "A mask can be defined to select the bones that are displayed. A simple way to populate the "
-		     "bone mask is by defining a bone chain. A bone chain is defined by a root bone (option "
-		     "-rootmask), then the user can add either all children and sub-children of the root bone (option"
-		     " -childall), either all bones on the way to a given child bone (option -childmask). Only one bone"
-		     " chain can be defined, but the -childmask option can be used additively. Some"
-		     " specific bones can be added and removed by using the -bone and -nobone options. If the only bone"
-		     " option provided is the empty -nobone option, then no bones at all will be displayed.\n\n"
-		     "This viewer can also be used as a Point Light Display system, and is able to record automatically"
-		     " videos with these data. This system has been designed as a base tool for a psychology study on "
-		     "the human perception of the motion.\n\n"
-		     "The Point Light Display can be perturbated by adding noise points animated by a Perlin"
-		     " noise. The behavior of the motion of these noise points can be tweaked by several"
-		     " parameters. See http://libnoise.sourceforge.net/docs/classnoise_1_1module_1_1Perlin.html"
-		     " for more information on these parameters.\n\n"
-		     "Finally, this application uses a configuration file. See %s"
-		     " for more information", CS::Quote::Double ("/config/csmocapviewer.cfg"))),
+  : DemoApplication ("CrystalSpace.MocapViewer"),
     scfImplementationType (this), debugImage (nullptr), noiseScale (0.5f)
 {
-  // Configure the options for DemoApplication
   // Set the camera mode
   cameraManager.SetCameraMode (CS::Demo::CAMERA_MOVE_FREE);
-
-  // Command line options
-  commandLineHelper.AddCommandLineOption
-    ("info", "Parse the file, print out the mocap data information, then exit");
-  commandLineHelper.AddCommandLineOption
-    ("noanim", "Don't play the animation, only display the skeleton in rest pose");
-  commandLineHelper.AddCommandLineOption
-    ("start=<int>", "Set the index of the start frame");
-  commandLineHelper.AddCommandLineOption
-    ("end=<int>", "Set the index of the end frame");
-  commandLineHelper.AddCommandLineOption
-    ("scale=<float>", "Set the global scale to apply to the distances (default is 0.01)");
-  commandLineHelper.AddCommandLineOption
-    ("speed=<float>", "Set the speed to play the animation (default is 1.0)");
-  commandLineHelper.AddCommandLineOption
-    ("targetfile=<string>", "Set the file of the animesh to retarget the animation to");
-  commandLineHelper.AddCommandLineOption
-    ("targetname=<string>", "Set the name of the animesh factory to retarget the animation to");
-  commandLineHelper.AddCommandLineOption
-    ("pld", csString().Format ("Set the display mode as %s",
-			       CS::Quote::Single ("Point Light Display")));
-  commandLineHelper.AddCommandLineOption
-    ("rotcamera=<float>", "Rotate the camera of a given angle around the Y axis, in degree");
-  commandLineHelper.AddCommandLineOption
-    ("poscamera=<float>", "Scale the distance between the camera and the target. Default value is 1.0");
-  commandLineHelper.AddCommandLineOption
-    ("rootmask=<string>", "Set the bone name of the root of the bone chain that will be used as a mask");
-  commandLineHelper.AddCommandLineOption
-    ("childmask=<string>", "Add a child to the bone chain that will be used as a mask");
-  commandLineHelper.AddCommandLineOption
-    ("childall", "Add all sub-children of the root bone to the bone chain that will be used as a mask");
-  commandLineHelper.AddCommandLineOption
-    ("bone=<string>", "Add a bone to be displayed by its name");
-  commandLineHelper.AddCommandLineOption
-    ("nobone", "Don't display any bone at all");
-  commandLineHelper.AddCommandLineOption
-    ("nobone=<string>", "Remove a bone to be displayed by its name");
-  commandLineHelper.AddCommandLineOption
-    ("record", "Record the session in a video file, then exit");
-  commandLineHelper.AddCommandLineOption
-    ("recordfile=<string>", "Force the name of the video file to be created");
-  commandLineHelper.AddCommandLineOption
-    ("ncount=<int>", "Set the number of noise points added. Default value is 0");
-  commandLineHelper.AddCommandLineOption
-    ("nscale=<float>", "Scale to apply on the position of the noise points. Default value is 0.5");
-  commandLineHelper.AddCommandLineOption
-    ("noctaves=<int>", "Set the number of octaves of the noise. Value must be between 1 and 30. Default value is 6");
-  commandLineHelper.AddCommandLineOption
-    ("nfrequency=<float>", "Set the frequency of the noise. Value must be positive. Default value is 1.0");
-  commandLineHelper.AddCommandLineOption
-    ("nlacunarity=<float>", "Set the lacunarity of the noise. Value is suggested to be between 1.5 and 3.5. Default value is 2.0");
-  commandLineHelper.AddCommandLineOption
-    ("npersistence=<float>", "Set the persistence of the noise. Value is suggested to be between 0.0 and 1.0. Default value is 0.5");
 }
 
 MocapViewer::~MocapViewer ()
 {
   delete debugImage;
+}
+
+void MocapViewer::PrintHelp ()
+{
+  csCommandLineHelper commandLineHelper;
+
+  // Usage examples
+  commandLineHelper.AddCommandLineExample ("csmocapviewer csmocapviewer idle01.bvh");
+  commandLineHelper.AddCommandLineExample ("csmocapviewer /lib/krystal/mocap/idle01.bvh");
+  commandLineHelper.AddCommandLineExample ("csmocapviewer C:\\CS\\data\\krystal\\mocap\\idle01.bvh");
+  commandLineHelper.AddCommandLineExample ("csmocapviewer -start=20 -end=60 -scale=0.1 idle01.bvh");
+  commandLineHelper.AddCommandLineExample ("csmocapviewer -rootmask=Hips idle01.bvh");
+  commandLineHelper.AddCommandLineExample ("csmocapviewer -rootmask=Hips -childmask=Head -childmask=LeftHand idle01.bvh");
+  commandLineHelper.AddCommandLineExample ("csmocapviewer -rootmask=Hips -childall idle01.bvh");
+  commandLineHelper.AddCommandLineExample ("csmocapviewer -pld -record -recordfile=mocap.nuv idle01.bvh");
+  commandLineHelper.AddCommandLineExample ("csmocapviewer -rotcamera=-90 idle01.bvh");
+  commandLineHelper.AddCommandLineExample ("csmocapviewer idle01.bvh -pld -ncount=200 -nfrequency=0.4 -poscamera=0.7");
+  commandLineHelper.AddCommandLineExample ("csmocapviewer -targetfile=data/krystal/krystal.xml -targetname=krystal -nobone idle01.bvh");
+
+  // Command line options
+  size_t section = 0;
+  commandLineHelper.AddCommandLineOption
+    ("info", "Parse the file, print out the mocap data information, then exit", csVariant (), section);
+  commandLineHelper.AddCommandLineOption
+    ("noanim", "Don't play the animation, only display the skeleton in rest pose", csVariant (), section);
+  commandLineHelper.AddCommandLineOption
+    ("start", "Set the index of the start frame", csVariant (0), section);
+  commandLineHelper.AddCommandLineOption
+    ("end", "Set the index of the end frame", csVariant (0), section);
+  commandLineHelper.AddCommandLineOption
+    ("scale", "Set the global scale to apply to the distances", csVariant (0.01f), section);
+  commandLineHelper.AddCommandLineOption
+    ("speed", "Set the speed to play the animation", csVariant (1.0f), section);
+
+  section = commandLineHelper.AddCommandLineSection ("Display");
+  commandLineHelper.AddCommandLineOption
+    ("pld", csString ().Format ("Set the display mode as %s",
+				CS::Quote::Single ("Point Light Display")), csVariant (), section);
+  commandLineHelper.AddCommandLineOption
+    ("rotcamera", "Rotate the camera of a given angle around the Y axis, in degree", csVariant (0.0f), section);
+  commandLineHelper.AddCommandLineOption
+    ("poscamera", "Scale the distance between the camera and the target", csVariant (1.0f), section);
+
+  section = commandLineHelper.AddCommandLineSection ("Animesh retargeting");
+  commandLineHelper.AddCommandLineOption
+    ("targetfile", "Set the file of the animesh to retarget the animation to", csVariant (""), section);
+  commandLineHelper.AddCommandLineOption
+    ("targetname", "Set the name of the animesh factory to retarget the animation to", csVariant (""), section);
+
+  section = commandLineHelper.AddCommandLineSection ("Bone filtering");
+  commandLineHelper.AddCommandLineOption
+    ("rootmask", "Set the bone name of the root of the bone chain that will be used as a mask", csVariant (""), section);
+  commandLineHelper.AddCommandLineOption
+    ("childmask", "Add a child to the bone chain that will be used as a mask", csVariant (""), section);
+  commandLineHelper.AddCommandLineOption
+    ("childall", "Add all sub-children of the root bone to the bone chain that will be used as a mask", csVariant (), section);
+  commandLineHelper.AddCommandLineOption
+    ("bone", "Add a bone to be displayed by its name", csVariant (""), section);
+  commandLineHelper.AddCommandLineOption
+    ("nobone", "Don't display any bone at all", csVariant (), section);
+  commandLineHelper.AddCommandLineOption
+    ("nobone", "Remove a bone to be displayed by its name", csVariant (""), section);
+
+  section = commandLineHelper.AddCommandLineSection ("Video recording");
+  commandLineHelper.AddCommandLineOption
+    ("record", "Record the session in a video file, then exit", csVariant (), section);
+  commandLineHelper.AddCommandLineOption
+    ("recordfile", "Force the name of the video file to be created", csVariant (""), section);
+
+  section = commandLineHelper.AddCommandLineSection ("Noise generation");
+  commandLineHelper.AddCommandLineOption
+    ("ncount", "Set the number of noise points added", csVariant (0), section);
+  commandLineHelper.AddCommandLineOption
+    ("nscale", "Scale to apply on the position of the noise points", csVariant (0.5f), section);
+  commandLineHelper.AddCommandLineOption
+    ("noctaves", "Set the number of octaves of the noise. Value must be between 1 and 30", csVariant (6), section);
+  commandLineHelper.AddCommandLineOption
+    ("nfrequency", "Set the frequency of the noise. Value must be positive", csVariant (1.0f), section);
+  commandLineHelper.AddCommandLineOption
+    ("nlacunarity", "Set the lacunarity of the noise. Value is suggested to be between 1.5 and 3.5", csVariant (2.0f), section);
+  commandLineHelper.AddCommandLineOption
+    ("npersistence", "Set the persistence of the noise. Value is suggested to be between 0.0 and 1.0", csVariant (0.5f), section);
+
+  // Printing help
+  commandLineHelper.PrintApplicationHelp
+    (GetObjectRegistry (),
+     "csmocapviewer", "csmocapviewer [OPTIONS] [filename]", csString ().Format
+     ("Crystal Space's viewer for motion captured data. This viewer supports currently"
+      " only the Biovision Hierarchical data file format (BVH).\n\n"
+      "The animation can be retargeted automatically to an animesh. Use either the -targetfile and"
+      " -targetname options for that. The results will depend on the actual similitudes between the"
+      " two skeletons.\n\n"
+      "A mask can be defined to select the bones that are displayed. A simple way to populate the "
+      "bone mask is by defining a bone chain. A bone chain is defined by a root bone (option "
+      "-rootmask), then the user can add either all children and sub-children of the root bone (option"
+      " -childall), either all bones on the way to a given child bone (option -childmask). Only one bone"
+      " chain can be defined, but the -childmask option can be used additively. Some"
+      " specific bones can be added and removed by using the -bone and -nobone options. If the only bone"
+      " option provided is the empty -nobone option, then no bones at all will be displayed.\n\n"
+      "This viewer can also be used as a Point Light Display system, and is able to record automatically"
+      " videos with these data. This system has been designed as a base tool for a psychology study on "
+      "the human perception of the motion.\n\n"
+      "The Point Light Display can be perturbated by adding noise points animated by a Perlin"
+      " noise. The behavior of the motion of these noise points can be tweaked by several"
+      " parameters. See http://libnoise.sourceforge.net/docs/classnoise_1_1module_1_1Perlin.html"
+      " for more information on these parameters.\n\n"
+      "Finally, this application uses a configuration file. See %s"
+      " for more information", CS::Quote::Double ("/config/csmocapviewer.cfg")));
 }
 
 void MocapViewer::Frame ()
@@ -273,7 +292,7 @@ bool MocapViewer::CreateAvatar ()
   if (mocapFilename == "")
   {
     ReportError ("No BVH file provided");
-    commandLineHelper.WriteHelp (GetObjectRegistry ());
+    PrintHelp ();
     return false;
   }
 

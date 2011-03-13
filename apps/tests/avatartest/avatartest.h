@@ -109,7 +109,8 @@ private:
   // Decal textures
   csRef<iDecalManager> decalManager;
 
-  //-- csBaseEventHandler
+  //-- CS::Demo::DemoApplication
+  void PrintHelp ();
   void Frame ();
   bool OnKeyboard (iEvent &event);
   bool OnMouseDown (iEvent &event);

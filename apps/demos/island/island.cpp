@@ -26,16 +26,21 @@
 #define WATER_LEVEL 50.0
 
 IslandDemo::IslandDemo ()
-  : DemoApplication ("CrystalSpace.IslandDemo", "csavatarstudio", "csavatarstudio",
-		     "Crystal Space island demo."),
-    inWater (false)
+  : DemoApplication ("CrystalSpace.IslandDemo"), inWater (false)
 {
-  // Configure the options for DemoApplication
-
   // Set the camera mode
   cameraManager.SetCameraMode (CS::Demo::CAMERA_MOVE_FREE);
   cameraManager.SetStartPosition (csVector3 (500.0f, 200.0f, 500.0f));
   cameraManager.SetMotionSpeed (10.0f);
+}
+
+void IslandDemo::PrintHelp ()
+{
+  csCommandLineHelper commandLineHelper;
+
+  // Printing help
+  commandLineHelper.PrintApplicationHelp
+    (GetObjectRegistry (), "csisland", "csisland", "Island environment demo.");
 }
 
 void IslandDemo::Frame ()

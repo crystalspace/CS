@@ -151,6 +151,8 @@ public:
   HairTest ();
   ~HairTest ();
 
+  void PrintHelp ();
+
   // Save fur
   void SaveFactory(iMeshFactoryWrapper* meshfactwrap, const char * filename);
   void SaveObject(iMeshWrapper* meshwrap, const char * filename);

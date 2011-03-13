@@ -33,28 +33,37 @@
 #define MODEL_SINTEL 3
 
 AvatarTest::AvatarTest ()
-  : DemoApplication ("CrystalSpace.AvatarTest", "avatartest",
-		     "avatartest <OPTIONS>",
-		     "Tests on the animation of objects iAnimatedMesh."),
-    avatarScene (0), dynamicsDebugMode (DYNDEBUG_NONE)
+  : DemoApplication ("CrystalSpace.AvatarTest"),
+    avatarScene (nullptr), dynamicsDebugMode (DYNDEBUG_NONE)
 {
   // Configure the options for DemoApplication
 
   // Set the camera mode
   cameraManager.SetCameraMode (CS::Demo::CAMERA_ROTATE);
-
-  // Command line options
-  commandLineHelper.AddCommandLineOption
-    ("scene=<name>", "Set the starting scene (frankie, krystal, sintel)");
-  commandLineHelper.AddCommandLineOption
-    ("nophysics", "Disable the physical animations");
-  commandLineHelper.AddCommandLineOption
-    ("nosoft", "Disable the soft bodies");
 }
 
 AvatarTest::~AvatarTest ()
 {
   delete avatarScene;
+}
+
+void AvatarTest::PrintHelp ()
+{
+  csCommandLineHelper commandLineHelper;
+
+  // Command line options
+  commandLineHelper.AddCommandLineOption
+    ("scene", "Set the starting scene", csVariant ("frankie"));
+  commandLineHelper.AddCommandLineOption
+    ("physics", "Enable the physical animations", csVariant (true));
+  commandLineHelper.AddCommandLineOption
+    ("soft", "Enable the soft bodies", csVariant (true));
+
+  // Printing help
+  commandLineHelper.PrintApplicationHelp
+    (GetObjectRegistry (), "avatartest",
+     "avatartest <OPTIONS>",
+     "Tests on the animation of objects iAnimatedMesh.");
 }
 
 void AvatarTest::Frame ()

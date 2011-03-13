@@ -73,6 +73,7 @@ class MocapViewer : public CS::Demo::DemoApplication,
   ~MocapViewer ();
 
   //-- CS::Demo::DemoApplication
+  void PrintHelp ();
   void Frame ();
 
   //-- csApplicationFramework

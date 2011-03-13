@@ -35,31 +35,38 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define ENVIRONMENT_TERRAIN 2
 
 Simple::Simple ()
-  : DemoApplication ("CrystalSpace.PhysTut", "phystut",
-		     "phystut <OPTIONS>",
-		     "Physics tutorial for Crystal Space."),
+  : DemoApplication ("CrystalSpace.PhysTut"),
     isSoftBodyWorld (false), environment (ENVIRONMENT_WALLS), solver (0),
     autodisable (false), do_bullet_debug (false), remainingStepDuration (0.0f),
     debugMode (false), allStatic (false), pauseDynamic (false), dynamicSpeed (1.0f),
     physicalCameraMode (CAMERA_DYNAMIC), dragging (false), softDragging (false)
 {
-  // Configure the options for DemoApplication
-
   // We manage the camera by ourselves
   cameraManager.SetCameraMode (CS::Demo::CAMERA_NO_MOVE);
   cameraManager.SetMouseMoveEnabled (false);
-
-  // Command line options
-  commandLineHelper.AddCommandLineOption
-    ("phys_engine=<name>", "Specify which physics plugin to use (ode, bullet)");
-  commandLineHelper.AddCommandLineOption
-    ("nosoft", "Disable the soft bodies");
-  commandLineHelper.AddCommandLineOption
-    ("terrain", "Start with the terrain environment");
 }
 
 Simple::~Simple ()
 {
+}
+
+void Simple::PrintHelp ()
+{
+  csCommandLineHelper commandLineHelper;
+
+  // Command line options
+  commandLineHelper.AddCommandLineOption
+    ("phys_engine", "Specify which physics plugin to use", csVariant ("bullet"));
+  commandLineHelper.AddCommandLineOption
+    ("soft", "Enable the soft bodies", csVariant (true));
+  commandLineHelper.AddCommandLineOption
+    ("terrain", "Start with the terrain environment", csVariant ());
+
+  // Printing help
+  commandLineHelper.PrintApplicationHelp
+    (GetObjectRegistry (), "phystut",
+     "phystut <OPTIONS>",
+     "Physics tutorial for Crystal Space.");
 }
 
 void Simple::Frame ()

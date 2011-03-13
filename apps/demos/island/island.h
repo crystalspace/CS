@@ -34,7 +34,8 @@ class IslandDemo : public CS::Demo::DemoApplication
  public:
   IslandDemo ();
 
-  //-- csBaseEventHandler
+  //-- CS::Demo::DemoApplication
+  void PrintHelp ();
   void Frame ();
 
   //-- csApplicationFramework
