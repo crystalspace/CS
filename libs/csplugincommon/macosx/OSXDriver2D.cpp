@@ -13,6 +13,7 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
+#include "csutil/cmdhelp.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
 
@@ -146,8 +147,8 @@ bool OSXDriver2D::HandleEvent(iEvent &ev)
     }
     else if (ev.Name == commandLineHelpEvt)
     {
-      csPrintf("Options for MacOS X 2D graphics drivers:\n"
-	       "  -screen=<num>      Screen number to display on (default=0)\n\n");
+      csCommandLineHelper::PrintTitle ("MacOS X 2D graphics drivers", 1);
+      csCommandLineHelper::PrintOption ("screen", "Screen number to display on", csVariant (0));
       handled = true;
     }
     else if (ev.Name == keyboardDownEvt)
