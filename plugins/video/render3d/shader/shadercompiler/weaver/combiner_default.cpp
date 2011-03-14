@@ -138,8 +138,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
               // For now only support 1 tag...
               if (hasTag) return 0;
               hasTag = true;
-              result.AttachNew (new scfString (
-                node->GetAttributeValue ("name")));
+	      csString tagStr (node->GetAttributeValue ("name"));
+	      csString fallbackTex (node->GetAttributeValue ("fallback"));
+	      if (!fallbackTex.IsEmpty())
+	      {
+		tagStr.Append ("|");
+		tagStr.Append (fallbackTex);
+	      }
+              result.AttachNew (new scfString (tagStr));
             }
             break;
           case WeaverCompiler::XMLTOKEN_INSTANCEPARAM:
