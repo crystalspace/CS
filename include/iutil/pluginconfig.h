@@ -24,6 +24,10 @@
  */
 /**\addtogroup util
  * @{ */
+#include "csgeom/vector2.h"
+#include "csgeom/vector3.h"
+#include "csgeom/vector4.h"
+#include "csutil/cscolor.h"
 #include "csutil/scf.h"
 #include "csutil/scfstr.h"
 
@@ -39,7 +43,23 @@ enum csVariantType
   /// Float type
   CSVAR_FLOAT,
   /// String type
-  CSVAR_STRING
+  CSVAR_STRING,
+  /// csColor type
+  CSVAR_COLOR,
+  /// csColor4 type
+  CSVAR_COLOR4,
+  /// csVector2 type
+  CSVAR_VECTOR2,
+  /// csVector3 type
+  CSVAR_VECTOR3,
+  /// csVector4 type
+  CSVAR_VECTOR4,
+  /// A VFS path, ie either a file or a directory
+  CSVAR_VFSPATH,
+  /// A VFS file
+  CSVAR_VFSFILE,
+  /// A VFS directory
+  CSVAR_VFSDIR
 };
 
 /**
@@ -55,35 +75,56 @@ private:
   {
     long l;
     bool b;
-    float f;
+    // TODO: this could be more optimized...
+    float f[4];
     iString* s;
-  } v;
+  } val;
+
   void Clear()
   {
-    if ((type == CSVAR_STRING) && (v.s != 0)) v.s->DecRef();
+    if ((type == CSVAR_STRING
+	 || type == CSVAR_VFSPATH
+	 || type == CSVAR_VFSFILE
+	 || type == CSVAR_VFSDIR)
+	&& (val.s != 0)) val.s->DecRef();
   }
+
 public:
   /// Constructor initialized with a value of type CSVAR_CMD
-  csVariant () { type = CSVAR_CMD; memset (&v, 0, sizeof (v)); }
+  csVariant () { type = CSVAR_CMD; memset (&val, 0, sizeof (val)); }
   /// Constructor initialized with a value of type CSVAR_LONG
-  csVariant (int i) { type = CSVAR_LONG; v.l = i; }
+  csVariant (int i) { type = CSVAR_LONG; val.l = i; }
   /// Constructor initialized with a value of type CSVAR_LONG
-  csVariant (long l) { type = CSVAR_LONG; v.l = l; }
+  csVariant (long l) { type = CSVAR_LONG; val.l = l; }
   /// Constructor initialized with a value of type CSVAR_BOOL
-  csVariant (bool b) { type = CSVAR_BOOL; v.b = b; }
+  csVariant (bool b) { type = CSVAR_BOOL; val.b = b; }
   /// Constructor initialized with a value of type CSVAR_FLOAT
-  csVariant (float f) { type = CSVAR_FLOAT; v.f = f; }
+  csVariant (float f) { type = CSVAR_FLOAT; val.f[0] = f; }
   /// Constructor initialized with a value of type CSVAR_STRING
-  csVariant (const char* s) { type = CSVAR_STRING; v.s = s ? new scfString (s) : nullptr; }
+  csVariant (const char* s) { type = CSVAR_STRING; val.s = s ? new scfString (s) : nullptr; }
+  /// Constructor initialized with a value of type CSVAR_COLOR
+  csVariant (csColor c) { type = CSVAR_COLOR; val.f[0] = c[0]; val.f[1] = c[1]; val.f[2] = c[2]; }
+  /// Constructor initialized with a value of type CSVAR_COLOR4
+  csVariant (csColor4 c) { type = CSVAR_COLOR4; val.f[0] = c[0]; val.f[1] = c[1]; val.f[2] = c[2]; val.f[3] = c[3]; }
+  /// Constructor initialized with a value of type CSVAR_VECTOR2
+  csVariant (csVector2 v) { type = CSVAR_VECTOR2; val.f[0] = v[0]; val.f[1] = v[1]; }
+  /// Constructor initialized with a value of type CSVAR_VECTOR3
+  csVariant (csVector3 v) { type = CSVAR_VECTOR3; val.f[0] = v[0]; val.f[1] = v[1]; val.f[2] = v[2]; }
+  /// Constructor initialized with a value of type CSVAR_VECTOR4
+  csVariant (csVector4 v) { type = CSVAR_VECTOR4; val.f[0] = v[0]; val.f[1] = v[1]; val.f[2] = v[2]; val.f[3] = v[3]; }
 
   /// Copy constructor.
   csVariant (const csVariant& var)
   {
-    memset (&v, 0, sizeof (v));
+    memset (&val, 0, sizeof (val));
     
     type = var.type;
-    v = var.v;
-    if ((type == CSVAR_STRING) && (v.s != 0)) v.s->IncRef(); 
+    val = var.val;
+    if ((type == CSVAR_STRING
+	 || type == CSVAR_VFSPATH
+	 || type == CSVAR_VFSFILE
+	 || type == CSVAR_VFSDIR)
+	&& (val.s != 0)) val.s->IncRef(); 
   }
 
   ~csVariant () { Clear(); }
@@ -93,8 +134,12 @@ public:
   {
     Clear ();
     type = var.type;
-    v = var.v;
-    if ((type == CSVAR_STRING) && (v.s != 0)) v.s->IncRef ();
+    val = var.val;
+    if ((type == CSVAR_STRING
+	 || type == CSVAR_VFSPATH
+	 || type == CSVAR_VFSFILE
+	 || type == CSVAR_VFSDIR)
+	&& (val.s != 0)) val.s->IncRef ();
     return var;
   }
   
@@ -103,21 +148,21 @@ public:
   {
     Clear();
     type = CSVAR_LONG;
-    v.l = l;
+    val.l = l;
   }
   /// Assign a bool
   void SetBool (bool b)
   {
     Clear();
     type = CSVAR_BOOL;
-    v.b = b;
+    val.b = b;
   }
   /// Assign a float
   void SetFloat (float f)
   {
     Clear();
     type = CSVAR_FLOAT;
-    v.f = f;
+    val.f[0] = f;
   }
   /// Assign a string
   void SetString (const char* s)
@@ -125,9 +170,9 @@ public:
     Clear();
     type = CSVAR_STRING;
     if (s)
-      v.s = new scfString (s);
+      val.s = new scfString (s);
     else
-      v.s = 0;
+      val.s = 0;
   }
   /// Assign a command. A command has no value, it is just a flag which can be set or not.
   void SetCommand ()
@@ -135,33 +180,157 @@ public:
     Clear();
     type = CSVAR_CMD;
   }
+  /// Assign a csColor
+  void SetColor (csColor c)
+  {
+    Clear();
+    type = CSVAR_COLOR;
+    val.f[0] = c[0];
+    val.f[1] = c[1];
+    val.f[2] = c[2];
+  }
+  /// Assign a csColor4
+  void SetColor4 (csColor4 c)
+  {
+    Clear();
+    type = CSVAR_COLOR4;
+    val.f[0] = c[0];
+    val.f[1] = c[1];
+    val.f[2] = c[2];
+    val.f[3] = c[3];
+  }
+  /// Assign a csVector2
+  void SetVector2 (csVector2 v)
+  {
+    Clear();
+    type = CSVAR_VECTOR2;
+    val.f[0] = v[0];
+    val.f[1] = v[1];
+  }
+  /// Assign a csVector3
+  void SetVector3 (csVector3 v)
+  {
+    Clear();
+    type = CSVAR_VECTOR3;
+    val.f[0] = v[0];
+    val.f[1] = v[1];
+    val.f[2] = v[2];
+  }
+  /// Assign a csVector4
+  void SetVector4 (csVector4 v)
+  {
+    Clear();
+    type = CSVAR_VECTOR4;
+    val.f[0] = v[0];
+    val.f[1] = v[1];
+    val.f[2] = v[2];
+    val.f[3] = v[3];
+  }
+  /// Assign a VFS path, ie either a file or a directory
+  void SetVFSPath (const char* s)
+  {
+    Clear();
+    type = CSVAR_VFSPATH;
+    if (s)
+      val.s = new scfString (s);
+    else
+      val.s = 0;
+  }
+  /// Assign a VFS file
+  void SetVFSFile (const char* s)
+  {
+    Clear();
+    type = CSVAR_VFSFILE;
+    if (s)
+      val.s = new scfString (s);
+    else
+      val.s = 0;
+  }
+  /// Assign a VFS directory
+  void SetVFSDir (const char* s)
+  {
+    Clear();
+    type = CSVAR_VFSDIR;
+    if (s)
+      val.s = new scfString (s);
+    else
+      val.s = 0;
+  }
 
   /// Retrieve a long
   long GetLong () const
   {
     CS_ASSERT (type == CSVAR_LONG);
-    return v.l;
+    return val.l;
   }
   /// Retrieve a bool
   bool GetBool () const
   {
     CS_ASSERT (type == CSVAR_BOOL);
-    return v.b;
+    return val.b;
   }
   /// Retrieve a float
   float GetFloat () const
   {
     CS_ASSERT (type == CSVAR_FLOAT);
-    return v.f;
+    return val.f[0];
   }
   /// Retrieve a string
   const char* GetString () const
   {
     CS_ASSERT (type == CSVAR_STRING);
-    return v.s->GetData();
+    return val.s->GetData();
+  }
+  /// Retrieve a csColor
+  csColor GetColor () const
+  {
+    CS_ASSERT (type == CSVAR_COLOR);
+    return csColor (val.f[0], val.f[1], val.f[2]);
+  }
+  /// Retrieve a csColor4
+  csColor4 GetColor4 () const
+  {
+    CS_ASSERT (type == CSVAR_COLOR4);
+    return csColor4 (val.f[0], val.f[1], val.f[2], val.f[3]);
+  }
+  /// Retrieve a csVector2
+  csVector2 GetVector2 () const
+  {
+    CS_ASSERT (type == CSVAR_VECTOR2);
+    return csVector2 (val.f[0], val.f[1]);
+  }
+  /// Retrieve a csVector3
+  csVector3 GetVector3 () const
+  {
+    CS_ASSERT (type == CSVAR_VECTOR3);
+    return csVector3 (val.f[0], val.f[1], val.f[2]);
+  }
+  /// Retrieve a csVector4
+  csVector4 GetVector4 () const
+  {
+    CS_ASSERT (type == CSVAR_VECTOR4);
+    return csVector4 (val.f[0], val.f[1], val.f[2], val.f[3]);
+  }
+  /// Retrieve a VFS path, ie either a file or a directory
+  const char* GetVFSPath () const
+  {
+    CS_ASSERT (type == CSVAR_VFSPATH);
+    return val.s->GetData();
+  }
+  /// Retrieve a VFS file
+  const char* GetVFSFile () const
+  {
+    CS_ASSERT (type == CSVAR_VFSFILE);
+    return val.s->GetData();
+  }
+  /// Retrieve a VFS directory
+  const char* GetVFSDir () const
+  {
+    CS_ASSERT (type == CSVAR_VFSDIR);
+    return val.s->GetData();
   }
 
-  /// Get the type of the contained value. The default value is CSVAR_LONG.
+  /// Get the type of the contained value. The default value is CSVAR_CMD.
   csVariantType GetType () const { return type; }
 };
 
