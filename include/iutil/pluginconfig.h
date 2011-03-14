@@ -54,12 +54,8 @@ enum csVariantType
   CSVAR_VECTOR3,
   /// csVector4 type
   CSVAR_VECTOR4,
-  /// A VFS path, ie either a file or a directory
-  CSVAR_VFSPATH,
-  /// A VFS file
-  CSVAR_VFSFILE,
-  /// A VFS directory
-  CSVAR_VFSDIR
+  /// A VFS path
+  CSVAR_VFSPATH
 };
 
 /**
@@ -83,9 +79,7 @@ private:
   void Clear()
   {
     if ((type == CSVAR_STRING
-	 || type == CSVAR_VFSPATH
-	 || type == CSVAR_VFSFILE
-	 || type == CSVAR_VFSDIR)
+	 || type == CSVAR_VFSPATH)
 	&& (val.s != 0)) val.s->DecRef();
   }
 
@@ -121,9 +115,7 @@ public:
     type = var.type;
     val = var.val;
     if ((type == CSVAR_STRING
-	 || type == CSVAR_VFSPATH
-	 || type == CSVAR_VFSFILE
-	 || type == CSVAR_VFSDIR)
+	 || type == CSVAR_VFSPATH)
 	&& (val.s != 0)) val.s->IncRef(); 
   }
 
@@ -136,9 +128,7 @@ public:
     type = var.type;
     val = var.val;
     if ((type == CSVAR_STRING
-	 || type == CSVAR_VFSPATH
-	 || type == CSVAR_VFSFILE
-	 || type == CSVAR_VFSDIR)
+	 || type == CSVAR_VFSPATH)
 	&& (val.s != 0)) val.s->IncRef ();
     return var;
   }
@@ -226,31 +216,11 @@ public:
     val.f[2] = v[2];
     val.f[3] = v[3];
   }
-  /// Assign a VFS path, ie either a file or a directory
+  /// Assign a VFS path
   void SetVFSPath (const char* s)
   {
     Clear();
     type = CSVAR_VFSPATH;
-    if (s)
-      val.s = new scfString (s);
-    else
-      val.s = 0;
-  }
-  /// Assign a VFS file
-  void SetVFSFile (const char* s)
-  {
-    Clear();
-    type = CSVAR_VFSFILE;
-    if (s)
-      val.s = new scfString (s);
-    else
-      val.s = 0;
-  }
-  /// Assign a VFS directory
-  void SetVFSDir (const char* s)
-  {
-    Clear();
-    type = CSVAR_VFSDIR;
     if (s)
       val.s = new scfString (s);
     else
@@ -311,22 +281,10 @@ public:
     CS_ASSERT (type == CSVAR_VECTOR4);
     return csVector4 (val.f[0], val.f[1], val.f[2], val.f[3]);
   }
-  /// Retrieve a VFS path, ie either a file or a directory
+  /// Retrieve a VFS path
   const char* GetVFSPath () const
   {
     CS_ASSERT (type == CSVAR_VFSPATH);
-    return val.s->GetData();
-  }
-  /// Retrieve a VFS file
-  const char* GetVFSFile () const
-  {
-    CS_ASSERT (type == CSVAR_VFSFILE);
-    return val.s->GetData();
-  }
-  /// Retrieve a VFS directory
-  const char* GetVFSDir () const
-  {
-    CS_ASSERT (type == CSVAR_VFSDIR);
     return val.s->GetData();
   }
 
