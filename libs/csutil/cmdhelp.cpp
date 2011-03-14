@@ -89,6 +89,9 @@ void csCommandLineHelper::PrintOption (const csOptionDescription& option, const 
       else
 	desc.Format ("%s", option.description);
       break;
+    default:
+      // TODO: other types
+      break;
     }
 
   //@@@????
