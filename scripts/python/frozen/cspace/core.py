@@ -595,16 +595,24 @@ csColor4_swigregister(csColor4)
 class csCommandLineHelper(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    Help = staticmethod(_core.csCommandLineHelper_Help)
-    CheckHelp = staticmethod(_core.csCommandLineHelper_CheckHelp)
     def __init__(self, *args): 
         this = _core.new_csCommandLineHelper(*args)
         try: self.this.append(this)
         except: self.this = this
+    PrintTitle = staticmethod(_core.csCommandLineHelper_PrintTitle)
+    PrintOption = staticmethod(_core.csCommandLineHelper_PrintOption)
+    Help = staticmethod(_core.csCommandLineHelper_Help)
+    CheckHelp = staticmethod(_core.csCommandLineHelper_CheckHelp)
+    def AddCommandLineSection(*args): return _core.csCommandLineHelper_AddCommandLineSection(*args)
+    def AddCommandLineOption(*args): return _core.csCommandLineHelper_AddCommandLineOption(*args)
+    def AddCommandLineExample(*args): return _core.csCommandLineHelper_AddCommandLineExample(*args)
+    def PrintApplicationHelp(*args): return _core.csCommandLineHelper_PrintApplicationHelp(*args)
     __swig_destroy__ = _core.delete_csCommandLineHelper
     __del__ = lambda self : None;
 csCommandLineHelper_swigregister = _core.csCommandLineHelper_swigregister
 csCommandLineHelper_swigregister(csCommandLineHelper)
+csCommandLineHelper_PrintTitle = _core.csCommandLineHelper_PrintTitle
+csCommandLineHelper_PrintOption = _core.csCommandLineHelper_PrintOption
 csCommandLineHelper_Help = _core.csCommandLineHelper_Help
 csCommandLineHelper_CheckHelp = _core.csCommandLineHelper_CheckHelp
 

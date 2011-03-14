@@ -1229,14 +1229,20 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-*Help = *cspacec::csCommandLineHelper_Help;
-*CheckHelp = *cspacec::csCommandLineHelper_CheckHelp;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csCommandLineHelper(@_);
     bless $self, $pkg if defined($self);
 }
 
+*PrintTitle = *cspacec::csCommandLineHelper_PrintTitle;
+*PrintOption = *cspacec::csCommandLineHelper_PrintOption;
+*Help = *cspacec::csCommandLineHelper_Help;
+*CheckHelp = *cspacec::csCommandLineHelper_CheckHelp;
+*AddCommandLineSection = *cspacec::csCommandLineHelper_AddCommandLineSection;
+*AddCommandLineOption = *cspacec::csCommandLineHelper_AddCommandLineOption;
+*AddCommandLineExample = *cspacec::csCommandLineHelper_AddCommandLineExample;
+*PrintApplicationHelp = *cspacec::csCommandLineHelper_PrintApplicationHelp;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
