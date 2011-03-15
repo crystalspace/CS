@@ -38,6 +38,7 @@
 #include "assimp/aiPostProcess.h" // Post processing flags
 #include "assimp/IOStream.h"
 #include "assimp/IOSystem.h"
+#include "assimp/ProgressHandler.h"
 
 #include "common.h"
 
@@ -241,9 +242,6 @@ private:
     CS::Animation::BoneID boneID;
   };
   csHash<AnimeshNode, csString> animeshNodes;
-
-  // Progress management
-  AssimpProgressHandler progressHandler;
 };
 
 }

@@ -121,7 +121,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     // Create an Assimp importer and parse the file
     Assimp::Importer importer;
     importer.SetIOHandler (new csIOSystem (vfs, nullptr));
-    importer.SetProgressHandler (&progressHandler);
+    importer.SetProgressHandler (new AssimpProgressHandler ());
     printf ("Loading...");
     scene = importer.ReadFileFromMemory
       (**buffer, buffer->GetSize (), importFlags, "");
@@ -158,7 +158,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     // Create an Assimp importer and parse the file
     Assimp::Importer importer;
     importer.SetIOHandler (new csIOSystem (vfs, nullptr));
-    importer.SetProgressHandler (&progressHandler);
+    importer.SetProgressHandler (new AssimpProgressHandler ());
     printf ("Loading...");
     scene = importer.ReadFileFromMemory
       (**buffer, buffer->GetSize (), importFlags, "");
@@ -200,7 +200,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     // Create an Assimp importer and parse the file
     Assimp::Importer importer;
     importer.SetIOHandler (new csIOSystem (vfs, filename));
-    importer.SetProgressHandler (&progressHandler);
+    importer.SetProgressHandler (new AssimpProgressHandler ());
     printf ("Loading...");
     scene = importer.ReadFile (filename, importFlags);
 
