@@ -23,6 +23,7 @@
 #include "cssysdef.h"
 #include "csgfx/shadervarcontext.h"
 #include "cstool/csapplicationframework.h"
+#include "cstool/csdemoapplication.h"
 #include "cstool/csview.h"
 #include "cstool/meshobjtmpl.h"
 #include "csutil/cmdhelp.h"
@@ -54,27 +55,23 @@
 class GeneralTab;
 class MaterialTab;
 
+enum LightMode
+{
+  THREE_POINT = 0,
+  FRONT_BACK_TOP,
+  UNLIT
+};
+
 class ViewMesh : public csApplicationFramework, public csBaseEventHandler
 {
  private:
 
   csRef<iCollection> collection;
 
-  csVector3 camTarget;
-  float     camDist;
-  float     camYaw;
-  float     camPitch;
-
-  bool      camModePan;
-  bool      camModeRotate;
-  bool      camModeZoom;
-
   csStringArray reloadLibraryFilenames;
 
   csString reloadFilename;
   csString reloadFilePath;
-
-  int       lastMouseX, lastMouseY;
 
   csRef<iEngine> engine;
   csRef<iLoader> loader;
@@ -88,16 +85,17 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   csRef<iCEGUI> cegui;
   csRef<iThreadReturn> loading;
   iSector* room;
-  int x,y;
   csRef<FramePrinter> printer;
+
+  CS::Demo::CameraManager cameraManager;
+
+  LightMode lightMode;
+  void SetLightMode (LightMode lightMode);
 
   CEGUI::Window* form;
   CEGUI::Window* stddlg;
 
-  enum { movenormal, moveorigin, rotateorigin } camMode;
-
-  float roomsize, scale;
-  float move_sprite_speed;
+  float scale;
 
   csRef<AssetBase> asset;
 
@@ -105,15 +103,7 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   int max_lod_level;
   bool auto_lod;
 
-  void ResetCamera();
-  void UpdateCamera();
-  void FixCameraForOrigin(const csVector3 & desiredOrigin);
-
   bool OnKeyboard (iEvent&);
-
-  bool OnMouseDown (iEvent&);
-  bool OnMouseUp (iEvent&);
-  bool OnMouseMove (iEvent&);
 
   void Frame ();
 
