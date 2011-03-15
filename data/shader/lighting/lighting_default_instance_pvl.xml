@@ -25,6 +25,7 @@
   <alias name="staticspecular" file="/shader-snippets/lighting/staticspec-null.xml" />
   <alias name="lighting" file="/shader-snippets/lighting/lighting-pvl.xml" />
   <alias name="surface" file="/shader-snippets/surface/surface-classic.xml" />
+  <alias name="shininess" file="/shader-snippets/surface/shininess-default-pv.xml" />
   
   <technique priority="500" minlights="5">
     <!-- 1 pass, 6 lights -->

@@ -36,6 +36,7 @@
     <alias name="normalmap" weak="yes" file="/shader-snippets/surface/normalmap.xml" />
     <alias name="surface" weak="yes" file="/shader-snippets/surface/surface-classic.xml" />
     <alias name="specular" weak="yes" file="/shader-snippets/surface/specular-weirdold.xml" />
+    <alias name="shininess" weak="yes" file="/shader-snippets/surface/shininess-default.xml" />
     <alias name="staticspecular" weak="yes" file="/shader-snippets/lighting/staticspec-default.xml" />
     <alias name="glow" weak="yes" file="/shader-snippets/lighting/glow.xml" />
     <alias name="lightmaptc" weak="yes" file="/shader-snippets/texcoord-lightmap.xml" />
@@ -53,6 +54,7 @@
     <snippet id="position" filealias="position" />
     <snippet id="texcoord" filealias="texcoord" />
     <snippet id="specular" filealias="specular" />
+    <snippet id="shininess" filealias="shininess" />
     <snippet id="normalmap" filealias="normalmap" />
     <snippet id="ambient_lightmaptc" filealias="lightmaptc" />
     <snippet id="ambient" filealias="ambient" />
@@ -77,6 +79,7 @@
     <connection from="parallax" to="surface" />
     <connection from="parallax" to="normalmap" />
     <connection from="parallax" to="specular" />
+    <connection from="parallax" to="shininess" />
     <connection from="parallax" to="glow" />
     <connection from="ambient_lightmaptc" to="ambient">
       <explicit from="result" to="texCoordLM" />
@@ -84,7 +87,9 @@
     <connection from="normalmap" to="ambient" />
     <connection from="normalmap" to="lighting" />
     <connection from="normalmap" to="staticspecular" />
+    <connection from="shininess" to="staticspecular" />
     <connection from="surface" to="apply_mixmode_alpha" />
+    <connection from="shininess" to="lighting" />
     <connection from="apply_mixmode_alpha" to="specular" />
     <connection from="apply_mixmode_alpha" to="apply_alpha" />
     <connection from="apply_alpha" to="apply_lighting">
