@@ -59,7 +59,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       aiProcess_CalcTangentSpace // needed only for advanced shaders
       //| aiProcess_ConvertToLeftHanded // seems deprecated
       //| aiProcess_FindDegenerates // optimization
-      | aiProcess_FindInvalidData // in all cases?
+      //| aiProcess_FindInvalidData // in all cases? Not currently since it invalidates the animation data...
       | aiProcess_FlipUVs // always needed for CS
       | aiProcess_FlipWindingOrder // always needed for CS
       //| aiProcess_GenNormals // for fast
@@ -69,7 +69,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       | aiProcess_JoinIdenticalVertices // always needed
       | aiProcess_LimitBoneWeights // Needed due to limitation of animeshes
       | aiProcess_MakeLeftHanded // always needed for CS
-      | aiProcess_OptimizeGraph // only for models, not for scenes
+      //| aiProcess_OptimizeGraph // only for models, not for scenes
       | aiProcess_OptimizeMeshes // in all cases?
       //| aiProcess_PreTransformVertices // can be useful for genmeshes
       //| aiProcess_RemoveRedundantMaterials // in all cases?
@@ -121,12 +121,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     // Create an Assimp importer and parse the file
     Assimp::Importer importer;
     importer.SetIOHandler (new csIOSystem (vfs, nullptr));
+    importer.SetProgressHandler (&progressHandler);
+    printf ("Loading...");
     scene = importer.ReadFileFromMemory
       (**buffer, buffer->GetSize (), importFlags, "");
 
     // If the import failed, report it
     if (!scene)
     {
+      printf ("FAILED!\n");
       ReportError ("Failed to load binary file: %s",
 		   importer.GetErrorString());
       return (iBase*) nullptr;
@@ -155,12 +158,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     // Create an Assimp importer and parse the file
     Assimp::Importer importer;
     importer.SetIOHandler (new csIOSystem (vfs, nullptr));
+    importer.SetProgressHandler (&progressHandler);
+    printf ("Loading...");
     scene = importer.ReadFileFromMemory
       (**buffer, buffer->GetSize (), importFlags, "");
 
     // If the import failed, report it
     if (!scene)
     {
+      printf ("FAILED!\n");
       ReportError ("Failed to load factory %s: %s",
 		   CS::Quote::Single (factname),
 		   importer.GetErrorString());
@@ -176,7 +182,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
   iMeshFactoryWrapper* AssimpLoader::Load (const char* factname,
 					   const char* filename)
   {
-    // TODO: implement iPluginConfig, use iVerbosityManager, csProgressPulse
+    // TODO: implement iPluginConfig, use iVerbosityManager, iProgressMeter
     // TODO: custom options: scale, genmesh/animesh/scene/factories,
     //   find duplicates/optimize, save default animesh pose, fast/optimized
     // TODO: if forced to be a genmesh then don't read animations,
@@ -194,11 +200,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     // Create an Assimp importer and parse the file
     Assimp::Importer importer;
     importer.SetIOHandler (new csIOSystem (vfs, filename));
+    importer.SetProgressHandler (&progressHandler);
+    printf ("Loading...");
     scene = importer.ReadFile (filename, importFlags);
 
     // If the import failed, report it
     if (!scene)
     {
+      printf ("FAILED!\n");
       ReportError ("Failed to load factory %s from file %s: %s",
 		   CS::Quote::Single (factname),
 		   CS::Quote::Single (filename),
@@ -214,7 +223,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 
   void AssimpLoader::ImportScene ()
   {
-    printf ("\nLoading OK!\n");
+    printf ("SUCCESS!\n");
     printf ("animations: %i\n", scene->mNumAnimations);
     printf ("meshes: %i\n", scene->mNumMeshes);
     printf ("materials: %i\n", scene->mNumMaterials);

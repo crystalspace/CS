@@ -30,6 +30,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
 {
 
   /**
+   * Progress reporting
+   */
+  bool AssimpProgressHandler::Update (float percentage)
+  {
+    printf (".");
+    // TODO: let the user abort the loading
+    return true;
+  }
+
+  /**
    * Error reporting
    */
   void AssimpLoader::ReportError (const char* description, ...)

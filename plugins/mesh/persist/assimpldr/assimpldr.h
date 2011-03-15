@@ -127,11 +127,17 @@ struct AnimeshData
   csHash<AnimeshSubmesh, aiMesh*> submeshes;
 };
 
+struct AssimpProgressHandler : public Assimp::ProgressHandler
+{
+  //-- Assimp::ProgressHandler
+  bool Update (float percentage);  
+};
+
 class AssimpLoader : 
   public scfImplementation3<AssimpLoader,
 			    iBinaryLoaderPlugin,
 			    iModelLoader,
-			    iComponent>
+                            iComponent>
 {
 public:
 
@@ -235,6 +241,9 @@ private:
     CS::Animation::BoneID boneID;
   };
   csHash<AnimeshNode, csString> animeshNodes;
+
+  // Progress management
+  AssimpProgressHandler progressHandler;
 };
 
 }
