@@ -33,6 +33,8 @@
 	<input name="maxLights" type="int" default="value" defval="8"/>
 	<input name="minLights" type="int" default="value" defval="0"/>
 	<input file="/shader-snippets/lightScale.inp" private="yes" />
+	<!-- Shininess value for specular reflection -->
+	<input name="shininess" type="float" default="value" defval="32" />
 	
 	<block location="pass">
 	  <?Include /shader-snippets/lighting/lighting-tools.inc ?>
@@ -72,7 +74,7 @@
 	    Light light = GetCurrentLight (lightSpace, i);
 	    float4 lightAttenuationVec = lightProps.attenuationVec[i];
 	    float3 d, s;
-	    ComputeLight (lightSpace, light, eyeToSurf, normal, 32,
+	    ComputeLight (lightSpace, light, eyeToSurf, normal, shininess,
 	      lightProps.colorDiffuse[i], lightProps.colorSpecular[i],
 	      lightAttenuationVec, 1.0, d, s);
 		      
