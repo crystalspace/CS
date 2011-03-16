@@ -181,7 +181,7 @@ struct iSkeletonFactory : public virtual iBase
    * Get the transform of the bone in bone space.
    * \param bone The ID of the bone to get the transform for
    * \param rot The rotation quaternion provided as a result
-   * \param offset The movement offset provided as a result
+   * \param offset The position offset provided as a result
    */
   virtual void GetTransformBoneSpace (BoneID bone, csQuaternion& rot, 
     csVector3& offset) const = 0;
@@ -190,7 +190,7 @@ struct iSkeletonFactory : public virtual iBase
    * Set the transform of the bone in bone space.
    * \param bone The ID of the bone to set the transform for
    * \param rot The rotation quaternion of the bone
-   * \param offset The movement offset of the bone
+   * \param offset The position offset of the bone
    */
   virtual void SetTransformBoneSpace (BoneID bone, const csQuaternion& rot, 
     const csVector3& offset) = 0;
@@ -199,7 +199,7 @@ struct iSkeletonFactory : public virtual iBase
    * Get the transform of the bone in absolute space.
    * \param bone The ID of the bone to get the transform for
    * \param rot The rotation quaternion provided as a result
-   * \param offset The movement offset provided as a result
+   * \param offset The position offset provided as a result
    */
   virtual void GetTransformAbsSpace (BoneID bone, csQuaternion& rot, 
     csVector3& offset) const = 0;
@@ -208,7 +208,8 @@ struct iSkeletonFactory : public virtual iBase
    * Set the transform of the bone in absolute space.
    * \param bone The ID of the bone to set the transform for
    * \param rot The rotation quaternion of the bone
-   * \param offset The movement offset of the bone
+   * \param offset The position offset of the bone
+   * \warning The transform of the parent bones must have already been set.
    */
   virtual void SetTransformAbsSpace (BoneID bone, const csQuaternion& rot, 
     const csVector3& offset) = 0;
@@ -286,7 +287,7 @@ struct iSkeleton : public virtual iBase
    * Get the transform of the bone in bone space.
    * \param bone The ID of the bone to get the transform for
    * \param rot The rotation quaternion provided as a result
-   * \param offset The movement offset provided as a result
+   * \param offset The position offset provided as a result
    */
   virtual void GetTransformBoneSpace (BoneID bone, csQuaternion& rot, 
     csVector3& offset) const = 0;
@@ -295,7 +296,7 @@ struct iSkeleton : public virtual iBase
    * Set the transform of the bone in bone space.
    * \param bone The ID of the bone to set the transform for
    * \param rot The rotation quaternion of the bone
-   * \param offset The movement offset of the bone
+   * \param offset The position offset of the bone
    */
   virtual void SetTransformBoneSpace (BoneID bone, const csQuaternion& rot, 
     const csVector3& offset) = 0;
@@ -304,7 +305,7 @@ struct iSkeleton : public virtual iBase
    * Get the transform of the bone in absolute space.
    * \param bone The ID of the bone to get the transform for
    * \param rot The rotation quaternion provided as a result
-   * \param offset The movement offset provided as a result
+   * \param offset The position offset provided as a result
    */
   virtual void GetTransformAbsSpace (BoneID bone, csQuaternion& rot, 
     csVector3& offset) const = 0;
@@ -313,7 +314,8 @@ struct iSkeleton : public virtual iBase
    * Set the transform of the bone in absolute space.
    * \param bone The ID of the bone to set the transform for
    * \param rot The rotation quaternion of the bone
-   * \param offset The movement offset of the bone
+   * \param offset The position offset of the bone
+   * \warning The transform of the parent bones must have already been set.
    */
   virtual void SetTransformAbsSpace (BoneID bone, const csQuaternion& rot, 
     const csVector3& offset) = 0;
@@ -322,7 +324,7 @@ struct iSkeleton : public virtual iBase
    * Get the transform of the bone in bind space.
    * \param bone The ID of the bone to get the transform for
    * \param rot The rotation quaternion provided as a result
-   * \param offset The movement offset provided as a result
+   * \param offset The position offset provided as a result
    */
   virtual void GetTransformBindSpace (BoneID bone, csQuaternion& rot, 
     csVector3& offset) const = 0;
@@ -332,7 +334,8 @@ struct iSkeleton : public virtual iBase
    * Set the transform of the bone in bind space.
    * \param bone The ID of the bone to set the transform for
    * \param rot The rotation quaternion of the bone
-   * \param offset The movement offset of the bone
+   * \param offset The position offset of the bone
+   * \warning The transform of the parent bones must have already been set.
    */
   virtual void SetTransformBindSpace (BoneID bone, const csQuaternion& rot, 
     const csVector3& offset) = 0;
