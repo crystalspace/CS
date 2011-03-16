@@ -223,9 +223,27 @@ struct iSkeletonAnimPacket : public virtual iBase
 
 /**
  * Data structure for raw skeletal animations. It defines the key frames of the
- * animation but not the current playing state.
- * Each animation is made up of one or more channels, where a channel is a set
- * of key frames associated with a specific bone.
+ * animation but not its current playing state. You need to use a
+ * CS::Animation::iSkeletonAnimationNode in order to play this animation.
+ *
+ * Each animation is made up of one or more channels, where each channel is
+ * associated to a bone of the skeleton. Each channel can contain one or more
+ * keyframes defining the configuration of the bone at a given time. When the
+ * animation is played, the configuration of the bone is blended between the two
+ * closest keyframes of the given playback time.
+ *
+ * For a given channel, if there is no keyframe defined before the current playing
+ * time, then the null transform will be assumed. Therefore, you don't need to
+ * define a keyframe at time 0 if its bind transform is null. Warning: this is only
+ * valid when the BIND transform is null, ie the value after ConvertFrameSpace()
+ * has been called.
+ *
+ * Similarly, if there is no keyframe defined after the current playing
+ * time, then the transform of the last keyframe will be assumed.
+ *
+ * When this animation is played by an CS::Animation::iSkeletonAnimationNode, it
+ * calls the BlendState() method who will blend the animation at a given time
+ * into the state of the skeleton.
  *
  * Main creators of instances implementing this interface:
  * - CS::Animation::iSkeletonAnimPacketFactory::CreateAnimation()

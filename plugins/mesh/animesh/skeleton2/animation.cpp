@@ -384,69 +384,94 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       AnimationChannel* channel = channels[c];
 
       // Find keyframes before/after time
-      size_t before, after;
+      size_t before, after, key;
 
+      // Check if there is any keyframe
       if (channel->keyFrames.GetSize () == 0)
 	continue;
 
+      // Check if there is only one keyframe
       if (channel->keyFrames.GetSize () == 1)
-	before = after = 0;
-
-      else
       {
-	size_t ki = channel->keyFrames.FindSortedKey (cmp, &before);
+	// If the keyframe not already happened then apply the null transform
+	if (channel->keyFrames[0].time > playbackTime)
+	  goto apply_none;
 
-	// First keyframe
-	if (ki != csArrayItemNotFound)
+	else
 	{
-	  before = ki;
+	  before = 0;
+	  goto apply_single;
 	}
+      }
 
-	if (channel->keyFrames[before].time > playbackTime && before > 0)
+      // Search the first keyframe
+      key = channel->keyFrames.FindSortedKey (cmp, &before);
+      if (key != csArrayItemNotFound)
+	before = key;
+
+      // There are no more keyframes, therefore apply the last one
+      if (before >= channel->keyFrames.GetSize ())
+      {
+	before = channel->keyFrames.GetSize () - 1;
+	goto apply_single;
+      }
+
+      // Check that we are really after the keyframe
+      if (channel->keyFrames[before].time > playbackTime)
+      {
+	if (before > 0)
 	  before--;
 
-	// Second
-	after = before + 1;
-	if (after == channel->keyFrames.GetSize ())
-	{
-	  // Handle end-of-frame
-	  after = isPlayingCyclic ? 0 : before;
-	}
+	// There are no keyframes before this one, therefore apply the null transform
+	else goto apply_none;
       }
 
-      const KeyFrame& k1 = channel->keyFrames[before];
-      const KeyFrame& k2 = channel->keyFrames[after];
+      // Search the second keyframe
+      after = before + 1;
+      if (after == channel->keyFrames.GetSize ())
+	goto apply_single;
 
-      // blending factor
-      const float t = before == after ? -1.0f : (playbackTime - k1.time) / (k2.time - k1.time);
-
-      // Blend together
-      csQuaternion& q = state->GetQuaternion (channel->bone);
-      csVector3& v = state->GetVector (channel->bone);
-
-      csQuaternion qResult;
-      csVector3 vResult;
-
-      if (t <= 0.0f)
+      // Normal interpolation between two keyframes
       {
-        qResult = k1.rotation;
-        vResult = k1.offset;
-      }
-      else if (t >= 1.0f)
-      {
-        qResult = k2.rotation;
-        vResult = k2.offset;
-      }
-      else
-      {
-        qResult = k1.rotation.SLerp (k2.rotation, t);
-        vResult = csLerp (k1.offset, k2.offset, t);
+	const KeyFrame& k1 = channel->keyFrames[before];
+	const KeyFrame& k2 = channel->keyFrames[after];
+
+	// Blend between the two keyframes
+	const float t = (playbackTime - k1.time) / (k2.time - k1.time);
+	csQuaternion qResult = k1.rotation.SLerp (k2.rotation, t);
+	csVector3 vResult = csLerp (k1.offset, k2.offset, t);
+
+	csQuaternion& q = state->GetQuaternion (channel->bone);
+	csVector3& v = state->GetVector (channel->bone);
+	q = q.SLerp (qResult, baseWeight);
+	v = csLerp (v, vResult, baseWeight);
+	state->SetBoneUsed (channel->bone);
+
+	continue;
       }
 
-      q = q.SLerp (qResult, baseWeight);
-      v = csLerp (v, vResult, baseWeight);
+    apply_single:
+      // Apply a specific keyframe
+      {
+	const KeyFrame& k1 = channel->keyFrames[before];
+	csQuaternion& q = state->GetQuaternion (channel->bone);
+	csVector3& v = state->GetVector (channel->bone);
+	q = q.SLerp (k1.rotation, baseWeight);
+	v = csLerp (v, k1.offset, baseWeight);
+	state->SetBoneUsed (channel->bone);
 
-      state->SetBoneUsed (channel->bone);
+	continue;
+      }
+
+    apply_none:
+      // Apply the null transform
+      {
+	state->GetQuaternion (channel->bone).SetIdentity ();
+	state->GetVector (channel->bone).Set (0.0f);
+	state->SetBoneUsed (channel->bone);
+
+	continue;
+      }
     }
   }
 
