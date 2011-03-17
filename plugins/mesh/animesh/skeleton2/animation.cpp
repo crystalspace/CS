@@ -388,7 +388,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     state->SetBoneUsed (boneID);
   }
 
-  // Apply a specific keyframe
+  // Apply the interpolation between two keyframes
   inline void ApplyInterpolatedKeys (CS::Animation::AnimatedMeshState* state,
 				     CS::Animation::BoneID boneID,
 				     Animation::KeyFrame k1,
