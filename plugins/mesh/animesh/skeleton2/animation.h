@@ -129,8 +129,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       float& timeBefore, csQuaternion& beforeRot, csVector3& beforeOffset,
       float& timeAfter, csQuaternion& afterRot, csVector3& afterOffset);
 
+    inline virtual void BlendState (CS::Animation::AnimatedMeshState* state, 
+      float baseWeight, float playbackTime, bool isPlayingCyclic) const
+    { BlendState (state, baseWeight, playbackTime); }
     virtual void BlendState (CS::Animation::AnimatedMeshState* state, 
-      float baseWeight, float playbackTime, bool isPlayingCyclic) const;
+      float baseWeight, float playbackTime) const;
 
     virtual float GetDuration () const;
 
@@ -138,15 +141,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual bool GetFramesInBindSpace () const;
     virtual void ConvertFrameSpace (CS::Animation::iSkeletonFactory* skeleton);
 
-  private:
-    csString name;
-
+  public:
     struct KeyFrame
     {
       float time;
       csQuaternion rotation;
       csVector3 offset;
+
+      KeyFrame ()
+      : offset (0.0f) {}
     };
+
+  private:
+    csString name;
 
     static int KeyFrameCompare (KeyFrame const& k1, KeyFrame const& k2);
     static int KeyFrameTimeCompare (KeyFrame const& k, float const& t);

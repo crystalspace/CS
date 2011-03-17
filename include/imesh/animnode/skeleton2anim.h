@@ -233,13 +233,15 @@ struct iSkeletonAnimPacket : public virtual iBase
  * closest keyframes of the given playback time.
  *
  * For a given channel, if there is no keyframe defined before the current playing
- * time, then the null transform will be assumed. Therefore, you don't need to
- * define a keyframe at time 0 if its bind transform is null. Warning: this is only
- * valid when the BIND transform is null, ie the value after ConvertFrameSpace()
- * has been called.
+ * time (ie there are no keyframe defined for the time 0), then the last keyframe
+ * will be used as the first closest keyframe. Similarly, if there is no keyframe
+ * defined after the current playing time, then the first keyframe will be used as
+ * the second closest keyframe.
  *
- * Similarly, if there is no keyframe defined after the current playing
- * time, then the transform of the last keyframe will be assumed.
+ * This behavior of the transition bewteen the last and the first keyframes is useful
+ * for cyclic animations but may be surprising for animations which are not. A good
+ * practice when defining non cyclic animations is therefore to always define a
+ * keyframe for all channels at time 0 and at the last key time.
  *
  * When this animation is played by an CS::Animation::iSkeletonAnimationNode, it
  * calls the BlendState() method who will blend the animation at a given time
@@ -321,6 +323,7 @@ struct iSkeletonAnimation : public virtual iBase
    * \param afterRot The rotation of the bone for the key frame after the given time.
    * \param afterOffset The position of the bone for the key frame after the given time.
    */
+  CS_DEPRECATED_METHOD_MSG("Deprecated in 1.9. Don't use it anymore (or complain if you found a good reason to).")
   virtual void GetTwoKeyFrames (ChannelID channel, float time, BoneID& bone,
     float& timeBefore, csQuaternion& beforeRot, csVector3& beforeOffset,
     float& timeAfter, csQuaternion& afterRot, csVector3& afterOffset) = 0;
@@ -331,8 +334,9 @@ struct iSkeletonAnimation : public virtual iBase
    * \param state The skeletal state where the result will be blended.
    * \param baseWeight The base weight to be used for blending.
    * \param playbackTime The current playback time.
-   * \param isPlayingCyclic If the playing should be cyclic or not.
+   * \param isPlayingCyclic If the playing should be cyclic or not. This parameter is now ignored.
    */
+  CS_DEPRECATED_METHOD_MSG("Deprecated in 1.9. Use instead the version without the 'isPlayingCyclic' parameter.")
   virtual void BlendState (AnimatedMeshState* state, 
     float baseWeight, float playbackTime, bool isPlayingCyclic) const = 0;
 
@@ -418,6 +422,16 @@ struct iSkeletonAnimation : public virtual iBase
    */
   virtual void AddOrSetKeyFrame (ChannelID channel, float time, 
     const csVector3& offset) = 0;
+
+  /**
+   * Blend the animation into a skeletal state buffer at a specific playback 
+   * position.
+   * \param state The skeletal state where the result will be blended.
+   * \param baseWeight The base weight to be used for blending.
+   * \param playbackTime The current playback time.
+   */
+  virtual void BlendState (AnimatedMeshState* state, 
+    float baseWeight, float playbackTime) const = 0;
 };
 
 
