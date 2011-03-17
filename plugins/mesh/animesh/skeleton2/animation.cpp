@@ -375,20 +375,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     afterOffset = k2.offset;
   }  
 
-  // Apply the null keyframe
-  inline void ApplyNullKey (CS::Animation::AnimatedMeshState* state,
-			    CS::Animation::BoneID boneID,
-			    float baseWeight)
-  {
-    csQuaternion krot;
-    csVector3 kpos (0.0f);
-    csQuaternion& q = state->GetQuaternion (boneID);
-    csVector3& v = state->GetVector (boneID);
-    q = q.SLerp (krot, baseWeight);
-    v = csLerp (v, kpos, baseWeight);
-    state->SetBoneUsed (boneID);
-  }
-
   // Apply a specific keyframe
   inline void ApplySingleKey (CS::Animation::AnimatedMeshState* state,
 			      CS::Animation::BoneID boneID,
