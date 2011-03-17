@@ -265,7 +265,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       return;
 
     if (factory->animation)
-      factory->animation->BlendState (state, baseWeight, playbackPosition, factory->cyclic);
+      factory->animation->BlendState (state, baseWeight, playbackPosition);
   }
   
   void AnimationNode::TickAnimation (float dt)
