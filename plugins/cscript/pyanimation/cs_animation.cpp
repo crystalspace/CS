@@ -9288,7 +9288,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iSkeletonAnimation_BlendState(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iSkeletonAnimation_BlendState__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CS::Animation::iSkeletonAnimation *arg1 = (CS::Animation::iSkeletonAnimation *) 0 ;
   CS::Animation::AnimatedMeshState *arg2 = (CS::Animation::AnimatedMeshState *) 0 ;
@@ -9802,6 +9802,132 @@ fail:
     "  Possible C/C++ prototypes are:\n"
     "    AddOrSetKeyFrame(CS::Animation::iSkeletonAnimation *,CS::Animation::ChannelID,float,csQuaternion const &)\n"
     "    AddOrSetKeyFrame(CS::Animation::iSkeletonAnimation *,CS::Animation::ChannelID,float,csVector3 const &)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSkeletonAnimation_BlendState__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::iSkeletonAnimation *arg1 = (CS::Animation::iSkeletonAnimation *) 0 ;
+  CS::Animation::AnimatedMeshState *arg2 = (CS::Animation::AnimatedMeshState *) 0 ;
+  float arg3 ;
+  float arg4 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  float val3 ;
+  int ecode3 = 0 ;
+  float val4 ;
+  int ecode4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimation_BlendState",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonAnimation, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimation_BlendState" "', argument " "1"" of type '" "CS::Animation::iSkeletonAnimation const *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Animation::iSkeletonAnimation * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_CS__Animation__AnimatedMeshState, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSkeletonAnimation_BlendState" "', argument " "2"" of type '" "CS::Animation::AnimatedMeshState *""'"); 
+  }
+  arg2 = reinterpret_cast< CS::Animation::AnimatedMeshState * >(argp2);
+  ecode3 = SWIG_AsVal_float(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iSkeletonAnimation_BlendState" "', argument " "3"" of type '" "float""'");
+  } 
+  arg3 = static_cast< float >(val3);
+  ecode4 = SWIG_AsVal_float(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iSkeletonAnimation_BlendState" "', argument " "4"" of type '" "float""'");
+  } 
+  arg4 = static_cast< float >(val4);
+  ((CS::Animation::iSkeletonAnimation const *)arg1)->BlendState(arg2,arg3,arg4);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSkeletonAnimation_BlendState(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[6];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 5); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 4) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_CS__Animation__iSkeletonAnimation, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_CS__Animation__AnimatedMeshState, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        {
+          int res = SWIG_AsVal_float(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          {
+            int res = SWIG_AsVal_float(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            return _wrap_iSkeletonAnimation_BlendState__SWIG_1(self, args);
+          }
+        }
+      }
+    }
+  }
+  if (argc == 5) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_CS__Animation__iSkeletonAnimation, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_CS__Animation__AnimatedMeshState, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        {
+          int res = SWIG_AsVal_float(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          {
+            int res = SWIG_AsVal_float(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            {
+              int res = SWIG_AsVal_bool(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              return _wrap_iSkeletonAnimation_BlendState__SWIG_0(self, args);
+            }
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iSkeletonAnimation_BlendState'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    BlendState(CS::Animation::iSkeletonAnimation const *,CS::Animation::AnimatedMeshState *,float,float,bool)\n"
+    "    BlendState(CS::Animation::iSkeletonAnimation const *,CS::Animation::AnimatedMeshState *,float,float)\n");
   return NULL;
 }
 
@@ -17519,7 +17645,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonAnimation_GetKeyFrameCount", _wrap_iSkeletonAnimation_GetKeyFrameCount, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimation_GetKeyFrame", _wrap_iSkeletonAnimation_GetKeyFrame, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimation_GetTwoKeyFrames", _wrap_iSkeletonAnimation_GetTwoKeyFrames, METH_VARARGS, NULL},
-	 { (char *)"iSkeletonAnimation_BlendState", _wrap_iSkeletonAnimation_BlendState, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimation_GetDuration", _wrap_iSkeletonAnimation_GetDuration, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimation_SetKeyFrame", _wrap_iSkeletonAnimation_SetKeyFrame, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimation_SetFramesInBindSpace", _wrap_iSkeletonAnimation_SetFramesInBindSpace, METH_VARARGS, NULL},
@@ -17530,6 +17655,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonAnimation_SetChannelBone", _wrap_iSkeletonAnimation_SetChannelBone, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimation_RemoveChannel", _wrap_iSkeletonAnimation_RemoveChannel, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimation_AddOrSetKeyFrame", _wrap_iSkeletonAnimation_AddOrSetKeyFrame, METH_VARARGS, NULL},
+	 { (char *)"iSkeletonAnimation_BlendState", _wrap_iSkeletonAnimation_BlendState, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimation_scfGetVersion", _wrap_iSkeletonAnimation_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonAnimation", _wrap_delete_iSkeletonAnimation, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimation_swigregister", iSkeletonAnimation_swigregister, METH_VARARGS, NULL},
