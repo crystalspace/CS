@@ -3263,8 +3263,8 @@ void csEngine::UpdateAdaptiveLODs()
 static const csOptionDescription
   config_options[] =
 {
-  { 0, "fov", "Field of Vision", CSVAR_LONG },
-  { 1, "renderloop", "Override the default render loop", CSVAR_STRING },
+  csOptionDescription( 0, "fov", "Field of Vision", CSVAR_LONG ),
+  csOptionDescription( 1, "renderloop", "Override the default render loop", CSVAR_STRING )
 };
 const int NUM_OPTIONS =
 (

@@ -1801,9 +1801,9 @@ csPtr<iMeshObjectFactory> csSprite3DMeshObjectType::NewFactory ()
 
 static const csOptionDescription config_options [NUM_OPTIONS] =
 {
-  { 0, "sprlod_m", "Sprite LOD Level (m factor)", CSVAR_FLOAT },
-  { 1, "sprlod_a", "Sprite LOD Level (a factor)", CSVAR_FLOAT },
-  { 2, "sprlq", "Sprite Lighting Quality", CSVAR_LONG },
+  csOptionDescription( 0, "sprlod_m", "Sprite LOD Level (m factor)", CSVAR_FLOAT ),
+  csOptionDescription( 1, "sprlod_a", "Sprite LOD Level (a factor)", CSVAR_FLOAT ),
+  csOptionDescription( 2, "sprlq", "Sprite Lighting Quality", CSVAR_LONG )
 };
 
 bool csSprite3DMeshObjectType::SetOption (int id, csVariant* value)
