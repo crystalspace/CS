@@ -22,8 +22,10 @@
 
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
-#include "imap/modelload.h"
+#include "imap/loader.h"
 #include "imesh/animesh.h"
+#include "imesh/genmesh.h"
+#include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "iutil/stringarray.h"
@@ -40,14 +42,24 @@ namespace CS {
 namespace Mesh {
 
 csRef<iAnimatedMeshFactory> AnimatedMeshTools::LoadAnimesh
-(iModelLoader* loader, const char* factoryName, const char* filename)
+(iObjectRegistry* object_reg, iLoader* loader, const char* factoryName,
+ const char* filename)
 {
   // Load the base mesh
-  csRef<iMeshFactoryWrapper> factoryWrapper =
-    loader->Load (factoryName, filename);
-  if (!factoryWrapper)
+  csLoadResult result = loader->Load (filename);
+  if (!result.success)
   {
     ReportWarning ("Could not load mesh from file %s!",
+		   CS::Quote::Single (filename));
+    return (iAnimatedMeshFactory*) nullptr;
+  }
+
+  // Search for the factory wrapper
+  csRef<iMeshFactoryWrapper> factoryWrapper =
+    scfQueryInterface<iMeshFactoryWrapper> (result.result);
+  if (!factoryWrapper)
+  {
+    ReportWarning ("The object loaded from file %s is not a mesh factory!",
 		   CS::Quote::Single (filename));
     return (iAnimatedMeshFactory*) nullptr;
   }
@@ -58,9 +70,19 @@ csRef<iAnimatedMeshFactory> AnimatedMeshTools::LoadAnimesh
     (factoryWrapper->GetMeshObjectFactory ());
   if (!factory)
   {
-    ReportWarning ("The mesh loaded from file %s is not an animesh!",
-		   CS::Quote::Single (filename));
-    return (iAnimatedMeshFactory*) nullptr;
+    // If it is a genmesh then convert it to an animesh
+    csRef<iGeneralFactoryState> gmstate =
+      scfQueryInterface<iGeneralFactoryState> (factoryWrapper->GetMeshObjectFactory ());
+
+    if (gmstate)
+      factory = ImportGeneralMesh (object_reg, gmstate, true);
+
+    else
+    {
+      ReportWarning ("The mesh loaded from file %s is neither a genmesh nor an animesh!",
+		     CS::Quote::Single (filename));
+      return (iAnimatedMeshFactory*) nullptr;
+    }
   }
 
   return factory;
@@ -79,15 +101,17 @@ iAnimatedMeshFactory* AnimatedMeshTools::ImportSplittedMesh
     return nullptr;
   }
 
-  // Temporary hack: use explicitely the assimp loader
-  csRef<iPluginManager> plugmgr = 
-    csQueryRegistry<iPluginManager> (object_reg);
-  csRef<iModelLoader> loader =
-    csLoadPlugin<iModelLoader> (plugmgr, "crystalspace.mesh.loader.assimp");
+  // Find the main loader
+  csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
+  if (!loader)
+  {
+    ReportError ("Could not find the main loader!");
+    return nullptr;
+  }
 
   // Load the base mesh
   csRef<iAnimatedMeshFactory> meshFact =
-    LoadAnimesh (loader, factoryName, baseMesh);
+    LoadAnimesh (object_reg, loader, factoryName, baseMesh);
   if (!meshFact)
   {
     ReportError ("Error loading base mesh %s!",
@@ -95,7 +119,7 @@ iAnimatedMeshFactory* AnimatedMeshTools::ImportSplittedMesh
     return nullptr;
   }
 
-  // Find the base name of base mesh
+  // Find the base name of the base mesh
   csString baseName = baseMesh;
   size_t index = baseName.FindLast ('/');
   if (index != (size_t) -1)
@@ -124,7 +148,7 @@ iAnimatedMeshFactory* AnimatedMeshTools::ImportSplittedMesh
     // Load the animesh
     // TODO: don't load other data than the indices
     csRef<iAnimatedMeshFactory> morphFact =
-      LoadAnimesh (loader, factoryName, files->Get (i));
+      LoadAnimesh (object_reg, loader, factoryName, files->Get (i));
     if (!morphFact)
       continue;
 
@@ -159,17 +183,35 @@ bool AnimatedMeshTools::ImportMorphMesh
     engine = csQueryRegistry<iEngine> (object_reg);
     if (!engine)
     {
-      ReportError ("Could not find the engine");
-      return false;
+      ReportError ("Could not find the engine in order to delete the imported genmesh");
+      deleteMesh = false;
     }
+  }
+
+  // Check that the base mesh has some vertices
+  if (!baseMesh->GetVertexCount ())
+  {
+    ReportWarning
+      ("The base animesh has no vertices!",
+       CS::Quote::Single (morphName));
+
+    // Delete the mesh if needed
+    if (deleteMesh)
+    {
+      csRef<iMeshObjectFactory> factory =
+	scfQueryInterface<iMeshObjectFactory> (morphMesh);
+      engine->GetMeshFactories ()->Remove (factory->GetMeshFactoryWrapper ());
+    }
+
+    return false;
   }
 
   // Check that the two meshes have the same count of vertices
   if (baseMesh->GetVertexCount () != morphMesh->GetVertexCount ())
   {
     ReportWarning
-      ("The animesh for the morph target %s has a different count of vertices!",
-       CS::Quote::Single (morphName));
+      ("The animesh for the morph target %s has a different count of vertices (%i VS %i)!",
+       CS::Quote::Single (morphName), baseMesh->GetVertexCount (), morphMesh->GetVertexCount ());
 
     // Delete the mesh if needed
     if (deleteMesh)
@@ -227,6 +269,100 @@ bool AnimatedMeshTools::ImportMorphMesh
   }
 
   return true;
+}
+
+iAnimatedMeshFactory* AnimatedMeshTools::ImportGeneralMesh
+(iObjectRegistry* object_reg, iGeneralFactoryState* genmesh, bool deleteMesh)
+{
+  // Find a pointer to the engine
+  csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
+  if (!engine)
+  {
+    ReportError ("Could not find the engine");
+    return nullptr;
+  }
+
+  // Create the animesh factory
+  csRef<iMeshObjectFactory> genmeshFactory =
+    scfQueryInterface<iMeshObjectFactory> (genmesh);
+  csRef<iMeshFactoryWrapper> factoryWrapper = engine->CreateMeshFactory
+    ("crystalspace.mesh.object.animesh",
+     genmeshFactory->GetMeshFactoryWrapper ()->QueryObject ()->GetName ());
+
+  // Find the animesh interface
+  csRef<iAnimatedMeshFactory> factory =
+    scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
+    (factoryWrapper->GetMeshObjectFactory ());
+
+  // Copy the render buffers
+  csRef<iRenderBuffer> buffer;
+  if (genmesh->GetVertexCount ())
+  {
+    buffer = csRenderBuffer::CreateRenderBuffer
+      (genmesh->GetVertexCount (), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+    buffer->CopyInto (genmesh->GetVertices (), genmesh->GetVertexCount ());
+    factory->SetVertices (buffer);
+  }
+
+  if (genmesh->GetNormals ())
+  {
+    buffer = csRenderBuffer::CreateRenderBuffer
+      (genmesh->GetVertexCount (), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+    buffer->CopyInto (genmesh->GetNormals (), genmesh->GetVertexCount ());
+    factory->SetNormals (buffer);
+  }
+
+  if (genmesh->GetTexels ())
+  {
+    buffer = csRenderBuffer::CreateRenderBuffer
+      (genmesh->GetVertexCount (), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
+    buffer->CopyInto (genmesh->GetTexels (), genmesh->GetVertexCount ());
+    factory->SetTexCoords (buffer);
+  }
+
+  // Add all submeshes
+  for (size_t i = 0; i < genmesh->GetSubMeshCount (); i++)
+  {
+    iGeneralMeshSubMesh* subMesh = genmesh->GetSubMesh (i);
+    CS::Mesh::iAnimatedMeshSubMeshFactory* submeshFactory;
+
+    if (deleteMesh)
+      submeshFactory =
+	factory->CreateSubMesh (subMesh->GetIndices (), subMesh->GetName (), true);
+
+    else
+    {
+      // Copy the index buffer of the submesh
+      csRef<iRenderBuffer> indices = subMesh->GetIndices ();
+      buffer = csRenderBuffer::CreateIndexRenderBuffer
+	(indices->GetElementCount (), CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT,
+	 indices->GetRangeStart (), indices->GetRangeEnd ());
+
+      csTriangle* triangleData = (csTriangle*) indices->Lock (CS_BUF_LOCK_NORMAL);
+      buffer->CopyInto (triangleData, indices->GetElementCount ());
+      indices->Release ();
+
+      // Create the submesh
+      submeshFactory = factory->CreateSubMesh (buffer, subMesh->GetName (), true);
+    }
+
+    // Setup the material of the submesh
+    submeshFactory->SetMaterial (subMesh->GetMaterial ());
+    if (!i)
+      factoryWrapper->GetMeshObjectFactory ()->SetMaterialWrapper (subMesh->GetMaterial ());
+  }
+
+  factory->Invalidate ();
+
+  // Delete the genmesh if needed
+  if (deleteMesh)
+  {
+    csRef<iMeshObjectFactory> factory =
+      scfQueryInterface<iMeshObjectFactory> (genmesh);
+    engine->GetMeshFactories ()->Remove (factory->GetMeshFactoryWrapper ());
+  }
+
+  return factory;
 }
 
 } //namespace Mesh

@@ -28,7 +28,10 @@
 
 #include "ivaria/reporter.h"
 
-struct iModelLoader;
+#include "csutil/dirtyaccessarray.h"
+
+struct iGeneralFactoryState;
+struct iLoader;
 struct iObjectRegistry;
 
 namespace CS {
@@ -63,7 +66,8 @@ class CS_CRYSTALSPACE_EXPORT AnimatedMeshTools
 #endif
   }
 
-  static csRef<iAnimatedMeshFactory> LoadAnimesh (iModelLoader* loader,
+  static csRef<iAnimatedMeshFactory> LoadAnimesh (iObjectRegistry* object_reg,
+						  iLoader* loader,
 						  const char* factoryName,
 						  const char* filename);
 
@@ -98,20 +102,34 @@ class CS_CRYSTALSPACE_EXPORT AnimatedMeshTools
 
   /**
    * Create a new morph target in an animesh by importing the vertices from
-   * another animesh. The two animeshes must have the same vertices in the
-   * same order.
+   * another animesh.
    *
    * \param object_reg The object registry
    * \param baseMesh The base animesh where the morph target will be imported.
-   * \param morphMesh The animesh to import in the other as a new morph target.
+   * \param morphMesh The animesh to import into the other as a new morph target.
    * \param morphName The name of the new morph target
    * \param deleteMesh Whether or not the animesh \a morphMesh should be
    * removed from the engine.
+   *
+   * \warning The two animeshes must have the same vertices in the same order.
    */
   static bool ImportMorphMesh
     (iObjectRegistry* object_reg, iAnimatedMeshFactory* baseMesh,
      iAnimatedMeshFactory* morphMesh, const char* morphName,
-     bool deleteMesh = false);
+     bool deleteMesh = true);
+
+  /**
+   * Create a new animesh from a genmesh. It imports only the mesh part of the
+   * genmesh (ie vertices, indices, etc), not the animations.
+   *
+   * \param object_reg The object registry
+   * \param genmesh The genmesh to be imported
+   * \param deleteMesh Whether or not the genmesh should be removed from the engine.
+   */
+  static iAnimatedMeshFactory* ImportGeneralMesh
+    (iObjectRegistry* object_reg, iGeneralFactoryState* genmesh,
+     bool deleteMesh = true);
+
 };
 
 } //namespace Mesh
