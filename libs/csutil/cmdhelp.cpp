@@ -66,28 +66,28 @@ void csCommandLineHelper::PrintOption (const csOptionDescription& option, const 
   switch (option.type)
     {
     case CSVAR_BOOL:
-      opt.Format ("  -[no]%s", option.name);
-      desc.Format ("%s (%s) ", option.description, value.GetBool ()
+      opt.Format ("  -[no]%s", option.name.GetData ());
+      desc.Format ("%s (%s) ", option.description.GetData (), value.GetBool ()
 		   ? "yes" : "no");
       break;
     case CSVAR_CMD:
-      opt.Format ("  -%s", option.name);
-      desc = option.description;
+      opt.Format ("  -%s", option.name.GetData ());
+      desc = option.description.GetData ();
       break;
     case CSVAR_FLOAT:
-      opt.Format ("  -%s=<float>", option.name);
-      desc.Format ("%s (%g)", option.description, value.GetFloat ());
+      opt.Format ("  -%s=<float>", option.name.GetData ());
+      desc.Format ("%s (%g)", option.description.GetData (), value.GetFloat ());
       break;
     case CSVAR_LONG:
-      opt.Format ("  -%s=<int>", option.name);
-      desc.Format ("%s (%ld)", option.description, value.GetLong ());
+      opt.Format ("  -%s=<int>", option.name.GetData ());
+      desc.Format ("%s (%ld)", option.description.GetData (), value.GetLong ());
       break;
     case CSVAR_STRING:
-      opt.Format ("  -%s=<string>", option.name);
+      opt.Format ("  -%s=<string>", option.name.GetData ());
       if (value.GetString () && strlen (value.GetString ()))
-	desc.Format ("%s (%s)", option.description, value.GetString ());
+	desc.Format ("%s (%s)", option.description.GetData (), value.GetString ());
       else
-	desc.Format ("%s", option.description);
+	desc.Format ("%s", option.description.GetData ());
       break;
     default:
       // TODO: other types
