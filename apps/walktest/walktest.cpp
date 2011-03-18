@@ -256,27 +256,26 @@ void WalkTest::Help ()
 					  csVariant (false));
   commandLineHelper.AddCommandLineOption ("dupes", "Check for duplicate objects in multiple maps",
 					  csVariant (true));
-  commandLineHelper.AddCommandLineOption ("noprecache", "After loading don't precache to speed up rendering",
+  commandLineHelper.AddCommandLineOption ("noprecache",
+					  "After loading don't precache to speed up rendering",
 					  csVariant ());
   commandLineHelper.AddCommandLineOption ("bots", "Allow random generation of bots", csVariant ());
-  commandLineHelper.AddCommandLineOption ("saveable", csString ().Format ("Enable engine %s flag",
-									  CS::Quote::Single ("saveable")), csVariant ());
-  /*
-  // TODO: this line won't work if it is the last one...
-  commandLineHelper.AddCommandLineOption ("world", csString ().Format ("Use given world file instead of %s",
-								       CS::Quote::Single ("world")).GetData (), csVariant (""));
-  */
-  csString txt;
-  txt.Format ("Use given world file instead of %s", CS::Quote::Single ("world"));
-  commandLineHelper.AddCommandLineOption ("world", txt, csVariant (""));
+  commandLineHelper.AddCommandLineOption ("saveable",
+					  csString ().Format ("Enable engine %s flag",
+							      CS::Quote::Single ("saveable")),
+					  csVariant ());
+  commandLineHelper.AddCommandLineOption ("world",
+					  csString ().Format ("Use given world file instead of %s",
+							      CS::Quote::Single ("world")).GetData (),
+					  csVariant (""));
 
   // Printing help
   commandLineHelper.PrintApplicationHelp
     (object_reg, "walktest", "walktest [OPTIONS] [filename]", csString().Format
-     ("This is the quintessential test application for the project, and the application most"
-      " likely to be up-to-date any time a change is made to any part of the project. Developers"
-      " probably should not use this application as a guide for developing their own programs, as"
-      " it is not the best example in clean coding.\n\n"
+     ("This is the quintessential test application for Crystal Space. It allows mainly to load"
+      " world files and navigate into them.\n\n"
+      "Developers should probably not use this application as a guide for developing their own"
+      " programs, as it is not the best example in clean coding.\n\n"
       "More information is available on the usages of walktest in the Crystal Space manual\n\n"
       "If specified, walktest will load the map from the given VFS path instead of the default %s",
       CS::Quote::Single (cfg->GetStr ("Walktest.Settings.WorldFile", "world"))));
