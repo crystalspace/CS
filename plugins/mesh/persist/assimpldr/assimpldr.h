@@ -63,6 +63,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
  * Open Asset Import Library loader for Crystal Space
  */
 
+enum ImportType
+{
+  IMPORT_UNDEFINED = 0,
+  IMPORT_SCENE,
+  IMPORT_MODEL
+};
+
 enum NodeType
 {
   NODE_UNDEFINED = 0,
@@ -169,6 +176,7 @@ public:
   void ImportTexture (aiTexture* texture, size_t index);
   void ImportMaterial (aiMaterial* material, size_t index);
 
+  bool HasBone (aiNode* node);
   void InitSceneNode (aiNode* node);
   void AnalyzeSceneNode (aiNode* node, aiNode* animeshNode);
 
@@ -220,6 +228,8 @@ private:
 
   csRefArray<iTextureWrapper> textures;
   csRefArray<iMaterialWrapper> materials;
+
+  ImportType importType;
 
   // The first mesh factory encountered is used as the return value when needed
   csRef<iMeshFactoryWrapper> firstMesh;

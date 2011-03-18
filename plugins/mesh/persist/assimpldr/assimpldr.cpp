@@ -66,11 +66,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       | aiProcess_GenSmoothNormals // for optimized
       | aiProcess_GenUVCoords // needed only for texture based materials
       //| aiProcess_ImproveCacheLocality // optimization
-      | aiProcess_JoinIdenticalVertices // always needed
+      //| aiProcess_JoinIdenticalVertices // almost always needed. Causes problems when wanting to merge morph targets
       | aiProcess_LimitBoneWeights // Needed due to limitation of animeshes
       | aiProcess_MakeLeftHanded // always needed for CS
-      //| aiProcess_OptimizeGraph // only for models, not for scenes
-      | aiProcess_OptimizeMeshes // in all cases?
+      | aiProcess_OptimizeGraph // only for models, not for scenes
+      //| aiProcess_OptimizeMeshes // in all cases? Causes problems when wanting to merge morph targets
       //| aiProcess_PreTransformVertices // can be useful for genmeshes
       //| aiProcess_RemoveRedundantMaterials // in all cases?
       | aiProcess_SortByPType // always needed
@@ -136,6 +136,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     }
 
     // Import the scene into CS
+    importType = IMPORT_SCENE;
     ImportScene ();
 
     // TODO: list of failed factories
@@ -173,7 +174,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       return nullptr;
     }
 
-    // Import the scene into CS
+    // Import the model into CS
+    importType = IMPORT_MODEL;
     ImportScene ();
 
     return firstMesh;
@@ -215,7 +217,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       return nullptr;
     }
 
-    // Import the scene into CS
+    // Import the model into CS
+    importType = IMPORT_MODEL;
     ImportScene ();
 
     return firstMesh;
@@ -308,17 +311,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
     if (!scene->mRootNode)
       return;
 
-    // Analyze the scene tree
-    InitSceneNode (scene->mRootNode);
-    AnalyzeSceneNode (scene->mRootNode, nullptr);
+    // Import either the model or the whole scene
+    if (importType == IMPORT_MODEL)
+    {
+      // If there is any bone then this an animesh
+      if (HasBone (scene->mRootNode))
+	ImportAnimesh (scene->mRootNode);
 
-    printf ("\nImported scene tree:\n");
-    PrintImportNode (scene->mRootNode, "");
-    printf ("\n");
+      // Otherwise this is a genmesh
+      else ImportGenmesh (scene->mRootNode);
+    }
 
-    // Import the whole scene
-    // TODO: terrains, lights, cameras
-    ImportSceneNode (scene->mRootNode);
+    else
+    {
+      // Analyze the scene tree
+      InitSceneNode (scene->mRootNode);
+      AnalyzeSceneNode (scene->mRootNode, nullptr);
+
+      printf ("\nImported scene tree:\n");
+      PrintImportNode (scene->mRootNode, "");
+      printf ("\n");
+
+      // TODO: terrains, lights, cameras, null meshes with extra render meshes
+      ImportSceneNode (scene->mRootNode);
+    }
 
     // Import all animations
     for (unsigned int i = 0; i < scene->mNumAnimations; i++)
@@ -480,6 +496,34 @@ CS_PLUGIN_NAMESPACE_BEGIN(AssimpLoader)
       materialWrapper->GetMaterial ()->AddVariable (shaderVariables[i]);
 
     // TODO: import all other material properties
+  }
+
+  bool AssimpLoader::HasBone (aiNode* node)
+  {
+    // Check if any mesh of this node has any bone
+    for (unsigned int i = 0; i < node->mNumMeshes; i++)
+    {
+      aiMesh*& mesh = scene->mMeshes[node->mMeshes[i]];
+
+      // Check the validity of the mesh
+      if (!mesh->HasFaces ()
+	  || !mesh->HasPositions ())
+	continue;
+
+      // Check if there are any bones
+      if (mesh->mNumBones > 0)
+	return true;
+    }
+
+    // Check the child nodes
+    for (unsigned int i = 0; i < node->mNumChildren; i++)
+    {
+      aiNode*& subnode = node->mChildren[i];
+      if (HasBone (subnode))
+	return true;
+    }
+
+    return false;
   }
 
   void AssimpLoader::InitSceneNode (aiNode* node)
