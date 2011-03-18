@@ -602,7 +602,6 @@ bool CameraManager::GetMouseMoveEnabled ()
 
 void CameraManager::ResetCamera ()
 {
-  printf ("CameraManager::ResetCamera\n");
   if (camera)
   {
     csOrthoTransform transform (csMatrix3 (), startPosition);
