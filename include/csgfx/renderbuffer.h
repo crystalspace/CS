@@ -116,7 +116,6 @@ public:
   virtual size_t GetOffset () const
   { return props.offset; }
 
-  /// Get version
   virtual uint GetVersion ()
   {
     return version;
