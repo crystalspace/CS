@@ -298,9 +298,9 @@ struct csOptionDescription
   /// Description index (or ID)
   int id;
   /// Short name of this option.
-  const char* name;
+  csString name;
   /// Description for this option.
-  const char* description;
+  csString description;
   /// Type to use for this option.
   csVariantType type;
 
