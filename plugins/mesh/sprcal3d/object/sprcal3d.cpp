@@ -168,7 +168,7 @@ void csSpriteCal3DMeshObjectFactory::LastCalError::Report (iObjectRegistry* objr
     text << " " << CS::Quote::Single (text);
   }
 
-  text << " in " << file << "(" << line;
+  text << " in " << file << "(" << line << ")";
   if (msg && (*msg != 0))
     text << "]";
 
