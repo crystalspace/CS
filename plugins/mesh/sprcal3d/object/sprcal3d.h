@@ -211,6 +211,23 @@ private:
 
   /// Material handle as returned by iTextureManager.
   iMeshFactoryWrapper* logparent;
+  
+  /// Container for last Cal3D error
+  class LastCalError
+  {
+    csString descr;
+    csString text;
+    csString file;
+    int line;
+  public:
+    void Clear ();
+    void Stash ();
+    void Report (iObjectRegistry* objreg,
+		 int severity,
+		 const char* msgId,
+		 const char* msg);
+  };
+  LastCalError lastError;
 
   csSpriteCal3DMeshObjectType* sprcal3d_type;
 

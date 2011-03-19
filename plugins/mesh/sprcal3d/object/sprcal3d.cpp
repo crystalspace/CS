@@ -78,29 +78,6 @@ CS_LEAKGUARD_IMPLEMENT (csSpriteCal3DMeshObjectFactory);
 #define CS_BUFCOMP_CALINDEX   CS_BUFCOMP_UNSIGNED_INT
 #endif
 
-static void ReportCalError (iObjectRegistry* objreg, const char* msgId, 
-                const char* msg)
-{
-  csString text;
-
-  if (msg && (*msg != 0))
-    text << msg << " [";
-  text << "Cal3d: " << CalError::getLastErrorDescription().data();
-
-  if (CalError::getLastErrorText ().size () > 0)
-  {
-    text << " " << CS::Quote::Single (CalError::getLastErrorText().data());
-  }
-
-  text << " in " << CalError::getLastErrorFile().data() << "(" << 
-    CalError::getLastErrorLine ();
-  if (msg && (*msg != 0))
-    text << "]";
-
-  csReport (objreg, CS_REPORTER_SEVERITY_ERROR, msgId,
-    "%s", text.GetData());
-}
-
 //--------------------------------------------------------------------------
 
 csSpriteCal3DSocket::csSpriteCal3DSocket() : scfImplementationType (this)
@@ -159,6 +136,47 @@ size_t csSpriteCal3DSocket::FindSecondary (const char* mesh_name)
 
 //--------------------------------------------------------------------------
 
+void csSpriteCal3DMeshObjectFactory::LastCalError::Clear ()
+{
+  text.Empty();
+  descr.Empty();
+  file.Empty();
+  line = -1;
+}
+
+void csSpriteCal3DMeshObjectFactory::LastCalError::Stash ()
+{
+  text = CalError::getLastErrorText().data();
+  descr = CalError::getLastErrorDescription().data();
+  file = CalError::getLastErrorFile().data();
+  line = CalError::getLastErrorLine();
+}
+
+void csSpriteCal3DMeshObjectFactory::LastCalError::Report (iObjectRegistry* objreg,
+							   int severity,
+							   const char* msgId,
+							   const char* msg)
+{
+  csString text;
+
+  if (msg && (*msg != 0))
+    text << msg << " [";
+  text << "Cal3d: " << descr;
+
+  if (text.Length() > 0)
+  {
+    text << " " << CS::Quote::Single (text);
+  }
+
+  text << " in " << file << "(" << line;
+  if (msg && (*msg != 0))
+    text << "]";
+
+  csReport (objreg, severity, msgId, "%s", text.GetData());
+}
+
+//--------------------------------------------------------------------------
+
 void csSpriteCal3DMeshObjectFactory::Report (int severity, const char* msg, ...)
 {
   va_list arg;
@@ -198,7 +216,8 @@ bool csSpriteCal3DMeshObjectFactory::Create(const char* /*name*/)
 
 void csSpriteCal3DMeshObjectFactory::ReportLastError ()
 {
-  ReportCalError (object_reg, "crystalspace.mesh.sprite.cal3d", 0);
+  lastError.Report (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    "crystalspace.mesh.sprite.cal3d", "");
 }
 
 void csSpriteCal3DMeshObjectFactory::SetBasePath(const char *path)
@@ -221,6 +240,7 @@ void csSpriteCal3DMeshObjectFactory::AbsoluteRescaleFactory(float factor)
 bool csSpriteCal3DMeshObjectFactory::LoadCoreSkeleton (iVFS *vfs,
     const char *filename, int loadFlags)
 {
+  lastError.Clear ();
   csString path(basePath);
   path.Append(filename);
   csRef<iDataBuffer> file = vfs->ReadFile (path);
@@ -229,6 +249,7 @@ bool csSpriteCal3DMeshObjectFactory::LoadCoreSkeleton (iVFS *vfs,
     CalLoader::setLoadingMode (loadFlags);
     CalCoreSkeletonPtr skel = CalLoader::loadCoreSkeleton (
         (void *)file->GetData() );
+    lastError.Stash();
     if (skel)
     {
       calCoreModel.setCoreSkeleton (skel.get());
@@ -250,6 +271,7 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreAnimation (
     int idle_pct, bool lock,
     int loadFlags)
 {
+  lastError.Clear ();
   csString path(basePath);
   path.Append(filename);
   csRef<iDataBuffer> file = vfs->ReadFile (path);
@@ -258,6 +280,7 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreAnimation (
     CalLoader::setLoadingMode (loadFlags);
     CalCoreAnimationPtr anim = CalLoader::loadCoreAnimation (
         (void*)file->GetData(), calCoreModel.getCoreSkeleton() );
+    lastError.Stash();
     if (anim)
     {
       int id = calCoreModel.addCoreAnimation(anim.get());
@@ -279,6 +302,8 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreAnimation (
         std::string str(name);
         calCoreModel.addAnimationName (str,id);
       }
+      else
+	lastError.Stash();
       return id;
     }
     return -1;
@@ -293,6 +318,7 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMesh (
     iMaterialWrapper *defmat,
     int loadFlags)
 {
+  lastError.Clear ();
   csString path(basePath);
   path.Append(filename);
   csRef<iDataBuffer> file = vfs->ReadFile (path);
@@ -301,11 +327,13 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMesh (
     csCal3DMesh *mesh = new csCal3DMesh;
     CalLoader::setLoadingMode (loadFlags);
     CalCoreMeshPtr coremesh = CalLoader::loadCoreMesh((void*)file->GetData() );
+    lastError.Stash();
     if (coremesh)
     {
       mesh->calCoreMeshID = calCoreModel.addCoreMesh(coremesh.get());
       if (mesh->calCoreMeshID == -1)
       {
+	lastError.Stash();
         delete mesh;
         return false;
       }
@@ -329,6 +357,8 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMorphTarget (
     const char *name,
     int loadFlags)
 {
+  lastError.Clear ();
+
   if (mesh_index < 0 || meshes.GetSize () <= (size_t)mesh_index)
   {
     return -1;
@@ -341,6 +371,7 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMorphTarget (
   {
     CalLoader::setLoadingMode (loadFlags);
     CalCoreMeshPtr core_mesh = CalLoader::loadCoreMesh((void *)file->GetData() );
+    lastError.Stash();
     if(core_mesh.get() == 0)
       return -1;
     
@@ -348,6 +379,7 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMorphTarget (
                            addAsMorphTarget(core_mesh.get());
     if(morph_index == -1)
     {
+      lastError.Stash();
       return -1;
     }
     meshes[mesh_index]->morph_target_name.Push(name);
