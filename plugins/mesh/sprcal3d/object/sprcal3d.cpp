@@ -285,7 +285,7 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreAnimation (
     {
       csSpriteCal3DMeshObjectType::CalLoaderLock lock (sprcal3d_type);
       CalLoader::setLoadingMode (loadFlags);
-      CalCoreAnimationPtr anim = CalLoader::loadCoreAnimation (
+      anim = CalLoader::loadCoreAnimation (
         (void*)file->GetData(), calCoreModel.getCoreSkeleton() );
       lastError.Stash();
       if (anim)
