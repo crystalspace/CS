@@ -201,11 +201,6 @@ void csSpriteCal3DMeshObjectFactory::ReportLastError ()
   ReportCalError (object_reg, "crystalspace.mesh.sprite.cal3d", 0);
 }
 
-void csSpriteCal3DMeshObjectFactory::SetLoadFlags(int flags)
-{
-  CalLoader::setLoadingMode(flags);
-}
-
 void csSpriteCal3DMeshObjectFactory::SetBasePath(const char *path)
 {
   basePath = path;
@@ -224,13 +219,14 @@ void csSpriteCal3DMeshObjectFactory::AbsoluteRescaleFactory(float factor)
 }
 
 bool csSpriteCal3DMeshObjectFactory::LoadCoreSkeleton (iVFS *vfs,
-    const char *filename)
+    const char *filename, int loadFlags)
 {
   csString path(basePath);
   path.Append(filename);
   csRef<iDataBuffer> file = vfs->ReadFile (path);
   if (file)
   {
+    CalLoader::setLoadingMode (loadFlags);
     CalCoreSkeletonPtr skel = CalLoader::loadCoreSkeleton (
         (void *)file->GetData() );
     if (skel)
@@ -251,13 +247,15 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreAnimation (
     int type,
     float base_vel, float min_vel, float max_vel,
     int min_interval, int max_interval,
-    int idle_pct, bool lock)
+    int idle_pct, bool lock,
+    int loadFlags)
 {
   csString path(basePath);
   path.Append(filename);
   csRef<iDataBuffer> file = vfs->ReadFile (path);
   if (file)
   {
+    CalLoader::setLoadingMode (loadFlags);
     CalCoreAnimationPtr anim = CalLoader::loadCoreAnimation (
         (void*)file->GetData(), calCoreModel.getCoreSkeleton() );
     if (anim)
@@ -292,7 +290,8 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMesh (
     iVFS *vfs,const char *filename,
     const char *name,
     bool attach,
-    iMaterialWrapper *defmat)
+    iMaterialWrapper *defmat,
+    int loadFlags)
 {
   csString path(basePath);
   path.Append(filename);
@@ -300,6 +299,7 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMesh (
   if (file)
   {
     csCal3DMesh *mesh = new csCal3DMesh;
+    CalLoader::setLoadingMode (loadFlags);
     CalCoreMeshPtr coremesh = CalLoader::loadCoreMesh((void*)file->GetData() );
     if (coremesh)
     {
@@ -326,7 +326,8 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMesh (
 int csSpriteCal3DMeshObjectFactory::LoadCoreMorphTarget (
     iVFS *vfs,int mesh_index,
     const char *filename,
-    const char *name)
+    const char *name,
+    int loadFlags)
 {
   if (mesh_index < 0 || meshes.GetSize () <= (size_t)mesh_index)
   {
@@ -338,6 +339,7 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMorphTarget (
   csRef<iDataBuffer> file = vfs->ReadFile (path);
   if (file)
   {
+    CalLoader::setLoadingMode (loadFlags);
     CalCoreMeshPtr core_mesh = CalLoader::loadCoreMesh((void *)file->GetData() );
     if(core_mesh.get() == 0)
       return -1;

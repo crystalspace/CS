@@ -96,7 +96,7 @@ struct CalAnimationCallback;
  */
 struct iSpriteCal3DFactoryState : public virtual iBase
 {
-  SCF_INTERFACE (iSpriteCal3DFactoryState, 1, 0, 1);
+  SCF_INTERFACE (iSpriteCal3DFactoryState, 2, 0, 0);
 
   /// Initialize internal Cal3d data structures.
   virtual bool Create(const char *name) = 0;
@@ -109,9 +109,9 @@ struct iSpriteCal3DFactoryState : public virtual iBase
   virtual void ReportLastError () = 0;
 
   /**
-   * This function sets the flags, which the factory sets in CalLoader
-   * when loading new models.
+   * \deprecated Deprecated in 1.9. Pass load flags to Load*() functions instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Pass load flags to Load*() functions instead")
   virtual void SetLoadFlags(int flags) = 0;
 
   /**
@@ -122,8 +122,10 @@ struct iSpriteCal3DFactoryState : public virtual iBase
 
   /**
    * This loads the supplied file as the skeleton data for the sprite.
+   * \param loadFlags Cal3d loader flags.
    */
-  virtual bool LoadCoreSkeleton(iVFS *vfs,const char *filename) = 0;
+  virtual bool LoadCoreSkeleton (iVFS *vfs,const char *filename,
+				 int loadFlags = 0) = 0;
 
   /**
    * This function resizes all instances of this factory permanently.
@@ -161,6 +163,7 @@ struct iSpriteCal3DFactoryState : public virtual iBase
    *   frame or not. If not locked, the action will return to the base keyframe
    *   when complete.  If locked, the action will stay in the final keyframe
    *   position until cleared.  (This is usually for anims like "death".)
+   * \param loadFlags Cal3d loader flags.
    */
   virtual int LoadCoreAnimation(
 	iVFS *vfs,
@@ -173,7 +176,8 @@ struct iSpriteCal3DFactoryState : public virtual iBase
         int min_interval,
         int max_interval,
         int idle_pct,
-        bool lock) = 0;
+        bool lock,
+	int loadFlags = 0) = 0;
 
   /**
    * This loads a submesh which will attach to this skeleton.
@@ -185,9 +189,11 @@ struct iSpriteCal3DFactoryState : public virtual iBase
    * later.
    * defmat is the material which should be used when the object is created,
    * if any.
+   * \param loadFlags Cal3d loader flags.
    */
   virtual int LoadCoreMesh(iVFS *vfs,const char *filename,
-  	const char *name,bool attach,iMaterialWrapper *defmat) = 0;
+  	const char *name,bool attach,iMaterialWrapper *defmat,
+	int loadFlags = 0) = 0;
 
   /**
    * This adds a mesh as a morph target of another mesh.
@@ -197,11 +203,13 @@ struct iSpriteCal3DFactoryState : public virtual iBase
    *   target to.
    * \param filename The name of the file of the mesh of the morph tarrget.
    * \param name The name of the morph target.
+   * \param loadFlags Cal3d loader flags.
    *
    * \return The index of the morph target.
    */
   virtual int LoadCoreMorphTarget(iVFS *vfs, int mesh_index,
-  	const char *filename, const char *name) = 0;
+  	const char *filename, const char *name,
+	int loadFlags = 0) = 0;
 
   /**
    * This adds a new morph animation.
