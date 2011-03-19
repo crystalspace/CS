@@ -1058,6 +1058,7 @@ private:
   csRef<iVirtualClock> vc;
   csWeakRef<iEngine> engine;
 
+  CS::Threading::Mutex loaderLock;
 public:
   float updateanim_sqdistance1;
   int updateanim_skip1;		// 0 is normal, > 0 is skip
@@ -1086,6 +1087,17 @@ public:
   /// New Factory.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
   /** @} */
+  
+  /**
+   * Scoped lock to serialize access to Cal loader.
+   * This is needed because the Cal3D loader uses global variables during loading.
+   */
+  class CalLoaderLock
+  {
+    CS::Threading::MutexScopedLock theLock;
+  public:
+    CalLoaderLock (csSpriteCal3DMeshObjectType* objType) : theLock (objType->loaderLock) {}
+  };
 };
 
 }

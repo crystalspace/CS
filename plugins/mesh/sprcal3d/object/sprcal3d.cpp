@@ -246,10 +246,13 @@ bool csSpriteCal3DMeshObjectFactory::LoadCoreSkeleton (iVFS *vfs,
   csRef<iDataBuffer> file = vfs->ReadFile (path);
   if (file)
   {
-    CalLoader::setLoadingMode (loadFlags);
-    CalCoreSkeletonPtr skel = CalLoader::loadCoreSkeleton (
-        (void *)file->GetData() );
-    lastError.Stash();
+    CalCoreSkeletonPtr skel;
+    {
+      csSpriteCal3DMeshObjectType::CalLoaderLock lock (sprcal3d_type);
+      CalLoader::setLoadingMode (loadFlags);
+      skel = CalLoader::loadCoreSkeleton ((void *)file->GetData() );
+      lastError.Stash();
+    }
     if (skel)
     {
       calCoreModel.setCoreSkeleton (skel.get());
@@ -277,13 +280,22 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreAnimation (
   csRef<iDataBuffer> file = vfs->ReadFile (path);
   if (file)
   {
-    CalLoader::setLoadingMode (loadFlags);
-    CalCoreAnimationPtr anim = CalLoader::loadCoreAnimation (
+    CalCoreAnimationPtr anim;
+    int id = -1;
+    {
+      csSpriteCal3DMeshObjectType::CalLoaderLock lock (sprcal3d_type);
+      CalLoader::setLoadingMode (loadFlags);
+      CalCoreAnimationPtr anim = CalLoader::loadCoreAnimation (
         (void*)file->GetData(), calCoreModel.getCoreSkeleton() );
-    lastError.Stash();
+      lastError.Stash();
+      if (anim)
+      {
+	id = calCoreModel.addCoreAnimation(anim.get());
+	lastError.Stash();
+      }
+    }
     if (anim)
     {
-      int id = calCoreModel.addCoreAnimation(anim.get());
       if (id != -1)
       {
         csCal3DAnimation *an = new csCal3DAnimation;
@@ -302,8 +314,6 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreAnimation (
         std::string str(name);
         calCoreModel.addAnimationName (str,id);
       }
-      else
-	lastError.Stash();
       return id;
     }
     return -1;
@@ -325,18 +335,25 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMesh (
   if (file)
   {
     csCal3DMesh *mesh = new csCal3DMesh;
-    CalLoader::setLoadingMode (loadFlags);
-    CalCoreMeshPtr coremesh = CalLoader::loadCoreMesh((void*)file->GetData() );
-    lastError.Stash();
+    CalCoreMeshPtr coremesh;
+    {
+      csSpriteCal3DMeshObjectType::CalLoaderLock lock (sprcal3d_type);
+      CalLoader::setLoadingMode (loadFlags);
+      coremesh = CalLoader::loadCoreMesh((void*)file->GetData() );
+      lastError.Stash();
+      if (coremesh)
+      {
+	mesh->calCoreMeshID = calCoreModel.addCoreMesh(coremesh.get());
+	if (mesh->calCoreMeshID == -1)
+	{
+	  lastError.Stash();
+	  delete mesh;
+	  return false;
+	}
+      }
+    }
     if (coremesh)
     {
-      mesh->calCoreMeshID = calCoreModel.addCoreMesh(coremesh.get());
-      if (mesh->calCoreMeshID == -1)
-      {
-	lastError.Stash();
-        delete mesh;
-        return false;
-      }
       mesh->name              = name;
       mesh->attach_by_default = attach;
       mesh->default_material  = defmat;
@@ -369,6 +386,7 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMorphTarget (
   csRef<iDataBuffer> file = vfs->ReadFile (path);
   if (file)
   {
+    csSpriteCal3DMeshObjectType::CalLoaderLock lock (sprcal3d_type);
     CalLoader::setLoadingMode (loadFlags);
     CalCoreMeshPtr core_mesh = CalLoader::loadCoreMesh((void *)file->GetData() );
     lastError.Stash();
