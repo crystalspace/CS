@@ -26,6 +26,7 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
+#include <../plugins/utilities/movierecorder/lzoconf.h>
 
 
 csCommandLineHelper::csCommandLineHelper ()
@@ -39,11 +40,9 @@ void csCommandLineHelper::PrintTitle (const char* title, unsigned int level)
 {
   csString txt = title;
   if (!level) txt = txt.Upcase ();
-  csPrintf ("\n%s\n", txt.GetData ());
-  const char* line = level > 1 ? "-" : "=";
-  for (size_t i = 0; i < strlen (title); i++)
-    csPrintf (line);
-  csPrintf ("\n\n");    
+  csString underline;
+  underline.PadRight (txt.Length(), level > 1 ? '-' : '=');
+  csPrintf ("\n%s\n%s\n\n", txt.GetData (), underline.GetData());
 }
 
 void csCommandLineHelper::PrintOption (const char* name, const char* description, const csVariant& value)
