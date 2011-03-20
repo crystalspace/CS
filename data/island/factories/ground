@@ -1,0 +1,28 @@
+<library>
+
+    <textures>
+        <texture name="ground01.jpg">
+            <file>textures/ground01.jpg</file>
+        </texture>
+    </textures>
+
+    <materials>
+        <material name="ground01">
+	    <texture>ground01.jpg</texture> 
+        </material>
+    </materials>
+
+    <meshfact name="ground">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <zuse />
+        <params>
+            <material>ground01</material>
+            <v nx="0" ny="1" nz="0" u="25.508" v="13.19" x="-10000.0" y="0.0" z="-10000.0" />
+            <v nx="0" ny="1" nz="0" u="23.3935" v="9.38565" x="-10000.0" y="0.0" z="10000.0" />
+            <v nx="0" ny="1" nz="0" u="20.834" v="12.5587" x="10000.0" y="0.0" z="-10000.0" />
+            <v nx="0" ny="1" nz="0" u="22.7134" v="17.0958" x="10000.0" y="0.0" z="10000.0" />
+            <t v1="0" v2="1" v3="3" />
+            <t v1="3" v2="2" v3="0" />
+        </params>
+    </meshfact>
+</library>

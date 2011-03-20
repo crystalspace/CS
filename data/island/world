@@ -6,76 +6,45 @@
     <plugins>
         <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
         <plugin name="genmeshfact">crystalspace.mesh.loader.factory.genmesh</plugin>
-        <plugin name="waterfact">crystalspace.mesh.loader.factory.watermesh</plugin>
-        <plugin name="water">crystalspace.mesh.loader.watermesh</plugin>
+        <plugin name="emitFact">crystalspace.mesh.loader.factory.emit</plugin>
+        <plugin name="emit">crystalspace.mesh.loader.emit</plugin>
     </plugins>
     <shaders>
         <shader>
-            <file>/shader/reflect/water_plane.xml</file>
-        </shader>
-        <shader>
-            <file>/shader/water/water.xml</file>
-        </shader>
-        <shader>
             <file>/shader/lighting/fullbright.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/particles/basic.xml</file>
         </shader>
     </shaders>
     <textures>
-        <texture name="normal map 1">
-            <file>/water/723-normal.jpg</file>
-        </texture>
-        <texture name="normal map 2">
-            <file>/water/w_normalmap.png</file>
-        </texture>
-        <texture name="normal map 3">
-            <file>/water/940-bump.jpg</file>
-        </texture>
-        <texture name="sky_001.dds">
-            <file>textures/sky_001.dds</file>
-        </texture>
-        <texture name="BUMPgeneric_water_001_ani">
-            <file>textures/generic_water_001_ani</file>
-            <class>normalmap</class>
-            <mipmap>no</mipmap>
-        </texture>
-        <texture name="water_envmap_01.dds">
-            <file>textures/water_envmap_01.dds</file>
+        <texture name="fp2">
+            <file>/lib/stdtex/fp2.png</file>
         </texture>
     </textures>
     <materials>
-        <material name="oceanmat">
-            <shader type="standard">water</shader>
-            <shadervar name="tex normal" type="texture">normal map 2</shadervar>
-        </material>
         <material name="sky_001">
             <texture>sky_001.dds</texture>
             <shader type="base">lighting_fullbright</shader>
             <shader type="diffuse">*null</shader>
         </material>
-        <material name="water_01">
-            <shader type="base">reflect_water_plane</shader>
-            <shader type="diffuse">reflect_water_plane</shader>
-            <shadervar name="tex normal" type="texture">BUMPgeneric_water_001_ani</shadervar>
-            <shadervar name="tex environment" type="texture">water_envmap_01.dds</shadervar>
-            <shadervar name="water fog color" type="vector4">0.4,0.7,0.9,0.5</shadervar>
-            <shadervar name="water perturb scale" type="vector4">10,10,0,0</shadervar>
-            <shadervar name="specular" type="vector4">0.4,0.7,0.9,1</shadervar>
+        <material name="fp2">
+            <texture>fp2</texture>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">particles_basic</shader>
         </material>
     </materials>
-    <meshfact name="oceanfact">
-        <plugin>waterfact</plugin>
-        <params>
-	  <length>1000</length>
-	  <width>1000</width>
-            <isocean>no</isocean>
-        </params>
-    </meshfact>
     <library>terrain.cslib</library>
     <library>factories/skydome_frankieisland_SkyDome</library>
+    <library>factories/ground</library>
     <library>factories/water</library>
+    <meshfact name="emitFact">
+        <plugin>emitFact</plugin>
+        <params />
+    </meshfact>
     <start>
         <sector>TerrainSector</sector>
-        <position x="500" y="200" z="500" />
+        <position x="263" y="70" z="406" />
         <forward x="0" y="0" z="1" />
         <up x="0" y="1" z="0" />
     </start>
@@ -95,27 +64,6 @@
             </move>
             <priority>wall</priority>
         </meshobj>
-        <meshobj name="ocean">
-            <plugin>water</plugin>
-            <params>
-                <factory>oceanfact</factory>
-                <material>oceanmat</material>
-            </params>
-            <move>
-                <v x="-250" y="50" z="-250" />
-            </move>
-        </meshobj>
-        <!--meshobj name="oceanreflect">
-            <plugin>water</plugin>
-            <params>
-                <factory>oceanfact</factory>
-                <material>oceanmat</material>
-            </params>
-            <move>
-	        <rotate x="3.1415927" />
-                <v x="-250" y="50" z="-250" />
-            </move>
-        </meshobj-->
         <meshobj name="skydome_frankieisland_SkyDome">
             <plugin>genmesh</plugin>
             <params>
@@ -131,7 +79,7 @@
                 <v x="5000" y="0" z="5000" />
             </move>
         </meshobj>
-        <!--meshobj name="water">
+        <meshobj name="water">
             <plugin>genmesh</plugin>
             <noshadowreceive />
             <priority>alpha</priority>
@@ -141,10 +89,113 @@
             <trimesh>
                 <id>colldet</id>
             </trimesh>
+            <move>
+                <v x="0.0" y="50.0" z="0.0" />
+            </move>
+            <zuse />
+        </meshobj>
+        <meshobj name="ground">
+            <plugin>genmesh</plugin>
+            <noshadowreceive />
+            <priority>alpha</priority>
+            <params>
+                <factory>ground</factory>
+            </params>
+            <trimesh>
+                <id>colldet</id>
+            </trimesh>
             <zuse />
             <move>
-                <v x="15.022" y="1.9622" z="15.8728" />
+                <v x="0.0" y="38.0" z="0.0" />
             </move>
-        </meshobj-->
+        </meshobj>
+        <meshobj name="emit10">
+            <priority>alpha</priority>
+            <plugin>emit</plugin>
+            <ztest />
+            <move>
+                <v x="165.7" y="136.2" z="300.9" />
+            </move>
+            <params>
+                <factory>emitFact</factory>
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <number>30</number>
+                <material>fp2</material>
+                <regularparticles sides="8" radius="9" />
+                <lighting>no</lighting>
+                <totaltime>30000</totaltime>
+                <startpos>
+                    <emitsphere x="0" y="0.5" z="0" p="0" q="4" />
+                </startpos>
+                <startspeed>
+                    <emitsphere x="-0.3" y="0" z="0" p="0" q="3" />
+                </startspeed>
+                <startaccel>
+                    <emitfixed x="0" y="0.2" z="0" />
+                </startaccel>
+                <attractor>
+                    <emitcone x="0" y="-100.0" z="0" p="-0.7" q="0" r=".4" s="0" t="300" />
+                </attractor>
+                <attractorforce>-0.001</attractorforce>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>0</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>0.5</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>50</time>
+                    <alpha>0</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>0.5</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="0.2" />
+                    <time>150</time>
+                    <alpha>0.2</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>1</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="0.5" blue="0.2" />
+                    <time>250</time>
+                    <alpha>0.5</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>1</rotspeed>
+                    <scale>0.8</scale>
+                </aging>
+                <aging>
+                    <color red="0.2" green="0.2" blue="0.2" />
+                    <time>300</time>
+                    <alpha>0.5</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0.7</rotspeed>
+                    <scale>1.5</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0" blue="0" />
+                    <time>1500</time>
+                    <alpha>0.4</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0.6</rotspeed>
+                    <scale>1.5</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0" blue="0" />
+                    <time>30000</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>10</scale>
+                </aging>
+            </params>
+        </meshobj>
     </sector>
 </world>
