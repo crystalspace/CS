@@ -254,7 +254,7 @@
 
         <meshgen name="grass">
             <densityfactormap name="fertile">
-                <image>meshmaps/00000_00000.png</image>
+                <image>meshmaps/00000_00000.PNG</image>
                 <!--world2image>
 		    <m11>0.001953125</m11><m12>0</m12><m13>0</m13><m14>0.5</m14>
 		    <m21>0</m21><m22>0</m22><m23>-0.001953125</m23><m24>0.5</m24>
