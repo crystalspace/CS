@@ -365,8 +365,7 @@ class CS_CRYSTALSPACE_EXPORT CameraManager : public csBaseEventHandler
  * - management of the camera (class CS::Demo::CameraManager).
  * - display of the available keys, Crystal Space logo and other informations
  * (class CS::Demo::HUDManager).
- * - management of the command line's help (class CS::Demo::CommandLineHelper).
- * - screenshots (F12 key)
+ * - screenshots
  *
  * Here is an example for the most simple use of this class:
  * \code

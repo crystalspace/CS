@@ -117,6 +117,8 @@ void HUDManager::Frame ()
   if (!g3d || !g2d || !vc) return;
 #endif
 
+  if (!enabled) return;
+
   // Tell the 3D driver we're going to display 2D things.
   if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS))
     return;
@@ -690,6 +692,13 @@ DemoApplication::DemoApplication (const char* applicationName)
   : mouseInitialized (false)
 {
   SetApplicationName (applicationName);
+
+  // Initialize the default key descriptions
+  hudManager.keyDescriptions.Push ("arrow keys: move camera");
+  hudManager.keyDescriptions.Push ("SHIFT-arrow keys: lateral motion");
+  hudManager.keyDescriptions.Push ("CTRL-arrow keys: speedier motion");
+  hudManager.keyDescriptions.Push ("F9: toggle HUD");
+  hudManager.keyDescriptions.Push ("F12: screenshot");
 }
 
 DemoApplication::~DemoApplication ()
@@ -780,10 +789,6 @@ bool DemoApplication::Application ()
 
   // Initialize the camera and HUD managers
   hudManager.Initialize (GetObjectRegistry ());
-  hudManager.keyDescriptions.Push ("arrow keys: move camera");
-  hudManager.keyDescriptions.Push ("SHIFT-arrow keys: lateral motion");
-  hudManager.keyDescriptions.Push ("CTRL-arrow keys: speedier motion");
-
   cameraManager.Initialize (GetObjectRegistry ());
 
   return true;
@@ -924,6 +929,14 @@ bool DemoApplication::OnKeyboard (iEvent &event)
 	ReportInfo ("Screenshot saved to %s...",
 		    CS::Quote::Single (path->GetData ()));
       }
+
+      return true;
+    }
+
+    // Toggle HUD
+    if (csKeyEventHelper::GetCookedCode (&event) == CSKEY_F9)
+    {
+      hudManager.SetEnabled (!hudManager.GetEnabled ());
 
       return true;
     }
