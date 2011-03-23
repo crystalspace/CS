@@ -313,6 +313,13 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
     return 0;
   }
 
+  iMaterialWrapper* m = partmeshes[0]->GetMaterialWrapper ();
+  if (!m)
+  {
+    n = 0;
+    return 0;
+  }
+
   int ClipPortal, ClipPlane, ClipZ;
   CS::RenderViewClipper::CalculateClipSettings (rview->GetRenderContext(),
     frustum_mask, ClipPortal, ClipPlane, ClipZ);
@@ -378,7 +385,6 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
     }
   }
 
-  iMaterialWrapper* m = partmeshes[0]->GetMaterialWrapper ();
   m->Visit ();
 
   //index_buffer->CopyToBuffer (triangles,
@@ -414,7 +420,6 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
   rm->indexstart = 0;
   rm->indexend = (uint)TriangleCount * 3;
   rm->material = m;
-  CS_ASSERT (m != 0);
   rm->worldspace_origin = movable->GetFullPosition ();
   rm->object2world = camera->GetTransform ();
   rm->bbox = GetObjectBoundingBox();  

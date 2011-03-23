@@ -609,9 +609,9 @@ void csEmitMeshObject::StartParticle (int i)
 {
   csVector3 pos;
   csVector3 startgiven(0,0,0);
-  startpos->GetValue(pos, startgiven);
-  startspeed->GetValue(part_speed[i], pos);
-  startaccel->GetValue(part_accel[i], pos);
+  if(startpos) startpos->GetValue(pos, startgiven);
+  if(startspeed) startspeed->GetValue(part_speed[i], pos);
+  if(startaccel) startaccel->GetValue(part_accel[i], pos);
   if(attractor) attractor->GetValue(part_attract[i], pos);
   csRef<iMeshObject> meshobj = scfQueryInterface<iMeshObject> (GetParticle (i));
   meshobj->SetMixMode (MixMode);
