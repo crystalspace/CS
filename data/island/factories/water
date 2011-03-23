@@ -4,9 +4,6 @@
         <shader>
             <file>/shader/reflect/water_plane.xml</file>
         </shader>
-        <shader>
-            <file>/shader/water/water.xml</file>
-        </shader>
     </shaders>
 
     <textures>
@@ -37,8 +34,8 @@
             <shader type="base">reflect_water_plane</shader>
             <shader type="diffuse">reflect_water_plane</shader>
             <shadervar name="tex normal" type="texture">BUMPgeneric_water_001_ani</shadervar>
-            <shadervar name="tex environment" type="texture">water_envmap_01.dds</shadervar>
-            <shadervar name="water fog color" type="vector4">0.4,0.7,0.9,0.5</shadervar>
+            <shadervar name="tex environment" type="texture">sky_001.dds</shadervar>
+            <shadervar name="water fog color" type="vector4">0.4,0.7,0.9,1</shadervar>
             <shadervar name="water perturb scale" type="vector4">10,10,0,0</shadervar>
             <shadervar name="specular" type="vector4">0.4,0.7,0.9,1</shadervar>
         </material>

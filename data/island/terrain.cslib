@@ -1,4 +1,19 @@
 <library>
+    <shaders>
+        <shader>
+            <file>/shader/terrain/basemap.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/terrain/splatbase.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/terrain/splat.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/terrain/splat-detail.xml</file>
+        </shader>
+    </shaders>
+
     <textures>
         <texture name="basemap_00000_00000_000.PNG">
             <file>basemaps/basemap_00000_00000_000.PNG</file>

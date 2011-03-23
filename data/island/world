@@ -1,31 +1,55 @@
 <world>
+
     <variables>
         <variable name="LodM" value="-0.00666667" />
         <variable name="LodA" value="1.33333" />
     </variables>
+
     <plugins>
         <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
         <plugin name="genmeshfact">crystalspace.mesh.loader.factory.genmesh</plugin>
         <plugin name="emitFact">crystalspace.mesh.loader.factory.emit</plugin>
         <plugin name="emit">crystalspace.mesh.loader.emit</plugin>
     </plugins>
+
     <shaders>
         <shader>
-            <file>/shader/lighting/fullbright.xml</file>
+            <file>/shader/lighting/fullbright_fixed.xml</file>
         </shader>
         <shader>
             <file>/shader/particles/basic.xml</file>
         </shader>
     </shaders>
+
     <textures>
         <texture name="fp2">
             <file>/lib/stdtex/fp2.png</file>
         </texture>
+        <texture name="prop_mushrooms_001_co">
+            <file>textures/prop_mushrooms_001_col.dds</file>
+        </texture>
+        <!--texture name="prop_mushrooms_001_ao">
+            <file>textures/prop_mushrooms_001_ao.dds</file>
+        </texture>
+        <texture name="prop_mushrooms_001_sp">
+            <file>textures/prop_mushrooms_001_spec.dds</file>
+        </texture>
+        <texture name="BUMPprop_mushrooms_001_no">
+            <file>textures/prop_mushrooms_001_nor.dds</file>
+            <class>normalmap</class>
+        </texture-->
+        <texture name="prop_plants_groun.007">
+            <file>textures/prop_plants_ground_002_col.png</file>
+            <alpha>
+                <binary />
+            </alpha>
+        </texture>
     </textures>
+
     <materials>
         <material name="sky_001">
             <texture>sky_001.dds</texture>
-            <shader type="base">lighting_fullbright</shader>
+            <shader type="base">lighting_fullbright_fixed</shader>
             <shader type="diffuse">*null</shader>
         </material>
         <material name="fp2">
@@ -33,27 +57,53 @@
             <shader type="diffuse">*null</shader>
             <shader type="ambient">particles_basic</shader>
         </material>
+        <material name="mushrooms1">
+            <texture>prop_mushrooms_001_co</texture>
+            <!--shadervar name="tex normal compressed" type="texture">BUMPprop_mushrooms_001_no</shadervar>
+            <shadervar name="tex specular" type="texture">prop_mushrooms_001_sp</shadervar>
+            <shadervar name="tex ambient occlussion" type="texture">prop_mushrooms_001_ao</shadervar>
+            <shadervar name="visible_layers" type="int">1</shadervar-->
+        </material>
+        <material name="plants1">
+            <texture>prop_plants_groun.007</texture>
+            <shader type="terrain splat">terrain_splatting</shader>
+            <!--shader type="base">lighting_default_binalpha</shader>
+            <shader type="diffuse">lighting_default_binalpha</shader>
+            <shadervar name="tex normal compressed" type="texture">BUMPprop_plants_groun</shadervar>
+            <shadervar name="tex specular" type="texture">prop_plants_groun.008</shadervar>
+            <shadervar name="shininess" type="float">2</shadervar-->
+        </material>
     </materials>
+
     <library>terrain.cslib</library>
     <library>factories/skydome_frankieisland_SkyDome</library>
     <library>factories/ground</library>
     <library>factories/water</library>
+    <library>factories/mushroom_or_001.004_mushroom_red_001mushroom_red_001_mushroom_red_001</library>
+    <library>factories/flowers_purple_01.015_flower_001.124flowers_s_white_01_flower_001.020</library>
+
+    <library>/lev/terrainf/grass.lib</library>
+
     <meshfact name="emitFact">
         <plugin>emitFact</plugin>
         <params />
     </meshfact>
+
     <start>
         <sector>TerrainSector</sector>
         <position x="263" y="70" z="406" />
-        <forward x="0" y="0" z="1" />
+        <!--position x="10" y="70" z="10" /-->
         <up x="0" y="1" z="0" />
     </start>
+
     <sector name="TerrainSector">
+
         <light name="sun">
             <center x="-50000" y="86030" z="0" />
             <color red="1.25903" green="1.20995" blue="1.10420" />
             <radius>1000000</radius>
         </light>
+
         <meshobj name="Terrain">
             <plugin>crystalspace.mesh.loader.terrain2</plugin>
             <params>
@@ -64,6 +114,7 @@
             </move>
             <priority>wall</priority>
         </meshobj>
+
         <meshobj name="skydome_frankieisland_SkyDome">
             <plugin>genmesh</plugin>
             <params>
@@ -79,6 +130,7 @@
                 <v x="5000" y="0" z="5000" />
             </move>
         </meshobj>
+
         <meshobj name="water">
             <plugin>genmesh</plugin>
             <noshadowreceive />
@@ -94,6 +146,7 @@
             </move>
             <zuse />
         </meshobj>
+
         <meshobj name="ground">
             <plugin>genmesh</plugin>
             <noshadowreceive />
@@ -109,6 +162,7 @@
                 <v x="0.0" y="38.0" z="0.0" />
             </move>
         </meshobj>
+
         <meshobj name="emit10">
             <priority>alpha</priority>
             <plugin>emit</plugin>
@@ -197,5 +251,63 @@
                 </aging>
             </params>
         </meshobj>
+
+        <meshgen name="grass">
+            <densityfactormap name="fertile">
+                <image>meshmaps/00000_00000.png</image>
+                <!--world2image>
+		    <m11>0.001953125</m11><m12>0</m12><m13>0</m13><m14>0.5</m14>
+		    <m21>0</m21><m22>0</m22><m23>-0.001953125</m23><m24>0.5</m24>
+		    <m31>0</m31><m32>0</m32><m33>0</m33><m34>0</m34>
+		    <m41>0</m41><m42>0</m42><m43>0</m43><m44>1</m44>
+		</world2image-->
+                <world2image>
+                    <m11>0.001953125</m11>
+                    <m12>0</m12>
+                    <m13>0</m13>
+                    <m14>0</m14>
+                    <m21>0</m21>
+                    <m22>0</m22>
+                    <m23>0.001953125</m23>
+                    <m24>0</m24>
+                    <m31>0</m31>
+                    <m32>0</m32>
+                    <m33>0</m33>
+                    <m34>0</m34>
+                    <m41>0</m41>
+                    <m42>0</m42>
+                    <m43>0</m43>
+                    <m44>0</m44>
+                </world2image>
+            </densityfactormap>
+            <geometry>
+                <factory maxdist="10" name="Grass" />
+                <factory maxdist="30" name="GrassLow" />
+                <radius>0</radius>
+                <density>5</density>
+                <densityfactormap factor="1">fertile</densityfactormap>
+            </geometry>
+            <geometry>
+                <factory maxdist="30" name="flowers_purple_01.015_flower_001.124flowers_s_white_01_flower_001.020" />
+                <radius>0</radius>
+                <density>5</density>
+                <densityfactormap factor="1">fertile</densityfactormap>
+            </geometry>
+            <geometry>
+                <factory maxdist="30" name="mushroom_or_001.004_mushroom_red_001mushroom_red_001_mushroom_red_001" />
+                <radius>0</radius>
+                <density>5</density>
+                <densityfactormap factor="1">fertile</densityfactormap>
+            </geometry>
+            <!--<densityscale mindist="26" maxdist="30" maxfactor="0" />-->
+            <alphascale mindist="22" maxdist="30" />
+            <samplebox>
+                <min x="0" y="-200" z="0" />
+                <max x="512" y="300" z="512" />
+            </samplebox>
+            <meshobj>Terrain</meshobj>
+        </meshgen>
+
     </sector>
+
 </world>
