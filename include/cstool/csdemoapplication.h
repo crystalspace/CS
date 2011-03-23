@@ -32,7 +32,9 @@
 // All these files commonly needed are already included, so that the
 // applications only need to include the files relevant for them.
 #include "cstool/csapplicationframework.h"
+#include "cstool/numberedfilenamehelper.h"
 #include "cstool/simplestaticlighter.h"
+#include "csutil/cfgacc.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/common_handlers.h"
 #include "csutil/csbaseeventh.h"
@@ -357,13 +359,14 @@ class CS_CRYSTALSPACE_EXPORT CameraManager : public csBaseEventHandler
  * in order to simplify their code, make it more pertinent for the user, and
  * unify the graphical and general layout between all applications.
  *
- * The basic functionalities provided by this class are:
+ * The functionalities provided by this class are:
  * - creation of the main objects of the engine
  * - default creation of the scene
  * - management of the camera (class CS::Demo::CameraManager).
  * - display of the available keys, Crystal Space logo and other informations
  * (class CS::Demo::HUDManager).
  * - management of the command line's help (class CS::Demo::CommandLineHelper).
+ * - screenshots (F12 key)
  *
  * Here is an example for the most simple use of this class:
  * \code
@@ -433,6 +436,12 @@ class CS_CRYSTALSPACE_EXPORT DemoApplication : public csApplicationFramework,
   /// Whether the previous mouse cusor position was initialized
   bool mouseInitialized;
 
+  /// The file helper to find new filenames to save screenshots
+  CS::NumberedFilenameHelper screenshotHelper;
+
+  // Image format of the screenshots
+  csString screenshotFormat;
+
  protected:
   /// Reference to the engine
   csRef<iEngine> engine;
@@ -464,6 +473,9 @@ class CS_CRYSTALSPACE_EXPORT DemoApplication : public csApplicationFramework,
 
   /// Visual debugger
   csRef<CS::Debug::iVisualDebugger> visualDebugger;
+
+  /// Access to the configuration manager system
+  csConfigAccess config;
 
   //-- csBaseEventHandler
   /**

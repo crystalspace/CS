@@ -720,7 +720,7 @@ bool DemoApplication::OnInitialize (int argc, char* argv[])
     CS_REQUEST_PLUGIN ("crystalspace.utilities.visualdebugger",
 		       CS::Debug::iVisualDebugger),
     CS_REQUEST_END))
-    return ReportError ("Failed to initialize plugins!");
+    return ReportError ("Failed to initialize some plugins!");
 
   // Register to the event queue
   csBaseEventHandler::Initialize (GetObjectRegistry ());
@@ -769,8 +769,21 @@ bool DemoApplication::Application ()
   view = csPtr<iView> (new csView (engine, g3d));
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
+  // Load the configuration file
+  config.AddConfig (GetObjectRegistry (), "/config/csdemoapplication.cfg");
+
+  // Load the screenshot configuration
+  screenshotFormat = config->GetStr ("DemoApplication.Screenshot.ImageFormat", "jpg");
+  csString screenshotMask = config->GetStr ("DemoApplication.Screenshot.FilenameFormat",
+					    "/tmp/CS_screenshot_0000");
+  screenshotHelper.SetMask (screenshotMask + "." + screenshotFormat);
+
   // Initialize the camera and HUD managers
   hudManager.Initialize (GetObjectRegistry ());
+  hudManager.keyDescriptions.Push ("arrow keys: move camera");
+  hudManager.keyDescriptions.Push ("SHIFT-arrow keys: lateral motion");
+  hudManager.keyDescriptions.Push ("CTRL-arrow keys: speedier motion");
+
   cameraManager.Initialize (GetObjectRegistry ());
 
   return true;
@@ -778,7 +791,7 @@ bool DemoApplication::Application ()
 
 void DemoApplication::PrintHelp ()
 {
-  csCommandLineHelper::Help (GetObjectRegistry ());  
+  csCommandLineHelper::Help (GetObjectRegistry ());
 }
 
 bool DemoApplication::CreateRoom ()
@@ -876,10 +889,47 @@ bool DemoApplication::OnKeyboard (iEvent &event)
   {
     // Help key
     if (csKeyEventHelper::GetCookedCode (&event) == CSKEY_F1)
+    {
       hudManager.SwitchKeysPage ();
+      return true;
+    }
+
+    // Screenshot key
+    //if (csKeyEventHelper::GetCookedCode (&event) == CSKEY_PRINTSCREEN)
+    if (csKeyEventHelper::GetCookedCode (&event) == CSKEY_F12)
+    {
+      // Get the screenshot
+      csRef<iImage> screenshot = g2d->ScreenShot ();
+
+      // Convert the screenshot to the target image format
+      csRef<iImageIO> imageIO = csQueryRegistry<iImageIO> (GetObjectRegistry ());
+      if (!screenshot || !imageIO)
+	return false;
+
+      csRef<iDataBuffer> data =
+	imageIO->Save (screenshot, csString ().Format ("image/%s", screenshotFormat.GetData ()));
+
+      if (!data)
+      {
+	ReportError ("Could not export screenshot image to format %s!",
+		     CS::Quote::Single (screenshotFormat.GetData ()));
+	return false;
+      }
+
+      // Save the file
+      csString filename = screenshotHelper.FindNextFilename (vfs);
+      if (data && vfs->WriteFile (filename, data->GetData (), data->GetSize ()))
+      {
+	csRef<iDataBuffer> path = vfs->GetRealPath (filename.GetData ());
+	ReportInfo ("Screenshot saved to %s...",
+		    CS::Quote::Single (path->GetData ()));
+      }
+
+      return true;
+    }
 
     // ESC key
-    else if (csKeyEventHelper::GetCookedCode (&event) == CSKEY_ESC)
+    if (csKeyEventHelper::GetCookedCode (&event) == CSKEY_ESC)
     {
       csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (GetObjectRegistry ()));
       if (q) q->GetEventOutlet()->Broadcast (csevQuit (GetObjectRegistry ()));
