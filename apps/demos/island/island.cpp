@@ -33,13 +33,6 @@ IslandDemo::IslandDemo ()
   cameraManager.SetCameraMode (CS::Demo::CAMERA_MOVE_FREE);
   cameraManager.SetStartPosition (csVector3 (500.0f, 200.0f, 500.0f));
   cameraManager.SetMotionSpeed (10.0f);
-
-  // Define the available keys
-  hudManager.SetEnabled (true);
-  hudManager.keyDescriptions.DeleteAll ();
-  hudManager.keyDescriptions.Push ("arrow keys: move camera");
-  hudManager.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
-  hudManager.keyDescriptions.Push ("+/-: walk faster/slower");
 }
 
 void IslandDemo::PrintHelp ()
