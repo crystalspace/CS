@@ -21,6 +21,7 @@
 
 #include "cssysdef.h"
 
+#include "iengine/campos.h"
 #include "island.h"
 
 #define WATER_LEVEL 50.0
@@ -32,6 +33,13 @@ IslandDemo::IslandDemo ()
   cameraManager.SetCameraMode (CS::Demo::CAMERA_MOVE_FREE);
   cameraManager.SetStartPosition (csVector3 (500.0f, 200.0f, 500.0f));
   cameraManager.SetMotionSpeed (10.0f);
+
+  // Define the available keys
+  hudManager.SetEnabled (true);
+  hudManager.keyDescriptions.DeleteAll ();
+  hudManager.keyDescriptions.Push ("arrow keys: move camera");
+  hudManager.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
+  hudManager.keyDescriptions.Push ("+/-: walk faster/slower");
 }
 
 void IslandDemo::PrintHelp ()
@@ -40,7 +48,21 @@ void IslandDemo::PrintHelp ()
 
   // Printing help
   commandLineHelper.PrintApplicationHelp
-    (GetObjectRegistry (), "csisland", "csisland", "Island environment demo.");
+    (GetObjectRegistry (), "csisland", "csisland", "Crystal Space's island environment demo.");
+}
+
+bool IslandDemo::OnInitialize (int argc, char* argv[])
+{
+  // Default behavior from DemoApplication
+  if (!DemoApplication::OnInitialize (argc, argv))
+    return false;
+
+  // Register to the event queue
+  csBaseEventHandler::Initialize (GetObjectRegistry ());
+  if (!RegisterQueue (GetObjectRegistry (), csevAllEvents (GetObjectRegistry ())))
+    return ReportError ("Failed to set up the event handler!");
+
+  return true;
 }
 
 void IslandDemo::Frame ()
@@ -71,7 +93,7 @@ bool IslandDemo::Application ()
     return false;
 
    // Create the scene
-   if (!CreateScene ())
+  if (!CreateScene ())
      return false;
 
    // Run the application
@@ -85,8 +107,7 @@ bool IslandDemo::CreateScene ()
   printf ("Loading level...\n");
 
   // Load the level file named 'world'.
-  csRef<iVFS> VFS (csQueryRegistry<iVFS> (GetObjectRegistry ()));
-  VFS->ChDir ("/lev/island");
+  vfs->ChDir ("/lev/island");
   if (!loader->LoadMapFile ("world"))
     ReportError("Error couldn't load level!");
 
@@ -94,6 +115,14 @@ bool IslandDemo::CreateScene ()
   room = engine->FindSector ("TerrainSector");
   view->GetCamera ()->SetSector (room);
   cameraManager.SetCamera (view->GetCamera ());
+
+  // Find the start position of the camera
+  iCameraPositionList* positions = engine->GetCameraPositions ();
+  if (positions->GetCount ())
+  {
+    positions->Get (0)->Load (view->GetCamera (), engine);
+    cameraManager.SetStartPosition (view->GetCamera ()->GetTransform ().GetOrigin ());
+  }
 
   printf ("Level loaded...\n");
 
