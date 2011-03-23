@@ -49,10 +49,10 @@
             <file>textures/generic_grayrock1_col.jpg</file>
         </texture>
         <texture name="generic_darkrock_col.jpg">
-            <file>textures/generic_darkrock_col.jpg</file>
+            <file>textures/generic_darkRock_col.jpg</file>
         </texture>
         <texture name="generic_lightrock_col.jpg">
-            <file>textures/generic_lightrock_col.jpg</file>
+            <file>textures/generic_lightRock_col.jpg</file>
         </texture>
         <texture name="alphamap_00000_00000_000_2.PNG">
             <file>alphamaps/alphamap_00000_00000_000_2.PNG</file>
