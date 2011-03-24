@@ -19,7 +19,7 @@ except:
     pass
 
 # Legacy identifiers
-csSkeletalState2 = animation.csSkeletalState
+csSkeletalState2 = animation.AnimatedMeshState
 iSkeleton2 = animation.iSkeleton
 iSkeletonFactory2 = animation.iSkeletonFactory
 iSkeletonManager2 = animation.iSkeletonManager
