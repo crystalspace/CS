@@ -27,6 +27,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "csutil/scanstr.h"
 #include "csutil/scfarray.h"
+#include "csutil/stringconv.h"
 #include "csutil/stringquote.h"
 #include "csutil/sysfunc.h"
 
@@ -1925,7 +1926,7 @@ bool csShaderExpression::parse_sexp_atom (const char*& text, cons* head)
     (*text == '.' && isdigit(text[1]))) 
   { /* TYPE_NUMBER */
     const char* tmp = text;
-    char* tmp3 = 0;
+    const char* tmp3 = nullptr;
 
     while (!isspace (*tmp) && *tmp)
       tmp++;
@@ -1935,7 +1936,7 @@ bool csShaderExpression::parse_sexp_atom (const char*& text, cons* head)
     memcpy (tmp2, text, size);
     tmp2[size] = 0;
 
-    double n = strtod (text, &tmp3);
+    float n = CS::Utility::strtof (text, &tmp3);
   
     head->car.type = TYPE_NUMBER;
     head->car.num = n;
@@ -1946,7 +1947,7 @@ bool csShaderExpression::parse_sexp_atom (const char*& text, cons* head)
   { /* TYPE_VECTOR* */ 
     int args = 0;
     float arg[4];
-    char* tmp = 0;
+    const char* tmp = 0;
 
     text += 2;
 
@@ -1954,7 +1955,7 @@ bool csShaderExpression::parse_sexp_atom (const char*& text, cons* head)
 
     while (args < 4)
     {
-      arg[args++] = (float)strtod(text, &tmp);
+      arg[args++] = CS::Utility::strtof (text, &tmp);
 
       if (isspace (*tmp))
         tmp++;
@@ -2130,11 +2131,11 @@ bool csShaderExpression::parse_xml_atom (oper_arg& arg, csStringID type,
 
 bool csShaderExpression::parse_num_atom (const char*& text, oper_arg& arg)
 {
-  char* tmp = 0;
+  const char* tmp = 0;
 
   errno = 0;
   
-  double n = strtod (text, &tmp);
+  float n = CS::Utility::strtof (text, &tmp);
   
   if (*tmp)
   {
@@ -2150,7 +2151,7 @@ bool csShaderExpression::parse_num_atom (const char*& text, oper_arg& arg)
     return false;
   }
 
-  arg.num = (float)n;
+  arg.num = n;
 
   return true;
 }
