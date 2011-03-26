@@ -1,6 +1,7 @@
 <library>
     <meshfact name="mushroom_or_001.004_mushroom_red_001mushroom_red_001_mushroom_red_001">
         <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <priority>alpha</priority>
         <zuse />
         <params>
             <material>mushrooms1</material>

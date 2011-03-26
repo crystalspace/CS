@@ -1,11 +1,13 @@
 <library>
     <meshfact name="tree">
         <nullmesh>
+	    <!--todo: compute the real values-->
             <min x="-2" y="0" z="-2" />
             <max x="2" y="4" z="2" />
         </nullmesh>
     <meshfact name="tree_generic_001.027_treebrown_002tree_generic_002_treebrown_002">
         <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <priority>alpha</priority>
         <zuse />
             <move>
                 <v x=".2201" y="5.5791" z=".4923" />

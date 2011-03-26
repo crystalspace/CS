@@ -93,8 +93,8 @@
             <texture>prop_plants_groun.007</texture>
             <shader type="oc_depthwrite">*null</shader>
             <shader type="oc_depthtest">z_only_instanced</shader>
-            <shader type="base">lighting_default_instance</shader>
-            <shader type="diffuse">lighting_default_instance</shader>
+            <shader type="base">lighting_default_instance_binalpha</shader>
+            <shader type="diffuse">lighting_default_instance_binalpha</shader>
             <!--shader type="terrain splat">terrain_splatting</shader-->
             <!--shader type="base">lighting_default_binalpha</shader>
             <shader type="diffuse">lighting_default_binalpha</shader>
@@ -177,11 +177,13 @@
             <move>
                 <v x="5000" y="0" z="5000" />
             </move>
+            <priority>sky</priority>
         </meshobj>
 
         <meshobj name="water">
             <plugin>genmesh</plugin>
-            <noshadowreceive />
+            <!--noshadowreceive /-->
+            <noshadowcast />
             <priority>alpha</priority>
             <params>
                 <factory>water</factory>
@@ -197,8 +199,7 @@
 
         <meshobj name="ground">
             <plugin>genmesh</plugin>
-            <noshadowreceive />
-            <priority>alpha</priority>
+            <priority>wall</priority>
             <params>
                 <factory>ground</factory>
             </params>
@@ -211,7 +212,7 @@
             </move>
         </meshobj>
 
-        <meshobj name="emit10">
+        <meshobj name="volcano_smoke">
             <priority>alpha</priority>
             <plugin>emit</plugin>
             <ztest />
