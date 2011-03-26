@@ -19,6 +19,18 @@
         <shader>
             <file>/shader/particles/basic.xml</file>
         </shader>
+        <shader>
+            <file>/shader/early_z/z_only_instanced.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/lighting/fullbright_instance.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/lighting/lighting_default_instance.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/lighting/lighting_default_instance_binalpha.xml</file>
+        </shader>
     </shaders>
 
     <textures>
@@ -44,6 +56,15 @@
                 <binary />
             </alpha>
         </texture>
+        <texture name="trees_bark_002_col.pn">
+            <file>textures/trees_bark_002_col.dds</file>
+        </texture>
+        <texture name="trees_leaves_003_col.">
+            <file>textures/trees_leaves_003_col.dds</file>
+            <alpha>
+                <binary />
+            </alpha>
+        </texture>
     </textures>
 
     <materials>
@@ -59,6 +80,10 @@
         </material>
         <material name="mushrooms1">
             <texture>prop_mushrooms_001_co</texture>
+            <shader type="oc_depthwrite">*null</shader>
+            <shader type="oc_depthtest">z_only_instanced</shader>
+            <shader type="base">lighting_default_instance</shader>
+            <shader type="diffuse">lighting_default_instance</shader>
             <!--shadervar name="tex normal compressed" type="texture">BUMPprop_mushrooms_001_no</shadervar>
             <shadervar name="tex specular" type="texture">prop_mushrooms_001_sp</shadervar>
             <shadervar name="tex ambient occlussion" type="texture">prop_mushrooms_001_ao</shadervar>
@@ -66,12 +91,36 @@
         </material>
         <material name="plants1">
             <texture>prop_plants_groun.007</texture>
-            <shader type="terrain splat">terrain_splatting</shader>
+            <shader type="oc_depthwrite">*null</shader>
+            <shader type="oc_depthtest">z_only_instanced</shader>
+            <shader type="base">lighting_default_instance</shader>
+            <shader type="diffuse">lighting_default_instance</shader>
+            <!--shader type="terrain splat">terrain_splatting</shader-->
             <!--shader type="base">lighting_default_binalpha</shader>
             <shader type="diffuse">lighting_default_binalpha</shader>
             <shadervar name="tex normal compressed" type="texture">BUMPprop_plants_groun</shadervar>
             <shadervar name="tex specular" type="texture">prop_plants_groun.008</shadervar>
             <shadervar name="shininess" type="float">2</shadervar-->
+        </material>
+        <material name="tree_brown">
+            <texture>trees_bark_002_col.pn</texture>
+            <shader type="oc_depthwrite">*null</shader>
+            <shader type="oc_depthtest">z_only_instanced</shader>
+            <shader type="base">lighting_default_instance</shader>
+            <shader type="diffuse">lighting_default_instance</shader>
+            <!--shader type="base">lighting_default_binalpha</shader>
+            <shader type="diffuse">lighting_default_binalpha</shader>
+            <shadervar name="tex normal compressed" type="texture">BUMPtrees_bark_002_nor.pn</shadervar>
+            <shadervar name="tex specular" type="texture">trees_bark_002_spec.p</shadervar-->
+        </material>
+        <material name="browntreeleaves">
+            <texture>trees_leaves_003_col.</texture>
+            <shader type="oc_depthwrite">*null</shader>
+            <shader type="oc_depthtest">z_only_instanced</shader>
+            <shader type="base">lighting_default_instance_binalpha</shader>
+            <shader type="diffuse">lighting_default_instance_binalpha</shader>
+            <!--shader type="base">lighting_default_binalpha</shader>
+            <shader type="diffuse">lighting_default_binalpha</shader-->
         </material>
     </materials>
 
@@ -81,8 +130,7 @@
     <library>factories/water</library>
     <library>factories/mushroom_or_001.004_mushroom_red_001mushroom_red_001_mushroom_red_001</library>
     <library>factories/flowers_purple_01.015_flower_001.124flowers_s_white_01_flower_001.020</library>
-
-    <library>/lev/terrainf/grass.lib</library>
+    <library>factories/tree.cslib</library>
 
     <meshfact name="emitFact">
         <plugin>emitFact</plugin>
@@ -255,12 +303,6 @@
         <meshgen name="grass">
             <densityfactormap name="fertile">
                 <image>meshmaps/00000_00000.PNG</image>
-                <!--world2image>
-		    <m11>0.001953125</m11><m12>0</m12><m13>0</m13><m14>0.5</m14>
-		    <m21>0</m21><m22>0</m22><m23>-0.001953125</m23><m24>0.5</m24>
-		    <m31>0</m31><m32>0</m32><m33>0</m33><m34>0</m34>
-		    <m41>0</m41><m42>0</m42><m43>0</m43><m44>1</m44>
-		</world2image-->
                 <world2image>
                     <m11>0.001953125</m11>
                     <m12>0</m12>
@@ -281,22 +323,21 @@
                 </world2image>
             </densityfactormap>
             <geometry>
-                <factory maxdist="10" name="Grass" />
-                <factory maxdist="30" name="GrassLow" />
-                <radius>0</radius>
-                <density>5</density>
-                <densityfactormap factor="1">fertile</densityfactormap>
-            </geometry>
-            <geometry>
                 <factory maxdist="30" name="flowers_purple_01.015_flower_001.124flowers_s_white_01_flower_001.020" />
                 <radius>0</radius>
-                <density>5</density>
+                <density>.5</density>
                 <densityfactormap factor="1">fertile</densityfactormap>
             </geometry>
             <geometry>
                 <factory maxdist="30" name="mushroom_or_001.004_mushroom_red_001mushroom_red_001_mushroom_red_001" />
-                <radius>0</radius>
-                <density>5</density>
+                <radius>0.1</radius>
+                <density>.005</density>
+                <densityfactormap factor="1">fertile</densityfactormap>
+            </geometry>
+            <geometry>
+                <factory maxdist="40" name="tree" />
+                <radius>4</radius>
+                <density>.05</density>
                 <densityfactormap factor="1">fertile</densityfactormap>
             </geometry>
             <!--<densityscale mindist="26" maxdist="30" maxfactor="0" />-->
