@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2010 Christian Van Brussel, Communications and Remote
+  Copyright (C) 2010-11 Christian Van Brussel, Communications and Remote
       Sensing Laboratory of the School of Engineering at the 
       Universite catholique de Louvain, Belgium
       http://www.tele.ucl.ac.be
@@ -29,10 +29,6 @@
 IslandDemo::IslandDemo ()
   : DemoApplication ("CrystalSpace.IslandDemo"), inWater (false)
 {
-  // Set the camera mode
-  cameraManager.SetCameraMode (CS::Demo::CAMERA_MOVE_FREE);
-  cameraManager.SetStartPosition (csVector3 (500.0f, 200.0f, 500.0f));
-  cameraManager.SetMotionSpeed (10.0f);
 }
 
 void IslandDemo::PrintHelp ()
@@ -104,20 +100,17 @@ bool IslandDemo::CreateScene ()
   if (!loader->LoadMapFile ("world"))
     ReportError("Error couldn't load level!");
 
-  // Setup the the sector and the camera
+  // Setup the sector and the camera
   room = engine->FindSector ("TerrainSector");
   view->GetCamera ()->SetSector (room);
   cameraManager.SetCamera (view->GetCamera ());
+  cameraManager.SetCameraMode (CS::Demo::CAMERA_MOVE_FREE);
+  cameraManager.SetMotionSpeed (10.0f);
 
-  // Find the start position of the camera
-  iCameraPositionList* positions = engine->GetCameraPositions ();
-  if (positions->GetCount ())
-  {
-    positions->Get (0)->Load (view->GetCamera (), engine);
-    cameraManager.SetStartPosition (view->GetCamera ()->GetTransform ().GetOrigin ());
-  }
+  printf ("Precaching all things...\n");
+  engine->PrecacheDraw ();
 
-  printf ("Level loaded...\n");
+  printf ("Ready!\n");
 
   return true;
 }
