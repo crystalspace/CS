@@ -137,14 +137,16 @@
         <params />
     </meshfact>
 
-    <start>
+    <start name="start_position">
         <sector>TerrainSector</sector>
         <position x="263" y="70" z="406" />
         <!--position x="10" y="70" z="10" /-->
-        <up x="0" y="1" z="0" />
+        <up x="-0.135703" y="0.971338" z="-0.19516" />
+        <forward x="-0.55453" y="-0.237703" z="-0.797492" />
     </start>
 
     <sector name="TerrainSector">
+        <cullerp plugin="crystalspace.culling.frustvis"/>
 
         <light name="sun">
             <center x="-50000" y="86030" z="0" />
@@ -184,7 +186,7 @@
             <plugin>genmesh</plugin>
             <!--noshadowreceive /-->
             <noshadowcast />
-            <priority>alpha</priority>
+            <priority>transp</priority>
             <params>
                 <factory>water</factory>
             </params>
@@ -337,7 +339,7 @@
             </geometry>
             <geometry>
                 <factory maxdist="40" name="tree" />
-                <radius>4</radius>
+                <radius>.4</radius>
                 <density>.05</density>
                 <densityfactormap factor="1">fertile</densityfactormap>
             </geometry>
