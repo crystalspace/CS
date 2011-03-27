@@ -631,7 +631,7 @@ void ViewMesh::SaveSprite (const char* filename, bool binary)
 {
   if (!asset) return;
 
-  csRef<iDocumentSystem> xml(new csTinyDocumentSystem());
+  csRef<iDocumentSystem> xml = csPtr<iDocumentSystem>(new csTinyDocumentSystem());
   csRef<iDocument> doc = xml->CreateDocument();
   csRef<iDocumentNode> root = doc->CreateRoot();
 
@@ -680,7 +680,7 @@ void ViewMesh::SaveSprite (const char* filename, bool binary)
   //Invoke the iSaverPlugin::WriteDown
   if (binary)
   {
-    csRef<iString> fname (new scfString(filename));
+    csRef<iString> fname (csPtr<iString> (new scfString(filename)));
     fname->Append(".binary", 7);
 
     csRef<iFile> file (vfs->Open(*fname, VFS_FILE_WRITE));
@@ -774,7 +774,7 @@ void ViewMesh::ScaleSprite (float newScale)
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
   CEGUI::Window* component = winMgr->getWindow("General/ScaleSprite");
-  csRef<iString> valueMesh(new scfString());
+  csRef<iString> valueMesh (csPtr<iString> (new scfString()));
   valueMesh->Format("%.2f", scale);
   component->setProperty("Text", valueMesh->GetData());
 }
