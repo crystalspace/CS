@@ -55,5 +55,7 @@
   </materials>
   <sounds/>
   <library>/lib/krystal/skelkrystal_rig</library>
+  <!--library>/lib/krystal/skelkrystal_body</library>
+  <library>/lib/krystal/anims_idle.cslib</library-->
   <library>/lib/krystal/krystal</library>
 </library>
