@@ -56,7 +56,6 @@ CS_MASTER_HEADER_REJECTS =
   [ ConcatDirs csutil   win32 psdk-compat.h ]
   [ ConcatDirs csutil   zip.h        ]
   [ ConcatDirs imap     parser.h     ]
-  [ Wildcard [ ConcatDirs imesh animation              ] : *.h ]
   [ ConcatDirs inetwork vosapi.h     ]
   [ ConcatDirs ivaria   icegui.h     ]
   [ ConcatDirs ivaria   xwindow.h    ]
@@ -207,8 +206,7 @@ CS_MASTER_HEADERS =
       itexture
       iutil
       ivaria
-      ivideo
-      animation :
+      ivideo :
       $(CS_MASTER_HEADER_BOILERPLATE) 
       $(CS_MASTER_HEADER_DOC_DIRECTORY) 
       $(CS_MASTER_HEADER_INCLUDE_CSSYSDEF_H) : 
