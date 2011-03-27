@@ -24,7 +24,6 @@
  * the exact right header file(s).
  */
 #include "cssysdef.h"
-#include "animation.h"
 #include "csgeom.h"
 #include "csgfx.h"
 #include "csplugincommon.h"
