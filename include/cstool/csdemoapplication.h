@@ -222,15 +222,33 @@ class CS_CRYSTALSPACE_EXPORT CameraManager : public csBaseEventHandler
   CameraMode GetCameraMode ();
 
   /**
-   * Set the start position of the camera. This position is used when ResetCamera() is called.
-   * The default value is 'csVector3 (0.0f, 0.0f, -3.0f)'.
+   * Set the starting position of the camera. This position is used when ResetCamera() is called.
+   * \sa ClearStartPosition()
    */
   void SetStartPosition (csVector3 position);
 
   /**
-   * Get the start position of the camera. This position is used when ResetCamera() is called.
+   * Get the starting position of the camera. This position is used when ResetCamera() is called.
    */
   csVector3 GetStartPosition ();
+
+  /**
+   * Clear the starting position of the camera. The next calls to ResetCamera() will now use the
+   * current camera position set by SwitchCameraPosition().
+   */
+  void ClearStartPosition ();
+
+  /**
+   * Return whether or not a starting position has been defined by SetStartPosition().
+   */
+  bool HasStartPosition ();
+
+  /**
+   * Switch to the next engine camera position (see iEngine::GetCameraPositions()). This position
+   * will be used for each subsequent call to ResetCamera() (unless another position has been
+   * set by SetStartPosition()).
+   */
+  virtual void SwitchCameraPosition ();
 
   /**
    * Set the target of the camera, ie what it is looking at. This is relevant
@@ -279,8 +297,9 @@ class CS_CRYSTALSPACE_EXPORT CameraManager : public csBaseEventHandler
   bool GetMouseMoveEnabled ();
 
   /**
-   * Reset the camera position to the position returned by
-   * CameraManager::GetStartPosition().
+   * Reset the camera position to its initial position. This position is either the one defined by
+   * SetStartPosition() or the current engine camera position defined by SwitchCameraPosition().
+   * If no starting position has been defined at all, then this method will simply don't do anything.
    */
   void ResetCamera ();
 
@@ -316,6 +335,8 @@ class CS_CRYSTALSPACE_EXPORT CameraManager : public csBaseEventHandler
   void UpdatePositionParameters (const csVector3& newPosition);
   void ApplyPositionParameters ();
 
+  // Reference to the engine
+  csRef<iEngine> engine;
   // Reference to the keyboard driver
   csRef<iKeyboardDriver> kbd;
   // Reference to the virtual clock
@@ -330,6 +351,9 @@ class CS_CRYSTALSPACE_EXPORT CameraManager : public csBaseEventHandler
   bool mouseMoveEnabled;
 
   csVector3 startPosition;
+  bool hasStartPosition;
+  size_t currentCameraPosition;  
+
   csVector3 cameraTarget;
   float minimumDistance;
 
@@ -438,7 +462,7 @@ class CS_CRYSTALSPACE_EXPORT DemoApplication : public csApplicationFramework,
   /// The file helper to find new filenames to save screenshots
   CS::NumberedFilenameHelper screenshotHelper;
 
-  // Image format of the screenshots
+  /// Image format of the screenshots
   csString screenshotFormat;
 
  protected:

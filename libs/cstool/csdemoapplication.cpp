@@ -26,6 +26,8 @@
 #include "cstool/materialbuilder.h"
 #include "cstool/csdemoapplication.h"
 
+#include "iengine/campos.h"
+
 /**
  * Error reporting
  */
@@ -252,8 +254,8 @@ bool HUDManager::GetEnabled ()
 
 CameraManager::CameraManager ()
   : cameraMode (CAMERA_MOVE_FREE), mouseMoveEnabled (true),
-    startPosition (0.0f, 0.0f, -3.0f), cameraTarget (0.0f), minimumDistance (0.1f),
-    cameraDistance (0.0f), cameraYaw (0.0f), cameraPitch (0.0f),
+    hasStartPosition (false), currentCameraPosition (0), cameraTarget (0.0f),
+    minimumDistance (0.1f), cameraDistance (0.0f), cameraYaw (0.0f), cameraPitch (0.0f),
     cameraModePan (false), cameraModeRotate (false), cameraModeZoom (false),
     motionSpeed (5.0f), rotationSpeed (2.0f), wasUpdated (false),
     previousMouseX (0), previousMouseY (0)
@@ -269,6 +271,9 @@ CameraManager::~CameraManager ()
 void CameraManager::Initialize (iObjectRegistry* registry)
 {
   // Find references to the engine objects
+  engine = csQueryRegistry<iEngine> (registry);
+  if (!engine) ReportError (registry, "crystalspace.demo.cameramanager", "Failed to locate 3D engine!");
+
   vc = csQueryRegistry<iVirtualClock> (registry);
   if (!vc) ReportError (registry, "crystalspace.demo.cameramanager", "Failed to locate virtual clock!");
 
@@ -344,22 +349,18 @@ void CameraManager::UpdateCamera ()
 	// camera's X axis, and up and down arrows cause the camera to
 	// go forwards and backwards.
 	if (kbd->GetKeyState (CSKEY_RIGHT))
-	  cameraYaw += rotationDelta;
+	  camera->GetTransform ().RotateOther (csVector3 (0.0f, 1.0f, 0.0f), rotationDelta);
 	if (kbd->GetKeyState (CSKEY_LEFT))
-	  cameraYaw -= rotationDelta;
+	  camera->GetTransform ().RotateOther (csVector3 (0.0f, 1.0f, 0.0f), -rotationDelta);
 	if (kbd->GetKeyState (CSKEY_PGUP))
-	  cameraPitch += rotationDelta;
+	  camera->GetTransform ().RotateThis (csVector3 (1.0f, 0.0f, 0.0f), -rotationDelta);
 	if (kbd->GetKeyState (CSKEY_PGDN))
-	  cameraPitch -= rotationDelta;
+	  camera->GetTransform ().RotateThis (csVector3 (1.0f, 0.0f, 0.0f), rotationDelta);
 	if (kbd->GetKeyState (CSKEY_UP))
 	  camera->Move (CS_VEC_FORWARD * motionDelta);
 	if (kbd->GetKeyState (CSKEY_DOWN))
 	  camera->Move (CS_VEC_BACKWARD * motionDelta);
       }
-
-      csMatrix3 rot = csXRotMatrix3 (cameraPitch) * csYRotMatrix3 (cameraYaw);
-      csOrthoTransform ot (rot, camera->GetTransform().GetOrigin ());
-      camera->SetTransform (ot);
 
       break;
     }
@@ -445,7 +446,7 @@ bool CameraManager::OnMouseDown (iEvent &event)
   if (!camera || !mouseMoveEnabled)
     return false;
 
-  if (cameraMode != CAMERA_ROTATE)
+  if (cameraMode != CAMERA_ROTATE && cameraMode != CAMERA_MOVE_LOOKAT)
     UpdatePositionParameters (camera->GetTransform ().GetOrigin ());
 
   previousMouseX = mouse->GetLastX ();
@@ -501,8 +502,6 @@ bool CameraManager::OnMouseUp (iEvent &event)
     break;
   }
 
-  UpdatePositionParameters (camera->GetTransform ().GetOrigin ());
-
   return false;
 }
 
@@ -551,7 +550,8 @@ bool CameraManager::OnMouseMove (iEvent &event)
 
 void CameraManager::SetCameraMode (CameraMode cameraMode)
 {
-  if (camera && this->cameraMode != cameraMode && cameraMode == CAMERA_ROTATE)
+  if (camera && this->cameraMode != cameraMode
+      && (cameraMode == CAMERA_ROTATE || cameraMode == CAMERA_MOVE_LOOKAT))
     UpdatePositionParameters (camera->GetTransform ().GetOrigin ());
 
   this->cameraMode = cameraMode;
@@ -565,11 +565,32 @@ CameraMode CameraManager::GetCameraMode ()
 void CameraManager::SetStartPosition (csVector3 position)
 {
   startPosition = position;
+  hasStartPosition = true;
 }
 
 csVector3 CameraManager::GetStartPosition ()
 {
-  return startPosition;
+  if (hasStartPosition)
+    return startPosition;
+  return csVector3 (0.0f);
+}
+
+void CameraManager::ClearStartPosition ()
+{
+  hasStartPosition = false;
+}
+
+bool CameraManager::HasStartPosition ()
+{
+  return hasStartPosition;
+}
+
+void CameraManager::SwitchCameraPosition ()
+{
+  iCameraPositionList* positions = engine->GetCameraPositions ();
+  if (positions->GetCount ())
+    currentCameraPosition = (currentCameraPosition + 1) % positions->GetCount ();
+  ResetCamera ();
 }
 
 void CameraManager::SetCameraTarget (csVector3 position)
@@ -606,9 +627,21 @@ void CameraManager::ResetCamera ()
 {
   if (camera)
   {
-    csOrthoTransform transform (csMatrix3 (), startPosition);
-    camera->SetTransform (transform);
-    UpdatePositionParameters (startPosition);
+    if (hasStartPosition)
+    {
+      csOrthoTransform transform (csMatrix3 (), startPosition);
+      camera->SetTransform (transform);
+    }
+
+    else
+    {
+      iCameraPositionList* positions = engine->GetCameraPositions ();
+      if (positions->GetCount ())
+	positions->Get (currentCameraPosition)->Load (camera, engine);
+    }
+
+    if (cameraMode == CAMERA_ROTATE || cameraMode == CAMERA_MOVE_LOOKAT)
+      UpdatePositionParameters (camera->GetTransform ().GetOrigin ());
   }
 }
 
@@ -697,6 +730,7 @@ DemoApplication::DemoApplication (const char* applicationName)
   hudManager.keyDescriptions.Push ("arrow keys: move camera");
   hudManager.keyDescriptions.Push ("SHIFT-arrow keys: lateral motion");
   hudManager.keyDescriptions.Push ("CTRL-arrow keys: speedier motion");
+  hudManager.keyDescriptions.Push ("F5: next camera position");
   hudManager.keyDescriptions.Push ("F9: toggle HUD");
   hudManager.keyDescriptions.Push ("F12: screenshot");
 }
@@ -899,6 +933,20 @@ bool DemoApplication::OnKeyboard (iEvent &event)
       return true;
     }
 
+    // Switch to next camera position
+    if (csKeyEventHelper::GetCookedCode (&event) == CSKEY_F5)
+    {
+      cameraManager.SwitchCameraPosition ();
+      return true;
+    }
+
+    // Toggle HUD
+    if (csKeyEventHelper::GetCookedCode (&event) == CSKEY_F9)
+    {
+      hudManager.SetEnabled (!hudManager.GetEnabled ());
+      return true;
+    }
+
     // Screenshot key
     //if (csKeyEventHelper::GetCookedCode (&event) == CSKEY_PRINTSCREEN)
     if (csKeyEventHelper::GetCookedCode (&event) == CSKEY_F12)
@@ -929,14 +977,6 @@ bool DemoApplication::OnKeyboard (iEvent &event)
 	ReportInfo ("Screenshot saved to %s...",
 		    CS::Quote::Single (path->GetData ()));
       }
-
-      return true;
-    }
-
-    // Toggle HUD
-    if (csKeyEventHelper::GetCookedCode (&event) == CSKEY_F9)
-    {
-      hudManager.SetEnabled (!hudManager.GetEnabled ());
 
       return true;
     }
