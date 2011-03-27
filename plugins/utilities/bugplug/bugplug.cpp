@@ -48,10 +48,13 @@
 #include "csutil/scanstr.h"
 #include "csutil/set.h"
 #include "csutil/scf.h"
+#include "csutil/scfstr.h"
 #include "csutil/snprintf.h"
 #include "csutil/sysfunc.h"
+#include "csutil/xmltiny.h"
 
 #include "iengine/camera.h"
+#include "iengine/campos.h"
 #include "iengine/engine.h"
 #include "iengine/light.h"
 #include "iengine/material.h"
@@ -74,6 +77,7 @@
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
 #include "iutil/dbghelp.h"
+#include "iutil/document.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
 #include "iutil/eventq.h"
@@ -1135,6 +1139,29 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
           }
           break;
         }
+    case DEBUGCMD_PRINTPOSITION:
+        {
+	  csRef<iSaver> saver =
+	    csLoadPluginCheck<iSaver> (object_reg, "crystalspace.level.saver");
+
+	  // Create a camera position and save the current camera into it
+	  csRef<iCameraPosition> cameraPosition =
+	    Engine->GetCameraPositions ()->CreateCameraPosition ("start_position");
+	  cameraPosition->Save (catcher->camera);
+
+	  // Create a document node and save the camera position into it
+	  csRef<iDocumentSystem> documentSystem = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
+	  csRef<iDocument> document = documentSystem->CreateDocument ();
+	  csRef<iDocumentNode> rootNode = document->CreateRoot ();
+	  saver->SaveCameraPosition (cameraPosition, rootNode);
+
+	  // Print out the camera position
+	  scfString str;
+	  document->Write (&str);
+	  printf ("Printing camera position:\n%s", str.GetData ());
+
+	  break;
+	}
     case DEBUGCMD_COLORSECTORS:
 	Report (CS_REPORTER_SEVERITY_DEBUG,
 	    	"Color all sectors...");
@@ -2282,6 +2309,7 @@ int csBugPlug::GetCommandCode (const char* cmdstr, csString& args)
   if (!strcmp (cmd, "toggle_fps_time")) return DEBUGCMD_TOGGLEFPSTIME;
   if (!strcmp (cmd, "meshskel"))        return DEBUGCMD_MESHSKEL;
   if (!strcmp (cmd, "printportals"))    return DEBUGCMD_PRINTPORTALS;
+  if (!strcmp (cmd, "printposition"))   return DEBUGCMD_PRINTPOSITION;
 
   return DEBUGCMD_UNKNOWN;
 }
