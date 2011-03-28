@@ -531,15 +531,16 @@ bool csSaver::SaveShaders (iDocumentNode *parent)
 bool csSaver::SaveCameraPosition(iCameraPosition *cam, iDocumentNode *parent)
 {
   csRef<iDocumentNode> n = CreateNode(parent, "start");
+
   // Set the name attribute if cam pos has a name
   const char *camname = cam->QueryObject()->GetName();
-  if(camname && strcmp(camname, "") != 0)
+  if (camname && strcmp(camname, "") != 0)
     n->SetAttribute("name", camname);
 
   // write the sector
   csRef<iDocumentNode> sectornode = CreateNode(n, "sector");
   const char *sectorname = cam->GetSector();
-  if(sectorname && *sectorname)
+  if (sectorname && *sectorname)
     sectornode->CreateNodeBefore (CS_NODE_TEXT)->SetValue(sectorname);
       
   // write position
@@ -556,7 +557,7 @@ bool csSaver::SaveCameraPosition(iCameraPosition *cam, iDocumentNode *parent)
 
   // write farplane if available
   csPlane3 *fp = cam->GetFarPlane();
-  if(fp)
+  if (fp)
   {
     csRef<iDocumentNode> farplanenode = CreateNode(n, "farplane");
     farplanenode->SetAttributeAsFloat("a", fp->A());
@@ -564,13 +565,15 @@ bool csSaver::SaveCameraPosition(iCameraPosition *cam, iDocumentNode *parent)
     farplanenode->SetAttributeAsFloat("c", fp->C());
     farplanenode->SetAttributeAsFloat("d", fp->D());
   }
+
+  return true;
 }
 
 bool csSaver::SaveCameraPositions(iDocumentNode *parent)
 {
   csRef<iCameraPositionList> camlist = engine->GetCameraPositions();
 	
-  for(int i = 0; i < camlist->GetCount(); i++)
+  for (int i = 0; i < camlist->GetCount(); i++)
   {
     csRef<iCameraPosition> cam = camlist->Get(i);
 
