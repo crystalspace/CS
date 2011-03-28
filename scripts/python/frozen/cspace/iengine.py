@@ -667,6 +667,7 @@ class iCameraPosition(core.iBase):
     def SetFarPlane(*args): return _iengine.iCameraPosition_SetFarPlane(*args)
     def ClearFarPlane(*args): return _iengine.iCameraPosition_ClearFarPlane(*args)
     def GetFarPlane(*args): return _iengine.iCameraPosition_GetFarPlane(*args)
+    def Save(*args): return _iengine.iCameraPosition_Save(*args)
     scfGetVersion = staticmethod(_iengine.iCameraPosition_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iCameraPosition
     __del__ = lambda self : None;

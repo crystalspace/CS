@@ -5302,6 +5302,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SaveCollectionFile = *cspacec::iSaver_SaveCollectionFile;
 *SaveCollection = *cspacec::iSaver_SaveCollection;
 *SavePortal = *cspacec::iSaver_SavePortal;
+*SaveCameraPosition = *cspacec::iSaver_SaveCameraPosition;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -19632,6 +19633,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetFarPlane = *cspacec::iCameraPosition_SetFarPlane;
 *ClearFarPlane = *cspacec::iCameraPosition_ClearFarPlane;
 *GetFarPlane = *cspacec::iCameraPosition_GetFarPlane;
+*Save = *cspacec::iCameraPosition_Save;
 *scfGetVersion = *cspacec::iCameraPosition_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

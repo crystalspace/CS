@@ -22322,6 +22322,36 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iCameraPosition_Save(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iCameraPosition *arg1 = (iCameraPosition *) 0 ;
+  iCamera *arg2 = (iCamera *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iCameraPosition_Save",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iCameraPosition, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iCameraPosition_Save" "', argument " "1"" of type '" "iCameraPosition *""'"); 
+  }
+  arg1 = reinterpret_cast< iCameraPosition * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iCamera, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iCameraPosition_Save" "', argument " "2"" of type '" "iCamera *""'"); 
+  }
+  arg2 = reinterpret_cast< iCamera * >(argp2);
+  (arg1)->Save(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iCameraPosition_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -38459,6 +38489,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iCameraPosition_SetFarPlane", _wrap_iCameraPosition_SetFarPlane, METH_VARARGS, NULL},
 	 { (char *)"iCameraPosition_ClearFarPlane", _wrap_iCameraPosition_ClearFarPlane, METH_VARARGS, NULL},
 	 { (char *)"iCameraPosition_GetFarPlane", _wrap_iCameraPosition_GetFarPlane, METH_VARARGS, NULL},
+	 { (char *)"iCameraPosition_Save", _wrap_iCameraPosition_Save, METH_VARARGS, NULL},
 	 { (char *)"iCameraPosition_scfGetVersion", _wrap_iCameraPosition_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iCameraPosition", _wrap_delete_iCameraPosition, METH_VARARGS, NULL},
 	 { (char *)"iCameraPosition_swigregister", iCameraPosition_swigregister, METH_VARARGS, NULL},
