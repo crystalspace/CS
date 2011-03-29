@@ -50,7 +50,7 @@
       </block>
     </input>
 
-    <input file="/shader-snippets/objectToWorld.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/objectToWorld.inp" private="yes" />
     
     <input file="/shader-snippets/normal.inp" private="yes" />
     
