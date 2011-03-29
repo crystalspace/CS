@@ -36,7 +36,6 @@ class IslandDemo : public CS::Demo::DemoApplication
 
   //-- CS::Demo::DemoApplication
   void PrintHelp ();
-  bool OnInitialize (int argc, char* argv[]);
   void Frame ();
 
   //-- csApplicationFramework

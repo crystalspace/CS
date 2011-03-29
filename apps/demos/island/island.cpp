@@ -40,20 +40,6 @@ void IslandDemo::PrintHelp ()
     (GetObjectRegistry (), "csisland", "csisland", "Crystal Space's island environment demo.");
 }
 
-bool IslandDemo::OnInitialize (int argc, char* argv[])
-{
-  // Default behavior from DemoApplication
-  if (!DemoApplication::OnInitialize (argc, argv))
-    return false;
-
-  // Register to the event queue
-  csBaseEventHandler::Initialize (GetObjectRegistry ());
-  if (!RegisterQueue (GetObjectRegistry (), csevAllEvents (GetObjectRegistry ())))
-    return ReportError ("Failed to set up the event handler!");
-
-  return true;
-}
-
 void IslandDemo::Frame ()
 {
   iCamera* camera = view->GetCamera ();
@@ -107,7 +93,7 @@ bool IslandDemo::CreateScene ()
   cameraManager.SetCameraMode (CS::Demo::CAMERA_MOVE_FREE);
   cameraManager.SetMotionSpeed (10.0f);
 
-  printf ("Precaching all things...\n");
+  printf ("Precaching data...\n");
   engine->PrecacheDraw ();
 
   printf ("Ready!\n");
