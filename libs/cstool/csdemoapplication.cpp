@@ -53,15 +53,16 @@ namespace Demo {
 // ------------------------ HUDManager ------------------------
 
 HUDManager::HUDManager ()
-  : cslogo (nullptr), enabled (true), frameCount (0), frameTime (0), currentFPS (0.0f),
-    currentKeyPage (0)
+  : scfImplementationType (this), cslogo (nullptr), enabled (true), frameCount (0),
+    frameTime (0), currentFPS (0.0f), currentKeyPage (0)
 {
 }
 
 HUDManager::~HUDManager ()
 {
   // Unregister from the event queue
-  UnregisterQueue ();
+  if (eventQueue)
+    eventQueue->RemoveListener (this);
 
   // Delete the logo
   delete cslogo;
@@ -81,6 +82,9 @@ void HUDManager::Initialize (iObjectRegistry* registry)
 
   csRef<iLoader> loader = csQueryRegistry<iLoader> (registry);
   if (!loader) ReportError (registry, "crystalspace.demo.hudmanager", "Failed to locate main loader!");
+
+  eventQueue = csQueryRegistry<iEventQueue> (registry);
+  if (!eventQueue) ReportError (registry, "crystalspace.demo.hudmanager", "Failed to locate event queue!");
 
   // Load the font
   csRef<iFontServer> fontServer = g2d->GetFontServer ();
@@ -108,22 +112,20 @@ void HUDManager::Initialize (iObjectRegistry* registry)
   }
 
   // Register to the event queue
-  csBaseEventHandler::Initialize (registry);
-  if (!RegisterQueue (registry, csevAllEvents (registry)))
-    ReportError (registry, "crystalspace.demo.hudmanager", "Failed to setup the event handler!");
+  eventQueue->RegisterListener (this, csevFrame (registry));
 }
 
-void HUDManager::Frame ()
+bool HUDManager::HandleEvent (iEvent& event)
 {
 #ifdef CS_DEBUG
-  if (!g3d || !g2d || !vc) return;
+  if (!g3d || !g2d || !vc) return false;
 #endif
 
-  if (!enabled) return;
+  if (!enabled) return false;
 
   // Tell the 3D driver we're going to display 2D things.
   if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS))
-    return;
+    return false;
 
   // Get the elasped time
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -202,6 +204,8 @@ void HUDManager::Frame ()
     cslogo->Draw (g3d,
 		  g2d->GetWidth () - cslogo->Width() - logoMargin,
 		  logoMargin);
+
+  return false;
 }
 
 void HUDManager::SwitchKeysPage ()
@@ -253,23 +257,25 @@ bool HUDManager::GetEnabled ()
 // ------------------------ CameraManager ------------------------
 
 CameraManager::CameraManager ()
-  : cameraMode (CAMERA_MOVE_FREE), mouseMoveEnabled (true),
+  : scfImplementationType (this), cameraMode (CAMERA_MOVE_FREE), mouseMoveEnabled (true),
     hasStartPosition (false), currentCameraPosition (0), cameraTarget (0.0f),
     minimumDistance (0.1f), cameraDistance (0.0f), cameraYaw (0.0f), cameraPitch (0.0f),
     cameraModePan (false), cameraModeRotate (false), cameraModeZoom (false),
-    motionSpeed (5.0f), rotationSpeed (2.0f), wasUpdated (false),
-    previousMouseX (0), previousMouseY (0)
+    motionSpeed (5.0f), rotationSpeed (2.0f), previousMouseX (0), previousMouseY (0)
 {
 }
 
 CameraManager::~CameraManager ()
 {
   // Unregister from the event queue
-  csBaseEventHandler::UnregisterQueue ();
+  if (eventQueue)
+    eventQueue->RemoveListener (this);
 }
 
 void CameraManager::Initialize (iObjectRegistry* registry)
 {
+  this->registry = registry;
+
   // Find references to the engine objects
   engine = csQueryRegistry<iEngine> (registry);
   if (!engine) ReportError (registry, "crystalspace.demo.cameramanager", "Failed to locate 3D engine!");
@@ -283,10 +289,13 @@ void CameraManager::Initialize (iObjectRegistry* registry)
   mouse = csQueryRegistry<iMouseDriver> (registry);
   if (!mouse) ReportError (registry, "crystalspace.demo.cameramanager", "Failed to locate mouse driver!");
 
+  eventQueue = csQueryRegistry<iEventQueue> (registry);
+  if (!eventQueue) ReportError (registry, "crystalspace.demo.hudmanager", "Failed to locate event queue!");
+
   // Register to the event queue
-  csBaseEventHandler::Initialize (registry);
-  if (!RegisterQueue (registry, csevAllEvents (registry)))
-    ReportError (registry, "crystalspace.demo.cameramanager", "Failed to setup the event handler!");
+  csEventID events[3] = { csevFrame (registry), csevMouseEvent (registry), 
+			  CS_EVENTLIST_END };
+  eventQueue->RegisterListener (this, events);
 }
 
 void CameraManager::SetCamera (iCamera* camera)
@@ -302,12 +311,36 @@ iCamera* CameraManager::GetCamera ()
   return camera;
 }
 
-void CameraManager::UpdateCamera ()
+bool CameraManager::HandleEvent (iEvent& event)
 {
 #ifdef CS_DEBUG
-  if (!vc || !kbd || !mouse) return;
+  if (!engine || !vc || !kbd || !mouse) return false;
 #endif
 
+  if (event.Name == csevFrame (registry))
+  {
+    Frame();
+    return true;
+  }
+
+  if (CS_IS_MOUSE_EVENT (registry, event))
+    switch(csMouseEventHelper::GetEventType (&event))
+    {
+    case csMouseEventTypeMove:
+      return OnMouseMove (event);
+    case csMouseEventTypeUp:
+      return OnMouseUp (event);
+    case csMouseEventTypeDown:
+      return OnMouseDown (event);
+    default:
+      break;
+    }
+
+  return false;
+}
+
+void CameraManager::Frame ()
+{
   if (!camera || cameraMode == CAMERA_NO_MOVE) return;
 
   // Compute the speed of the camera
@@ -424,25 +457,10 @@ void CameraManager::UpdateCamera ()
   default:
     break;
   }
-
-  wasUpdated = true;
 }
 
-void CameraManager::Frame ()
+bool CameraManager::OnMouseDown (iEvent& event)
 {
-  // Update the camera if it was not yet made manually
-  if (!wasUpdated)
-    UpdateCamera ();
-
-  wasUpdated = false;
-}
-
-bool CameraManager::OnMouseDown (iEvent &event)
-{
-#ifdef CS_DEBUG
-  if (!vc || !kbd || !mouse) return false;
-#endif
-
   if (!camera || !mouseMoveEnabled)
     return false;
 
@@ -479,12 +497,8 @@ bool CameraManager::OnMouseDown (iEvent &event)
   return false;
 }
 
-bool CameraManager::OnMouseUp (iEvent &event)
+bool CameraManager::OnMouseUp (iEvent& event)
 {
-#ifdef CS_DEBUG
-  if (!vc || !kbd || !mouse) return false;
-#endif
-
   if (!camera || !mouseMoveEnabled)
     return false;
 
@@ -505,12 +519,8 @@ bool CameraManager::OnMouseUp (iEvent &event)
   return false;
 }
 
-bool CameraManager::OnMouseMove (iEvent &event)
+bool CameraManager::OnMouseMove (iEvent& event)
 {
-#ifdef CS_DEBUG
-  if (!vc || !kbd || !mouse) return false;
-#endif
-
   int x = csMouseEventHelper::GetX (&event) - previousMouseX;
   int y = csMouseEventHelper::GetY (&event) - previousMouseY;
   if (!x && !y)
@@ -625,6 +635,10 @@ bool CameraManager::GetMouseMoveEnabled ()
 
 void CameraManager::ResetCamera ()
 {
+#ifdef CS_DEBUG
+  if (!engine || !vc || !kbd || !mouse) return;
+#endif
+
   if (camera)
   {
     if (hasStartPosition)
@@ -907,9 +921,6 @@ void DemoApplication::Frame ()
     mouseInitialized = true;
   }
 
-  // Update the camera before the rendering of the view
-  cameraManager.UpdateCamera ();
-
   // Tell the 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (CSDRAW_3DGRAPHICS))
     return;
@@ -921,7 +932,7 @@ void DemoApplication::Frame ()
   visualDebugger->Display (view);
 }
 
-bool DemoApplication::OnKeyboard (iEvent &event)
+bool DemoApplication::OnKeyboard (iEvent& event)
 {
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&event);
   if (eventtype == csKeyEventTypeDown)
@@ -998,7 +1009,7 @@ void DemoApplication::OnExit ()
   printer.Invalidate ();
 }
 
-bool DemoApplication::OnMouseMove (iEvent &event)
+bool DemoApplication::OnMouseMove (iEvent& event)
 {
   previousMouse.x = mouse->GetLastX ();
   previousMouse.y = mouse->GetLastY ();

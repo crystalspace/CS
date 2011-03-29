@@ -39,6 +39,7 @@
 #include "csutil/common_handlers.h"
 #include "csutil/csbaseeventh.h"
 #include "csutil/event.h"
+//#include "csutil/eventhandlers.h"
 #include "csutil/hash.h"
 #include "csutil/stringarray.h"
 
@@ -74,7 +75,8 @@ namespace Demo {
  * informations such as the current Frames Per Second.
  * \warning Initialize() must be called before any other operation.
  */
-class CS_CRYSTALSPACE_EXPORT HUDManager : public csBaseEventHandler
+  class CS_CRYSTALSPACE_EXPORT HUDManager
+    : public scfImplementation1<HUDManager, iEventHandler>
 {
  public:
   /**
@@ -91,8 +93,8 @@ class CS_CRYSTALSPACE_EXPORT HUDManager : public csBaseEventHandler
    */
   void Initialize (iObjectRegistry* registry);
 
-  //-- csBaseEventHandler
-  void Frame ();
+  //-- iEventHandler
+  bool HandleEvent (iEvent& event);
 
   /**
    * Switch to the next page describing the list of available keyboard keys. This is useful
@@ -138,6 +140,9 @@ class CS_CRYSTALSPACE_EXPORT HUDManager : public csBaseEventHandler
    */
   csStringArray stateDescriptions;
 
+  // Declare this event handler as listening to the '2D' frame phase
+  CS_EVENTHANDLER_PHASE_2D ("crystalspace.demo.hudmanager");
+
  private:
   // Reference to the 3D graphics
   csRef<iGraphics3D> g3d;
@@ -145,6 +150,8 @@ class CS_CRYSTALSPACE_EXPORT HUDManager : public csBaseEventHandler
   csRef<iGraphics2D> g2d;
   // Reference to the virtual clock
   csRef<iVirtualClock> vc;
+  // Reference to the event queue
+  csRef<iEventQueue> eventQueue;
 
   // Reference to the font used to display information
   csRef<iFont> font;
@@ -188,7 +195,8 @@ enum CameraMode
  *
  * \warning Initialize() must be called before any other operation.
  */
-class CS_CRYSTALSPACE_EXPORT CameraManager : public csBaseEventHandler
+class CS_CRYSTALSPACE_EXPORT CameraManager
+  : public scfImplementation1<CameraManager, iEventHandler>
 {
  public:
   /**
@@ -206,15 +214,6 @@ class CS_CRYSTALSPACE_EXPORT CameraManager : public csBaseEventHandler
   void SetCamera (iCamera* camera);
   /// Get the camera controlled by this manager, or nullptr if there are none.
   iCamera* GetCamera ();
-
-  /**
-   * Update the position of the camera. You don't need to call this, but it can be used
-   * to control the exact moment where the camera is updated (eg before the rendering of
-   * the view). If you don't call this, then the camera will still be updated automatically
-   * once per frame, but it may or not have a one frame delay depending on if it is updated
-   * after or before the rendering of the view.
-   */
-  void UpdateCamera ();
 
   /// Set the camera mode to be used. The default value is CS::Demo::CAMERA_MOVE_NORMAL.
   void SetCameraMode (CameraMode cameraMode);
@@ -325,15 +324,22 @@ class CS_CRYSTALSPACE_EXPORT CameraManager : public csBaseEventHandler
    */
   float GetRotationSpeed ();
 
-  //-- csBaseEventHandler
-  void Frame ();
-  bool OnMouseDown (iEvent &event);
-  bool OnMouseUp (iEvent &event);
-  bool OnMouseMove (iEvent &event);
+  //-- iEventHandler
+  bool HandleEvent (iEvent& event);
+
+  // Declare this event handler as listening to the 'logic' frame phase
+  CS_EVENTHANDLER_PHASE_LOGIC ("crystalspace.demo.cameramanager");
 
  private:
+  void Frame ();
+  bool OnMouseDown (iEvent& event);
+  bool OnMouseUp (iEvent& event);
+  bool OnMouseMove (iEvent& event);
+
   void UpdatePositionParameters (const csVector3& newPosition);
   void ApplyPositionParameters ();
+
+  iObjectRegistry* registry;
 
   // Reference to the engine
   csRef<iEngine> engine;
@@ -343,6 +349,8 @@ class CS_CRYSTALSPACE_EXPORT CameraManager : public csBaseEventHandler
   csRef<iVirtualClock> vc;
   // Reference to the mouse driver
   csRef<iMouseDriver> mouse;
+  // Reference to the event queue
+  csRef<iEventQueue> eventQueue;
 
   // Reference to the camera
   csRef<iCamera> camera;
@@ -368,8 +376,6 @@ class CS_CRYSTALSPACE_EXPORT CameraManager : public csBaseEventHandler
 
   float motionSpeed;
   float rotationSpeed;
-
-  bool wasUpdated;
 
   int previousMouseX, previousMouseY;
 };
@@ -503,20 +509,22 @@ class CS_CRYSTALSPACE_EXPORT DemoApplication : public csApplicationFramework,
   //-- csBaseEventHandler
   /**
    * Base implementation of the method inherited from csBaseEventHandler. It initializes the
-   * previous position of the mouse cursor, update the camera manager, renders the view and
-   * displays the visual debugging information if any.
+   * previous position of the mouse cursor, renders the view and displays the visual debugging
+   * information if any.
    */
   virtual void Frame ();
 
-  /// Base implementation of the method inherited from csBaseEventHandler. It checks for the
-  /// "Help" or "Esc" keys.
-  virtual bool OnKeyboard (iEvent &event);
+  /**
+   * Base implementation of the method inherited from csBaseEventHandler. It checks for the
+   * "Help" or "Esc" keys.
+   */
+  virtual bool OnKeyboard (iEvent& event);
 
   /**
    * Base implementation of the method inherited from csBaseEventHandler. It simply updates
    * the \a previousMouse position.
    */
-  virtual bool OnMouseMove (iEvent &event);
+  virtual bool OnMouseMove (iEvent& event);
 
   /**
    * Default initialization for the creation of the main sector (DemoApplication::room). It
