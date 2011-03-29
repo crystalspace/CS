@@ -349,10 +349,6 @@ bool ViewMesh::Application()
 
   printer.AttachNew (new FramePrinter (object_reg));
 
-  // Initialize the camera
-  cameraManager.Initialize (object_reg);
-  cameraManager.SetCameraMode (CS::Demo::CAMERA_ROTATE);
-
   Run();
 
   return true;
@@ -361,7 +357,11 @@ bool ViewMesh::Application()
 bool ViewMesh::CreateRoom ()
 {
   room = engine->CreateSector ("room");
+
+  // Initialize the camera
   view->GetCamera ()->SetSector (room);
+  cameraManager.Initialize (object_reg);
+  cameraManager.SetCameraMode (CS::Demo::CAMERA_ROTATE);
   cameraManager.SetCamera (view->GetCamera ());
 
   csRef<iLight> light;
