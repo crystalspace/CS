@@ -160,7 +160,7 @@ private:
 
   CS_EVENTHANDLER_NAMES ("crystalspace.viewmesh")
   
-  virtual const csHandlerID * GenericPrec (csRef<iEventHandlerRegistry> &r1, 
+  virtual const csHandlerID * GenericSucc (csRef<iEventHandlerRegistry> &r1, 
     csRef<iEventNameRegistry> &r2, csEventID event) const 
   {
     static csHandlerID precConstraint[2];
