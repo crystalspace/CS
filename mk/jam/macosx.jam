@@ -241,7 +241,7 @@ rule CreateApplicationWrapper
     }
     if $(icon)
     {
-	$(<)_APPICON = $(icon) ;
+	$(<)_APPICON = $(icon:BS) ;
         AppIcon $(<) : $(icon) ;
     }
 }
@@ -386,7 +386,7 @@ EOT
 #    already set SEARCH on the icon, if necessary.
 rule AppIcon
 {
-    local icon = $(>:G=$(<)) ;
+    local icon = $(>:BSG=$(<)) ;
     Depends $(<) : $(icon) ; 
     Depends $(icon) : $(>) ;
     MakeLocate $(icon) : 
