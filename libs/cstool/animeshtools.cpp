@@ -41,7 +41,7 @@
 namespace CS {
 namespace Mesh {
 
-csRef<iAnimatedMeshFactory> AnimatedMeshTools::LoadAnimesh
+csPtr<iAnimatedMeshFactory> AnimatedMeshTools::LoadAnimesh
 (iObjectRegistry* object_reg, iLoader* loader, const char* factoryName,
  const char* filename)
 {
@@ -51,7 +51,7 @@ csRef<iAnimatedMeshFactory> AnimatedMeshTools::LoadAnimesh
   {
     ReportWarning ("Could not load mesh from file %s!",
 		   CS::Quote::Single (filename));
-    return (iAnimatedMeshFactory*) nullptr;
+    return csPtr<iAnimatedMeshFactory> (nullptr);
   }
 
   // Search for the factory wrapper
@@ -61,7 +61,7 @@ csRef<iAnimatedMeshFactory> AnimatedMeshTools::LoadAnimesh
   {
     ReportWarning ("The object loaded from file %s is not a mesh factory!",
 		   CS::Quote::Single (filename));
-    return (iAnimatedMeshFactory*) nullptr;
+    return csPtr<iAnimatedMeshFactory> (nullptr);
   }
 
   // Find the animesh interface
@@ -81,24 +81,28 @@ csRef<iAnimatedMeshFactory> AnimatedMeshTools::LoadAnimesh
     {
       ReportWarning ("The mesh loaded from file %s is neither a genmesh nor an animesh!",
 		     CS::Quote::Single (filename));
-      return (iAnimatedMeshFactory*) nullptr;
+      return csPtr<iAnimatedMeshFactory> (nullptr);
     }
   }
 
-  return factory;
+  return csPtr<iAnimatedMeshFactory> (factory);
 }
 
-iAnimatedMeshFactory* AnimatedMeshTools::ImportSplittedMesh
+csPtr<iAnimatedMeshFactory> AnimatedMeshTools::ImportSplitMorphMesh
 (iObjectRegistry* object_reg, const char* path, const char* baseMesh,
- const char* meshMask, const char* factoryName)
+ const char* factoryName, const char* meshMask)
 {
+
   // Change the current working directory to the given path
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
   csVfsDirectoryChanger diretoryChanger (vfs);
-  if (!diretoryChanger.ChangeToFull (path))
+  if (path)
   {
-    ReportError ("Could not find path %s!", CS::Quote::Single (path));
-    return nullptr;
+    if (!diretoryChanger.ChangeToFull (path))
+    {
+      ReportError ("Could not find path %s!", CS::Quote::Single (path));
+      return csPtr<iAnimatedMeshFactory> (nullptr);
+    }
   }
 
   // Find the main loader
@@ -106,7 +110,7 @@ iAnimatedMeshFactory* AnimatedMeshTools::ImportSplittedMesh
   if (!loader)
   {
     ReportError ("Could not find the main loader!");
-    return nullptr;
+    return csPtr<iAnimatedMeshFactory> (nullptr);
   }
 
   // Load the base mesh
@@ -116,23 +120,32 @@ iAnimatedMeshFactory* AnimatedMeshTools::ImportSplittedMesh
   {
     ReportError ("Error loading base mesh %s!",
 		 CS::Quote::Single (baseMesh));
-    return nullptr;
+    return csPtr<iAnimatedMeshFactory> (nullptr);
   }
 
   // Find the base name of the base mesh
   csString baseName = baseMesh;
+  csString suffix;
   size_t index = baseName.FindLast ('/');
   if (index != (size_t) -1)
     baseName = baseName.Slice (index + 1);
   index = baseName.FindLast ('.');
   if (index != (size_t) -1)
+  {
+    suffix = baseName.Slice (index + 1);
     baseName = baseName.Slice (0, index);
+  }
   csRef<iDataBuffer> dataBuffer = vfs->GetRealPath (baseMesh);
-  csString realBaseName = dataBuffer->GetData ();
+  csString realBaseFile = dataBuffer->GetData ();
+
+  // If the mask is empty then build a new one based the base name
+  csString mask = meshMask;
+  if (mask == "")
+    mask = baseName + ".*[.]" + suffix;
 
   // Load all animesh files matching the mask
   csRef<iStringArray> files = vfs->FindFiles (path);
-  csRegExpMatcher matcher (meshMask);
+  csRegExpMatcher matcher (mask);
   for (size_t i = 0; i < files->GetSize (); i++)
   {
     // Check if the file matches the mask
@@ -142,7 +155,7 @@ iAnimatedMeshFactory* AnimatedMeshTools::ImportSplittedMesh
     // Check that it is not the base file
     dataBuffer = vfs->GetRealPath (files->Get (i));
     csString txt = dataBuffer->GetData ();
-    if (txt == realBaseName)
+    if (txt == realBaseFile)
       continue;
 
     // Load the animesh
@@ -169,7 +182,7 @@ iAnimatedMeshFactory* AnimatedMeshTools::ImportSplittedMesh
       continue;
   }
 
-  return meshFact;
+  return csPtr<iAnimatedMeshFactory> (meshFact);
 }
 
 bool AnimatedMeshTools::ImportMorphMesh
@@ -258,7 +271,7 @@ bool AnimatedMeshTools::ImportMorphMesh
   iAnimatedMeshMorphTarget* target =
     baseMesh->CreateMorphTarget (morphName);
   target->SetVertexOffsets (morphBuffer);
-  //target->Invalidate ();
+  target->Invalidate ();
 
   // Delete the mesh if needed
   if (deleteMesh)
@@ -271,7 +284,7 @@ bool AnimatedMeshTools::ImportMorphMesh
   return true;
 }
 
-iAnimatedMeshFactory* AnimatedMeshTools::ImportGeneralMesh
+csPtr<iAnimatedMeshFactory> AnimatedMeshTools::ImportGeneralMesh
 (iObjectRegistry* object_reg, iGeneralFactoryState* genmesh, bool deleteMesh)
 {
   // Find a pointer to the engine
@@ -279,7 +292,7 @@ iAnimatedMeshFactory* AnimatedMeshTools::ImportGeneralMesh
   if (!engine)
   {
     ReportError ("Could not find the engine");
-    return nullptr;
+    return csPtr<iAnimatedMeshFactory> (nullptr);
   }
 
   // Create the animesh factory
@@ -362,7 +375,7 @@ iAnimatedMeshFactory* AnimatedMeshTools::ImportGeneralMesh
     engine->GetMeshFactories ()->Remove (factory->GetMeshFactoryWrapper ());
   }
 
-  return factory;
+  return csPtr<iAnimatedMeshFactory> (factory);
 }
 
 } //namespace Mesh

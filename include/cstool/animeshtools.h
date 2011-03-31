@@ -66,7 +66,7 @@ class CS_CRYSTALSPACE_EXPORT AnimatedMeshTools
 #endif
   }
 
-  static csRef<iAnimatedMeshFactory> LoadAnimesh (iObjectRegistry* object_reg,
+  static csPtr<iAnimatedMeshFactory> LoadAnimesh (iObjectRegistry* object_reg,
 						  iLoader* loader,
 						  const char* factoryName,
 						  const char* filename);
@@ -74,7 +74,7 @@ class CS_CRYSTALSPACE_EXPORT AnimatedMeshTools
  public:
 
   /**
-   * Import a mesh with its morph targets splitted in several different
+   * Import a mesh with its morph targets split in several different
    * model files. This is useful eg to load directly models from the
    * FaceGen software.
    *
@@ -87,18 +87,19 @@ class CS_CRYSTALSPACE_EXPORT AnimatedMeshTools
    * \param path A VFS path to the directory containing all the data files
    * \param baseMesh The name of the file defining the base animesh where
    * all morph targets will be imported.
-   * \param meshMask A regular expression to determine which files should
-   * be imported as a new morph target. Use for example ".*[.]3[dD][sS]"
-   * if you want all files terminating by ".3ds" or ".3DS".
-   * \param factoryName Name to be given to the newly created animesh
-   * factory.
    * \note The animesh models with a different number of vertices than the
    * base animesh won't be imported. These models are also supposed to have
    * the same vertices in the same order.
+   * \param meshMask A regular expression to determine which files should
+   * be imported as a new morph target. Use for example ".*[.]3[dD][sS]"
+   * if you want all files terminating by ".3ds" or ".3DS". If you provide
+   * an empty mask, then a new one will be built based on \p baseMesh.
+   * \param factoryName Name to be given to the newly created animesh
+   * factory.
    */
-  static iAnimatedMeshFactory* ImportSplittedMesh
+  static csPtr<iAnimatedMeshFactory> ImportSplitMorphMesh
     (iObjectRegistry* object_reg, const char* path, const char* baseMesh,
-     const char* meshMask, const char* factoryName);
+     const char* factoryName, const char* meshMask = "");
 
   /**
    * Create a new morph target in an animesh by importing the vertices from
@@ -126,7 +127,7 @@ class CS_CRYSTALSPACE_EXPORT AnimatedMeshTools
    * \param genmesh The genmesh to be imported
    * \param deleteMesh Whether or not the genmesh should be removed from the engine.
    */
-  static iAnimatedMeshFactory* ImportGeneralMesh
+  static csPtr<iAnimatedMeshFactory> ImportGeneralMesh
     (iObjectRegistry* object_reg, iGeneralFactoryState* genmesh,
      bool deleteMesh = true);
 
