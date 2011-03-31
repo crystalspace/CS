@@ -810,10 +810,13 @@ void ViewMesh::SetLightMode (LightMode lightMode)
       break;
     }
 
+  ll->Get (0)->SetCutoffDistance (roomSize);
+  ll->Get (1)->SetCutoffDistance (roomSize);
+  ll->Get (2)->SetCutoffDistance (roomSize);
+
   ll->Get (0)->GetMovable()->UpdateMove();
   ll->Get (1)->GetMovable()->UpdateMove();
   ll->Get (2)->GetMovable()->UpdateMove();
-  // TODO: update light radius...
 
   this->lightMode = lightMode;
 }
