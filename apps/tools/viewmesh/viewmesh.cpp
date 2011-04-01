@@ -68,7 +68,7 @@ CS_IMPLEMENT_APPLICATION
 
 ViewMesh::ViewMesh () : 
   lightMode (THREE_POINT), scale (1.0f), lod_level (0), max_lod_level (0),
-  auto_lod (false)
+  auto_lod (false), mouseMove (false)
 {
   SetApplicationName ("CrystalSpace.ViewMesh");
 }
@@ -132,6 +132,35 @@ bool ViewMesh::OnKeyboard(iEvent& ev)
       }
     }
   }
+  return false;
+}
+
+bool ViewMesh::OnMouseDown (iEvent &event)
+{
+  // We start here a mouse interaction with the camera, therefore
+  // we must take precedence in the mouse events over the CeGUI
+  // window. In order to do that, we re-register to the event
+  // queue, but with a different priority.
+  if (mouseMove) return false;
+  mouseMove = true;
+
+  // Re-register to the event queue
+  csBaseEventHandler::UnregisterQueue ();
+  RegisterQueue (GetObjectRegistry (), csevAllEvents (GetObjectRegistry ()));
+
+  return false;
+}
+
+bool ViewMesh::OnMouseUp (iEvent &event)
+{
+  // We finish here a mouse interaction with the camera, therefore
+  // the CeGUI window should again take precedence in the mouse events.
+  if (!mouseMove) return false;
+  mouseMove = false;
+
+  // Re-register to the event queue
+  csBaseEventHandler::UnregisterQueue ();
+  RegisterQueue (GetObjectRegistry (), csevAllEvents (GetObjectRegistry ()));
   return false;
 }
 

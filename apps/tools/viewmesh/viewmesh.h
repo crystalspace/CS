@@ -104,6 +104,8 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   bool auto_lod;
 
   bool OnKeyboard (iEvent&);
+  bool OnMouseDown (iEvent &event);
+  bool OnMouseUp (iEvent &event);
 
   void Frame ();
 
@@ -158,16 +160,55 @@ private:
   bool StdDlgDirSelect (const CEGUI::EventArgs& e);
   bool StdDlgDirChange (const CEGUI::EventArgs& e);
 
+  /// Whether or not there is currently a mouse interaction with the camera
+  bool mouseMove;
+
   CS_EVENTHANDLER_NAMES ("crystalspace.viewmesh")
   
+  virtual const csHandlerID * GenericPrec (csRef<iEventHandlerRegistry> &r1, 
+    csRef<iEventNameRegistry> &r2, csEventID event) const 
+  {
+    // The CeGUI window has precedence in the mouse events iff
+    // there are no current mouse interaction with the camera
+    if (!mouseMove)
+    {
+      static csHandlerID precConstraint[2];
+    
+      precConstraint[0] = r1->GetGenericID("crystalspace.cegui");
+      precConstraint[1] = CS_HANDLERLIST_END;
+      return precConstraint;
+    }
+
+    else
+    {
+      static csHandlerID precConstraint[1];
+    
+      precConstraint[0] = CS_HANDLERLIST_END;
+      return precConstraint;
+    }
+  }
+
   virtual const csHandlerID * GenericSucc (csRef<iEventHandlerRegistry> &r1, 
     csRef<iEventNameRegistry> &r2, csEventID event) const 
   {
-    static csHandlerID precConstraint[2];
+    // The CeGUI window has precedence in the mouse events iff
+    // there are no current mouse interaction with the camera
+    if (mouseMove)
+    {
+      static csHandlerID precConstraint[2];
     
-    precConstraint[0] = r1->GetGenericID("crystalspace.cegui");
-    precConstraint[1] = CS_HANDLERLIST_END;
-    return precConstraint;
+      precConstraint[0] = r1->GetGenericID("crystalspace.cegui");
+      precConstraint[1] = CS_HANDLERLIST_END;
+      return precConstraint;
+    }
+
+    else
+    {
+      static csHandlerID precConstraint[1];
+    
+      precConstraint[0] = CS_HANDLERLIST_END;
+      return precConstraint;
+    }
   }
 
   CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
