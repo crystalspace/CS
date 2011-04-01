@@ -52,12 +52,9 @@ Monster::~Monster()
 {
 }
 
-bool Monster::Initialize(iMeshWrapper* spawn)
+bool Monster::Initialize (const char* name, iSector* sector, csTransform& transform)
 {
   csRef<iConfigManager> cfg (csQueryRegistry<iConfigManager> (object_reg));
-
-  //Replace spawn mesh with real mesh.
-  std::string name = spawn->QueryObject()->GetName();
 
   std::string tmp, filename;
   filename = name;
@@ -79,9 +76,8 @@ bool Monster::Initialize(iMeshWrapper* spawn)
     return false;
   }
 
-  csVector3 pos = spawn->GetMovable()->GetPosition();
-  iSector* sector = spawn->GetMovable()->GetSectors()->Get(0);
-  mesh->GetMovable()->SetPosition(sector, pos);
+  mesh->GetMovable()->SetSector(sector);
+  mesh->GetMovable()->SetTransform(transform);
   mesh->GetMovable()->UpdateMove();
 
   mesh->QueryObject()->ObjAdd(this);

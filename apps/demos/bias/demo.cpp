@@ -149,7 +149,6 @@ bool Demo::Application()
   printer.AttachNew (new FramePrinter (object_reg));
 
   csRef<iPluginManager> plugin_mgr;
-  csRef<iCollideSystem> collide_system;
   plugin_mgr = csQueryRegistry<iPluginManager> (object_reg);
 
   const char* p = "crystalspace.collisiondetection.opcode";
@@ -158,8 +157,6 @@ bool Demo::Application()
   object_reg->Register (collide_system, "iCollideSystem");
 
   CreateRoom();
-
-  csColliderHelper::InitializeCollisionWrappers (collide_system, engine);
 
   player.AttachNew(new Player(object_reg));
   object_reg->Register(player, "Player");
@@ -458,25 +455,42 @@ void Demo::CreateRoom ()
     SimpleStaticLighter::ShineLights (room, engine, 4);
   }
 
-  // Switch the monster meshes with their real models and objects
-  csArray<int> index;
-  csRef<iMeshList> list = engine->GetMeshes();
-  for (int i = 0; i < list->GetCount(); i++)
+  // Collect the list of all monsters
+  csArray<int> monsterIndices;
+  csRef<iMeshList> engineMeshes = engine->GetMeshes();
+  csArray<MonsterData> monsterList;
+  for (int i = 0; i < engineMeshes->GetCount(); i++)
   {
-    csRef<iMeshWrapper> mesh = list->Get(i);
+    csRef<iMeshWrapper> mesh = engineMeshes->Get(i);
     if (strncmp (mesh->QueryObject()->GetName(), "entity", 6) == 0)
     {
-      printf("creating entity %s\n", mesh->QueryObject()->GetName());
-      csRef<Monster> monster;
-      monster.AttachNew(new Monster(object_reg));
-      if (monster->Initialize (mesh))
-	monsters.Push(monster);
-      index.Push(i);
+      MonsterData monster;
+      monster.name = mesh->QueryObject()->GetName();
+      monster.transform = mesh->GetMovable()->GetTransform();
+      monster.sector = mesh->GetMovable()->GetSectors()->Get(0);
+      monsterList.Push(monster);
+      monsterIndices.Push(i);
     }
   }
-  while (index.GetSize() > 0)
+
+  // Remove the dummy meshes of the monsters
+  while (monsterIndices.GetSize() > 0)
   {
-    list->Remove(index.Pop());
+    engineMeshes->Remove(monsterIndices.Pop());
+  }
+
+  // Initialize the collision system with the current state of the scene
+  csColliderHelper::InitializeCollisionWrappers (collide_system, engine);
+
+  // Create all monsters
+  for (size_t i = 0; i < monsterList.GetSize(); i++)
+  {
+    MonsterData& data = monsterList[i];
+
+    csRef<Monster> monster;
+    monster.AttachNew(new Monster(object_reg));
+    if (monster->Initialize (data.name, data.sector, data.transform))
+      monsters.Push(monster);
   }
 
   // Pre-load the 'gibs' mesh

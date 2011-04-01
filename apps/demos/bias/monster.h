@@ -44,7 +44,7 @@ public:
   Monster(iObjectRegistry*);
   ~Monster();
 
-  virtual bool Initialize (iMeshWrapper*);
+  virtual bool Initialize (const char* name, iSector* sector, csTransform& transform);
 
   virtual void PlayAnimation(const char*, bool);
   virtual void StopAnimation();

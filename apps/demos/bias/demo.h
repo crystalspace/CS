@@ -36,8 +36,14 @@ private:
   bool do_freelook;
 
   csRef<Player> player;
-
   csRefArray<Monster> monsters;
+
+  struct MonsterData
+  {
+    csString name;
+    csRef<iSector> sector;
+    csTransform transform;
+  };
 
 private:
   iSector *room;
@@ -52,6 +58,7 @@ private:
   csRef<iVFS> vfs;
   csRef<iCEGUI> cegui;
   csRef<FramePrinter> printer;
+  csRef<iCollideSystem> collide_system;
 
   void Frame();
 
