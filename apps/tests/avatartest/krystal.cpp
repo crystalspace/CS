@@ -70,6 +70,9 @@ KrystalScene::~KrystalScene ()
 
   if (skirtBody)
     avatarTest->bulletDynamicSystem->RemoveSoftBody (skirtBody);
+
+  if (IKMesh)
+    avatarTest->engine->RemoveObject (IKMesh);
 }
 
 csVector3 KrystalScene::GetCameraTarget ()
