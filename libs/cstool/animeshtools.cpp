@@ -138,7 +138,7 @@ csPtr<iAnimatedMeshFactory> AnimatedMeshTools::ImportSplitMorphMesh
   csRef<iDataBuffer> dataBuffer = vfs->GetRealPath (baseMesh);
   csString realBaseFile = dataBuffer->GetData ();
 
-  // If the mask is empty then build a new one based the base name
+  // If the mask is empty then build a new one based on the base name
   csString mask = meshMask;
   if (mask == "")
     mask = baseName + ".*[.]" + suffix;

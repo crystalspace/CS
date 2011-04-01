@@ -2,7 +2,7 @@
     <meshfact name="Jane">
         <plugin>crystalspace.mesh.loader.factory.animesh.splitmorph</plugin>
 	<params>
-	    <!--vfspath>/lib/jane/</realpath-->
+	    <!--vfspath>/lib/jane/</vfspath-->
 	    <realpath>data/jane/Jane_hi_all_3ds.zip</realpath>
 	    <basefile>Jane_hi_all.3ds</basefile>
 	    <!--meshname>Jane</meshname-->
