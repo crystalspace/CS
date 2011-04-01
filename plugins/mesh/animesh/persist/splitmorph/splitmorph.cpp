@@ -24,8 +24,9 @@
 #include "imesh/animesh.h"
 #include "iutil/document.h"
 #include "iutil/vfs.h"
-#include "animeshtools.h"
+#include "cstool/animeshtools.h"
 #include "csutil/scf.h"
+#include "csutil/stringquote.h"
 
 #include "splitmorph.h"
 
@@ -109,8 +110,14 @@ CS_PLUGIN_NAMESPACE_BEGIN (SplitMorph)
     if (!realPath.IsEmpty ())
     {
       csRef<iVFS> vfs =  csQueryRegistry<iVFS> (registry);
-      vfs->Mount ("/temp_splitmorph/", realPath/*.GetData ()*/);
-      path = "/temp_splitmorph/";
+      if (!vfs->Mount ("/tmp/splitmorph", realPath))
+      {
+	synldr->ReportError (msgidFactory, node, "Could not mount real path %s!",
+			     CS::Quote::Single (realPath));
+	return csPtr<iBase> (nullptr);
+      }
+
+      path = "/tmp/splitmorph/";
     }
 
     // Import the animesh
@@ -123,7 +130,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (SplitMorph)
     if (!realPath.IsEmpty ())
     {
       csRef<iVFS> vfs =  csQueryRegistry<iVFS> (registry);
-      vfs->Unmount ("/temp_splitmorph/", nullptr);
+      vfs->Unmount ("/tmp/splitmorph", nullptr);
     }
 
     return scfQueryInterface<iBase> (meshFactory);
