@@ -202,7 +202,7 @@ public:
   { return ABS(v.x)<f && ABS(v.y)<f && ABS(v.z)<f && ABS(v.w)<f; }
 
   /// Returns n-th component of the vector.
-#ifdef __STRICT_ANSI__
+#if defined( __STRICT_ANSI__) || defined(SWIG)
   inline float operator[] (size_t n) const 
   { return (n&2)?((n&1)?w:z):((n&1)?y:x); }
 #else
@@ -210,7 +210,7 @@ public:
 #endif
 
   /// Returns n-th component of the vector.
-#ifdef __STRICT_ANSI__
+#if defined( __STRICT_ANSI__) || defined(SWIG)
   inline float & operator[] (size_t n) 
   { return (n&2)?((n&1)?w:z):((n&1)?y:x); }
 #else

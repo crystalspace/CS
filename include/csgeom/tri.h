@@ -87,14 +87,14 @@ namespace CS
     }
 
     /// Returns n-th component of the triangle.
-#ifdef __STRICT_ANSI__
+#if defined( __STRICT_ANSI__) || defined(SWIG)
     inline const T& operator[] (size_t n) const { return !n?a:n&1?b:c; }
 #else
     inline const T& operator[] (size_t n) const { return components[n]; }
 #endif
 
     /// Returns n-th component of the triangle.
-#ifdef __STRICT_ANSI__
+#if defined( __STRICT_ANSI__) || defined(SWIG)
     inline T& operator[] (size_t n) { return !n?a:n&1?b:c; }
 #else
     inline T& operator[] (size_t n) { return components[n]; }
