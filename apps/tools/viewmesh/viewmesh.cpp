@@ -20,24 +20,12 @@
 /* ViewMesh: tool for displaying mesh objects (3d sprites) */
 #include "viewmesh.h"
 
-#include "csutil/cscolor.h"
-#include "csutil/common_handlers.h"
-#include "csutil/event.h"
 #include "csutil/scanstr.h"
-#include "csutil/scfstr.h"
-#include "csutil/stringconv.h"
 #include "imesh/animesh.h"
-#include "imesh/object.h"
 #include "imesh/animnode/skeleton2anim.h"
 #include "imesh/genmesh.h"
-#include "iutil/eventq.h"
 #include "iutil/object.h"
-#include "iutil/stringarray.h"
-#include "iengine/scenenode.h"
-#include "iengine/renderloop.h"
-#include "ivideo/graph2d.h"
 #include "ivideo/material.h"
-#include "csutil/scfstringarray.h"
 
 #include "animeshasset.h"
 #include "cal3dasset.h"
@@ -67,10 +55,10 @@ CS_IMPLEMENT_APPLICATION
 //---------------------------------------------------------------------------
 
 ViewMesh::ViewMesh () : 
-  lightMode (THREE_POINT), scale (1.0f), lod_level (0), max_lod_level (0),
-  auto_lod (false), mouseMove (false)
+  DemoApplication ("CrystalSpace.ViewMesh"), lightMode (THREE_POINT), scale (1.0f),
+  lod_level (0), max_lod_level (0), auto_lod (false), mouseMove (false)
 {
-  SetApplicationName ("CrystalSpace.ViewMesh");
+  hudManager.keyDescriptions.DeleteAll ();
 }
 
 ViewMesh::~ViewMesh ()
@@ -79,10 +67,8 @@ ViewMesh::~ViewMesh ()
 
 void ViewMesh::Frame()
 {
-  if (!g3d->BeginDraw (CSDRAW_3DGRAPHICS))
-    return;
-
-  view->Draw ();
+  // Default behavior from DemoApplication
+  DemoApplication::Frame ();
 
   if (loading)
     LoadSprite(reloadFilename, reloadFilePath);
@@ -92,19 +78,14 @@ void ViewMesh::Frame()
 
 bool ViewMesh::OnKeyboard(iEvent& ev)
 {
+  // Default behavior from DemoApplication
+  if (DemoApplication::OnKeyboard (ev))
+    return true;
+
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
   if (eventtype == csKeyEventTypeDown)
   {
-    utf32_char code = csKeyEventHelper::GetCookedCode(&ev);
-    if (code == CSKEY_ESC)
-    {
-      csRef<iEventQueue> q = 
-        csQueryRegistry<iEventQueue> (GetObjectRegistry());
-      if (q.IsValid())
-	q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
-      return false;
-    }
-
+    // Change progressive LOD
     bool needLODUpdate = false;
     if (csKeyEventHelper::GetCookedCode (&ev) == '-'
 	&& !auto_lod
@@ -289,24 +270,15 @@ void ViewMesh::LoadLibrary(const char* file, bool record)
   loader->LoadLibraryFile(file, collection);
 }
 
-bool ViewMesh::OnInitialize(int /*argc*/, char* /*argv*/ [])
+bool ViewMesh::OnInitialize(int argc, char* argv [])
 {
-  if (csCommandLineHelper::CheckHelp (GetObjectRegistry()))
-  {
-    ViewMesh::Help();
-    csCommandLineHelper::Help(GetObjectRegistry());
-    return 0;
-  }
+  // Default behavior from DemoApplication
+  if (!DemoApplication::OnInitialize (argc, argv))
+    return false;
 
   if (!csInitializer::RequestPlugins(GetObjectRegistry(),
-    CS_REQUEST_VFS,
-    CS_REQUEST_OPENGL3D,
-    CS_REQUEST_ENGINE,
-    CS_REQUEST_FONTSERVER,
     CS_REQUEST_IMAGELOADER,
     CS_REQUEST_LEVELLOADER,
-    CS_REQUEST_REPORTER,
-    CS_REQUEST_REPORTERLISTENER,
     CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
     CS_REQUEST_END))
     return ReportError("Failed to initialize plugins!");
@@ -320,39 +292,16 @@ bool ViewMesh::OnInitialize(int /*argc*/, char* /*argv*/ [])
     CS_REQUEST_END))
     return ReportError("Failed to initialize plugins!");
 
-  csBaseEventHandler::Initialize(GetObjectRegistry());
-
-  if (!RegisterQueue(GetObjectRegistry(), csevAllEvents(GetObjectRegistry())))
-    return ReportError("Failed to set up event handler!");
-
   return true;
-}
-
-void ViewMesh::OnExit()
-{
-  printer.Invalidate ();
 }
 
 bool ViewMesh::Application()
 {
-  if (!OpenApplication(GetObjectRegistry()))
-    return ReportError("Error opening system!");
+  // Default behavior from DemoApplication
+  if (!DemoApplication::Application ())
+    return false;
 
-  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
-  if (!g3d) return ReportError("Failed to locate 3D renderer!");
-
-  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry());
-  if (!vc) return ReportError("Failed to locate Virtual Clock!");
-
-  vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
-  if (!vfs) return ReportError("Failed to locate Virtual FileSystem!");
-
-  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry());
-  if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
-
-  loader = csQueryRegistry<iLoader> (GetObjectRegistry());
-  if (!loader) return ReportError("Failed to locate Loader!");
-
+  // Find references to the plugins of the animation nodes
   tloader = csQueryRegistry<iThreadedLoader> (GetObjectRegistry());
   if (!tloader) return ReportError("Failed to locate threaded Loader!");
 
@@ -362,10 +311,6 @@ bool ViewMesh::Application()
   cegui = csQueryRegistry<iCEGUI> (GetObjectRegistry());
   if (!cegui) return ReportError("Failed to locate CEGUI plugin");
   
-  view.AttachNew(new csView (engine, g3d));
-  iGraphics2D* g2d = g3d->GetDriver2D ();
-  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
-
   collection = engine->CreateCollection ("viewmesh_region");
   reloadFilename = "";
 
@@ -375,8 +320,6 @@ bool ViewMesh::Application()
     return false;
 
   HandleCommandLine();
-
-  printer.AttachNew (new FramePrinter (object_reg));
 
   Run();
 
@@ -613,7 +556,7 @@ void ViewMesh::LoadSprite (const char* filename, const char* path)
     csBox3 bbox = asset->GetMesh ()->GetWorldBoundingBox ();
     cameraManager.SetCameraTarget (bbox.GetCenter ());
     float boxSize = bbox.GetSize ().Norm ();
-    cameraManager.SetStartPosition (bbox.GetCenter () + csVector3 (0.0f, 0.0f, - boxSize * 1.3f));
+    cameraManager.SetStartPosition (bbox.GetCenter () + csVector3 (0.0f, 0.0f, - boxSize));
     cameraManager.SetMotionSpeed (boxSize * 5.0f);
     cameraManager.ResetCamera ();
 
