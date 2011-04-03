@@ -104,6 +104,10 @@ if $(CEGUI.AVAILABLE) = "yes"
   {
     VIEWMESH.PLUGINLIST += csjpgimg ;
   }
+  if $(MNG.AVAILABLE) = "yes" && $(JPEG.AVAILABLE) = "yes" && $(ZLIB.AVAILABLE) = "yes"
+  {
+    VIEWMESH.PLUGINLIST += csjngimg ;
+  }
   if $(PNG.AVAILABLE) = "yes"
   {
     VIEWMESH.PLUGINLIST += cspngimg ;
