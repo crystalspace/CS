@@ -22,11 +22,16 @@
 #ifndef __HAIRTEST_H__
 #define __HAIRTEST_H__
 
-#include "crystalspace.h"
-
+#include "imesh/animesh.h"
+#include "imesh/animnode/ragdoll.h"
 #include "imesh/furmesh.h"
+#include "ivaria/dynamics.h"
+#include "ivaria/dynamicsdebug.h"
 #include "ivaria/icegui.h"
 
+#include "cstool/csdemoapplication.h"
+
+// Different states for the display of the physical objects
 #define DYNDEBUG_NONE 1
 #define DYNDEBUG_MIXED 2
 #define DYNDEBUG_COLLIDER 3
@@ -39,8 +44,6 @@ public:
   virtual ~AvatarScene () {}
 
   // Camera related
-  virtual csVector3 GetCameraStart () = 0;
-  virtual float GetCameraMinimumDistance () = 0;
   virtual csVector3 GetCameraTarget () = 0;
 
   // Dynamic simuation related
@@ -57,7 +60,7 @@ public:
   virtual void KillAvatar () = 0;
 
   // Display of information on the state of the scene
-  virtual void UpdateStateDescription () = 0;
+  virtual void UpdateStateDescription () {}
 
   // Switch fur dynamics
   virtual void SwitchFurPhysics() = 0;
@@ -144,14 +147,11 @@ private:
   // Switch Active Colliders displayed
   void SwitchDynamics();
 
-  //-- csDemoApplication
-  csVector3 GetCameraStart ();
-  float GetCameraMinimumDistance ();
-  csVector3 GetCameraTarget ();
-
 public:
   HairTest ();
   ~HairTest ();
+
+  void PrintHelp ();
 
   // Save fur
   void SaveFactory(iMeshFactoryWrapper* meshfactwrap, const char * filename);

@@ -95,6 +95,21 @@ public:
     else
       return 0;
   }
+  
+  /**
+   * Get the pointer to the start of the array and set internal array
+   * pointer to null and size and capacity to 0.
+   * After the data is detached it's up to you to destroy all elements
+   * and free the memory!
+   */
+  T* Detach ()
+  {
+    T* ptr = GetArray ();
+    this->SetDataVeryUnsafe (nullptr);
+    this->SetSizeVeryUnsafe (0);
+    this->SetCapacityVeryUnsafe (0);
+    return ptr;
+  }
 };
 
 /**

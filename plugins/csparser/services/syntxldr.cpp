@@ -299,6 +299,41 @@ bool csTextSyntaxService::ParseMatrix (iDocumentNode* node, csMatrix3 &m)
   return true;
 }
 
+bool csTextSyntaxService::ParseMatrix (iDocumentNode* node, CS::Math::Matrix4& m)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_M11: m.m11 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M12: m.m12 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M13: m.m13 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M14: m.m14 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M21: m.m21 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M22: m.m22 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M23: m.m23 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M24: m.m24 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M31: m.m31 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M32: m.m32 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M33: m.m33 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M34: m.m34 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M41: m.m31 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M42: m.m32 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M43: m.m33 = child->GetContentsValueAsFloat (); break;
+      case XMLTOKEN_M44: m.m34 = child->GetContentsValueAsFloat (); break;
+      default:
+        ReportBadToken (child);
+        return false;
+    }
+  }
+  return true;
+}
+
 bool csTextSyntaxService::WriteMatrix (iDocumentNode* node, const csMatrix3& m)
 {
   csRef<iDocumentNode> m11Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);

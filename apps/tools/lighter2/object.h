@@ -352,6 +352,7 @@ namespace lighter
     };
     typedef csHash<csRef<LightInfluencesRC>, GroupAndLight> LightInfluencesHash;
     LightInfluencesHash* lightInfluences;
+    CS::Threading::Mutex lightInfluencesMutex;
 
     friend class ObjectFactory;
   };

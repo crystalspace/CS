@@ -62,6 +62,8 @@
 	<input name="lightOffset" type="int" default="value" defval="0"/>
 	<input name="maxLights" type="int" default="value" defval="3"/>
 	<input name="minLights" type="int" default="value" defval="0"/>
+	<!-- Shininess value for specular reflection -->
+	<input name="shininess" type="float" default="value" defval="32" />
 	
 	<block location="pass">
 	  <?Include /shader-snippets/lighting/lighting-tools.inc ?>
@@ -139,7 +141,7 @@
 	    Light light = GetCurrentLight (lightSpace, i);
 	    float4 lightAttenuationVec = lightProps.attenuationVec[i];
 	    float3 d, s;
-	    ComputeLight (lightSpace, light, myEyeToSurf, normal, 32,
+	    ComputeLight (lightSpace, light, myEyeToSurf, normal, shininess,
 	      lightDiffuse, lightProps.colorSpecular[i],
 	      lightAttenuationVec, shadow.GetVisibility(), d, s);
 	    

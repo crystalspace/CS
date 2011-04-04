@@ -25,13 +25,13 @@
 FrankieScene::FrankieScene (HairTest* hairTest)
   : hairTest (hairTest), furPhysicsEnabled(false)
 {
+  // Setup the parameters of the camera manager
+  hairTest->cameraManager.SetStartPosition (csVector3 (0.0f, 0.25f, -1.25f));
+  hairTest->cameraManager.SetCameraMinimumDistance (0.75f);
+
   // Define the available keys
-  hairTest->hudHelper.keyDescriptions.DeleteAll ();
-  hairTest->hudHelper.keyDescriptions.Push ("arrow keys: move camera");
-  hairTest->hudHelper.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
- 
-  if (hairTest->physicsEnabled)
-    hairTest->hudHelper.keyDescriptions.Push ("d: display active colliders");
+  hairTest->hudManager.keyDescriptions.DeleteAll ();
+  hairTest->hudManager.stateDescriptions.DeleteAll ();
 }
 
 FrankieScene::~FrankieScene ()
@@ -51,16 +51,6 @@ FrankieScene::~FrankieScene ()
   }
 }
 
-csVector3 FrankieScene::GetCameraStart ()
-{
-  return csVector3 (0.0f, 0.0f, -1.25f);
-}
-
-float FrankieScene::GetCameraMinimumDistance ()
-{
-  return 0.75f;
-}
-
 csVector3 FrankieScene::GetCameraTarget ()
 {
   csRef<iMeshObject> animeshObject = scfQueryInterface<iMeshObject> (animesh);
@@ -72,7 +62,7 @@ csVector3 FrankieScene::GetCameraTarget ()
 
 float FrankieScene::GetSimulationSpeed ()
 {
-  return 0.25f;
+  return 1.0f;
 }
 
 bool FrankieScene::HasPhysicalObjects ()
@@ -90,7 +80,7 @@ bool FrankieScene::CreateAvatar ()
     return hairTest->ReportError ("Can't load Frankie library file!");
 
   // Load some fur
-  rc = hairTest->loader->Load ("/lib/frankie/frankie_furmesh.xml");
+  rc = hairTest->loader->Load ("/lib/hairtest/frankie_furmesh.xml");
   if (!rc.success)
     return hairTest->ReportError ("Can't load frankie furmesh library!");
 
@@ -285,13 +275,13 @@ bool FrankieScene::CreateAvatar ()
 
   // Get plugin manager
   csRef<iPluginManager> plugmgr = 
-    csQueryRegistry<iPluginManager> (hairTest->object_reg);
+    csQueryRegistry<iPluginManager> (hairTest->GetObjectRegistry ());
   if (!plugmgr)
     return hairTest->ReportError("Failed to locate Plugin Manager!");
 
   // Load furMesh
   csRef<CS::Mesh::iFurMeshType> furMeshType = 
-    csQueryRegistry<CS::Mesh::iFurMeshType> (hairTest->object_reg);
+    csQueryRegistry<CS::Mesh::iFurMeshType> (hairTest->GetObjectRegistry ());
   if (!furMeshType)
     return hairTest->ReportError("Failed to locate CS::Mesh::iFurMeshType plugin!");
 
@@ -403,11 +393,6 @@ void FrankieScene::ResetScene ()
     furMesh->ResetMesh();
 }
 
-void FrankieScene::UpdateStateDescription ()
-{
-  hairTest->hudHelper.stateDescriptions.DeleteAll ();
-}
-
 
 void FrankieScene::SwitchFurPhysics()
 {
@@ -441,7 +426,7 @@ void FrankieScene::SaveFur()
     return;
   }
 
-  hairTest->SaveFactory(meshfactwrap, "/lib/frankie/frankie_furmesh_factory.save");
+  hairTest->SaveFactory(meshfactwrap, "/lib/hairtest/frankie_furmesh_factory.save");
 
   iMeshWrapper* meshwrap = 
     hairTest->engine->FindMeshObject("frankie_furmesh_object");
@@ -451,5 +436,5 @@ void FrankieScene::SaveFur()
     return;
   }
 
-  hairTest->SaveObject(meshwrap, "/lib/frankie/frankie_furmesh_object.save");
+  hairTest->SaveObject(meshwrap, "/lib/hairtest/frankie_furmesh_object.save");
 }

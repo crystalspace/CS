@@ -66,6 +66,7 @@ public:
   virtual void Set (const char *sector, const csVector3 &pos,
     const csVector3 &forward, const csVector3 &upward);
   virtual bool Load (iCamera *c, iEngine *e);
+  virtual void Save (iCamera* camera);
   virtual void SetFarPlane (csPlane3* pl);
   virtual void ClearFarPlane ();
   virtual csPlane3* GetFarPlane () const

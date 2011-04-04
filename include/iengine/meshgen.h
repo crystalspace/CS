@@ -49,7 +49,7 @@ struct iTerraFormer;
  */
 struct iMeshGeneratorGeometry : public virtual iBase
 {
-  SCF_INTERFACE(iMeshGeneratorGeometry, 1, 1, 0);
+  SCF_INTERFACE(iMeshGeneratorGeometry, 1, 1, 1);
 
   /**
    * Add a factory and the maximum distance after which this factory
@@ -166,6 +166,19 @@ struct iMeshGeneratorGeometry : public virtual iBase
    * \param speed is the value of the wind speed.
    */
   virtual void SetWindSpeed (float speed) = 0;
+
+  /**
+   * Use a density factor map.
+   * The sum of all densities from factor maps will affect the density
+   * at a given point. The value from the map will be scaled by the given
+   * factor. The final density will be based on
+   * base density * sum of density factor map values.
+   * \param factorMapID The identifier with which the map was added to the
+   *   mesh generator.
+   * \param factor Factor by which the density from the image is multiplied.
+   */
+  virtual bool UseDensityFactorMap (const char* factorMapID,
+				    float factor) = 0;
 };
 
 /**
@@ -182,7 +195,7 @@ struct iMeshGeneratorGeometry : public virtual iBase
  */
 struct iMeshGenerator : public virtual iBase
 {
-  SCF_INTERFACE(iMeshGenerator, 1, 0, 1);
+  SCF_INTERFACE(iMeshGenerator, 1, 0, 2);
 
   /**
    * Get the iObject for this mesh generator.
@@ -302,6 +315,23 @@ struct iMeshGenerator : public virtual iBase
    * the block after making changes to the density map (for example).
    */
   virtual void ClearPosition (const csVector3& pos) = 0;
+  
+  /**
+   * Add a density factor map in grayscale.
+   * These can be used by geometries to influence the density at some given
+   * point.
+   * \param factorMapID Identifier by which this map is referenced.
+   *   Used to link factor maps to geometries.
+   * \param mapImage Image with density data.
+   * \param worldToMap Transformation to map world coordinates into
+   *   normalized image coordinates. Transform is applied to coordinates
+   *   for which the density is to be determined, and the X and Y
+   *   components of the transformed coordinates are used as image 
+   *   coordinates.
+   */
+  virtual void AddDensityFactorMap (const char* factorMapID,
+				    iImage* mapImage,
+				    const CS::Math::Matrix4& worldToMap) = 0;
 };
 
 /** @} */

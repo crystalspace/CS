@@ -61,7 +61,7 @@ struct iSkeletonRandomNode;
 struct iSkeletonFSMNodeFactory;
 struct iSkeletonFSMNode;
 
-class csSkeletalState;
+class AnimatedMeshState;
 
 
 /**\addtogroup meshplugins
@@ -116,7 +116,7 @@ enum SynchronizationMode
  */
 struct iSkeletonAnimPacketFactory : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonAnimPacketFactory, 2, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonAnimPacketFactory, 2, 0, 1);
   
   /**
    * Create an instance of this animation packet
@@ -182,6 +182,16 @@ struct iSkeletonAnimPacketFactory : public virtual iBase
    * Create a FSM node
    */
   virtual csPtr<iSkeletonFSMNodeFactory> CreateFSMNode (const char* name) = 0;
+
+  /**
+   * Remove the animation of the given name
+   */
+  virtual void RemoveAnimation (const char* name) = 0;
+
+  /**
+   * Remove the animation of the given index
+   */
+  virtual void RemoveAnimation (size_t index) = 0;
 };
 
 /**
@@ -213,9 +223,29 @@ struct iSkeletonAnimPacket : public virtual iBase
 
 /**
  * Data structure for raw skeletal animations. It defines the key frames of the
- * animation but not the current playing state.
- * Each animation is made up of one or more channels, where a channel is a set
- * of key frames associated with a specific bone.
+ * animation but not its current playing state. You need to use a
+ * CS::Animation::iSkeletonAnimationNode in order to play this animation.
+ *
+ * Each animation is made up of one or more channels, where each channel is
+ * associated to a bone of the skeleton. Each channel can contain one or more
+ * keyframes defining the configuration of the bone at a given time. When the
+ * animation is played, the configuration of the bone is blended between the two
+ * closest keyframes of the given playback time.
+ *
+ * For a given channel, if there is no keyframe defined before the current playing
+ * time (ie there are no keyframe defined for the time 0), then the last keyframe
+ * will be used as the first closest keyframe. Similarly, if there is no keyframe
+ * defined after the current playing time, then the first keyframe will be used as
+ * the second closest keyframe.
+ *
+ * This behavior of the transition bewteen the last and the first keyframes is useful
+ * for cyclic animations but may be surprising for animations which are not. A good
+ * practice when defining non cyclic animations is therefore to always define a
+ * keyframe for all channels at time 0 and at the last key time.
+ *
+ * When this animation is played by an CS::Animation::iSkeletonAnimationNode, it
+ * calls the BlendState() method who will blend the animation at a given time
+ * into the state of the skeleton.
  *
  * Main creators of instances implementing this interface:
  * - CS::Animation::iSkeletonAnimPacketFactory::CreateAnimation()
@@ -229,7 +259,7 @@ struct iSkeletonAnimPacket : public virtual iBase
  */
 struct iSkeletonAnimation : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonAnimation, 2, 0, 3);
+  SCF_INTERFACE(CS::Animation::iSkeletonAnimation, 2, 0, 4);
 
   /**
    * Get the name of the animation.
@@ -293,6 +323,7 @@ struct iSkeletonAnimation : public virtual iBase
    * \param afterRot The rotation of the bone for the key frame after the given time.
    * \param afterOffset The position of the bone for the key frame after the given time.
    */
+  CS_DEPRECATED_METHOD_MSG("Deprecated in 1.9. Don't use it anymore (or complain if you found a good reason to).")
   virtual void GetTwoKeyFrames (ChannelID channel, float time, BoneID& bone,
     float& timeBefore, csQuaternion& beforeRot, csVector3& beforeOffset,
     float& timeAfter, csQuaternion& afterRot, csVector3& afterOffset) = 0;
@@ -303,9 +334,10 @@ struct iSkeletonAnimation : public virtual iBase
    * \param state The skeletal state where the result will be blended.
    * \param baseWeight The base weight to be used for blending.
    * \param playbackTime The current playback time.
-   * \param isPlayingCyclic If the playing should be cyclic or not.
+   * \param isPlayingCyclic If the playing should be cyclic or not. This parameter is now ignored.
    */
-  virtual void BlendState (csSkeletalState* state, 
+  CS_DEPRECATED_METHOD_MSG("Deprecated in 1.9. Use instead the version without the 'isPlayingCyclic' parameter.")
+  virtual void BlendState (AnimatedMeshState* state, 
     float baseWeight, float playbackTime, bool isPlayingCyclic) const = 0;
 
   /**
@@ -368,6 +400,38 @@ struct iSkeletonAnimation : public virtual iBase
    * \warning This will alter the ID of the successive channels.
    */
   virtual void RemoveChannel (ChannelID channel) = 0;
+
+  /**
+   * Add or reset the rotation at the given time within the given channel.
+   * \param channel Id of the channel.
+   * \param time The time of the key frame.
+   * \param rotation The rotation of the bone for the key frame.
+   * \remark The rotation must be in the space defined by
+   * GetFramesInBoneSpace().
+   */
+  virtual void AddOrSetKeyFrame (ChannelID channel, float time, 
+    const csQuaternion& rotation) = 0;
+
+  /**
+   * Add or reset the position at the given time within the given channel.
+   * \param channel Id of the channel.
+   * \param time The time of the key frame.
+   * \param offset The position of the bone for the key frame.
+   * \remark The offset must be in the space defined by
+   * GetFramesInBoneSpace().
+   */
+  virtual void AddOrSetKeyFrame (ChannelID channel, float time, 
+    const csVector3& offset) = 0;
+
+  /**
+   * Blend the animation into a skeletal state buffer at a specific playback 
+   * position.
+   * \param state The skeletal state where the result will be blended.
+   * \param baseWeight The base weight to be used for blending.
+   * \param playbackTime The current playback time.
+   */
+  virtual void BlendState (AnimatedMeshState* state, 
+    float baseWeight, float playbackTime) const = 0;
 };
 
 
@@ -496,7 +560,7 @@ struct iSkeletonAnimNode : public virtual iBase
    * \param state The global blend state to blend into
    * \param baseWeight Global weight for the blending of this node
    */
-  virtual void BlendState (csSkeletalState* state, float baseWeight = 1.0f) = 0;
+  virtual void BlendState (AnimatedMeshState* state, float baseWeight = 1.0f) = 0;
 
   /**
    * Update the state of the animation generated by this node
@@ -1051,6 +1115,45 @@ struct iSkeletonFSMNode : public iSkeletonAnimNode
    */
   virtual iSkeletonAnimNode* GetStateNode (StateID state) const = 0;
 };
+
+/**
+ * Template for an animation node manager.
+ * \a FactoryInterface is the interface type for the node factory.
+ * Usage example:
+ * \code
+ * struct iSkeletonFooNodeManager :
+ *   public CS::Animation::iSkeletonAnimNodeManager<iSkeletonFooNodeFactory>
+ * {
+ *   SCF_ISKELETONANIMNODEMANAGER_INTERFACE(iSkeletonFooNodeManager, 1, 0, 0);
+ * };
+ * \endcode
+ */
+/* Implementation note: bump number before '*10' in
+ * SCF_ISKELETONANIMNODEMANAGER_INTERFACE when changing this interface. */
+template <class FactoryInterface>
+struct iSkeletonAnimNodeManager : public virtual iBase
+{
+  typedef FactoryInterface FactoryInterfaceType;
+
+  /// Create an animation node factory with the given name
+  virtual FactoryInterface* CreateAnimNodeFactory (const char* name) = 0;
+
+  /// Find the animation node factory with the given name
+  virtual FactoryInterface* FindAnimNodeFactory (const char* name) = 0;
+
+  /**
+   * Remove the animation node factory of the given name. It will no longer
+   * hold any reference to this factory.
+   */
+  virtual void RemoveAnimNodeFactory (const char* name) = 0;
+
+  /// Remove all animation node factories
+  virtual void ClearAnimNodeFactories () = 0;
+};
+
+#define SCF_ISKELETONANIMNODEMANAGER_INTERFACE(Name, a, b, c)	\
+  SCF_INTERFACE (Name, ((0*10)+(a)), (b), (c))
+
 
 } // namespace Animation
 } // namespace CS

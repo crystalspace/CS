@@ -35,21 +35,8 @@
 struct iMovable;
 struct iCamera;
 
-namespace CS
-{
-namespace Mesh
-{
-
-  struct iAnimatedMesh;
-
-} // namespace Mesh
-} // namespace CS
-
-
-namespace CS
-{
-namespace Animation
-{
+namespace CS {
+namespace Animation {
 
 struct iBodySkeleton;
 struct iSkeletonLookAtNodeFactory;
@@ -59,25 +46,10 @@ struct iSkeletonLookAtListener;
  * A class to manage the creation and deletion of 'LookAt' animation 
  * node factories.
  */
-struct iSkeletonLookAtNodeManager : public virtual iBase
+struct iSkeletonLookAtNodeManager
+  : public virtual CS::Animation::iSkeletonAnimNodeManager<CS::Animation::iSkeletonLookAtNodeFactory>
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonLookAtNodeManager, 1, 0, 0);
-
-  /**
-   * Create a new 'LookAt' animation node factory.
-   * \param name The name of the new factory.
-   */
-  virtual iSkeletonLookAtNodeFactory* CreateAnimNodeFactory (const char *name) = 0;
-
-  /**
-   * Find the specified 'LookAt' animation node factory.
-   */
-  virtual iSkeletonLookAtNodeFactory* FindAnimNodeFactory (const char* name) const = 0;
-
-  /**
-   * Delete all 'LookAt' animation node factories.
-   */
-  virtual void ClearAnimNodeFactories () = 0;
+  SCF_ISKELETONANIMNODEMANAGER_INTERFACE (CS::Animation::iSkeletonLookAtNodeManager, 1, 0, 0);
 };
 
 /**
@@ -96,9 +68,9 @@ struct iSkeletonLookAtNodeManager : public virtual iBase
  * This animation node uses only the pitch and yaw (ie rotations around X and Y axis)
  * in order to achieve the look at the target, the roll is not used.
  */
-struct iSkeletonLookAtNodeFactory : public iSkeletonAnimNodeFactory
+struct iSkeletonLookAtNodeFactory : public virtual iSkeletonAnimNodeFactory
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonLookAtNodeFactory, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonLookAtNodeFactory, 2, 0, 0);
 
   /**
    * Set the body skeleton that is used to specify the geometrical constraints of the animated
@@ -142,27 +114,24 @@ struct iSkeletonLookAtNodeFactory : public iSkeletonAnimNodeFactory
    * add its control on top of the animation of the child node. The animation of
    * the bone made by the child node may still be used, for example when the node
    * is transitioning between targets, or when the target is not reachable.
+   *
+   * It is valid to set a null reference as node.
    */
   virtual void SetChildNode (iSkeletonAnimNodeFactory* node) = 0;
 
   /**
    * Return the child animation node of this node.
    */
-  virtual iSkeletonAnimNodeFactory* GetChildNode () = 0;
-
-  /**
-   * Clear the child animation node of this node.
-   */
-  virtual void ClearChildNode () = 0;
+  virtual iSkeletonAnimNodeFactory* GetChildNode () const = 0;
 };
 
 /**
  * An animation node that controls a bone of an animesh in order to make it look
  * at a target.
  */
-struct iSkeletonLookAtNode : public iSkeletonAnimNode
+struct iSkeletonLookAtNode : public virtual iSkeletonAnimNode
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonLookAtNode, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonLookAtNode, 2, 0, 0);
 
   /**
    * Return whether or not there is currently a target defined

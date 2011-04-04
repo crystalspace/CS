@@ -121,10 +121,13 @@ public:
 
   virtual bool StopAnimation(const char* animationName) { return false; }
 
+  virtual bool RemoveAnimation(const char* animationName) { return false; }
+
   virtual bool GetReverseAction() { return false; }
 
   virtual void SetReverseAction(bool value) {}
 
+  virtual void SetAnimationSpeed(float speed) {}
 
   // Sockets
   virtual bool SupportsSockets() = 0;

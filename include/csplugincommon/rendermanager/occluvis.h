@@ -33,6 +33,8 @@ struct iGraphics3D;
 struct iMeshWrapper;
 struct iObjectRegistry;
 
+#include "csutil/deprecated_warn_off.h"
+
 namespace CS
 {
   namespace RenderManager
@@ -184,7 +186,7 @@ namespace CS
 
       struct NodeMeshList : public csRefCount
       {
-        NodeMeshList () : meshList (nullptr)
+        NodeMeshList () : numMeshes (0), meshList (nullptr)
         {
         }
 
@@ -239,8 +241,10 @@ namespace CS
       // Hash of mesh nodes for a render view.
       csHash<csRefArray<NodeMeshList>*, csPtrKey<iRenderView> > nodeMeshHash;
 
-      // Hash of MeshList objects for visibility objects.
-      csHash<NodeMeshList*, csPtrKey<iVisibilityObject> > visobjMeshHash;
+      // Hashes of MeshList objects for visibility objects.
+      typedef csHash<NodeMeshList*, csPtrKey<iVisibilityObject> > VisObjMeshHash;
+      typedef csHash<VisObjMeshHash, csPtrKey<iRenderView> > VisObjMeshHashes;
+      VisObjMeshHashes visobjMeshHashes;
 
       // Vector of vistest objects (used in the box/sphere/etc. tests).
       VistestObjectsArray vistest_objects;
@@ -255,6 +259,9 @@ namespace CS
       // Fallback depth write shader type ID.
       csStringID fbDepthWriteID;
 
+      // Name of the default depth write/test shader.
+      csString defaultShader;
+
       // Shader variable stack for depth rendering.
       csShaderVariableStack shaderVarStack;
 
@@ -267,6 +274,9 @@ namespace CS
       template<bool bQueryVisibility>
       void RenderMeshes (AABBVisTreeNode* node,
                          iRenderView* rview,
+                         size_t& lastTicket,
+                         iShader*& lastShader,
+                         iShaderVariableContext* shadervars,
                          NodeMeshList*& nodeMeshList);
 
       /**
@@ -360,7 +370,7 @@ namespace CS
       csOccluvis (iObjectRegistry *object_reg);
       virtual ~csOccluvis ();
 
-      virtual void Setup (const char*) {}
+      virtual void Setup (const char* defaultShaderName);
 
      /**
       * Register a visibility object with this culler.
@@ -403,31 +413,43 @@ namespace CS
       /**
        * Prepare culling for the next frame.
        */
-      virtual void RenderViscull (iRenderView* rview);
+      virtual void RenderViscull (iRenderView* rview, iShaderVariableContext* shadervars);
 
      /**
-      * Mark that we're about to perform precache visibility culling.
+      * Mark that we're about to perform precaching.
       */
-      virtual void PrecacheCulling ()
+      virtual void BeginPrecacheCulling ()
       {
         bAllVisible = true;
       }
 
+      /**
+       * Mark that we've finished precaching.
+       */
+      virtual void EndPrecacheCulling ()
+      {
+        bAllVisible = false;
+      }
+
+      virtual void PrecacheCulling () { CS_ASSERT ("Call (Begin/End)PrecacheCulling!\n"); }
       virtual const char* ParseCullerParameters (iDocumentNode* node) { return 0; }
     };
 
     class F2BSorter
     {
     public:
-      F2BSorter (const csVector3& cameraOrigin)
+      F2BSorter (iEngine* engine, const csVector3& cameraOrigin)
         : cameraOrigin (cameraOrigin)
-      {}
+      {
+        portalPriority = engine->GetRenderPriority ("portal");
+      }
 
       bool operator() (csOccluvis::NodeMeshList* const& m1,
                        csOccluvis::NodeMeshList* const& m2);
 
     private:
       const csVector3& cameraOrigin;
+      CS::Graphics::RenderPriority portalPriority;
     };
 
     class csOccluvisObjIt :
@@ -484,5 +506,7 @@ namespace CS
     };
   }
 }
+
+#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_RENDERMANAGER_OCCLUVIS_H__

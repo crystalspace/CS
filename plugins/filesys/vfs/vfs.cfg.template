@@ -51,7 +51,7 @@ VFS.Mount.lev/castle   = $(CS_MAPDIR)$/castle$/
 VFS.Mount.lev/castle-staticlit = $(CS_MAPDIR)$/castle-staticlit$/
 VFS.Mount.lev/castle-staticlit/bindata = $(CS_MAPDIR)$/castle-staticlit$/bindata.zip
 VFS.Mount.lev/oceantest = $(CS_MAPDIR)$/oceantest$/
-VFS.Mount.lev/island = $@(CS_MAPDIR)$/island$/
+VFS.Mount.lev/island = $(CS_MAPDIR)$/island$/
 VFS.Mount.lev/bias = $(CS_MAPDIR)$/bias$/world.zip
 VFS.Mount.lev/lodtest = $(CS_MAPDIR)$/lodtest$/
 
@@ -70,15 +70,15 @@ VFS.Mount.lib/startme  = $(CS_DATADIR)$/startme.zip
 VFS.Mount.lib/hairtest = $(CS_DATADIR)$/hairtest$/
 
 ; General CEGUI data
-VFS.Mount.cegui  			= $@(CS_DATADIR)$/cegui$/
+VFS.Mount.cegui  			= $(CS_DATADIR)$/cegui$/
 ; CEgui test
-VFS.Mount.ceguitest  	= $@(CS_DATADIR)$/ceguitest$/
+VFS.Mount.ceguitest  	= $(CS_DATADIR)$/ceguitest$/
 ; CEgui hairtest
-VFS.Mount.hairtest  	= $@(CS_DATADIR)$/hairtest$/
+VFS.Mount.hairtest  	= $(CS_DATADIR)$/hairtest$/
 ; Viewmesh
-VFS.Mount.viewmesh   	= $@(CS_DATADIR)$/viewmesh$/
+VFS.Mount.viewmesh   	= $(CS_DATADIR)$/viewmesh$/
 ; Simpvs
-VFS.Mount.simpvs   		= $@(CS_DATADIR)$/simpvs$/
+VFS.Mount.simpvs   		= $(CS_DATADIR)$/simpvs$/
 
 ; Mount for unittest
 VFS.Mount.lev/unittest = $(CS_DATADIR)$/unittest$/

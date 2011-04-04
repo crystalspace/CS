@@ -92,8 +92,8 @@ double ParseScaleFactor(iObjectIterator* it);
 void WalkTest::SaveCamera (const char *fName)
 {
   iCamera *c = views->GetCamera ();
-  csOrthoTransform& camtrans = c->GetTransform ();
   if (!c) return;
+  csOrthoTransform& camtrans = c->GetTransform ();
   const csMatrix3& m_o2t = camtrans.GetO2T ();
   const csVector3& v_o2t = camtrans.GetOrigin ();
   csString s;
@@ -277,10 +277,10 @@ void SetConfigOption (iBase* plugin, const char* optName, const char* optValue)
     {
       csOptionDescription odesc;
       if (!config->GetOptionDescription (i, &odesc)) break;
-      if (strcmp (odesc.name, optName) == 0)
+      if (strcmp (odesc.name.GetData (), optName) == 0)
       {
 	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Set option %s to %s",
-		odesc.name, optValue);
+		     odesc.name.GetData (), optValue);
 	csVariant var;
 	switch (odesc.type)
 	{
@@ -869,7 +869,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 	    csOptionDescription odesc;
 	    if (!config->GetOptionDescription (i, &odesc)) break;
 	    csString buf;
-	    buf.Format ("Option %s (%s) ", odesc.name, odesc.description);
+	    buf.Format ("Option %s (%s) ", odesc.name.GetData (), odesc.description.GetData ());
 	    csVariant var;
 	    config->GetOption (i, &var);
 	    switch (odesc.type)

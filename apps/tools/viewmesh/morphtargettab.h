@@ -62,7 +62,9 @@ MorphTargetTab::MorphTargetTab(iObjectRegistry* obj_reg, AssetBase* ass)
   btn = winMgr->getWindow("MorphTargets/ClearButton");
   btn->subscribeEvent(CEGUI::PushButton::EventClicked,
     CEGUI::Event::Subscriber(&MorphTargetTab::ClearButton, this));
-  
+
+  CEGUI::Window* component = winMgr->getWindow("MorphTargets/WeightInput");
+  component->setProperty("Text", "1.0");
 }
 
 MorphTargetTab::~MorphTargetTab() 

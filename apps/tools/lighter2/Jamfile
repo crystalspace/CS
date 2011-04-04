@@ -38,9 +38,11 @@ LIGHTER2.PLUGINLIST =
   emit
   emitldr
   engine
+  engseq
   genmesh
   gmeshanim
   gmeshldr
+  gmeshanimpdl
   gmeshskelanim2
   skeleton
   skelldr

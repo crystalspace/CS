@@ -42,7 +42,7 @@
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/material.h"
 #include "plugins/engine/3d/sector.h"
-#include "plugins/engine/3d/meshgen.h"
+#include "meshgen/meshgen.h"
 #include "plugins/engine/3d/meshobj.h"
 
 //--------------------------------------------------------------------------
@@ -260,8 +260,6 @@ void csSector::RelinkMesh (iMeshWrapper *mesh)
 
 void csSector::PrecacheDraw ()
 {
-  GetVisibilityCuller ()->PrecacheCulling ();
-
   // First calculate the box of all objects in the level.
   csBox3 box;
   box.StartBoundingBox ();
@@ -292,12 +290,10 @@ void csSector::PrecacheDraw ()
   camera->GetTransform ().SetOrigin (pos);
   camera->GetTransform ().LookAt (lookat-pos, csVector3 (0, 0, 1));
 
-  // @@@ Ideally we would want to disable visibility culling
-  // here so that all objects are visible.
-  /*g3d->BeginDraw (CSDRAW_3DGRAPHICS);
-  view->Draw ();
-  g3d->FinishDraw ();*/
+  // Begin culler precaching and precache the view.
+  GetVisibilityCuller ()->BeginPrecacheCulling ();
   engine->renderManager->PrecacheView (view);
+  GetVisibilityCuller ()->EndPrecacheCulling ();
 }
 
 //----------------------------------------------------------------------
@@ -494,8 +490,8 @@ public:
       for (size_t i = 0; i < numExtra; ++i)
       {
           privMeshlist->AddRenderMeshes (&extraMeshes[i], 1,
-                  cmesh->csMeshWrapper::GetExtraRenderMeshPriority(i),
-                  cmesh->csMeshWrapper::GetExtraRenderMeshZBufMode(i),
+                  cmesh->csMeshWrapper::GetExtraRenderMesh (i)->renderPrio,
+                  cmesh->csMeshWrapper::GetExtraRenderMesh (i)->z_buf_mode,
                   (iMeshWrapper*)cmesh);
       }
     }
@@ -993,7 +989,7 @@ void csSector::PrepareDraw (iRenderView *rview)
   const csVector3& pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
   for (i = 0 ; i < meshGenerators.GetSize () ; i++)
   {
-    meshGenerators[i]->AllocateBlocks (pos);
+    meshGenerators[i]->UpdateForPosition (pos);
   }
 
   // CS_ENTITY_CAMERA meshes have to be moved to right position first.
@@ -1225,6 +1221,11 @@ iMeshGenerator* csSector::CreateMeshGenerator (const char* name)
   meshgen->QueryObject ()->SetName (name);
   meshGenerators.Push (meshgen);
   return (iMeshGenerator*)meshgen;
+}
+
+iMeshGenerator* csSector::GetMeshGenerator (size_t idx)
+{
+  return meshGenerators[idx];
 }
 
 iMeshGenerator* csSector::GetMeshGeneratorByName (const char* name)

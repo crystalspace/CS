@@ -103,6 +103,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
   anim_ctrl_texels = false;
   anim_ctrl_normals = false;
   anim_ctrl_colors = false;
+  anim_ctrl_bbox = false;
 
   subMeshes.GetDefaultSubmesh()->parentSubMesh =
     factory->subMeshes.GetDefaultSubmesh();
@@ -151,6 +152,26 @@ const csColor4* csGenmeshMeshObject::AnimControlGetColors (csColor4* source)
 	factory->GetShapeNumber ());
 }
 
+const csBox3& csGenmeshMeshObject::AnimControlGetBbox ()
+{
+  return anim_ctrl->UpdateBoundingBox (vc->GetCurrentTicks (),
+				       factory->GetShapeNumber (),
+				       factory->GetObjectBoundingBox ());
+}
+
+const csBox3* csGenmeshMeshObject::AnimControlGetBboxes ()
+{
+  return anim_ctrl->UpdateBoundingBoxes (vc->GetCurrentTicks (),
+					 factory->GetShapeNumber ());
+}
+
+const float csGenmeshMeshObject::AnimControlGetRadius ()
+{
+  return anim_ctrl->UpdateRadius (vc->GetCurrentTicks (),
+				  factory->GetShapeNumber (),
+				  factory->GetRadius ());
+}
+
 void csGenmeshMeshObject::SetAnimationControl (
 	iGenMeshAnimationControl* ac)
 {
@@ -161,8 +182,9 @@ void csGenmeshMeshObject::SetAnimationControl (
     anim_ctrl_texels = ac->AnimatesTexels ();
     anim_ctrl_normals = ac->AnimatesNormals ();
     anim_ctrl_colors = ac->AnimatesColors ();
+    anim_ctrl_bbox = ac->AnimatesBBoxRadius ();
     
-    //small hack to force animation initiallizing
+    // small hack to force the initialization of the animation
     AnimControlGetVertices ();
     AnimControlGetTexels ();
     AnimControlGetNormals ();
@@ -173,8 +195,15 @@ void csGenmeshMeshObject::SetAnimationControl (
     anim_ctrl_texels = false;
     anim_ctrl_normals = false;
     anim_ctrl_colors = false;
+    anim_ctrl_bbox = false;
   }
   SetupShaderVariableContext ();
+
+  // Initialize the object model
+  if (anim_ctrl_bbox)
+    objectModel.AttachNew (new csAnimatedModel (this));
+  else
+    objectModel = (iObjectModel*) nullptr;
 }
 
 void csGenmeshMeshObject::UpdateSubMeshProxies () const
@@ -292,7 +321,7 @@ void csGenmeshMeshObject::SetupObject ()
   }
 }
 
-iRenderBuffer* csGenmeshMeshObject::GetPositions()
+iRenderBuffer* csGenmeshMeshObject::GetPositions ()
 {
   if (anim_ctrl)
   {
@@ -312,16 +341,28 @@ iRenderBuffer* csGenmeshMeshObject::GetPositions()
   return factory->GetPositions ();
 }
 
+const csVector3* csGenmeshMeshObject::GetVertices ()
+{
+  if (anim_ctrl)
+  {
+    const csVector3* mesh_vertices = AnimControlGetVertices ();
+    if (!mesh_vertices) mesh_vertices = factory->GetVertices ();
+    return mesh_vertices;
+  }
+  
+  return factory->GetVertices ();
+}
+
 #include "csutil/custom_new_disable.h"
 
-int csGenmeshMeshObject::ComputeProgLODLevel(const SubMeshProxy& subMesh, const csVector3& camera_pos)
+int csGenmeshMeshObject::ComputeProgLODLevel (const SubMeshProxy& subMesh, const csVector3& camera_pos)
 {
   float min, max;
   factory->GetProgLODDistances(min, max);
   if (min >= max)
     return 0;
   csVector3 objpos = logparent->GetMovable()->GetPosition();
-  const csBox3& bbox = GetObjectBoundingBox ();
+  const csBox3& bbox = anim_ctrl_bbox ? objectModel->GetObjectBoundingBox () : factory->GetObjectBoundingBox ();
   csVector3 bbpos = bbox.GetCenter();
   float dist = (camera_pos - (objpos + bbpos)).Norm();
   csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(factory);
@@ -372,6 +413,10 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   renderMeshes.Empty();
   renderMeshes.SetCapacity (sm.GetSize ());
 
+  const csBox3* bboxes;
+  if (anim_ctrl_bbox)
+    bboxes = AnimControlGetBboxes ();
+
   for (size_t i = 0; i<sm.GetSize (); ++i)
   {
     SubMeshProxy& subMesh = *(sm[i]);
@@ -395,7 +440,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     bool b2f = subMesh.SubMeshProxy::GetBack2Front () || factoryB2F;
     if (b2f)
       index_buffer = subMesh.SubMeshProxy::GetIndicesB2F (b2fPos, frameNum,
-	factory->GetVertices(), factory->GetVertexCount());
+	GetVertices(), factory->GetVertexCount());
     else
       index_buffer = subMesh.SubMeshProxy::GetIndices();
     if (!index_buffer)
@@ -438,7 +483,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
       static_cast<iShaderVariableContext*> (&subMesh), svcontext));
     meshPtr->variablecontext = mergedSVContext;
     meshPtr->object2world = o2wt;
-    meshPtr->bbox = subMesh.parentSubMesh->GetObjectBoundingBox (positions);
+    meshPtr->bbox = anim_ctrl_bbox ? bboxes[i] : subMesh.parentSubMesh->GetObjectBoundingBox (positions);
 
     meshPtr->buffers = smBufferHolder;
     meshPtr->geometryInstance = (void*)factory;
@@ -452,22 +497,29 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
 
 #include "csutil/custom_new_enable.h"
 
-const csBox3& csGenmeshMeshObject::GetObjectBoundingBox ()
+csGenmeshMeshObject::csAnimatedModel::csAnimatedModel (csGenmeshMeshObject* object)
+  : scfImplementationType (this), object (object)
+{}
+
+csGenmeshMeshObject::csAnimatedModel::~csAnimatedModel ()
+{}
+
+const csBox3& csGenmeshMeshObject::csAnimatedModel::GetObjectBoundingBox ()
 {
-  return factory->GetObjectBoundingBox ();
+  const csBox3& bbox = object->AnimControlGetBbox ();
+  return bbox;
 }
 
-void csGenmeshMeshObject::SetObjectBoundingBox (const csBox3& bbox)
+void csGenmeshMeshObject::csAnimatedModel::SetObjectBoundingBox (const csBox3& bbox)
 {
-  factory->SetObjectBoundingBox (bbox);
 }
 
-void csGenmeshMeshObject::GetRadius (float& rad, csVector3& cent)
+void csGenmeshMeshObject::csAnimatedModel::GetRadius (float& rad, csVector3& cent)
 {
-  rad = factory->GetRadius ();
-  cent = factory->GetObjectBoundingBox ().GetCenter ();
+  rad = object->AnimControlGetRadius ();
+  cent = object->AnimControlGetBbox ().GetCenter ();
 }
-  
+
 bool csGenmeshMeshObject::HitBeamOutline (const csVector3& start,
   const csVector3& end, csVector3& isect, float* pr)
 {
@@ -479,7 +531,7 @@ bool csGenmeshMeshObject::HitBeamOutline (const csVector3& start,
   SubMeshProxiesContainer& sm = subMeshes;
 
   csSegment3 seg (start, end);
-  const csVector3 *vrt = factory->GetVertices ();
+  const csVector3 *vrt = GetVertices ();
   for (size_t s = 0; s < sm.GetSize(); s++)
   {
     iRenderBuffer* indexBuffer = sm[s]->GetIndices();
@@ -503,7 +555,7 @@ bool csGenmeshMeshObject::HitBeamOutline (const csVector3& start,
 
 bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
   const csVector3& end, csVector3& isect, float *pr, int* polygon_idx,
-  iMaterialWrapper** material, iMaterialArray* materials)
+  iMaterialWrapper** material)
 {
   if (polygon_idx) *polygon_idx = -1;
   // This is the slow version. Use for an accurate hit on the object.
@@ -519,7 +571,7 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
   float dist, temp;
   float itot_dist = 1 / tot_dist;
   dist = temp = tot_dist;
-  const csVector3 *vrt = factory->GetVertices ();
+  const csVector3 *vrt = GetVertices ();
   csVector3 tmp;
   iMaterialWrapper* mat = 0;
   for (size_t s = 0; s < sm.GetSize(); s++)
@@ -550,7 +602,6 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
     return false;
 
   if (material) *material = mat;
-  if (materials) materials->Push (mat);
 
   return true;
 }
@@ -563,7 +614,7 @@ void csGenmeshMeshObject::BuildDecal(const csVector3* pos, float decalRadius,
 
   csPoly3D poly;
   poly.SetVertexCount(3);
-  csVector3* vertices = factory->GetVertices();
+  const csVector3* vertices = factory->GetVertices();
 
   for (size_t s = 0; s < sm.GetSize(); s++)
   {
@@ -585,6 +636,8 @@ void csGenmeshMeshObject::BuildDecal(const csVector3* pos, float decalRadius,
 
 iObjectModel* csGenmeshMeshObject::GetObjectModel ()
 {
+  if (anim_ctrl_bbox)
+    return objectModel;
   return factory->GetObjectModel ();
 }
 
@@ -877,8 +930,7 @@ iGeneralMeshSubMesh* csGenmeshMeshObjectFactory::AddSubMesh (
 {
   if (polyMeshType != Submeshes) SetPolyMeshSubmeshes();
   return subMeshes.AddSubMesh (indices, material, 
-    genmesh_type->submeshNamePool.Register (name), 
-    mixmode);
+    genmesh_type->StoreName (name), mixmode);
 }
 
 void csGenmeshMeshObjectFactory::SetAnimationControlFactory (
@@ -930,18 +982,6 @@ float csGenmeshMeshObjectFactory::GetRadius ()
   return radius;
 }
 
-// TODO: Optimize. Cache this value in the class.
-int csGenmeshMeshObjectFactory::GetNumProgLODLevels() const
-{
-  int max_size = 0;
-  for (size_t s = 0; s < subMeshes.GetSize(); s++)
-  {
-    if (max_size < subMeshes[s]->GetSlidingWindowSize())
-      max_size = subMeshes[s]->GetSlidingWindowSize();
-  }
-  return max_size;
-}
-  
 const csBox3& csGenmeshMeshObjectFactory::GetObjectBoundingBox ()
 {
   SetupFactory ();
@@ -956,7 +996,18 @@ void csGenmeshMeshObjectFactory::SetObjectBoundingBox (const csBox3& bbox)
   object_bbox = bbox;
 }
 
-
+// TODO: Optimize. Cache this value in the class.
+int csGenmeshMeshObjectFactory::GetNumProgLODLevels() const
+{
+  int max_size = 0;
+  for (size_t s = 0; s < subMeshes.GetSize(); s++)
+  {
+    if (max_size < subMeshes[s]->GetSlidingWindowSize())
+      max_size = subMeshes[s]->GetSlidingWindowSize();
+  }
+  return max_size;
+}
+  
 void csGenmeshMeshObjectFactory::SetupFactory ()
 {
   if (!initialized)
@@ -1797,7 +1848,7 @@ csPtr<iMeshObject> csGenmeshMeshObjectFactory::NewInstance ()
 SCF_IMPLEMENT_FACTORY (csGenmeshMeshObjectType)
 
 csGenmeshMeshObjectType::csGenmeshMeshObjectType (iBase* pParent) :
-  scfImplementationType (this, pParent), do_verbose (false)
+  scfImplementationType (this, pParent)
 {
 }
 
@@ -1823,10 +1874,14 @@ bool csGenmeshMeshObjectType::Initialize (iObjectRegistry* object_reg)
   base_id = strset->Request ("base");
   csRef<iVerbosityManager> verbosemgr (
     csQueryRegistry<iVerbosityManager> (object_reg));
-  if (verbosemgr) 
-    do_verbose = verbosemgr->Enabled ("genmesh");
 
   return true;
+}
+
+const char* csGenmeshMeshObjectType::StoreName (const char* name)
+{
+  CS::Threading::ScopedLock<CS::Threading::Mutex> lock (m);
+  return submeshNamePool.Register (name);
 }
 
 }

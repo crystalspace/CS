@@ -32,6 +32,9 @@
   </block>
 
   <block location="pass">
+    <!-- meshgen puts number of instances into the SV "instances num",
+	 must be used for correct rendering -->
+    <instancesnum>instances num</instancesnum>
     <instanceparam source="instancing transforms"
       destination="vertexIn.instancingTransforms" />
   </block>

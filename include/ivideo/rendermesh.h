@@ -153,7 +153,8 @@ namespace Graphics
     RenderMeshModes () : z_buf_mode ((csZBufMode)~0), mixmode (CS_FX_COPY),
       alphaToCoverage (false), atcMixmode (CS_MIXMODE_BLEND (ONE, ZERO)),
       cullMode (cullNormal),
-      alphaType (csAlphaMode::alphaNone), zoffset (false), doInstancing (false)
+      alphaType (csAlphaMode::alphaNone), zoffset (false), doInstancing (false),
+      instParams (nullptr), instParamBuffers (nullptr)
     {
     }
 
@@ -172,7 +173,8 @@ namespace Graphics
       instParamNum (x.instParamNum),
       instParamsTargets (x.instParamsTargets),
       instanceNum (x.instanceNum),
-      instParams (x.instParams)	
+      instParams (x.instParams),
+      instParamBuffers (x.instParamBuffers)
     {
     }
 
@@ -221,11 +223,34 @@ namespace Graphics
     /// Holder of default render buffers
     csRef<csRenderBufferHolder> buffers;
 
+    /// Whether to enable instancing.
     bool doInstancing; 
+    /// Number of instance parameters.
     size_t instParamNum; 
+    /// Targets of instance parameters.
     const csVertexAttrib* instParamsTargets; 
-    size_t instanceNum; 
+    /// Number of instances.
+    size_t instanceNum;
+    /**
+     * Instance parameters, as shader variables.
+     * The "instance" array (elements of type csShaderVariable**) has one
+     * "parameter" array for each instance. The parameter array (elements of
+     * type csShaderVariable*) has one shader variable for each instance
+     * parameter.
+     */
     csShaderVariable** const * instParams;
+    /**
+     * Instance parameters, as shader variables.
+     * Each element in the array is a render buffer with the values
+     * for an instance parameter; there must be as many render buffers
+     * as parameters.
+     *
+     * The instance data can be given in both the instParams and
+     * instParamsBuffers array; in that case, the render buffer takes
+     * precedence. Only when a buffer is null the shader variable data
+     * is taken.
+     */
+    iRenderBuffer** instParamBuffers;
   };
 
   /**

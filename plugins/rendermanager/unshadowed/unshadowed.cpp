@@ -72,7 +72,8 @@ public:
 
 
   void operator() (typename RenderTreeType::ContextNode& context,
-    typename PortalSetupType::ContextSetupData& portalSetupData)
+                   typename PortalSetupType::ContextSetupData& portalSetupData,
+                   bool recursePortals = true)
   {
     CS::RenderManager::RenderView* rview = context.renderView;
     iSector* sector = rview->GetThisSector ();
@@ -92,6 +93,7 @@ public:
     Viscull<RenderTreeType> (context, rview, culler);
 
     // Set up all portals
+    if (recursePortals)
     {
       recurseCount++;
       PortalSetupType portalSetup (rmanager->portalPersistent, *this);      
@@ -220,7 +222,7 @@ RMUnshadowed::RMUnshadowed (iBase* parent)
   SetTreePersistent (treePersistent);
 }
 
-bool RMUnshadowed::RenderView (iView* view)
+bool RMUnshadowed::RenderView (iView* view, bool recursePortals)
 {
   // Setup a rendering view
   view->UpdateClipper ();
@@ -268,7 +270,7 @@ bool RMUnshadowed::RenderView (iView* view)
     ContextSetupType contextSetup (this, renderLayer);
     ContextSetupType::PortalSetupType::ContextSetupData portalData (startContext);
 
-    contextSetup (*startContext, portalData);
+    contextSetup (*startContext, portalData, recursePortals);
   
     targets.StartRendering (shaderManager);
     targets.EnqueueTargets (renderTree, shaderManager, renderLayer, contextsScannedForTargets);
@@ -280,7 +282,7 @@ bool RMUnshadowed::RenderView (iView* view)
     TargetManagerType::TargetSettings ts;
     targets.GetNextTarget (ts);
 
-    HandleTarget (renderTree, ts);
+    HandleTarget (renderTree, ts, recursePortals);
   }
 
   targets.FinishRendering ();
@@ -303,9 +305,14 @@ bool RMUnshadowed::RenderView (iView* view)
   return true;
 }
 
+bool RMUnshadowed::RenderView (iView* view)
+{
+  return RenderView (view, true);
+}
+
 bool RMUnshadowed::PrecacheView (iView* view)
 {
-  if (!RenderView (view)) return false;
+  if (!RenderView (view, false)) return false;
 
   postEffects.ClearIntermediates();
   hdr.GetHDRPostEffects().ClearIntermediates();
@@ -318,7 +325,8 @@ bool RMUnshadowed::PrecacheView (iView* view)
 }
 
 bool RMUnshadowed::HandleTarget (RenderTreeType& renderTree,
-                                 const TargetManagerType::TargetSettings& settings)
+                                 const TargetManagerType::TargetSettings& settings,
+                                 bool recursePortals)
 {
   // Prepare
   csRef<CS::RenderManager::RenderView> rview;
@@ -337,7 +345,7 @@ bool RMUnshadowed::HandleTarget (RenderTreeType& renderTree,
   ContextSetupType contextSetup (this, renderLayer);
   ContextSetupType::PortalSetupType::ContextSetupData portalData (startContext);
 
-  contextSetup (*startContext, portalData);
+  contextSetup (*startContext, portalData, recursePortals);
   
   targets.EnqueueTargets (renderTree, shaderManager, renderLayer, contextsScannedForTargets);
 

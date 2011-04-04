@@ -42,6 +42,8 @@ namespace lighter
      *   to take ownership.
      */
     virtual void SwapIn (void* data, size_t size) = 0;
+    /// Return a descriptive string of the swappable. Used for debugging.
+    virtual const char* Describe() const = 0;
   };
   
   /// Class that manages swapping in/swapping out of objects

@@ -936,18 +936,8 @@ namespace CS
     {
     #  if defined (CS_PLATFORM_WIN32)
       ::DebugBreak();
-    #  elif defined (CS_PROCESSOR_X86)
-    #    if defined (CS_COMPILER_GCC)
-      asm ("int $3");
-    #    else
-      _asm int 3;
-    #    endif
-    #  elif defined (CS_PROCESSOR_POWERPC)
-    // Source: http://cocoawithlove.com/2008/03/break-into-debugger.html
-      asm("li r0, 20\nsc\nnop\nli r0, 37\nli r4, 2\nsc\nnop\n"
-           : : : "memory","r0","r3","r4" );
     #  else
-      static int x = 0; x /= x;
+      raise (SIGTRAP);
     #  endif
     }
     

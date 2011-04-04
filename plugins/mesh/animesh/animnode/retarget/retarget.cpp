@@ -29,111 +29,54 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
 {
-
-  /********************
-   *  RetargetNodeManager
-   ********************/
-
   SCF_IMPLEMENT_FACTORY(RetargetNodeManager);
 
-  CS_LEAKGUARD_IMPLEMENT(RetargetNodeManager);
+  // --------------------------  RetargetNodeFactory  --------------------------
 
-  RetargetNodeManager::RetargetNodeManager (iBase* parent)
-    : scfImplementationType (this, parent)
-  {
-  }
+  CS_LEAKGUARD_IMPLEMENT(RetargetNodeFactory);
 
-  CS::Animation::iSkeletonRetargetNodeFactory* RetargetNodeManager::CreateAnimNodeFactory
-    (const char *name)
-  {
-    csRef<CS::Animation::iSkeletonRetargetNodeFactory> newFact;
-    newFact.AttachNew (new RetargetAnimNodeFactory (this, name));
-
-    return factoryHash.PutUnique (name, newFact);
-  }
-
-  CS::Animation::iSkeletonRetargetNodeFactory* RetargetNodeManager::FindAnimNodeFactory
-    (const char* name) const
-  {
-    return factoryHash.Get (name, 0);
-  }
-
-  void RetargetNodeManager::ClearAnimNodeFactories ()
-  {
-    factoryHash.DeleteAll ();
-  }
-
-  bool RetargetNodeManager::Initialize (iObjectRegistry* object_reg)
-  {
-    this->object_reg = object_reg;
-    return true;
-  }
-
-  void RetargetNodeManager::Report (int severity, const char* msg, ...) const
-  {
-    va_list arg;
-    va_start (arg, msg);
-    csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
-    if (rep)
-      rep->ReportV (severity,
-		    "crystalspace.mesh.animesh.animnode.retarget",
-		    msg, arg);
-    else
-      {
-	csPrintfV (msg, arg);
-	csPrintf ("\n");
-      }
-    va_end (arg);
-  }
-
-  /********************
-   *  RetargetAnimNodeFactory
-   ********************/
-
-  CS_LEAKGUARD_IMPLEMENT(RetargetAnimNodeFactory);
-
-  RetargetAnimNodeFactory::RetargetAnimNodeFactory (RetargetNodeManager* manager, const char *name)
+  RetargetNodeFactory::RetargetNodeFactory (RetargetNodeManager* manager, const char *name)
     : scfImplementationType (this), manager (manager), name (name)
   {
   }
 
-  void RetargetAnimNodeFactory::SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* node)
+  void RetargetNodeFactory::SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* node)
   {
     childNode = node;
   }
 
-  CS::Animation::iSkeletonAnimNodeFactory* RetargetAnimNodeFactory::GetChildNode ()
+  CS::Animation::iSkeletonAnimNodeFactory* RetargetNodeFactory::GetChildNode ()
   {
     return childNode;
   }
 
-  void RetargetAnimNodeFactory::ClearChildNode ()
+  void RetargetNodeFactory::ClearChildNode ()
   {
     childNode = 0;
   }
 
-  void RetargetAnimNodeFactory::SetSourceSkeleton (CS::Animation::iSkeletonFactory* skeleton)
+  void RetargetNodeFactory::SetSourceSkeleton (CS::Animation::iSkeletonFactory* skeleton)
   {
     sourceSkeleton = skeleton;
   }
 
-  void RetargetAnimNodeFactory::SetBoneMapping (CS::Animation::BoneMapping& mapping)
+  void RetargetNodeFactory::SetBoneMapping (CS::Animation::BoneMapping& mapping)
   {
     boneMapping = mapping;
   }
 
-  void RetargetAnimNodeFactory::AddBodyChain (CS::Animation::iBodyChain* chain)
+  void RetargetNodeFactory::AddBodyChain (CS::Animation::iBodyChain* chain)
   {
     // TODO: check every nodes have only one child
     bodyChains.Push (chain);
   }
 
-  void RetargetAnimNodeFactory::RemoveBodyChain (CS::Animation::iBodyChain* chain)
+  void RetargetNodeFactory::RemoveBodyChain (CS::Animation::iBodyChain* chain)
   {
     bodyChains.Delete (chain);
   }
 
-  csPtr<CS::Animation::iSkeletonAnimNode> RetargetAnimNodeFactory::CreateInstance
+  csPtr<CS::Animation::iSkeletonAnimNode> RetargetNodeFactory::CreateInstance
     (CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton)
   {
     // TODO: asserts
@@ -143,16 +86,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
       child = childNode->CreateInstance (packet, skeleton);
 
     csRef<CS::Animation::iSkeletonAnimNode> newP;
-    newP.AttachNew (new RetargetAnimNode (this, skeleton, child));
+    newP.AttachNew (new RetargetNode (this, skeleton, child));
     return csPtr<CS::Animation::iSkeletonAnimNode> (newP);
   }
 
-  const char* RetargetAnimNodeFactory::GetNodeName () const
+  const char* RetargetNodeFactory::GetNodeName () const
   {
     return name;
   }
 
-  CS::Animation::iSkeletonAnimNodeFactory* RetargetAnimNodeFactory::FindNode (const char* name)
+  CS::Animation::iSkeletonAnimNodeFactory* RetargetNodeFactory::FindNode (const char* name)
   {
     if (this->name == name)
       return this;
@@ -163,13 +106,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
     return 0;
   }
 
-  /********************
-   *  RetargetAnimNode
-   ********************/
+  // --------------------------  RetargetNode  --------------------------
 
-  CS_LEAKGUARD_IMPLEMENT(RetargetAnimNode);
+  CS_LEAKGUARD_IMPLEMENT(RetargetNode);
 
-  RetargetAnimNode::RetargetAnimNode (RetargetAnimNodeFactory* factory, 
+  RetargetNode::RetargetNode (RetargetNodeFactory* factory, 
 				      CS::Animation::iSkeleton* skeleton,
 				      CS::Animation::iSkeletonAnimNode* childNode)
     : scfImplementationType (this), factory (factory), skeleton (skeleton), childNode (childNode),
@@ -255,7 +196,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
     }
   }
 
-  void RetargetAnimNode::Play ()
+  void RetargetNode::Play ()
   {
     if (isPlaying)
       return;
@@ -270,7 +211,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
     }
   }
 
-  void RetargetAnimNode::Stop ()
+  void RetargetNode::Stop ()
   {
     isPlaying = false;
 
@@ -279,13 +220,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
       childNode->Stop ();
   }
 
-  void RetargetAnimNode::SetPlaybackPosition (float time)
+  void RetargetNode::SetPlaybackPosition (float time)
   {
     if (childNode)
       childNode->SetPlaybackPosition (time);
   }
 
-  float RetargetAnimNode::GetPlaybackPosition () const
+  float RetargetNode::GetPlaybackPosition () const
   {
     if (childNode)
       return childNode->GetPlaybackPosition ();
@@ -293,7 +234,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
     return 0.0f;
   }
 
-  float RetargetAnimNode::GetDuration () const
+  float RetargetNode::GetDuration () const
   {
     if (childNode)
       return childNode->GetDuration ();
@@ -301,13 +242,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
     return 0.0f;
   }
 
-  void RetargetAnimNode::SetPlaybackSpeed (float speed)
+  void RetargetNode::SetPlaybackSpeed (float speed)
   {
     if (childNode)
       childNode->SetPlaybackSpeed (speed);
   }
 
-  float RetargetAnimNode::GetPlaybackSpeed () const
+  float RetargetNode::GetPlaybackSpeed () const
   {
     if (childNode)
       return childNode->GetPlaybackSpeed ();
@@ -315,7 +256,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
     return 1.0f;
   }
 
-  void RetargetAnimNode::BlendState (CS::Animation::csSkeletalState* state, float baseWeight)
+  void RetargetNode::BlendState (CS::Animation::AnimatedMeshState* state, float baseWeight)
   {
     // Check that this node is active
     if (!isPlaying || !childNode)
@@ -377,23 +318,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
     }
   }
 
-  void RetargetAnimNode::TickAnimation (float dt)
+  void RetargetNode::TickAnimation (float dt)
   {
     if (childNode)
       childNode->TickAnimation (dt);
   }
 
-  bool RetargetAnimNode::IsActive () const
+  bool RetargetNode::IsActive () const
   {
     return isPlaying;
   }
 
-  CS::Animation::iSkeletonAnimNodeFactory* RetargetAnimNode::GetFactory () const
+  CS::Animation::iSkeletonAnimNodeFactory* RetargetNode::GetFactory () const
   {
     return factory;
   }
 
-  CS::Animation::iSkeletonAnimNode* RetargetAnimNode::FindNode (const char* name)
+  CS::Animation::iSkeletonAnimNode* RetargetNode::FindNode (const char* name)
   {
     if (factory->name == name)
       return this;
@@ -404,13 +345,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
     return 0;
   }
 
-  void RetargetAnimNode::AddAnimationCallback
+  void RetargetNode::AddAnimationCallback
     (CS::Animation::iSkeletonAnimCallback* callback)
   {
     // TODO
   }
 
-  void RetargetAnimNode::RemoveAnimationCallback
+  void RetargetNode::RemoveAnimationCallback
     (CS::Animation::iSkeletonAnimCallback* callback)
   {
     // TODO

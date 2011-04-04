@@ -45,7 +45,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
     struct ShaderPassPerTag : public CS::Memory::CustomAllocated
     {
-      ShaderPassPerTag ()
+      ShaderPassPerTag () : instancesNumVar (CS::InvalidShaderVarStringID) 
       { 
         //setup default mappings
         for (unsigned int i=0; i < CS_VATTRIB_SPECIFIC_NUM; i++)
@@ -60,7 +60,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         csVertexAttrib destination; 
       }; 
 
-      // Instancing mapping 
+      // Instancing mapping
+      CS::ShaderVarStringID instancesNumVar;
       csArray<InstanceMapping> instances_binds; 
 
 
@@ -150,6 +151,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       csDirtyAccessArray<csShaderVariable**>); 
     CS_DECLARE_STATIC_CLASSVAR_REF(instOuterVar, GetInstOuterVars, 
       csArray<csShaderVariable*>); 
+    CS_DECLARE_STATIC_CLASSVAR_REF(instParamBuffers, GetInstParamBuffers, 
+      csDirtyAccessArray<iRenderBuffer*>); 
 
     void SetupInstances (csRenderMeshModes& modes, ShaderPass *thispass, 
       const csShaderVariableStack& stack); 

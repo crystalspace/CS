@@ -104,7 +104,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     virtual CS::Animation::iSkeletonFactory* GetSkeletonFactory () const;
     virtual void SetBoneInfluencesPerVertex (uint num);
     virtual uint GetBoneInfluencesPerVertex () const;
-    virtual CS::Mesh::csAnimatedMeshBoneInfluence* GetBoneInfluences ();
+    virtual CS::Mesh::AnimatedMeshBoneInfluence* GetBoneInfluences ();
 
     virtual CS::Mesh::iAnimatedMeshMorphTarget* CreateMorphTarget (const char* name);
     virtual CS::Mesh::iAnimatedMeshMorphTarget* GetMorphTarget (uint target);
@@ -167,7 +167,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csRef<iRenderBuffer> tangentBuffer;
     csRef<iRenderBuffer> binormalBuffer;
     csRef<iRenderBuffer> colorBuffer;
-    csDirtyAccessArray<CS::Mesh::csAnimatedMeshBoneInfluence> boneInfluences;
+    csDirtyAccessArray<CS::Mesh::AnimatedMeshBoneInfluence> boneInfluences;
     csRef<iRenderBuffer> masterBWBuffer;
     csRef<iRenderBuffer> boneWeightAndIndexBuffer[2];
 
@@ -337,7 +337,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       const csVector3& end, csVector3& isect, float* pr);
     virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
       csVector3& isect, float* pr, int* polygon_idx,
-      iMaterialWrapper** material, iMaterialArray* materials);
+      iMaterialWrapper** material);
 
     virtual void SetMeshWrapper (iMeshWrapper* logparent);
     virtual iMeshWrapper* GetMeshWrapper () const;
@@ -500,7 +500,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     // Hold the bone transforms
     csRef<csShaderVariable> boneTransformArray;
-    csRef<CS::Animation::csSkeletalState> lastSkeletonState;
+    csRef<CS::Animation::AnimatedMeshState> lastSkeletonState;
 
     csRenderMeshHolder rmHolder;
     csDirtyAccessArray<CS::Graphics::RenderMesh*> renderMeshList;

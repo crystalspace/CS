@@ -965,7 +965,8 @@ iSoftBody* csBulletDynamicsSystem::CreateSoftBody
   btSoftBody* body = btSoftBodyHelpers::CreateFromTriMesh
     (*softWorldInfo, vertices, triangles, genmeshFactory->GetTriangleCount ());
 
-  body->generateBendingConstraints(2);
+  body->generateBendingConstraints (2);
+  body->randomizeConstraints ();
   body->m_cfg.piterations = 10;
   body->m_cfg.collisions |= btSoftBody::fCollision::VF_SS;
   body->m_materials[0]->m_kLST = 1;
@@ -1008,13 +1009,14 @@ iSoftBody* csBulletDynamicsSystem::CreateSoftBody
   btSoftBody* body = btSoftBodyHelpers::CreateFromTriMesh
     (*softWorldInfo, btVertices, btTriangles, triangleCount);
 
-  body->generateBendingConstraints(2);
+  body->generateBendingConstraints (2);
+  body->randomizeConstraints ();
   body->m_cfg.piterations = 10;
   body->m_cfg.collisions |= btSoftBody::fCollision::VF_SS;
   body->m_materials[0]->m_kLST = 1;
 
-  delete btVertices;
-  delete btTriangles;
+  delete [] btVertices;
+  delete [] btTriangles;
 
   btSoftRigidDynamicsWorld* softWorld =
     static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);

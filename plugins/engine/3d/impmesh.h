@@ -35,7 +35,6 @@
 
 class csVector3;
 class csMatrix3;
-class csMovable;
 class csMeshFactoryWrapper;
 class csImposterMesh;
 class csEngine;
@@ -45,6 +44,7 @@ struct iRenderView;
 CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 {
   class csMeshWrapper;
+  class csMovable;
 }
 CS_PLUGIN_NAMESPACE_END(Engine)
 
@@ -248,7 +248,8 @@ public:
   	const csVector3& end, csVector3& isect, float* pr) { return false; }
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr, int* polygon_idx = 0,
-	iMaterialWrapper** material = 0, iMaterialArray* materials = 0) { return false; }
+	iMaterialWrapper** material = 0)
+  { return false; }
   virtual void SetMeshWrapper (iMeshWrapper* logparent) {}
   virtual bool SetColor (const csColor& color) { return false; }
   virtual bool GetColor (csColor& color) const { return false; }

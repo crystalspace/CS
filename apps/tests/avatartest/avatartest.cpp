@@ -33,23 +33,13 @@
 #define MODEL_SINTEL 3
 
 AvatarTest::AvatarTest ()
-  : DemoApplication ("CrystalSpace.AvatarTest", "avatartest",
-		     "avatartest <OPTIONS>",
-		     "Tests on the animation of objects iAnimatedMesh."),
-    avatarScene (0), dynamicsDebugMode (DYNDEBUG_NONE)
+  : DemoApplication ("CrystalSpace.AvatarTest"),
+    avatarScene (nullptr), dynamicsDebugMode (DYNDEBUG_NONE)
 {
   // Configure the options for DemoApplication
 
   // Set the camera mode
-  cameraHelper.SetCameraMode (CS::Demo::CSDEMO_CAMERA_ROTATE);
-
-  // Command line options
-  commandLineHelper.AddCommandLineOption
-    ("scene=<name>", "Set the starting scene (frankie, krystal, sintel)");
-  commandLineHelper.AddCommandLineOption
-    ("disable-physics", "Disable the physical animations");
-  commandLineHelper.AddCommandLineOption
-    ("disable-soft", "Disable the soft bodies");
+  cameraManager.SetCameraMode (CS::Demo::CAMERA_ROTATE);
 }
 
 AvatarTest::~AvatarTest ()
@@ -57,28 +47,23 @@ AvatarTest::~AvatarTest ()
   delete avatarScene;
 }
 
-csVector3 AvatarTest::GetCameraStart ()
+void AvatarTest::PrintHelp ()
 {
-  if (avatarScene)
-    return avatarScene->GetCameraStart ();
+  csCommandLineHelper commandLineHelper;
 
-  return csVector3 (0.0f);
-}
+  // Command line options
+  commandLineHelper.AddCommandLineOption
+    ("scene", "Set the starting scene", csVariant ("frankie"));
+  commandLineHelper.AddCommandLineOption
+    ("physics", "Enable the physical animations", csVariant (true));
+  commandLineHelper.AddCommandLineOption
+    ("soft", "Enable the soft bodies", csVariant (true));
 
-csVector3 AvatarTest::GetCameraTarget ()
-{
-  if (avatarScene)
-    return avatarScene->GetCameraTarget ();
-
-  return csVector3 (0.0f);
-}
-
-float AvatarTest::GetCameraMinimumDistance ()
-{
-  if (avatarScene)
-    return avatarScene->GetCameraMinimumDistance ();
-
-  return 0.1f;
+  // Printing help
+  commandLineHelper.PrintApplicationHelp
+    (GetObjectRegistry (), "avatartest",
+     "avatartest <OPTIONS>",
+     "Tests on the animation of objects iAnimatedMesh.");
 }
 
 void AvatarTest::Frame ()
@@ -93,6 +78,9 @@ void AvatarTest::Frame ()
 
   // Update the avatar
   avatarScene->Frame ();
+
+  // Update the target of the camera
+  cameraManager.SetCameraTarget (avatarScene->GetCameraTarget ());
 
   // Update the information on the current state of the application
   avatarScene->UpdateStateDescription ();
@@ -149,7 +137,8 @@ bool AvatarTest::OnKeyboard (iEvent &ev)
       }
 
       // Re-initialize camera position
-      cameraHelper.ResetCamera ();
+      cameraManager.SetCameraTarget (avatarScene->GetCameraTarget ());
+      cameraManager.ResetCamera ();
 
       // Toggle the debug mode of the dynamic system
       if (physicsEnabled)
@@ -226,7 +215,7 @@ bool AvatarTest::HitBeamAnimatedMesh (csVector3& isect, csVector3& direction, in
   if (!avatarScene)
     return false;
 
-  csVector2 v2d (mouseX, g2d->GetHeight () - mouseY);
+  csVector2 v2d (mouse->GetLastX (), g2d->GetHeight () - mouse->GetLastY ());
   iCamera* camera = view->GetCamera ();
   csVector3 v3d = camera->InvPerspective (v2d, 10000);
   csVector3 startBeam = camera->GetTransform ().GetOrigin ();
@@ -271,7 +260,7 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
   // Check if physical effects are enabled
   csRef<iCommandLineParser> clp =
     csQueryRegistry<iCommandLineParser> (GetObjectRegistry ());
-  physicsEnabled = !clp->GetBoolOption ("disable-physics", false);
+  physicsEnabled = clp->GetBoolOption ("physics", true);
 
   while (physicsEnabled)
   {
@@ -313,7 +302,7 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
     }
 
     // Check whether the soft bodies are enabled or not
-    softBodiesEnabled = !clp->GetBoolOption ("disable-soft", false);
+    softBodiesEnabled = clp->GetBoolOption ("soft", true);
 
     // Load the soft body animation control plugin & factory
     if (softBodiesEnabled)
@@ -464,7 +453,8 @@ bool AvatarTest::Application ()
     return false;
 
   // Initialize the camera position
-  cameraHelper.ResetCamera ();
+  cameraManager.SetCameraTarget (avatarScene->GetCameraTarget ());
+  cameraManager.ResetCamera ();
 
   // Run the application
   Run();

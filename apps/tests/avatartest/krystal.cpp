@@ -29,19 +29,25 @@
 KrystalScene::KrystalScene (AvatarTest* avatarTest)
   : avatarTest (avatarTest), debug (false), IKenabled (false)
 {
+  // Setup the parameters of the camera manager
+  avatarTest->cameraManager.SetStartPosition (csVector3 (0.0f, 1.0f, -2.5f));
+  avatarTest->cameraManager.SetCameraMinimumDistance (CAMERA_MINIMUM_DISTANCE);
+
   // Define the available keys
-  avatarTest->hudHelper.keyDescriptions.DeleteAll ();
-  avatarTest->hudHelper.keyDescriptions.Push ("arrow keys: move camera");
-  avatarTest->hudHelper.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
+  avatarTest->hudManager.keyDescriptions.DeleteAll ();
+  avatarTest->hudManager.keyDescriptions.Push ("arrow keys: move camera");
+  avatarTest->hudManager.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
   if (avatarTest->physicsEnabled)
   {
-    avatarTest->hudHelper.keyDescriptions.Push ("i: toggle Inverse Kinematics");
-    avatarTest->hudHelper.keyDescriptions.Push ("d: display active colliders");
-    avatarTest->hudHelper.keyDescriptions.Push ("left mouse: kill Krystal");
+    avatarTest->hudManager.keyDescriptions.Push ("i: toggle Inverse Kinematics");
+    avatarTest->hudManager.keyDescriptions.Push ("d: display active colliders");
+    avatarTest->hudManager.keyDescriptions.Push ("left mouse: kill Krystal");
   }
-  avatarTest->hudHelper.keyDescriptions.Push ("a: display bone positions");
-  avatarTest->hudHelper.keyDescriptions.Push ("r: reset scene");
-  avatarTest->hudHelper.keyDescriptions.Push ("n: switch to next scene");
+  avatarTest->hudManager.keyDescriptions.Push ("a: display bone positions");
+  avatarTest->hudManager.keyDescriptions.Push ("r: reset scene");
+  avatarTest->hudManager.keyDescriptions.Push ("n: switch to next scene");
+
+  avatarTest->hudManager.stateDescriptions.DeleteAll ();
 }
 
 KrystalScene::~KrystalScene ()
@@ -64,16 +70,9 @@ KrystalScene::~KrystalScene ()
 
   if (skirtBody)
     avatarTest->bulletDynamicSystem->RemoveSoftBody (skirtBody);
-}
 
-csVector3 KrystalScene::GetCameraStart ()
-{
-  return csVector3 (0.0f, 1.0f, -2.5f);
-}
-
-float KrystalScene::GetCameraMinimumDistance ()
-{
-  return CAMERA_MINIMUM_DISTANCE;
+  if (IKMesh)
+    avatarTest->engine->RemoveObject (IKMesh);
 }
 
 csVector3 KrystalScene::GetCameraTarget ()
@@ -142,7 +141,8 @@ void KrystalScene::Frame ()
   {
     // Keep the 'IKMesh' mesh at the same distance to the camera
     csRef<iCamera> camera = avatarTest->view->GetCamera ();
-    csVector2 v2d (avatarTest->mouseX, avatarTest->g2d->GetHeight () - avatarTest->mouseY);
+    csVector2 v2d (avatarTest->mouse->GetLastX (),
+		   avatarTest->g2d->GetHeight () - avatarTest->mouse->GetLastY ());
     csVector3 v3d = camera->InvPerspective (v2d, 10000);
     csVector3 startBeam = camera->GetTransform ().GetOrigin ();
     csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
@@ -318,7 +318,8 @@ bool KrystalScene::OnMouseDown (iEvent &ev)
     // Trace a beam to see if the IK box was really clicked
     // Compute the end beam points
     csRef<iCamera> camera = avatarTest->view->GetCamera ();
-    csVector2 v2d (avatarTest->mouseX, avatarTest->g2d->GetHeight () - avatarTest->mouseY);
+    csVector2 v2d (avatarTest->mouse->GetLastX (),
+		   avatarTest->g2d->GetHeight () - avatarTest->mouse->GetLastY ());
     csVector3 v3d = camera->InvPerspective (v2d, 10000);
     csVector3 startBeam = camera->GetTransform ().GetOrigin ();
     csVector3 endBeam = camera->GetTransform ().This2Other (v3d);
@@ -724,9 +725,4 @@ void KrystalScene::ResetSoftBodies ()
   animationControl->CreateAnimatedMeshAnchor (animesh, spineBody, 78);
   animationControl->CreateAnimatedMeshAnchor (animesh, spineBody, 79);
   animationControl->CreateAnimatedMeshAnchor (animesh, spineBody, 80);
-}
-
-void KrystalScene::UpdateStateDescription ()
-{
-  avatarTest->hudHelper.stateDescriptions.DeleteAll ();
 }

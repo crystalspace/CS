@@ -560,11 +560,10 @@ bool csWaterMeshObject::HitBeamOutline (const csVector3& start,
 
 bool csWaterMeshObject::HitBeamObject (const csVector3& start,
                                        const csVector3& end, csVector3& isect, float *pr, int* polygon_idx,
-                                       iMaterialWrapper** material, iMaterialArray* materials)
+                                       iMaterialWrapper** material)
 {
   
   if (material) *material = csWaterMeshObject::material;
-  if (materials) materials->Push (csWaterMeshObject::material);
   if (polygon_idx) *polygon_idx = -1;
   // This is the slow version. Use for an accurate hit on the object.
   // It will cycle through every triangle in the mesh serching for the
@@ -647,7 +646,7 @@ void csWaterMeshObject::PreGetBuffer (csRenderBufferHolder *holder,
       // Copy the data into the render buffer
       // since we don't keep a local copy of the color buffer here.
       color_buffer->CopyInto (colors, factory->numVerts);
-      delete colors;
+      delete [] colors;
     }
     holder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
   } 
@@ -976,7 +975,7 @@ csRef<iTextureWrapper> csWaterMeshObjectFactory::MakeFresnelTex(int size)
   csRef<iTextureWrapper> fresnelTexWrapper;
   // fresnelTexWrapper->SetTextureHandle(texHandle);
 
-  delete buf;
+  delete [] buf;
 
   return fresnelTexWrapper;
 }

@@ -211,6 +211,23 @@ private:
 
   /// Material handle as returned by iTextureManager.
   iMeshFactoryWrapper* logparent;
+  
+  /// Container for last Cal3D error
+  class LastCalError
+  {
+    csString descr;
+    csString text;
+    csString file;
+    int line;
+  public:
+    void Clear ();
+    void Stash ();
+    void Report (iObjectRegistry* objreg,
+		 int severity,
+		 const char* msgId,
+		 const char* msg);
+  };
+  LastCalError lastError;
 
   csSpriteCal3DMeshObjectType* sprcal3d_type;
 
@@ -265,17 +282,19 @@ public:
   /// Create a new core object.
   bool Create(const char *name);
   void ReportLastError ();
-  void SetLoadFlags(int flags);
+  void SetLoadFlags(int flags) {}
   void SetBasePath(const char *path);
   void RescaleFactory(float factor);
   void AbsoluteRescaleFactory(float factor);
   void CalculateAllBoneBoundingBoxes();
 
-  bool LoadCoreSkeleton(iVFS *vfs,const char *filename);
+  bool LoadCoreSkeleton(iVFS *vfs,const char *filename,
+			int loadFlags);
 
   int  LoadCoreAnimation(iVFS *vfs,const char *filename,const char *name,
     int type,float base_vel, float min_vel,float max_vel,int min_interval,
-    int max_interval,int idle_pct, bool lock);
+    int max_interval,int idle_pct, bool lock,
+    int loadFlags);
 
   /** Load a core mesh for the factory.  Reads in the mesh details and stores
     * them in a list for use by models.
@@ -289,10 +308,11 @@ public:
     * \return The id of the mesh that cal3d as assigned to it.
     */
   int LoadCoreMesh(iVFS *vfs,const char *filename,const char *name,
-    bool attach,iMaterialWrapper *defmat);
+    bool attach,iMaterialWrapper *defmat,
+    int loadFlags);
 
   int LoadCoreMorphTarget(iVFS *vfs,int mesh_index,const char *filename,
-    const char *name);
+    const char *name, int loadFlags);
   int AddMorphAnimation(const char *name);
   bool AddMorphTarget(int morphanimation_index,const char *mesh_name,
     const char *morphtarget_name);
@@ -587,7 +607,7 @@ public:
       csVector3& intersect, float* pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
       csVector3& intersect, float* pr, int* = 0,
-      iMaterialWrapper** = 0, iMaterialArray* materials = 0);
+      iMaterialWrapper** = 0);
 
   virtual bool SetColor (const csColor& /*col*/)
   {
@@ -1038,6 +1058,7 @@ private:
   csRef<iVirtualClock> vc;
   csWeakRef<iEngine> engine;
 
+  CS::Threading::Mutex loaderLock;
 public:
   float updateanim_sqdistance1;
   int updateanim_skip1;		// 0 is normal, > 0 is skip
@@ -1066,6 +1087,17 @@ public:
   /// New Factory.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
   /** @} */
+  
+  /**
+   * Scoped lock to serialize access to Cal loader.
+   * This is needed because the Cal3D loader uses global variables during loading.
+   */
+  class CalLoaderLock
+  {
+    CS::Threading::MutexScopedLock theLock;
+  public:
+    CalLoaderLock (csSpriteCal3DMeshObjectType* objType) : theLock (objType->loaderLock) {}
+  };
 };
 
 }

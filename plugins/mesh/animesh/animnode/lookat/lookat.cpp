@@ -46,81 +46,25 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
 {
-
-  /********************
-   *  LookAtNodeManager
-   ********************/
-
   SCF_IMPLEMENT_FACTORY(LookAtNodeManager);
 
-  CS_LEAKGUARD_IMPLEMENT(LookAtNodeManager);
+  // --------------------------  LookAtNodeFactory  --------------------------
 
-  LookAtNodeManager::LookAtNodeManager (iBase* parent)
-    : scfImplementationType (this, parent)
-  {
-  }
+  CS_LEAKGUARD_IMPLEMENT(LookAtNodeFactory);
 
-  CS::Animation::iSkeletonLookAtNodeFactory* LookAtNodeManager::CreateAnimNodeFactory (const char *name)
-  {
-    csRef<CS::Animation::iSkeletonLookAtNodeFactory> newFact;
-    newFact.AttachNew (new LookAtAnimNodeFactory (this, name));
-
-    return factoryHash.PutUnique (name, newFact);
-  }
-
-  CS::Animation::iSkeletonLookAtNodeFactory* LookAtNodeManager::FindAnimNodeFactory
-    (const char* name) const
-  {
-    return factoryHash.Get (name, 0);
-  }
-
-  void LookAtNodeManager::ClearAnimNodeFactories ()
-  {
-    factoryHash.DeleteAll ();
-  }
-
-  bool LookAtNodeManager::Initialize (iObjectRegistry* object_reg)
-  {
-    this->object_reg = object_reg;
-    return true;
-  }
-
-  void LookAtNodeManager::Report (int severity, const char* msg, ...) const
-  {
-    va_list arg;
-    va_start (arg, msg);
-    csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
-    if (rep)
-      rep->ReportV (severity,
-		    "crystalspace.mesh.animesh.animnode.lookat",
-		    msg, arg);
-    else
-      {
-	csPrintfV (msg, arg);
-	csPrintf ("\n");
-      }
-    va_end (arg);
-  }
-
-  /********************
-   *  LookAtAnimNodeFactory
-   ********************/
-
-  CS_LEAKGUARD_IMPLEMENT(LookAtAnimNodeFactory);
-
-  LookAtAnimNodeFactory::LookAtAnimNodeFactory (LookAtNodeManager* manager, const char *name)
-    : scfImplementationType (this), manager (manager), name (name),
-    boneID (CS::Animation::InvalidBoneID), maximumSpeed (PI), alwaysRotate (false),
+  LookAtNodeFactory::LookAtNodeFactory (LookAtNodeManager* manager, const char *name)
+    : scfImplementationType (this), CS::Animation::SkeletonAnimNodeFactorySingle (name),
+    manager (manager), boneID (CS::Animation::InvalidBoneID), maximumSpeed (PI), alwaysRotate (false),
     listenerMinimumDelay (0.1f)
   {
   }
 
-  void LookAtAnimNodeFactory::SetBodySkeleton (CS::Animation::iBodySkeleton* skeleton)
+  void LookAtNodeFactory::SetBodySkeleton (CS::Animation::iBodySkeleton* skeleton)
   {
     this->skeleton = skeleton;
   }
 
-  void LookAtAnimNodeFactory::SetBone (CS::Animation::BoneID boneID)
+  void LookAtNodeFactory::SetBone (CS::Animation::BoneID boneID)
   {
     this->boneID = boneID;
 
@@ -139,88 +83,48 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     }
   }
 
-  void LookAtAnimNodeFactory::SetMaximumSpeed (float speed)
+  void LookAtNodeFactory::SetMaximumSpeed (float speed)
   {
     CS_ASSERT (speed >= 0.0f);
     maximumSpeed = speed;
   }
 
-  void LookAtAnimNodeFactory::SetAlwaysRotate (bool alwaysRotate)
+  void LookAtNodeFactory::SetAlwaysRotate (bool alwaysRotate)
   {
     this->alwaysRotate = alwaysRotate;
   }
 
-  void LookAtAnimNodeFactory::SetListenerDelay (float delay)
+  void LookAtNodeFactory::SetListenerDelay (float delay)
   {
     CS_ASSERT (delay >= 0.0f);
     listenerMinimumDelay = delay;
   }
 
-  void LookAtAnimNodeFactory::SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* node)
+  csPtr<CS::Animation::SkeletonAnimNodeSingleBase> LookAtNodeFactory::ActualCreateInstance (
+    CS::Animation::iSkeletonAnimPacket* packet,
+    CS::Animation::iSkeleton* skeleton)
   {
-    childNode = node;
+    return csPtr<CS::Animation::SkeletonAnimNodeSingleBase> (new LookAtNode (this, skeleton));
   }
 
-  CS::Animation::iSkeletonAnimNodeFactory* LookAtAnimNodeFactory::GetChildNode ()
-  {
-    return childNode;
-  }
+  // --------------------------  LookAtNode  --------------------------
 
-  void LookAtAnimNodeFactory::ClearChildNode ()
-  {
-    childNode = 0;
-  }
+  CS_LEAKGUARD_IMPLEMENT(LookAtNode);
 
-  csPtr<CS::Animation::iSkeletonAnimNode> LookAtAnimNodeFactory::CreateInstance (
-               CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton)
-  {
-    csRef<CS::Animation::iSkeletonAnimNode> child;
-    if (childNode)
-      child = childNode->CreateInstance (packet, skeleton);
-
-    csRef<CS::Animation::iSkeletonAnimNode> newP;
-    newP.AttachNew (new LookAtAnimNode (this, skeleton, child));
-    return csPtr<CS::Animation::iSkeletonAnimNode> (newP);
-  }
-
-  const char* LookAtAnimNodeFactory::GetNodeName () const
-  {
-    return name;
-  }
-
-  CS::Animation::iSkeletonAnimNodeFactory* LookAtAnimNodeFactory::FindNode
-    (const char* name)
-  {
-    if (this->name == name)
-      return this;
-
-    if (childNode)
-      return childNode->FindNode (name);
-
-    return 0;
-  }
-
-  /********************
-   *  LookAtAnimNode
-   ********************/
-
-  CS_LEAKGUARD_IMPLEMENT(LookAtAnimNode);
-
-  LookAtAnimNode::LookAtAnimNode (LookAtAnimNodeFactory* factory, 
-				  CS::Animation::iSkeleton* skeleton,
-				  CS::Animation::iSkeletonAnimNode* childNode)
-    : scfImplementationType (this), factory (factory), skeleton (skeleton),
-    childNode (childNode), targetMode (TARGET_NONE),
-    isPlaying (false), trackingInitialized (true)    
+  LookAtNode::LookAtNode (LookAtNodeFactory* factory, 
+			  CS::Animation::iSkeleton* skeleton)
+    : scfImplementationType (this),
+    CS::Animation::SkeletonAnimNodeSingle<LookAtNodeFactory> (factory, skeleton),
+    targetMode (TARGET_NONE), trackingInitialized (true)    
   {
   }
 
-  bool LookAtAnimNode::HasTarget ()
+  bool LookAtNode::HasTarget ()
   {
     return targetMode != TARGET_NONE;
   }
 
-  void LookAtAnimNode::SetTarget (csVector3 target)
+  void LookAtNode::SetTarget (csVector3 target)
   {
     // init tracking
     if (trackingStatus == STATUS_BASE_REACHED
@@ -240,7 +144,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     targetOffset = csVector3 (0);
   }
 
-  void LookAtAnimNode::SetTarget (iMovable* target, const csVector3& offset)
+  void LookAtNode::SetTarget (iMovable* target, const csVector3& offset)
   {
     CS_ASSERT (target);
 
@@ -262,7 +166,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     targetOffset = offset;
   }
 
-  void LookAtAnimNode::SetTarget (iCamera* target, const csVector3& offset)
+  void LookAtNode::SetTarget (iCamera* target, const csVector3& offset)
   {
     CS_ASSERT (target);
 
@@ -284,7 +188,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     targetOffset = offset;
   }
   
-  void LookAtAnimNode::RemoveTarget ()
+  void LookAtNode::RemoveTarget ()
   {
     // call listeners
     if (listenerStatus == STATUS_TARGET_REACHED)
@@ -297,17 +201,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     listenerStatus = STATUS_HEADING_BASE;
   }
 
-  void LookAtAnimNode::AddListener (CS::Animation::iSkeletonLookAtListener* listener)
+  void LookAtNode::AddListener (CS::Animation::iSkeletonLookAtListener* listener)
   {
     listeners.PushSmart (listener);
   }
 
-  void LookAtAnimNode::RemoveListener (CS::Animation::iSkeletonLookAtListener* listener)
+  void LookAtNode::RemoveListener (CS::Animation::iSkeletonLookAtListener* listener)
   {
     listeners.Delete (listener);
   }
 
-  void LookAtAnimNode::Play ()
+  void LookAtNode::Play ()
   {
     if (isPlaying)
       return;
@@ -325,41 +229,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
       childNode->Play ();
   }
 
-  void LookAtAnimNode::Stop ()
-  {
-    isPlaying = false;
-
-    // stop child node
-    if (childNode)
-      childNode->Stop ();
-  }
-
-  void LookAtAnimNode::SetPlaybackPosition (float time)
-  {
-    // nothing to do
-  }
-
-  float LookAtAnimNode::GetPlaybackPosition () const
-  {
-    return 0.0f;
-  }
-
-  float LookAtAnimNode::GetDuration () const
-  {
-    return 0.0f;
-  }
-
-  void LookAtAnimNode::SetPlaybackSpeed (float speed)
-  {
-    // TODO: nothing to do? apply on maximumSpeed? forward to child node?
-  }
-
-  float LookAtAnimNode::GetPlaybackSpeed () const
-  {
-    return 1.0f;
-  }
-
-  void LookAtAnimNode::BlendState (CS::Animation::csSkeletalState* state, float baseWeight)
+  void LookAtNode::BlendState (CS::Animation::AnimatedMeshState* state, float baseWeight)
   {
     // check that this node is active
     if (!isPlaying)
@@ -672,46 +542,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
       }
   }
 
-  void LookAtAnimNode::TickAnimation (float dt)
+  void LookAtNode::TickAnimation (float dt)
   {
-    frameDuration += dt;
-    listenerDelay += dt;
+    frameDuration += playbackSpeed * dt;
+    listenerDelay += playbackSpeed * dt;
 
     if (childNode)
       childNode->TickAnimation (dt);
-  }
-
-  bool LookAtAnimNode::IsActive () const
-  {
-    return isPlaying;
-  }
-
-  CS::Animation::iSkeletonAnimNodeFactory* LookAtAnimNode::GetFactory () const
-  {
-    return factory;
-  }
-
-  CS::Animation::iSkeletonAnimNode* LookAtAnimNode::FindNode (const char* name)
-  {
-    if (factory->name == name)
-      return this;
-
-    if (childNode)
-      return childNode->FindNode (name);
-
-    return 0;
-  }
-
-  void LookAtAnimNode::AddAnimationCallback
-    (CS::Animation::iSkeletonAnimCallback* callback)
-  {
-    // TODO
-  }
-
-  void LookAtAnimNode::RemoveAnimationCallback
-    (CS::Animation::iSkeletonAnimCallback* callback)
-  {
-    // TODO
   }
 
 }

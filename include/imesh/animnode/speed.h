@@ -40,24 +40,10 @@ struct iSkeletonSpeedNodeFactory;
  * A class to manage the creation and deletion of speed animation 
  * node factories.
  */
-struct iSkeletonSpeedNodeManager : public virtual iBase
+struct iSkeletonSpeedNodeManager
+  : public virtual CS::Animation::iSkeletonAnimNodeManager<CS::Animation::iSkeletonSpeedNodeFactory>
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonSpeedNodeManager, 1, 0, 0);
-
-  /**
-   * Create a 'speed' animation node factory of the given name.
-   */
-  virtual iSkeletonSpeedNodeFactory* CreateAnimNodeFactory (const char* name) = 0;
-
-  /**
-   * Find the 'speed' animation node factory of the given name.
-   */
-  virtual iSkeletonSpeedNodeFactory* FindAnimNodeFactory (const char* name) = 0;
-
-  /**
-   * Delete all 'speed' animation node factories.
-   */
-  virtual void ClearAnimNodeFactories () = 0;
+  SCF_ISKELETONANIMNODEMANAGER_INTERFACE (CS::Animation::iSkeletonSpeedNodeManager, 1, 0, 0);
 };
 
 /**
@@ -65,9 +51,9 @@ struct iSkeletonSpeedNodeManager : public virtual iBase
  * This animation node takes some animations of the animesh moving at different speed
  * (eg idle, walking, running), and blend them to achieve any custom speed.
  */
-struct iSkeletonSpeedNodeFactory : public iSkeletonAnimNodeFactory
+struct iSkeletonSpeedNodeFactory : public virtual iSkeletonAnimNodeFactory
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonSpeedNodeFactory, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonSpeedNodeFactory, 2, 0, 0);
 
   /**
    * Add a child animation node to this node. This child node should provide the

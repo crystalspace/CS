@@ -43,8 +43,24 @@ namespace lighter
 
   SwapManager::~SwapManager ()
   {
+  #ifdef CS_DEBUG
     // Sanity check that nothing is registered any more.
+    if (swapCache.GetSize() > 0)
+    {
+      csPrintf ("Leftover swappables:\n");
+      SwapCacheType::GlobalIterator it (swapCache.GetIterator());
+      while (it.HasNext())
+      {
+	csPtrKey<iSwappable> p;
+	it.Next (p);
+	csPrintf ("%p: ", (iSwappable*)p);
+	fflush (stdout);
+	csPrintf ("%s\n", p->Describe());
+      }
+    }
+    // Also, annoy.
     CS_ASSERT(swapCache.GetSize() == 0);
+  #endif
   }
 
   void SwapManager::RegisterSwappable (iSwappable* obj)

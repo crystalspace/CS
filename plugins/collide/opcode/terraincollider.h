@@ -78,6 +78,9 @@ public:
             const csVector3& end, bool oneHit, iTerrainVector3Array* points);
   virtual csTerrainColliderCollideSegmentResult CollideSegment (
       iTerrainCell* cell, const csVector3& start, const csVector3& end);
+  virtual bool CollideSegment (iTerrainCell* cell, const csVector3& start,
+                               const csVector3& end,
+			       csVector3& hitPoint);
 
   virtual bool CollideTriangles (iTerrainCell* cell, const csVector3* vertices,
                        size_t tri_count,

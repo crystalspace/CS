@@ -28,64 +28,9 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(SpeedNode)
 {
-
-  /********************
-   *  SpeedNodeManager
-   ********************/
-
   SCF_IMPLEMENT_FACTORY(SpeedNodeManager);
 
-  CS_LEAKGUARD_IMPLEMENT(SpeedNodeManager);
-
-  SpeedNodeManager::SpeedNodeManager (iBase* parent)
-    : scfImplementationType (this, parent)
-  {
-  }
-
-  CS::Animation::iSkeletonSpeedNodeFactory* SpeedNodeManager::CreateAnimNodeFactory (const char* name)
-  {
-    csRef<CS::Animation::iSkeletonSpeedNodeFactory> newFact;
-    newFact.AttachNew (new SpeedNodeFactory (this, name));
-
-    return speedFactories.PutUnique (name, newFact);
-  }
-
-  CS::Animation::iSkeletonSpeedNodeFactory* SpeedNodeManager::FindAnimNodeFactory (const char* name)
-  {
-   return speedFactories.Get (name, 0);
-  }
-
-  void SpeedNodeManager::ClearAnimNodeFactories ()
-  {
-    speedFactories.DeleteAll ();
-  }
-
-  bool SpeedNodeManager::Initialize (iObjectRegistry*)
-  {
-    this->object_reg = object_reg;
-    return true;
-  }
-
-  void SpeedNodeManager::Report (int severity, const char* msg, ...) const
-  {
-    va_list arg;
-    va_start (arg, msg);
-    csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
-    if (rep)
-      rep->ReportV (severity,
-		    "crystalspace.mesh.animesh.animnode.speed",
-		    msg, arg);
-    else
-      {
-	csPrintfV (msg, arg);
-	csPrintf ("\n");
-      }
-    va_end (arg);
-  }
-
-  /********************
-   *  SpeedNodeFactory
-   ********************/
+  // --------------------------  SpeedNodeFactory  --------------------------
 
   CS_LEAKGUARD_IMPLEMENT(SpeedNodeFactory);
 
@@ -143,14 +88,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(SpeedNode)
     return 0;
   }
 
-  /********************
-   *  SpeedNode
-   ********************/
+  // --------------------------  SpeedNode  --------------------------
 
   CS_LEAKGUARD_IMPLEMENT(SpeedNode);
 
   SpeedNode::SpeedNode (SpeedNodeFactory* factory, CS::Animation::iSkeleton* skeleton)
-    : scfImplementationType (this), factory (factory), skeleton (skeleton),
+    : scfImplementationType (this), factory (factory), skeleton (skeleton), playbackSpeed (1.0f),
     speed (0.0f), slowNode (0), fastNode (0), currentPosition (0.0f), speedRatio (1.0f),
     isPlaying (false)
   {
@@ -308,33 +251,34 @@ CS_PLUGIN_NAMESPACE_BEGIN(SpeedNode)
 
   void SpeedNode::SetPlaybackPosition (float time)
   {
-    // TODO?
+    currentPosition = time / cycleDuration;
+
+    subNodes[slowNode]->SetPlaybackPosition (time);
+    if (slowNode != fastNode)
+      subNodes[fastNode]->SetPlaybackPosition (time);
   }
 
   float SpeedNode::GetPlaybackPosition () const
   {
-    // TODO?
-    return 0.0f;
+    return currentPosition * cycleDuration;
   }
 
   float SpeedNode::GetDuration () const
   {
-    // TODO?
-    return 0.0f;
+    return cycleDuration;
   }
 
   void SpeedNode::SetPlaybackSpeed (float speed)
   {
-    // TODO!
+    playbackSpeed = speed;
   }
 
   float SpeedNode::GetPlaybackSpeed () const
   {
-    // TODO!
-    return 0.0f;
+    return playbackSpeed;
   }
 
-  void SpeedNode::BlendState (CS::Animation::csSkeletalState* state, float baseWeight)
+  void SpeedNode::BlendState (CS::Animation::AnimatedMeshState* state, float baseWeight)
   {
     if (!isPlaying)
       return;
@@ -355,7 +299,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(SpeedNode)
       return;
 
     // update current position
-    currentPosition += dt / cycleDuration;
+    currentPosition += playbackSpeed * dt / cycleDuration;
     if (currentPosition >= 1.0f)
       currentPosition = 0.0f;
     else if (currentPosition <= 0.0f)

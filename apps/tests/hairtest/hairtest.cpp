@@ -32,19 +32,15 @@
 #define CS_EVENT_UNHANDLED false
 
 HairTest::HairTest ()
-: DemoApplication ("CrystalSpace.HairTest", "hairtest",
-                     "hairtest <OPTIONS>",
-                     "Tests on the animation of objects CS::Mesh::iAnimatedMesh."),
-                     avatarScene (0), avatarSceneType(MODEL_KRYSTAL), 
-                     furMeshEnabled (true), dynamicsDebugMode (DYNDEBUG_NONE)
+: DemoApplication ("CrystalSpace.HairTest"),
+  avatarScene (0), avatarSceneType(MODEL_KRYSTAL), 
+  furMeshEnabled (true), dynamicsDebugMode (DYNDEBUG_NONE)
 {
   // Use a default rotate camera
-  cameraHelper.SetCameraMode (CS::Demo::CSDEMO_CAMERA_ROTATE);
-  SetHUDDisplayed(false);
+  cameraManager.SetCameraMode (CS::Demo::CAMERA_ROTATE);
 
-  // Command line options
-  commandLineHelper.AddCommandLineOption
-    ("scene=<name>", "Set the starting scene (krystal, frankie)");
+  // Don't display the available keys
+  hudManager.keyDescriptions.DeleteAll ();
 }
 
 HairTest::~HairTest ()
@@ -52,28 +48,17 @@ HairTest::~HairTest ()
   delete avatarScene;
 }
 
-csVector3 HairTest::GetCameraStart ()
+void HairTest::PrintHelp ()
 {
-  if (avatarScene)
-    return avatarScene->GetCameraStart ();
+  csCommandLineHelper commandLineHelper;
 
-  return csVector3 (0.0f);
-}
+  // Command line options
+  commandLineHelper.AddCommandLineOption
+    ("scene", "Set the starting scene", csVariant ("krystal"));
 
-csVector3 HairTest::GetCameraTarget ()
-{
-  if (avatarScene)
-    return avatarScene->GetCameraTarget ();
-
-  return csVector3 (0.0f);
-}
-
-float HairTest::GetCameraMinimumDistance ()
-{
-  if (avatarScene)
-    return avatarScene->GetCameraMinimumDistance ();
-
-  return 0.1f;
+  // Printing help
+  commandLineHelper.PrintApplicationHelp
+    (GetObjectRegistry (), "hairtest", "hairtest <OPTIONS>", "Tests on the fur mesh.");
 }
 
 void HairTest::Frame ()
@@ -88,6 +73,9 @@ void HairTest::Frame ()
   // order to achieve a 'slow motion' effect)
   if (physicsEnabled)
     dynamics->Step (speed * avatarScene->GetSimulationSpeed ());
+
+  // Update the target of the camera
+  cameraManager.SetCameraTarget (avatarScene->GetCameraTarget ());
 
   // Update the information on the current state of the application
   avatarScene->UpdateStateDescription ();
@@ -601,14 +589,15 @@ void HairTest::SwitchScenes()
   }
 
   // Re-initialize camera position
-  cameraHelper.ResetCamera ();
+  cameraManager.SetCameraTarget (avatarScene->GetCameraTarget ());
+  cameraManager.ResetCamera ();
 
   furMeshEnabled = true;
 }
 
 void HairTest::SaveObject(iMeshWrapper* meshwrap, const char * filename)
 {
-  csPrintf("Saving object ...\n");
+  csPrintf("Saving object to file %s...\n", filename);
 
   csRef<iDocumentSystem> xml(new csTinyDocumentSystem());
   csRef<iDocument> doc = xml->CreateDocument();
@@ -663,7 +652,7 @@ void HairTest::SaveObject(iMeshWrapper* meshwrap, const char * filename)
 
 void HairTest::SaveFactory(iMeshFactoryWrapper* meshfactwrap, const char * filename)
 {
-  csPrintf("Saving factory ...\n");
+  csPrintf("Saving factory to file %s...\n", filename);
 
   csRef<iDocumentSystem> xml(new csTinyDocumentSystem());
   csRef<iDocument> doc = xml->CreateDocument();
@@ -1011,7 +1000,7 @@ bool HairTest::Application ()
     CEGUI::Event::Subscriber(&HairTest::StdDlgDirChange, this));
 
   // ------------------------------------------------------------------------
-  vfs->ChDir ("/lib/krystal/");
+  vfs->ChDir ("/lib/hairtest/");
   btn = winMgr->getWindow("HairTest/StdDlg/Path");
   btn->setProperty("Text", vfs->GetCwd());
   StdDlgUpdateLists(vfs->GetCwd());
@@ -1237,7 +1226,8 @@ bool HairTest::Application ()
     CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedOverallLOD, this)); 
 
   // Initialize camera position
-  cameraHelper.ResetCamera ();
+  cameraManager.SetCameraTarget (avatarScene->GetCameraTarget ());
+  cameraManager.ResetCamera ();
 
   // Run the application
   Run();

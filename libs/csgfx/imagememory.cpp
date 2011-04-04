@@ -177,7 +177,7 @@ void csImageMemory::EnsureImage()
 
 void csImageMemory::FreeImage ()
 {
-  if (!destroy_image)
+  if (destroy_image)
   {
     delete [] Palette;
     delete [] Alpha;

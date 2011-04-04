@@ -39,7 +39,6 @@
 #include "iengine/imposter.h"
 #include "iengine/lod.h"
 #include "iengine/mesh.h"
-#include "iengine/meshgen.h"
 #include "iengine/movable.h"
 #include "iengine/portalcontainer.h"
 #include "iengine/scenenode.h"
@@ -73,7 +72,6 @@
 #include "iutil/vfs.h"
 
 #include "ivaria/keyval.h"
-#include "ivaria/terraform.h"
 
 #include "ivideo/material.h"
 
@@ -588,7 +586,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csVfsDirectoryChanger dirChange(vfs);
     dirChange.ChangeToFull(cwd);
 
-    bool res = Load(ret, buffer, 0, collection, ssource, missingdata, keepFlags, do_verbose);
+    bool res = Load (ret, buffer, 0, collection, ssource, missingdata, keepFlags, do_verbose);
 
     if(sync && res)
     {
@@ -1191,7 +1189,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             return false;
           break;
         }
-      case  XMLTOKEN_VARIABLES:
+      case XMLTOKEN_VARIABLES:
         if (!ParseVariableList (ldr_context, child))
           return false;
         break;
@@ -4351,241 +4349,95 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return true;
   }
 
-  bool csThreadedLoader::LoadMeshGen (iLoaderContext* ldr_context,
-    iDocumentNode* node, iSector* sector)
+  // TODO: add a CS namespace at the start of each CS & CEL file,
+  // eg "<crystalspace xmlns="http://www.crystalspace3d.org/docs/online/manual/">"
+  // Have a specific namspace for CEL?
+  static bool TestCrystalFile (const char* data, int dataSize)
   {
-    const char* name = node->GetAttributeValue ("name");
-    iMeshGenerator* meshgen = sector->CreateMeshGenerator (name);
-    ldr_context->AddToCollection(meshgen->QueryObject ());
+    if (!dataSize)
+      return false;
 
-    csRef<iDocumentNodeIterator> it = node->GetNodes ();
-    while (it->HasNext ())
+    // TODO: Check binary CS files, or instead add methods to iDocument:
+    // - to check whether they can or not manage the data to be loaded
+    // - to return the first tag met in the data (in order to be able to test for the tags
+    //   crystalspace, world, library, etc)
+    const char* b = data;
+
+    // Go to first character
+    while (isspace (*b))
     {
-      csRef<iDocumentNode> child = it->Next ();
-      if (child->GetType () != CS_NODE_ELEMENT) continue;
-      const char* value = child->GetValue ();
-      csStringID id = xmltokens.Request (value);
-      switch (id)
-      {
-      case XMLTOKEN_GEOMETRY:
-        if (!LoadMeshGenGeometry (ldr_context, child, meshgen))
-          return false;
-        break;
-      case XMLTOKEN_MESHOBJ:
-        {
-          const char* meshname = child->GetContentsValue ();
-          iMeshWrapper* mesh = ldr_context->FindMeshObject (meshname);
-          if (!mesh)
-          {
-            SyntaxService->ReportError (
-              "crystalspace.maploader.parse.meshgen",
-              child, "Can't find mesh object %s for mesh generator!",
-              CS::Quote::Single (meshname));
-            return false;
-          }
-          meshgen->AddMesh (mesh);
-        }
-        break;
-      case XMLTOKEN_DENSITYSCALE:
-        {
-          float mindist = child->GetAttributeValueAsFloat ("mindist");
-          float maxdist = child->GetAttributeValueAsFloat ("maxdist");
-          float maxfactor = child->GetAttributeValueAsFloat ("maxfactor");
-          meshgen->SetDensityScale (mindist, maxdist, maxfactor);
-        }
-        break;
-      case XMLTOKEN_ALPHASCALE:
-        {
-          float mindist = child->GetAttributeValueAsFloat ("mindist");
-          float maxdist = child->GetAttributeValueAsFloat ("maxdist");
-          meshgen->SetAlphaScale (mindist, maxdist);
-        }
-        break;
-      case XMLTOKEN_NUMBLOCKS:
-        meshgen->SetBlockCount (child->GetContentsValueAsInt ());
-        break;
-      case XMLTOKEN_CELLDIM:
-        meshgen->SetCellCount (child->GetContentsValueAsInt ());
-        break;
-      case XMLTOKEN_SAMPLEBOX:
-        {
-          csBox3 b;
-          if (!SyntaxService->ParseBox (child, b))
-            return false;
-          meshgen->SetSampleBox (b);
-        }
-        break;
-      default:
-        SyntaxService->ReportBadToken (child);
-        return false;
-      }
+      b++;
+      if (b - data >= dataSize) return false;
     }
-    return true;
-  }
 
-  bool csThreadedLoader::LoadMeshGenGeometry (iLoaderContext* ldr_context,
-    iDocumentNode* node,
-    iMeshGenerator* meshgen)
-  {
-    iMeshGeneratorGeometry* geom = meshgen->CreateGeometry ();
-
-    csRef<iDocumentNodeIterator> it = node->GetNodes ();
-    while (it->HasNext ())
-    {
-      csRef<iDocumentNode> child = it->Next ();
-      if (child->GetType () != CS_NODE_ELEMENT) continue;
-      const char* value = child->GetValue ();
-      csStringID id = xmltokens.Request (value);
-      switch (id)
-      {
-      case XMLTOKEN_FACTORY:
-        {
-          const char* factname = child->GetAttributeValue ("name");
-          float maxdist = child->GetAttributeValueAsFloat ("maxdist");
-          iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
-          if (!fact)
-          {
-            SyntaxService->ReportError (
-              "crystalspace.maploader.parse.meshgen",
-              child, "Can't find mesh factory %s for mesh generator!",
-              CS::Quote::Single (factname));
-            return false;
-          }
-          geom->AddFactory (fact, maxdist);
-        }
-        break;
-      case XMLTOKEN_POSITIONMAP:
-        {
-          const char* map_name = child->GetAttributeValue ("mapname");
-          csRef<iTerraFormer> map = csQueryRegistryTagInterface<iTerraFormer> 
-            (object_reg, map_name);
-          if (!map)
-          {
-            SyntaxService->ReportError (
-              "crystalspace.maploader.parse.meshgen",
-              child, "Can't find map position map terraformer %s!", CS::Quote::Single (map_name));
-            return false;
-          }
-
-          csVector2 min, max;
-          csRef<iDocumentNode> region_node = child->GetNode ("region");
-
-          SyntaxService->ParseVector (region_node->GetNode ("min"), min);
-          SyntaxService->ParseVector (region_node->GetNode ("max"), max);
-
-          float value = child->GetAttributeValueAsFloat ("value");
-
-          uint resx = child->GetAttributeValueAsInt ("resx");
-          uint resy = child->GetAttributeValueAsInt ("resy");
-
-          csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
-            object_reg, "crystalspace.shared.stringset");
-
-          geom->AddPositionsFromMap (map, csBox2 (min.x, min.y, max.x, max.y), 
-            resx, resy, value, strings->Request ("heights"));
-        }
-        break;
-      case XMLTOKEN_DENSITYMAP:
-        {
-          const char* map_name = child->GetContentsValue ();
-          csRef<iTerraFormer> map_tf = csQueryRegistryTagInterface<iTerraFormer> 
-            (object_reg, map_name);
-          if (!map_tf)
-          {
-            SyntaxService->ReportError (
-              "crystalspace.maploader.parse.meshgen",
-              child, "Can't find map density map terraformer %s!", CS::Quote::Single (map_name));
-            return false;
-          }
-          float factor = child->GetAttributeValueAsFloat ("factor");
-          csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
-            object_reg, "crystalspace.shared.stringset");
-          geom->SetDensityMap (map_tf, factor, strings->Request ("densitymap"));
-        }
-        break;
-      case XMLTOKEN_MATERIALFACTOR:
-        {
-          const char* matname = child->GetAttributeValue ("material");
-          if (!matname)
-          {
-            SyntaxService->ReportError (
-              "crystalspace.maploader.parse.meshgen",
-              child, "%s attribute is missing!",
-	      CS::Quote::Single ("material"));
-            return false;
-          }
-          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-          if (!mat)
-          {
-            SyntaxService->ReportError (
-              "crystalspace.maploader.parse.meshgen",
-              child, "Can't find material %s!", CS::Quote::Single (matname));
-            return false;
-          }
-          float factor = child->GetAttributeValueAsFloat ("factor");
-          geom->AddDensityMaterialFactor (mat, factor);
-        }
-        break;
-      case XMLTOKEN_DEFAULTMATERIALFACTOR:
-        {
-          float factor = child->GetContentsValueAsFloat ();
-          geom->SetDefaultDensityMaterialFactor (factor);
-        }
-        break;
-      case XMLTOKEN_RADIUS:
-        geom->SetRadius (child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_DENSITY:
-        geom->SetDensity (child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_WINDBIAS:
-        geom->SetWindBias(child->GetContentsValueAsFloat ());
-        break;
-      case XMLTOKEN_WINDDIRECTION:
-        geom->SetWindDirection(child->GetAttributeValueAsFloat("x"),
-          child->GetAttributeValueAsFloat("y"));
-        break;
-      case XMLTOKEN_WINDSPEED:
-        geom->SetWindSpeed(child->GetContentsValueAsFloat ());
-        break;
-      default:
-        SyntaxService->ReportBadToken (child);
-        return false;
-      }
-    }
-    return true;
-  }
-
-  static bool TestXML (const char* b)
-  {
-    while (*b && isspace (*b)) b++;
+    // Check for '?xml' or '!--' tags
     if (*b != '<') return false;
     b++;
-    if (*b == '?')
+    if (b - data + 4 >= dataSize) return false;
+    while (*b == '?' || *b == '!')
     {
-      return (b[1] == 'x' && b[2] == 'm' && b[3] == 'l' && isspace (b[4]));
+      if (*b == '?' && !(b[1] == 'x' && b[2] == 'm' && b[3] == 'l' && isspace (b[4])))
+	return false;
+
+      if (*b == '!' && !(b[1] == '-' && b[2] == '-'))
+	return false;
+
+      // Go to the next '>'
+      while (*b != '>')
+      {
+	b++;
+	if (b - data >= dataSize) return false;
+      }
+
+      b++;
+      if (b - data >= dataSize) return false;
+
+      // Go to the next '<'
+      while (isspace (*b))
+      {
+	b++;
+	if (b - data >= dataSize) return false;
+      }
+
+      if (*b != '<')
+	return false;
+
+      b++;
+      if (b - data >= dataSize) return false;
     }
-    else if (*b == '!')
-    {
-      return (b[1] == '-' && b[2] == '-');
-    }
-    else
+
+    // Check for a valid character
+    if (!isalpha (*b) && *b != '_')
+      return false;
+
+    // Check for a 'world' or 'library' tag
+    const char* start = b;
+    while (*b != '>' && !isspace (*b))
     {
       b++;
-      if (!isalpha (*b) && *b != '_')
-        return false;
-      b++;
-      while (isalnum (*b)) b++;
-      if (!isspace (*b) && *b != '>')
-        return false;
-      return true;
+      if (b - data >= dataSize) return false;
     }
+    csString tag (start, b - start);
+
+    return tag.CompareNoCase ("world")
+      || tag.CompareNoCase ("library")
+      || tag.CompareNoCase ("texture")
+      || tag.CompareNoCase ("meshfact")
+      || tag.CompareNoCase ("meshgen")
+      || tag.CompareNoCase ("meshobj")
+      || tag.CompareNoCase ("trimesh")
+      || tag.CompareNoCase ("portals")
+      || tag.CompareNoCase ("light")
+      || tag.CompareNoCase ("meshref")
+      || tag.CompareNoCase ("plugins")
+      || tag.CompareNoCase ("sequence")
+      || tag.CompareNoCase ("trigger");
   }
 
   bool csThreadedLoader::Load (iThreadReturn* ret, iDataBuffer* buffer, const char* fname, iCollection* collection,
     iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags, bool do_verbose)
   {
-    if (TestXML (buffer->GetData ()))
+    if (TestCrystalFile (buffer->GetData (), buffer->GetSize ()))
     {
       csRef<iDocument> doc;
       bool er = LoadStructuredDoc (fname, buffer, doc);
@@ -4597,8 +4449,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       if (doc)
       {
         csRef<iDocumentNode> node = doc->GetRoot ();
-	      csString cwd = vfs->GetCwd ();
-        return LoadNodeTC(ret, false, cwd, node, collection, 0, ssource, missingdata, keepFlags, do_verbose);
+	csString cwd = vfs->GetCwd ();
+        return LoadNodeTC (ret, false, cwd, node, collection, 0, ssource, missingdata, keepFlags, do_verbose);
       }
       else
       {
@@ -4609,6 +4461,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         return false;
       }
     }
+
     else
     {
       csRef<iPluginManager> plugin_mgr = csQueryRegistry<iPluginManager> (

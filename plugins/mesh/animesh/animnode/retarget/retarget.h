@@ -22,53 +22,28 @@
 #define __CS_RETARGET_H__
 
 #include "csutil/scf_implementation.h"
-#include "iutil/comp.h"
+#include "cstool/animnodetmpl.h"
 #include "csutil/leakguard.h"
 #include "csutil/weakref.h"
 #include "csutil/refarr.h"
 #include "csutil/csstring.h"
 #include "imesh/animnode/retarget.h"
-
+#include "iutil/comp.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
 {
 
-  class RetargetNodeManager : public scfImplementation2<RetargetNodeManager,
-    CS::Animation::iSkeletonRetargetNodeManager, iComponent>
-  {
-    friend class RetargetAnimNode;
+  class RetargetNodeManager;
 
-  public:
-    CS_LEAKGUARD_DECLARE(RetargetNodeManager);
-
-    RetargetNodeManager (iBase* parent);
-
-    //-- CS::Animation::iSkeletonRetargetNodeManager
-    virtual CS::Animation::iSkeletonRetargetNodeFactory* CreateAnimNodeFactory (const char *name);
-
-    virtual CS::Animation::iSkeletonRetargetNodeFactory* FindAnimNodeFactory (const char* name) const;
-    virtual void ClearAnimNodeFactories ();
-
-    //-- iComponent
-    virtual bool Initialize (iObjectRegistry*);
-
-    // error reporting
-    void Report (int severity, const char* msg, ...) const;
-
-  private:
-    iObjectRegistry* object_reg;
-    csHash<csRef<CS::Animation::iSkeletonRetargetNodeFactory>, csString> factoryHash;
-  };
-
-  class RetargetAnimNodeFactory : public scfImplementation2<RetargetAnimNodeFactory, 
+  class RetargetNodeFactory : public scfImplementation2<RetargetNodeFactory, 
     scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory>, CS::Animation::iSkeletonRetargetNodeFactory>
   {
-    friend class RetargetAnimNode;
+    friend class RetargetNode;
 
   public:
-    CS_LEAKGUARD_DECLARE(RetargetAnimNodeFactory);
+    CS_LEAKGUARD_DECLARE(RetargetNodeFactory);
 
-    RetargetAnimNodeFactory (RetargetNodeManager* manager, const char *name);
+    RetargetNodeFactory (RetargetNodeManager* manager, const char *name);
 
     //-- CS::Animation::iSkeletonRetargetNodeFactory
     virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* node);
@@ -98,13 +73,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
     csRefArray<CS::Animation::iBodyChain> bodyChains;
   };
 
-  class RetargetAnimNode : public scfImplementation2<RetargetAnimNode, 
+  class RetargetNode : public scfImplementation2<RetargetNode, 
     scfFakeInterface<CS::Animation::iSkeletonAnimNode>, CS::Animation::iSkeletonRetargetNode>
   {
   public:
-    CS_LEAKGUARD_DECLARE(RetargetAnimNode);
+    CS_LEAKGUARD_DECLARE(RetargetNode);
 
-    RetargetAnimNode (RetargetAnimNodeFactory* factory, CS::Animation::iSkeleton* skeleton,
+    RetargetNode (RetargetNodeFactory* factory, CS::Animation::iSkeleton* skeleton,
 		      CS::Animation::iSkeletonAnimNode* childNode);
 
     //-- CS::Animation::iSkeletonRetargetNode
@@ -120,7 +95,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
     virtual void SetPlaybackSpeed (float speed);
     virtual float GetPlaybackSpeed () const;
 
-    virtual void BlendState (CS::Animation::csSkeletalState* state,
+    virtual void BlendState (CS::Animation::AnimatedMeshState* state,
 			     float baseWeight = 1.0f);
     virtual void TickAnimation (float dt);
 
@@ -132,11 +107,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
     virtual void RemoveAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback);
 
   private:
-    RetargetAnimNodeFactory* factory;
+    RetargetNodeFactory* factory;
     csWeakRef<CS::Animation::iSkeleton> skeleton;
     csRef<CS::Animation::iSkeletonAnimNode> childNode;
     bool isPlaying;
-    CS::Animation::csSkeletalState childState;
+    CS::Animation::AnimatedMeshState childState;
     csHash<csQuaternion, CS::Animation::BoneID> alignRotations;
 
     struct RotationCache
@@ -175,6 +150,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Retarget)
       CS::Animation::iSkeletonFactory* skeletonFactory;
       csHash<csQuaternion, CS::Animation::BoneID> rotations;
     };
+  };
+
+  class RetargetNodeManager
+    : public CS::Animation::AnimNodeManagerCommon<RetargetNodeManager,
+						  CS::Animation::iSkeletonRetargetNodeManager,
+						  RetargetNodeFactory>
+  {
+  public:
+    RetargetNodeManager (iBase* parent)
+     : AnimNodeManagerCommonType (parent) {}
   };
 
 }

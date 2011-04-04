@@ -120,7 +120,7 @@ if $(PYTHON.AVAILABLE) = "yes"
 {
 Description pythmod : "build all python bindings modules" ;
 PythModDepends coremod imeshmod isndsysmod ivariamod ienginemod cstoolmod
-  ivideomod imapmod csgfxmod csgeommod ;
+  ivideomod imapmod csgfxmod csgeommod animationmod ;
 Depends bindings : pythmod ;
 }
 

@@ -21,7 +21,6 @@
 #ifndef __AVATARTEST_H__
 #define __AVATARTEST_H__
 
-#include "cstool/csdemoapplication.h"
 #include "imesh/animesh.h"
 #include "imesh/animnode/debug.h"
 #include "imesh/animnode/ik.h"
@@ -33,6 +32,8 @@
 #include "ivaria/dynamics.h"
 #include "ivaria/dynamicsdebug.h"
 #include "ivaria/softanim.h"
+
+#include "cstool/csdemoapplication.h"
 
 #define DYNDEBUG_NONE 1
 #define DYNDEBUG_MIXED 2
@@ -46,8 +47,6 @@ class AvatarScene
   virtual ~AvatarScene () {}
 
   // Camera related
-  virtual csVector3 GetCameraStart () = 0;
-  virtual float GetCameraMinimumDistance () = 0;
   virtual csVector3 GetCameraTarget () = 0;
 
   // Dynamic simulation related
@@ -64,10 +63,10 @@ class AvatarScene
   virtual bool CreateAvatar () = 0;
 
   // User interaction with the scene
-  virtual void ResetScene () = 0;
+  virtual void ResetScene () {}
 
   // Display of information on the state of the scene
-  virtual void UpdateStateDescription () = 0;
+  virtual void UpdateStateDescription () {}
   virtual void PostFrame () {}
 
   // Animesh objects
@@ -110,16 +109,12 @@ private:
   // Decal textures
   csRef<iDecalManager> decalManager;
 
-  //-- csBaseEventHandler
+  //-- CS::Demo::DemoApplication
+  void PrintHelp ();
   void Frame ();
   bool OnKeyboard (iEvent &event);
   bool OnMouseDown (iEvent &event);
   bool OnMouseUp (iEvent &event);
-
-  //-- CS::Demo::CameraManager
-  csVector3 GetCameraStart ();
-  float GetCameraMinimumDistance ();
-  csVector3 GetCameraTarget ();
 
   // HitBeam test for mouse pointing at the animesh
   // isect will be in object coordinate, direction in world coordinates

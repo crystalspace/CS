@@ -94,7 +94,7 @@ namespace CS
  */
 struct iSyntaxService : public virtual iBase
 {
-  SCF_INTERFACE (iSyntaxService, 3, 0, 0);
+  SCF_INTERFACE (iSyntaxService, 3, 0, 1);
   
   /**\name Parse reporting helpers
    * @{ */
@@ -420,6 +420,10 @@ struct iSyntaxService : public virtual iBase
     csRef<csRefCount>& parseState, CS::Utility::PortalParameters& params,
     bool& handled) = 0;
 
+  /**
+   * Parse a 4x4 matrix.
+   */
+  virtual bool ParseMatrix (iDocumentNode* node, CS::Math::Matrix4& m) = 0;
 };
 
 /** @} */

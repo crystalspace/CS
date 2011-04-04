@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include <ctype.h>
 #include <stdarg.h>
+#include "csutil/cmdhelp.h"
 #include "csutil/csuctransform.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
@@ -665,14 +666,13 @@ bool Win32Assistant::HandleEvent (iEvent& e)
   {
 
    #ifdef CS_DEBUG 
-    const char *defcon = "yes";
+    const bool defcon = true;
    #else
-    const char *defcon = "no";
+    const bool defcon = false;
    #endif
 
-    csPrintf ("Win32-specific options:\n");
-    csPrintf ("  -[no]console       Create a debug console (default = %s)\n\n",
-      defcon);
+    csCommandLineHelper::PrintTitle ("Win32-specific options", 1);
+    csCommandLineHelper::PrintOption ("console", "Create a debug console", csVariant (defcon));
   }
   return false;
 }

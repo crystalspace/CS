@@ -149,7 +149,7 @@ bool csTriangulate2::Process(const csContour2 &contour, csTriangleMesh &result, 
 
 
 
-  delete V;
+  delete [] V;
 
   return true;
 }

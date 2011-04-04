@@ -27,6 +27,7 @@
  * @{ */
 #include "csutil/scf.h"
 #include "iutil/databuff.h"
+#include <time.h>
 
 struct iConfigFile;
 
@@ -50,16 +51,57 @@ struct csFileTime
   int mon;
   /// Year, 1768, 1900, 2001, ...
   int year;
+
+  ///empty constructor.
+  csFileTime() {}
+
+  /// Construct a csFileTime item from a <tt>struct tm</tt>
+  csFileTime(const struct tm& time)
+  {
+      *this = time;
+  }
+
+  /// Assign a <tt>struct tm</tt>.
+  void operator=(const struct tm& time)
+  {
+    sec  = time.tm_sec;
+    min  = time.tm_sec;
+    hour = time.tm_hour;
+    day  = time.tm_mday;
+    mon  = time.tm_mon;
+    year = time.tm_year + 1900;
+  }
+
+  /// Create a <tt>struct tm</tt> from object.
+  operator struct tm() const
+  {
+    struct tm time;
+    time.tm_sec = sec;
+    time.tm_min = min;
+    time.tm_hour = hour;
+    time.tm_mday = day;
+    time.tm_mon = mon;
+    time.tm_year = year - 1900;
+    return time;
+  }
 };
 
-/// This macro can be used to assign a "struct tm" to a csFileTime
+namespace CS
+{
+  namespace Deprecated
+  {
+    CS_DEPRECATED_METHOD_MSG("Use assign operator of csFileTime.")
+    static inline void ASSIGN_FILETIME (csFileTime &ft, const struct tm &time)
+    {
+      ft = time;
+    }
+  }
+}
+/** 
+ * \deprecated Deprecated in 1.9. Use assign operator of csFileTime.
+ */
 #define ASSIGN_FILETIME(ft,tm)	\
-  (ft).sec = (tm).tm_sec;	\
-  (ft).min = (tm).tm_min;	\
-  (ft).hour = (tm).tm_hour;	\
-  (ft).day = (tm).tm_mday;	\
-  (ft).mon = (tm).tm_mon;	\
-  (ft).year = (tm).tm_year + 1900;
+  CS::Deprecated::ASSIGN_FILETIME(ft, tm);
 
 /// Composite path divider
 #define VFS_PATH_DIVIDER        ','

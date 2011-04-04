@@ -46,7 +46,7 @@ CS_LEAKGUARD_IMPLEMENT (csXMLShaderTech);
 /* Magic value for tech + pass cache files.
  * The most significant byte serves as a "version", increase when the
  * cache file format changes. */
-static const uint32 cacheFileMagic = 0x08747863;
+static const uint32 cacheFileMagic = 0x09747863;
 
 //---------------------------------------------------------------------------
 
@@ -75,6 +75,8 @@ CS_IMPLEMENT_STATIC_CLASSVAR_REF (csXMLShaderTech, instParamPtrs,
                                   GetInstParamPtrs, csDirtyAccessArray<csShaderVariable**>, ()); 
 CS_IMPLEMENT_STATIC_CLASSVAR_REF (csXMLShaderTech, instOuterVar,  
                                   GetInstOuterVars, csArray<csShaderVariable*>, ()); 
+CS_IMPLEMENT_STATIC_CLASSVAR_REF (csXMLShaderTech, instParamBuffers,  
+                                  GetInstParamBuffers, csDirtyAccessArray<iRenderBuffer*>, ()); 
 
 csXMLShaderTech::csXMLShaderTech (csXMLShader* parent) : 
 passes(0), passesCount(0), currentPass((size_t)~0),
@@ -342,6 +344,16 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
     }
   }
   pass->instances_binds.ShrinkBestFit ();
+  // Read number of instances SV
+  {
+    csRef<iDocumentNode> instancesNumNode = node->GetNode (xmltokens.Request (
+      csXMLShaderCompiler::XMLTOKEN_INSTANCESNUM));
+    if (instancesNumNode && (instancesNumNode->GetType() == CS_NODE_ELEMENT))
+    {
+      const char* source = instancesNumNode->GetContentsValue();
+      pass->instancesNumVar = hlp.stringsSvName->Request (source);
+    }
+  }
   
   if (cacheTo)
   {
@@ -1067,6 +1079,8 @@ bool csXMLShaderTech::WritePassPerTag (const ShaderPassPerTag& pass,
     if (cacheFile->Write ((char*)&diskAttr, sizeof (diskAttr))
 	!= sizeof (diskAttr)) return false;
   }
+  if (!WriteShadervarName (pass.instancesNumVar, cacheFile))
+    return false;
 
   return true;
 }
@@ -1324,6 +1338,7 @@ bool csXMLShaderTech::ReadPassPerTag (ShaderPassPerTag& pass,
     }
     pass.instances_binds.ShrinkBestFit();
   }
+  pass.instancesNumVar = ReadShadervarName (cacheFile);
 
   return true;
 }
@@ -2051,9 +2066,20 @@ void csXMLShaderTech::SetupInstances (csRenderMeshModes& modes,
   }
 
   size_t numVars = 0;
+  size_t numSVs = 0;
   size_t numInsts = 0;
   GetInstParamsTargets().Empty ();
   GetInstOuterVars().Empty ();
+  
+  {
+    csShaderVariable* instsNumSV = csGetShaderVariableFromStack (stack, thispass->instancesNumVar);
+    if (instsNumSV)
+    {
+      int n;
+      instsNumSV->GetValue (n);
+      numInsts = n;
+    }
+  }
 
   // Pass one: collect number of instances, SVs per instance
   for (size_t i = 0; i < instances_binds.GetSize(); i++)
@@ -2062,9 +2088,26 @@ void csXMLShaderTech::SetupInstances (csRenderMeshModes& modes,
     var = csGetShaderVariableFromStack (stack, instances_binds[i].variable);
     GetInstOuterVars().Push (var);
     if (var == 0) continue;
-    if (var->GetType() == csShaderVariable::ARRAY)
+    
+    size_t varElems = (size_t)~0;
+    if (var->GetType() == csShaderVariable::RENDERBUFFER)
     {
-      size_t varElems = var->GetArraySize();
+      // Buffer variable: use buffer as parameter data
+      iRenderBuffer* buf;
+      var->GetValue (buf);
+      varElems = buf ? buf->GetElementCount() : 0;
+    }
+    else if (var->GetType() == csShaderVariable::ARRAY)
+    {
+      // Array variable: use array elements as parameter data
+      varElems = var->GetArraySize();
+      numSVs++;
+    }
+    else
+      // SVs of other types are passed directly to instancing
+      numSVs++;
+    if (varElems != (size_t)~0)
+    {
       if (numInsts == 0)
 	// First SV array seen, use length as initial instance count
 	numInsts = varElems;
@@ -2078,43 +2121,72 @@ void csXMLShaderTech::SetupInstances (csRenderMeshModes& modes,
 	break;
       }
     }
+    
     GetInstParamsTargets().Push (instances_binds[i].destination);
     numVars++;
   }
   
   // Pass two: fill arrays
-  GetInstParams().SetSize (numInsts * numVars);
-  GetInstParamPtrs().SetSize (numInsts);
-  size_t svPos = 0;
-  for (size_t instNum = 0; instNum < numInsts; instNum++)
+  GetInstParams().SetSize (numInsts * numSVs);
+  GetInstParamPtrs().SetSize (numInsts, nullptr);
+  GetInstParamBuffers().SetSize (numVars - numSVs, nullptr);
+  
+  size_t bindNum = 0;	// Counts actual parameter
+  size_t svNum = 0;	// Counts parameter provided as SVs
+  for (size_t i = 0; i < instances_binds.GetSize(); i++)
   {
-    GetInstParamPtrs()[instNum] = 
-      GetInstParams().GetArray() + svPos;
-    for (size_t i = 0; i < instances_binds.GetSize(); i++)
-    {
-      csShaderVariable* var = GetInstOuterVars()[i];
-      if (var == 0) continue;
+    csShaderVariable* var = GetInstOuterVars()[i];
+    if (var == 0) continue;
 
-      /* If a shader var contains an array, the elements of the array are used as
-	 the parameters for each instance.
-       */
+    if (var->GetType() == csShaderVariable::RENDERBUFFER)
+    {
+      iRenderBuffer* buf;
+      var->GetValue (buf);
+      GetInstParamBuffers()[bindNum] = buf;
+    }
+    else
+    {
+      csShaderVariable** bindPtr = GetInstParams().GetArray() + svNum;
+      svNum++;
       if (var->GetType() == csShaderVariable::ARRAY)
       {
-        size_t varElems = var->GetArraySize();
-        size_t n = csMin (varElems, instNum);
-        var = var->GetArrayElement (n);
+	/* If a shader var contains an array, the elements of the array are used as
+	   the parameters for each instance.
+	 */
+	size_t varElems = var->GetArraySize();
+	for (size_t instNum = 0; instNum < numInsts; instNum++)
+	{
+	  size_t n = csMin (varElems, instNum);
+	  *bindPtr = var->GetArrayElement (n);
+	  bindPtr += numSVs;
+	}
       }
-      /* Otherwise, the shader var is replicated across all instances.
-       */
-      GetInstParams()[svPos] = var;
-      svPos++;
+      else
+      {
+	/* Otherwise, the shader var is replicated across all instances. */
+	for (size_t instNum = 0; instNum < numInsts; instNum++)
+	{
+	  *bindPtr = var;
+	  bindPtr += numSVs;
+	}
+      }
+    }
+    bindNum++;
+  }
+
+  if (numSVs > 0)
+  {
+    for (size_t i = 0; i < numInsts; i++)
+    {
+      GetInstParamPtrs()[i] = GetInstParams().GetArray() + numSVs*i;
     }
   }
 
   modes.instParamNum = numVars;
   modes.instParamsTargets = GetInstParamsTargets().GetArray(); 
   modes.instanceNum = numInsts;
-  modes.instParams = GetInstParamPtrs().GetArray();
+  modes.instParams = (numSVs > 0) ? GetInstParamPtrs().GetArray() : nullptr;
+  modes.instParamBuffers = (numSVs < numVars) ? GetInstParamBuffers().GetArray() : nullptr;
   modes.doInstancing = true;
 }
 

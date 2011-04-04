@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2010 Christian Van Brussel, Communications and Remote
+  Copyright (C) 2010-11 Christian Van Brussel, Communications and Remote
       Sensing Laboratory of the School of Engineering at the 
       Universite catholique de Louvain, Belgium
       http://www.tele.ucl.ac.be
@@ -34,11 +34,9 @@ class IslandDemo : public CS::Demo::DemoApplication
  public:
   IslandDemo ();
 
-  //-- csBaseEventHandler
+  //-- CS::Demo::DemoApplication
+  void PrintHelp ();
   void Frame ();
-
-  //-- CS::Demo::CameraManager
-  csVector3 GetCameraStart ();
 
   //-- csApplicationFramework
   bool Application ();

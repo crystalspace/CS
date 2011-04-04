@@ -40,70 +40,15 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
 {
-
-  /********************
-   *  DebugNodeManager
-   ********************/
-
   SCF_IMPLEMENT_FACTORY(DebugNodeManager);
 
-  CS_LEAKGUARD_IMPLEMENT(DebugNodeManager);
-
-  DebugNodeManager::DebugNodeManager (iBase* parent)
-    : scfImplementationType (this, parent)
-  {
-  }
-
-  CS::Animation::iSkeletonDebugNodeFactory* DebugNodeManager::CreateAnimNodeFactory (const char* name)
-  {
-    csRef<CS::Animation::iSkeletonDebugNodeFactory> newFact;
-    newFact.AttachNew (new DebugNodeFactory (this, name));
-
-    return debugFactories.PutUnique (name, newFact);
-  }
-
-  CS::Animation::iSkeletonDebugNodeFactory* DebugNodeManager::FindAnimNodeFactory (const char* name)
-  {
-    return debugFactories.Get (name, 0);
-  }
-
-  void DebugNodeManager::ClearAnimNodeFactories ()
-  {
-    debugFactories.DeleteAll ();
-  }
-
-  bool DebugNodeManager::Initialize (iObjectRegistry* object_reg)
-  {
-    this->object_reg = object_reg;
-    return true;
-  }
-
-  void DebugNodeManager::Report (int severity, const char* msg, ...) const
-  {
-    va_list arg;
-    va_start (arg, msg);
-    csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
-    if (rep)
-      rep->ReportV (severity,
-		    "crystalspace.mesh.animesh.animnode.debug",
-		    msg, arg);
-    else
-    {
-      csPrintfV (msg, arg);
-      csPrintf ("\n");
-    }
-    va_end (arg);
-  }
-
-  /********************
-   *  DebugNodeFactory
-   ********************/
+  // --------------------------  IKDebugNodeFactory  --------------------------
 
   CS_LEAKGUARD_IMPLEMENT(DebugNodeFactory);
 
   DebugNodeFactory::DebugNodeFactory (DebugNodeManager* manager, const char *name)
-    : scfImplementationType (this), manager (manager), name (name),
-    modes (CS::Animation::DEBUG_SQUARES), image (nullptr), boneMaskUsed (false),
+    : scfImplementationType (this), CS::Animation::SkeletonAnimNodeFactorySingle (name),
+    manager (manager), modes (CS::Animation::DEBUG_SQUARES), image (nullptr), boneMaskUsed (false),
     leafBonesDisplayed (true)
   {
   }
@@ -139,57 +84,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     leafBonesDisplayed = displayed;
   }
 
-  void DebugNodeFactory::SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* factory)
+  csPtr<CS::Animation::SkeletonAnimNodeSingleBase> DebugNodeFactory::ActualCreateInstance (
+    CS::Animation::iSkeletonAnimPacket* packet,
+    CS::Animation::iSkeleton* skeleton)
   {
-    subFactory = factory;
+    return csPtr<CS::Animation::SkeletonAnimNodeSingleBase> (new DebugNode (this, skeleton));
   }
 
-  CS::Animation::iSkeletonAnimNodeFactory* DebugNodeFactory::GetChildNode () const
-  {
-    return subFactory;
-  }
-
-  csPtr<CS::Animation::iSkeletonAnimNode> DebugNodeFactory::CreateInstance
-    (CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton)
-  {
-    // create the node instance
-    csRef<DebugNode> newP;
-    newP.AttachNew (new DebugNode (this, skeleton));
-
-    if (subFactory)
-    {
-      csRef<CS::Animation::iSkeletonAnimNode> node =
-	subFactory->CreateInstance (packet, skeleton);
-      newP->subNode = node;
-    }
-
-    return csPtr<CS::Animation::iSkeletonAnimNode> (newP);
-  }
-
-  const char* DebugNodeFactory::GetNodeName () const
-  {
-    return name;
-  }
-
-  CS::Animation::iSkeletonAnimNodeFactory* DebugNodeFactory::FindNode (const char* name)
-  {
-    if (this->name == name)
-      return this;
-
-    if (subFactory)
-      return subFactory->FindNode (name);
-
-    return 0;
-  }
-
-  /********************
-   *  DebugNode
-   ********************/
+  // --------------------------  IKDebugNode  --------------------------
 
   CS_LEAKGUARD_IMPLEMENT(DebugNode);
 
   DebugNode::DebugNode (DebugNodeFactory* factory, CS::Animation::iSkeleton* skeleton)
-    : scfImplementationType (this), factory (factory), skeleton (skeleton)
+    : scfImplementationType (this),
+    CS::Animation::SkeletonAnimNodeSingle<DebugNodeFactory> (factory, skeleton)
   {
   }
 
@@ -198,8 +106,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     if (!factory->modes)
       return;
 
-    csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (factory->manager->object_reg);
-    csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (factory->manager->object_reg);
+    csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (factory->manager->GetObjectRegistry());
+    csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (factory->manager->GetObjectRegistry());
     CS_ASSERT(g3d && g2d);
 
     // Tell the 3D driver we're going to display 2D things.
@@ -312,103 +220,5 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
       }
     }
   }
-
-  void DebugNode::Play ()
-  {
-    if (subNode)
-      subNode->Play ();
-  }
-
-  void DebugNode::Stop ()
-  {
-    if (subNode)
-      subNode->Stop ();
-  }
-
-  void DebugNode::SetPlaybackPosition (float time)
-  {
-    if (subNode)
-      subNode->SetPlaybackPosition (time);
-  }
-
-  float DebugNode::GetPlaybackPosition () const
-  {
-    if (subNode)
-      return subNode->GetPlaybackPosition ();
-
-    return 0.0f;
-  }
-
-  float DebugNode::GetDuration () const
-  {
-    if (subNode)
-      return subNode->GetDuration ();
-
-    return 0.0f;
-  }
-
-  void DebugNode::SetPlaybackSpeed (float speed)
-  {
-    if (subNode)
-      subNode->SetPlaybackSpeed (speed);
-  }
-
-  float DebugNode::GetPlaybackSpeed () const
-  {
-    if (subNode)
-      return subNode->GetPlaybackSpeed ();
-
-    return 0.0f;
-  }
-
-  void DebugNode::BlendState (CS::Animation::csSkeletalState* state,
-			      float baseWeight)
-  {
-    if (subNode)
-      subNode->BlendState (state, baseWeight);
-  }
-
-  void DebugNode::TickAnimation (float dt)
-  {
-    if (subNode)
-      subNode->TickAnimation (dt);
-  }
-
-  bool DebugNode::IsActive () const
-  {
-    if (subNode)
-      return subNode->IsActive ();
-
-    return false;
-  }
-
-  CS::Animation::iSkeletonAnimNodeFactory* DebugNode::GetFactory () const
-  {
-    return factory;
-  }
-
-  CS::Animation::iSkeletonAnimNode* DebugNode::FindNode (const char* name)
-  {
-    if (factory->name == name)
-      return this;
-
-    if (subNode)
-      return subNode->FindNode (name);
-
-    return 0;
-  }
-
-  void DebugNode::AddAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback)
-  {
-    if (subNode)
-      subNode->AddAnimationCallback (callback);
-  }
-
-  void DebugNode::RemoveAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback)
-  {
-    if (subNode)
-      subNode->RemoveAnimationCallback (callback);
-  }
-
 }
 CS_PLUGIN_NAMESPACE_END(DebugNode)

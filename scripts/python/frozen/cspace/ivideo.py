@@ -167,6 +167,7 @@ CS_VATTRIB_GENERIC_LAST = _ivideo.CS_VATTRIB_GENERIC_LAST
 CS_VATTRIB_GENERIC_NUM = _ivideo.CS_VATTRIB_GENERIC_NUM
 CS_IATTRIB_FIRST = _ivideo.CS_IATTRIB_FIRST
 CS_IATTRIB_LAST = _ivideo.CS_IATTRIB_LAST
+CS_IATTRIB_NUM = _ivideo.CS_IATTRIB_NUM
 CS_VATTRIB_UNUSED = _ivideo.CS_VATTRIB_UNUSED
 CS_VATTRIB_INVALID = _ivideo.CS_VATTRIB_INVALID
 CS_VATTRIB_POSITION = _ivideo.CS_VATTRIB_POSITION
@@ -530,6 +531,7 @@ class RenderMeshModes(object):
     instParamsTargets = _swig_property(_ivideo.RenderMeshModes_instParamsTargets_get, _ivideo.RenderMeshModes_instParamsTargets_set)
     instanceNum = _swig_property(_ivideo.RenderMeshModes_instanceNum_get, _ivideo.RenderMeshModes_instanceNum_set)
     instParams = _swig_property(_ivideo.RenderMeshModes_instParams_get, _ivideo.RenderMeshModes_instParams_set)
+    instParamBuffers = _swig_property(_ivideo.RenderMeshModes_instParamBuffers_get, _ivideo.RenderMeshModes_instParamBuffers_set)
 RenderMeshModes_swigregister = _ivideo.RenderMeshModes_swigregister
 RenderMeshModes_swigregister(RenderMeshModes)
 

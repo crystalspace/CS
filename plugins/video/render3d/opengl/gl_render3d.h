@@ -192,6 +192,8 @@ public:
 // To silence EnableZOffset/DisableZOffset
 #include "csutil/deprecated_warn_off.h"
 
+class ProfileScope;
+
 class csGLGraphics3D : public scfImplementation3<csGLGraphics3D, 
 						 iGraphics3D,
 						 iComponent,
@@ -210,6 +212,7 @@ private:
   bool isOpen;
   uint frameNum;
   
+  friend class ProfileScope;
   QueryPool queryPool;
   bool glProfiling;
   ProfilingHelper profileHelper;
@@ -362,7 +365,6 @@ private:
 
   /// Should we use special buffertype (VBO) or just system memory
   bool use_hw_render_buffers;
-  csGLDRAWRANGEELEMENTS glDrawRangeElements;
   static GLvoid csAPIENTRY myDrawRangeElements (GLenum mode, GLuint start, 
     GLuint end, GLsizei count, GLenum type, const GLvoid* indices);
 
@@ -437,9 +439,6 @@ private:
     gen_renderBuffers[attr] = buffer;
   }
 
-  void* RenderLock (iRenderBuffer* buffer, csGLRenderBufferLockType type);
-  void RenderRelease (iRenderBuffer* buffer);
-
   struct ImageUnit : public CS::Memory::CustomAllocated
   {
     csGLBasicTextureHandle* texture;
@@ -503,17 +502,6 @@ public:
   csRef<csGLTextureManager> txtmgr;
   bool verbose;
   
-  class ProfileScope
-  {
-    csGLGraphics3D* renderer;
-    const char* descr;
-    int64 startStamp;
-    GLuint startQuery, endQuery;
-  public:
-    ProfileScope (csGLGraphics3D* renderer, const char* descr);
-    ~ProfileScope ();
-  };
-
   csGLGraphics3D (iBase *parent);
   virtual ~csGLGraphics3D ();
 
@@ -535,6 +523,17 @@ public:
   
   inline bool GetMultisampleEnabled() const
   { return multisampleEnabled; }
+  
+  inline GLint GetNumTCUnits() const
+  { return numTCUnits; }
+  
+  /* glDrawRangeElements, wrapping either the extension function, or
+     a backwards compatibility drawing function. */
+  csGLDRAWRANGEELEMENTS glDrawRangeElements;
+  
+  // Also used by instancing helper
+  void* RenderLock (iRenderBuffer* buffer, csGLRenderBufferLockType type);
+  void RenderRelease (iRenderBuffer* buffer);
 
   ////////////////////////////////////////////////////////////////////
   //                            iGraphics3D
@@ -683,11 +682,6 @@ public:
 
   /// Do backbuffer printing
   void Print (csRect const* area);
-
-  /// Pseudo-instancing 
-  void SetupInstance (size_t instParamNum, const csVertexAttrib targets[],  
-    csShaderVariable* const params[]); 
-  void TeardownInstance (size_t instParamNum, const csVertexAttrib targets[]); 
 
   /// Drawroutine. Only way to draw stuff
   void DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,

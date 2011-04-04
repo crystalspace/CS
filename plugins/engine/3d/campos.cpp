@@ -93,6 +93,22 @@ bool csCameraPosition::Load (iCamera *camera, iEngine *e)
   return true;
 }
 
+void csCameraPosition::Save (iCamera* camera)
+{
+  sector = camera->GetSector ()->QueryObject ()->GetName ();
+  csReversibleTransform& transform = camera->GetTransform ();
+  position = transform.GetOrigin ();
+  upward.Set (0.0f, 1.0f, 0.0f);
+  upward = transform.This2OtherRelative (upward);
+  forward.Set (0.0f, 0.0f, 1.0f);
+  forward = transform.This2OtherRelative (forward);
+  ClearFarPlane ();
+  far_plane = camera->GetFarPlane ();
+  // Copy the plane if it is valid
+  if (far_plane)
+    far_plane = new csPlane3 (*far_plane);
+}
+
 void csCameraPosition::SetFarPlane (csPlane3 *fp)
 {
   ClearFarPlane ();

@@ -124,7 +124,7 @@ struct iMeshObjectDrawCallback : virtual public iBase
  */
 struct iMeshObject : public virtual iBase
 {
-  SCF_INTERFACE(iMeshObject, 3,1,0);
+  SCF_INTERFACE(iMeshObject, 4,0,0);
   /**
    * Get the reference to the factory that created this mesh object.
    */
@@ -224,8 +224,7 @@ struct iMeshObject : public virtual iBase
    */
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr, int* polygon_idx = 0,
-	iMaterialWrapper** material = 0,
-	iMaterialArray* materials = 0) = 0;
+	iMaterialWrapper** material = 0) = 0;
 
   /**
    * Set a reference to the mesh wrapper holding the mesh objects.

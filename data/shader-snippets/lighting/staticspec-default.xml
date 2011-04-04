@@ -117,6 +117,8 @@
 	<input name="normal" type="normal_tangent" default="value" defval="0,0,1">
 	  <attribute name="perfragment" type="bool" defval="false" />
 	</input>
+	<!-- Shininess value for specular reflection -->
+	<input name="shininess" type="float" default="value" defval="32" />
 	
 	<input name="lightmap_dir1" type="tex2d" default="complex" private="yes">
 	  <block location="pass">
@@ -236,7 +238,7 @@
 	  float3 speccol = 2 * ComputeDLMColor (lightDir, baseLit);
 	  
 	  float3 H = normalize (-eyeToSurf + lightDir);
-	  spec += (pow (saturate (dot (normal, H)), 32) * speccol);
+	  spec += (pow (saturate (dot (normal, H)), shininess) * speccol);
 	 
 	  lightDir.xy = rawdir2;
 	  lightDir.z = rawdir3.y;
@@ -244,7 +246,7 @@
 	  speccol = 2 * ComputeDLMColor (lightDir, baseLit);
 	  
 	  H = normalize (-eyeToSurf + lightDir);
-	  spec += (pow (saturate (dot (normal, H)), 32) * speccol);
+	  spec += (pow (saturate (dot (normal, H)), shininess) * speccol);
 	  
 	  specular = spec;
 	  specular_attr_perfragment = true;

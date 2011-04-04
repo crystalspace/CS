@@ -65,6 +65,7 @@ public:
 
   bool SaveTriMesh(iDocumentNode *parent, csStringID id,
       iTriangleMesh* trimesh);
+  bool SaveCameraPosition(iCameraPosition *position, iDocumentNode *parent);
   bool SaveCameraPositions(iDocumentNode *parent);
   bool SaveLibraryReferences(iDocumentNode *parent);
   bool SaveAddons(iDocumentNode *parent);

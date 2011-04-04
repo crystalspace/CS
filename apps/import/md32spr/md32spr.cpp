@@ -841,7 +841,7 @@ void MD32spr::WriteXMLTags(md3Model * model,
 	root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       child->SetValue("key");
       child->SetAttribute("name", "md3tag");
-      rotationMatrix = &model->tags[i * model->header->numTags + j].rotation[0][0];
+      rotationMatrix = &(model->tags[i * model->header->numTags + j].rotation[0][0]);
       translationVector = &model->tags[i * model->header->numTags + j].position[0];
       // Convert rotation matrix to string.
       k = 0;
@@ -1209,6 +1209,8 @@ char *basename(const char *path, char *base)
   }
   memcpy (base, file, sz);
   base[sz] = '\0';
+  delete [] dir;
+  delete [] file;
   return base;
 }
 

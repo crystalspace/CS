@@ -18,10 +18,13 @@
 */
 
 #include "cssysdef.h"
-#include "csplugincommon/rendermanager/viscullcommon.h"
 
 #include "csplugincommon/rendermanager/occluvis.h"
+#include "csplugincommon/rendermanager/viscullcommon.h"
 #include "csutil/cfgacc.h"
+#include "imap/loader.h"
+#include "iutil/objreg.h"
+#include "iutil/vfs.h"
 
 namespace CS
 {
@@ -39,6 +42,22 @@ namespace CS
       csString cfgkey (prefix);
       cfgkey.Append (".OcclusionCulling");
       occluvisEnabled = cfg->GetBool (cfgkey, true);
+
+      // Load the default occlusion shader.
+      if (occluvisEnabled)
+      {
+        cfgkey = prefix;
+        cfgkey.Append (".DefaultOcclusionShaderPath");
+        const char* defaultShaderPath = cfg->GetStr (cfgkey, "/shader/early_z/z_only.xml");
+
+        csRef<iVFS> vfs = csQueryRegistry<iVFS> (objReg);
+        csRef<iThreadedLoader> loader = csQueryRegistry<iThreadedLoader> (objReg);
+        loader->LoadShaderWait (vfs->GetCwd (), defaultShaderPath);
+
+        cfgkey = prefix;
+        cfgkey.Append (".DefaultOcclusionShaderName");
+        defaultOccluvisShaderName = cfg->GetStr (cfgkey, "z_only");
+      }
     }
   
     csPtr<iVisibilityCuller> RMViscullCommon::GetVisCuller ()
@@ -47,6 +66,7 @@ namespace CS
       
       csRef<iVisibilityCuller> psVisCuller;
       psVisCuller.AttachNew (new csOccluvis (objReg));
+      psVisCuller->Setup (defaultOccluvisShaderName);
       return csPtr<iVisibilityCuller> (psVisCuller);
     }
   } // namespace RenderManager

@@ -1,0 +1,147 @@
+ <!-- The animation packets in this file are not designed to be usable. They are just presented as an example of usage -->
+
+ <library>
+ <addon plugin="crystalspace.skeletalanimation.loader">
+
+  <animationpacket name="mocap_idle01" type="mocap" skelname="mocap_idle01" animname="idle01" file="/lib/krystal/mocap/Female1_D2_Wait.bvh" start="895" end="1010">
+    <node type="fsm" name="root" start="0">
+      <state name="stand">
+        <node type="animation" packet="krystal_rig_packet" animation="stand" cyclic="true" autoreset="true"/>
+      </state>
+      <state name="anim">
+        <node type="retarget" name="retarget" skelsource="krystal_mocap_idle01" skeltarget="krystal_rig">
+      	  <mapping>
+            <namemap/>
+      	  </mapping>
+      	  <chain body="krystal_body" name="left_arm"/>
+      	  <chain body="krystal_body" name="right_arm"/>
+      	  <chain body="krystal_body" name="left_leg"/>
+      	  <chain body="krystal_body" name="right_leg"/>
+      	  <node type="animation" animation="idle01" cyclic="false" autostop="true" autoreset="true"/>
+    	</node>
+      </state>
+    </node>
+  </animationpacket>
+
+  <animationpacket name="mocap_idle02" type="mocap" skelname="mocap_idle02" animname="idle02" file="/lib/krystal/mocap/Female1_D2_Wait.bvh" start="775" end="881"/>
+  <animationpacket name="mocap_idle03" type="mocap" skelname="mocap_idle03" animname="idle03" file="/lib/krystal/mocap/Female1_D2_Wait.bvh" start="55" end="204"/>
+  <animationpacket name="mocap_idle04" type="mocap" skelname="mocap_idle04" animname="idle04" file="/lib/krystal/mocap/Female1_D2_Wait.bvh" start="623" end="776"/>
+  <animationpacket name="mocap_idle05" type="mocap" skelname="mocap_idle05" animname="idle05" file="/lib/krystal/mocap/Female1_D2_Wait.bvh" start="217" end="351"/>
+  <animationpacket name="mocap_idle06" type="mocap" skelname="mocap_idle06" animname="idle06" file="/lib/krystal/mocap/Female1_A01_Sway.bvh" start="34" end="328"/>
+
+  <animationpacket name="krystal_mocap_idle02" type="mocap" skelname="krystal_mocap_idle02" animname="idle02" file="/lib/krystal/mocap/idle02.bvh"/>
+
+  <animationpacket name="krystal_mocap_idle01" type="mocap" skelname="krystal_mocap_idle01" animname="idle01" file="/lib/krystal/mocap/idle01.bvh">
+    <node type="fsm" name="root" start="0">
+   <state name="stand">
+      <node type="animation" packet="krystal_rig_packet" animation="stand" cyclic="false"/>
+   </state>
+   <state name="idle01">
+    <node type="retarget" name="retarget" skelsource="krystal_mocap_idle01" skeltarget="krystal_rig">
+      <mapping>
+        <namemap/>
+      </mapping>
+      <chain body="krystal_body" name="torso"/>
+      <chain body="krystal_body" name="left_arm"/>
+      <chain body="krystal_body" name="right_arm"/>
+      <chain body="krystal_body" name="left_leg"/>
+      <chain body="krystal_body" name="right_leg"/>
+      <node type="animation" animation="idle01" cyclic="false" autostop="true"/>
+    </node>
+   </state>
+   <state name="stand">
+      <node type="animation" packet="krystal_rig_packet" animation="stand" cyclic="false"/>
+   </state>
+   <state name="idle02">
+    <node type="retarget" name="retarget2" skelsource="krystal_mocap_idle02" skeltarget="krystal_rig">
+      <mapping>
+        <namemap/>
+      </mapping>
+      <chain body="krystal_body" name="torso"/>
+      <chain body="krystal_body" name="left_arm"/>
+      <chain body="krystal_body" name="right_arm"/>
+      <chain body="krystal_body" name="left_leg"/>
+      <chain body="krystal_body" name="right_leg"/>
+      <node type="animation" packet="krystal_mocap_idle02" animation="idle02" cyclic="false" autostop="true"/>
+    </node>
+   </state>
+   <transition from="stand" to="idle01" automatic="true"/>
+   <transition from="idle01" to="stand" automatic="true"/>
+   <transition from="stand" to="idle02" automatic="true"/>
+   <transition from="idle02" to="stand" automatic="true"/>
+   </node>
+  </animationpacket>
+
+  <animationpacket name="krystal_mocap_idle01b" type="mocap" skelname="krystal_mocap_idle01" animname="idle01" file="/lib/krystal/mocap/idle01.bvh">
+    <node type="retarget" name="retarget" skelsource="krystal_mocap_idle01" skeltarget="krystal_rig">
+      <mapping>
+        <namemap/>
+      </mapping>
+      <chain body="krystal_body" name="torso"/>
+      <chain body="krystal_body" name="left_arm"/>
+      <chain body="krystal_body" name="right_arm"/>
+      <chain body="krystal_body" name="left_leg"/>
+      <chain body="krystal_body" name="right_leg"/>
+      <node type="animation" animation="idle01"/>
+    </node>
+  </animationpacket>
+
+  <animationpacket name="krystal_mocap_idle02" type="mocap" skelname="krystal_mocap_idle02" animname="idle02" file="/lib/krystal/mocap/01_02.bvh" start="1000" end="1200">
+    <node type="retarget" name="retarget" skelsource="krystal_mocap_idle02" skeltarget="krystal_rig">
+      <mapping>
+        <bonemap source="hip" target="Hips"/>
+        <bonemap source="abdomen" target="ToSpine"/>
+        <bonemap source="chest" target="Spine"/>
+        <bonemap source="neck" target="Neck"/>
+        <bonemap source="head" target="Head"/>
+        <bonemap source="rCollar" target="RightShoulder"/>
+        <bonemap source="rShldr" target="RightArm"/>
+        <bonemap source="rForeArm" target="RightForeArm"/>
+        <bonemap source="rHand" target="RightHand"/>
+        <bonemap source="lCollar" target="LeftShoulder"/>
+        <bonemap source="lShldr" target="LeftArm"/>
+        <bonemap source="lForeArm" target="LeftForeArm"/>
+        <bonemap source="lHand" target="LeftHand"/>
+        <bonemap source="rThigh" target="RightUpLeg"/>
+        <bonemap source="rShin" target="RightLeg"/>
+        <bonemap source="rFoot" target="RightFoot"/>
+        <bonemap source="lThigh" target="LeftUpLeg"/>
+        <bonemap source="lShin" target="LeftLeg"/>
+        <bonemap source="lFoot" target="LeftFoot"/>
+      </mapping>
+      <chain body="krystal_body" name="torso"/>
+      <chain body="krystal_body" name="left_arm"/>
+      <chain body="krystal_body" name="right_arm"/>
+      <chain body="krystal_body" name="left_leg"/>
+      <chain body="krystal_body" name="right_leg"/>
+      <node type="animation" animation="idle02"/>
+    </node>
+  </animationpacket>
+
+  <animationpacket name="test">
+   <node type="lookat" skeleton="krystal_rig" bone="Head" body="krystal_body" maxspeed="3.1415927" alwaysrot="false" delay="0.1">
+    <node type="debug">
+     <mode type="2d_lines"/>
+     <mode type="squares"/>
+     <!--mode type="images" file=""/-->
+     <node type="speed">
+      <node nodespeed="1.0" type="animation" packet="krystal_rig_packet" animation="idle01"/>
+      <node nodespeed="2.0" type="animation" packet="krystal_rig_packet" animation="idle02"/>
+      <node nodespeed="3.0" type="ragdoll" name="ragdoll" body="krystal_body">
+       <chain body="krystal_body" name="torso" state="inactive"/>
+       <chain body="krystal_body" name="torso" state="dynamic"/>
+       <chain body="krystal_body" name="torso" state="kinematic"/>
+       <node type="ikccd" jointinit="true" iterations="50" motionratio="0.1" distance="0.01" upward="true">
+        <effector body="krystal_body" chain="left_arm" bone="LeftHand"/>
+         <node type="ikphysical" chainreset="true">
+          <effector body="krystal_body" chain="left_arm" bone="LeftHand"/>
+         </node>
+       </node>
+      </node>
+     </node>
+    </node>
+   </node>
+  </animationpacket>
+
+</addon>
+</library>

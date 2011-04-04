@@ -71,6 +71,8 @@ public:
   virtual void MovableDestroyed (iMovable*) { }
 };
 
+#include "csutil/deprecated_warn_off.h"
+
 /**
  * A simple frustum based visisibility culling system.
  */
@@ -151,7 +153,7 @@ public:
   virtual void UnregisterVisObject (iVisibilityObject* visobj);
   virtual bool VisTest (iRenderView* rview, 
     iVisibilityCullerListener* viscallback, int w = 0, int h = 0);
-  virtual void PrecacheCulling () { VisTest ((iRenderView*)0, 0); }
+  virtual void PrecacheCulling () { BeginPrecacheCulling (); }
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csBox3& box);
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csSphere& sphere);
   virtual void VisTest (const csSphere& sphere, 
@@ -169,13 +171,17 @@ public:
     iMeshWrapper** p_mesh = 0, int* poly_idx = 0,
     bool accurate = true);
   virtual const char* ParseCullerParameters (iDocumentNode*) { return 0; }
-  virtual void RenderViscull (iRenderView* rview) {}
+  virtual void RenderViscull (iRenderView* rview, iShaderVariableContext* shaders) {}
+  virtual void BeginPrecacheCulling () { VisTest ((iRenderView*)0, 0); }
+  virtual void EndPrecacheCulling () {}
 
   bool HandleEvent (iEvent& ev);
 
   CS_EVENTHANDLER_NAMES("crystalspace.frustvis")
   CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
+
+#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_FRUSTVIS_H__
 

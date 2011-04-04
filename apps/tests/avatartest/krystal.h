@@ -30,8 +30,6 @@ class KrystalScene : public AvatarScene
   ~KrystalScene ();
 
   // Camera related
-  csVector3 GetCameraStart ();
-  float GetCameraMinimumDistance ();
   csVector3 GetCameraTarget ();
 
   // Dynamic simulation related
@@ -52,7 +50,6 @@ class KrystalScene : public AvatarScene
   void ResetSoftBodies ();
 
   // Display of information on the state of the scene
-  void UpdateStateDescription ();
   void PostFrame ();
 
  private:

@@ -109,6 +109,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
     : scfImplementationType (this), factory (factory), mesh (mesh), lastTicks (0),
     meshPosition (0.0f)
   {
+    // Initialize the bounding boxes and the radius
+    csRef<iGeneralFactoryState> meshState =
+      scfQueryInterface<iGeneralFactoryState> (mesh->GetFactory());
+    bboxes.SetSize (meshState->GetSubMeshCount ());
+
+    csRef<iObjectModel> model =
+      scfQueryInterface<iObjectModel> (mesh->GetFactory());
+
+    bbox = model->GetObjectBoundingBox ();
+    for (size_t i = 0; i < meshState->GetSubMeshCount (); i++)
+      bboxes[i] = bbox;
   }
 
   void SoftBodyControl::SetSoftBody (CS::Physics::Bullet::iSoftBody* body, bool doubleSided)
@@ -118,8 +129,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
     // Reset the data
     softBody = body;
     this->doubleSided = doubleSided;
-    vertices.SetSize (softBody->GetVertexCount () * 2);
-    normals.SetSize (softBody->GetVertexCount () * 2);
+    vertices.SetSize (doubleSided ? softBody->GetVertexCount () * 2 : softBody->GetVertexCount ());
+    normals.SetSize (doubleSided ? softBody->GetVertexCount () * 2 : softBody->GetVertexCount ());
     anchors.DeleteAll ();
 
     // Initialize the vertices and mesh position
@@ -150,8 +161,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
     if (animeshVertexIndex == (size_t) ~0)
     {
       csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (animesh);
-      csReversibleTransform& animeshTransform =
-	mesh->GetMeshWrapper ()->GetMovable ()->GetTransform ();
+      csReversibleTransform animeshTransform =
+	mesh->GetMeshWrapper ()->GetMovable ()->GetFullTransform ();
 
       // Create a walker for the position buffer of the animesh
       iRenderBuffer* positions = animesh->GetAnimatedMeshFactory ()->GetVertices ();
@@ -237,10 +248,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
     return true;
   }
 
+  bool SoftBodyControl::AnimatesBBoxRadius () const
+  {
+    return true;
+  }
+
   void SoftBodyControl::Update (csTicks current, int num_verts, uint32 version_id)
   {
+    // TODO: don't do anything if the state of the dynamic system hasn't changed
+    // TODO: LOD control on the animation rate
+
     if (!softBody)
       return;
+
+    bbox.StartBoundingBox ();
 
     // Update the position of the vertices and compute the next position of the mesh
     csVector3 lastPosition = meshPosition;
@@ -248,9 +269,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
     for (size_t i = 0; i < softBody->GetVertexCount (); i++)
     {
       csVector3 position = softBody->GetVertexPosition (i);
-      vertices[i] = position - lastPosition;
       meshPosition += position;
 
+      vertices[i] = position - lastPosition;
       normals[i] = softBody->GetVertexNormal (i);
 
       if (doubleSided)
@@ -258,18 +279,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
 	vertices[i + softBody->GetVertexCount ()] = vertices[i];
 	normals[i + softBody->GetVertexCount ()] = - normals[i];
       }
+
+      bbox.AddBoundingVertex (vertices[i]);
     }
     meshPosition /= softBody->GetVertexCount ();
 
-    // Update the position of the mesh
-    mesh->GetMeshWrapper ()->GetMovable ()->SetPosition (lastPosition);
-    mesh->GetMeshWrapper ()->GetMovable ()->UpdateMove ();
-
-    // Invalidate the vertices of the factory of the mesh. This will cause the genmesh
-    // to recompute its bounding box.
+    // Update the bounding boxes of the submeshes
     csRef<iGeneralFactoryState> meshState =
       scfQueryInterface<iGeneralFactoryState> (mesh->GetFactory());
-    meshState->Invalidate ();
+    for (size_t i = 0; i < meshState->GetSubMeshCount (); i++)
+      bboxes[i] = bbox;
+
+    // Update the position of the mesh
+    // TODO: update the position as less as possible?
+    mesh->GetMeshWrapper ()->GetMovable ()->SetFullPosition (lastPosition);
+    mesh->GetMeshWrapper ()->GetMovable ()->UpdateMove ();
 
     // Update the position of the anchors to the animeshes
     for (csArray<Anchor>::Iterator it = anchors.GetIterator (); it.HasNext (); )
@@ -325,6 +349,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
 	      : num_verts == (int) softBody->GetVertexCount ());
 
     return vertices.GetArray ();
+  }
+
+  const csBox3& SoftBodyControl::UpdateBoundingBox (csTicks current, uint32 version_id,
+						    const csBox3& bbox)
+  {
+    return this->bbox;
+  }
+
+  const float SoftBodyControl::UpdateRadius (csTicks current, uint32 version_id,
+					     const float radius)
+  {
+    return bbox.GetSize ().Norm () * 0.5f;
+  }
+
+  const csBox3* SoftBodyControl::UpdateBoundingBoxes (csTicks current, uint32 version_id)
+  {
+    return bboxes.GetArray ();
   }
 
 }

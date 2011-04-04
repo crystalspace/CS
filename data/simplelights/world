@@ -34,6 +34,9 @@
             <file>substrate0037.png</file>
             <class>normalmap</class>
         </texture>
+        <texture name="substrate0037-spec.png">
+            <file>substrate0037-spec.png</file>
+        </texture>
         <texture name="asphalt.jpg">
             <file>/lib/stdtex/asphalt.jpg</file>
         </texture>
@@ -41,21 +44,23 @@
     <materials>
         <material name="wall_wood_hori_color.png">
             <texture>wall_wood_hori_color.png</texture>
-            <shadervar name="mat shininess" type="float">30</shadervar>
+            <shadervar name="shininess" type="float">30</shadervar>
             <shadervar name="tex normal" type="texture">wall_wood_hori_bump.png</shadervar>
             <shadervar name="tex specular" type="texture">wall_wood_hori_specu.png</shadervar>
         </material>
         <material name="substrate0037-diffuse.png">
             <texture>substrate0037-diffuse.png</texture>
-            <shadervar name="mat shininess" type="float">30</shadervar>
+            <shadervar name="shininess" type="float">256</shadervar>
             <shadervar name="tex normal" type="texture">substrate0037.png</shadervar>
-            <shadervar name="tex specular" type="texture">substrate0037.png</shadervar>
+            <shadervar name="tex specular" type="texture">substrate0037-spec.png</shadervar>
+	    <shadervar name="shininess vertex lighting scale" type="float">0.25</shadervar>
         </material>
         <material name="asphalt.jpg">
             <texture>substrate0037-diffuse.png</texture>
-            <shadervar name="mat shininess" type="float">30</shadervar>
+            <shadervar name="shininess" type="float">128</shadervar>
             <shadervar name="tex normal" type="texture">substrate0037.png</shadervar>
-            <shadervar name="tex specular" type="texture">substrate0037.png</shadervar>
+            <shadervar name="tex specular" type="texture">substrate0037-spec.png</shadervar>
+	    <shadervar name="shininess vertex lighting scale" type="float">0.25</shadervar>
         </material>
     </materials>
     <!--addon>

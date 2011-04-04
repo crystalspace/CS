@@ -119,11 +119,6 @@ public:
 };
 
 
-struct ExtraRenderMeshData
-{
-    csZBufMode      zBufMode;
-};
-
 #include "csutil/deprecated_warn_off.h"
 
 /**
@@ -167,9 +162,8 @@ protected:
   CS::Graphics::RenderPriority render_priority;
 
   // Used to store extra rendermeshes that something might attach to this
-  // mesh (ie, for decals)
+  // mesh (ie, for decals or lines)
   csDirtyAccessArray<csRenderMesh*> extraRenderMeshes;
-  csArray<ExtraRenderMeshData> extraRenderMeshData;
 
   /**
    * This value indicates the last time that was used to do animation.
@@ -450,14 +444,9 @@ public:
    * This list is used for special cases (like decals) where additional
    * things need to be renderered for the mesh in an abstract way.
    */
+  virtual size_t AddExtraRenderMesh(CS::Graphics::RenderMesh* renderMesh);
   virtual size_t AddExtraRenderMesh(CS::Graphics::RenderMesh* renderMesh, 
           csZBufMode zBufMode);
-  virtual void AddExtraRenderMesh(CS::Graphics::RenderMesh* renderMesh, 
-    CS::Graphics::RenderPriority priority, csZBufMode zBufMode)
-  {
-    renderMesh->renderPrio = priority;
-    AddExtraRenderMesh (renderMesh, zBufMode);
-  }
 
   /**
    * Grabs any additional render meshes this mesh might have on top
@@ -472,11 +461,6 @@ public:
   /// Get number of extra render meshes.
   virtual size_t GetExtraRenderMeshCount () const
   { return extraRenderMeshes.GetSize(); }
-
-  /** 
-   * Gets the priority of a specific extra rendermesh.
-   */
-  virtual CS::Graphics::RenderPriority GetExtraRenderMeshPriority(size_t idx) const;
 
   /**
    * Gets the z-buffer mode of a specific extra rendermesh

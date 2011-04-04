@@ -1817,6 +1817,17 @@ typedef GLvoid (csAPIENTRY* csGLGETQUERYOBJECTI64V) (GLuint id, GLenum pname, GL
 typedef GLvoid (csAPIENTRY* csGLGETQUERYOBJECTUI64V) (GLuint id, GLenum pname, GLuint64* params);
 
 /** @} */
+/**\name InstancedDrawFuncs constants
+ * @{ */
+
+/** @} */
+
+/**\name InstancedDrawFuncs functions
+ * @{ */
+typedef GLvoid (csAPIENTRY* csGLDRAWARRAYSINSTANCEDARB) (GLenum mode, GLint first, GLsizei count, GLsizei primcount);
+typedef GLvoid (csAPIENTRY* csGLDRAWELEMENTSINSTANCEDARB) (GLenum mode, GLsizei count, GLenum type, const GLvoid* indices, GLsizei primcount);
+
+/** @} */
 /**\name GL_ARB_imaging constants
  * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/imaging.txt">http://www.opengl.org/registry/specs/ARB/imaging.txt</a>.
  * @{ */
@@ -11332,8 +11343,6 @@ typedef GLvoid (csAPIENTRY* csGLCLAMPCOLORARB) (GLenum target, GLenum clamp);
 /**\name GL_ARB_draw_instanced functions
  * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/draw_instanced.txt">http://www.opengl.org/registry/specs/ARB/draw_instanced.txt</a>.
  * @{ */
-typedef GLvoid (csAPIENTRY* csGLDRAWARRAYSINSTANCEDARB) (GLenum mode, GLint first, GLsizei count, GLsizei primcount);
-typedef GLvoid (csAPIENTRY* csGLDRAWELEMENTSINSTANCEDARB) (GLenum mode, GLsizei count, GLenum type, const GLvoid* indices, GLsizei primcount);
 
 /** @} */
 /**\name GL_ARB_depth_buffer_float constants
@@ -12760,6 +12769,20 @@ public:
   #ifndef GLGETQUERYOBJECTUI64V_DECL
   #define GLGETQUERYOBJECTUI64V_DECL
   csGLGETQUERYOBJECTUI64V glGetQueryObjectui64v;
+  #endif
+
+
+  /** @} */
+  /**\name InstancedDrawFuncs functions
+   * @{ */
+  #ifndef GLDRAWARRAYSINSTANCEDARB_DECL
+  #define GLDRAWARRAYSINSTANCEDARB_DECL
+  csGLDRAWARRAYSINSTANCEDARB glDrawArraysInstancedARB;
+  #endif
+
+  #ifndef GLDRAWELEMENTSINSTANCEDARB_DECL
+  #define GLDRAWELEMENTSINSTANCEDARB_DECL
+  csGLDRAWELEMENTSINSTANCEDARB glDrawElementsInstancedARB;
   #endif
 
 
@@ -17527,16 +17550,6 @@ public:
   /**\name GL_ARB_draw_instanced functions
    * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/draw_instanced.txt">http://www.opengl.org/registry/specs/ARB/draw_instanced.txt</a>.
    * @{ */
-  #ifndef GLDRAWARRAYSINSTANCEDARB_DECL
-  #define GLDRAWARRAYSINSTANCEDARB_DECL
-  csGLDRAWARRAYSINSTANCEDARB glDrawArraysInstancedARB;
-  #endif
-
-  #ifndef GLDRAWELEMENTSINSTANCEDARB_DECL
-  #define GLDRAWELEMENTSINSTANCEDARB_DECL
-  csGLDRAWELEMENTSINSTANCEDARB glDrawElementsInstancedARB;
-  #endif
-
 
   /** @} */
   /**\name GL_ARB_depth_buffer_float functions
@@ -17635,6 +17648,9 @@ public:
   /** Whether the "Queries64" pseudo-extension was found. 
    * Set by csGLExtensionManager::InitQueries64(). */
   bool CS_Queries64;
+  /** Whether the "InstancedDrawFuncs" pseudo-extension was found. 
+   * Set by csGLExtensionManager::InitInstancedDrawFuncs(). */
+  bool CS_InstancedDrawFuncs;
   /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/imaging.txt">GL_ARB_imaging</a> extension was found. 
    * Set by csGLExtensionManager::InitGL_ARB_imaging(). */
   bool CS_GL_ARB_imaging;
@@ -18200,6 +18216,7 @@ protected:
   bool tested_CS_GL_version_2_1;
   bool tested_CS_Queries;
   bool tested_CS_Queries64;
+  bool tested_CS_InstancedDrawFuncs;
   bool tested_CS_GL_ARB_imaging;
   bool tested_CS_GL_ARB_multitexture;
   bool tested_CS_GL_ARB_transpose_matrix;
@@ -19001,6 +19018,43 @@ public:
 
       CS_Queries64 = allclear;
       if (CS_Queries64)
+      {
+	Report (msgExtFoundAndUsed, "pseudo", CS::Quote::Single (ext));
+      }
+      else
+      {
+        Report (msgExtInitFail, "pseudo", CS::Quote::Single (ext));
+      }
+    }
+    else
+    {
+      Report (msgExtNotFound, "pseudo", CS::Quote::Single (ext));
+    }
+  }
+  
+  /** Initialize "InstancedDrawFuncs" pseudo-extension. 
+   * Check presence with csGLExtensionFlags::CS_InstancedDrawFuncs. */
+  void InitInstancedDrawFuncs ()
+  {
+    if (tested_CS_InstancedDrawFuncs) return;
+    if (!extstrGL) return;
+    tested_CS_InstancedDrawFuncs = true;
+    const char* ext = "InstancedDrawFuncs";
+
+    
+    CS_InstancedDrawFuncs = true;
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_InstancedDrawFuncs;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+      EXTMGR_FUNC_INIT(glDrawArraysInstancedARB, GLDRAWARRAYSINSTANCEDARB);
+      EXTMGR_FUNC_INIT(glDrawElementsInstancedARB, GLDRAWELEMENTSINSTANCEDARB);
+
+      CS_InstancedDrawFuncs = allclear;
+      if (CS_InstancedDrawFuncs)
       {
 	Report (msgExtFoundAndUsed, "pseudo", CS::Quote::Single (ext));
       }
@@ -25029,7 +25083,12 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_draw_instanced = true;
     const char* ext = "GL_ARB_draw_instanced";
-
+    InitInstancedDrawFuncs();
+    if (!CS_InstancedDrawFuncs)
+    {
+      Report (msgDependencyNotFound, "GL", CS::Quote::Single (ext), CS::Quote::Single ("InstancedDrawFuncs"));
+      return;
+    }
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -25041,8 +25100,6 @@ public:
     allclear = true;
     if (init)	// Don't check the functions if ext isn't reported anyway
     {
-      EXTMGR_FUNC_INIT(glDrawArraysInstancedARB, GLDRAWARRAYSINSTANCEDARB);
-      EXTMGR_FUNC_INIT(glDrawElementsInstancedARB, GLDRAWELEMENTSINSTANCEDARB);
 
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_draw_instanced)
     }
@@ -25089,7 +25146,12 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_ARB_instanced_arrays = true;
     const char* ext = "GL_ARB_instanced_arrays";
-
+    InitInstancedDrawFuncs();
+    if (!CS_InstancedDrawFuncs)
+    {
+      Report (msgDependencyNotFound, "GL", CS::Quote::Single (ext), CS::Quote::Single ("InstancedDrawFuncs"));
+      return;
+    }
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     

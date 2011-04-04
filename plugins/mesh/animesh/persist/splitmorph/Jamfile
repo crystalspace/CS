@@ -1,0 +1,6 @@
+SubDir TOP plugins mesh animesh persist splitmorph ;
+
+Description splitmorph : "Loader of animated mesh with morph targets split in several files" ;
+Plugin splitmorph : [ Wildcard *.cpp *.h ] ;
+LinkWith splitmorph : crystalspace ;
+CompileGroups splitmorph : meshes ;

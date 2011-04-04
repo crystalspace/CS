@@ -52,12 +52,9 @@ Monster::~Monster()
 {
 }
 
-bool Monster::Initialize(iMeshWrapper* spawn)
+bool Monster::Initialize (const char* name, iSector* sector, csTransform& transform)
 {
   csRef<iConfigManager> cfg (csQueryRegistry<iConfigManager> (object_reg));
-
-  //Replace spawn mesh with real mesh.
-  std::string name = spawn->QueryObject()->GetName();
 
   std::string tmp, filename;
   filename = name;
@@ -79,28 +76,27 @@ bool Monster::Initialize(iMeshWrapper* spawn)
     return false;
   }
 
-  csVector3 pos = spawn->GetMovable()->GetPosition();
-  iSector* sector = spawn->GetMovable()->GetSectors()->Get(0);
-  mesh->GetMovable()->SetPosition(sector, pos);
+  mesh->GetMovable()->SetSector(sector);
+  mesh->GetMovable()->SetTransform(transform);
   mesh->GetMovable()->UpdateMove();
 
   mesh->QueryObject()->ObjAdd(this);
 
   weapon->mesh = mesh;
 
-  csRef<CS::Mesh::iAnimatedMesh> animesh = scfQueryInterface<CS::Mesh::iAnimatedMesh> (mesh->GetMeshObject ());
+  csRef<CS::Mesh::iAnimatedMesh> animesh = scfQueryInterfaceSafe<CS::Mesh::iAnimatedMesh> (mesh->GetMeshObject ());
   if (animesh)
   {
     // Start the root animation node
     rootNode = animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
 
     // Find the FSM animation node
-    weapon->fsmNode = fsmNode = static_cast<CS::Animation::iSkeletonFSMNode*> (rootNode->FindNode ("fsm"));
+    weapon->fsmNode = fsmNode = scfQueryInterfaceSafe<CS::Animation::iSkeletonFSMNode> (rootNode->FindNode ("fsm"));
     weapon->fsmNodeFactory =
-      fsmNodeFactory = fsmNode ? (CS::Animation::iSkeletonFSMNodeFactory*) fsmNode->GetFactory () : 0;
+      fsmNodeFactory = fsmNode ? scfQueryInterface<CS::Animation::iSkeletonFSMNodeFactory> (fsmNode->GetFactory ()) : 0;
 
     // Find the LookAt animation node
-    lookAtNode = (CS::Animation::iSkeletonLookAtNode*) rootNode->FindNode ("lookat");
+    lookAtNode = scfQueryInterfaceSafe<CS::Animation::iSkeletonLookAtNode> (rootNode->FindNode ("lookat"));
   }
 
   // If this is the 'knight' monster then create and attach a sword in his hand

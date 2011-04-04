@@ -22,12 +22,13 @@
 #define __CS_DEBUGNODE_H__
 
 #include "csutil/scf_implementation.h"
-#include "iutil/comp.h"
+#include "cstool/animnodetmpl.h"
 #include "csutil/bitarray.h"
 #include "csutil/leakguard.h"
 #include "csutil/weakref.h"
 #include "csutil/refarr.h"
 #include "csutil/csstring.h"
+#include "iutil/comp.h"
 #include "imesh/animnode/debug.h"
 #include "imesh/bodymesh.h"
 #include "iengine/sector.h"
@@ -35,36 +36,13 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
 {
+  class DebugNodeManager;
 
-  class DebugNodeManager : public scfImplementation2<DebugNodeManager,
-    CS::Animation::iSkeletonDebugNodeManager, iComponent>
-  {
-  public:
-    CS_LEAKGUARD_DECLARE(DebugNodeManager);
-
-    DebugNodeManager (iBase* parent);
-
-    //-- CS::Animation::iSkeletonDebugNodeManager
-    virtual CS::Animation::iSkeletonDebugNodeFactory* CreateAnimNodeFactory (const char* name);
-    virtual CS::Animation::iSkeletonDebugNodeFactory* FindAnimNodeFactory (const char* name);
-    virtual void ClearAnimNodeFactories ();
-
-    //-- iComponent
-    virtual bool Initialize (iObjectRegistry*);
-
-    // Error reporting
-    void Report (int severity, const char* msg, ...) const;
-
-  private:
-    iObjectRegistry* object_reg;
-    csHash<csRef<CS::Animation::iSkeletonDebugNodeFactory>, csString> debugFactories;
-
-    friend class DebugNodeFactory;
-    friend class DebugNode;
-  };
-
-  class DebugNodeFactory : public scfImplementation2<DebugNodeFactory, 
-    scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory>, CS::Animation::iSkeletonDebugNodeFactory>
+  class DebugNodeFactory
+    : public scfImplementation2<DebugNodeFactory, 
+    scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory>,
+    CS::Animation::iSkeletonDebugNodeFactory>,
+    public CS::Animation::SkeletonAnimNodeFactorySingle
   {
   public:
     CS_LEAKGUARD_DECLARE(DebugAnimNodeFactory);
@@ -79,21 +57,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     virtual void SetBoneMask (csBitArray& boneMask);
     virtual void UnsetBoneMask ();
     virtual void SetLeafBonesDisplayed (bool displayed);
-    virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* factory);
-    virtual iSkeletonAnimNodeFactory* GetChildNode () const;
 
-    //-- CS::Animation::iSkeletonAnimNodeFactory
-    virtual csPtr<CS::Animation::iSkeletonAnimNode> CreateInstance (
-	       CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton);
-    virtual const char* GetNodeName () const;
-    virtual CS::Animation::iSkeletonAnimNodeFactory* FindNode (const char* name);
+    inline virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* factory)
+    { CS::Animation::SkeletonAnimNodeFactorySingle::SetChildNode (factory); }
+    inline virtual iSkeletonAnimNodeFactory* GetChildNode () const
+    { return CS::Animation::SkeletonAnimNodeFactorySingle::GetChildNode (); }
 
+    //-- CS::Animation::SkeletonAnimNodeFactorySingle
+    csPtr<CS::Animation::SkeletonAnimNodeSingleBase> ActualCreateInstance (
+      CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton);
   private:
     DebugNodeManager* manager;
-    csString name;
     CS::Animation::SkeletonDebugMode modes;
     csPixmap* image;
-    csRef<CS::Animation::iSkeletonAnimNodeFactory> subFactory;
     bool boneMaskUsed;
     csBitArray boneMask;
     bool leafBonesDisplayed;
@@ -101,8 +77,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     friend class DebugNode;
   };
 
-  class DebugNode : public scfImplementation2<DebugNode, 
-    scfFakeInterface<CS::Animation::iSkeletonAnimNode>, CS::Animation::iSkeletonDebugNode>
+  class DebugNode
+    : public scfImplementation2<DebugNode, 
+				scfFakeInterface<CS::Animation::iSkeletonAnimNode>,
+				CS::Animation::iSkeletonDebugNode>,
+      public CS::Animation::SkeletonAnimNodeSingle<DebugNodeFactory>
   {
   public:
     CS_LEAKGUARD_DECLARE(DebugNode);
@@ -112,35 +91,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
 
     //-- CS::Animation::iSkeletonDebugNode
     virtual void Draw (iCamera* camera, csColor color = csColor (255, 0, 255));
-
-    //-- CS::Animation::iSkeletonAnimNode
-    virtual void Play ();
-    virtual void Stop ();
-
-    virtual void SetPlaybackPosition (float time);
-    virtual float GetPlaybackPosition () const;
-
-    virtual float GetDuration () const;
-    virtual void SetPlaybackSpeed (float speed);
-    virtual float GetPlaybackSpeed () const;
-
-    virtual void BlendState (CS::Animation::csSkeletalState* state,
-			     float baseWeight = 1.0f);
-    virtual void TickAnimation (float dt);
-
-    virtual bool IsActive () const;
-    virtual CS::Animation::iSkeletonAnimNodeFactory* GetFactory () const;
-    virtual CS::Animation::iSkeletonAnimNode* FindNode (const char* name);
-
-    virtual void AddAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback);
-    virtual void RemoveAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback);
-
   private:
-    DebugNodeFactory* factory;
-    csWeakRef<CS::Animation::iSkeleton> skeleton;
-    csRef<CS::Animation::iSkeletonAnimNode> subNode;
-
     friend class DebugNodeFactory;
+  };
+
+  class DebugNodeManager
+    : public CS::Animation::AnimNodeManagerCommon<DebugNodeManager,
+						  CS::Animation::iSkeletonDebugNodeManager,
+						  DebugNodeFactory>
+  {
+  public:
+    DebugNodeManager (iBase* parent)
+     : AnimNodeManagerCommonType (parent) {}
   };
 
 }

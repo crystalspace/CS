@@ -150,7 +150,7 @@ bool GeneralTab::CameraModeRotate (const CEGUI::EventArgs& e)
     (CEGUI::RadioButton*) winMgr->getWindow("General/RotateRadio");
 
   if (radio->getSelectedButtonInGroup () == radio)
-    viewmesh->camMode = ViewMesh::rotateorigin;
+    viewmesh->cameraManager.SetCameraMode (CS::Demo::CAMERA_ROTATE);
   return true;
 }
 
@@ -162,7 +162,7 @@ bool GeneralTab::CameraModeMoveOrigin (const CEGUI::EventArgs& e)
     (CEGUI::RadioButton*) winMgr->getWindow("General/LooktooriginRadio");
 
   if (radio->getSelectedButtonInGroup () == radio)
-    viewmesh->camMode = ViewMesh::moveorigin;
+    viewmesh->cameraManager.SetCameraMode (CS::Demo::CAMERA_MOVE_LOOKAT);
   return true;
 }
 
@@ -174,7 +174,7 @@ bool GeneralTab::CameraModeMoveNormal (const CEGUI::EventArgs& e)
     (CEGUI::RadioButton*) winMgr->getWindow("General/NormalMovementRadio");
 
   if (radio->getSelectedButtonInGroup () == radio)
-    viewmesh->camMode = ViewMesh::movenormal;
+    viewmesh->cameraManager.SetCameraMode (CS::Demo::CAMERA_MOVE_FREE);
   return true;
 }
 
@@ -186,9 +186,8 @@ bool GeneralTab::LightThreePoint (const CEGUI::EventArgs& e)
     (CEGUI::RadioButton*) winMgr->getWindow("General/ThreePointLighting");
 
   if (radio->getSelectedButtonInGroup () == radio)
-    viewmesh->MoveLights (csVector3 (-viewmesh->roomsize/2, viewmesh->roomsize/2, 0),
-                csVector3 (viewmesh->roomsize/2,  -viewmesh->roomsize/2, 0),
-                csVector3 (0, 0, -viewmesh->roomsize/2));
+    viewmesh->SetLightMode (THREE_POINT);
+
   return true;
 }
 
@@ -200,9 +199,8 @@ bool GeneralTab::LightFrontBackTop (const CEGUI::EventArgs& e)
     (CEGUI::RadioButton*) winMgr->getWindow("General/FrontBackTopLighting");
 
   if (radio->getSelectedButtonInGroup () == radio)
-    viewmesh->MoveLights (csVector3 (0, 0, viewmesh->roomsize/4),
-                csVector3 (0, 0, -viewmesh->roomsize/4),
-                csVector3 (0, viewmesh->roomsize/2, 0));
+    viewmesh->SetLightMode (FRONT_BACK_TOP);
+
   return true;
 }
 
@@ -214,9 +212,8 @@ bool GeneralTab::LightUnlit (const CEGUI::EventArgs& e)
     (CEGUI::RadioButton*) winMgr->getWindow("General/UnlitLighting");
 
   if (radio->getSelectedButtonInGroup () == radio)
-    viewmesh->MoveLights (csVector3 (0, 0, 0),
-                csVector3 (0,  -viewmesh->roomsize/4, 0),
-                csVector3 (0, viewmesh->roomsize/2, -viewmesh->roomsize/2));
+    viewmesh->SetLightMode (UNLIT);
+
   return true;
 }
 
@@ -273,7 +270,7 @@ bool GeneralTab::SetScaleSprite (const CEGUI::EventArgs& e)
 
 bool GeneralTab::ResetCameraButton (const CEGUI::EventArgs& e)
 {
-  viewmesh->ResetCamera();
+  viewmesh->cameraManager.ResetCamera ();
   return true;
 }
 

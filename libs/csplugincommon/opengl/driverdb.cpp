@@ -18,7 +18,6 @@
 */
 
 #include "cssysdef.h"
-#include "imap/services.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/document.h"
 #include "iutil/vfs.h"
@@ -41,7 +40,6 @@ private:
   csGLDriverDatabase* db;
   csStringHash& tokens;
   iConfigManager* cfgmgr;
-  iSyntaxService* synsrv;
   int usedCfgPrio;
 
   enum FulfillConditions
@@ -55,7 +53,7 @@ public:
   CS_LEAKGUARD_DECLARE (csDriverDBReader);
 
   csDriverDBReader (csGLDriverDatabase* db, iConfigManager* cfgmgr, 
-    iSyntaxService* synsrv, int usedCfgPrio);
+    int usedCfgPrio);
 
   bool Apply (iDocumentNode* node);
 
@@ -72,13 +70,11 @@ CS_LEAKGUARD_IMPLEMENT (csDriverDBReader);
 
 csDriverDBReader::csDriverDBReader (csGLDriverDatabase* db, 
 				    iConfigManager* cfgmgr, 
-				    iSyntaxService* synsrv, 
 				    int usedCfgPrio) :
   tokens(db->tokens)
 {
   csDriverDBReader::db = db;
   csDriverDBReader::cfgmgr = cfgmgr;
-  csDriverDBReader::synsrv = synsrv;
   csDriverDBReader::usedCfgPrio = usedCfgPrio;
 }
 
@@ -100,8 +96,7 @@ bool csDriverDBReader::Apply (iDocumentNode* node)
 	    (csConfigDocument*)0));
 	  if (!cfg.IsValid ())
 	  {
-	    synsrv->Report (
-	      "crystalspace.canvas.openglcommon.driverdb",
+	    db->Report (
 	      CS_REPORTER_SEVERITY_WARNING,
 	      child,
 	      "unknown config %s", cfgname);
@@ -114,7 +109,7 @@ bool csDriverDBReader::Apply (iDocumentNode* node)
 	}
 	break;
       default:
-	synsrv->ReportBadToken (child);
+	db->ReportBadToken (child);
 	return false;
     }
   }
@@ -135,8 +130,7 @@ bool csDriverDBReader::ParseConditions (iDocumentNode* node,
       fulfill = All;
     else
     {
-      synsrv->Report (
-	"crystalspace.canvas.openglcommon.driverdb",
+      db->Report (
 	CS_REPORTER_SEVERITY_WARNING,
 	node,
 	"Invalid %s attribute %s",
@@ -174,7 +168,7 @@ bool csDriverDBReader::ParseConditions (iDocumentNode* node,
 	  return false;
 	break;
       default:
-	synsrv->ReportBadToken (child);
+	db->ReportBadToken (child);
 	return false;
     }
 
@@ -205,8 +199,7 @@ bool csDriverDBReader::ParseRegexp (iDocumentNode* node, bool& result)
   const char* string = node->GetAttributeValue ("string");
   if (string == 0)
   {
-    synsrv->Report (
-      "crystalspace.canvas.openglcommon.driverdb",
+    db->Report (
       CS_REPORTER_SEVERITY_WARNING,
       node,
       "No %s attribute",
@@ -216,8 +209,7 @@ bool csDriverDBReader::ParseRegexp (iDocumentNode* node, bool& result)
   const char* pattern = node->GetAttributeValue ("pattern");
   if (pattern == 0)
   {
-    synsrv->Report (
-      "crystalspace.canvas.openglcommon.driverdb",
+    db->Report (
       CS_REPORTER_SEVERITY_WARNING,
       node,
       "No %s attribute",
@@ -242,8 +234,7 @@ bool csDriverDBReader::ParseCompareVer (iDocumentNode* node, bool& result)
   const char* version = node->GetAttributeValue ("version");
   if (version == 0)
   {
-    synsrv->Report (
-      "crystalspace.canvas.openglcommon.driverdb",
+    db->Report (
       CS_REPORTER_SEVERITY_WARNING,
       node,
       "No %s attribute",
@@ -253,8 +244,7 @@ bool csDriverDBReader::ParseCompareVer (iDocumentNode* node, bool& result)
   const char* relation = node->GetAttributeValue ("relation");
   if (relation == 0)
   {
-    synsrv->Report (
-      "crystalspace.canvas.openglcommon.driverdb",
+    db->Report (
       CS_REPORTER_SEVERITY_WARNING,
       node,
       "No %s attribute",
@@ -265,8 +255,7 @@ bool csDriverDBReader::ParseCompareVer (iDocumentNode* node, bool& result)
   const char* space = strchr (relation, ' ');
   if (space == 0)
   {
-    synsrv->Report (
-      "crystalspace.canvas.openglcommon.driverdb",
+    db->Report (
       CS_REPORTER_SEVERITY_WARNING,
       node,
       "Malformed %s",
@@ -293,8 +282,7 @@ bool csDriverDBReader::ParseCompareVer (iDocumentNode* node, bool& result)
     csString relstr;
     relstr.Append (relation, rellen);
 
-    synsrv->Report (
-      "crystalspace.canvas.openglcommon.driverdb",
+    db->Report (
       CS_REPORTER_SEVERITY_WARNING,
       node,
       "Unknown relation %s", CS::Quote::Single (relstr.GetData()));
@@ -333,8 +321,7 @@ bool csDriverDBReader::ParseConfigs (iDocumentNode* node)
 	  const char* name = child->GetAttributeValue ("name");
 	  if (!name)
 	  {
-	    synsrv->Report (
-	      "crystalspace.canvas.openglcommon.driverdb",
+	    db->Report (
 	      CS_REPORTER_SEVERITY_WARNING,
 	      child,
 	      "<config> has no name");
@@ -351,7 +338,7 @@ bool csDriverDBReader::ParseConfigs (iDocumentNode* node)
 	}
 	break;
       default:
-	synsrv->ReportBadToken (child);
+	db->ReportBadToken (child);
 	return false;
     }
   }
@@ -416,7 +403,7 @@ bool csDriverDBReader::ParseRules (iDocumentNode* node)
 	}
 	break;
       default:
-	synsrv->ReportBadToken (child);
+	db->ReportBadToken (child);
 	return false;
     }
   }
@@ -522,6 +509,84 @@ void csGLDriverDatabase::Report (int severity, const char* msg, ...)
   va_end (args);
 }
 
+static const char* GetDescriptiveAttribute (iDocumentNode* n,
+					    const char*& attrName)
+{
+  static const char* descriptiveAttrs[] = {
+    "name",
+    "description",
+    0
+  };
+
+  const char* attr;
+  const char** currentAttr = descriptiveAttrs;
+  while (*currentAttr != 0)
+  {
+    attr = n->GetAttributeValue (*currentAttr);
+    if (attr != 0)
+    {
+      attrName = *currentAttr;
+      return attr;
+    }
+    currentAttr++;
+  }
+  return 0;
+}
+
+void csGLDriverDatabase::Report (int severity, 
+				 iDocumentNode* errornode,
+				 const char* msg, ...)
+{
+  csString errmsg;
+  va_list args;
+  va_start (args, msg);
+  errmsg.FormatV (msg, args);
+  va_end (args);
+  
+  bool first = true;
+
+  csString nodepath;
+  csRef<iDocumentNode> n (errornode);
+  while (n)
+  {
+    const char* v = n->GetValue ();
+    const char* attrName = 0;
+    const char* name = GetDescriptiveAttribute (n, attrName);
+    if (name || (v && *v))
+    {
+      if (!first)
+	nodepath = "," + nodepath;
+      else
+	first = false;
+      csString attrStr;
+      if (name)
+      {
+	attrStr = "(";
+	if (attrName) attrStr.AppendFmt ("%s=", attrName);
+	attrStr.AppendFmt ("%s)", name);
+      }
+      if (!attrStr.IsEmpty()) nodepath = attrStr + nodepath;
+      if (v && *v)
+      {
+        nodepath = v + nodepath;
+      }
+    }
+    n = n->GetParent ();
+  }
+  if (nodepath.IsEmpty())
+    Report (severity, "%s", (const char*)errmsg);
+  else
+    Report (severity, "%s\n[node: %s]",
+    	(const char*)errmsg, (const char*)nodepath);
+}
+
+void csGLDriverDatabase::ReportBadToken (iDocumentNode* badtokennode)
+{
+  Report (CS_REPORTER_SEVERITY_ERROR,
+	  badtokennode, "Unexpected token %s!",
+	  CS::Quote::Single (badtokennode->GetValue ()));
+}
+
 csGLDriverDatabase::csGLDriverDatabase () : ogl2d (0)
 {
   ::InitTokenTable (tokens);
@@ -541,10 +606,7 @@ void csGLDriverDatabase::Open (csGraphics2DGLCommon* ogl2d,
   csRef<iConfigManager> cfgmgr = 
     csQueryRegistry<iConfigManager> (ogl2d->object_reg);
 
-  csRef<iSyntaxService> synsrv = csQueryRegistryOrLoad<iSyntaxService> (
-  	ogl2d->object_reg, "crystalspace.syntax.loader.service.text");
-
-  csDriverDBReader reader (this, cfgmgr, synsrv, configPriority);
+  csDriverDBReader reader (this, cfgmgr, configPriority);
 
   csRef<iDocumentNodeIterator> it (dbRoot->GetNodes ());
   while (it->HasNext())
@@ -564,7 +626,7 @@ void csGLDriverDatabase::Open (csGraphics2DGLCommon* ogl2d,
 	  return;
 	break;
       default:
-	synsrv->ReportBadToken (node);
+	ReportBadToken (node);
 	return;
     }
   }

@@ -1877,7 +1877,7 @@ bool csThing::HitBeamOutline (const csVector3&,
 
 bool csThing::HitBeamObject (const csVector3&,
   const csVector3&, csVector3&, float*, int*,
-  iMaterialWrapper**, iMaterialArray*)
+  iMaterialWrapper**)
 {
   return false;
 }
@@ -2492,9 +2492,9 @@ void csThingObjectType::Notify (const char *description, ...)
 static const csOptionDescription
   config_options[] =
 {
-  { 0, "cosfact", "Cosinus factor for lighting", CSVAR_FLOAT },
-  { 1, "lightqual", "Lighting quality", CSVAR_LONG },
-  { 2, "fullbright", "Enable/disable fullbright", CSVAR_BOOL }
+  csOptionDescription( 0, "cosfact", "Cosinus factor for lighting", CSVAR_FLOAT ),
+  csOptionDescription( 1, "lightqual", "Lighting quality", CSVAR_LONG ),
+  csOptionDescription( 2, "fullbright", "Enable/disable fullbright", CSVAR_BOOL )
 };
 const int NUM_OPTIONS =
   (

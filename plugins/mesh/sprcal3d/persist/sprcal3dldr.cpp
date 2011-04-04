@@ -157,6 +157,7 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   float scale = 0.0;
+  int loadFlags = LOADER_FLIP_WINDING;
 
   while (it->HasNext ())
   {
@@ -168,13 +169,23 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
     {
     case XMLTOKEN_OPTIONS:
       {
-          bool rotate = child->GetAttributeValueAsBool("rotate_x_axis");
-          bool invert = child->GetAttributeValueAsBool("flip_textures");
-          //newspr->SetLoadFlags( rotate?LOADER_ROTATE_X_AXIS:0
-          //| invert?LOADER_INVERT_V_COORD:0 );          
-          newspr->SetLoadFlags( (rotate?LOADER_ROTATE_X_AXIS:0) 
-          | (invert?LOADER_INVERT_V_COORD:0) | LOADER_FLIP_WINDING );          
-          break;
+	csRef<iDocumentAttribute> rotateAttr = child->GetAttribute ("rotate_x_axis");
+	if (rotateAttr)
+	{
+	  if (rotateAttr->GetValueAsBool())
+	    loadFlags |= LOADER_ROTATE_X_AXIS;
+	  else
+	    loadFlags &= ~LOADER_ROTATE_X_AXIS;
+	}
+	csRef<iDocumentAttribute> invertAttr = child->GetAttribute ("flip_textures");
+	if (invertAttr)
+	{
+	  if (invertAttr->GetValueAsBool())
+	    loadFlags |= LOADER_INVERT_V_COORD;
+	  else
+	    loadFlags &= ~LOADER_INVERT_V_COORD;
+	}
+	break;
       }
     case XMLTOKEN_PATH:
       {
@@ -224,7 +235,7 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	const char *file = child->GetAttributeValue("file");
 	if (file)
 	{
-	  if (!newspr->LoadCoreSkeleton(vfs,file))
+	  if (!newspr->LoadCoreSkeleton(vfs, file, loadFlags))
 	  {
 	    synldr->ReportError (
   	      "crystalspace.spritecal3dfactoryloader.parse.badfile",
@@ -290,7 +301,7 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	    max_vel,
             min_interval,
             max_interval,
-            idle_pct, lock);
+            idle_pct, lock, loadFlags);
 
 	  if (animID == -1)
 	  {
@@ -331,7 +342,7 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	  {
 	    mat = LoadMaterialTag(newspr,child,ldr_context,def_matl,def_matl);
 	  }
-	  int mesh_index = newspr->LoadCoreMesh(vfs,file,name,attach,mat);
+	  int mesh_index = newspr->LoadCoreMesh(vfs,file,name,attach,mat, loadFlags);
           if (mesh_index == -1)
 	  {
 	      synldr->ReportError (
@@ -357,7 +368,7 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
                 if (morph_file)
                 {
                   int morph_index = newspr->LoadCoreMorphTarget(
-		      vfs,mesh_index,morph_file,morph_name);
+		      vfs,mesh_index,morph_file,morph_name, loadFlags);
                   if (morph_index == -1)
                   {
                     newspr->ReportLastError();

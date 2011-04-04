@@ -560,12 +560,12 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
 };
 
 /**
- * Implementing this class allows the creation of classes that control
- * animation of vertex, texel, normal, and color data right before it is
- * being used. This can be used for various special effects. Note then when
- * animating vertex that it is prefered that the bounding box of the
- * object doesn't change too dramatically because this animation is
- * called AFTER visibility culling!
+ * Implementing this class allows to control the animation of the vertex,
+ * texel, normal, color and bounding box data of the genmesh.
+ *
+ * Note that, when animating the vertex data, it is prefered that the bounding box
+ * of the object doesn't change too dramatically because this animation is
+ * called AFTER the visibility culling.
  * 
  * Main creators of instances implementing this interface:
  * - iGenMeshAnimationControlFactory::CreateAnimationControl()
@@ -578,72 +578,126 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
  */
 struct iGenMeshAnimationControl : public virtual iBase
 {
-  SCF_INTERFACE(iGenMeshAnimationControl, 2, 0, 0);
+  SCF_INTERFACE(iGenMeshAnimationControl, 2, 0, 1);
 
-  /// Returns true if this control animates vertices.
+  /// Returns true if this control animates the vertices of the genmesh.
   virtual bool AnimatesVertices () const = 0;
-  /// Returns true if this control animates texels.
+  /// Returns true if this control animates the texels of the genmesh.
   virtual bool AnimatesTexels () const = 0;
-  /// Returns true if this control animates normals.
+  /// Returns true if this control animates the normals of the genmesh.
   virtual bool AnimatesNormals () const = 0;
-  /// Returns true if this control animates colors.
+  /// Returns true if this control animates the colors of the genmesh.
   virtual bool AnimatesColors () const = 0;
 
   /**
-   * General update method.
+   * General update method. It is called before all other update methods.
+   * \param current The current time given by the virtual clock
+   * \param num_verts The count of vertices of the genmesh
+   * \param version_id The version number of the shape of the genmesh, as returned by
+   * iObjectModel::GetShapeNumber(). The animation control can use this to optimize the
+   * animation calculation by caching the animated version of the array and returning
+   * that one.
    */
   virtual void Update (csTicks current, int num_verts, 
     uint32 version_id) = 0;
 
   /**
-   * Given the factory vertex data, return the animated data.
+   * Given the factory vertex data, return the animated vertex data.
    * If this control doesn't animate vertices then it will return the
-   * source array unchanged.
-   * The 'version_id' is a number that changes whenever the input array
-   * changes. The animation control can use this to optimize the animation
-   * calculation by caching the animated version of the array and returning
+   * source array unchanged, otherwise it has to allocate the data array.
+   * \param current The current time given by the virtual clock
+   * \param verts The vertices of the factory of the genmesh
+   * \param num_verts The count of vertices of the genmesh
+   * \param version_id The version number of the shape of the genmesh, as returned by
+   * iObjectModel::GetShapeNumber(). The animation control can use this to optimize the
+   * animation calculation by caching the animated version of the array and returning
    * that one.
    */
   virtual const csVector3* UpdateVertices (csTicks current,
   	const csVector3* verts, int num_verts, uint32 version_id) = 0;
 
   /**
-   * Given the factory texel data, return the animated data.
+   * Given the factory texel data, return the animated texel data.
    * If this control doesn't animate texels then it will return the
-   * source array unchanged.
-   * The 'version_id' is a number that changes whenever the input array
-   * changes. The animation control can use this to optimize the animation
-   * calculation by caching the animated version of the array and returning
+   * source array unchanged, otherwise it has to allocate the data array.
+   * \param current The current time given by the virtual clock
+   * \param texels The texels of the factory of the genmesh
+   * \param num_texels The count of texels of the genmesh
+   * \param version_id The version number of the shape of the genmesh, as returned by
+   * iObjectModel::GetShapeNumber(). The animation control can use this to optimize the
+   * animation calculation by caching the animated version of the array and returning
    * that one.
    */
   virtual const csVector2* UpdateTexels (csTicks current,
   	const csVector2* texels, int num_texels, uint32 version_id) = 0;
 
   /**
-   * Given the factory normal data, return the animated data.
+   * Given the factory normal data, return the animated normal data.
    * If this control doesn't animate normals then it will return the
-   * source array unchanged.
-   * The 'version_id' is a number that changes whenever the input array
-   * changes. The animation control can use this to optimize the animation
-   * calculation by caching the animated version of the array and returning
+   * source array unchanged, otherwise it has to allocate the data array.
+   * \param current The current time given by the virtual clock
+   * \param normals The normals of the factory of the genmesh
+   * \param num_verts The count of normals of the genmesh
+   * \param version_id The version number of the shape of the genmesh, as returned by
+   * iObjectModel::GetShapeNumber(). The animation control can use this to optimize the
+   * animation calculation by caching the animated version of the array and returning
    * that one.
    */
   virtual const csVector3* UpdateNormals (csTicks current,
   	const csVector3* normals, int num_normals, uint32 version_id) = 0;
 
   /**
-   * Given the factory color data, return the animated data.
+   * Given the factory color data, return the animated color data.
    * If this control doesn't animate colors then it will return the
-   * source array unchanged.
-   * The 'version_id' is a number that changes whenever the input array
-   * changes. The animation control can use this to optimize the animation
-   * calculation by caching the animated version of the array and returning
-   * that one.
+   * source array unchanged, otherwise it has to allocate the data array.
    * \remarks \a colors may be 0. In this case all color values should be
    *   assumed to be (0, 0, 0, 1).
+   * \param current The current time given by the virtual clock
+   * \param colors The original colors of the genmesh
+   * \param num_verts The count of colors of the genmesh
+   * \param version_id The version number of the shape of the genmesh, as returned by
+   * iObjectModel::GetShapeNumber(). The animation control can use this to optimize the
+   * animation calculation by caching the animated version of the array and returning
+   * that one.
    */
   virtual const csColor4* UpdateColors (csTicks current,
   	const csColor4* colors, int num_colors, uint32 version_id) = 0;
+
+  /// Returns true if this control animates the bounding box and the radius of the genmesh.
+  virtual bool AnimatesBBoxRadius () const = 0;
+
+  /**
+   * Given the bounding box of the factory, return the bounding box of the whole genmesh.
+   * \param current The current time given by the virtual clock
+   * \param version_id The version number of the shape of the genmesh, as returned by
+   * iObjectModel::GetShapeNumber(). The animation control can use this to optimize the
+   * animation calculation by caching the animated version of the array and returning
+   * that one.
+   * \param bbox The bounding box of the factory of the genmesh
+   */
+  virtual const csBox3& UpdateBoundingBox (csTicks current, uint32 version_id, const csBox3& bbox) = 0;
+
+  /**
+   * Given the radius of the factory, return the radius of the whole genmesh.
+   * \param current The current time given by the virtual clock
+   * \param version_id The version number of the shape of the genmesh, as returned by
+   * iObjectModel::GetShapeNumber(). The animation control can use this to optimize the
+   * animation calculation by caching the animated version of the array and returning
+   * that one.
+   * \param radius The radius of the factory of the genmesh
+   */
+  virtual const float UpdateRadius (csTicks current, uint32 version_id, const float radius) = 0;
+
+  /**
+   * Return the animated bounding boxes of the given submesh.
+   * If this control doesn't animate the bounding boxes and radius, then it will simply do nothing and return nullptr.
+   * \param current The current time given by the virtual clock
+   * \param version_id The version number of the shape of the genmesh, as returned by
+   * iObjectModel::GetShapeNumber(). The animation control can use this to optimize the
+   * animation calculation by caching the animated version of the array and returning
+   * that one.
+   */
+  virtual const csBox3* UpdateBoundingBoxes (csTicks current, uint32 version_id) = 0;
 };
 
 /**

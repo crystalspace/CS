@@ -1,90 +1,159 @@
 <world>
+
     <variables>
         <variable name="LodM" value="-0.00666667" />
         <variable name="LodA" value="1.33333" />
     </variables>
+
     <plugins>
         <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
         <plugin name="genmeshfact">crystalspace.mesh.loader.factory.genmesh</plugin>
-        <plugin name="waterfact">crystalspace.mesh.loader.factory.watermesh</plugin>
-        <plugin name="water">crystalspace.mesh.loader.watermesh</plugin>
+        <plugin name="emitFact">crystalspace.mesh.loader.factory.emit</plugin>
+        <plugin name="emit">crystalspace.mesh.loader.emit</plugin>
     </plugins>
+
     <shaders>
         <shader>
-            <file>/shader/reflect/water_plane.xml</file>
+            <file>/shader/lighting/fullbright_fixed.xml</file>
         </shader>
         <shader>
-            <file>/shader/water/water.xml</file>
+            <file>/shader/particles/basic.xml</file>
         </shader>
         <shader>
-            <file>/shader/lighting/fullbright.xml</file>
+            <file>/shader/early_z/z_only_instanced.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/lighting/fullbright_instance.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/lighting/lighting_default_instance.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/lighting/lighting_default_instance_binalpha.xml</file>
         </shader>
     </shaders>
+
     <textures>
-        <texture name="normal map 1">
-            <file>/water/723-normal.jpg</file>
+        <texture name="fp2">
+            <file>/lib/stdtex/fp2.png</file>
         </texture>
-        <texture name="normal map 2">
-            <file>/water/w_normalmap.png</file>
+        <texture name="prop_mushrooms_001_co">
+            <file>textures/prop_mushrooms_001_col.dds</file>
         </texture>
-        <texture name="normal map 3">
-            <file>/water/940-bump.jpg</file>
+        <!--texture name="prop_mushrooms_001_ao">
+            <file>textures/prop_mushrooms_001_ao.dds</file>
         </texture>
-        <texture name="sky_001.dds">
-            <file>textures/sky_001.dds</file>
+        <texture name="prop_mushrooms_001_sp">
+            <file>textures/prop_mushrooms_001_spec.dds</file>
         </texture>
-        <texture name="BUMPgeneric_water_001_ani">
-            <file>textures/generic_water_001_ani</file>
+        <texture name="BUMPprop_mushrooms_001_no">
+            <file>textures/prop_mushrooms_001_nor.dds</file>
             <class>normalmap</class>
-            <mipmap>no</mipmap>
+        </texture-->
+        <texture name="prop_plants_groun.007">
+            <file>textures/prop_plants_ground_002_col.png</file>
+            <alpha>
+                <binary />
+            </alpha>
         </texture>
-        <texture name="water_envmap_01.dds">
-            <file>textures/water_envmap_01.dds</file>
+        <texture name="trees_bark_002_col.pn">
+            <file>textures/trees_bark_002_col.dds</file>
+        </texture>
+        <texture name="trees_leaves_003_col.">
+            <file>textures/trees_leaves_003_col.dds</file>
+            <alpha>
+                <binary />
+            </alpha>
         </texture>
     </textures>
+
     <materials>
-        <material name="oceanmat">
-            <shader type="standard">water</shader>
-            <shadervar name="tex normal" type="texture">normal map 2</shadervar>
-        </material>
         <material name="sky_001">
             <texture>sky_001.dds</texture>
-            <shader type="base">lighting_fullbright</shader>
+            <shader type="base">lighting_fullbright_fixed</shader>
             <shader type="diffuse">*null</shader>
         </material>
-        <material name="water_01">
-            <shader type="base">reflect_water_plane</shader>
-            <shader type="diffuse">reflect_water_plane</shader>
-            <shadervar name="tex normal" type="texture">BUMPgeneric_water_001_ani</shadervar>
-            <shadervar name="tex environment" type="texture">water_envmap_01.dds</shadervar>
-            <shadervar name="water fog color" type="vector4">0.4,0.7,0.9,0.5</shadervar>
-            <shadervar name="water perturb scale" type="vector4">10,10,0,0</shadervar>
-            <shadervar name="specular" type="vector4">0.4,0.7,0.9,1</shadervar>
+        <material name="fp2">
+            <texture>fp2</texture>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">particles_basic</shader>
+        </material>
+        <material name="mushrooms1">
+            <texture>prop_mushrooms_001_co</texture>
+            <shader type="oc_depthwrite">*null</shader>
+            <shader type="oc_depthtest">z_only_instanced</shader>
+            <shader type="base">lighting_default_instance</shader>
+            <shader type="diffuse">lighting_default_instance</shader>
+            <!--shadervar name="tex normal compressed" type="texture">BUMPprop_mushrooms_001_no</shadervar>
+            <shadervar name="tex specular" type="texture">prop_mushrooms_001_sp</shadervar>
+            <shadervar name="tex ambient occlussion" type="texture">prop_mushrooms_001_ao</shadervar>
+            <shadervar name="visible_layers" type="int">1</shadervar-->
+        </material>
+        <material name="plants1">
+            <texture>prop_plants_groun.007</texture>
+            <shader type="oc_depthwrite">*null</shader>
+            <shader type="oc_depthtest">z_only_instanced</shader>
+            <shader type="base">lighting_default_instance_binalpha</shader>
+            <shader type="diffuse">lighting_default_instance_binalpha</shader>
+            <!--shader type="terrain splat">terrain_splatting</shader-->
+            <!--shader type="base">lighting_default_binalpha</shader>
+            <shader type="diffuse">lighting_default_binalpha</shader>
+            <shadervar name="tex normal compressed" type="texture">BUMPprop_plants_groun</shadervar>
+            <shadervar name="tex specular" type="texture">prop_plants_groun.008</shadervar>
+            <shadervar name="shininess" type="float">2</shadervar-->
+        </material>
+        <material name="tree_brown">
+            <texture>trees_bark_002_col.pn</texture>
+            <shader type="oc_depthwrite">*null</shader>
+            <shader type="oc_depthtest">z_only_instanced</shader>
+            <shader type="base">lighting_default_instance</shader>
+            <shader type="diffuse">lighting_default_instance</shader>
+            <!--shader type="base">lighting_default_binalpha</shader>
+            <shader type="diffuse">lighting_default_binalpha</shader>
+            <shadervar name="tex normal compressed" type="texture">BUMPtrees_bark_002_nor.pn</shadervar>
+            <shadervar name="tex specular" type="texture">trees_bark_002_spec.p</shadervar-->
+        </material>
+        <material name="browntreeleaves">
+            <texture>trees_leaves_003_col.</texture>
+            <shader type="oc_depthwrite">*null</shader>
+            <shader type="oc_depthtest">z_only_instanced</shader>
+            <shader type="base">lighting_default_instance_binalpha</shader>
+            <shader type="diffuse">lighting_default_instance_binalpha</shader>
+            <!--shader type="base">lighting_default_binalpha</shader>
+            <shader type="diffuse">lighting_default_binalpha</shader-->
         </material>
     </materials>
-    <meshfact name="oceanfact">
-        <plugin>waterfact</plugin>
-        <params>
-	  <length>1000</length>
-	  <width>1000</width>
-            <isocean>no</isocean>
-        </params>
-    </meshfact>
+
     <library>terrain.cslib</library>
     <library>factories/skydome_frankieisland_SkyDome</library>
+    <library>factories/ground</library>
     <library>factories/water</library>
-    <start>
+    <library>factories/mushroom_or_001.004_mushroom_red_001mushroom_red_001_mushroom_red_001</library>
+    <library>factories/flowers_purple_01.015_flower_001.124flowers_s_white_01_flower_001.020</library>
+    <library>factories/tree.cslib</library>
+
+    <meshfact name="emitFact">
+        <plugin>emitFact</plugin>
+        <params />
+    </meshfact>
+
+    <start name="start_position">
         <sector>TerrainSector</sector>
-        <position x="500" y="200" z="500" />
-        <forward x="0" y="0" z="1" />
-        <up x="0" y="1" z="0" />
+        <position x="263" y="70" z="406" />
+        <!--position x="10" y="70" z="10" /-->
+        <up x="-0.135703" y="0.971338" z="-0.19516" />
+        <forward x="-0.55453" y="-0.237703" z="-0.797492" />
     </start>
+
     <sector name="TerrainSector">
+        <cullerp plugin="crystalspace.culling.frustvis"/>
+
         <light name="sun">
             <center x="-50000" y="86030" z="0" />
             <color red="1.25903" green="1.20995" blue="1.10420" />
             <radius>1000000</radius>
         </light>
+
         <meshobj name="Terrain">
             <plugin>crystalspace.mesh.loader.terrain2</plugin>
             <params>
@@ -95,27 +164,7 @@
             </move>
             <priority>wall</priority>
         </meshobj>
-        <meshobj name="ocean">
-            <plugin>water</plugin>
-            <params>
-                <factory>oceanfact</factory>
-                <material>oceanmat</material>
-            </params>
-            <move>
-                <v x="-250" y="50" z="-250" />
-            </move>
-        </meshobj>
-        <!--meshobj name="oceanreflect">
-            <plugin>water</plugin>
-            <params>
-                <factory>oceanfact</factory>
-                <material>oceanmat</material>
-            </params>
-            <move>
-	        <rotate x="3.1415927" />
-                <v x="-250" y="50" z="-250" />
-            </move>
-        </meshobj-->
+
         <meshobj name="skydome_frankieisland_SkyDome">
             <plugin>genmesh</plugin>
             <params>
@@ -130,21 +179,179 @@
             <move>
                 <v x="5000" y="0" z="5000" />
             </move>
+            <priority>sky</priority>
         </meshobj>
-        <!--meshobj name="water">
+
+        <meshobj name="water">
             <plugin>genmesh</plugin>
-            <noshadowreceive />
-            <priority>alpha</priority>
+            <!--noshadowreceive /-->
+            <noshadowcast />
+            <priority>transp</priority>
             <params>
                 <factory>water</factory>
             </params>
             <trimesh>
                 <id>colldet</id>
             </trimesh>
+            <move>
+                <v x="0.0" y="50.0" z="0.0" />
+            </move>
+            <zuse />
+        </meshobj>
+
+        <meshobj name="ground">
+            <plugin>genmesh</plugin>
+            <priority>wall</priority>
+            <params>
+                <factory>ground</factory>
+            </params>
+            <trimesh>
+                <id>colldet</id>
+            </trimesh>
             <zuse />
             <move>
-                <v x="15.022" y="1.9622" z="15.8728" />
+                <v x="0.0" y="38.0" z="0.0" />
             </move>
-        </meshobj-->
+        </meshobj>
+
+        <meshobj name="volcano_smoke">
+            <priority>alpha</priority>
+            <plugin>emit</plugin>
+            <ztest />
+            <move>
+                <v x="165.7" y="136.2" z="300.9" />
+            </move>
+            <params>
+                <factory>emitFact</factory>
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <number>30</number>
+                <material>fp2</material>
+                <regularparticles sides="8" radius="9" />
+                <lighting>no</lighting>
+                <totaltime>30000</totaltime>
+                <startpos>
+                    <emitsphere x="0" y="0.5" z="0" p="0" q="4" />
+                </startpos>
+                <startspeed>
+                    <emitsphere x="-0.3" y="0" z="0" p="0" q="3" />
+                </startspeed>
+                <startaccel>
+                    <emitfixed x="0" y="0.2" z="0" />
+                </startaccel>
+                <attractor>
+                    <emitcone x="0" y="-100.0" z="0" p="-0.7" q="0" r=".4" s="0" t="300" />
+                </attractor>
+                <attractorforce>-0.001</attractorforce>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>0</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>0.5</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>50</time>
+                    <alpha>0</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>0.5</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="0.2" />
+                    <time>150</time>
+                    <alpha>0.2</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>1</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="0.5" blue="0.2" />
+                    <time>250</time>
+                    <alpha>0.5</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>1</rotspeed>
+                    <scale>0.8</scale>
+                </aging>
+                <aging>
+                    <color red="0.2" green="0.2" blue="0.2" />
+                    <time>300</time>
+                    <alpha>0.5</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0.7</rotspeed>
+                    <scale>1.5</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0" blue="0" />
+                    <time>1500</time>
+                    <alpha>0.4</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0.6</rotspeed>
+                    <scale>1.5</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0" blue="0" />
+                    <time>30000</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>10</scale>
+                </aging>
+            </params>
+        </meshobj>
+
+        <meshgen name="grass">
+            <densityfactormap name="fertile">
+                <image>meshmaps/00000_00000.PNG</image>
+                <world2image>
+                    <m11>0.001953125</m11>
+                    <m12>0</m12>
+                    <m13>0</m13>
+                    <m14>0</m14>
+                    <m21>0</m21>
+                    <m22>0</m22>
+                    <m23>0.001953125</m23>
+                    <m24>0</m24>
+                    <m31>0</m31>
+                    <m32>0</m32>
+                    <m33>0</m33>
+                    <m34>0</m34>
+                    <m41>0</m41>
+                    <m42>0</m42>
+                    <m43>0</m43>
+                    <m44>0</m44>
+                </world2image>
+            </densityfactormap>
+            <geometry>
+                <factory maxdist="30" name="flowers_purple_01.015_flower_001.124flowers_s_white_01_flower_001.020" />
+                <radius>0</radius>
+                <density>.5</density>
+                <densityfactormap factor="1">fertile</densityfactormap>
+            </geometry>
+            <geometry>
+                <factory maxdist="30" name="mushroom_or_001.004_mushroom_red_001mushroom_red_001_mushroom_red_001" />
+                <radius>0.1</radius>
+                <density>.005</density>
+                <densityfactormap factor="1">fertile</densityfactormap>
+            </geometry>
+            <geometry>
+                <factory maxdist="40" name="tree" />
+                <radius>.4</radius>
+                <density>.05</density>
+                <densityfactormap factor="1">fertile</densityfactormap>
+            </geometry>
+            <!--<densityscale mindist="26" maxdist="30" maxfactor="0" />-->
+            <alphascale mindist="22" maxdist="30" />
+            <samplebox>
+                <min x="0" y="-200" z="0" />
+                <max x="512" y="300" z="512" />
+            </samplebox>
+            <meshobj>Terrain</meshobj>
+        </meshgen>
+
     </sector>
+
 </world>

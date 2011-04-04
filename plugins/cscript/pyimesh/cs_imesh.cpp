@@ -2530,7 +2530,7 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_CS__Graphics__RenderPriority swig_types[7]
 #define SWIGTYPE_p_CS__Memory__AllocatorMalloc swig_types[8]
 #define SWIGTYPE_p_CS__Memory__CustomAllocated swig_types[9]
-#define SWIGTYPE_p_CS__Mesh__csAnimatedMeshBoneInfluence swig_types[10]
+#define SWIGTYPE_p_CS__Mesh__AnimatedMeshBoneInfluence swig_types[10]
 #define SWIGTYPE_p_CS__Mesh__iAnimatedMesh swig_types[11]
 #define SWIGTYPE_p_CS__Mesh__iAnimatedMeshFactory swig_types[12]
 #define SWIGTYPE_p_CS__Mesh__iAnimatedMeshMorphTarget swig_types[13]
@@ -3407,15 +3407,6 @@ SWIGINTERN PyObject *iGeneralFactoryState_GetTrianglesAsBuffer(iGeneralFactorySt
     }
 SWIGINTERN int iGeneralFactoryState_scfGetVersion(){ return scfInterfaceTraits<iGeneralFactoryState>::GetVersion(); }
 SWIGINTERN void delete_iGeneralFactoryState(iGeneralFactoryState *self){ if (self) self->DecRef (); }
-SWIGINTERN int iSkeletonBone_scfGetVersion(){ return scfInterfaceTraits<iSkeletonBone>::GetVersion(); }
-SWIGINTERN void delete_iSkeletonBone(iSkeletonBone *self){ if (self) self->DecRef (); }
-
-SWIGINTERNINLINE PyObject *
-SWIG_From_unsigned_SS_int  (unsigned int value)
-{    
-  return SWIG_From_unsigned_SS_long  (value);
-}
-
 
   #define SWIG_From_double   PyFloat_FromDouble 
 
@@ -3424,6 +3415,15 @@ SWIGINTERNINLINE PyObject *
 SWIG_From_float  (float value)
 {    
   return SWIG_From_double  (value);
+}
+
+SWIGINTERN int iSkeletonBone_scfGetVersion(){ return scfInterfaceTraits<iSkeletonBone>::GetVersion(); }
+SWIGINTERN void delete_iSkeletonBone(iSkeletonBone *self){ if (self) self->DecRef (); }
+
+SWIGINTERNINLINE PyObject *
+SWIG_From_unsigned_SS_int  (unsigned int value)
+{    
+  return SWIG_From_unsigned_SS_long  (value);
 }
 
 SWIGINTERN int iSkeleton_scfGetVersion(){ return scfInterfaceTraits<iSkeleton>::GetVersion(); }
@@ -7885,6 +7885,172 @@ SWIGINTERN PyObject *_wrap_iGenMeshAnimationControl_UpdateColors(PyObject *SWIGU
   arg5 = static_cast< uint32 >(val5);
   result = (csColor4 *)(arg1)->UpdateColors(arg2,(csColor4 const *)arg3,arg4,arg5);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csColor4, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGenMeshAnimationControl_AnimatesBBoxRadius(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGenMeshAnimationControl *arg1 = (iGenMeshAnimationControl *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshAnimationControl_AnimatesBBoxRadius",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControl, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshAnimationControl_AnimatesBBoxRadius" "', argument " "1"" of type '" "iGenMeshAnimationControl const *""'"); 
+  }
+  arg1 = reinterpret_cast< iGenMeshAnimationControl * >(argp1);
+  result = (bool)((iGenMeshAnimationControl const *)arg1)->AnimatesBBoxRadius();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGenMeshAnimationControl_UpdateBoundingBox(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGenMeshAnimationControl *arg1 = (iGenMeshAnimationControl *) 0 ;
+  csTicks arg2 ;
+  uint32 arg3 ;
+  csBox3 *arg4 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  unsigned int val2 ;
+  int ecode2 = 0 ;
+  unsigned long val3 ;
+  int ecode3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  csBox3 *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshAnimationControl_UpdateBoundingBox",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControl, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshAnimationControl_UpdateBoundingBox" "', argument " "1"" of type '" "iGenMeshAnimationControl *""'"); 
+  }
+  arg1 = reinterpret_cast< iGenMeshAnimationControl * >(argp1);
+  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iGenMeshAnimationControl_UpdateBoundingBox" "', argument " "2"" of type '" "csTicks""'");
+  } 
+  arg2 = static_cast< csTicks >(val2);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iGenMeshAnimationControl_UpdateBoundingBox" "', argument " "3"" of type '" "uint32""'");
+  } 
+  arg3 = static_cast< uint32 >(val3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csBox3,  0  | 0);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iGenMeshAnimationControl_UpdateBoundingBox" "', argument " "4"" of type '" "csBox3 const &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iGenMeshAnimationControl_UpdateBoundingBox" "', argument " "4"" of type '" "csBox3 const &""'"); 
+  }
+  arg4 = reinterpret_cast< csBox3 * >(argp4);
+  {
+    csBox3 const &_result_ref = (arg1)->UpdateBoundingBox(arg2,arg3,(csBox3 const &)*arg4);
+    result = (csBox3 *) &_result_ref;
+  }
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csBox3, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGenMeshAnimationControl_UpdateRadius(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGenMeshAnimationControl *arg1 = (iGenMeshAnimationControl *) 0 ;
+  csTicks arg2 ;
+  uint32 arg3 ;
+  float arg4 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  unsigned int val2 ;
+  int ecode2 = 0 ;
+  unsigned long val3 ;
+  int ecode3 = 0 ;
+  float val4 ;
+  int ecode4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  float result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshAnimationControl_UpdateRadius",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControl, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshAnimationControl_UpdateRadius" "', argument " "1"" of type '" "iGenMeshAnimationControl *""'"); 
+  }
+  arg1 = reinterpret_cast< iGenMeshAnimationControl * >(argp1);
+  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iGenMeshAnimationControl_UpdateRadius" "', argument " "2"" of type '" "csTicks""'");
+  } 
+  arg2 = static_cast< csTicks >(val2);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iGenMeshAnimationControl_UpdateRadius" "', argument " "3"" of type '" "uint32""'");
+  } 
+  arg3 = static_cast< uint32 >(val3);
+  ecode4 = SWIG_AsVal_float(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iGenMeshAnimationControl_UpdateRadius" "', argument " "4"" of type '" "float""'");
+  } 
+  arg4 = static_cast< float >(val4);
+  result = (float)(arg1)->UpdateRadius(arg2,arg3,arg4);
+  resultobj = SWIG_From_float(static_cast< float >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGenMeshAnimationControl_UpdateBoundingBoxes(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGenMeshAnimationControl *arg1 = (iGenMeshAnimationControl *) 0 ;
+  csTicks arg2 ;
+  uint32 arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  unsigned int val2 ;
+  int ecode2 = 0 ;
+  unsigned long val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  csBox3 *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGenMeshAnimationControl_UpdateBoundingBoxes",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControl, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshAnimationControl_UpdateBoundingBoxes" "', argument " "1"" of type '" "iGenMeshAnimationControl *""'"); 
+  }
+  arg1 = reinterpret_cast< iGenMeshAnimationControl * >(argp1);
+  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iGenMeshAnimationControl_UpdateBoundingBoxes" "', argument " "2"" of type '" "csTicks""'");
+  } 
+  arg2 = static_cast< csTicks >(val2);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iGenMeshAnimationControl_UpdateBoundingBoxes" "', argument " "3"" of type '" "uint32""'");
+  } 
+  arg3 = static_cast< uint32 >(val3);
+  result = (csBox3 *)(arg1)->UpdateBoundingBoxes(arg2,arg3);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csBox3, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -13999,9 +14165,9 @@ SWIGINTERN PyObject *iGenMeshSkeletonControlState_swigregister(PyObject *SWIGUNU
   return SWIG_Py_Void();
 }
 
-SWIGINTERN PyObject *_wrap_csAnimatedMeshBoneInfluence_bone_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_AnimatedMeshBoneInfluence_bone_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  CS::Mesh::csAnimatedMeshBoneInfluence *arg1 = (CS::Mesh::csAnimatedMeshBoneInfluence *) 0 ;
+  CS::Mesh::AnimatedMeshBoneInfluence *arg1 = (CS::Mesh::AnimatedMeshBoneInfluence *) 0 ;
   CS::Animation::BoneID arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -14010,19 +14176,19 @@ SWIGINTERN PyObject *_wrap_csAnimatedMeshBoneInfluence_bone_set(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"csAnimatedMeshBoneInfluence_bone_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__csAnimatedMeshBoneInfluence, 0 |  0 );
+  if(!PyArg_UnpackTuple(args,(char *)"AnimatedMeshBoneInfluence_bone_set",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__AnimatedMeshBoneInfluence, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csAnimatedMeshBoneInfluence_bone_set" "', argument " "1"" of type '" "CS::Mesh::csAnimatedMeshBoneInfluence *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "AnimatedMeshBoneInfluence_bone_set" "', argument " "1"" of type '" "CS::Mesh::AnimatedMeshBoneInfluence *""'"); 
   }
-  arg1 = reinterpret_cast< CS::Mesh::csAnimatedMeshBoneInfluence * >(argp1);
+  arg1 = reinterpret_cast< CS::Mesh::AnimatedMeshBoneInfluence * >(argp1);
   {
     res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__Animation__BoneID,  0  | 0);
     if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csAnimatedMeshBoneInfluence_bone_set" "', argument " "2"" of type '" "CS::Animation::BoneID""'"); 
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "AnimatedMeshBoneInfluence_bone_set" "', argument " "2"" of type '" "CS::Animation::BoneID""'"); 
     }  
     if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csAnimatedMeshBoneInfluence_bone_set" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "AnimatedMeshBoneInfluence_bone_set" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
     } else {
       CS::Animation::BoneID * temp = reinterpret_cast< CS::Animation::BoneID * >(argp2);
       arg2 = *temp;
@@ -14037,20 +14203,20 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csAnimatedMeshBoneInfluence_bone_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_AnimatedMeshBoneInfluence_bone_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  CS::Mesh::csAnimatedMeshBoneInfluence *arg1 = (CS::Mesh::csAnimatedMeshBoneInfluence *) 0 ;
+  CS::Mesh::AnimatedMeshBoneInfluence *arg1 = (CS::Mesh::AnimatedMeshBoneInfluence *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   CS::Animation::BoneID result;
   
-  if(!PyArg_UnpackTuple(args,(char *)"csAnimatedMeshBoneInfluence_bone_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__csAnimatedMeshBoneInfluence, 0 |  0 );
+  if(!PyArg_UnpackTuple(args,(char *)"AnimatedMeshBoneInfluence_bone_get",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__AnimatedMeshBoneInfluence, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csAnimatedMeshBoneInfluence_bone_get" "', argument " "1"" of type '" "CS::Mesh::csAnimatedMeshBoneInfluence *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "AnimatedMeshBoneInfluence_bone_get" "', argument " "1"" of type '" "CS::Mesh::AnimatedMeshBoneInfluence *""'"); 
   }
-  arg1 = reinterpret_cast< CS::Mesh::csAnimatedMeshBoneInfluence * >(argp1);
+  arg1 = reinterpret_cast< CS::Mesh::AnimatedMeshBoneInfluence * >(argp1);
   result =  ((arg1)->bone);
   resultobj = SWIG_NewPointerObj((new CS::Animation::BoneID(static_cast< const CS::Animation::BoneID& >(result))), SWIGTYPE_p_CS__Animation__BoneID, SWIG_POINTER_OWN |  0 );
   return resultobj;
@@ -14059,9 +14225,9 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csAnimatedMeshBoneInfluence_influenceWeight_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_AnimatedMeshBoneInfluence_influenceWeight_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  CS::Mesh::csAnimatedMeshBoneInfluence *arg1 = (CS::Mesh::csAnimatedMeshBoneInfluence *) 0 ;
+  CS::Mesh::AnimatedMeshBoneInfluence *arg1 = (CS::Mesh::AnimatedMeshBoneInfluence *) 0 ;
   float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -14070,15 +14236,15 @@ SWIGINTERN PyObject *_wrap_csAnimatedMeshBoneInfluence_influenceWeight_set(PyObj
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"csAnimatedMeshBoneInfluence_influenceWeight_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__csAnimatedMeshBoneInfluence, 0 |  0 );
+  if(!PyArg_UnpackTuple(args,(char *)"AnimatedMeshBoneInfluence_influenceWeight_set",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__AnimatedMeshBoneInfluence, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csAnimatedMeshBoneInfluence_influenceWeight_set" "', argument " "1"" of type '" "CS::Mesh::csAnimatedMeshBoneInfluence *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "AnimatedMeshBoneInfluence_influenceWeight_set" "', argument " "1"" of type '" "CS::Mesh::AnimatedMeshBoneInfluence *""'"); 
   }
-  arg1 = reinterpret_cast< CS::Mesh::csAnimatedMeshBoneInfluence * >(argp1);
+  arg1 = reinterpret_cast< CS::Mesh::AnimatedMeshBoneInfluence * >(argp1);
   ecode2 = SWIG_AsVal_float(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csAnimatedMeshBoneInfluence_influenceWeight_set" "', argument " "2"" of type '" "float""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "AnimatedMeshBoneInfluence_influenceWeight_set" "', argument " "2"" of type '" "float""'");
   } 
   arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->influenceWeight = arg2;
@@ -14089,20 +14255,20 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csAnimatedMeshBoneInfluence_influenceWeight_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_AnimatedMeshBoneInfluence_influenceWeight_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  CS::Mesh::csAnimatedMeshBoneInfluence *arg1 = (CS::Mesh::csAnimatedMeshBoneInfluence *) 0 ;
+  CS::Mesh::AnimatedMeshBoneInfluence *arg1 = (CS::Mesh::AnimatedMeshBoneInfluence *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   float result;
   
-  if(!PyArg_UnpackTuple(args,(char *)"csAnimatedMeshBoneInfluence_influenceWeight_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__csAnimatedMeshBoneInfluence, 0 |  0 );
+  if(!PyArg_UnpackTuple(args,(char *)"AnimatedMeshBoneInfluence_influenceWeight_get",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__AnimatedMeshBoneInfluence, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csAnimatedMeshBoneInfluence_influenceWeight_get" "', argument " "1"" of type '" "CS::Mesh::csAnimatedMeshBoneInfluence *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "AnimatedMeshBoneInfluence_influenceWeight_get" "', argument " "1"" of type '" "CS::Mesh::AnimatedMeshBoneInfluence *""'"); 
   }
-  arg1 = reinterpret_cast< CS::Mesh::csAnimatedMeshBoneInfluence * >(argp1);
+  arg1 = reinterpret_cast< CS::Mesh::AnimatedMeshBoneInfluence * >(argp1);
   result = (float) ((arg1)->influenceWeight);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
@@ -14111,32 +14277,32 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_new_csAnimatedMeshBoneInfluence(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_new_AnimatedMeshBoneInfluence(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  CS::Mesh::csAnimatedMeshBoneInfluence *result = 0 ;
+  CS::Mesh::AnimatedMeshBoneInfluence *result = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"new_csAnimatedMeshBoneInfluence",0,0)) SWIG_fail;
-  result = (CS::Mesh::csAnimatedMeshBoneInfluence *)new CS::Mesh::csAnimatedMeshBoneInfluence();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Mesh__csAnimatedMeshBoneInfluence, SWIG_POINTER_NEW |  0 );
+  if(!PyArg_UnpackTuple(args,(char *)"new_AnimatedMeshBoneInfluence",0,0)) SWIG_fail;
+  result = (CS::Mesh::AnimatedMeshBoneInfluence *)new CS::Mesh::AnimatedMeshBoneInfluence();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Mesh__AnimatedMeshBoneInfluence, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
   return NULL;
 }
 
 
-SWIGINTERN PyObject *_wrap_delete_csAnimatedMeshBoneInfluence(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_delete_AnimatedMeshBoneInfluence(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  CS::Mesh::csAnimatedMeshBoneInfluence *arg1 = (CS::Mesh::csAnimatedMeshBoneInfluence *) 0 ;
+  CS::Mesh::AnimatedMeshBoneInfluence *arg1 = (CS::Mesh::AnimatedMeshBoneInfluence *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"delete_csAnimatedMeshBoneInfluence",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__csAnimatedMeshBoneInfluence, SWIG_POINTER_DISOWN |  0 );
+  if(!PyArg_UnpackTuple(args,(char *)"delete_AnimatedMeshBoneInfluence",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__AnimatedMeshBoneInfluence, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csAnimatedMeshBoneInfluence" "', argument " "1"" of type '" "CS::Mesh::csAnimatedMeshBoneInfluence *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_AnimatedMeshBoneInfluence" "', argument " "1"" of type '" "CS::Mesh::AnimatedMeshBoneInfluence *""'"); 
   }
-  arg1 = reinterpret_cast< CS::Mesh::csAnimatedMeshBoneInfluence * >(argp1);
+  arg1 = reinterpret_cast< CS::Mesh::AnimatedMeshBoneInfluence * >(argp1);
   delete arg1;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -14145,10 +14311,10 @@ fail:
 }
 
 
-SWIGINTERN PyObject *csAnimatedMeshBoneInfluence_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *AnimatedMeshBoneInfluence_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
-  SWIG_TypeNewClientData(SWIGTYPE_p_CS__Mesh__csAnimatedMeshBoneInfluence, SWIG_NewClientData(obj));
+  SWIG_TypeNewClientData(SWIGTYPE_p_CS__Mesh__AnimatedMeshBoneInfluence, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
 
@@ -15359,7 +15525,7 @@ SWIGINTERN PyObject *_wrap_iAnimatedMeshFactory_GetBoneInfluences(PyObject *SWIG
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  CS::Mesh::csAnimatedMeshBoneInfluence *result = 0 ;
+  CS::Mesh::AnimatedMeshBoneInfluence *result = 0 ;
   
   if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshFactory_GetBoneInfluences",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__iAnimatedMeshFactory, 0 |  0 );
@@ -15367,8 +15533,8 @@ SWIGINTERN PyObject *_wrap_iAnimatedMeshFactory_GetBoneInfluences(PyObject *SWIG
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMeshFactory_GetBoneInfluences" "', argument " "1"" of type '" "CS::Mesh::iAnimatedMeshFactory *""'"); 
   }
   arg1 = reinterpret_cast< CS::Mesh::iAnimatedMeshFactory * >(argp1);
-  result = (CS::Mesh::csAnimatedMeshBoneInfluence *)(arg1)->GetBoneInfluences();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Mesh__csAnimatedMeshBoneInfluence, 0 |  0 );
+  result = (CS::Mesh::AnimatedMeshBoneInfluence *)(arg1)->GetBoneInfluences();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Mesh__AnimatedMeshBoneInfluence, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -23531,7 +23697,59 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_LoadCoreSkeleton(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_LoadCoreSkeleton__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iSpriteCal3DFactoryState *arg1 = (iSpriteCal3DFactoryState *) 0 ;
+  iVFS *arg2 = (iVFS *) 0 ;
+  char *arg3 = (char *) 0 ;
+  int arg4 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_LoadCoreSkeleton",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_LoadCoreSkeleton" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
+  }
+  arg1 = reinterpret_cast< iSpriteCal3DFactoryState * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iVFS, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSpriteCal3DFactoryState_LoadCoreSkeleton" "', argument " "2"" of type '" "iVFS *""'"); 
+  }
+  arg2 = reinterpret_cast< iVFS * >(argp2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iSpriteCal3DFactoryState_LoadCoreSkeleton" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iSpriteCal3DFactoryState_LoadCoreSkeleton" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = static_cast< int >(val4);
+  result = (bool)(arg1)->LoadCoreSkeleton(arg2,(char const *)arg3,arg4);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  return resultobj;
+fail:
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_LoadCoreSkeleton__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iSpriteCal3DFactoryState *arg1 = (iSpriteCal3DFactoryState *) 0 ;
   iVFS *arg2 = (iVFS *) 0 ;
@@ -23574,6 +23792,68 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_LoadCoreSkeleton(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[5];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 4); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 3) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iSpriteCal3DFactoryState, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iVFS, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_AsCharPtrAndSize(argv[2], 0, NULL, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          return _wrap_iSpriteCal3DFactoryState_LoadCoreSkeleton__SWIG_1(self, args);
+        }
+      }
+    }
+  }
+  if (argc == 4) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iSpriteCal3DFactoryState, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iVFS, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_AsCharPtrAndSize(argv[2], 0, NULL, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          {
+            int res = SWIG_AsVal_int(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            return _wrap_iSpriteCal3DFactoryState_LoadCoreSkeleton__SWIG_0(self, args);
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iSpriteCal3DFactoryState_LoadCoreSkeleton'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    LoadCoreSkeleton(iSpriteCal3DFactoryState *,iVFS *,char const *,int)\n"
+    "    LoadCoreSkeleton(iSpriteCal3DFactoryState *,iVFS *,char const *)\n");
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_RescaleFactory(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iSpriteCal3DFactoryState *arg1 = (iSpriteCal3DFactoryState *) 0 ;
@@ -23604,7 +23884,143 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_LoadCoreAnimation(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_LoadCoreAnimation__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iSpriteCal3DFactoryState *arg1 = (iSpriteCal3DFactoryState *) 0 ;
+  iVFS *arg2 = (iVFS *) 0 ;
+  char *arg3 = (char *) 0 ;
+  char *arg4 = (char *) 0 ;
+  int arg5 ;
+  float arg6 ;
+  float arg7 ;
+  float arg8 ;
+  int arg9 ;
+  int arg10 ;
+  int arg11 ;
+  bool arg12 ;
+  int arg13 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  int res4 ;
+  char *buf4 = 0 ;
+  int alloc4 = 0 ;
+  int val5 ;
+  int ecode5 = 0 ;
+  float val6 ;
+  int ecode6 = 0 ;
+  float val7 ;
+  int ecode7 = 0 ;
+  float val8 ;
+  int ecode8 = 0 ;
+  int val9 ;
+  int ecode9 = 0 ;
+  int val10 ;
+  int ecode10 = 0 ;
+  int val11 ;
+  int ecode11 = 0 ;
+  bool val12 ;
+  int ecode12 = 0 ;
+  int val13 ;
+  int ecode13 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  PyObject * obj8 = 0 ;
+  PyObject * obj9 = 0 ;
+  PyObject * obj10 = 0 ;
+  PyObject * obj11 = 0 ;
+  PyObject * obj12 = 0 ;
+  int result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_LoadCoreAnimation",13,13,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8,&obj9,&obj10,&obj11,&obj12)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_LoadCoreAnimation" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
+  }
+  arg1 = reinterpret_cast< iSpriteCal3DFactoryState * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iVFS, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSpriteCal3DFactoryState_LoadCoreAnimation" "', argument " "2"" of type '" "iVFS *""'"); 
+  }
+  arg2 = reinterpret_cast< iVFS * >(argp2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iSpriteCal3DFactoryState_LoadCoreAnimation" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  res4 = SWIG_AsCharPtrAndSize(obj3, &buf4, NULL, &alloc4);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iSpriteCal3DFactoryState_LoadCoreAnimation" "', argument " "4"" of type '" "char const *""'");
+  }
+  arg4 = reinterpret_cast< char * >(buf4);
+  ecode5 = SWIG_AsVal_int(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iSpriteCal3DFactoryState_LoadCoreAnimation" "', argument " "5"" of type '" "int""'");
+  } 
+  arg5 = static_cast< int >(val5);
+  ecode6 = SWIG_AsVal_float(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iSpriteCal3DFactoryState_LoadCoreAnimation" "', argument " "6"" of type '" "float""'");
+  } 
+  arg6 = static_cast< float >(val6);
+  ecode7 = SWIG_AsVal_float(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iSpriteCal3DFactoryState_LoadCoreAnimation" "', argument " "7"" of type '" "float""'");
+  } 
+  arg7 = static_cast< float >(val7);
+  ecode8 = SWIG_AsVal_float(obj7, &val8);
+  if (!SWIG_IsOK(ecode8)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "iSpriteCal3DFactoryState_LoadCoreAnimation" "', argument " "8"" of type '" "float""'");
+  } 
+  arg8 = static_cast< float >(val8);
+  ecode9 = SWIG_AsVal_int(obj8, &val9);
+  if (!SWIG_IsOK(ecode9)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "iSpriteCal3DFactoryState_LoadCoreAnimation" "', argument " "9"" of type '" "int""'");
+  } 
+  arg9 = static_cast< int >(val9);
+  ecode10 = SWIG_AsVal_int(obj9, &val10);
+  if (!SWIG_IsOK(ecode10)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode10), "in method '" "iSpriteCal3DFactoryState_LoadCoreAnimation" "', argument " "10"" of type '" "int""'");
+  } 
+  arg10 = static_cast< int >(val10);
+  ecode11 = SWIG_AsVal_int(obj10, &val11);
+  if (!SWIG_IsOK(ecode11)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode11), "in method '" "iSpriteCal3DFactoryState_LoadCoreAnimation" "', argument " "11"" of type '" "int""'");
+  } 
+  arg11 = static_cast< int >(val11);
+  ecode12 = SWIG_AsVal_bool(obj11, &val12);
+  if (!SWIG_IsOK(ecode12)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode12), "in method '" "iSpriteCal3DFactoryState_LoadCoreAnimation" "', argument " "12"" of type '" "bool""'");
+  } 
+  arg12 = static_cast< bool >(val12);
+  ecode13 = SWIG_AsVal_int(obj12, &val13);
+  if (!SWIG_IsOK(ecode13)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode13), "in method '" "iSpriteCal3DFactoryState_LoadCoreAnimation" "', argument " "13"" of type '" "int""'");
+  } 
+  arg13 = static_cast< int >(val13);
+  result = (int)(arg1)->LoadCoreAnimation(arg2,(char const *)arg3,(char const *)arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13);
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  return resultobj;
+fail:
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_LoadCoreAnimation__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iSpriteCal3DFactoryState *arg1 = (iSpriteCal3DFactoryState *) 0 ;
   iVFS *arg2 = (iVFS *) 0 ;
@@ -23731,7 +24147,255 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_LoadCoreMesh(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_LoadCoreAnimation(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[14];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 13); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 12) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iSpriteCal3DFactoryState, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iVFS, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_AsCharPtrAndSize(argv[2], 0, NULL, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          int res = SWIG_AsCharPtrAndSize(argv[3], 0, NULL, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            {
+              int res = SWIG_AsVal_int(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              {
+                int res = SWIG_AsVal_float(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_float(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  {
+                    int res = SWIG_AsVal_float(argv[7], NULL);
+                    _v = SWIG_CheckState(res);
+                  }
+                  if (_v) {
+                    {
+                      int res = SWIG_AsVal_int(argv[8], NULL);
+                      _v = SWIG_CheckState(res);
+                    }
+                    if (_v) {
+                      {
+                        int res = SWIG_AsVal_int(argv[9], NULL);
+                        _v = SWIG_CheckState(res);
+                      }
+                      if (_v) {
+                        {
+                          int res = SWIG_AsVal_int(argv[10], NULL);
+                          _v = SWIG_CheckState(res);
+                        }
+                        if (_v) {
+                          {
+                            int res = SWIG_AsVal_bool(argv[11], NULL);
+                            _v = SWIG_CheckState(res);
+                          }
+                          if (_v) {
+                            return _wrap_iSpriteCal3DFactoryState_LoadCoreAnimation__SWIG_1(self, args);
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 13) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iSpriteCal3DFactoryState, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iVFS, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_AsCharPtrAndSize(argv[2], 0, NULL, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          int res = SWIG_AsCharPtrAndSize(argv[3], 0, NULL, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            {
+              int res = SWIG_AsVal_int(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              {
+                int res = SWIG_AsVal_float(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_float(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  {
+                    int res = SWIG_AsVal_float(argv[7], NULL);
+                    _v = SWIG_CheckState(res);
+                  }
+                  if (_v) {
+                    {
+                      int res = SWIG_AsVal_int(argv[8], NULL);
+                      _v = SWIG_CheckState(res);
+                    }
+                    if (_v) {
+                      {
+                        int res = SWIG_AsVal_int(argv[9], NULL);
+                        _v = SWIG_CheckState(res);
+                      }
+                      if (_v) {
+                        {
+                          int res = SWIG_AsVal_int(argv[10], NULL);
+                          _v = SWIG_CheckState(res);
+                        }
+                        if (_v) {
+                          {
+                            int res = SWIG_AsVal_bool(argv[11], NULL);
+                            _v = SWIG_CheckState(res);
+                          }
+                          if (_v) {
+                            {
+                              int res = SWIG_AsVal_int(argv[12], NULL);
+                              _v = SWIG_CheckState(res);
+                            }
+                            if (_v) {
+                              return _wrap_iSpriteCal3DFactoryState_LoadCoreAnimation__SWIG_0(self, args);
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iSpriteCal3DFactoryState_LoadCoreAnimation'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    LoadCoreAnimation(iSpriteCal3DFactoryState *,iVFS *,char const *,char const *,int,float,float,float,int,int,int,bool,int)\n"
+    "    LoadCoreAnimation(iSpriteCal3DFactoryState *,iVFS *,char const *,char const *,int,float,float,float,int,int,int,bool)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_LoadCoreMesh__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iSpriteCal3DFactoryState *arg1 = (iSpriteCal3DFactoryState *) 0 ;
+  iVFS *arg2 = (iVFS *) 0 ;
+  char *arg3 = (char *) 0 ;
+  char *arg4 = (char *) 0 ;
+  bool arg5 ;
+  iMaterialWrapper *arg6 = (iMaterialWrapper *) 0 ;
+  int arg7 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  int res4 ;
+  char *buf4 = 0 ;
+  int alloc4 = 0 ;
+  bool val5 ;
+  int ecode5 = 0 ;
+  void *argp6 = 0 ;
+  int res6 = 0 ;
+  int val7 ;
+  int ecode7 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  int result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_LoadCoreMesh",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_LoadCoreMesh" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
+  }
+  arg1 = reinterpret_cast< iSpriteCal3DFactoryState * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iVFS, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSpriteCal3DFactoryState_LoadCoreMesh" "', argument " "2"" of type '" "iVFS *""'"); 
+  }
+  arg2 = reinterpret_cast< iVFS * >(argp2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iSpriteCal3DFactoryState_LoadCoreMesh" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  res4 = SWIG_AsCharPtrAndSize(obj3, &buf4, NULL, &alloc4);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iSpriteCal3DFactoryState_LoadCoreMesh" "', argument " "4"" of type '" "char const *""'");
+  }
+  arg4 = reinterpret_cast< char * >(buf4);
+  ecode5 = SWIG_AsVal_bool(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iSpriteCal3DFactoryState_LoadCoreMesh" "', argument " "5"" of type '" "bool""'");
+  } 
+  arg5 = static_cast< bool >(val5);
+  res6 = SWIG_ConvertPtr(obj5, &argp6,SWIGTYPE_p_iMaterialWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "iSpriteCal3DFactoryState_LoadCoreMesh" "', argument " "6"" of type '" "iMaterialWrapper *""'"); 
+  }
+  arg6 = reinterpret_cast< iMaterialWrapper * >(argp6);
+  ecode7 = SWIG_AsVal_int(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iSpriteCal3DFactoryState_LoadCoreMesh" "', argument " "7"" of type '" "int""'");
+  } 
+  arg7 = static_cast< int >(val7);
+  result = (int)(arg1)->LoadCoreMesh(arg2,(char const *)arg3,(char const *)arg4,arg5,arg6,arg7);
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  return resultobj;
+fail:
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_LoadCoreMesh__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iSpriteCal3DFactoryState *arg1 = (iSpriteCal3DFactoryState *) 0 ;
   iVFS *arg2 = (iVFS *) 0 ;
@@ -23804,7 +24468,172 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_LoadCoreMorphTarget(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_LoadCoreMesh(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[8];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 7); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 6) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iSpriteCal3DFactoryState, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iVFS, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_AsCharPtrAndSize(argv[2], 0, NULL, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          int res = SWIG_AsCharPtrAndSize(argv[3], 0, NULL, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            {
+              int res = SWIG_AsVal_bool(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              void *vptr = 0;
+              int res = SWIG_ConvertPtr(argv[5], &vptr, SWIGTYPE_p_iMaterialWrapper, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                return _wrap_iSpriteCal3DFactoryState_LoadCoreMesh__SWIG_1(self, args);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 7) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iSpriteCal3DFactoryState, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iVFS, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_AsCharPtrAndSize(argv[2], 0, NULL, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          int res = SWIG_AsCharPtrAndSize(argv[3], 0, NULL, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            {
+              int res = SWIG_AsVal_bool(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              void *vptr = 0;
+              int res = SWIG_ConvertPtr(argv[5], &vptr, SWIGTYPE_p_iMaterialWrapper, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_int(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  return _wrap_iSpriteCal3DFactoryState_LoadCoreMesh__SWIG_0(self, args);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iSpriteCal3DFactoryState_LoadCoreMesh'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    LoadCoreMesh(iSpriteCal3DFactoryState *,iVFS *,char const *,char const *,bool,iMaterialWrapper *,int)\n"
+    "    LoadCoreMesh(iSpriteCal3DFactoryState *,iVFS *,char const *,char const *,bool,iMaterialWrapper *)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_LoadCoreMorphTarget__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iSpriteCal3DFactoryState *arg1 = (iSpriteCal3DFactoryState *) 0 ;
+  iVFS *arg2 = (iVFS *) 0 ;
+  int arg3 ;
+  char *arg4 = (char *) 0 ;
+  char *arg5 = (char *) 0 ;
+  int arg6 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  int res4 ;
+  char *buf4 = 0 ;
+  int alloc4 = 0 ;
+  int res5 ;
+  char *buf5 = 0 ;
+  int alloc5 = 0 ;
+  int val6 ;
+  int ecode6 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  int result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSpriteCal3DFactoryState_LoadCoreMorphTarget",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSpriteCal3DFactoryState, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSpriteCal3DFactoryState_LoadCoreMorphTarget" "', argument " "1"" of type '" "iSpriteCal3DFactoryState *""'"); 
+  }
+  arg1 = reinterpret_cast< iSpriteCal3DFactoryState * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iVFS, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSpriteCal3DFactoryState_LoadCoreMorphTarget" "', argument " "2"" of type '" "iVFS *""'"); 
+  }
+  arg2 = reinterpret_cast< iVFS * >(argp2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iSpriteCal3DFactoryState_LoadCoreMorphTarget" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  res4 = SWIG_AsCharPtrAndSize(obj3, &buf4, NULL, &alloc4);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iSpriteCal3DFactoryState_LoadCoreMorphTarget" "', argument " "4"" of type '" "char const *""'");
+  }
+  arg4 = reinterpret_cast< char * >(buf4);
+  res5 = SWIG_AsCharPtrAndSize(obj4, &buf5, NULL, &alloc5);
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iSpriteCal3DFactoryState_LoadCoreMorphTarget" "', argument " "5"" of type '" "char const *""'");
+  }
+  arg5 = reinterpret_cast< char * >(buf5);
+  ecode6 = SWIG_AsVal_int(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iSpriteCal3DFactoryState_LoadCoreMorphTarget" "', argument " "6"" of type '" "int""'");
+  } 
+  arg6 = static_cast< int >(val6);
+  result = (int)(arg1)->LoadCoreMorphTarget(arg2,arg3,(char const *)arg4,(char const *)arg5,arg6);
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  if (alloc5 == SWIG_NEWOBJ) delete[] buf5;
+  return resultobj;
+fail:
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  if (alloc5 == SWIG_NEWOBJ) delete[] buf5;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_LoadCoreMorphTarget__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iSpriteCal3DFactoryState *arg1 = (iSpriteCal3DFactoryState *) 0 ;
   iVFS *arg2 = (iVFS *) 0 ;
@@ -23864,6 +24693,88 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_LoadCoreMorphTarget(PyObject
 fail:
   if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
   if (alloc5 == SWIG_NEWOBJ) delete[] buf5;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSpriteCal3DFactoryState_LoadCoreMorphTarget(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[7];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 6); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 5) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iSpriteCal3DFactoryState, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iVFS, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        {
+          int res = SWIG_AsVal_int(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          int res = SWIG_AsCharPtrAndSize(argv[3], 0, NULL, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            int res = SWIG_AsCharPtrAndSize(argv[4], 0, NULL, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              return _wrap_iSpriteCal3DFactoryState_LoadCoreMorphTarget__SWIG_1(self, args);
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 6) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iSpriteCal3DFactoryState, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iVFS, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        {
+          int res = SWIG_AsVal_int(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          int res = SWIG_AsCharPtrAndSize(argv[3], 0, NULL, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            int res = SWIG_AsCharPtrAndSize(argv[4], 0, NULL, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              {
+                int res = SWIG_AsVal_int(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                return _wrap_iSpriteCal3DFactoryState_LoadCoreMorphTarget__SWIG_0(self, args);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iSpriteCal3DFactoryState_LoadCoreMorphTarget'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    LoadCoreMorphTarget(iSpriteCal3DFactoryState *,iVFS *,int,char const *,char const *,int)\n"
+    "    LoadCoreMorphTarget(iSpriteCal3DFactoryState *,iVFS *,int,char const *,char const *)\n");
   return NULL;
 }
 
@@ -27327,7 +28238,6 @@ SWIGINTERN PyObject *_wrap_iMeshObject_HitBeamObject(PyObject *SWIGUNUSEDPARM(se
   float *arg5 = (float *) 0 ;
   int *arg6 = (int *) 0 ;
   iMaterialWrapper **arg7 = (iMaterialWrapper **) 0 ;
-  iMaterialArray *arg8 = (iMaterialArray *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -27342,19 +28252,16 @@ SWIGINTERN PyObject *_wrap_iMeshObject_HitBeamObject(PyObject *SWIGUNUSEDPARM(se
   int res6 = SWIG_TMPOBJ ;
   void *argp7 = 0 ;
   int res7 = 0 ;
-  void *argp8 = 0 ;
-  int res8 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
-  PyObject * obj5 = 0 ;
   bool result;
   
   arg5 = &temp5;
   arg6 = &temp6;
-  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_HitBeamObject",4,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_HitBeamObject",4,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_HitBeamObject" "', argument " "1"" of type '" "iMeshObject *""'"); 
@@ -27391,14 +28298,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_HitBeamObject(PyObject *SWIGUNUSEDPARM(se
     }
     arg7 = reinterpret_cast< iMaterialWrapper ** >(argp7);
   }
-  if (obj5) {
-    res8 = SWIG_ConvertPtr(obj5, &argp8,SWIGTYPE_p_iMaterialArray, 0 |  0 );
-    if (!SWIG_IsOK(res8)) {
-      SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "iMeshObject_HitBeamObject" "', argument " "8"" of type '" "iMaterialArray *""'"); 
-    }
-    arg8 = reinterpret_cast< iMaterialArray * >(argp8);
-  }
-  result = (bool)(arg1)->HitBeamObject((csVector3 const &)*arg2,(csVector3 const &)*arg3,*arg4,arg5,arg6,arg7,arg8);
+  result = (bool)(arg1)->HitBeamObject((csVector3 const &)*arg2,(csVector3 const &)*arg3,*arg4,arg5,arg6,arg7);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   if (SWIG_IsTmpObj(res5)) {
     resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_float((*arg5)));
@@ -33158,6 +34058,73 @@ SWIGINTERN PyObject *_wrap_iTerrainCollider_CollideSegment__SWIG_1(PyObject *SWI
   iTerrainCell *arg2 = (iTerrainCell *) 0 ;
   csVector3 *arg3 = 0 ;
   csVector3 *arg4 = 0 ;
+  csVector3 *arg5 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCollider_CollideSegment",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCollider, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCollider_CollideSegment" "', argument " "1"" of type '" "iTerrainCollider *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainCollider * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iTerrainCell, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTerrainCollider_CollideSegment" "', argument " "2"" of type '" "iTerrainCell *""'"); 
+  }
+  arg2 = reinterpret_cast< iTerrainCell * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iTerrainCollider_CollideSegment" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainCollider_CollideSegment" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  arg3 = reinterpret_cast< csVector3 * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iTerrainCollider_CollideSegment" "', argument " "4"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainCollider_CollideSegment" "', argument " "4"" of type '" "csVector3 const &""'"); 
+  }
+  arg4 = reinterpret_cast< csVector3 * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csVector3,  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iTerrainCollider_CollideSegment" "', argument " "5"" of type '" "csVector3 &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainCollider_CollideSegment" "', argument " "5"" of type '" "csVector3 &""'"); 
+  }
+  arg5 = reinterpret_cast< csVector3 * >(argp5);
+  result = (bool)(arg1)->CollideSegment(arg2,(csVector3 const &)*arg3,(csVector3 const &)*arg4,*arg5);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainCollider_CollideSegment__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainCollider *arg1 = (iTerrainCollider *) 0 ;
+  iTerrainCell *arg2 = (iTerrainCell *) 0 ;
+  csVector3 *arg3 = 0 ;
+  csVector3 *arg4 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -33233,7 +34200,34 @@ SWIGINTERN PyObject *_wrap_iTerrainCollider_CollideSegment(PyObject *self, PyObj
           int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csVector3, 0);
           _v = SWIG_CheckState(res);
           if (_v) {
-            return _wrap_iTerrainCollider_CollideSegment__SWIG_1(self, args);
+            return _wrap_iTerrainCollider_CollideSegment__SWIG_2(self, args);
+          }
+        }
+      }
+    }
+  }
+  if (argc == 5) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iTerrainCollider, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iTerrainCell, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_csVector3, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csVector3, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            void *vptr = 0;
+            int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_csVector3, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              return _wrap_iTerrainCollider_CollideSegment__SWIG_1(self, args);
+            }
           }
         }
       }
@@ -33277,6 +34271,7 @@ fail:
   SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iTerrainCollider_CollideSegment'.\n"
     "  Possible C/C++ prototypes are:\n"
     "    CollideSegment(iTerrainCollider *,iTerrainCell *,csVector3 const &,csVector3 const &,bool,iTerrainVector3Array *)\n"
+    "    CollideSegment(iTerrainCollider *,iTerrainCell *,csVector3 const &,csVector3 const &,csVector3 &)\n"
     "    CollideSegment(iTerrainCollider *,iTerrainCell *,csVector3 const &,csVector3 const &)\n");
   return NULL;
 }
@@ -34720,6 +35715,73 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideSegment__SWIG_1(PyObject *SWIGU
   iTerrainSystem *arg1 = (iTerrainSystem *) 0 ;
   csVector3 *arg2 = 0 ;
   csVector3 *arg3 = 0 ;
+  csVector3 *arg4 = 0 ;
+  iMaterialWrapper **arg5 = (iMaterialWrapper **) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_CollideSegment",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_CollideSegment" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainSystem * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTerrainSystem_CollideSegment" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainSystem_CollideSegment" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  arg2 = reinterpret_cast< csVector3 * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iTerrainSystem_CollideSegment" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainSystem_CollideSegment" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  arg3 = reinterpret_cast< csVector3 * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iTerrainSystem_CollideSegment" "', argument " "4"" of type '" "csVector3 &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainSystem_CollideSegment" "', argument " "4"" of type '" "csVector3 &""'"); 
+  }
+  arg4 = reinterpret_cast< csVector3 * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5,SWIGTYPE_p_p_iMaterialWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iTerrainSystem_CollideSegment" "', argument " "5"" of type '" "iMaterialWrapper **""'"); 
+  }
+  arg5 = reinterpret_cast< iMaterialWrapper ** >(argp5);
+  result = (bool)(arg1)->CollideSegment((csVector3 const &)*arg2,(csVector3 const &)*arg3,*arg4,arg5);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideSegment__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainSystem *arg1 = (iTerrainSystem *) 0 ;
+  csVector3 *arg2 = 0 ;
+  csVector3 *arg3 = 0 ;
   bool arg4 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -34770,7 +35832,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideSegment__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideSegment__SWIG_3(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iTerrainSystem *arg1 = (iTerrainSystem *) 0 ;
   csVector3 *arg2 = 0 ;
@@ -34838,7 +35900,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideSegment(PyObject *self, PyObjec
         int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_csVector3, 0);
         _v = SWIG_CheckState(res);
         if (_v) {
-          return _wrap_iTerrainSystem_CollideSegment__SWIG_2(self, args);
+          return _wrap_iTerrainSystem_CollideSegment__SWIG_3(self, args);
         }
       }
     }
@@ -34860,7 +35922,34 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideSegment(PyObject *self, PyObjec
             _v = SWIG_CheckState(res);
           }
           if (_v) {
-            return _wrap_iTerrainSystem_CollideSegment__SWIG_1(self, args);
+            return _wrap_iTerrainSystem_CollideSegment__SWIG_2(self, args);
+          }
+        }
+      }
+    }
+  }
+  if (argc == 5) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iTerrainSystem, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csVector3, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_csVector3, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          void *vptr = 0;
+          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_csVector3, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            void *vptr = 0;
+            int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_p_iMaterialWrapper, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              return _wrap_iTerrainSystem_CollideSegment__SWIG_1(self, args);
+            }
           }
         }
       }
@@ -34904,6 +35993,7 @@ fail:
   SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iTerrainSystem_CollideSegment'.\n"
     "  Possible C/C++ prototypes are:\n"
     "    CollideSegment(iTerrainSystem *,csVector3 const &,csVector3 const &,bool,iTerrainVector3Array *,iMaterialArray *)\n"
+    "    CollideSegment(iTerrainSystem *,csVector3 const &,csVector3 const &,csVector3 &,iMaterialWrapper **)\n"
     "    CollideSegment(iTerrainSystem *,csVector3 const &,csVector3 const &,bool)\n"
     "    CollideSegment(iTerrainSystem *,csVector3 const &,csVector3 const &)\n");
   return NULL;
@@ -36505,7 +37595,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iTerrainCell_CollideSegment(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iTerrainCell_CollideSegment__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iTerrainCell *arg1 = (iTerrainCell *) 0 ;
   csVector3 *arg2 = 0 ;
@@ -36565,6 +37655,134 @@ SWIGINTERN PyObject *_wrap_iTerrainCell_CollideSegment(PyObject *SWIGUNUSEDPARM(
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainCell_CollideSegment__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainCell *arg1 = (iTerrainCell *) 0 ;
+  csVector3 *arg2 = 0 ;
+  csVector3 *arg3 = 0 ;
+  csVector3 *arg4 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCell_CollideSegment",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCell, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCell_CollideSegment" "', argument " "1"" of type '" "iTerrainCell *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainCell * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iTerrainCell_CollideSegment" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainCell_CollideSegment" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  arg2 = reinterpret_cast< csVector3 * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iTerrainCell_CollideSegment" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainCell_CollideSegment" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  arg3 = reinterpret_cast< csVector3 * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iTerrainCell_CollideSegment" "', argument " "4"" of type '" "csVector3 &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iTerrainCell_CollideSegment" "', argument " "4"" of type '" "csVector3 &""'"); 
+  }
+  arg4 = reinterpret_cast< csVector3 * >(argp4);
+  result = (bool)(arg1)->CollideSegment((csVector3 const &)*arg2,(csVector3 const &)*arg3,*arg4);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainCell_CollideSegment(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[6];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 5); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 4) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iTerrainCell, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csVector3, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_csVector3, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          void *vptr = 0;
+          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_csVector3, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            return _wrap_iTerrainCell_CollideSegment__SWIG_1(self, args);
+          }
+        }
+      }
+    }
+  }
+  if (argc == 5) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iTerrainCell, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csVector3, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_csVector3, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          {
+            int res = SWIG_AsVal_bool(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            void *vptr = 0;
+            int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_iTerrainVector3Array, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              return _wrap_iTerrainCell_CollideSegment__SWIG_0(self, args);
+            }
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iTerrainCell_CollideSegment'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    CollideSegment(iTerrainCell *,csVector3 const &,csVector3 const &,bool,iTerrainVector3Array *)\n"
+    "    CollideSegment(iTerrainCell *,csVector3 const &,csVector3 const &,csVector3 &)\n");
   return NULL;
 }
 
@@ -44694,6 +45912,10 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iGenMeshAnimationControl_UpdateTexels", _wrap_iGenMeshAnimationControl_UpdateTexels, METH_VARARGS, NULL},
 	 { (char *)"iGenMeshAnimationControl_UpdateNormals", _wrap_iGenMeshAnimationControl_UpdateNormals, METH_VARARGS, NULL},
 	 { (char *)"iGenMeshAnimationControl_UpdateColors", _wrap_iGenMeshAnimationControl_UpdateColors, METH_VARARGS, NULL},
+	 { (char *)"iGenMeshAnimationControl_AnimatesBBoxRadius", _wrap_iGenMeshAnimationControl_AnimatesBBoxRadius, METH_VARARGS, NULL},
+	 { (char *)"iGenMeshAnimationControl_UpdateBoundingBox", _wrap_iGenMeshAnimationControl_UpdateBoundingBox, METH_VARARGS, NULL},
+	 { (char *)"iGenMeshAnimationControl_UpdateRadius", _wrap_iGenMeshAnimationControl_UpdateRadius, METH_VARARGS, NULL},
+	 { (char *)"iGenMeshAnimationControl_UpdateBoundingBoxes", _wrap_iGenMeshAnimationControl_UpdateBoundingBoxes, METH_VARARGS, NULL},
 	 { (char *)"delete_iGenMeshAnimationControl", _wrap_delete_iGenMeshAnimationControl, METH_VARARGS, NULL},
 	 { (char *)"iGenMeshAnimationControl_swigregister", iGenMeshAnimationControl_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iGenMeshAnimationControlFactory_CreateAnimationControl", _wrap_iGenMeshAnimationControlFactory_CreateAnimationControl, METH_VARARGS, NULL},
@@ -44919,13 +46141,13 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iGenMeshSkeletonControlState_scfGetVersion", _wrap_iGenMeshSkeletonControlState_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iGenMeshSkeletonControlState", _wrap_delete_iGenMeshSkeletonControlState, METH_VARARGS, NULL},
 	 { (char *)"iGenMeshSkeletonControlState_swigregister", iGenMeshSkeletonControlState_swigregister, METH_VARARGS, NULL},
-	 { (char *)"csAnimatedMeshBoneInfluence_bone_set", _wrap_csAnimatedMeshBoneInfluence_bone_set, METH_VARARGS, NULL},
-	 { (char *)"csAnimatedMeshBoneInfluence_bone_get", _wrap_csAnimatedMeshBoneInfluence_bone_get, METH_VARARGS, NULL},
-	 { (char *)"csAnimatedMeshBoneInfluence_influenceWeight_set", _wrap_csAnimatedMeshBoneInfluence_influenceWeight_set, METH_VARARGS, NULL},
-	 { (char *)"csAnimatedMeshBoneInfluence_influenceWeight_get", _wrap_csAnimatedMeshBoneInfluence_influenceWeight_get, METH_VARARGS, NULL},
-	 { (char *)"new_csAnimatedMeshBoneInfluence", _wrap_new_csAnimatedMeshBoneInfluence, METH_VARARGS, NULL},
-	 { (char *)"delete_csAnimatedMeshBoneInfluence", _wrap_delete_csAnimatedMeshBoneInfluence, METH_VARARGS, NULL},
-	 { (char *)"csAnimatedMeshBoneInfluence_swigregister", csAnimatedMeshBoneInfluence_swigregister, METH_VARARGS, NULL},
+	 { (char *)"AnimatedMeshBoneInfluence_bone_set", _wrap_AnimatedMeshBoneInfluence_bone_set, METH_VARARGS, NULL},
+	 { (char *)"AnimatedMeshBoneInfluence_bone_get", _wrap_AnimatedMeshBoneInfluence_bone_get, METH_VARARGS, NULL},
+	 { (char *)"AnimatedMeshBoneInfluence_influenceWeight_set", _wrap_AnimatedMeshBoneInfluence_influenceWeight_set, METH_VARARGS, NULL},
+	 { (char *)"AnimatedMeshBoneInfluence_influenceWeight_get", _wrap_AnimatedMeshBoneInfluence_influenceWeight_get, METH_VARARGS, NULL},
+	 { (char *)"new_AnimatedMeshBoneInfluence", _wrap_new_AnimatedMeshBoneInfluence, METH_VARARGS, NULL},
+	 { (char *)"delete_AnimatedMeshBoneInfluence", _wrap_delete_AnimatedMeshBoneInfluence, METH_VARARGS, NULL},
+	 { (char *)"AnimatedMeshBoneInfluence_swigregister", AnimatedMeshBoneInfluence_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSocketFactory_GetName", _wrap_iAnimatedMeshSocketFactory_GetName, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSocketFactory_SetName", _wrap_iAnimatedMeshSocketFactory_SetName, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSocketFactory_GetTransform", _wrap_iAnimatedMeshSocketFactory_GetTransform, METH_VARARGS, NULL},
@@ -46794,13 +48016,13 @@ static swig_type_info _swigt__p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT
 static swig_type_info _swigt__p_csArrayT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_csArrayElementHandlerT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t = {"_p_csArrayT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_csArrayElementHandlerT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_csArrayT_csPluginRequest_csArrayElementHandlerT_csPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t = {"_p_csArrayT_csPluginRequest_csArrayElementHandlerT_csPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_csTriangleMeshEdge = {"_p_csTriangleMeshEdge", 0, 0, 0, 0, 0};
-static swig_type_info _swigt__p_CS__Mesh__csAnimatedMeshBoneInfluence = {"_p_CS__Mesh__csAnimatedMeshBoneInfluence", "CS::Mesh::csAnimatedMeshBoneInfluence *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_CS__Mesh__iAnimatedMesh = {"_p_CS__Mesh__iAnimatedMesh", "CS::Mesh::iAnimatedMesh *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_CS__Mesh__iAnimatedMeshFactory = {"_p_CS__Mesh__iAnimatedMeshFactory", "CS::Mesh::iAnimatedMeshFactory *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_CS__Mesh__iAnimatedMeshMorphTarget = {"_p_CS__Mesh__iAnimatedMeshMorphTarget", "CS::Mesh::iAnimatedMeshMorphTarget *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_CS__Mesh__AnimatedMeshBoneInfluence = {"_p_CS__Mesh__AnimatedMeshBoneInfluence", "CS::Mesh::AnimatedMeshBoneInfluence *|csAnimatedMeshBoneInfluence *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_CS__Mesh__iAnimatedMesh = {"_p_CS__Mesh__iAnimatedMesh", "CS::Mesh::iAnimatedMesh *|iAnimatedMesh *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_CS__Mesh__iAnimatedMeshFactory = {"_p_CS__Mesh__iAnimatedMeshFactory", "CS::Mesh::iAnimatedMeshFactory *|iAnimatedMeshFactory *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_CS__Mesh__iAnimatedMeshMorphTarget = {"_p_CS__Mesh__iAnimatedMeshMorphTarget", "CS::Mesh::iAnimatedMeshMorphTarget *|iAnimatedMeshMorphTarget *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Mesh__iAnimatedMeshSocket = {"_p_CS__Mesh__iAnimatedMeshSocket", "CS::Mesh::iAnimatedMeshSocket *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_CS__Mesh__iAnimatedMeshSocketFactory = {"_p_CS__Mesh__iAnimatedMeshSocketFactory", "CS::Mesh::iAnimatedMeshSocketFactory *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_CS__Mesh__iAnimatedMeshSubMesh = {"_p_CS__Mesh__iAnimatedMeshSubMesh", "CS::Mesh::iAnimatedMeshSubMesh *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_CS__Mesh__iAnimatedMeshSocketFactory = {"_p_CS__Mesh__iAnimatedMeshSocketFactory", "CS::Mesh::iAnimatedMeshSocketFactory *|iAnimatedMeshSocketFactory *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_CS__Mesh__iAnimatedMeshSubMesh = {"_p_CS__Mesh__iAnimatedMeshSubMesh", "CS::Mesh::iAnimatedMeshSubMesh *|iAnimatedMeshSubMesh *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Mesh__iAnimatedMeshSubMeshFactory = {"_p_CS__Mesh__iAnimatedMeshSubMeshFactory", "CS::Mesh::iAnimatedMeshSubMeshFactory *|iAnimatedMeshFactorySubMesh *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__StringIDT_CS__StringSetTag__General_t = {"_p_CS__StringIDT_CS__StringSetTag__General_t", "csStringID *|csEventID *|CS::StringID< CS::StringSetTag::General > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__StringIDT_CS__StringSetTag__ShaderVar_t = {"_p_CS__StringIDT_CS__StringSetTag__ShaderVar_t", "CS::ShaderVarStringID *|CS::StringID< CS::StringSetTag::ShaderVar > *", 0, 0, (void*)0, 0};
@@ -47143,7 +48365,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_CS__Graphics__RenderPriority,
   &_swigt__p_CS__Memory__AllocatorMalloc,
   &_swigt__p_CS__Memory__CustomAllocated,
-  &_swigt__p_CS__Mesh__csAnimatedMeshBoneInfluence,
+  &_swigt__p_CS__Mesh__AnimatedMeshBoneInfluence,
   &_swigt__p_CS__Mesh__iAnimatedMesh,
   &_swigt__p_CS__Mesh__iAnimatedMeshFactory,
   &_swigt__p_CS__Mesh__iAnimatedMeshMorphTarget,
@@ -47508,7 +48730,7 @@ static swig_cast_info _swigc__p_csArrayT_csArrayT_int_csArrayElementHandlerT_int
 static swig_cast_info _swigc__p_csArrayT_csPluginRequest_csArrayElementHandlerT_csPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t[] = {{&_swigt__p_csArrayT_csPluginRequest_csArrayElementHandlerT_csPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csTriangleMeshEdge[] = {{&_swigt__p_csTriangleMeshEdge, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Memory__CustomAllocated[] = {  {&_swigt__p_CS__Memory__CustomAllocated, 0, 0, 0},  {&_swigt__p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csArrayT_char_csArrayElementHandlerT_char_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_csArrayElementHandlerT_csArrayT_char_csArrayElementHandlerT_char_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_csArrayT_char_csArrayElementHandlerT_char_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_csArrayElementHandlerT_csArrayT_char_csArrayElementHandlerT_char_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csVector4_csArrayElementHandlerT_csVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_csVector4_csArrayElementHandlerT_csVector4_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_unsigned_int_csArrayElementHandlerT_unsigned_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_csRefT_iShader_t_csArrayElementHandlerT_csRefT_iShader_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_csArrayElementHandlerT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_csArrayElementHandlerT_csArrayT_int_csArrayElementHandlerT_int_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csArrayT_csPluginRequest_csArrayElementHandlerT_csPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, _p_csArrayT_csPluginRequest_csArrayElementHandlerT_csPluginRequest_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_tTo_p_CS__Memory__CustomAllocated, 0, 0},  {&_swigt__p_csTriangleMeshEdge, _p_csTriangleMeshEdgeTo_p_CS__Memory__CustomAllocated, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_CS__Mesh__csAnimatedMeshBoneInfluence[] = {  {&_swigt__p_CS__Mesh__csAnimatedMeshBoneInfluence, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_CS__Mesh__AnimatedMeshBoneInfluence[] = {  {&_swigt__p_CS__Mesh__AnimatedMeshBoneInfluence, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Mesh__iAnimatedMesh[] = {  {&_swigt__p_CS__Mesh__iAnimatedMesh, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Mesh__iAnimatedMeshFactory[] = {  {&_swigt__p_CS__Mesh__iAnimatedMeshFactory, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Mesh__iAnimatedMeshMorphTarget[] = {  {&_swigt__p_CS__Mesh__iAnimatedMeshMorphTarget, 0, 0, 0},{0, 0, 0, 0}};
@@ -47857,7 +49079,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_CS__Graphics__RenderPriority,
   _swigc__p_CS__Memory__AllocatorMalloc,
   _swigc__p_CS__Memory__CustomAllocated,
-  _swigc__p_CS__Mesh__csAnimatedMeshBoneInfluence,
+  _swigc__p_CS__Mesh__AnimatedMeshBoneInfluence,
   _swigc__p_CS__Mesh__iAnimatedMesh,
   _swigc__p_CS__Mesh__iAnimatedMeshFactory,
   _swigc__p_CS__Mesh__iAnimatedMeshMorphTarget,

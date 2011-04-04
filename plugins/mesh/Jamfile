@@ -8,6 +8,7 @@ SubInclude TOP plugins mesh haze ;
 SubInclude TOP plugins mesh lghtng ;
 SubInclude TOP plugins mesh null ;
 SubInclude TOP plugins mesh particles ;
+SubInclude TOP plugins mesh persist ;
 SubInclude TOP plugins mesh spr2d ;
 SubInclude TOP plugins mesh spr3d ;
 SubInclude TOP plugins mesh sprcal3d ;

@@ -82,6 +82,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
   public:
 
+    bool RenderView(iView *view, bool recursePortals);
     void AddDeferredLayer(CS::RenderManager::MultipleRenderLayer &layers, int &addedLayer);
     void AddZOnlyLayer(CS::RenderManager::MultipleRenderLayer &layers, int &addedLayer);
 

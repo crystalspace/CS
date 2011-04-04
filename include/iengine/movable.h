@@ -61,7 +61,7 @@ struct iMovableListener : public virtual iBase
 /**
  * This interface represents the position and orientation of an object
  * relative to its parent (this is the transformation between local object
- * space of the model and world space (i.e. where it is in the world)).
+ * space of the model and world space (ie where it is in the world)).
  * Movables are attached to objects (like meshes). For example, use
  * iMeshWrapper::GetMovable()) to get the movable belonging to some mesh.
  * 
@@ -86,7 +86,7 @@ struct iMovableListener : public virtual iBase
  */
 struct iMovable : public virtual iBase
 {
-  SCF_INTERFACE(iMovable, 2,0,1);
+  SCF_INTERFACE(iMovable, 2,0,2);
 
   /**
    * Get the scene node that this movable belongs too.
@@ -129,7 +129,7 @@ struct iMovable : public virtual iBase
   virtual iSectorList* GetSectors () = 0;
 
   /**
-   * Return true if we are placed in a sector (i.e. visible).
+   * Return true if we are placed in a sector (ie visible).
    */
   virtual bool InSector () const = 0;
 
@@ -305,7 +305,7 @@ struct iMovable : public virtual iBase
   virtual bool IsFullTransformIdentity () const = 0;
 
   /**
-   * Set the transform of this movable to the identity transform (i.e.
+   * Set the transform of this movable to the identity transform (ie
    * not moving at all). You have to call UpdateMove() after calling
    * this.
    * <p>
@@ -322,6 +322,14 @@ struct iMovable : public virtual iBase
    * in accordance with the given new full transform.
    */
   virtual void SetFullTransform (const csReversibleTransform& t) = 0;
+
+  /**
+   * Set the transformation vector for this object. If there are no parent to this
+   * movable, then this method will be equivalent to SetPosition(). Otherwise,
+   * the relative position between this movable and its parent will be updated
+   * in accordance with the given new full position.
+   */
+  virtual void SetFullPosition (const csVector3& v) = 0;
 };
 
 /** @} */

@@ -88,14 +88,18 @@ public:
     dv = v1 - v0;
     dh = h1 - h0;
     
+    // Stepping variables
+    t = 0;
+    h = h0;
+    cell_height = cell->GetHeight (gridOffsetStart);
+    
     // vertical case
     if (du == 0 && dv == 0)
     {
       vertical = true;
 
-      float height = cell->GetHeight (gridOffsetStart);
-      if (csMin(h0, h1) <= height &&
-        csMax(h0, h1) >= height)
+      if (csMin(h0, h1) <= cell_height &&
+        csMax(h0, h1) >= cell_height)
       {
         verticalhit = true;
       }
@@ -123,11 +127,6 @@ public:
     if (du > 0) eu = 1 - eu;
     if (dv > 0) ev = 1 - ev;
     if (ep < 0) ep += halfRoot2;
-    
-    // Stepping variables
-    t = 0;
-    h = h0;
-    cell_height = cell->GetHeight (gridOffsetStart);
     
     firsttime = true;
   }

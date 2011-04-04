@@ -75,7 +75,12 @@ namespace CS
     }
 
     template<bool bQueryVisibility>
-    void csOccluvis::RenderMeshes(AABBVisTreeNode* node, iRenderView* rview, NodeMeshList*& nodeMeshList)
+    void csOccluvis::RenderMeshes(AABBVisTreeNode* node,
+                                  iRenderView* rview,
+                                  size_t& lastTicket,
+                                  iShader*& lastShader,
+                                  iShaderVariableContext* shadervars,
+                                  NodeMeshList*& nodeMeshList)
     {
       if (bQueryVisibility)
       {
@@ -127,6 +132,15 @@ namespace CS
                 depthShader = mat->GetShader (fbDepthWriteID);
               }
             }
+
+            if (!depthShader)
+            {
+              // TODO: Come up with some better check or remove check when shader setup perf is better.
+              if (shadervars)
+              {
+                depthShader = shaderMgr->GetShader (defaultShader);
+              }
+            }
           }
 
           // Disable the alpha test (since alpha test disables fast GPU depth writing paths).
@@ -140,34 +154,44 @@ namespace CS
           {
             if (!depthShader)
             {
-              // Render 'unshaded'.
               csVertexAttrib vA = CS_VATTRIB_POSITION;
               iRenderBuffer *rB = rm->buffers->GetRenderBuffer (CS_BUFFER_POSITION);
               g3d->ActivateBuffers (&vA, &rB, 1);
               g3d->DrawMeshBasic (rm, modes);
               g3d->DeactivateBuffers (&vA, 1);
             }
-            else // Render with a depth test/write shader.
+            else
             {
               // Set up the shadervar stack.
               mw->GetSVContext ()->PushVariables (shaderVarStack);
+              if (shadervars) shadervars->PushVariables (shaderVarStack);
 
-              // Get a shader ticket.
+              // Get the shader ticket.
               size_t ticket = depthShader->GetTicket (modes, shaderVarStack);
 
-              // For each pass, render the mesh (more than 1 really needed?)
-              const size_t numPasses = depthShader->GetNumberOfPasses (ticket);
-              for (size_t p = 0; p < numPasses; ++p)
+              // Check whether we need to change the shader.
+              if (depthShader != lastShader || ticket != lastTicket)
               {
-                if (!depthShader->ActivatePass (ticket, p)) continue;
-                if (!depthShader->SetupPass (ticket, rm, modes, shaderVarStack)) continue;
+                if (lastShader)
+                  lastShader->DeactivatePass (lastTicket);
 
-                g3d->DrawMesh (rm, modes, shaderVarStack);
+                // We only support single-pass here (hence the 0).
+                if (!depthShader->ActivatePass (ticket, 0))
+                  continue;
 
-                depthShader->TeardownPass (ticket);
-                depthShader->DeactivatePass (ticket);
+                lastShader = depthShader;
+                lastTicket = ticket;
               }
 
+              // Set up the pass for this mesh.
+              if (!depthShader->SetupPass (ticket, rm, modes, shaderVarStack))
+                continue;
+
+              // Draw the mesh.
+              g3d->DrawMesh (rm, modes, shaderVarStack);
+
+              // Prepare for the next mesh.
+              depthShader->TeardownPass (ticket);
               shaderVarStack.Clear ();
             }
           }
@@ -289,6 +313,7 @@ namespace CS
 
           if (hasMeshes)
           {
+            VisObjMeshHash& visobjMeshHash = visobjMeshHashes.GetOrCreate (f2bData.rview);
             csRef<NodeMeshList> meshes = visobjMeshHash.Get (csPtrKey<iVisibilityObject> (visobj), csRef<NodeMeshList> ());
             if (!meshes.IsValid ())
             {
@@ -298,11 +323,46 @@ namespace CS
 
             // Update the meshes data.
             meshes->node = node;
-            meshes->numMeshes = numMeshes;
             meshes->framePassed = engine->GetCurrentFrameNumber ();
 
-            delete[] meshes->meshList;
-            meshes->meshList = new csSectorVisibleRenderMeshes[numMeshes];
+            // Resize the meshlist if needed.
+            if (!meshes->meshList || meshes->numMeshes != numMeshes)
+            {
+              for (int m = 0; m < meshes->numMeshes; ++m)
+              {
+                delete[] meshes->meshList[m].rmeshes;
+              }
+
+              delete[] meshes->meshList;
+              meshes->meshList = new csSectorVisibleRenderMeshes[numMeshes];
+              meshes->numMeshes = numMeshes;
+
+              for (int m = 0; m < numMeshes; ++m)
+              {
+                // Do a semi-deep copy.
+                meshes->meshList[m].imesh = sectorMeshList[m].imesh;
+                meshes->meshList[m].num = sectorMeshList[m].num;
+                meshes->meshList[m].rmeshes = new csRenderMesh*[sectorMeshList[m].num];
+                memcpy (meshes->meshList[m].rmeshes, sectorMeshList[m].rmeshes, sizeof (csRenderMesh*) * sectorMeshList[m].num);
+              }
+            }
+            else
+            {
+              // Resize the rendermeshes if needed, else just copy.
+              for (int m = 0; m < numMeshes; ++m)
+              {
+                // Do a semi-deep copy.
+                if (meshes->meshList[m].num != sectorMeshList[m].num)
+                {
+                  meshes->meshList[m].num = sectorMeshList[m].num;
+                  delete[] meshes->meshList[m].rmeshes;
+                  meshes->meshList[m].rmeshes = new csRenderMesh*[sectorMeshList[m].num];
+                }
+
+                meshes->meshList[m].imesh = sectorMeshList[m].imesh;
+                memcpy (meshes->meshList[m].rmeshes, sectorMeshList[m].rmeshes, sizeof (csRenderMesh*) * sectorMeshList[m].num);
+              }
+            }
 
             // We will store per-rendermesh data.
             size_t numRenderMeshes = 0;
@@ -328,27 +388,35 @@ namespace CS
               }
             }
 
-            // Check for a mesh 'never draw' state.
+            // Check for a mesh 'never draw' Z state.
             bool bNeverDrawAny = false;
-            switch (visobj->GetMeshWrapper ()->GetZBufMode ())
+
+            // Portals are never drawn to Z.
+            if (visobj->GetMeshWrapper ()->GetPortalContainer ())
             {
-            case CS_ZBUF_NONE:
-            case CS_ZBUF_INVERT:
-            case CS_ZBUF_TEST:
-            case CS_ZBUF_EQUAL:
+              bNeverDrawAny = true;
+            }
+            else
+            {
+              // Check the z buffer mode of the mesh.
+              switch (visobj->GetMeshWrapper ()->GetZBufMode ())
               {
-                bNeverDrawAny = true;
+              case CS_ZBUF_NONE:
+              case CS_ZBUF_INVERT:
+              case CS_ZBUF_TEST:
+              case CS_ZBUF_EQUAL:
+                {
+                  bNeverDrawAny = true;
+                  break;
+                }
+              default:
                 break;
               }
-            default:
-              break;
             }
 
             // Check the 'never draw' state of each render mesh.
             for (int iCurrRenderMesh = 0, m = 0; m < numMeshes; ++m)
             {
-              meshes->meshList[m] = sectorMeshList[m];
-
               // For each render mesh; check if there is a depth-test shader - only test the z-buffer.
               for (int r = 0; r < sectorMeshList[m].num; ++r, ++iCurrRenderMesh)
               {
@@ -484,6 +552,14 @@ namespace CS
       }
     }
 
+    void csOccluvis::Setup (const char* defaultShaderName)
+    {
+      defaultShader = defaultShaderName;
+      depthWriteID = stringSet->Request ("oc_depthwrite");
+      depthTestID = stringSet->Request ("oc_depthtest");
+      fbDepthWriteID = stringSet->Request ("depthwrite");
+    }
+
     void csOccluvis::RegisterVisObject (iVisibilityObject* visobj)
     {
       csRef<csVisibilityObjectWrapper> visobj_wrap;
@@ -522,16 +598,22 @@ namespace CS
       }
 
       csArray<csRefArray<NodeMeshList>*> nodeMeshLists = nodeMeshHash.GetAll ();
-      csArray<NodeMeshList*> meshLists = visobjMeshHash.GetAll(csPtrKey<iVisibilityObject> (visobj));
-      for(size_t i = 0; i < nodeMeshLists.GetSize(); ++i)
-      {
-        for(size_t j = 0; j < meshLists.GetSize(); ++j)
-        {
-          nodeMeshLists[i]->Delete(meshLists[j]);
-        }
-      }
 
-      visobjMeshHash.DeleteAll (csPtrKey<iVisibilityObject> (visobj));
+      VisObjMeshHashes::GlobalIterator itr = visobjMeshHashes.GetIterator ();
+      while (itr.HasNext ())
+      {
+        VisObjMeshHash& visobjMeshHash = itr.Next ();
+        csArray<NodeMeshList*> meshLists = visobjMeshHash.GetAll(csPtrKey<iVisibilityObject> (visobj));
+        for(size_t i = 0; i < nodeMeshLists.GetSize(); ++i)
+        {
+          for(size_t j = 0; j < meshLists.GetSize(); ++j)
+          {
+            nodeMeshLists[i]->Delete(meshLists[j]);
+          }
+        }
+
+        visobjMeshHash.DeleteAll (csPtrKey<iVisibilityObject> (visobj));
+      }
 
       RemoveObject (visobj);
     }
@@ -610,9 +692,6 @@ namespace CS
 
       // Set up the shader variable stack and IDs
       shaderVarStack.Setup (svStrings->GetSize ());
-      depthWriteID = stringSet->Request ("oc_depthwrite");
-      depthTestID = stringSet->Request ("oc_depthtest");
-      fbDepthWriteID = stringSet->Request ("depthwrite");
 
       /**
        * If the 'all visible' flag is set, render everything without any culling.
@@ -621,7 +700,6 @@ namespace CS
       {
         // Mark all visible.
         MarkAllVisible (rootNode, f2bData);
-        bAllVisible = false;
         return false;
       }
 
@@ -645,7 +723,7 @@ namespace CS
       /**
        * Sort the array F2B.
        */
-      F2BSorter sorter (f2bData.pos);
+      F2BSorter sorter (engine, f2bData.pos);
       nodeMeshLists.Sort (sorter);
 
       /**
@@ -673,7 +751,7 @@ namespace CS
       return true;
     }
 
-    void csOccluvis::RenderViscull (iRenderView* rview)
+    void csOccluvis::RenderViscull (iRenderView* rview, iShaderVariableContext* shadervars)
     {
       // If we're marking all visible this frame, just return.
       if (bAllVisible)
@@ -693,6 +771,12 @@ namespace CS
       // Set up g3d for rendering a z-only pass.
       g3d->SetWriteMask (false, false, false, false);
 
+      // The last shader used for occlusion rendering
+      iShader* lastShader = 0;
+
+      // The last ticket used for occlusion rendering.
+      size_t lastTicket = 0;
+
       /**
        * Iterate over the node list (F2B) rendering the z-only pass
        * and any occlusion queries.
@@ -709,15 +793,19 @@ namespace CS
               CheckNodeVisibility (nodeMeshList->node, rview))
           {
             // Render with occlusion queries.
-            RenderMeshes<true> (nodeMeshList->node, rview, nodeMeshList);
+            RenderMeshes<true> (nodeMeshList->node, rview, lastTicket, lastShader, shadervars, nodeMeshList);
           }
           else
           {
             // Render without occlusion queries.
-            RenderMeshes<false> (nodeMeshList->node, rview, nodeMeshList);
+            RenderMeshes<false> (nodeMeshList->node, rview, lastTicket, lastShader, shadervars, nodeMeshList);
           }
         }
       }
+
+      // Deactivate the last shader+ticket.
+      if (lastShader)
+        lastShader->DeactivatePass (lastTicket);
 
       // Reset rendering settings.
       g3d->SetWriteMask (true, true, true, true);
@@ -729,6 +817,7 @@ namespace CS
       iMeshWrapper* mw1 = m1->meshList->imesh;
       iMeshWrapper* mw2 = m2->meshList->imesh;
 
+      // Equal priorities - check distance.
       if (mw1->GetRenderPriority () == mw2->GetRenderPriority ())
       {
         csBox3& m1box = m1->node->GetBBox ();
@@ -740,6 +829,13 @@ namespace CS
         return distSqRm1 < distSqRm2;
       }
 
+      // Portals get special treatment - always rendered last.
+      if (mw1->GetRenderPriority () == portalPriority)
+        return false;
+      if (mw2->GetRenderPriority () == portalPriority)
+        return true;
+
+      // Else order by priority.
       return (mw1->GetRenderPriority () < mw2->GetRenderPriority ());
     }
 

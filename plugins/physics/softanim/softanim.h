@@ -100,6 +100,7 @@ class SoftBodyControl : public scfImplementation2<SoftBodyControl,
     virtual bool AnimatesNormals () const;
     virtual bool AnimatesTexels () const;
     virtual bool AnimatesVertices () const;
+    virtual bool AnimatesBBoxRadius () const;
     virtual void Update (csTicks current, int num_verts, uint32 version_id);
     virtual const csColor4* UpdateColors (csTicks current, const csColor4* colors,
 					  int num_colors, uint32 version_id);
@@ -109,6 +110,11 @@ class SoftBodyControl : public scfImplementation2<SoftBodyControl,
 					   int num_texels, uint32 version_id);
     virtual const csVector3* UpdateVertices (csTicks current, const csVector3* verts,
 					     int num_verts, uint32 version_id);
+    virtual const csBox3& UpdateBoundingBox (csTicks current, uint32 version_id,
+					     const csBox3& factoryBbox);
+    virtual const float UpdateRadius (csTicks current, uint32 version_id,
+				      const float factoryRadius);
+    virtual const csBox3* UpdateBoundingBoxes (csTicks current, uint32 version_id);
 
   private:
     SoftBodyControlFactory* factory;
@@ -117,6 +123,8 @@ class SoftBodyControl : public scfImplementation2<SoftBodyControl,
     bool doubleSided;
     csDirtyAccessArray<csVector3> vertices;
     csDirtyAccessArray<csVector3> normals;
+    csBox3 bbox;
+    csDirtyAccessArray<csBox3> bboxes;
     csTicks lastTicks;
     csVector3 meshPosition;
 

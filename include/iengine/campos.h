@@ -59,11 +59,11 @@ struct iCamera;
  */
 struct iCameraPosition : public virtual iBase
 {
-  SCF_INTERFACE(iCameraPosition,2,0,0);
+  SCF_INTERFACE(iCameraPosition,2,0,1);
   /// Get the iObject for this camera position.
   virtual iObject *QueryObject() = 0;
 
-  /// Create a clone this camera position.
+  /// Create a clone of this camera position.
   virtual iCameraPosition* Clone () const = 0;
 
   /// Return the home sector.
@@ -91,7 +91,7 @@ struct iCameraPosition : public virtual iBase
       const csVector3 &forward, const csVector3 &upward) = 0;
 
   /// Load the camera position into a camera object.
-  virtual bool Load (iCamera*, iEngine*) = 0;
+  virtual bool Load (iCamera* camera, iEngine* engine) = 0;
 
   /**
    * Set the 3D far plane used to clip all geometry.
@@ -113,6 +113,9 @@ struct iCameraPosition : public virtual iBase
    * Get the current far plane (or 0 if none is defined).
    */
   virtual csPlane3* GetFarPlane () const = 0;
+
+  /// Save a camera object into this camera position.
+  virtual void Save (iCamera* camera) = 0;
 };
 
 /**

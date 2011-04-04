@@ -469,9 +469,9 @@ bool csGraphics2D::GetWindowDecoration (WindowDecoration decoration)
 
 static const csOptionDescription config_options [NUM_OPTIONS] =
 {
-  { 0, "depth", "Display depth", CSVAR_LONG },
-  { 1, "fs", "Fullscreen if available", CSVAR_BOOL },
-  { 2, "mode", "Window size or resolution", CSVAR_STRING },
+  csOptionDescription( 0, "depth", "Display depth", CSVAR_LONG ),
+  csOptionDescription( 1, "fs", "Fullscreen if available", CSVAR_BOOL ),
+  csOptionDescription( 2, "mode", "Window size or resolution", CSVAR_STRING )
 };
 
 bool csGraphics2D::SetOption (int id, csVariant* value)

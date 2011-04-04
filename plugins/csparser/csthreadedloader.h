@@ -753,17 +753,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       iStreamSource* ssource, csSafeCopyArray<ProxyTexture>* proxyTextures,
     csWeakRefArray<iMaterialWrapper> &materialArray);
 
-    /**
-    * Load a mesh generator geometry.
-    */
+    /**\name Mesh generator loading
+     * @{ */
+    /// Load a mesh generator geometry density factor map image
+    bool LoadMeshGenDensityFactorMap (iDocumentNode* mapNode,
+				      iMeshGenerator* meshgen);
+    /// Load a mesh generator geometry.
     bool LoadMeshGenGeometry (iLoaderContext* ldr_context,
       iDocumentNode* node, iMeshGenerator* meshgen);
-
-    /**
-    * Load a mesh generator.
-    */
+    /// Load a mesh generator.
     bool LoadMeshGen (iLoaderContext* ldr_context,
       iDocumentNode* node, iSector* sector);
+    /** @} */
 
     /**
     * Handle the result of a mesh object plugin loader.

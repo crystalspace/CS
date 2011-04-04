@@ -55,7 +55,7 @@ private:
   bool reverseAction;
 
 private:
-  bool HandleSkel2Node (const char* animName, CS::Animation::iSkeletonAnimNode* node, bool start);
+  void RebuildAnimationTree ();
 
 public:
   static bool Support(iMeshWrapper* mesh);
@@ -72,10 +72,13 @@ public:
 
   virtual bool StopAnimation(const char* animationName);
 
+  virtual bool RemoveAnimation(const char* animationName);
+
   virtual bool GetReverseAction();
 
   virtual void SetReverseAction(bool value);
 
+  virtual void SetAnimationSpeed(float speed);
 
   // Sockets
   virtual bool SupportsSockets();

@@ -28,15 +28,21 @@ SintelScene::SintelScene (AvatarTest* avatarTest)
   : avatarTest (avatarTest), activeFacialExpression (0),
     currentExpressionIndex (0), activeFacialTransition (false)
 {
+  // Setup the parameters of the camera manager
+  avatarTest->cameraManager.SetStartPosition (csVector3 (0.0f, 0.08f, -0.5f));
+  avatarTest->cameraManager.SetCameraMinimumDistance (0.4f);
+
   // Define the available keys
-  avatarTest->hudHelper.keyDescriptions.DeleteAll ();
-  avatarTest->hudHelper.keyDescriptions.Push ("arrow keys: move camera");
-  avatarTest->hudHelper.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
-  avatarTest->hudHelper.keyDescriptions.Push ("1: neutral");
-  avatarTest->hudHelper.keyDescriptions.Push ("2: smiling");
-  avatarTest->hudHelper.keyDescriptions.Push ("3: angry");
-  avatarTest->hudHelper.keyDescriptions.Push ("4: sad");
-  avatarTest->hudHelper.keyDescriptions.Push ("n: switch to next scene");
+  avatarTest->hudManager.keyDescriptions.DeleteAll ();
+  avatarTest->hudManager.keyDescriptions.Push ("arrow keys: move camera");
+  avatarTest->hudManager.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
+  avatarTest->hudManager.keyDescriptions.Push ("1: neutral");
+  avatarTest->hudManager.keyDescriptions.Push ("2: smiling");
+  avatarTest->hudManager.keyDescriptions.Push ("3: angry");
+  avatarTest->hudManager.keyDescriptions.Push ("4: sad");
+  avatarTest->hudManager.keyDescriptions.Push ("n: switch to next scene");
+
+  avatarTest->hudManager.stateDescriptions.DeleteAll ();
 }
 
 SintelScene::~SintelScene ()
@@ -53,16 +59,6 @@ SintelScene::~SintelScene ()
 
   if (eyesMesh)
     avatarTest->engine->RemoveObject (eyesMesh);
-}
-
-csVector3 SintelScene::GetCameraStart ()
-{
-  return csVector3 (0.0f, 0.08f, -0.5f);
-}
-
-float SintelScene::GetCameraMinimumDistance ()
-{
-  return 0.4f;
 }
 
 csVector3 SintelScene::GetCameraTarget ()
@@ -476,13 +472,4 @@ bool SintelScene::CreateAvatar ()
   ResetScene ();
 
   return true;
-}
-
-void SintelScene::ResetScene ()
-{
-}
-
-void SintelScene::UpdateStateDescription ()
-{
-  avatarTest->hudHelper.stateDescriptions.DeleteAll ();
 }

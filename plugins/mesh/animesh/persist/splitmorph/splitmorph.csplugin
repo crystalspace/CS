@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- splitmorph.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.loader.factory.animesh.splitmorph</name>
+        <implementation>SplitMorphLoader</implementation>
+        <description>Loader of animated mesh with morph targets split in several files</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

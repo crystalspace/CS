@@ -22,40 +22,18 @@
 #define __CS_RAGDOLL_H__
 
 #include "csutil/scf_implementation.h"
-#include "iutil/comp.h"
+#include "cstool/animnodetmpl.h"
 #include "csutil/leakguard.h"
 #include "csutil/weakref.h"
 #include "csutil/csstring.h"
 #include "imesh/animnode/ragdoll.h"
+#include "iutil/comp.h"
 #include "ivaria/bullet.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 {
 
-  class RagdollNodeManager : public scfImplementation2<RagdollNodeManager,
-    CS::Animation::iSkeletonRagdollNodeManager, iComponent>
-  {
-  public:
-    CS_LEAKGUARD_DECLARE(RagdollNodeManager);
-
-    RagdollNodeManager (iBase* parent);
-
-    //-- CS::Animation::iSkeletonRagdollNodeManager
-    virtual CS::Animation::iSkeletonRagdollNodeFactory* CreateAnimNodeFactory (const char *name);
-
-    virtual CS::Animation::iSkeletonRagdollNodeFactory* FindAnimNodeFactory (const char* name) const;
-    virtual void ClearAnimNodeFactories ();
-
-    //-- iComponent
-    virtual bool Initialize (iObjectRegistry*);
-
-    // error reporting
-    void Report (int severity, const char* msg, ...) const;
-
-  private:
-    iObjectRegistry* object_reg;
-    csHash<csRef<CS::Animation::iSkeletonRagdollNodeFactory>, csString> factoryHash;
-  };
+  class RagdollNodeManager;
 
   struct ChainData
   {
@@ -63,22 +41,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     CS::Animation::RagdollState state;
   };
 
-  class RagdollAnimNodeFactory : public scfImplementation2<RagdollAnimNodeFactory, 
-    scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory>, CS::Animation::iSkeletonRagdollNodeFactory>
+  class RagdollNodeFactory
+    : public scfImplementation2<RagdollNodeFactory,
+    scfFakeInterface<CS::Animation::iSkeletonAnimNodeFactory>,
+    CS::Animation::iSkeletonRagdollNodeFactory>,
+    public CS::Animation::SkeletonAnimNodeFactorySingle
   {
-    friend class RagdollAnimNode;
-
   public:
-    CS_LEAKGUARD_DECLARE(RagdollAnimNodeFactory);
+    CS_LEAKGUARD_DECLARE(RagdollNodeFactory);
 
-    RagdollAnimNodeFactory (RagdollNodeManager* manager, const char *name);
-
-    //-- CS::Animation::iSkeletonAnimNodeFactory
-    virtual csPtr<CS::Animation::iSkeletonAnimNode> CreateInstance (
-	       CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton);
-
-    virtual const char* GetNodeName () const;
-    virtual CS::Animation::iSkeletonAnimNodeFactory* FindNode (const char* name);
+    RagdollNodeFactory (RagdollNodeManager* manager, const char *name);
 
     //-- CS::Animation::iSkeletonRagdollNodeFactory
     virtual void SetBodySkeleton (CS::Animation::iBodySkeleton* skeleton);
@@ -89,28 +61,34 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 			       = CS::Animation::STATE_INACTIVE);
     virtual void RemoveBodyChain (CS::Animation::iBodyChain* chain);
 
-    virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* node);
-    virtual CS::Animation::iSkeletonAnimNodeFactory* GetChildNode () const;
-    virtual void ClearChildNode ();
+    inline virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* factory)
+    { CS::Animation::SkeletonAnimNodeFactorySingle::SetChildNode (factory); }
+    inline virtual iSkeletonAnimNodeFactory* GetChildNode () const
+    { return CS::Animation::SkeletonAnimNodeFactorySingle::GetChildNode (); }
 
+    //-- CS::Animation::iSkeletonAnimNodeFactory
+    csPtr<CS::Animation::SkeletonAnimNodeSingleBase> ActualCreateInstance (
+      CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton);
   protected:
     RagdollNodeManager* manager;
-    csString name;
     csRef<CS::Animation::iBodySkeleton> bodySkeleton;
     csArray<ChainData> chains;
     CS::Animation::BoneID ragdollRoot;
-    csRef<CS::Animation::iSkeletonAnimNodeFactory> childNode;
+
+    friend class RagdollNode;
   };
 
-  class RagdollAnimNode : public scfImplementation2<RagdollAnimNode, 
-    scfFakeInterface<CS::Animation::iSkeletonAnimNode>, CS::Animation::iSkeletonRagdollNode>
+  class RagdollNode
+    : public scfImplementation2<RagdollNode,
+				scfFakeInterface<CS::Animation::iSkeletonAnimNode>,
+				CS::Animation::iSkeletonRagdollNode>,
+      CS::Animation::SkeletonAnimNodeSingle<RagdollNodeFactory>
   {
   public:
-    CS_LEAKGUARD_DECLARE(RagdollAnimNode);
+    CS_LEAKGUARD_DECLARE(RagdollNode);
 
-    RagdollAnimNode (RagdollAnimNodeFactory* factory, CS::Animation::iSkeleton* skeleton,
-		    CS::Animation::iSkeletonAnimNode* childNode);
-    ~RagdollAnimNode ();
+    RagdollNode (RagdollNodeFactory* factory, CS::Animation::iSkeleton* skeleton);
+    ~RagdollNode ();
 
     //-- CS::Animation::iSkeletonRagdollNode
     virtual void SetDynamicSystem (iDynamicSystem* system);
@@ -130,34 +108,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
 
     //-- CS::Animation::iSkeletonAnimNode
     virtual void Play ();
-
     virtual void Stop ();
 
-    virtual void SetPlaybackPosition (float time);
-
-    virtual float GetPlaybackPosition () const;
-
-    virtual float GetDuration () const;
-
-    virtual void SetPlaybackSpeed (float speed);
-
-    virtual float GetPlaybackSpeed () const;
-
-    virtual void BlendState (CS::Animation::csSkeletalState* state,
+    virtual void BlendState (CS::Animation::AnimatedMeshState* state,
 			     float baseWeight = 1.0f);
-
-    virtual void TickAnimation (float dt);
-
-    virtual bool IsActive () const;
-
-    virtual CS::Animation::iSkeletonAnimNodeFactory* GetFactory () const;
-
-    virtual CS::Animation::iSkeletonAnimNode* FindNode (const char* name);
-
-    virtual void AddAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback);
-
-    virtual void RemoveAnimationCallback (CS::Animation::iSkeletonAnimCallback* callback);
-
   private:
     struct BoneData
     {
@@ -181,17 +135,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     void ResetChainNodeTransform (CS::Animation::iBodyChainNode* chainNode);
 
   private:
-    RagdollAnimNodeFactory* factory;
     csWeakRef<iSceneNode> sceneNode;
-    csWeakRef<CS::Animation::iSkeleton> skeleton;
     csWeakRef<iDynamicSystem> dynamicSystem;
     csArray<ChainData> chains;
-    csRef<CS::Animation::iSkeletonAnimNode> childNode;
     csHash<BoneData, CS::Animation::BoneID> bones;
     csArray<ResetChainData> resetChains;
-    bool isActive;
     CS::Animation::BoneID maxBoneID;
 
+    friend class RagdollNodeFactory;
     friend class BoneKinematicCallback;
   };
 
@@ -199,14 +150,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(Ragdoll)
     <BoneKinematicCallback, CS::Physics::Bullet::iKinematicCallback>
   {
   public:
-    BoneKinematicCallback (RagdollAnimNode* ragdollNode, CS::Animation::BoneID boneID);
+    BoneKinematicCallback (RagdollNode* ragdollNode, CS::Animation::BoneID boneID);
     ~BoneKinematicCallback ();
 
     void GetBodyTransform (iRigidBody* body, csOrthoTransform& transform) const;
 
   private:
-    RagdollAnimNode* ragdollNode;
+    RagdollNode* ragdollNode;
     CS::Animation::BoneID boneID;
+  };
+
+  class RagdollNodeManager
+    : public CS::Animation::AnimNodeManagerCommon<RagdollNodeManager,
+						  CS::Animation::iSkeletonRagdollNodeManager,
+						  RagdollNodeFactory>
+  {
+  public:
+    RagdollNodeManager (iBase* parent)
+     : AnimNodeManagerCommonType (parent) {}
+     
+    void Report (int severity, const char* msg, ...) const;
   };
 
 }

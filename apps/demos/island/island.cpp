@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2010 Christian Van Brussel, Communications and Remote
+  Copyright (C) 2010-11 Christian Van Brussel, Communications and Remote
       Sensing Laboratory of the School of Engineering at the 
       Universite catholique de Louvain, Belgium
       http://www.tele.ucl.ac.be
@@ -21,20 +21,23 @@
 
 #include "cssysdef.h"
 
+#include "iengine/campos.h"
 #include "island.h"
 
 #define WATER_LEVEL 50.0
 
 IslandDemo::IslandDemo ()
-  : DemoApplication ("CrystalSpace.IslandDemo", "csavatarstudio", "csavatarstudio",
-		     "Crystal Space island demo."),
-    inWater (false)
+  : DemoApplication ("CrystalSpace.IslandDemo"), inWater (false)
 {
-  // Configure the options for DemoApplication
+}
 
-  // Set the camera mode
-  cameraHelper.SetCameraMode (CS::Demo::CSDEMO_CAMERA_MOVE_FREE);
-  cameraHelper.SetMotionSpeed (10.0f);
+void IslandDemo::PrintHelp ()
+{
+  csCommandLineHelper commandLineHelper;
+
+  // Printing help
+  commandLineHelper.PrintApplicationHelp
+    (GetObjectRegistry (), "csisland", "csisland", "Crystal Space's island environment demo.");
 }
 
 void IslandDemo::Frame ()
@@ -65,7 +68,7 @@ bool IslandDemo::Application ()
     return false;
 
    // Create the scene
-   if (!CreateScene ())
+  if (!CreateScene ())
      return false;
 
    // Run the application
@@ -79,23 +82,23 @@ bool IslandDemo::CreateScene ()
   printf ("Loading level...\n");
 
   // Load the level file named 'world'.
-  csRef<iVFS> VFS (csQueryRegistry<iVFS> (GetObjectRegistry ()));
-  VFS->ChDir ("/lev/island");
+  vfs->ChDir ("/lev/island");
   if (!loader->LoadMapFile ("world"))
     ReportError("Error couldn't load level!");
 
-  // Setup the the sector and the camera
+  // Setup the sector and the camera
   room = engine->FindSector ("TerrainSector");
   view->GetCamera ()->SetSector (room);
+  cameraManager.SetCamera (view->GetCamera ());
+  cameraManager.SetCameraMode (CS::Demo::CAMERA_MOVE_FREE);
+  cameraManager.SetMotionSpeed (10.0f);
 
-  printf ("Level loaded...\n");
+  printf ("Precaching data...\n");
+  engine->PrecacheDraw ();
+
+  printf ("Ready!\n");
 
   return true;
-}
-
-csVector3 IslandDemo::GetCameraStart ()
-{
-  return csVector3 (500.0f, 200.0f, 500.0f);
 }
 
 //---------------------------------------------------------------------------

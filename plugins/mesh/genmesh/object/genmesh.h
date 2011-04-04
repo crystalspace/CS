@@ -189,9 +189,10 @@ private:
   void SetupObject ();
 
   /// Get positions buffer
-  iRenderBuffer* GetPositions();
+  iRenderBuffer* GetPositions ();
+  const csVector3* GetVertices ();
   
-  int ComputeProgLODLevel(const SubMeshProxy& subMesh, const csVector3& camera_pos);
+  int ComputeProgLODLevel (const SubMeshProxy& subMesh, const csVector3& camera_pos);
   
 public:
   /// Constructor.
@@ -219,15 +220,29 @@ public:
   bool IsLighting () const { return false; }
   void SetManualColors (bool m) { do_manual_colors = m; }
   bool IsManualColors () const { return do_manual_colors; }
-  const csBox3& GetObjectBoundingBox ();
-  void SetObjectBoundingBox (const csBox3& bbox);
-  void GetRadius (float& rad, csVector3& cent);
   void SetShadowCasting (bool m) { }
   bool IsShadowCasting () const { return true; }
   void SetShadowReceiving (bool m) { }
   bool IsShadowReceiving () const { return false; }
   iGeneralMeshSubMesh* FindSubMesh (const char* name) const; 
   /** @} */
+
+  class csAnimatedModel : public scfImplementationExt0<csAnimatedModel, 
+                                                              csObjectModel>
+  {
+    csGenmeshMeshObject* object;
+
+  public:
+    csAnimatedModel (csGenmeshMeshObject* object);
+    virtual ~csAnimatedModel ();
+
+    /**\name iObjectModel implementation
+     * @{ */
+    const csBox3& GetObjectBoundingBox ();
+    void SetObjectBoundingBox (const csBox3& bbox);
+    void GetRadius (float& rad, csVector3& cent);
+  };
+  csRef<iObjectModel> objectModel;
 
   iVirtualClock* vc;
   csRef<iGenMeshAnimationControl> anim_ctrl;
@@ -237,10 +252,14 @@ public:
   const csVector2* AnimControlGetTexels ();
   const csVector3* AnimControlGetNormals ();
   const csColor4* AnimControlGetColors (csColor4* source);
+  const csBox3& AnimControlGetBbox ();
+  const csBox3* AnimControlGetBboxes ();
+  const float AnimControlGetRadius ();
   bool anim_ctrl_verts;
   bool anim_ctrl_texels;
   bool anim_ctrl_normals;
   bool anim_ctrl_colors;
+  bool anim_ctrl_bbox;
   struct AnimBuffers
   {
     csRef<iRenderBuffer> position;
@@ -291,7 +310,7 @@ public:
     csVector3& isect, float *pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr, int* polygon_idx = 0,
-	iMaterialWrapper** material = 0, iMaterialArray* materials = 0);
+	iMaterialWrapper** material = 0);
   virtual void SetMeshWrapper (iMeshWrapper* lp)
   {
     logparent = lp;
@@ -738,11 +757,13 @@ class csGenmeshMeshObjectType :
                             iMeshObjectType,
                             iComponent>
 {
-public:
+private:
   iObjectRegistry* object_reg;
-  bool do_verbose;
-  MergedSVContext::Pool mergedSVContextPool;
+  CS::Threading::Mutex m;
   csStringHash submeshNamePool;
+
+public:
+  MergedSVContext::Pool mergedSVContextPool;
   csStringID base_id;
 
   /// Constructor.
@@ -753,6 +774,8 @@ public:
   virtual csPtr<iMeshObjectFactory> NewFactory ();
   /// Initialize.
   bool Initialize (iObjectRegistry* object_reg);
+  /// Thread safe duplicate-free store of a name.
+  const char* StoreName (const char* name);
 };
 
 }

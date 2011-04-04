@@ -94,6 +94,9 @@ public:
 
   virtual bool CollideSegment (const csVector3& start, const csVector3& end,
     bool oneHit, iTerrainVector3Array* points, iMaterialArray* materials);
+  virtual bool CollideSegment (const csVector3& start, const csVector3& end,
+			       csVector3& hitPoint,
+			       iMaterialWrapper** hitMaterial);
   virtual csTerrainColliderCollideSegmentResult CollideSegment (
       const csVector3& start, const csVector3& end, bool use_ray);
 
@@ -144,7 +147,7 @@ public:
 
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
         csVector3& isect, float* pr, int* polygon_idx,
-        iMaterialWrapper** material, iMaterialArray* materials);
+        iMaterialWrapper** material);
 
   // ------------ iObjectModel implementation ------------
   virtual iTerrainSystem* GetTerrainColldet () { return this; }
@@ -174,7 +177,7 @@ private:
 
   bool HitBeamOutline (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr,
-    iMaterialArray* materials);
+    iMaterialWrapper** material);
 };
 
 }

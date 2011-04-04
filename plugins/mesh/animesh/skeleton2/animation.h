@@ -45,6 +45,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     virtual CS::Animation::iSkeletonAnimation* CreateAnimation (const char* name);
     virtual CS::Animation::iSkeletonAnimation* FindAnimation (const char* name);
+    virtual void RemoveAnimation (const char* name);
+    virtual void RemoveAnimation (size_t index);
     virtual void ClearAnimations ();
     virtual CS::Animation::iSkeletonAnimation* GetAnimation (size_t index);
     virtual size_t GetAnimationCount () const;
@@ -113,6 +115,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 			      CS::Animation::KeyFrameID keyframe,
 			      const csQuaternion& rotation, const csVector3& offset);
 
+    virtual void AddOrSetKeyFrame (CS::Animation::ChannelID channel, float time, 
+				   const csQuaternion& rotation);
+    virtual void AddOrSetKeyFrame (CS::Animation::ChannelID channel, float time, 
+				   const csVector3& offset);
+
     virtual size_t GetKeyFrameCount (CS::Animation::ChannelID channel) const;
 
     virtual void GetKeyFrame (CS::Animation::ChannelID channel, CS::Animation::KeyFrameID keyframe, 
@@ -122,8 +129,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       float& timeBefore, csQuaternion& beforeRot, csVector3& beforeOffset,
       float& timeAfter, csQuaternion& afterRot, csVector3& afterOffset);
 
-    virtual void BlendState (CS::Animation::csSkeletalState* state, 
-      float baseWeight, float playbackTime, bool isPlayingCyclic) const;
+    inline virtual void BlendState (CS::Animation::AnimatedMeshState* state, 
+      float baseWeight, float playbackTime, bool isPlayingCyclic) const
+    { BlendState (state, baseWeight, playbackTime); }
+    virtual void BlendState (CS::Animation::AnimatedMeshState* state, 
+      float baseWeight, float playbackTime) const;
 
     virtual float GetDuration () const;
 
@@ -131,15 +141,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual bool GetFramesInBindSpace () const;
     virtual void ConvertFrameSpace (CS::Animation::iSkeletonFactory* skeleton);
 
-  private:
-    csString name;
-
+  public:
     struct KeyFrame
     {
       float time;
       csQuaternion rotation;
       csVector3 offset;
+
+      KeyFrame ()
+      : offset (0.0f) {}
     };
+
+  private:
+    csString name;
 
     static int KeyFrameCompare (KeyFrame const& k1, KeyFrame const& k2);
     static int KeyFrameTimeCompare (KeyFrame const& k, float const& t);

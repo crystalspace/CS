@@ -22,6 +22,7 @@
 #include "gl_render3d.h"
 #include "gl_txtmgr.h"
 #include "gl_r2t_ext_fb_o.h"
+#include "profilescope.h"
 
 #include "csplugincommon/opengl/glenum_identstrs.h"
 #include "csplugincommon/opengl/glhelper.h"
@@ -467,7 +468,7 @@ void csGLRender2TextureEXTfbo::FinishDraw (bool readbackTargets)
   
   if (readbackTargets)
   {
-    csGLGraphics3D::ProfileScope _profile (G3D, "render target readback");
+    ProfileScope _profile (G3D, "render target readback");
       
     for (int a = 0; a < rtaNumAttachments; a++)
     {

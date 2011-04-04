@@ -190,13 +190,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return playbackSpeed;
   }
 
-  void PriorityNode::BlendState (CS::Animation::csSkeletalState* state, float baseWeight)
+  void PriorityNode::BlendState (CS::Animation::AnimatedMeshState* state, float baseWeight)
   {
-    csRef<CS::Animation::csSkeletalState> locState;
-    locState.AttachNew (new CS::Animation::csSkeletalState); //@@TODO: cache these
+    csRef<CS::Animation::AnimatedMeshState> locState;
+    locState.AttachNew (new CS::Animation::AnimatedMeshState); //@@TODO: cache these
 
-    csRef<CS::Animation::csSkeletalState> totalState;
-    totalState.AttachNew (new CS::Animation::csSkeletalState);
+    csRef<CS::Animation::AnimatedMeshState> totalState;
+    totalState.AttachNew (new CS::Animation::AnimatedMeshState);
     totalState->Setup (state->GetBoneCount ());
 
     for (size_t i = 0; i < indexList.GetSize (); ++i)
@@ -529,7 +529,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return playbackSpeed;
   }
 
-  void RandomNode::BlendState (CS::Animation::csSkeletalState* state, float baseWeight)
+  void RandomNode::BlendState (CS::Animation::AnimatedMeshState* state, float baseWeight)
   {
     if (!active || !subNodes.GetSize ())
       return;

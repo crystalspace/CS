@@ -289,7 +289,11 @@ rule InferFlagTuples
   }
   if $(accum)
   {
-    tuples += $(accum:J=" ") ;
+    if $(tuples) {
+      tuples += $(accum:J=" ") ;
+    } else {
+      tuples = $(accum) ;
+    }
   }
   return $(tuples) ;
 }

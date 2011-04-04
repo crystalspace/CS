@@ -23516,16 +23516,15 @@
       <key time="0.75" x="0.0500000402331" y="-4.00482258556e-006" z="0.0250003106892" qx="1.0" qy="-4.24682696121e-007" qz="-8.84090786712e-006" qw="8.48548661452e-005" />
     </channel>
   </animation>
-<node y="-1356.25407763" x="-1437.93108009" type="priority" name="root2">
-    <node y="-1449.31222415" x="-1252.75049007" type="fsm" name="standard" priority="1">
+    <node y="-1449.31222415" x="-1252.75049007" type="fsm" name="fsm" start="0">
+      <state name="stand">
+        <node y="-1488.4880321" x="-1137.86169568" animation="Frankie_Idle1" type="animation" name="idle"/>
+      </state>
       <state name="run">
         <node y="-1377.12071963" x="-1076.4888868" animation="Frankie_Run" type="animation" name="run"/>
       </state>
       <state name="glide">
         <node y="-1322.49252094" x="-1134.49074057" animation="Frankie_Glide" type="animation" name="glide"/>
-      </state>
-      <state name="idle">
-        <node y="-1488.4880321" x="-1137.86169568" animation="Frankie_Idle1" type="animation" name="idle"/>
       </state>
       <state name="fall">
         <node name="fall" cyclic="yes" autoreset="yes" animation="Frankie_Fall" y="-1264.44379491" x="-1132.99807052" type="animation"/>
@@ -23542,15 +23541,10 @@
       <state name="walkfast">
         <node y="-1434.56442668" x="-1022.27978316" animation="Frankie_WalkFast" type="animation" name="walkfast"/>
       </state>
+      <state name="jump">
+        <node y="-1377.12071963" x="-1076.4888868" animation="Frankie_IdleJump" type="animation" name="run"/>
+      </state>
     </node>
-    <node name="jump" cyclic="no" autoreset="no" priority="2" animation="Frankie_IdleJump" y="-1333.1429351" x="-1329.78931004" type="animation"/>
-    <node name="land" cyclic="no" autoreset="yes" priority="3" animation="Frankie_Land" y="-1277.08569954" x="-1328.01320212" type="animation"/>
-    <node name="throw" cyclic="no" autoreset="yes" priority="4" animation="Frankie_Throw1" y="-1221.74401605" x="-1326.60104006" type="animation"/>
-    <node name="pick" cyclic="no" autoreset="yes" priority="2" animation="Frankie_Pick" y="-1167.84878261" x="-1325.34698534" type="animation"/>
-    <node name="hitted" cyclic="no" autoreset="yes" priority="3" animation="Frankie_HitWalk" y="-1111.27378423" x="-1323.50934899" type="animation"/>
-    <node name="lost" cyclic="no" autoreset="yes" priority="10" animation="Frankie_Death1" y="-1056.17939645" x="-1324.9833601" type="animation"/>
-    <node name="run2idle" cyclic="no" autoreset="yes" priority="2" animation="Frankie_Run2Idle" y="-1590.23115431" x="-1258.73940091" type="animation" autostop="yes"/>
-  </node>
  </animationpacket>
   <skeleton name="frankie_rig">
     <bone name="WingsIn">

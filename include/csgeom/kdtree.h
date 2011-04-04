@@ -173,7 +173,7 @@ public:
   void DumpObject (csKDTreeChild* object, const char* msg);
   void DumpNode ();
   void DumpNode (const char* msg);
-  void DebugExit ();
+  static void DebugExit ();
 
 private:
   csKDTree* child1;             // If child1 is not 0 then child2 will

@@ -28,6 +28,7 @@
 #include "gl_render3d.h"
 #include "gl_txtmgr.h"
 #include "gl_r2t_framebuf.h"
+#include "profilescope.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
@@ -596,7 +597,7 @@ void csGLRender2TextureFramebuf::FinishDraw (bool readbackTargets)
     
     if (readbackTargets)
     {
-      csGLGraphics3D::ProfileScope _profile (G3D, "render target readback");
+      ProfileScope _profile (G3D, "render target readback");
       
       if (colorTarget.IsValid())
       {

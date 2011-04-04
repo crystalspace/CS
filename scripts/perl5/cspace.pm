@@ -407,6 +407,7 @@ sub new {
 
 *GetArray = *cspacec::Vector2DirtyAccessArray_GetArray;
 *GetArrayCopy = *cspacec::Vector2DirtyAccessArray_GetArrayCopy;
+*Detach = *cspacec::Vector2DirtyAccessArray_Detach;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -509,6 +510,7 @@ sub new {
 
 *GetArray = *cspacec::Vector3DirtyAccessArray_GetArray;
 *GetArrayCopy = *cspacec::Vector3DirtyAccessArray_GetArrayCopy;
+*Detach = *cspacec::Vector3DirtyAccessArray_Detach;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -611,6 +613,7 @@ sub new {
 
 *GetArray = *cspacec::Vector4DirtyAccessArray_GetArray;
 *GetArrayCopy = *cspacec::Vector4DirtyAccessArray_GetArrayCopy;
+*Detach = *cspacec::Vector4DirtyAccessArray_Detach;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -713,6 +716,7 @@ sub new {
 
 *GetArray = *cspacec::UIntDirtyAccessArray_GetArray;
 *GetArrayCopy = *cspacec::UIntDirtyAccessArray_GetArrayCopy;
+*Detach = *cspacec::UIntDirtyAccessArray_Detach;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -1225,14 +1229,20 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-*Help = *cspacec::csCommandLineHelper_Help;
-*CheckHelp = *cspacec::csCommandLineHelper_CheckHelp;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csCommandLineHelper(@_);
     bless $self, $pkg if defined($self);
 }
 
+*PrintTitle = *cspacec::csCommandLineHelper_PrintTitle;
+*PrintOption = *cspacec::csCommandLineHelper_PrintOption;
+*Help = *cspacec::csCommandLineHelper_Help;
+*CheckHelp = *cspacec::csCommandLineHelper_CheckHelp;
+*AddCommandLineSection = *cspacec::csCommandLineHelper_AddCommandLineSection;
+*AddCommandLineOption = *cspacec::csCommandLineHelper_AddCommandLineOption;
+*AddCommandLineExample = *cspacec::csCommandLineHelper_AddCommandLineExample;
+*PrintApplicationHelp = *cspacec::csCommandLineHelper_PrintApplicationHelp;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -5292,6 +5302,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SaveCollectionFile = *cspacec::iSaver_SaveCollectionFile;
 *SaveCollection = *cspacec::iSaver_SaveCollection;
 *SavePortal = *cspacec::iSaver_SavePortal;
+*SaveCameraPosition = *cspacec::iSaver_SaveCameraPosition;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -10392,6 +10403,8 @@ sub DESTROY {
 *swig_instanceNum_set = *cspacec::RenderMeshModes_instanceNum_set;
 *swig_instParams_get = *cspacec::RenderMeshModes_instParams_get;
 *swig_instParams_set = *cspacec::RenderMeshModes_instParams_set;
+*swig_instParamBuffers_get = *cspacec::RenderMeshModes_instParamBuffers_get;
+*swig_instParamBuffers_set = *cspacec::RenderMeshModes_instParamBuffers_set;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -14782,6 +14795,10 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *UpdateTexels = *cspacec::iGenMeshAnimationControl_UpdateTexels;
 *UpdateNormals = *cspacec::iGenMeshAnimationControl_UpdateNormals;
 *UpdateColors = *cspacec::iGenMeshAnimationControl_UpdateColors;
+*AnimatesBBoxRadius = *cspacec::iGenMeshAnimationControl_AnimatesBBoxRadius;
+*UpdateBoundingBox = *cspacec::iGenMeshAnimationControl_UpdateBoundingBox;
+*UpdateRadius = *cspacec::iGenMeshAnimationControl_UpdateRadius;
+*UpdateBoundingBoxes = *cspacec::iGenMeshAnimationControl_UpdateBoundingBoxes;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -15522,20 +15539,20 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::csAnimatedMeshBoneInfluence ##############
+############# Class : cspace::AnimatedMeshBoneInfluence ##############
 
-package cspace::csAnimatedMeshBoneInfluence;
+package cspace::AnimatedMeshBoneInfluence;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-*swig_bone_get = *cspacec::csAnimatedMeshBoneInfluence_bone_get;
-*swig_bone_set = *cspacec::csAnimatedMeshBoneInfluence_bone_set;
-*swig_influenceWeight_get = *cspacec::csAnimatedMeshBoneInfluence_influenceWeight_get;
-*swig_influenceWeight_set = *cspacec::csAnimatedMeshBoneInfluence_influenceWeight_set;
+*swig_bone_get = *cspacec::AnimatedMeshBoneInfluence_bone_get;
+*swig_bone_set = *cspacec::AnimatedMeshBoneInfluence_bone_set;
+*swig_influenceWeight_get = *cspacec::AnimatedMeshBoneInfluence_influenceWeight_get;
+*swig_influenceWeight_set = *cspacec::AnimatedMeshBoneInfluence_influenceWeight_set;
 sub new {
     my $pkg = shift;
-    my $self = cspacec::new_csAnimatedMeshBoneInfluence(@_);
+    my $self = cspacec::new_AnimatedMeshBoneInfluence(@_);
     bless $self, $pkg if defined($self);
 }
 
@@ -15545,7 +15562,7 @@ sub DESTROY {
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_csAnimatedMeshBoneInfluence($self);
+        cspacec::delete_AnimatedMeshBoneInfluence($self);
         delete $OWNER{$self};
     }
 }
@@ -19616,6 +19633,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetFarPlane = *cspacec::iCameraPosition_SetFarPlane;
 *ClearFarPlane = *cspacec::iCameraPosition_ClearFarPlane;
 *GetFarPlane = *cspacec::iCameraPosition_GetFarPlane;
+*Save = *cspacec::iCameraPosition_Save;
 *scfGetVersion = *cspacec::iCameraPosition_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -20074,8 +20092,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *swig_polygon_idx_set = *cspacec::csHitBeamResult_polygon_idx_set;
 *swig_material_get = *cspacec::csHitBeamResult_material_get;
 *swig_material_set = *cspacec::csHitBeamResult_material_set;
-*swig_materials_get = *cspacec::csHitBeamResult_materials_get;
-*swig_materials_set = *cspacec::csHitBeamResult_materials_set;
 *swig_facehit_get = *cspacec::csHitBeamResult_facehit_get;
 *swig_facehit_set = *cspacec::csHitBeamResult_facehit_set;
 *swig_hit_get = *cspacec::csHitBeamResult_hit_get;
@@ -20210,7 +20226,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *AddExtraRenderMesh = *cspacec::iMeshWrapper_AddExtraRenderMesh;
 *GetExtraRenderMesh = *cspacec::iMeshWrapper_GetExtraRenderMesh;
 *GetExtraRenderMeshCount = *cspacec::iMeshWrapper_GetExtraRenderMeshCount;
-*GetExtraRenderMeshPriority = *cspacec::iMeshWrapper_GetExtraRenderMeshPriority;
 *GetExtraRenderMeshZBufMode = *cspacec::iMeshWrapper_GetExtraRenderMeshZBufMode;
 *RemoveExtraRenderMesh = *cspacec::iMeshWrapper_RemoveExtraRenderMesh;
 *AddInstance = *cspacec::iMeshWrapper_AddInstance;
@@ -20275,6 +20290,10 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetInstanceFactory = *cspacec::iMeshFactoryWrapper_GetInstanceFactory;
 *AddInstance = *cspacec::iMeshFactoryWrapper_AddInstance;
 *GetInstances = *cspacec::iMeshFactoryWrapper_GetInstances;
+*AddExtraRenderMesh = *cspacec::iMeshFactoryWrapper_AddExtraRenderMesh;
+*GetExtraRenderMesh = *cspacec::iMeshFactoryWrapper_GetExtraRenderMesh;
+*GetExtraRenderMeshCount = *cspacec::iMeshFactoryWrapper_GetExtraRenderMeshCount;
+*RemoveExtraRenderMesh = *cspacec::iMeshFactoryWrapper_RemoveExtraRenderMesh;
 *scfGetVersion = *cspacec::iMeshFactoryWrapper_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -20507,6 +20526,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *IsFullTransformIdentity = *cspacec::iMovable_IsFullTransformIdentity;
 *TransformIdentity = *cspacec::iMovable_TransformIdentity;
 *SetFullTransform = *cspacec::iMovable_SetFullTransform;
+*SetFullPosition = *cspacec::iMovable_SetFullPosition;
 *scfGetVersion = *cspacec::iMovable_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -20616,6 +20636,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *IntersectSegment = *cspacec::iVisibilityCuller_IntersectSegment;
 *ParseCullerParameters = *cspacec::iVisibilityCuller_ParseCullerParameters;
 *RenderViscull = *cspacec::iVisibilityCuller_RenderViscull;
+*BeginPrecacheCulling = *cspacec::iVisibilityCuller_BeginPrecacheCulling;
+*EndPrecacheCulling = *cspacec::iVisibilityCuller_EndPrecacheCulling;
 *scfGetVersion = *cspacec::iVisibilityCuller_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -22822,6 +22844,7 @@ sub CS_VATTRIB_GENERIC_LAST () { $cspacec::CS_VATTRIB_GENERIC_LAST }
 sub CS_VATTRIB_GENERIC_NUM () { $cspacec::CS_VATTRIB_GENERIC_NUM }
 sub CS_IATTRIB_FIRST () { $cspacec::CS_IATTRIB_FIRST }
 sub CS_IATTRIB_LAST () { $cspacec::CS_IATTRIB_LAST }
+sub CS_IATTRIB_NUM () { $cspacec::CS_IATTRIB_NUM }
 sub CS_VATTRIB_UNUSED () { $cspacec::CS_VATTRIB_UNUSED }
 sub CS_VATTRIB_INVALID () { $cspacec::CS_VATTRIB_INVALID }
 sub CS_VATTRIB_POSITION () { $cspacec::CS_VATTRIB_POSITION }

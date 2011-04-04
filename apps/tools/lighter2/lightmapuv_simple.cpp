@@ -200,7 +200,7 @@ namespace lighter
       size_t numLMs = globalLightmaps.GetSize();
       numLMs /= 4;
       index = numLMs;
-      for (size_t i = 5; i-- > 2; )
+      for (size_t i = 4; i-- > 1; )
       {
 	globalLightmaps.Insert (index + numLMs*i,
 	  new Lightmap (*newL));

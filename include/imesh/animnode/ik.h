@@ -26,7 +26,6 @@
  */
 
 #include "csutil/scf_interface.h"
-
 #include "imesh/animnode/skeleton2anim.h"
 
 struct iMovable;
@@ -60,25 +59,10 @@ struct iSkeletonIKNodeFactory;
  * A class to manage the creation and deletion of Inverse Kinematics animation 
  * node factories.
  */
-struct iSkeletonIKNodeManager : public virtual iBase
+struct iSkeletonIKNodeManager
+  : public virtual CS::Animation::iSkeletonAnimNodeManager<CS::Animation::iSkeletonIKNodeFactory>
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonIKNodeManager, 1, 0, 0);
-
-  /**
-   * Create a new Inverse Kinematics animation node factory.
-   */
-  virtual iSkeletonIKNodeFactory* CreateAnimNodeFactory (const char *name) = 0;
-
-  /**
-   * Find the Inverse Kinematics animation node factory with the given name.
-   */
-  virtual iSkeletonIKNodeFactory* FindAnimNodeFactory
-    (const char* name) const = 0;
-
-  /**
-   * Delete all Inverse Kinematics animation node factories.
-   */
-  virtual void ClearAnimNodeFactories () = 0;
+  SCF_ISKELETONANIMNODEMANAGER_INTERFACE (CS::Animation::iSkeletonIKNodeManager, 1, 0, 0);
 };
 
 /**
@@ -94,9 +78,9 @@ struct iSkeletonIKNodeManager : public virtual iBase
  *
  * \sa iSkeletonIKPhysicalNodeFactory
  */
-struct iSkeletonIKNodeFactory : public iSkeletonAnimNodeFactory
+struct iSkeletonIKNodeFactory : public virtual iSkeletonAnimNodeFactory
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonIKNodeFactory, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonIKNodeFactory, 2, 0, 0);
 
   /**
    * Set the physical description of the skeleton.
@@ -112,6 +96,8 @@ struct iSkeletonIKNodeFactory : public iSkeletonAnimNodeFactory
    * Set the child animation node of this node. The IK controller will
    * add its control on top of the animation of the child node. This child
    * node is not mandatory.
+   *
+   * It is valid to set a null reference as chid node.
    */
   virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* node) = 0;
 
@@ -119,11 +105,6 @@ struct iSkeletonIKNodeFactory : public iSkeletonAnimNodeFactory
    * Return the child animation node of this node.
    */
   virtual CS::Animation::iSkeletonAnimNodeFactory* GetChildNode () const = 0;
-
-  /**
-   * Clear the child animation node of this node.
-   */
-  virtual void ClearChildNode () = 0;
 
   /**
    * Add an effector to this factory.
@@ -154,9 +135,9 @@ struct iSkeletonIKNodeFactory : public iSkeletonAnimNodeFactory
  *
  * \sa iSkeletonIKPhysicalNode
  */
-struct iSkeletonIKNode : public iSkeletonAnimNode
+struct iSkeletonIKNode : public virtual iSkeletonAnimNode
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonIKNode, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonIKNode, 2, 0, 0);
 
   /**
    * Add a constraint on the given effector so that it sticks to the given world transform.
@@ -280,8 +261,7 @@ struct iSkeletonIKPhysicalNode : public iSkeletonIKNode
  *
  * \warning The current implementation does not care about the rotational component
  * of the constraints.
- * \warning The current implementation does not care about the constraints of the
- * joints of the chain.
+ * \warning The current implementation can only manage one constraint per chain.
  *
  * \sa iSkeletonIKNodeFactory
  */
@@ -369,8 +349,7 @@ struct iSkeletonIKCCDNodeFactory : public iSkeletonIKNodeFactory
  *
  * \warning The current implementation does not care about the rotational component
  * of the constraints.
- * \warning The current implementation does not care about the constraints of the
- * joints of the chain.
+ * \warning The current implementation can only manage one constraint per chain.
  *
  * \sa iSkeletonIKNode
  */

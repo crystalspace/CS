@@ -23,16 +23,19 @@
 #include "cssysdef.h"
 #include "csgfx/shadervarcontext.h"
 #include "cstool/csapplicationframework.h"
+#include "cstool/csdemoapplication.h"
 #include "cstool/csview.h"
 #include "cstool/meshobjtmpl.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/cmdline.h"
-#include "csutil/csbaseeventh.h"
 #include "csutil/common_handlers.h"
+#include "csutil/csbaseeventh.h"
 #include "csutil/evoutlet.h"
+#include "csutil/parray.h"
 #include "csutil/plugmgr.h"
 #include "csutil/virtclk.h"
 #include "csutil/xmltiny.h"
+
 #include "iengine/camera.h"
 #include "iengine/engine.h"
 #include "iengine/light.h"
@@ -46,19 +49,18 @@
 #include "imesh/spritecal3d.h"
 #include "ivaria/icegui.h"
 
-#include "csutil/parray.h"
-
-struct iAnimatedMesh;
-struct iAnimatedMeshFactory;
-struct iAnimatedMeshSocket;
-struct iSkeletonAnimNode;
-struct iSkeletonAnimNodeFactory;
-
 #include "assetbase.h"
 #include "tabbase.h"
 
 class GeneralTab;
 class MaterialTab;
+
+enum LightMode
+{
+  THREE_POINT = 0,
+  FRONT_BACK_TOP,
+  UNLIT
+};
 
 class ViewMesh : public csApplicationFramework, public csBaseEventHandler
 {
@@ -66,21 +68,10 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
 
   csRef<iCollection> collection;
 
-  csVector3 camTarget;
-  float     camDist;
-  float     camYaw;
-  float     camPitch;
-
-  bool      camModePan;
-  bool      camModeRotate;
-  bool      camModeZoom;
-
   csStringArray reloadLibraryFilenames;
 
   csString reloadFilename;
   csString reloadFilePath;
-
-  int       lastMouseX, lastMouseY;
 
   csRef<iEngine> engine;
   csRef<iLoader> loader;
@@ -94,16 +85,17 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   csRef<iCEGUI> cegui;
   csRef<iThreadReturn> loading;
   iSector* room;
-  int x,y;
   csRef<FramePrinter> printer;
+
+  CS::Demo::CameraManager cameraManager;
+
+  LightMode lightMode;
+  void SetLightMode (LightMode lightMode);
 
   CEGUI::Window* form;
   CEGUI::Window* stddlg;
 
-  enum { movenormal, moveorigin, rotateorigin } camMode;
-
-  float roomsize, scale;
-  float move_sprite_speed;
+  float scale;
 
   csRef<AssetBase> asset;
 
@@ -111,15 +103,9 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   int max_lod_level;
   bool auto_lod;
 
-  void ResetCamera();
-  void UpdateCamera();
-  void FixCameraForOrigin(const csVector3 & desiredOrigin);
-
   bool OnKeyboard (iEvent&);
-
-  bool OnMouseDown (iEvent&);
-  bool OnMouseUp (iEvent&);
-  bool OnMouseMove (iEvent&);
+  bool OnMouseDown (iEvent &event);
+  bool OnMouseUp (iEvent &event);
 
   void Frame ();
 
@@ -174,16 +160,55 @@ private:
   bool StdDlgDirSelect (const CEGUI::EventArgs& e);
   bool StdDlgDirChange (const CEGUI::EventArgs& e);
 
+  /// Whether or not there is currently a mouse interaction with the camera
+  bool mouseMove;
+
   CS_EVENTHANDLER_NAMES ("crystalspace.viewmesh")
   
   virtual const csHandlerID * GenericPrec (csRef<iEventHandlerRegistry> &r1, 
     csRef<iEventNameRegistry> &r2, csEventID event) const 
   {
-    static csHandlerID precConstraint[2];
+    // The CeGUI window has precedence in the mouse events iff
+    // there are no current mouse interaction with the camera
+    if (!mouseMove)
+    {
+      static csHandlerID precConstraint[2];
     
-    precConstraint[0] = r1->GetGenericID("crystalspace.cegui");
-    precConstraint[1] = CS_HANDLERLIST_END;
-    return precConstraint;
+      precConstraint[0] = r1->GetGenericID("crystalspace.cegui");
+      precConstraint[1] = CS_HANDLERLIST_END;
+      return precConstraint;
+    }
+
+    else
+    {
+      static csHandlerID precConstraint[1];
+    
+      precConstraint[0] = CS_HANDLERLIST_END;
+      return precConstraint;
+    }
+  }
+
+  virtual const csHandlerID * GenericSucc (csRef<iEventHandlerRegistry> &r1, 
+    csRef<iEventNameRegistry> &r2, csEventID event) const 
+  {
+    // The CeGUI window has precedence in the mouse events iff
+    // there are no current mouse interaction with the camera
+    if (mouseMove)
+    {
+      static csHandlerID precConstraint[2];
+    
+      precConstraint[0] = r1->GetGenericID("crystalspace.cegui");
+      precConstraint[1] = CS_HANDLERLIST_END;
+      return precConstraint;
+    }
+
+    else
+    {
+      static csHandlerID precConstraint[1];
+    
+      precConstraint[0] = CS_HANDLERLIST_END;
+      return precConstraint;
+    }
   }
 
   CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS

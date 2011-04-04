@@ -48,24 +48,10 @@ struct iBodyChain;
  * A class to manage the creation and deletion of debug animation 
  * node factories.
  */
-struct iSkeletonDebugNodeManager : public virtual iBase
+struct iSkeletonDebugNodeManager
+  : public virtual CS::Animation::iSkeletonAnimNodeManager<CS::Animation::iSkeletonDebugNodeFactory>
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonDebugNodeManager, 1, 0, 0);
-
-  /**
-   * Create a 'debug' animation node factory of the given name.
-   */
-  virtual iSkeletonDebugNodeFactory* CreateAnimNodeFactory (const char* name) = 0;
-
-  /**
-   * Find the 'debug' animation node factory of the given name.
-   */
-  virtual iSkeletonDebugNodeFactory* FindAnimNodeFactory (const char* name) = 0;
-
-  /**
-   * Delete all 'debug' animation node factories.
-   */
-  virtual void ClearAnimNodeFactories () = 0;
+  SCF_ISKELETONANIMNODEMANAGER_INTERFACE (CS::Animation::iSkeletonDebugNodeManager, 1, 0, 0);
 };
 
 // ----------------------------- iSkeletonDebugNode -----------------------------
@@ -85,9 +71,9 @@ enum SkeletonDebugMode
 /**
  * Factory for the 'debug' animation node (see CS::Animation::iSkeletonDebugNode).
  */
-struct iSkeletonDebugNodeFactory : public iSkeletonAnimNodeFactory
+struct iSkeletonDebugNodeFactory : public virtual iSkeletonAnimNodeFactory
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonDebugNodeFactory, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonDebugNodeFactory, 2, 0, 0);
 
   /**
    * Set the combination of visualization modes to be used for displaying the animation.
@@ -122,7 +108,7 @@ struct iSkeletonDebugNodeFactory : public iSkeletonAnimNodeFactory
   virtual void SetLeafBonesDisplayed (bool displayed) = 0;
 
   /**
-   * Set the child animation node of this node.
+   * Set the child animation node of this node. It is valid to set a null reference as chid node.
    */
   virtual void SetChildNode (iSkeletonAnimNodeFactory* factory) = 0;
 
@@ -141,9 +127,9 @@ struct iSkeletonDebugNodeFactory : public iSkeletonAnimNodeFactory
  * \warning You have to call Draw() at each frame if you want the 2D information
  * displayed by this node.
  */
-struct iSkeletonDebugNode : public iSkeletonAnimNode
+struct iSkeletonDebugNode : public virtual iSkeletonAnimNode
 {
-  SCF_INTERFACE(iSkeletonDebugNode, 1, 0, 0);
+  SCF_INTERFACE(iSkeletonDebugNode, 2, 0, 0);
 
   /**
    * Draw the 2D visual information

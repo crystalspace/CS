@@ -67,178 +67,27 @@ CS_IMPLEMENT_APPLICATION
 //---------------------------------------------------------------------------
 
 ViewMesh::ViewMesh () : 
-  camMode(rotateorigin), roomsize(5), scale(1), move_sprite_speed(0), lod_level(0), max_lod_level(0), auto_lod(false)
-  {
-    SetApplicationName ("CrystalSpace.ViewMesh");
-  }
-
-  ViewMesh::~ViewMesh ()
-  {
-  }
-
-  void ViewMesh::Frame()
-  {
-    csTicks elapsed_time = vc->GetElapsedTicks ();
-    float speed = (elapsed_time / 1000.0) * (0.06 * 20);
-
-    iCamera* c = view->GetCamera();
-    csVector3 orig = c->GetTransform().GetOrigin();
-
-    if (asset)
-    {
-      switch (camMode)
-      {
-      case movenormal:
-        {
-          if (kbd->GetKeyState (CSKEY_SHIFT))
-          {
-            if (kbd->GetKeyState (CSKEY_UP))
-              camTarget += c->GetTransform().This2OtherRelative(
-              csVector3(0,1,0)) * 4 * speed;
-            if (kbd->GetKeyState (CSKEY_DOWN))
-              camTarget -= c->GetTransform().This2OtherRelative(
-              csVector3(0,1,0)) * 4 * speed;
-            if (kbd->GetKeyState (CSKEY_RIGHT))
-              camTarget += c->GetTransform().This2OtherRelative(
-              csVector3(1,0,0)) * 4 * speed;
-            if (kbd->GetKeyState (CSKEY_LEFT))
-              camTarget -= c->GetTransform().This2OtherRelative(
-              csVector3(1,0,0)) * 4 * speed;
-          }
-          else
-          {
-            if (kbd->GetKeyState (CSKEY_UP))
-              camTarget += (camTarget - orig).Unit() * 4 * speed;
-            if (kbd->GetKeyState (CSKEY_DOWN))
-              camTarget -= (camTarget - orig).Unit() * 4 * speed;
-          }
-
-          UpdateCamera();
-          orig = c->GetTransform().GetOrigin();
-          if (!kbd->GetKeyState (CSKEY_SHIFT))
-          {
-            if (kbd->GetKeyState (CSKEY_RIGHT))
-              camYaw += speed;
-            if (kbd->GetKeyState (CSKEY_LEFT))
-              camYaw -= speed;
-          }
-          if (kbd->GetKeyState (CSKEY_PGUP))
-            camPitch = csMin<float>(3.14159f * 0.5f - 0.01f, camPitch + speed);
-          if (kbd->GetKeyState (CSKEY_PGDN))
-            camPitch = csMax<float>(-3.14159f * 0.5f + 0.01f, camPitch - speed);
-
-          UpdateCamera();
-          csVector3 deltaOrig = c->GetTransform().GetOrigin() - orig;
-          camTarget -= deltaOrig;
-          UpdateCamera();
-          break;
-        }
-      case moveorigin:
-        {
-          if (kbd->GetKeyState (CSKEY_DOWN))
-            orig.z -= 4 * speed;
-          if (kbd->GetKeyState (CSKEY_UP))
-            orig.z += 4 * speed;
-          if (kbd->GetKeyState (CSKEY_LEFT))
-            orig.x -= 4 * speed;
-          if (kbd->GetKeyState (CSKEY_RIGHT))
-            orig.x += 4 * speed;
-          if (kbd->GetKeyState (CSKEY_PGUP))
-            orig.y += 4 * speed;
-          if (kbd->GetKeyState (CSKEY_PGDN))
-            orig.y -= 4 * speed;
-          FixCameraForOrigin(orig);
-          UpdateCamera();
-          break;
-        }
-      case rotateorigin:
-        {
-          if (kbd->GetKeyState (CSKEY_LEFT))
-            camYaw += speed;
-          if (kbd->GetKeyState (CSKEY_RIGHT))
-            camYaw -= speed;
-          if (kbd->GetKeyState (CSKEY_UP))
-            camPitch = csMin<float>(3.14159f * 0.5f - 0.01f, camPitch + speed);
-          if (kbd->GetKeyState (CSKEY_DOWN))
-            camPitch = csMax<float>(-3.14159f * 0.5f + 0.01f, camPitch - speed);
-          if (kbd->GetKeyState (CSKEY_PGUP))
-            camDist = csMax<float>(0.01f, camDist - speed * 4);
-          if (kbd->GetKeyState (CSKEY_PGDN))
-            camDist += speed * 4;
-          UpdateCamera();
-          break;
-        }
-      default:
-        break;
-      }
-
-      csRef<iMovable> mov = asset->GetMesh()->GetMovable();
-      csVector3 pos = mov->GetFullPosition();    
-      mov->MovePosition(csVector3(pos.x, pos.y, -move_sprite_speed*elapsed_time/1000.0f));
-      mov->UpdateMove();
-      if (pos.z > roomsize) 
-      {
-        pos.z = -roomsize;
-        mov->SetPosition(pos);
-      }
-      else if (pos.z < -roomsize) 
-      {
-        pos.z = roomsize;
-        mov->SetPosition(pos);
-      }
-    }
-
-    if (!g3d->BeginDraw (CSDRAW_3DGRAPHICS))
-      return;
-
-    view->Draw ();
-
-    if (loading)
-      LoadSprite(reloadFilename, reloadFilePath);
-
-    cegui->Render();
-  }
-
-  void ViewMesh::ResetCamera()
-  {
-    camTarget.Set(0,0,0);
-    if (asset)
-    {
-      csBox3 box;
-      box = asset->GetMesh()->GetWorldBoundingBox();
-      camTarget = box.GetCenter();
-    }
-
-    camDist = 3.5f;
-    camYaw = 0.0f;
-    camPitch = -0.2f;
-  }
-
-void ViewMesh::UpdateCamera()
+  lightMode (THREE_POINT), scale (1.0f), lod_level (0), max_lod_level (0),
+  auto_lod (false), mouseMove (false)
 {
-  csVector3 camPos;
-
-  camPos.x = camTarget.x - camDist * (float)cos(camPitch) * (float)sin(camYaw);
-  camPos.y = camTarget.y - camDist * (float)sin(camPitch);
-  camPos.z = camTarget.z - camDist * (float)cos(camPitch) * (float)cos(camYaw);
-
-  iCamera * c = view->GetCamera();
-  c->GetTransform().SetOrigin(camPos);
-  c->GetTransform().LookAt(camTarget - camPos, csVector3(0,1,0));
+  SetApplicationName ("CrystalSpace.ViewMesh");
 }
 
-void ViewMesh::FixCameraForOrigin(const csVector3 & desiredOrigin)
+ViewMesh::~ViewMesh ()
 {
-  // calculate distance, yaw, and pitch values that will put the origin at the desired origin
+}
 
-  camDist = (camTarget - desiredOrigin).Norm();
+void ViewMesh::Frame()
+{
+  if (!g3d->BeginDraw (CSDRAW_3DGRAPHICS))
+    return;
 
-  camPitch = (float)asin((camTarget.y - desiredOrigin.y) / camDist);
+  view->Draw ();
 
-  camYaw = (float)asin((camTarget.x - desiredOrigin.x)
-      / (camDist * (float)cos(camPitch)));
-  if ((camTarget.z - desiredOrigin.z) / (camDist * (float)cos(camPitch)) < 0.0f)
-      camYaw = 3.14159f - camYaw;
+  if (loading)
+    LoadSprite(reloadFilename, reloadFilePath);
+
+  cegui->Render();
 }
 
 bool ViewMesh::OnKeyboard(iEvent& ev)
@@ -261,7 +110,7 @@ bool ViewMesh::OnKeyboard(iEvent& ev)
 	&& !auto_lod
 	&& lod_level < max_lod_level)
     {
-      lod_level += 1;
+      lod_level += max_lod_level / 20;
       needLODUpdate = true;
     }
 
@@ -269,7 +118,7 @@ bool ViewMesh::OnKeyboard(iEvent& ev)
 	&& !auto_lod
 	&& lod_level > 0)
     {
-      lod_level -= 1;
+      lod_level -= max_lod_level / 20;
       needLODUpdate = true;
     }
 
@@ -286,125 +135,83 @@ bool ViewMesh::OnKeyboard(iEvent& ev)
   return false;
 }
 
-bool ViewMesh::OnMouseDown (iEvent& e)
+bool ViewMesh::OnMouseDown (iEvent &event)
 {
-  const float mouseWheelZoomAmount = 0.25f;
+  // We start here a mouse interaction with the camera, therefore
+  // we must take precedence in the mouse events over the CeGUI
+  // window. In order to do that, we re-register to the event
+  // queue, but with a different priority.
+  if (mouseMove) return false;
+  mouseMove = true;
 
-  if (!asset)
-    return false;
-
-  uint button = csMouseEventHelper::GetButton(&e);
-  switch (button)
-  {
-  case 0:
-    camModePan = true;
-    break;
-  case 1:
-    camModeRotate = true;
-    break;
-  case 2:
-    camModeZoom = true;
-    break;
-  case 3:
-    camDist = csMax<float>(0.1f, camDist - mouseWheelZoomAmount);
-    UpdateCamera();
-    break;
-  case 4:
-    camDist = csMax<float>(0.1f, camDist + mouseWheelZoomAmount);
-    UpdateCamera();
-    break;
-  }
-  return false;
-}
-
-bool ViewMesh::OnMouseUp (iEvent& e)
-{
-  if (!asset)
-    return false;
-
-  uint button = csMouseEventHelper::GetButton(&e);
-  switch (button)
-  {
-  case 0:
-    camModePan = false;
-    break;
-  case 1:
-    camModeRotate = false;
-    break;
-  case 2:
-    camModeZoom = false;
-    break;
-  }
-  return false;
-}
-
-bool ViewMesh::OnMouseMove (iEvent& e)
-{
-  int x = csMouseEventHelper::GetX(&e);
-  int y = csMouseEventHelper::GetY(&e);
-  float dx = (float)(x - lastMouseX) * 0.02f;
-  float dy = (float)(y - lastMouseY) * -0.02f;
-  iCamera * c = view->GetCamera();
-
-  lastMouseX = x;
-  lastMouseY = y;
-
-  if (camModePan)
-  {
-    camTarget += c->GetTransform().This2OtherRelative(csVector3(1,0,0)) * dx 
-               + c->GetTransform().This2OtherRelative(csVector3(0,1,0)) * dy;
-  }
-  if (camModeRotate)
-  {
-    camYaw += dx;
-    camPitch += dy;
-  }
-  if (camModeZoom)
-  {
-    camDist = csMax<float>(0.1f, camDist - (dx + dy));
-  }
-
-  if (camModePan || camModeRotate || camModePan)
-    UpdateCamera();
+  // Re-register to the event queue
+  csBaseEventHandler::UnregisterQueue ();
+  RegisterQueue (GetObjectRegistry (), csevAllEvents (GetObjectRegistry ()));
 
   return false;
 }
 
+bool ViewMesh::OnMouseUp (iEvent &event)
+{
+  // We finish here a mouse interaction with the camera, therefore
+  // the CeGUI window should again take precedence in the mouse events.
+  if (!mouseMove) return false;
+  mouseMove = false;
+
+  // Re-register to the event queue
+  csBaseEventHandler::UnregisterQueue ();
+  RegisterQueue (GetObjectRegistry (), csevAllEvents (GetObjectRegistry ()));
+  return false;
+}
 
 void ViewMesh::Help ()
 {
-  csPrintf ("Options for ViewMesh:\n");
-  csPrintf ("  -L=<file>          Load a library file (for textures/materials)\n");
-  csPrintf ("  -Scale=<ratio>     Scale the Object\n");
-  csPrintf ("  -RoomSize=<units>  Radius and height (4*) of the room (default 5)\n");
-  csPrintf ("  -R=<realpath>      Real path from where to load the model\n");
-  csPrintf ("  -C=<vfsdir>        Current VFS directory\n");
-  csPrintf ("  <file>             Load the specified mesh object from the VFS path (meshfact or library)\n");
-  csPrintf ("\n");
-  csPrintf ("Example:\n");
-  csPrintf ("  viewmesh -C=data/frankie/ frankie.xml\n");
-  csPrintf ("\n");
+  csCommandLineHelper commandLineHelper;
+
+  // Usage examples
+  commandLineHelper.AddCommandLineExample ("viewmesh data/frankie/frankie.xml");
+  commandLineHelper.AddCommandLineExample ("viewmesh -R=data/kwartz.zip kwartz.lib");
+  commandLineHelper.AddCommandLineExample ("viewmesh -R=data/seymour.zip Seymour.dae");
+
+  // Command line options
+  commandLineHelper.AddCommandLineOption
+    ("R", "Real path to be mounted in VFS", csVariant (""));
+  commandLineHelper.AddCommandLineOption
+    ("C", "VFS directory where to find the files", csVariant ("/"));
+  commandLineHelper.AddCommandLineOption
+    ("L", "Load a library file (for textures/materials)", csVariant (""));
+  commandLineHelper.AddCommandLineOption
+    ("scale", "Scale the Object", csVariant (1.0f));
+
+  // Printing help
+  commandLineHelper.PrintApplicationHelp
+    (object_reg, "viewmesh", "viewmesh [OPTIONS] [filename]",
+     "Crystal Space's tool for the visualization and the manipulation of meshes\n\n"
+     "If provided, it will load the given file from the specified VFS directory."
+     " If no VFS directory is provided then it will assume the one of the file. "
+     "An additional real path can be provided to be mounted before loading the file."
+     " This is useful for example to mount an archive in VFS before accessing the"
+     " files in it.");
 }
 
-void ViewMesh::HandleCommandLine()
+void ViewMesh::HandleCommandLine ()
 {
   csRef<iCommandLineParser> cmdline =
-    csQueryRegistry<iCommandLineParser> (GetObjectRegistry());
+    csQueryRegistry<iCommandLineParser> (GetObjectRegistry ());
 
   const char* libname;
-  for (int i=0; (libname=cmdline->GetOption("L",i)); i++)
+  for (int i=0; (libname = cmdline->GetOption ("L",i)); i++)
   {
-    if (!loader->LoadLibraryFile(libname))
+    if (!loader->LoadLibraryFile (libname))
     {
       ReportError("Couldn't load lib %s.\n", libname);
     }
   }
 
-  const char* meshfilename = cmdline->GetName (0);
+  csString meshfilename = cmdline->GetName (0);
   const char* texturefilename = cmdline->GetName (1);
   const char* texturename = cmdline->GetName (2);
   const char* scaleTxt = cmdline->GetOption("Scale");
-  const char* roomSize = cmdline->GetOption("RoomSize");
   const char* realPath = cmdline->GetOption("R");
 
   csString vfsDir = cmdline->GetOption("C");
@@ -415,14 +222,19 @@ void ViewMesh::HandleCommandLine()
     vfs->ChDir ("/tmp/viewmesh");
   }
 
-  if(vfsDir.IsEmpty() && meshfilename)
+  if (vfsDir.IsEmpty() && meshfilename)
   {
-    vfsDir = csString(meshfilename).Slice(0, csString(meshfilename).FindLast('/'));
+    size_t index = meshfilename.FindLast ('/');
+    if (index != (size_t) -1)
+    {
+      vfsDir = meshfilename.Slice (0, index);
+      meshfilename = meshfilename.Slice (index + 1);
+    }
   }
 
   if (!vfsDir.IsEmpty())
   {
-    if(!vfs->ChDir (vfsDir))
+    if (!vfs->ChDir (vfsDir))
     {
       ReportError("Cannot change to path: %s\n", vfsDir.GetData ());
     }
@@ -445,8 +257,6 @@ void ViewMesh::HandleCommandLine()
   {
     LoadSprite(meshfilename);
   }
-
-  if (roomSize) roomsize = CS::Utility::strtof(roomSize);
 
   if (scaleTxt != 0)
   {
@@ -566,16 +376,6 @@ bool ViewMesh::Application()
 
   HandleCommandLine();
 
-  ResetCamera();
-  UpdateCamera();
-
-  camModePan = false;
-  camModeRotate = false;
-  camModeZoom = false;
-
-  x = g3d->GetDriver2D ()->GetWidth ();
-  y = g3d->GetDriver2D ()->GetHeight ();
-
   printer.AttachNew (new FramePrinter (object_reg));
 
   Run();
@@ -586,19 +386,24 @@ bool ViewMesh::Application()
 bool ViewMesh::CreateRoom ()
 {
   room = engine->CreateSector ("room");
+
+  // Initialize the camera
   view->GetCamera ()->SetSector (room);
+  cameraManager.Initialize (object_reg);
+  cameraManager.SetCameraMode (CS::Demo::CAMERA_ROTATE);
+  cameraManager.SetCamera (view->GetCamera ());
 
   csRef<iLight> light;
   light = engine->CreateLight
-    (0, csVector3(-roomsize/2, roomsize/2, 0), 2*roomsize, csColor(1, 1, 1));
+    (0, csVector3 (0.0f), 100.0f, csColor(1, 1, 1));
   room->GetLights ()->Add (light);
 
   light = engine->CreateLight
-    (0, csVector3(roomsize/2, roomsize/2,  0), 2*roomsize, csColor(1, 1, 1));
+    (0, csVector3 (0.0f), 100.0f, csColor(1, 1, 1));
   room->GetLights ()->Add (light);
 
   light = engine->CreateLight
-    (0, csVector3(0, roomsize/2, -roomsize/2), 2*roomsize, csColor(1, 1, 1));
+    (0, csVector3(0.0f), 100.0f, csColor(1, 1, 1));
   room->GetLights ()->Add (light);
 
   return true;
@@ -768,6 +573,7 @@ void ViewMesh::LoadSprite (const char* filename, const char* path)
     csRef<iGeneralFactoryState> fstate = scfQueryInterface<iGeneralFactoryState>(factwrap->GetMeshObjectFactory());
     if (fstate)
     {
+      lod_level = 0;
       max_lod_level = fstate->GetNumProgLODLevels();
     }
 
@@ -801,13 +607,17 @@ void ViewMesh::LoadSprite (const char* filename, const char* path)
 
   ScaleSprite (scale);
 
+  // Reset the camera and light positions
   if (asset)
   {
-    csBox3 box;
-    box = asset->GetMesh()->GetWorldBoundingBox();
-    csVector3 sprpos = box.GetCenter();
-    csVector3 campos = view->GetCamera ()->GetTransform ().GetOrigin();
-    view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (campos.x, sprpos.y, campos.z));
+    csBox3 bbox = asset->GetMesh ()->GetWorldBoundingBox ();
+    cameraManager.SetCameraTarget (bbox.GetCenter ());
+    float boxSize = bbox.GetSize ().Norm ();
+    cameraManager.SetStartPosition (bbox.GetCenter () + csVector3 (0.0f, 0.0f, - boxSize * 1.3f));
+    cameraManager.SetMotionSpeed (boxSize * 5.0f);
+    cameraManager.ResetCamera ();
+
+    SetLightMode (lightMode);
   }
 
   generalTab->SetAsset(asset);
@@ -843,7 +653,6 @@ void ViewMesh::LoadSprite (const char* filename, const char* path)
     RegisterTab<ParticlesTab>();
   }
 
-  ResetCamera();
   loading.Invalidate();
 }
 
@@ -851,7 +660,7 @@ void ViewMesh::SaveSprite (const char* filename, bool binary)
 {
   if (!asset) return;
 
-  csRef<iDocumentSystem> xml(new csTinyDocumentSystem());
+  csRef<iDocumentSystem> xml = csPtr<iDocumentSystem>(new csTinyDocumentSystem());
   csRef<iDocument> doc = xml->CreateDocument();
   csRef<iDocumentNode> root = doc->CreateRoot();
 
@@ -900,7 +709,7 @@ void ViewMesh::SaveSprite (const char* filename, bool binary)
   //Invoke the iSaverPlugin::WriteDown
   if (binary)
   {
-    csRef<iString> fname (new scfString(filename));
+    csRef<iString> fname (csPtr<iString> (new scfString(filename)));
     fname->Append(".binary", 7);
 
     csRef<iFile> file (vfs->Open(*fname, VFS_FILE_WRITE));
@@ -994,25 +803,57 @@ void ViewMesh::ScaleSprite (float newScale)
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
   CEGUI::Window* component = winMgr->getWindow("General/ScaleSprite");
-  csRef<iString> valueMesh(new scfString());
+  csRef<iString> valueMesh (csPtr<iString> (new scfString()));
   valueMesh->Format("%.2f", scale);
   component->setProperty("Text", valueMesh->GetData());
 }
 
-void ViewMesh::MoveLights (const csVector3 &a, const csVector3 &b,
-    const csVector3 &c)
+void ViewMesh::SetLightMode (LightMode lightMode)
 {
   iLightList* ll = room->GetLights ();
   if (ll->GetCount () < 3)
     ReportError("MoveLights () has less lights than expected!");
 
-  ll->Get (0)->GetMovable()->SetPosition (a);
-  ll->Get (1)->GetMovable()->SetPosition (b);
-  ll->Get (2)->GetMovable()->SetPosition (c);
+  float roomSize = 5.0f;
+  if (asset)
+    roomSize = asset->GetMesh ()->GetWorldBoundingBox ().GetSize ().Norm () * 5.0f;
+
+  switch (lightMode)
+    {
+    case THREE_POINT:
+      ll->Get (0)->GetMovable()->SetPosition (csVector3 (-roomSize / 2.0f, roomSize / 2.0f, 0.0f));
+      ll->Get (1)->GetMovable()->SetPosition (csVector3 (roomSize / 2.0f,  -roomSize / 2.0f, 0.0f));
+      ll->Get (2)->GetMovable()->SetPosition (csVector3 (0.0f, 0.0f, -roomSize / 2.0f));
+      break;
+
+    case FRONT_BACK_TOP:
+      ll->Get (0)->GetMovable()->SetPosition (csVector3 (0.0f, 0.0f, roomSize / 4.0f));
+      ll->Get (1)->GetMovable()->SetPosition (csVector3 (0.0f, 0.0f, -roomSize / 4.0f));
+      ll->Get (2)->GetMovable()->SetPosition (csVector3 (0.0f, roomSize / 2.0f, 0.0f));
+      break;
+
+    case UNLIT:
+      ll->Get (0)->GetMovable()->SetPosition (csVector3 (0.0f));
+      ll->Get (1)->GetMovable()->SetPosition (csVector3 (0.0f,  -roomSize / 4.0f, 0.0f));
+      ll->Get (2)->GetMovable()->SetPosition (csVector3 (0.0f, roomSize / 2.0f, -roomSize / 2.0f));
+      break;
+    }
+
+  ll->Get (0)->SetCutoffDistance (roomSize);
+  ll->Get (1)->SetCutoffDistance (roomSize);
+  ll->Get (2)->SetCutoffDistance (roomSize);
 
   ll->Get (0)->GetMovable()->UpdateMove();
   ll->Get (1)->GetMovable()->UpdateMove();
   ll->Get (2)->GetMovable()->UpdateMove();
+
+  this->lightMode = lightMode;
+}
+
+void ViewMesh::MoveLights (const csVector3 &a, const csVector3 &b,
+    const csVector3 &c)
+{
+
 }
 
 //---------------------------------------------------------------------------

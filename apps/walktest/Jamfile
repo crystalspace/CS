@@ -92,6 +92,10 @@ if $(JPEG.AVAILABLE) = "yes"
 {
   WALKALL.PLUGINLIST += csjpgimg ;
 }
+if $(MNG.AVAILABLE) = "yes" && $(JPEG.AVAILABLE) = "yes" && $(ZLIB.AVAILABLE) = "yes"
+{
+  WALKALL.PLUGINLIST += csjngimg ;
+}
 if $(PNG.AVAILABLE) = "yes"
 {
   WALKALL.PLUGINLIST += cspngimg ;

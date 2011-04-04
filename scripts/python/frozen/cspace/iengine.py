@@ -667,6 +667,7 @@ class iCameraPosition(core.iBase):
     def SetFarPlane(*args): return _iengine.iCameraPosition_SetFarPlane(*args)
     def ClearFarPlane(*args): return _iengine.iCameraPosition_ClearFarPlane(*args)
     def GetFarPlane(*args): return _iengine.iCameraPosition_GetFarPlane(*args)
+    def Save(*args): return _iengine.iCameraPosition_Save(*args)
     scfGetVersion = staticmethod(_iengine.iCameraPosition_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iCameraPosition
     __del__ = lambda self : None;
@@ -903,7 +904,6 @@ class csHitBeamResult(object):
     r = _swig_property(_iengine.csHitBeamResult_r_get, _iengine.csHitBeamResult_r_set)
     polygon_idx = _swig_property(_iengine.csHitBeamResult_polygon_idx_get, _iengine.csHitBeamResult_polygon_idx_set)
     material = _swig_property(_iengine.csHitBeamResult_material_get, _iengine.csHitBeamResult_material_set)
-    materials = _swig_property(_iengine.csHitBeamResult_materials_get, _iengine.csHitBeamResult_materials_set)
     facehit = _swig_property(_iengine.csHitBeamResult_facehit_get, _iengine.csHitBeamResult_facehit_set)
     hit = _swig_property(_iengine.csHitBeamResult_hit_get, _iengine.csHitBeamResult_hit_set)
     def __init__(self, *args): 
@@ -984,7 +984,6 @@ class iMeshWrapper(core.iBase):
     def AddExtraRenderMesh(*args): return _iengine.iMeshWrapper_AddExtraRenderMesh(*args)
     def GetExtraRenderMesh(*args): return _iengine.iMeshWrapper_GetExtraRenderMesh(*args)
     def GetExtraRenderMeshCount(*args): return _iengine.iMeshWrapper_GetExtraRenderMeshCount(*args)
-    def GetExtraRenderMeshPriority(*args): return _iengine.iMeshWrapper_GetExtraRenderMeshPriority(*args)
     def GetExtraRenderMeshZBufMode(*args): return _iengine.iMeshWrapper_GetExtraRenderMeshZBufMode(*args)
     def RemoveExtraRenderMesh(*args): return _iengine.iMeshWrapper_RemoveExtraRenderMesh(*args)
     def AddInstance(*args): return _iengine.iMeshWrapper_AddInstance(*args)
@@ -1028,6 +1027,10 @@ class iMeshFactoryWrapper(core.iBase):
     def GetInstanceFactory(*args): return _iengine.iMeshFactoryWrapper_GetInstanceFactory(*args)
     def AddInstance(*args): return _iengine.iMeshFactoryWrapper_AddInstance(*args)
     def GetInstances(*args): return _iengine.iMeshFactoryWrapper_GetInstances(*args)
+    def AddExtraRenderMesh(*args): return _iengine.iMeshFactoryWrapper_AddExtraRenderMesh(*args)
+    def GetExtraRenderMesh(*args): return _iengine.iMeshFactoryWrapper_GetExtraRenderMesh(*args)
+    def GetExtraRenderMeshCount(*args): return _iengine.iMeshFactoryWrapper_GetExtraRenderMeshCount(*args)
+    def RemoveExtraRenderMesh(*args): return _iengine.iMeshFactoryWrapper_RemoveExtraRenderMesh(*args)
     scfGetVersion = staticmethod(_iengine.iMeshFactoryWrapper_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iMeshFactoryWrapper
     __del__ = lambda self : None;
@@ -1152,6 +1155,7 @@ class iMovable(core.iBase):
     def IsFullTransformIdentity(*args): return _iengine.iMovable_IsFullTransformIdentity(*args)
     def TransformIdentity(*args): return _iengine.iMovable_TransformIdentity(*args)
     def SetFullTransform(*args): return _iengine.iMovable_SetFullTransform(*args)
+    def SetFullPosition(*args): return _iengine.iMovable_SetFullPosition(*args)
     scfGetVersion = staticmethod(_iengine.iMovable_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iMovable
     __del__ = lambda self : None;
@@ -1199,6 +1203,8 @@ class iVisibilityCuller(core.iBase):
     def IntersectSegment(*args): return _iengine.iVisibilityCuller_IntersectSegment(*args)
     def ParseCullerParameters(*args): return _iengine.iVisibilityCuller_ParseCullerParameters(*args)
     def RenderViscull(*args): return _iengine.iVisibilityCuller_RenderViscull(*args)
+    def BeginPrecacheCulling(*args): return _iengine.iVisibilityCuller_BeginPrecacheCulling(*args)
+    def EndPrecacheCulling(*args): return _iengine.iVisibilityCuller_EndPrecacheCulling(*args)
     scfGetVersion = staticmethod(_iengine.iVisibilityCuller_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iVisibilityCuller
     __del__ = lambda self : None;

@@ -129,15 +129,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   AnimationNodeFactory::AnimationNodeFactory (const char* name)
     : scfImplementationType (this), name (name), cyclic (false),
-    automaticReset (false), automaticStop (true), playbackSpeed (1.0f), 
-    animationDuration (0.0f)
+    automaticReset (false), automaticStop (true), playbackSpeed (1.0f)
   {}
 
   void AnimationNodeFactory::SetAnimation (CS::Animation::iSkeletonAnimation* animation)
   {
     this->animation = animation;
-    if (animation)
-      animationDuration = animation->GetDuration ();
   }
   
   CS::Animation::iSkeletonAnimation* AnimationNodeFactory::GetAnimation () const
@@ -236,7 +233,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   void AnimationNode::SetPlaybackPosition (float time)
   {
-    playbackPosition = csMin (time, factory->animationDuration);
+    playbackPosition = csMin (time, GetDuration ());
   }
 
   float AnimationNode::GetPlaybackPosition () const
@@ -262,13 +259,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return playbackSpeed;
   }
 
-  void AnimationNode::BlendState (CS::Animation::csSkeletalState* state, float baseWeight)
+  void AnimationNode::BlendState (CS::Animation::AnimatedMeshState* state, float baseWeight)
   {
     if (!isPlaying)
       return;
 
     if (factory->animation)
-      factory->animation->BlendState (state, baseWeight, playbackPosition, factory->cyclic);
+      factory->animation->BlendState (state, baseWeight, playbackPosition);
   }
   
   void AnimationNode::TickAnimation (float dt)
@@ -278,7 +275,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     playbackPosition += dt * playbackSpeed;
 
-    const float duration = factory->animationDuration;
+    const float duration = GetDuration ();
     if (duration < SMALL_EPSILON)
     {
       playbackPosition = 0;

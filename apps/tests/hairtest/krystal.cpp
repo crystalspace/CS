@@ -28,15 +28,13 @@
 KrystalScene::KrystalScene (HairTest* hairTest)
 : hairTest (hairTest), hairPhysicsEnabled(true), isDead(false)
 {
-  // Define the available keys
-  hairTest->hudHelper.keyDescriptions.DeleteAll ();
-  hairTest->hudHelper.keyDescriptions.Push ("arrow keys: move camera");
-  hairTest->hudHelper.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
-  
-  if (hairTest->physicsEnabled)
-    hairTest->hudHelper.keyDescriptions.Push ("d: display active colliders");
+  // Setup the parameters of the camera manager
+  hairTest->cameraManager.SetStartPosition (csVector3 (0.0f, 1.0f, -2.5f));
+  hairTest->cameraManager.SetCameraMinimumDistance (CAMERA_MINIMUM_DISTANCE);
 
-  hairTest->hudHelper.keyDescriptions.Push ("e: stop/start fur physics");
+  // Define the available keys
+  hairTest->hudManager.keyDescriptions.DeleteAll ();
+  hairTest->hudManager.stateDescriptions.DeleteAll ();
 }
 
 KrystalScene::~KrystalScene ()
@@ -54,16 +52,6 @@ KrystalScene::~KrystalScene ()
     csRef<iMeshObject> furMeshObject = scfQueryInterface<iMeshObject> (furMesh);
     hairTest->engine->RemoveObject (furMeshObject->GetMeshWrapper ());
   }
-}
-
-csVector3 KrystalScene::GetCameraStart ()
-{
-  return csVector3 (0.0f, 1.0f, -2.5f);
-}
-
-float KrystalScene::GetCameraMinimumDistance ()
-{
-  return CAMERA_MINIMUM_DISTANCE;
 }
 
 csVector3 KrystalScene::GetCameraTarget ()
@@ -156,7 +144,7 @@ void KrystalScene::SaveFur()
     return;
   }
 
-  hairTest->SaveFactory(meshfactwrap, "/lib/krystal/krystal_furmesh_factory.save");
+  hairTest->SaveFactory(meshfactwrap, "/lib/hairtest/krystal_furmesh_factory.save");
 
   iMeshWrapper* meshwrap = 
     hairTest->engine->FindMeshObject("krystal_furmesh_object");
@@ -166,7 +154,7 @@ void KrystalScene::SaveFur()
     return;
   }
 
-  hairTest->SaveObject(meshwrap, "/lib/krystal/krystal_furmesh_object.save");
+  hairTest->SaveObject(meshwrap, "/lib/hairtest/krystal_furmesh_object.save");
 }
 
 bool KrystalScene::CreateAvatar ()
@@ -177,16 +165,6 @@ bool KrystalScene::CreateAvatar ()
   csLoadResult rc = hairTest->loader->Load ("/lib/krystal/krystal.xml");
   if (!rc.success)
     return hairTest->ReportError ("Can't load Krystal library file!");
-
-  // Load some fur
-  rc = hairTest->loader->Load ("/lib/krystal/krystal_furmesh.xml");
-  if (!rc.success)
-    return hairTest->ReportError ("Can't load krystal furmesh library!");
-
-  csRef<iMeshWrapper> krystalFurmeshObject = 
-    hairTest->engine->FindMeshObject("krystal_furmesh_object");
-  if (!krystalFurmeshObject)
-    return hairTest->ReportError ("Can't find fur mesh object!");
 
   csRef<iMeshFactoryWrapper> meshfact =
     hairTest->engine->FindMeshFactory ("krystal");
@@ -210,15 +188,25 @@ bool KrystalScene::CreateAvatar ()
   if (!bodySkeleton)
     return hairTest->ReportError ("Can't find Krystal's body mesh description!");
 
+  // Load some fur
+  rc = hairTest->loader->Load ("/lib/hairtest/krystal_furmesh.xml");
+  if (!rc.success)
+    return hairTest->ReportError ("Can't load krystal furmesh library!");
+
+  csRef<iMeshWrapper> krystalFurmeshObject = 
+    hairTest->engine->FindMeshObject ("krystal_furmesh_object");
+  if (!krystalFurmeshObject)
+    return hairTest->ReportError ("Can't find fur mesh object!");
+
   // Get plugin manager
   csRef<iPluginManager> plugmgr = 
-    csQueryRegistry<iPluginManager> (hairTest->object_reg);
+    csQueryRegistry<iPluginManager> (hairTest->GetObjectRegistry ());
   if (!plugmgr)
     return hairTest->ReportError("Failed to locate Plugin Manager!");
 
-  // Load furMesh
+  // Find the fur mesh plugin
   csRef<CS::Mesh::iFurMeshType> furMeshType = 
-    csQueryRegistry<CS::Mesh::iFurMeshType> (hairTest->object_reg);
+    csQueryRegistry<CS::Mesh::iFurMeshType> (hairTest->GetObjectRegistry ());
   if (!furMeshType)
     return hairTest->ReportError("Failed to locate CS::Mesh::iFurMeshType plugin!");
 
@@ -351,33 +339,34 @@ bool KrystalScene::CreateAvatar ()
   csRef<iRigidBody> headBody = ragdollNode->GetBoneRigidBody
     (animeshFactory->GetSkeletonFactory ()->FindBone ("Head"));
 
-  // Load fur material
+  // Load the fur material
   rc = hairTest-> loader ->Load ("/lib/hairtest/fur_material_krystal.xml");
   if (!rc.success)
-    hairTest->ReportError("Can't load Fur library file!");
+    hairTest->ReportError ("Can't load Fur library file!");
 
-  // Load Marschner shader
+  // Load the Marschner shader
   csRef<iMaterialWrapper> materialWrapper = 
-    hairTest->engine->FindMaterial("marschner_material");
+    hairTest->engine->FindMaterial ("marschner_material");
   if (!materialWrapper)
-    hairTest->ReportError("Can't find marschner material!");
+    hairTest->ReportError ("Can't find marschner material!");
 
-  // Create hairMeshProperties
+  // Create the fur properties for the hairs
   csRef<CS::Mesh::iFurMeshMaterialProperties> hairMeshProperties = 
-    furMeshType->CreateHairMeshMarschnerProperties("krsytal_marschner");
+    furMeshType->CreateHairMeshMarschnerProperties ("krystal_marschner");
+  hairMeshProperties->SetMaterial(materialWrapper->GetMaterial ());
+  animesh->GetSubMesh (1)->SetMaterial (materialWrapper);
 
-  hairMeshProperties->SetMaterial(materialWrapper->GetMaterial());
-
+  // Create the two possible animation control's. We'll switch between than at the user request.
   hairPhysicsControl = scfQueryInterface<CS::Animation::iFurPhysicsControl>
-    (furMeshType->CreateFurPhysicsControl("krystal_hairs_physics"));
+    (furMeshType->CreateFurPhysicsControl ("krystal_hairs_physics"));
   animationPhysicsControl = scfQueryInterface<CS::Animation::iFurAnimatedMeshControl>
-    (furMeshType->CreateFurAnimatedMeshControl("krystal_hairs_animation"));
+    (furMeshType->CreateFurAnimatedMeshControl ("krystal_hairs_animation"));
 
-  hairPhysicsControl->SetBulletDynamicSystem(hairTest->bulletDynamicSystem);
-  hairPhysicsControl->SetRigidBody(headBody);
+  hairPhysicsControl->SetBulletDynamicSystem (hairTest->bulletDynamicSystem);
+  hairPhysicsControl->SetRigidBody (headBody);
 //   hairPhysicsControl->SetAnimatedMesh(animesh);
 
-  animationPhysicsControl->SetAnimatedMesh(animesh);
+  animationPhysicsControl->SetAnimatedMesh (animesh);
 
   iSector* sector = hairTest->engine->FindSector("room");
 
@@ -390,26 +379,26 @@ bool KrystalScene::CreateAvatar ()
   csRef<iMeshObject> imo = krystalFurmeshObject->GetMeshObject();
 
   // Get reference to the iFurMesh interface
-  furMesh = scfQueryInterface<CS::Mesh::iFurMesh>(imo);
+  furMesh = scfQueryInterface<CS::Mesh::iFurMesh> (imo);
 
   csRef<CS::Mesh::iFurMeshState> ifms = 
-    scfQueryInterface<CS::Mesh::iFurMeshState>(furMesh);
+    scfQueryInterface<CS::Mesh::iFurMeshState> (furMesh);
 
-  animationPhysicsControl->SetDisplacement(ifms->GetDisplacement());
+  animationPhysicsControl->SetDisplacement (ifms->GetDisplacement ());
 
-  furMesh->SetFurMeshProperties(hairMeshProperties);
+  furMesh->SetFurMeshProperties (hairMeshProperties);
 
-  furMesh->SetAnimatedMesh(animesh);
-  furMesh->SetMeshFactory(animeshFactory);
-  furMesh->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
-  furMesh->GenerateGeometry(hairTest->view, hairTest->room);
+  furMesh->SetAnimatedMesh (animesh);
+  furMesh->SetMeshFactory (animeshFactory);
+  furMesh->SetMeshFactorySubMesh (animesh->GetSubMesh (2)->GetFactorySubMesh ());
+  furMesh->GenerateGeometry (hairTest->view, hairTest->room);
 
-  furMesh->SetAnimationControl(hairPhysicsControl);
-  furMesh->StartAnimationControl();
+  furMesh->SetAnimationControl (hairPhysicsControl);
+  furMesh->StartAnimationControl ();
 
-  furMesh->SetGuideLOD(0);
-  furMesh->SetStrandLOD(1);
-  furMesh->SetControlPointsLOD(0.0f);
+  furMesh->SetGuideLOD (0);
+  furMesh->SetStrandLOD (1);
+  furMesh->SetControlPointsLOD (0.0f);
 
   // Reset the scene so as to put the parameters of the animation nodes in a default state
   ResetScene ();
@@ -465,13 +454,8 @@ void KrystalScene::ResetScene ()
     hairTest->bulletDynamicSystem->SetStepParameters (0.016667f, 1, 10);
 
     if (furMesh)
-      furMesh->ResetMesh();
+      furMesh->ResetMesh ();
   }
 
   isDead = false;
-}
-
-void KrystalScene::UpdateStateDescription ()
-{
-  hairTest->hudHelper.stateDescriptions.DeleteAll ();
 }

@@ -39,6 +39,7 @@
 #include "csgfx/imagememory.h"
 #include "csgfx/renderbuffer.h"
 #include "csplugincommon/opengl/assumedstate.h"
+#include "csplugincommon/opengl/glenum_identstrs.h"
 #include "csplugincommon/opengl/glhelper.h"
 #include "csplugincommon/opengl/glstates.h"
 #include "csplugincommon/render3d/normalizationcube.h"
@@ -53,12 +54,13 @@
 #include "gl_r2t_framebuf.h"
 #include "gl_render3d.h"
 #include "gl_txtmgr_basictex.h"
+#include "profilescope.h"
 
 const int CS_CLIPPER_EMPTY = 0xf008412;
 
 // uses CS_CLIPPER_EMPTY
 #include "gl_stringlists.h"
-#include <csplugincommon/opengl/glenum_identstrs.h>
+#include "instancing.h"
 
 
 
@@ -164,31 +166,6 @@ void csGLGraphics3D::OutputMarkerString (const char* function,
   ext->glStringMarkerGREMEDY ((GLsizei)marker.Length (), marker);
 }
 
-
-csGLGraphics3D::ProfileScope::ProfileScope (csGLGraphics3D* renderer, const char* descr)
- : renderer (renderer), descr (descr), startStamp (0),
-   startQuery (0), endQuery (0)   
-{
-  if (renderer->glProfiling)
-  {
-    startQuery = renderer->queryPool.AllocQuery ();
-    endQuery = renderer->queryPool.AllocQuery ();
-    startStamp = csGetMicroTicks();
-    csGLGraphics3D::ext->glQueryCounter (startQuery, GL_TIMESTAMP);
-  }
-}
-
-csGLGraphics3D::ProfileScope::~ProfileScope ()
-{
-  if (startQuery != 0)
-  {
-    csGLGraphics3D::ext->glQueryCounter (endQuery, GL_TIMESTAMP);
-    renderer->profileHelper.RecordTimeSpan (renderer->frameNum,
-					    startStamp,
-					    startQuery, endQuery,
-					    descr);
-  }
-}
 
 void csGLGraphics3D::RecordProfileEvent (const char* descr)
 {
@@ -913,6 +890,11 @@ bool csGLGraphics3D::Open ()
   ext->InitGL_ARB_seamless_cube_map ();
   ext->InitGL_AMD_seamless_cubemap_per_texture ();
   ext->InitGL_ARB_half_float_vertex ();
+  ext->InitGL_ARB_instanced_arrays ();
+  
+  /* Some of the exts checked for above affect the state cache,
+     so let it grab the state again */
+  statecache->currentContext->InitCache();
   
   // Some 'assumed state' is for extensions, so set again
   CS::PluginCommon::GL::SetAssumedState (statecache, ext);
@@ -2037,155 +2019,6 @@ void csGLGraphics3D::SetWorldToCamera (const csReversibleTransform& w2c)
   glLoadMatrixf (m);
 }
 
-void csGLGraphics3D::SetupInstance (size_t instParamNum, 
-                                    const csVertexAttrib targets[], 
-                                    csShaderVariable* const params[])
-{
-  ProfileScope _profile (this, "Setup instance"); // @@@ Worthwhile to measure?
-  
-  csVector4 v;
-  float matrix[16];
-  bool uploadMatrix;
-  for (size_t n = 0; n < instParamNum; n++)
-  {
-    csShaderVariable* param = params[n];
-    csVertexAttrib target = targets[n];
-    switch (param->GetType())
-    {
-    case csShaderVariable::MATRIX:
-      {
-        csMatrix3 m;
-        params[n]->GetValue (m);
-        makeGLMatrix (m, matrix, target != CS_IATTRIB_OBJECT2WORLD);
-        uploadMatrix = true;
-      }
-      break;
-    case csShaderVariable::TRANSFORM:
-      {
-        csReversibleTransform tf;
-        params[n]->GetValue (tf);
-        makeGLMatrix (tf, matrix, target != CS_IATTRIB_OBJECT2WORLD);
-        uploadMatrix = true;
-      }
-      break;
-    default:
-      uploadMatrix = false;
-    }
-    if (uploadMatrix)
-    {
-      switch (target)
-      {
-      case CS_IATTRIB_OBJECT2WORLD:
-        {
-          statecache->SetMatrixMode (GL_MODELVIEW);
-          glPushMatrix ();
-          glMultMatrixf (matrix);
-        }
-        break;
-      default:
-        if (ext->CS_GL_ARB_multitexture)
-        {
-          if ((target >= CS_VATTRIB_TEXCOORD0) 
-            && (target <= CS_VATTRIB_TEXCOORD7))
-          {
-            // numTCUnits is type GLint, while target is an enumerated
-            // type. These are not necessarily the same.
-            size_t maxN = csMin (3,csVertexAttrib(numTCUnits) - (target - CS_VATTRIB_TEXCOORD0));
-            GLenum tu = GL_TEXTURE0 + (target - CS_VATTRIB_TEXCOORD0);
-            for (size_t n = 0; n < maxN; n++)
-            {
-              ext->glMultiTexCoord4fvARB (tu + (GLenum)n, &matrix[n*4]);
-            }
-          }
-        }
-        if (ext->glVertexAttrib4fvARB)
-        {
-          if (CS_VATTRIB_IS_GENERIC (target))
-          {
-            size_t maxN = csMin (3, CS_VATTRIB_GENERIC_LAST - target + 1);
-            GLenum attr = (target - CS_VATTRIB_GENERIC_FIRST);
-            for (size_t n = 0; n < maxN; n++)
-            {
-              ext->glVertexAttrib4fvARB (attr + (GLenum)n, &matrix[n*4]);
-            }
-          }
-        }
-      }
-    }
-    else
-    {
-      params[n]->GetValue (v);
-      switch (target)
-      {
-      case CS_VATTRIB_WEIGHT:
-        if (ext->CS_GL_EXT_vertex_weighting)
-          ext->glVertexWeightfvEXT (v.m);
-        break;
-      case CS_VATTRIB_NORMAL:
-        glNormal3fv (v.m);
-        break;
-      case CS_VATTRIB_PRIMARY_COLOR:
-        glColor4fv (v.m);
-        break;
-      case CS_VATTRIB_SECONDARY_COLOR:
-        if (ext->CS_GL_EXT_secondary_color)
-          ext->glSecondaryColor3fvEXT (v.m);
-        break;
-      case CS_VATTRIB_FOGCOORD:
-        if (ext->CS_GL_EXT_fog_coord)
-          ext->glFogCoordfvEXT (v.m);
-        break;
-      case CS_IATTRIB_OBJECT2WORLD:
-        {
-          statecache->SetMatrixMode (GL_MODELVIEW);
-          glPushMatrix ();
-        }
-        break;
-      default:
-        if (ext->CS_GL_ARB_multitexture)
-        {
-          if ((target >= CS_VATTRIB_TEXCOORD0) 
-            && (target <= CS_VATTRIB_TEXCOORD7))
-            ext->glMultiTexCoord4fvARB (
-            GL_TEXTURE0 + (target - CS_VATTRIB_TEXCOORD0), 
-            v.m);
-        }
-        else if (target == CS_VATTRIB_TEXCOORD)
-        {
-          glTexCoord4fv (v.m);
-        }
-        if (ext->glVertexAttrib4fvARB)
-        {
-          if (CS_VATTRIB_IS_GENERIC (target))
-            ext->glVertexAttrib4fvARB (target - CS_VATTRIB_0,
-            v.m);
-        }
-      }
-    }
-  }
-}
-
-void csGLGraphics3D::TeardownInstance (size_t instParamNum, 
-                                       const csVertexAttrib targets[])
-{
-  for (size_t n = 0; n < instParamNum; n++)
-  {
-    csVertexAttrib target = targets[n];
-    switch (target)
-    {
-    case CS_IATTRIB_OBJECT2WORLD:
-      {
-        statecache->SetMatrixMode (GL_MODELVIEW);
-        glPopMatrix ();
-      }
-      break;
-    default:
-      /* Nothing to do */
-      break;
-    }
-  }
-}
-
 void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,
     const csShaderVariableStack& stacks)
@@ -2444,17 +2277,15 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 
         if (modes.doInstancing)
         {
-          const size_t instParamNum = modes.instParamNum;
-          const csVertexAttrib* const instParamsTargets = modes.instParamsTargets;
-          for (size_t n = 0; n < modes.instanceNum; n++)
-          {
-            SetupInstance (instParamNum, instParamsTargets, modes.instParams[n]);
-            glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
+	  InstancingHelper instHelper (this, modes.instanceNum,
+				       modes.instParamNum,
+				       modes.instParamsTargets,
+				       modes.instParams,
+				       modes.instParamBuffers);
+	  instHelper.DrawAllInstances (primitivetype, (GLuint)iIndexbuf->GetRangeStart(),
               (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
               compType, 
               ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
-            TeardownInstance (instParamNum, instParamsTargets);
-          }
         }
         else
         {
@@ -4599,17 +4430,15 @@ void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
 
         if (modes.doInstancing)
         {
-          const size_t instParamNum = modes.instParamNum;
-          const csVertexAttrib* const instParamsTargets = modes.instParamsTargets;
-          for (size_t n = 0; n < modes.instanceNum; n++)
-          {
-            SetupInstance (instParamNum, instParamsTargets, modes.instParams[n]);
-            glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
+	  InstancingHelper instHelper (this, modes.instanceNum,
+				       modes.instParamNum,
+				       modes.instParamsTargets,
+				       modes.instParams,
+				       modes.instParamBuffers);
+	  instHelper.DrawAllInstances (primitivetype, (GLuint)iIndexbuf->GetRangeStart(),
               (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
               compType, 
               ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
-            TeardownInstance (instParamNum, instParamsTargets);
-          }
         }
         else
         {
@@ -4631,7 +4460,7 @@ void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
   //indexbuf->RenderRelease ();
   RenderRelease (iIndexbuf);
   // Restore cull mode
-  //if (cullMode == CS::Graphics::cullFlipped) statecache->SetCullFace (cullFace);
+  if (cullMode == CS::Graphics::cullFlipped) statecache->SetCullFace (cullFace);
   //statecache->Disable_GL_POLYGON_OFFSET_FILL ();
 }
 }

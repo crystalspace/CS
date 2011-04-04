@@ -140,25 +140,10 @@ struct NameBoneMappingHelper
  * A class to manage the creation and deletion of 'Retarget' animation 
  * node factories.
  */
-struct iSkeletonRetargetNodeManager : public virtual iBase
+struct iSkeletonRetargetNodeManager
+  : public virtual CS::Animation::iSkeletonAnimNodeManager<CS::Animation::iSkeletonRetargetNodeFactory>
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonRetargetNodeManager, 1, 0, 0);
-
-  /**
-   * Create a new 'Retarget' animation node factory.
-   * \param name The name of the new factory.
-   */
-  virtual iSkeletonRetargetNodeFactory* CreateAnimNodeFactory (const char *name) = 0;
-
-  /**
-   * Find the specified 'Retarget' animation node factory.
-   */
-  virtual iSkeletonRetargetNodeFactory* FindAnimNodeFactory (const char* name) const = 0;
-
-  /**
-   * Delete all 'Retarget' animation node factories.
-   */
-  virtual void ClearAnimNodeFactories () = 0;
+  SCF_ISKELETONANIMNODEMANAGER_INTERFACE (CS::Animation::iSkeletonRetargetNodeManager, 1, 0, 0);
 };
 
 /**
@@ -177,9 +162,9 @@ struct iSkeletonRetargetNodeManager : public virtual iBase
  * In all cases, this node will only be able to retarget the animations of the bones covered by the
  * bone mapping provided by the user (see SetBoneMapping()).
  */
-struct iSkeletonRetargetNodeFactory : public iSkeletonAnimNodeFactory
+struct iSkeletonRetargetNodeFactory : public virtual iSkeletonAnimNodeFactory
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonRetargetNodeFactory, 1, 0, 0);
+  SCF_INTERFACE(CS::Animation::iSkeletonRetargetNodeFactory, 2, 0, 0);
 
   /**
    * Set the child animation node of this node. This child node plays the animation for the source skeleton.

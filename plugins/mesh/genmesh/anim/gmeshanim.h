@@ -327,6 +327,7 @@ public:
   virtual bool AnimatesTexels () const { return animates_texels; }
   virtual bool AnimatesNormals () const { return animates_normals; }
   virtual bool AnimatesColors () const { return animates_colors; }
+  virtual bool AnimatesBBoxRadius () const { return false; }
   virtual void Update(csTicks, int, uint32) { }
   virtual const csVector3* UpdateVertices (csTicks current,
   	const csVector3* verts, int num_verts, uint32 version_id);
@@ -336,6 +337,12 @@ public:
   	const csVector3* normals, int num_normals, uint32 version_id);
   virtual const csColor4* UpdateColors (csTicks current,
   	const csColor4* colors, int num_colors, uint32 version_id);
+  virtual const csBox3& UpdateBoundingBox (csTicks current, uint32 version_id,
+	const csBox3& bbox) { return bbox; }
+  virtual const float UpdateRadius (csTicks current, uint32 version_id,
+	const float radius) { return radius; }
+  virtual const csBox3* UpdateBoundingBoxes (csTicks current, uint32 version_id)
+  { return nullptr; }
 
   // --- For iGenMeshAnimationControlState ---------------------------
   virtual bool Execute (const char* scriptname);

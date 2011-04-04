@@ -546,6 +546,17 @@ csTerrainColliderCollideSegmentResult csTerrainCell::CollideSegment (
   return collider->CollideSegment (this, start, end);
 }
 
+bool csTerrainCell::CollideSegment (const csVector3& start, const csVector3& end,
+				    csVector3& hitPoint)
+{
+  iTerrainCollider* collider = terrain->GetCollider ();
+
+  if (!collider || !collisionProperties->GetCollidable ()) 
+    return false;
+
+  return collider->CollideSegment (this, start, end, hitPoint);  
+}
+
 bool csTerrainCell::CollideTriangles (const csVector3* vertices,
   size_t tri_count, const unsigned int* indices, float radius,
   const csReversibleTransform& trans, bool oneHit,

@@ -353,7 +353,7 @@ struct csTerrainColliderCollideSegmentResult
 /// Provides an interface for custom collision
 struct iTerrainCollider : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainCollider, 2, 0, 1);
+  SCF_INTERFACE (iTerrainCollider, 3, 0, 0);
 
   /**
    * Create an object that implements iTerrainCellCollisionProperties
@@ -381,6 +381,21 @@ struct iTerrainCollider : public virtual iBase
                                const csVector3& end, bool oneHit, 
                                iTerrainVector3Array* points) = 0;
 
+  /**
+   * Collide segment with cell.
+   * Stops on finding the first intersection point (the closest to the segment
+   * start).
+   * \param cell cell
+   * \param start segment start (specified in object space)
+   * \param end segment end (specified in object space)
+   * \param hitPoint receives the intersection point
+   * 
+   * \return true if there was an intersections, false if there was none
+   */
+  virtual bool CollideSegment (iTerrainCell* cell, const csVector3& start,
+                               const csVector3& end,
+			       csVector3& hitPoint) = 0;
+			       
   /**
    * Collide segment with cell
    *
@@ -585,7 +600,7 @@ struct iTerrainFactoryCell;
  */
 struct iTerrainSystem : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainSystem, 2, 1, 1);
+  SCF_INTERFACE (iTerrainSystem, 3, 0, 0);
 
   /**
    * Query a cell by name
@@ -638,8 +653,7 @@ struct iTerrainSystem : public virtual iBase
   virtual void SetMaterialPalette (const csTerrainMaterialPalette& array) = 0;
 
   /**
-   * Collide segment with the terrain
-   *
+   * Collide segment with the terrain.
    * \param start segment start (specified in object space)
    * \param end segment end (specified in object space)
    * \param oneHit if this is true, than stop on finding the first
@@ -658,6 +672,27 @@ struct iTerrainSystem : public virtual iBase
   virtual bool CollideSegment (const csVector3& start, const csVector3& end,
                            bool oneHit, iTerrainVector3Array* points,
                            iMaterialArray* materials) = 0;
+			   
+  /**
+   * Collide segment with the terrain.
+   * Stops on finding the first intersection point (the closest to the segment
+   * start).
+   * \param start segment start (specified in object space)
+   * \param end segment end (specified in object space)
+   * \param hitPoint receives intersection point
+   * \param hitMaterial receives material at intersection point if not null
+   * 
+   * \return true if there was an intersections, false if there were none
+   *
+   * \rem this will perform cell loading for the cells that potentially
+   * collide with the segment
+   *
+   * \rem this will not perform collision for cells that have Collideable
+   * property set to false
+   */
+  virtual bool CollideSegment (const csVector3& start, const csVector3& end,
+			       csVector3& hitPoint,
+			       iMaterialWrapper** hitMaterial) = 0;
 
   /**
    * Collide segment with the terrain
@@ -892,7 +927,7 @@ struct iTerrainSystem : public virtual iBase
  */
 struct iTerrainCell : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainCell, 5, 0, 2);
+  SCF_INTERFACE (iTerrainCell, 6, 0, 0);
 
   /// Enumeration that specifies current cell state
   enum LoadState
@@ -1192,6 +1227,20 @@ struct iTerrainCell : public virtual iBase
    */
   virtual bool CollideSegment (const csVector3& start, const csVector3& end,
                            bool oneHit, iTerrainVector3Array* points) = 0;
+
+  /**
+   * Collide segment with cell.
+   * Stops on finding the first intersection point (the closest to the segment
+   * start).
+   * \param cell cell
+   * \param start segment start (specified in object space)
+   * \param end segment end (specified in object space)
+   * \param hitPoint receives the intersection point
+   * 
+   * \return true if there was an intersections, false if there was none
+   */
+  virtual bool CollideSegment (const csVector3& start, const csVector3& end,
+			       csVector3& hitPoint) = 0;
 
   /**
    * Collide set of triangles with cell (using the collider)

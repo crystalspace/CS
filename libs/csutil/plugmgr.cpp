@@ -150,13 +150,13 @@ void csPluginManager::QueryOptions (iComponent *obj)
       csOptionDescription option;
       if (!Config->GetOptionDescription (i, &option))
         break;
-      OptionList.Push (new csPluginOption (option.name, option.type, option.id,
+      OptionList.Push (new csPluginOption (option.name.GetData (), option.type, option.id,
         (option.type == CSVAR_BOOL) || (option.type == CSVAR_CMD), Config));
       if (option.type == CSVAR_BOOL)
       {
         char buf[100];
         strcpy (buf, "no");
-        strcpy (buf + 2, option.name);
+        strcpy (buf + 2, option.name.GetData ());
         OptionList.Push (new csPluginOption (buf, option.type, option.id,
           false, Config));
       }
@@ -190,6 +190,9 @@ void csPluginManager::QueryOptions (iComponent *obj)
 	  case CSVAR_STRING:
 	    if (!val) continue;
 	    optval.SetString (val);
+	    break;
+	  default:
+	    // TODO: other types
 	    break;
         }
         pio->Config->SetOption (pio->ID, &optval);

@@ -59,6 +59,8 @@ public:
   CSCEGUIConfTest();
   ~CSCEGUIConfTest();
 
+  void PrintHelp ();
+
   // Handle exit button clicked event
   bool OnListSelection (const CEGUI::EventArgs& e);
 
