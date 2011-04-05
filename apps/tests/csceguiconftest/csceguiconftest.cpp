@@ -33,6 +33,12 @@ CSCEGUIConfTest::CSCEGUIConfTest() : DemoApplication ("CrystalSpace.CSCEGUIConfT
   myInt = 0;
   myFloat = 0.0f;
   myString = "test";
+
+  hudManager.keyDescriptions.DeleteAll ();
+  hudManager.stateDescriptions.Push ("myBool");
+  hudManager.stateDescriptions.Push ("myInt");
+  hudManager.stateDescriptions.Push ("myFloat");
+  hudManager.stateDescriptions.Push ("myString");
 }
 
 CSCEGUIConfTest::~CSCEGUIConfTest()
@@ -113,16 +119,10 @@ void CSCEGUIConfTest::Frame()
 
   cegui->Render ();
 
-  if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS))
-    return;
-
-  int margin = 15;
-  int fontColor = g2d->FindRGB (255, 150, 100);
-
-  hudManager.WriteShadow(margin, 0, fontColor,  "myBool    %s", myBool?"True":"False");
-  hudManager.WriteShadow(margin, 15, fontColor, "myInt     %d", myInt);
-  hudManager.WriteShadow(margin, 30, fontColor, "myFloat   %f", myFloat);
-  hudManager.WriteShadow(margin, 45, fontColor, "myString  %s", myString.GetData());
+  hudManager.stateDescriptions.Put (0, csString ().Format ("myBool    %s", myBool?"True":"False"));
+  hudManager.stateDescriptions.Put (1, csString ().Format ("myInt     %d", myInt));
+  hudManager.stateDescriptions.Put (2, csString ().Format ("myFloat   %f", myFloat));
+  hudManager.stateDescriptions.Put (3, csString ().Format ("myString  %s", myString.GetData()));
 }
 
 bool CSCEGUIConfTest::OnInitialize(int argc, char* argv [])
