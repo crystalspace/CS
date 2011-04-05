@@ -93,6 +93,9 @@ struct iRenderManagerTargets : public virtual iBase
   virtual void MarkAsUsed (iTextureHandle* target) = 0;
 };
 
+/**
+ * Interface to add post-effects layers
+ */
 struct iRenderManagerPostEffects : public virtual iBase
 {
   SCF_INTERFACE(iRenderManagerPostEffects,1,0,0);

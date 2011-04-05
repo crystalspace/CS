@@ -21,32 +21,10 @@
 #define __VIEWMESH_H__
 
 #include "cssysdef.h"
-#include "csgfx/shadervarcontext.h"
-#include "cstool/csapplicationframework.h"
 #include "cstool/csdemoapplication.h"
 #include "cstool/csview.h"
-#include "cstool/meshobjtmpl.h"
-#include "csutil/cmdhelp.h"
-#include "csutil/cmdline.h"
-#include "csutil/common_handlers.h"
-#include "csutil/csbaseeventh.h"
-#include "csutil/evoutlet.h"
-#include "csutil/parray.h"
-#include "csutil/plugmgr.h"
-#include "csutil/virtclk.h"
 #include "csutil/xmltiny.h"
-
-#include "iengine/camera.h"
-#include "iengine/engine.h"
-#include "iengine/light.h"
-#include "iengine/material.h"
-#include "iengine/mesh.h"
-#include "iengine/movable.h"
-#include "iengine/sector.h"
-#include "imap/loader.h"
 #include "imap/writer.h"
-#include "imesh/sprite3d.h"
-#include "imesh/spritecal3d.h"
 #include "ivaria/icegui.h"
 
 #include "assetbase.h"
@@ -62,7 +40,7 @@ enum LightMode
   UNLIT
 };
 
-class ViewMesh : public csApplicationFramework, public csBaseEventHandler
+class ViewMesh : public CS::Demo::DemoApplication
 {
  private:
 
@@ -73,21 +51,10 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   csString reloadFilename;
   csString reloadFilePath;
 
-  csRef<iEngine> engine;
-  csRef<iLoader> loader;
   csRef<iThreadedLoader> tloader;
   csRef<iSaver> saver;
-  csRef<iGraphics3D> g3d;
-  csRef<iKeyboardDriver> kbd;
-  csRef<iVirtualClock> vc;
-  csRef<iVFS> vfs;
-  csRef<iView> view;
   csRef<iCEGUI> cegui;
   csRef<iThreadReturn> loading;
-  iSector* room;
-  csRef<FramePrinter> printer;
-
-  CS::Demo::CameraManager cameraManager;
 
   LightMode lightMode;
   void SetLightMode (LightMode lightMode);
@@ -138,19 +105,18 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   }
 
   void UnRegisterTabs ();
-  
 
  public:
 
   ViewMesh ();
   ~ViewMesh ();
 
-  void OnExit ();
   bool OnInitialize (int argc, char* argv[]);
-
   bool Application ();
 
 private:
+
+  // CeGUI events
 
   void StdDlgUpdateLists(const char* filename);
 
@@ -159,6 +125,8 @@ private:
   bool StdDlgFileSelect (const CEGUI::EventArgs& e);
   bool StdDlgDirSelect (const CEGUI::EventArgs& e);
   bool StdDlgDirChange (const CEGUI::EventArgs& e);
+
+  // Event management
 
   /// Whether or not there is currently a mouse interaction with the camera
   bool mouseMove;

@@ -22,7 +22,7 @@
 
 #include "tabbase.h"
 
-#include <ivaria/reporter.h>
+#include "ivaria/reporter.h"
 
 class MorphTargetTab : public TabBase
 {
