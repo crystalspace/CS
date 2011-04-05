@@ -214,6 +214,9 @@ public:
 } // namespace Utility
 } // namespace CS
 
+/**
+ * A string-to-ID hash table.
+ */
 typedef CS::Utility::StringHash<CS::StringSetTag::General> csStringHash;
 
 #endif // __CS_STRHASH_H__

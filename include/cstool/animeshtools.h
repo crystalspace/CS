@@ -87,15 +87,15 @@ class CS_CRYSTALSPACE_EXPORT AnimatedMeshTools
    * \param path A VFS path to the directory containing all the data files
    * \param baseMesh The name of the file defining the base animesh where
    * all morph targets will be imported.
-   * \note The animesh models with a different number of vertices than the
-   * base animesh won't be imported. These models are also supposed to have
-   * the same vertices in the same order.
+   * \param factoryName Name to be given to the newly created animesh
+   * factory.
    * \param meshMask A regular expression to determine which files should
    * be imported as a new morph target. Use for example ".*[.]3[dD][sS]"
    * if you want all files terminating by ".3ds" or ".3DS". If you provide
    * an empty mask, then a new one will be built based on \p baseMesh.
-   * \param factoryName Name to be given to the newly created animesh
-   * factory.
+   * \note The animesh models with a different number of vertices than the
+   * base animesh won't be imported. These models are also supposed to have
+   * the same vertices in the same order.
    */
   static csPtr<iAnimatedMeshFactory> ImportSplitMorphMesh
     (iObjectRegistry* object_reg, const char* path, const char* baseMesh,
