@@ -162,7 +162,7 @@ MSIMergeModuleFromList_A CS.arch.$(MSM_ARCH).csconfig : cs-config : $(MSM_VERSIO
 MSIMergeModuleFromList_A CS.arch.$(MSM_ARCH).python : python-modules : $(MSM_VERSION) : : $(MSM_ARCH) ;
 
 # Safeguard
-MSI_UPGRADE_CODES_FOR_VERSION = 1.9 ;
+MSI_UPGRADE_CODES_FOR_VERSION = 2.0 ;
 if "$(MSI_UPGRADE_CODES_FOR_VERSION)" != "$(MSI_VERSION_MAJORMINOR)"
 {
   Exit "CS version was changed, please set new MSI upgrade codes" ;

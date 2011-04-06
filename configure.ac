@@ -13,7 +13,7 @@ AC_PREREQ([2.56])
 #	Keep this value synchronized with CS/include/csver.h.template,
 #	CS/docs/texinfo/version.txi, and CS/mk/autoconf/crystal.m4.
 #------------------------------------------------------------------------------
-m4_define([cs_version_number], [1.9])
+m4_define([cs_version_number], [2.0])
 
 
 
@@ -23,7 +23,7 @@ m4_define([cs_version_number], [1.9])
 AC_INIT([crystalspace], [cs_version_number],
         [crystal-main@lists.sourceforge.net])
 CS_PACKAGEINFO([Crystal Space],
-    [Copyright (C)1998-2008 Jorrit Tyberghein and others],
+    [Copyright (C)1998-2011 Jorrit Tyberghein and others],
     [http://www.crystalspace3d.org/])
 AC_CONFIG_SRCDIR([libs/Jamfile])
 AC_CONFIG_AUX_DIR([mk/autoconf])
