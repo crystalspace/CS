@@ -20,7 +20,7 @@
 AC_PREREQ([2.56])
 
 # Should stay in sync with csver.h
-m4_define([cs_min_version_default], [1.9])
+m4_define([cs_min_version_default], [2.0])
 
 
 #------------------------------------------------------------------------------
