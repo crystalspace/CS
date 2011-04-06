@@ -34,7 +34,7 @@
  * Also affects the version number - unstable versions have the RCS revision
  *  as the 'build' version component.
  */
-#define CS_VERSION_UNSTABLE
+//#define CS_VERSION_UNSTABLE
 
 /**
  * Build version based off SVN revision.
@@ -55,9 +55,9 @@
  *
  * The relative SVN revision is computed by the script `rcsrev`.
  */
-//CS_RCSREV_OFFSET 513
+//CS_RCSREV_OFFSET 0
 #ifndef CS_VERSION_RCSREV
-#define CS_VERSION_RCSREV	514
+#define CS_VERSION_RCSREV	0
 #endif
 
 /**\name Version number definitions (numeric)
@@ -67,7 +67,6 @@
 /// Minor version (even are stable versions, odd are development versions)
 #define CS_VERSION_NUM_MINOR  	0
 /// Maintenance release
-// @@@ NOTE: set 77 in 1.9 for continuity reasons; reset to 0 on version bump
 #define CS_VERSION_NUM_RELEASE	0
 /**
  * Build number.
