@@ -33,13 +33,15 @@ namespace lighter
     samples = (IrradianceSample*)malloc( sizeof( IrradianceSample ) * ( maxSamples ) );
 
     // Create initial root node
-    root = new OctreeSampleNode(samples, maxError);
+    root = new OctreeSampleNode(&samples, maxError);
     root->SetBoundingBox(bboxMin, bboxMax);
   }
 
   IrradianceCache::~IrradianceCache()
   {
     free( samples );
+    delete root;
+    root = 0;
   }
 
   size_t IrradianceCache :: GetSampleCount() { return storedSamples; }
@@ -91,16 +93,17 @@ namespace lighter
     root->FindSamples(samp, nearest);
 
     // Check results
+    bool result = false;
     if(nearest->count > 0)
     {
       // Compute irradiance estimate
       power[0] = power[1] = power[2] = 0.0;
       float weightSum = 0.0;
 
-      for(size_t i=0; i<nearest->count; i++)
+      for(size_t i = 0; i < nearest->count; ++i)
       {
         // Get local copies of data
-        IrradianceSample *Pi = nearest->samples[i];
+        IrradianceSample* Pi = nearest->samples[i];
         float Wi = nearest->weights[i];
 
         // Add weighted power contribution
@@ -118,11 +121,16 @@ namespace lighter
       power[2] /= weightSum;
 
       // Signal success
-      return true;
+      result = true;
     }
-    
-    // No valid samples found
-    return false;
+
+    // free temporary memory
+    delete samp;
+    delete[] nearest->weights;
+    delete[] nearest->samples;
+    delete nearest;
+
+    return result;
   }
 
 
@@ -133,15 +141,8 @@ namespace lighter
 
     // Allocate a new array
     IrradianceSample *newSamples =
-      (IrradianceSample*)malloc( sizeof( IrradianceSample ) * ( newMax ) );
+      (IrradianceSample*)realloc(samples, sizeof( IrradianceSample ) * ( newMax ) );
     if(newSamples == NULL) return false;
-
-    // Copy over old data
-    for(size_t i=0; i<maxSamples; i++)
-      newSamples[i] = samples[i];
-
-    // Free old array
-    free(samples);
 
     // Replace old variables
     samples = newSamples;
