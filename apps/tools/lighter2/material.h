@@ -107,7 +107,7 @@ namespace lighter
     // The original texture image
     CS::ImageAutoConvert * textureImg;
     csRef<MaterialImage<csColor> > filterImage;
-	  float refractiveIndex;
+    float refractiveIndex;
     bool isTexImageValid;
     bool produceCaustic;
 	   
@@ -118,8 +118,8 @@ namespace lighter
     void SetRefractiveIndex(float refrIndex) {refractiveIndex = refrIndex;}
     bool IsTextureValid() const {return isTexImageValid;}
     float GetRefractiveIndex(){return refractiveIndex;}
-	  //Returns the color at uv coordinates in original texture
-	  csColor GetTextureValue(csVector2 uv) const;
+    //Returns the color at uv coordinates in original texture
+    csColor GetTextureValue(csVector2 uv) const;
 
   };
   typedef csHash<RadMaterial, csString> MaterialHash;
