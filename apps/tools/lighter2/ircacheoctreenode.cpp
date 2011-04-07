@@ -26,7 +26,7 @@ namespace lighter
 {
   double OctreeSampleNode::alpha = 0.1;
 
-  OctreeSampleNode::OctreeSampleNode(IrradianceSample* parentArray,
+  OctreeSampleNode::OctreeSampleNode(IrradianceSample** parentArray,
     const double newAlpha)
   {
     if(newAlpha > 0.0)
@@ -48,7 +48,7 @@ namespace lighter
   OctreeSampleNode::~OctreeSampleNode()
   {
     for(size_t i=0; i<8; i++)
-      if(child[i] != NULL) delete child[i];
+      delete child[i];
   }
 
   bool OctreeSampleNode::Shadowed(const IrradianceSample *A,
@@ -115,15 +115,18 @@ namespace lighter
     // Check all samples at this node
     for(size_t i=0; i<samples.GetSize(); i++)
     {
-      IrradianceSample *Pi = &(masterArray[samples[i]]);
-      if(!Shadowed(samp, Pi))
+      IrradianceSample *Pi = &((*masterArray)[samples[i]]);
+      if(Pi && !Shadowed(samp, Pi))
       {
         float weight = Weight(samp, Pi);
         if(weight > 1.0/alpha)
         {
-          nearest->samples[nearest->count] = Pi;
-          nearest->weights[nearest->count] = weight;
-          nearest->count++;
+          #pragma omp critical
+          {
+            nearest->samples[nearest->count] = Pi;
+            nearest->weights[nearest->count] = weight;
+            nearest->count++;
+          }
         }
       }
     }
@@ -136,6 +139,7 @@ namespace lighter
       childSizeSq *= childSizeSq;
 
       // Compute distance to center of each child
+      #pragma omp parallel for
       for(size_t i=0; i<8; i++)
       {
         float tmp[3], distSq;
@@ -149,7 +153,7 @@ namespace lighter
         {
           child[i]->FindSamples(samp, nearest);
         }
-      }      
+      }
     }
   }
 
@@ -157,8 +161,15 @@ namespace lighter
   {
     // Check if size is within specified limits
     float validRange =
-      masterArray[newNode].mean*OctreeSampleNode::alpha;
-    if(size > 2.0*validRange && size < 4.0*validRange)
+      (*masterArray)[newNode].mean*OctreeSampleNode::alpha*4;
+
+    if(validRange < SMALL_EPSILON)
+    {
+      CS_ASSERT(false);
+      return;
+    }
+
+    if(size < validRange)
     {
       samples.Push(newNode);
     }
@@ -170,9 +181,9 @@ namespace lighter
       if(isLeaf) SplitNode();
 
       // Find child that bounds this new sample
-      bool xPlus = (masterArray[newNode].pos[0] >= center[0]);
-      bool yPlus = (masterArray[newNode].pos[1] >= center[1]);
-      bool zPlus = (masterArray[newNode].pos[2] >= center[2]);
+      bool xPlus = ((*masterArray)[newNode].pos[0] >= center[0]);
+      bool yPlus = ((*masterArray)[newNode].pos[1] >= center[1]);
+      bool zPlus = ((*masterArray)[newNode].pos[2] >= center[2]);
 
       // Only three tests to find the proper octant
       if(xPlus)
