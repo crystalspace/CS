@@ -18,6 +18,9 @@
 #    Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 #==============================================================================
+# If you modify this file then please modify also the file
+# 'CEL/mk/autoconf/cel.m4'
+#==============================================================================
 AC_PREREQ([2.56])
 
 m4_define([cel_min_version_default], [2.0])
