@@ -57,18 +57,17 @@
  */
 //CS_RCSREV_OFFSET 513
 #ifndef CS_VERSION_RCSREV
-#define CS_VERSION_RCSREV	3453
+#define CS_VERSION_RCSREV	3455
 #endif
 
 /**\name Version number definitions (numeric)
  * @{ */
 /// Major version
-#define CS_VERSION_NUM_MAJOR  	1
+#define CS_VERSION_NUM_MAJOR  	2
 /// Minor version (even are stable versions, odd are development versions)
-#define CS_VERSION_NUM_MINOR  	9
+#define CS_VERSION_NUM_MINOR  	1
 /// Maintenance release
-// @@@ NOTE: set 77 in 1.9 for continuity reasons; reset to 0 on version bump
-#define CS_VERSION_NUM_RELEASE	77
+#define CS_VERSION_NUM_RELEASE	0
 /**
  * Build number.
  * (Actually, a version number dependent on the SVN revision this version was
