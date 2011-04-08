@@ -63510,12 +63510,12 @@ SWIGEXPORT void SWIG_init(void) {
   
   SWIG_Python_SetConstant(d, "CS_COMPILER_NAME",SWIG_FromCharPtr("GCC"));
   SWIG_Python_SetConstant(d, "CS_PLATFORM_NAME",SWIG_FromCharPtr("Unix"));
-  SWIG_Python_SetConstant(d, "CS_PROCESSOR_SIZE",SWIG_From_int(static_cast< int >(32)));
-  SWIG_Python_SetConstant(d, "CS_LONG_SIZE",SWIG_From_int(static_cast< int >(4)));
+  SWIG_Python_SetConstant(d, "CS_PROCESSOR_SIZE",SWIG_From_int(static_cast< int >(64)));
+  SWIG_Python_SetConstant(d, "CS_LONG_SIZE",SWIG_From_int(static_cast< int >(8)));
   SWIG_Python_SetConstant(d, "CS_PROCESSOR_NAME",SWIG_FromCharPtr("x86"));
   SWIG_Python_SetConstant(d, "CS_WCHAR_T_SIZE",SWIG_From_int(static_cast< int >(4)));
   SWIG_Python_SetConstant(d, "CS_PACKAGE_NAME",SWIG_FromCharPtr("crystalspace"));
-  SWIG_Python_SetConstant(d, "CS_PACKAGE_VERSION",SWIG_FromCharPtr("1.9"));
+  SWIG_Python_SetConstant(d, "CS_PACKAGE_VERSION",SWIG_FromCharPtr("2.0"));
   PyDict_SetItemString(d,(char*)"cvar", SWIG_globals());
   SWIG_addvarlink(SWIG_globals(),(char*)"csArrayItemNotFound",Swig_var_csArrayItemNotFound_get, Swig_var_csArrayItemNotFound_set);
   SWIG_addvarlink(SWIG_globals(),(char*)"iSCF_SCF",Swig_var_iSCF_SCF_get, Swig_var_iSCF_SCF_set);
