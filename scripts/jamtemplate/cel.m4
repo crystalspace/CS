@@ -20,7 +20,7 @@
 #==============================================================================
 AC_PREREQ([2.56])
 
-m4_define([cel_min_version_default], [1.9])
+m4_define([cel_min_version_default], [2.0])
 
 #------------------------------------------------------------------------------
 # CS_PATH_CEL_CHECK([MINIMUM-VERSION], [ACTION-IF-FOUND],
@@ -122,7 +122,7 @@ AS_IF([test -n "$CEL_CONFIG_TOOL"],
     [cfg="$CEL_CONFIG_TOOL"
 
     CS_CHECK_PROG_VERSION([CEL], [$cfg --version],
-	[m4_default([$1],[cel_min_version_default])], [9.9|.9],
+	m4_default([$1],[cel_min_version_default]), [9.9|.9],
 	[cel_sdk=yes], [cel_sdk=no])
 
     AS_IF([test $cel_sdk = yes],
