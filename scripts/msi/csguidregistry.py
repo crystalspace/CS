@@ -3,11 +3,11 @@ guid_registry = {
     "base": '174182C0-BF94-11DC-B42B-0015582877AD',
 
     #Upgrade codes for our installers. Those may not change.
-    "CS.upgrade_code": '3C8B4562-BF93-11DC-B42B-0015582877AD',
-    "CS.cel.upgrade_code": '64D0D104-BF93-11DC-B42B-0015582877AD',
-    "CS.b2CS.upgrade_code": '7552D0F4-BF93-11DC-B42B-0015582877AD',
-    "cel.upgrade_code": '7C953DF2-BF93-11DC-B42B-0015582877AD',
-    "b2cs.upgrade_code": '826602C0-BF93-11DC-B42B-0015582877AD',
+    "CS.upgrade_code": '91B4A2B2-6A99-4682-B8F9-4F3DA22D5759',
+    "CS.cel.upgrade_code": 'A1F1EFB7-82A1-4D07-A847-FBAE58844093',
+    "CS.b2CS.upgrade_code": '7A644BA2-813D-46EC-9B74-198E60AAFDC0',
+    "cel.upgrade_code": '767F3BFB-9B54-4FCB-9605-346B5DAE46B2',
+    "b2cs.upgrade_code": 'E08931F4-BD68-4C4C-ADC5-4AF3B4510A5B',
 
     #CS merge modules
     "CS.doc.msm": '88888F92-BF93-11DC-B42B-0015582877AD',
