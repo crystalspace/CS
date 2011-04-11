@@ -29,12 +29,12 @@ KrystalScene::KrystalScene (HairTest* hairTest)
 : hairTest (hairTest), hairPhysicsEnabled(true), isDead(false)
 {
   // Setup the parameters of the camera manager
-  hairTest->cameraManager.SetStartPosition (csVector3 (0.0f, 1.0f, -2.5f));
-  hairTest->cameraManager.SetCameraMinimumDistance (CAMERA_MINIMUM_DISTANCE);
+  hairTest->cameraManager->SetStartPosition (csVector3 (0.0f, 1.0f, -2.5f));
+  hairTest->cameraManager->SetCameraMinimumDistance (CAMERA_MINIMUM_DISTANCE);
 
   // Define the available keys
-  hairTest->hudManager.keyDescriptions.DeleteAll ();
-  hairTest->hudManager.stateDescriptions.DeleteAll ();
+  hairTest->hudManager->GetKeyDescriptions ()->Empty ();
+  hairTest->hudManager->GetStateDescriptions ()->Empty ();
 }
 
 KrystalScene::~KrystalScene ()

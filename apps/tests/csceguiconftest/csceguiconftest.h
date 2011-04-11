@@ -31,29 +31,24 @@
 
 struct iSector;
 
-class CSCEGUIConfTest : public CS::Demo::DemoApplication
+class CSCEGUIConfTest : public CS::Utility::DemoApplication
 {
 private:
-  bool myBool;
   int myInt;
   float myFloat;
+  bool myBool;
   csString myString;
 
 private:
-  float rotX, rotY;
-  csRef<iVFS> vfs;
   csRef<iCEGUI> cegui;
   csRef<iConfigListener> configEventNotifier;
 
-  csRef<iEventHandler> myBoolL;
   csRef<iEventHandler> myIntL;
   csRef<iEventHandler> myFloatL;
+  csRef<iEventHandler> myBoolL;
   csRef<iEventHandler> myStringL;
 
   void Frame();
-
-  bool OnKeyboard(iEvent&);
-  bool OnMouseDown(iEvent&);
 
 public:
   CSCEGUIConfTest();

@@ -40,7 +40,7 @@ enum LightMode
   UNLIT
 };
 
-class ViewMesh : public CS::Demo::DemoApplication
+class ViewMesh : public CS::Utility::DemoApplication
 {
  private:
 

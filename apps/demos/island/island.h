@@ -24,7 +24,7 @@
 
 #include "cstool/csdemoapplication.h"
 
-class IslandDemo : public CS::Demo::DemoApplication
+class IslandDemo : public CS::Utility::DemoApplication
 {
  private:
   bool CreateScene ();
@@ -34,7 +34,7 @@ class IslandDemo : public CS::Demo::DemoApplication
  public:
   IslandDemo ();
 
-  //-- CS::Demo::DemoApplication
+  //-- CS::Utility::DemoApplication
   void PrintHelp ();
   void Frame ();
 

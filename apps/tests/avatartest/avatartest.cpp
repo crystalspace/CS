@@ -36,10 +36,6 @@ AvatarTest::AvatarTest ()
   : DemoApplication ("CrystalSpace.AvatarTest"),
     avatarScene (nullptr), dynamicsDebugMode (DYNDEBUG_NONE)
 {
-  // Configure the options for DemoApplication
-
-  // Set the camera mode
-  cameraManager.SetCameraMode (CS::Demo::CAMERA_ROTATE);
 }
 
 AvatarTest::~AvatarTest ()
@@ -80,7 +76,7 @@ void AvatarTest::Frame ()
   avatarScene->Frame ();
 
   // Update the target of the camera
-  cameraManager.SetCameraTarget (avatarScene->GetCameraTarget ());
+  cameraManager->SetCameraTarget (avatarScene->GetCameraTarget ());
 
   // Update the information on the current state of the application
   avatarScene->UpdateStateDescription ();
@@ -137,8 +133,8 @@ bool AvatarTest::OnKeyboard (iEvent &ev)
       }
 
       // Re-initialize camera position
-      cameraManager.SetCameraTarget (avatarScene->GetCameraTarget ());
-      cameraManager.ResetCamera ();
+      cameraManager->SetCameraTarget (avatarScene->GetCameraTarget ());
+      cameraManager->ResetCamera ();
 
       // Toggle the debug mode of the dynamic system
       if (physicsEnabled)
@@ -452,9 +448,10 @@ bool AvatarTest::Application ()
   if (!avatarScene->CreateAvatar ())
     return false;
 
-  // Initialize the camera position
-  cameraManager.SetCameraTarget (avatarScene->GetCameraTarget ());
-  cameraManager.ResetCamera ();
+  // Initialize the camera manager
+  cameraManager->SetCameraMode (CS::Utility::CAMERA_ROTATE);
+  cameraManager->SetCameraTarget (avatarScene->GetCameraTarget ());
+  cameraManager->ResetCamera ();
 
   // Run the application
   Run();

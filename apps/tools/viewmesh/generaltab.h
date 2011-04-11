@@ -150,7 +150,7 @@ bool GeneralTab::CameraModeRotate (const CEGUI::EventArgs& e)
     (CEGUI::RadioButton*) winMgr->getWindow("General/RotateRadio");
 
   if (radio->getSelectedButtonInGroup () == radio)
-    viewmesh->cameraManager.SetCameraMode (CS::Demo::CAMERA_ROTATE);
+    viewmesh->cameraManager->SetCameraMode (CS::Utility::CAMERA_ROTATE);
   return true;
 }
 
@@ -162,7 +162,7 @@ bool GeneralTab::CameraModeMoveOrigin (const CEGUI::EventArgs& e)
     (CEGUI::RadioButton*) winMgr->getWindow("General/LooktooriginRadio");
 
   if (radio->getSelectedButtonInGroup () == radio)
-    viewmesh->cameraManager.SetCameraMode (CS::Demo::CAMERA_MOVE_LOOKAT);
+    viewmesh->cameraManager->SetCameraMode (CS::Utility::CAMERA_MOVE_LOOKAT);
   return true;
 }
 
@@ -174,7 +174,7 @@ bool GeneralTab::CameraModeMoveNormal (const CEGUI::EventArgs& e)
     (CEGUI::RadioButton*) winMgr->getWindow("General/NormalMovementRadio");
 
   if (radio->getSelectedButtonInGroup () == radio)
-    viewmesh->cameraManager.SetCameraMode (CS::Demo::CAMERA_MOVE_FREE);
+    viewmesh->cameraManager->SetCameraMode (CS::Utility::CAMERA_MOVE_FREE);
   return true;
 }
 
@@ -270,7 +270,7 @@ bool GeneralTab::SetScaleSprite (const CEGUI::EventArgs& e)
 
 bool GeneralTab::ResetCameraButton (const CEGUI::EventArgs& e)
 {
-  viewmesh->cameraManager.ResetCamera ();
+  viewmesh->cameraManager->ResetCamera ();
   return true;
 }
 

@@ -30,6 +30,7 @@
 #include "imesh/animnode/skeleton2anim.h"
 
 struct iMovieRecorder;
+class csPixmap;
 
 namespace CS {
 namespace Animation {
@@ -42,7 +43,7 @@ struct iSkeletonDebugNode;
 } // namespace CS
 
 
-class MocapViewer : public CS::Demo::DemoApplication,
+class MocapViewer : public CS::Utility::DemoApplication,
   public scfImplementation1<MocapViewer, CS::Animation::iSkeletonAnimCallback>
 {
  private:
@@ -72,7 +73,7 @@ class MocapViewer : public CS::Demo::DemoApplication,
   MocapViewer ();
   ~MocapViewer ();
 
-  //-- CS::Demo::DemoApplication
+  //-- CS::Utility::DemoApplication
   void PrintHelp ();
   void Frame ();
 

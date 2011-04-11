@@ -18,7 +18,6 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include "cssysdef.h"
 
 #include "iengine/campos.h"
@@ -89,9 +88,9 @@ bool IslandDemo::CreateScene ()
   // Setup the sector and the camera
   room = engine->FindSector ("TerrainSector");
   view->GetCamera ()->SetSector (room);
-  cameraManager.SetCamera (view->GetCamera ());
-  cameraManager.SetCameraMode (CS::Demo::CAMERA_MOVE_FREE);
-  cameraManager.SetMotionSpeed (10.0f);
+  cameraManager->SetCamera (view->GetCamera ());
+  cameraManager->SetCameraMode (CS::Utility::CAMERA_MOVE_FREE);
+  cameraManager->SetMotionSpeed (10.0f);
 
   printf ("Precaching data...\n");
   engine->PrecacheDraw ();

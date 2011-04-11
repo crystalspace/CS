@@ -29,20 +29,20 @@ SintelScene::SintelScene (AvatarTest* avatarTest)
     currentExpressionIndex (0), activeFacialTransition (false)
 {
   // Setup the parameters of the camera manager
-  avatarTest->cameraManager.SetStartPosition (csVector3 (0.0f, 0.08f, -0.5f));
-  avatarTest->cameraManager.SetCameraMinimumDistance (0.4f);
+  avatarTest->cameraManager->SetStartPosition (csVector3 (0.0f, 0.08f, -0.5f));
+  avatarTest->cameraManager->SetCameraMinimumDistance (0.4f);
 
   // Define the available keys
-  avatarTest->hudManager.keyDescriptions.DeleteAll ();
-  avatarTest->hudManager.keyDescriptions.Push ("arrow keys: move camera");
-  avatarTest->hudManager.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
-  avatarTest->hudManager.keyDescriptions.Push ("1: neutral");
-  avatarTest->hudManager.keyDescriptions.Push ("2: smiling");
-  avatarTest->hudManager.keyDescriptions.Push ("3: angry");
-  avatarTest->hudManager.keyDescriptions.Push ("4: sad");
-  avatarTest->hudManager.keyDescriptions.Push ("n: switch to next scene");
+  avatarTest->hudManager->GetKeyDescriptions ()->Empty ();
+  avatarTest->hudManager->GetKeyDescriptions ()->Push ("arrow keys: move camera");
+  avatarTest->hudManager->GetKeyDescriptions ()->Push ("SHIFT-up/down keys: camera closer/farther");
+  avatarTest->hudManager->GetKeyDescriptions ()->Push ("1: neutral");
+  avatarTest->hudManager->GetKeyDescriptions ()->Push ("2: smiling");
+  avatarTest->hudManager->GetKeyDescriptions ()->Push ("3: angry");
+  avatarTest->hudManager->GetKeyDescriptions ()->Push ("4: sad");
+  avatarTest->hudManager->GetKeyDescriptions ()->Push ("n: switch to next scene");
 
-  avatarTest->hudManager.stateDescriptions.DeleteAll ();
+  avatarTest->hudManager->GetStateDescriptions ()->Empty ();
 }
 
 SintelScene::~SintelScene ()

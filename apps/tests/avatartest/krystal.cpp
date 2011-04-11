@@ -30,24 +30,24 @@ KrystalScene::KrystalScene (AvatarTest* avatarTest)
   : avatarTest (avatarTest), debug (false), IKenabled (false)
 {
   // Setup the parameters of the camera manager
-  avatarTest->cameraManager.SetStartPosition (csVector3 (0.0f, 1.0f, -2.5f));
-  avatarTest->cameraManager.SetCameraMinimumDistance (CAMERA_MINIMUM_DISTANCE);
+  avatarTest->cameraManager->SetStartPosition (csVector3 (0.0f, 1.0f, -2.5f));
+  avatarTest->cameraManager->SetCameraMinimumDistance (CAMERA_MINIMUM_DISTANCE);
 
   // Define the available keys
-  avatarTest->hudManager.keyDescriptions.DeleteAll ();
-  avatarTest->hudManager.keyDescriptions.Push ("arrow keys: move camera");
-  avatarTest->hudManager.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
+  avatarTest->hudManager->GetKeyDescriptions ()->Empty ();
+  avatarTest->hudManager->GetKeyDescriptions ()->Push ("arrow keys: move camera");
+  avatarTest->hudManager->GetKeyDescriptions ()->Push ("SHIFT-up/down keys: camera closer/farther");
   if (avatarTest->physicsEnabled)
   {
-    avatarTest->hudManager.keyDescriptions.Push ("i: toggle Inverse Kinematics");
-    avatarTest->hudManager.keyDescriptions.Push ("d: display active colliders");
-    avatarTest->hudManager.keyDescriptions.Push ("left mouse: kill Krystal");
+    avatarTest->hudManager->GetKeyDescriptions ()->Push ("i: toggle Inverse Kinematics");
+    avatarTest->hudManager->GetKeyDescriptions ()->Push ("d: display active colliders");
+    avatarTest->hudManager->GetKeyDescriptions ()->Push ("left mouse: kill Krystal");
   }
-  avatarTest->hudManager.keyDescriptions.Push ("a: display bone positions");
-  avatarTest->hudManager.keyDescriptions.Push ("r: reset scene");
-  avatarTest->hudManager.keyDescriptions.Push ("n: switch to next scene");
+  avatarTest->hudManager->GetKeyDescriptions ()->Push ("a: display bone positions");
+  avatarTest->hudManager->GetKeyDescriptions ()->Push ("r: reset scene");
+  avatarTest->hudManager->GetKeyDescriptions ()->Push ("n: switch to next scene");
 
-  avatarTest->hudManager.stateDescriptions.DeleteAll ();
+  avatarTest->hudManager->GetStateDescriptions ()->Empty ();
 }
 
 KrystalScene::~KrystalScene ()

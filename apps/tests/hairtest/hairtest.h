@@ -75,7 +75,7 @@ public:
   csRef<CS::Mesh::iFurMesh> furMesh;
 };
 
-class HairTest : public CS::Demo::DemoApplication
+class HairTest : public CS::Utility::DemoApplication
 {
   friend class KrystalScene;
   friend class FrankieScene;

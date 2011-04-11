@@ -26,12 +26,12 @@ FrankieScene::FrankieScene (HairTest* hairTest)
   : hairTest (hairTest), furPhysicsEnabled(false)
 {
   // Setup the parameters of the camera manager
-  hairTest->cameraManager.SetStartPosition (csVector3 (0.0f, 0.25f, -1.25f));
-  hairTest->cameraManager.SetCameraMinimumDistance (0.75f);
+  hairTest->cameraManager->SetStartPosition (csVector3 (0.0f, 0.25f, -1.25f));
+  hairTest->cameraManager->SetCameraMinimumDistance (0.75f);
 
   // Define the available keys
-  hairTest->hudManager.keyDescriptions.DeleteAll ();
-  hairTest->hudManager.stateDescriptions.DeleteAll ();
+  hairTest->hudManager->GetKeyDescriptions ()->Empty ();
+  hairTest->hudManager->GetStateDescriptions ()->Empty ();
 }
 
 FrankieScene::~FrankieScene ()

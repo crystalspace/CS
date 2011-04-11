@@ -36,30 +36,30 @@ FrankieScene::FrankieScene (AvatarTest* avatarTest)
     lookAtListener (this), decalsEnabled (false), decal (nullptr), decalPosition (0.0f)
 {
   // Setup the parameters of the camera manager
-  avatarTest->cameraManager.SetStartPosition (csVector3 (0.0f, 0.25f, -1.25f));
-  avatarTest->cameraManager.SetCameraMinimumDistance (0.75f);
+  avatarTest->cameraManager->SetStartPosition (csVector3 (0.0f, 0.25f, -1.25f));
+  avatarTest->cameraManager->SetCameraMinimumDistance (0.75f);
 
   // Define the available keys
-  avatarTest->hudManager.keyDescriptions.DeleteAll ();
-  avatarTest->hudManager.keyDescriptions.Push ("arrow keys: move camera");
-  avatarTest->hudManager.keyDescriptions.Push ("SHIFT-up/down keys: camera closer/farther");
-  avatarTest->hudManager.keyDescriptions.Push ("+/-: walk faster/slower");
-  avatarTest->hudManager.keyDescriptions.Push (csString().Format ("t: toggle %s target mode",
+  avatarTest->hudManager->GetKeyDescriptions ()->Empty ();
+  avatarTest->hudManager->GetKeyDescriptions ()->Push ("arrow keys: move camera");
+  avatarTest->hudManager->GetKeyDescriptions ()->Push ("SHIFT-up/down keys: camera closer/farther");
+  avatarTest->hudManager->GetKeyDescriptions ()->Push ("+/-: walk faster/slower");
+  avatarTest->hudManager->GetKeyDescriptions ()->Push (csString().Format ("t: toggle %s target mode",
 					      CS::Quote::Single ("LookAt")));
-  avatarTest->hudManager.keyDescriptions.Push (csString().Format ("a: toggle %s mode",
+  avatarTest->hudManager->GetKeyDescriptions ()->Push (csString().Format ("a: toggle %s mode",
 					      CS::Quote::Single ("LookAt: always rotate")));
-  avatarTest->hudManager.keyDescriptions.Push (csString().Format ("s: toggle %s",
+  avatarTest->hudManager->GetKeyDescriptions ()->Push (csString().Format ("s: toggle %s",
 					      CS::Quote::Single ("LookAt: rotation speed")));
   if (avatarTest->physicsEnabled)
   {
-    avatarTest->hudManager.keyDescriptions.Push ("f: toggle physical tail");
-    avatarTest->hudManager.keyDescriptions.Push ("left mouse: kill Frankie");
-    avatarTest->hudManager.keyDescriptions.Push ("d: display active colliders");
+    avatarTest->hudManager->GetKeyDescriptions ()->Push ("f: toggle physical tail");
+    avatarTest->hudManager->GetKeyDescriptions ()->Push ("left mouse: kill Frankie");
+    avatarTest->hudManager->GetKeyDescriptions ()->Push ("d: display active colliders");
   }
   if (avatarTest->decalManager)
-    avatarTest->hudManager.keyDescriptions.Push ("c: toggle decals under the mouse");
-  avatarTest->hudManager.keyDescriptions.Push ("r: reset scene");
-  avatarTest->hudManager.keyDescriptions.Push ("n: switch to next scene");
+    avatarTest->hudManager->GetKeyDescriptions ()->Push ("c: toggle decals under the mouse");
+  avatarTest->hudManager->GetKeyDescriptions ()->Push ("r: reset scene");
+  avatarTest->hudManager->GetKeyDescriptions ()->Push ("n: switch to next scene");
 }
 
 FrankieScene::~FrankieScene ()
@@ -631,34 +631,34 @@ void FrankieScene::ResetScene ()
 
 void FrankieScene::UpdateStateDescription ()
 {
-  avatarTest->hudManager.stateDescriptions.DeleteAll ();
+  avatarTest->hudManager->GetStateDescriptions ()->Empty ();
 
   if (targetMode == LOOKAT_CAMERA)
-    avatarTest->hudManager.stateDescriptions.Push ("Watch out, Frankie is looking at you!");
+    avatarTest->hudManager->GetStateDescriptions ()->Push ("Watch out, Frankie is looking at you!");
   else if (targetMode == LOOKAT_POSITION)
-    avatarTest->hudManager.stateDescriptions.Push ("Frankie is looking at something");
+    avatarTest->hudManager->GetStateDescriptions ()->Push ("Frankie is looking at something");
   else if (targetMode == LOOKAT_NOTHING)
-    avatarTest->hudManager.stateDescriptions.Push ("Frankie doesn't care about anything");
+    avatarTest->hudManager->GetStateDescriptions ()->Push ("Frankie doesn't care about anything");
 
   if (alwaysRotate)
-    avatarTest->hudManager.stateDescriptions.Push ("Always rotate: ON");
+    avatarTest->hudManager->GetStateDescriptions ()->Push ("Always rotate: ON");
   else
-    avatarTest->hudManager.stateDescriptions.Push ("Always rotate: OFF");
+    avatarTest->hudManager->GetStateDescriptions ()->Push ("Always rotate: OFF");
 
   if (rotationSpeed == ROTATION_SLOW)
-    avatarTest->hudManager.stateDescriptions.Push ("Rotation speed: really slow");
+    avatarTest->hudManager->GetStateDescriptions ()->Push ("Rotation speed: really slow");
   else if (rotationSpeed == ROTATION_NORMAL)
-    avatarTest->hudManager.stateDescriptions.Push ("Rotation speed: normal");
+    avatarTest->hudManager->GetStateDescriptions ()->Push ("Rotation speed: normal");
   else if (rotationSpeed == ROTATION_IMMEDIATE)
-    avatarTest->hudManager.stateDescriptions.Push ("Rotation speed: infinite");
+    avatarTest->hudManager->GetStateDescriptions ()->Push ("Rotation speed: infinite");
 
   csString txt;
   txt.Format ("Walk speed: %.1f", ((float) currentSpeed) / 10.0f);
-  avatarTest->hudManager.stateDescriptions.Push (txt);
+  avatarTest->hudManager->GetStateDescriptions ()->Push (txt);
 
   if (decalsEnabled)
-    avatarTest->hudManager.stateDescriptions.Push ("Decal textures: ON");
+    avatarTest->hudManager->GetStateDescriptions ()->Push ("Decal textures: ON");
   else
-    avatarTest->hudManager.stateDescriptions.Push ("Decal textures: OFF");
+    avatarTest->hudManager->GetStateDescriptions ()->Push ("Decal textures: OFF");
 }
 

@@ -58,7 +58,6 @@ ViewMesh::ViewMesh () :
   DemoApplication ("CrystalSpace.ViewMesh"), lightMode (THREE_POINT), scale (1.0f),
   lod_level (0), max_lod_level (0), auto_lod (false), mouseMove (false)
 {
-  hudManager.keyDescriptions.DeleteAll ();
 }
 
 ViewMesh::~ViewMesh ()
@@ -301,6 +300,9 @@ bool ViewMesh::Application()
   if (!DemoApplication::Application ())
     return false;
 
+  // Initialize the HUD manager
+  hudManager->GetKeyDescriptions ()->Empty ();
+
   // Find references to the plugins of the animation nodes
   tloader = csQueryRegistry<iThreadedLoader> (GetObjectRegistry());
   if (!tloader) return ReportError("Failed to locate threaded Loader!");
@@ -332,9 +334,8 @@ bool ViewMesh::CreateRoom ()
 
   // Initialize the camera
   view->GetCamera ()->SetSector (room);
-  cameraManager.Initialize (object_reg);
-  cameraManager.SetCameraMode (CS::Demo::CAMERA_ROTATE);
-  cameraManager.SetCamera (view->GetCamera ());
+  cameraManager->SetCameraMode (CS::Utility::CAMERA_ROTATE);
+  cameraManager->SetCamera (view->GetCamera ());
 
   csRef<iLight> light;
   light = engine->CreateLight
@@ -554,11 +555,11 @@ void ViewMesh::LoadSprite (const char* filename, const char* path)
   if (asset)
   {
     csBox3 bbox = asset->GetMesh ()->GetWorldBoundingBox ();
-    cameraManager.SetCameraTarget (bbox.GetCenter ());
+    cameraManager->SetCameraTarget (bbox.GetCenter ());
     float boxSize = bbox.GetSize ().Norm ();
-    cameraManager.SetStartPosition (bbox.GetCenter () + csVector3 (0.0f, 0.0f, - boxSize));
-    cameraManager.SetMotionSpeed (boxSize * 5.0f);
-    cameraManager.ResetCamera ();
+    cameraManager->SetStartPosition (bbox.GetCenter () + csVector3 (0.0f, 0.0f, - boxSize));
+    cameraManager->SetMotionSpeed (boxSize * 5.0f);
+    cameraManager->ResetCamera ();
 
     SetLightMode (lightMode);
   }
