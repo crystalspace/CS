@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- cameramanager.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.utilities.cameramanager</name>
+        <implementation>CameraManager</implementation>
+        <description>Camera motion manager</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
