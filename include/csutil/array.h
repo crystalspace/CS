@@ -739,7 +739,10 @@ public:
     return Get(n);
   }
 
-  /// Insert a copy of element at the indicated position.
+  /**
+   * Insert or reset a copy of the element \c what at the position with index \c n.
+   * If the size of the array is smaller than \c n then it will be resized.
+   */
   void Put (size_t n, T const& what)
   {
     if (n >= count)
@@ -944,7 +947,7 @@ public:
   }
 
   /**
-   * Find an element in array.
+   * Find an element in this array.
    * \return csArrayItemNotFound if not found, else the item index.
    * \warning Performs a slow linear search. For faster searching, sort the
    *   array and then use FindSortedKey().
@@ -1002,7 +1005,8 @@ public:
   }
 
   /**
-   * Clear entire array, releasing all allocated memory.
+   * Clear the entire array, releasing all allocated memory.
+   * \sa Empty()
    */
   void DeleteAll ()
   {
@@ -1018,7 +1022,7 @@ public:
   }
 
   /**
-   * Truncate array to specified number of elements. The new number of
+   * Truncate the array to the specified number of elements. The new number of
    * elements cannot exceed the current number of elements.
    * \remarks Does not reclaim memory used by the array itself, though the
    *   removed objects are destroyed. To reclaim the array's memory invoke
@@ -1040,7 +1044,7 @@ public:
   }
 
   /**
-   * Remove all elements.  Similar to DeleteAll(), but does not release memory
+   * Remove all elements. Similar to DeleteAll(), but does not release memory
    * used by the array itself, thus making it more efficient for cases when the
    * number of contained elements will fluctuate.
    */
