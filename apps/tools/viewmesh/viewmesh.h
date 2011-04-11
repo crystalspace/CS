@@ -21,7 +21,7 @@
 #define __VIEWMESH_H__
 
 #include "cssysdef.h"
-#include "cstool/csdemoapplication.h"
+#include "cstool/demoapplication.h"
 #include "cstool/csview.h"
 #include "csutil/xmltiny.h"
 #include "imap/writer.h"

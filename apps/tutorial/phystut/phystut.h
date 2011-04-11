@@ -19,7 +19,7 @@
 #ifndef __PHYSTUT_H__
 #define __PHYSTUT_H__
 
-#include "cstool/csdemoapplication.h"
+#include "cstool/demoapplication.h"
 #include "ivaria/dynamics.h"
 #include "ivaria/bullet.h"
 #include "ivaria/ode.h"

@@ -19,7 +19,7 @@
 #ifndef __CSCEGUICONFTEST_H__
 #define __CSCEGUICONFTEST_H__
 
-#include "crystalspace.h"
+#include "cstool/demoapplication.h"
 
 #include "csutil/custom_new_disable.h"
 #include <CEGUI.h>

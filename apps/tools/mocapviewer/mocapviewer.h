@@ -22,7 +22,7 @@
 #ifndef __MOCAPVIEWER_H__
 #define __MOCAPVIEWER_H__
 
-#include "cstool/csdemoapplication.h"
+#include "cstool/demoapplication.h"
 #include "cstool/mocapparser.h"
 #include "cstool/noise/noise.h"
 #include "cstool/noise/noisegen.h"

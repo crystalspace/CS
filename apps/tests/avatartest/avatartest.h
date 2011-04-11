@@ -33,7 +33,7 @@
 #include "ivaria/dynamicsdebug.h"
 #include "ivaria/softanim.h"
 
-#include "cstool/csdemoapplication.h"
+#include "cstool/demoapplication.h"
 
 #define DYNDEBUG_NONE 1
 #define DYNDEBUG_MIXED 2

@@ -29,7 +29,7 @@
 #include "ivaria/dynamicsdebug.h"
 #include "ivaria/icegui.h"
 
-#include "cstool/csdemoapplication.h"
+#include "cstool/demoapplication.h"
 
 // Different states for the display of the physical objects
 #define DYNDEBUG_NONE 1

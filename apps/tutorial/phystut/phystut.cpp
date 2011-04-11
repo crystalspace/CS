@@ -842,70 +842,6 @@ bool Simple::OnInitialize (int argc, char* argv[])
   if (!dynamics)
     return ReportError ("No iDynamics plugin!");
 
-  // Now that we know the physical plugin in use, we can define the available keys
-  hudManager->GetKeyDescriptions ()->Empty ();
-  hudManager->GetKeyDescriptions ()->Push ("b: spawn a box");
-  hudManager->GetKeyDescriptions ()->Push ("s: spawn a sphere");
-  if (phys_engine_id == BULLET_ID)
-  {
-    hudManager->GetKeyDescriptions ()->Push ("c: spawn a cylinder");
-    hudManager->GetKeyDescriptions ()->Push ("a: spawn a capsule");
-  }
-  hudManager->GetKeyDescriptions ()->Push ("v: spawn a convex mesh");
-  hudManager->GetKeyDescriptions ()->Push ("m: spawn a concave mesh");
-  hudManager->GetKeyDescriptions ()->Push ("*: spawn a static concave mesh");
-  if (phys_engine_id == BULLET_ID)
-    hudManager->GetKeyDescriptions ()->Push ("q: spawn a compound body");
-  hudManager->GetKeyDescriptions ()->Push ("j: spawn a joint with motor");
-  if (phys_engine_id == BULLET_ID)
-  {
-    hudManager->GetKeyDescriptions ()->Push ("h: spawn a chain");
-    hudManager->GetKeyDescriptions ()->Push ("r: spawn a Frankie's ragdoll");
-  }
-  if (isSoftBodyWorld)
-  {
-    hudManager->GetKeyDescriptions ()->Push ("y: spawn a rope");
-    hudManager->GetKeyDescriptions ()->Push ("u: spawn a cloth");
-    hudManager->GetKeyDescriptions ()->Push ("i: spawn a soft body");
-  }
-  hudManager->GetKeyDescriptions ()->Push ("SPACE: spawn random object");
-  if (phys_engine_id == BULLET_ID)
-  {
-    hudManager->GetKeyDescriptions ()->Push ("left mouse: fire!");
-    hudManager->GetKeyDescriptions ()->Push ("right mouse: drag object");
-    hudManager->GetKeyDescriptions ()->Push ("CTRL-x: cut selected object");
-    hudManager->GetKeyDescriptions ()->Push ("CTRL-v: paste object");
-  }
-  hudManager->GetKeyDescriptions ()->Push ("f: toggle camera modes");
-  hudManager->GetKeyDescriptions ()->Push ("t: toggle all bodies dynamic/static");
-  hudManager->GetKeyDescriptions ()->Push ("p: pause the simulation");
-  hudManager->GetKeyDescriptions ()->Push ("o: toggle speed of simulation");
-  hudManager->GetKeyDescriptions ()->Push ("d: toggle Bullet debug display");
-  if (phys_engine_id == BULLET_ID)
-    hudManager->GetKeyDescriptions ()->Push ("?: toggle display of collisions");
-  hudManager->GetKeyDescriptions ()->Push ("g: toggle gravity");
-  hudManager->GetKeyDescriptions ()->Push ("I: toggle autodisable");
-  if (phys_engine_id == ODE_ID)
-  {
-    hudManager->GetKeyDescriptions ()->Push ("1: enable StepFast solver");
-    hudManager->GetKeyDescriptions ()->Push ("2: disable StepFast solver");
-    hudManager->GetKeyDescriptions ()->Push ("3: enable QuickStep solver");
-  }
-#ifdef CS_HAVE_BULLET_SERIALIZER
-  if (phys_engine_id == BULLET_ID)
-    hudManager->GetKeyDescriptions ()->Push ("CTRL-s: save the dynamic world");
-#endif
-  /*
-  if (phys_engine_id == BULLET_ID)
-    hudManager->GetKeyDescriptions ()->Push ("CTRL-n: next environment");
-  */
-  if (phys_engine_id == BULLET_ID)
-  {
-    hudManager->GetKeyDescriptions ()->Push ("CTRL-i: start profiling");
-    hudManager->GetKeyDescriptions ()->Push ("CTRL-o: stop profiling");
-    hudManager->GetKeyDescriptions ()->Push ("CTRL-p: dump profile");
-  }
-
   return true;
 }
 
@@ -996,8 +932,72 @@ bool Simple::Application ()
   cameraManager->SetCameraMode (CS::Utility::CAMERA_NO_MOVE);
   cameraManager->SetMouseMoveEnabled (false);
 
-  // Init the camera
+  // Initialize the camera
   UpdateCameraMode ();
+
+  // Initialize the HUD manager
+  hudManager->GetKeyDescriptions ()->Empty ();
+  hudManager->GetKeyDescriptions ()->Push ("b: spawn a box");
+  hudManager->GetKeyDescriptions ()->Push ("s: spawn a sphere");
+  if (phys_engine_id == BULLET_ID)
+  {
+    hudManager->GetKeyDescriptions ()->Push ("c: spawn a cylinder");
+    hudManager->GetKeyDescriptions ()->Push ("a: spawn a capsule");
+  }
+  hudManager->GetKeyDescriptions ()->Push ("v: spawn a convex mesh");
+  hudManager->GetKeyDescriptions ()->Push ("m: spawn a concave mesh");
+  hudManager->GetKeyDescriptions ()->Push ("*: spawn a static concave mesh");
+  if (phys_engine_id == BULLET_ID)
+    hudManager->GetKeyDescriptions ()->Push ("q: spawn a compound body");
+  hudManager->GetKeyDescriptions ()->Push ("j: spawn a joint with motor");
+  if (phys_engine_id == BULLET_ID)
+  {
+    hudManager->GetKeyDescriptions ()->Push ("h: spawn a chain");
+    hudManager->GetKeyDescriptions ()->Push ("r: spawn a Frankie's ragdoll");
+  }
+  if (isSoftBodyWorld)
+  {
+    hudManager->GetKeyDescriptions ()->Push ("y: spawn a rope");
+    hudManager->GetKeyDescriptions ()->Push ("u: spawn a cloth");
+    hudManager->GetKeyDescriptions ()->Push ("i: spawn a soft body");
+  }
+  hudManager->GetKeyDescriptions ()->Push ("SPACE: spawn random object");
+  if (phys_engine_id == BULLET_ID)
+  {
+    hudManager->GetKeyDescriptions ()->Push ("left mouse: fire!");
+    hudManager->GetKeyDescriptions ()->Push ("right mouse: drag object");
+    hudManager->GetKeyDescriptions ()->Push ("CTRL-x: cut selected object");
+    hudManager->GetKeyDescriptions ()->Push ("CTRL-v: paste object");
+  }
+  hudManager->GetKeyDescriptions ()->Push ("f: toggle camera modes");
+  hudManager->GetKeyDescriptions ()->Push ("t: toggle all bodies dynamic/static");
+  hudManager->GetKeyDescriptions ()->Push ("p: pause the simulation");
+  hudManager->GetKeyDescriptions ()->Push ("o: toggle speed of simulation");
+  hudManager->GetKeyDescriptions ()->Push ("d: toggle Bullet debug display");
+  if (phys_engine_id == BULLET_ID)
+    hudManager->GetKeyDescriptions ()->Push ("?: toggle display of collisions");
+  hudManager->GetKeyDescriptions ()->Push ("g: toggle gravity");
+  hudManager->GetKeyDescriptions ()->Push ("I: toggle autodisable");
+  if (phys_engine_id == ODE_ID)
+  {
+    hudManager->GetKeyDescriptions ()->Push ("1: enable StepFast solver");
+    hudManager->GetKeyDescriptions ()->Push ("2: disable StepFast solver");
+    hudManager->GetKeyDescriptions ()->Push ("3: enable QuickStep solver");
+  }
+#ifdef CS_HAVE_BULLET_SERIALIZER
+  if (phys_engine_id == BULLET_ID)
+    hudManager->GetKeyDescriptions ()->Push ("CTRL-s: save the dynamic world");
+#endif
+  /*
+  if (phys_engine_id == BULLET_ID)
+    hudManager->GetKeyDescriptions ()->Push ("CTRL-n: next environment");
+  */
+  if (phys_engine_id == BULLET_ID)
+  {
+    hudManager->GetKeyDescriptions ()->Push ("CTRL-i: start profiling");
+    hudManager->GetKeyDescriptions ()->Push ("CTRL-o: stop profiling");
+    hudManager->GetKeyDescriptions ()->Push ("CTRL-p: dump profile");
+  }
 
   // Pre-load the animated mesh and the ragdoll animation node data
   if (phys_engine_id == BULLET_ID)
