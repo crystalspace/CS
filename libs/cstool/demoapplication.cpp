@@ -23,7 +23,7 @@
 #include "cstool/csview.h"
 #include "cstool/genmeshbuilder.h"
 #include "cstool/materialbuilder.h"
-#include "cstool/csdemoapplication.h"
+#include "cstool/demoapplication.h"
 
 #include "iengine/campos.h"
 
