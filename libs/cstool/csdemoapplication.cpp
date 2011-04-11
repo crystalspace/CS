@@ -18,10 +18,9 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include "cssysdef.h"
+
 #include "cstool/csview.h"
-#include "cstool/cspixmap.h"
 #include "cstool/genmeshbuilder.h"
 #include "cstool/materialbuilder.h"
 #include "cstool/csdemoapplication.h"
@@ -48,690 +47,7 @@ void ReportWarning (iObjectRegistry* registry, const char* objectId, const char*
 }
 
 namespace CS {
-namespace Demo {
-
-// ------------------------ HUDManager ------------------------
-
-HUDManager::HUDManager ()
-  : scfImplementationType (this), cslogo (nullptr), enabled (true), frameCount (0),
-    frameTime (0), currentFPS (0.0f), currentKeyPage (0)
-{
-}
-
-HUDManager::~HUDManager ()
-{
-  // Unregister from the event queue
-  if (eventQueue)
-    eventQueue->RemoveListener (this);
-
-  // Delete the logo
-  delete cslogo;
-}
-
-void HUDManager::Initialize (iObjectRegistry* registry)
-{
-  // Find references to the engine objects
-  g3d = csQueryRegistry<iGraphics3D> (registry);
-  if (!g3d) ReportError (registry, "crystalspace.demo.hudmanager", "Failed to locate 3D renderer!");
-
-  g2d = csQueryRegistry<iGraphics2D> (registry);
-  if (!g2d) ReportError (registry, "crystalspace.demo.hudmanager", "Failed to locate 2D renderer!");
-
-  vc = csQueryRegistry<iVirtualClock> (registry);
-  if (!vc) ReportError (registry, "crystalspace.demo.hudmanager", "Failed to locate virtual clock!");
-
-  csRef<iLoader> loader = csQueryRegistry<iLoader> (registry);
-  if (!loader) ReportError (registry, "crystalspace.demo.hudmanager", "Failed to locate main loader!");
-
-  eventQueue = csQueryRegistry<iEventQueue> (registry);
-  if (!eventQueue) ReportError (registry, "crystalspace.demo.hudmanager", "Failed to locate event queue!");
-
-  // Load the font
-  csRef<iFontServer> fontServer = g2d->GetFontServer ();
-  if (!fontServer)
-    ReportError (registry, "crystalspace.demo.hudmanager", "Failed to locate font server!");
-  else
-  {
-    font = fontServer->LoadFont (CSFONT_COURIER);
-    if (!font)
-      ReportError (registry, "crystalspace.demo.hudmanager", "Failed to load font!");
-  }
-
-  // Load the Crystal Space logo image
-  csRef<iTextureWrapper> texture = loader->LoadTexture
-    ("cslogo2", "/lib/std/cslogo2.png", CS_TEXTURE_2D, 0, true, true, true);
-  if (!texture.IsValid ())
-    ReportError (registry, "crystalspace.demo.hudmanager", "Failed to load CS logo!\n");
-
-  else
-  {
-    // Create a 2D sprite for the logo
-    iTextureHandle* textureHandle = texture->GetTextureHandle ();
-    if (textureHandle)
-      cslogo = new csSimplePixmap (textureHandle);
-  }
-
-  // Register to the event queue
-  eventQueue->RegisterListener (this, csevFrame (registry));
-}
-
-bool HUDManager::HandleEvent (iEvent& event)
-{
-#ifdef CS_DEBUG
-  if (!g3d || !g2d || !vc) return false;
-#endif
-
-  if (!enabled) return false;
-
-  // Tell the 3D driver we're going to display 2D things.
-  if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS))
-    return false;
-
-  // Get the elasped time
-  csTicks elapsed_time = vc->GetElapsedTicks ();
-
-  // Update the Frame Per Second data
-  frameCount++;
-  frameTime += elapsed_time;
-
-  if (frameTime > 500)
-  {
-    currentFPS = ((float) (frameCount * 1000)) / (float) frameTime;
-    frameCount = 0;
-    frameTime = 0;
-  }
-
-  int margin = 15;
-  int logoMargin = 5;
-  int lineSize = 18;
-  int fontColor = g2d->FindRGB (255, 150, 100);
-
-  // Display the available keys
-  if (keyDescriptions.GetSize ())
-  {
-    int y = margin;
-
-    // Check if there is enough room to display all keys
-    maxKeys = (uint) ((g2d->GetHeight () - 2 * margin
-		       - (stateDescriptions.GetSize () + 5) * lineSize)
-		      / lineSize);
-    if (keyDescriptions.GetSize () < maxKeys)
-    {
-      currentKeyPage = 0;
-      WriteShadow (margin, y, fontColor, "Keys available:");
-    }
-    else
-      WriteShadow (margin, y, fontColor, "Keys available (%i/%i):",
-		   currentKeyPage + 1, keyDescriptions.GetSize () / maxKeys + 1);
-    y += lineSize;
-
-    // Write all keys
-    uint index = 0;
-    for (csStringArray::Iterator it = keyDescriptions.GetIterator ();
-	 it.HasNext (); index++)
-    {
-      if (index / maxKeys == currentKeyPage)
-      {
-	WriteShadow (margin + 5, y, fontColor, it.Next ());
-	y += lineSize;
-      }
-      else
-	it.Next ();
-    }
-
-    if (keyDescriptions.GetSize () > maxKeys)
-    {
-      WriteShadow (margin, y, fontColor, "F1: more keys");
-      y += lineSize;
-    }
-  }
-
-  // Display the state descriptions
-  int y = g2d->GetHeight () - margin - lineSize;
-
-  WriteShadow (margin, y, fontColor, "FPS: %.2f", currentFPS);
-  y -= lineSize;
-
-  for (csStringArray::ReverseIterator it = stateDescriptions.GetReverseIterator ();
-       it.HasNext (); )
-  {
-    WriteShadow (margin, y, fontColor, it.Next ());
-    y -= lineSize;
-  }
-
-  // Display the Crystal Space logo
-  if (cslogo)
-    cslogo->Draw (g3d,
-		  g2d->GetWidth () - cslogo->Width() - logoMargin,
-		  logoMargin);
-
-  return false;
-}
-
-void HUDManager::SwitchKeysPage ()
-{
-  if (keyDescriptions.GetSize ())
-    currentKeyPage =
-      (currentKeyPage + 1) % (keyDescriptions.GetSize () / maxKeys + 1);
-}
-
-void HUDManager::WriteShadow (int x, int y, int fg, const char *str,...)
-{
-  csString buf;
-  va_list arg;
-
-  va_start (arg, str);
-  buf.FormatV (str, arg);
-  va_end (arg);
-
-  Write (x + 1, y - 1, 0, -1, "%s", buf.GetData ());
-  Write (x, y, fg, -1, "%s", buf.GetData ());
-}
-
-void HUDManager::Write (int x, int y, int fg, int bg, const char *str,...)
-{
-#ifdef CS_DEBUG
-  if (!g2d) return;
-#endif
-
-  csString buf;
-  va_list arg;
-
-  va_start (arg,str);
-  buf.FormatV (str, arg);
-  va_end (arg);
-
-  g2d->Write (font, x, y, fg, bg, buf);
-}
-
-void HUDManager::SetEnabled (bool enabled)
-{
-  this->enabled = enabled;
-}
-
-bool HUDManager::GetEnabled ()
-{
-  return enabled;
-}
-
-// ------------------------ CameraManager ------------------------
-
-CameraManager::CameraManager ()
-  : scfImplementationType (this), cameraMode (CAMERA_MOVE_FREE), mouseMoveEnabled (true),
-    hasStartPosition (false), currentCameraPosition (0), cameraTarget (0.0f),
-    minimumDistance (0.1f), cameraDistance (0.0f), cameraYaw (0.0f), cameraPitch (0.0f),
-    cameraModePan (false), cameraModeRotate (false), cameraModeZoom (false),
-    motionSpeed (5.0f), rotationSpeed (2.0f), previousMouseX (0), previousMouseY (0)
-{
-}
-
-CameraManager::~CameraManager ()
-{
-  // Unregister from the event queue
-  if (eventQueue)
-    eventQueue->RemoveListener (this);
-}
-
-void CameraManager::Initialize (iObjectRegistry* registry)
-{
-  this->registry = registry;
-
-  // Find references to the engine objects
-  engine = csQueryRegistry<iEngine> (registry);
-  if (!engine) ReportError (registry, "crystalspace.demo.cameramanager", "Failed to locate 3D engine!");
-
-  vc = csQueryRegistry<iVirtualClock> (registry);
-  if (!vc) ReportError (registry, "crystalspace.demo.cameramanager", "Failed to locate virtual clock!");
-
-  kbd = csQueryRegistry<iKeyboardDriver> (registry);
-  if (!kbd) ReportError (registry, "crystalspace.demo.cameramanager", "Failed to locate keyboard driver!");
-
-  mouse = csQueryRegistry<iMouseDriver> (registry);
-  if (!mouse) ReportError (registry, "crystalspace.demo.cameramanager", "Failed to locate mouse driver!");
-
-  eventQueue = csQueryRegistry<iEventQueue> (registry);
-  if (!eventQueue) ReportError (registry, "crystalspace.demo.hudmanager", "Failed to locate event queue!");
-
-  // Register to the event queue
-  csEventID events[3] = { csevFrame (registry), csevMouseEvent (registry), 
-			  CS_EVENTLIST_END };
-  eventQueue->RegisterListener (this, events);
-}
-
-void CameraManager::SetCamera (iCamera* camera)
-{
-  this->camera = camera;
-
-  if (camera && cameraMode != CAMERA_NO_MOVE)
-    ResetCamera ();
-}
-
-iCamera* CameraManager::GetCamera ()
-{
-  return camera;
-}
-
-bool CameraManager::HandleEvent (iEvent& event)
-{
-#ifdef CS_DEBUG
-  if (!engine || !vc || !kbd || !mouse) return false;
-#endif
-
-  if (event.Name == csevFrame (registry))
-  {
-    Frame();
-    return true;
-  }
-
-  if (CS_IS_MOUSE_EVENT (registry, event))
-    switch(csMouseEventHelper::GetEventType (&event))
-    {
-    case csMouseEventTypeMove:
-      return OnMouseMove (event);
-    case csMouseEventTypeUp:
-      return OnMouseUp (event);
-    case csMouseEventTypeDown:
-      return OnMouseDown (event);
-    default:
-      break;
-    }
-
-  return false;
-}
-
-void CameraManager::Frame ()
-{
-  if (!camera || cameraMode == CAMERA_NO_MOVE) return;
-
-  // Compute the speed of the camera
-  float elapsedTime = ((float) vc->GetElapsedTicks ()) / 1000.0f;
-  float motionDelta = elapsedTime * motionSpeed;
-  float rotationDelta = elapsedTime * rotationSpeed;
-
-  if (kbd->GetKeyState (CSKEY_CTRL))
-  {
-    motionDelta *= 10.0f;
-    rotationDelta *= 3.0f;
-  }
-
-  // Update the camera
-  csVector3 cameraOrigin = camera->GetTransform ().GetOrigin ();
-
-  switch (cameraMode)
-  {
-  case CAMERA_MOVE_FREE:
-    {
-      if (kbd->GetKeyState (CSKEY_SHIFT))
-      {
-	// If the user is holding down shift, the arrow keys will cause
-	// the camera to strafe up, down, left or right from it's
-	// current position.
-	if (kbd->GetKeyState (CSKEY_RIGHT))
-	  camera->Move (CS_VEC_RIGHT * motionDelta);
-	if (kbd->GetKeyState (CSKEY_LEFT))
-	  camera->Move (CS_VEC_LEFT * motionDelta);
-	if (kbd->GetKeyState (CSKEY_UP))
-	  camera->Move (CS_VEC_UP * motionDelta);
-	if (kbd->GetKeyState (CSKEY_DOWN))
-	  camera->Move (CS_VEC_DOWN * motionDelta);
-      }
-      else
-      {
-	// left and right cause the camera to rotate on the global Y
-	// axis; page up and page down cause the camera to rotate on the
-	// camera's X axis, and up and down arrows cause the camera to
-	// go forwards and backwards.
-	if (kbd->GetKeyState (CSKEY_RIGHT))
-	  camera->GetTransform ().RotateOther (csVector3 (0.0f, 1.0f, 0.0f), rotationDelta);
-	if (kbd->GetKeyState (CSKEY_LEFT))
-	  camera->GetTransform ().RotateOther (csVector3 (0.0f, 1.0f, 0.0f), -rotationDelta);
-	if (kbd->GetKeyState (CSKEY_PGUP))
-	  camera->GetTransform ().RotateThis (csVector3 (1.0f, 0.0f, 0.0f), -rotationDelta);
-	if (kbd->GetKeyState (CSKEY_PGDN))
-	  camera->GetTransform ().RotateThis (csVector3 (1.0f, 0.0f, 0.0f), rotationDelta);
-	if (kbd->GetKeyState (CSKEY_UP))
-	  camera->Move (CS_VEC_FORWARD * motionDelta);
-	if (kbd->GetKeyState (CSKEY_DOWN))
-	  camera->Move (CS_VEC_BACKWARD * motionDelta);
-      }
-
-      break;
-    }
-
-  case CAMERA_MOVE_LOOKAT:
-    {
-      // The arrow keys move the position of the camera, after that it is rotated
-      // to look at the target
-      if (kbd->GetKeyState (CSKEY_DOWN))
-	cameraOrigin.z -= motionDelta;
-      if (kbd->GetKeyState (CSKEY_UP))
-	cameraOrigin.z += motionDelta;
-      if (kbd->GetKeyState (CSKEY_LEFT))
-	cameraOrigin.x -= motionDelta;
-      if (kbd->GetKeyState (CSKEY_RIGHT))
-	cameraOrigin.x += motionDelta;
-      if (kbd->GetKeyState (CSKEY_PGUP))
-	cameraOrigin.y += motionDelta;
-      if (kbd->GetKeyState (CSKEY_PGDN))
-	cameraOrigin.y -= motionDelta;
-
-      camera->GetTransform ().SetOrigin (cameraOrigin);
-      camera->GetTransform ().LookAt (cameraTarget - cameraOrigin, csVector3 (0,1,0));
-
-      break;
-    }
-
-  case CAMERA_ROTATE:
-    {
-      // The arrow keys rotate the camera around the target
-      // Pressing shift or using page up/down makes the camera closer/farther
-      if (kbd->GetKeyState (CSKEY_LEFT))
-	cameraYaw += rotationDelta;
-      if (kbd->GetKeyState (CSKEY_RIGHT))
-	cameraYaw -= rotationDelta;
-      if (kbd->GetKeyState (CSKEY_UP))
-      {
-	if (kbd->GetKeyState (CSKEY_SHIFT))
-	  cameraDistance =
-	    csMax<float> (minimumDistance, cameraDistance - motionDelta);
-	else
-	  cameraPitch = csMax<float> (-3.14159f * 0.5f + 0.01f, cameraPitch - rotationDelta);
-      }
-      if (kbd->GetKeyState (CSKEY_DOWN))
-      {
-	if (kbd->GetKeyState (CSKEY_SHIFT))
-	  cameraDistance += motionDelta;
-	else
-	  cameraPitch = csMin<float> (3.14159f * 0.5f - 0.01f, cameraPitch + rotationDelta);
-      }
-      if (kbd->GetKeyState (CSKEY_PGUP))
-	cameraDistance =
-	  csMax<float> (minimumDistance, cameraDistance - motionDelta);
-      if (kbd->GetKeyState (CSKEY_PGDN))
-	cameraDistance += motionDelta;
-
-      ApplyPositionParameters ();
-
-      break;
-    }
-  default:
-    break;
-  }
-}
-
-bool CameraManager::OnMouseDown (iEvent& event)
-{
-  if (!camera || !mouseMoveEnabled)
-    return false;
-
-  if (cameraMode != CAMERA_ROTATE && cameraMode != CAMERA_MOVE_LOOKAT)
-    UpdatePositionParameters (camera->GetTransform ().GetOrigin ());
-
-  previousMouseX = mouse->GetLastX ();
-  previousMouseY = mouse->GetLastY ();
-
-  const float mouseWheelZoomAmount = motionSpeed / 20.0f;
-
-  uint button = csMouseEventHelper::GetButton (&event);
-  switch (button)
-  {
-  case 0:
-    cameraModePan = true;
-    panCameraTarget = cameraTarget;
-    break;
-  case 1:
-    cameraModeRotate = true;
-    break;
-  case 2:
-    cameraModeZoom = true;
-    break;
-  case 3:
-    cameraDistance = csMax<float> (minimumDistance, cameraDistance - mouseWheelZoomAmount);
-    ApplyPositionParameters ();
-    break;
-  case 4:
-    cameraDistance = csMax<float> (minimumDistance, cameraDistance + mouseWheelZoomAmount);
-    ApplyPositionParameters ();
-    break;
-  }
-  return false;
-}
-
-bool CameraManager::OnMouseUp (iEvent& event)
-{
-  if (!camera || !mouseMoveEnabled)
-    return false;
-
-  uint button = csMouseEventHelper::GetButton (&event);
-  switch (button)
-  {
-  case 0:
-    cameraModePan = false;
-    break;
-  case 1:
-    cameraModeRotate = false;
-    break;
-  case 2:
-    cameraModeZoom = false;
-    break;
-  }
-
-  return false;
-}
-
-bool CameraManager::OnMouseMove (iEvent& event)
-{
-  int x = csMouseEventHelper::GetX (&event) - previousMouseX;
-  int y = csMouseEventHelper::GetY (&event) - previousMouseY;
-  if (!x && !y)
-    return false;
-
-  float dx = (float) (x) * 0.004f;
-  float dy = (float) (y) * -0.004f;
-
-  previousMouseX = csMouseEventHelper::GetX (&event);
-  previousMouseY = csMouseEventHelper::GetY (&event);
-
-  if (cameraModePan)
-  {
-    panCameraTarget +=
-      camera->GetTransform ().This2OtherRelative (csVector3 (1,0,0)) * dx * motionSpeed / 10.0f
-      + camera->GetTransform ().This2OtherRelative (csVector3 (0,1,0)) * dy * motionSpeed / 10.0f;
-    ApplyPositionParameters ();
-  }
-
-  if (cameraModeRotate)
-  {
-    cameraYaw += dx * rotationSpeed;
-    cameraPitch += dy * rotationSpeed;
-    cameraPitch = csMax<float> (-3.14159f * 0.5f + 0.01f, cameraPitch);
-    cameraPitch = csMin<float> (3.14159f * 0.5f - 0.01f, cameraPitch);
-    ApplyPositionParameters ();
-  }
-
-  if (cameraModeZoom)
-  {
-    cameraDistance = csMax<float> (minimumDistance, cameraDistance - (dx + dy) * motionSpeed);
-    ApplyPositionParameters ();
-  }
-
-  return false;
-}
-
-void CameraManager::SetCameraMode (CameraMode cameraMode)
-{
-  if (camera && this->cameraMode != cameraMode
-      && (cameraMode == CAMERA_ROTATE || cameraMode == CAMERA_MOVE_LOOKAT))
-    UpdatePositionParameters (camera->GetTransform ().GetOrigin ());
-
-  this->cameraMode = cameraMode;
-}
-
-CameraMode CameraManager::GetCameraMode ()
-{
-  return cameraMode;
-}
-
-void CameraManager::SetStartPosition (csVector3 position)
-{
-  startPosition = position;
-  hasStartPosition = true;
-}
-
-csVector3 CameraManager::GetStartPosition ()
-{
-  if (hasStartPosition)
-    return startPosition;
-  return csVector3 (0.0f);
-}
-
-void CameraManager::ClearStartPosition ()
-{
-  hasStartPosition = false;
-}
-
-bool CameraManager::HasStartPosition ()
-{
-  return hasStartPosition;
-}
-
-void CameraManager::SwitchCameraPosition ()
-{
-  iCameraPositionList* positions = engine->GetCameraPositions ();
-  if (positions->GetCount ())
-    currentCameraPosition = (currentCameraPosition + 1) % positions->GetCount ();
-  ResetCamera ();
-}
-
-void CameraManager::SetCameraTarget (csVector3 position)
-{
-  cameraTarget = position;
-}
-
-csVector3 CameraManager::GetCameraTarget ()
-{
-  return cameraTarget;
-}
-
-void CameraManager::SetCameraMinimumDistance (float distance)
-{
-  minimumDistance = distance;
-}
-
-float CameraManager::GetCameraMinimumDistance ()
-{
-  return minimumDistance;
-}
-
-void CameraManager::SetMouseMoveEnabled (bool enabled)
-{
-  mouseMoveEnabled = enabled;
-}
-
-bool CameraManager::GetMouseMoveEnabled ()
-{
-  return mouseMoveEnabled;
-}
-
-void CameraManager::ResetCamera ()
-{
-#ifdef CS_DEBUG
-  if (!engine || !vc || !kbd || !mouse) return;
-#endif
-
-  if (camera)
-  {
-    if (hasStartPosition)
-    {
-      csOrthoTransform transform (csMatrix3 (), startPosition);
-      camera->SetTransform (transform);
-    }
-
-    else
-    {
-      iCameraPositionList* positions = engine->GetCameraPositions ();
-      if (positions->GetCount ())
-	positions->Get (currentCameraPosition)->Load (camera, engine);
-    }
-
-    if (cameraMode == CAMERA_ROTATE || cameraMode == CAMERA_MOVE_LOOKAT)
-      UpdatePositionParameters (camera->GetTransform ().GetOrigin ());
-  }
-}
-
-void CameraManager::SetMotionSpeed (float speed)
-{
-  motionSpeed = speed;
-}
-
-float CameraManager::GetMotionSpeed ()
-{
-  return motionSpeed;
-}
-
-void CameraManager::SetRotationSpeed (float speed)
-{
-  rotationSpeed = speed;
-}
-
-float CameraManager::GetRotationSpeed ()
-{
-  return rotationSpeed;
-}
-
-void CameraManager::UpdatePositionParameters (const csVector3& newPosition)
-{
-  // Compute the distance, yaw, and pitch values from the target to the new position
-  cameraDistance = (cameraTarget - newPosition).Norm ();
-
-  if (fabs (cameraDistance) < EPSILON)
-  {
-    cameraPitch = 0.0f;
-    cameraYaw = 0.0f;
-  }
-
-  else
-  {
-    cameraPitch =
-      (float) asin ((cameraTarget.y - newPosition.y) / cameraDistance);
-
-    if (fabs (cameraPitch) < EPSILON)
-    {
-      cameraYaw = (float) asin ((cameraTarget.x - newPosition.x) / cameraDistance);
-
-      if ((cameraTarget.z - newPosition.z) / (cameraDistance) < 0.0f)
-	cameraYaw = 3.14159f - cameraYaw;
-    }
-
-    else
-    {
-      cameraYaw = (float) asin ((cameraTarget.x - newPosition.x)
-				/ (cameraDistance * (float) cos (cameraPitch)));
-
-      if ((cameraTarget.z - newPosition.z)
-	  / (cameraDistance * (float) cos (cameraPitch)) < 0.0f)
-	cameraYaw = 3.14159f - cameraYaw;
-    }
-  }
-}
-
-void CameraManager::ApplyPositionParameters ()
-{
-  // Apply the distance, yaw, and pitch values to the camera
-  csVector3 position;
-  csVector3 target = cameraModePan ? panCameraTarget : cameraTarget;
-
-  position.x = target.x
-    - cameraDistance * (float) cos (cameraPitch) * (float) sin (cameraYaw);
-  position.y = target.y
-    - cameraDistance * (float) sin (cameraPitch);
-  position.z = target.z
-    - cameraDistance * (float) cos (cameraPitch) * (float) cos (cameraYaw);
-
-  camera->GetTransform ().SetOrigin (position);
-  camera->GetTransform ().LookAt
-    (target - position, csVector3 (0.0f, 1.0f, 0.0f));
-}
+namespace Utility {
 
 // ------------------------ DemoApplication ------------------------
 
@@ -739,14 +55,6 @@ DemoApplication::DemoApplication (const char* applicationName)
   : mouseInitialized (false)
 {
   SetApplicationName (applicationName);
-
-  // Initialize the default key descriptions
-  hudManager.keyDescriptions.Push ("arrow keys: move camera");
-  hudManager.keyDescriptions.Push ("SHIFT-arrow keys: lateral motion");
-  hudManager.keyDescriptions.Push ("CTRL-arrow keys: speedier motion");
-  hudManager.keyDescriptions.Push ("F5: next camera position");
-  hudManager.keyDescriptions.Push ("F9: toggle HUD");
-  hudManager.keyDescriptions.Push ("F12: screenshot");
 }
 
 DemoApplication::~DemoApplication ()
@@ -817,14 +125,25 @@ bool DemoApplication::Application ()
   mouse = csQueryRegistry<iMouseDriver> (GetObjectRegistry ());
   if (!mouse) return ReportError ("Failed to locate mouse driver!");
 
-  visualDebugger = csQueryRegistry<CS::Debug::iVisualDebugger> (GetObjectRegistry ());
-  if (!visualDebugger) return ReportError ("Failed to locate visual debugger!");
-
   printer.AttachNew (new FramePrinter (GetObjectRegistry ()));
 
   // Create a view to display things
   view = csPtr<iView> (new csView (engine, g3d));
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+
+  // Load remaining plugins
+  csRef<iPluginManager> pluginManager = csQueryRegistry<iPluginManager> (GetObjectRegistry ());
+
+  hudManager = csLoadPlugin<CS::Utility::iHUDManager>
+    (pluginManager, "crystalspace.utilities.texthud");
+  if (!hudManager) return ReportError ("Failed to locate HUD manager!");
+
+  cameraManager = csLoadPlugin<CS::Utility::iCameraManager>
+    (pluginManager, "crystalspace.utilities.cameramanager");
+  if (!cameraManager) return ReportError ("Failed to locate camera manager!");
+
+  visualDebugger = csQueryRegistry<CS::Debug::iVisualDebugger> (GetObjectRegistry ());
+  if (!visualDebugger) return ReportError ("Failed to locate visual debugger!");
 
   // Load the configuration file
   config.AddConfig (GetObjectRegistry (), "/config/csdemoapplication.cfg");
@@ -835,9 +154,13 @@ bool DemoApplication::Application ()
 					    "/tmp/CS_screenshot_0000");
   screenshotHelper.SetMask (screenshotMask + "." + screenshotFormat);
 
-  // Initialize the camera and HUD managers
-  hudManager.Initialize (GetObjectRegistry ());
-  cameraManager.Initialize (GetObjectRegistry ());
+  // Initialize the default key descriptions
+  hudManager->GetKeyDescriptions ()->Push ("arrow keys: move camera");
+  hudManager->GetKeyDescriptions ()->Push ("SHIFT-arrow keys: lateral motion");
+  hudManager->GetKeyDescriptions ()->Push ("CTRL-arrow keys: speedier motion");
+  hudManager->GetKeyDescriptions ()->Push ("F5: next camera position");
+  hudManager->GetKeyDescriptions ()->Push ("F9: toggle HUD");
+  hudManager->GetKeyDescriptions ()->Push ("F12: screenshot");
 
   return true;
 }
@@ -854,7 +177,7 @@ bool DemoApplication::CreateRoom ()
 
   // Setup the camera
   view->GetCamera ()->SetSector (room);
-  cameraManager.SetCamera (view->GetCamera ());
+  cameraManager->SetCamera (view->GetCamera ());
 
   // Creating the background
   // First we make a primitive for our geometry.
@@ -940,21 +263,21 @@ bool DemoApplication::OnKeyboard (iEvent& event)
     // Help key
     if (csKeyEventHelper::GetCookedCode (&event) == CSKEY_F1)
     {
-      hudManager.SwitchKeysPage ();
+      hudManager->SwitchKeysPage ();
       return true;
     }
 
     // Switch to next camera position
     if (csKeyEventHelper::GetCookedCode (&event) == CSKEY_F5)
     {
-      cameraManager.SwitchCameraPosition ();
+      cameraManager->SwitchCameraPosition ();
       return true;
     }
 
     // Toggle HUD
     if (csKeyEventHelper::GetCookedCode (&event) == CSKEY_F9)
     {
-      hudManager.SetEnabled (!hudManager.GetEnabled ());
+      hudManager->SetEnabled (!hudManager->GetEnabled ());
       return true;
     }
 
@@ -1017,5 +340,5 @@ bool DemoApplication::OnMouseMove (iEvent& event)
   return false;
 }
 
-} // namespace Demo
+} // namespace Utility
 } // namespace CS
