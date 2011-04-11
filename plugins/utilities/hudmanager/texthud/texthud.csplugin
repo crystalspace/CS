@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- texthud.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.utilities.texthud</name>
+        <implementation>TextHUDManager</implementation>
+        <description>Text-based HUD manager</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

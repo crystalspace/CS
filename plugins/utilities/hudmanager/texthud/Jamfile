@@ -1,0 +1,9 @@
+SubDir TOP plugins utilities hudmanager texthud ;
+
+Description texthud : "Text-based HUD manager" ;
+
+Plugin texthud
+	: [ Wildcard *.cpp *.h ]
+;
+
+LinkWith texthud : crystalspace ;
