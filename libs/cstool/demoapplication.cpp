@@ -146,7 +146,7 @@ bool DemoApplication::Application ()
   if (!visualDebugger) return ReportError ("Failed to locate visual debugger!");
 
   // Load the configuration file
-  config.AddConfig (GetObjectRegistry (), "/config/csdemoapplication.cfg");
+  config.AddConfig (GetObjectRegistry (), "/config/demoapplication.cfg");
 
   // Load the screenshot configuration
   screenshotFormat = config->GetStr ("DemoApplication.Screenshot.ImageFormat", "jpg");
