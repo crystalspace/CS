@@ -29,7 +29,7 @@
 class csDualQuaternion;
 
 /**\file
- * Skeleton2 interface files
+ * Skeleton interfaces for the CS::Mesh::iAnimatedMesh
  */
 
 struct iSceneNode;
@@ -112,7 +112,7 @@ struct iSkeletonManager : public virtual iBase
 
 /**
  * A skeleton factory is an object defining the base pose and topology
- * from which CS::Animation::iSkeleton2 instances can be created.
+ * from which CS::Animation::iSkeleton instances can be created.
  *
  * A note on coordinate spaces, cause there are a few to keep track of.
  * Within the skeleton factory there are two types coordinate spaces:
