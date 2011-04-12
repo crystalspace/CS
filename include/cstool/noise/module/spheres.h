@@ -26,6 +26,7 @@
 #include "modulebase.h"
 
 namespace CS {
+namespace Math {
 namespace Noise {
 namespace Module {
 
@@ -38,7 +39,7 @@ namespace Module {
     /// @addtogroup generatormodules
     /// @{
 
-    /// Default frequency value for the CS::Noise::Module::Spheres noise module.
+    /// Default frequency value for the CS::Math::Noise::Module::Spheres noise module.
     const double DEFAULT_SPHERES_FREQUENCY = 1.0;
 
     /// Noise module that outputs concentric spheres.
@@ -73,7 +74,7 @@ namespace Module {
         /// Constructor.
         ///
         /// The default frequency is set to
-        /// CS::Noise::Module::DEFAULT_SPHERES_FREQUENCY.
+        /// CS::Math::Noise::Module::DEFAULT_SPHERES_FREQUENCY.
         Spheres ();
 
         /// Returns the frequency of the concentric spheres.
@@ -120,6 +121,7 @@ namespace Module {
 
 } // namespace Module
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

@@ -22,7 +22,7 @@
 
 #include "cstool/noise/module/checkerboard.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 Checkerboard::Checkerboard ():
   Module (GetSourceModuleCount ())

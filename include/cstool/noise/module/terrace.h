@@ -26,6 +26,7 @@
 #include "modulebase.h"
 
 namespace CS {
+namespace Math {
 namespace Noise {
 namespace Module {
 
@@ -85,7 +86,7 @@ namespace Module {
 	      ///
 	      /// @pre No two control points have the same value.
 	      ///
-	      /// @throw CS::Noise::ExceptionInvalidParam An invalid parameter was
+	      /// @throw CS::Math::Noise::ExceptionInvalidParam An invalid parameter was
         /// specified; see the preconditions for more information.
 	      ///
 	      /// Two or more control points define the terrace-forming curve.  The
@@ -170,7 +171,7 @@ namespace Module {
 	      /// @post The previous control points on the terrace-forming curve are
         /// deleted.
 	      ///
-	      /// @throw CS::Noise::ExceptionInvalidParam An invalid parameter was
+	      /// @throw CS::Math::Noise::ExceptionInvalidParam An invalid parameter was
         /// specified; see the preconditions for more information.
 	      ///
 	      /// Two or more control points define the terrace-forming curve.  The
@@ -189,7 +190,7 @@ namespace Module {
 	      ///
 	      /// @pre No two control points have the same value.
 	      ///
-	      /// @throw CS::Noise::ExceptionInvalidParam An invalid parameter was
+	      /// @throw CS::Math::Noise::ExceptionInvalidParam An invalid parameter was
         /// specified; see the preconditions for more information.
 	      ///
 	      /// By inserting the control point at the returned array index, this
@@ -235,6 +236,7 @@ namespace Module {
 
 } // namespace Module
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

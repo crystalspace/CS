@@ -64,8 +64,8 @@ class MocapViewer : public CS::Utility::DemoApplication,
   bool printInfo;
 
   // Noise points
-  CS::Noise::Module::Perlin noiseX;
-  CS::Noise::Module::Perlin noiseY;
+  CS::Math::Noise::Module::Perlin noiseX;
+  CS::Math::Noise::Module::Perlin noiseY;
   csArray<csVector3> noisePoints;
   float noiseScale;
 

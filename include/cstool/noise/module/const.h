@@ -26,6 +26,7 @@
 #include "modulebase.h"
 
 namespace CS {
+namespace Math {
 namespace Noise {
 namespace Module {
 
@@ -39,7 +40,7 @@ namespace Module {
     /// @addtogroup generatormodules
     /// @{
 
-    /// Default constant value for the CS::Noise::Module::Const noise module.
+    /// Default constant value for the CS::Math::Noise::Module::Const noise module.
     const double DEFAULT_CONST_VALUE = 0.0;
 
     /// Noise module that outputs a constant value.
@@ -60,7 +61,7 @@ namespace Module {
         /// Constructor.
         ///
         /// The default constant value is set to
-        /// CS::Noise::Module::DEFAULT_CONST_VALUE.
+        /// CS::Math::Noise::Module::DEFAULT_CONST_VALUE.
         Const ();
 
         /// Returns the constant output value for this noise module.
@@ -104,6 +105,7 @@ namespace Module {
 
 } // namespace Module
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

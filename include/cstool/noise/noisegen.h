@@ -27,6 +27,7 @@
 #include "basictypes.h"
 
 namespace CS {
+namespace Math {
 namespace Noise {
 
   /// @addtogroup libnoise
@@ -139,7 +140,7 @@ namespace Noise {
   int IntValueNoise3D (int x, int y, int z, int seed = 0);
 
   /// Modifies a floating-point value so that it can be stored in a
-  /// CS::Noise::int32 variable.
+  /// CS::Math::Noise::int32 variable.
   ///
   /// @param n A floating-point number.
   ///
@@ -148,11 +149,11 @@ namespace Noise {
   /// This function does not modify @a n.
   ///
   /// In libnoise, the noise-generating algorithms are all integer-based;
-  /// they use variables of type CS::Noise::int32.  Before calling a noise
+  /// they use variables of type CS::Math::Noise::int32.  Before calling a noise
   /// function, pass the @a x, @a y, and @a z coordinates to this function to
-  /// ensure that these coordinates can be cast to a CS::Noise::int32 value.
+  /// ensure that these coordinates can be cast to a CS::Math::Noise::int32 value.
   ///
-  /// Although you could do a straight cast from double to CS::Noise::int32, the
+  /// Although you could do a straight cast from double to CS::Math::Noise::int32, the
   /// resulting value may differ between platforms.  By using this function,
   /// you ensure that the resulting value is identical between platforms.
   inline double MakeInt32Range (double n)
@@ -204,6 +205,7 @@ namespace Noise {
   /// @}
 
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

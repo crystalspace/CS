@@ -26,6 +26,7 @@
 #include "modulebase.h"
 
 namespace CS {
+namespace Math {
 namespace Noise {
 namespace Module {
 
@@ -38,15 +39,15 @@ namespace Module {
     /// @addtogroup transformermodules
     /// @{
 
-    /// Default @a x rotation angle for the CS::Noise::Module::RotatePoint noise
+    /// Default @a x rotation angle for the CS::Math::Noise::Module::RotatePoint noise
     /// module.
     const double DEFAULT_ROTATE_X = 0.0;
 
-    /// Default @a y rotation angle for the CS::Noise::Module::RotatePoint noise
+    /// Default @a y rotation angle for the CS::Math::Noise::Module::RotatePoint noise
     /// module.
     const double DEFAULT_ROTATE_Y = 0.0;
 
-    /// Default @a z rotation angle for the CS::Noise::Module::RotatePoint noise
+    /// Default @a z rotation angle for the CS::Math::Noise::Module::RotatePoint noise
     /// module.
     const double DEFAULT_ROTATE_Z = 0.0;
 
@@ -75,13 +76,13 @@ namespace Module {
         /// Constructor.
         ///
         /// The default rotation angle around the @a x axis, in degrees, is
-        /// set to CS::Noise::Module::DEFAULT_ROTATE_X.
+        /// set to CS::Math::Noise::Module::DEFAULT_ROTATE_X.
         ///
         /// The default rotation angle around the @a y axis, in degrees, is
-        /// set to CS::Noise::Module::DEFAULT_ROTATE_Y.
+        /// set to CS::Math::Noise::Module::DEFAULT_ROTATE_Y.
         ///
         /// The default rotation angle around the @a z axis, in degrees, is
-        /// set to CS::Noise::Module::DEFAULT_ROTATE_Z.
+        /// set to CS::Math::Noise::Module::DEFAULT_ROTATE_Z.
         RotatePoint ();
 
         virtual int GetSourceModuleCount () const
@@ -226,6 +227,7 @@ namespace Module {
 
 } // namespace Module
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

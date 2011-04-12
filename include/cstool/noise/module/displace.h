@@ -26,6 +26,7 @@
 #include "modulebase.h"
 
 namespace CS {
+namespace Math {
 namespace Noise {
 namespace Module {
 
@@ -59,7 +60,7 @@ namespace Module {
     /// the input value using the output values from the three displacement
     /// modules before retrieving the output value from the source module.
     ///
-    /// The CS::Noise::Module::Turbulence noise module is a special case of the
+    /// The CS::Math::Noise::Module::Turbulence noise module is a special case of the
     /// displacement module; internally, there are three Perlin-noise modules
     /// that perform the displacement operation.
     ///
@@ -86,7 +87,7 @@ namespace Module {
       /// @pre This displacement module has been added to this noise module
       /// via a call to SetSourceModule() or SetXDisplaceModule().
       ///
-      /// @throw CS::Noise::ExceptionNoModule See the preconditions for more
+      /// @throw CS::Math::Noise::ExceptionNoModule See the preconditions for more
       /// information.
       ///
       /// The GetValue() method displaces the input value by adding the output
@@ -96,7 +97,7 @@ namespace Module {
       const Module& GetXDisplaceModule () const
       {
         if (m_pSourceModule == NULL || m_pSourceModule[1] == NULL) {
-          //throw CS::Noise::ExceptionNoModule ();
+          //throw CS::Math::Noise::ExceptionNoModule ();
 	  CS_ASSERT (false);
         }
         return *(m_pSourceModule[1]);
@@ -109,7 +110,7 @@ namespace Module {
       /// @pre This displacement module has been added to this noise module
       /// via a call to SetSourceModule() or SetYDisplaceModule().
       ///
-      /// @throw CS::Noise::ExceptionNoModule See the preconditions for more
+      /// @throw CS::Math::Noise::ExceptionNoModule See the preconditions for more
       /// information.
       ///
       /// The GetValue() method displaces the input value by adding the output
@@ -119,7 +120,7 @@ namespace Module {
       const Module& GetYDisplaceModule () const
       {
         if (m_pSourceModule == NULL || m_pSourceModule[2] == NULL) {
-          //throw CS::Noise::ExceptionNoModule ();
+          //throw CS::Math::Noise::ExceptionNoModule ();
 	  CS_ASSERT (false);
         }
         return *(m_pSourceModule[2]);
@@ -132,7 +133,7 @@ namespace Module {
       /// @pre This displacement module has been added to this noise module
       /// via a call to SetSourceModule() or SetZDisplaceModule().
       ///
-      /// @throw CS::Noise::ExceptionNoModule See the preconditions for more
+      /// @throw CS::Math::Noise::ExceptionNoModule See the preconditions for more
       /// information.
       ///
       /// The GetValue() method displaces the input value by adding the output
@@ -142,7 +143,7 @@ namespace Module {
       const Module& GetZDisplaceModule () const
       {
         if (m_pSourceModule == NULL || m_pSourceModule[3] == NULL) {
-          //throw CS::Noise::ExceptionNoModule ();
+          //throw CS::Math::Noise::ExceptionNoModule ();
 	  CS_ASSERT (false);
         }
         return *(m_pSourceModule[3]);
@@ -255,6 +256,7 @@ namespace Module {
 
 } // namespace Module
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

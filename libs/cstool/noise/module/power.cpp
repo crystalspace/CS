@@ -21,7 +21,7 @@
 
 #include "cstool/noise/module/power.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 Power::Power ():
   Module (GetSourceModuleCount ())

@@ -26,6 +26,7 @@
 #include "modulebase.h"
 
 namespace CS {
+namespace Math {
 namespace Noise {
 namespace Module {
 
@@ -38,25 +39,25 @@ namespace Module {
     /// @addtogroup generatormodules
     /// @{
 
-    /// Default frequency for the CS::Noise::Module::Perlin noise module.
+    /// Default frequency for the CS::Math::Noise::Module::Perlin noise module.
     const double DEFAULT_PERLIN_FREQUENCY = 1.0;
 
-    /// Default lacunarity for the CS::Noise::Module::Perlin noise module.
+    /// Default lacunarity for the CS::Math::Noise::Module::Perlin noise module.
     const double DEFAULT_PERLIN_LACUNARITY = 2.0;
 
-    /// Default number of octaves for the CS::Noise::Module::Perlin noise module.
+    /// Default number of octaves for the CS::Math::Noise::Module::Perlin noise module.
     const int DEFAULT_PERLIN_OCTAVE_COUNT = 6;
 
-    /// Default persistence value for the CS::Noise::Module::Perlin noise module.
+    /// Default persistence value for the CS::Math::Noise::Module::Perlin noise module.
     const double DEFAULT_PERLIN_PERSISTENCE = 0.5;
 
-    /// Default noise quality for the CS::Noise::Module::Perlin noise module.
-    const CS::Noise::NoiseQuality DEFAULT_PERLIN_QUALITY = QUALITY_STD;
+    /// Default noise quality for the CS::Math::Noise::Module::Perlin noise module.
+    const CS::Math::Noise::NoiseQuality DEFAULT_PERLIN_QUALITY = QUALITY_STD;
 
-    /// Default noise seed for the CS::Noise::Module::Perlin noise module.
+    /// Default noise seed for the CS::Math::Noise::Module::Perlin noise module.
     const int DEFAULT_PERLIN_SEED = 0;
 
-    /// Maximum number of octaves for the CS::Noise::Module::Perlin noise module.
+    /// Maximum number of octaves for the CS::Math::Noise::Module::Perlin noise module.
     const int PERLIN_MAX_OCTAVE = 30;
 
     /// Noise module that outputs 3-dimensional Perlin noise.
@@ -153,7 +154,7 @@ namespace Module {
     /// libnoise, I noticed that my coherent-noise function generated terrain
     /// with some "regularity" to the terrain features.  This page describes a
     /// better coherent-noise function called <i>gradient noise</i>.  This
-    /// version of CS::Noise::Module::Perlin uses gradient coherent noise to
+    /// version of CS::Math::Noise::Module::Perlin uses gradient coherent noise to
     /// generate Perlin noise.
     class CS_CRYSTALSPACE_EXPORT Perlin: public Module
     {
@@ -163,19 +164,19 @@ namespace Module {
         /// Constructor.
         ///
         /// The default frequency is set to
-        /// CS::Noise::Module::DEFAULT_PERLIN_FREQUENCY.
+        /// CS::Math::Noise::Module::DEFAULT_PERLIN_FREQUENCY.
         ///
         /// The default lacunarity is set to
-        /// CS::Noise::Module::DEFAULT_PERLIN_LACUNARITY.
+        /// CS::Math::Noise::Module::DEFAULT_PERLIN_LACUNARITY.
         ///
         /// The default number of octaves is set to
-        /// CS::Noise::Module::DEFAULT_PERLIN_OCTAVE_COUNT.
+        /// CS::Math::Noise::Module::DEFAULT_PERLIN_OCTAVE_COUNT.
         ///
         /// The default persistence value is set to
-        /// CS::Noise::Module::DEFAULT_PERLIN_PERSISTENCE.
+        /// CS::Math::Noise::Module::DEFAULT_PERLIN_PERSISTENCE.
         ///
         /// The default seed value is set to
-        /// CS::Noise::Module::DEFAULT_PERLIN_SEED.
+        /// CS::Math::Noise::Module::DEFAULT_PERLIN_SEED.
         Perlin ();
 
         /// Returns the frequency of the first octave.
@@ -201,9 +202,9 @@ namespace Module {
         ///
         /// @returns The quality of the Perlin noise.
         ///
-        /// See CS::Noise::NoiseQuality for definitions of the various
+        /// See CS::Math::Noise::NoiseQuality for definitions of the various
         /// coherent-noise qualities.
-        CS::Noise::NoiseQuality GetNoiseQuality () const
+        CS::Math::Noise::NoiseQuality GetNoiseQuality () const
         {
           return m_noiseQuality;
         }
@@ -270,9 +271,9 @@ namespace Module {
         ///
         /// @param noiseQuality The quality of the Perlin noise.
         ///
-        /// See CS::Noise::NoiseQuality for definitions of the various
+        /// See CS::Math::Noise::NoiseQuality for definitions of the various
         /// coherent-noise qualities.
-        void SetNoiseQuality (CS::Noise::NoiseQuality noiseQuality)
+        void SetNoiseQuality (CS::Math::Noise::NoiseQuality noiseQuality)
         {
           m_noiseQuality = noiseQuality;
         }
@@ -283,9 +284,9 @@ namespace Module {
         /// noise.
         ///
         /// @pre The number of octaves ranges from 1 to
-        /// CS::Noise::Module::PERLIN_MAX_OCTAVE.
+        /// CS::Math::Noise::Module::PERLIN_MAX_OCTAVE.
         ///
-        /// @throw CS::Noise::ExceptionInvalidParam An invalid parameter was
+        /// @throw CS::Math::Noise::ExceptionInvalidParam An invalid parameter was
         /// specified; see the preconditions for more information.
         ///
         /// The number of octaves controls the amount of detail in the Perlin
@@ -296,7 +297,7 @@ namespace Module {
         void SetOctaveCount (int octaveCount)
         {
           if (octaveCount < 1 || octaveCount > PERLIN_MAX_OCTAVE) {
-            //throw CS::Noise::ExceptionInvalidParam ();
+            //throw CS::Math::Noise::ExceptionInvalidParam ();
 	    CS_ASSERT (false);
           }
           m_octaveCount = octaveCount;
@@ -332,7 +333,7 @@ namespace Module {
         double m_lacunarity;
 
         /// Quality of the Perlin noise.
-        CS::Noise::NoiseQuality m_noiseQuality;
+        CS::Math::Noise::NoiseQuality m_noiseQuality;
 
         /// Total number of octaves that generate the Perlin noise.
         int m_octaveCount;
@@ -353,6 +354,7 @@ namespace Module {
 
 } // namespace Module
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

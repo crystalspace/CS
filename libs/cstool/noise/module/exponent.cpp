@@ -22,7 +22,7 @@
 
 #include "cstool/noise/module/exponent.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 Exponent::Exponent ():
   Module (GetSourceModuleCount ()),

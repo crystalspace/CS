@@ -23,7 +23,7 @@
 #include "cstool/noise/module/blend.h"
 #include "cstool/noise/interp.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 Blend::Blend ():
   Module (GetSourceModuleCount ())

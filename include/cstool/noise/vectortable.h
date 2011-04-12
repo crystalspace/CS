@@ -14,6 +14,7 @@
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 namespace CS {
+namespace Math {
 namespace Noise {
 
   // A table of 256 random normalized vectors.  Each row is an (x, y, z, 0)
@@ -284,6 +285,7 @@ namespace Noise {
   };
 
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

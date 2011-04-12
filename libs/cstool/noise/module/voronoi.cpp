@@ -23,7 +23,7 @@
 #include "cstool/noise/mathconsts.h"
 #include "cstool/noise/module/voronoi.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 Voronoi::Voronoi ():
   Module (GetSourceModuleCount ()),

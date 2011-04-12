@@ -24,7 +24,7 @@
 #include "cstool/noise/misc.h"
 #include "cstool/noise/module/terrace.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 Terrace::Terrace ():
   Module (GetSourceModuleCount ()),
@@ -66,7 +66,7 @@ int Terrace::FindInsertionPos (double value)
     } else if (value == m_pControlPoints[insertionPos]) {
       // Each control point is required to contain a unique value, so throw
       // an exception.
-      //throw CS::Noise::ExceptionInvalidParam ();
+      //throw CS::Math::Noise::ExceptionInvalidParam ();
       CS_ASSERT (false);
     }
   }
@@ -145,7 +145,7 @@ void Terrace::InsertAtPos (int insertionPos, double value)
 void Terrace::MakeControlPoints (int controlPointCount)
 {
   if (controlPointCount < 2) {
-    //throw CS::Noise::ExceptionInvalidParam ();
+    //throw CS::Math::Noise::ExceptionInvalidParam ();
     CS_ASSERT (false);
   }
 

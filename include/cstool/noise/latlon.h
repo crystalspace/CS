@@ -27,6 +27,7 @@
 #include "mathconsts.h"
 
 namespace CS {
+namespace Math {
 namespace Noise {
 
   /// @addtogroup libnoise
@@ -48,6 +49,7 @@ namespace Noise {
   /// @}
 
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

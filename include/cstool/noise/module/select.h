@@ -26,6 +26,7 @@
 #include "modulebase.h"
 
 namespace CS {
+namespace Math {
 namespace Noise {
 namespace Module {
 
@@ -38,15 +39,15 @@ namespace Module {
     /// @addtogroup selectormodules
     /// @{
 
-    /// Default edge-falloff value for the CS::Noise::Module::Select noise module.
+    /// Default edge-falloff value for the CS::Math::Noise::Module::Select noise module.
     const double DEFAULT_SELECT_EDGE_FALLOFF = 0.0;
 
     /// Default lower bound of the selection range for the
-    /// CS::Noise::Module::Select noise module.
+    /// CS::Math::Noise::Module::Select noise module.
     const double DEFAULT_SELECT_LOWER_BOUND = -1.0;
 
     /// Default upper bound of the selection range for the
-    /// CS::Noise::Module::Select noise module.
+    /// CS::Math::Noise::Module::Select noise module.
     const double DEFAULT_SELECT_UPPER_BOUND = 1.0;
 
     /// Noise module that outputs the value selected from one of two source
@@ -87,13 +88,13 @@ namespace Module {
         /// Constructor.
         ///
         /// The default falloff value at the edge transition is set to
-        /// CS::Noise::Module::DEFAULT_SELECT_EDGE_FALLOFF.
+        /// CS::Math::Noise::Module::DEFAULT_SELECT_EDGE_FALLOFF.
         ///
         /// The default lower bound of the selection range is set to
-        /// CS::Noise::Module::DEFAULT_SELECT_LOWER_BOUND.
+        /// CS::Math::Noise::Module::DEFAULT_SELECT_LOWER_BOUND.
         ///
         /// The default upper bound of the selection range is set to
-        /// CS::Noise::Module::DEFAULT_SELECT_UPPER_BOUND.
+        /// CS::Math::Noise::Module::DEFAULT_SELECT_UPPER_BOUND.
         Select ();
 
         /// Returns the control module.
@@ -103,7 +104,7 @@ namespace Module {
         /// @pre A control module has been added to this noise module via a
         /// call to SetSourceModule() or SetControlModule().
         ///
-        /// @throw CS::Noise::ExceptionNoModule See the preconditions for more
+        /// @throw CS::Math::Noise::ExceptionNoModule See the preconditions for more
         /// information.
         ///
         /// The control module determines the output value to select.  If the
@@ -115,7 +116,7 @@ namespace Module {
         const Module& GetControlModule () const
         {
           if (m_pSourceModule == NULL || m_pSourceModule[2] == NULL) {
-            //throw CS::Noise::ExceptionNoModule ();
+            //throw CS::Math::Noise::ExceptionNoModule ();
 	    CS_ASSERT (false);
           }
           return *(m_pSourceModule[2]);
@@ -177,7 +178,7 @@ namespace Module {
         /// @pre The lower bound must be less than or equal to the upper
         /// bound.
         ///
-        /// @throw CS::Noise::ExceptionInvalidParam An invalid parameter was
+        /// @throw CS::Math::Noise::ExceptionInvalidParam An invalid parameter was
         /// specified; see the preconditions for more information.
         ///
         /// If the output value from the control module is within the
@@ -261,6 +262,7 @@ namespace Module {
 
 } // namespace Module
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

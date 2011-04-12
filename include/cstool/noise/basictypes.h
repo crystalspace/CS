@@ -28,6 +28,7 @@
 // You may need to modify these constants for your compiler or platform.
 
 namespace CS {
+namespace Math {
 namespace Noise {
 
   /// @defgroup libnoise libnoise
@@ -58,6 +59,7 @@ namespace Noise {
   /// @}
 
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

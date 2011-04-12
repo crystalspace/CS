@@ -26,6 +26,7 @@
 #include "modulebase.h"
 
 namespace CS {
+namespace Math {
 namespace Noise {
 namespace Module {
 
@@ -38,10 +39,10 @@ namespace Module {
     /// @addtogroup modifiermodules
     /// @{
 
-    /// Default bias for the CS::Noise::Module::ScaleBias noise module.
+    /// Default bias for the CS::Math::Noise::Module::ScaleBias noise module.
     const double DEFAULT_BIAS = 0.0;
 
-    /// Default scale for the CS::Noise::Module::ScaleBias noise module.
+    /// Default scale for the CS::Math::Noise::Module::ScaleBias noise module.
     const double DEFAULT_SCALE = 1.0;
 
     /// Noise module that applies a scaling factor and a bias to the output
@@ -61,9 +62,9 @@ namespace Module {
 
         /// Constructor.
         ///
-        /// The default bias is set to CS::Noise::Module::DEFAULT_BIAS.
+        /// The default bias is set to CS::Math::Noise::Module::DEFAULT_BIAS.
         ///
-        /// The default scaling factor is set to CS::Noise::Module::DEFAULT_SCALE.
+        /// The default scaling factor is set to CS::Math::Noise::Module::DEFAULT_SCALE.
         ScaleBias ();
 
         /// Returns the bias to apply to the scaled output value from the
@@ -144,6 +145,7 @@ namespace Module {
 
 } // namespace Module
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

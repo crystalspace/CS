@@ -22,7 +22,7 @@
 
 #include "cstool/noise/module/invert.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 Invert::Invert ():
   Module (GetSourceModuleCount ())

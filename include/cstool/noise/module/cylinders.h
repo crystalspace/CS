@@ -26,6 +26,7 @@
 #include "modulebase.h"
 
 namespace CS {
+namespace Math {
 namespace Noise {
 namespace Module {
 
@@ -38,7 +39,7 @@ namespace Module {
     /// @addtogroup generatormodules
     /// @{
 
-    /// Default frequency value for the CS::Noise::Module::Cylinders noise module.
+    /// Default frequency value for the CS::Math::Noise::Module::Cylinders noise module.
     const double DEFAULT_CYLINDERS_FREQUENCY = 1.0;
 
     /// Noise module that outputs concentric cylinders.
@@ -75,7 +76,7 @@ namespace Module {
         /// Constructor.
         ///
         /// The default frequency is set to
-        /// CS::Noise::Module::DEFAULT_CYLINDERS_FREQUENCY.
+        /// CS::Math::Noise::Module::DEFAULT_CYLINDERS_FREQUENCY.
         Cylinders ();
 
         /// Returns the frequency of the concentric cylinders.
@@ -122,6 +123,7 @@ namespace Module {
 
 } // namespace Module
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

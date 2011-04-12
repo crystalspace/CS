@@ -29,6 +29,7 @@
 #include "../module/modulebase.h"
 
 namespace CS {
+namespace Math {
 namespace Noise {
 namespace Model {
 
@@ -66,7 +67,7 @@ namespace Model {
         ///
         /// @param module The noise module that is used to generate the output
         /// values.
-        Cylinder (const CS::Noise::Module::Module& module);
+        Cylinder (const CS::Math::Noise::Module::Module& module);
 
         /// Returns the noise module that is used to generate the output
         /// values.
@@ -74,7 +75,7 @@ namespace Model {
         /// @returns A reference to the noise module.
         ///
         /// @pre A noise module was passed to the SetModule() method.
-        const CS::Noise::Module::Module& GetModule () const
+        const CS::Math::Noise::Module::Module& GetModule () const
         {
           assert (m_pModule != NULL);
           return *m_pModule;
@@ -106,7 +107,7 @@ namespace Model {
         ///
         /// This noise module must exist for the lifetime of this object,
         /// until you pass a new noise module to this method.
-        void SetModule (const CS::Noise::Module::Module& module)
+        void SetModule (const CS::Math::Noise::Module::Module& module)
         {
           m_pModule = &module;
         }
@@ -114,7 +115,7 @@ namespace Model {
       private:
 
         /// A pointer to the noise module used to generate the output values.
-        const CS::Noise::Module::Module* m_pModule;
+        const CS::Math::Noise::Module::Module* m_pModule;
 
     };
 
@@ -124,6 +125,7 @@ namespace Model {
 
 } // namespace Model
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

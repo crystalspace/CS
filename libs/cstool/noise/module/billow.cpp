@@ -22,7 +22,7 @@
 
 #include "cstool/noise/module/billow.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 Billow::Billow ():
   Module (GetSourceModuleCount ()),
