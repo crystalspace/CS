@@ -3917,6 +3917,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *Insert = *cspacec::iStringArray_Insert;
 *Empty = *cspacec::iStringArray_Empty;
 *IsEmpty = *cspacec::iStringArray_IsEmpty;
+*Put = *cspacec::iStringArray_Put;
 *scfGetVersion = *cspacec::iStringArray_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

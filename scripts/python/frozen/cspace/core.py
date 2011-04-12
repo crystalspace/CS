@@ -2017,6 +2017,7 @@ class iStringArray(iBase):
     def Insert(*args): return _core.iStringArray_Insert(*args)
     def Empty(*args): return _core.iStringArray_Empty(*args)
     def IsEmpty(*args): return _core.iStringArray_IsEmpty(*args)
+    def Put(*args): return _core.iStringArray_Put(*args)
     def Length (*args):
         print "iStringArray.Length() is deprecated, use iStringArray.GetSize() instead"
         return self.GetSize(*args)
