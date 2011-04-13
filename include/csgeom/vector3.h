@@ -275,7 +275,7 @@ public:
   inline void Set (float v) { x = y = z = v; }
 
   /// Get the value of this vector.
-  inline void Get (float* v) { v[0] = x; v[1] = y; v[2] = z; }
+  inline void Get (float* v) const { v[0] = x; v[1] = y; v[2] = z; }
 
   /// Returns the norm of this vector.
   inline float Norm () const
