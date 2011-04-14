@@ -5723,7 +5723,7 @@ SWIGINTERN PyObject *_wrap_csVector3_Get(PyObject *SWIGUNUSEDPARM(self), PyObjec
   if(!PyArg_UnpackTuple(args,(char *)"csVector3_Get",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csVector3, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csVector3_Get" "', argument " "1"" of type '" "csVector3 *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csVector3_Get" "', argument " "1"" of type '" "csVector3 const *""'"); 
   }
   arg1 = reinterpret_cast< csVector3 * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_float, 0 |  0 );
@@ -5731,7 +5731,7 @@ SWIGINTERN PyObject *_wrap_csVector3_Get(PyObject *SWIGUNUSEDPARM(self), PyObjec
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csVector3_Get" "', argument " "2"" of type '" "float *""'"); 
   }
   arg2 = reinterpret_cast< float * >(argp2);
-  (arg1)->Get(arg2);
+  ((csVector3 const *)arg1)->Get(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
