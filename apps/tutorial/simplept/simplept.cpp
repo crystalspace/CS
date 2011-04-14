@@ -491,8 +491,9 @@ bool Simple::CreateRoom ()
     targetView->GetCamera ()->GetTransform ().SetOrigin (csVector3 (-0.5,0,0));
     targetView->GetCamera ()->SetSector (room);
     targetView->SetRectangle (0, 0, 256, 256);
-    targetView->GetCamera ()->SetPerspectiveCenter (128, 128);
-    targetView->GetCamera ()->SetFOVAngle (targetView->GetCamera ()->GetFOVAngle(), 256);
+    iPerspectiveCamera* pcam = targetView->GetPerspectiveCamera ();
+    pcam->SetPerspectiveCenter (0.5f, 0.5f);
+    pcam->SetFOVAngle (pcam->GetFOVAngle (), 1.0f);
 
     csRef<iRenderManagerTargets> targets =
       scfQueryInterface<iRenderManagerTargets> (rm);
