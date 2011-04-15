@@ -17,10 +17,6 @@
 // headers
 // ----------------------------------------------------------------------------
 
-#if defined(__GNUG__) && !defined(NO_GCC_PRAGMA)
-    #pragma implementation "odcombo.h"
-#endif
-
 #include "wx/wxprec.h"
 
 #ifdef __BORLANDC__
@@ -49,6 +45,10 @@
 #if defined(__WXMSW__) && !defined(__WXUNIVERSAL__)
     #include "wx/msw/uxtheme.h"
 #endif
+
+#include <wx/propgrid/propgrid.h>
+
+#if !wxPG_USING_WXOWNERDRAWNCOMBOBOX
 
 #include "wx/propgrid/odcombo.h"
 
@@ -493,6 +493,9 @@ BEGIN_EVENT_TABLE(wxPGVListBoxComboPopup, wxVListBox)
     EVT_MOTION(wxPGVListBoxComboPopup::OnMouseMove)
     EVT_KEY_DOWN(wxPGVListBoxComboPopup::OnKey)
     EVT_LEFT_UP(wxPGVListBoxComboPopup::OnLeftClick)
+#if wxCHECK_VERSION(2,8,0)
+    EVT_MOUSE_CAPTURE_LOST(wxPGVListBoxComboPopup::OnMouseCaptureLost)
+#endif
 END_EVENT_TABLE()
 
 
@@ -546,8 +549,13 @@ void wxPGVListBoxComboPopup::PaintComboControl( wxDC& dc, const wxRect& rect )
 {
     if ( !(m_combo->GetWindowStyle() & wxODCB_STD_CONTROL_PAINT) )
     {
+        int flags = wxPGCC_PAINTING_CONTROL;
+
+        if ( m_combo->ShouldDrawFocus() )
+            flags |= wxPGCC_PAINTING_SELECTED;
+
         m_combo->DrawFocusBackground(dc,rect,0);
-        if ( m_combo->OnDrawListItem(dc,rect,m_value,wxPGCC_PAINTING_CONTROL) )
+        if ( m_combo->OnDrawItem(dc,rect,m_value,flags) )
             return;
     }
 
@@ -568,13 +576,13 @@ void wxPGVListBoxComboPopup::OnDrawItem( wxDC& dc, const wxRect& rect, size_t n)
     else
         dc.SetTextForeground( wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT) );
 
-    if ( !m_combo->OnDrawListItem(dc,rect,(int)n,0) )
+    if ( !m_combo->OnDrawItem(dc,rect,(int)n,0) )
         dc.DrawText( GetString(n), rect.x + 2, rect.y );
 }
 
 wxCoord wxPGVListBoxComboPopup::OnMeasureItem(size_t n) const
 {
-    int itemHeight = m_combo->OnMeasureListItem(n);
+    int itemHeight = m_combo->OnMeasureItem(n);
     if ( itemHeight < 0 )
         itemHeight = m_itemHeight;
 
@@ -636,6 +644,9 @@ bool wxPGVListBoxComboPopup::HandleKey( int keycode, bool saturate )
 {
     int value = m_value;
     int itemCount = GetCount();
+
+    if ( itemCount == 0 )
+        return false;
 
     if ( keycode == WXK_DOWN || keycode == WXK_RIGHT )
     {
@@ -750,7 +761,7 @@ void wxPGVListBoxComboPopup::OnKey(wxKeyEvent& event)
 
 void wxPGVListBoxComboPopup::CheckWidth( int pos )
 {
-    wxCoord x = m_combo->OnMeasureListItemWidth(pos);
+    wxCoord x = m_combo->OnMeasureItemWidth(pos);
 
     if ( x < 0 )
     {
@@ -969,6 +980,12 @@ wxSize wxPGVListBoxComboPopup::GetAdjustedSize( int minWidth, int prefHeight, in
     else
         height = 50;
 
+    // JACS
+#if defined(__WXMAC__)
+    // Set a minimum height since otherwise scrollbars won't draw properly
+    height = wxMax(50, height);
+#endif
+
     // Take scrollbar into account in width calculations
     int widestWidth = m_widestWidth + wxSystemSettings::GetMetric(wxSYS_VSCROLL_X);
     return wxSize(minWidth > widestWidth ? minWidth : widestWidth,
@@ -998,6 +1015,13 @@ void wxPGVListBoxComboPopup::Populate( int n, const wxString choices[] )
     if ( strValue.Length() )
         m_value = m_strings.Index(strValue);
 }
+
+#if wxCHECK_VERSION(2,8,0)
+void wxPGVListBoxComboPopup::OnMouseCaptureLost(wxMouseCaptureLostEvent& event)
+{
+    event.Skip(false);  // we don't want the event processed anywhere else
+}
+#endif
 
 // ----------------------------------------------------------------------------
 // input handling
@@ -1512,8 +1536,9 @@ wxSize wxPGComboControlBase::DoGetBestSize() const
     // TODO: Better method to calculate close-to-native control height.
 
     int fhei;
-    if ( m_font.Ok() )
-        fhei = (m_font.GetPointSize()*2) + 5;
+    wxFont font = GetFont();
+    if ( font.Ok() )
+        fhei = (font.GetPointSize()*2) + 5;
     else if ( wxNORMAL_FONT->Ok() )
         fhei = (wxNORMAL_FONT->GetPointSize()*2) + 5;
     else
@@ -1825,20 +1850,20 @@ void wxPGComboControlBase::RecalcAndRefresh()
     }
 }
 
-bool wxPGComboControlBase::OnDrawListItem( wxDC& WXUNUSED(dc),
-                                                 const wxRect& WXUNUSED(rect),
-                                                 int WXUNUSED(item),
-                                                 int WXUNUSED(flags) )
+bool wxPGComboControlBase::OnDrawItem( wxDC& WXUNUSED(dc),
+                                       const wxRect& WXUNUSED(rect),
+                                       int WXUNUSED(item),
+                                       int WXUNUSED(flags) ) const
 {
     return false; // signals caller to make default drawing
 }
 
-wxCoord wxPGComboControlBase::OnMeasureListItem( int WXUNUSED(item) )
+wxCoord wxPGComboControlBase::OnMeasureItem( size_t WXUNUSED(item) ) const
 {
     return -1; // signals caller to use default
 }
 
-wxCoord wxPGComboControlBase::OnMeasureListItemWidth( int WXUNUSED(item) )
+wxCoord wxPGComboControlBase::OnMeasureItemWidth( size_t WXUNUSED(item) ) const
 {
     return -1; // signals caller to use default
 }
@@ -2185,7 +2210,7 @@ void wxPGComboControlBase::SetPopup( wxPGComboPopup* iface )
         //m_popup->PushEventHandler( iface );
         */
 
-        // FIXME: This bypasses wxGTK popupwindow bug
+        // This bypasses wxGTK popupwindow bug
         //   (i.e. window is not initially hidden when it should be)
         m_winPopup->Hide();
 
@@ -2199,7 +2224,7 @@ void wxPGComboControlBase::SetPopup( wxPGComboPopup* iface )
     }
 
     // This must be after creation
-    if ( m_valueString )
+    if ( m_valueString.length() )
         iface->SetStringValue(m_valueString);
 
 }
@@ -2413,7 +2438,6 @@ void wxPGComboControlBase::ShowPopup()
     else
     {
         // This is neede since focus/selection indication may change when popup is shown
-        // FIXME: But in that case, would m_isPopupShown need to go before this?
         Refresh();
     }
 
@@ -2511,7 +2535,7 @@ void wxPGComboControlBase::OnPopupDismiss()
 void wxPGComboControlBase::HidePopup()
 {
     // Should be able to call this without popup interface
-    //wxCHECK_RET( m_popupInterface, _T("no popup interface") );
+    //wxCHECK_RET( m_popupInterface, wxT("no popup interface") );
     if ( !m_isPopupShown )
         return;
 
@@ -3340,7 +3364,7 @@ void wxPGComboControl::OnPaintEvent( wxPaintEvent& WXUNUSED(event) )
     const bool isEnabled = IsEnabled();
     wxColour bgCol = GetBackgroundColour();
 
-    HDC hDc = GetHdcOf(dc);
+    HDC hDc = wxPG_GetHDCOf(dc);
     HWND hWnd = GetHwndOf(this);
 
     wxUxThemeEngine* theme = NULL;
@@ -3702,7 +3726,7 @@ void wxPGOwnerDrawnComboBox::Clear()
 
 void wxPGOwnerDrawnComboBox::Delete(wxODCIndex n)
 {
-    wxCHECK_RET( (n >= 0) && (n < GetCount()), _T("invalid index in wxPGOwnerDrawnComboBox::Delete") );
+    wxCHECK_RET( (n >= 0) && (n < GetCount()), wxT("invalid index in wxPGOwnerDrawnComboBox::Delete") );
 
     if ( GetSelection() == (int) n )
         SetValue(wxEmptyString);
@@ -3718,13 +3742,13 @@ wxODCCount wxPGOwnerDrawnComboBox::GetCount() const
 
 wxString wxPGOwnerDrawnComboBox::GetString(wxODCIndex n) const
 {
-    wxCHECK_MSG( (n >= 0) && (n < GetCount()), wxEmptyString, _T("invalid index in wxPGOwnerDrawnComboBox::GetString") );
+    wxCHECK_MSG( (n >= 0) && (n < GetCount()), wxEmptyString, wxT("invalid index in wxPGOwnerDrawnComboBox::GetString") );
     return m_popupInterface->GetString(n);
 }
 
 void wxPGOwnerDrawnComboBox::SetString(wxODCIndex n, const wxString& s)
 {
-    wxCHECK_RET( (n >= 0) && (n < GetCount()), _T("invalid index in wxPGOwnerDrawnComboBox::SetString") );
+    wxCHECK_RET( (n >= 0) && (n < GetCount()), wxT("invalid index in wxPGOwnerDrawnComboBox::SetString") );
     m_popupInterface->SetString(n,s);
 }
 
@@ -3736,7 +3760,7 @@ int wxPGOwnerDrawnComboBox::FindString(const wxString& s) const
 
 void wxPGOwnerDrawnComboBox::Select(int n)
 {
-    wxCHECK_RET( (n >= -1) && (n < (int)GetCount()), _T("invalid index in wxPGOwnerDrawnComboBox::Select") );
+    wxCHECK_RET( (n >= -1) && (n < (int)GetCount()), wxT("invalid index in wxPGOwnerDrawnComboBox::Select") );
     wxASSERT( m_popupInterface );
 
     m_popupInterface->SetSelection(n);
@@ -3776,10 +3800,49 @@ int wxPGOwnerDrawnComboBox::DoInsert(const wxString& item, wxODCIndex pos)
     return pos;
 }
 
+#if wxCHECK_VERSION(2,9,0)
+int wxPGOwnerDrawnComboBox::DoInsertItems(const wxArrayStringsAdapter& items,
+                                          unsigned int pos,
+                                          void **clientData,
+                                          wxClientDataType type)
+{
+    const unsigned int count = items.GetCount();
+
+    if ( HasFlag(wxCB_SORT) )
+    {
+        int n = pos;
+
+        for( unsigned int i = 0; i < count; ++i )
+        {
+            int n = GetVListBoxComboPopup()->Append(items[i]);
+            AssignNewItemClientData(n, clientData, i, type);
+        }
+
+        return n;
+    }
+    else
+    {
+        for( unsigned int i = 0; i < count; ++i, ++pos )
+        {
+            GetVListBoxComboPopup()->Insert(items[i], pos);
+            AssignNewItemClientData(pos, clientData, i, type);
+        }
+
+        return pos - 1;
+    }
+}
+#endif
+
 void wxPGOwnerDrawnComboBox::DoSetItemClientData(wxODCIndex n, void* clientData)
 {
     wxASSERT(m_popupInterface);
-    m_popupInterface->SetItemClientData(n,clientData,m_clientDataItemsType);
+    m_popupInterface->SetItemClientData(n,clientData,
+#if wxCHECK_VERSION(2,9,0)
+        GetClientDataType()
+#else
+        m_clientDataItemsType
+#endif
+        );
 }
 
 void* wxPGOwnerDrawnComboBox::DoGetItemClientData(wxODCIndex n) const
@@ -3798,4 +3861,7 @@ wxClientData* wxPGOwnerDrawnComboBox::DoGetItemClientObject(wxODCIndex n) const
     return (wxClientData*) DoGetItemClientData(n);
 }
 
+#endif // wxPG_USING_WXOWNERDRAWNCOMBOBOX
+
 #endif // wxUSE_COMBOBOX
+
