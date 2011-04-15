@@ -1,4 +1,4 @@
-SubDir TOP apps editor ;
+SubDir TOP apps tools editor ;
 
 if $(WX.AVAILABLE) = "yes" && $(WX.AUI.AVAILABLE) = "yes"
 {
