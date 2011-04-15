@@ -26,6 +26,7 @@
 #include "modulebase.h"
 
 namespace CS {
+namespace Math {
 namespace Noise {
 namespace Module {
 
@@ -38,24 +39,24 @@ namespace Module {
     /// @addtogroup generatormodules
     /// @{
 
-    /// Default frequency for the CS::Noise::Module::RidgedMulti noise module.
+    /// Default frequency for the CS::Math::Noise::Module::RidgedMulti noise module.
     const double DEFAULT_RIDGED_FREQUENCY = 1.0;
 
-    /// Default lacunarity for the CS::Noise::Module::RidgedMulti noise module.
+    /// Default lacunarity for the CS::Math::Noise::Module::RidgedMulti noise module.
     const double DEFAULT_RIDGED_LACUNARITY = 2.0;
 
-    /// Default number of octaves for the CS::Noise::Module::RidgedMulti noise
+    /// Default number of octaves for the CS::Math::Noise::Module::RidgedMulti noise
     /// module.
     const int DEFAULT_RIDGED_OCTAVE_COUNT = 6;
 
-    /// Default noise quality for the CS::Noise::Module::RidgedMulti noise
+    /// Default noise quality for the CS::Math::Noise::Module::RidgedMulti noise
     /// module.
-    const CS::Noise::NoiseQuality DEFAULT_RIDGED_QUALITY = QUALITY_STD;
+    const CS::Math::Noise::NoiseQuality DEFAULT_RIDGED_QUALITY = QUALITY_STD;
 
-    /// Default noise seed for the CS::Noise::Module::RidgedMulti noise module.
+    /// Default noise seed for the CS::Math::Noise::Module::RidgedMulti noise module.
     const int DEFAULT_RIDGED_SEED = 0;
 
-    /// Maximum number of octaves for the CS::Noise::Module::RidgedMulti noise
+    /// Maximum number of octaves for the CS::Math::Noise::Module::RidgedMulti noise
     /// module.
     const int RIDGED_MAX_OCTAVE = 30;
 
@@ -131,16 +132,16 @@ namespace Module {
         /// Constructor.
         ///
         /// The default number of octaves is set to
-        /// CS::Noise::Module::DEFAULT_RIDGED_OCTAVE_COUNT.
+        /// CS::Math::Noise::Module::DEFAULT_RIDGED_OCTAVE_COUNT.
         ///
         /// The default frequency is set to
-        /// CS::Noise::Module::DEFAULT_RIDGED_FREQUENCY.
+        /// CS::Math::Noise::Module::DEFAULT_RIDGED_FREQUENCY.
         ///
         /// The default lacunarity is set to
-        /// CS::Noise::Module::DEFAULT_RIDGED_LACUNARITY.
+        /// CS::Math::Noise::Module::DEFAULT_RIDGED_LACUNARITY.
         ///
         /// The default seed value is set to
-        /// CS::Noise::Module::DEFAULT_RIDGED_SEED.
+        /// CS::Math::Noise::Module::DEFAULT_RIDGED_SEED.
         RidgedMulti ();
 
         /// Returns the frequency of the first octave.
@@ -166,9 +167,9 @@ namespace Module {
         ///
         /// @returns The quality of the ridged-multifractal noise.
         ///
-        /// See CS::Noise::NoiseQuality for definitions of the various
+        /// See CS::Math::Noise::NoiseQuality for definitions of the various
         /// coherent-noise qualities.
-        CS::Noise::NoiseQuality GetNoiseQuality () const
+        CS::Math::Noise::NoiseQuality GetNoiseQuality () const
         {
           return m_noiseQuality;
         }
@@ -229,9 +230,9 @@ namespace Module {
         ///
         /// @param noiseQuality The quality of the ridged-multifractal noise.
         ///
-        /// See CS::Noise::NoiseQuality for definitions of the various
+        /// See CS::Math::Noise::NoiseQuality for definitions of the various
         /// coherent-noise qualities.
-        void SetNoiseQuality (CS::Noise::NoiseQuality noiseQuality)
+        void SetNoiseQuality (CS::Math::Noise::NoiseQuality noiseQuality)
         {
           m_noiseQuality = noiseQuality;
         }
@@ -243,9 +244,9 @@ namespace Module {
         /// ridged-multifractal noise.
         ///
         /// @pre The number of octaves ranges from 1 to
-        /// CS::Noise::Module::RIDGED_MAX_OCTAVE.
+        /// CS::Math::Noise::Module::RIDGED_MAX_OCTAVE.
         ///
-        /// @throw CS::Noise::ExceptionInvalidParam An invalid parameter was
+        /// @throw CS::Math::Noise::ExceptionInvalidParam An invalid parameter was
         /// specified; see the preconditions for more information.
         ///
         /// The number of octaves controls the amount of detail in the
@@ -256,7 +257,7 @@ namespace Module {
         void SetOctaveCount (int octaveCount)
         {
           if (octaveCount > RIDGED_MAX_OCTAVE) {
-            //throw CS::Noise::ExceptionInvalidParam ();
+            //throw CS::Math::Noise::ExceptionInvalidParam ();
 	    CS_ASSERT (false);
           }
           m_octaveCount = octaveCount;
@@ -285,7 +286,7 @@ namespace Module {
         double m_lacunarity;
 
         /// Quality of the ridged-multifractal noise.
-        CS::Noise::NoiseQuality m_noiseQuality;
+        CS::Math::Noise::NoiseQuality m_noiseQuality;
 
         /// Total number of octaves that generate the ridged-multifractal
         /// noise.
@@ -307,6 +308,7 @@ namespace Module {
 
 } // namespace Module
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

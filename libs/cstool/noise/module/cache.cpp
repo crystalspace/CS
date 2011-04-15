@@ -22,7 +22,7 @@
 
 #include "cstool/noise/module/cache.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 Cache::Cache ():
   Module (GetSourceModuleCount ()),

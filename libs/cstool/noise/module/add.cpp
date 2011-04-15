@@ -22,7 +22,7 @@
 
 #include "cstool/noise/module/add.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 Add::Add ():
   Module (GetSourceModuleCount ())

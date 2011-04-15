@@ -22,7 +22,7 @@
 
 #include "cstool/noise/module/const.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 Const::Const ():
   Module (GetSourceModuleCount ()),

@@ -23,13 +23,13 @@
 #include "cstool/noise/mathconsts.h"
 #include "cstool/noise/model/cylinder.h"
 
-using namespace CS::Noise::Model;
+using namespace CS::Math::Noise::Model;
 
 Cylinder::Cylinder (): m_pModule (NULL)
 {
 }
 
-Cylinder::Cylinder (const CS::Noise::Module::Module& module):
+Cylinder::Cylinder (const CS::Math::Noise::Module::Module& module):
   m_pModule (&module)
 {
 }

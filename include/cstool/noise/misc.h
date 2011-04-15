@@ -24,6 +24,7 @@
 #define NOISE_MISC_H
 
 namespace CS {
+namespace Math {
 namespace Noise {
 
   /// Clamps a value onto a clamping range.
@@ -93,6 +94,7 @@ namespace Noise {
   /// @}
 
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

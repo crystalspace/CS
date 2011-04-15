@@ -19,7 +19,7 @@
 #ifndef __CSCEGUICONFTEST_H__
 #define __CSCEGUICONFTEST_H__
 
-#include "crystalspace.h"
+#include "cstool/demoapplication.h"
 
 #include "csutil/custom_new_disable.h"
 #include <CEGUI.h>
@@ -31,29 +31,24 @@
 
 struct iSector;
 
-class CSCEGUIConfTest : public CS::Demo::DemoApplication
+class CSCEGUIConfTest : public CS::Utility::DemoApplication
 {
 private:
-  bool myBool;
   int myInt;
   float myFloat;
+  bool myBool;
   csString myString;
 
 private:
-  float rotX, rotY;
-  csRef<iVFS> vfs;
   csRef<iCEGUI> cegui;
   csRef<iConfigListener> configEventNotifier;
 
-  csRef<iEventHandler> myBoolL;
   csRef<iEventHandler> myIntL;
   csRef<iEventHandler> myFloatL;
+  csRef<iEventHandler> myBoolL;
   csRef<iEventHandler> myStringL;
 
   void Frame();
-
-  bool OnKeyboard(iEvent&);
-  bool OnMouseDown(iEvent&);
 
 public:
   CSCEGUIConfTest();

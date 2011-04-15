@@ -22,7 +22,7 @@
 
 #include "cstool/noise/module/displace.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 Displace::Displace ():
   Module (GetSourceModuleCount ())

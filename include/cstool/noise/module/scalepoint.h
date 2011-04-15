@@ -26,6 +26,7 @@
 #include "modulebase.h"
 
 namespace CS {
+namespace Math {
 namespace Noise {
 namespace Module {
 
@@ -39,15 +40,15 @@ namespace Module {
     /// @{
 
     /// Default scaling factor applied to the @a x coordinate for the
-    /// CS::Noise::Module::ScalePoint noise module.
+    /// CS::Math::Noise::Module::ScalePoint noise module.
     const double DEFAULT_SCALE_POINT_X = 1.0;
 
     /// Default scaling factor applied to the @a y coordinate for the
-    /// CS::Noise::Module::ScalePoint noise module.
+    /// CS::Math::Noise::Module::ScalePoint noise module.
     const double DEFAULT_SCALE_POINT_Y = 1.0;
 
     /// Default scaling factor applied to the @a z coordinate for the
-    /// CS::Noise::Module::ScalePoint noise module.
+    /// CS::Math::Noise::Module::ScalePoint noise module.
     const double DEFAULT_SCALE_POINT_Z = 1.0;
 
     /// Noise module that scales the coordinates of the input value before
@@ -71,13 +72,13 @@ namespace Module {
         /// Constructor.
         ///
         /// The default scaling factor applied to the @a x coordinate is set
-        /// to CS::Noise::Module::DEFAULT_SCALE_POINT_X.
+        /// to CS::Math::Noise::Module::DEFAULT_SCALE_POINT_X.
         ///
         /// The default scaling factor applied to the @a y coordinate is set
-        /// to CS::Noise::Module::DEFAULT_SCALE_POINT_Y.
+        /// to CS::Math::Noise::Module::DEFAULT_SCALE_POINT_Y.
         ///
         /// The default scaling factor applied to the @a z coordinate is set
-        /// to CS::Noise::Module::DEFAULT_SCALE_POINT_Z.
+        /// to CS::Math::Noise::Module::DEFAULT_SCALE_POINT_Z.
         ScalePoint ();
 
         virtual int GetSourceModuleCount () const
@@ -205,6 +206,7 @@ namespace Module {
 
 } // namespace Module
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

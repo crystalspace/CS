@@ -26,6 +26,7 @@
 #include "modulebase.h"
 
 namespace CS {
+namespace Math {
 namespace Noise {
 namespace Module {
 
@@ -38,7 +39,7 @@ namespace Module {
     /// @addtogroup modifiermodules
     /// @{
 
-    /// Default exponent for the CS::Noise::Module::Exponent noise module.
+    /// Default exponent for the CS::Math::Noise::Module::Exponent noise module.
     const double DEFAULT_EXPONENT = 1.0;
 
     /// Noise module that maps the output value from a source module onto an
@@ -59,7 +60,7 @@ namespace Module {
 
         /// Constructor.
         ///
-        /// The default exponent is set to CS::Noise::Module::DEFAULT_EXPONENT.
+        /// The default exponent is set to CS::Math::Noise::Module::DEFAULT_EXPONENT.
         Exponent ();
 
         /// Returns the exponent value to apply to the output value from the
@@ -112,6 +113,7 @@ namespace Module {
 
 } // namespace Module
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

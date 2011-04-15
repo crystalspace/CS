@@ -23,14 +23,14 @@
 #include "cstool/noise/latlon.h"
 #include "cstool/noise/model/sphere.h"
 
-using namespace CS::Noise::Model;
+using namespace CS::Math::Noise::Model;
 
 Sphere::Sphere ():
   m_pModule (NULL)
 {
 }
 
-Sphere::Sphere (const CS::Noise::Module::Module& module):
+Sphere::Sphere (const CS::Math::Noise::Module::Module& module):
   m_pModule (&module)
 {
 }

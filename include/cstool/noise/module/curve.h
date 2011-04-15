@@ -26,6 +26,7 @@
 #include "modulebase.h"
 
 namespace CS {
+namespace Math {
 namespace Noise {
 namespace Module {
 
@@ -94,7 +95,7 @@ namespace Module {
         ///
         /// @pre No two control points have the same input value.
         ///
-        /// @throw CS::Noise::ExceptionInvalidParam An invalid parameter was
+        /// @throw CS::Math::Noise::ExceptionInvalidParam An invalid parameter was
         /// specified; see the preconditions for more information.
         ///
         /// It does not matter which order these points are added.
@@ -146,7 +147,7 @@ namespace Module {
         ///
         /// @pre No two control points have the same input value.
         ///
-        /// @throw CS::Noise::ExceptionInvalidParam An invalid parameter was
+        /// @throw CS::Math::Noise::ExceptionInvalidParam An invalid parameter was
         /// specified; see the preconditions for more information.
         ///
         /// By inserting the control point at the returned array index, this
@@ -190,6 +191,7 @@ namespace Module {
 
 } // namespace Module
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

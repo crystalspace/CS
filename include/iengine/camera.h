@@ -251,6 +251,7 @@ struct iCamera : public virtual iBase
    * Eliminate roundoff error by snapping the camera orientation to a
    * grid of density n
    */
+  CS_DEPRECATED_METHOD_MSG("Don't use it anymore")
   virtual void Correct (int n) = 0;
 
   /// Return true if space is mirrored.

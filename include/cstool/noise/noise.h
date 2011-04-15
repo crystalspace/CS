@@ -61,7 +61,7 @@
 /// If the application passes the same input value to a noise module, the
 /// noise module returns the same output value.
 ///
-/// All noise modules are derived from the CS::Noise::Module::Module abstract
+/// All noise modules are derived from the CS::Math::Noise::Module::Module abstract
 /// base class.
 ///
 /// @section contact Contact

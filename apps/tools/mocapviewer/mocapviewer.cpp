@@ -34,8 +34,6 @@ MocapViewer::MocapViewer ()
   : DemoApplication ("CrystalSpace.MocapViewer"),
     scfImplementationType (this), debugImage (nullptr), noiseScale (0.5f)
 {
-  // Set the camera mode
-  cameraManager.SetCameraMode (CS::Demo::CAMERA_MOVE_FREE);
 }
 
 MocapViewer::~MocapViewer ()
@@ -197,12 +195,12 @@ void MocapViewer::Frame ()
   }
 
   // Update the HUD
-  hudManager.stateDescriptions.DeleteIndex (0);
+  hudManager->GetStateDescriptions ()->DeleteIndex (0);
   csString txt;
   txt.Format ("Frame: %i on %u",
 	      (int) (animNode->GetPlaybackPosition () / parsingResult.frameDuration),
 	      (unsigned int) parsingResult.frameCount);
-  hudManager.stateDescriptions.Insert (0, txt);
+  hudManager->GetStateDescriptions ()->Insert (0, txt);
 }
 
 bool MocapViewer::OnInitialize (int argc, char* argv[])
@@ -256,6 +254,9 @@ bool MocapViewer::Application ()
     csQueryRegistry<CS::Animation::iSkeletonRetargetNodeManager> (GetObjectRegistry ());
   if (!retargetNodeManager)
     return ReportError("Failed to locate CS::Animation::iSkeletonRetargetNodeManager plugin!");
+
+  // Set the camera mode
+  cameraManager->SetCameraMode (CS::Utility::CAMERA_MOVE_FREE);
 
   // Default behavior from DemoApplication for the creation of the scene
   if (!CreateRoom ())
@@ -559,12 +560,12 @@ bool MocapViewer::CreateAvatar ()
     animNode->AddAnimationCallback (this);
 
   // Initialize the HUD
-  hudManager.stateDescriptions.Push ("Frame:");
+  hudManager->GetStateDescriptions ()->Push ("Frame:");
   csString hudTxt;
   hudTxt.Format ("Mocap FPS: %.2f", 1.0f / parsingResult.frameDuration);
-  hudManager.stateDescriptions.Push (hudTxt);
+  hudManager->GetStateDescriptions ()->Push (hudTxt);
   hudTxt.Format ("Total length: %.2f seconds", animNode->GetDuration ());
-  hudManager.stateDescriptions.Push (hudTxt);
+  hudManager->GetStateDescriptions ()->Push (hudTxt);
 
   // Setup the noise points
   txt = clp->GetOption ("ncount", 0);
@@ -844,10 +845,10 @@ bool MocapViewer::CreateAvatar ()
       movieRecorder->SetFilenameFormat (videoFormat.GetData ());
 
     // Disable the display of the HUD
-    hudManager.SetEnabled (false);
+    hudManager->SetEnabled (false);
 
     // Disable the motion of the camera
-    cameraManager.SetCameraMode (CS::Demo::CAMERA_NO_MOVE);
+    cameraManager->SetCameraMode (CS::Utility::CAMERA_NO_MOVE);
 
     // Start the movie recording
     movieRecorder->Start ();

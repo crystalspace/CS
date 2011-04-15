@@ -26,6 +26,7 @@
 #include "modulebase.h"
 
 namespace CS {
+namespace Math {
 namespace Noise {
 namespace Module {
 
@@ -38,11 +39,11 @@ namespace Module {
     /// @addtogroup modifiermodules
     /// @{
 
-    /// Default lower bound of the clamping range for the CS::Noise::Module::Clamp
+    /// Default lower bound of the clamping range for the CS::Math::Noise::Module::Clamp
     /// noise module.
     const double DEFAULT_CLAMP_LOWER_BOUND = -1.0;
 
-    /// Default upper bound of the clamping range for the CS::Noise::Module::Clamp
+    /// Default upper bound of the clamping range for the CS::Math::Noise::Module::Clamp
     /// noise module.
     const double DEFAULT_CLAMP_UPPER_BOUND = 1.0;
 
@@ -72,10 +73,10 @@ namespace Module {
         /// Constructor.
         ///
         /// The default lower bound of the clamping range is set to
-        /// CS::Noise::Module::DEFAULT_CLAMP_LOWER_BOUND.
+        /// CS::Math::Noise::Module::DEFAULT_CLAMP_LOWER_BOUND.
         ///
         /// The default upper bound of the clamping range is set to
-        /// CS::Noise::Module::DEFAULT_CLAMP_UPPER_BOUND.
+        /// CS::Math::Noise::Module::DEFAULT_CLAMP_UPPER_BOUND.
         Clamp ();
 
         /// Returns the lower bound of the clamping range.
@@ -117,7 +118,7 @@ namespace Module {
         /// @pre The lower bound must be less than or equal to the
         /// upper bound.
         ///
-        /// @throw CS::Noise::ExceptionInvalidParam An invalid parameter was
+        /// @throw CS::Math::Noise::ExceptionInvalidParam An invalid parameter was
         /// specified; see the preconditions for more information.
         ///
         /// If the output value from the source module is less than the lower
@@ -145,6 +146,7 @@ namespace Module {
 
 } // namespace Module
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

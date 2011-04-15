@@ -41,9 +41,6 @@ Simple::Simple ()
     debugMode (false), allStatic (false), pauseDynamic (false), dynamicSpeed (1.0f),
     physicalCameraMode (CAMERA_DYNAMIC), dragging (false), softDragging (false)
 {
-  // We manage the camera by ourselves
-  cameraManager.SetCameraMode (CS::Demo::CAMERA_NO_MOVE);
-  cameraManager.SetMouseMoveEnabled (false);
 }
 
 Simple::~Simple ()
@@ -194,47 +191,47 @@ void Simple::Frame ()
       (cameraBody->GetTransform ().GetOrigin ());
 
   // Update the demo's state information
-  hudManager.stateDescriptions.DeleteAll ();
+  hudManager->GetStateDescriptions ()->Empty ();
   csString txt;
 
-  hudManager.stateDescriptions.Push (csString ("Physics engine: ") + phys_engine_name);
+  hudManager->GetStateDescriptions ()->Push (csString ("Physics engine: ") + phys_engine_name);
 
   txt.Format ("Rigid bodies count: %d", dynamicSystem->GetBodysCount ());
-  hudManager.stateDescriptions.Push (txt);
+  hudManager->GetStateDescriptions ()->Push (txt);
 
   if (isSoftBodyWorld)
   {
     txt.Format ("Soft bodies count: %d", (int) bulletDynamicSystem->GetSoftBodyCount ());
-    hudManager.stateDescriptions.Push (txt);
+    hudManager->GetStateDescriptions ()->Push (txt);
   }
 
   if (phys_engine_id == ODE_ID)
   {
     if (solver==0)
-      hudManager.stateDescriptions.Push (csString ("Solver: WorldStep"));
+      hudManager->GetStateDescriptions ()->Push (csString ("Solver: WorldStep"));
     else if (solver==1)
-      hudManager.stateDescriptions.Push (csString ("Solver: StepFast"));
+      hudManager->GetStateDescriptions ()->Push (csString ("Solver: StepFast"));
     else if (solver==2)
-      hudManager.stateDescriptions.Push (csString ("Solver: QuickStep"));
+      hudManager->GetStateDescriptions ()->Push (csString ("Solver: QuickStep"));
   }
 
   if (autodisable)
-    hudManager.stateDescriptions.Push (csString ("AutoDisable: ON"));
+    hudManager->GetStateDescriptions ()->Push (csString ("AutoDisable: ON"));
   else
-    hudManager.stateDescriptions.Push (csString ("AutoDisable: OFF"));
+    hudManager->GetStateDescriptions ()->Push (csString ("AutoDisable: OFF"));
 
   switch (physicalCameraMode)
     {
     case CAMERA_DYNAMIC:
-      hudManager.stateDescriptions.Push (csString ("Camera mode: dynamic"));
+      hudManager->GetStateDescriptions ()->Push (csString ("Camera mode: dynamic"));
       break;
 
     case CAMERA_FREE:
-      hudManager.stateDescriptions.Push (csString ("Camera mode: free"));
+      hudManager->GetStateDescriptions ()->Push (csString ("Camera mode: free"));
       break;
 
     case CAMERA_KINEMATIC:
-      hudManager.stateDescriptions.Push (csString ("Camera mode: kinematic"));
+      hudManager->GetStateDescriptions ()->Push (csString ("Camera mode: kinematic"));
       break;
 
     default:
@@ -845,70 +842,6 @@ bool Simple::OnInitialize (int argc, char* argv[])
   if (!dynamics)
     return ReportError ("No iDynamics plugin!");
 
-  // Now that we know the physical plugin in use, we can define the available keys
-  hudManager.keyDescriptions.DeleteAll ();
-  hudManager.keyDescriptions.Push ("b: spawn a box");
-  hudManager.keyDescriptions.Push ("s: spawn a sphere");
-  if (phys_engine_id == BULLET_ID)
-  {
-    hudManager.keyDescriptions.Push ("c: spawn a cylinder");
-    hudManager.keyDescriptions.Push ("a: spawn a capsule");
-  }
-  hudManager.keyDescriptions.Push ("v: spawn a convex mesh");
-  hudManager.keyDescriptions.Push ("m: spawn a concave mesh");
-  hudManager.keyDescriptions.Push ("*: spawn a static concave mesh");
-  if (phys_engine_id == BULLET_ID)
-    hudManager.keyDescriptions.Push ("q: spawn a compound body");
-  hudManager.keyDescriptions.Push ("j: spawn a joint with motor");
-  if (phys_engine_id == BULLET_ID)
-  {
-    hudManager.keyDescriptions.Push ("h: spawn a chain");
-    hudManager.keyDescriptions.Push ("r: spawn a Frankie's ragdoll");
-  }
-  if (isSoftBodyWorld)
-  {
-    hudManager.keyDescriptions.Push ("y: spawn a rope");
-    hudManager.keyDescriptions.Push ("u: spawn a cloth");
-    hudManager.keyDescriptions.Push ("i: spawn a soft body");
-  }
-  hudManager.keyDescriptions.Push ("SPACE: spawn random object");
-  if (phys_engine_id == BULLET_ID)
-  {
-    hudManager.keyDescriptions.Push ("left mouse: fire!");
-    hudManager.keyDescriptions.Push ("right mouse: drag object");
-    hudManager.keyDescriptions.Push ("CTRL-x: cut selected object");
-    hudManager.keyDescriptions.Push ("CTRL-v: paste object");
-  }
-  hudManager.keyDescriptions.Push ("f: toggle camera modes");
-  hudManager.keyDescriptions.Push ("t: toggle all bodies dynamic/static");
-  hudManager.keyDescriptions.Push ("p: pause the simulation");
-  hudManager.keyDescriptions.Push ("o: toggle speed of simulation");
-  hudManager.keyDescriptions.Push ("d: toggle Bullet debug display");
-  if (phys_engine_id == BULLET_ID)
-    hudManager.keyDescriptions.Push ("?: toggle display of collisions");
-  hudManager.keyDescriptions.Push ("g: toggle gravity");
-  hudManager.keyDescriptions.Push ("I: toggle autodisable");
-  if (phys_engine_id == ODE_ID)
-  {
-    hudManager.keyDescriptions.Push ("1: enable StepFast solver");
-    hudManager.keyDescriptions.Push ("2: disable StepFast solver");
-    hudManager.keyDescriptions.Push ("3: enable QuickStep solver");
-  }
-#ifdef CS_HAVE_BULLET_SERIALIZER
-  if (phys_engine_id == BULLET_ID)
-    hudManager.keyDescriptions.Push ("CTRL-s: save the dynamic world");
-#endif
-  /*
-  if (phys_engine_id == BULLET_ID)
-    hudManager.keyDescriptions.Push ("CTRL-n: next environment");
-  */
-  if (phys_engine_id == BULLET_ID)
-  {
-    hudManager.keyDescriptions.Push ("CTRL-i: start profiling");
-    hudManager.keyDescriptions.Push ("CTRL-o: stop profiling");
-    hudManager.keyDescriptions.Push ("CTRL-p: dump profile");
-  }
-
   return true;
 }
 
@@ -995,8 +928,76 @@ bool Simple::Application ()
   meshFact = loader->LoadMeshObjectFactory ("/varia/physmesh");
   if (!meshFact) return ReportError ("Error loading mesh object factory!");
 
-  // Init the camera
+  // Disable the camera manager
+  cameraManager->SetCameraMode (CS::Utility::CAMERA_NO_MOVE);
+  cameraManager->SetMouseMoveEnabled (false);
+
+  // Initialize the camera
   UpdateCameraMode ();
+
+  // Initialize the HUD manager
+  hudManager->GetKeyDescriptions ()->Empty ();
+  hudManager->GetKeyDescriptions ()->Push ("b: spawn a box");
+  hudManager->GetKeyDescriptions ()->Push ("s: spawn a sphere");
+  if (phys_engine_id == BULLET_ID)
+  {
+    hudManager->GetKeyDescriptions ()->Push ("c: spawn a cylinder");
+    hudManager->GetKeyDescriptions ()->Push ("a: spawn a capsule");
+  }
+  hudManager->GetKeyDescriptions ()->Push ("v: spawn a convex mesh");
+  hudManager->GetKeyDescriptions ()->Push ("m: spawn a concave mesh");
+  hudManager->GetKeyDescriptions ()->Push ("*: spawn a static concave mesh");
+  if (phys_engine_id == BULLET_ID)
+    hudManager->GetKeyDescriptions ()->Push ("q: spawn a compound body");
+  hudManager->GetKeyDescriptions ()->Push ("j: spawn a joint with motor");
+  if (phys_engine_id == BULLET_ID)
+  {
+    hudManager->GetKeyDescriptions ()->Push ("h: spawn a chain");
+    hudManager->GetKeyDescriptions ()->Push ("r: spawn a Frankie's ragdoll");
+  }
+  if (isSoftBodyWorld)
+  {
+    hudManager->GetKeyDescriptions ()->Push ("y: spawn a rope");
+    hudManager->GetKeyDescriptions ()->Push ("u: spawn a cloth");
+    hudManager->GetKeyDescriptions ()->Push ("i: spawn a soft body");
+  }
+  hudManager->GetKeyDescriptions ()->Push ("SPACE: spawn random object");
+  if (phys_engine_id == BULLET_ID)
+  {
+    hudManager->GetKeyDescriptions ()->Push ("left mouse: fire!");
+    hudManager->GetKeyDescriptions ()->Push ("right mouse: drag object");
+    hudManager->GetKeyDescriptions ()->Push ("CTRL-x: cut selected object");
+    hudManager->GetKeyDescriptions ()->Push ("CTRL-v: paste object");
+  }
+  hudManager->GetKeyDescriptions ()->Push ("f: toggle camera modes");
+  hudManager->GetKeyDescriptions ()->Push ("t: toggle all bodies dynamic/static");
+  hudManager->GetKeyDescriptions ()->Push ("p: pause the simulation");
+  hudManager->GetKeyDescriptions ()->Push ("o: toggle speed of simulation");
+  hudManager->GetKeyDescriptions ()->Push ("d: toggle Bullet debug display");
+  if (phys_engine_id == BULLET_ID)
+    hudManager->GetKeyDescriptions ()->Push ("?: toggle display of collisions");
+  hudManager->GetKeyDescriptions ()->Push ("g: toggle gravity");
+  hudManager->GetKeyDescriptions ()->Push ("I: toggle autodisable");
+  if (phys_engine_id == ODE_ID)
+  {
+    hudManager->GetKeyDescriptions ()->Push ("1: enable StepFast solver");
+    hudManager->GetKeyDescriptions ()->Push ("2: disable StepFast solver");
+    hudManager->GetKeyDescriptions ()->Push ("3: enable QuickStep solver");
+  }
+#ifdef CS_HAVE_BULLET_SERIALIZER
+  if (phys_engine_id == BULLET_ID)
+    hudManager->GetKeyDescriptions ()->Push ("CTRL-s: save the dynamic world");
+#endif
+  /*
+  if (phys_engine_id == BULLET_ID)
+    hudManager->GetKeyDescriptions ()->Push ("CTRL-n: next environment");
+  */
+  if (phys_engine_id == BULLET_ID)
+  {
+    hudManager->GetKeyDescriptions ()->Push ("CTRL-i: start profiling");
+    hudManager->GetKeyDescriptions ()->Push ("CTRL-o: stop profiling");
+    hudManager->GetKeyDescriptions ()->Push ("CTRL-p: dump profile");
+  }
 
   // Pre-load the animated mesh and the ragdoll animation node data
   if (phys_engine_id == BULLET_ID)

@@ -204,51 +204,6 @@ public:
   }
 
   /**
-   * Set the world to camera transformation matrix.
-   * This basically defines the direction that the camera looks.
-   */
-  inline void SetW2C (const csMatrix3& m) { SetO2T (m); }
-
-  /**
-   * Set the camera to world transformation matrix.
-   * This basically defines the direction that the camera looks.
-   */
-  inline void SetC2W (const csMatrix3& m) { SetT2O (m); }
-
-  /**
-   * Return the world to camera transformation matrix.
-   */
-  inline csMatrix3 GetW2C () const { return GetO2T (); }
-
-  /**
-   * Return the camera to world transformation matrix.
-   */
-  inline csMatrix3 GetC2W () const { return GetT2O (); }
-
-  /**
-   * Return the world to camera translation.
-   */
-  inline csVector3 GetW2CTranslation () const { return GetO2TTranslation (); }
-
-  /**
-   * Transform a worldspace point to camera space.
-   */
-  inline csVector3 World2Camera (const csVector3& v) const
-  { return Other2This (v); }
-
-  /**
-   * Transform a camera space point to world space.
-   */
-  inline csVector3 Camera2World (const csVector3& v) const
-  { return This2Other (v); }
-
-  /**
-   * Transform a camera space point to worldspace, relative to camera position.
-   */
-  inline csVector3 Camera2WorldRelative (const csVector3& v) const
-  { return This2OtherRelative (v); }
-
-  /**
    * Moves the camera a relative amount in world coordinates.
    * If 'cd' is true then collision detection with objects and things
    * inside the sector is active. Otherwise you can walk through objects

@@ -22,9 +22,9 @@
 
 #include "cstool/noise/latlon.h"
 
-using namespace CS::Noise;
+using namespace CS::Math::Noise;
 
-void CS::Noise::LatLonToXYZ (double lat, double lon, double& x, double& y,
+void CS::Math::Noise::LatLonToXYZ (double lat, double lon, double& x, double& y,
   double& z)
 {
   double r = cos (DEG_TO_RAD * lat);

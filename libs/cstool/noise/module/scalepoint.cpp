@@ -22,7 +22,7 @@
 
 #include "cstool/noise/module/scalepoint.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 ScalePoint::ScalePoint ():
   Module (GetSourceModuleCount ()),

@@ -24,7 +24,7 @@
 #include "cstool/noise/misc.h"
 #include "cstool/noise/module/curve.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 Curve::Curve ():
   Module (GetSourceModuleCount ()),
@@ -65,7 +65,7 @@ int Curve::FindInsertionPos (double inputValue)
     } else if (inputValue == m_pControlPoints[insertionPos].inputValue) {
       // Each control point is required to contain a unique input value, so
       // throw an exception.
-      //throw CS::Noise::ExceptionInvalidParam ();
+      //throw CS::Math::Noise::ExceptionInvalidParam ();
       CS_ASSERT (false);
     }
   }

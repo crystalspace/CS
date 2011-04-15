@@ -51,9 +51,15 @@ class FrankieScene : public AvatarScene
 
   // Display of information on the state of the scene
   void UpdateStateDescription ();
+  void PostFrame ();
 
  private:
   AvatarTest* avatarTest;
+
+  // Debug node related
+  bool debug;
+  csRef<CS::Animation::iSkeletonDebugNode> debugNode;
+  csRef<CS::Animation::iSkeletonDebugNodeFactory> debugNodeFactory;
 
   // LookAt node related
   csRef<CS::Animation::iSkeletonLookAtNode> lookAtNode;

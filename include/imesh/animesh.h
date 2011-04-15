@@ -33,7 +33,7 @@ struct iShaderVariableContext;
 class csReversibleTransform;
 
 /**\file
- * Animated mesh interface files
+ * Animated mesh interface file
  */
 
 namespace CS

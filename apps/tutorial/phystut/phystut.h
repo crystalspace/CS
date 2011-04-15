@@ -19,7 +19,7 @@
 #ifndef __PHYSTUT_H__
 #define __PHYSTUT_H__
 
-#include "cstool/csdemoapplication.h"
+#include "cstool/demoapplication.h"
 #include "ivaria/dynamics.h"
 #include "ivaria/bullet.h"
 #include "ivaria/ode.h"
@@ -28,7 +28,7 @@
 #include "imesh/animesh.h"
 #include "imesh/animnode/ragdoll.h"
 
-class Simple : public CS::Demo::DemoApplication
+class Simple : public CS::Utility::DemoApplication
 {
 private:
   // Physics related
@@ -119,7 +119,7 @@ public:
   Simple ();
   ~Simple ();
 
-  //-- CS::Demo::DemoApplication
+  //-- CS::Utility::DemoApplication
   void PrintHelp ();
   bool OnInitialize (int argc, char* argv[]);
   bool Application ();

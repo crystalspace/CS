@@ -33,7 +33,7 @@
 #include "ivaria/dynamicsdebug.h"
 #include "ivaria/softanim.h"
 
-#include "cstool/csdemoapplication.h"
+#include "cstool/demoapplication.h"
 
 #define DYNDEBUG_NONE 1
 #define DYNDEBUG_MIXED 2
@@ -74,7 +74,7 @@ class AvatarScene
   csRef<CS::Mesh::iAnimatedMesh> animesh;
 };
 
-class AvatarTest : public CS::Demo::DemoApplication
+class AvatarTest : public CS::Utility::DemoApplication
 {
   friend class FrankieScene;
   friend class KrystalScene;
@@ -109,7 +109,7 @@ private:
   // Decal textures
   csRef<iDecalManager> decalManager;
 
-  //-- CS::Demo::DemoApplication
+  //-- CS::Utility::DemoApplication
   void PrintHelp ();
   void Frame ();
   bool OnKeyboard (iEvent &event);

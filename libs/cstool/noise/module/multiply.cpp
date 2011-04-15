@@ -22,7 +22,7 @@
 
 #include "cstool/noise/module/multiply.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 Multiply::Multiply ():
   Module (GetSourceModuleCount ())

@@ -22,7 +22,7 @@
 
 #include "cstool/noise/module/ridgedmulti.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 RidgedMulti::RidgedMulti ():
   Module (GetSourceModuleCount ()),

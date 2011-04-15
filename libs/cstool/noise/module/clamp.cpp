@@ -22,7 +22,7 @@
 
 #include "cstool/noise/module/clamp.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 Clamp::Clamp ():
   Module (GetSourceModuleCount ()),

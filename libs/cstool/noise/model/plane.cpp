@@ -21,14 +21,14 @@
 
 #include "cstool/noise/model/plane.h"
 
-using namespace CS::Noise::Model;
+using namespace CS::Math::Noise::Model;
 
 Plane::Plane ():
   m_pModule (NULL)
 {
 }
 
-Plane::Plane (const CS::Noise::Module::Module& module) :
+Plane::Plane (const CS::Math::Noise::Module::Module& module) :
   m_pModule( &module)
 {
 }

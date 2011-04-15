@@ -29,9 +29,9 @@ CS_IMPLEMENT_APPLICATION
 
 CSCEGUIConfTest::CSCEGUIConfTest() : DemoApplication ("CrystalSpace.CSCEGUIConfTest")
 {
-  myBool = false;
   myInt = 0;
   myFloat = 0.0f;
+  myBool = false;
   myString = "test";
 }
 
@@ -51,78 +51,15 @@ void CSCEGUIConfTest::PrintHelp ()
 
 void CSCEGUIConfTest::Frame()
 {
-  // First get elapsed time from the virtual clock.
-  csTicks elapsed_time = vc->GetElapsedTicks ();
-
-  // Now rotate the camera according to keyboard state
-  float speed = (elapsed_time / 1000.0) * (0.03 * 20);
-
-  iCamera* c = view->GetCamera();
-  if (kbd->GetKeyState (CSKEY_SHIFT))
-  {
-    // If the user is holding down shift, the arrow keys will cause
-    // the camera to strafe up, down, left or right from it's
-    // current position.
-    if (kbd->GetKeyState (CSKEY_RIGHT))
-      c->Move (CS_VEC_RIGHT * 4 * speed);
-    if (kbd->GetKeyState (CSKEY_LEFT))
-      c->Move (CS_VEC_LEFT * 4 * speed);
-    if (kbd->GetKeyState (CSKEY_UP))
-      c->Move (CS_VEC_UP * 4 * speed);
-    if (kbd->GetKeyState (CSKEY_DOWN))
-      c->Move (CS_VEC_DOWN * 4 * speed);
-  }
-  else
-  {
-    // left and right cause the camera to rotate on the global Y
-    // axis; page up and page down cause the camera to rotate on the
-    // _camera's_ X axis (more on this in a second) and up and down
-    // arrows cause the camera to go forwards and backwards.
-    if (kbd->GetKeyState (CSKEY_RIGHT))
-      rotY += speed;
-    if (kbd->GetKeyState (CSKEY_LEFT))
-      rotY -= speed;
-    if (kbd->GetKeyState (CSKEY_PGUP))
-      rotX += speed;
-    if (kbd->GetKeyState (CSKEY_PGDN))
-      rotX -= speed;
-    if (kbd->GetKeyState (CSKEY_UP))
-      c->Move (CS_VEC_FORWARD * 4 * speed);
-    if (kbd->GetKeyState (CSKEY_DOWN))
-      c->Move (CS_VEC_BACKWARD * 4 * speed);
-  }
-
-  // We now assign a new rotation transformation to the camera.  You
-  // can think of the rotation this way: starting from the zero
-  // position, you first rotate "rotY" radians on your Y axis to get
-  // the first rotation.  From there you rotate "rotX" radians on
-  // your X axis to get the final rotation.  We multiply the
-  // individual rotations on each axis together to get a single
-  // rotation matrix.  The rotations are applied in right to left
-  // order .
-  csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
-  csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
-  c->SetTransform (ot);
-  // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw (CSDRAW_3DGRAPHICS))
-    return;
-
-  
-  // Tell the camera to render into the frame buffer.
-  view->Draw ();
+  // Default behavior from DemoApplication
+  DemoApplication::Frame ();
 
   cegui->Render ();
 
-  if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS))
-    return;
-
-  int margin = 15;
-  int fontColor = g2d->FindRGB (255, 150, 100);
-
-  hudManager.WriteShadow(margin, 0, fontColor,  "myBool    %s", myBool?"True":"False");
-  hudManager.WriteShadow(margin, 15, fontColor, "myInt     %d", myInt);
-  hudManager.WriteShadow(margin, 30, fontColor, "myFloat   %f", myFloat);
-  hudManager.WriteShadow(margin, 45, fontColor, "myString  %s", myString.GetData());
+  hudManager->GetStateDescriptions ()->Put (0, csString ().Format ("myInt     %d", myInt));
+  hudManager->GetStateDescriptions ()->Put (1, csString ().Format ("myFloat   %f", myFloat));
+  hudManager->GetStateDescriptions ()->Put (2, csString ().Format ("myBool    %s", myBool?"True":"False"));
+  hudManager->GetStateDescriptions ()->Put (3, csString ().Format ("myString  %s", myString.GetData()));
 }
 
 bool CSCEGUIConfTest::OnInitialize(int argc, char* argv [])
@@ -146,15 +83,19 @@ bool CSCEGUIConfTest::Application()
   if (!DemoApplication::Application ())
     return false;
 
+  // Initialize the HUD manager
+  hudManager->GetKeyDescriptions ()->Empty ();
+  hudManager->GetStateDescriptions ()->Push ("myInt");
+  hudManager->GetStateDescriptions ()->Push ("myFloat");
+  hudManager->GetStateDescriptions ()->Push ("myBool");
+  hudManager->GetStateDescriptions ()->Push ("myString");
+
   configEventNotifier.AttachNew(new CS::Utility::ConfigEventNotifier(GetObjectRegistry()));
 
-  myBoolL.AttachNew(new CS::Utility::ConfigListener<bool>(GetObjectRegistry(), "CSCEGUIConfTest.myBool", myBool));
   myIntL.AttachNew(new CS::Utility::ConfigListener<int>(GetObjectRegistry(), "CSCEGUIConfTest.myInt", myInt));
   myFloatL.AttachNew(new CS::Utility::ConfigListener<float>(GetObjectRegistry(), "CSCEGUIConfTest.myFloat", myFloat));
+  myBoolL.AttachNew(new CS::Utility::ConfigListener<bool>(GetObjectRegistry(), "CSCEGUIConfTest.myBool", myBool));
   myStringL.AttachNew(new CS::Utility::ConfigListener<csString>(GetObjectRegistry(), "CSCEGUIConfTest.myString", myString));
-
-  vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
-  if (!vfs) return ReportError("Failed to locate VFS!");
 
   cegui = csQueryRegistry<iCEGUI> (GetObjectRegistry());
   if (!cegui) return ReportError("Failed to locate CEGUI plugin");
@@ -201,12 +142,7 @@ bool CSCEGUIConfTest::Application()
     list->addItem(item);
   }
 
-  // These are used store the current orientation of the camera.
-  rotY = rotX = 0;
-
-  CreateRoom();
-  view->GetCamera()->SetSector (room);
-  view->GetCamera()->GetTransform().SetOrigin(csVector3 (0, 5, 0));
+  CreateRoom ();
 
   Run();
 
@@ -239,17 +175,6 @@ bool CSCEGUIConfTest::OnListSelection (const CEGUI::EventArgs& e)
   }
 
   return true;
-}
-
-bool CSCEGUIConfTest::OnKeyboard(iEvent& ev)
-{
-  DemoApplication::OnKeyboard (ev);
-  return false;
-}
-
-bool CSCEGUIConfTest::OnMouseDown(iEvent& ev)
-{
-  return false;
 }
 
 /*---------------*

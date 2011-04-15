@@ -29,7 +29,7 @@
 #include "ivaria/dynamicsdebug.h"
 #include "ivaria/icegui.h"
 
-#include "cstool/csdemoapplication.h"
+#include "cstool/demoapplication.h"
 
 // Different states for the display of the physical objects
 #define DYNDEBUG_NONE 1
@@ -75,7 +75,7 @@ public:
   csRef<CS::Mesh::iFurMesh> furMesh;
 };
 
-class HairTest : public CS::Demo::DemoApplication
+class HairTest : public CS::Utility::DemoApplication
 {
   friend class KrystalScene;
   friend class FrankieScene;

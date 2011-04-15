@@ -47,12 +47,6 @@ namespace CS
   {}
 
   /**
-   * Tools for demo, test and tutorial applications
-   */
-  namespace Demo
-  {}
-
-  /**
    * Contains deprecated code that will be removed after next stable release.
    * Do not use of any members.
    */
@@ -81,7 +75,31 @@ namespace CS
    * Mathematical functions and definitions
    */
   namespace Math
-  {}
+  {
+    /**
+     * Noise generation and utilities. Objects from this namespace
+     * use the libnoise library, see http://libnoise.sourceforge.net for
+     * more information.
+     */
+    namespace Noise
+    {
+      /**
+       * Geometric models for noise generation. Objects from this namespace
+       * use the libnoise library, see http://libnoise.sourceforge.net for
+       * more information.
+       */
+      namespace Model
+      {}
+
+      /**
+       * Noise modules for the combination of noise functions. Objects from this
+       * namespace use the libnoise library, see http://libnoise.sourceforge.net
+       * for more information.
+       */
+      namespace Module
+      {}
+    }
+  }
 
   /**
    * Memory allocation
@@ -100,30 +118,6 @@ namespace CS
    */
   namespace Meta
   {}
-
-  /**
-   * Noise generation and utilities. Objects from this namespace
-   * use the libnoise library, see http://libnoise.sourceforge.net for
-   * more information.
-   */
-  namespace Noise
-  {
-    /**
-     * Geometric models for noise generation. Objects from this namespace
-     * use the libnoise library, see http://libnoise.sourceforge.net for
-     * more information.
-     */
-    namespace Model
-    {}
-
-    /**
-     * Noise modules for the combination of noise functions. Objects from this
-     * namespace use the libnoise library, see http://libnoise.sourceforge.net
-     * for more information.
-     */
-    namespace Module
-    {}
-  }
 
   /**
    * Platform specific code and wrappers

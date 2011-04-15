@@ -32,7 +32,8 @@
 /// This is an SCF-compatible interface for csStringArray.
 struct iStringArray : public virtual iBase
 {
-  SCF_INTERFACE(iStringArray, 2,1,0);
+  SCF_INTERFACE (iStringArray, 2, 1, 1);
+
   /// Get array length.
   virtual size_t GetSize () const = 0;
 
@@ -83,7 +84,7 @@ struct iStringArray : public virtual iBase
    * <p>
    * \remarks Some people find Contains() more idiomatic than Find().
    */
-  virtual size_t Contains(const char* str, bool case_sensitive = true) const=0;
+  virtual size_t Contains (const char* str, bool case_sensitive = true) const=0;
 
   /**
    * Sort array.
@@ -98,7 +99,7 @@ struct iStringArray : public virtual iBase
   /// Insert a string before entry \c n in the array.
   virtual bool Insert (size_t n, char const *value) = 0;
 
-  /// Remove all strings from array, releasing allocated memory.
+  /// Remove all strings from the array, but does not release the memory allocated.
   virtual void Empty () = 0;
 
   /**
@@ -106,7 +107,13 @@ struct iStringArray : public virtual iBase
    * \remarks Rigidly equivalent to <tt>return GetSize() == 0</tt>, but more
    *   idiomatic.
    */
-  virtual bool IsEmpty() const = 0;
+  virtual bool IsEmpty () const = 0;
+
+  /**
+   * Insert or reset the element with index \c n.
+   * If the size of the array is smaller than \c n then it will be resized.
+   */
+  virtual void Put (size_t n, const char* value) = 0;
 };
 
 /** @} */

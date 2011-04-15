@@ -19,7 +19,7 @@
 
 #include "cstool/noise/model/line.h"
 
-using namespace CS::Noise::Model;
+using namespace CS::Math::Noise::Model;
 
 Line::Line ():
 
@@ -34,7 +34,7 @@ Line::Line ():
 {
 }
 
-Line::Line (const CS::Noise::Module::Module& module):
+Line::Line (const CS::Math::Noise::Module::Module& module):
 
   m_attenuate (true),
   m_pModule (&module),

@@ -122,7 +122,7 @@ public:
    * <p>
    * \remarks Some people find Contains() more idiomatic than Find().
    */
-  virtual size_t Contains(const char* str, bool case_sensitive = true) const
+  virtual size_t Contains (const char* str, bool case_sensitive = true) const
   {
     return v.Contains (str, case_sensitive);
   }
@@ -149,10 +149,11 @@ public:
     return v.Insert (n, (char*)value);
   }
 
-  /// Remove all strings from array, releasing allocated memory.
+
+  /// Remove all strings from the array, but does not release the memory allocated.
   virtual void Empty ()
   {
-    v.Empty();
+    v.Empty ();
   }
 
   /**
@@ -160,9 +161,18 @@ public:
    * \remarks Rigidly equivalent to <tt>return GetSize() == 0</tt>, but more
    *   idiomatic.
    */
-  virtual bool IsEmpty() const
+  virtual bool IsEmpty () const
   {
-    return v.IsEmpty();
+    return v.IsEmpty ();
+  }
+
+  /**
+   * Insert or reset the element with index \c n.
+   * If the size of the array is smaller than \c n then it will be resized.
+   */
+  virtual void Put (size_t n, const char* value)
+  {
+    v.Put (n, value);
   }
 };
 

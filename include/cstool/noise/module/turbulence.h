@@ -26,6 +26,7 @@
 #include "perlin.h"
 
 namespace CS {
+namespace Math {
 namespace Noise {
 namespace Module { 
 
@@ -38,16 +39,16 @@ namespace Module {
     /// @addtogroup transformermodules
     /// @{
 
-    /// Default frequency for the CS::Noise::Module::Turbulence noise module.
+    /// Default frequency for the CS::Math::Noise::Module::Turbulence noise module.
     const double DEFAULT_TURBULENCE_FREQUENCY = DEFAULT_PERLIN_FREQUENCY;
 
-    /// Default power for the CS::Noise::Module::Turbulence noise module.
+    /// Default power for the CS::Math::Noise::Module::Turbulence noise module.
     const double DEFAULT_TURBULENCE_POWER = 1.0;
 
-    /// Default roughness for the CS::Noise::Module::Turbulence noise module.
+    /// Default roughness for the CS::Math::Noise::Module::Turbulence noise module.
     const int DEFAULT_TURBULENCE_ROUGHNESS = 3;
 
-    /// Default noise seed for the CS::Noise::Module::Turbulence noise module.
+    /// Default noise seed for the CS::Math::Noise::Module::Turbulence noise module.
     const int DEFAULT_TURBULENCE_SEED = DEFAULT_PERLIN_SEED;
 
     /// Noise module that randomly displaces the input value before
@@ -103,7 +104,7 @@ namespace Module {
     /// are generating values for textures, you can use this noise module to
     /// produce realistic marble-like or "oily" textures.
     ///
-    /// Internally, there are three CS::Noise::Module::Perlin noise modules
+    /// Internally, there are three CS::Math::Noise::Module::Perlin noise modules
     /// that displace the input value; one for the @a x, one for the @a y,
     /// and one for the @a z coordinate.
     ///
@@ -116,16 +117,16 @@ namespace Module {
         /// Constructor.
         ///
         /// The default frequency is set to
-        /// CS::Noise::Module::DEFAULT_TURBULENCE_FREQUENCY.
+        /// CS::Math::Noise::Module::DEFAULT_TURBULENCE_FREQUENCY.
         ///    
         /// The default power is set to
-        /// CS::Noise::Module::DEFAULT_TURBULENCE_POWER.
+        /// CS::Math::Noise::Module::DEFAULT_TURBULENCE_POWER.
         ///
         /// The default roughness is set to
-        /// CS::Noise::Module::DEFAULT_TURBULENCE_ROUGHNESS.
+        /// CS::Math::Noise::Module::DEFAULT_TURBULENCE_ROUGHNESS.
         ///
         /// The default seed value is set to
-        /// CS::Noise::Module::DEFAULT_TURBULENCE_SEED.
+        /// CS::Math::Noise::Module::DEFAULT_TURBULENCE_SEED.
         Turbulence ();
 
         /// Returns the frequency of the turbulence.
@@ -165,7 +166,7 @@ namespace Module {
         ///
         /// @returns The seed value.
         ///
-        /// Internally, there are three CS::Noise::Module::Perlin noise modules
+        /// Internally, there are three CS::Math::Noise::Module::Perlin noise modules
         /// that displace the input value; one for the @a x, one for the @a y,
         /// and one for the @a z coordinate.  
         int GetSeed () const;
@@ -211,10 +212,10 @@ namespace Module {
         /// the displacement amount.  High values roughly change the
         /// displacement amount, which produces more "kinky" changes.
         ///
-        /// Internally, there are three CS::Noise::Module::Perlin noise modules
+        /// Internally, there are three CS::Math::Noise::Module::Perlin noise modules
         /// that displace the input value; one for the @a x, one for the @a y,
         /// and one for the @a z coordinate.  The roughness value is equal to
-        /// the number of octaves used by the CS::Noise::Module::Perlin noise
+        /// the number of octaves used by the CS::Math::Noise::Module::Perlin noise
         /// modules.
         void SetRoughness (int roughness)
         {
@@ -229,10 +230,10 @@ namespace Module {
         ///
         /// @param seed The seed value.
         ///
-        /// Internally, there are three CS::Noise::Module::Perlin noise modules
+        /// Internally, there are three CS::Math::Noise::Module::Perlin noise modules
         /// that displace the input value; one for the @a x, one for the @a y,
         /// and one for the @a z coordinate.  This noise module assigns the
-        /// following seed values to the CS::Noise::Module::Perlin noise modules:
+        /// following seed values to the CS::Math::Noise::Module::Perlin noise modules:
         /// - It assigns the seed value (@a seed + 0) to the @a x noise module.
         /// - It assigns the seed value (@a seed + 1) to the @a y noise module.
         /// - It assigns the seed value (@a seed + 2) to the @a z noise module.
@@ -262,6 +263,7 @@ namespace Module {
 
 } // namespace Module
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

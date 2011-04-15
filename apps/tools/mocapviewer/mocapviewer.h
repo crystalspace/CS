@@ -22,7 +22,7 @@
 #ifndef __MOCAPVIEWER_H__
 #define __MOCAPVIEWER_H__
 
-#include "cstool/csdemoapplication.h"
+#include "cstool/demoapplication.h"
 #include "cstool/mocapparser.h"
 #include "cstool/noise/noise.h"
 #include "cstool/noise/noisegen.h"
@@ -30,6 +30,7 @@
 #include "imesh/animnode/skeleton2anim.h"
 
 struct iMovieRecorder;
+class csPixmap;
 
 namespace CS {
 namespace Animation {
@@ -42,7 +43,7 @@ struct iSkeletonDebugNode;
 } // namespace CS
 
 
-class MocapViewer : public CS::Demo::DemoApplication,
+class MocapViewer : public CS::Utility::DemoApplication,
   public scfImplementation1<MocapViewer, CS::Animation::iSkeletonAnimCallback>
 {
  private:
@@ -63,8 +64,8 @@ class MocapViewer : public CS::Demo::DemoApplication,
   bool printInfo;
 
   // Noise points
-  CS::Noise::Module::Perlin noiseX;
-  CS::Noise::Module::Perlin noiseY;
+  CS::Math::Noise::Module::Perlin noiseX;
+  CS::Math::Noise::Module::Perlin noiseY;
   csArray<csVector3> noisePoints;
   float noiseScale;
 
@@ -72,7 +73,7 @@ class MocapViewer : public CS::Demo::DemoApplication,
   MocapViewer ();
   ~MocapViewer ();
 
-  //-- CS::Demo::DemoApplication
+  //-- CS::Utility::DemoApplication
   void PrintHelp ();
   void Frame ();
 

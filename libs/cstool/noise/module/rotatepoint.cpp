@@ -23,7 +23,7 @@
 #include "cstool/noise/mathconsts.h"
 #include "cstool/noise/module/rotatepoint.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 RotatePoint::RotatePoint ():
   Module (GetSourceModuleCount ())

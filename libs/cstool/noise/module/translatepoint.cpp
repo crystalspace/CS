@@ -22,7 +22,7 @@
 
 #include "cstool/noise/module/translatepoint.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 TranslatePoint::TranslatePoint ():
   Module (GetSourceModuleCount ()),

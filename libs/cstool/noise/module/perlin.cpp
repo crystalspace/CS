@@ -22,7 +22,7 @@
 
 #include "cstool/noise/module/perlin.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 Perlin::Perlin ():
   Module (GetSourceModuleCount ()),

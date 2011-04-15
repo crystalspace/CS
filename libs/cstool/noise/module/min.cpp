@@ -23,7 +23,7 @@
 #include "cstool/noise/misc.h"
 #include "cstool/noise/module/min.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 Min::Min ():
   Module (GetSourceModuleCount ())

@@ -26,6 +26,7 @@
 #include "modulebase.h"
 
 namespace CS {
+namespace Math {
 namespace Noise {
 namespace Module {
 
@@ -39,14 +40,14 @@ namespace Module {
     /// @{
 
     /// Default displacement to apply to each cell for the
-    /// CS::Noise::Module::Voronoi noise module.
+    /// CS::Math::Noise::Module::Voronoi noise module.
     const double DEFAULT_VORONOI_DISPLACEMENT = 1.0;
 
-    /// Default frequency of the seed points for the CS::Noise::Module::Voronoi
+    /// Default frequency of the seed points for the CS::Math::Noise::Module::Voronoi
     /// noise module.
     const double DEFAULT_VORONOI_FREQUENCY = 1.0;
 
-    /// Default seed of the noise function for the CS::Noise::Module::Voronoi
+    /// Default seed of the noise function for the CS::Math::Noise::Module::Voronoi
     /// noise module.
     const int DEFAULT_VORONOI_SEED = 0;
 
@@ -93,13 +94,13 @@ namespace Module {
         /// Constructor.
         ///
         /// The default displacement value is set to
-        /// CS::Noise::Module::DEFAULT_VORONOI_DISPLACEMENT.
+        /// CS::Math::Noise::Module::DEFAULT_VORONOI_DISPLACEMENT.
         ///
         /// The default frequency is set to
-        /// CS::Noise::Module::DEFAULT_VORONOI_FREQUENCY.
+        /// CS::Math::Noise::Module::DEFAULT_VORONOI_FREQUENCY.
         ///
         /// The default seed value is set to
-        /// CS::Noise::Module::DEFAULT_VORONOI_SEED.
+        /// CS::Math::Noise::Module::DEFAULT_VORONOI_SEED.
         Voronoi ();
 
         /// Enables or disables applying the distance from the nearest seed
@@ -239,6 +240,7 @@ namespace Module {
 
 } // namespace Module
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

@@ -53,7 +53,7 @@ const int SEED_NOISE_GEN = 1013;
 const int SHIFT_NOISE_GEN = 8;
 #endif
 
-double CS::Noise::GradientCoherentNoise3D (double x, double y, double z, int seed,
+double CS::Math::Noise::GradientCoherentNoise3D (double x, double y, double z, int seed,
   NoiseQuality noiseQuality)
 {
   // Create a unit-length cube aligned along an integer boundary.  This cube
@@ -109,7 +109,7 @@ double CS::Noise::GradientCoherentNoise3D (double x, double y, double z, int see
   return LinearInterp (iy0, iy1, zs);
 }
 
-double CS::Noise::GradientNoise3D (double fx, double fy, double fz, int ix,
+double CS::Math::Noise::GradientNoise3D (double fx, double fy, double fz, int ix,
   int iy, int iz, int seed)
 {
   // Randomly generate a gradient vector given the integer coordinates of the
@@ -142,7 +142,7 @@ double CS::Noise::GradientNoise3D (double fx, double fy, double fz, int ix,
     + (zvGradient * zvPoint)) * 2.12;
 }
 
-int CS::Noise::IntValueNoise3D (int x, int y, int z, int seed)
+int CS::Math::Noise::IntValueNoise3D (int x, int y, int z, int seed)
 {
   // All constants are primes and must remain prime in order for this noise
   // function to work correctly.
@@ -156,7 +156,7 @@ int CS::Noise::IntValueNoise3D (int x, int y, int z, int seed)
   return (n * (n * n * 60493 + 19990303) + 1376312589) & 0x7fffffff;
 }
 
-double CS::Noise::ValueCoherentNoise3D (double x, double y, double z, int seed,
+double CS::Math::Noise::ValueCoherentNoise3D (double x, double y, double z, int seed,
   NoiseQuality noiseQuality)
 {
   // Create a unit-length cube aligned along an integer boundary.  This cube
@@ -211,7 +211,7 @@ double CS::Noise::ValueCoherentNoise3D (double x, double y, double z, int seed,
   return LinearInterp (iy0, iy1, zs);
 }
 
-double CS::Noise::ValueNoise3D (int x, int y, int z, int seed)
+double CS::Math::Noise::ValueNoise3D (int x, int y, int z, int seed)
 {
   return 1.0 - ((double)IntValueNoise3D (x, y, z, seed) / 1073741824.0);
 }

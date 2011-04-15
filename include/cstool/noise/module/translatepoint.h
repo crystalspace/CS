@@ -26,6 +26,7 @@
 #include "modulebase.h"
 
 namespace CS {
+namespace Math {
 namespace Noise {
 namespace Module {
 
@@ -39,15 +40,15 @@ namespace Module {
     /// @{
 
     /// Default translation factor applied to the @a x coordinate for the
-    /// CS::Noise::Module::TranslatePoint noise module.
+    /// CS::Math::Noise::Module::TranslatePoint noise module.
     const double DEFAULT_TRANSLATE_POINT_X = 0.0;
 
     /// Default translation factor applied to the @a y coordinate for the
-    /// CS::Noise::Module::TranslatePoint noise module.
+    /// CS::Math::Noise::Module::TranslatePoint noise module.
     const double DEFAULT_TRANSLATE_POINT_Y = 0.0;
 
     /// Default translation factor applied to the @a z coordinate for the
-    /// CS::Noise::Module::TranslatePoint noise module.
+    /// CS::Math::Noise::Module::TranslatePoint noise module.
     const double DEFAULT_TRANSLATE_POINT_Z = 0.0;
 
     /// Noise module that moves the coordinates of the input value before
@@ -72,13 +73,13 @@ namespace Module {
         /// Constructor.
         ///
         /// The default translation amount to apply to the @a x coordinate is
-        /// set to CS::Noise::Module::DEFAULT_TRANSLATE_POINT_X.
+        /// set to CS::Math::Noise::Module::DEFAULT_TRANSLATE_POINT_X.
         ///
         /// The default translation amount to apply to the @a y coordinate is
-        /// set to CS::Noise::Module::DEFAULT_TRANSLATE_POINT_Y.
+        /// set to CS::Math::Noise::Module::DEFAULT_TRANSLATE_POINT_Y.
         ///
         /// The default translation amount to apply to the @a z coordinate is
-        /// set to CS::Noise::Module::DEFAULT_TRANSLATE_POINT_Z.
+        /// set to CS::Math::Noise::Module::DEFAULT_TRANSLATE_POINT_Z.
         TranslatePoint ();
 
         virtual int GetSourceModuleCount () const
@@ -216,6 +217,7 @@ namespace Module {
 
 } // namespace Module
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

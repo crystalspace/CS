@@ -1,7 +1,9 @@
 SubDir TOP plugins utilities ;
 
 SubInclude TOP plugins utilities bugplug ;
+SubInclude TOP plugins utilities cameramanager ;
 SubInclude TOP plugins utilities colladaconvertor ;
+SubInclude TOP plugins utilities hudmanager ;
 SubInclude TOP plugins utilities movierecorder ;
 SubInclude TOP plugins utilities profiler ;
 SubInclude TOP plugins utilities visualdebug ;

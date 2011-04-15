@@ -23,7 +23,7 @@
 #include "cstool/noise/interp.h"
 #include "cstool/noise/module/select.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 Select::Select ():
   Module (GetSourceModuleCount ()),

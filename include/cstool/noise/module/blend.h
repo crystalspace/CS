@@ -26,6 +26,7 @@
 #include "modulebase.h"
 
 namespace CS {
+namespace Math {
 namespace Noise {
 namespace Module {
 
@@ -80,7 +81,7 @@ namespace Module {
         /// @pre A control module has been added to this noise module via a
         /// call to SetSourceModule() or SetControlModule().
         ///
-        /// @throw CS::Noise::ExceptionNoModule See the preconditions for more
+        /// @throw CS::Math::Noise::ExceptionNoModule See the preconditions for more
         /// information.
         ///
         /// The control module determines the weight of the blending
@@ -91,7 +92,7 @@ namespace Module {
         const Module& GetControlModule () const
         {
           if (m_pSourceModule == NULL || m_pSourceModule[2] == NULL) {
-            //throw CS::Noise::ExceptionNoModule ();
+            //throw CS::Math::Noise::ExceptionNoModule ();
 	    CS_ASSERT (false);
           }
           return *(m_pSourceModule[2]);
@@ -138,6 +139,7 @@ namespace Module {
 
 } // namespace Module
 } // namespace Noise
+} // namespace Math
 } // namespace CS
 
 #endif

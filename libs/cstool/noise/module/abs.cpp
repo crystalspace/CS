@@ -22,7 +22,7 @@
 
 #include "cstool/noise/module/abs.h"
 
-using namespace CS::Noise::Module;
+using namespace CS::Math::Noise::Module;
 
 Abs::Abs ():
   Module (GetSourceModuleCount ())

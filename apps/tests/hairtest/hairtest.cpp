@@ -36,11 +36,6 @@ HairTest::HairTest ()
   avatarScene (0), avatarSceneType(MODEL_KRYSTAL), 
   furMeshEnabled (true), dynamicsDebugMode (DYNDEBUG_NONE)
 {
-  // Use a default rotate camera
-  cameraManager.SetCameraMode (CS::Demo::CAMERA_ROTATE);
-
-  // Don't display the available keys
-  hudManager.keyDescriptions.DeleteAll ();
 }
 
 HairTest::~HairTest ()
@@ -75,7 +70,7 @@ void HairTest::Frame ()
     dynamics->Step (speed * avatarScene->GetSimulationSpeed ());
 
   // Update the target of the camera
-  cameraManager.SetCameraTarget (avatarScene->GetCameraTarget ());
+  cameraManager->SetCameraTarget (avatarScene->GetCameraTarget ());
 
   // Update the information on the current state of the application
   avatarScene->UpdateStateDescription ();
@@ -589,8 +584,8 @@ void HairTest::SwitchScenes()
   }
 
   // Re-initialize camera position
-  cameraManager.SetCameraTarget (avatarScene->GetCameraTarget ());
-  cameraManager.ResetCamera ();
+  cameraManager->SetCameraTarget (avatarScene->GetCameraTarget ());
+  cameraManager->ResetCamera ();
 
   furMeshEnabled = true;
 }
@@ -1225,9 +1220,13 @@ bool HairTest::Application ()
   sliderOverallLOD->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded,
     CEGUI::Event::Subscriber(&HairTest::OnEventThumbTrackEndedOverallLOD, this)); 
 
-  // Initialize camera position
-  cameraManager.SetCameraTarget (avatarScene->GetCameraTarget ());
-  cameraManager.ResetCamera ();
+  // Initialize the camera manager
+  cameraManager->SetCameraMode (CS::Utility::CAMERA_ROTATE);
+  cameraManager->SetCameraTarget (avatarScene->GetCameraTarget ());
+  cameraManager->ResetCamera ();
+
+  // Don't display the available keys
+  hudManager->GetKeyDescriptions ()->Empty ();
 
   // Run the application
   Run();
