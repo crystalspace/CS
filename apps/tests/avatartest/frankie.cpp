@@ -32,7 +32,7 @@
 #define ROTATION_IMMEDIATE 3
 
 FrankieScene::FrankieScene (AvatarTest* avatarTest)
-  : avatarTest (avatarTest), targetReached (false),
+  : avatarTest (avatarTest), debug (false), targetReached (false),
     lookAtListener (this), decalsEnabled (false), decal (nullptr), decalPosition (0.0f)
 {
   // Setup the parameters of the camera manager
@@ -46,9 +46,9 @@ FrankieScene::FrankieScene (AvatarTest* avatarTest)
   avatarTest->hudManager->GetKeyDescriptions ()->Push ("+/-: walk faster/slower");
   avatarTest->hudManager->GetKeyDescriptions ()->Push (csString().Format ("t: toggle %s target mode",
 					      CS::Quote::Single ("LookAt")));
-  avatarTest->hudManager->GetKeyDescriptions ()->Push (csString().Format ("a: toggle %s mode",
+  avatarTest->hudManager->GetKeyDescriptions ()->Push (csString().Format ("y: toggle %s mode",
 					      CS::Quote::Single ("LookAt: always rotate")));
-  avatarTest->hudManager->GetKeyDescriptions ()->Push (csString().Format ("s: toggle %s",
+  avatarTest->hudManager->GetKeyDescriptions ()->Push (csString().Format ("u: toggle %s",
 					      CS::Quote::Single ("LookAt: rotation speed")));
   if (avatarTest->physicsEnabled)
   {
@@ -56,6 +56,7 @@ FrankieScene::FrankieScene (AvatarTest* avatarTest)
     avatarTest->hudManager->GetKeyDescriptions ()->Push ("left mouse: kill Frankie");
     avatarTest->hudManager->GetKeyDescriptions ()->Push ("d: display active colliders");
   }
+  avatarTest->hudManager->GetKeyDescriptions ()->Push ("a: display bone positions");
   if (avatarTest->decalManager)
     avatarTest->hudManager->GetKeyDescriptions ()->Push ("c: toggle decals under the mouse");
   avatarTest->hudManager->GetKeyDescriptions ()->Push ("r: reset scene");
@@ -151,6 +152,12 @@ void FrankieScene::Frame ()
   }
 }
 
+void FrankieScene::PostFrame ()
+{
+  debugNode->Draw (avatarTest->view->GetCamera ());
+}
+
+
 bool FrankieScene::OnKeyboard (iEvent &ev)
 {
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
@@ -181,7 +188,7 @@ bool FrankieScene::OnKeyboard (iEvent &ev)
     }
 
     // Toggle the 'always rotate' option of the 'LookAt' animation node
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'a')
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'y')
     {
       alwaysRotate = !alwaysRotate;
       lookAtNodeFactory->SetAlwaysRotate (alwaysRotate);
@@ -189,7 +196,7 @@ bool FrankieScene::OnKeyboard (iEvent &ev)
     }
 
     // Toggle the rotation speed of the 'LookAt' animation node
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 's')
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'u')
     {
       if (rotationSpeed == ROTATION_SLOW)
       {
@@ -268,6 +275,18 @@ bool FrankieScene::OnKeyboard (iEvent &ev)
 	decal = nullptr;
       }
 
+      return true;
+    }
+
+    // Switching debug modes
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'a')
+    {
+      debug = !debug;
+      debugNodeFactory->SetDebugModes
+	(debug ?
+	 (CS::Animation::SkeletonDebugMode)
+	 (CS::Animation::DEBUG_2DLINES | CS::Animation::DEBUG_SQUARES)
+	 : CS::Animation::DEBUG_NONE);
       return true;
     }
 
@@ -409,12 +428,18 @@ bool FrankieScene::CreateAvatar ()
     return avatarTest->ReportError ("Can't find Frankie's body mesh description!");
 
   // Create a new animation tree. The structure of the tree is:
-  //   + ragdoll animation node (root node - only if physics are enabled)
-  //     + 'LookAt' animation node
-  //       + 'speed' animation node
-  //         + animation nodes for all speeds
+  //   + Debug animation node (root node)
+  //     + Ragdoll animation node (only if physics are enabled)
+  //       + 'LookAt' animation node
+  //         + 'speed' animation node
+  //           + animation nodes for all speeds
   csRef<CS::Animation::iSkeletonAnimPacketFactory> animPacketFactory =
     animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ();
+
+  // Create the 'debug' node
+  debugNodeFactory = avatarTest->debugManager->CreateAnimNodeFactory ("debug");
+  debugNodeFactory->SetDebugModes (CS::Animation::DEBUG_NONE);
+  animPacketFactory->SetAnimationRoot (debugNodeFactory);
 
   // Create the 'LookAt' animation node
   lookAtNodeFactory = avatarTest->lookAtManager->CreateAnimNodeFactory ("lookat");
@@ -491,7 +516,7 @@ bool FrankieScene::CreateAvatar ()
     // Create the ragdoll animation node
     csRef<CS::Animation::iSkeletonRagdollNodeFactory> ragdollNodeFactory =
       avatarTest->ragdollManager->CreateAnimNodeFactory ("ragdoll");
-    animPacketFactory->SetAnimationRoot (ragdollNodeFactory);
+    debugNodeFactory->SetChildNode (ragdollNodeFactory);
     ragdollNodeFactory->SetBodySkeleton (bodySkeleton);
     ragdollNodeFactory->SetChildNode (lookAtNodeFactory);
 
@@ -514,7 +539,7 @@ bool FrankieScene::CreateAvatar ()
   }
 
   else
-    animPacketFactory->SetAnimationRoot (lookAtNodeFactory);
+    debugNodeFactory->SetChildNode (lookAtNodeFactory);
 
   // Create the animated mesh
   csRef<iMeshWrapper> avatarMesh =
@@ -526,6 +551,9 @@ bool FrankieScene::CreateAvatar ()
   // We can therefore set them up now.
   CS::Animation::iSkeletonAnimNode* rootNode =
     animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
+
+  // Find a reference to the debug node
+  debugNode = scfQueryInterface<CS::Animation::iSkeletonDebugNode> (rootNode->FindNode ("debug"));
 
   // Setup of the LookAt animation node
   lookAtNode = scfQueryInterface<CS::Animation::iSkeletonLookAtNode> (rootNode->FindNode ("lookat"));
