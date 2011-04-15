@@ -21,10 +21,10 @@
  * malloc() is in the WX libs. */
 #define CS_NO_MALLOC_OVERRIDE
 
-#include <cssysdef.h>
+#include "cssysdef.h"
 
-#include <cstool/initapp.h>
-#include <iutil/objreg.h>
+#include "cstool/initapp.h"
+#include "iutil/objreg.h"
 
 #include "editor.h"
 

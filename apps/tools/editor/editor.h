@@ -24,8 +24,8 @@
 #include "ieditor/interfacewrappermanager.h"
 #include "ieditor/actionmanager.h"
 
-#include <iengine/collection.h>
-#include <csutil/refarr.h>
+#include "iengine/collection.h"
+#include "csutil/refarr.h"
 
 struct iObjectRegistry;
 struct csSimpleRenderMesh;
@@ -43,13 +43,12 @@ public:
   
   virtual bool Initialize (iObjectRegistry* reg);
 
-  virtual bool LoadMap (const char* path, const char* filename,
+  virtual bool LoadMapFile (const char* path, const char* filename,
                         iProgressMeter* meter, bool clearEngine);
 
-  virtual void SaveMap (const char* path, const char* filename);
+  virtual void SaveMapFile (const char* path, const char* filename);
   
-  
-  virtual bool LoadLibrary (const char* path, const char* filename);
+  virtual bool LoadLibraryFile (const char* path, const char* filename);
   
   virtual void AddMapListener (iMapListener* listener);
 

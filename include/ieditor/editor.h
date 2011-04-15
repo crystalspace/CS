@@ -55,16 +55,15 @@ struct iEditor : public virtual iBase
   SCF_INTERFACE (iEditor, 0, 0, 1);
 
   /// Load a map from the given VFS file.
-  virtual bool LoadMap (const char* path, const char* filename,
-                        iProgressMeter* meter = 0, bool clearEngine = true) = 0;
+  virtual bool LoadMapFile (const char* path, const char* filename,
+			    iProgressMeter* meter = 0, bool clearEngine = true) = 0;
 
   /// Save the engine contents to the given file
-  virtual void SaveMap (const char* path, const char* filename) = 0;
-  
+  virtual void SaveMapFile (const char* path, const char* filename) = 0;
   
   /// Load a library file.
-  virtual bool LoadLibrary (const char* path, const char* filename) = 0;
-  
+  virtual bool LoadLibraryFile (const char* path, const char* filename) = 0;
+
   /// Add a map listener.
   virtual void AddMapListener (iMapListener* listener) = 0;
 

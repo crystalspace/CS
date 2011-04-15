@@ -16,18 +16,18 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <cssysdef.h>
+#include "cssysdef.h"
 #include "csutil/scf.h"
 
-#include <iutil/objreg.h>
-#include <iengine/engine.h>
-#include <iengine/mesh.h>
-#include <iengine/texture.h>
-#include <imap/loader.h>
-#include <imesh/genmesh.h>
-#include <imesh/object.h>
-#include <ivideo/texture.h>
-#include <ivideo/graph3d.h>
+#include "iutil/objreg.h"
+#include "iengine/engine.h"
+#include "iengine/mesh.h"
+#include "iengine/texture.h"
+#include "imap/loader.h"
+#include "imesh/genmesh.h"
+#include "imesh/object.h"
+#include "ivideo/texture.h"
+#include "ivideo/graph3d.h"
 
 #include <wx/menu.h>
 #include <wx/toolbar.h>
@@ -183,7 +183,7 @@ void MainFrame::OnOpen (wxCommandEvent& event)
   csRef<iProgressMeter> meter (new StatusBarProgressMeter (statusBar));
   
 
-  if (editor->LoadMap (dialog.GetPath(), dialog.GetFilename(), meter, 0))
+  if (editor->LoadMapFile (dialog.GetPath(), dialog.GetFilename(), meter, 0))
   {
     SetStatusText (wxT("Ready"));
   }
@@ -204,7 +204,7 @@ void MainFrame::OnSave (wxCommandEvent& event)
 
   SetStatusText (wxT("Saving map..."));
 
-  editor->SaveMap (dialog.GetPath(), dialog.GetFilename());
+  editor->SaveMapFile (dialog.GetPath(), dialog.GetFilename());
 
   SetStatusText (wxT("Ready"));
 }
@@ -221,7 +221,7 @@ void MainFrame::OnImportLibrary(wxCommandEvent& event)
 
   SetStatusText (wxT("Loading library..."));
 
-  if (editor->LoadLibrary (dialog.GetPath(), dialog.GetFilename()))
+  if (editor->LoadLibraryFile (dialog.GetPath(), dialog.GetFilename()))
   {
     SetStatusText (wxT("Ready"));
   }

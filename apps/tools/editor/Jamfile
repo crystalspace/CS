@@ -2,18 +2,19 @@ SubDir TOP apps tools editor ;
 
 if $(WX.AVAILABLE) = "yes" && $(WX.AUI.AVAILABLE) = "yes"
 {
-  Description propgrid : "wxPropertyGrid library" ;
-  Library propgrid : [ Wildcard wx propgrid : *.cpp *.h ] : notest ;
-  ExternalLibs propgrid : WX ;
-  CFlags propgrid : $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;
+#  Description propgrid : "wxPropertyGrid library" ;
+#  Library propgrid : [ Wildcard wx propgrid : *.cpp *.h ] : notest ;
+#  ExternalLibs propgrid : WX ;
+#  CFlags propgrid : $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;
 
-  IncludeDir : propgrid ;
+#  IncludeDir : propgrid ;
 
   Description : "Crystal Space Editor" ;
   Application cseditor : [ Wildcard *.cpp *.h ] ;
   ExternalLibs cseditor : CRYSTAL WX ;
   CFlags cseditor : $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;
-  LinkWith cseditor : propgrid crystalspace ;
+#  LinkWith cseditor : propgrid crystalspace ;
+  LinkWith cseditor : crystalspace ;
   Win32Resource cseditor : [ ConcatDirs $(SUBDIR) cseditor.rc ] ;
   # To locate wx.rc
   Win32RcFlags cseditor : [ Match ^(-I.*) ^(-D.*) : [ SplitToList $(WX.CFLAGS) ] ] ;

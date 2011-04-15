@@ -16,15 +16,15 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <cssysdef.h>
+#include "cssysdef.h"
 #include "csutil/scf.h"
 
-#include <cstool/initapp.h>
-#include <csutil/cmdhelp.h>
-#include <imap/saverfile.h>
-#include <iutil/stringarray.h>
-#include <ivideo/graph2d.h>
-#include <ivaria/collider.h>
+#include "cstool/initapp.h"
+#include "csutil/cmdhelp.h"
+#include "imap/saverfile.h"
+#include "iutil/stringarray.h"
+#include "ivideo/graph2d.h"
+#include "ivaria/collider.h"
 
 #include <wx/textctrl.h>
 
@@ -190,8 +190,8 @@ void Editor::LoadPlugins ()
   };
 }
 
-bool Editor::LoadMap (const char* path, const char* filename, iProgressMeter* meter,
-                      bool clearEngine)
+bool Editor::LoadMapFile (const char* path, const char* filename, iProgressMeter* meter,
+			  bool clearEngine)
 {
   vfs->ChDir (path);
 
@@ -213,7 +213,7 @@ bool Editor::LoadMap (const char* path, const char* filename, iProgressMeter* me
   return true;
 }
 
-bool Editor::LoadLibrary (const char* path, const char* filename)
+bool Editor::LoadLibraryFile (const char* path, const char* filename)
 {
   vfs->ChDir (path);
 
@@ -232,7 +232,7 @@ bool Editor::LoadLibrary (const char* path, const char* filename)
   return true;
 }
 
-void Editor::SaveMap (const char* path, const char* filename)
+void Editor::SaveMapFile (const char* path, const char* filename)
 {
   vfs->ChDir (path);
   
