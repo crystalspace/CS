@@ -256,9 +256,21 @@ void csExactCuller::AddObject (void* obj,
   csReversibleTransform movtrans = movable->GetFullTransform ();
   const csReversibleTransform& camtrans = camera->GetTransform ();
   csReversibleTransform trans = camtrans / movtrans;
-  float fov = camera->GetFOV ();
-  float sx = camera->GetShiftX ();
-  float sy = camera->GetShiftY ();
+  float fov, sx, sy;
+  csRef<iPerspectiveCamera> pcam =
+    scfQueryInterface<iPerspectiveCamera> (camera);
+  if (pcam)
+  {
+    fov = pcam->GetFOV ();
+    sx = pcam->GetShiftX ();
+    sy = pcam->GetShiftY ();
+  }
+  else
+  {
+    fov = 1.0f;
+    sx = 0.0f;
+    sy = 0.0f;
+  }
 
   // Calculate camera position in object space.
   csVector3 campos_object = movtrans.Other2This (camtrans.GetOrigin ());
