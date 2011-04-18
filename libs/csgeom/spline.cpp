@@ -228,6 +228,9 @@ void csCubicSpline::Calculate (float time)
     if (time >= time_points[idx] && time <= time_points[idx + 1]) break;
   }
 
+  // Correct for floating point inaccuracies in the previous loop.
+  if (idx == num_points-1) idx--;
+
   A = (time_points[idx + 1] - time) / (time_points[idx + 1] - time_points[idx]);
   B = 1 - A;
 
