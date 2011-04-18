@@ -241,7 +241,7 @@ bool RMUnshadowed::RenderView (iView* view, bool recursePortals)
   iPerspectiveCamera* pcam = view->GetPerspectiveCamera ();
   if (pcam)
   {
-    ifov = 1.0f / pcam->GetFOV ();
+    ifov = pcam->GetInvFOV ();
     sx = pcam->GetShiftX ();
     sy = pcam->GetShiftY ();
   }

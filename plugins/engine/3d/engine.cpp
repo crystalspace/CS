@@ -1162,7 +1162,7 @@ void csEngine::StartDraw (iCamera *c, iClipper2D* /*view*/,
     scfQueryInterface<iPerspectiveCamera> (c);
   if (pcam)
   {
-    ifov = 1.0f / pcam->GetFOV ();
+    ifov = pcam->GetInvFOV ();
     sx = pcam->GetShiftX ();
     sy = pcam->GetShiftY ();
   }
