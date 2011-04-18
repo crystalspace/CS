@@ -30,7 +30,9 @@
 
 /* Fun fact: should occur after csutil/event.h, otherwise, gcc may report
  * missing csMouseEventHelper symbols. */
+#include "csutil/custom_new_disable.h"
 #include <wx/wx.h>
+#include "csutil/custom_new_enable.h"
 
 CS_IMPLEMENT_APPLICATION
 
