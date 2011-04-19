@@ -247,7 +247,14 @@ bool CS3DPanel::HandleEvent (iEvent& ev)
         position = position/(int)selc;
   
         iCamera* cam = view->GetCamera ();
-        csVector2 p (mouse_x, cam->GetShiftY () * 2.0f - mouse_y);
+        csRef<iPerspectiveCamera> pcam =
+          scfQueryInterface<iPerspectiveCamera> (cam);
+        float sy;
+        if (pcam)
+          sy = pcam->GetShiftY ();
+        else
+          sy = 0.0f;
+        csVector2 p (mouse_x, sy * 2.0f - mouse_y);
         csVector3 v = cam->InvPerspective (p, 1.0f);
         csVector3 end = cam->GetTransform ().This2Other(v);
         csVector3 origin = cam->GetTransform ().GetO2TTranslation ();
