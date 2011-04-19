@@ -3143,6 +3143,8 @@ SWIG_AsVal_unsigned_SS_int (PyObject * obj, unsigned int *val)
   return res;
 }
 
+SWIGINTERN int iAnimatedImage_scfGetVersion(){ return scfInterfaceTraits<iAnimatedImage>::GetVersion(); }
+SWIGINTERN void delete_iAnimatedImage(iAnimatedImage *self){ if (self) self->DecRef (); }
 
 SWIGINTERN int
 SWIG_AsVal_bool (PyObject *obj, bool *val)
@@ -6142,6 +6144,40 @@ SWIGINTERN PyObject *_wrap_iAnimatedImage_IsAnimated(PyObject *SWIGUNUSEDPARM(se
   arg1 = reinterpret_cast< iAnimatedImage * >(argp1);
   result = (bool)(arg1)->IsAnimated();
   resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iAnimatedImage_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedImage_scfGetVersion",0,0)) SWIG_fail;
+  result = (int)iAnimatedImage_scfGetVersion();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_delete_iAnimatedImage(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iAnimatedImage *arg1 = (iAnimatedImage *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iAnimatedImage",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iAnimatedImage, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iAnimatedImage" "', argument " "1"" of type '" "iAnimatedImage *""'"); 
+  }
+  arg1 = reinterpret_cast< iAnimatedImage * >(argp1);
+  delete_iAnimatedImage(arg1);
+  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -14843,6 +14879,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iImageIO_swigregister", iImageIO_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedImage_Animate", _wrap_iAnimatedImage_Animate, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedImage_IsAnimated", _wrap_iAnimatedImage_IsAnimated, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedImage_scfGetVersion", _wrap_iAnimatedImage_scfGetVersion, METH_VARARGS, NULL},
+	 { (char *)"delete_iAnimatedImage", _wrap_delete_iAnimatedImage, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedImage_swigregister", iAnimatedImage_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iProcTexture_GetAlwaysAnimate", _wrap_iProcTexture_GetAlwaysAnimate, METH_VARARGS, NULL},
 	 { (char *)"iProcTexture_SetAlwaysAnimate", _wrap_iProcTexture_SetAlwaysAnimate, METH_VARARGS, NULL},
