@@ -158,7 +158,7 @@ bool MainFrame::SecondInitialize (iObjectRegistry* obj_reg)
 {
   if (!vfs)
     vfs = csQueryRegistry<iVFS> (object_reg);
-  vfs->Mount ("/cseditor/", "data/editor/");
+  vfs->Mount ("/cseditor/", "$@data$/editor$/");
   vfs->ChDir ("/cseditor/sys/");
   csRef<iLoader> loader = csQueryRegistry<iLoader> (obj_reg);
   if (!loader)

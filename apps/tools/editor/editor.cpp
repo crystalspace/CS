@@ -57,6 +57,18 @@ bool Editor::Initialize (iObjectRegistry* reg)
 {
   object_reg = reg;
 
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (object_reg))
+  {
+    csCommandLineHelper commandLineHelper;
+
+    // Printing help
+    commandLineHelper.PrintApplicationHelp
+      (object_reg, "cseditor", "cseditor <OPTIONS>",
+       "The Crystal Space editor");
+    return true;
+  }
+
   selection.AttachNew (new ObjectList ());
   objects.AttachNew (new ObjectList ());
 
@@ -83,11 +95,10 @@ bool Editor::Initialize (iObjectRegistry* reg)
 
 bool Editor::InitCS ()
 {
-  
   // Request every standard plugin except for OpenGL/WXGL canvas
   if (!csInitializer::RequestPlugins (object_reg,
         CS_REQUEST_VFS,
-        CS_REQUEST_PLUGIN ("crystalspace.graphics2d.wxgl", iGraphics2D),
+	CS_REQUEST_PLUGIN ("crystalspace.graphics2d.wxgl", iGraphics2D),
         CS_REQUEST_OPENGL3D,
         CS_REQUEST_ENGINE,
         CS_REQUEST_FONTSERVER,
@@ -103,13 +114,6 @@ bool Editor::InitCS ()
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
               "crystalspace.application.editor",
               "Can't initialize plugins!");
-    return false;
-  }
-
-  // Check for commandline help.
-  if (csCommandLineHelper::CheckHelp (object_reg))
-  {
-    csCommandLineHelper::Help (object_reg);
     return false;
   }
 
