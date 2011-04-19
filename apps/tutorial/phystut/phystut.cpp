@@ -1885,6 +1885,7 @@ void Simple::SpawnSoftBody ()
   //   gmstate->GetTriangles (), gmstate->GetTriangleCount ());
   body->SetMass (2.0f);
   body->SetRigidity (0.8f);
+  body->GenerateBendingConstraints (2);
 
   // Create the mesh
   gmstate->SetAnimationControlFactory (softBodyAnimationFactory);
