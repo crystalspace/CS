@@ -57,6 +57,7 @@ END_EVENT_TABLE()
 SceneBrowserPanel::SceneBrowserPanel (iBase* parent)
  : scfImplementationType (this, parent)
 {
+  treectrl = 0;
 }
 
 bool SceneBrowserPanel::Initialize (iObjectRegistry* obj_reg)
@@ -110,7 +111,8 @@ int SceneBrowserPanel::GetDefaultDockPosition () const
 void SceneBrowserPanel::OnSize (wxSizeEvent& event)
 {
   // Resize the tree control
-  treectrl->SetSize (event.GetSize());
+  if (treectrl)
+    treectrl->SetSize (event.GetSize());
   event.Skip();
 }
 

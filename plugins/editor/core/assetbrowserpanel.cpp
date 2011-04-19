@@ -62,6 +62,7 @@ END_EVENT_TABLE()
 AssetBrowserPanel::AssetBrowserPanel (iBase* parent)
  : scfImplementationType (this, parent)
 {
+  treectrl = 0;
 }
 
 bool AssetBrowserPanel::Initialize (iObjectRegistry* obj_reg)
@@ -115,7 +116,8 @@ int AssetBrowserPanel::GetDefaultDockPosition () const
 void AssetBrowserPanel::OnSize (wxSizeEvent& event)
 {
   // Resize the tree control
-  treectrl->SetSize (event.GetSize());
+  if (treectrl)
+    treectrl->SetSize (event.GetSize());
   event.Skip();
 }
 
