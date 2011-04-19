@@ -68,6 +68,7 @@ class csBulletSoftBody : public scfImplementation1<csBulletSoftBody,
   virtual void AddForce (csVector3 force, size_t vertexIndex);
   virtual size_t GetTriangleCount () const;
   virtual csTriangle GetTriangle (size_t index) const;
+  virtual void GenerateBendingConstraints (size_t distance);
 
  private:
   void UpdateAnchorPositions ();
