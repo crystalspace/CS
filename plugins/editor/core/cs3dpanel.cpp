@@ -133,12 +133,10 @@ bool CS3DPanel::Initialize (iObjectRegistry* obj_reg)
   iEventNameRegistry* name_reg = csEventNameRegistry::GetRegistry (object_reg);
   // Register the event handler
   csEventID events[] = {
-    //csevProcess (object_reg),
-    //csevFinalProcess (object_reg),
     csevFrame (object_reg),
     csevMouseMove (object_reg, 0),
     csevMouseDown (object_reg, 0),
-    csevKeyboardEvent(object_reg),
+    csevKeyboardEvent (object_reg),
     CS_EVENTLIST_END
   };
   
@@ -183,26 +181,22 @@ int CS3DPanel::GetDefaultDockPosition () const
 
 bool CS3DPanel::HandleEvent (iEvent& ev)
 {
+  // Frame event
   if (ev.Name == Frame)
   {
     ProcessFrame ();
     FinishFrame ();
     return true;
   }
-  /*
-  if (ev.Name == Process)
-  {
-    ProcessFrame ();
-    return true;
-  }
-  else if (ev.Name == FinalProcess)
-  {
-    FinishFrame ();
-    return true;
-  }
-  */
+
+  // Mouse events
   iEventNameRegistry* name_reg = csEventNameRegistry::GetRegistry (object_reg);
   csRef<iMouseDriver> mousedrv = csQueryRegistry<iMouseDriver> (object_reg);
+
+  // Set the focus on this window when the user clicks on it. This enables the
+  // keyboad events to be catched.
+  if (ev.Name == csevMouseDown (name_reg, 0))
+    window->SetFocus ();
 
   int mouse_but;
   if (ev.Name == csevMouseMove (name_reg, 0))
@@ -329,6 +323,10 @@ bool CS3DPanel::HandleEvent (iEvent& ev)
     }
   }
 
+  if (ev.Name == csevMouseMove (name_reg, 0))
+    return true;
+
+  // Keyboard events
   if (CS_IS_KEYBOARD_EVENT(object_reg, ev)) 
   {
     if (ev.Name == csevKeyboardDown(object_reg))
@@ -351,12 +349,16 @@ bool CS3DPanel::HandleEvent (iEvent& ev)
           opstartpos.Set (mousepos);
           break;
         default:
+	  return false;
           break;
       }
+
+      return true;
     }
     else if (ev.Name == csevKeyboardDown(object_reg))
     {
       editor->SetTransformStatus (iEditor::NOTHING);
+      return true;
     }
   }
   
@@ -604,7 +606,7 @@ void CS3DPanel::OnMapLoaded (const char* path, const char* filename)
   initializedColliderActor = true;
 }
 
- void CS3DPanel::OnLibraryLoaded (const char* path, const char* filename, iCollection* collection)
+void CS3DPanel::OnLibraryLoaded (const char* path, const char* filename, iCollection* collection)
 {
 }
 
