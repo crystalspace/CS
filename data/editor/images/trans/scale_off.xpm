@@ -1,5 +1,5 @@
 /* XPM */
-static char * scale_off_xpm[] = {
+static const char * scale_off_xpm[] = {
 "21 21 34 1",
 " 	c None",
 ".	c #505050",

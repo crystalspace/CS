@@ -1,5 +1,5 @@
 /* XPM */
-static char *folder_closed_xpm[] = {
+static const char *folder_closed_xpm[] = {
 /* columns rows colors chars-per-pixel */
 "16 16 85 1",
 "  c black",

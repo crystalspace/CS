@@ -1,5 +1,5 @@
 /* XPM */
-static char * rot_on_xpm[] = {
+static const char * rot_on_xpm[] = {
 "22 21 29 1",
 " 	c #505050",
 ".	c #8C8C8C",

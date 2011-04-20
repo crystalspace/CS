@@ -1,5 +1,5 @@
 /* XPM */
-static char *defaultIcon_xpm[] = {
+static const char *defaultIcon_xpm[] = {
 /* columns rows colors chars-per-pixel */
 "16 16 236 2",
 "   c #002528",
