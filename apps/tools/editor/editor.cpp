@@ -184,12 +184,15 @@ void Editor::LoadPlugins ()
     for (size_t i = 0; i < pluginClasses->GetSize (); i++)
     {
       const char* className = pluginClasses->Get (i);
-      iBase* b = plugmgr->LoadPlugin (className);
+      csRef<iComponent> c (plugmgr->LoadPluginInstance (className,
+        iPluginManager::lpiInitialize | iPluginManager::lpiReportErrors
+          | iPluginManager::lpiLoadDependencies));
+      csRef<iBase> b = scfQueryInterface<iBase> (c);
 
       csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
         "crystalspace.application.editor", "Attempt to load plugin '%s' %s",
-        className, (b != 0) ? "successful" : "failed");
-      if (b != 0) b->DecRef ();
+        className, b ? "successful" : "failed");
+      if (b) b->DecRef ();
     }
   };
 }
