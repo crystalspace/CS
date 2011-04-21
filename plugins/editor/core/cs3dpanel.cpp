@@ -130,7 +130,7 @@ bool CS3DPanel::Initialize (iObjectRegistry* obj_reg)
 
   CS_INITIALIZE_EVENT_SHORTCUTS (object_reg);
   
-  iEventNameRegistry* name_reg = csEventNameRegistry::GetRegistry (object_reg);
+  //iEventNameRegistry* name_reg = csEventNameRegistry::GetRegistry (object_reg);
   // Register the event handler
   csEventID events[] = {
     csevFrame (object_reg),
@@ -420,7 +420,7 @@ void CS3DPanel::ProcessFrame ()
   MoveCamera ();
   
   // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_CLEARSCREEN | CSDRAW_3DGRAPHICS))
+  if (!g3d->BeginDraw (CSDRAW_CLEARSCREEN | CSDRAW_3DGRAPHICS))
     return;
 
   // Tell the camera to render into the frame buffer.
