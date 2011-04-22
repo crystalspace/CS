@@ -37,7 +37,7 @@
 template<>
 class csHashComputer<iBase*> : public csHashComputerIntegral<iBase*> {};
 
-using namespace CSE;
+using namespace CS::EditorApp;
 
 CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {

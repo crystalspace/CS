@@ -30,8 +30,8 @@
 struct iObjectRegistry;
 struct csSimpleRenderMesh;
 
-namespace CSE
-{
+namespace CS {
+namespace EditorApp {
 
 class MainFrame;
 
@@ -102,6 +102,7 @@ private:
 
 };
 
-}
+} // namespace EditorApp
+} // namespace CS
 
 #endif

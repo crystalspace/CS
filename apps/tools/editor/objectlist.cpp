@@ -22,8 +22,8 @@
 #include "ieditor/editorobject.h"
 #include "objectlist.h"
 
-namespace CSE
-{
+namespace CS {
+namespace EditorApp {
 
 ObjectList::ObjectList ()
   : scfImplementationType (this)
@@ -88,4 +88,6 @@ iEditorObject* ObjectList::FindObject (iBase* obj)
   return objects.Get (obj, 0);
 }
 
-}
+} // namespace EditorApp
+} // namespace CS
+

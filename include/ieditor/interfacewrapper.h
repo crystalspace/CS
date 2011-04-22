@@ -26,8 +26,8 @@
 
 #include "ieditor/editorobject.h"
 
-namespace CSE
-{
+namespace CS {
+namespace EditorApp {
 
 struct iInterfaceWrapperFactory;
 
@@ -87,7 +87,7 @@ struct iInterfaceWrapperFactory : public virtual iBase
   /// TODO: Property metadata function(s)
 };
 
-
-}
+} // namespace EditorApp
+} // namespace CS
 
 #endif

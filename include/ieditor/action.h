@@ -24,8 +24,8 @@
 
 #include <wx/string.h>
 
-namespace CSE
-{
+namespace CS {
+namespace EditorApp {
 
 /**
  * An undoable action. All reversible operations should implement this
@@ -47,6 +47,7 @@ struct iAction : public virtual iBase
   virtual const wxChar* GetDescription () const = 0;
 };
 
-}
+} // namespace EditorApp
+} // namespace CS
 
 #endif

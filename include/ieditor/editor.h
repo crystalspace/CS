@@ -29,8 +29,8 @@ struct iProgressMeter;
 struct csSimpleRenderMesh;
 struct iCollection;
 
-namespace CSE
-{
+namespace CS {
+namespace EditorApp {
 
 struct iObjectList;
 
@@ -106,6 +106,7 @@ struct iEditor : public virtual iBase
   virtual TransformStatus GetTransformStatus () = 0;
 };
 
-}
+} // namespace EditorApp
+} // namespace CS
 
 #endif

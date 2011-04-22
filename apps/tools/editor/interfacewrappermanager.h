@@ -24,8 +24,8 @@
 
 #include <csutil/hash.h>
 
-namespace CSE
-{
+namespace CS {
+namespace EditorApp {
 
 class InterfaceWrapperManager : public scfImplementation1<InterfaceWrapperManager, iInterfaceWrapperManager>
 {
@@ -44,6 +44,7 @@ protected:
   csHash<csRef<iInterfaceWrapperFactory>, scfInterfaceID> interfaceHash;
 };
 
-}
+} // namespace EditorApp
+} // namespace CS
 
 #endif

@@ -27,12 +27,13 @@
 #include "ieditor/editorobject.h"
 #include "ieditor/objectlist.h"
 
-using namespace CSE;
+using namespace CS::EditorApp;
 
 CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {
 
-class SetObjectNameAction : public scfImplementation1<SetObjectNameAction,iAction>
+class SetObjectNameAction : public scfImplementation1<SetObjectNameAction,
+    iAction>
 {
 public:
   SetObjectNameAction (iEditorObject* obj, const char* name);

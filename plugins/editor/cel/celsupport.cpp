@@ -32,7 +32,8 @@
 #include "physicallayer/persist.h"
 #include "behaviourlayer/bl.h"
 
-using namespace CSE;
+using namespace CS {
+namespace EditorApp {;
 
 CS_IMPLEMENT_PLUGIN
 

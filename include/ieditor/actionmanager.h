@@ -22,8 +22,8 @@
 #include <csutil/scf.h>
 #include <csutil/scf_implementation.h>
 
-namespace CSE
-{
+namespace CS {
+namespace EditorApp {
 
 struct iAction;
 
@@ -79,6 +79,7 @@ struct iActionManager : public virtual iBase
   virtual void RemoveListener (iActionListener* listener) = 0;
 };
 
-}
+} // namespace EditorApp
+} // namespace CS
 
 #endif

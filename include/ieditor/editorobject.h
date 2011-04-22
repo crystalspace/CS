@@ -24,8 +24,8 @@
 
 class wxBitmap;
 
-namespace CSE
-{
+namespace CS {
+namespace EditorApp {
 
 /**
  * Iterator over iBase objects.
@@ -128,6 +128,7 @@ struct iEditorObject : public virtual iBase
   virtual void RemoveListener (iEditorObjectChangeListener* listener) = 0;
 };
 
-}
+} // namespace EditorApp
+} // namespace CS
 
 #endif

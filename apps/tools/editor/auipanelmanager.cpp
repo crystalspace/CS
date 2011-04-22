@@ -23,8 +23,8 @@
 
 #include "auipanelmanager.h"
 
-namespace CSE
-{
+namespace CS {
+namespace EditorApp {
 
 AUIPanelManager::AUIPanelManager (iObjectRegistry* obj_reg)
   : scfImplementationType (this), object_reg (obj_reg)
@@ -88,4 +88,5 @@ void AUIPanelManager::SetPanelVisible (iPanel* panel, bool visible)
   mgr.Update ();
 }
 
-}
+} // namespace EditorApp
+} // namespace CS

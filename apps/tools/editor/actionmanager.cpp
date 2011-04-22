@@ -25,8 +25,8 @@
 
 #include "ieditor/action.h"
 
-namespace CSE
-{
+namespace CS {
+namespace EditorApp {
 
 ActionManager::ActionManager (iObjectRegistry* obj_reg)
   : scfImplementationType (this), object_reg (obj_reg)
@@ -121,4 +121,5 @@ void ActionManager::NotifyListeners (iAction* action)
   }
 }
 
-}
+} // namespace EditorApp
+} // namespace CS

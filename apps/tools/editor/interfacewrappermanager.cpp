@@ -22,8 +22,8 @@
 
 #include "interfacewrappermanager.h"
 
-namespace CSE
-{
+namespace CS {
+namespace EditorApp {
 
 InterfaceWrapperManager::InterfaceWrapperManager (iObjectRegistry* obj_reg)
   : scfImplementationType (this), object_reg (obj_reg)
@@ -46,4 +46,5 @@ iInterfaceWrapperFactory* InterfaceWrapperManager::GetFactory (scfInterfaceID in
   return interfaceHash.Get (interface_id, 0);
 }
 
-}
+} // namespace EditorApp
+} // namespace CS

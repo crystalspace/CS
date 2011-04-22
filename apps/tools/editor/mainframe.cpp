@@ -38,8 +38,8 @@
 
 #include "ieditor/action.h"
 
-namespace CSE
-{
+namespace CS {
+namespace EditorApp {
 
 enum
 {
@@ -316,4 +316,5 @@ void MainFrame::UpdateEditMenu ()
         + wxString(redo->GetDescription ()) + wxT("\"\tCtrl+Y"));
 }
 
-}
+} // namespace EditorApp
+} // namespace CS

@@ -25,13 +25,11 @@
 
 #include <wx/dataobj.h>
 
-using namespace CSE;
-
 CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {
 
 struct DnDObjectDump {
-  csRef<iEditorObject> obj;
+  csRef<CS::EditorApp::iEditorObject> obj;
 };
     
   
@@ -65,18 +63,18 @@ public:
   }
   
   
-  virtual iEditorObject* GetEditorObject ()
+  virtual CS::EditorApp::iEditorObject* GetEditorObject ()
   {
     return obj;
   }
   
-  virtual void SetEditorObject (iEditorObject* o)
+  virtual void SetEditorObject (CS::EditorApp::iEditorObject* o)
   {
     obj = o;
   }
 
 private:
-  csRef<iEditorObject> obj;
+  csRef<CS::EditorApp::iEditorObject> obj;
 };
 
 }

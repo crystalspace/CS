@@ -25,8 +25,8 @@
 
 #include "ieditor/panelmanager.h"
 
-namespace CSE
-{
+namespace CS {
+namespace EditorApp {
 
 class AUIPanelManager : public scfImplementation1<AUIPanelManager,iPanelManager>
 {
@@ -54,6 +54,7 @@ private:
   
 };
 
-}
+} // namespace EditorApp
+} // namespace CS
 
 #endif

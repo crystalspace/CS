@@ -38,8 +38,8 @@
 
 #include "editor.h"
 
-namespace CSE
-{
+namespace CS {
+namespace EditorApp {
 
 Editor::Editor ()
   : scfImplementationType (this), helper_meshes (0), transstatus (NOTHING)
@@ -290,4 +290,5 @@ Editor::TransformStatus Editor::GetTransformStatus ()
   return transstatus;
 }
 
-}
+} // namespace EditorApp
+} // namespace CS

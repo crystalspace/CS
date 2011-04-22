@@ -26,8 +26,8 @@
 
 class wxWindow;
 
-namespace CSE
-{
+namespace CS {
+namespace EditorApp {
 
 enum PanelDockPosition
 {
@@ -93,6 +93,7 @@ struct iPanelManager : public virtual iBase
   // TODO: Maybe a GetIterator() function?
 };
 
-}
+} // namespace EditorApp
+} // namespace CS
 
 #endif

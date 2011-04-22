@@ -58,7 +58,7 @@ class EditorApp: public wxApp
 {
 public:
   iObjectRegistry* object_reg;
-  CSE::Editor* editor;
+  CS::EditorApp::Editor* editor;
 
   virtual bool OnInit(void);
   virtual int OnExit(void);
@@ -85,7 +85,7 @@ bool EditorApp::OnInit(void)
   object_reg = csInitializer::CreateEnvironment (argc, argv);
 #endif
 
-  editor = new CSE::Editor ();
+  editor = new CS::EditorApp::Editor ();
   if (!editor->Initialize (object_reg))
     return false;
 

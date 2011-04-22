@@ -22,8 +22,8 @@
 #include <csutil/scf.h>
 #include <csutil/scf_implementation.h>
 
-namespace CSE
-{
+namespace CS {
+namespace EditorApp {
 
 struct iInterfaceWrapperFactory;
   
@@ -45,6 +45,7 @@ struct iInterfaceWrapperManager : public virtual iBase
   virtual iInterfaceWrapperFactory* GetFactory (scfInterfaceID interface_id) = 0;
 };
 
-}
+} // namespace EditorApp
+} // namespace CS
 
 #endif

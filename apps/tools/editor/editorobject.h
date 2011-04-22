@@ -29,8 +29,8 @@
 
 struct iObjectRegistry;
 
-namespace CSE
-{
+namespace CS {
+namespace EditorApp {
 
 class EditorObject : public scfImplementation1<EditorObject, iEditorObject>
 {
@@ -90,6 +90,7 @@ protected:
   wxBitmap* icon;
 };
 
-}
+} // namespace EditorApp
+} // namespace CS
 
 #endif

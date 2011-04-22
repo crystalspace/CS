@@ -24,8 +24,8 @@
 
 #include "ieditor/editorobject.h"
 
-namespace CSE
-{
+namespace CS {
+namespace EditorApp {
 
 class iObjectList;
 
@@ -73,6 +73,7 @@ struct iObjectList : public virtual iBase
   virtual iEditorObject* FindObject (iBase* obj) = 0;
 };
 
-}
+} // namespace EditorApp
+} // namespace CS
 
 #endif

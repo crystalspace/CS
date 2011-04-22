@@ -28,7 +28,7 @@
 
 #include <wx/bitmap.h>
 
-using namespace CSE;
+using namespace CS::EditorApp;
 
 CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {

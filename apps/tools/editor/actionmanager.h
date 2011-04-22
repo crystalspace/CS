@@ -25,8 +25,8 @@
 
 struct iObjectRegistry;
 
-namespace CSE
-{
+namespace CS {
+namespace EditorApp {
 
 class ActionManager : public scfImplementation1<ActionManager, iActionManager>
 {
@@ -55,6 +55,7 @@ private:
 
 };
 
-}
+} // namespace EditorApp
+} // namespace CS
 
 #endif

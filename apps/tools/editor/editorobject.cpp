@@ -27,8 +27,8 @@
 
 #include "editorobject.h"
 
-namespace CSE
-{
+namespace CS {
+namespace EditorApp {
 
 EditorObject::EditorObject (iObjectRegistry* obj_reg, iBase* object, wxBitmap* icon)
   : scfImplementationType (this), object (object), type (EditorObjectTypeUnknown), icon (icon)
@@ -148,4 +148,5 @@ void EditorObject::NotifyListeners ()
   }
 }
 
-}
+} // namespace EditorApp
+} // namespace CS

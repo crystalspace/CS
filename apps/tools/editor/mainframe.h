@@ -31,8 +31,8 @@
 #include <wx/statusbr.h>
 #include <wx/gauge.h>
 
-namespace CSE
-{
+namespace CS {
+namespace EditorApp {
 
 class StatusBar;
 
@@ -92,6 +92,7 @@ private:
   DECLARE_EVENT_TABLE()
 };
 
-}
+} // namespace EditorApp
+} // namespace CS
 
 #endif

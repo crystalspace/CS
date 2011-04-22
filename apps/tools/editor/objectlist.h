@@ -27,8 +27,8 @@
 template<>
 class csHashComputer<iBase*> : public csHashComputerIntegral<iBase*> {};
 
-namespace CSE
-{
+namespace CS {
+namespace EditorApp {
 
 struct iEditorObjectIterator;
 struct iObjectListListener;
@@ -84,6 +84,7 @@ public:
   };
 };
 
-}
+} // namespace EditorApp
+} // namespace CS
 
 #endif

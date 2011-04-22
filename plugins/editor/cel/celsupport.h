@@ -29,8 +29,6 @@
 struct iCelPlLayer;
 struct iCelBlLayer;
 
-using namespace CSE;
-
 CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {
 
