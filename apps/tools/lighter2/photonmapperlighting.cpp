@@ -131,7 +131,7 @@ namespace lighter
             {
               // Compute the direction to the source point
               csVector3 dirToSource = point - hit.hitPoint;
-              meanDist += 1.0/dirToSource.Norm();
+              meanDist += dirToSource.InverseNorm();
               rayCount++;
               dirToSource.Normalize();
 
@@ -150,9 +150,13 @@ namespace lighter
         // Normalize the accumulated energy
         c = final * (PI / (numFinalGatherMSubdivs*numFinalGatherNSubdivs));
 
-        // Cache the results
-        sector->AddToIRCache(point, normal, c, rayCount/meanDist);
-        globalStats.photonmapping.irCachePrimary++;
+        // Cache the results if we accumulated some energy
+        if(rayCount > 0)
+        {
+          #pragma omp critical
+          sector->AddToIRCache(point, normal, c, rayCount/meanDist);
+          globalStats.photonmapping.irCachePrimary++;
+        }
       }
     }
 
@@ -259,7 +263,6 @@ namespace lighter
         enableCaustics = false;
       }
     }
-
 
     for (size_t lightIdx = 0; lightIdx < allNonPDLights.GetSize(); ++lightIdx)
     {
@@ -567,15 +570,14 @@ namespace lighter
     lighter::HitPoint hit;
     hit.distance = FLT_MAX*0.9f;
     lighter::Ray ray = photon.getRay();
-	bool hitResult;
-	#pragma omp critical
-		{
-			hitResult = lighter::Raytracer::TraceClosestHit(sect->kdTree, ray, hit); 
-		}
+    bool hitResult;
+    #pragma omp critical
+    hitResult = lighter::Raytracer::TraceClosestHit(sect->kdTree, ray, hit); 
+
     if (hitResult)
     {
       // TODO: Why would a hit be returned and 'hit.primitive' be NULL?
-      if (!hit.primitive) { return; }
+      if (!hit.primitive || !hit.primitive->GetMaterial()) { return; }
 
       // Get the surface normal and direction from light source
       csVector3 N = hit.primitive->ComputeNormal(hit.hitPoint);
@@ -584,18 +586,18 @@ namespace lighter
 
       
       // Compute reflected color intensity (lambertian)
-	    // Compute the UV coordinates for the hit point for the primitive
-	    csVector2 uvCordOnPrimitive = hit.primitive->ComputeUV(hit.hitPoint);
+      // Compute the UV coordinates for the hit point for the primitive
+      csVector2 uvCordOnPrimitive = hit.primitive->ComputeUV(hit.hitPoint);
 
-	    // Get the color of the primitive at that point
-      const lighter::RadMaterial * hitPtMaterial = hit.primitive->GetMaterial();
-	    static csColor hitPtColor (1,1,1);
+      // Get the color of the primitive at that point
+      const lighter::RadMaterial* hitPtMaterial = hit.primitive->GetMaterial();
+      static csColor hitPtColor (1,1,1);
       if(hitPtMaterial->IsTextureValid())
       {
         hitPtColor = hitPtMaterial->GetTextureValue(uvCordOnPrimitive);
       }
-	    float dot = ABS((-L)*N);
-	    csColor reflColor = photon.color*photon.power*dot*hitPtColor;
+      float dot = ABS((-L)*N);
+      csColor reflColor = photon.color*photon.power*dot*hitPtColor;
       float refrIndex  =  hitPtMaterial->refractiveIndex;
 
       // Record photon based on enabled options
@@ -603,19 +605,19 @@ namespace lighter
       {
         if(!produceCaustic)
         {
-		  #pragma omp critical
+	  #pragma omp critical
           sect->AddPhoton(reflColor, hit.hitPoint, L);
         }
         else if (!hitPtMaterial->produceCaustic)
         {
           // Add the photon to the caustic photon map
-		  #pragma omp critical
+	  #pragma omp critical
           sect->AddCausticPhoton(reflColor, hit.hitPoint, L);
           return;
         }
       }
 
-        // If indirect lighting is enabled, scatter the photon
+      // If indirect lighting is enabled, scatter the photon
       static csColor blackColor (0,0,0);
       if(maxDepth > 0 && reflColor!=blackColor )
       {

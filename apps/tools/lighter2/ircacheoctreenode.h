@@ -42,7 +42,7 @@ namespace lighter
     float center[3], size;
 
     // General data for all nodes
-    IrradianceSample* masterArray;
+    IrradianceSample** masterArray;
     static double alpha;
 
     // Helper functions
@@ -51,7 +51,7 @@ namespace lighter
     static float Weight(const IrradianceSample *A, const IrradianceSample *B);
 
   public:
-    OctreeSampleNode(IrradianceSample* parentArray,
+    OctreeSampleNode(IrradianceSample** parentArray,
       const double newAlpha = -1.0);
     ~OctreeSampleNode();
 
