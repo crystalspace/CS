@@ -19,7 +19,7 @@
 
   <materials>
 		<material name="sky">
-      <!--<shader type="depthwrite">*null</shader>-->
+      <shader type="oc_depthwrite">*null</shader>
 			<shader type="standard">sky</shader>
       <shadervar type="texture" name="tex night">nightsky</shadervar>
 		</material>

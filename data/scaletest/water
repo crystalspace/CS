@@ -15,9 +15,9 @@
    </textures>
   <materials>
     <material name="Water">
-      <shader type="depthwrite">*null</shader>
       <shader type="base">reflect_water_plane</shader>
       <shader type="diffuse">reflect_water_plane</shader>
+      <shader type="oc_depthwrite">reflect_water_plane</shader>
       <shadervar type="texture" name="tex normal">water_n</shadervar>
       <shadervar type="vector4" name="water fog color">0,0.4,0.2,1</shadervar>
       <!--<shadervar type="float" name="water fog density">1</shadervar>-->
@@ -28,7 +28,8 @@
   </materials>
   <meshfact name='water'>
     <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
-    <zuse/>
+    <priority>alpha</priority>
+    <ztest/>
     <params>
       <material>Water</material>
       <v x="3253.340332" y="0.000000" z="1337.966064" u="0.000000" v="1.000000" nx="0.000000" ny="1.000000" nz="-0.000000"/>

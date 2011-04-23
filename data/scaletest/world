@@ -5,11 +5,6 @@
 		<plugin name="genmeshfact">crystalspace.mesh.loader.factory.genmesh</plugin>
 	</plugins>
 
-	<settings>
-		<clearscreen>yes</clearscreen>
-		<clearzbuf>yes</clearzbuf>
-	</settings>
-
 	<library>skydome</library>
 	<library>clouddome</library>
 	<library>water</library>
