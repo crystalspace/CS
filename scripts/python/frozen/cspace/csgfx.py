@@ -192,8 +192,12 @@ class iAnimatedImage(core.iBase):
     __repr__ = _swig_repr
     def Animate(*args): return _csgfx.iAnimatedImage_Animate(*args)
     def IsAnimated(*args): return _csgfx.iAnimatedImage_IsAnimated(*args)
+    scfGetVersion = staticmethod(_csgfx.iAnimatedImage_scfGetVersion)
+    __swig_destroy__ = _csgfx.delete_iAnimatedImage
+    __del__ = lambda self : None;
 iAnimatedImage_swigregister = _csgfx.iAnimatedImage_swigregister
 iAnimatedImage_swigregister(iAnimatedImage)
+iAnimatedImage_scfGetVersion = _csgfx.iAnimatedImage_scfGetVersion
 
 class iProcTexture(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')

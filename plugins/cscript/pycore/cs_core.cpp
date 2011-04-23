@@ -48530,6 +48530,48 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iStringArray_Put(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iStringArray *arg1 = (iStringArray *) 0 ;
+  size_t arg2 ;
+  char *arg3 = (char *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iStringArray_Put",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iStringArray, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iStringArray_Put" "', argument " "1"" of type '" "iStringArray *""'"); 
+  }
+  arg1 = reinterpret_cast< iStringArray * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iStringArray_Put" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iStringArray_Put" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  (arg1)->Put(arg2,(char const *)arg3);
+  resultobj = SWIG_Py_Void();
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  return resultobj;
+fail:
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iStringArray___getitem__(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iStringArray *arg1 = (iStringArray *) 0 ;
@@ -61229,6 +61271,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iStringArray_Insert", _wrap_iStringArray_Insert, METH_VARARGS, NULL},
 	 { (char *)"iStringArray_Empty", _wrap_iStringArray_Empty, METH_VARARGS, NULL},
 	 { (char *)"iStringArray_IsEmpty", _wrap_iStringArray_IsEmpty, METH_VARARGS, NULL},
+	 { (char *)"iStringArray_Put", _wrap_iStringArray_Put, METH_VARARGS, NULL},
 	 { (char *)"iStringArray___getitem__", _wrap_iStringArray___getitem__, METH_VARARGS, NULL},
 	 { (char *)"iStringArray___contains__", _wrap_iStringArray___contains__, METH_VARARGS, NULL},
 	 { (char *)"iStringArray___delitem__", _wrap_iStringArray___delitem__, METH_VARARGS, NULL},
