@@ -664,6 +664,7 @@ void KrystalScene::ResetSoftBodies ()
     (hairsFactoryState, csOrthoTransform (csMatrix3 (), csVector3 (0.0f)));
   hairsBody->SetMass (2.0f);
   hairsBody->SetRigidity (0.02f);
+  hairsBody->GenerateBendingConstraints (3);
 
   // Init the animation control for the animation of the genmesh
   csRef<iGeneralMeshState> hairsMeshState =
@@ -687,6 +688,7 @@ void KrystalScene::ResetSoftBodies ()
     (skirtFactoryState, spineTransform);
   skirtBody->SetMass (2.0f);
   skirtBody->SetRigidity (0.02f);
+  skirtBody->GenerateBendingConstraints (3);
 
   // Init the animation control for the animation of the genmesh
   csRef<iGeneralMeshState> skirtMeshState =

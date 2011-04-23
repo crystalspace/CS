@@ -237,6 +237,12 @@ csTriangle csBulletSoftBody::GetTriangle (size_t index) const
 		     face.m_n[2] - &body->m_nodes[0]);
 }
 
+void csBulletSoftBody::GenerateBendingConstraints (size_t distance)
+{
+  body->generateBendingConstraints (distance);
+  body->randomizeConstraints ();
+}
+
 void csBulletSoftBody::UpdateAnchorPositions ()
 {
   for (csArray<AnimatedAnchor>::Iterator it = animatedAnchors.GetIterator (); it.HasNext (); )

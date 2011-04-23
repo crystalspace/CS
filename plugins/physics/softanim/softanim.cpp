@@ -269,11 +269,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
     for (size_t i = 0; i < softBody->GetVertexCount (); i++)
     {
       csVector3 position = softBody->GetVertexPosition (i);
+
+      // Check that the vertex is still valid
+      if (CS::IsNaN (position[0]) || CS::IsNaN (position[1]) || CS::IsNaN (position[2]))
+	position = vertices[i] + lastPosition;
+
+      else
+      {
+	vertices[i] = position - lastPosition;
+	normals[i] = softBody->GetVertexNormal (i);
+      }
+
       meshPosition += position;
 
-      vertices[i] = position - lastPosition;
-      normals[i] = softBody->GetVertexNormal (i);
-
+      // Update the double side if needed
       if (doubleSided)
       {
 	vertices[i + softBody->GetVertexCount ()] = vertices[i];

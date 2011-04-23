@@ -1680,6 +1680,31 @@ AS_IF([test $cs_cv_libwx = yes],
 AS_IF([test $cs_cv_libwx_opengl = yes],
     [CS_EMIT_BUILD_RESULT([cs_cv_libwx_opengl], [WX])])
 
+AS_IF([test $cs_cv_libwx = yes],
+    [CS_CHECK_BUILD([if wxWidgets is built with wxAUI support],
+	[cs_cv_libwx_aui],
+	[AC_LANG_PROGRAM(
+	    [[#include "wx/wxprec.h"
+	    #ifdef __BORLANDC__
+	    #pragma hdrstop
+	    #endif
+	    #ifndef WX_PRECOMP
+	    #include "wx/wx.h"
+	    #endif
+	    #include "wx/aui/aui.h"
+	    ]],
+	    [wxAuiManager mgr; wxWindow* w;
+	     mgr.SetManagedWindow(w);
+	     mgr.AddPane(w, wxAuiPaneInfo());])],
+	[CS_CREATE_TUPLE(
+	    [$cs_cv_libwx_cflags],
+	    [$cs_cv_libwx_lflags],
+	    [$cs_cv_libwx_libs])],
+	[C++])],
+    [cs_cv_libwx_aui=no])
+
+AS_IF([test $cs_cv_libwx_aui = yes],
+    [CS_EMIT_BUILD_RESULT([cs_cv_libwx_aui], [WX.AUI])])
 
 
 #----------------------------------------------------------------------------

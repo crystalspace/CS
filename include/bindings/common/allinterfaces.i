@@ -247,7 +247,6 @@ namespace Animation
 %enddef
 
 %define CORE_APPLY_FOR_EACH_INTERFACE
-  INTERFACE_APPLY(iAnimatedImage)
   INTERFACE_APPLY(iBase)
   INTERFACE_APPLY(iCacheManager)
   INTERFACE_APPLY(iCommandLineParser)
@@ -296,6 +295,7 @@ namespace Animation
 #define CSTOOL_APPLY_FOR_EACH_INTERFACE
 
 %define CSGFX_APPLY_FOR_EACH_INTERFACE
+  INTERFACE_APPLY(iAnimatedImage)
   INTERFACE_APPLY(iImage)
   INTERFACE_APPLY(iImageIO)
   INTERFACE_APPLY(iShaderVarStringSet)

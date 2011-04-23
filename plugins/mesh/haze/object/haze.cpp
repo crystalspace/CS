@@ -623,9 +623,21 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
   csVector3 campos = camera->GetTransform().GetOrigin();
   if (!movable->IsFullTransformIdentity ())
     campos = movable->GetFullTransform() * campos;
-  float fov = camera->GetFOV ();
-  float shx = camera->GetShiftX ();
-  float shy = camera->GetShiftY ();
+  float fov, shx, shy;
+  csRef<iPerspectiveCamera> pcamera =
+    scfQueryInterface<iPerspectiveCamera> (camera);
+  if (pcamera)
+  {
+    fov = pcamera->GetFOV ();
+    shx = pcamera->GetShiftX ();
+    shy = pcamera->GetShiftY ();
+  }
+  else
+  {
+    fov = 1.0f;
+    shx = 0.0f;
+    shy = 0.0f;
+  }
   /// obj to camera space
   csReversibleTransform tr_o2c = camera->GetTransform ();
   if (!movable->IsFullTransformIdentity ())

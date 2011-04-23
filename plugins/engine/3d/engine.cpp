@@ -1157,10 +1157,25 @@ void csEngine::StartDraw (iCamera *c, iClipper2D* /*view*/,
   // Calculate frustum for screen dimensions (at z=1).
   c->SetViewportSize (rview.GetGraphics3D()->GetWidth(),
     rview.GetGraphics3D()->GetHeight());
-  float leftx = -c->GetShiftX () * c->GetInvFOV ();
-  float rightx = (frameWidth - c->GetShiftX ()) * c->GetInvFOV ();
-  float topy = -c->GetShiftY () * c->GetInvFOV ();
-  float boty = (frameHeight - c->GetShiftY ()) * c->GetInvFOV ();
+  float ifov, sx, sy;
+  csRef<iPerspectiveCamera> pcam =
+    scfQueryInterface<iPerspectiveCamera> (c);
+  if (pcam)
+  {
+    ifov = pcam->GetInvFOV ();
+    sx = pcam->GetShiftX ();
+    sy = pcam->GetShiftY ();
+  }
+  else
+  {
+    ifov = 1.0f;
+    sx = 0.0f;
+    sy = 0.0f;
+  }
+  float leftx = -sx * ifov;
+  float rightx = (frameWidth - sx) * ifov;
+  float topy = -sy * ifov;
+  float boty = (frameHeight - sy) * ifov;
   rview.SetFrustum (leftx, rightx, topy, boty);
 }
 
@@ -1330,10 +1345,26 @@ void csEngine::AddHalo (iCamera* camera, csLight *Light)
   // Check if light is behind us
   if (v.z <= SMALL_Z) return ;
 
+  float fov, sx, sy;
+  csRef<iPerspectiveCamera> pcam =
+    scfQueryInterface<iPerspectiveCamera> (camera);
+  if (pcam)
+  {
+    fov = pcam->GetFOV ();
+    sx = pcam->GetShiftX ();
+    sy = pcam->GetShiftY ();
+  }
+  else
+  {
+    fov = 1.0f;
+    sx = 0.0f;
+    sy = 0.0f;
+  }
+
   // Project X,Y into screen plane
-  float iz = camera->GetFOV () / v.z;
-  v.x = v.x * iz + camera->GetShiftX ();
-  v.y = frameHeight - 1 - (v.y * iz + camera->GetShiftY ());
+  float iz = fov / v.z;
+  v.x = v.x * iz + sx;
+  v.y = frameHeight - 1 - (v.y * iz + sy);
 
   // If halo is not inside visible region, return
   if (!topLevelClipper->GetClipper ()->IsInside (csVector2 (v.x, v.y))) return ;

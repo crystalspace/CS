@@ -428,7 +428,7 @@ void csDecal::EndMesh ()
   pRenderMesh->geometryInstance = (void *)bufferHolder;
   //variableContext.AttachNew(new csShaderVariableContext);
   //pRenderMesh->variablecontext = variableContext;
-  currMesh->AddExtraRenderMesh(pRenderMesh, decalTemplate->GetZBufMode ());
+  currMesh->AddExtraRenderMesh(pRenderMesh);
   pRenderMesh->renderPrio = decalTemplate->GetRenderPriority ();
 
   // record the animation control data then reset it

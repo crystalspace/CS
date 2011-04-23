@@ -218,11 +218,11 @@ bool csBulletJoint::RebuildJoint ()
 
 	// apply min/max values
 	if (min_angle[0] < max_angle[0])
-	  coneTwist->setLimit (0, (max_angle[0] - min_angle[0]) * 5.0f);
+	  coneTwist->setLimit (3, (max_angle[0] - min_angle[0]) * 5.0f);
 	if (min_angle[1] < max_angle[1])
-	  coneTwist->setLimit (1, (max_angle[1] - min_angle[1]) * 5.0f);
+	  coneTwist->setLimit (4, (max_angle[1] - min_angle[1]) * 5.0f);
 	if (min_angle[2] < max_angle[2])
-	  coneTwist->setLimit (2, (max_angle[2] - min_angle[2]) * 5.0f);
+	  coneTwist->setLimit (5, (max_angle[2] - min_angle[2]) * 5.0f);
 
 	constraint = coneTwist;
       }

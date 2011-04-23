@@ -9,6 +9,7 @@ SubInclude TOP plugins culling ;
 SubInclude TOP plugins decal ;
 SubInclude TOP plugins device ;
 SubInclude TOP plugins documentsystem ;
+SubInclude TOP plugins editor ;
 SubInclude TOP plugins engine ;
 SubInclude TOP plugins engseq ;
 SubInclude TOP plugins filesys ;

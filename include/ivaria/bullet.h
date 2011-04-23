@@ -528,6 +528,15 @@ struct iSoftBody : public iBody
    * Return the normal vector in world coordinates for the given vertex.
    */
   virtual csVector3 GetVertexNormal (size_t index) const = 0;
+
+  /**
+   * Generate bending constraints between the vertices of this soft body.
+   * This can be used to make the body more rigid.
+   * \param distance Maximum number of triangle edges that can exist
+   * between two vertices in order to have a constraint generated for
+   * this pair of vertices. Typical values are 2 or 3.
+   */
+  virtual void GenerateBendingConstraints (size_t distance) = 0;
 };
 
 /**

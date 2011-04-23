@@ -237,10 +237,25 @@ bool RMUnshadowed::RenderView (iView* view, bool recursePortals)
   view->GetEngine ()->UpdateNewFrame ();  
   view->GetEngine ()->FireStartFrame (rview);
 
-  float leftx = -c->GetShiftX () * c->GetInvFOV ();
-  float rightx = (frameWidth - c->GetShiftX ()) * c->GetInvFOV ();
-  float topy = -c->GetShiftY () * c->GetInvFOV ();
-  float boty = (frameHeight - c->GetShiftY ()) * c->GetInvFOV ();
+  float ifov, sx, sy;
+  iPerspectiveCamera* pcam = view->GetPerspectiveCamera ();
+  if (pcam)
+  {
+    ifov = pcam->GetInvFOV ();
+    sx = pcam->GetShiftX ();
+    sy = pcam->GetShiftY ();
+  }
+  else
+  {
+    ifov = 1.0f;
+    sx = 0.0f;
+    sy = 0.0f;
+  }
+
+  float leftx = -sx * ifov;
+  float rightx = (frameWidth - sx) * ifov;
+  float topy = -sy * ifov;
+  float boty = (frameHeight - sy) * ifov;
   rview->SetFrustum (leftx, rightx, topy, boty);
 
   contextsScannedForTargets.Empty ();

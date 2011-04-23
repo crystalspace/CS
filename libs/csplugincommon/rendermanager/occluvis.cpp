@@ -1210,10 +1210,11 @@ namespace CS
                   else
                   {
                     data->isect = movtrans.This2Other(obj_isect);
-                    data->sqdist = csSquaredDist::PointPoint (
-                              data->seg.Start(), data->isect);
-                    data->mesh = mesh;
                   }
+
+                  data->sqdist = csSquaredDist::PointPoint (data->seg.Start(),
+                                                            data->isect);
+                  data->mesh = mesh;
                 }
               }
             }
