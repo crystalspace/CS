@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/eventnames.h"
 #include "csutil/scf.h"
 
 #include "iutil/objreg.h"
@@ -26,12 +27,15 @@
 #include "imap/loader.h"
 #include "imesh/genmesh.h"
 #include "imesh/object.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "ivideo/texture.h"
 #include "ivideo/graph3d.h"
 
 #include <wx/menu.h>
 #include <wx/toolbar.h>
 
+#include "editor.h"
 #include "mainframe.h"
 #include "statusbar.h"
 #include "vfsfiledialog.h"
@@ -77,7 +81,7 @@ END_EVENT_TABLE ()
 #include "data/editor/images/trans/scale_off.xpm"
 
 MainFrame::MainFrame (const wxString& title, const wxPoint& pos, const wxSize& size)
-  : wxFrame (NULL, -1, title, pos, size)
+: wxFrame (NULL, -1, title, pos, size), loadingResource (nullptr)
 {
   wxMenu* fileMenu = new wxMenu ();
 
@@ -107,16 +111,16 @@ MainFrame::MainFrame (const wxString& title, const wxPoint& pos, const wxSize& s
   statusBar->Show ();
 
   wxToolBar* toolBar = CreateToolBar (wxNO_BORDER|wxHORIZONTAL|wxTB_FLAT, ID_ToolBar);
-  toolBar->SetToolBitmapSize (wxSize (16, 16));
+  toolBar->SetToolBitmapSize (wxSize (21, 21));
 
   //wxBitmap* moveon = new wxBitmap (move_on_xpm));
   wxBitmap* moveoff = new wxBitmap (move_off_xpm);
   wxBitmap* rotoff = new wxBitmap (rot_off_xpm);
   wxBitmap* scaleoff = new wxBitmap (scale_off_xpm);
-  toolBar->AddCheckTool(ID_MoveTool, wxT("Move"), *moveoff, *moveoff, wxT("Move object"));
-  toolBar->AddCheckTool(ID_RotateTool, wxT("Rotate"), *rotoff, *rotoff, wxT("Rotate object"));
-  toolBar->AddCheckTool(ID_ScaleTool, wxT("Scale"), *scaleoff, *scaleoff, wxT("Scale object"));
-  toolBar->Realize();
+  toolBar->AddCheckTool (ID_MoveTool, wxT ("Move"), *moveoff, *moveoff, wxT ("Move object"));
+  toolBar->AddCheckTool (ID_RotateTool, wxT ("Rotate"), *rotoff, *rotoff, wxT ("Rotate object"));
+  toolBar->AddCheckTool (ID_ScaleTool, wxT ("Scale"), *scaleoff, *scaleoff, wxT ("Scale object"));
+  toolBar->Realize ();
 
   delete moveoff;
   delete rotoff;
@@ -126,17 +130,16 @@ MainFrame::MainFrame (const wxString& title, const wxPoint& pos, const wxSize& s
 MainFrame::~MainFrame ()
 {
   delete statusBar;
+  delete pump;
   
   panelManager->Uninitialize ();
 }
 
-bool MainFrame::Initialize (iObjectRegistry* obj_reg)
+bool MainFrame::Initialize (iObjectRegistry* obj_reg, Editor* editor)
 {
   object_reg = obj_reg;
 
-  editor = csQueryRegistry<iEditor> (object_reg);
-  if (!editor)
-    return false;
+  this->editor = editor;
   
   panelManager = csQueryRegistry<iPanelManager> (object_reg);
   if (!panelManager)
@@ -167,7 +170,86 @@ bool MainFrame::SecondInitialize (iObjectRegistry* obj_reg)
   
   loader->LoadLibraryFile ("arrows.lib");
   
+  pump = new Pump(this);
+  pump->Start (20);
+
   return true;
+}
+
+csPtr<iProgressMeter> MainFrame::GetProgressMeter ()
+{
+  csRef<iProgressMeter> meter;
+  meter.AttachNew (new StatusBarProgressMeter (statusBar));
+  return csPtr<iProgressMeter> (meter);
+}
+
+void MainFrame::Update ()
+{
+  // Check the status of any resource currently loaded
+  if (loadingResource && loadingReturn->IsFinished ())
+  {
+    if (loadingReturn->WasSuccessful ())
+    {
+      csString text = loadingResource->isLibrary ? "Library \"" : "Map \"";
+      text += loadingResource->file + "\" was loaded successfully";
+      SetStatusText (wxString::FromAscii (text.GetData ()));
+
+      if (loadingResource->isLibrary)
+	editor->FireLibraryLoaded (loadingResource->path, loadingResource->file);
+      else
+	editor->FireMapLoaded (loadingResource->path, loadingResource->file);
+    }
+
+    else
+    {
+      csString text = "Failed to load ";
+      text += loadingResource->isLibrary ? "library \"" : "map \"";
+      text += loadingResource->file + "\"";
+      SetStatusText (wxString::FromAscii (text.GetData ()));
+    }
+
+    delete loadingResource;
+    loadingResource = nullptr;
+    loadingReturn = nullptr;
+  }
+
+  // If there are no loading active then push any pending one
+  if (!loadingResource && resourceData.GetSize ())
+  {
+    loadingResource = new ResourceData ();
+    *loadingResource = resourceData.Top ();
+    resourceData.DeleteIndex (0);
+
+    csString text = "Loading ";
+    text += loadingResource->isLibrary ? "library \"" : "map \"";
+    text += loadingResource->file;
+    SetStatusText (wxString::FromAscii (text.GetData ()));
+
+    if (loadingResource->isLibrary)
+      loadingReturn = editor->LoadLibraryFile (loadingResource->path, loadingResource->file);
+    else
+      loadingReturn = editor->LoadMapFile (loadingResource->path, loadingResource->file, loadingResource->clearEngine);
+  }
+}
+
+void MainFrame::PushMapFile (const char* path, const char* filename, bool clearEngine)
+{
+  ResourceData resource;
+  resource.path = path;
+  resource.file = filename;
+  resource.clearEngine = clearEngine;
+  resource.isLibrary = false;
+  resourceData.Push (resource);
+}
+
+void MainFrame::PushLibraryFile (const char* path, const char* filename)
+{
+  ResourceData resource;
+  resource.path = path;
+  resource.file = filename;
+  resource.clearEngine = false;
+  resource.isLibrary = true;
+  resourceData.Push (resource);
 }
 
 void MainFrame::OnOpen (wxCommandEvent& event)
@@ -178,20 +260,7 @@ void MainFrame::OnOpen (wxCommandEvent& event)
   cssVFSFileDlg dialog (this, -1, _("Open"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, vfs, wxT("/lev/"), VFS_OPEN);
   if (!dialog.ShowModal ())
     return;
-
-  SetStatusText (wxT("Loading map..."));
-
-  csRef<iProgressMeter> meter (new StatusBarProgressMeter (statusBar));
-  
-
-  if (editor->LoadMapFile (dialog.GetPath(), dialog.GetFilename(), meter, 0))
-  {
-    SetStatusText (wxT("Ready"));
-  }
-  else
-  {
-    SetStatusText (wxT("Map failed to load!"));
-  }
+  PushMapFile (dialog.GetPath(), dialog.GetFilename(), true);
 }
 
 void MainFrame::OnSave (wxCommandEvent& event)
@@ -210,7 +279,6 @@ void MainFrame::OnSave (wxCommandEvent& event)
   SetStatusText (wxT("Ready"));
 }
 
-
 void MainFrame::OnImportLibrary(wxCommandEvent& event)
 {
   if (!vfs)
@@ -219,23 +287,16 @@ void MainFrame::OnImportLibrary(wxCommandEvent& event)
   cssVFSFileDlg dialog (this, -1, _("Import Library"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, vfs, wxT("/lib/"), VFS_OPEN);
   if (!dialog.ShowModal ())
     return;
-
-  SetStatusText (wxT("Loading library..."));
-
-  if (editor->LoadLibraryFile (dialog.GetPath(), dialog.GetFilename()))
-  {
-    SetStatusText (wxT("Ready"));
-  }
-  else
-  {
-    SetStatusText (wxT("Library failed to load!"));
-  }
+  PushLibraryFile (dialog.GetPath(), dialog.GetFilename());
 }
-
 
 void MainFrame::OnQuit (wxCommandEvent& event)
 {
-  Close (true);
+  // Tell CS we're going down
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
+  if (q) q->GetEventOutlet ()->Broadcast (csevQuit (object_reg));
+
+  Destroy ();
 }
 
 void MainFrame::OnUndo (wxCommandEvent& event)

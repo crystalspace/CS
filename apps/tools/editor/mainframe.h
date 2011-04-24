@@ -23,17 +23,18 @@
 #include "ieditor/panelmanager.h"
 #include "ieditor/actionmanager.h"
 
-#include <iutil/vfs.h>
-#include <ivaria/pmeter.h>
-#include <csutil/csstring.h>
+#include "iutil/vfs.h"
+#include "ivaria/pmeter.h"
+#include "csutil/csstring.h"
 
 #include <wx/frame.h>
 #include <wx/statusbr.h>
-#include <wx/gauge.h>
+#include <wx/timer.h>
 
 namespace CS {
 namespace EditorApp {
 
+class Editor;
 class StatusBar;
 
 class MainFrame : public wxFrame
@@ -42,8 +43,15 @@ public:
   MainFrame (const wxString& title, const wxPoint& pos, const wxSize& size);
   virtual ~MainFrame ();
 
-  bool Initialize (iObjectRegistry* obj_reg);
+  bool Initialize (iObjectRegistry* obj_reg, Editor* editor);
   bool SecondInitialize (iObjectRegistry* obj_reg);
+
+  csPtr<iProgressMeter> GetProgressMeter ();
+
+  void Update ();
+
+  void PushMapFile (const char* path, const char* filename, bool clearEngine);
+  void PushLibraryFile (const char* path, const char* filename);
 
   void OnOpen (wxCommandEvent& event);
   void OnSave (wxCommandEvent& event);
@@ -64,7 +72,7 @@ private:
 
   iObjectRegistry* object_reg;
 
-  csRef<iEditor> editor;
+  Editor* editor;
   csRef<iVFS> vfs;
   csRef<iPanelManager> panelManager;
   csRef<iActionManager> actionManager;
@@ -88,6 +96,29 @@ private:
   private:
     MainFrame* mainFrame;
   };
+
+  struct ResourceData
+  {
+    csString path;
+    csString file;
+    bool clearEngine;
+    bool isLibrary;
+  };
+  csArray<ResourceData> resourceData;
+  ResourceData* loadingResource;
+  csRef<iThreadReturn> loadingReturn;
+
+  class Pump : public wxTimer
+  {
+  public:
+    Pump (MainFrame* frame) : frame (frame) {}
+    
+    virtual void Notify ()
+    { frame->Update (); }
+  private:
+    MainFrame* frame;
+  };
+  Pump* pump;
 
   DECLARE_EVENT_TABLE()
 };

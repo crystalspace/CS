@@ -19,15 +19,16 @@
 #ifndef __IEDITOR_EDITOR_H__
 #define __IEDITOR_EDITOR_H__
 
-#include <csutil/array.h>
-#include <csutil/scf.h>
-#include <csutil/scf_implementation.h>
+#include "csutil/array.h"
+#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 
 #include "ieditor/editorobject.h"
 
-struct iProgressMeter;
-struct csSimpleRenderMesh;
 struct iCollection;
+struct iProgressMeter;
+struct iThreadReturn;
+struct csSimpleRenderMesh;
 
 namespace CS {
 namespace EditorApp {
@@ -44,7 +45,6 @@ struct iMapListener : public virtual iBase
 
   /// Called after library is loaded.
   virtual void OnLibraryLoaded (const char* path, const char* filename, iCollection* collection) = 0;
-
 };
 
 /**
@@ -54,15 +54,18 @@ struct iEditor : public virtual iBase
 {
   SCF_INTERFACE (iEditor, 0, 0, 1);
 
+  /// Get a progress meter to be notified of the progress of an action
+  virtual csPtr<iProgressMeter> GetProgressMeter () = 0;
+
   /// Load a map from the given VFS file.
-  virtual bool LoadMapFile (const char* path, const char* filename,
-			    iProgressMeter* meter = 0, bool clearEngine = true) = 0;
+  virtual iThreadReturn* LoadMapFile (const char* path, const char* filename,
+				      bool clearEngine = true) = 0;
 
   /// Save the engine contents to the given file
   virtual void SaveMapFile (const char* path, const char* filename) = 0;
   
   /// Load a library file.
-  virtual bool LoadLibraryFile (const char* path, const char* filename) = 0;
+  virtual iThreadReturn* LoadLibraryFile (const char* path, const char* filename) = 0;
 
   /// Add a map listener.
   virtual void AddMapListener (iMapListener* listener) = 0;

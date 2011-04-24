@@ -28,6 +28,8 @@
 #include "csutil/refarr.h"
 
 struct iObjectRegistry;
+struct iSaver;
+struct iVFS;
 struct csSimpleRenderMesh;
 
 namespace CS {
@@ -43,12 +45,13 @@ public:
   
   virtual bool Initialize (iObjectRegistry* reg);
 
-  virtual bool LoadMapFile (const char* path, const char* filename,
-                        iProgressMeter* meter, bool clearEngine);
+  virtual csPtr<iProgressMeter> GetProgressMeter ();
+
+  virtual iThreadReturn* LoadMapFile (const char* path, const char* filename, bool clearEngine);
 
   virtual void SaveMapFile (const char* path, const char* filename);
   
-  virtual bool LoadLibraryFile (const char* path, const char* filename);
+  virtual iThreadReturn* LoadLibraryFile (const char* path, const char* filename);
   
   virtual void AddMapListener (iMapListener* listener);
 
@@ -66,9 +69,12 @@ public:
   virtual void SetTransformStatus (TransformStatus status);
   virtual TransformStatus GetTransformStatus ();
 
-private:
-  bool InitCS ();
+  void FireMapLoaded (const char* path, const char* file);
+  void FireLibraryLoaded (const char* path, const char* file);
 
+private:
+  void Help ();
+  bool InitCS ();
   void LoadPlugins ();
 
   iObjectRegistry* object_reg;
@@ -80,7 +86,7 @@ private:
 
   csRef<iEngine> engine;
   csRef<iVFS> vfs;
-  csRef<iLoader> loader;
+  csRef<iThreadedLoader> loader;
   csRef<iSaver> saver;
 
   csRef<iCollection> mainCollection;

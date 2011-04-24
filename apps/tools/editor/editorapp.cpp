@@ -72,6 +72,8 @@ IMPLEMENT_APP(EditorApp)
  *---------------------------------------------------------------------*/
 bool EditorApp::OnInit(void)
 {
+  wxInitAllImageHandlers ();
+
 #if defined(wxUSE_UNICODE) && wxUSE_UNICODE
   char** csargv;
   csargv = (char**)cs_malloc(sizeof(char*) * argc);
