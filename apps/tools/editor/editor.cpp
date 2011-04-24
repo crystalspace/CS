@@ -234,23 +234,6 @@ bool Editor::InitCS ()
   if (filename)
     mainFrame->PushMapFile (vfsDir, filename, false);
 
-/*
-  if (!vfsDir.IsEmpty())
-  {
-    if (!vfs->ChDir (vfsDir))
-    {
-      ReportError("Cannot change to path: %s\n", vfsDir.GetData ());
-    }
-    else
-    {
-      // Update StdDlg path.
-      CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
-      CEGUI::Window* window = winMgr->getWindow("StdDlg/Path");
-      window->setProperty("Text", vfs->GetCwd());
-      StdDlgUpdateLists(vfs->GetCwd());
-    }
-  }
-*/
   return true;
 }
 
@@ -286,8 +269,13 @@ csPtr<iProgressMeter> Editor::GetProgressMeter ()
 
 iThreadReturn* Editor::LoadMapFile (const char* path, const char* filename, bool clearEngine)
 {
-  printf ("Editor::LoadMapFile %s %s\n", path, filename);
   vfs->ChDir (path);
+
+  if (clearEngine)
+  {
+    engine->RemoveCollection (mainCollection);
+    mainCollection = engine->CreateCollection ("Main collection");
+  }
 
   csRef<iThreadReturn> loadingResult =
     loader->LoadMapFile (vfs->GetCwd (), filename, clearEngine, mainCollection);
@@ -298,10 +286,8 @@ iThreadReturn* Editor::LoadLibraryFile (const char* path, const char* filename)
 {
   vfs->ChDir (path);
 
-  iCollection* collection = engine->CreateCollection ("loading_collection");
-
   csRef<iThreadReturn> loadingResult =
-    loader->LoadLibraryFile (vfs->GetCwd (), filename, collection);
+    loader->LoadLibraryFile (vfs->GetCwd (), filename, mainCollection);
   return loadingResult;
 }
 
@@ -314,7 +300,6 @@ void Editor::SaveMapFile (const char* path, const char* filename)
 
 void Editor::FireMapLoaded (const char* path, const char* filename)
 {
-    //engine->Prepare ();
   csRef<iProgressMeter> progressMeter = GetProgressMeter ();
   engine->Prepare (progressMeter);
 
@@ -335,7 +320,7 @@ void Editor::FireLibraryLoaded (const char* path, const char* filename)
   csRefArray<iMapListener>::Iterator it = mapListeners.GetIterator ();
   while (it.HasNext ())
   {
-    it.Next ()->OnLibraryLoaded (path, filename, nullptr/*collection*/);
+    it.Next ()->OnLibraryLoaded (path, filename, mainCollection);
   }
 }
 
