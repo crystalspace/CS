@@ -66,6 +66,8 @@
 /* Fun fact: should occur after csutil/event.h, otherwise, gcc may report
  * missing csMouseEventHelper symbols. */
 #include <wx/wx.h>
+#include <wx/treectrl.h>
+#include <wx/xrc/xmlres.h>
 
 CS_IMPLEMENT_APPLICATION
 
@@ -87,6 +89,7 @@ int main (int argc, const char* const argv[])
 
 //-----------------------------------------------------------------------------
 
+#include "data/wxtest/sceneIcon.xpm"
 
 BEGIN_EVENT_TABLE(Simple, wxFrame)
   EVT_SHOW( Simple::OnShow )
@@ -98,8 +101,8 @@ END_EVENT_TABLE()
 Simple* simple = 0;
 
 Simple::Simple (iObjectRegistry* object_reg)
-  : wxFrame(0, -1, wxT("Crystal Space WxWidget Canvas test"), 
-    wxDefaultPosition, wxSize(500, 500))
+  : wxFrame (0, -1, wxT ("Crystal Space WxWidget Canvas test"), 
+             wxDefaultPosition, wxSize (800, 600))
 {
   Simple::object_reg = object_reg;
 }
@@ -307,21 +310,70 @@ bool Simple::Initialize ()
     return false;
   }
 
-  new wxPanel(this, -1, wxPoint(0, 0), wxSize(1, 1));
-  wxPanel* panel = new wxPanel(this, -1, wxPoint(50, 50), wxSize(400, 400));
-  Show(true);
-  panel->Show(true);
+  // Load the frame from an XRC file
+  wxXmlResource::Get ()->InitAllHandlers ();
+  if (!wxXmlResource::Get ()->Load (wxT ("data/wxtest/wxtest.xrc")))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+              "crystalspace.application.wxtest",
+              "Could not load XRC ressource file!");
+    return false;
+  }
 
-  iGraphics2D* g2d = g3d->GetDriver2D();
+  wxPanel* mainPanel = wxXmlResource::Get ()->LoadPanel (this, wxT ("MyPanel"));
+  if (!mainPanel)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+              "crystalspace.application.wxtest",
+              "Could not find main panel in XRC ressource file!");
+    return false;
+  }
+
+  // Populate the tree with some test items
+  wxTreeCtrl* tree = XRCCTRL (*mainPanel, "m_treeCtrl", wxTreeCtrl);
+  if (!tree)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+              "crystalspace.application.wxtest",
+              "Could not find tree in XRC ressource file!");
+    return false;
+  }
+
+  wxImageList* imageList = new wxImageList (16, 16);
+  tree->AssignImageList (imageList);
+  
+  wxBitmap sceneBmp (sceneIcon_xpm);
+  int rootIconIdx = imageList->Add (sceneBmp);
+
+  wxTreeItemId rootId = tree->AddRoot (wxT ("Root node"), rootIconIdx);
+  tree->AppendItem (rootId, wxT ("test1"));
+  tree->AppendItem (rootId, wxT ("test2"));
+  tree->AppendItem (rootId, wxT ("test3"));
+  tree->AppendItem (rootId, wxT ("test4"));
+
+  // Find the panel where to place the wxgl canvas
+  wxPanel* panel = XRCCTRL (*this, "m_panel1", wxPanel);
+  if (!panel)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+              "crystalspace.application.wxtest",
+              "Could not find the panel for the wxgl canvas in XRC ressource file!");
+    return false;
+  }
+
+  // Create the wxgl canvas
+  iGraphics2D* g2d = g3d->GetDriver2D ();
   csRef<iWxWindow> wxwin = scfQueryInterface<iWxWindow> (g2d);
-  if( !wxwin )
+  if (!wxwin)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
               "crystalspace.application.wxtest",
               "Canvas is no iWxWindow plugin!");
     return false;
   }
-  wxwin->SetParent(panel);
+
+  wxwin->SetParent (panel);
+  Show (true);
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!csInitializer::OpenApplication (object_reg))
@@ -336,7 +388,7 @@ bool Simple::Initialize ()
      This is so it receives keyboard events (and conveniently translate these
      into CS keyboard events/update the CS keyboard state).
    */
-  wxwin->GetWindow()->SetFocus ();
+  wxwin->GetWindow ()->SetFocus ();
 
   // Load the texture from the standard library.  This is located in
   // CS/data/standard.zip and mounted as /lib/std using the Virtual
@@ -487,6 +539,8 @@ IMPLEMENT_APP(MyApp)
  *---------------------------------------------------------------------*/
   bool MyApp::OnInit(void)
 {
+  wxInitAllImageHandlers ();
+
 #if defined(wxUSE_UNICODE) && wxUSE_UNICODE
   char** csargv;
   csargv = (char**)cs_malloc(sizeof(char*) * argc);
