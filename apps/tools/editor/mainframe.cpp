@@ -159,6 +159,7 @@ bool MainFrame::Initialize (iObjectRegistry* obj_reg, Editor* editor)
 
   return true;
 }
+
 bool MainFrame::SecondInitialize (iObjectRegistry* obj_reg)
 {
   if (!vfs)
@@ -170,6 +171,7 @@ bool MainFrame::SecondInitialize (iObjectRegistry* obj_reg)
     return false;
   
   loader->LoadLibraryFile ("arrows.lib");
+  vfs->ChDir ("/");
   
   pump = new Pump(this);
   pump->Start (20);
