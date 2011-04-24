@@ -260,7 +260,11 @@ void MainFrame::OnOpen (wxCommandEvent& event)
   if (!vfs)
     vfs = csQueryRegistry<iVFS> (object_reg);
 
-  cssVFSFileDlg dialog (this, -1, _("Open"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, vfs, wxT("/lev/"), VFS_OPEN);
+  csString path = vfs->GetCwd ();
+  if (path == "/")
+    path = "/lev/";
+
+  cssVFSFileDlg dialog (this, -1, _("Open"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, vfs, path, VFS_OPEN);
   if (!dialog.ShowModal ())
     return;
   PushMapFile (dialog.GetPath(), dialog.GetFilename(), true);
@@ -271,7 +275,11 @@ void MainFrame::OnSave (wxCommandEvent& event)
   if (!vfs)
     vfs = csQueryRegistry<iVFS> (object_reg);
 
-  cssVFSFileDlg dialog (this, -1, _("Save"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, vfs, wxT("/lev/"), VFS_SAVE);
+  csString path = vfs->GetCwd ();
+  if (path == "/")
+    path = "/lev/";
+
+  cssVFSFileDlg dialog (this, -1, _("Save"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, vfs, path, VFS_SAVE);
   if (!dialog.ShowModal ())
     return;
 
@@ -287,7 +295,11 @@ void MainFrame::OnImportLibrary(wxCommandEvent& event)
   if (!vfs)
     vfs = csQueryRegistry<iVFS> (object_reg);
 
-  cssVFSFileDlg dialog (this, -1, _("Import Library"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, vfs, wxT("/lib/"), VFS_OPEN);
+  csString path = vfs->GetCwd ();
+  if (path == "/")
+    path = "/lib/";
+
+  cssVFSFileDlg dialog (this, -1, _("Import Library"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, vfs, path, VFS_OPEN);
   if (!dialog.ShowModal ())
     return;
   PushLibraryFile (dialog.GetPath(), dialog.GetFilename());

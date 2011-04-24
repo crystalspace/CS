@@ -56,7 +56,7 @@ public:
        const wxSize& size = wxDefaultSize,
        long style = wxDEFAULT_DIALOG_STYLE,
        iVFS* vfs = 0,
-       const wxString& startpath = wxT("/"),
+       const csString& startpath = "/",
        fileDialogType dialogType = VFS_OPEN
      );
   ~cssVFSFileDlg();
