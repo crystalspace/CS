@@ -166,7 +166,8 @@ void SceneBrowserTreeCtrl::OnObjectAdded (iObjectList* list, iEditorObject* obj)
                                             wxString(obj->GetName (), *wxConvCurrent),
                                                 imageIdx, -1,
                                                 new SceneBrowserTreeItemData (obj));
-    
+    ExpandAll ();
+
     // Put id in map
     itemMap.Put (obj->GetIBase (), id);
   }

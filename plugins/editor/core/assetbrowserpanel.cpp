@@ -133,10 +133,8 @@ AssetBrowserTreeCtrl::AssetBrowserTreeCtrl(iObjectRegistry* obj_reg, iEditor* ed
     editor (editor), editingLabel (false),
     ignoreSelectionChanges (false)
 {
-  actionManager = csQueryRegistry<iActionManager> (obj_reg);
-  
   engine = csQueryRegistry<iEngine> (obj_reg);
-  
+  actionManager = csQueryRegistry<iActionManager> (obj_reg);
   
   // Register for object list events
   objects = editor->GetObjects ();
@@ -174,6 +172,7 @@ void AssetBrowserTreeCtrl::OnObjectAdded (iObjectList* list, iEditorObject* obj)
 				  wxString(obj->GetName (), *wxConvCurrent),
 				  imageIdx, -1,
 				  new AssetBrowserTreeItemData (obj));
+    ExpandAll ();
     
     // Put id in map
     itemMap.Put (obj->GetIBase (), id);
