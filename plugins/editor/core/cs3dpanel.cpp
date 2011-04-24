@@ -193,11 +193,6 @@ bool CS3DPanel::HandleEvent (iEvent& ev)
   iEventNameRegistry* name_reg = csEventNameRegistry::GetRegistry (object_reg);
   csRef<iMouseDriver> mousedrv = csQueryRegistry<iMouseDriver> (object_reg);
 
-  // Set the focus on this window when the user clicks on it. This enables the
-  // keyboad events to be catched.
-  if (ev.Name == csevMouseDown (name_reg, 0))
-    window->SetFocus ();
-
   int mouse_but;
   if (ev.Name == csevMouseMove (name_reg, 0))
   {
