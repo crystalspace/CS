@@ -131,6 +131,7 @@ MainFrame::~MainFrame ()
 {
   delete statusBar;
   delete pump;
+  delete loadingResource;
   
   panelManager->Uninitialize ();
 }
