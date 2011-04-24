@@ -41,145 +41,139 @@ class wxChoice;
 
 enum fileDialogType
 {
-	VFS_OPEN,
-	VFS_SAVE
+  VFS_OPEN,
+  VFS_SAVE
 };
 
 class cssVFSFileDlg : public wxDialog
 {
 public:
   cssVFSFileDlg
-     ( wxWindow *parent,
-       wxWindowID id,
-       const wxString &title,
-       const wxPoint& pos = wxDefaultPosition,
-       const wxSize& size = wxDefaultSize,
-       long style = wxDEFAULT_DIALOG_STYLE,
-       iVFS* vfs = 0,
-       const csString& startpath = "/",
-       fileDialogType dialogType = VFS_OPEN
-     );
+    ( wxWindow *parent,
+      wxWindowID id,
+      const wxString &title,
+      const wxPoint& pos = wxDefaultPosition,
+      const wxSize& size = wxDefaultSize,
+      long style = wxDEFAULT_DIALOG_STYLE,
+      iVFS* vfs = 0,
+      const csString& startpath = "/",
+      fileDialogType dialogType = VFS_OPEN
+      );
   ~cssVFSFileDlg();
 
-        const char*  GetPath() { return curdvpath.GetData(); }
-        const char*  GetFilename() {return filename.GetData(); }
-
-
-
+  const char*  GetPath() { return curdvpath.GetData(); }
+  const char*  GetFilename() {return filename.GetData(); }
 
 protected:
-//EVENT Methods
-	void OnDirTreeExpandBranch( wxTreeEvent& event );
-	void OnDirTreeCollapseBranch( wxTreeEvent& event );
+  //EVENT Methods
+  void OnDirTreeExpandBranch( wxTreeEvent& event );
+  void OnDirTreeCollapseBranch( wxTreeEvent& event );
   void OnDirTreeSelChange( wxTreeEvent& event );
   void OnRightClickItem( wxTreeEvent& event);
 
   void OnDirViewSelChange( wxListEvent& event );
-	void OnDirViewActivated( wxListEvent & event );
+  void OnDirViewActivated( wxListEvent & event );
 
-	void OnPathTextEnter(wxCommandEvent& event);
+  void OnPathTextEnter(wxCommandEvent& event);
 
   virtual void OnOk( wxCommandEvent& event );
   virtual void OnCancel( wxCommandEvent& event );
 
-	void OnViewModeSelect( wxCommandEvent& event );
+  void OnViewModeSelect( wxCommandEvent& event );
 
-	void OnOpenParent( wxCommandEvent& event );
-
+  void OnOpenParent( wxCommandEvent& event );
 
 private:
-//Enumerators
-	enum ctrllist
-	{
-		DIRECTORY_TREE = wxID_HIGHEST + 1,
-		DIRECTORY_LIST,
+  //Enumerators
+  enum ctrllist
+  {
+    DIRECTORY_TREE = wxID_HIGHEST + 1,
+    DIRECTORY_LIST,
 		
-		TEXT_PATH,
+    TEXT_PATH,
 
-		CHOICE_FILTER,
+    CHOICE_FILTER,
 
-		BUTTON_OPEN,
-		BUTTON_CANCEL,
-		BUTTON_NEW_FOLDER,
-		BUTTON_PARENT,
+    BUTTON_OPEN,
+    BUTTON_CANCEL,
+    BUTTON_NEW_FOLDER,
+    BUTTON_PARENT,
 
-		CHOICE_VIEW_MODE
-	};
+    CHOICE_VIEW_MODE
+  };
 
-	enum imageId
-	{
-		IMAGE_FOLDER_OPEN,
-		IMAGE_FOLDER_CLOSED,
-		IMAGE_FILE,
-		IMAGE_NEW_DIR,
-		IMAGE_TO_PARENT,
-		IMAGE_COUNT		//Should always be at the bottom.
-	};
+  enum imageId
+  {
+    IMAGE_FOLDER_OPEN,
+    IMAGE_FOLDER_CLOSED,
+    IMAGE_FILE,
+    IMAGE_NEW_DIR,
+    IMAGE_TO_PARENT,
+    IMAGE_COUNT		//Should always be at the bottom.
+  };
 
-	enum viewTypes
-	{
-		LIST,
-		REPORT,
-		ICON,
-		DETAIL
-	};
+  enum viewTypes
+  {
+    LIST,
+    REPORT,
+    ICON,
+    DETAIL
+  };
 
-	enum fileTypes
-	{
-		FOLDER,
-		FILE
-	};
+  enum fileTypes
+  {
+    FOLDER,
+    FILE
+  };
 
-
-	//Operations
-	wxImageList* CreateImageList();
+  //Operations
+  wxImageList* CreateImageList();
   csString GetPathByTreeItem(wxTreeItemId id);
-	bool HasChildDir( wxTreeItemId parent );
-	void InitFilterList(wxString choices []);
-	void InitViewTypeList();
-	bool IsDir( const char *path );
-	bool IsFile( const char *path );
-	bool LoadVFSDirView( const char *path);
-	bool LoadVFSTreeBranch(wxTreeItemId parent, const char *path);
+  bool HasChildDir( wxTreeItemId parent );
+  void InitFilterList(wxString choices []);
+  void InitViewTypeList();
+  bool IsDir( const char *path );
+  bool IsFile( const char *path );
+  bool LoadVFSDirView( const char *path);
+  bool LoadVFSTreeBranch(wxTreeItemId parent, const char *path);
 
-	void OpenTreeItemChild( wxString childName );
+  void OpenTreeItemChild( wxString childName );
 
-//Images
-	wxImageList* imageList;
-	int imageIdList[IMAGE_COUNT];
+  //Images
+  wxImageList* imageList;
+  int imageIdList[IMAGE_COUNT];
 
-//Frame Elements
+  //Frame Elements
   wxTreeCtrl *dirtree;
   wxTextCtrl *thepath;
   wxChoice *filter;
-	wxButton *okbutton;
-	wxButton *cancelbut;
-	wxStaticText *pathtext;
-	wxListCtrl *fileView;
-	wxChoice *viewTypes;
-	wxBitmapButton *newFolderButton;
-	wxBitmapButton *parentFolderButton;
+  wxButton *okbutton;
+  wxButton *cancelbut;
+  wxStaticText *pathtext;
+  wxListCtrl *fileView;
+  wxChoice *viewTypes;
+  wxBitmapButton *newFolderButton;
+  wxBitmapButton *parentFolderButton;
 
-	csString curdvpath;
-        csString filename;
-	fileDialogType dialogType;
+  csString curdvpath;
+  csString filename;
+  fileDialogType dialogType;
 
   csRef<iVFS> vfs;
 
-  DECLARE_EVENT_TABLE()
+  DECLARE_EVENT_TABLE();
 };
-
 
 class FileDlgTreeItemData : public wxTreeItemData
 {
 public:
-	explicit FileDlgTreeItemData(const wxString& newData ) : data(newData) {}
+  explicit FileDlgTreeItemData(const wxString& newData ) : data(newData) {}
 
-	const wxChar *GetData() const { return data.c_str(); }
-	void SetData(wxString newData) { data = newData; }
+  const wxChar *GetData() const { return data.c_str(); }
+  void SetData(wxString newData) { data = newData; }
 
 private:
-	wxString data;
+  wxString data;
 };
 
 #endif
