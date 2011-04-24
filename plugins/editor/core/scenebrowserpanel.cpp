@@ -137,13 +137,13 @@ SceneBrowserTreeCtrl::SceneBrowserTreeCtrl(iObjectRegistry* obj_reg, iEditor* ed
   // Register for selection events
   selection = editor->GetSelection ();
   selection->AddListener (this);
-  
-  imageList = new wxImageList (512, 256);
+
+  imageList = new wxImageList (16, 16);
   AssignImageList(imageList);
-  
-  wxBitmap sceneBmp (wxBITMAP(sceneIcon));
+
+  wxBitmap sceneBmp (sceneIcon_xpm);
   int rootIconIdx = imageList->Add (sceneBmp);
-  AddRoot(wxT("Scene"), rootIconIdx);
+  AddRoot (wxT ("Scene"), rootIconIdx);
 }
 
 

@@ -47,9 +47,9 @@ SCF_IMPLEMENT_FACTORY(CSObjectMapListener)
 CSObjectMapListener::CSObjectMapListener (iBase* parent)
   : scfImplementationType (this, parent)
 {
-  meshBmp = new wxBitmap (wxBITMAP(meshIcon));
-  lightBmp = new wxBitmap (wxBITMAP(lightIcon));
-  defaultBmp = new wxBitmap (wxBITMAP(defaultIcon));
+  meshBmp = new wxBitmap (meshIcon_xpm);
+  lightBmp = new wxBitmap (lightIcon_xpm);
+  defaultBmp = new wxBitmap (defaultIcon_xpm);
 }
 
 CSObjectMapListener::~CSObjectMapListener ()

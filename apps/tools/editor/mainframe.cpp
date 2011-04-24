@@ -107,11 +107,12 @@ MainFrame::MainFrame (const wxString& title, const wxPoint& pos, const wxSize& s
   statusBar->Show ();
 
   wxToolBar* toolBar = CreateToolBar (wxNO_BORDER|wxHORIZONTAL|wxTB_FLAT, ID_ToolBar);
+  toolBar->SetToolBitmapSize (wxSize (16, 16));
 
-  //wxBitmap* moveon = new wxBitmap (wxBITMAP(move_on));
-  wxBitmap* moveoff = new wxBitmap (wxBITMAP(move_off));
-  wxBitmap* rotoff = new wxBitmap (wxBITMAP(rot_off));
-  wxBitmap* scaleoff = new wxBitmap (wxBITMAP(scale_off));
+  //wxBitmap* moveon = new wxBitmap (move_on_xpm));
+  wxBitmap* moveoff = new wxBitmap (move_off_xpm);
+  wxBitmap* rotoff = new wxBitmap (rot_off_xpm);
+  wxBitmap* scaleoff = new wxBitmap (scale_off_xpm);
   toolBar->AddCheckTool(ID_MoveTool, wxT("Move"), *moveoff, *moveoff, wxT("Move object"));
   toolBar->AddCheckTool(ID_RotateTool, wxT("Rotate"), *rotoff, *rotoff, wxT("Rotate object"));
   toolBar->AddCheckTool(ID_ScaleTool, wxT("Scale"), *scaleoff, *scaleoff, wxT("Scale object"));

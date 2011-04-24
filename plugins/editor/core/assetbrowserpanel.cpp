@@ -145,13 +145,13 @@ AssetBrowserTreeCtrl::AssetBrowserTreeCtrl(iObjectRegistry* obj_reg, iEditor* ed
   // Register for selection events
   selection = editor->GetSelection ();
   selection->AddListener (this);
-  
-  imageList = new wxImageList (512, 256);
+
+  imageList = new wxImageList (16, 16);
   AssignImageList(imageList);
   
-  wxBitmap sceneBmp (wxBITMAP(sceneIcon));
+  wxBitmap sceneBmp (sceneIcon_xpm);
   int rootIconIdx = imageList->Add (sceneBmp);
-  AddRoot(wxT("Assets"), rootIconIdx);
+  AddRoot (wxT("Assets"), rootIconIdx);
 }
 
 
@@ -167,13 +167,13 @@ void AssetBrowserTreeCtrl::OnObjectAdded (iObjectList* list, iEditorObject* obj)
     obj->AddListener (this);
     
     // Find the parent item
-    wxTreeItemId parentId = itemMap.Get (obj->GetParent (), GetRootItem());
-    
+    wxTreeItemId parentId = itemMap.Get (obj->GetParent (), GetRootItem ());
+
     // Append to tree
     wxTreeItemId id = AppendItem (parentId,
-                                            wxString(obj->GetName (), *wxConvCurrent),
-                                                imageIdx, -1,
-                                                new AssetBrowserTreeItemData (obj));
+				  wxString(obj->GetName (), *wxConvCurrent),
+				  imageIdx, -1,
+				  new AssetBrowserTreeItemData (obj));
     
     // Put id in map
     itemMap.Put (obj->GetIBase (), id);
