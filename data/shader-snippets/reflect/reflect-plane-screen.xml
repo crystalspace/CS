@@ -78,7 +78,7 @@
       <technique priority="100">
 	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 	
-	<input name="positionW" type="position4_world" />
+	<input name="positionC" type="position4_camera" />
 	
 	<input name="texReflect" type="tex2d" default="complex">
 	  <block location="pass">
@@ -107,19 +107,17 @@
 	  </block>
 	</input>
 	
-	<input name="projectedToWorld" type="float4x4" default="complex" private="yes">
+	<input name="projectedToCamera" type="float4x4" default="complex" private="yes">
 	  <block location="cg:fragmentIn">
-	    <uniform type="float4x4" name="projectedToWorld" />
+	    <uniform type="float4x4" name="projectedToCamera" />
 	  </block>
 	  
 	  <block location="cg:fragmentMain">
-	    projectedToWorld = fragmentIn.projectedToWorld;
+	    projectedToCamera = fragmentIn.projectedToCamera;
 	  </block>
 	  
 	  <block location="cg:variablemap">
-	    <variablemap destination="fragmentIn.projectedToWorld" type="expr">
-	      <sexp>(* "world2camera transform" "projection transform inverse")</sexp>
-	    </variablemap>
+	    <variablemap destination="fragmentIn.projectedToCamera" variable="projection transform inverse" />
 	  </block>
 	</input>
 	
@@ -143,17 +141,19 @@
 	  float2 screenPos = (reflTC.xy * reflTC2screen * inv_reflW)+float2(-1,1);
 	  float4 positionProjected = float4 (
 	    screenPos.x, screenPos.y, camDepth, 1);
-	  float4 positionUnprojectedW = mul (projectedToWorld, positionProjected);
-	  positionUnprojectedW /= positionUnprojectedW.w;
+	  float4 positionUnprojectedC = mul (projectedToCamera, positionProjected);
+	  positionUnprojectedC /= positionUnprojectedC.w;
 	  
-	  mirroredPointDist = length (positionW.xyz - positionUnprojectedW.xyz);
+	  if (positionUnprojectedC.z &gt;= positionC.z)
+	    mirroredPointDist = length (positionC.xyz - positionUnprojectedC.xyz);
+	  else
+	    mirroredPointDist = 0;
 	  
 	  float perturbWeight = saturate (mirroredPointDist);
 	  tc.xy += perturb * perturbWeight;
 	  surfaceColor = tex2Dproj (texReflect, tc);
 	  surfaceColor_attr_perfragment = true;
 	  
-	  mirroredPointDist = max (mirroredPointDist, 0);
 	  mirroredPointDistSat = saturate (mirroredPointDist);
 	</block>
 	
