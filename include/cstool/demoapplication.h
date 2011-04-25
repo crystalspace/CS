@@ -226,6 +226,14 @@ class CS_CRYSTALSPACE_EXPORT DemoApplication : public csApplicationFramework,
    */
   virtual void PrintHelp ();
 
+  /**
+   * Return VFS path of an additional config file to load at initialization
+   * Override this if you wish to use an application-specific config file on
+   * top of <tt>demoapplication.cfg</tt>.
+   */
+  virtual const char* GetApplicationConfigFile()
+  { return nullptr; }
+
  public:
   /**
    * Constructor.
