@@ -137,7 +137,9 @@
 	  float3 tc = reflTC.xyw;
 	  float inv_reflW = 1 / reflTC.w;
 	  
-	  float camDepth = tex2Dproj (texReflectDepth, tc).x*-2 + 1;
+	  /* The depth offset can mitigate issues from depth precision when large scales
+	     are involved (eg csisland) */
+	  float camDepth = tex2Dproj (texReflectDepth, tc).x*-2 + 1 + (1.0/8388608.0);
 	  float2 screenPos = (reflTC.xy * reflTC2screen * inv_reflW)+float2(-1,1);
 	  float4 positionProjected = float4 (
 	    screenPos.x, screenPos.y, camDepth, 1);
