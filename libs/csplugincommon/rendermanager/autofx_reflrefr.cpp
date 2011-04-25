@@ -81,6 +81,8 @@ namespace CS
 	
 	svReflXform = strings->Request ("reflection coord xform");
 	reflXformSV.AttachNew (new csShaderVariable (svReflXform));
+	svRefrXform = strings->Request ("refraction coord xform");
+	refrXformSV.AttachNew (new csShaderVariable (svRefrXform));
 	screenFlipped = postEffects ? postEffects->ScreenSpaceYFlipped() : false;
 	  
 	csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objReg);
