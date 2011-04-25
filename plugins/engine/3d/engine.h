@@ -481,6 +481,11 @@ public:
 
   virtual iCameraPositionList* GetCameraPositions ()
   { return &cameraPositions; }
+  
+  virtual float GetDefaultNearClipDistance () const
+  { return defaultNearClip; }
+  virtual void SetDefaultNearClipDistance (float dist)
+  { defaultNearClip = csMax (dist, float (SMALL_Z)); }
 
   //-- Portal handling
   
@@ -1065,6 +1070,8 @@ private:
   /// If using adaptive LODs, this stores the computed adaptive LOD multiplier
   float adaptiveLODsMultiplier;
 
+  /// Default camera near clipping distance
+  float defaultNearClip;
 };
 
 #include "csutil/deprecated_warn_on.h"

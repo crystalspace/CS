@@ -180,7 +180,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine, 8, 0, 0);
+  SCF_INTERFACE(iEngine, 8, 0, 1);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -1338,6 +1338,14 @@ struct iEngine : public virtual iBase
   THREADED_INTERFACE1(SyncEngineLists, csRef<iThreadedLoader> loader);
   virtual void SyncEngineListsNow(csRef<iThreadedLoader> loader) = 0;
   /** @} */
+  
+  /**\name Camera default properties
+   * @{ */
+  /// Retrieve default near plane clipping distance for perspective cameras
+  virtual float GetDefaultNearClipDistance () const = 0;
+  /// Set default near plane clipping distance for perspective cameras
+  virtual void SetDefaultNearClipDistance (float dist) = 0;
+  /**@} */
 };
 
 /** @} */

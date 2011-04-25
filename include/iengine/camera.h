@@ -346,7 +346,7 @@ struct iCamera : public virtual iBase
  */
 struct iPerspectiveCamera : public virtual iBase
 {
-  SCF_INTERFACE(iPerspectiveCamera, 1, 0, 0);
+  SCF_INTERFACE(iPerspectiveCamera, 1, 0, 1);
   
   /// Get the iCamera interface for this camera.
   virtual iCamera* GetCamera() = 0;
@@ -384,6 +384,25 @@ struct iPerspectiveCamera : public virtual iBase
    * center of the camera on the normalized screen.
    */
   virtual void SetPerspectiveCenter (float x, float y) = 0;
+  
+  /**
+   * Get the near clip distance of this camera.
+   * Higher clip distances increases the possibility that the camera may look
+   * "inside" some geometry, however, it also provides higher depth value
+   * precision - especially for large scenes this can prevent depth buffer
+   * issues (Z-fighting, wrong occlusion) at a distance.
+   * 
+   * If you have a collider (player etc.) coupled to camera movement a good
+   * initial value for the near clip distance is a value slightly above the
+   * collider radius.
+   */
+  virtual float GetNearClipDistance() const = 0;
+  /**
+   * Set near clip distance of this camera.
+   * 
+   * The default near clipping distance is controlled by the engine.
+   */
+  virtual void SetNearClipDistance (float dist) = 0;
 };
 
 /**

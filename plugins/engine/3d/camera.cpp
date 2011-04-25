@@ -175,8 +175,9 @@ float PerspectiveImpl:: default_aspect = 0;
 float PerspectiveImpl:: default_inv_aspect = 0;
 float PerspectiveImpl:: default_fov_angle = 90;
 
-PerspectiveImpl::PerspectiveImpl ()
-  : matrixDirty (true), invMatrixDirty (true)
+PerspectiveImpl::PerspectiveImpl (csEngine* engine)
+  : nearClip (engine->csEngine::GetDefaultNearClipDistance()),
+    matrixDirty (true), invMatrixDirty (true)
 {
   aspect = default_aspect;
   inv_aspect = default_inv_aspect;
@@ -271,7 +272,7 @@ void PerspectiveImpl::UpdateMatrix ()
   if (!matrixDirty) return;
   
   matrix = CS::Math::Projections::CSPerspective (1.0f, 
-    aspect, shift_x, shift_y*aspect, inv_aspect);
+    aspect, shift_x, shift_y*aspect, inv_aspect, nearClip);
   
   matrixDirty = false;
   invMatrixDirty = true;
