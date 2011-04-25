@@ -61,8 +61,8 @@ public:
       );
   ~cssVFSFileDlg();
 
-  const char*  GetPath() { return curdvpath.GetData(); }
-  const char*  GetFilename() {return filename.GetData(); }
+  const char* GetPath() { return curdvpath.GetData(); }
+  const char* GetFilename() { return filename.GetData(); }
 
 protected:
   //EVENT Methods

@@ -75,7 +75,7 @@ bool Editor::Initialize (iObjectRegistry* reg)
   actionManager.AttachNew (new ActionManager (object_reg));
   
   // Create the main frame
-  mainFrame = new MainFrame (wxT ("Crystal Space Editor"), wxDefaultPosition, wxSize (800, 600));
+  mainFrame = new MainFrame (wxT ("Crystal Space Editor"), wxDefaultPosition, wxSize (1024, 768));
   mainFrame->Initialize (object_reg, this);
 
   mainFrame->Show ();

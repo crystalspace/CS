@@ -85,10 +85,9 @@ MainFrame::MainFrame (const wxString& title, const wxPoint& pos, const wxSize& s
 {
   wxMenu* fileMenu = new wxMenu ();
 
-  fileMenu->Append (ID_Open, wxT("&Open\tCtrl+O"));
-  fileMenu->Append (ID_Save, wxT("&Save\tCtrl+S"));
-  fileMenu->AppendSeparator ();
-  fileMenu->Append (ID_ImportLibrary, wxT("&Import Library\tCtrl+I"));
+  fileMenu->Append (ID_Open, wxT("&Open world file\tCtrl+O"));
+  fileMenu->Append (ID_ImportLibrary, wxT("&Import library file\tCtrl+I"));
+  fileMenu->Append (ID_Save, wxT("&Save world file\tCtrl+S"));
   fileMenu->AppendSeparator ();
   fileMenu->Append (ID_Quit, wxT("&Quit\tCtrl+Q"));
 
@@ -225,7 +224,7 @@ void MainFrame::Update ()
 
     csString text = "Loading ";
     text += loadingResource->isLibrary ? "library \"" : "map \"";
-    text += loadingResource->file;
+    text += loadingResource->file + "\"...";
     SetStatusText (wxString::FromAscii (text.GetData ()));
 
     if (loadingResource->isLibrary)
@@ -264,10 +263,10 @@ void MainFrame::OnOpen (wxCommandEvent& event)
   if (path == "/")
     path = "/lev/";
 
-  cssVFSFileDlg dialog (this, -1, _("Open"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, vfs, path, VFS_OPEN);
+  cssVFSFileDlg dialog (this, -1, _("Open world file"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, vfs, path, VFS_OPEN);
   if (!dialog.ShowModal ())
     return;
-  PushMapFile (dialog.GetPath(), dialog.GetFilename(), true);
+  PushMapFile (dialog.GetPath (), dialog.GetFilename (), true);
 }
 
 void MainFrame::OnSave (wxCommandEvent& event)
@@ -279,13 +278,13 @@ void MainFrame::OnSave (wxCommandEvent& event)
   if (path == "/")
     path = "/lev/";
 
-  cssVFSFileDlg dialog (this, -1, _("Save"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, vfs, path, VFS_SAVE);
+  cssVFSFileDlg dialog (this, -1, _("Save world file"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, vfs, path, VFS_SAVE);
   if (!dialog.ShowModal ())
     return;
 
   SetStatusText (wxT("Saving map..."));
 
-  editor->SaveMapFile (dialog.GetPath(), dialog.GetFilename());
+  editor->SaveMapFile (dialog.GetPath (), dialog.GetFilename ());
 
   SetStatusText (wxT("Ready"));
 }
@@ -299,10 +298,10 @@ void MainFrame::OnImportLibrary(wxCommandEvent& event)
   if (path == "/")
     path = "/lib/";
 
-  cssVFSFileDlg dialog (this, -1, _("Import Library"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, vfs, path, VFS_OPEN);
+  cssVFSFileDlg dialog (this, -1, _("Import library file"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, vfs, path, VFS_OPEN);
   if (!dialog.ShowModal ())
     return;
-  PushLibraryFile (dialog.GetPath(), dialog.GetFilename());
+  PushLibraryFile (dialog.GetPath (), dialog.GetFilename ());
 }
 
 void MainFrame::OnQuit (wxCommandEvent& event)
