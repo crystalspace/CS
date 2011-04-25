@@ -1332,12 +1332,13 @@ struct iEngine : public virtual iBase
   virtual void ReloadRenderManager() = 0;
   /** @} */
 
+  // @{
   /**
    * Loader List Sync
    */
   THREADED_INTERFACE1(SyncEngineLists, csRef<iThreadedLoader> loader);
   virtual void SyncEngineListsNow(csRef<iThreadedLoader> loader) = 0;
-  /** @} */
+  // @}
   
   /**\name Camera default properties
    * @{ */
