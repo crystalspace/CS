@@ -21,6 +21,9 @@
     
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     <input id="reflectXform" type="translateScale2" default="shadervar" defsv="reflection coord xform" />
+    <!-- Factor applied to perturbance scaling.
+	 The closer the value to 0 is, the larger is the area at which perturbance is scaled. -->
+    <input id="perturbFadeScale" type="float" default="value" defval="1" />
     
     <!-- Put the computation of the reflection TC into a separate snippet
 	 so weaver only emits it once. -->
@@ -126,6 +129,7 @@
 	<input name="reflTC2screen" type="translateScale2" />
 	
 	<input name="perturb" type="float2" default="value" defval="0,0" />
+	<input name="perturbFadeScale" type="float" />
 	
 	<block location="cg:vertexMain">
 	  surfaceColor = float4 (0, 0, 0, 1);
@@ -152,7 +156,7 @@
 	  else
 	    mirroredPointDist = 0;
 	  
-	  float perturbWeight = saturate (mirroredPointDist);
+	  float perturbWeight = saturate (mirroredPointDist * perturbFadeScale);
 	  tc.xy += perturb * perturbWeight;
 	  surfaceColor = tex2Dproj (texReflect, tc);
 	  surfaceColor_attr_perfragment = true;
@@ -170,5 +174,6 @@
     
     <connection from="reflectXform" to="reflTC" />
     <connection from="reflTC" to="actualReflect" />
+    <connection from="perturbFadeScale" to="actualReflect" />
   </technique>
 </snippet>
