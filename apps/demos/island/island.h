@@ -37,6 +37,8 @@ class IslandDemo : public CS::Utility::DemoApplication
   //-- CS::Utility::DemoApplication
   void PrintHelp ();
   void Frame ();
+  const char* GetApplicationConfigFile()
+  { return "/config/csisland.cfg"; }
 
   //-- csApplicationFramework
   bool Application ();
