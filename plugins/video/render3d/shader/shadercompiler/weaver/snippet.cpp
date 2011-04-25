@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2003-2007 by Marten Svanfeldt
-            (C) 2004-2007 by Frank Richter
+            (C) 2004-2011 by Frank Richter
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -353,10 +353,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	csRef<iDocumentNode> child = nodes->Next ();
 	if (child->GetType() != CS_NODE_ELEMENT) continue;
 	
-	Technique::Input newInput;
-        if (!ParseInput (child, newInput, aliases, defaultCombinerName))
+        if (!ParseInput (child, newTech, aliases, defaultCombinerName))
           return 0;	
-	newTech.AddInput (newInput);
       }
     }
 
@@ -407,10 +405,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
 
   bool Snippet::ParseInput (iDocumentNode* child, 
-                            Technique::Input& newInput,
+                            AtomTechnique& newTech,
                             const FileAliases& aliases,
                             const char* defaultCombinerName) const
   {
+    Technique::Input newInput;
+    
     const char* condition = child->GetAttributeValue ("condition");
     newInput.condition = condition;
     if (child->GetAttributeValueAsBool ("private"))
@@ -467,6 +467,37 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       {
         newInput.defaultType = Technique::Input::Undefined;
       }
+      else if (strcmp (def, "shadervar") == 0)
+      {
+	const char* svName = inputNode->GetAttributeValue ("defsv");
+        if (!svName || !*svName)
+        {
+          compiler->Report (CS_REPORTER_SEVERITY_WARNING, inputNode,
+            "%s node with a %s default but without %s attribute",
+	    CS::Quote::Single ("input"),
+	    CS::Quote::Single ("shadervar"),
+	    CS::Quote::Single ("defsv"));
+          return false;
+        }
+        
+	csRef<WeaverCommon::iCombinerLoader> combinerLoader = 
+	  csLoadPluginCheck<WeaverCommon::iCombinerLoader> (compiler->objectreg,
+	    newTech.combiner.classId, false);
+	if (!combinerLoader.IsValid())
+	{
+	  // Don't complain, will happen later anyway
+	  return false;
+	}
+	
+	csRef<iDocumentNode> svBlocksNode = 
+	  compiler->CreateAutoNode (CS_NODE_ELEMENT);
+	combinerLoader->GenerateSVInputBlocks (svBlocksNode, "c", 
+	  svName, newInput.type, newInput.name, newInput.name);
+        if (!ReadBlocks (compiler, svBlocksNode, newInput.complexBlocks, 
+            aliases, defaultCombinerName))
+	  return false;
+        newInput.defaultType = Technique::Input::Complex;
+      }
       else
       {
         compiler->Report (CS_REPORTER_SEVERITY_WARNING, inputNode,
@@ -487,6 +518,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       newInput.attributes.Push (newAttr);
     }
 
+    newTech.AddInput (newInput);
     return true;
   }
 
