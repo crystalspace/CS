@@ -20,6 +20,52 @@
 #=============================================================================
 
 #-----------------------------------------------------------------------------
+# _CS_CHECK_SEPARATE_SECTION(LANGUAGE, PROPERTY, [EMITTER-OPTIONS])
+#	Check whether the compiler for LANGUAGE supports the
+#	-ffunction-sections and -fdata-sections arguments. The flags can,
+#	in conjunction with --gc-sections linker flag, reduce the size of the
+#	final linked binaries.
+#	However, on some (older) gcc versions these flags produce annoying,
+#	but harmless, warnings. If this is discovered to be the case the
+#	flags aren't used.
+#	The check result is emitted to the build property PROPERTY using the
+#	emitter options EMITTER-OPTIONS.
+#-----------------------------------------------------------------------------
+# Helper function to get language-dependent part of check result variables.
+# Works with the 'anomalous' C case where all default autoconf variables use
+# 'cc' in their names.
+AC_DEFUN([_CS_CC_SH],
+    [CS_TR_SH_lang(_AC_CC([$1]))])
+AC_DEFUN([_CS_CHECK_SEPARATE_SECTION],
+    [# We need -Werror for the following checks...
+    CS_COMPILER_ERRORS([$1])
+
+    CS_CHECK_BUILD_FLAGS([if $]_AC_CC([$1])[ accepts -ffunction-sections -fdata-sections],
+	[cs_cv_prog_]_CS_CC_SH([$1])[_individual_sections],
+	[CS_CREATE_TUPLE([-ffunction-sections -fdata-sections])],
+	[C])
+    AS_IF([test "$cs_cv_prog_]_CS_CC_SH([$1])[_individual_sections" != ""],
+	[g_flag=''
+	AS_IF([test "$ac_cv_prog_]_CS_CC_SH([$1])[_g" != "no"],
+	    [g_flag='-g'])
+	CS_CHECK_BUILD(
+	    [if $cs_cv_prog_]_CS_CC_SH([$1])[_individual_sections isn't annoying],
+	    [cs_cv_prog_]_CS_CC_SH([$1])[_individual_sections_annoy],
+	    [],
+	    [CS_CREATE_TUPLE([$cs_cv_prog_]_CS_CC_SH([$1])[_individual_sections])],
+	    [C],
+	    [], [], [],
+	    [$g_flag $cs_cv_prog_]CS_TR_SH_lang([$1])[_enable_errors])
+	])
+	AS_IF([test "$cs_cv_prog_]_CS_CC_SH([$1])[_individual_sections_annoy" != "no"],
+	    [CS_EMIT_BUILD_PROPERTY([$2],
+		[$cs_cv_prog_]_CS_CC_SH([$1])[_individual_sections], [$3])
+	    ])
+    ])
+
+
+
+#-----------------------------------------------------------------------------
 # Detection of C and C++ compilers and setting flags
 #
 # CS_PROG_CC
@@ -65,15 +111,11 @@ AC_DEFUN([CS_PROG_CC],[
 		;;
 	esac
 
-	# The -ffunction-sections and -fdata-sections can, in conjunction with
-	# the linker flag --gc-sections, reduce the size of the final linked
-	# binaries.
-	CS_EMIT_BUILD_FLAGS([if $CC accepts -ffunction-sections -fdata-sections],
-	    [cs_cv_prog_cc_individual_sections],
-	    [CS_CREATE_TUPLE([-ffunction-sections -fdata-sections])],
-	    [C], [COMPILER.CFLAGS], [append])
+	_CS_CHECK_SEPARATE_SECTION([C], [COMPILER.CFLAGS], [append])
     ])
 ])
+
+
 
 #-----------------------------------------------------------------------------
 # CS_PROG_CXX
