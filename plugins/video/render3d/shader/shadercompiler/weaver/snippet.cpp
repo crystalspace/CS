@@ -774,6 +774,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
             HandleVaryingNode (*newTech, child, aliases);
           }
           break;
+        case WeaverCompiler::XMLTOKEN_INPUT:
+          {
+            HandleCompoundInput (*newTech, child, aliases);
+          }
+          break;
         case WeaverCompiler::XMLTOKEN_ALIAS:
           break;
         default:
@@ -1209,6 +1214,84 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       outputNode->SetValue ("output");
       outputNode->SetAttribute ("type", weaverType);
       outputNode->SetAttribute ("name", "output");
+    }
+    
+    HandleSnippetNode (tech, snippetNode, aliases);
+  }
+
+  void Snippet::HandleCompoundInput (CompoundTechnique& tech,
+				     iDocumentNode* node,
+				     const FileAliases& aliases)
+  {
+    if (tech.combiner.classId.IsEmpty())
+    {
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
+	"Need a combiner to use <input> in compound snippets");
+      return;
+    }
+
+    const char* id = node->GetAttributeValue ("id");
+    if (!id || !*id)
+    {
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
+	"Inputs must have an %s attribute",
+	CS::Quote::Single ("id"));
+      return;
+    }
+    if (tech.GetSnippet (id) != 0)
+    {
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
+	"Duplicate snippet id %s", CS::Quote::Single (id));
+      return;
+    }
+
+    csRef<WeaverCommon::iCombinerLoader> combinerLoader = 
+      csLoadPluginCheck<WeaverCommon::iCombinerLoader> (compiler->objectreg,
+        tech.combiner.classId, false);
+    if (!combinerLoader.IsValid())
+    {
+      // Don't complain, will happen later anyway
+      return;
+    }
+    
+    csRef<iDocumentNode> snippetNode = 
+      compiler->CreateAutoNode (CS_NODE_ELEMENT);
+    snippetNode->SetValue ("snippet");
+    snippetNode->SetAttribute ("id", id);
+    csRef<iDocumentNode> techNode = 
+      snippetNode->CreateNodeBefore (CS_NODE_ELEMENT);
+    techNode->SetValue ("technique");
+    {
+      csRef<iDocumentNode> combinerNode = 
+        techNode->CreateNodeBefore (CS_NODE_ELEMENT);
+      combinerNode->SetValue ("combiner");
+      combinerNode->SetAttribute ("name", "c");
+      combinerNode->SetAttribute ("plugin", tech.combiner.classId);
+    }
+    
+    csString weaverType;
+    weaverType = node->GetAttributeValue ("type");
+    if (weaverType.IsEmpty())
+    {
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
+	"Need a %s attribute for inputs",
+	CS::Quote::Single ("type"));
+      return;
+    }
+    
+    {
+      csRef<iDocumentNode> inputNode =
+        techNode->CreateNodeBefore (CS_NODE_ELEMENT);
+      CS::DocSystem::CloneNode (node, inputNode);
+      inputNode->SetValue ("input");
+      inputNode->SetAttribute ("name", id);
+    }
+    {
+      csRef<iDocumentNode> outputNode = 
+        techNode->CreateNodeBefore (CS_NODE_ELEMENT);
+      outputNode->SetValue ("output");
+      outputNode->SetAttribute ("type", weaverType);
+      outputNode->SetAttribute ("name", id);
     }
     
     HandleSnippetNode (tech, snippetNode, aliases);
