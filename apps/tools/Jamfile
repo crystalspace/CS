@@ -4,7 +4,6 @@ SubInclude TOP apps tools basemapgen ;
 SubInclude TOP apps tools csfgen ;
 SubInclude TOP apps tools docconv ;
 SubInclude TOP apps tools distfieldgen ;
-SubInclude TOP apps tools editor ;
 SubInclude TOP apps tools genmeshify ;
 SubInclude TOP apps tools heightmapgen ;
 SubInclude TOP apps tools heightmapproc ;
