@@ -16,33 +16,33 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <cssysdef.h>
+#include "cssysdef.h"
 #include "csutil/scf.h"
 
-#include <cstool/enginetools.h>
-#include <csgeom/plane3.h>
-#include <csgeom/math3d.h>
-#include <csutil/event.h>
-#include <csutil/sysfunc.h>
-#include <cstool/csview.h>
-#include <iutil/csinput.h>
-#include <iutil/eventq.h>
-#include <iutil/objreg.h>
-#include <iutil/plugin.h>
-#include <iutil/virtclk.h>
-#include <iengine/campos.h>
-#include <iengine/sector.h>
-#include <iengine/scenenode.h>
-#include <iengine/mesh.h>
-#include <iengine/movable.h>
-#include <iengine/engine.h>
-#include <iengine/camera.h>
-#include <imesh/object.h>
-#include <imesh/objmodel.h>
-#include <ivideo/graph3d.h>
-#include <ivideo/graph2d.h>
-#include <ivideo/natwin.h>
-#include <ivideo/wxwin.h>
+#include "cstool/enginetools.h"
+#include "csgeom/plane3.h"
+#include "csgeom/math3d.h"
+#include "csutil/event.h"
+#include "csutil/sysfunc.h"
+#include "cstool/csview.h"
+#include "iutil/csinput.h"
+#include "iutil/eventq.h"
+#include "iutil/objreg.h"
+#include "iutil/plugin.h"
+#include "iutil/virtclk.h"
+#include "iengine/campos.h"
+#include "iengine/sector.h"
+#include "iengine/scenenode.h"
+#include "iengine/mesh.h"
+#include "iengine/movable.h"
+#include "iengine/engine.h"
+#include "iengine/camera.h"
+#include "imesh/object.h"
+#include "imesh/objmodel.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/natwin.h"
+#include "ivideo/wxwin.h"
 
 #include "cs3dpanel.h"
 
@@ -100,7 +100,9 @@ bool CS3DPanel::Initialize (iObjectRegistry* obj_reg)
   if (!q)
     return false;
 
-  iGraphics2D* g2d = g3d->GetDriver2D();
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  g2d->AllowResize (true);
+
   csRef<iWxWindow> wxwin = scfQueryInterface<iWxWindow> (g2d);
   if( !wxwin )
   {
@@ -479,8 +481,8 @@ void CS3DPanel::ProcessFrame ()
     return;
   
   csTransform tr_w2c = view->GetCamera ()->GetTransform ();
-  float fov = g3d->GetPerspectiveAspect ();
-  
+  int fov = g3d->GetDriver2D ()->GetHeight ();
+
   csRef<iEditorObjectIterator> it = selection->GetIterator ();
   while (it->HasNext ())
   {
@@ -554,6 +556,33 @@ void CS3DPanel::OnSize (wxSizeEvent& event)
   wxwin->GetWindow()->SetSize (size);
   
   event.Skip();
+}
+
+void CS3DPanel::OnDrop (wxCoord x, wxCoord y, iEditorObject* obj)
+{
+  printf ("CS3DPanel::OnDrop\n");
+
+  iCamera* camera = view->GetCamera ();
+    
+  if (camera->GetSector ())
+  {
+    csScreenTargetResult result = csEngineTools::FindScreenTarget (
+      csVector2 (x, y), 100000.0f, camera);
+      
+    csRef<iMeshFactoryWrapper> meshFact = scfQueryInterface<iMeshFactoryWrapper> (obj->GetIBase ());
+  
+    csRef<iMeshWrapper> mesh = engine->CreateMeshWrapper (meshFact, obj->GetName(),
+							  result.mesh->GetMovable ()->GetSectors()->Get(0), result.isect);
+    
+    if (!mesh)
+      return;
+  
+    wxBitmap* meshBmp = new wxBitmap (wxBITMAP(meshIcon));
+    csRef<iEditorObject> editorObject (editor->CreateEditorObject (mesh, meshBmp));
+    objects->Add (editorObject);
+    
+    delete meshBmp;
+  }
 }
 
 void CS3DPanel::OnMapLoaded (const char* path, const char* filename)

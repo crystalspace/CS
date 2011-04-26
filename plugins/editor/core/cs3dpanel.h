@@ -23,12 +23,12 @@
 #include "ieditor/panelmanager.h"
 #include "ieditor/editor.h"
 
-#include <csutil/scf_implementation.h>
-#include <iutil/comp.h>
-#include <iutil/event.h>
-#include <iutil/eventh.h>
-#include <csutil/eventnames.h>
-#include <cstool/collider.h>
+#include "csutil/scf_implementation.h"
+#include "iutil/comp.h"
+#include "iutil/event.h"
+#include "iutil/eventh.h"
+#include "csutil/eventnames.h"
+#include "cstool/collider.h"
 
 #include <wx/event.h>
 #include <wx/dnd.h>
@@ -72,29 +72,7 @@ public:
 
   void OnSize (wxSizeEvent& event);
   
-  void OnDrop (wxCoord x, wxCoord y, iEditorObject* obj)
-  {
-    iCamera* camera = view->GetCamera ();
-    
-    if (camera->GetSector ())
-    {
-      csScreenTargetResult result = csEngineTools::FindScreenTarget (
-          csVector2 (x, y), 100000.0f, camera);
-      
-      csRef<iMeshFactoryWrapper> meshFact = scfQueryInterface<iMeshFactoryWrapper> (obj->GetIBase ());
-  
-      csRef<iMeshWrapper> mesh = engine->CreateMeshWrapper (meshFact, obj->GetName(), result.mesh->GetMovable ()->GetSectors()->Get(0), result.isect);
-    
-      if (!mesh)
-        return;
-  
-      wxBitmap* meshBmp = new wxBitmap (wxBITMAP(meshIcon));
-      csRef<iEditorObject> editorObject (editor->CreateEditorObject (mesh, meshBmp));
-      objects->Add (editorObject);
-    
-      delete meshBmp;
-    }
-  }
+  void OnDrop (wxCoord x, wxCoord y, iEditorObject* obj);
   
 private:
   iObjectRegistry* object_reg;
@@ -142,10 +120,10 @@ private:
   class Pump : public wxTimer
   {
   public:
-    Pump(CS3DPanel* p) : panel(p) {}
+    Pump (CS3DPanel* p) : panel (p) {}
     
-    virtual void Notify()
-    { panel->PushFrame(); }
+    virtual void Notify ()
+    { panel->PushFrame (); }
   private:
     CS3DPanel* panel;
   };
