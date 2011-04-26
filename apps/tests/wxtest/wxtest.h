@@ -21,6 +21,7 @@
 
 #include <stdarg.h>
 #include "csutil/ref.h"
+#include "ivideo/wxwin.h"
 
 #include "csutil/custom_new_disable.h"
 #include <wx/wx.h>
@@ -35,6 +36,7 @@ struct iObjectRegistry;
 struct iEvent;
 struct iSector;
 struct iView;
+struct iWxWindow;
 class FramePrinter;
 
 class Simple : public wxFrame
@@ -74,6 +76,21 @@ public:
   void OnShow(wxShowEvent& event);
 
   DECLARE_EVENT_TABLE()
+
+  class Panel : public wxPanel
+  {
+  public:
+      Panel(wxWindow* parent, iWxWindow* p, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize)
+	: wxPanel (parent, wxID_ANY, wxDefaultPosition, wxDefaultSize), p (p)
+      {}
+    
+      virtual void OnSize (wxSizeEvent& ev)
+      { if (p->GetWindow()) p->GetWindow()->SetSize (ev.GetSize ()); } //printf ("OnSize\n");; }
+    private:
+      iWxWindow* p;
+      
+      DECLARE_EVENT_TABLE()
+  };
 };
 
 #endif // __SIMPLE1_H__

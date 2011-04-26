@@ -55,7 +55,6 @@
 #include "ivideo/material.h"
 #include "ivideo/fontserv.h"
 #include "ivideo/natwin.h"
-#include "ivideo/wxwin.h"
 #include "igraphic/imageio.h"
 #include "imap/loader.h"
 #include "ivaria/reporter.h"
@@ -97,13 +96,16 @@ BEGIN_EVENT_TABLE(Simple, wxFrame)
   EVT_ICONIZE( Simple::OnIconize )
 END_EVENT_TABLE()
 
+BEGIN_EVENT_TABLE(Simple::Panel, wxPanel)
+  EVT_SIZE(Simple::Panel::OnSize)
+END_EVENT_TABLE()
 
 // The global pointer to simple
 Simple* simple = 0;
 
 Simple::Simple (iObjectRegistry* object_reg)
   : wxFrame (0, -1, wxT ("Crystal Space WxWidget Canvas test"), 
-             wxDefaultPosition, wxSize (800, 600))
+             wxDefaultPosition, wxSize (1000, 600))
 {
   Simple::object_reg = object_reg;
 }
@@ -114,6 +116,14 @@ Simple::~Simple ()
 
 void Simple::SetupFrame ()
 {
+  // TODO: remove that!
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  view = csPtr<iView> (new csView (engine, g3d));
+  view->SetAutoResize (true);
+  view->GetCamera ()->SetSector (room);
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
   // Now rotate the camera according to keyboard state
@@ -347,10 +357,11 @@ bool Simple::Initialize ()
   int rootIconIdx = imageList->Add (sceneBmp);
 
   wxTreeItemId rootId = tree->AddRoot (wxT ("Root node"), rootIconIdx);
-  tree->AppendItem (rootId, wxT ("test1"));
-  tree->AppendItem (rootId, wxT ("test2"));
-  tree->AppendItem (rootId, wxT ("test3"));
-  tree->AppendItem (rootId, wxT ("test4"));
+  tree->AppendItem (rootId, wxT ("test1"), rootIconIdx);
+  tree->AppendItem (rootId, wxT ("test2"), rootIconIdx);
+  tree->AppendItem (rootId, wxT ("test3"), rootIconIdx);
+  tree->AppendItem (rootId, wxT ("test4"), rootIconIdx);
+  tree->ExpandAll ();
 
   // Find the panel where to place the wxgl canvas
   wxPanel* panel = XRCCTRL (*this, "m_panel1", wxPanel);
@@ -364,6 +375,7 @@ bool Simple::Initialize ()
 
   // Create the wxgl canvas
   iGraphics2D* g2d = g3d->GetDriver2D ();
+  g2d->AllowResize (true);
   csRef<iWxWindow> wxwin = scfQueryInterface<iWxWindow> (g2d);
   if (!wxwin)
   {
@@ -373,7 +385,10 @@ bool Simple::Initialize ()
     return false;
   }
 
-  wxwin->SetParent (panel);
+  wxPanel* panel1 = new Simple::Panel (panel, wxwin);
+  panel->GetSizer ()->Add (panel1, 1, wxALL | wxEXPAND);
+  wxwin->SetParent (panel1);
+
   Show (true);
 
   // Open the main system. This will open all the previously loaded plug-ins.
@@ -399,7 +414,7 @@ bool Simple::Initialize ()
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
               "crystalspace.application.wxtest",
               "Error loading %s texture!",
-	      CS::Quote::Single ("stone4"));
+              CS::Quote::Single ("stone4"));
     return false;
   }
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
@@ -443,6 +458,7 @@ bool Simple::Initialize ()
   SimpleStaticLighter::ShineLights (room, engine, 4);
 
   view = csPtr<iView> (new csView (engine, g3d));
+  view->SetAutoResize (true);
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
 
