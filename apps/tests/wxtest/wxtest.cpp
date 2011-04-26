@@ -120,6 +120,7 @@ void Simple::SetupFrame ()
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view = csPtr<iView> (new csView (engine, g3d));
   view->SetAutoResize (true);
+  view->GetPerspectiveCamera ()->SetFOV ((float) (g2d->GetHeight ()) / (float) (g2d->GetWidth ()), g2d->GetWidth ());
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
@@ -459,9 +460,9 @@ bool Simple::Initialize ()
 
   view = csPtr<iView> (new csView (engine, g3d));
   view->SetAutoResize (true);
+  view->GetPerspectiveCamera ()->SetFOV ((float) (g2d->GetHeight ()) / (float) (g2d->GetWidth ()), g2d->GetWidth ());
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
-
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   printer.AttachNew (new FramePrinter (object_reg));
