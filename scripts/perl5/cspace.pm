@@ -19344,6 +19344,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SyncEngineLists = *cspacec::iEngine_SyncEngineLists;
 *SyncEngineListsWait = *cspacec::iEngine_SyncEngineListsWait;
 *SyncEngineListsNow = *cspacec::iEngine_SyncEngineListsNow;
+*GetDefaultNearClipDistance = *cspacec::iEngine_GetDefaultNearClipDistance;
+*SetDefaultNearClipDistance = *cspacec::iEngine_SetDefaultNearClipDistance;
 *scfGetVersion = *cspacec::iEngine_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -19555,6 +19557,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetShiftX = *cspacec::iPerspectiveCamera_GetShiftX;
 *GetShiftY = *cspacec::iPerspectiveCamera_GetShiftY;
 *SetPerspectiveCenter = *cspacec::iPerspectiveCamera_SetPerspectiveCenter;
+*GetNearClipDistance = *cspacec::iPerspectiveCamera_GetNearClipDistance;
+*SetNearClipDistance = *cspacec::iPerspectiveCamera_SetNearClipDistance;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

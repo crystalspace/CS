@@ -19431,6 +19431,58 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iEngine_GetDefaultNearClipDistance(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iEngine *arg1 = (iEngine *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  float result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iEngine_GetDefaultNearClipDistance",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iEngine, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iEngine_GetDefaultNearClipDistance" "', argument " "1"" of type '" "iEngine const *""'"); 
+  }
+  arg1 = reinterpret_cast< iEngine * >(argp1);
+  result = (float)((iEngine const *)arg1)->GetDefaultNearClipDistance();
+  resultobj = SWIG_From_float(static_cast< float >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iEngine_SetDefaultNearClipDistance(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iEngine *arg1 = (iEngine *) 0 ;
+  float arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  float val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iEngine_SetDefaultNearClipDistance",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iEngine, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iEngine_SetDefaultNearClipDistance" "', argument " "1"" of type '" "iEngine *""'"); 
+  }
+  arg1 = reinterpret_cast< iEngine * >(argp1);
+  ecode2 = SWIG_AsVal_float(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iEngine_SetDefaultNearClipDistance" "', argument " "2"" of type '" "float""'");
+  } 
+  arg2 = static_cast< float >(val2);
+  (arg1)->SetDefaultNearClipDistance(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iEngine_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -21749,6 +21801,58 @@ SWIGINTERN PyObject *_wrap_iPerspectiveCamera_SetPerspectiveCenter(PyObject *SWI
   } 
   arg3 = static_cast< float >(val3);
   (arg1)->SetPerspectiveCenter(arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iPerspectiveCamera_GetNearClipDistance(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iPerspectiveCamera *arg1 = (iPerspectiveCamera *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  float result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iPerspectiveCamera_GetNearClipDistance",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPerspectiveCamera, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPerspectiveCamera_GetNearClipDistance" "', argument " "1"" of type '" "iPerspectiveCamera const *""'"); 
+  }
+  arg1 = reinterpret_cast< iPerspectiveCamera * >(argp1);
+  result = (float)((iPerspectiveCamera const *)arg1)->GetNearClipDistance();
+  resultobj = SWIG_From_float(static_cast< float >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iPerspectiveCamera_SetNearClipDistance(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iPerspectiveCamera *arg1 = (iPerspectiveCamera *) 0 ;
+  float arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  float val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iPerspectiveCamera_SetNearClipDistance",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPerspectiveCamera, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPerspectiveCamera_SetNearClipDistance" "', argument " "1"" of type '" "iPerspectiveCamera *""'"); 
+  }
+  arg1 = reinterpret_cast< iPerspectiveCamera * >(argp1);
+  ecode2 = SWIG_AsVal_float(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iPerspectiveCamera_SetNearClipDistance" "', argument " "2"" of type '" "float""'");
+  } 
+  arg2 = static_cast< float >(val2);
+  (arg1)->SetNearClipDistance(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -38402,6 +38506,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iEngine_SyncEngineLists", _wrap_iEngine_SyncEngineLists, METH_VARARGS, NULL},
 	 { (char *)"iEngine_SyncEngineListsWait", _wrap_iEngine_SyncEngineListsWait, METH_VARARGS, NULL},
 	 { (char *)"iEngine_SyncEngineListsNow", _wrap_iEngine_SyncEngineListsNow, METH_VARARGS, NULL},
+	 { (char *)"iEngine_GetDefaultNearClipDistance", _wrap_iEngine_GetDefaultNearClipDistance, METH_VARARGS, NULL},
+	 { (char *)"iEngine_SetDefaultNearClipDistance", _wrap_iEngine_SetDefaultNearClipDistance, METH_VARARGS, NULL},
 	 { (char *)"iEngine_scfGetVersion", _wrap_iEngine_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iEngine", _wrap_delete_iEngine, METH_VARARGS, NULL},
 	 { (char *)"iEngine_swigregister", iEngine_swigregister, METH_VARARGS, NULL},
@@ -38468,6 +38574,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iPerspectiveCamera_GetShiftX", _wrap_iPerspectiveCamera_GetShiftX, METH_VARARGS, NULL},
 	 { (char *)"iPerspectiveCamera_GetShiftY", _wrap_iPerspectiveCamera_GetShiftY, METH_VARARGS, NULL},
 	 { (char *)"iPerspectiveCamera_SetPerspectiveCenter", _wrap_iPerspectiveCamera_SetPerspectiveCenter, METH_VARARGS, NULL},
+	 { (char *)"iPerspectiveCamera_GetNearClipDistance", _wrap_iPerspectiveCamera_GetNearClipDistance, METH_VARARGS, NULL},
+	 { (char *)"iPerspectiveCamera_SetNearClipDistance", _wrap_iPerspectiveCamera_SetNearClipDistance, METH_VARARGS, NULL},
 	 { (char *)"delete_iPerspectiveCamera", _wrap_delete_iPerspectiveCamera, METH_VARARGS, NULL},
 	 { (char *)"iPerspectiveCamera_swigregister", iPerspectiveCamera_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iCustomMatrixCamera_GetCamera", _wrap_iCustomMatrixCamera_GetCamera, METH_VARARGS, NULL},
