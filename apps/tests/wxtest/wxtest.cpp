@@ -66,6 +66,7 @@
 /* Fun fact: should occur after csutil/event.h, otherwise, gcc may report
  * missing csMouseEventHelper symbols. */
 #include <wx/wx.h>
+#include <wx/imaglist.h>
 #include <wx/treectrl.h>
 #include <wx/xrc/xmlres.h>
 
