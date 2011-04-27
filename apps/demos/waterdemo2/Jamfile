@@ -1,0 +1,5 @@
+SubDir TOP apps demos waterdemo2 ;
+
+Description waterdemo2 : "Water demo number two" ;
+Application waterdemo2 : [ Wildcard *.cpp *.h ] ;
+LinkWith waterdemo2 : crystalspace ;

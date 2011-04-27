@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+    Copyright (C) 2008 by Frank Richter
+    
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+    
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    Library General Public License for more details.
+    
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    -->
+<shader compiler="shaderweaver" name="reflect_water_simple_cube" lights="1">
+  <shadervar name="water fog color" type="vector4">0,0.17,0.49,0.6</shadervar>
+  <technique priority="200">
+    <tag>per_pixel_lighting</tag>
+    <pass>
+      <mixmode>
+	<blendop src="one" dst="srcalpha_inv" />
+	<alphatest>disable</alphatest>
+      </mixmode>
+      
+      <!-- Combiner to use for this particular pass.
+	   Techniques Referenced snippets must only utilize the same 
+	   combiner with compatible options specified. If a technique
+	   doesn't meet that requirement, the next one is tried.
+	   -->
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      
+      <alias name="surface" weak="yes" file="/shader-snippets/surface/surface-clear.xml" />
+      <alias name="apply_alpha" weak="yes" file="/shader-snippets/surface/alpha-premult.xml" />
+      <alias name="lighting" weak="yes" file="/shader-snippets/lighting/lighting-ppl.xml" />
+      
+      <!-- Snippets - the building blocks of this shader. -->
+      <snippet id="position" file="/shader-snippets/position.xml" />
+      <snippet id="surface" filealias="surface" />
+      <snippet id="parallax" file="/shader-snippets/surface/parallax.xml" />
+      <snippet id="lighting" filealias="lighting" />
+      <snippet id="fake_light_diffuse" file="/shader-snippets/rgba-black.xml" />
+      <snippet id="ambient" file="/shader-snippets/lighting/ambient-one.xml" />
+      <snippet id="specular" file="/shader-snippets/surface/specular-default.xml" />
+      <snippet id="apply_lighting" file="/shader-snippets/lighting/apply-lighting.xml" />
+      
+      <snippet id="normalmap" file="/shader-snippets/surface/normalmap.xml" />
+      <snippet id="reflection" file="/shader-snippets/reflect/reflect-env-world.xml" />
+      <snippet id="reflection_cubemap" file="/shader-snippets/surface/envmap-cube.xml" />
+      <snippet id="fresnel" file="/shader-snippets/reflect/fresnel.xml" />
+      <snippet id="lerp" file="/shader-snippets/lerp.xml" />
+      
+      <snippet id="sectorfog" file="/shader-snippets/fog/fog-sector.xml" />
+      
+      <!-- "connections" describe what snippets take input from what other
+	   snippets (ie the "data flow" is modeled). The exact resolution of
+	   what output is linked to what input is done automatically. -->
+      <connection from="position" to="parallax" />
+      <connection from="position" to="reflection" />
+      <connection from="parallax" to="normalmap" />
+      <connection from="position" to="fresnel" />
+      <connection from="position" to="lighting" />
+      <connection from="surface" to="specular" />
+      <!--connection from="surface" to="mod_light_surf" />
+    <connection from="lighting" to="mod_light_surf" />
+    <connection from="mod_light_surf" to="lerp" /-->
+      
+      <connection from="normalmap" to="reflection" />
+      <connection from="normalmap" to="fresnel" />
+      <connection from="normalmap" to="lighting" />
+      <connection from="reflection" to="reflection_cubemap" />
+      <connection from="reflection_cubemap" to="lerp">
+	<explicit from="reflected" to="b" />
+      </connection>
+      <connection from="fresnel" to="lerp">
+	<explicit from="result" to="factor" />
+      </connection>
+      
+      <connection from="lerp" to="apply_lighting">
+	<explicit from="result" to="surfaceDiffuse" />
+      </connection>
+      <connection from="fake_light_diffuse" to="apply_lighting">
+	<explicit from="result" to="lightDiffuse" />
+      </connection>
+      <connection from="lighting" to="apply_lighting">
+	<explicit from="specularColor" to="lightSpecular" />
+      </connection>
+      <connection from="ambient" to="apply_lighting">
+	<explicit from="ambient" to="ambient" />
+      </connection>
+      <connection from="specular" to="apply_lighting">
+	<explicit from="specularColor" to="surfaceSpecular" />
+      </connection>
+      <connection from="apply_lighting" to="sectorfog" />
+
+      <parameter id="refraction" type="shadervar" weavertype="rgba">water fog color</parameter>
+      <connection from="refraction" to="lerp">
+	<explicit from="output" to="a" />
+      </connection>
+      <parameter id="texReflectCube" weavertype="texcube" type="shadervar">tex environment</parameter>
+      <connection from="texReflectCube" to="reflection_cubemap" />
+    </pass>
+  </technique>
+  
+  <technique priority="100">
+    <pass>
+      <mixmode>
+	<blendop src="one" dst="srcalpha_inv" />
+	<alphatest>disable</alphatest>
+      </mixmode>
+      
+      <!-- Combiner to use for this particular pass.
+	   Techniques Referenced snippets must only utilize the same 
+	   combiner with compatible options specified. If a technique
+	   doesn't meet that requirement, the next one is tried.
+	   -->
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      
+      <alias name="surface" weak="yes" file="/shader-snippets/surface/surface-clear.xml" />
+      <alias name="apply_alpha" weak="yes" file="/shader-snippets/surface/alpha-premult.xml" />
+      <alias name="lighting" weak="yes" file="/shader-snippets/lighting/lighting-pvl.xml" />
+      
+      <!-- Snippets - the building blocks of this shader. -->
+      <snippet id="position" file="/shader-snippets/position.xml" />
+      <snippet id="surface" filealias="surface" />
+      <snippet id="parallax" file="/shader-snippets/surface/parallax.xml" />
+      <snippet id="lighting" filealias="lighting" />
+      <snippet id="fake_light_diffuse" file="/shader-snippets/rgba-black.xml" />
+      <snippet id="ambient" file="/shader-snippets/lighting/ambient-one.xml" />
+      <snippet id="specular" file="/shader-snippets/surface/specular-default.xml" />
+      <snippet id="apply_lighting" file="/shader-snippets/lighting/apply-lighting.xml" />
+      
+      <snippet id="normalmap" file="/shader-snippets/surface/normalmap.xml" />
+      <snippet id="reflection" file="/shader-snippets/reflect/reflect-env-world.xml" />
+      <snippet id="reflection_cubemap" file="/shader-snippets/surface/envmap-cube.xml" />
+      <snippet id="fresnel" file="/shader-snippets/reflect/fresnel.xml" />
+      <snippet id="lerp" file="/shader-snippets/lerp.xml" />
+      
+      <snippet id="sectorfog" file="/shader-snippets/fog/fog-sector.xml" />
+      
+      <!-- "connections" describe what snippets take input from what other
+	   snippets (ie the "data flow" is modeled). The exact resolution of
+	   what output is linked to what input is done automatically. -->
+      <connection from="position" to="parallax" />
+      <connection from="position" to="reflection" />
+      <connection from="parallax" to="normalmap" />
+      <connection from="position" to="fresnel" />
+      <connection from="position" to="lighting" />
+      <connection from="surface" to="specular" />
+      <!--connection from="surface" to="mod_light_surf" />
+    <connection from="lighting" to="mod_light_surf" />
+    <connection from="mod_light_surf" to="lerp" /-->
+      
+      <connection from="normalmap" to="reflection" />
+      <connection from="normalmap" to="fresnel" />
+      <connection from="normalmap" to="lighting" />
+      <connection from="reflection" to="reflection_cubemap" />
+      <connection from="reflection_cubemap" to="lerp">
+	<explicit from="reflected" to="b" />
+      </connection>
+      <connection from="fresnel" to="lerp">
+	<explicit from="result" to="factor" />
+      </connection>
+      
+      <connection from="lerp" to="apply_lighting">
+	<explicit from="result" to="surfaceDiffuse" />
+      </connection>
+      <connection from="fake_light_diffuse" to="apply_lighting">
+	<explicit from="result" to="lightDiffuse" />
+      </connection>
+      <connection from="lighting" to="apply_lighting">
+	<explicit from="specularColor" to="lightSpecular" />
+      </connection>
+      <connection from="ambient" to="apply_lighting">
+	<explicit from="ambient" to="ambient" />
+      </connection>
+      <connection from="specular" to="apply_lighting">
+	<explicit from="specularColor" to="surfaceSpecular" />
+      </connection>
+      <connection from="apply_lighting" to="sectorfog" />
+
+      <parameter id="refraction" type="shadervar" weavertype="rgba">water fog color</parameter>
+      <connection from="refraction" to="lerp">
+	<explicit from="output" to="a" />
+      </connection>
+      <parameter id="texReflectCube" weavertype="texcube" type="shadervar">tex environment</parameter>
+      <connection from="texReflectCube" to="reflection_cubemap" />
+    </pass>
+  </technique>
+  
+  <!-- Last but not least, fall back to a fixed function version, for older
+       hardware. -->
+  <fallbackshader name="reflect_environment" file="/shader/reflect/reflect_environment.xml" />
+</shader>

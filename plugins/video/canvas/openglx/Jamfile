@@ -1,0 +1,14 @@
+SubDir TOP plugins video canvas openglx ;
+
+if $(GLX.AVAILABLE) = "yes"
+{
+Description glx2d : "GL/X 2D driver" ;
+Plugin glx2d : [ Wildcard *.cpp *.h ] ;
+LinkWith glx2d : crystalspace_opengl crystalspace ;
+if $(XRENDER.AVAILABLE) = "yes"
+{
+  CFlags glx2d : [ FDefines CS_HAVE_XRENDER ] ;
+}
+ExternalLibs glx2d : GLX XRENDER ;
+CompileGroups glx2d : canvases openglcanvas ;
+}

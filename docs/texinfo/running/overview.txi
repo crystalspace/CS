@@ -1,0 +1,301 @@
+@c -*-texinfo-*-
+@node Applications Overview, , Walktest, Running The Demos
+@section Applications Overview
+@cindex Applications, Quick Overview
+@cindex Applications, Overview
+@cindex Quick Overview, Applications
+@cindex Overview, Applications
+
+This section provides a quick overview of the various applications which are
+bundled with Crystal Space.  In some cases, more detailed information for a
+particular application may be found in subsequent sections.
+
+Most of these applications provide a basic description on how to use them by
+launching them along with the @samp{--help} parameter.
+
+@table @code
+@cindex @file{3ds2lev}
+@cindex Applications, @file{3ds2lev}
+@item 3ds2lev
+A @sc{3ds} to Crystal Space map converter (work in progress!).
+
+@cindex @file{asndtest}
+@cindex Applications, @file{asndtest}
+@item sndtest
+@emph{OpenAL} sound test.
+
+@cindex @file{avatartest}
+@cindex Applications, @file{avatartest}
+@item avatartest
+An application to test and demonstrate the animated mesh animations.
+
+@cindex @file{basemapgen}
+@cindex Applications, @file{basemapgen}
+@item basemapgen
+Base map generator for terrain2. For a given terrain, it will generate the global texture to be applied on it by combining the textures splatted on the terrain.
+
+@cindex @file{ceguitest}
+@cindex Applications, @file{ceguitest}
+@item ceguitest
+A test application for the Crystal Space Crazy Eddie's @sc{gui} System plugin.
+
+@cindex @file{collada2cs}
+@cindex Applications, @file{collada2cs}
+@item collada2cs
+A @sc{Collada} to Crystal Space converter.
+
+@cindex @file{consoletest}
+@cindex Applications, @file{consoletest}
+@item consoletest
+A Crystal Space console output testing application.
+
+@cindex @file{csbench}
+@cindex Applications, @file{csbench}
+@item csbench
+A Crystal Space benchmarking application.
+
+@cindex @file{csbias}
+@cindex Applications, @file{csdemo}
+@item csdemo
+A demonstration of a medieval First Person Shooter showing several features of Crystal Space
+
+@cindex @file{csmocapviewer}
+@cindex Applications, @file{csmocapviewer}
+@item csmocapviewer
+A viewer for motion captured data
+
+@cindex @file{csfgen}
+@cindex Applications, @file{csfgen}
+@item csfgen
+A @emph{TrueType} to Crystal Space font converter.
+
+@cindex @file{csimagetool}
+@cindex Applications, @file{csimagetool}
+@item csimagetool
+The Crystal Space image manipulator.
+
+@cindex @file{distfieldgen}
+@cindex Applications, @file{distfieldgen}
+@item distfieldgen
+Distance field generator for images (see @uref{http://www.valvesoftware.com/publications/2007/SIGGRAPH2007_AlphaTestedMagnification.pdf, here} for more information on the ways it can be used).
+
+@cindex @file{docconv}
+@cindex Applications, @file{docconv}
+@item docconv
+An utility to convert between document formats. @xref{Binary XML} for the conversion to and from binary XML.
+
+@cindex @file{eventtest}
+@cindex Applications, @file{eventtest}
+@item eventtest
+An application for the testing of the event system with keyboard, mouse and joystick.
+
+@cindex @file{g2dtest}
+@cindex Applications, @file{g2dtest}
+@item g2dtest
+The Crystal Space canvas plugin test application.
+
+@cindex @file{genmeshify}
+@cindex Applications, @file{genmeshify}
+@item genmeshify
+A tool to convert from the old @emph{thing} mesh to a @emph{genmesh}.
+
+@cindex @file{heightmapgen}
+@cindex Applications, @file{heightmapgen}
+@item heightmapgen
+todo
+
+@cindex @file{heightmapproc}
+@cindex Applications, @file{heightmapproc}
+@item heightmapproc
+todo
+
+@cindex @file{imptest}
+@cindex Applications, @file{imptest}
+@item imptest
+A test application for imposters.
+
+@cindex @file{isotest}
+@cindex Applications, @file{isotest}
+@item isotest
+An application demonstrating how you can use the 3D engine to simulate
+a semi-isometric view.
+
+@cindex @file{jobtest}
+@cindex Applications, @file{jobtest}
+@item jobtest
+todo
+
+@cindex @file{joytest}
+@cindex Applications, @file{joytest}
+@item joytest
+A test application on the use of joysticks.
+
+@cindex @file{levtool}
+@cindex Applications, @file{levtool}
+@item levtool
+todo
+
+@cindex @file{lghtngtest}
+@cindex Applications, @file{lghtngtest}
+@item lghtngtest
+todo
+
+@cindex @file{lighter2}
+@cindex Applications, @file{lighter2}
+@item lighter2
+Tool to compute static lighting for a CrystalSpace world. @xref{Using lighter2}.
+
+@cindex @file{maya2spr}
+@cindex Applications, @file{maya2spr}
+@item maya2spr
+A tool to convert models from @emph{Maya} into Crystal Space.
+
+@cindex @file{mazing}
+@cindex Applications, @file{mazing}
+@item mazing
+A tutorial application. @xref{Tutorial Mazing}.
+
+@cindex @file{md32spr}
+@cindex Applications, @file{md32spr}
+@item md32spr
+todo
+
+@cindex @file{mdl2spr}
+@cindex Applications, @file{mdl2spr}
+@item mdl2spr
+This application is a Quake @file{.mdl} and @file{.md2} model converter.  It
+converts model files into native Crystal Space sprites. @xref{mdl2spr}.
+
+@cindex @file{optimisedata}
+@cindex Applications, @file{optimisedata}
+@item optimisedata
+todo
+
+@cindex @file{partconv}
+@cindex Applications, @file{partconv}
+@item partconv
+todo
+
+@cindex @file{pathtut}
+@cindex Applications, @file{pathtut}
+@item pathtut
+A demonstration on the way to use the sequencing system. @xref{Sequence Manager}.
+
+@cindex @file{phystut}
+@cindex Applications, @file{phystut}
+@item phystut
+An application to test and demonstrate the use of the physics plugin. @xref{Collision Detection}.
+
+@cindex @file{pysimp}
+@cindex Applications, @file{pysimp}
+@item pysimp
+An extremely simple example demonstrating use of the Python plug-in module.
+
+@cindex @file{shadertut}
+@cindex Applications, @file{shadertut}
+@item shadertut
+A tutorial on the usage of shaders.
+
+@cindex @file{shagnetron}
+@cindex Applications, @file{shagnetron}
+@item shagnetron
+todo
+
+@cindex @file{simdtest}
+@cindex Applications, @file{simdtest}
+@item simdtest
+Tests for the Single Instruction on Multiple Data available on your system.
+
+@cindex @file{simpcd}
+@cindex Applications, @file{simpcd}
+@item simpcd
+A demonstration on the way to use collision detection. @xref{Basic Collision Detection}.
+
+@cindex @file{simple1}
+@cindex Applications, @file{simple1}
+@item simple1
+A tutorial application. @xref{Tutorial Simple}. The code of this application is a good candidate if you want to test some piece of code.
+
+@cindex @file{simple2}
+@cindex Applications, @file{simple2}
+@item simple2
+A tutorial application. @xref{Tutorial Simple 2}. The code of this application is a good candidate if you want to test some piece of code.
+
+@cindex @file{simplept}
+@cindex Applications, @file{simplept}
+@item simplept
+A tutorial for procedural textures. @xref{ProcTextures}
+
+@cindex @file{simpmap}
+@cindex Applications, @file{simpmap}
+@item simpmap
+A tutorial application. @xref{Tutorial Simple Map}.
+
+@cindex @file{simpvs}
+@cindex Applications, @file{simpvs}
+@item simpvs
+todo
+
+@cindex @file{sndtest}
+@cindex Applications, @file{sndtest}
+@item sndtest
+An application for testing the Crystal Space @emph{sndsys} sound system.
+
+@cindex @file{startme}
+@cindex Applications, @file{startme}
+@item startme
+The main demonstration application, providing access to many Crystal Space's demos.
+
+@cindex @file{threadtest}
+@cindex Applications, @file{threadtest}
+@item threadtest
+A test application on the threaded loader.
+
+@cindex @file{tri3dtest}
+@cindex Applications, @file{tri3dtest}
+@item tri3dtest
+A test application on the automatic triangulation of a mesh.
+
+@cindex @file{unittest}
+@cindex Applications, @file{unittest}
+@item unittest
+todo
+
+@cindex @file{viewmesh}
+@cindex Applications, @file{viewmesh}
+@item viewmesh
+A tool to preview Crystal Space models and libraries.
+@xref{ViewMesh}.
+
+@cindex @file{vsh}
+@cindex Applications, @file{vsh}
+@item vsh
+This is the test application for the Virtual File System (@sc{vfs}).  It works
+very similar to the standard Unix shell programs.  @xref{VFS}.
+
+@cindex @file{walktest}
+@cindex Applications, @file{walktest}
+@item walktest
+The quintessential Crystal Space test program.  @file{walktest} is the test
+harness for most of the features which get added to the engine.  It is not
+necessarily a good programming example, but if you are interested in seeing
+an engine feature in action, this is probably the place to look.
+@xref{Walktest}.
+
+@cindex @file{waterdemo}
+@cindex Applications, @file{waterdemo}
+@item waterdemo
+A demonstration application, showing how to modify dynamically a material to
+achieve a water animation.
+
+@cindex @file{waterdemo2}
+@cindex Applications, @file{waterdemo2}
+@item waterdemo2
+A demonstration application about the 'ocean' watermesh. @xref{MeshObject Watermesh}.
+
+@cindex @file{wxtest}
+@cindex Applications, @file{wxtest}
+@item wxtest
+A demonstration application showing how to use the iWxWindow plugin.
+
+@end table

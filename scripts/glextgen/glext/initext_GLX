@@ -1,0 +1,31 @@
+#if defined(CS_OPENGL_GLX) && defined (CS_GLEXTMANAGER_USE_GLX)
+  /** Initialize <a href="%Name:url%">%Name%</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_%Name%. */
+  void Init%Name% (Display* glxDisplay, int glxScreen)
+  {
+    if (tested_CS_%Name%) return;
+    tested_CS_%Name% = true;
+    const char* ext = "%Name%";
+    char cfgkey[%Cfglen% + %Namelen% + 1];
+    sprintf (cfgkey, "%Cfgprefix%%%s", ext);
+    
+    (void)glxDisplay;      // avoid `unused variable' warning.
+    (void)glxScreen;
+%Extcheck%
+    bool allclear, funcTest;
+    (void)funcTest; // avoid `unused variable' warning.
+    bool init = CS_%Name%;
+    allclear = true;
+    if (init)
+    {
+%FunctionsInit%
+      EXTMGR_REPORT_INIT_RESULT("GLX", %Name%)
+      CS_%Name% &= allclear;
+    }
+    else
+    {
+      Report (msgExtNotFound, "GLX", CS::Quote::Single (ext));
+    }
+  }
+#endif
+

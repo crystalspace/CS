@@ -1,0 +1,11 @@
+SubDir TOP plugins mesh persist assimpldr ;
+
+if $(ASSIMP.AVAILABLE) = "yes"
+{
+  Description assimpldr : "Open Asset Import Library loader for Crystal Space" ;
+
+  Plugin assimpldr : [ Wildcard *.cpp *.h ] ;
+  LinkWith assimpldr : crystalspace ;
+  ExternalLibs assimpldr : ASSIMP ;
+  CompileGroups assimpldr :  meshes ;
+}

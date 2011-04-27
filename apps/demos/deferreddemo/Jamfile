@@ -1,0 +1,11 @@
+SubDir TOP apps demos deferreddemo ;
+
+if $(CEGUI.AVAILABLE) = "yes"
+{
+  Description deferreddemo : "Demonstrates the use of Deferred Shading." ;
+  Application deferreddemo : [ Wildcard *.cpp *.h ] ;
+  CFlags deferreddemo : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+  LinkWith deferreddemo : crystalspace ;
+  ExternalLibs deferreddemo : CEGUI ;
+  FileListEntryApplications deferreddemo : app-demo ;
+}

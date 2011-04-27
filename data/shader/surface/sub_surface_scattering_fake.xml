@@ -1,0 +1,16 @@
+<shader compiler="xmlshader" name="sub_surface_scattering_fake" lights="1">
+    <shadervars>
+      <shadervar name="hdr scale" type="vector4">1,1,0,0</shadervar>
+    </shadervars>
+    <technique priority="200">
+    <pass>
+      <buffer source="normal" destination="normal" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      <buffer source="tangent" destination="texture coordinate 1" />
+      <buffer source="binormal" destination="texture coordinate 2" />	  
+      <vp plugin="glcg" file="/shader/surface/sub_surface_scattering_fake.cgvp" />
+      <texture name="mytextcoord" destination="texturebase" />
+      <fp plugin="glcg" file="/shader/surface/sub_surface_scattering_fake.cgfp" />
+    </pass>
+    </technique>
+</shader>

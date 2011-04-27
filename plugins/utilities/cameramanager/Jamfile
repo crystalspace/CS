@@ -1,0 +1,9 @@
+SubDir TOP plugins utilities cameramanager ;
+
+Description cameramanager : "Camera motion manager" ;
+
+Plugin cameramanager
+	: [ Wildcard *.cpp *.h ]
+;
+
+LinkWith cameramanager : crystalspace ;

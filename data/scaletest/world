@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<world>
+	<plugins>
+		<plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
+		<plugin name="genmeshfact">crystalspace.mesh.loader.factory.genmesh</plugin>
+	</plugins>
+
+	<library>skydome</library>
+	<library>clouddome</library>
+	<library>water</library>
+	
+	<library>house.xml</library>
+
+
+	<sector name="World">
+
+		<ambient blue="0.34999999404" green="0.34999999404" red="0.379999995232"/>
+
+
+		<meshobj name="clouds">
+			<plugin>genmesh</plugin>
+			<priority>transp</priority>
+			<params>
+				<factory>clouddome</factory>
+			</params>
+          <!--<camera />-->
+          </meshobj>
+
+          <meshobj name="sky">
+            <plugin>genmesh</plugin>
+            <priority>object</priority>
+            <params>
+              <factory>skydome</factory>
+            </params>
+            <!--<camera />-->
+		</meshobj>
+
+		<meshobj name="water">
+			<plugin>genmesh</plugin>
+			<params>
+				<factory>water</factory>
+			</params>
+			<move>
+				<v y="0" x="0" z="0"/>
+			</move>
+		</meshobj>
+		
+		<meshobj name="scale_smaller_1">
+			<plugin>genmesh</plugin>
+			<params>
+				<factory>9</factory>
+			</params>
+			<move>
+				<matrix><scale all="0.5" /></matrix>
+				<v y="6" x="0" z="0"/>
+			</move>
+		</meshobj>
+		
+		<meshobj name="scale_normal">
+			<plugin>genmesh</plugin>
+			<params>
+				<factory>9</factory>
+			</params>
+			<move>
+				<v y="6" x="15" z="0"/>
+			</move>
+		</meshobj>
+		
+		<meshobj name="scale_larger_1">
+			<plugin>genmesh</plugin>
+			<params>
+				<factory>9</factory>
+			</params>
+			<move>
+				<matrix><scale all="1.5" /></matrix>
+				<v y="6" x="40" z="0"/>
+			</move>
+		</meshobj>
+		
+		<light name="Lamp">
+            <center x="0" y="1000" z="0" />
+            <color red="1.0" green="1.0" blue="1.0" />
+            <radius>5000</radius>
+            <attenuation c="0" l="0" q="0.1" />
+        </light>
+
+
+	</sector>
+	
+	<start name="Camera">
+        <sector>World</sector>
+        <position x="0" y="2" z="-20" />
+    </start>
+
+</world>

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!-- cseditorcore.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.editor.plugin.core.cs3dpanel</name>
+        <implementation>CS3DPanel</implementation>
+        <description>CSEditor 3D Panel</description>
+      </class>
+      <class>
+        <name>crystalspace.editor.plugin.core.scenebrowserpanel</name>
+        <implementation>SceneBrowserPanel</implementation>
+        <description>CSEditor Scene Browser Panel</description>
+      </class>
+      <class>
+        <name>crystalspace.editor.plugin.core.assetbrowserpanel</name>
+        <implementation>AssetBrowserPanel</implementation>
+        <description>CSEditor Asset Browser Panel</description>
+      </class>
+      <class>
+        <name>crystalspace.editor.plugin.core.csobjectmaplistener</name>
+        <implementation>CSObjectMapListener</implementation>
+        <description>CSEditor CS Object Map Listener</description>
+      </class>
+      <class>
+        <name>crystalspace.editor.plugin.core.csinterfacewrappers</name>
+        <implementation>CSInterfaceWrappers</implementation>
+        <description>CSEditor CS Interface Wrappers</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

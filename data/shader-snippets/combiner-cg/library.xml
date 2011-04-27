@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+  Copyright (C) 2007 by Frank Richter
+	    (C) 2007 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<combinerlibrary>
+
+  <!-- Note on costs: try to set the number of asm instructions as the cost 
+       for a coercion. -->
+       
+  <!-- Each coercion implicitly has an input named "input" and and output 
+       named "output". Type is the "from" resp. "to" one. -->
+
+  <coercion from="rgb" to="rgba" cost="1">
+    <block location="fragmentMain">
+      output = float4 (input, 1);
+    </block>
+
+    <block location="vertexMain">
+      output = float4 (input, 1);
+    </block>
+  </coercion>
+
+  <coercion from="rgba" to="rgb" cost="1">
+    <block location="fragmentMain">
+      output = input.rgb;
+    </block>
+    
+    <block location="vertexMain">
+      output = input.rgb;
+    </block>
+  </coercion>
+  
+  <coercion from="float" to="rgb" cost="0">
+    <block location="fragmentMain">
+      output = float3 (input);
+    </block>
+
+    <block location="vertexMain">
+      output = float3 (input);
+    </block>
+  </coercion>
+  
+  <coercion from="float" to="rgba" cost="0">
+    <block location="fragmentMain">
+      output = float4 (input);
+    </block>
+
+    <block location="vertexMain">
+      output = float4 (input);
+    </block>
+  </coercion>
+  
+  <!------------------------------------------------------------------------->
+  
+  <coercion from="position4_world" to="position4_screen" cost="4">
+    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+	 verbatim -->
+    <input name="ModelViewProj" type="float4x4" default="complex"
+	private="yes">
+      <block location="vertexIn">
+	<uniform type="float4x4" name="ModelViewProj" binding="state.matrix.mvp" />
+      </block>
+      
+      <block location="vertexMain">
+	ModelViewProj = vertexIn.ModelViewProj;
+      </block>
+    </input>
+    
+    <block location="vertexMain">
+      output = mul (ModelViewProj, input);
+    </block>
+  </coercion>
+  
+  <coercion from="position4_world" to="position4_camera" cost="4">
+    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+	 verbatim -->
+    <input file="/shader-snippets/combiner-cg/ModelView.inp" private="yes" />
+    
+    <block location="vertexMain">
+      output = mul (ModelView, input);
+    </block>
+    
+    <block location="fragmentMain">
+    #if FRAGMENT_PROGRAM_LEVEL >= 0x200
+      output = mul (ModelView, input);
+    #else
+      /* PS1.x can't do matrix mul ...
+         Leave 'output' deliberately undefined to catch (undesired) uses of it */
+    #endif
+    </block>
+  </coercion>
+  
+  <!------------------------------------------------------------------------->
+  
+  <coercion from="direction_object" to="direction_tangent" cost="3">
+    <input file="/shader-snippets/combiner-cg/Normal.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/Tangent.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/Bitangent.inp" private="yes" />
+    
+    <block location="vertexMain">
+      float3x3 obj2tang;
+      obj2tang[0] = Tangent;
+      obj2tang[1] = Bitangent;
+      obj2tang[2] = Normal;
+      output =  mul (obj2tang, input);
+    </block>
+    
+    <block location="fragmentMain">
+    #if FRAGMENT_PROGRAM_LEVEL >= 0x200
+      float3x3 obj2tang;
+      obj2tang[0] = Tangent;
+      obj2tang[1] = Bitangent;
+      obj2tang[2] = Normal;
+      output =  mul (obj2tang, input);
+    #else
+      /* PS1.x can't do matrix mul ...
+         Leave 'output' deliberately undefined to catch (undesired) uses of it */
+    #endif
+    </block>
+  </coercion>
+  
+  <coercion from="direction_object" to="direction_world" cost="3">
+    <block location="vertexMain">
+      output =  mul (objectToWorld, float4 (input, 0)).xyz;
+    </block>
+    
+    <block location="fragmentMain">
+    #if FRAGMENT_PROGRAM_LEVEL >= 0x200
+      output =  mul (objectToWorld, float4 (input, 0)).xyz;
+    #else
+      /* PS1.x can't do matrix mul ...
+         Leave 'output' deliberately undefined to catch (undesired) uses of it */
+    #endif
+    </block>
+  </coercion>
+  
+  <coercion from="direction_world" to="direction_camera" cost="3">
+    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+	 verbatim -->
+    <input file="/shader-snippets/combiner-cg/ModelView.inp" private="yes" />
+    
+    <block location="vertexMain">
+      output = mul (ModelView, float4 (input, 0)).xyz;
+    </block>
+    
+    <block location="fragmentMain">
+    #if FRAGMENT_PROGRAM_LEVEL >= 0x200
+      output = mul (ModelView, float4 (input, 0)).xyz;
+    #else
+      /* PS1.x can't do matrix mul ...
+         Leave 'output' deliberately undefined to catch (undesired) uses of it */
+    #endif
+    </block>
+  </coercion>
+  
+  <coercion from="direction_camera" to="direction_world" cost="3">
+    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+	 verbatim -->
+    <input name="ModelViewIT" type="float4x4" default="complex"
+	private="yes">
+      <block location="vertexIn">
+	<uniform type="float4x4" name="ModelViewIT" 
+	  binding="state.matrix.modelview.invtrans" />
+      </block>
+      
+      <block location="vertexMain">
+	ModelViewIT = vertexIn.ModelViewIT;
+      </block>
+    </input>
+    
+    <block location="vertexMain">
+      output = mul (ModelViewIT, float4 (input, 0)).xyz;
+    </block>
+  </coercion>
+  
+  <coercion from="direction_tangent" to="direction_object" cost="3">
+    <input file="/shader-snippets/combiner-cg/Normal.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/Tangent.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/Bitangent.inp" private="yes" />
+    
+    <block location="vertexMain">
+      float3x3 obj2tang;
+      obj2tang[0] = Tangent;
+      obj2tang[1] = Bitangent;
+      obj2tang[2] = Normal;
+      /* NOTE: This assumes the Normal/Tangent/Bitangent are orthonormal.
+      Only then we the transposed matrix is conveniently equal to the
+      inverse. Lastly, multiplying with the matrix on theright is the same
+      as multiplying with the transpose on the left. */
+      output = mul (input, obj2tang);
+    </block>
+    
+    <block location="fragmentMain">
+    #if FRAGMENT_PROGRAM_LEVEL >= 0x200
+      float3x3 obj2tang;
+      obj2tang[0] = Tangent;
+      obj2tang[1] = Bitangent;
+      obj2tang[2] = Normal;
+      output = mul (input, obj2tang);
+    #else
+      /* PS1.x can't do matrix mul ...
+         Leave 'output' deliberately undefined to catch (undesired) uses of it */
+    #endif
+    </block>
+  </coercion>
+  
+  <coercion from="direction_object" to="direction_camera" cost="3">
+    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+	 verbatim -->
+    <input file="/shader-snippets/combiner-cg/ModelView.inp" private="yes" />
+    
+    <block location="vertexMain">
+      output = mul (ModelView, float4 (input, 0)).xyz;
+    </block>
+    
+    <block location="fragmentMain">
+    #if FRAGMENT_PROGRAM_LEVEL >= 0x200
+      output = mul (ModelView, float4 (input, 0)).xyz;
+    #else
+      /* PS1.x can't do matrix mul ...
+         Leave 'output' deliberately undefined to catch (undesired) uses of it */
+    #endif
+    </block>
+  </coercion>
+  
+  <!------------------------------------------------------------------------->
+  
+  <coercion from="normal_object" to="normal_tangent" cost="3">
+    <input file="/shader-snippets/combiner-cg/Normal.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/Tangent.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/Bitangent.inp" private="yes" />
+    
+    <block location="vertexMain">
+      float3x3 obj2tang;
+      obj2tang[0] = Tangent;
+      obj2tang[1] = Bitangent;
+      obj2tang[2] = Normal;
+      output =  mul (obj2tang, input);
+    </block>
+    
+    <block location="fragmentMain">
+    #if FRAGMENT_PROGRAM_LEVEL >= 0x200
+      float3x3 obj2tang;
+      obj2tang[0] = Tangent;
+      obj2tang[1] = Bitangent;
+      obj2tang[2] = Normal;
+      output =  mul (obj2tang, input);
+    #else
+      /* PS1.x can't do matrix mul ...
+         Leave 'output' deliberately undefined to catch (undesired) uses of it */
+    #endif
+    </block>
+  </coercion>
+  
+  <coercion from="normal_tangent" to="normal_object" cost="3">
+    <input file="/shader-snippets/combiner-cg/Normal.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/Tangent.inp" private="yes" />
+    <input file="/shader-snippets/combiner-cg/Bitangent.inp" private="yes" />
+    
+    <block location="vertexMain">
+      float3x3 obj2tang;
+      obj2tang[0] = Tangent;
+      obj2tang[1] = Bitangent;
+      obj2tang[2] = Normal;
+      /* NOTE: This assumes the Normal/Tangent/Bitangent are orthonormal.
+         Only then we the transposed matrix is conveniently equal to the
+	 inverse. Lastly, multiplying with the matrix on theright is the same
+	 as multiplying with the transpose on the left. */
+      output = mul (input, obj2tang);
+    </block>
+    
+    <block location="fragmentMain">
+    #if FRAGMENT_PROGRAM_LEVEL >= 0x200
+      float3x3 obj2tang;
+      obj2tang[0] = Tangent;
+      obj2tang[1] = Bitangent;
+      obj2tang[2] = Normal;
+      output = mul (input, obj2tang);
+    #else
+      /* PS1.x can't do matrix mul ...
+         Leave 'output' deliberately undefined to catch (undesired) uses of it */
+    #endif
+    </block>
+  </coercion>
+  
+  <coercion from="normal_object" to="normal_world" cost="3">
+    <block location="vertexMain">
+      output =  mul (objectToWorld, float4 (input, 0)).xyz;
+    </block>
+    
+    <block location="fragmentMain">
+    #if FRAGMENT_PROGRAM_LEVEL >= 0x200
+      output =  mul (objectToWorld, float4 (input, 0)).xyz;
+    #else
+      /* PS1.x can't do matrix mul ...
+         Leave 'output' deliberately undefined to catch (undesired) uses of it */
+    #endif
+    </block>
+  </coercion>
+  
+  <coercion from="normal_world" to="normal_camera" cost="3">
+    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+	 verbatim -->
+    <input name="worldToCamera" type="float4x4" default="complex" 
+	private="yes">
+      <block location="vertexIn">
+	<uniform type="float4x4" name="worldToCamera" />
+      </block>
+      
+      <block location="fragmentIn">
+	<uniform type="float4x4" name="worldToCamera" />
+      </block>
+      
+      <block location="vertexMain">
+	worldToCamera = vertexIn.worldToCamera;
+      </block>
+
+      <block location="fragmentMain">
+	worldToCamera = fragmentIn.worldToCamera;
+      </block>
+
+      <block location="variablemap">
+	<variablemap variable="world2camera transform" 
+	  destination="vertexIn.world2camera" />
+	<variablemap variable="world2camera transform" 
+	  destination="fragmentIn.world2camera" />
+      </block>
+    </input>
+    
+    <block location="vertexMain">
+      output =  mul (worldToCamera, float4 (input, 0)).xyz;
+    </block>
+    
+    <block location="fragmentMain">
+    #if FRAGMENT_PROGRAM_LEVEL >= 0x200
+      output =  mul (worldToCamera, float4 (input, 0)).xyz;
+    #else
+      /* PS1.x can't do matrix mul ...
+         Leave 'output' deliberately undefined to catch (undesired) uses of it */
+    #endif
+    </block>
+  </coercion>
+  
+  <coercion from="normal_object" to="normal_camera" cost="3">
+    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+	 verbatim -->
+    <input file="/shader-snippets/combiner-cg/ModelView.inp" private="yes" />
+    
+    <block location="vertexMain">
+      output = mul (ModelView, float4 (input, 0)).xyz;
+    </block>
+    
+    <block location="fragmentMain">
+    #if FRAGMENT_PROGRAM_LEVEL >= 0x200
+      output = mul (ModelView, float4 (input, 0)).xyz;
+    #else
+      /* PS1.x can't do matrix mul ...
+         Leave 'output' deliberately undefined to catch (undesired) uses of it */
+    #endif
+    </block>
+  </coercion>
+  
+  <!------------------------------------------------------------------------->
+  
+  <coerciontemplate name="normalize" cost="3">
+    <block location="vertexMain">
+      output = normalize (input);
+    </block>
+    
+    <block location="fragmentMain">
+      output = normalize (input);
+    </block>
+  </coerciontemplate>
+  
+  <coerciontemplate name="passthrough" cost="0">
+    <block location="vertexMain">
+      output = input;
+    </block>
+    
+    <block location="fragmentMain">
+      output = input;
+    </block>
+  </coerciontemplate>
+  
+</combinerlibrary>

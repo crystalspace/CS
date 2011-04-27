@@ -1,0 +1,175 @@
+@c -*-texinfo-*-
+@node MeshObject Furmesh, Furmesh Animation, Furmesh Mesh, Furmesh Mesh
+@subsubsection Furmesh Mesh Object
+@cindex MeshObject
+@cindex 3D Sprite
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+@cindex @code{iFurMeshType}
+@cindex @code{iFurMeshFactory}
+
+@emph{Written by Alexandru - Teodor Voicu,
+@email{voicualexandruteodor@@gmail.com}.}
+
+A Furmesh is a set of 3D triangles that is used to  create both hairs and 
+furs on base meshes (currently only AnimatedMeshes are supported).
+Furmeshes can update their position based on physics or on the base mesh's 
+animation, via the Furmesh Animation Control (@pxref{Furmesh Animation}). 
+Defining complex shaders, that can have lookup textures, updated whenever 
+needed, is done via the Furmesh Material Properties (@pxref{Furmesh 
+Material}). You can find some other info about the Furmesh plugin on 
+this blog: @uref{http://hairrendering.wordpress.com/}.
+
+There is also a @sc{howto} discussing the creation of furmeshes.
+@xref{HOWTO Create Furmesh}.
+
+@subsubheading Basic Structure
+
+The following @sc{scf} class names are used (for @code{csLoadPlugin}):
+
+@itemize @bullet
+@item
+Type plugin: @code{crystalspace.mesh.furmesh}
+@item
+Loader plugin: @code{crystalspace.mesh.loader.furmesh}
+@item
+Factory loader plugin: @code{crystalspace.mesh.loader.factory.furmesh}
+@end itemize
+
+Objects in this plugin implement the following @sc{scf} interfaces, which you
+can retrieve with @code{scfQueryInterface}:
+
+@itemize @bullet
+@item
+@emph{MeshObject}
+@itemize @bullet
+@item
+Implements @samp{iMeshObject}
+@item
+Implements @samp{iFurMesh}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectFactory}
+@item
+Implements @samp{iFurMeshFactory}
+@end itemize
+@item
+@emph{MeshObjectType}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectType}
+@end itemize
+@end itemize
+
+@subsubheading Factory State Interface
+
+No attributes are specified in the current factory state implementation.
+
+@subsubheading Factory Loader
+
+No tags supported.
+
+@subsubheading Object State Interface
+
+@samp{iFurMeshState} (residing in @file{CS/include/imesh/furmesh.h}) is
+the @sc{scf} interface that you can use to manipulate settings for a furmesh
+object.  By using this interface you can access the material, blending mode
+(mixmode), and various other configuration parameters for a furmesh object.
+
+@subsubheading Object Loader
+
+Here is a list of all the tags supported by a furmesh object and their
+meaning:
+@itemize @bullet
+@item @samp{factory}
+The name of the factory to use.
+@item @samp{strandwidth}
+This is a float variable used to set the width of a fur strand:
+@samp{<strandwidth>0.001</strandwidth>}.
+@item @samp{displacement}
+This is a float variable used to set the distance between the furmesh and the base
+mesh:
+@samp{<displacement>0.02</displacement>}.
+@item @samp{densitymap}
+This is a UV greyscale texture of the base mesh, giving information about the density
+of the Furmesh, based on areas. White means the highest density, while black means no
+furs.
+@samp{<densitymap>krystal_skull_densitymap</densitymap>}.
+@item @samp{densityfactorguidefurs}
+This is a float variable used to specify what is the maximum density for LOD guide furs.
+@samp{<densityfactorguidefurs>10</densityfactorguidefurs>}.
+@item @samp{densityfactorfurstrands}
+This is a float variable used to specify what is the maximum density for fur strands.
+@samp{<densityfactorfurstrands>120</densityfactorfurstrands>}.
+@item @samp{heightmap}
+This is a UV greyscale texture of the base mesh, giving information about the height
+of the Furmesh, based on areas. White means the biggest height, while black means 0 height.
+@samp{<heightmap>krystal_skull_heightmap</heightmap>}.
+@item @samp{heightfactor}
+This is a float variable used to specify what is the maximum height for furs.
+@samp{<heightfactor>0.4</heightfactor>}.
+@item @samp{controlpointsdistance}
+This is a float variable used to set the distance between points on a fur strand. 
+@samp{<controlpointsdistance>0.05</controlpointsdistance>}.
+@item @samp{positiondeviation}
+This is a float variable used to set the percentage of the maximum deviation a fur strand
+might have. 
+@samp{<positiondeviation>0.005</positiondeviation>}.
+@item @samp{growtangents}
+This is a variable, specifying if guide furs should initially grow based on normal or
+tangent direction. While normal direction is good for small furs, tangent direction might be
+used for longer static furs.
+@samp{<growtangents/>}.
+@item @samp{mixmode}
+Control the transparency of this object. See @ref{XMLServices Mixmode} for
+a list of possibilities.
+@samp{<mixmode> <copy /> </mixmode>}.
+@item @samp{priority}
+Set the rendering priority for this furmesh object.
+@samp{<priority>object</priority>}.
+@end itemize
+
+@subsubheading Furmesh Data Structures
+
+Because a Furmesh can update its geometry by being synchronized with various
+physics objects, such as Bullet ropes for hairs (which are computationally 
+expensive), only a small part (less than 1%) of the geometry really has such an
+external object attached.
+
+This lead to creating two types of data structures: guide furs, which always 
+have a corresponding external object and fur strands, which have references to 
+three close guide furs in order to update their position.
+
+Guide furs are created on each vertex of the base mesh, the mesh on which fur
+will grow, and are never displayed, except only for debug purpose.
+
+Fur strands are generated by iterating through the triangles specified by the
+base mesh and choosing three random barycentric coordinates in order to determine
+their position relative to three guide furs. The barycentric coordinates are used 
+both to update the position of fur strands, using the guide furs and to generate 
+UV coordinates.
+
+@subsubheading Furmesh Geometry
+
+In order to keep the number of geometry as low as possible, fur strands are 
+represented as triangle strips that always face the camera, not as very thin 
+cylinders like in reality. Because of the always facing the camera constraint,
+all the geometry related data from the Furmesh can be computed more
+efficiently, directly when updating the fur strands. This is the reason why the 
+Furmesh doesn't have any methods to compute normals, tangents or binormals, 
+or gives access to the @code{iRenderBuffers}.
+
+@subsubheading Furmesh LOD System
+
+Due to the high number of fur strands, a LOD system had to be used, especially when 
+the viewer was further away from the Furmesh so that it could be rendered at lower 
+quality. Apart from displaying fewer fur strands, the number of guide furs vary as 
+well. In order to make this possible another type of fur structure had to be added,
+LOD guide furs, which on lower LOD settings act as normal fur strands, while on 
+higher LOD act as guide furs. The methods that allow setting various LODs are: 
+@code{SetGuideLOD()}, @code{SetStrandLOD()}, or  @code{SetLOD()} which acts as an
+overall LOD function, calling both previous defined methods.

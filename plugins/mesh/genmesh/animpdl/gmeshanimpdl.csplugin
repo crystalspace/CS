@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- gmeshanimpdl.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.anim.pdlight</name>
+        <implementation>GenmeshAnimationPDLType</implementation>
+        <description>Crystal Space Genmesh animation plugin for PD lights</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

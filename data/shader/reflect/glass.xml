@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+  Copyright (C) 2007 by Frank Richter
+	    (C) 2007 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<shader compiler="shaderweaver" name="glass">
+  <technique priority="100">
+    <pass>
+      <!-- Combiner to use for this particular pass.
+	   Techniques Referenced snippets must only utilize the same 
+	   combiner with compatible options specified. If a technique
+	   doesn't meet that requirement, the next one is tried.
+	-->
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+
+      <!-- Snippets - the building blocks of this shader. -->
+      <snippet id="position" file="/shader-snippets/position.xml" />
+      <snippet id="parallax" file="/shader/surface/parallax.xml" />
+      <!--snippet id="surface" file="/shader/surface/surface-classic.xml" />
+      <snippet id="lighting" file="/shader/lighting/light-classic.xml" />
+      <snippet id="mod_light_surf" file="/shader-snippets/modulate.xml" /-->
+      
+      <snippet id="normalmap" file="/shader-snippets/surface/normalmap.xml" />
+      <snippet id="reflection" file="/shader-snippets/reflect/reflect-env-world.xml" />
+      <snippet id="reflection_cubemap" file="/shader-snippets/surface/envmap-cube.xml" />
+      <snippet id="refraction" file="/shader-snippets/reflect/refract-env-world.xml" />
+      <snippet id="refraction_cubemap" file="/shader-snippets/surface/envmap-cube.xml" />
+      <snippet id="fresnel" file="/shader-snippets/reflect/fresnel.xml" />
+      <snippet id="lerp_reflect_refract" file="/shader-snippets/lerp.xml" />
+      
+      <snippet id="apply_mixmode_alpha" file="/shader-snippets/mixmode-alpha.xml" />
+      <snippet id="sectorfog" file="/shader/fog/fog-sector.xml" />
+      
+      <!-- "connections" describe what snippets take input from what other
+           snippets (ie the "data flow" is modeled). The exact resolution of
+	   what output is linked to what input is done automatically. -->
+      <connection from="position" to="parallax" />
+      <connection from="position" to="reflection" />
+      <connection from="position" to="refraction" />
+      <connection from="parallax" to="normalmap" />
+      <connection from="position" to="fresnel" />
+      <!--connection from="surface" to="mod_light_surf" />
+      <connection from="lighting" to="mod_light_surf" />
+      <connection from="mod_light_surf" to="lerp" /-->
+	    
+      <connection from="normalmap" to="refraction" />
+      <connection from="normalmap" to="reflection" />
+      <connection from="normalmap" to="fresnel" />
+      <connection from="refraction" to="refraction_cubemap" />
+      <connection from="refraction_cubemap" to="lerp_reflect_refract" />
+      <connection from="reflection" to="reflection_cubemap" />
+      <connection from="reflection_cubemap" to="lerp_reflect_refract" />
+      <connection from="fresnel" to="lerp_reflect_refract" />
+      
+      <connection from="lerp_reflect_refract" to="apply_mixmode_alpha" />
+      <connection from="apply_mixmode_alpha" to="sectorfog" />
+    </pass>
+  </technique>
+  
+  <!-- Last but not least, fall back to a fixed function version, for older
+       hardware. -->
+  <fallbackshader name="std_lighting_fixed" file="/shader/reflectsphere.xml" />
+</shader>

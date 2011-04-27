@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GUILayout>
+  <Window Type="DefaultWindow" Name="Animations" >
+    <Property Name="Text" Value="Ani" />
+    <Window Type="ice/StaticImage" Name="Animations/main" >
+      <Property Name='UnifiedSize' Value='{{1.0,0.0},{1.0,0.0}}'/>
+      <Property Name='UnifiedPosition' Value='{{0.0,0.0},{0.0,0.0}}'/>
+
+      <Window Type="ice/Listbox" Name="Animations/List" >
+        <Property Name="Text" Value="Set" />
+        <Property Name='UnifiedSize' Value='{{1.0,-10.0},{1.0,-140.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,5.0}}'/>
+      </Window>
+
+
+
+      <Window Type="ice/Button" Name="Animations/SetAnimation" >
+        <Property Name="Text" Value="Set" />
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{1.0,-130.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="Animations/AddAnimation" >
+        <Property Name="Text" Value="Add" />
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.502,0.0},{1.0,-130.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="Animations/RemoveAnimation" >
+        <Property Name="Text" Value="Remove" />
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{1.0,-100.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="Animations/ClearAnimation" >
+        <Property Name="Text" Value="Clear" />
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.502,0.0},{1.0,-100.0}}'/>
+      </Window>
+
+
+
+      <Window Type="ice/Button" Name="Animations/FasterAnimation" >
+        <Property Name="Text" Value="Faster" />
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{1.0,-65.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="Animations/SlowerAnimation" >
+        <Property Name="Text" Value="Slower" />
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.502,0.0},{1.0,-65.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="Animations/ReverseAnimation" >
+        <Property Name="Text" Value="Reverse" />
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{1.0,-35.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="Animations/StopAnimation" >
+        <Property Name="Text" Value="Stop" />
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.502,0.0},{1.0,-35.0}}'/>
+      </Window>
+
+    </Window>
+  </Window>
+</GUILayout>
+

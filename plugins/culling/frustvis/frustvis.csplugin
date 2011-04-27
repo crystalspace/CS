@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- frustvis.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.culling.frustvis</name>
+        <implementation>csFrustumVis</implementation>
+        <description>Simple Frustum Visibility System</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

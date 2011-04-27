@@ -1,0 +1,304 @@
+@c -*-texinfo-*-
+@node MeshObject TerrFunc, MeshObject Terrain2, MeshObject Genmesh, MeshObject
+@subsection Terrain Mesh Object
+@cindex MeshObject
+@cindex Terrain Engine
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+@cindex @code{iTerrainObjectState}
+@cindex @code{iTerrainFactoryState}
+
+@emph{Written by Jorrit Tyberghein,
+(@email{jorrit.tyberghein@@gmail.com}).}
+
+This mesh object represents a landscape engine. The basic idea is that
+the entire landscape is represented by a two dimensional heightmap.
+This heighmap typically comes from a heightmap image file but it can also
+come from other sources.
+
+It features:
+@itemize @bullet
+@item
+Automatic lod.
+@item
+Splatting: having multiple detail materials selected with a material palette
+and smooth transitions between the different materials.
+@item
+Static precalculated lighting with shadows.
+@item
+Dynamic lighting using bumpmapping and similar techniques.
+@end itemize
+
+@subsubheading Basic Structure
+
+The following @sc{scf} class names are used (for @code{csLoadPlugin}):
+
+@itemize @bullet
+@item
+Type plugin: @code{crystalspace.mesh.object.terrain.bruteblock}
+@item
+Loader plugin: @code{crystalspace.mesh.loader.terrain}
+@item
+Factory loader plugin: @code{crystalspace.mesh.loader.factory.terrain}
+@end itemize
+
+Objects in this plugin implement the following @sc{scf} interfaces, which you
+can retrieve with @code{scfQueryInterface}:
+
+@itemize @bullet
+@item
+@emph{MeshObject}
+@itemize @bullet
+@item
+Implements @samp{iMeshObject}
+@item
+Implements @samp{iTerrainObjectState}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectFactory}
+@item
+Implements @samp{iTerrainFactoryState}
+@end itemize
+@item
+@emph{MeshObjectType}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectType}
+@end itemize
+@end itemize
+
+@subsubheading Factory State Interface
+
+Use the @samp{iTerrainFactoryState} @sc{scf} interface to access settings for
+a terrain factory.  The definition of this interface can be found in
+@file{CS/include/imesh/terrain.h} and that is also the include file you need
+to include in your applications to use this plugin.  Using this interface you
+can access the terraformer and sample area for a terrain factory.
+
+@subsubheading Object State Interface
+
+@samp{iTerrainObjectState} (residing in @file{CS/include/imesh/terrain.h})
+is the @sc{scf} interface that you can use to manipulate settings for a terrain
+object.  By using this interface you can access the base material, material
+palette, and various other settings for the terrain object.
+
+@subsubheading How Does it Work
+
+The easiest way to explain how the landscape engine works is to show
+an example world file:
+
+@example
+<world>
+  <textures>
+    <texture name="andrew_marble4.jpg">
+      <file>/lib/stdtex/andrew_marble4.jpg</file>
+    </texture>
+    <texture name="stone4.gif">
+      <file>/lib/std/stone4.gif</file>
+    </texture>
+    <texture name="grass.png">
+      <file>/lev/terrain/grass.png</file>
+    </texture>
+    <texture name="materialmap_base.png">
+      <file>/lev/terrain/materialmap_base.png</file>
+    </texture>
+  </textures>
+
+  <shaders>
+    <shader><file>/shader/terrain_fixed_base.xml</file></shader>
+    <shader><file>/shader/terrain_fixed_splatting.xml</file></shader>
+  </shaders>
+
+  <materials>
+    <material name="Base">
+      <texture>materialmap_base.png</texture>
+      <shader type="ambient">terrain_fixed_base</shader>
+    </material>
+    <material name="Marble">
+      <texture>andrew_marble4.jpg</texture>
+      <shadervar name="texture scale" type="vector2">16,16</shadervar>
+      <shader type="terrain splat">terrain_fixed_splatting</shader>
+    </material>
+    <material name="Stone">
+      <texture>stone4.gif</texture>
+      <shadervar name="texture scale" type="vector2">16,16</shadervar>
+      <shader type="terrain splat">terrain_fixed_splatting</shader>
+    </material>
+    <material name="Grass">
+      <texture>grass.png</texture>
+      <shadervar name="texture scale" type="vector2">16,16</shadervar>
+      <shader type="terrain splat">terrain_fixed_splatting</shader>
+    </material>
+  </materials>
+
+  <addon>
+    <plugin>crystalspace.renderloop.loop.loader</plugin>
+    <paramsfile>/shader/std_rloop_terrainfixed.xml</paramsfile>
+  </addon>
+    
+  <settings>
+    <clearzbuf>yes</clearzbuf>
+    <renderloop>std_rloop_terrainfixed</renderloop>
+  </settings>
+
+  <start>
+    <sector>room</sector>
+    <position x="0" y="30" z="0" />
+  </start>
+
+  <addon plugin="crystalspace.terraformer.simple.loader">
+    <name>simple</name>
+    <heightmap>/lev/terrain/heightmap_257x257.png</heightmap>
+    <scale x="256" y="32" z="256" />
+  </addon>
+
+  <meshfact name="TerrainFact">
+    <plugin>crystalspace.mesh.loader.factory.terrain</plugin>
+    <params>
+      <plugin>crystalspace.mesh.object.terrain.bruteblock</plugin>
+      <terraformer>simple</terraformer>
+      <sampleregion>
+        <min x="-256" y="-256" />
+        <max x="256" y="256" />
+      </sampleregion>
+    </params>
+  </meshfact>
+
+  <sector name="room">
+     <light name="sun">
+       <center x="-50000" y="86030" z="0" />
+       <color red="0.85903" green="0.80995" blue="0.70420" />
+       <radius>1000000</radius>
+     </light>
+
+    <meshobj name="Terrain">
+      <plugin>crystalspace.mesh.loader.terrain</plugin>
+      <params>
+        <factory>TerrainFact</factory>
+        <material>Base</material>
+	<materialpalette>
+	  <material>Grass</material>
+	  <material>Marble</material>
+	  <material>Stone</material>
+	</materialpalette>
+	<lodvalue name="splatting distance">200</lodvalue>
+  	<lodvalue name="block resolution">16</lodvalue>
+  	<lodvalue name="block split distance">8</lodvalue>
+  	<lodvalue name="minimum block size">32</lodvalue>
+  	<lodvalue name="cd resolution">256</lodvalue>
+	<materialmap image="/lev/terrain/materialmap.png" />
+	<staticlighting>yes</staticlighting>
+	<castshadows>yes</castshadows>
+      </params>
+    </meshobj>
+  </sector>
+</world>
+@end example
+
+@subsubheading Textures and Materials
+
+In the first part of this world file we define the textures as used
+by the landscape mesh. In this particular example we use
+@file{materialmap_base.png} as the base material. This is the material that
+is going to be used for the landscape in the distance. The three other
+textures are individual textures that are going to be used by the splatting
+algorithm (more on that later).
+
+In this particular example we use the @file{terrain_fixed_base.xml} and
+@file{terrain_fixed_splatting.xml} shaders. This means that we use simple
+static lighting (needs rilighting using @samp{lighter2}). Other options here are the
+@file{splatting_base.xml} and related shaders which allow for fully dynamic
+lighting and bumpmapping.
+
+We need to define four materials. One material for the base material so
+that one uses the @samp{terrain_fixed_base} shader. The three others will
+be used by the splatting algorithm so they need the
+@samp{terrain_fixed_splatting} shader. Using the @samp{texture scale}
+shader variable you can control the scale of these textures as used on the
+terrain.
+
+@subsubheading Level Setup
+
+Because we need the @samp{terrain_fixed_base} shaders we also need the
+@file{std_rloop_terrainfixed.xml} renderloop. This renderloop works together
+with the fixed terrain shaders. It also supports rendering of normal
+software vertex lighted meshes and meshes using lightmaps so you can easily
+put other objects on the landscape.
+
+@subsubheading Heightmap Data
+
+The landscape engine uses a terraformer plugin to get the heightmap
+data from. Currently there is only one terraformer which loads heightmap
+data from a normal image. Using the
+@samp{crystalspace.terraformer.simple.loader} terraformer plugin loader
+we can load the heightmap data (@file{heightmap_257x257.png}) and
+give it the name @samp{simple}. Using the @samp{scale} keyword we can
+scale it to the right dimensions as needed for the landscape engine.
+
+@subsubheading Mesh Factory
+
+In the mesh factory of the landscape engine we say which terraformer we
+are going to use (i.e. @samp{simple} in this case) and also where we will
+sample the terraformer. In the terraformer itself we scaled the heightmap
+data to the right dimensions. But in the factory we decide which region
+we will actually use for geometry.
+
+@subsubheading Mesh Object
+
+Finally we need the actual mesh object representing the landscape.
+Here we say what the base material is that we will use and we also setup
+the material palette. In our case we use a palette as follows:
+
+@itemize @bullet
+@item
+@samp{Grass}: index 0
+@item
+@samp{Marble}: index 1
+@item
+@samp{Stone}; index 2
+@end itemize
+
+This palette is used in combination with a materialmap (@file{materialmap.png}).
+The materialmap is an indexed image which tells the landscape engine which
+material should be used on every triangle of the terrain. In addition the
+following flags are set here:
+
+@itemize @bullet
+@item
+@samp{splatting distance}: this is the distance at which it stops using
+splatting and switches to the base material. Making this lower will cause
+the landscape to be less detailed (less detailed material) but it will run
+faster.
+@item
+@samp{block resolution}: this controls the internal resolution of the blocks.
+@item
+@samp{block split distance}: unknown?
+@item
+@samp{minimum block size}: unknown?
+@item
+@samp{cd resolution}: this is a current hack to control the resolution
+of the triangle mesh used for collision detection. The default is 256 which
+means that a mesh of 256x256x2 triangles will be used. Larger values will
+result in more accurate collision detection (no sinking through floor) but
+slower and more memory usage.
+@item
+@samp{staticlighting}: enable this if you want to use static lighting.
+@item
+@samp{castshadows}: enable this if you want to enable shadow casting for
+other objects on this terrain. This is only used in combination with
+static lighting.
+@end itemize
+
+@subsubheading Using From Code
+
+It is also possible to use the landscape mesh from code. Use the state
+interfaces @code{iTerrainFactoryState} and @code{iTerrainObjectState}
+with the @samp{terrain} mesh type using the generic mesh generation code
+(@pxref{Generic Mesh Creation Code}).
+
+TODO: add more information here.
+

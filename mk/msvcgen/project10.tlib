@@ -1,0 +1,191 @@
+[% FILTER null;
+#==============================================================================
+# TemplateToolkit2 template for MSVC7 project (vcproj) file.
+# Copyright (C) 2004,2008 by Eric Sunshine <sunshine@sunshineco.com>
+#
+#    This library is free software; you can redistribute it and/or modify it
+#    under the terms of the GNU Library General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or (at your
+#    option) any later version.
+#
+#    This library is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library General Public
+#    License for more details.
+#
+#    You should have received a copy of the GNU Library General Public License
+#    along with this library; if not, write to the Free Software Foundation,
+#    Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#==============================================================================
+  PROCESS macros.tlib;
+  PROCESS control.tlib;
+  PROCESS projectx10.tlib;
+
+  MACRO composedefs(defs) GET compose('defines', defs, ';');
+  MACRO composedirs(tag, seed) BLOCK;
+    buildtag = ${"build.${tag}key"};
+    GET composepaths("${buildtag}${platform.suffix}",seed,';');
+  END;
+  MACRO debugformat(platform,tag) GET ${"platform.debugformat10_${tag}"};
+
+  my = {};
+  load(respfile, 'doc');
+  FOREACH f IN my.doc.customize; PROCESS $f | null; END;
+
+  files = striproots(filter(my.doc.file).split('\|')).split('\|').sort;
+  files_obj_unique = striproots(filter(my.doc.file_obj_unique).split('\|')).split('\|').sort;
+END -%]
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+[%- FOREACH platform IN platforms -%]
+  [%~ IF comparable_msvc_version >= platform.min_vc_version -%]
+    [%~ FOREACH build IN builds -%]
+      [%~ FOREACH mutator IN mutators %]
+    <ProjectConfiguration Include="[% build.name %][% mutator.namesuffix %]|[% platform.name %]">
+      <Configuration>[% build.name %][% mutator.namesuffix %]</Configuration>
+      <Platform>[% platform.name %]</Platform>
+    </ProjectConfiguration>
+      [%~ END %]
+    [%~ END %]
+  [%~ END %]
+[%~ END %]
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{[% guid(my.doc.project.0) %]}</ProjectGuid>
+    <SccProjectName />
+    <SccLocalPath />
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+[%- FOREACH build IN builds -%]
+  [%~ FOREACH mutator IN mutators %]
+  <PropertyGroup Condition="'$(Configuration)'=='[% build.name %][% mutator.namesuffix %]'" Label="Configuration">
+[% interpolate('PropertiesConfiguration') -%]
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  [%~ END %]
+[%~ END %]
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+[%- FOREACH platform IN platforms %]
+  [%~ IF comparable_msvc_version >= platform.min_vc_version %]
+  <ImportGroup Condition="'$(Platform)'=='[% platform.name %]'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  [%~ END %]
+[%~ END %]
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+[% FOREACH platform IN platforms -%]
+  [%~ IF comparable_msvc_version >= platform.min_vc_version -%]
+    [%~ FOREACH build IN builds -%]
+      [%~ FOREACH mutator IN mutators -%]
+[% interpolate('PropertiesDirsAndIncremental') -%]
+      [%~ END %]
+    [%~ END %]
+  [%~ END %]
+[%~ END -%]
+  </PropertyGroup>
+[%- FOREACH platform IN platforms -%]
+  [%~ IF comparable_msvc_version >= platform.min_vc_version -%]
+    [%~ FOREACH build IN builds -%]
+      [%~ FOREACH mutator IN mutators %]
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='[% build.name %][% mutator.namesuffix %]|[% platform.name %]'">
+    <ClCompile>
+[% interpolate('compiler') -%]
+      <PreprocessorDefinitions>
+[%- d = ['WIN32']; composedefs(d.merge(mutator.defines)) %];%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>[% flags(compose('cflags', [], ' ')) | html %] [% flags(compose('cflags7', [], ' ')) | html %] %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>[% composedirs('incdirs', ['.']) %];%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeaderOutputFile>[% workbuild([my.doc.project.0, '.pch']) %]</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>[% workbuild([]) %]</AssemblerListingLocation>
+      <ObjectFileName>[% workbuild([]) %]</ObjectFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <DebugInformationFormat>[% debugformat(platform, build.tag) %]</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+    </ClCompile>
+    <Link>
+[% interpolate('linker') -%]
+      <AdditionalOptions>[% flags(compose('lflags', [], ' ')) | html %] [% flags(compose('lflags7', [], ' ')) | html %] %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>[% compose('libs', [], ';') %];%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>[% composedirs('libdirs', []) %];%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <TargetMachine>[% platform.targetmachine10 %]</TargetMachine>
+      <LargeAddressAware>true</LargeAddressAware>
+    </Link>
+    <Lib>
+[% interpolate('librarian') -%]
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetMachine>[% platform.targetmachine10 %]</TargetMachine>
+    </Lib>
+    <PostBuildEvent>
+[% interpolate('postbuild') -%]
+    </PostBuildEvent>
+    <ResourceCompile>
+      <PreprocessorDefinitions>
+[%- composedefs(platform.rcdefs.merge([glue (['PROJECTGEN_VERSION', my.doc.msvcversion.0], '=')])) %];%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>[% composedirs('incdirs', ['.', path([my.doc.sourceroot.0, my.doc.subdir.0])]) %]</AdditionalIncludeDirectories>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+[%- IF ${"my.doc.manifest${platform.suffix}"} %]
+    <Manifest>
+      <AdditionalManifestFiles>[% path([my.doc.sourceroot.0, ${"my.doc.manifest${platform.suffix}.0"}]) %]</AdditionalManifestFiles>
+    </Manifest>
+[%- END %]
+  </ItemDefinitionGroup>
+      [%~ END %]
+    [%~ END %]
+  [%~ END %]
+[%~ END %]
+[%- FOREACH group IN groups %]
+[%- items = files.grep(group.types) %]
+[%- items_ambiguous = files_obj_unique.grep(group.types) %]
+[%- IF (items.size > 0) || (items_ambiguous.size > 0) %]
+  <ItemGroup>
+  [%- FOREACH file IN items %]
+    [%- exclusion = [] %]
+    [%- IF group.apply_exclusion %]
+      [%- FOREACH build IN builds -%]
+	[%~ FOREACH mutator IN mutators %]
+	  [%- exclusion = exclusion.merge(interpolate('exclude_' _ group.apply_exclusion, '\|').split('\|')) %]
+	[%~ END %]
+      [%~ END %]
+    [%- END %]
+    [%- IF exclusion.size > 0 %]
+    <[% group.itemtype %] Include="[% path([my.doc.sourceroot.0, file]) %]">
+      [%- exclusion.join('') %]
+    </[% group.itemtype %]>
+    [%- ELSE %]
+    <[% group.itemtype %] Include="[% path([my.doc.sourceroot.0, file]) %]" />
+    [%- END %]
+  [%- END %]
+  [%- FOREACH file IN items_ambiguous %]
+    [%- IF file.match('\\.(h|hpp|rc)$') %]
+    <[% group.itemtype %] Include="[% path([my.doc.sourceroot.0, file]) %]" />
+    [%- ELSE %]
+    <[% group.itemtype %] Include="[% path([my.doc.sourceroot.0, file]) %]">
+      <ObjectFileName>[% "\$(IntermediateOutputPath)" _ file.replace('/', '_') _ '.obj' %]</ObjectFileName>
+    </[% group.itemtype %]>
+    [%~ END %]
+  [%~ END %]
+  </ItemGroup>
+[%- END %]
+[%- END %]
+[%- IF my.doc.depends %]
+  <ItemGroup>
+  [%- FOREACH dependency IN my.doc.depends %]
+    <ProjectReference Include="[% dependency %].vcxproj">
+      <Project>{[% guid(dependency) %]}</Project>
+    </ProjectReference>
+  [%- END %]
+  </ItemGroup>
+[%- END %]
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>[% -%]

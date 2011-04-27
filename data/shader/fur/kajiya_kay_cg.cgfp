@@ -1,0 +1,43 @@
+<include>
+  <variablemap variable="light specular[0]" destination="LightColor" />
+  <variablemap variable="Ks" destination="Ks" />
+  <variablemap variable="fur color" destination="FurColor" />  
+  <variablemap variable="hdr scale" destination="hdrScale" />
+  <program>
+
+struct vertex2fragment { 
+	float4 HPosition : POSITION;
+	float3 LightVec : TEXCOORD0;	
+	float3 WorldNormal : TEXCOORD1;	
+	float3 WorldTangent : TEXCOORD2;	
+	float3 WorldView: TEXCOORD3;
+};
+
+float4 main (vertex2fragment IN,
+			uniform float Ks,
+			uniform float3 LightColor,
+			uniform float4 FurColor,			
+			uniform float4 hdrScale) : COLOR
+{
+	float4 OUT = float4(0, 0, 0, FurColor.a);
+	
+	float3 Ln = normalize(IN.LightVec);
+	float3 Nn = normalize(IN.WorldNormal);
+	float3 Vn = normalize(IN.WorldView);
+
+	float tangentLight = dot(Nn, Ln);
+	float tangentEye = dot(Nn, Vn);
+	
+	float3 specularColor = pow( tangentLight * tangentEye + sin( acos( tangentLight ) ) * sin( acos( tangentEye ) ) , 60.0);	
+	specularColor *= Ks;
+	specularColor *= LightColor;
+	specularColor = max (0.0, specularColor);
+	
+	OUT.xyz = specularColor;
+	OUT.xyz = OUT.xyz*hdrScale.y+hdrScale.w;
+	OUT.xyz *= FurColor.a;
+	return OUT;
+}
+
+    </program>
+</include>

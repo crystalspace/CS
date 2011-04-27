@@ -1,0 +1,99 @@
+@c -*-texinfo-*-
+@node Decals, Deferred Shading, Progressive Level of Detail, Engine
+@subsection Decals
+@cindex Decals
+@cindex @code{iDecalManager}
+
+@noindent
+@emph{Written by Andrew Robberts and adapted by Jorrit Tyberghein}
+
+@emph{Note}: A decal is a piece of geometry that wraps around the
+existing world.  Examples of this might be a bullet mark in a wall, a halo
+projected onto the floor around a selected item, or even a simple shadow
+underneath a player.
+
+To create a decal you first need a reference to the global decal manager
+and decal template designed for your decal.
+
+@subsubheading Decal Manager
+
+The decal manager is used to create decals.  Use the @code{iDecalManager}
+@sc{scf}F interface to access the decal manager.
+
+You can load and get a reference to an iDecalManager through any mechanism
+that loads a Crystal Space Plugin. For example, the following code will
+attempt to load the decal plugin and give an iDecalManager reference.
+
+@example
+iObjectRegistry* object_reg = @dots{};
+csRef<iDecalManager> decal_mgr = csLoadPluginCheck<iDecalManager> (
+  object_reg, "crystalspace.decal.manager");
+@end example
+
+@subsubheading Decal Templates
+@cindex @code{iDecalTemplate}
+
+A decal template holds all the generic settings that are needed to create
+a decal such as lifespan, color, material, and other more complicated settings.
+
+A decal template is created using the decal manager's
+@samp{CreateDecalTemplate} function:
+
+@example
+iMaterialWrapper* matWrap = @dots{};	// Material wrapper for your decal.
+csRef<iDecalTemplate> decalTemplate = decal_mgr->CreateDecalTemplate(matWrap);
+@end example
+
+The returned decalTemplate has sufficient default values to create a decal,
+but the decal template can be greatly customized by calling the many
+settings functions of iDecalTemplate.
+
+@subsubheading Creating Decals
+
+Once you have an @code{iDecalManager} reference and your @code{iDecalTemplate}
+you can create a decal using the decal manager's CreateDecal function:
+
+@example
+iDecal * iDecalManager::CreateDecal(iDecalTemplate * decalTemplate,
+  iSector * sector, const csVector3 & pos, const csVector3 & up,
+  const csVector3 & normal, float width, float height, iDecal * oldDecal)
+@end example
+
+@itemize @bullet
+@item @samp{decalTemplate}
+This is the decal template you created earlier that will dictate the
+settings used for the decal.
+@item @samp{sector}
+This is the sector where the decal will be placed.
+@item @samp{pos}
+This is the position of the decal in the given sector.
+@item @samp{up}
+This is the direction of the top side of the decal.  This setting can be
+used to rotate the decal.
+@item @samp{normal}
+This is the direction that will be perpendicular to the decal.  This
+setting can be used to tilt the decal.  For something like a bullet mark,
+you will probably want this direction to be perpendicular to the wall
+that will receive the bullet mark.
+@item @samp{width}
+The width of the decal.
+@item @samp{height}
+The height of the decal.
+@item @samp{oldDecal}
+This is an optional parameter.  If you're recreating a decal (ie,
+moving/rotating an old decal) you can pass your old decal.  The decal
+manager will recycle this decal as much as possible so that supplying
+an old decal is more efficient than deleting the old decal manually
+and creating a new one from scratch.
+@end itemize
+
+@subsubheading Deleting Decals
+
+If you set a lifespan for your decal through
+@code{iDecalTemplate::SetTimeToLive()}, then your decal will die naturally
+and delete itself.
+
+However, if you want to remove your decal early or it does not have a
+lifespan set, then you can remove your decal from the world by passing
+your @code{iDecal} pointer into @code{iDecalManager::DeleteDecal()}.
+

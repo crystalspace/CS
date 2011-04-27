@@ -1,0 +1,10 @@
+SubDir TOP apps tests csbench ;
+
+Description csbench : "Crystal Space benchmark" ;
+
+Application csbench
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith csbench : crystalspace ;
+FileListEntryApplications csbench : app-demo ;
+

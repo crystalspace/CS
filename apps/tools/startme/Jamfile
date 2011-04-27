@@ -1,0 +1,17 @@
+SubDir TOP apps tools startme ;
+
+if $(CEGUI.AVAILABLE) = "yes"
+{
+Description startme : "Crystal Space demo launcher" ;
+ApplicationIcon win32 : startme : startme.ico ;
+ApplicationIcon macosx : startme : startme.icns ;
+Application startme : [ Wildcard *.cpp *.h ] ;
+CFlags startme : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+LinkWith startme : crystalspace ;
+ExternalLibs startme : CEGUI ;
+FileListEntryApplications startme : app-demo ;
+}
+
+IconsFromSVG startme ;
+IconsMakeWin32ICO startme.ico : startme ;
+IconsMakeMacICNS startme.icns : startme ;

@@ -1,0 +1,187 @@
+@c -*-texinfo-*-
+@node MinGW, Cygwin, MSVC7, Platform Instructions
+@subsection Windows using MinGW
+
+@noindent
+@emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Originally
+written by Philip Wyett, @email{philwyett@@gmx.com}.  Last updated 13
+Dec 2004.}
+
+These instructions are for building Crystal Space with MinGW, the
+@emph{Minimalist @sc{gnu} compiler for Windows}.
+
+@noindent
+@uref{http://www.mingw.org/}
+
+@subsubheading Necessary Resources
+
+Download the following packages:
+
+@itemize @bullet
+@item
+The most recent version of the MinGW compiler and related tools.  This package
+is typically named @file{MinGW-?.?.?-?.exe}, where the question marks stand for
+the actual version number.
+
+@noindent
+@uref{http://prdownloads.sourceforge.net/mingw/}
+
+@noindent
+Or:
+
+@noindent
+@uref{http://www.mingw.org/download.shtml}
+
+@item
+The most recent version of @sc{msys}.  This is an adjunct package for MinGW
+which provides additional useful utilities as well as a convenient shell
+environment.  @sc{msys} provides a more reliable and robust environment for the
+configuration and build phases of Crystal Space.  It is available from the
+MinGW web site.  This package is typically named @file{MSYS-?.?.?.exe}, where
+the question marks stand for the actual version number.
+
+@noindent
+@uref{http://prdownloads.sourceforge.net/mingw/}
+
+@noindent
+Or:
+
+@noindent
+@uref{http://www.mingw.org/download.shtml}
+
+@item
+The most recent Crystal Space Win32 Libs package.  This package provides a set
+of additional required and optional resources used when building Crystal Space,
+such as zlib, libpng, libjpeg, @sc{ode}, @sc{nasm} (the Netwide Assembler),
+etc.  @xref{cs-win32libs}.
+@end itemize
+
+@subsubheading Installation
+
+Follow these instructions to install the packages which you downloaded.
+Be sure to install them in the order shown.
+
+@itemize @bullet
+@item
+Install the MinGW compiler.  The is a self-extracting executable.  The
+following instructions assume you will install the MinGW package at
+@file{C:\mingw32}, though you are free to install it wherever you like.
+
+@item
+Install @sc{msys}.  This is a self-extracting executable.  During the
+installation, you will be asked for the location of the MinGW installation.
+This allows @sc{msys} to correctly locate the MinGW tools later on when
+building Crystal Space.  Be sure to enter the correct path (@file{C:/mingw32},
+in our example) when prompted.
+
+@item
+Install the @file{cs-win32libs} package.  This is a self-extracting executable.
+After the installation, you should opt to also install support for the
+@sc{msys} development environment.  This will augment the @sc{msys} shell
+startup file so a helper script named @file{cslibs-config} can be found when
+configuring Crystal Space.  This script is used by the Crystal Space configure
+script to determine where the rest of the @file{cs-win32libs} resources are
+located.
+
+You may want to select ``MSYS/MinGW typical'' in the ``Select Components'' 
+screen. You can further adjust the selection of installed components depending 
+on your actual set up (e.g. install VisualC-related components if you plan to 
+also use CrystalSpace with VisualC++).
+@end itemize
+
+@emph{Note}: If you ever install a new version of @sc{msys}, then you should 
+also re-install the @file{cs-win32libs} package.
+
+@subsubheading Building Crystal Space
+
+You must configure and build Crystal Space from within the @sc{msys} shell
+environment.  To launch this environment, click on the @sc{msys} icon which the
+installation procedure placed upon your desktop, or choose the @sc{msys} item
+from the @emph{Programs} menu.  This will launch a Unix-like shell window into
+which you type commands.
+
+Crystal Space can be built with either @file{make} or Jam (@pxref{GettingJam}).
+Both tools work equally well.  The @file{cs-win32libs} package contains a
+pre-built version of Jam which you can invoke simply by typing @samp{jam} at
+the @sc{msys} command prompt.  In the examples below, wherever @samp{jam}
+is used, you can instead substitute @file{make -k} if you so desire.
+
+At the shell prompt, go to your @file{CS} directory with the @samp{cd} command.
+For example, if Crystal Space resides at @file{C:\work\CS}, invoke the command
+@samp{cd /c/work/CS}.  Next, configure and build the project with the following
+sequence of commands:
+
+@example
+./configure
+jam
+@end example
+
+If you prefer to build a @dfn{debug} version of Crystal Space, substitute
+the following commands for those shown above:
+
+@example
+./configure --enable-debug
+jam
+@end example
+
+If the Crystal Space source directory is read-only, if it is shared between
+several developers, or if you simply dislike building a project within its
+source tree, you can instead configure and build from a different directory.
+For instance:
+
+@example
+mkdir $HOME/builddir
+cd $HOME/builddir
+/c/work/CS/configure --enable-debug
+jam
+@end example
+
+Finally, if you want to utilize Crystal Space as a software development kit
+(@sc{sdk}), you can install it and then clean up the detritus of the build
+process:
+
+@example
+jam install
+jam distclean
+@end example
+
+@subsubheading Additional Build Options
+
+Sometimes it is a good idea to remove all of the built programs and executable
+files and start from scratch.  You can do this with the following commands:
+
+@example
+jam clean
+jam
+@end example
+
+Once in a while it is even a good idea to completely clean and re-configure the
+project.  This may be required if you are using the bleeding-edge version of
+Crystal Space from the @sc{svn} repository after some radical change.
+
+@example
+jam distclean
+./configure
+jam
+@end example
+
+@subsubheading Troubleshooting
+
+If you successfully built Crystal Space, yet find that you can not run the
+applications from the @file{CS\} root directory, a possible cause might be that
+the pathname leading up to the @file{CS\} directory might have embedded
+whitespace.  For instance, if you installed the project in @file{C:\my
+stuff\CS}, try renaming the path to @file{C:\my_stuff\CS} or
+@file{C:\mystuff\CS}.
+
+@subheading Blasting the Past
+
+If you were previously using the older, deprecated @file{cs_mingw_0.??.exe}
+package which contained the entire MinGW distribution along with other
+unrelated tools and resources, or the @file{csmingwlibs} package, it is highly
+recommended that you first remove the older package, as well as any residual
+files and resources before installing the newer MinGW, @sc{msys}, and
+@file{cs-win32libs} packages.  For best results, it would probably be wise to
+remove the entire old @file{MinGW} directory (though you may want to make a
+backup copy of it just in case) and clean your environment variables of any
+references to the old resource directories.

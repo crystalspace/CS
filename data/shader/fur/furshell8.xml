@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+  Copyright (C) 2008 by Frank Richter
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+
+<!-- @@@ FIXME: Will look bad with > 1 lights. Possible solutions:
+                 - Use an ambient cube or so thingie to apply additional lights
+		 - Software lighting via vproc_std
+-->
+<shader compiler="shaderweaver" name="furshell8" lights="1">
+  <technique priority="500">
+    <!-- 1 light, multiple fur shells -->
+    <passgen sequence="0,1,2,3,4,5,6,7" param="shellNum">
+      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
+      <!-- First pass: blend with alpha -->
+	<mixmode>
+	  <blendop src="one" dst="srcalpha_inv" />
+	  <alphatest>disable</alphatest>
+	</mixmode>
+      <?else?>
+	<!-- Later pass: blend with add -->
+	<mixmode>
+	  <blendop src="one" dst="one" />
+	  <alphatest>disable</alphatest>
+	</mixmode>
+      <?endif?>
+      
+      <!-- Combiner to use for this particular pass.
+	   Techniques Referenced snippets must only utilize the same 
+	   combiner with compatible options specified. If a technique
+	   doesn't meet that requirement, the next one is tried.
+	-->
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+
+      <!-- Snippets - the building blocks of this shader. -->
+      <snippet id="position" file="/shader-snippets/fur/position-furshell.xml" />
+      <snippet id="normalmap" file="/shader-snippets/surface/normalmap.xml" />
+      <snippet id="surface" file="/shader-snippets/fur/surface-furshell.xml" />
+      <snippet id="lighting" file="/shader-snippets/lighting/lighting-ppl.xml" />
+      <snippet id="ambient" file="/shader-snippets/lighting/ambient-simple.xml" />
+      <snippet id="mod_diffuse" file="/shader-snippets/modulate_rgb.xml" />
+      <snippet id="specular" file="/shader-snippets/surface/specular-weirdold.xml" />
+      <snippet id="apply_lighting" file="/shader-snippets/lighting/apply-lighting.xml" />
+      <snippet id="hdrscale" file="/shader-snippets/hdr-postscale.xml" />
+      <!-- "connections" describe what snippets take input from what other
+	   snippets (ie the "data flow" is modeled). The exact resolution of
+	   what output is linked to what input is done automatically. -->
+      <connection from="position" to="lighting" />
+      <connection from="normalmap" to="lighting" />
+      <connection from="surface" to="apply_lighting">
+	<explicit from="surfaceColor" to="surfaceDiffuse" />
+      </connection>
+      <connection from="surface" to="specular" />
+      <connection from="lighting" to="apply_lighting">
+	<explicit from="diffuseColor" to="lightDiffuse" />
+	<explicit from="specularColor" to="lightSpecular" />
+      </connection>
+      <connection from="ambient" to="apply_lighting">
+	<explicit from="ambient" to="ambient" />
+      </connection>
+      <connection from="specular" to="apply_lighting">
+	<explicit from="specularColor" to="surfaceSpecular" />
+      </connection>
+      <connection from="apply_lighting" to="hdrscale" />
+      
+      <parameter id="totalShells" type="int">8</parameter>
+      <connection from="shellNum" to="position" />
+      <connection from="totalShells" to="position" />
+      <connection from="shellNum" to="surface" />
+      <connection from="totalShells" to="surface" />
+      
+      <parameter id="lightOffset" type="int">0</parameter>
+      <parameter id="maxLights" type="int">1</parameter>
+      <parameter id="maxTotalLights" type="int">1</parameter>
+      <connection from="lightOffset" to="lighting" />
+      <connection from="maxLights" to="lighting" />
+      <connection from="maxTotalLights" to="lighting" />
+    </passgen>
+  </technique>
+  
+  <fallbackshader name="furshell8_pvl" file="/shader/fur/furshell8_pvl.xml" />
+</shader>

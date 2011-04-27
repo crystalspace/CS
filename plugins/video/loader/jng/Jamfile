@@ -1,0 +1,10 @@
+SubDir TOP plugins video loader jng ;
+
+if $(MNG.AVAILABLE) = "yes" && $(JPEG.AVAILABLE) = "yes"
+{
+Description csjngimg : "jng image loader" ;
+Plugin csjngimg : [ Wildcard *.cpp *.h ] ;
+LinkWith csjngimg : crystalspace ;
+ExternalLibs csjngimg : MNG JPEG ZLIB ;
+CompileGroups csjngimg : imageloaders ;
+}

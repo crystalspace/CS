@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<library>
+  <plugins>
+    <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
+    <plugin name="genmeshfact">crystalspace.mesh.loader.factory.genmesh</plugin>
+  </plugins>
+  <shaders>
+        <shader>
+            <file>/shader/lighting/lighting_default_binalpha.xml</file>
+        </shader>
+  </shaders>
+  <textures>
+    <texture name="krystal_hairs.png">
+      <file>/lib/krystal/krystal_hairs.png</file>
+    </texture>
+  </textures>
+  <materials>
+    <material name="hairs_material">
+      <texture>krystal_hairs.png</texture>
+    </material>
+  </materials>
+  <sounds/>
+  <library>/lib/krystal/krystal_hairs</library>
+  <triggers/>
+</library>

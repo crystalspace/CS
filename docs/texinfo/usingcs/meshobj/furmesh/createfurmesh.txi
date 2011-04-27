@@ -1,0 +1,173 @@
+@c -*-texinfo-*-
+@node HOWTO Create Furmesh, , Furmesh Material, Furmesh Mesh
+@subsubsection Creating a Furmesh Mesh
+@cindex @code{iFurMeshFactory}
+@cindex @code{iFurMeshState}
+@cindex @samp{iLoaderPlugin}
+@cindex furmesh mesh
+
+@emph{Written by Alexandru - Teodor Voicu,
+@email{voicualexandruteodor@@gmail.com}.}
+
+This section describes how to create a Furmesh mesh.
+
+@subsubheading What is Furmesh?
+
+A @samp{Furmesh} mesh object (@pxref{MeshObject Furmesh}) is a generic
+triangle mesh object used for rendering both fur and hair. Furmeshes 
+also support animation via (@pxref{Furmesh Animation}) and advanced 
+shaders via (@pxref{Furmesh Material}).
+
+Furmeshes have different performance when used on static objects or 
+dynamic objects, and so they can be used both for rendering long hairs 
+(having complex animations, based on bullet physics) and for rendering 
+furs, on bigger surfaces, but having just simple animations or being 
+static.
+
+Due to the high volume of geometry, furmeshes don't support any kind of 
+shadows.
+
+Furmesh objects always have to be created through a factory. So, first
+you create the actual furmesh factory and then you create one or more 
+instances from that factory. Furmesh factories can be created from 
+furmesh types or from map files.
+
+@subsubheading Creating a Furmesh in a Map
+
+Here is an example of how to create a furmesh for Krystal model in a 
+map file:
+
+@example
+<meshfact name="krystal_furmesh_factory">
+  <plugin>crystalspace.mesh.loader.factory.furmesh</plugin>
+  <params/>
+</meshfact>
+@end example
+
+Having the furmesh object defined as:
+
+@example
+<meshobj name="krystal_furmesh_object">
+  <plugin>crystalspace.mesh.loader.furmesh</plugin>
+  <params>
+    <factory>krystal_furmesh_factory</factory>
+    <strandwidth>0.001</strandwidth>
+    <displacement>0.02</displacement>
+    <densitymap>krystal_skull_densitymap</densitymap>
+    <densityfactorguidefurs>10</densityfactorguidefurs>
+    <densityfactorfurstrands>120</densityfactorfurstrands>
+    <heightmap>krystal_skull_heightmap</heightmap>
+    <heightfactor>0.4</heightfactor>
+    <controlpointsdistance>0.05</controlpointsdistance>
+    <positiondeviation>0.005</positiondeviation>
+    <growtangents/>
+    <mixmode>
+      <copy />
+    </mixmode>			
+    <priority>object</priority>			
+  </params>
+</meshobj>
+@end example
+
+The densitymap and the heightmap are textures that can be defined as 
+well in a map (library) file, by:
+
+@example
+<textures>
+  <texture name='krystal_skull_densitymap'>
+     <file>/lib/krystal/krystal_skull_densitymap.png</file>
+  </texture>
+  <texture name='krystal_skull_heightmap'>
+     <file>/lib/krystal/krystal_skull_heightmap.png</file>
+   </texture>	
+</textures>
+@end example
+
+However, this only sets the properties for a furmesh. Creating the 
+actual geometry can be done only programmatically, because other
+interfaces, for the furmesh animation and for the furmesh material
+have to be specify first.
+
+@subsubheading Creating a Furmesh Programmatically
+
+Here we create the actual furmesh programmatically, after setting the
+furmesh properties:
+
+@example
+// Load some fur
+rc = hairTest->loader->Load ("/lib/krystal/krystal_furmesh.xml");
+if (!rc.success)
+  return hairTest->ReportError ("Can't load krystal furmesh library!");
+
+csRef<iMeshWrapper> krystalFurmeshObject = 
+  hairTest->engine->FindMeshObject("krystal_furmesh_object");
+if (!krystalFurmeshObject)
+  return hairTest->ReportError ("Can't find fur mesh object!");
+
+@dots{}  
+
+iSector* sector = hairTest->engine->FindSector("room");
+
+if (!sector)
+  return hairTest->ReportError("Could not find default room!");
+
+krystalFurmeshObject->GetMovable()->SetSector(sector);
+krystalFurmeshObject->GetMovable()->UpdateMove();
+
+@dots{}  
+
+csRef<iMeshObject> imo = krystalFurmeshObject->GetMeshObject();
+
+// Get reference to the iFurMesh interface
+furMesh = scfQueryInterface<CS::Mesh::iFurMesh>(imo);
+
+furMesh->SetFurMeshProperties(hairMeshProperties);
+
+furMesh->SetAnimesh(animesh);
+furMesh->SetMeshFactory(animeshFactory);
+furMesh->SetMeshFactorySubMesh(animesh -> GetSubMesh(1)->GetFactorySubMesh());
+furMesh->GenerateGeometry(hairTest->view, hairTest->room);
+
+furMesh->SetGuideLOD(0);
+furMesh->SetStrandLOD(1);
+
+furMesh->SetAnimationControl(animationPhysicsControl);
+furMesh->StartAnimationControl();  
+@dots{}  
+@end example
+
+In order to not use map files at all, we can create the furmesh factory 
+and furmesh object, programmatically, as well:
+
+@example
+csRef<iMeshObjectFactory> imof = furMeshType->NewFactory();
+
+csRef<iMeshFactoryWrapper> imfw = 
+  hairTest->engine->CreateMeshFactory(imof, "hair_factory");
+
+csRef<iMeshWrapper> hairMesh = hairTest->engine->
+  CreateMeshWrapper (imfw, "hair_mesh_wrapper", hairTest->room, csVector3 (0));
+
+@dots{}    
+  
+csRef<iMeshObject> imo = hairMesh->GetMeshObject();
+
+csRef<CS::Mesh::iFurMeshState> ifms = 
+  scfQueryInterface<CS::Mesh::iFurMeshState>(furMesh);
+
+ifms->SetStrandWidth(0.001);  
+ifms->SetDisplacement(0.02);
+@dots{}
+  
+// Get reference to the iFurMesh interface
+furMesh = scfQueryInterface<CS::Mesh::iFurMesh>(imo);
+@dots{}  
+@end example
+
+@subsubheading Include Files
+
+The include files useful for this section are:
+
+@example
+#include <imesh/furmesh.h>
+@end example

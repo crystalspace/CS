@@ -1,0 +1,19 @@
+<library>
+    <meshfact name="Jane">
+        <plugin>crystalspace.mesh.loader.factory.animesh.splitmorph</plugin>
+	<params>
+	    <!--vfspath>/lib/jane/</vfspath-->
+	    <realpath>data/jane/Jane_hi_all_3ds.zip</realpath>
+	    <basefile>Jane_hi_all.3ds</basefile>
+	    <!--meshname>Jane</meshname-->
+	    <!--mask>Jane.*[.]3[dD][sS]</mask-->
+	</params>
+    </meshfact>
+    <!--meshfact name="Test">
+        <plugin>crystalspace.mesh.loader.factory.animesh.splitmorph</plugin>
+	<params>
+	    <realpath>data$/jane$/</realpath>
+	    <basefile>test.3ds</basefile>
+	</params>
+    </meshfact-->
+</library>

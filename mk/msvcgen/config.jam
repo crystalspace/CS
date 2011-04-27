@@ -1,0 +1,103 @@
+#==============================================================================
+# MSVC-specific configuration for msvcgen
+#
+#    This library is free software; you can redistribute it and/or modify it
+#    under the terms of the GNU Library General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or (at your
+#    option) any later version.
+#
+#    This library is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library General Public
+#    License for more details.
+#
+#    You should have received a copy of the GNU Library General Public License
+#    along with this library; if not, write to the Free Software Foundation,
+#    Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#==============================================================================
+#------------------------------------------------------------------------------
+# This file contains extra configuration information for the msvcgen process.
+# The most common use of this file is to provide MSVC-specific fallback values
+# for the library checks normally performed by the Crystal Space configure
+# script, and which the various Jamfiles reference via the ExternalLibs rule.
+# Such fallbacks consist of variables named TAG.CFLAGS, TAG.LFLAGS, and
+# TAG.LIBS, where TAG represents the library's identifier emitted by the
+# configure script.  For instance, to provide MSVC-specific fallback values for
+# the FreeType2 library, which the configure script identifies as FT2, you can
+# define variables named FT2.CFLAGS, FT2.LFLAGS, and FT2.LIBS.  You should also
+# set TAG.AVAILABLE variables to "yes" to ensure that the correct Jamfiles are
+# loaded for MSVC and that the correct project targets get created.  For
+# instance, to ensure that the FreeType2 plugin's project file is generated,
+# set FT2.AVAILABLE to "yes".
+#------------------------------------------------------------------------------
+
+3DS.AVAILABLE = yes ;
+3DS.DEFINES = LIB3DS_GENERIC_DATA_IO_CALLBACKS ;
+3DS.LIBS = lib3ds.lib ;
+BULLET.AVAILABLE = yes ;
+BULLET.CFLAGS.X86 = [ FIncludes "../../winlibs/x86/include/bullet" ] ;
+BULLET.CFLAGS.X64 = [ FIncludes "../../winlibs/x64/include/bullet" ] ;
+BULLET.LIBS.8 = bulletsoftbody-vc8.lib bulletcollision-vc8.lib bulletdynamics-vc8.lib bulletmath-vc8.lib ;
+BULLET.LIBS.DEBUG.8 = bulletsoftbody-vc8_d.lib bulletcollision-vc8_d.lib bulletdynamics-vc8_d.lib bulletmath-vc8_d.lib ;
+BULLET.LIBS.9 = bulletsoftbody-vc9.lib bulletcollision-vc9.lib bulletdynamics-vc9.lib bulletmath-vc9.lib ;
+BULLET.LIBS.DEBUG.9 = bulletsoftbody-vc9_d.lib bulletcollision-vc9_d.lib bulletdynamics-vc9_d.lib bulletmath-vc9_d.lib ;
+BULLET.LIBS.10 = bulletsoftbody-vc10.lib bulletcollision-vc10.lib bulletdynamics-vc10.lib bulletmath-vc10.lib ;
+BULLET.LIBS.DEBUG.10 = bulletsoftbody-vc10_d.lib bulletcollision-vc10_d.lib bulletdynamics-vc10_d.lib bulletmath-vc10_d.lib ;
+CAL3D.AVAILABLE = yes ;
+CAL3D.DEFINES = CS_HAVE_CAL3D ;
+CAL3D.LIBS.8 = cal3d-vc8.lib ;
+CAL3D.LIBS.DEBUG.8 = cal3d-vc8_d.lib ;
+CAL3D.LIBS.9 = cal3d-vc9.lib ;
+CAL3D.LIBS.DEBUG.9 = cal3d-vc9_d.lib ;
+CAL3D.LIBS.10 = cal3d-vc10.lib ;
+CAL3D.LIBS.DEBUG.10 = cal3d-vc10_d.lib ;
+CEGUI.AVAILABLE = yes ;
+CEGUI.LIBS.8 = CEGUIBase-vc8.lib ;
+CEGUI.LIBS.DEBUG.8 = CEGUIBase-vc8_d.lib ;
+CEGUI.LIBS.9 = CEGUIBase-vc9.lib ;
+CEGUI.LIBS.DEBUG.9 = CEGUIBase-vc9_d.lib ;
+CEGUI.LIBS.10 = CEGUIBase-vc10.lib ;
+CEGUI.LIBS.DEBUG.10 = CEGUIBase-vc10_d.lib ;
+CG.AVAILABLE = yes ;
+CG.LIBS = cg.lib cgGL.lib ;
+DIRECTX8.AVAILABLE = yes ;
+DIRECTX8.LIBS = dsound.lib dinput8.lib ;
+FT2.AVAILABLE = yes ;
+FT2.LIBS = freetype2.lib ;
+GL.AVAILABLE = yes ;
+GL.LIBS = opengl32.lib ;
+JPEG.AVAILABLE = yes ;
+JPEG.LIBS = libjpeg.lib ;
+MIKMOD.AVAILABLE = yes ;
+MIKMOD.LIBS = mikmod.lib ;
+MNG.AVAILABLE = yes ;
+MNG.LIBS = libmng.lib ;
+ODE.AVAILABLE = yes ;
+ODE.LIBS = ode.lib ;
+OPENAL.AVAILABLE = yes ;
+OPENAL.LIBS = openal32.lib ;
+PNG.AVAILABLE = yes ;
+PNG.LIBS = libpng.lib ;
+PYTHON.DEFINES = SWIG_GLOBAL ;
+PYTHON.AVAILABLE = yes ;
+SOCKET.AVAILABLE = yes ;
+SOCKET.LIBS = wsock32.lib ;
+SPEEX.AVAILABLE = yes ;
+SPEEX.LIBS = speex.lib ogg.lib ;
+STL.AVAILABLE = yes ;
+VORBISFILE.AVAILABLE = yes ;
+VORBISFILE.LIBS = vorbisfile.lib vorbis.lib ogg.lib ;
+WAVEOUT.AVAILABLE = yes ;
+WAVEOUT.LIBS = winmm.lib ;
+WX.AVAILABLE = yes ;
+WX.DEFINES = wxUSE_GUI=1 WXUSINGDLL=1 UNICODE _UNICODE ;
+WX.DEFINES.DEBUG = wxUSE_GUI=1 WXUSINGDLL=1 WXDEBUG=1 UNICODE _UNICODE ;
+WX.LIBS.8 = wxbase28u-vc8.lib wxmsw28u_core-vc8.lib wxmsw28u_gl-vc8.lib opengl32.lib ;
+WX.LIBS.DEBUG.8 = wxbase28u-vc8_d.lib wxmsw28u_core-vc8_d.lib wxmsw28u_gl-vc8_d.lib opengl32.lib ;
+WX.LIBS.9 = wxbase28u-vc9.lib wxmsw28u_core-vc9.lib wxmsw28u_gl-vc9.lib opengl32.lib ;
+WX.LIBS.DEBUG.9 = wxbase28u-vc9_d.lib wxmsw28u_core-vc9_d.lib wxmsw28u_gl-vc9_d.lib opengl32.lib ;
+WX.LIBS.10 = wxbase28u-vc10.lib wxmsw28u_core-vc10.lib wxmsw28u_gl-vc10.lib opengl32.lib ;
+WX.LIBS.DEBUG.10 = wxbase28u-vc10_d.lib wxmsw28u_core-vc10_d.lib wxmsw28u_gl-vc10_d.lib opengl32.lib ;
+ZLIB.AVAILABLE = yes ;
+ZLIB.LIBS = zlib.lib ;

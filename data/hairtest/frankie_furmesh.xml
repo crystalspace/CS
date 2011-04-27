@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <plugins>
+    <plugin name='furmeshfact'>crystalspace.mesh.loader.factory.furmesh</plugin>
+    <plugin name='furmesh'>crystalspace.mesh.loader.furmesh</plugin>
+  </plugins>
+  <textures>
+    <texture name="frankie_densitymap">
+      <file>/lib/frankie/frankie_densitymap.png</file>
+    </texture>
+    <texture name="frankie_heightmap">
+      <file>/lib/frankie/frankie_heightmap.png</file>
+    </texture>
+  </textures>
+  <library>/lib/hairtest/frankie_furmesh_factory</library>
+  <library>/lib/hairtest/frankie_furmesh_object</library>
+</library>  

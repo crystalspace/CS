@@ -1,0 +1,68 @@
+<!--
+  Copyright (C) 2008 by Mike Gist
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+
+<snippet type="compound">
+  <technique priority="100">
+    <snippet id="surface_classic" file="/shader-snippets/surface/surface-classic.xml" />
+    
+    <snippet id="surface_modulate">
+      <technique priority="100">
+	  <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+
+        <input name="surfaceColorIn" type="rgba">
+          <attribute name="perfragment" type="bool" />
+        </input>
+
+        <input name="color_modulation" type="rgb" default="complex">
+          <block location="shadervars">
+             <shadervar name="color modulation" type="vector3">1,1,1</shadervar>
+          </block>
+
+          <block location="cg:variablemap">
+	      <variablemap variable="color modulation" destination="fragmentIn.color_modulation" />
+          </block>
+      
+          <block location="cg:fragmentIn">
+	      <uniform type="rgb" name="color_modulation" />
+          </block>
+      
+          <block location="cg:fragmentMain">
+	      color_modulation = fragmentIn.color_modulation;
+          </block>
+        </input>
+
+        <block location="cg:vertexMain">
+          surfaceColorOut = surfaceColorIn * float4 (color_modulation, 1);
+          surfaceColorOut_attr_perfragment = surfaceColorIn_attr_perfragment;
+        </block>
+    
+        <block location="cg:fragmentMain">
+          surfaceColorOut = surfaceColorIn * float4 (color_modulation, 1);
+          surfaceColorOut_attr_perfragment = surfaceColorIn_attr_perfragment;
+        </block>
+
+        <output name="surfaceColorOut" type="rgba">
+          <attribute name="perfragment" type="bool" />
+        </output>
+      </technique>
+    </snippet>
+
+    <connection from="surface_classic" to="surface_modulate" />
+  </technique>
+</snippet>
+

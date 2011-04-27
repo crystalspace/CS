@@ -1,0 +1,49 @@
+<html>
+<p><br>
+  Well, you asked for it and you ll get it. If you have read this guide you might 
+  have understood than the exporter exports into a format who is not only used 
+  by PlaneShift, but by the graphic engine who use it, so here are a few links 
+  to things that you might find interesting, they point to the crystalspace documentation. 
+  In reality I didn't try those features by myself, but they are more likely going 
+  to works, as anything than who works with crystalspace in general should works 
+  with PlaneShift.<br>
+  <br>
+  Please notice than all these features require than you edit the world file by 
+  yourself, if you know what XML is it's better as the world file use an xml-like 
+  grammar, if you don't know you should be smart enough to undertand how it works 
+  by looking at the examples.<br>
+  <br>
+  First a quick link to the <a href="http://crystal.sourceforge.net/docs/online/manual/cs_205.php#SEC471">format 
+  of a map file section</a> it's easier to edit something when you know how it 
+  works, isn't it ? <br>
+  Then an other to some <a href="http://crystal.sourceforge.net/docs/online/manual/cs_214.php#SEC530" >interesting 
+  object</a> than you can use <br>
+  Your map isn t rendering fast enough ? You can plan to use <a href="http://crystal.sourceforge.net/docs/online/manual/cs_202.php#SEC460">LOD 
+  ( level of detail )</a> <br>
+  You might find very difficult to add particles systems, because for meshes you 
+  can use your favorite modeler, then import the mesh into PS, but for particles, 
+  you can only guess how it will looks like depending on the values you used this 
+  is why there is an app named partedit than you should find at the root of the 
+  "CS" directory.</p>
+<p>&nbsp;</p>
+<h2><a name="priority">Rendering Priorities</a></h2>
+<p>Just as s reference.</p>
+<p>In Crystal Space you can define rendering priorities for objects. Currently 
+  we assign priorities with these rules:</p>
+<ul>
+  <li>all "_t_" objects have "alpha" priority</li>
+  <li>all "_sky_" objects have "sky" priority</li>
+  <li>all "_p_" objects have "wall" priority</li>
+  <li>all "_s_" objects have "object" priority</li>
+  <li>all others objects have "object" priority</li>
+</ul>
+<p>CS renders objects in this sequence:</p>
+<ol>
+  <li>sky</li>
+  <li>wall</li>
+  <li>object</li>
+  <li>alpha</li>
+</ol>
+<p></p>
+<p>&nbsp; </p>
+</html>

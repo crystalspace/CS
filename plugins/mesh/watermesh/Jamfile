@@ -1,0 +1,4 @@
+SubDir TOP plugins mesh watermesh ;
+
+SubInclude TOP plugins mesh watermesh object ;
+SubInclude TOP plugins mesh watermesh persist ;

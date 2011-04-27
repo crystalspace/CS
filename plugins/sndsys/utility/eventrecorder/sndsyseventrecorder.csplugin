@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- sndsyseventrecorder.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.sndsys.utility.eventrecorder</name>
+        <implementation>csSndSysBasicEventRecorder</implementation>
+        <description>Sound System Event Recorder</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
+

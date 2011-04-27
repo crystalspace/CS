@@ -1,0 +1,33 @@
+<library>
+
+
+  <plugins>
+    <plugin name='skeletonfact'>crystalspace.mesh.loader.factory.skeleton</plugin>
+    <plugin name='animeshfact'>crystalspace.mesh.loader.factory.animesh</plugin>
+  </plugins>
+  
+  
+  <textures>
+    <texture name='crossbow.png'>
+      <file>textures/crossbow6mi9.png</file>
+    </texture>
+    
+    <texture name='BUMPnormalmap.png'>
+      <file>textures/normalmap.png</file>
+      <class>normalmap</class>
+    </texture>
+  </textures>
+  
+  
+  <materials>
+    <material name='crossbowcrossbow6mi9.png'>
+      <texture>crossbow.png</texture>
+      <shadervar type='texture' name='tex normal'>BUMPnormalmap.png</shadervar>
+    </material>
+  </materials>
+
+
+  <library>factories/skelArmature</library>
+  <library>factories/crossbow</library>
+
+</library>

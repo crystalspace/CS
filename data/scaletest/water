@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<library>
+  <plugins>
+    <plugin name="genmeshfact">crystalspace.mesh.loader.factory.genmesh</plugin>
+  </plugins>
+  <shaders>
+    <shader>
+      <file>/shader/reflect/water_plane.xml</file>
+    </shader>
+  </shaders>
+   <textures>
+     <texture name="water_n">
+       <file>textures/water_n.mng</file>
+     </texture>
+   </textures>
+  <materials>
+    <material name="Water">
+      <shader type="base">reflect_water_plane</shader>
+      <shader type="diffuse">reflect_water_plane</shader>
+      <shader type="oc_depthwrite">reflect_water_plane</shader>
+      <shadervar type="texture" name="tex normal">water_n</shadervar>
+      <shadervar type="vector4" name="water fog color">0,0.4,0.2,1</shadervar>
+      <!--<shadervar type="float" name="water fog density">1</shadervar>-->
+      <shadervar type="vector4" name="specular">1,1,1,1</shadervar>
+      <shadervar name="water perturb scale" type="vector4">0.1,0.1,0,0</shadervar>
+      <!--<shadervar name="texture scale" type="vector2">0.0025,0.0025</shadervar>-->
+    </material>
+  </materials>
+  <meshfact name='water'>
+    <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+    <priority>alpha</priority>
+    <ztest/>
+    <params>
+      <material>Water</material>
+      <v x="3253.340332" y="0.000000" z="1337.966064" u="0.000000" v="1.000000" nx="0.000000" ny="1.000000" nz="-0.000000"/>
+      <v x="-3253.339111" y="0.000000" z="1337.966675" u="1.000000" v="1.000000" nx="0.000000" ny="1.000000" nz="-0.000000"/>
+      <v x="-3253.340820" y="0.000000" z="-1337.965942" u="1.000000" v="0.000000" nx="0.000000" ny="1.000000" nz="-0.000000"/>
+      <v x="3253.340332" y="0.000000" z="-1337.966187" u="0.000000" v="0.000000" nx="0.000000" ny="1.000000" nz="-0.000000"/>
+      <t v1="2" v2="1" v3="0"/>
+      <t v1="3" v2="2" v3="0"/>
+      <t v1="0" v2="1" v3="2"/>
+      <t v1="0" v2="2" v3="3"/>
+    </params>
+  </meshfact>
+</library>

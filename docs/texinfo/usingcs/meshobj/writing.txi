@@ -1,0 +1,14 @@
+@c -*-texinfo-*-
+@node Writing MeshObjects, HOWTO Create Genmesh, Using MeshObject, MeshObject
+@subsection Writing Mesh Objects
+@cindex MeshObject
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@gmail.com}.}
+
+This section explains how you can write your own Mesh Object plug-in modules.
+
+@sc{not yet written.}

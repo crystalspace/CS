@@ -1,0 +1,63 @@
+<include>
+  <variablemap variable="light specular[0]" destination="LightColor" />
+  <variablemap variable="constants M" destination="constantsM" />  
+  <variablemap variable="hdr scale" destination="hdrScale" />
+  <program>
+
+struct vertex2fragment { 
+	float4 HPosition : POSITION;
+	float3 LightVec : TEXCOORD0;	
+	float3 WorldTangent : TEXCOORD1;
+	float3 WorldView: TEXCOORD2;
+};
+
+float4 main (vertex2fragment IN,
+			// Lookup tables for the hair model (fixed point)
+			uniform sampler2D lookup1fixed,
+			uniform sampler2D lookup2fixed,		
+			uniform float3 LightColor,
+			uniform float3 constantsM,
+			uniform float4 hdrScale) : COLOR
+{
+	float4 OUT = float4(0, 0, 0, 1);
+
+	float MR_ct = constantsM.x;
+	float MTT_ct = constantsM.y;
+	float MTRT_ct = constantsM.z;
+	
+	float3 Ln = normalize(IN.LightVec);
+	float3 Tn = normalize(IN.WorldTangent);
+	float3 Vn = normalize(IN.WorldView);
+	
+	float sin_qi = dot(Tn, Ln);
+	float sin_qo = dot(Tn, Vn);
+	
+	/* Compute the longitudinal reflectance component */
+	float2 uv1 = float2( sin_qi , sin_qo ) * 0.5 + 0.5;
+	float4 M = tex2D(lookup1fixed, uv1);
+
+	M.x *= MR_ct;
+	M.y *= MTT_ct;
+	M.z *= MTRT_ct;
+	
+	float3 lightPerp = normalize(Ln - sin_qi * Tn);
+	float3 eyePerp = normalize(Vn - sin_qo * Tn);
+	
+	float cos_fd = dot( eyePerp, lightPerp ) * rsqrt( dot( eyePerp, eyePerp ) * dot( lightPerp, lightPerp ));
+	float cos_qd = cos( ( asin( sin_qi ) - asin( sin_qo ) ) / 2.0 );
+	//cos_qd = (M.w - 0.5) * 2.0;
+	
+    /* Compute the azimuthal reflectance component */
+	float2 uv2 = float2( cos_fd, cos_qd ) * 0.5 + 0.5;
+	float4 N = tex2D(lookup2fixed, uv2);
+
+	float3 specularColor = ( M.r * N.r + M.g * N.g + M.b * N.b ) /  max(0.2, cos_qd * cos_qd);
+	specularColor *= LightColor;
+	
+	OUT.xyz = specularColor;
+	OUT.xyz = OUT.xyz*hdrScale.y+hdrScale.w;
+	return OUT;
+}
+
+    </program>
+</include>

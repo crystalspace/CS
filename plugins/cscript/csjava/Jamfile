@@ -1,0 +1,170 @@
+SubDir TOP plugins cscript csjava ;
+
+if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(JAVA) && $(JAVAC) && $(CMD.SWIG) &&
+  ! [ Property build : projgen ]
+{
+  # The `ant' shell script is dysfunctional on MSYS when environment variables
+  # JAVACMD or JAVA_HOME are set with DOS-style paths.  The problem is that the
+  # `exec' command under the MSYS shell which is invoked by the `ant' script as
+  # its very last operation misinterprets the DOS-style path as a _relative_,
+  # rather than _absolute_, path.  This causes it to look for $JAVACMD relative
+  # to the current working directory, which fails fatally.  We work around the
+  # problem by assigning JAVACMD the value of $(JAVA) which was discovered by
+  # the CS configure script.  Furthermore, we forcibly transmogrify the path
+  # from DOS-style to MSYS-style if needed.  Our replacement JAVACMD is
+  # correctly recognized by MSYS's `exec' as an absolute path.
+  if $(TARGET.OS) = WIN32 && $(MSYSTEM)
+  {
+    CSJAVA.ANT_PREPARE = "
+      JAVACMD=`echo "$(JAVA)" | $(SED) 's,^\\([A-Za-z]\\):,/\\1,'`
+      export JAVACMD" ;
+  }
+
+  # The `ant' shell script chokes under Cygwin if JAVA_HOME is not set.
+  # Grab a default value from either JAVACMD or $(JAVA).
+  if $(TARGET.OS) = WIN32
+  {
+    CSJAVA.ANT_PREPARE += "
+      if [ -z \"$JAVA_HOME\" ]; then
+        if [ -n \"$JAVACMD\" ]; then
+          JAVA_HOME=`dirname "$JAVACMD" | $(SED) 's,/bin,,'`
+        else
+          JAVA_HOME=`dirname "$(JAVA)" | $(SED) 's,/bin,,'`
+        fi
+        export JAVA_HOME
+      fi" ;
+  }
+  
+  if ! $(CSJAVA.MODULE.PREFIX) && ! $(CSJAVA.MODULE.SUFFIX)
+  {
+    switch $(TARGET.OS)
+    {
+    case WIN32 :
+      CSJAVA.MODULE.PREFIX = ;
+      CSJAVA.MODULE.SUFFIX = .dll ;
+    case MACOS_X :
+      CSJAVA.MODULE.PREFIX = lib ;
+      CSJAVA.MODULE.SUFFIX = .jnilib ;
+    case UNIX :
+      CSJAVA.MODULE.PREFIX = lib ;
+      CSJAVA.MODULE.SUFFIX = .so ;
+    case * :
+      CSJAVA.MODULE.PREFIX = lib ;
+      CSJAVA.MODULE.SUFFIX = .so ;
+    }
+  }
+  
+  # Be wary of Jam's variable interpolation: "$(X)foo" expands to nothing if X
+  # does not have a value.  (This differs from other interpolators which would
+  # expand it to "foo".)
+  if ! $(CSJAVA.MODULE.PREFIX) { CSJAVA.MODULE.PREFIX = "" ; }
+  if ! $(CSJAVA.MODULE.SUFFIX) { CSJAVA.MODULE.SUFFIX = "" ; }
+
+  local common = [ DoSourceGrist csjava.cpp ] ;
+
+  local javabase = [ ConcatDirs $(LOCATE_TARGET) src ] ;
+  local javadir = [ ConcatDirs $(javabase) org crystalspace3d ] ;
+  Depends $(common) : $(javadir:G=dir) ;
+  MkDir $(javadir:G=dir) ;
+
+  Swig $(common) :
+    [ DoSourceGrist cspace.i ] :
+    java :
+    -c++ -package org.crystalspace3d :
+    [ ConcatDirs $(TOP) include ]
+    [ ConcatDirs $(BUILDTOP) include ] :
+    [ ConcatDirs $(TOP) include bindings ] :
+    :
+    :
+    $(LOCATE_TARGET) src org crystalspace3d ;
+  CleanDir javaswigclean : $(javabase) ;
+  Depends csjavaclean : javaswigclean ;
+
+  NotFile csjava ;
+  Depends bindings : csjava ;
+
+  local desc = "pure Java module" ;
+  Description csjava : $(desc) ;
+  Help csjava : "Build the $(desc)" ;
+
+  local javamod = "$(CSJAVA.MODULE.PREFIX)csjava$(CSJAVA.MODULE.SUFFIX)" ;
+  local javamodsrc = $(common) [ DoSourceGrist [ Wildcard *.cpp ] ] ;
+  local javamodobj = [ CompileObjects $(javamodsrc) ] ;
+  javamod_TARGET = $(javamod) ;
+  javamod_SOURCES = $(javamodsrc) ;
+  javamod_OBJECTS = $(javamodobj) ;
+  LinkWith javamod : crystalspace ;
+  ExternalLibs javamod : JAVA ;
+  CFlags javamod : $(COMPILER.CFLAGS.VISIBILITY_DEFAULT) $(PLUGIN.CFLAGS) 
+    $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) 
+    $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;
+  LFlags javamod : $(PLUGIN.LFLAGS) $(LINKLIBS) $(CSJAVA.LFLAGS) ;
+  Depends csjava : $(javamod) ;
+  MakeLocate $(javamod) : $(LOCATE.TARGETS) ;
+  Depends $(javamod) : $(javamodobj) ;
+  LinkPlugin $(javamod) : $(javamodobj) ;
+  Clean csjavaclean : $(javamod) ;
+
+  local jar_extra = [ Wildcard [ ConcatDirs org crystalspace3d ] : *.java ] ;
+  SEARCH on $(jar_extra) = $(SEARCH_SOURCE) ;
+  MakeLocate $(jar_extra:BSG=built) : $(javadir) ;
+  Clean csjavaclean : $(jar_extra:BSG=built) ;
+  local i ;
+  for i in $(jar_extra)
+  {
+    Depends $(i:BSG=built) : $(i) ;
+    Copy $(i:BSG=built) : $(i) ;
+  }
+
+  local buildbase = [ ConcatDirs $(LOCATE_TARGET) build ] ;
+  local buildxml = build.xml ;
+  local classdir = [ ConcatDirs $(LOCATE_TARGET) classes ] ;
+  local jar = crystalspace.jar ;
+  jar = $(jar:G=csjava) ;
+  SEARCH on $(buildxml) = $(SEARCH_SOURCE) ;
+  Depends $(buildxml:G=build) : $(buildxml) ;
+  MakeLocate $(buildxml:G=build) : $(LOCATE_TARGET) ;
+  Copy $(buildxml:G=build) : $(buildxml) ;
+  Clean csjavaclean : $(buildxml:G=build) ;
+  Depends $(jar) : $(common) $(buildxml:G=build) $(jar_extra:BSG=built) ;
+  MakeLocate $(jar) : $(LOCATE_TARGET) ;
+
+  actions Ant
+  {
+    $(CSJAVA.ANT_PREPARE)
+    "$(ANT)" -quiet -emacs -Dbuild.compiler.emacs=true -buildfile $(>)
+  }
+  Ant $(jar) : $(buildxml:G=build) ;
+  Clean csjavaclean : $(jar) ;
+  CleanDir csjavaclean : $(buildbase) ;
+
+  local jarfinal = $(jar:G=csjavafinal) ;
+  MakeLocate $(jarfinal) : $(LOCATE.TARGETS) ;
+  Copy $(jarfinal) : $(jar) ;
+  Depends $(jarfinal) : $(jar) ;
+  Depends csjava : $(jarfinal) ;
+  Clean csjavaclean : $(jarfinal) ;
+
+  rule InstallJavaJar
+  {
+    InstallBindingsData $(1) : $(2) : $(3) ;
+  }
+  InstallJavaJar $(jarfinal) : $(LOCATE_TARGET) : bindings java ;
+
+  InstallBindingsModule $(javamod) : bindings java ;
+  local cleantarget ;
+  if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
+  {
+    local debugfile = [ SplitDebugInfo $(javamod) ] ;
+    cleantarget += $(debugfile) ;
+    NoCare $(debugfile) ;
+    Depends install_bindings : [ DoInstall $(debugfile) :
+                                  $(appdatadir) bindings java :
+                                  $(INSTALL_DATA) ] ;
+  }
+
+  Always csjavaclean ;
+  NotFile csjavaclean ;
+  Clean csjavaclean : $(javamod) $(javamodobj) $(cleantarget) ;
+  Depends clean : csjavaclean ;
+}

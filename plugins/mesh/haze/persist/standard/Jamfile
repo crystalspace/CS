@@ -1,0 +1,11 @@
+SubDir TOP plugins mesh haze persist standard ;
+
+Description hazeldr : "Haze mesh object loader" ;
+
+Plugin hazeldr
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith hazeldr : crystalspace ;
+
+CompileGroups hazeldr :  meshes ;
+

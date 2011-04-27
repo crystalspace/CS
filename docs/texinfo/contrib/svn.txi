@@ -1,0 +1,88 @@
+@c -*-texinfo-*-
+@node SVN Guide, Porting, Coding Style, Contributing
+@section @sc{svn} Etiquette Guidelines
+@cindex @sc{svn} Guide
+@cindex @sc{svn} Etiquette
+@cindex Etiquette, @sc{svn}
+
+Since Crystal Space has enough developers to warrant the use of @sc{svn} to
+manage its code base, there are some rules you need to keep in mind if you
+are going to be making changes of any sort to the @sc{svn} source tree.
+
+The repository for Crystal Space is located at
+@file{https://crystal.svn.sourceforge.net/svnroot/crystal/CS}. The latest
+bleeding edge version can be found in the @file{trunk} subdirectory, assorted
+branches in @file{branches}.
+
+For further instructions, please refer to the following document:
+
+@uref{http://sourceforge.net/svn/?group_id=649}
+
+Checkout @file{https://crystal.svn.sourceforge.net/svnroot/crystal/CS/trunk} to
+download the source code.  See the documentation for your @sc{svn} client on
+how to do this.
+
+If you do not have a developer account, you will be able to check out files,
+but will not be able to commit any changes.
+
+If you do have developer account, check out the source code as outlined above.
+@sc{svn} will ask you for a password the first time you commit a change. You
+need to specify your SourceForge username when first committing a change:
+
+@example
+svn ci --username <SF username>
+@end example
+
+Having a developer account implies you will be able to make changes to the
+code.  You should read the rest of this document before making any changes.
+
+Below are some guidelines you should follow before committing files.  Also be
+sure to read the important portability guidelines in the @cite{Portability}
+section.  @xref{Portability}.
+
+@enumerate
+@item
+Always perform an @samp{update} before committing new or changed files, and
+then rebuild @emph{everything} from scratch after updating.  @emph{Do not rely
+on dependencies!}  If there were any conflicts during the update, resolve them.
+If there were any merges, examine them to ensure that the merged code still
+accurately reflects your changes.
+
+@item
+If you worked on the engine internals or on the renderers, run @code{walktest}
+using @file{flarge} and visit various locations which exercise the engine's
+features, such as the doughnut in the street and the foggy corridor.
+
+@item
+If it works, commit @emph{everything} you have modified, not just parts of
+your modifications.  If you have created new files, please be certain that you
+have used the @sc{svn} @samp{add} command before committing in order to ensure
+that the new files actually get added to the repository.
+
+@item
+Do another @samp{update} after committing everything.  Take a look at the
+output to see if you really committed everything you intended to commit.
+
+@item
+Do another rebuild to ensure your changes didn't collide with somebody else's
+recent changes.
+
+@item
+For large and important modifications, post a description of your changes to
+the main mailing list, @email{crystal-main@@lists.sourceforge.net}.  This is
+especially important if your changes may have affected other ports which must
+be updated by other developers as a consequence.
+@end enumerate
+
+This might look overdone to some people, but you should remember that we are
+all working together with the same source.  A bug in your code can cripple the
+entire project.
+
+One final thing to remember is that you should @emph{never} commit files that
+you @emph{know} will stop the progress of other developers.  The @sc{svn}
+repository is the place to commit completed code, not code that needs
+debugging because you can't find a certain bug.  Other developers should not
+have to stop and track down your bugs just so they can proceed with their own
+coding.  When you've committed code, please monitor the mailing list regularly
+for any signs that you've caused a problem somewhere.  This is part of the
+responsibility that goes with the ability to commit code.

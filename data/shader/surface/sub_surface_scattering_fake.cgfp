@@ -1,0 +1,98 @@
+<cgfp>
+<variablemap variable="hdr scale" destination="hdrScale" />
+<program>
+<![CDATA[
+
+struct vertex2fragment { 
+	float4 position : POSITION;
+	float2 texCoord : TEXCOORD0;
+	float3 worldNormal : TEXCOORD1;
+	float3 eyeVec : TEXCOORD2;
+	float3 lightVec : TEXCOORD3;
+	float3 worldTangent : TEXCOORD4;
+	float3 worldBinormal : TEXCOORD5;
+	float3 vertPos : TEXCOORD6;
+
+	//float4 LightPosition1 : TEXCOORD7;
+};
+
+float halfLambert(float3 vec1, float3 vec2)
+{
+	float product = dot(vec1, vec2);
+	product *= 0.5;
+	product += 0.5;
+	return product;
+}
+
+float blinnPhongSpecular(float3 normalVec, float3 lightVec, float specPower)
+{
+	float3 halfAngle = normalize(normalVec + lightVec);
+	return pow(saturate(dot(normalVec, halfAngle)), specPower);
+}
+
+float4 main (vertex2fragment IN,
+       uniform sampler2D texturebase,
+       uniform float4 hdrScale) : COLOR
+{
+	//float3 LightPosition1 = float4(3.0f, 3.0f, 3.0f);
+	float4 LightPosition1 = float4(3.0f, 3.0f, 3.0f, 1.0f);
+	float materialThickness = 0.6f;
+	float extinctionCoefficientRed = 0.8f;
+	float extinctionCoefficientGreen = 0.2f;
+	float extinctionCoefficientBlue = 0.12f;
+	float rimScalar = 1.0f;
+	float specularPower = 1.0f;
+	float3 lightColor = float3(1.0f, 1.0f, 1.0f);
+	//float3 lightColor = float3(0.6f, 0.2f, 0.2f);
+	float3 specColor = float3 (0.9f, 0.9f, 1.0f);
+	//float3 specColor = float3(0.6f, 0.2f, 0.2f);
+
+
+	float attenuation = (1.0f / distance(LightPosition1, IN.vertPos));
+	// here some tests for more realistic attenuation
+	//float ligthDistance = distance(LightPosition1, IN.vertPos);
+	//float attenuation = (1.0f / (ligthDistance * ligthDistance));
+	attenuation *= 5.0f;
+
+	float3 eyeVec = normalize(IN.eyeVec);
+	//float3 lightVec = normalize(IN.lightVec.xyz);
+	float3 lightVec = normalize(IN.lightVec);
+	float3 worldNormal = normalize(IN.worldNormal);
+	// should be normal map, not texture, this was already deactivated 
+	// in the original shader
+	//float3 nMap = tex2D(texturebase, IN.texCoord);
+	//worldNormal.x = dot(nMap.x, IN.worldTangent);
+	//worldNormal.y = dot(nMap.y, IN.worldBinormal);
+	//worldNormal.z = dot(nMap.z, IN.worldNormal);
+
+	float4 dotLN = halfLambert(lightVec, worldNormal) * attenuation;
+	dotLN *= tex2D(texturebase, IN.texCoord);
+
+	float3 indirectLightComponent = (float3)(materialThickness * max(0, dot(-worldNormal, lightVec)));
+	//float3 indirectLightComponent = (float3)(max(0, dot(-worldNormal, lightVec)));
+	indirectLightComponent *= attenuation;
+	indirectLightComponent.r *= extinctionCoefficientRed;
+	indirectLightComponent.g *= extinctionCoefficientGreen;
+	indirectLightComponent.b *= extinctionCoefficientBlue;
+	// should be thickness map, not texture (ie, to be removed?)
+	//indirectLightComponent.rgb *= tex2D(texturebase, IN.texCoord).r;
+
+	float3 rim = (float3)(1.0f - max(0.0f, dot(worldNormal, eyeVec)));
+	rim *= rim;
+	rim *= max(0.0f, dot(worldNormal, lightVec)) * specColor;
+
+	float4 finalCol = dotLN + float4(indirectLightComponent, 1.0f);
+	// here, I reduced the rim lighting component
+	//finalCol.rgb += (rim * rimScalar * attenuation * finalCol.a);
+	finalCol.rgb += (rim * rimScalar * attenuation * finalCol.a * 0.3f);
+	finalCol.rgb += (blinnPhongSpecular(worldNormal, lightVec, specularPower) * attenuation * specColor * finalCol.a * 0.05f);
+	finalCol.rgb *= lightColor;
+
+	finalCol.rgb = finalCol.rgb*hdrScale.y+hdrScale.w;
+	
+	return dotLN*hdrScale.y+hdrScale.w;
+}
+
+]]>
+</program>
+</cgfp>

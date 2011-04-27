@@ -1,0 +1,9 @@
+SubDir TOP plugins rendermanager null ;
+
+Description rm_unshadowed : "Null Rendermanager (renders nothing)" ;
+
+Plugin rm_null : 
+  [ Wildcard *.cpp *.h ]
+;
+CompileGroups rm_null : rendermanagers ;
+LinkWith rm_null : crystalspace ;

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!-- joywin.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.device.joystick.windows</name>
+        <implementation>csWindowsJoystick</implementation>
+        <description>Crystal Space Joystick plugin for Windows</description>
+      </class>
+      <class>
+        <name>crystalspace.device.joystick</name>
+        <implementation>csWindowsJoystick</implementation>
+        <description>Crystal Space Joystick plugin for Windows</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

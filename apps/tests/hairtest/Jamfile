@@ -1,0 +1,12 @@
+SubDir TOP apps tests hairtest ;
+
+if $(CEGUI.AVAILABLE) = "yes"
+{
+Description hairtest : "tests on hairs" ;
+Application hairtest :
+  [ Wildcard *.h *.cpp ] ;
+CFlags hairtest : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+LinkWith hairtest : crystalspace ;
+ExternalLibs hairtest : CEGUI ;
+FileListEntryApplications hairtest : app-demo ;
+}

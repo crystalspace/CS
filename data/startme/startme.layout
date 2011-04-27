@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GUILayout>
+    <Window Type="DefaultWindow" Name="root">
+        <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+        <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+        <Property Name="MousePassThroughEnabled" Value="True" />
+	
+
+        <Window Type="crystal/StaticText" Name="Description" >
+          <Property Name="UnifiedAreaRect" Value="{{0.0,10},{0.0,10},{1.0,-400},{1.0,-150}}" />
+          <Property Name="HorzFormatting" Value="WordWrapLeftAligned" />
+        </Window>
+      
+        <Window Type="crystal/StaticImage" Name="Logo" >
+            <Property Name="Image" Value="set:crystal image:logo" />
+            <!--<Property Name="UnifiedAreaRect" Value="{{1.0,-591},{1.0,-591},{1.0,0},{1.0,0}}" />-->
+            <Property Name="UnifiedSize" Value="{{0,370},{0,370}}" />
+            <Property Name="UnifiedPosition" Value="{{1,-210},{1,-210}}" />
+            <Property Name="BackgroundEnabled" Value="False" />
+            <Property Name="FrameEnabled" Value="False" />
+        </Window>
+    </Window>
+</GUILayout>

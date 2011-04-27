@@ -1,0 +1,138 @@
+@c -*-texinfo-*-
+@c ============================================================================
+@c
+@c    Platform-Specific Texinfo Configuration for Unix
+@c    Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
+@c
+@c    This library is free software; you can redistribute it and/or
+@c    modify it under the terms of the GNU Library General Public
+@c    License as published by the Free Software Foundation; either
+@c    version 2 of the License, or (at your option) any later version.
+@c
+@c    This library is distributed in the hope that it will be useful,
+@c    but WITHOUT ANY WARRANTY; without even the implied warranty of
+@c    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+@c    Library General Public License for more details.
+@c
+@c    You should have received a copy of the GNU Library General Public
+@c    License along with this library; if not, write to the Free
+@c    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+@c
+@c ============================================================================
+@c ----------------------------------------------------------------------------
+@c unixdef.txi
+@c
+@c    Unix-specific configuration for Texinfo.
+@c
+@c    This file defines @import{} and @picture{} macros for including other
+@c    Texinfo and image files which reside in subdirectories.  Use the
+@c    @import{} and @picture{} macros rather than Texinfo's @include and
+@c    @image{} commands, respectively.
+@c
+@c    Neither TeX nor the Texinfo tools (makeinfo, texi2html, etc.) deal
+@c    gracefully with differences in pathname syntax between various platforms
+@c    (such as Unix, Windows/DOS, Macintosh, etc.).  The @import{} and
+@c    @picture{} macros defined by this file take platform-specific pathname
+@c    syntax into account and act appropriately.
+@c
+@c    To import a Texinfo file from the current directory, use @import{}.  To
+@c    import a file from within an immediate subdirectory, use @imports{}.
+@c    Use @importss{} for a file two directories deep; @importsss{} for a file
+@c    three levels deep; and so on.  For example, to include the file
+@c    "bar.texi" which resides within an immediate subdirectory named "foo",
+@c    use the command @imports{foo,bar.texi}.
+@c
+@c    The @picture{} macros work similarly.  Use @picture{} to import an image
+@c    from the current directory; @pictures{} for a file from an immediate
+@c    subdirectory; @picturess{} for a file two directories deep, and so on.
+@c    Unlike Texinfo's @image{} directive, @picture{} does not allow manual
+@c    specification of the image's dimensions.
+@c
+@c NOTES
+@c    The practice of adding an "s" to the name of the @import{} and
+@c    @picture{} directives was chosen on account of the extremely limited
+@c    macro handling capabilities within the Texinfo language, since it does
+@c    not provide any mechanism for gracefully handling a variable number of
+@c    arguments.
+@c
+@c    Texinfo to HTML conversion via texi2html requires version 1.60 or later
+@c    since earlier versions do not understand the @macro directive.
+@c
+@c TODO / BUGS
+@c    The TeX versions of @import{} do not (yet) deal gracefully with
+@c    underscores ("_") in pathname components.  Unfortunately, TeX treats the
+@c    underscore as a subscripting operator.
+@c ----------------------------------------------------------------------------
+
+@ifnottex
+@rmacro import{a}
+@include \a\
+@end rmacro
+
+@rmacro imports{a,b}
+@include \a\/\b\
+@end rmacro
+
+@rmacro importss{a,b,c}
+@include \a\/\b\/\c\
+@end rmacro
+
+@rmacro importsss{a,b,c,d}
+@include \a\/\b\/\c\/\d\
+@end rmacro
+
+@rmacro importssss{a,b,c,d,e}
+@include \a\/\b\/\c\/\d\/\e\
+@end rmacro
+
+@rmacro importsssss{a,b,c,d,e,f}
+@include \a\/\b\/\c\/\d\/\e\/\f\
+@end rmacro
+@end ifnottex
+
+@macro picture{a}
+@image{\a\}
+@end macro
+
+@macro pictures{a,b}
+@image{\a\/\b\}
+@end macro
+
+@macro picturess{a,b,c}
+@image{\a\/\b\/\c\}
+@end macro
+
+@macro picturesss{a,b,c,d}
+@image{\a\/\b\/\c\/\d\}
+@end macro
+
+@macro picturessss{a,b,c,d,e}
+@image{\a\/\b\/\c\/\d\/\e\}
+@end macro
+
+@macro picturesssss{a,b,c,d,e,f}
+@image{\a\/\b\/\c\/\d\/\e\/\f\}
+@end macro
+
+@tex
+\gdef\import#1{\doimport#1\finish}
+\gdef\doimport#1\finish{\begingroup
+  \def\thisfile{#1}%
+  \input\thisfile
+\endgroup}
+
+\gdef\imports#1{\doimports#1\finish}
+\gdef\doimports#1,#2\finish{\doimport#1/#2\finish}
+
+\gdef\importss#1{\doimportss#1\finish}
+\gdef\doimportss#1,#2,#3\finish{\doimport#1/#2/#3\finish}
+
+\gdef\importsss#1{\doimportsss#1\finish}
+\gdef\doimportsss#1,#2,#3,#4\finish{\doimport#1/#2/#3/#4\finish}
+
+\gdef\importssss#1{\doimportssss#1\finish}
+\gdef\doimportssss#1,#2,#3,#4,#5\finish{\doimport#1/#2/#3/#4/#5\finish}
+
+\gdef\importsssss#1{\doimportsssss#1\finish}
+\gdef\doimportsssss#1,#2,#3,#4,#5,#6\finish{\doimport#1/#2/#3/#4/#5/#6\finish}
+@end tex

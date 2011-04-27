@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh emit persist standard ;
+
+Description emitldr : "Emit mesh object loader" ;
+
+Plugin emitldr
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith emitldr : crystalspace ;
+
+CompileGroups emitldr :  meshes ;

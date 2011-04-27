@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GUILayout>
+  <Window Type="DefaultWindow" Name="General" >
+    <Property Name="Text" Value="Main" />
+    <Window Type="ice/StaticImage" Name="General/main" >
+      <Property Name='UnifiedSize' Value='{{1.0,0.0},{1.0,0.0}}'/>
+      <Property Name='UnifiedPosition' Value='{{0.0,0.0},{0.0,0.0}}'/>
+
+      <Window Type="ice/Button" Name="General/LoadButton" >
+        <Property Name="Text" Value="Load" />
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,20.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{0.0,5.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="General/SaveButton" >
+        <Property Name="Text" Value="Save XML" />
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,20.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.502,0.0},{0.0,5.0}}'/>
+      </Window>
+
+      <Window Type="ice/Button" Name="General/LoadLibButton" >
+        <Property Name="Text" Value="Load Lib" />
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,20.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{0.0,35.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="General/SaveBinaryButton" >
+        <Property Name="Text" Value="Save Binary" />
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,20.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.502,0.0},{0.0,35.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="General/ReloadButton">
+        <Property Name="Text" Value="Reload" />
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,20.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{0.0,65.0}}'/>
+      </Window>
+
+
+      <Window Type="ice/StaticText" Name="General/ScaleSpriteLable" >
+        <Property Name="Text" Value="Scale:" />
+        <Property Name="BackgroundEnabled" Value="False" />
+        <Property Name="FrameEnabled" Value="False" />
+        <Property Name='UnifiedSize' Value='{{0.0,40.0},{0.0,32.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{0.0,100.0}}'/>
+      </Window>
+      <Window Type="ice/Editbox" Name="General/ScaleSprite" >
+        <Property Name='UnifiedSize' Value='{{0.75,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.22,0.0},{0.0,103.0}}'/>
+      </Window>
+
+
+      <Window Type="ice/RadioButton" Name="General/RotateRadio" >
+        <Property Name="Text" Value="Rotate" />
+        <Property Name='UnifiedSize' Value='{{0.0,140.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{0.0,140.0}}'/>
+      </Window>
+      <Window Type="ice/RadioButton" Name="General/NormalMovementRadio" >
+        <Property Name="Text" Value="Normal Movement" />
+        <Property Name='UnifiedSize' Value='{{0.0,140.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{0.0,160.0}}'/>
+      </Window>
+      <Window Type="ice/RadioButton" Name="General/LooktooriginRadio" >
+        <Property Name="Text" Value="Look to origin" />
+        <Property Name='UnifiedSize' Value='{{0.0,140.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{0.0,180.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="General/ResetCameraButton">
+        <Property Name="Text" Value="Reset Camera" />
+        <Property Name='UnifiedSize' Value='{{0.0,110.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{0.0,215.0}}'/>
+      </Window>
+
+
+      <Window Type="ice/RadioButton" Name="General/ThreePointLighting" >
+        <Property Name="Text" Value="Three Point Lighting" />
+        <Property Name='UnifiedSize' Value='{{0.0,160.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{0.0,250.0}}'/>
+      </Window>
+      <Window Type="ice/RadioButton" Name="General/FrontBackTopLighting" >
+        <Property Name="Text" Value="Front Back and Top" />
+        <Property Name='UnifiedSize' Value='{{0.0,160.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{0.0,270.0}}'/>
+      </Window>
+      <Window Type="ice/RadioButton" Name="General/UnlitLighting" >
+        <Property Name="Text" Value="Unlit" />
+        <Property Name='UnifiedSize' Value='{{0.0,160.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{0.0,290.0}}'/>
+      </Window>
+    </Window>
+  </Window> 
+</GUILayout>
+

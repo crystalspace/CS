@@ -1,0 +1,68 @@
+<library>
+
+  <plugins>
+    <plugin name='skeletonfact'>crystalspace.mesh.loader.factory.skeleton</plugin>
+    <plugin name='animeshfact'>crystalspace.mesh.loader.factory.animesh</plugin>
+  </plugins>
+	
+  <textures>
+
+    <texture name='knight_ice.png'>
+          <file>textures/ice.png</file>
+    </texture>
+    <texture name='uvmap1.jpg'>
+      <file>textures/uvmap1.jpg</file>
+    </texture>
+    <texture name='MaleCol1.png'>
+      <file>textures/MaleCol1.png</file>
+    </texture>
+    <texture name='strands.png.001'>
+      <file>textures/strands.png.001</file>
+    </texture>
+    <texture name='sword.jpg'>
+      <file>textures/sword.jpg</file>
+    </texture>
+    <texture name='BUMPknight_normalmap.png'>
+      <file>textures/normalmap.png</file>
+      <class>normalmap</class>
+    </texture>
+  </textures>
+  
+  <materials>
+
+	  <material name='knight_armor'>
+		  <texture>uvmap1.jpg</texture>
+		  <shadervar type='texture' name='tex normal'>BUMPknight_normalmap.png</shadervar>
+	  </material>
+	  <material name='knight_skin'>
+		  <texture>MaleCol1.png</texture>
+		  <shadervar type='texture' name='tex normal'>BUMPknight_normalmap.png</shadervar>
+	  </material>
+	  <material name='knight_hair'>
+		  <texture>strands.png.001</texture>
+		  <shadervar type='texture' name='tex normal'>BUMPknight_normalmap.png</shadervar>
+	  </material>
+	  <material name='knight_eye'>
+		  <texture>uvmap1.jpg</texture>
+		  <shadervar type='texture' name='tex normal'>BUMPknight_normalmap.png</shadervar>
+	  </material>
+	  <material name='knight_sword'>
+		  <texture>sword.jpg</texture>
+		  <shadervar type='texture' name='tex normal'>BUMPknight_normalmap.png</shadervar>
+	  </material>
+
+    
+    <material name='knight-ice'>
+          <texture>knight_ice.png</texture>
+          <shadervar type='texture' name='tex normal'>BUMPknight_normalmap.png</shadervar>
+          <shadervar name="specular" type="vector4">0.9, 0.9, 1, 1</shadervar>
+          <shadervar name="light 0 diffuse" type="vector4">0.9, 0.9, 1, 1</shadervar>
+    </material>
+    
+  </materials>
+  
+  
+  <library>factories/skelArmature</library>
+  <library>factories/knight</library>
+
+</library>

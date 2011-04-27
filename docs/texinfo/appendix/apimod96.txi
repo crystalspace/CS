@@ -1,0 +1,197 @@
+@c -*-texinfo-*-
+@node Release Notes 96, Release Notes 94, Release Notes 98, Release Notes
+@appendixsec Release Notes from 0.94 to 0.96
+@cindex Release Notes
+
+This section documents the major changes between versions 0.94 and 0.96 of
+Crystal Space.
+
+@subheading Reference Counting Utilities
+
+The new template class @code{csRef<>} automates reference count manipulation,
+thus freeing programmers from the task of manipulating reference counts
+manually.  When assigned, @code{csRef<>} increments the reference count of the
+target object by invoking the object's @code{IncRef()} method.  When the
+@code{csRef<>} is destroyed, or when it is re-assigned, it decrements the
+object's reference count via @code{DecRef()}.  This frees clients from having
+to invoke @code{IncRef()} and @code{DecRef()} manually, thus helping to
+alleviate a potential source of resource leaks.  The companion template
+@code{csPtr<>} has also been added as a micro-optimization for certain cases
+when it is desirable to avoid reference count manipulation during assignment.
+See the smart pointer @sc{howto} for additional information,
+@ref{Smart Pointers}.  Also see the @sc{api} documentation for
+@code{csRef<>} and @code{csPtr<>}.
+
+The Crystal Space @sc{api} has been largely updated to return @code{csRef<>}
+and @code{csPtr<>} from functions which transfer ownership of an object to the
+caller of the function.  Client code which used to assign results of such
+function calls to a normal pointer and invoke @code{IncRef()} on that pointer
+should now instead simply assign the result to a @code{csRef<>}, and allow the
+reference count to be managed automatically.  See the smart pointer @sc{howto}
+for complete details.  @xref{Smart Pointers}.
+
+@subheading iPolygonMesh changes
+@cindex @code{iPolygonMesh}
+
+The header for @samp{iPolygonMesh} has moved from @file{include/ivaria}
+to @file{include/igeom}.
+
+@subheading iMeshObject changes
+@cindex @code{iMeshObject}
+@cindex @code{iVisibilityObject}
+@cindex @code{iObjectModel}
+
+The following functions have been removed:
+
+@itemize @bullet
+@item
+@code{iMeshObject::GetShapeNumber()}
+@item
+@code{iMeshObject::GetObjectBoundingBox()}
+@item
+@code{iMeshObject::GetRadius()}
+@end itemize
+
+Instead there is now a new routine called
+@code{iMeshObject::GetObjectModel()} which will return an instance of
+@samp{iObjectModel}.  The functions can be called from that instance.
+
+A similar change has taken place in the @samp{iVisibilityObject} interface.
+
+@subheading @sc{xml}
+@cindex @sc{xml}
+
+The map format has changed to @sc{xml}. Use the @file{cs2xml} tool to
+convert old maps like this (with a real path to a zip file):
+
+@example
+  cs2xml data/oldlevel.zip
+@end example
+
+or (with a @sc{vfs} path):
+
+@example
+  cs2xml /this/mydata/sprite1
+@end example
+
+@subheading csGetObject and csGetCommand
+@cindex @code{csGetObject()}
+
+The old parser is gone. We switched to @sc{xml}.
+
+@subheading Fast @sc{scf} Interfaces
+@cindex @code{SCF_QUERY_INTERFACE_FAST}
+@cindex @code{CS_GET_CHILD_OBJECT_FAST}
+@cindex @code{CS_GET_NAMED_CHILD_OBJECT_FAST}
+@cindex @code{CS_GET_FIRST_NAMED_CHILD_OBJECT_FAST}
+@cindex @code{SCF_DECLARE_FAST_INTERFACE}
+
+The following macros have been removed:
+
+@itemize @bullet
+@item
+@code{SCF_QUERY_INTERFACE_FAST}
+@item
+@code{CS_GET_CHILD_OBJECT_FAST}
+@item
+@code{CS_GET_NAMED_CHILD_OBJECT_FAST}
+@item
+@code{CS_GET_FIRST_NAMED_CHILD_OBJECT_FAST}
+@item
+@code{SCF_DECLARE_FAST_INTERFACE}
+@end itemize
+
+Fast interfaces are now default. Just use the
+normal query versions instead of the ones above.
+
+@subheading Internal @sc{scf} Changes
+
+For interfaces the @samp{scfGetID_Interfacename} and the
+@samp{VERSION_Interfacename} have been renamed to
+@samp{Interfacename_scfGetID} and @samp{Interfacename_VERSION} for making
+namespaces working nicely with them.
+
+@subheading Make Targets 
+
+Some targets for the @samp{make} facility (all applications, some plugins) have
+changed.  In general, the name of a target is now the same as the name of the
+resulting binary (without suffix).  For example, @file{walktest} is now built
+with @samp{make -k walktest} instead of @samp{make -k walk}.  However, the
+composite target names have not been changed.  To build @file{walktest} and all
+required plugins, one still invokes @samp{make -k walkall}.
+
+@subheading Sound Loader Changes
+The @code{iLoader::LoadSound()} that returns an @code{iSoundWrapper}
+now returns a pointer that has a reference count of one more compared
+to before.
+
+@subheading iTextureManager Changes
+
+The following methods have moved:
+
+@itemize @bullet
+@item
+@code{iTextureManager::FindRGB()} @result{} @code{iGraphics2D::FindRGB()}
+@end itemize
+
+The following methods were eliminated:
+
+@itemize @bullet
+@item
+@code{iTextureManager::SetPalette()}
+@item
+@code{iTextureManager::ResetPalette()}
+@item
+@code{iTextureManager::ReserveColor()}
+@end itemize
+
+@subheading Procedural Textures
+
+The procedural texture system has been rewritten. See the documentation for
+@code{iGraphics3D::SetRenderTarget()} for details.
+
+@subheading Hardmove Change
+@cindex @samp{Hardmove}
+
+The interpretation of the matrix used in the @samp{hardmove} tag
+for mesh factories (@samp{meshfact}) has been inverted so it is more
+logical and also corresponds with the wah @samp{hardmove} is interpreted
+for mesh objects (@samp{meshobj}).
+
+@subheading Octree Removal
+
+The old octree culler is now completely gone. Instead you should use
+@emph{Dynavis} now. If you still have an old level that uses this culler
+then you can try to convert it using the @file{levtool} utility but this
+is only a temporary measure. It is a lot better to design the level with
+@emph{Dynavis} in mind. To convert an old level do this:
+
+@example
+  levtool -dynavis old_level.zip
+@end example
+
+Note that the statements @samp{culler} and @samp{vistree} are no longer
+supported in world files. The loader will give an error if it finds them.
+
+@subheading Typed Vectors
+@cindex @code{CS_DECLARE_TYPED_VECTOR}
+@cindex @code{CS_DECLARE_OBJECT_VECTOR}
+@cindex @code{CS_DECLARE_GROWING_ARRAY}
+@cindex @code{csRefArray<T>}
+@cindex @code{csRefArrayObject<T>}
+@cindex @code{csPArray<T>}
+@cindex @code{csPDelArray<T>}
+@cindex @code{csGrowingArray<T>}
+
+All the macro versions of the growing arrays and vectors have been removed
+and replaced with corresponding templated arrays (@pxref{csUtil}).  For
+example, the following macros and all derivatives have been removed:
+
+@itemize @bullet
+@item
+@code{CS_DECLARE_TYPED_VECTOR}
+@item
+@code{CS_DECLARE_OBJECT_VECTOR}
+@item
+@code{CS_DECLARE_GROWING_ARRAY}
+@end itemize

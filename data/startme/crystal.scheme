@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<GUIScheme Name="crystal">
+	<Imageset Name="crystal" Filename="crystal.imageset" />
+	<LookNFeel Filename="crystal.looknfeel" />
+	<WindowRendererSet Filename="CEGUIFalagardWRBase" />
+  <FalagardMapping WindowType="crystal/Icon"  TargetType="DefaultWindow" Renderer="Falagard/Default"  LookNFeel="crystal/Icon" />
+  
+	<FalagardMapping WindowType="crystal/StaticImage" TargetType="DefaultWindow" Renderer="Falagard/StaticImage" LookNFeel="crystal/StaticImage" />
+	<FalagardMapping WindowType="crystal/StaticText"  TargetType="DefaultWindow" Renderer="Falagard/StaticText"  LookNFeel="crystal/StaticText" />  
+</GUIScheme>

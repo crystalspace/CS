@@ -1,0 +1,6 @@
+SubDir TOP plugins mesh animesh animnode lookat ;
+
+Description lookat : "LookAt animation node plugin for an animated mesh object" ;
+Plugin lookat : [ Wildcard *.cpp *.h ] ;
+LinkWith lookat : crystalspace ;
+CompileGroups lookat : meshes ;

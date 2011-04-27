@@ -1,0 +1,42 @@
+SubDir TOP plugins ;
+
+SubInclude TOP plugins collide ;
+SubInclude TOP plugins console ;
+SubInclude TOP plugins cscript ;
+SubInclude TOP plugins csparser ;
+SubInclude TOP plugins cssaver ;
+SubInclude TOP plugins culling ;
+SubInclude TOP plugins decal ;
+SubInclude TOP plugins device ;
+SubInclude TOP plugins documentsystem ;
+SubInclude TOP plugins editor ;
+SubInclude TOP plugins engine ;
+SubInclude TOP plugins engseq ;
+SubInclude TOP plugins filesys ;
+SubInclude TOP plugins font ;
+SubInclude TOP plugins gui ;
+SubInclude TOP plugins mesh ;
+SubInclude TOP plugins misc ;
+SubInclude TOP plugins physics ;
+SubInclude TOP plugins proctex ;
+SubInclude TOP plugins rendermanager ;
+SubInclude TOP plugins reporter ;
+SubInclude TOP plugins sequence ;
+SubInclude TOP plugins sndsys ;
+SubInclude TOP plugins stdrep ;
+SubInclude TOP plugins terraformer ;
+SubInclude TOP plugins translator ;
+SubInclude TOP plugins utilities ;
+SubInclude TOP plugins video ;
+
+# Assemble big static plugins lib
+if [ Property build : projgen ] = msvc
+{
+  StaticPluginLibrary crystalspace_staticplugins : 
+    cspython
+  ;
+}
+else
+{
+  StaticPluginLibrary crystalspace_staticplugins ;
+}

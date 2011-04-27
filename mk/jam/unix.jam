@@ -1,0 +1,240 @@
+#============================================================================
+# Jam configuration and actions for Unix (GNU/Linux, BSD, Darwin, etc.)
+# Copyright (C)2003 by Matze Braun <matzebraun@users.sourceforge.net>
+#
+#    This library is free software; you can redistribute it and/or modify it
+#    under the terms of the GNU Library General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or (at your
+#    option) any later version.
+#
+#    This library is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library General Public
+#    License for more details.
+#
+#    You should have received a copy of the GNU Library General Public License
+#    along with this library; if not, write to the Free Software Foundation,
+#    Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#============================================================================
+SHELL ?= "/bin/sh" ;
+
+# Only use nasm on x86 for now...
+NASM.FLAGS += -f elf ;
+
+PLUGIN.CFLAGS += $(COMPILER.C++FLAGS.PIC) ;
+LIBRARY.CFLAGS += $(COMPILER.C++FLAGS.PIC) ;
+APPLICATION.LFLAGS += $(LINK.GC_SECTIONS) ;
+PLUGIN.LFLAGS += $(LINK.GC_SECTIONS) ;
+PLUGIN.LFLAGS += $(COMPILER.C++FLAGS.PIC) ;
+LIBRARY.LFLAGS += $(COMPILER.C++FLAGS.PIC) ;
+
+# The BFD tag name under which to embed meta-information into a plugin module.
+# This much match the name expected by csGetPluginMetadata() (bfdplugins.cpp).
+SECTION_TAG_NAME ?= .crystalspace ;
+
+#----------------------------------------------------------------------------
+# platform specific rules
+
+##  ConstructApplicationTarget target : options
+##    Constructs the application target name (ie. foo.exe for foo)
+rule ConstructApplicationTarget
+{
+  return $(<) ;
+}
+rule ConstructStaticLibraryTarget
+{
+  local libbase = [ LibraryBaseName $(<) ] ;
+  return lib$(libbase)$(SUFLIB) ;
+}
+rule ConstructSharedLibraryTarget
+{
+  local libbase = [ LibraryBaseName $(<) ] ;
+  return lib$(libbase).so ; 
+}
+rule ConstructSharedLibraryLinkLib
+{
+  local libbase = [ LibraryBaseName $(<) ] ;
+  return lib$(libbase).so ; 
+}
+rule ConstructPluginTarget
+{
+  return $(<).so ;
+}
+
+# SystemLinkApplication target : objects : options
+#  do system specific actions needed for linking the application and construct
+#  correct clean targets.
+rule SystemLinkApplication
+{
+  local target = $($(<)_TARGET) ;
+  
+  Depends $(target) : $(>) ;
+  LinkApplication $(target) : $(>) ;
+  # setup clean rules
+  Clean clean : $(target) ;
+  Clean $(<)clean : $(target) ;
+}
+
+rule SystemInstallApplication
+{
+  local suffix = $(4) ;
+  if "$(suffix)"
+  {
+    local target_suffixed = $(<)-$(suffix) ;
+    local installed =
+      [ DoInstallFile $(<) : $(bindir) $(2) : $(target_suffixed) : $(INSTALL_PROGRAM) ] ;
+    Depends install_bin : $(installed) ;
+    NotFile $(target_suffixed) ;
+    local linktarget = $(<:D=$(bindir)) ;
+    Depends install_bin : [ 
+      InstallSymLink $(linktarget) : $(target_suffixed) ] ;
+  }
+  else
+  {
+    Depends install_bin :
+      [ DoInstall $(<) : $(bindir) $(2) : $(INSTALL_PROGRAM) ] ;
+  }
+}
+
+rule SystemDoFileListEntryApplications
+{
+  local target = $($(<)_TARGET) ;
+  local entries = [ DoFileListEntries $(target) : : $(2) ] ;
+  if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
+  {
+    local debugfile = $($(target)_DEBUGFILE) ;
+    entries += [ DoFileListEntries $(debugfile) : : debug-$(2) ] ;
+  }
+  return $(entries) ;
+}
+
+rule SystemInstallPlugin
+{
+  Depends install_plugin : [ DoInstall $(<) : $(plugindir) $(2) :
+      $(INSTALL_PROGRAM) ] ;
+}
+
+rule SystemDoFileListEntryPlugin
+{
+  local target = $($(<)_TARGET) ;
+  local entries = [ DoFileListEntries $(target) : : $(2) ] ;
+  if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
+  {
+    local debugfile = $($(target)_DEBUGFILE) ;
+    entries += [ DoFileListEntries $(debugfile) : : debug-$(2) ] ;
+  }
+  if $(EMBED_META) != "yes" || $(OBJCOPY.AVAILABLE) != "yes"
+  {
+    entries += [ DoFileListEntries $($(<)_METAFILE) : : $(2) ] ;
+  }
+  return $(entries) ;
+}
+
+# Put the meta data into the object file headers
+rule ObjTagMetaData
+{
+  Depends $(<) : $(>) ;
+}
+actions ObjTagMetaData
+{
+  $(CMD.OBJCOPY) --add-section $(SECTION_TAG_NAME)=$(>) $(<)
+}
+
+# SystemLinkPlugin target : objects : options
+#  do system specific actions needed for linking the plugin and construct
+#  correct clean targets.
+rule SystemLinkPlugin
+{
+  local target = $($(<)_TARGET) ;
+  
+  Depends $(target) : $(>) ;
+  LinkPlugin $(target) : $(>) ;
+  if $(EMBED_META) = "yes" && $(OBJCOPY.AVAILABLE) = "yes"
+  {
+    ObjTagMetaData $(target) : $($(<)_METAFILE) ;
+  }
+  else
+  {
+    PluginMetaData $(<) : $($(<)_METAFILE) : $(3) ;
+  }
+  # setup clean rules
+  Clean clean : $(target) ;
+  Clean $(<)clean : $(target) ;
+}
+
+# SystemLinkSharedLibrary barename : target : objects : linklib
+rule SystemLinkSharedLibrary
+{
+  local barename = $(1) ;
+  local target = $(2) ;
+  local objects = $(3) ;
+  local linklib = $(4) ;
+  LFlags $(target) : $(LINKLIBS) ;
+  Depends $(target) : $(objects) ;
+  if $(LINKER.RESPONSEFILES) = "yes"
+  {
+    local response = $(target).resp ;
+    MakeLocate $(response) : $(LOCATE.OBJECTS)/libs ;
+    ResponseFile $(response) : $(objects) ;
+    Depends $(response) : $(objects) ;
+    Depends $(target) : $(response) ;
+    LinkSharedLibraryRsp $(target) : $(response) ;
+    Clean clean : $(response) ;
+    Clean $(barename)clean : $(response) ;
+  }
+  else
+  {
+    LinkSharedLibraryFirst $(target) : $(objects[1]) ;
+    LinkSharedLibraryIncremental $(target) : $(objects[2-]) ;
+    LinkSharedLibraryFinal $(target) ;
+  }
+
+  Clean clean : $(target) ;
+  Clean $(barename)clean : $(target) ;
+}
+
+actions LinkApplication bind NEEDLIBS bind EXTRAOBJECTS
+{
+  $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
+}
+
+if $(PLUGIN.LFLAGS.USE_SONAME) = "yes"
+{
+  actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS
+  {
+    $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS) \
+      -Wl,-soname,$(<:BS)
+  }
+}
+else
+{
+  actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS
+  {
+    $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
+  }
+}
+
+actions piecemeal together LinkSharedLibraryFirst bind NEEDLIBS bind EXTRAOBJECTS
+{
+  $(CMD.LD) -r -o $(<).il $(>)
+}
+
+actions piecemeal together LinkSharedLibraryIncremental bind NEEDLIBS bind EXTRAOBJECTS
+{
+  $(CMD.LD) -r -o $(<).il.new $(<).il $(>)
+  $(MV) $(<).il.new $(<).il
+}
+
+actions LinkSharedLibraryFinal bind NEEDLIBS bind EXTRAOBJECTS
+{
+  $(CMD.LINK) -shared -o $(<) $(<).il $(LINK.GC_SECTIONS) $(EXTRAOBJECTS) \
+    $(NEEDLIBS) $(LINKLIBS) -Wl,-soname,$(<:BS)
+  $(RM) $(<).il
+}
+
+actions LinkSharedLibraryRsp bind NEEDLIBS bind EXTRAOBJECTS
+{
+  $(CMD.LINK) -shared -o $(<) -Wl,@$(>) $(LINK.GC_SECTIONS) $(EXTRAOBJECTS) \
+    $(NEEDLIBS) $(LINKLIBS) -Wl,-soname,$(<:BS)
+}

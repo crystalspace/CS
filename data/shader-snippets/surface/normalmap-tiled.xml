@@ -1,0 +1,98 @@
+<!--
+  Copyright (C) 2007 by Frank Richter
+	    (C) 2007 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet>
+  <technique priority="100">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <input file="/shader-snippets/texCoord.inp" />
+    
+    <input name="texNormal" type="tex2d" default="complex">
+      <block location="pass">
+	<texture name="tex normal" destination="fragmentIn.texNormal" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="tex2d" name="texNormal" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	texNormal = fragmentIn.texNormal;
+      </block>
+    </input>
+    
+    <input name="texNormalCompressed" type="tex2d" default="complex">
+      <block location="pass">
+	<texture name="tex normal compressed" destination="fragmentIn.texNormalCompressed" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="tex2d" name="texNormalCompressed" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	texNormalCompressed = fragmentIn.texNormalCompressed;
+      </block>
+    </input>
+
+    <input name="texture_scale" type="scale2" default="complex">
+      <block location="shadervars">
+	  <shadervar name="texture scale" type="vector2">1,1</shadervar>
+      </block>
+      
+      <block location="cg:variablemap">
+	  <variablemap variable="texture scale" destination="fragmentIn.texture_scale" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	  <uniform type="float2" name="texture_scale" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	  texture_scale = fragmentIn.texture_scale;
+      </block>
+    </input>
+    
+    <block location="cg:fragmentMain">
+    <?if vars."tex normal compressed".texture ?>
+      normal = half3 (h4tex2D (texNormalCompressed, texCoord*texture_scale).wy*2-1, 0);
+      normal.z = sqrt (1 - dot (normal.xy, normal.xy));
+      normal_attr_perfragment = true;
+    <?elsif vars."tex normal".texture ?>
+      normal = normalize (h4tex2D (texNormal, texCoord*texture_scale).xyz*2-1);
+      normal_attr_perfragment = true;
+    <?else?>
+      normal = half3 (0, 0, 1);
+      normal_attr_perfragment = false;
+    <?endif?>
+    </block>
+    
+    <block location="cg:vertexMain">
+      normal = half3 (0, 0, 1);
+    <?if vars."tex normal".texture || vars."tex normal compressed".texture?>
+      normal_attr_perfragment = true;
+    <?else?>
+      normal_attr_perfragment = false;
+    <?endif?>
+    </block>
+    
+    <output name="normal" type="normal_tangent">
+      <attribute name="perfragment" type="bool" />
+    </output>
+  </technique>
+</snippet>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwindows.org/wxxrc" version="2.3.0.1">
+	<object class="wxPanel" name="MyPanel">
+		<style>wxTAB_TRAVERSAL</style>
+		<object class="wxBoxSizer">
+			<orient>wxHORIZONTAL</orient>
+			<object class="sizeritem">
+				<option>1</option>
+				<flag>wxEXPAND</flag>
+				<border>5</border>
+				<object class="wxSplitterWindow" name="m_splitter1">
+					<style>wxSP_3D|wxSP_NO_XP_THEME</style>
+					<sashpos>-1</sashpos>
+					<gravity>0</gravity>
+					<minsize>200</minsize>
+					<orientation>vertical</orientation>
+					<object class="wxPanel" name="m_panel1">
+						<style>wxTAB_TRAVERSAL</style>
+						<object class="wxBoxSizer">
+							<orient>wxVERTICAL</orient>
+						</object>
+					</object>
+					<object class="wxScrolledWindow" name="m_scrolledWindow1">
+						<style>wxHSCROLL|wxVSCROLL</style>
+						<object class="wxBoxSizer">
+							<orient>wxVERTICAL</orient>
+							<object class="sizeritem">
+								<option>1</option>
+								<flag>wxEXPAND|wxALL</flag>
+								<border>5</border>
+								<object class="wxTreeCtrl" name="m_treeCtrl">
+									<style>wxTR_DEFAULT_STYLE</style>
+								</object>
+							</object>
+						</object>
+					</object>
+				</object>
+			</object>
+		</object>
+	</object>
+</resource>

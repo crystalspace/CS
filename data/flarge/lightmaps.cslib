@@ -1,0 +1,801 @@
+<library>
+    <textures>
+        <texture name="lightmap_room_walls_0">
+            <file>lightmaps/lightmap_room_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_room_walls_1">
+            <file>lightmaps/lightmap_room_walls_1.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_test2_walls_0">
+            <file>lightmaps/lightmap_test2_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_test2_walls_1">
+            <file>lightmaps/lightmap_test2_walls_1.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_doorway_walls_0">
+            <file>lightmaps/lightmap_doorway_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_large_walls_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_large_walls_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_large_walls_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+                <map lightid="447515093a53b4264df2cd55ca34226b">lightmaps/lightmap_large_walls_0_pd_447515093a53b4264df2cd55ca34226b.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_large_button1_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_large_button1_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_large_button1_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_large_wavyPortal_0">
+            <file>lightmaps/lightmap_large_wavyPortal_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_large_wavyPortal_1">
+            <file>lightmaps/lightmap_large_wavyPortal_1.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_large_switchBoard_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_large_switchBoard_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_large_switchBoard_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_large_handle1_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_large_handle1_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_large_handle1_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_large_handle2_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_large_handle2_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_large_handle2_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_large_handle3_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_large_handle3_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_large_handle3_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_large_rot_door1_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_large_rot_door1_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="447515093a53b4264df2cd55ca34226b">lightmaps/lightmap_large_rot_door1_0_pd_447515093a53b4264df2cd55ca34226b.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_large_s_large2_0">
+            <file>lightmaps/lightmap_large_s_large2_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_large_stair_railD_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_large_stair_railD_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_large_stair_railD_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_large_stair_railU_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_large_stair_railU_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_large_stair_railU_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_large_stair_rail1_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_large_stair_rail1_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_large_stair_rail1_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_large_stair_rail2_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_large_stair_rail2_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_large_stair_rail2_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_large_stair_rail3_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_large_stair_rail3_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_large_stair_rail3_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_large_stair_rail4_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_large_stair_rail4_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_large_stair_rail4_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_large_stair_rail5_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_large_stair_rail5_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_large_stair_rail5_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_large_stair1_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_large_stair1_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_large_stair1_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_large_stair2_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_large_stair2_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_large_stair2_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_large_stair3_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_large_stair3_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_large_stair3_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_large_stair4_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_large_stair4_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_large_stair4_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_large_stair5_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_large_stair5_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_large_stair5_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_large_stair6_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_large_stair6_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_large_stair6_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_large_stair7_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_large_stair7_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_large_stair7_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_large_stair8_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_large_stair8_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_large_stair8_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_win3a_walls_transp_0">
+            <file>lightmaps/lightmap_win3a_walls_transp_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_win3a_walls_0">
+            <file>lightmaps/lightmap_win3a_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_win3a_walls_1">
+            <file>lightmaps/lightmap_win3a_walls_1.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_win3b_walls_transp_0">
+            <file>lightmaps/lightmap_win3b_walls_transp_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_win3b_walls_0">
+            <file>lightmaps/lightmap_win3b_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_win3b_walls_1">
+            <file>lightmaps/lightmap_win3b_walls_1.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_door2_walls_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_door2_walls_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_door2_walls_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_door2_walls_1">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_door2_walls_1.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_door2_walls_1_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_shapes_walls_transp_0">
+            <file>lightmaps/lightmap_shapes_walls_transp_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_shapes_walls_0">
+            <file>lightmaps/lightmap_shapes_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_shapes_cube2_0">
+            <file>lightmaps/lightmap_shapes_cube2_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_shapes_cube3_0">
+            <file>lightmaps/lightmap_shapes_cube3_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_shapes_cube4_0">
+            <file>lightmaps/lightmap_shapes_cube4_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_shapes_cube5_0">
+            <file>lightmaps/lightmap_shapes_cube5_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_shapes_cube6_0">
+            <file>lightmaps/lightmap_shapes_cube6_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_shapes_cube7_0">
+            <file>lightmaps/lightmap_shapes_cube7_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_shapes_cube8_0">
+            <file>lightmaps/lightmap_shapes_cube8_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_shapes_prism3_1_0">
+            <file>lightmaps/lightmap_shapes_prism3_1_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_shapes_prism4_1_0">
+            <file>lightmaps/lightmap_shapes_prism4_1_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_shapes_circle1_0">
+            <file>lightmaps/lightmap_shapes_circle1_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_shapes_band1_0">
+            <file>lightmaps/lightmap_shapes_band1_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_shapes_band2_0">
+            <file>lightmaps/lightmap_shapes_band2_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_door1_walls_0">
+            <file>lightmaps/lightmap_door1_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_door1_walls_1">
+            <file>lightmaps/lightmap_door1_walls_1.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_room3_walls_0">
+            <file>lightmaps/lightmap_room3_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_room3a_walls_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_room3a_walls_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="b02231c100dfdb2ed6206c0b2e6d47c2">lightmaps/lightmap_room3a_walls_0_pd_b02231c100dfdb2ed6206c0b2e6d47c2.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_room3a_walls_1">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_room3a_walls_1.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="b02231c100dfdb2ed6206c0b2e6d47c2">lightmaps/lightmap_room3a_walls_1_pd_b02231c100dfdb2ed6206c0b2e6d47c2.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_uphole1_walls_0">
+            <file>lightmaps/lightmap_uphole1_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_uphole2_walls_0">
+            <file>lightmaps/lightmap_uphole2_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_large2_walls_0">
+            <file>lightmaps/lightmap_large2_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_hole1_walls_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_hole1_walls_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_hole1_walls_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_hole2_walls_0">
+            <file>lightmaps/lightmap_hole2_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_hole3_walls_0">
+            <file>lightmaps/lightmap_hole3_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_hole4_walls_0">
+            <file>lightmaps/lightmap_hole4_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_corridor_walls_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_corridor_walls_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_corridor_walls_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_corridor_walls_1">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_corridor_walls_1.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_corridor_walls_1_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_hole1u_walls_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_hole1u_walls_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_hole1u_walls_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_hole2u_walls_0">
+            <file>lightmaps/lightmap_hole2u_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_hole3u_walls_0">
+            <file>lightmaps/lightmap_hole3u_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_hole4u_walls_0">
+            <file>lightmaps/lightmap_hole4u_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_corridoru_walls_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_corridoru_walls_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_corridoru_walls_0_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_corridoru_walls_1">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_corridoru_walls_1.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_corridoru_walls_1_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_cor1_walls_0">
+            <file>lightmaps/lightmap_cor1_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_cor1_walls_1">
+            <file>lightmaps/lightmap_cor1_walls_1.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_win2a_walls_0">
+            <file>lightmaps/lightmap_win2a_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_win2b_walls_0">
+            <file>lightmaps/lightmap_win2b_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_door_walls_0">
+            <file>lightmaps/lightmap_door_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_door_walls_1">
+            <file>lightmaps/lightmap_door_walls_1.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_hall1_walls_transp_0">
+            <file>lightmaps/lightmap_hall1_walls_transp_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_hall1_walls_0">
+            <file>lightmaps/lightmap_hall1_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_hall2d_walls_transp_0">
+            <file>lightmaps/lightmap_hall2d_walls_transp_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_hall2d_walls_0">
+            <file>lightmaps/lightmap_hall2d_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_hall2u_walls_transp_0">
+            <file>lightmaps/lightmap_hall2u_walls_transp_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_hall2u_walls_0">
+            <file>lightmaps/lightmap_hall2u_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_hall2l_walls_0">
+            <file>lightmaps/lightmap_hall2l_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_hall2r_walls_0">
+            <file>lightmaps/lightmap_hall2r_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_hall3_walls_transp_0">
+            <file>lightmaps/lightmap_hall3_walls_transp_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_hall3_walls_0">
+            <file>lightmaps/lightmap_hall3_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_box_walls_transp_0">
+            <file>lightmaps/lightmap_box_walls_transp_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_box_walls_transp_1">
+            <file>lightmaps/lightmap_box_walls_transp_1.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_win1_walls_0">
+            <file>lightmaps/lightmap_win1_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_street1_walls_transp_0">
+            <file>lightmaps/lightmap_street1_walls_transp_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_street1_walls_0">
+            <file>lightmaps/lightmap_street1_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_street1_walls_1">
+            <file>lightmaps/lightmap_street1_walls_1.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_street1_car_0">
+            <file>lightmaps/lightmap_street1_car_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_street1_carRoof_0">
+            <file>lightmaps/lightmap_street1_carRoof_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_street1_carRoof_1">
+            <file>lightmaps/lightmap_street1_carRoof_1.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_street1_tire1_0">
+            <file>lightmaps/lightmap_street1_tire1_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_street1_tire2_0">
+            <file>lightmaps/lightmap_street1_tire2_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_street1_tire3_0">
+            <file>lightmaps/lightmap_street1_tire3_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_street1_tire4_0">
+            <file>lightmaps/lightmap_street1_tire4_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_win4_walls_transp_0">
+            <file>lightmaps/lightmap_win4_walls_transp_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_win4_walls_0">
+            <file>lightmaps/lightmap_win4_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_win5_walls_transp_0">
+            <file>lightmaps/lightmap_win5_walls_transp_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_win5_walls_0">
+            <file>lightmaps/lightmap_win5_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_street1D_walls_0">
+            <file>lightmaps/lightmap_street1D_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_street1D_walls_1">
+            <file>lightmaps/lightmap_street1D_walls_1.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_street1D_walls_2">
+            <file>lightmaps/lightmap_street1D_walls_2.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_street1D2_walls_0">
+            <file>lightmaps/lightmap_street1D2_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_roof1_walls_0">
+            <file>lightmaps/lightmap_roof1_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_street2_walls_0">
+            <file>lightmaps/lightmap_street2_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_street2_walls_1">
+            <file>lightmaps/lightmap_street2_walls_1.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_inside_walls_0">
+            <file>lightmaps/lightmap_inside_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_pool_walls_0">
+            <file>lightmaps/lightmap_pool_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_pool_walls_1">
+            <file>lightmaps/lightmap_pool_walls_1.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_pool_walls_2">
+            <file>lightmaps/lightmap_pool_walls_2.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_kamer1_walls_0">
+            <file>lightmaps/lightmap_kamer1_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_kamer2_walls_0">
+            <file>lightmaps/lightmap_kamer2_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_kamer2u_walls_0">
+            <file>lightmaps/lightmap_kamer2u_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_kamer2d_walls_0">
+            <file>lightmaps/lightmap_kamer2d_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_kamer2r_walls_0">
+            <file>lightmaps/lightmap_kamer2r_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_kamer2l_walls_0">
+            <file>lightmaps/lightmap_kamer2l_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_kamer2l1_walls_0">
+            <file>lightmaps/lightmap_kamer2l1_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_kamer2l1_walls_1">
+            <file>lightmaps/lightmap_kamer2l1_walls_1.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_kamer2l2_walls_0">
+            <file>lightmaps/lightmap_kamer2l2_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_kamer2l2_walls_1">
+            <file>lightmaps/lightmap_kamer2l2_walls_1.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_gang_walls_0">
+            <file>lightmaps/lightmap_gang_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_gang_walls_1">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_gang_walls_1.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="fe2ba28a046fd726655b5ed67fb7dbe1">lightmaps/lightmap_gang_walls_1_pd_fe2ba28a046fd726655b5ed67fb7dbe1.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_gang2_walls_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_gang2_walls_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="9e3d7c2f65e288bf48c411e3e7bbbc45">lightmaps/lightmap_gang2_walls_0_pd_9e3d7c2f65e288bf48c411e3e7bbbc45.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_gang2_a1_0">
+            <file>lightmaps/lightmap_gang2_a1_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_gang2_a2_0">
+            <file>lightmaps/lightmap_gang2_a2_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_gang2_a3_0">
+            <file>lightmaps/lightmap_gang2_a3_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_gang2_a3_1">
+            <file>lightmaps/lightmap_gang2_a3_1.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_gang3_walls_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_gang3_walls_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="9e3d7c2f65e288bf48c411e3e7bbbc45">lightmaps/lightmap_gang3_walls_0_pd_9e3d7c2f65e288bf48c411e3e7bbbc45.png</map>
+                <map lightid="b02231c100dfdb2ed6206c0b2e6d47c2">lightmaps/lightmap_gang3_walls_0_pd_b02231c100dfdb2ed6206c0b2e6d47c2.png</map>
+                <map lightid="db4227d870ffb4338b8ac2f28db5ea53">lightmaps/lightmap_gang3_walls_0_pd_db4227d870ffb4338b8ac2f28db5ea53.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_gang3_walls_1">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_gang3_walls_1.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="9e3d7c2f65e288bf48c411e3e7bbbc45">lightmaps/lightmap_gang3_walls_1_pd_9e3d7c2f65e288bf48c411e3e7bbbc45.png</map>
+                <map lightid="b02231c100dfdb2ed6206c0b2e6d47c2">lightmaps/lightmap_gang3_walls_1_pd_b02231c100dfdb2ed6206c0b2e6d47c2.png</map>
+                <map lightid="db4227d870ffb4338b8ac2f28db5ea53">lightmaps/lightmap_gang3_walls_1_pd_db4227d870ffb4338b8ac2f28db5ea53.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_gang3_e1_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_gang3_e1_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="b02231c100dfdb2ed6206c0b2e6d47c2">lightmaps/lightmap_gang3_e1_0_pd_b02231c100dfdb2ed6206c0b2e6d47c2.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_gang3_e2_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_gang3_e2_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="b02231c100dfdb2ed6206c0b2e6d47c2">lightmaps/lightmap_gang3_e2_0_pd_b02231c100dfdb2ed6206c0b2e6d47c2.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_gang3_e3_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_gang3_e3_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="b02231c100dfdb2ed6206c0b2e6d47c2">lightmaps/lightmap_gang3_e3_0_pd_b02231c100dfdb2ed6206c0b2e6d47c2.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_gang3_c1_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_gang3_c1_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="db4227d870ffb4338b8ac2f28db5ea53">lightmaps/lightmap_gang3_c1_0_pd_db4227d870ffb4338b8ac2f28db5ea53.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_gang3_c2_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_gang3_c2_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="db4227d870ffb4338b8ac2f28db5ea53">lightmaps/lightmap_gang3_c2_0_pd_db4227d870ffb4338b8ac2f28db5ea53.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_gang3_c3_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_gang3_c3_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="db4227d870ffb4338b8ac2f28db5ea53">lightmaps/lightmap_gang3_c3_0_pd_db4227d870ffb4338b8ac2f28db5ea53.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_gang3_a1_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_gang3_a1_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="9e3d7c2f65e288bf48c411e3e7bbbc45">lightmaps/lightmap_gang3_a1_0_pd_9e3d7c2f65e288bf48c411e3e7bbbc45.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_gang3_a2_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_gang3_a2_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="9e3d7c2f65e288bf48c411e3e7bbbc45">lightmaps/lightmap_gang3_a2_0_pd_9e3d7c2f65e288bf48c411e3e7bbbc45.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_gang3_a3_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_gang3_a3_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="9e3d7c2f65e288bf48c411e3e7bbbc45">lightmaps/lightmap_gang3_a3_0_pd_9e3d7c2f65e288bf48c411e3e7bbbc45.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_gang4_walls_0">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_gang4_walls_0.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="b02231c100dfdb2ed6206c0b2e6d47c2">lightmaps/lightmap_gang4_walls_0_pd_b02231c100dfdb2ed6206c0b2e6d47c2.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_gang4_walls_1">
+            <type>crystalspace.texture.loader.pdlight</type>
+            <file>lightmaps/lightmap_gang4_walls_1.png</file>
+            <class>lightmap</class>
+            <params>
+                <map lightid="b02231c100dfdb2ed6206c0b2e6d47c2">lightmaps/lightmap_gang4_walls_1_pd_b02231c100dfdb2ed6206c0b2e6d47c2.png</map>
+            </params>
+        </texture>
+        <texture name="lightmap_gang5_walls_0">
+            <file>lightmaps/lightmap_gang5_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_gang5_walls_1">
+            <file>lightmaps/lightmap_gang5_walls_1.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_gang5a_walls_0">
+            <file>lightmaps/lightmap_gang5a_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_gang5b_walls_0">
+            <file>lightmaps/lightmap_gang5b_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+        <texture name="lightmap_biglight_walls_0">
+            <file>lightmaps/lightmap_biglight_walls_0.png</file>
+            <class>lightmap</class>
+        </texture>
+    </textures>
+</library>

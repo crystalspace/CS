@@ -1,0 +1,5 @@
+SubDir TOP apps tests threadtest ;
+
+Description threadtest : "Thread Test" ;
+Application threadtest : [ Wildcard *.cpp *.h ] : noinstall ;
+LinkWith threadtest : crystalspace ;

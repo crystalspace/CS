@@ -1,0 +1,377 @@
+@c -*-texinfo-*-
+@node MeshObject Particles, MeshObject Portal Container, MeshObject Terrain2, MeshObject
+@subsection Particles Mesh Object
+@cindex MeshObject
+@cindex Particles Particle System
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+@cindex @code{iParticleSystemBase}
+@cindex @code{iParticleSystemFactory}
+@cindex @code{iParticleSystem}
+@cindex @code{iParticleEmitter}
+@cindex @code{iParticleEffector}
+
+@emph{Written by M@aa{}rten Svanfeldt,
+@email{developer@@svanfeldt.com}.}
+
+Particles is a general particle rendering and simple simulation plugin. It
+also contains a few simpler built-in implementations of particle emitters
+and effectors.
+
+@subsubheading Basic Structure
+
+The following @sc{scf} class names are used (for @code{csLoadPlugin}):
+
+@itemize @bullet
+@item
+Type plugin: @samp{crystalspace.mesh.object.particles}
+@item
+Loader plugin: @samp{crystalspace.mesh.loader.particles}
+@item
+Factory loader plugin: @samp{crystalspace.mesh.loader.factory.particles}
+@end itemize
+
+Objects in this plugin implement the following @sc{scf} interfaces (get
+with @code{scfQueryInterface}):
+
+@itemize @bullet
+@item
+@emph{MeshObject}
+@itemize @bullet
+@item
+Implements @samp{iMeshObject}
+@item
+Implements @samp{iParticleSystem}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectFactory}
+@item
+Implements @samp{iParticleSystemFactory}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectType}
+@end itemize
+@end itemize
+
+@subsubheading Factory State Interface
+
+Use the @samp{iParticleSystemFactory} @sc{scf} interface to access settings for
+a particle system factory.  The definition of this interface can be found in
+@file{CS/include/imesh/particles.h} and that is also the include file you need
+to include in your applications to use this plugin.  Using this interface you
+can access the material, default particle billboard setup, rotation mode, 
+emitters, effectors and various other configuration parameters for a 
+particle system factory.
+
+Notice that once a particle system have been created from a factory, changing
+the factory won't change the instance. So in the case of particle systems
+the factory should be viewed as a template rather than a "parent".
+
+@subsubheading Object State Interface
+
+Use the @samp{iParticleSystem} @sc{scf} interface to access settings for
+a particle system.  The definition of this interface can be found in
+@file{CS/include/imesh/particles.h} and that is also the include file you need
+to include in your applications to use this plugin.  Using this interface you
+can access the material, default particle billboard setup, rotation mode, 
+emitters, effectors and various other configuration parameters for a 
+particle system.
+
+@anchor{Particles Factory and Object Loader}
+@subsubheading Factory and Object Loader
+
+The factory and object loader in much recognize the same set of keywords.
+
+@table @code
+@item <renderorientation>orientation</renderorientation>
+Set how the particle billboards are oriented in relation to the world and the
+camera. @xref{Particles billboard setup,,Particle billboard setup}.
+@item <rotationmode>rotation</rotationmode>
+Set how rotation of the particles affect the visual output. Valid values are
+@samp{none}, @samp{texcoord} and @samp{vertex}. Default is no effect 
+(@samp{none}).
+@item <sortmode>sort</sortmode>
+Control the particle front-to-back sorting mode. Valid values are
+@samp{none}, @samp{distance} and @samp{dot}.
+@item <integrationmode>integration</integrationmode>
+Velocity to position integration mode. Valid values are
+@samp{none}, @samp{linear} and @samp{both}. Default is @samp{linear}.
+@item <commondirection x="" y="" z="" />
+Set common direction. Common direction is used as a reference direction for
+billboard setup for a few particle billboard orientations.
+@item <transformmode>tmode</transformmode>
+Set the transform mode of the particle system and thereby the coordinate systems
+used. Valid values are @samp{local}, @samp{localemitter}, @samp{world}.
+@item <individualsize>yes/no</individualsize>
+Determin if particle rendering should use the individual size associated with 
+each particle, or if the global <particlesize> property should be used.
+@item <particlesize x="" y="" />
+Set global particle size.
+@item <minbb>@dots{}</minbb>
+Set the minimum bounding box of the particles mesh. The particle system is only
+rendered when the bounding box is deemed visible (within frustum), and
+therefore it can sometimes be required to have a bigger bounding box than the
+current distribution of the particles.
+@item <emitter type="">@dots{}</emitter>
+Add a built-in emitter to the particles system.
+@item <effector type="">@dots{}</effector>
+Add a built-in effector to the particles system.
+@end table
+
+
+@subsubheading Factory Loader
+
+Also see the general documentation for keywords recognized both by factory and 
+object. 
+@xref{Particles Factory and Object Loader, , Factory and Object Loader}.
+
+@table @code
+@item <deepcreation>yes/no</deepcreation>
+Enable or disable deep-copy on creation of particle systems.
+@item <material>materialName</material>
+Set the default material for particle system factory.
+@item <mixmode>mixmode</mixmode>
+Set the default mixmode for particle system factory.
+@pxref{XMLServices Mixmode}.
+@end table
+
+@subsubheading Object Loader
+
+Also see the general documentation for keywords recognized both by factory and 
+object. 
+@xref{Particles Factory and Object Loader, , Factory and Object Loader}.
+
+@table @code
+@item <factory>factoryName</factory>
+Set the factory to use when creating the particle system.
+@item <material>materialName</material>
+Set the material for particle system.
+@item <mixmode>mixmode</mixmode>
+Set the mixmode for particle system.
+@pxref{XMLServices Mixmode}.
+@item <preadvance>time</preadvance>
+Advance the time of the particle system object by the given duration.
+This is useful to fill a particle system after its initial creation.
+@end table
+
+@subsubheading Operation of particles
+The particle system have three basic parts
+
+@itemize @bullet
+@item Particle update loop
+@item Particle billboard setup
+@item Handling of emitters and effectors
+@end itemize
+
+Apart from this the particles plugin also contains some management code to keep
+everything together and interface the rest of Crystal Space, as well as loading
+and saving from/to files.
+
+@subsubheading Particle update loop
+The main part of work related to particle creation and movement is done in the
+particle update loop. The update loop is called once per frame for every visible
+particle system.
+
+The steps of the update loop are:
+@enumerate
+@item Retirement of old particles. Particles time-to-live is decreased by
+current elapsed time, and those with zero or negative time-to-live are removed.
+@item Emission of new particles. The emitters are polled one at a time to emit
+their particles into the system.
+@item Apply physical (or non-physical) effects to particles. The effectors are
+ran one after another to apply their effect to the particles.
+@item Position and orientation integration. Depending on the integration setting
+no integration or integration of position or position and rotation is done.
+@end enumerate
+
+@anchor{Particles billboard setup}
+@subsubheading Particle billboard setup
+The second big part of particles plugin is the particle billboard setup. In 
+computations each particle is "point-like" however for rendering you have to
+give it an extent. 
+
+The particles plugin provides rendering in form of rectangular (quadratile) 
+areas of settable size and orientation relative to the camera.
+
+@table @samp
+@item camface
+The particle billboards always face the camera location, so the camera to
+particle vector is used as normal. The camera up vector is used as up-vector
+for the billboards.
+@item camface approx
+The billboards are aligned with the camera plane, and camera up and right
+vectors are used as billboard vectors. This is the default mode and the mode
+most other particle systems in Crystal Space have.
+@item common
+Use common up direction as up vector for particle and as @samp{camface}
+face the camera properly. This makes the particles look like fixed around one
+axis.
+@item common approx
+Approximative version of @samp{common} mode. Common up direction is used
+as billboard up direction and camera forward vector as plane normal. This mode
+is equal to old @samp{Rain} particle system.
+@item velocity
+Almost the same as @samp{common} mode, but instead of using a common direction
+the particle linear velocity is used as up direction.
+@item self
+Orients particle billboard according to the coordinate base defined by the
+quaternion in the particle (it's internal orientation). Setup is such that
+xy-plane is the billboard plane and positive z-axis normal.
+@item self forward
+Same as @samp{self} mode, however particles are always facing camera. It is
+equivalent to two-sided particles.
+@end table
+
+@subsubheading Emitters
+Emitters are the entities responsible for emitting new particles into the
+particle system. Without any emitters there won't be any particles and nothing
+to see.
+
+In principle an emitter is any class implementing the interface 
+@samp{iParticleEmitter}, so you can implement your own emitters, however for
+convenience there are a few built in emitter types. These can be accessed via
+the @samp{crystalspace.mesh.object.particles.emitter} plugin class and interface
+@samp{iParticleBuiltinEmitterFactory} interface.
+The built in emitters are also loadable via the normal particle loader using
+@code{<emitter type="..">} tags. The available types are:
+@itemize @bullet
+@item @samp{sphere}
+@item @samp{box}
+@item @samp{cylinder}
+@item @samp{cone}
+@end itemize
+
+Many of the options are same for several of the emitter types, so below is a
+description of all available options for the built in emitters and which type
+of emitters they apply to.
+
+@multitable @columnfractions .33 .33 .33
+@item Keyword @tab Applies to @tab Description
+@item @code{<enabled>yes/no</enabled>}
+@tab @samp{all}
+@tab Should the emitter emit particles at all.
+
+@item @code{<starttime>time</starttime>}
+@tab @samp{all}
+@tab Start time of emitter relative to first time particle gets into view.
+
+@item @code{<duration>time</duration>}
+@tab @samp{all}
+@tab Duration for which the emitter should be active.
+
+@item @code{<emissionrate>rate</emissionrate>}	
+@tab @samp{all}
+@tab Emission rate in particles per second.
+
+@item @code{<initialttl min="" max="" />}
+@tab @samp{all}
+@tab Initial TTL of the particles will be assigned randomly between min and max
+values.
+
+@item @code{<mass min="" max="" />}
+@tab @samp{all}
+@tab Initial mass of the particles will be assigned randomly between min and max
+values.
+
+@item @code{<position x="" y="" z="" />}
+@tab @samp{all}
+@tab Emitter center position.
+
+@item @code{<placement>place</placement>}
+@tab @samp{all}
+@tab Particle placement relative to emitter. Valid values @samp{center}, 
+@samp{volume}, @samp{surface}. Default is @samp{center}.
+
+@item @code{<uniformvelocity>yes/no</uniformvelocity>}
+@tab @samp{all}
+@tab Sets if all particles should have the same uniform velocity vector or if
+only the magnitude should be used and direction should be emitter-specific.
+
+@item @code{<initialvelocity x="" y="" z=""/>}
+@tab @samp{all}
+@tab Set initial linear velocity vector.
+
+@item @code{<initialangularvelocity x="" y="" z=""/>}
+@tab @samp{all}
+@tab Set initial angular velocity vector.
+
+@item @code{<radius>rad</radius>}
+@tab @samp{sphere}, @samp{cylinder}
+@tab Radius of emitting sphere/cylinder
+
+@item @code{<extent x="" y="" z="" />}
+@tab @samp{cylinder}, @samp{cone}
+@tab Extent vector defining the cone or cylinder
+
+@item @code{<coneangle>angle</coneangle>}
+@tab @samp{cone}
+@tab Cone opening angle in radians
+
+@item @code{<box>..</box>}
+@tab @samp{box}
+@tab Box emitter extents
+@end multitable
+
+@subsubheading Effectors
+Just as emitters emit particles into the particle system, effectors put
+different kinds of effects on those who are already there, be it physical or
+non-physical effects.
+
+
+In principle an emitter is any class implementing the interface 
+@samp{iParticleEffector}, so you can implement your own effectors, however for
+convenience there are a few built in effector types. These can be accessed via
+the @samp{crystalspace.mesh.object.particles.effector} plugin class and
+@samp{iParticleBuiltinEffectorFactory} interface.
+The built in effectors are also loadable via the normal particle loader using
+@code{<effector type="..">} tags. The available types are:
+@itemize @bullet
+@item @samp{force}
+@item @samp{lincolor}
+@item @samp{forcefield}
+@end itemize
+
+@samp{Force} effector loader recognize following keywords:
+@table @code
+@item <acceleration x="" y="" z="" />
+Add a constant acceleration to particles. Useful for example for gravity.
+@item <force x="" y="" z="" />
+Add a constant force to particles.
+@item <randomacceleration>mag</randomacceleration>
+Add a random acceleration with given magnitude.
+@item <randomacceleration x="" y="" z="" />
+Add a random acceleration with given magnitude in the form of a vector.
+@end table
+
+@samp{Lincolor} effector sets the color of particles based on their remaning
+TTL. It takes a fixed number of "keypoints" and then interpolates between them.
+@samp{Lincolor} effector loader recognize following keywords:
+@table @code
+@item <color red="" green="" blue="" rtime="">
+Set a keypoint color at given remaining time to live.
+@end table
+
+@samp{Velocityfield} effector is a more complicated and resource using way of giving
+intricate movements to the particles. It works by taking a function defining
+the velocity of particles as a function of position and time. It then integrates
+to the new particle positions. Each function can take a number of vector and
+scalar parameters that affects their output
+To be noted is that @samp{velocityfield} effector does not change the particle
+velocities, so any "external" movement will be integrated as normally.
+@samp{Velocityfield} effector loader recognize following keywords:
+@table @code
+@item <type>field-type</type>
+Set the field function. Currently supported values are @samp{spiral} and 
+@samp{radialpoint}.
+@item <fparam>value</fparam>
+Specify a scalar parameter.
+@item <vparam x="" y="" z="" />
+Specify a vector parameter.
+@end table

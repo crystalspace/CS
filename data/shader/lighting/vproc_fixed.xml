@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!-- 'lights' must match with TheTechniques invocation below -->
+<shader compiler="xmlshader" name="lighting_vproc_fixed" lights="8">
+  <shadervars>
+    <shadervar type="vector3" name="mat specular">1,1,1</shadervar>
+    <shadervar type="float" name="mat shininess">32</shadervar>
+  </shadervars>
+
+  <?Template ifGLSupportsLight N?>
+    <?! GL fixed pipeline can only do: 
+	- unattenuated directional lights
+	- other lights if they are not attenuated LINEAR
+	Further, CS spotlights dont exactly map to GL ones...
+	So for now, GL fixed function spots look slightly off. ?>
+    <?if ((vars."light type".int == consts.CS_LIGHT_DIRECTIONAL)
+	&& (vars."light attenuation mode".int == consts.CS_ATTN_NONE)) 
+	|| (vars."light attenuation mode".int != consts.CS_ATTN_LINEAR) ?>
+  <?Endtemplate?>
+
+  <?Template ifNotGLSupportsLight N?>
+    <?ifGLSupportsLight $N$?>
+    <?else?>
+  <?Endtemplate?>
+  
+  <?Template elsifNotGLSupportsLight N?>
+    <?! should obviously be in sync with the stuff above ?>
+    <?elsif !(((vars."light type".int == consts.CS_LIGHT_DIRECTIONAL)
+	&& (vars."light attenuation mode".int == consts.CS_ATTN_NONE)) 
+	|| (vars."light attenuation mode".int != consts.CS_ATTN_LINEAR)) ?>
+  <?Endtemplate?>
+  
+  <?Template HandleLightFVP LightCount N?>
+    <?if (vars."light count".int &gt; $N$) && ($LightCount$ &gt; $N$) ?>
+      <?ifGLSupportsLight $N$ ?>
+	<light num="$N$">
+	  <?if (vars."light type".int == consts.CS_LIGHT_DIRECTIONAL)?>
+	    <?! Generate position for directional light ?>
+	    <position type="expression">
+	      <!-- small subtlety: GL spec says light coordinates are in
+		   object space, yet here they are world space - at the 
+		   time lighting parameters will be set, the GL object 
+		   space is CS world space actually. This is due the way
+		   CS sets up transforms. -->
+	      <sexp>
+		(* (make-vector 
+		     (elt1 "light direction world[$N$]")
+		     (elt2 "light direction world[$N$]")
+		     (elt3 "light direction world[$N$]")
+		     0)
+		   -1)
+	      </sexp>
+	    </position>
+	    <!--attenuation type="vector3">1,0,0</attenuation-->
+	  <?elsif (vars."light type".int == consts.CS_LIGHT_SPOTLIGHT)?>
+	    <spotcutoff type="expression">
+	      <!-- CS falloff is cosine of angle, GL wants angle -->
+	      <sexp>(* (arccos (min 1 "light outer falloff[$N$]") ) 57.295779513082320876798154814105)</sexp>
+	      <!-- 57.295... = 180/PI -->
+	    </spotcutoff>
+	  <?endif?>
+	  <?if (vars."light type".int != consts.CS_LIGHT_SPOTLIGHT)?>
+	    <!-- Override any falloff of the light -->
+	    <spotcutoff type="float">180</spotcutoff>
+	  <?endif?>
+	</light>
+      <?endif?>
+    <?endif?>
+  <?Endtemplate?>
+  
+  <?Template HandleLightVProc LightCount N?>
+    <?if (vars."light count".int &gt; $N$) && ($LightCount$ &gt; $N$) ?>
+      <?ifGLSupportsLight $N$ ?>
+	<enablelight num="$N$">no</enablelight>
+      <?endif?>
+    <?else?>
+      <enablelight num="$N$">no</enablelight>
+    <?endif?>
+  <?Endtemplate?>
+  
+  <?Template FVPcommon N ?>
+    <?if !vars."tex diffuse".texture ?>
+      <constantcolor layer="diffuse" type="shadervar">mat flatcolor</constantcolor>
+    <?endif?>
+    <!-- have GL light added on top of SW-computed light -->
+    <colormaterial>emission</colormaterial>
+    <!-- scale down colors, since FP will scale them up again -->
+    <matambient type="vector3">0.5,0.5,0.5</matambient>
+    <matdiffuse type="vector3">0.5,0.5,0.5</matdiffuse>
+    <matspecularexp type="shadervar">mat shininess</matspecularexp>
+    <?Generate L 0 7 ?>
+      <?HandleLightFVP $N$ $$L$$ ?>
+    <?Endgenerate?>
+  <?Endtemplate?>
+  <?Template VPROCcommon N ?>
+    <lightmixmode>add</lightmixmode>
+    <!--
+    <?if buffers."color lit"?>
+      <colormixmode>add</colormixmode>
+      <colorbuffer>color lit</colorbuffer>
+    <?else?>
+      <colormixmode>mul</colormixmode>
+      <colorbuffer>color unlit</colorbuffer>
+    <?endif?>
+    -->
+    <colormixmode>none</colormixmode>
+    <finalfactor type="float">0.5</finalfactor>
+    <lights>8</lights>
+    <?Generate L 0 7 ?>
+      <?HandleLightVProc $N$ $$L$$ ?>
+    <?Endgenerate?>
+  <?Endtemplate?>
+  <?Template FFPcommon?>
+    <layer name="diffuse">
+      <?if vars."tex diffuse".texture ?>
+        <colorsource num="0" source="texture" modifier="color"/>
+        <alphasource num="0" source="texture" modifier="alpha"/>
+      <?else?>
+        <colorsource num="0" source="constant color" modifier="color"/>
+        <alphasource num="0" source="constant color" modifier="alpha"/>
+      <?endif?>
+      <colorsource num="1" source="primary color" modifier="color"/>
+      <coloroperation operation="modulate" scale="2" />
+      <alphasource num="1" source="primary color" modifier="alpha"/>
+      <alphaoperation operation="modulate" />
+    </layer>
+  <?Endtemplate?>
+  
+  <?Template LightmapPass?>
+    <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
+      <pass>
+	<!-- First pass: blend with copy -->
+	<texture name="tex diffuse" destination="diffuse" />
+	<buffer source="texture coordinate 0" destination="texture coordinate diffuse" />
+	<?if vars."tex lightmap".texture ?>
+	  <buffer source="texture coordinate lightmap" destination="texture coordinate lighting" />
+	  <texture name="tex lightmap" destination="lighting" />
+	<?elsif vars."static color".buffer ?>
+	  <buffer source="static color" destination="color" />
+	<?endif?>
+	<vp plugin="glfixed">
+	  <fixedvp>
+	    <constantcolor layer="lighting" type="expr">
+	      <sexp>(* "dynamic ambient" 0.5)</sexp>
+	    </constantcolor>
+	    <constantcolor layer="diffuse" type="shadervar">mixmode alpha</constantcolor>
+	  </fixedvp>
+	</vp>
+	<fp plugin="glfixed">
+	  <fixedfp>
+	    <?if vars."tex lightmap".texture ?>
+	      <layer name="lighting">
+		<colorsource num="0" source="texture" modifier="color"/>
+		<colorsource num="1" source="constant color" modifier="color"/>
+		<coloroperation operation="add" />
+		<alphasource num="0" source="texture" modifier="alpha"/>
+		<alphaoperation operation="replace" />
+	      </layer>
+	    <?elsif vars."static color".buffer ?>
+	      <layer name="lighting">
+		<colorsource num="0" source="primary color" modifier="color"/>
+		<colorsource num="1" source="constant color" modifier="color"/>
+		<coloroperation operation="add" />
+		<alphasource num="0" source="texture" modifier="alpha"/>
+		<alphaoperation operation="replace" />
+	      </layer>
+	    <?else?>
+	      <layer name="lighting">
+		<colorsource num="0" source="constant color" modifier="color"/>
+		<coloroperation operation="replace" />
+		<alphasource num="0" source="texture" modifier="alpha"/>
+		<alphaoperation operation="replace" />
+	      </layer>
+	    <?endif?>
+	    <layer name="diffuse">
+	      <colorsource num="0" source="texture" modifier="color"/>
+	      <alphasource num="0" source="texture" modifier="alpha"/>
+	      <colorsource num="1" source="previous layer" modifier="color"/>
+	      <coloroperation operation="modulate" scale="2" />
+	      <alphasource num="1" source="constant color" modifier="alpha"/>
+	      <alphaoperation operation="modulate" />
+	    </layer>
+	  </fixedfp>
+	</fp>
+      </pass>
+    <?endif?>
+  <?Endtemplate?>
+
+  <?Template TheTechniques N ?>
+    <!-- Tech with separate specular -->
+    <technique priority="$N$50">
+      <?LightmapPass?>
+      <pass>
+	<?if (vars."pass number".int == 0) && !((vars."pass do_ambient") && (vars."tex lightmap".texture || vars."static color".buffer)) ?>
+	  <!-- First pass: blend with copy -->
+	<?else?>
+	  <!-- Later pass: blend with add -->
+	  <mixmode><add /></mixmode>
+	<?endif?>
+	<?if vars."tex diffuse".texture ?>
+	  <texture name="tex diffuse" destination="diffuse" />
+	  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+	<?else?>
+	  <!-- need to bind at least some texture -->
+	  <texture name="standardtex white" destination="diffuse" />
+	<?endif?>
+	<buffer source="normal" destination="normal" />
+	<buffer source="color" destination="color" />
+	<vp plugin="glfixed">
+	  <fixedvp>
+	    <?FVPcommon $N$ ?>
+	    <separatespecular/>
+	    <!-- specular is separate, so no downscaling -->
+	    <matspecular type="shadervar">mat specular</matspecular>
+	    <!--matspecular type="float">1</matspecular-->
+	  </fixedvp>
+	</vp>
+	<vproc plugin="vproc_std">
+	  <vproc_std>
+	    <?VPROCcommon $N$ ?>
+	  </vproc_std>
+	</vproc>
+	<fp plugin="glfixed">
+	  <fixedfp>
+	    <?FFPcommon?>
+	  </fixedfp>
+	</fp>
+      </pass>
+      <?if false ?>
+      <?Generate L 0 7 ?>
+        <?! This is an obtuse way to formulate "if one light is not GL-supported ?>
+	<?elsifNotGLSupportsLight $L$ ?>
+	<pass>
+	  <mixmode><add /></mixmode>
+	  <!-- need to bind at least some texture -->
+	  <texture name="standardtex white" destination="diffuse" />
+	  <buffer source="generic 0" destination="color" />
+	  <vproc plugin="vproc_std">
+	    <vproc_std>
+	      <lightmixmode>add</lightmixmode>
+	      <lights>2147483647</lights>
+	      <diffuse>no</diffuse>
+	      <specular buffer="generic 0" />
+	      <specularexp type="shadervar">mat shininess</specularexp>
+	      <lights>8</lights>
+	      <?Generate L 0 7 ?>
+		<?HandleLightVProc $N$ $$L$$ ?>
+	      <?Endgenerate?>
+	    </vproc_std>
+	  </vproc>
+	  <fp plugin="glfixed">
+	    <fixedfp>
+	      <layer name="specular">
+		<colorsource num="0" source="primary color" modifier="color"/>
+		<coloroperation operation="replace" />
+		<alphasource num="0" source="primary color" modifier="alpha"/>
+		<alphaoperation operation="replace" />
+	      </layer>
+	    </fixedfp>
+	  </fp>
+	</pass>
+	<?Endgenerate?>
+      <?endif?>
+    </technique>
+    <!-- Tech without separate specular -->
+    <technique priority="$N$00">
+      <?LightmapPass?>
+      <pass>
+	<?if vars."pass number".int == 0 ?>
+	  <!-- First pass: blend with copy -->
+	<?else?>
+	  <!-- Later pass: blend with add -->
+	  <mixmode><add /></mixmode>
+	<?endif?>
+	<?if vars."tex diffuse".texture ?>
+	  <texture name="tex diffuse" destination="diffuse" />
+	  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+	<?else?>
+	  <!-- need to bind at least some texture -->
+	  <texture name="standardtex white" destination="diffuse" />
+	<?endif?>
+	<buffer source="normal" destination="normal" />
+	<buffer source="color" destination="color" />
+	<vp plugin="glfixed">
+	  <fixedvp>
+	    <?FVPcommon $N$ ?>
+	    <!-- specular is not separate, downscale as well -->
+	    <matspecular type="expr">
+	      <sexp>(* "mat specular" 0.5)</sexp>
+	    </matspecular>
+	  </fixedvp>
+	</vp>
+	<vproc plugin="vproc_std">
+	  <vproc_std>
+	    <?VPROCcommon $N$ ?>
+	    <specularondiffuse />
+	  </vproc_std>
+	</vproc>
+	<fp plugin="glfixed">
+	  <fixedfp>
+	    <?FFPcommon?>
+	  </fixedfp>
+	</fp>
+      </pass>
+    </technique>
+  <?Endtemplate?>
+  
+  <?TheTechniques 8 ?>
+  
+  <fallbackshader name="lighting_vproc" file="/shader/lighting/vproc.xml" />
+</shader>

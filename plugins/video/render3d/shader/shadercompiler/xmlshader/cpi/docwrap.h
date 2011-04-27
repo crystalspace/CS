@@ -1,0 +1,519 @@
+/*
+  Copyright (C) 2004-2006 by Frank Richter
+	    (C) 2004-2006 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#ifndef __CS_DOCWRAP_H__
+#define __CS_DOCWRAP_H__
+
+#include "csutil/csstring.h"
+#include "csutil/documentcommon.h"
+#include "csutil/leakguard.h"
+#include "csutil/parray.h"
+#include "csutil/pooledscfclass.h"
+#include "csutil/ref.h"
+#include "csutil/refarr.h"
+#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
+#include "csutil/strhash.h"
+#include "csutil/weakref.h"
+
+#include "iutil/document.h"
+#include "iutil/objreg.h"
+
+#include "condeval.h"
+#include "docwrap_replacer.h"
+
+#include "csutil/custom_new_disable.h"
+
+CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
+{
+
+class csXMLShaderCompiler;
+class ForeignNodeStorage;
+class ForeignNodeReader;
+
+class csWrappedDocumentNodeIterator;
+struct WrapperStackEntry;
+
+struct csConditionNode;
+class csWrappedDocumentNodeFactory;
+class ConditionDumper;
+
+/**
+ * Callback to parse and evaluate conditions, used by
+ * csWrappedDocumentNode.
+ */
+struct iConditionResolver
+{
+  virtual ~iConditionResolver() {}
+
+  /**
+   * Parse a condition and return it's ID. 
+   */
+  virtual const char* ParseCondition (const char* str, size_t len, 
+    csConditionID& result) = 0;
+  /**
+   * Evaluate a condition.
+   */
+  virtual bool Evaluate (csConditionID condition) = 0;
+
+  /**
+   * Add a condition to the condition tree. When later a specific variant of
+   * a document will be chosen, this tree is used to quickly determine it.
+   */
+  virtual void AddNode (csConditionNode* parent,
+    csConditionID condition, csConditionNode*& trueNode, 
+    csConditionNode*& falseNode,
+    const MyBitArrayTemp& conditionResultsTrue,
+    const MyBitArrayTemp& conditionResultsFalse,
+    const MyBitArrayTemp& conditionResultsSet) = 0;
+  /// Finish adding of nodes. Frees up some tempoarily used resources.
+  virtual void FinishAdding () = 0;
+
+  virtual const char* ParseCondition (const char* str, size_t len, 
+    CondOperation& operation) = 0;
+};
+
+struct iWrappedDocumentNode : public virtual iBase
+{
+  SCF_INTERFACE (iWrappedDocumentNode, 0, 0, 1);
+};
+
+/**
+ * Wrapper around a document node, supporting conditionals.
+ */
+class csWrappedDocumentNode : 
+  public scfImplementationExt1<csWrappedDocumentNode,
+                               csDocumentNodeReadOnly,
+                               iWrappedDocumentNode>
+{
+  friend class csWrappedDocumentNodeIterator;
+  friend struct WrapperStackEntry;
+  friend class csTextNodeWrapper;
+  friend class csWrappedDocumentNodeFactory;
+
+  csRef<iDocumentNode> wrappedNode;
+  csWeakRef<csWrappedDocumentNode> parent;
+  iConditionResolver* resolver;
+  csString contents;
+  csWrappedDocumentNodeFactory* shared;
+
+public:
+  /**
+   * Contains all the consecutive children that are dependant on the same
+   * condition.
+   */
+  struct WrappedChild
+  {
+    csRef<iDocumentNode> childNode;
+
+    csConditionID condition;
+    uint conditionValueAndRefCount;
+    csRefArray<WrappedChild> childrenWrappers;
+
+    WrappedChild() : condition (csCondAlwaysTrue), 
+      conditionValueAndRefCount (conditionValueMask | 1)
+    {
+    }
+    
+    void IncRef() { conditionValueAndRefCount++; }
+    void DecRef()
+    {
+      CS_ASSERT (GetRefCount() > 0);
+      conditionValueAndRefCount--;
+      if (GetRefCount() == 0)
+        delete this;
+    }
+    int GetRefCount() const
+    { return conditionValueAndRefCount & ~conditionValueMask; }
+    
+    enum { conditionValueMask = 0x80000000 };
+    void SetConditionValue (bool b)
+    { 
+      conditionValueAndRefCount = 
+        b ? conditionValueAndRefCount | conditionValueMask
+          : conditionValueAndRefCount & ~conditionValueMask;
+    }
+    bool GetConditionValue () const
+    { return (conditionValueAndRefCount & conditionValueMask) != 0; }
+    
+    bool IsUnreachable() const
+    {
+      return ((condition == csCondAlwaysTrue) && !GetConditionValue())
+	|| ((condition == csCondAlwaysFalse) && GetConditionValue());
+    }
+
+    //typedef csFixedSizeAllocator<sizeof(WrappedChild)> WrappedChildAlloc;
+    //CS_DECLARE_STATIC_CLASSVAR_REF (childAlloc, ChildAlloc, WrappedChildAlloc);
+
+    void* operator new (size_t n);
+    void operator delete (void* p);
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+    inline void* operator new (size_t n, void*, int)
+    { return WrappedChild::operator new (n); }
+    inline void operator delete (void* p, void*, int)
+    { WrappedChild::operator delete (p); }
+#endif
+  protected:
+    ~WrappedChild() {}
+  };
+protected:
+  csRefArray<WrappedChild> wrappedChildren;
+
+  /**
+   * Helper class to go over the wrapped children in a linear fashion,
+   * without having to care that a hierarchy of WrappedChild structures 
+   * are actually used.
+   */
+  class WrapperWalker
+  {
+    struct WrapperPosition
+    {
+      size_t currentIndex;
+      csRefArray<WrappedChild>* currentWrappers;
+    };
+    csArray<WrapperPosition> posStack;
+    WrapperPosition* currentPos;
+    csRef<iDocumentNode> next;
+    iConditionResolver* resolver;
+
+    void SeekNext ();
+  public:
+    WrapperWalker (csRefArray<WrappedChild>& wrappedChildren,
+      iConditionResolver* resolver);
+    WrapperWalker ();
+    void SetData (csRefArray<WrappedChild>& wrappedChildren,
+      iConditionResolver* resolver);
+
+    bool HasNext ();
+    iDocumentNode* Peek ();
+    iDocumentNode* Next ();
+    
+    // The lazy implementation...
+    size_t GetNextPosition () { return HasNext() ? 0 : GetEndPosition(); }
+    size_t GetEndPosition () { return (size_t)~0; }
+  };
+  friend class WrapperWalker;
+
+  struct Template
+  {
+    typedef csRefArray<iDocumentNode, TempHeapAlloc> Nodes;
+    typedef csArray<TempString<>, csArrayElementHandler<TempString<> >, 
+      TempHeapAlloc> Params;
+    Nodes nodes;
+    Params paramMap;
+  };
+  struct GlobalProcessingState : public csRefCount, protected TempHeap
+  {
+    static GlobalProcessingState* Create()
+    {
+      GlobalProcessingState* gps;
+      gps = (GlobalProcessingState*)TempHeap::Alloc (sizeof (GlobalProcessingState));
+      new (gps) GlobalProcessingState;
+      return gps;
+    }
+    virtual void Delete ()
+    {
+      this->~GlobalProcessingState();
+      TempHeap::Free (this);
+    }
+    
+    ConditionDumper* condDumper;
+    csHash<Template, TempString<>, TempHeapAlloc> templates;
+    csArray<int, csArrayElementHandler<int>, TempHeapAlloc> ascendStack;
+    csSet<TempString<>, TempHeapAlloc> defines;
+    
+    csRef<iVFS> vfs;
+    csHash<csRef<iDocumentNode>, TempString<>, TempHeapAlloc> includesCache;
+  };
+  csRef<GlobalProcessingState> globalState;
+
+  struct NodeProcessingState;
+  void ParseCondition (WrapperStackEntry& newWrapper, const char* cond,
+    size_t condLen, iDocumentNode* node);
+  void CreateElseWrapper (NodeProcessingState* state, 
+    WrapperStackEntry& elseWrapper);
+  template<typename ConditionEval>
+  void ProcessInclude (ConditionEval& eval, const TempString<>& filename, 
+    NodeProcessingState* state, iDocumentNode* node, uint parseOptions);
+  /**
+   * Process a node when a Template or Generate is active.
+   * Returns 'true' if the node was handled.
+   */
+  template<typename ConditionEval>
+  bool ProcessTemplate (ConditionEval& eval, iDocumentNode* templNode, 
+    NodeProcessingState* state, uint parseOptions);
+  bool InvokeTemplate (Template* templ, const Template::Params& params,
+    Template::Nodes& templatedNodes);
+  template<typename ConditionEval>
+  bool InvokeTemplate (ConditionEval& eval, const char* name, 
+    iDocumentNode* node, NodeProcessingState* state, 
+    const Template::Params& params, uint parseOptions);
+  /// Validate that a 'Template' was properly matched by an 'Endtemplate'
+  void ValidateTemplateEnd (iDocumentNode* node, 
+    NodeProcessingState* state);
+  /// Validate that a 'Generate' was properly matched by an 'Endgenerate'
+  void ValidateGenerateEnd (iDocumentNode* node, 
+    NodeProcessingState* state);
+  /// Validate that an 'SIfDef' was properly matched by an 'SEndIf'
+  void ValidateStaticIfEnd (iDocumentNode* node, 
+    NodeProcessingState* state);
+  void ParseTemplateArguments (const char* str, 
+    Template::Params& strings, bool omitEmpty);
+  /**
+   * Process a node when a static conditition is active.
+   * Returns 'true' if the node was handled.
+   */
+  bool ProcessStaticIf (NodeProcessingState* state, iDocumentNode* node);
+
+  /// Process a "Template" or "TemplateWeak" instruction
+  bool ProcessInstrTemplate (NodeProcessingState* state, iDocumentNode* node, 
+    const TempString<>& args, bool weak);
+  /// Process a "Define" instruction
+  bool ProcessDefine (NodeProcessingState* state, iDocumentNode* node, 
+    const TempString<>& args);
+  /// Process an "Undef" instruction
+  bool ProcessUndef (NodeProcessingState* state, iDocumentNode* node, 
+    const TempString<>& args);
+  /// Process a static "IfDef"/"IfNDef" instruction
+  bool ProcessStaticIfDef (NodeProcessingState* state, iDocumentNode* node, 
+    const TempString<>& args, bool invert);
+
+  template<typename ConditionEval>
+  void ProcessSingleWrappedNode (ConditionEval& eval, 
+    NodeProcessingState* state, iDocumentNode* wrappedNode,
+    uint parseOptions);
+  template<typename ConditionEval>
+  void ProcessWrappedNode (ConditionEval& eval, NodeProcessingState* state,
+    iDocumentNode* wrappedNode, uint parseOptions);
+  template<typename ConditionEval>
+  void ProcessWrappedNode (ConditionEval& eval, uint parseOptions);
+  void Report (int severity, iDocumentNode* node, const char* msg, ...);
+  
+  static void AppendNodeText (WrapperWalker& walker, csString& text);
+
+  template<typename ConditionEval>
+  csWrappedDocumentNode (ConditionEval& eval,
+    csWrappedDocumentNode* parent,
+    iDocumentNode* wrappedNode,
+    iConditionResolver* resolver,
+    csWrappedDocumentNodeFactory* shared, 
+    GlobalProcessingState* globalState,
+    uint parseOptions);
+  csWrappedDocumentNode (csWrappedDocumentNode* parent,
+    iDocumentNode* wrappedNode,
+    csWrappedDocumentNodeFactory* shared);
+  csWrappedDocumentNode (csWrappedDocumentNode* parent,
+    iConditionResolver* resolver,
+    csWrappedDocumentNodeFactory* shared);
+  
+  bool StoreToCacheReal (iFile* cacheFile, ForeignNodeStorage& foreignNodes,
+    const ConditionsWriter& condWriter);
+  bool StoreWrappedChildren (iFile* file, 
+    ForeignNodeStorage& foreignNodes,
+    const csRefArray<WrappedChild>& children,
+    const ConditionsWriter& condWriter);
+  void CollectUsedConditions (const csRefArray<WrappedChild>& children,
+    ConditionsWriter& condWrite);
+  bool ReadFromCacheReal (iFile* cacheFile, ForeignNodeReader& foreignNodes,
+    const ConditionsReader& condReader, ConditionDumper& condDump);
+  bool ReadWrappedChildren (iFile* file, 
+    ForeignNodeReader& foreignNodes,
+    csRefArray<WrappedChild>& children,
+    const ConditionsReader& condReader, ConditionDumper& condDump);
+public:
+  CS_LEAKGUARD_DECLARE(csWrappedDocumentNode);
+
+  virtual ~csWrappedDocumentNode ();
+
+  virtual csDocumentNodeType GetType ()
+  { return wrappedNode->GetType(); }
+  virtual bool Equals (iDocumentNode* other);
+  virtual const char* GetValue ();
+
+  virtual csRef<iDocumentNode> GetParent ()
+  { return static_cast<iDocumentNode*> (parent); }
+  virtual csRef<iDocumentNodeIterator> GetNodes ();
+  virtual csRef<iDocumentNodeIterator> GetNodes (const char* value);
+  virtual csRef<iDocumentNode> GetNode (const char* value);
+
+  virtual const char* GetContentsValue ();
+
+  virtual csRef<iDocumentAttributeIterator> GetAttributes ();
+  virtual csRef<iDocumentAttribute> GetAttribute (const char* name);
+  virtual const char* GetAttributeValue (const char* name);
+  virtual int GetAttributeValueAsInt (const char* name);
+  virtual float GetAttributeValueAsFloat (const char* name);
+  virtual bool GetAttributeValueAsBool (const char* name, 
+    bool defaultvalue = false);
+    
+  bool ReadFromCache (iFile* cacheFile, ForeignNodeReader& foreignNodes,
+    const ConditionsReader& condReader, ConditionDumper& condDump);
+  bool StoreToCache (iFile* cacheFile, ForeignNodeStorage& foreignNodes,
+    const ConditionsWriter& condWriter);
+  void CollectUsedConditions (ConditionsWriter& condWrite);
+  
+  inline iDocumentNode* GetWrappedNode() const { return wrappedNode; }
+};
+
+class csTextNodeWrapper : 
+  public scfImplementationPooled<
+  scfImplementationExt0<csTextNodeWrapper, csDocumentNodeReadOnly>,
+  CS::Memory::AllocatorMalloc,
+  true>
+{
+  char* nodeText;
+  csRef<iDocumentNode> realMe;
+public:
+  csTextNodeWrapper (iDocumentNode* realMe, const char* text);
+  virtual ~csTextNodeWrapper ();
+
+  virtual csDocumentNodeType GetType ()
+  { return CS_NODE_TEXT; }
+  virtual bool Equals (iDocumentNode* other)
+  { return realMe->Equals (other); }
+
+  virtual const char* GetValue ()
+  { return nodeText; }
+
+  virtual csRef<iDocumentNode> GetParent ()
+  { return realMe->GetParent (); }
+
+  virtual const char* GetContentsValue ()
+  { return 0; }
+};
+
+class csWrappedDocumentNodeIterator : 
+  public scfImplementationPooled<
+  scfImplementation1<csWrappedDocumentNodeIterator, iDocumentNodeIterator>,
+  CS::Memory::AllocatorMalloc,
+  true>
+{
+  csString filter;
+
+  csWrappedDocumentNode* parentNode;
+  csWrappedDocumentNode::WrapperWalker walker;
+  csRef<iDocumentNode> next;
+  void SeekNext();
+public:
+  CS_LEAKGUARD_DECLARE(csWrappedDocumentNodeIterator);
+
+  csWrappedDocumentNodeIterator (csWrappedDocumentNode* node, const char* filter);
+  virtual ~csWrappedDocumentNodeIterator ();
+
+  virtual bool HasNext ();
+  virtual csRef<iDocumentNode> Next ();
+  size_t GetNextPosition () { return walker.GetNextPosition (); }
+  size_t GetEndPosition () { return walker.GetEndPosition (); }
+};
+
+enum
+{
+  wdnfpoExpandTemplates = 1,
+  wdnfpoHandleConditions = 2,
+  wdnfpoOnlyOneLevelConditions = 4
+};
+
+class csWrappedDocumentNodeFactory
+{
+  friend class csWrappedDocumentNode;
+  friend class csWrappedDocumentNodeIterator;
+
+  csXMLShaderCompiler* plugin;
+  csTextNodeWrapper::Pool textWrapperPool;
+  csWrappedDocumentNodeIterator::Pool iterPool;
+  csReplacerDocumentNodeFactory replacerFactory;
+  iObjectRegistry* objreg;
+
+  csStringHash pitokens;
+#define CS_TOKEN_ITEM_FILE \
+  "plugins/video/render3d/shader/shadercompiler/xmlshader/cpi/docwrap.tok"
+#define CS_TOKEN_LIST_TOKEN_PREFIX PITOKEN_
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE
+#undef CS_TOKEN_LIST_TOKEN_PREFIX
+  enum
+  {
+    PITOKEN_TEMPLATE_NEW = 0xfeeb1e,
+    PITOKEN_TEMPLATEWEAK,
+    PITOKEN_ENDTEMPLATE_NEW,
+    PITOKEN_INCLUDE_NEW,
+    PITOKEN_GENERATE,
+    PITOKEN_ENDGENERATE,
+    PITOKEN_DEFINE,
+    PITOKEN_UNDEF,
+    PITOKEN_STATIC_IFDEF,
+    PITOKEN_STATIC_IFNDEF,
+    PITOKEN_STATIC_ELSIFDEF,
+    PITOKEN_STATIC_ELSIFNDEF,
+    PITOKEN_STATIC_ELSE,
+    PITOKEN_STATIC_ENDIF
+  };
+
+  void DebugProcessing (const char* msg, ...) CS_GNUC_PRINTF (2, 3);
+public:
+  csWrappedDocumentNodeFactory (csXMLShaderCompiler* plugin);
+
+  /**
+   * Create a wrapper for a document node for conditional shaders.
+   * \param wrappedNode The document node to wrap in its entirety.
+   * \param resolver Condition resolver to which to add condition nodes.
+   * \param evaluator Condition evaluator to register conditions with.
+   * \param extraNodes Extra document nodes whose conditions are added to the
+   *  tree.
+   * \param dumpOut Optional destination for condition tree dump.
+   * \param parseOptions Parse options, see wdnfpoExpandTemplates etc.
+   * \param presetCondResults Preset condition results, with two bits per
+   *   condition - the same format csXMLShader::ComputeTechniquesConditionsResults
+   *   returns.
+   */
+  csWrappedDocumentNode* CreateWrapper (iDocumentNode* wrappedNode,
+    iConditionResolver* resolver, csConditionEvaluator& evaluator, 
+    const csRefArray<iDocumentNode>& extraNodes, csString* dumpOut,
+    uint parseOptions, const MyBitArrayTemp* presetCondResults = 0);
+  csWrappedDocumentNode* CreateWrapperStatic (iDocumentNode* wrappedNode,
+    iConditionResolver* resolver, csString* dumpOut,
+    uint parseOptions = wdnfpoExpandTemplates | wdnfpoHandleConditions);
+    
+  csWrappedDocumentNode* CreateWrapperFromCache (iFile* cacheFile,
+    iConditionResolver* resolver, csConditionEvaluator& evaluator,
+    ForeignNodeReader& foreignNodes,
+    const ConditionsReader& condReader, csString* dumpOut);
+};
+
+/// Helper to dump condition expressions and IDs to a string
+class ConditionDumper
+{
+  csString* currentOut;
+  csConditionEvaluator* currentEval;
+  MyBitArrayTemp seenConds;
+public:
+  ConditionDumper (csString* dumpOut, csConditionEvaluator* evaluator)
+    : currentOut (dumpOut), currentEval (evaluator) {}
+  bool DoesDumping() const { return currentOut != 0 ? true : false; }
+  csString GetConditionString (size_t id) const
+  { return currentEval ? currentEval->GetConditionString (id) : csString(); }
+  void Dump (size_t id, const char* condStr, size_t condLen);
+};
+
+}
+CS_PLUGIN_NAMESPACE_END(XMLShader)
+
+#include "csutil/custom_new_enable.h"
+
+#endif // __CS_DOCWRAP_H__

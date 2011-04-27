@@ -1,0 +1,11 @@
+SubDir TOP plugins video canvas embedgl ;
+
+if $(GL.AVAILABLE) = "yes"
+{
+Description embedgl : "GL Embedded driver" ;
+Plugin embedgl : [ Wildcard *.cpp *.h ] ;
+LinkWith embedgl : crystalspace_opengl crystalspace ;
+ExternalLibs embedgl : GL ;
+CompileGroups embedgl :  canvases ;
+}
+

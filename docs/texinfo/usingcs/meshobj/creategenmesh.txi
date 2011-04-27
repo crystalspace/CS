@@ -1,0 +1,157 @@
+@c -*-texinfo-*-
+@node HOWTO Create Genmesh, HOWTO Mesh LightAnim, Writing MeshObjects, MeshObject
+@subsection Creating a Genmesh Mesh
+@cindex @code{iGeneralFactoryState}
+@cindex @code{iGeneralMeshState}
+@cindex @samp{GeneralMeshBuilder}
+@cindex genmesh mesh
+
+This section describes how to create a Genmesh mesh.
+
+@subsubheading What is Genmesh?
+
+A @samp{Genmesh} mesh object (@pxref{MeshObject Genmesh}) is a generic
+triangle mesh object. Genmeshes also support animation
+(@pxref{GenMesh Animation}).
+
+Genmeshes are very useful for static or semi-static geometry (chests,
+doors, candles, swords, etc.) which can sometimes require a lot of detail.
+
+Genmeshes use vertex lighting (or stencil if you use a stencil lighting
+shader). You can also use lightmaps on genmeshes with the @samp{lighter2}
+application. @xref{Using lighter2}.
+
+Genmesh objects always have to be created through a factory. So, first
+you create the actual geometry in a genmesh factory and then you create one
+or more instances from that factory. This is a great way to save memory.
+This does mean that it is not possible to HardTransform genmeshes. It is
+only possible to HardTransform Genmesh factories.
+
+@subsubheading Creating a Genmesh in a Map
+
+Here is an example of how to create a cube genmesh in a map file:
+
+@example
+<meshfact name="cubeFact">
+  <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+  <params>
+    <v x="-0.1" y="0.1" z="0.1" u="0" v="0" />
+    <v x="-0.1" y="0.1" z="-0.1" u="1" v="0" />
+    <v x="0.1" y="0.1" z="-0.1" u="0" v="1" />
+    <v x="0.1" y="0.1" z="0.1" u="1" v="1" />
+    <v x="-0.1" y="-0.1" z="0.1" u="1" v="0" />
+    <v x="-0.1" y="-0.1" z="-0.1" u="0" v="1" />
+    <v x="0.1" y="-0.1" z="-0.1" u="1" v="1" />
+    <v x="0.1" y="-0.1" z="0.1" u="0" v="0" />
+    <t v1="0" v2="3" v3="1" />
+    <t v1="3" v2="2" v3="1" />
+    <t v1="4" v2="5" v3="7" />
+    <t v1="5" v2="6" v3="7" />
+    <t v1="0" v2="4" v3="3" />
+    <t v1="4" v2="7" v3="3" />
+    <t v1="1" v2="6" v3="5" />
+    <t v1="1" v2="2" v3="6" />
+    <t v1="0" v2="1" v3="5" />
+    <t v1="0" v2="5" v3="4" />
+    <t v1="2" v2="3" v3="7" />
+    <t v1="2" v2="7" v3="6" />
+    <autonormals />
+  </params>
+</meshfact>
+<sector name="bla">
+  <meshobj name="cube">
+    <plugin>crystalspace.mesh.loader.genmesh</plugin>
+    <params>
+      <factory>cubeFact</factory>
+      <material>mosaic</material>
+    </params>
+    <move>
+      <v x="1" y="0" z="3" />
+    </move>
+  </meshobj>
+</sector>
+@end example
+
+In this example we define a box by specifying the eight corner vertices
+and the twelve triangles. The @code{<autonormals>} tag specifies that normals
+will be created automatically (to give the box a smooth appearance). The
+normals are used for lighthing. It is also possible to specify normals
+manually. Note that with every vertex we also specify a texture coordinate
+(uv coordinate).
+
+To create a genmesh box you can actually use a short-hand notation:
+
+@example
+<meshfact name="cubeFact">
+  <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+  <params>
+    <box>
+      <min x="-0.1" y="-0.1" z="-0.1" />
+      <max x="0.1" y="0.1" z="0.1" />
+    </box>
+    <autonormals />
+    <lighting>true</lighting>
+  </params>
+</meshfact>
+@end example
+
+This is a quick way to make boxes in a map file.
+
+@subsubheading Creating a Genmesh Programmatically
+
+Here we create the same genmesh programmatically:
+
+@example
+// First create the factory:
+csRef<iMeshFactoryWrapper> fact = engine->CreateMeshFactory (
+  "crystalspace.mesh.object.genmesh", "cubeFact");
+csRef<iGeneralFactoryState> factstate = scfQueryInterface<iGeneralFactoryState> (
+  fact->GetMeshObjectFactory ());
+factstate->SetVertexCount (8);
+factstate->GetVertices ()[0].Set (-0.1, 0.1, 0.1);
+factstate->GetTexels ()[0].Set (0, 0);
+factstate->GetVertices ()[1].Set (-0.1, 0.1, -0.1);
+factstate->GetTexels ()[1].Set (1, 0);
+@dots{}
+factstate->SetTriangleCount (12);
+factstate->GetTriangles ()[0].Set (0, 3, 1);
+factstate->GetTriangles ()[1].Set (3, 2, 1);
+@dots{}
+factstate->CalculateNormals ();
+
+// Now create an instance:
+csRef<iMeshWrapper> mesh =
+  engine->CreateMeshWrapper (fact, "cube");
+mesh->GetMeshObject ()->SetMaterialWrapper (myMaterial);
+csRef<iGeneralMeshState> meshstate = scfQueryInterface<iGeneralMeshState> (
+  mesh->GetMeshObject ());
+meshstate->SetLighting (true);
+@dots{}
+@end example
+
+This will basically create the same cube as in the map file example.
+
+However, there is a much easier way by using the @samp{GeneralMeshBuilder}
+class:
+
+@example
+using namespace CS::Geometry;
+Box box (csVector3 (-.1, -.1, -.1), csVector3 (.1, .1, .1));
+
+// Now we make a factory and a mesh at once.
+csRef<iMeshWrapper> mesh = GeneralMeshBuilder::CreateFactoryAndMesh (
+      engine, room, "cube", "cubeFact", &box);
+mesh->GetMeshObject ()->SetMaterialWrapper (myMaterial);
+csRef<iGeneralMeshState> meshstate = scfQueryInterface<iGeneralMeshState> (
+  mesh->GetMeshObject ());
+meshstate->SetLighting (true);
+@end example
+
+@subsubheading Include Files
+
+The include files useful for this section are:
+
+@example
+#include <imesh/genmesh.h>
+#include <cstool/genmeshbuilder.h>
+@end example

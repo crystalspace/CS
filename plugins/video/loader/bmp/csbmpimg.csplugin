@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- csbmpimg.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphic.image.io.bmp</name>
+        <implementation>csBMPImageIO</implementation>
+        <description>CrystalSpace BMP image format I/O plugin</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

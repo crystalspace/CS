@@ -1,0 +1,562 @@
+/*
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#ifndef __WALKTEST_H__
+#define __WALKTEST_H__
+
+#include <stdarg.h>
+#include "csgeom/math2d.h"
+#include "csgeom/math3d.h"
+#include "csgeom/box.h"
+#include "cstool/collider.h"
+#include "csutil/cscolor.h"
+#include "csutil/parray.h"
+#include "csutil/weakref.h"
+#include "wentity.h"
+#include "iengine/engine.h"
+#include "ivaria/conout.h"
+#include "ivaria/conin.h"
+#include "iutil/vfs.h"
+#include "iutil/plugin.h"
+#include "iutil/event.h"
+#include "iutil/eventh.h"
+#include "iutil/eventnames.h"
+#include "csutil/eventhandlers.h"
+#include "ivideo/fontserv.h"
+#include "iengine/engine.h"
+
+#include "bot.h"
+#include "walktest.h"
+#include "fullscreenfx.h"
+
+class WalkTest;
+class WalkTestViews;
+class WalkTestRecorder;
+class WalkTestMissileLauncher;
+class WalkTestLights;
+class WalkTestAnimateSky;
+class BotManager;
+class csPixmap;
+class csWireFrameCam;
+class InfiniteMaze;
+struct iEngine;
+struct iCollideSystem;
+struct iObjectRegistry;
+struct iPluginManager;
+struct iConfigFile;
+struct iMaterialHandle;
+struct iLoader;
+struct iMeshWrapper;
+struct iLight;
+struct iView;
+struct iSndSysWrapper;
+struct iSndSysRenderer;
+struct iKeyboardDriver;
+struct iVirtualClock;
+struct iGraphics3D;
+struct iGraphics2D;
+struct iThreadManager;
+
+// Several map modes.
+#define MAP_OFF 0
+#define MAP_OVERLAY 1
+#define MAP_ON 2
+#define MAP_TXT 3
+
+class WalkDataObject : public scfImplementationExt1<WalkDataObject,
+						    csObject, 
+						    scfFakeInterface<WalkDataObject> >
+{
+protected:
+  /// Pointer to data.
+  void* data;
+
+public:
+  SCF_INTERFACE(WalkDataObject, 2, 0, 0);
+
+  /// Initialize this object with data pointer initialized to 'd'
+  WalkDataObject (void *d) : scfImplementationType (this), data (d)
+  {
+  }
+  /// Destroy object.
+  virtual ~WalkDataObject ()
+  {
+  }
+  /// Get the data associated with this object
+  void* GetData () const
+  { return data; }
+  /**
+   * Get first data pointer associated with other object.
+   */
+  static void* GetData (iObject* obj)
+  {
+    csRef<WalkDataObject> d (CS::GetChildObject<WalkDataObject> (obj));
+    void *res = (d ? d->GetData () : 0);
+    return res;
+  }
+};
+
+///
+struct csKeyMap
+{
+  csKeyMap* next, * prev;
+  utf32_char key;
+  bool shift, alt, ctrl;
+  char* cmd;
+  bool need_status,is_on;
+};
+
+struct csMapToLoad
+{
+  /// The startup directory on VFS with needed map file
+  csString map_name;
+  csMapToLoad* next_map;
+};
+
+///
+class WalkTest
+{
+public:
+  iObjectRegistry* object_reg;
+  csRef<iPluginManager> plugin_mgr;
+  csRef<iKeyboardDriver> kbd;
+  csRef<iVirtualClock> vc;
+  csWeakRef<iThreadManager> tm;
+
+  csRef<iEventNameRegistry> name_reg;
+  csEventID CommandLineHelp;
+  csEventID CanvasHidden;
+  csEventID CanvasExposed;
+  csEventID CanvasResize;
+
+  WalkTestMissileLauncher* missiles;
+  WalkTestLights* lights;
+
+  int FrameWidth, FrameHeight;
+
+  /// All maps we want to load.
+  csMapToLoad* first_map, * last_map;
+  int num_maps;
+  csMapToLoad* cache_map;	// If 0 no cache: entry was given.
+  /// A script to execute at startup.
+  char* auto_script;
+  csString world_file;
+
+  /// Player position, orientation, and velocity
+  csVector3 pos;
+  csVector3 desired_velocity;
+  csVector3 velocity;
+
+  /**
+   * Angular velocity: angle_velocity.x is constantly added to angle.x
+   * and so on.
+   */
+  csVector3 desired_angle_velocity;
+  csVector3 angle_velocity;
+
+  /// Colliders for "legs" and "body". Intersections are handled differently.
+  csRef<iCollider> body;
+  csRef<iCollider> legs;
+  csVector3 body_radius, body_center, legs_radius, legs_center;
+
+  csColliderActor collider_actor;
+
+  /// A list with all busy entities.
+  csArray<csWalkEntity*> busy_entities;
+  /// A vector that is used to temporarily store references to busy entities.
+  csArray<csWalkEntity*> busy_vector;
+
+  // For recording.
+  WalkTestRecorder* recorder;
+
+  // Various configuration values for collision detection.
+  /// Initial speed of jumping.
+  float cfg_jumpspeed;
+  /// Walk acceleration.
+  float cfg_walk_accelerate;
+  /// Walk maximum speed.
+  float cfg_walk_maxspeed;
+  /// Multiplier for maximum speed.
+  float cfg_walk_maxspeed_mult;
+  /// Is multiplier used?
+  float cfg_walk_maxspeed_multreal;
+  /// Walk brake deceleration.
+  float cfg_walk_brake;
+  /// Rotate acceleration.
+  float cfg_rotate_accelerate;
+  /// Rotate maximum speed.
+  float cfg_rotate_maxspeed;
+  /// Rotate brake deceleration.
+  float cfg_rotate_brake;
+  /// Look acceleration.
+  float cfg_look_accelerate;
+  /// Body height.
+  float cfg_body_height;
+  /// Body width.
+  float cfg_body_width;
+  /// Body depth.
+  float cfg_body_depth;
+  /// Eye offset.
+  float cfg_eye_offset;
+  /// Legs width.
+  float cfg_legs_width;
+  /// Legs depth.
+  float cfg_legs_depth;
+  /// Legs offset.
+  float cfg_legs_offset;
+
+  /// Was player already spawned?..
+  bool player_spawned;
+
+  /**
+   * If this flag is true we move in 3D (old system). Otherwise we move more
+   * like common 3D games do.
+   */
+  static bool move_3d;
+
+  /// Color for the TXT map background.
+  int bgcolor_txtmap;
+
+  /// Clear color for other map modes.
+  int bgcolor_map;
+
+  /**
+   * If true we show edges around all polygons (debugging).
+   */
+  bool do_edges;
+
+  // True if we've loaded all the 2d textures and sprites.
+  bool spritesLoaded;
+
+  WalkTestFullScreenFX* fsfx;
+
+  /**
+   * The main engine interface
+   */
+  csRef<iEngine> Engine;
+  /// The level loaders
+  csRef<iLoader> LevelLoader;
+  csRef<iThreadedLoader> TLevelLoader;
+  ///
+  csRef<iGraphics2D> myG2D;
+  csRef<iGraphics3D> myG3D;
+  csRef<iConsoleOutput> myConsole;
+  csRef<iVFS> myVFS;
+  csRef<iSndSysRenderer> mySound;
+
+  WalkTestViews* views;
+  WalkTestAnimateSky* sky;
+
+  /// A sprite to display the Crystal Space Logo
+  csPixmap* cslogo;
+
+  /// Some sounds.
+  iSndSysWrapper* wMissile_boom;
+  iSndSysWrapper* wMissile_whoosh;
+
+  /// for object movement.
+  csWeakRef<iMeshWrapper> closestMesh;
+  float object_move_speed;
+
+  /// Some flags.
+  bool do_show_coord;
+  bool do_object_move;
+  bool busy_perf_test;
+  bool do_show_z;
+  bool do_show_palette;
+  bool do_huge;
+  bool do_freelook;
+  bool do_light_frust;
+  bool do_logo;
+  bool doSave;
+  int cfg_debug_check_frustum;
+  int fgcolor_stats;
+
+  /// The selected light.
+  iLight* selected_light;
+  /// The selected polygon.
+  int selected_polygon;
+
+  /// Debug box 1.
+  csBox3 debug_box1;
+  /// Debug box 2.
+  csBox3 debug_box2;
+  /// If true then show both debug boxes.
+  bool do_show_debug_boxes;
+
+  bool on_ground;
+  bool inverse_mouse;
+  bool move_forward;
+
+  /// Collision detection plugin.
+  csRef<iCollideSystem> collide_system;
+
+  /// Player's body (as a 3D model) and legs
+  //csRef<iMeshWrapper> plbody, pllegs;
+
+  /// The console input plugin
+  csRef<iConsoleInput> ConsoleInput;
+  /// Is the console smaller than the screen?
+  bool SmallConsole;
+
+  /// The font we'll use for writing
+  csRef<iFont> Font;
+
+  /// is actually anything visible on the canvas?
+  bool canvas_exposed;
+
+  csArray<iMeshWrapper*> ghosts;
+
+public:
+  ///
+  WalkTest ();
+
+  ///
+  virtual ~WalkTest ();
+
+  /// Perform some initialization work
+  bool Initialize (int argc, const char* const argv[],
+    const char *iConfigName);
+
+  /// Report something to the reporter.
+  void Report (int severity, const char* msg, ...);
+
+  /// Fire all commands on an object (run time execution).
+  virtual void ActivateObject (iObject* object);
+
+  /**
+   * Find all key commands attached to an object and execute
+   * them (load time execution).
+   */
+  virtual void ParseKeyCmds (iObject* src);
+
+  /**
+   * Find all SEED_MESH_OBJ nodes
+   * commands attached to an object and create them (load time execution).
+   */
+  void ParseKeyNodes (iObject* src);
+
+  /**
+   * Find all key commands attached to objects and execute
+   * them (load time execution).
+   */
+  virtual void ParseKeyCmds ();
+
+  /**
+   * Set the current VFS dir to the given map directory.
+   */
+  bool SetMapDir (const char* map_dir, csString& map_file);
+
+  /// Draw the frame.
+  void SetupFrame ();
+  /// Finalize the frame.
+  void FinishFrame ();
+  ///
+  void PrepareFrame (csTicks elapsed_time, csTicks current_time);
+
+  /// Move bots, particle systems, players, etc. for each frame.
+  virtual void MoveSystems (csTicks elapsed_time, csTicks current_time);
+
+  /**
+   * Draw all things related to debugging (mostly edge drawing).
+   * Must be called with G3D set in 2D mode.
+   */
+  void DrawFrameDebug ();
+
+  /**
+   * Draw all things related to debugging in 3D mode instead of 2D.
+   * Must be called with G3D set in 3D mode.
+   */
+  void DrawFrameDebug3D ();
+
+  /**
+   * Another debug DrawFrame version which is called last. This
+   * one is temporary and contains debugging stuff active for the
+   * current thing that is being debugged.
+   */
+  void DrawFrameExtraDebug ();
+
+  /**
+   * Draw everything for the console.
+   */
+  virtual void DrawFrameConsole ();
+
+  /**
+   * Draw everything for a frame. This includes 3D graphics
+   * and everything related to 2D drawing as well (console, debugging, ...).
+   */
+  virtual void DrawFrame (csTicks elapsed_time, csTicks current_time);
+  /// Draws 3D objects to screen
+  virtual void DrawFrame3D (int drawflags, csTicks current_time);
+  /// Draws 2D objects to screen
+  virtual void DrawFrame2D (void);
+
+  /// Load all the graphics libraries needed
+  virtual void LoadLibraryData (iCollection* collection);
+  virtual bool Create2DSprites ();
+
+  ///
+  bool WalkHandleEvent (iEvent &Event);
+
+  /// Handle additional configuration defaults.
+  void SetDefaults ();
+  /// Commandline help for WalkTest.
+  void Help ();
+
+  /// Inits all the collision detection stuff
+  virtual void InitCollDet (iEngine* engine, iCollection* collection);
+
+  /// Destroys all the collision detection stuff
+  virtual void EndEngine();
+
+  /// Creates Colliders
+  virtual void CreateColliders();
+
+  /// Gravity correct movement function.
+  void Strafe (float speed);
+  /// Gravity correct movement function.
+  void Step (float speed);
+  /// Gravity correct movement function.
+  void Rotate (float speed);
+  /// Gravity correct movement function.
+  void Look (float speed);
+  /// Jump
+  void Jump ();
+  /// Do the actual acceleration calculation.
+  void InterpolateMovement ();
+
+  /// Immediate gravity incorrect movement functions.
+  void imm_forward (float speed, bool slow, bool fast);
+  void imm_backward (float speed, bool slow, bool fast);
+  void imm_left (float speed, bool slow, bool fast);
+  void imm_right (float speed, bool slow, bool fast);
+  void imm_up (float speed, bool slow, bool fast);
+  void imm_down (float speed, bool slow, bool fast);
+  void imm_rot_left_camera (float speed, bool slow, bool fast);
+  void imm_rot_left_world (float speed, bool slow, bool fast);
+  void imm_rot_right_camera (float speed, bool slow, bool fast);
+  void imm_rot_right_world (float speed, bool slow, bool fast);
+  void imm_rot_left_xaxis (float speed, bool slow, bool fast);
+  void imm_rot_right_xaxis (float speed, bool slow, bool fast);
+  void imm_rot_left_zaxis (float speed, bool slow, bool fast);
+  void imm_rot_right_zaxis (float speed, bool slow, bool fast);
+
+  void RotateCam(float x, float y);
+  
+  ///
+  void eatkeypress (iEvent* Event);
+
+  /// Handle mouse click events
+  virtual void MouseClick1Handler(iEvent &Event);
+  virtual void MouseClick2Handler(iEvent &Event);
+  virtual void MouseClick3Handler(iEvent &Event);
+
+  void GfxWrite (int x, int y, int fg, int bg, const char *str, ...);
+
+  bool do_bots;
+  BotManager* bots;
+
+  //@{
+  /// Save/load camera functions
+  void SaveCamera (const char *fName);
+  bool LoadCamera (const char *fName);
+  //@}
+
+  protected:
+    /**
+    * Embedded iEventHandler interface that handles frame events in the
+    * 3D phase.
+    */
+    class E3DEventHandler : 
+      public scfImplementation1<E3DEventHandler, 
+      iEventHandler>
+    {
+    private:
+      WalkTest* parent;
+    public:
+      E3DEventHandler (WalkTest* parent) :
+          scfImplementationType (this), parent (parent) { }
+      virtual ~E3DEventHandler () { }
+      virtual bool HandleEvent (iEvent& ev)
+      {
+        if (parent && (ev.Name == parent->Frame))
+        {      
+          parent->SetupFrame ();
+
+          return true;
+        }
+
+        return false;
+      }
+      CS_EVENTHANDLER_PHASE_3D("crystalspace.walktest.frame.3d")
+    };
+    csRef<E3DEventHandler> e3DEventHandler;
+
+    /**
+    * Embedded iEventHandler interface that handles frame events in the
+    * frame phase.
+    */
+    class FrameEventHandler : 
+      public scfImplementation1<FrameEventHandler, 
+      iEventHandler>
+    {
+    private:
+      WalkTest* parent;
+    public:
+      FrameEventHandler (WalkTest* parent) :
+          scfImplementationType (this), parent (parent) { }
+      virtual ~FrameEventHandler () { }
+      virtual bool HandleEvent (iEvent& ev)
+      {
+        if (parent && (ev.Name == parent->Frame))
+        {
+          if(!parent->spritesLoaded)
+          {
+            if(parent->Create2DSprites())
+            {
+              parent->spritesLoaded = true;
+            }
+          }
+
+          parent->FinishFrame ();
+
+          return true;
+        }
+
+        return false;
+      }
+      CS_EVENTHANDLER_PHASE_FRAME("crystalspace.walktest.frame.frame")
+    };
+    csRef<FrameEventHandler> frameEventHandler;
+
+    CS_DECLARE_FRAME_EVENT_SHORTCUTS;
+};
+
+extern csVector2 coord_check_vector;
+
+#define FRAME_WIDTH Sys->FrameWidth
+#define FRAME_HEIGHT Sys->FrameHeight
+
+extern void perf_test (int num);
+extern void CaptureScreen ();
+extern void free_keymap ();
+
+// The global system driver
+extern WalkTest *Sys;
+
+#endif // __WALKTEST_H__

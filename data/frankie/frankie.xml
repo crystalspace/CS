@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<library>
+  <plugins>
+    <plugin name="skeletonfact">crystalspace.mesh.loader.factory.skeleton</plugin>
+    <plugin name="animesh">crystalspace.mesh.loader.animesh</plugin>
+    <plugin name="animeshfact">crystalspace.mesh.loader.factory.animesh</plugin>
+  </plugins>
+  <shaders>
+	<shader>
+      <file>/shader/fur/fur_cg.xml</file>
+    </shader>
+  </shaders>
+  <textures>
+    <texture name='stone'>
+      <file>/lib/std/stone4.gif</file>
+    </texture>
+
+    <texture name="frankie_col">
+      <file>/lib/frankie/frankie_col.png</file>
+    </texture>
+    <texture name="BUMPfrankie_nor">
+      <file>/lib/frankie/frankie_nor.png</file>
+      <class>normalmap</class>
+    </texture>
+    <texture name="frankie_spec">
+      <file>/lib/frankie/frankie_spec.png</file>
+    </texture>
+  </textures>
+  <materials>
+    <material name="frankie_skin">
+      <texture>frankie_col</texture> 
+      <shadervar type="texture" name="tex normal">BUMPfrankie_nor</shadervar> 
+      <shadervar type="texture" name="tex specular">frankie_spec</shadervar> 
+      <!--shader type='standard'>fur_cg</shader>
+      <shadervar type="int" name="diffuse type">10</shadervar>
+      <shadervar type="texture" name="diffuse map">frankie_col</shadervar-->
+    </material>
+  </materials>
+  <library>/lib/frankie/skelfrankie_rig</library>
+  <library>/lib/frankie/franky_frankie</library>
+</library>
+

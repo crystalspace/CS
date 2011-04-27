@@ -1,0 +1,5 @@
+SubDir TOP data cegui ;
+
+InstallData [ Wildcard *.xsd ice.* *.layout ] : data cegui ;
+# ... the other files, however, also by some tools (notably viewmesh)
+FileListEntriesData [ Wildcard *.xsd ice.* ] : cegui : data-tool ;

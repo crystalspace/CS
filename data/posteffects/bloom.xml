@@ -1,0 +1,62 @@
+<posteffect>
+  <layer name="thresholded" mipmap="true" maxmipmap="6" shader="/shader/postproc/threshold.xml" />
+  
+  <layer name="thresh_blur_1_h" downsample="2" shader="/shader/postproc/gauss-h.xml" />
+  <layer name="thresh_blur_1_v" downsample="2" shader="/shader/postproc/gauss-v.xml" />
+  
+  <layer name="thresh_blur_2_h" downsample="3" shader="/shader/postproc/gauss-h.xml">
+    <inputs><input layer="thresholded" /></inputs>
+  </layer>
+  <layer name="thresh_blur_2_v" downsample="3" shader="/shader/postproc/gauss-v.xml" />
+  
+  <layer name="thresh_blur_3_h" downsample="4" shader="/shader/postproc/gauss-h.xml">
+    <inputs><input layer="thresholded" /></inputs>
+  </layer>
+  <layer name="thresh_blur_3_v" downsample="4" shader="/shader/postproc/gauss-v.xml" />
+  
+  <layer name="thresh_blur_4_h" downsample="5" shader="/shader/postproc/gauss-h.xml">
+    <inputs><input layer="thresholded" /></inputs>
+  </layer>
+  <layer name="thresh_blur_4_v" downsample="5" shader="/shader/postproc/gauss-v.xml" />
+  
+  <layer name="thresh_blur_5_h" downsample="6" shader="/shader/postproc/gauss-h.xml">
+    <inputs><input layer="thresholded" /></inputs>
+  </layer>
+  <layer name="thresh_blur_5_v" downsample="6" shader="/shader/postproc/gauss-v.xml" />
+  
+  <layer name="add_1_2" shader="/shader/postproc/add.xml">
+    <inputs>
+      <input layer="thresh_blur_1_v" />
+      <input layer="thresh_blur_2_v" texname="tex diffuse 2" texcoord="texture coordinate 1" />
+    </inputs>
+    <shadervar name="scale" type="vector2">1,0.0625</shadervar>
+  </layer>
+  <layer name="add_1_2_3" shader="/shader/postproc/add.xml">
+    <inputs>
+      <input layer="add_1_2" />
+      <input layer="thresh_blur_3_v" texname="tex diffuse 2" texcoord="texture coordinate 1" />
+    </inputs>
+    <shadervar name="scale" type="vector2">1,0.015625</shadervar>
+  </layer>
+  <layer name="add_1_2_3_4" shader="/shader/postproc/add.xml">
+    <inputs>
+      <input layer="add_1_2_3" />
+      <input layer="thresh_blur_4_v" texname="tex diffuse 2" texcoord="texture coordinate 1" />
+    </inputs>
+    <shadervar name="scale" type="vector2">1,0.00390625</shadervar>
+  </layer>
+  <layer name="add_1_2_3_4_5" shader="/shader/postproc/add.xml">
+    <inputs>
+      <input layer="add_1_2_3_4" />
+      <input layer="thresh_blur_5_v" texname="tex diffuse 2" texcoord="texture coordinate 1" />
+    </inputs>
+    <shadervar name="scale" type="vector2">1,0.0009765625</shadervar>
+  </layer>
+  
+  <layer shader="/shader/postproc/add_squared.xml">
+    <inputs>
+      <input layer="*screen" />
+      <input layer="add_1_2_3_4_5" texname="tex diffuse 2" texcoord="texture coordinate 1" />
+    </inputs>
+  </layer>
+</posteffect>

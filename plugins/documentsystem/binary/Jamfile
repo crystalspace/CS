@@ -1,0 +1,8 @@
+SubDir TOP plugins documentsystem binary ;
+
+Description bindoc : "binary document system" ;
+
+Plugin bindoc
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith bindoc : crystalspace ;

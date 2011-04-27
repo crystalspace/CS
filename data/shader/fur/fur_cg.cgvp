@@ -1,0 +1,61 @@
+<cgvp>
+  <variablemap variable="light position world[0]" destination="LightPos" />
+  <variablemap variable="object2world transform" destination="obj_tr" />  
+<program>
+<![CDATA[
+
+struct app2vertex {
+	float4 Position : POSITION;
+	float4 Normal : NORMAL;
+	float2 TexCoord : TEXCOORD0;
+	float4 Tangent : TEXCOORD1;
+	float3 Binormal : TEXCOORD2;
+};
+
+struct vertex2fragment { 
+	float4 HPosition : POSITION;
+	float3 LightVec : TEXCOORD0;	
+	float3 WorldNormal : TEXCOORD1;	
+	float3 WorldTangent : TEXCOORD2;	
+	float3 TangentShift : TEXCOORD3;
+	float2 TexCoord : TEXCOORD4;
+	float3 WorldView: TEXCOORD5;	
+};
+
+// main function
+vertex2fragment main (app2vertex IN,
+	uniform float4x4 ModelViewI : state.matrix.modelview.inverse,	
+	uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,	
+	uniform float4x4 ModelViewProj : state.matrix.mvp,
+	uniform float4x4 obj_tr,	
+	uniform float4 LightPos)
+{
+	vertex2fragment OUT;
+
+	float4 objLight = LightPos - mul(obj_tr, IN.Position);
+	
+	OUT.WorldNormal = mul(obj_tr, IN.Normal);
+	OUT.WorldTangent = mul(obj_tr, IN.Tangent);
+	OUT.TangentShift = IN.Binormal;
+	
+	// position in object coords:	
+	float4 Po = float4(IN.Position.x, IN.Position.y, IN.Position.z, 1.0);
+	
+	// light vector
+	OUT.LightVec = objLight.xyz;
+
+	// view vector in world coords:
+	OUT.WorldView = normalize(ModelViewIT[3].xyz - Po.xyz);	
+	
+	// uv mapping
+	OUT.TexCoord = IN.TexCoord;
+	
+	// pos in clip coords:
+	OUT.HPosition = mul(ModelViewProj, Po);
+	  
+	return OUT;	// output of vertex shader
+}
+
+]]>
+</program>
+</cgvp>

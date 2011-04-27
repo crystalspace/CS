@@ -1,0 +1,687 @@
+@c -*-texinfo-*-
+@node Tutorial Simple, Tutorial Simple 2, Tutorials, Tutorials
+@subsection Simple Tutorial 1: Basic Setup, World Creation
+@cindex Tutorial, Simple
+@cindex Simple Tutorial
+@cindex @code{GeneralMeshBuilder}
+
+This tutorial provides a step-by-step explanation on how you can use Crystal
+Space from within your application.  This tutorial is mainly based on the
+@file{simple1} application which you can compile and run to see what it does.
+To build @file{simple1} which ships with Crystal Space, type @samp{make
+simple1} or @samp{jam simple1}, or build the @file{appsimple1} project if you
+use @sc{msvc}.
+
+When you downloaded the Crystal Space package it contains a @file{CS/include}
+directory. This directory contains all header files you need when using the
+Crystal Space components and libraries in your own applications. On one hand,
+the include directory contains @sc{scf} interface definitions.  These pure
+interface file are stored in directories with names starting with the letter
+@samp{i} (as in @file{iengine/engine.h}).  On the other hand we also have plain
+C++ include files for interfacing with the libraries of Crystal Space.  When
+you install Crystal Space on your development system (for instance, by invoking
+@samp{make install} or @samp{jam install}), these headers are placed in a
+location where they can be easily accessed when writing new programs based on
+Crystal Space.  On Unix systems, for instance, these files usually end up in
+@file{/usr/local/include/crystalspace}. Since it can be difficult to remember
+which header files contain which classes and interfaces, you can instead
+include the convenient catch-all header file @file{crystalspace.h}.
+
+Crystal Space also has a reference manual and @sc{api} documentation.  The
+manual is included in @sc{html} form Crystal Space itself in the
+@file{CS/docs/html} directory. After you install Crystal Space, the
+documentation resides at @file{/usr/local/share/docs/crystalspace-*}.
+Documentation is also available online.  The @sc{api} documentation can be
+generated locally or viewed online.  @xref{Where to Get}.
+
+Additionally, note that the source code for some of these tutorials can be
+found in the @file{CS/apps/tutorials} directory. There are also a few
+additional tutorials at that location which are not (yet) covered in the
+documentation.
+
+Before reading this tutorial you should first read the basics
+(@pxref{The Basics}).
+
+This tutorial features:
+@itemize @bullet
+@item
+Basic setup of a Crystal Space application using @code{csApplicationFramework}.
+@item
+Setting up the application event handler using @code{csBaseEventHandler}.
+@item
+Using events to draw 3D frame and listen to keyboard so we can quit
+the application.
+@item
+Loading of the basic plugins needed to get the engine going using
+@code{csInitializer::RequestPlugins()}.
+@item
+Creating of the 3D window.
+@item
+Loading of a texture and material using @code{iLoader::LoadTexture()}.
+@item
+Creation of a simple room using @code{iEngine::CreateSector()} and
+@code{CS::Geometry::GeneralMeshBuilder}. Also adding a few lights so
+that everything is visible.
+@item
+Creation of a view (@code{csView} class) and a camera.
+@item
+Basic movement using the keyboard.
+@end itemize
+
+@menu
+* Simple Header File::
+* Simple Event Handling:: Event Handling
+* Simple World:: Creating a ``World''
+* Simple Camera:: The Camera
+* Simple Locomotion:: Locomotion (Moving Around)
+@end menu
+
+@node Simple Header File, Simple Event Handling, Tutorial Simple, Tutorial Simple
+@subsubsection Simple Header File
+@cindex Tutorial Simple Header File
+@cindex Simple Header File, Tutorial
+
+It is good practice to always put definitions and declarations in header
+files as opposed to source files. In some cases it is even required. Here
+we will show the header file for a simple Crystal Space application.
+Although this is not strictly required, we use a class to encapsulate
+the application logic. Our @file{simple.h} header looks as follows:
+
+@example
+#ifndef __SIMPLE_H__
+#define __SIMPLE_H__
+
+#include <crystalspace.h>
+
+class Simple : public csApplicationFramework, public csBaseEventHandler
+@{
+private:
+  csRef<iEngine> engine;
+  csRef<iLoader> loader;
+  csRef<iGraphics3D> g3d;
+  csRef<iKeyboardDriver> kbd;
+  csRef<iVirtualClock> vc;
+  csRef<iRenderManager> rm;
+  
+  csRef<FramePrinter> printer;
+
+public:
+  Simple ();
+  ~Simple ();
+
+  void OnExit ();
+  bool OnInitialize (int argc, char* argv[]);
+
+  bool Application ();
+  
+  void Frame ();
+  
+  bool SetupModules ();
+
+  CS_EVENTHANDLER_PHASE_LOGIC("application.simple1")
+@};
+
+#endif // __SIMPLE1_H__
+@end example
+
+In the @samp{Simple} class we keep a number of references to important
+objects that we are going to need a lot. That way we don't have to get
+them every time when we need them. Other than that we have a constructor
+which will do the initialization of these variables, a destructor which
+will clean up the application, an initialization function which will
+be responsible for the full set up of Crystal Space and our application.
+
+Note that we use smart pointers (@code{csRef<>}) for several of those
+references. That makes it easier to manage reference counting. We let
+the smart pointer take care of this for us.
+
+The event handler macro is used because our tutorial application also
+needs to be an event handler (it inherits from @code{csBaseEventHandler} for
+that). The macro indicates the name of this event handler and specifies that
+the application wants to handle the frame event in the first (or 'logic')
+phase.
+
+In the source file @file{simple.cpp} we place the following:
+
+@example
+#include "simple.h"
+
+CS_IMPLEMENT_APPLICATION
+
+Simple::Simple ()
+@{
+  SetApplicationName ("CrystalSpace.Simple1");
+@}
+
+Simple::~Simple ()
+@{
+@}
+
+void Simple::Frame ()
+@{
+@}
+
+bool Simple::OnInitialize(int argc, char* argv[])
+@{
+  if (!csInitializer::RequestPlugins(GetObjectRegistry(),
+    CS_REQUEST_VFS,
+    CS_REQUEST_OPENGL3D,
+    CS_REQUEST_ENGINE,
+    CS_REQUEST_FONTSERVER,
+    CS_REQUEST_IMAGELOADER,
+    CS_REQUEST_LEVELLOADER,
+    CS_REQUEST_REPORTER,
+    CS_REQUEST_REPORTERLISTENER,
+    CS_REQUEST_END))
+    return ReportError("Failed to initialize plugins!");
+
+  csBaseEventHandler::Initialize(GetObjectRegistry());
+  csEventID events[] = @{
+    csevFrame (GetObjectRegistry()),
+    csevKeyboardEvent (GetObjectRegistry()),
+    CS_EVENTLIST_END
+  @};
+  if (!RegisterQueue(GetObjectRegistry(), events))
+    return ReportError("Failed to set up event handler!");
+
+  return true;
+@}
+
+void Simple::OnExit()
+@{
+@}
+
+bool Simple::Application()
+@{
+  if (!OpenApplication(GetObjectRegistry()))
+    return ReportError("Error opening system!");
+
+  if (SetupModules())
+  @{
+    Run();
+  @}
+
+  return true;
+@}
+
+bool Simple::SetupModules ()
+@{
+  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
+  if (!g3d) return ReportError("Failed to locate 3D renderer!");
+
+  engine = csQueryRegistry<iEngine> (GetObjectRegistry());
+  if (!engine) return ReportError("Failed to locate 3D engine!");
+
+  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry());
+  if (!vc) return ReportError("Failed to locate Virtual Clock!");
+
+  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry());
+  if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
+
+  loader = csQueryRegistry<iLoader> (GetObjectRegistry());
+  if (!loader) return ReportError("Failed to locate Loader!");
+
+  return true;
+@}
+
+/*---------------*
+ * Main function
+ *---------------*/
+int main (int argc, char* argv[])
+@{
+  return csApplicationRunner<Simple>::Run (argc, argv);
+@}
+@end example
+
+This is almost the simplest possible application and it is absolutely useless.
+Also don't run it on an operating system where you can't kill a running
+application because there is no way to stop the application once it has
+started running.
+
+Even though this application is useless it already has a lot of features
+that are going to be very useful later. Here is a short summary of all
+the things and features it already has:
+
+@itemize @bullet
+@item
+It will open a window.
+
+@item
+You can control the size of the window and the video driver used
+for that window with command-line options (@samp{-video} and @samp{-mode}
+command-line options).
+
+@item
+It has the following plugins initialized and ready to use: engine, 3D
+renderer, canvas, reporter, reporter listener, font server, image loader,
+map loader, and @sc{vfs}.
+@end itemize
+
+Before we start making this application more useful lets have a look at what
+actually happens here.
+
+Before doing anything at all, after including the necessary header files, we
+first need to use a few macros.  The CS_IMPLEMENT_APPLICATION macro is
+essential for every application using Crystal Space.  It makes sure that the
+@code{main()} routine is correctly linked and called on every platform.
+
+@code{csInitializer::RequestPlugins()} will use the configuration file
+(which we are not using in this tutorial), the command-line and the
+requested plugins to find out which plugins to load. The command-line
+has highest priority, followed by the configuration file and lastly the
+requested plugins.
+
+This concludes the initialization pass.
+
+In @code{Simple::Application()} we open the window with a call
+to the function @code{csInitializer::OpenApplication()}. This sends
+the @samp{cscmdSystemOpen} broadcast message to all components that are
+listening to the event queue.  One of the plugins that listens for this is
+the 3D renderer which will then open its window (or enable graphics
+on a non-windowing operating system).
+
+After that, we call @code{Simple::SetupModules()} to locate all the
+common objects that we will need later, and store references to them
+in our main class. Because we use @code{csRef<>} or smart pointers,
+we don't have to worry about invoking @code{IncRef()} and @code{DecRef()}
+manually.
+
+Finally we start the default main loop by calling @code{Run()}.
+
+@node Simple Event Handling, Simple World, Simple Header File, Tutorial Simple
+@subsubsection Event Handling
+@cindex Event Handling, Simple Tutorial
+@cindex Simple Tutorial Event Handling
+
+To make the testing somewhat easier we will add a way to terminate the
+application by responding to the @key{ESC} key.  Add the following private
+method to our class in @file{simple.h}:
+
+@example
+bool OnKeyboard (iEvent&);
+@end example
+
+The function @code{OnKeyboard()} will be called when an event arrives
+Add the following code to @file{simple.cpp} just before
+@code{Simple::OnInitialize()}:
+
+@example
+bool Simple::OnKeyboard(iEvent& ev)
+@{
+  csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
+  if (eventtype == csKeyEventTypeDown)
+  @{
+    utf32_char code = csKeyEventHelper::GetCookedCode(&ev);
+    if (code == CSKEY_ESC)
+    @{
+      csRef<iEventQueue> q =
+        csQueryRegistry<iEventQueue> (GetObjectRegistry());
+      if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit (
+      	GetObjectRegistry ()));
+    @}
+  @}
+  return false;
+@}
+@end example
+
+@code{OnKeyboard()} checks if the @key{ESC} key has been pressed. If so it
+uses the object registry to find the global event queue object. Using
+@code{Broadcast()} it then broadcasts the @samp{csevQuit} message
+to all interested parties. This will cause the application to quit by
+terminating the run-loop.
+
+@node Simple World, Simple Camera, Simple Event Handling, Tutorial Simple
+@subsubsection Creating a ``World''
+@cindex Tutorial, Creating a ``World''
+@cindex World, Creating, Simple Tutorial
+@cindex iMaterialWrapper
+@cindex iSector
+@cindex iGeneralMeshState
+@cindex iGeneralFactoryState
+@cindex iLight
+@cindex iLightList
+@cindex iMeshWrapper
+
+Now we have a very exciting application which opens a black window and waits
+for the @key{ESC} key to quit.  We assume this is the application you always
+wanted to have?  No?  Ok then, let's create some 3D stuff.
+
+We'll add a texture manager, a room (technically called a
+@dfn{sector}) and some lights.  First, add a pointer to our main
+sector and a function @code{CreateRoom()} to the @samp{Simple} class
+header file:
+
+@example
+
+class Simple
+@{
+private:
+  @dots{}
+  iSector* room;
+  float rotX, rotY;
+  @dots{}
+  void CreateRoom ();
+  @dots{}
+@end example
+
+Now add these chunks of code (texture manager, room, lights) to
+@file{simple.cpp}:
+
+@example
+bool Simple::SetupModules ()
+@{
+  @dots{}
+  // These are used store the current orientation of the camera.
+  rotY = rotX = 0;
+  @dots{}
+  CreateRoom ()
+  
+  engine->Prepare ();
+
+  using namespace CS::Lighting;
+  SimpleStaticLighter::ShineLights (room, engine, 4);
+
+  rm = engine->GetRenderManager();
+  @dots{}
+@}
+@dots{}
+void Simple::CreateRoom ()
+@{
+  if (!loader->LoadTexture ("brick", "/lib/std/castle/brick1_d.jpg"))
+    ReportError("Error loading 'brick1_d' texture!");
+  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("brick");
+  
+  room = engine->CreateSector ("room");
+
+  // First we make a primitive for our geometry.
+  using namespace CS::Geometry;
+  DensityTextureMapper mapper (0.3f);
+  TesselatedBox box (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
+  box.SetLevel (3);
+  box.SetMapper (&mapper);
+  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+  // Now we make a factory and a mesh at once.
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+      engine, room, "walls", "walls_factory", &box);
+  walls->GetMeshObject ()->SetMaterialWrapper (tm);
+
+  csRef<iLight> light;
+  iLightList* ll = room->GetLights ();
+
+  light = engine->CreateLight (0, csVector3 (-3, 5, 0), 10,
+        csColor (1, 0, 0));
+  ll->Add (light);
+
+  light = engine->CreateLight (0, csVector3 (3, 5,  0), 10,
+        csColor (0, 0, 1));
+  ll->Add (light);
+
+  light = engine->CreateLight (0, csVector3 (0, 5, -3), 10,
+        csColor (0, 1, 0));
+  ll->Add (light);
+@}
+@end example
+
+This extra code first loads a texture with @code{LoadTexture()}.
+The first parameter is the name of the texture as it will be known in the
+engine; and the second is the
+actual filename on the @sc{vfs} volume (@pxref{VFS}). This function returns
+a @samp{iTextureWrapper} which we
+don't use.  Instead we use the @samp{iMaterialWrapper} which is created
+automatically by @code{LoadTexture()}.
+
+The next block of code shows how to add a normal map to the texture we just
+loaded.
+
+Then, we create our room with @code{CreateSector()}.  This room will initially
+be empty.  A room in Crystal Space is represented by @samp{iSector} which is
+basically a container which can hold geometrical objects. Objects
+in Crystal Space are represented by @dfn{mesh objects} (@pxref{MeshObject}).
+There are several types of mesh objects in Crystal Space. Every type of
+mesh object represents some different way to represent geometry. In this
+tutorial we are only going to use the ``genmesh'' mesh object type. This mesh
+object type is very useful for walls of indoor maps or buildings. Most mesh
+objects don't contain any geometry. The geometry definition is actually
+contained in the mesh factory. So that's why we first create a factory for
+our walls.
+
+Now, we want to create the six walls of our room. For this the best object
+to use is the GenMesh object (@pxref{MeshObject Genmesh}). With genmeshes
+the geometry is represented in the factory. From that factory you can then
+create multiple meshes. In our case we only need one mesh for the walls (which
+will be a box visible from the inside). So we will create one factory and
+one mesh from that factory.
+
+There is a @samp{CS::Geometry} namespace where there are several conveniance
+classes to help you build genmeshes. In our case we need a box that is visible
+from the inside. We will use the @samp{TesselatedBox} class for that purpose.
+We use a tesselated box (as opposed to a normal box) so that our lighting is
+more accurate. If you don't use lightmaps (like in this example) then genmeshes
+are only lit at vertices of the model and lighting for the rest of the
+surface is interpolated. So to get accurate lighting you need a model that
+has sufficient vertices. We use a tesselation level so that every face has
+16 vertices (3 times 3 quads or eighteen triangles for every face). You can
+increase the value in the @code{TesselatedBox::SetLevel()} call even more to
+get even better lighting resolution but that will increase the number of
+triangles in the model too much and it is not needed in this simple example.
+
+From this primitive we can now create both the factory and the mesh at once
+using the @code{GeneralMeshBuilder::CreateFactoryAndMesh()} method. In
+the @samp{GeneralMeshBuilder} class there are other methods that you can use
+to create only factories or meshes but in our case we use the simple method
+of creating both at once. Because we give it a pointer to our tesselated box
+it will immediatelly populate the factory with the triangles and vertices
+required for this box. The @code{CreateFactoryAndMesh()} method places the
+object at the origin in the sector (i.e. @samp{0,0,0}). If you want to change
+that you have to use @code{iMeshWrapper::GetMovable()}. But in this example
+the origin is fine.
+
+The last thing we have to do is to set a material to use for this mesh. You can
+set a material both on the factory (in which case all objects that are created
+from this factory will share it) or on the mesh. In this case we set it on the
+mesh by using @code{SetMaterialWrapper()}.
+
+Finally, we create some lights in our room to make sure that we actually are
+able to see the walls.  The interface @samp{iLight} represents a light.
+In this case we created some static lights which can not move and change
+intensity.  We create three such lights
+and add them to the room with @code{AddLight()}. Note that the list of lights
+in a sector is represented by an object implementing @samp{iLightList}. To
+get this list you call @code{iSector::GetLights()}.
+
+When creating a light we use several parameters.
+First we have the name of the light. This is not used
+often and mostly you can set this to 0. The second parameter is
+the location of the light in the world. Then follows a radius. The light will
+not affect polygons which are outside the sphere described by the center of
+the light and the radius.  The next parameter is the color of the light in
+@sc{rgb} format (<1,1,1> means white and <0,0,0> means black).
+The last parameter indicates whether or not we want to have a pseudo-dynamic
+light.  A pseudo-dynamic light still cannot move but it can change intensity.
+There are some performance costs associated with pseudo-dynamic lights so
+it is not enabled by default.
+
+The call to @code{Prepare()} prepares the engine for rendering your scene.  It
+will prepare all textures and meshes.
+
+Using the @code{ShineLights()} function we generate static vertex lighting
+for our dynamically created geometry. Most of the times Crystal Space applications
+will probably load maps from disk and for that situation the lighting information
+(vertex and lightmaps) should already be present as calculated by the @samp{lighter2}
+application. However, for dynamically generated geometry you can choose to either
+use some kind of hardware assisted lighting (by using the @samp{unshadowed}
+render manager for example) or else you can use static lighting. @code{ShineLights()}
+is a convenience function that has the same end result as if the objects were
+lit using @samp{lighter2} with vertex lighting.
+
+Ok, now we have created our room and properly initialized it.  If you
+compile and run this application you would still see a black screen.  Why?
+Because we have not created a camera through which you can view the room.
+
+@node Simple Camera, Simple Locomotion, Simple World, Tutorial Simple
+@subsubsection The Camera
+@cindex Tutorial, Camera
+@cindex Camera, Tutorial
+@cindex iView
+@cindex iCamera
+
+In Crystal Space there is an interface called @samp{iView} which
+encapsulates both @samp{iCamera} and @samp{iClipper2D} instances.
+In principle you can use those classes directly but using @samp{iView} is
+easier.  Now, edit @file{simple.h} to make use of @samp{iView}:
+
+@example
+@dots{}
+class Simple
+@{
+private:
+  @dots{}
+  csRef<iView> view;
+  @dots{}
+  void Frame ();
+  @dots{}
+@end example
+
+Then, edit @file{simple.cpp} and make the following changes at the end of
+our @code{SetupModules()} function:
+
+@example
+bool Simple::SetupModules ()
+@{
+  @dots{}
+  view.AttachNew(new csView (engine, g3d));
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+  @dots{}
+  view->GetCamera ()->SetSector (room);
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
+  
+  printer.AttachNew (new FramePrinter (GetObjectRegistry ()));
+
+  return true;
+@}
+@end example
+
+So, first we create a view for our world and a particular 3D renderer.
+The view has a current sector which is passed to the camera and is set by
+@code{SetSector()}.  The camera also has a position in that sector which you
+can set by first getting the camera with @code{GetCamera()} and then setting
+the position (which is a @samp{csVector3}) with @code{SetPosition()}.  The
+view also holds a clipping region which corresponds to the area on the window
+that is going to be used for drawing the world.  Crystal Space supports convex
+polygons as viewing areas, but in this case we use a simple rectangle
+the same size as the window.  We set this viewing rectangle with
+@code{SetRectangle()}.
+
+The call to create a new view is a bit special. See the discussion
+on smart pointers for a detailed discussion (@pxref{Smart Pointers}).
+
+Now, this still isn't enough.  We have a camera but the camera is not used.
+We have to write code that actually draws the screen. We will do this
+in the functions @code{ProcessFrame()} and @code{FinishFrame()}. Note that
+Crystal Space is event driven so the actual drawing needs to be triggered
+by the event handler. Add the following code somewhere in the source file:
+
+@example
+void Simple::Frame ()
+@{
+  rm->RenderView (view);
+@}
+@end example
+
+Drawing the screen is done in two steps. First there is the part that
+is done in @code{Frame()}. Here, we will actually fill the display.
+In this case we let the engine do most of that work by calling
+@code{rm->RenderView (view)}. But, in principle, you can do any kind of
+drawing here.
+
+The @code{FramePrinter} instance we created earlier will take care of updating
+the display.
+
+Compile and run this example.  For the first time you should see something: A
+solid wall.  Congratulations, you have created your first almost useful
+Crystal Space application.
+
+@node Simple Locomotion, , Simple Camera, Tutorial Simple
+@subsubsection Locomotion (Moving Around)
+@cindex Tutorial Simple Locomotion
+@cindex Locomotion, Tutorial
+@cindex Movement, Tutorial
+
+Staring at that solid wall gets a bit boring after some time.  The problem is
+that we can't move the camera to change our view point.  Let's add some code
+to do exactly this.  Edit @file{simple.cpp} again and change
+@file{Frame()} as follows:
+
+@example
+void Simple::Frame ()
+@{
+  // First get elapsed time from the virtual clock.
+  csTicks elapsed_time = vc->GetElapsedTicks ();
+
+  // Now rotate the camera according to keyboard state
+  float speed = (elapsed_time / 1000.0) * (0.03 * 20);
+
+  iCamera* c = view->GetCamera();
+  if (kbd->GetKeyState (CSKEY_SHIFT))
+  @{
+    // If the user is holding down shift, the arrow keys will cause
+    // the camera to strafe up, down, left or right from it's
+    // current position.
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+      c->Move (CS_VEC_RIGHT * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_LEFT))
+      c->Move (CS_VEC_LEFT * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_UP))
+      c->Move (CS_VEC_UP * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_DOWN))
+      c->Move (CS_VEC_DOWN * 4 * speed);
+  @}
+  else
+  @{
+    // left and right cause the camera to rotate on the global Y
+    // axis; page up and page down cause the camera to rotate on the
+    // _camera's_ X axis (more on this in a second) and up and down
+    // arrows cause the camera to go forwards and backwards.
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+      rotY += speed;
+    if (kbd->GetKeyState (CSKEY_LEFT))
+      rotY -= speed;
+    if (kbd->GetKeyState (CSKEY_PGUP))
+      rotX += speed;
+    if (kbd->GetKeyState (CSKEY_PGDN))
+      rotX -= speed;
+    if (kbd->GetKeyState (CSKEY_UP))
+      c->Move (CS_VEC_FORWARD * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_DOWN))
+      c->Move (CS_VEC_BACKWARD * 4 * speed);
+  @}
+
+  // We now assign a new rotation transformation to the camera.  You
+  // can think of the rotation this way: starting from the zero
+  // position, you first rotate "rotY" radians on your Y axis to get
+  // the first rotation.  From there you rotate "rotX" radians on the
+  // your X axis to get the final rotation.  We multiply the
+  // individual rotations on each axis together to get a single
+  // rotation matrix.  The rotations are applied in right to left
+  // order .
+  csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
+  csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
+  c->SetTransform (ot);
+
+  @dots{}
+@}
+@end example
+
+With this change, you can rotate the camera with the left
+and right arrow keys and move forward and backward with the up and down arrow
+keys.  Try it out to see the effect.  To rotate the camera we use
+@code{SetTransform()} which expects a transformation matrix.
+
+That's it for now.  In this tutorial you learned how to set up the Crystal
+Space system for use, how to create a simple room with some lights, how to
+respond to events, and how to handle some basic camera operations.
+
+You can now go on to the next tutorial (@pxref{Tutorial Simple 2})) to learn
+how to add a 3D sprite to this application.

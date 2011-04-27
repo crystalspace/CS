@@ -1,0 +1,15 @@
+SubDir TOP libs csplugincommon directx ;
+
+if $(DIRECTX8.AVAILABLE) = "yes"
+{
+  Description crystalspace_directx : "DirectX-specific plugin support" ;
+  Library crystalspace_directx : 
+    [ Wildcard *.cpp *.h ] 
+    [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) $(DOTDOT) include
+		 csplugincommon directx ] : *.h ]
+    : shared ;
+  LibDepends crystalspace_directx : crystalspace ;
+  ExternalLibs crystalspace_directx : DIRECTX8 ;
+  CFlags crystalspace_directx : [ FDefines CS_CSPLUGINCOMMON_DX_LIB ] ;
+  MsvcDefine crystalspace_directx : CS_CSPLUGINCOMMON_DX_LIB ;
+}

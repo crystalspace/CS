@@ -1,0 +1,81 @@
+<include>
+  <variablemap variable="light diffuse[0]" destination="LightColor" />
+  <variablemap variable="light ambient" destination="AmbientColor" />
+  <variablemap variable="diffuse type" destination="DiffuseType" />
+  <variablemap variable="fur color" destination="FurColor" />
+  <variablemap variable="Ks" destination="Ks" />  
+  <variablemap variable="hdr scale" destination="hdrScale" />
+  <program>
+
+struct vertex2fragment { 
+	float4 HPosition : POSITION;
+	float3 LightVec : TEXCOORD0;	
+	float3 WorldNormal : TEXCOORD1;	
+	float3 WorldTangent : TEXCOORD2;	
+	float3 TangentShift : TEXCOORD3;
+	float2 TexCoord : TEXCOORD4;
+	float3 WorldView: TEXCOORD5;		
+};
+
+float4 main (vertex2fragment IN,
+			// Lookup tables for the hair model (fixed point)
+			uniform sampler2D DiffuseMap,
+			uniform sampler2D ColorMap,
+			uniform sampler2D TextureMap,			
+			uniform int DiffuseType,
+			uniform float3 AmbientColor,
+			uniform float3 LightColor,
+			uniform float4 FurColor,
+			uniform float Ks,
+			uniform float4 hdrScale) : COLOR
+{
+	float4 OUT = float4(0, 0, 0, FurColor.a);
+
+	if (DiffuseType > 4)
+		IN.TangentShift.y = 0.01;
+	
+<?if (vars."color map") && (vars."texture map")?>
+	float2 uv = float2(clamp(tex2D(ColorMap, IN.TexCoord).x, 0.01, 0.99), clamp(IN.TangentShift.y, 0.01, 0.99));
+	FurColor = tex2D(TextureMap, uv);
+<?else?>
+	<?if vars."diffuse map"?>
+		FurColor = tex2D(DiffuseMap, IN.TexCoord);
+	<?endif?>	
+<?endif?>
+	float3 Ln = normalize(IN.LightVec);
+	float3 Nn = normalize(IN.WorldNormal);
+	float3 Tn = normalize(IN.WorldTangent);
+	
+	float sin_qi = dot(Tn, Ln);
+	
+    /* Pass colors */
+	float4 diffuseColor;
+
+	if (DiffuseType == 0)	//	no diffuse light
+		diffuseColor = 0;
+	else if (DiffuseType == 1)	//	normal diffuse light
+		diffuseColor.rgb = dot(Nn, Ln) * LightColor;
+	else if (DiffuseType == 2)	//	marschner diffuse from NVIDIA Nalu
+		diffuseColor.rgb = sqrt(max(0.0001, 1 - sin_qi * sin_qi)) * LightColor;
+	else if (DiffuseType == 3)	//	Kajiya and Kay diffuse
+		diffuseColor.rgb = sin(acos(sin_qi)) * LightColor;
+	else // ambient instead of diffuse
+		diffuseColor.rgb = LightColor;
+
+	float3 Vn = normalize(IN.WorldView);
+	float tangentEye = dot(Nn, Vn);
+	float tangentLight = dot(Nn, Ln);
+
+	float3 specularColor = pow( tangentLight * tangentEye + sin( acos( tangentLight ) ) * sin( acos( tangentEye ) ) , 60.0);	
+	specularColor *= Ks;
+	specularColor *= LightColor;
+	specularColor = max (0.0, specularColor);
+	
+	// No specular color
+	OUT.xyz = /*(0.8 + 0.4 * IN.TangentShift.x ) */ FurColor.xyz * diffuseColor + AmbientColor + specularColor;
+	OUT.xyz = OUT.xyz*hdrScale.y+hdrScale.w;
+	return OUT;
+}
+
+    </program>
+</include>

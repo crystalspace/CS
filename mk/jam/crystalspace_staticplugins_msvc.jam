@@ -1,0 +1,14 @@
+# This is an example on how to include the MSVC static plugins information
+# for external projects.
+# The information itself is split across multiple files, one for each
+# supported version of MSVC; the files for the desired MSVC versions must
+# be included (usually all).
+
+# The inclusions below are of examplary nature and would only work within
+# the source tree of CS. For an external project you could either directly
+# refer to the files inside CS or a copy in your project's sources; either
+# way, the include statements below would obviously have to adjusted 
+# appropriately.
+include $(TOP)/mk/msvc/crystalspace_staticplugins_msvc8.jam ;
+include $(TOP)/mk/msvc/crystalspace_staticplugins_msvc9.jam ;
+include $(TOP)/mk/msvc/crystalspace_staticplugins_msvc10.jam ;

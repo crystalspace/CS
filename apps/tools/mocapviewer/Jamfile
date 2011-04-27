@@ -1,0 +1,6 @@
+SubDir TOP apps tools mocapviewer ;
+
+Description csmocapviewer : "Crystal Space viewer of motion captured data" ;
+Application csmocapviewer : [ Wildcard *.cpp *.h ] ;
+LinkWith csmocapviewer : crystalspace ;
+FileListEntryApplications csmocapviewer : app-demo ;

@@ -1,0 +1,185 @@
+<library>
+    <textures>
+        <texture name="blue.gif">
+            <file>/lib/stdtex/blue.jpg</file>
+        </texture>
+        <texture name="green.gif">
+            <file>/lib/stdtex/green.jpg</file>
+        </texture>
+        <texture name="misty.gif">
+            <file>/lib/stdtex/misty.jpg</file>
+        </texture>
+        <texture name="red.gif">
+            <file>/lib/stdtex/red.jpg</file>
+        </texture>
+        <texture name="yellow.gif">
+            <file>/lib/stdtex/yellow.jpg</file>
+        </texture>
+    </textures>
+    <materials>
+        <material name="blue">
+            <texture>blue.gif</texture>
+        </material>
+        <material name="green">
+            <texture>green.gif</texture>
+        </material>
+        <material name="misty">
+            <texture>misty.gif</texture>
+        </material>
+        <material name="red">
+            <texture>red.gif</texture>
+        </material>
+        <material name="yellow">
+            <texture>yellow.gif</texture>
+        </material>
+    </materials>
+    <meshfact name="factory_box_walls_transp">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <numvt>24</numvt>
+            <v x="-10" y="15" z="45" u="0" v="0" />
+            <v x="-7" y="15" z="45" u="0.6" v="0" />
+            <v x="-7" y="15" z="50" u="0.6" v="1" />
+            <v x="-10" y="15" z="50" u="0" v="1" />
+            <v x="-10" y="15" z="50" u="0" v="0" />
+            <v x="-7" y="15" z="50" u="0.6" v="0" />
+            <v x="-7" y="10" z="50" u="0.6" v="1" />
+            <v x="-10" y="10" z="50" u="0" v="1" />
+            <v x="-7" y="15" z="50" u="0" v="0" />
+            <v x="-7" y="15" z="45" u="1" v="0" />
+            <v x="-7" y="10" z="45" u="1" v="1" />
+            <v x="-7" y="10" z="50" u="0" v="1" />
+            <v x="-10" y="15" z="45" u="0" v="0" />
+            <v x="-10" y="15" z="50" u="1" v="0" />
+            <v x="-10" y="10" z="50" u="1" v="1" />
+            <v x="-10" y="10" z="45" u="0" v="1" />
+            <v x="-10" y="10" z="50" u="0" v="0" />
+            <v x="-7" y="10" z="50" u="0.6" v="0" />
+            <v x="-7" y="10" z="45" u="0.6" v="1" />
+            <v x="-10" y="10" z="45" u="0" v="1" />
+            <v x="-7" y="15" z="45" u="0" v="0" />
+            <v x="-10" y="15" z="45" u="0.6" v="0" />
+            <v x="-10" y="10" z="45" u="0.6" v="1" />
+            <v x="-7" y="10" z="45" u="0" v="1" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="0" z="-1" />
+            <n x="0" y="0" z="-1" />
+            <n x="0" y="0" z="-1" />
+            <n x="0" y="0" z="-1" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <submesh name="blue_1">
+                <material>blue</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="4" />
+                    <e c0="5" />
+                    <e c0="6" />
+                    <e c0="4" />
+                    <e c0="6" />
+                    <e c0="7" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="green_1">
+                <material>green</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                    <e c0="0" />
+                    <e c0="2" />
+                    <e c0="3" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="misty_0">
+                <material>misty</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="8" />
+                    <e c0="9" />
+                    <e c0="10" />
+                    <e c0="8" />
+                    <e c0="10" />
+                    <e c0="11" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="misty_1">
+                <material>misty</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="12" />
+                    <e c0="13" />
+                    <e c0="14" />
+                    <e c0="12" />
+                    <e c0="14" />
+                    <e c0="15" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="red_0">
+                <material>red</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="16" />
+                    <e c0="17" />
+                    <e c0="18" />
+                    <e c0="16" />
+                    <e c0="18" />
+                    <e c0="19" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="yellow_0">
+                <material>yellow</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="20" />
+                    <e c0="21" />
+                    <e c0="22" />
+                    <e c0="20" />
+                    <e c0="22" />
+                    <e c0="23" />
+                </indexbuffer>
+            </submesh>
+            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                <e c0="0.03125" c1="0.59375" />
+                <e c0="0.0625" c1="0.59375" />
+                <e c0="0.0625" c1="0.625" />
+                <e c0="0.03125" c1="0.625" />
+                <e c0="0.03125" c1="0.71875" />
+                <e c0="0.0625" c1="0.71875" />
+                <e c0="0.0625" c1="0.75" />
+                <e c0="0.03125" c1="0.75" />
+                <e c0="0.03125" c1="0.03125" />
+                <e c0="0.5" c1="0.03125" />
+                <e c0="0.5" c1="0.5" />
+                <e c0="0.03125" c1="0.5" />
+                <e c0="0.03125" c1="0.03125" />
+                <e c0="0.5" c1="0.03125" />
+                <e c0="0.5" c1="0.5" />
+                <e c0="0.03125" c1="0.5" />
+                <e c0="0.03125" c1="0.59375" />
+                <e c0="0.0625" c1="0.59375" />
+                <e c0="0.0625" c1="0.625" />
+                <e c0="0.03125" c1="0.625" />
+                <e c0="0.03125" c1="0.71875" />
+                <e c0="0.0625" c1="0.71875" />
+                <e c0="0.0625" c1="0.75" />
+                <e c0="0.03125" c1="0.75" />
+            </renderbuffer>
+        </params>
+    </meshfact>
+</library>

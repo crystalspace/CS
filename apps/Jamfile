@@ -1,0 +1,8 @@
+SubDir TOP apps ;
+
+SubInclude TOP apps demos ;
+SubInclude TOP apps import ;
+SubInclude TOP apps tests ;
+SubInclude TOP apps tools ;
+SubInclude TOP apps tutorial ;
+SubInclude TOP apps walktest ;

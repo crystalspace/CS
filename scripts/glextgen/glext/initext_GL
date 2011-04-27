@@ -1,0 +1,28 @@
+  /** Initialize <a href="%Name:url%">%Name%</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_%Name%. */
+  void Init%Name% ()
+  {
+    if (tested_CS_%Name%) return;
+    if (!extstrGL) return;
+    tested_CS_%Name% = true;
+    const char* ext = "%Name%";
+%Depcheck%
+    char cfgkey[%Cfglen% + %Namelen% + 1];
+    sprintf (cfgkey, "%Cfgprefix%%%s", ext);
+    
+%Extcheck%
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_%Name%;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+%FunctionsInit%
+      EXTMGR_REPORT_INIT_RESULT("GL", %Name%)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
+    }
+  }
+  

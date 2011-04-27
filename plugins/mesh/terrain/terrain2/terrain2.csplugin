@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!-- terrain2.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.terrain2.bruteblockrenderer</name>
+        <implementation>csTerrainBruteBlockRenderer</implementation>
+        <description>Bruteblock terrain renderer</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.object.terrain2.terraformerdatafeeder</name>
+        <implementation>csTerrainTerraFormerDataFeeder</implementation>
+        <description>Terraformer-based data feeder</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.object.terrain2.threadeddatafeeder</name>
+        <implementation>csTerrainThreadedDataFeeder</implementation>
+        <description>Terrain multithreaded data feeder</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.object.terrain2.simpledatafeeder</name>
+        <implementation>csTerrainSimpleDataFeeder</implementation>
+        <description>Terrain simple data feeder</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.object.terrain2.modifiabledatafeeder</name>
+        <implementation>csTerrainModifiableDataFeeder</implementation>
+        <description>Terrain modifiable data feeder</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.object.terrain2</name>
+        <implementation>csTerrainMeshObjectType</implementation>
+        <description>Terrain mesh type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

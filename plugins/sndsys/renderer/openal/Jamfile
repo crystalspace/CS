@@ -1,0 +1,10 @@
+SubDir TOP plugins sndsys renderer openal ;
+
+if $(OPENAL.AVAILABLE) = "yes"
+{
+Plugin sndsysopenal : [ Wildcard *.cpp *.h ] ;
+Description sndsysopenal : "OpenAL sound renderer for sndsys" ;
+LinkWith sndsysopenal : crystalspace ;
+CompileGroups sndsysopenal : sndsys ;
+RelayLibs sndsysopenal : OPENAL : openal ;
+}

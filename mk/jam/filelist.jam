@@ -1,0 +1,140 @@
+#============================================================================
+# Rules for file list creation
+# Copyright (C)2008 by Frank Richter
+#
+#    This library is free software; you can redistribute it and/or modify it
+#    under the terms of the GNU Library General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or (at your
+#    option) any later version.
+#
+#    This library is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library General Public
+#    License for more details.
+#
+#    You should have received a copy of the GNU Library General Public License
+#    along with this library; if not, write to the Free Software Foundation,
+#    Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#============================================================================
+
+##  ListFile list
+##    Returns the output file name for a certain file list.
+rule ListFile
+{
+    listfile = $(1).txt ;
+    local dir = [ ConcatDirs $(BUILDTOP) out lists ] ;
+    MakeLocate $(listfile) : $(dir) ;
+    SEARCH on $(listfile) = $(dir) ;
+    Clean filelistsclean : $(listfile) ;
+    Depends clean : filelistsclean ;
+    return $(listfile) ;
+}
+
+##  DoFileListEntries sourcenames : directory : list
+##    Creates a new target adding the given sources named by
+##    `sourcenames' to the file list `list`.  `directory' is a list of 
+##    directory components indicating the directory part for entries of
+##    `sourcenames' written to the file list - it is relative to a file list
+##    dependent directory.  The DoFileListEntries rule returns the names of
+##    the file list targets.
+rule DoFileListEntries
+{
+    local targets i ;
+
+    for i in $(1)
+    {
+        targets += [ DoFileListEntry $(i) : $(2) : $(i) : $(3) ] ;
+    }
+
+    return $(targets) ;
+}
+
+##  DoFileListEntry sourcename : directory : destname : list
+##    Creates a new target adding the given source named by
+##    `sourcename' to the file list `list`.  `directory' is a list of 
+##    directory components indicating the directory part for `sourcename'
+##    written to the file list - it is relative to a file list dependent
+##    directory.  The DoFileListEntries rule returns the names of the file
+##    list targets.
+rule DoFileListEntry
+{
+    local target destdir srcdir listfile ;
+    dir = [ ConcatDirs $(2) ] ;
+    target = $(1:G=filelist!$(SUBDIR:J=!)) ;
+    
+    listfile = [ ListFile $(4) ] ;
+    
+    SEARCH on $(target) = [ on $(1) GetVar SEARCH ] ;
+    NoCare $(target) ;
+    WriteFileListEntry $(listfile) : $(target) : $(dir) : $(1) ;
+    Depends $(listfile) : $(target) ;
+    
+    return $(listfile) ;
+}
+
+##  FileListEntriesData sourcenames : directories : list
+##    Add plain files to a file list.
+rule FileListEntriesData
+{
+    SEARCH on $(<) = $(SUBDIR) ;
+    Depends filelists : [ DoFileListEntries $(<) : $(2) : $(3) ] ;
+}
+
+##  FileListEntryApplications app : list
+rule FileListEntryApplications
+{
+    $($(1)_TARGET)_FILELIST = $(2) ;
+    Depends filelists :
+      [ SystemDoFileListEntryApplications $(1) : $(2) ] ;
+}
+
+##  FileListEntryPlugin plugin : list
+rule FileListEntryPlugin
+{
+    $($(1)_TARGET)_FILELIST = $(2) ;
+    Depends filelists :
+      [ SystemDoFileListEntryPlugin $(1) : $(2) ] ;
+}
+
+#----------------------------------------------------------------------------
+
+rule WriteFileListEntry
+{
+  local listfile = $(1) ;
+  local srcfile = $(2) ;
+  
+  local destname = $(4:D=$(3):G=) ;
+  if $(destname) = ""
+  {
+    destname = $(4:G=) ;
+  }
+  
+  local listfile_gristed = $(listfile:G=$(destname)) ;
+  MakeLocate $(listfile_gristed) : [ on $(listfile) GetVar LOCATE ] ;
+  
+  DESTNAME on $(listfile_gristed) = $(destname) ;
+  LOCATE on $(srcfile) = [ on $(srcfile) GetVar SEARCH ] ;
+  if $($(listfile)_CREATED) != "yes"
+  {
+    WriteFileListEntry1 $(listfile_gristed) : $(srcfile) ;
+    $(listfile)_CREATED = yes ;
+  }
+  else
+  {
+    WriteFileListEntry2 $(listfile_gristed) : $(srcfile) ;
+  }
+  Depends $(listfile) : $(listfile_gristed) ;
+}
+
+actions WriteFileListEntry1
+{
+  echo "$(>):$(DESTNAME)" > $(<)
+}
+
+actions WriteFileListEntry2
+{
+  echo "$(>):$(DESTNAME)" >> $(<)
+}
+
+Help filelists : "Generate file lists for packages" ;

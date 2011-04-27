@@ -1,0 +1,134 @@
+#==============================================================================
+# MSVC-specific customizations for msvcgen
+# Copyright (C) 2004 by Eric Sunshine <sunshine@sunshineco.com>
+#
+#    This library is free software; you can redistribute it and/or modify it
+#    under the terms of the GNU Library General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or (at your
+#    option) any later version.
+#
+#    This library is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library General Public
+#    License for more details.
+#
+#    You should have received a copy of the GNU Library General Public License
+#    along with this library; if not, write to the Free Software Foundation,
+#    Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#==============================================================================
+
+GREP ?= grep ;
+
+SubDir TOP mk msvcgen ;
+
+InstallData [ Wildcard *.cslib *.jam *.tlib ] : build msvcgen ;
+
+MsvcGenSubDir TOP mk msvc : common ;
+MsvcGenSubDir TOP mk msvc8 : 8 ;
+MsvcGenSubDir TOP mk msvc9 : 9 ;
+MsvcGenSubDir TOP mk msvc10 : 10 ;
+MsvcGenTemplateDir TOP mk msvcgen ;
+
+# We need to customize the list of build configurations.
+MsvcGenVariable customize : custom.cslib custom2.cslib ;
+
+# Set up the workspaces we want msvcgen to synthesize.
+include [ ConcatDirs $(SUBDIR) workspaces.jam ] ;
+
+# Crystal Space-specific interpolation values.
+# cs-win32libs >= 1.9_004 include dir
+MsvcIncDirs : [ ConcatDirs .. .. winlibs x86 "include" ] : : x86 ;
+MsvcIncDirs : [ ConcatDirs .. .. winlibs x64 "include" ] : : x64 ;
+# include dir for previous versions
+MsvcIncDirs : [ ConcatDirs .. .. win32libs "include" ] ;
+# cs-win32libs >= 1.9_004 lib dir
+MsvcLibDirs : [ ConcatDirs .. .. winlibs x86 lib ] : : x86 ;
+MsvcLibDirs : [ ConcatDirs .. .. winlibs x64 lib ] : : x64 ;
+# lib dir for previous versions
+MsvcLibDirs : [ ConcatDirs .. .. win32libs lib ] ;
+
+#------------------------------------------------------------------------------
+# The msvcgen process needs to be presented with configuration information
+# suitable for Windows regardless of which platform is actually invoking
+# msvcgen.  This information comes from the static CS/mk/msvcgen/config.jam
+# file.  It controls which modules will be seen by msvcgen, and provides
+# additional compiler and linker flags when appropriate.
+#
+# On the other hand, local tools, such as Perl, are required for the actual
+# invocation of msvcgen, thus we need to use our own local configuration,
+# $(BUILDTOP)/Jamconfig; yet this configuration may cause the wrong set of
+# progjects to be built if it is specific to a platform other than Windows.
+# For instance, on MacOS/X, a local Jamconfig will cause msvcgen to generate a
+# project file for the CoreAudio plugin, which is specific to Macintosh.
+#
+# To work around this problem, we compose a special-purpose Jamconfig.msvcgen,
+# which is a combination of CS/mk/msvcgen/config.jam and the module-agnostic
+# information from $(BUILDTOP)/Jamconfig; that is, we extract information about
+# local tools, such as Perl, but omit information about modules relevant to the
+# local platform, such as CoreAudio.  The resulting Jamconfig.msvcgen is
+# essentially a cross-building configuration, suitable for generating project
+# files for Windows from the local platform (which might not be Windows).  We
+# create Jamconfig.msvcgen only when needed by making it a dependency of the
+# top-level msvcgen targets, and we instruct Jamrules to utilize this custom
+# configuration file by overriding JAMCONFIG.
+#------------------------------------------------------------------------------
+
+## MsvcJamconfig customconfig : jamconfig : jamconfigdir : boilerplate :
+##     boilerplatedir [ : rejects ]
+##   Create a hybrid Jam configuration file (as discussed above) by combining
+##   the 'boilerplate' file (which should contain MSVC-specific configuration)
+##   with a filtered version of this platform's Jamconfig file, 'jamconfig'
+##   (which resides in 'jamconfigdir').  The generated hybrid configuration
+##   file, 'customconfig' will be placed in 'jamconfigdir'.  'rejects' is a
+##   list of grep-style expressions which will filter out unwanted content from
+##   'jamconfig', leaving only the content which is required for actually
+##   running msvcgen.  (These are not extended grep-style patterns.  If you
+##   need those, then you will also need to redefine $(GREP) as "egrep" or
+##   "grep -E", if supported by the platform.)  'customconfig' will be made a
+##   dependency of each of the 'msvcgen' targets to ensure that it is created
+##   in time for th actual project synthesis run; and will be cleaned by
+##   'msvcclean', 'clean', and 'distclean'.
+rule MsvcJamconfig
+{
+  local target = $(1) ;
+  local source = $(2) ;
+  local sourcedir = $(3) ;
+  local boilerplate = $(4) ;
+  local boilerdir = $(5) ;
+  local rejects = " | $(GREP) -v '$(6)' " ;
+
+  target = $(target:G=msvcgenconfig) ;
+  source = $(source:G=msvcgenconfig) ;
+  boilerplate = $(boilerplate:G=msvcgenconfig) ;
+
+  SEARCH on $(source) = $(sourcedir) ;
+  SEARCH on $(boilerplate) = $(boilerdir) ;
+  BOILERPLATE on $(target) = $(boilerplate) ;
+  REJECTS on $(target) = $(rejects) ;
+
+  MakeLocate $(target) : $(sourcedir) ;
+  Always $(target) ;
+  Depends $(target) : $(source) $(boilerplate) ;
+  MsvcJamconfig1 $(target) : $(source) ;
+  Clean msvcclean : $(target) ;
+
+  local i ;
+  for i in $(MSVCGEN_TARGETS)
+  {
+    Depends $(i) : $(target) ;
+  }
+
+  local fullpath = [ ConcatDirs $(sourcedir) $(target:G=) ] ;
+  MSVCGEN_JAMOPTIONS += -sJAMCONFIG='$(fullpath)' ;
+  return $(fullpath) ;
+}
+
+actions MsvcJamconfig1 bind BOILERPLATE
+{
+  cat $(BOILERPLATE) > $(<)
+  cat $(>) $(REJECTS) >> $(<)
+}
+
+MsvcJamconfig Jamconfig.msvcgen : $(JAMCONFIG:BS) : $(JAMCONFIG:D) :
+    config.jam : $(SUBDIR) : AVAILABLE CFLAGS C++FLAGS LFLAGS ;

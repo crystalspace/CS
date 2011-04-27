@@ -1,0 +1,3 @@
+    SetupWGLextStr (hDC);
+    if (!extstrWGL) return;
+    CS_%Name% = CheckExtension (extstrWGL, ext);

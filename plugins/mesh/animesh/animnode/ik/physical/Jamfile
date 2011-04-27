@@ -1,0 +1,6 @@
+SubDir TOP plugins mesh animesh animnode ik physical ;
+
+Description ikphysical : "Physics based implementation of the inverse kinematics animation node" ;
+Plugin ikphysical : [ Wildcard *.cpp *.h ] ;
+LinkWith ikphysical : crystalspace ;
+CompileGroups ikphysical : meshes ;

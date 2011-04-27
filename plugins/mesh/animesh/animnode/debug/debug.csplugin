@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- debug.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.animesh.animnode.debug</name>
+        <implementation>DebugNodeManager</implementation>
+        <description>Crystal Space debug animation nodes of an animated mesh</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -1,0 +1,8 @@
+SubDir TOP plugins video render3d shader shaderplugins vproc_std ;
+
+Description vproc_std : "Standard vertex preprocessor" ;
+Plugin vproc_std : [ Wildcard *.cpp *.h ] ;
+Includes vproc_program.h : $(SUBDIR)/vproc_program.tok ;
+MsvcExtraFile vproc_std : $(SUBDIR)/vproc_program.tok ;
+LinkWith vproc_std : crystalspace ;
+CompileGroups vproc_std : shaders renderers renderall openglrenderer ;

@@ -1,0 +1,70 @@
+if ! $(BUILDTOP)
+{
+BUILDTOP = . ;
+}
+
+# Include configuration.  The value of JAMCONFIG may be overridden by targets
+# which recursively invoke 'jam' with a custom configuration file.  For
+# instance, this is done with the 'msvcgen' target (see CS/mk/msvcgen/Jamfile).
+JAMCONFIG ?= $(BUILDTOP)/Jamconfig ;
+include $(JAMCONFIG) ;
+
+# When a shared lib is built a macro is defined to signify that; make it CS for CS.
+LIBRARY_BUILD_DEFINE_PREFIX = CS ;
+
+# CFLAGS.  Don't use FDefines here since Boost Jam doesn't have it, and we have
+# not yet included mk/jam/build.jam which provides an emulation layer for
+# Boost.  We can not include build.jam earlier because these flags need to be
+# defined before build.jam is included.  :-(
+COMPILER.CFLAGS.debug += -DCS_DEBUG ;
+COMPILER.CFLAGS.profile += -g3 -pg ;
+COMPILER.LFLAGS.profile += -g3 -pg ;
+
+# If the source is an SVN checkout emit an preprocessor macro with the build
+# number derived from the SVN rev
+if "$(SOURCE_IS_SVN)" = "yes"
+{
+  COMPILER.CFLAGS += "-DCS_VERSION_RCSREV=\$\($(TOP)/bin/rcsrev print\)" ;
+}
+# Some .rc customizations
+WIN32RC.EXTRAHEADER = "#include \"csplatform.h\"
+#include \"csver.h\"" ;
+WIN32RC.VERSIONNUMBER = "CS_VERSION_NUM_MAJOR,CS_VERSION_NUM_MINOR,CS_VERSION_NUM_RELEASE,CS_VERSION_NUM_BUILD" ;
+WIN32RC.VERSIONSTR = "CS_VERSION" ;
+
+# Include CS build rules.
+include $(TOP)/mk/jam/build.jam ;
+
+# Some CS-specific customizations of vars
+PACKAGE_VERSION_SIGNIFICANT = "$(PACKAGE_VERSION_LIST[1]).$(PACKAGE_VERSION_LIST[2])" ;
+APPLICATION_SUFFIX = $(PACKAGE_VERSION_SIGNIFICANT) ;
+appdatadir = [ ConcatDirs $(datadir) $(PACKAGE_NAME)-$(PACKAGE_VERSION_SIGNIFICANT) ] ;
+appconfdir = [ ConcatDirs $(sysconfdir) $(PACKAGE_NAME)-$(PACKAGE_VERSION_SIGNIFICANT) ] ;
+appincdir = [ ConcatDirs $(includedir) $(PACKAGE_NAME)-$(PACKAGE_VERSION_SIGNIFICANT) ] ;
+plugindir = [ ConcatDirs $(libdir) $(PACKAGE_NAME)-$(PACKAGE_VERSION_SIGNIFICANT) ] ;
+
+# Set up default application icon.
+ApplicationIconDefault win32 : gui : cs1.ico : $(TOP) libs csutil win32 ;
+ApplicationIconDefault macosx : gui : appicon.icns :
+  $(TOP) libs csutil macosx ;
+
+# Unit-testing boilerplate: The code we want inserted into each test case and
+# the main driver program.
+UNITTEST_BOILERPLATE_TEST_PRE = "
+#include \"cssysdef.h\"
+#include \"csutil/scf.h\"
+" ;
+UNITTEST_BOILERPLATE_MAIN_PRE = $(UNITTEST_BOILERPLATE_TEST_PRE) "
+CS_IMPLEMENT_APPLICATION
+" ;
+
+# Set up a property which clients can query to determine if the build directory
+# differs from source directory.  This allows clients to perform conditional
+# actions based upon this knowledge.  We safely detect if the two directories
+# differ by checking if 'cssysdef.h' is present in $(BUILDTOP)/include.  If it
+# is not, then the directories differ.
+buildheaders = [ GLOB [ ConcatDirs $(BUILDTOP) include ] : *.h ] ;
+if ! [ IsElem cssysdef.h : $(buildheaders:BS) ]
+{
+  SetProperty build : standalone ;
+}

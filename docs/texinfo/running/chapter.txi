@@ -1,0 +1,18 @@
+@c -*-texinfo-*-
+@node Running The Demos, Using Crystal Space, Building, Top
+@chapter Running The Demos
+@cindex Running The Demos
+
+This chapter describes the demo, tutorial and test applications which are
+bundled with Crystal Space.  These applications can often serve as good
+demonstrations of how Crystal Spaces features can be utilized in your own
+programs and also serve as good examples of how to actually program with
+Crystal Space.
+
+@menu
+* Walktest:: Walktest, the Basic Test Application
+* Applications Overview:: Applications Overview
+@end menu
+
+@imports{running,walktest.txi}
+@imports{running,overview.txi}

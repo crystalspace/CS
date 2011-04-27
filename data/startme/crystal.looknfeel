@@ -1,0 +1,361 @@
+<?xml version="1.0" ?>
+<Falagard>
+  
+   <!--
+    ***************************************************
+        crystal/Icon
+    ***************************************************
+    -->
+    <WidgetLook name="crystal/Icon">
+      <PropertyLinkDefinition name="Image" widget="__auto_image__" targetProperty="Image" />
+      <Child type="ice/StaticImage" nameSuffix="__auto_image__">
+        <Property name="FrameEnabled" value="False" />
+        <Property name="BackgroundEnabled" value="False" />
+        <Property name="MousePassThroughEnabled" value="True" />
+        <Area>
+          <Dim type="LeftEdge" >
+            <AbsoluteDim value="66">
+              <DimOperator op="Multiply">
+              <WidgetDim widget="__auto_frame__" dimension="Width">
+                <DimOperator op="Divide">
+                  <ImageDim imageset="crystal" image="frame" dimension="Width">
+                  </ImageDim>
+                </DimOperator>
+              </WidgetDim>
+              </DimOperator>
+            </AbsoluteDim>
+          </Dim>
+          <Dim type="TopEdge" >
+            <AbsoluteDim value="66">
+              <DimOperator op="Multiply">
+                <WidgetDim widget="__auto_frame__" dimension="Height">
+                  <DimOperator op="Divide">
+                    <ImageDim imageset="crystal" image="frame" dimension="Height">
+                    </ImageDim>
+                  </DimOperator>
+                </WidgetDim>
+              </DimOperator>
+            </AbsoluteDim>
+          </Dim>
+          
+          <Dim type="Width" >
+            <UnifiedDim scale="1" offset="0" type="Width">
+              <DimOperator op="Subtract">
+                <AbsoluteDim value="130">
+                  <DimOperator op="Multiply">
+                    <WidgetDim widget="__auto_frame__" dimension="Width">
+                      <DimOperator op="Divide">
+                        <ImageDim imageset="crystal" image="frame" dimension="Width">
+                        </ImageDim>
+                      </DimOperator>
+                    </WidgetDim>
+                  </DimOperator>
+                </AbsoluteDim>
+              </DimOperator>
+            </UnifiedDim>
+          </Dim>
+          <Dim type="Height" >
+            <UnifiedDim scale="1" offset="0" type="Height">
+              <DimOperator op="Subtract">
+                <AbsoluteDim value="130">
+                  <DimOperator op="Multiply">
+                    <WidgetDim widget="__auto_frame__" dimension="Height">
+                      <DimOperator op="Divide">
+                        <ImageDim imageset="crystal" image="frame" dimension="Height">
+                        </ImageDim>
+                      </DimOperator>
+                    </WidgetDim>
+                  </DimOperator>
+                </AbsoluteDim>
+              </DimOperator>
+            </UnifiedDim>
+          </Dim>
+        </Area>
+      </Child>
+      <Child type="ice/StaticImage" nameSuffix="__auto_frame__">
+        <Property name="FrameEnabled" value="False" />
+        <Property name="BackgroundEnabled" value="False" />
+        <Property name="Image" value="set:crystal image:frame" />
+        <Property name="MousePassThroughEnabled" value="True" />
+        <Area>
+          <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+          <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+          <Dim type="Width" ><UnifiedDim scale="1" offset="0" type="Width" /></Dim>
+          <Dim type="Height" ><UnifiedDim scale="1" offset="0" type="Height" /></Dim>
+        </Area>
+      </Child>
+      <ImagerySection name="normal">
+      </ImagerySection>
+      <StateImagery name="Enabled">
+        <Layer>
+          <Section section="normal" />
+        </Layer>
+      </StateImagery>
+      <StateImagery name="Disabled">
+        <Layer>
+          <Section section="normal">
+            <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+          </Section>
+        </Layer>
+      </StateImagery>
+    </WidgetLook>
+    
+    <!--
+    ***************************************************
+        crystal/StaticShared
+        (Shared imagery components for static widgets)
+    ***************************************************
+    -->
+    <WidgetLook name="crystal/StaticShared">
+        <ImagerySection name="frame">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                </Area>
+                <Image type="TopLeftCorner" imageset="crystal" image="StaticTopLeft" />
+                <Image type="TopRightCorner" imageset="crystal" image="StaticTopRight" />
+                <Image type="BottomLeftCorner" imageset="crystal" image="StaticBottomLeft" />
+                <Image type="BottomRightCorner" imageset="crystal" image="StaticBottomRight" />
+                <Image type="LeftEdge" imageset="crystal" image="StaticLeft" />
+                <Image type="RightEdge" imageset="crystal" image="StaticRight" />
+                <Image type="TopEdge" imageset="crystal" image="StaticTop" />
+                <Image type="BottomEdge" imageset="crystal" image="StaticBottom" />
+                <ColourRectProperty name="FrameColours" />
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="background">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><ImageDim imageset="crystal" image="StaticLeft" dimension="Width" /></Dim>
+                    <Dim type="TopEdge" ><ImageDim imageset="crystal" image="StaticTop" dimension="Height" /></Dim>
+                    <Dim type="RightEdge" >
+                        <UnifiedDim scale="1" type="RightEdge">
+                            <DimOperator op="Subtract">
+                                <ImageDim imageset="crystal" image="StaticRight" dimension="Width" />
+                            </DimOperator>
+                        </UnifiedDim>
+                    </Dim>
+                    <Dim type="BottomEdge" >
+                        <UnifiedDim scale="1" type="BottomEdge">
+                            <DimOperator op="Subtract">
+                                <ImageDim imageset="crystal" image="StaticBottom" dimension="Height" />
+                            </DimOperator>
+                        </UnifiedDim>
+                    </Dim>
+                </Area>
+                <Image imageset="crystal" image="StaticBackdrop" />
+                <!--<ColourRectProperty name="BackgroundColours" />-->
+                <Colours topLeft="FFFFFFFF" topRight="FFFFFFFF" bottomLeft="FFFFFFFF" bottomRight="FFFFFFFF" />
+                <VertFormat type="Stretched" />
+                <HorzFormat type="Stretched" />
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="background_noframe">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image imageset="crystal" image="StaticBackdrop" />
+                <!--<ColourRectProperty name="BackgroundColours" />-->
+                <Colours topLeft="FFFFFFFF" topRight="FFFFFFFF" bottomLeft="FFFFFFFF" bottomRight="FFFFFFFF" />
+                <VertFormat type="Stretched" />
+                <HorzFormat type="Stretched" />
+            </ImageryComponent>
+        </ImagerySection>
+    </WidgetLook>
+    
+    <!--
+    ***************************************************
+        crystal/StaticImage
+    ***************************************************
+    -->
+    <WidgetLook name="crystal/StaticImage">
+		<PropertyDefinition name="ImageColours" initialValue="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" redrawOnWrite="true" />
+		<PropertyDefinition name="FrameColours" initialValue="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" redrawOnWrite="true" />
+		<PropertyDefinition name="BackgroundColours" initialValue="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" redrawOnWrite="true" />
+        <PropertyDefinition name="VertFormatting" initialValue="Stretched" redrawOnWrite="true" />
+        <PropertyDefinition name="HorzFormatting" initialValue="Stretched" redrawOnWrite="true" />
+        <Property name="BackgroundEnabled" value="True" />
+        <Property name="FrameEnabled" value="True" />
+        <ImagerySection name="image_withframe">
+            <ImageryComponent>
+                <Area>
+					<Dim type="LeftEdge" ><ImageDim imageset="crystal" image="StaticLeft" dimension="Width" /></Dim>
+					<Dim type="TopEdge" ><ImageDim imageset="crystal" image="StaticTop" dimension="Height" /></Dim>
+					<Dim type="RightEdge" >
+						<UnifiedDim scale="1" type="RightEdge">
+							<DimOperator op="Subtract">
+								<ImageDim imageset="crystal" image="StaticRight" dimension="Width" />
+							</DimOperator>
+						</UnifiedDim>
+					</Dim>
+					<Dim type="BottomEdge" >
+						<UnifiedDim scale="1" type="BottomEdge">
+							<DimOperator op="Subtract">
+								<ImageDim imageset="crystal" image="StaticBottom" dimension="Height" />
+							</DimOperator>
+						</UnifiedDim>
+					</Dim>
+				</Area>
+                <ImageProperty name="Image" />
+                <ColourRectProperty name="ImageColours" />
+                <VertFormatProperty name="VertFormatting" />
+                <HorzFormatProperty name="HorzFormatting" />
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="image_noframe">
+            <ImageryComponent>
+                <Area>
+					<Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+					<Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+					<Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+					<Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+				</Area>
+                <ImageProperty name="Image" />
+                <ColourRectProperty name="ImageColours" />
+                <VertFormatProperty name="VertFormatting" />
+                <HorzFormatProperty name="HorzFormatting" />
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled" />
+        <StateImagery name="Disabled" />
+        <StateImagery name="EnabledFrame">
+            <Layer>
+                <Section look="crystal/StaticShared" section="frame" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledFrame">
+            <Layer>
+                <Section look="crystal/StaticShared" section="frame" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="WithFrameEnabledBackground">
+            <Layer>
+                <Section look="crystal/StaticShared" section="background" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="WithFrameDisabledBackground">
+            <Layer>
+                <Section look="crystal/StaticShared" section="background" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="NoFrameEnabledBackground">
+            <Layer>
+                <Section look="crystal/StaticShared" section="background_noframe" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="NoFrameDisabledBackground">
+            <Layer>
+                <Section look="crystal/StaticShared" section="background_noframe" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="WithFrameImage">
+            <Layer>
+                <Section section="image_withframe" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="NoFrameImage">
+            <Layer>
+                <Section section="image_noframe" />
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    
+    <!--
+    ***************************************************
+        crystal/StaticText
+    ***************************************************
+    -->
+    <WidgetLook name="crystal/StaticText">
+		<PropertyDefinition name="FrameColours" initialValue="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" redrawOnWrite="true" />
+		<PropertyDefinition name="BackgroundColours" initialValue="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" redrawOnWrite="true" />
+		<Property name="TextColours" value="tl:FF000000 tr:FF000000 bl:FF000000 br:FF000000" />
+        <Property name="FrameEnabled" value="True" />
+        <Property name="BackgroundEnabled" value="True" />
+        <NamedArea name="WithFrameTextRenderArea">
+            <Area>
+                <Dim type="LeftEdge" ><ImageDim imageset="crystal" image="StaticLeft" dimension="Width" /></Dim>
+                <Dim type="TopEdge" ><ImageDim imageset="crystal" image="StaticTop" dimension="Height" /></Dim>
+                <Dim type="RightEdge" >
+                    <UnifiedDim scale="1" type="RightEdge">
+                        <DimOperator op="Subtract">
+                            <ImageDim imageset="crystal" image="StaticRight" dimension="Width" />
+                        </DimOperator>
+                    </UnifiedDim>
+                </Dim>
+                <Dim type="BottomEdge" >
+                    <UnifiedDim scale="1" type="BottomEdge">
+                        <DimOperator op="Subtract">
+                            <ImageDim imageset="crystal" image="StaticBottom" dimension="Height" />
+                        </DimOperator>
+                    </UnifiedDim>
+                </Dim>
+            </Area>
+        </NamedArea>
+        <NamedArea name="NoFrameTextRenderArea">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="RightEdge" ><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                <Dim type="BottomEdge" ><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+            </Area>
+        </NamedArea>
+        <Child  type="ice/HorizontalScrollbar" nameSuffix="__auto_hscrollbar__">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="1" offset="-12" type="Width" /></Dim>
+                <Dim type="Height" ><AbsoluteDim value="12" /></Dim>
+            </Area>
+            <VertAlignment type="BottomAligned" />
+        </Child>
+        <Child  type="ice/VerticalScrollbar" nameSuffix="__auto_vscrollbar__">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="Width" ><AbsoluteDim value="12" /></Dim>
+                <Dim type="Height" ><UnifiedDim scale="1" offset="-12" type="Height" /></Dim>
+            </Area>
+            <HorzAlignment type="RightAligned" />
+        </Child>
+        <StateImagery name="Enabled" />
+        <StateImagery name="Disabled" />
+        <StateImagery name="EnabledFrame">
+            <Layer>
+                <Section look="crystal/StaticShared" section="frame" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledFrame">
+            <Layer>
+                <Section look="crystal/StaticShared" section="frame" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="WithFrameEnabledBackground">
+            <Layer>
+                <Section look="crystal/StaticShared" section="background" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="WithFrameDisabledBackground">
+            <Layer>
+                <Section look="crystal/StaticShared" section="background" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="NoFrameEnabledBackground">
+            <Layer>
+                <Section look="crystal/StaticShared" section="background_noframe" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="NoFrameDisabledBackground">
+            <Layer>
+                <Section look="crystal/StaticShared" section="background_noframe" />
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+    
+</Falagard>

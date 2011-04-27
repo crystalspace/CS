@@ -1,0 +1,19 @@
+@c -*-texinfo-*-
+@node Map Loader, Sound System, Animation, Using Crystal Space
+@section Loading Maps and Models
+@cindex map loader
+
+This section describes the map file parser and the plugins to
+load models.
+
+@menu
+* HOWTO Level Loading:: Loading a Level
+* XML Syntax Services:: @sc{xml} Syntax Services
+* Binary XML:: Binary @sc{xml}
+* Model Loading:: Loading @sc{3ds} and @sc{md2} Models
+@end menu
+
+@importss{usingcs,loader,levload.txi}
+@importss{usingcs,loader,services.txi}
+@importss{usingcs,loader,binload.txi}
+@importss{usingcs,loader,modelload.txi}

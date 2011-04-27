@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+  Copyright (C) 2007-2008 by Frank Richter
+	    (C) 2007 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<shader compiler="shaderweaver" name="foliage_tree_leaves" lights="2">
+  <alias name="position" file="/shader-snippets/foliage/position-leaves.xml" />
+  <alias name="surface" file="/shader-snippets/surface/surface-modulate-alpha_instance.xml" />
+  <alias name="lighting" file="/shader-snippets/lighting/lighting-ppl.xml" />
+  <alias name="ambient" file="/shader-snippets/lighting/ambient-simple.xml" />
+  <alias name="apply_alpha" file="/shader-snippets/surface/alpha-nochange.xml" />
+
+<technique priority="200" minlights="1">
+    <!-- 1 pass, 2 lights -->
+    <pass>
+      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
+	<!-- First pass: don't blend -->
+	<mixmode>
+	  <blendop src="one" dst="zero" />
+	  <alphatest>enable</alphatest>
+	</mixmode>
+      <?else?>
+	<!-- Later pass: blend with add -->
+	<mixmode>
+	  <blendop src="one" dst="one" />
+	  <alphatest>enable</alphatest>
+	</mixmode>
+      <?endif?>
+      
+      <!-- Combiner to use for this particular pass.
+	   Techniques Referenced snippets must only utilize the same 
+	   combiner with compatible options specified. If a technique
+	   doesn't meet that requirement, the next one is tried.
+	-->
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+
+      <!-- The meat of the shader is actually in a snippet. to be shared more
+	   easily across all techniques -->
+      <snippet id="shared" file="/shader-snippets/lighting/lighting_default-shared.xml" />
+      
+      <parameter id="lightOffset" type="int">0</parameter>
+      <parameter id="maxLights" type="int">2</parameter>
+      <parameter id="minLights" type="int">1</parameter>
+      <connection from="lightOffset" to="shared" />
+      <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
+    </pass>
+  </technique>
+  
+  <technique priority="100" minlights="1">
+    <!-- 2 passes, 1+1 lights -->
+    <pass minlights="1">
+      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
+	<!-- First pass: don't blend -->
+	<mixmode>
+	  <blendop src="one" dst="zero" />
+	  <alphatest>enable</alphatest>
+	</mixmode>
+      <?else?>
+	<!-- Later pass: blend with add -->
+	<mixmode>
+	  <blendop src="one" dst="one" />
+	  <alphatest>enable</alphatest>
+	</mixmode>
+      <?endif?>
+      
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      
+      <snippet id="shared" file="/shader-snippets/lighting/lighting_default-shared.xml" />
+      
+      <parameter id="lightOffset" type="int">0</parameter>
+      <parameter id="maxLights" type="int">1</parameter>
+      <parameter id="minLights" type="int">1</parameter>
+      <connection from="lightOffset" to="shared" />
+      <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
+    </pass>
+    <pass minlights="2">
+      <!-- Later pass: blend with add -->
+      <mixmode>
+	<blendop src="one" dst="one" />
+	<alphatest>enable</alphatest>
+      </mixmode>
+
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      
+      <alias name="ambient" file="/shader-snippets/lighting/ambient-null.xml" />
+      <snippet id="shared" file="/shader-snippets/lighting/lighting_default-shared.xml" />
+      
+      <parameter id="lightOffset" type="int">1</parameter>
+      <parameter id="maxLights" type="int">1</parameter>
+      <parameter id="minLights" type="int">2</parameter>
+      <connection from="lightOffset" to="shared" />
+      <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
+    </pass>
+  </technique>
+  
+  <!-- No lights (ie ambient only) technique -->
+  <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
+  <technique priority="50">
+    <pass>
+      <!-- First(only) pass: blend with alpha -->
+      <mixmode>
+	  <blendop src="one" dst="zero" />
+	<alphatest>enable</alphatest>
+      </mixmode>
+      
+      <!-- Combiner to use for this particular pass.
+	   Techniques Referenced snippets must only utilize the same 
+	   combiner with compatible options specified. If a technique
+	   doesn't meet that requirement, the next one is tried.
+	   -->
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      
+      <!-- The meat of the shader is actually in a snippet. to be shared more
+	   easily across all techniques -->
+      <snippet id="shared" file="/shader-snippets/lighting/lighting_default-shared.xml" />
+      
+      <parameter id="lightOffset" type="int">0</parameter>
+      <parameter id="maxLights" type="int">0</parameter>
+      <connection from="lightOffset" to="shared" />
+      <connection from="maxLights" to="shared" />
+    </pass>
+  </technique>
+  <?endif?>
+  
+  <!-- Last but not least, fall back to a fixed function version, for older
+       hardware. -->
+  <fallbackshader name="lighting_vproc_fixed" file="/shader/lighting/vproc_fixed.xml" />
+</shader>
+

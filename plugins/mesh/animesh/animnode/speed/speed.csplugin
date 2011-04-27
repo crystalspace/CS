@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- speed.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.animesh.animnode.speed</name>
+        <implementation>SpeedNodeManager</implementation>
+        <description>Crystal Space speed animation nodes of an animated mesh</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

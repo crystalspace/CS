@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<shader compiler="xmlshader" name="fur_cg" lights="1">
+    <shadervars>
+      <shadervar name="hdr scale" type="vector4">1,1,0,0</shadervar>
+    </shadervars>
+    <technique priority="200">
+		<pass>
+		  <buffer source="normal" destination="normal" />
+		  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+		  <buffer source="tangent" destination="texture coordinate 1" />
+		  <buffer source="binormal" destination="texture coordinate 2" />	  
+		  <vp plugin="glcg" file="/shader/fur/fur_cg.cgvp" />
+		  <texture name="diffuse map" destination="DiffuseMap" />
+		  <texture name="color map" destination="ColorMap" />
+		  <texture name="texture map" destination="TextureMap" />
+		  <fp plugin="glcg">
+			<cgfp>
+				<?Include /shader/fur/fur_cg.cgfp ?>
+		    </cgfp>
+		  </fp>		  
+		</pass>
+	<?if (vars."marschner")?>	
+		<pass>
+			<buffer source="tangent" destination="texture coordinate 0" />
+			<vp plugin="glcg" file="/shader/fur/marschner_lookup_cg.cgvp" />
+			<texture name="tex M" destination="lookup1fixed" />
+			<texture name="tex N" destination="lookup2fixed" />	  	  
+			<fp plugin="glcg">
+				<cgfp>
+					<?Include /shader/fur/marschner_lookup_cg.cgfp ?>
+				</cgfp>
+			</fp>		  
+		</pass>	
+	<?else?>
+	<?if (vars."kajiya kay")?>
+		<pass>
+		    <mixmode> <add/> </mixmode>
+			<buffer source="normal" destination="normal" />
+			<vp plugin="glcg" file="/shader/fur/kajiya_kay_cg.cgvp" />
+			<fp plugin="glcg">
+				<cgfp>
+					<?Include /shader/fur/kajiya_kay_cg.cgfp ?>
+				</cgfp>
+			</fp>			
+		</pass>	
+	<?endif?>
+	<?endif?>
+    </technique>
+</shader>

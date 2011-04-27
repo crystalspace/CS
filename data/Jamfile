@@ -1,0 +1,65 @@
+SubDir TOP data ;
+
+RUNTIME_DATA = 
+  castle-tex.zip
+  fancycon.zip
+  shadermgr-defaults.zip
+  standard.zip
+  ttf-dejavu.zip
+  unifont.zip
+  ;
+DEMO_DATA =
+  startme.zip
+  teapot.zip
+  kwartz.zip
+  water.zip
+  ;
+
+InstallData
+  $(DEMO_DATA)
+  $(RUNTIME_DATA)
+  : data ;
+
+FileListEntriesData $(DEMO_DATA) : : data-demo ;
+FileListEntriesData $(RUNTIME_DATA) : : data-runtime ;
+
+maps =
+  isomap
+  parallaxtest
+  particles
+  partsys
+  r3dtest
+  stenciltest
+  terrain
+  terrainf ;
+for map in $(maps)
+{
+  local files =
+    [ Wildcard $(map) : *.lib *.jpg *.png *.map *.tga *.dds *.spr world ] ;
+  local lmfiles =
+    [ Wildcard $(map) lightmaps : *.png ] ;
+  InstallData $(files) : data maps $(map) ;
+  InstallData $(lmfiles) : data maps $(map) lightmaps ;
+
+  FileListEntriesData $(files) : $(map) : data-demo-maps ;
+  FileListEntriesData $(lmfiles) : $(map) lightmaps : data-demo-maps ;
+}
+
+SubInclude TOP data castle ;
+SubInclude TOP data castle-staticlit ;
+SubInclude TOP data cegui ;
+SubInclude TOP data ceguitest ;
+SubInclude TOP data config-app ;
+SubInclude TOP data config-plugins ;
+SubInclude TOP data cube ;
+SubInclude TOP data flarge ;
+SubInclude TOP data frankie ;
+SubInclude TOP data hairtest ;
+SubInclude TOP data krystal ;
+SubInclude TOP data posteffects ;
+SubInclude TOP data renderlayers ;
+SubInclude TOP data shader ;
+SubInclude TOP data shader-old ;
+SubInclude TOP data shader-snippets ;
+SubInclude TOP data varia ;
+SubInclude TOP data viewmesh ;

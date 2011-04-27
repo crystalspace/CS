@@ -1,0 +1,14 @@
+SubDir TOP plugins video loader svg ;
+
+if $(VGVM.AVAILABLE) = "yes"
+{
+  Description svgimage : "SVG image loader" ;
+  
+  Plugin svgimage
+	  : [ Wildcard *.cpp *.h ]
+  ;
+  LinkWith svgimage : crystalspace ;
+  ExternalLibs svgimage : VGVM ;
+  
+  CompileGroups svgimage :  imageloaders ;
+}

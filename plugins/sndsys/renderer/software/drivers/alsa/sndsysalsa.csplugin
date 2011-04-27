@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- sndsysalsa.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.sndsys.software.driver.alsa</name>
+        <implementation>SndSysDriverALSA</implementation>
+        <description>Sound System ALSA Software Driver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
+

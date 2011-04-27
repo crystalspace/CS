@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <plugins>
+    <plugin name='skeletonfact'>crystalspace.mesh.loader.factory.skeleton</plugin>
+    <plugin name='animeshfact'>crystalspace.mesh.loader.factory.animesh</plugin>
+  </plugins>
+  <shaders>
+    <shader>
+      <file>/shader/fur/fur_cg.xml</file>
+    </shader>
+    <shader>
+      <file>/shader/surface/sub_surface_scattering_fake.xml</file>
+    </shader>		
+  </shaders>
+  <textures>
+    <texture name='krystal_body_h'>
+      <file>/lib/krystal/krystal_body_h.png</file>
+    </texture>
+    <texture name='krystal_body_nor'>
+      <file>/lib/krystal/krystal_body_nor.png</file>
+    </texture>
+    <texture name='krystal_body_spec'>
+      <file>/lib/krystal/krystal_body_spec.png</file>
+    </texture>
+    <texture name='krystal_skull'>
+      <file>/lib/krystal/krystal_skull.png</file>
+    </texture>
+    <texture name='krystal_skull_colormap'>
+      <file>/lib/krystal/krystal_skull_colormap.png</file>
+    </texture>	
+    <texture name='krystal_skull_texturemap'>
+      <file>/lib/krystal/krystal_skull_texturemap.png</file>
+    </texture>		
+  </textures>
+  <materials>
+    <material name='krystal_material1'>
+      <texture>krystal_body_h</texture>
+      <shadervar type="texture" name="tex normal">krystal_body_nor</shadervar>
+      <shadervar type="texture" name="tex specular">krystal_body_spec</shadervar>
+    </material>
+    <material name='krystal_material'>
+      <shader type='standard'>sub_surface_scattering_fake</shader>
+      <shadervar type="texture" name="mytextcoord">krystal_body_h</shadervar>
+    </material>	
+    <material name='skull_material'>
+      <texture>krystal_body_h</texture>
+      <shadervar type="texture" name="tex normal">krystal_body_nor</shadervar>
+      <shadervar type="texture" name="tex specular">krystal_body_spec</shadervar>
+      <!--texture>krystal_skull</texture>
+      <shader type='standard'>fur_cg</shader>
+      <shadervar type="int" name="diffuse type">10</shadervar>
+      <shadervar type="texture" name="color map">krystal_skull_colormap</shadervar>
+      <shadervar type="texture" name="texture map">krystal_skull_texturemap</shadervar-->
+    </material>
+  </materials>
+  <sounds/>
+  <library>/lib/krystal/skelkrystal_rig</library>
+  <!--library>/lib/krystal/skelkrystal_body</library>
+  <library>/lib/krystal/anims_idle.cslib</library-->
+  <library>/lib/krystal/krystal</library>
+</library>

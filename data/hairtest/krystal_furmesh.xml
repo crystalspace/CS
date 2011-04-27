@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <plugins>
+    <plugin name='furmeshfact'>crystalspace.mesh.loader.factory.furmesh</plugin>
+    <plugin name='furmesh'>crystalspace.mesh.loader.furmesh</plugin>
+  </plugins>
+  <textures>
+    <texture name='krystal_skull_densitymap'>
+      <file>/lib/krystal/krystal_skull_densitymap.png</file>
+    </texture>
+    <texture name='krystal_skull_heightmap'>
+      <file>/lib/krystal/krystal_skull_heightmap.png</file>
+    </texture>	
+  </textures>
+  <library>/lib/hairtest/krystal_furmesh_factory</library>
+  <library>/lib/hairtest/krystal_furmesh_object</library>
+</library>  

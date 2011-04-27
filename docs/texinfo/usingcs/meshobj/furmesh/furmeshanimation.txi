@@ -1,0 +1,72 @@
+@c -*-texinfo-*-
+@node Furmesh Animation, Furmesh Material, MeshObject Furmesh, Furmesh Mesh
+@subsubsection Furmesh Animation
+@cindex @code{iFurAnimationControl}
+@cindex @code{iFurAnimatedMeshControl}
+@cindex @code{iFurPhysicsControl}
+
+@emph{Written by Alexandru - Teodor Voicu,
+@email{voicualexandruteodor@@gmail.com}.}
+
+@subsubheading Introduction
+
+Furmeshes support a variety of animations, from simple inherited animations, that
+come from objects on which the furmesh is attached, to complex animations, based
+on physics objects, such as Bullet ropes.
+
+There are three main interfaces that can be used for animating furmeshes:
+@itemize @bullet
+@item
+@code{iFurAnimationControl}. This interface only provides the most basic methods 
+needed to update guide fur strands positions (@pxref{MeshObject Furmesh}) on each 
+frame. It can be used to initially set up the furs directions and disable it 
+afterwards.
+@item
+@code{iFurAnimatedMeshControl}. This interface extends the 
+@code{iFurAnimationControl} in order to support simple animations inherited from 
+the base mesh. As the name suggest this only works with AnimatedMeshes, but can be
+easily extended to support other types of meshes that provide access to positions, 
+normals, tangents and binormals render buffers.
+@item
+@code{iFurPhysicsControl}. Although the @code{iFurAnimatedMeshControl} can be used
+for animating fur, for animating hairs, physical forces, such as gravity or winds
+or adequate response to movement, had to be added, using dynamic systems. The
+@code{iFurPhysicsControl} interface is designed to work with Bullet dynamic system
+to provide a physical simulation for hair on Animated Meshes.
+@end itemize
+
+@subsubheading Creating Furmesh Animations
+
+Creating both @code{iFurAnimatedMeshControl} and @code{iFurPhysicsControl} is done
+via the @code{iFurMeshType} interface, using the @code{CreateFurAnimatedMeshControl},
+respectively the @code{CreateFurPhysicsControl} methods.
+
+An example of creating such @code{iFurAnimationControl} interfaces is:
+@example
+@dots{}  
+// Load furMesh
+csRef<CS::Mesh::iFurMeshType> furMeshType = 
+  csQueryRegistry<CS::Mesh::iFurMeshType> (hairTest->object_reg);
+if (!furMeshType)
+  return hairTest->ReportError("Failed to locate CS::Mesh::iFurMeshType plugin!");
+@dots{}  
+// Create Hair Physics Control
+hairPhysicsControl = scfQueryInterface<CS::Mesh::iFurPhysicsControl>
+  (furMeshType->CreateFurPhysicsControl("krystal_hairs_physics"));
+// Set up Hair Physics Control
+hairPhysicsControl->SetBulletDynamicSystem(hairTest->bulletDynamicSystem);
+hairPhysicsControl->SetRigidBody(headBody);
+hairPhysicsControl->SetAnimatedMesh(animesh);
+@dots{}
+// Create Animation Physics Control    
+animationPhysicsControl = scfQueryInterface<CS::Mesh::iFurAnimatedMeshControl>
+  (furMeshType->CreateFurAnimatedMeshControl("krystal_hairs_animation"));
+// Set Animation Physics Control    
+animationPhysicsControl->SetAnimatedMesh(animesh);
+animationPhysicsControl->SetDisplacement(ifms->GetDisplacement());
+@dots{}
+// Regiseter Animation Control with the furmesh
+furMesh->SetAnimationControl(animationPhysicsControl);
+furMesh->StartAnimationControl();
+@dots{}
+@end example

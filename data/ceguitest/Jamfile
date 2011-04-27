@@ -1,0 +1,4 @@
+SubDir TOP data ceguitest ;
+
+InstallData [ Wildcard *.layout ] : data ceguitest ;
+FileListEntriesData [ Wildcard *.layout ] : ceguitest : data-demo ;

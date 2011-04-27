@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<shader compiler="xmlshader" name="lighting_vproc" lights="2147483647">
+    <shadervars>
+      <shadervar type="vector3" name="mat specular">1,1,1</shadervar>
+      <shadervar type="float" name="mat shininess">32</shadervar>
+    </shadervars>
+
+    <!-- Compute all lights with vproc_std (ie software per-vertex) -->
+    <technique priority="200">
+      <pass>
+	<?if vars."tex diffuse".texture ?>
+	  <texture name="tex diffuse" destination="diffuse" />
+	  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+	<?else?>
+	  <!-- need to bind at least some texture -->
+	  <texture name="standardtex white" destination="diffuse" />
+	<?endif?>
+	<buffer source="color" destination="color" />
+	<buffer source="generic 0" destination="secondary color" />
+	<vproc plugin="vproc_std">
+	  <vproc_std>
+	    <lightmixmode>add</lightmixmode>
+	    <!--
+	    <?if buffers."color lit"?>
+	      <colormixmode>add</colormixmode>
+	      <colorbuffer>color lit</colorbuffer>
+	    <?else?>
+	      <colormixmode>mul</colormixmode>
+	      <colorbuffer>color unlit</colorbuffer>
+	    <?endif?>
+	    -->
+	    <colormixmode>none</colormixmode>
+	    <finalfactor type="float">0.5</finalfactor>
+	    <lights>2147483647</lights>
+	    <specular buffer="generic 0" />
+	    <specularexp type="shadervar">mat shininess</specularexp>
+	  </vproc_std>
+	</vproc>
+	<fp plugin="glfixed">
+	  <fixedfp>
+	    <colorsum/>
+	    <layer name="diffuse">
+	      <?if vars."tex diffuse".texture ?>
+		<colorsource num="0" source="texture" modifier="color"/>
+		<alphasource num="0" source="texture" modifier="alpha"/>
+	      <?else?>
+		<colorsource num="0" source="constant color" modifier="color"/>
+		<alphasource num="0" source="constant color" modifier="alpha"/>
+	      <?endif?>
+	      <colorsource num="1" source="primary color" modifier="color"/>
+	      <coloroperation operation="modulate" scale="2" />
+	      <alphasource num="1" source="primary color" modifier="alpha"/>
+	      <alphaoperation operation="modulate" />
+	    </layer>
+	  </fixedfp>
+	</fp>
+      </pass>
+    </technique>
+</shader>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<library>
+  <plugins>
+    <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
+    <plugin name="genmeshfact">crystalspace.mesh.loader.factory.genmesh</plugin>
+  </plugins>
+  <shaders/>
+  <textures>
+    <texture name="krystal_hairs.png">
+      <file>/lib/krystal/krystal_hairs.png</file>
+    </texture>
+    <texture name="krystal_hairs_nor">
+      <file>/lib/krystal/krystal_hairs_nor.png</file>
+    </texture>
+    <texture name="krystal_hairs_spec">
+      <file>/lib/krystal/krystal_hairs_spec.png</file>
+    </texture>
+  </textures>
+  <materials>
+    <material name="skirt_material">
+      <texture>krystal_hairs.png</texture>
+      <shadervar type="texture" name="tex normal">krystal_hairs_nor</shadervar>
+      <shadervar type="texture" name="tex specular">krystal_hairs_spec</shadervar>
+    </material>
+  </materials>
+  <sounds/>
+  <library>/lib/krystal/krystal_skirt</library>
+  <triggers/>
+</library>

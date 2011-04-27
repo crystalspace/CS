@@ -1,0 +1,111 @@
+<library>
+    <textures>
+        <texture name="mosaic.gif">
+            <file>/lib/stdtex/mosaic.jpg</file>
+        </texture>
+        <texture name="mosaic-detail">
+            <file>mosaic-detail.dds</file>
+        </texture>
+        <texture name="mosaic-detail">
+            <file>mosaic-detail.dds</file>
+        </texture>
+    </textures>
+    <materials>
+        <material name="mosaic">
+            <texture>mosaic.gif</texture>
+            <shader type="standard">std_lighting_detail</shader>
+            <shadervar name="tex detail" type="texture">mosaic-detail</shadervar>
+            <shadervar name="tex detail scale" type="vector2">10,10</shadervar>
+            <shadervar name="tex height" type="texture">mosaic-detail</shadervar>
+            <shadervar name="tex height scale" type="vector2">10,10</shadervar>
+        </material>
+    </materials>
+    <meshfact name="factory_hole1_walls">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <numvt>16</numvt>
+            <v x="-11" y="7" z="21" u="0" v="0" />
+            <v x="-11" y="7" z="20" u="0.2" v="0" />
+            <v x="-11" y="3" z="20" u="0.2" v="0.8" />
+            <v x="-11" y="3" z="21" u="0" v="0.8" />
+            <v x="-20" y="7" z="20" u="0" v="0" />
+            <v x="-20" y="7" z="21" u="0.2" v="0" />
+            <v x="-20" y="3" z="21" u="0.2" v="0.8" />
+            <v x="-20" y="3" z="20" u="0" v="0.8" />
+            <v x="-20" y="7" z="20" u="0" v="0" />
+            <v x="-11" y="7" z="20" u="1.8" v="0" />
+            <v x="-11" y="7" z="21" u="1.8" v="0.2" />
+            <v x="-20" y="7" z="21" u="0" v="0.2" />
+            <v x="-20" y="3" z="21" u="0" v="0" />
+            <v x="-11" y="3" z="21" u="1.8" v="0" />
+            <v x="-11" y="3" z="20" u="1.8" v="0.2" />
+            <v x="-20" y="3" z="20" u="0" v="0.2" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <submesh name="mosaic_0">
+                <material>mosaic</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                    <e c0="0" />
+                    <e c0="2" />
+                    <e c0="3" />
+                    <e c0="4" />
+                    <e c0="5" />
+                    <e c0="6" />
+                    <e c0="4" />
+                    <e c0="6" />
+                    <e c0="7" />
+                    <e c0="8" />
+                    <e c0="9" />
+                    <e c0="10" />
+                    <e c0="8" />
+                    <e c0="10" />
+                    <e c0="11" />
+                    <e c0="12" />
+                    <e c0="13" />
+                    <e c0="14" />
+                    <e c0="12" />
+                    <e c0="14" />
+                    <e c0="15" />
+                </indexbuffer>
+            </submesh>
+            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                <e c0="0.21875" c1="0.40625" />
+                <e c0="0.3125" c1="0.40625" />
+                <e c0="0.3125" c1="0.8125" />
+                <e c0="0.21875" c1="0.8125" />
+                <e c0="0.03125" c1="0.40625" />
+                <e c0="0.125" c1="0.40625" />
+                <e c0="0.125" c1="0.8125" />
+                <e c0="0.03125" c1="0.8125" />
+                <e c0="0.03125" c1="0.21875" />
+                <e c0="0.9375" c1="0.21875" />
+                <e c0="0.9375" c1="0.3125" />
+                <e c0="0.03125" c1="0.3125" />
+                <e c0="0.03125" c1="0.03125" />
+                <e c0="0.9375" c1="0.03125" />
+                <e c0="0.9375" c1="0.125" />
+                <e c0="0.03125" c1="0.125" />
+            </renderbuffer>
+        </params>
+    </meshfact>
+</library>

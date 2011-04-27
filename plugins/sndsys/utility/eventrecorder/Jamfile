@@ -1,0 +1,7 @@
+SubDir TOP plugins sndsys utility eventrecorder ;
+
+Plugin sndsyseventrecorder : [ Wildcard *.cpp *.h ] ;
+Description sndsyseventrecorder : "Sound System Event Recorder Plugin" ;
+LinkWith sndsyseventrecorder : crystalspace ;
+CompileGroups sndsyseventrecorder : sndsys ;
+

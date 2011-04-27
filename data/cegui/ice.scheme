@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+<GUIScheme Name="ice">
+	<Imageset Name="ice" Filename="ice.imageset" />
+	<LookNFeel Filename="ice.looknfeel" />
+	<WindowRendererSet Filename="CEGUIFalagardWRBase" />
+	<FalagardMapping WindowType="ice/Button"      TargetType="CEGUI/PushButton"  Renderer="Falagard/Button"       LookNFeel="ice/Button" />
+	<FalagardMapping WindowType="ice/Checkbox"    TargetType="CEGUI/Checkbox"    Renderer="Falagard/ToggleButton" LookNFeel="ice/Checkbox" />
+	<FalagardMapping WindowType="ice/ImageToggleButton"    TargetType="CEGUI/Checkbox"    Renderer="Falagard/ToggleButton" LookNFeel="ice/ImageToggleButton" />
+	<FalagardMapping WindowType="ice/ImageButton" TargetType="CEGUI/PushButton"  Renderer="Falagard/Button"       LookNFeel="ice/ImageButton" />
+	<FalagardMapping WindowType="ice/RadioButton" TargetType="CEGUI/RadioButton" Renderer="Falagard/ToggleButton" LookNFeel="ice/RadioButton" />
+	<FalagardMapping WindowType="ice/FrameWindow"  TargetType="CEGUI/FrameWindow" Renderer="Falagard/FrameWindow"  LookNFeel="ice/FrameWindow" />
+	<FalagardMapping WindowType="ice/Titlebar"     TargetType="CEGUI/Titlebar"    Renderer="Falagard/Titlebar"     LookNFeel="ice/Titlebar" />
+	<FalagardMapping WindowType="ice/SystemButton" TargetType="CEGUI/PushButton"  Renderer="Falagard/SystemButton" LookNFeel="ice/Button" />
+	<FalagardMapping WindowType="ice/Editbox"          TargetType="CEGUI/Editbox"          Renderer="Falagard/Editbox"          LookNFeel="ice/Editbox" />
+	<FalagardMapping WindowType="ice/MultiLineEditbox" TargetType="CEGUI/MultiLineEditbox" Renderer="Falagard/MultiLineEditbox" LookNFeel="ice/MultiLineEditbox" />
+	<FalagardMapping WindowType="ice/Menubar"   TargetType="CEGUI/Menubar"   Renderer="Falagard/Menubar"   LookNFeel="ice/Menubar" />
+	<FalagardMapping WindowType="ice/PopupMenu" TargetType="CEGUI/PopupMenu" Renderer="Falagard/PopupMenu" LookNFeel="ice/PopupMenu" />
+	<FalagardMapping WindowType="ice/MenuItem"  TargetType="CEGUI/MenuItem"  Renderer="Falagard/MenuItem"  LookNFeel="ice/MenuItem" />
+	<FalagardMapping WindowType="ice/AlternateProgressBar" TargetType="CEGUI/ProgressBar" Renderer="Falagard/ProgressBar" LookNFeel="ice/AltProgressBar" />
+	<FalagardMapping WindowType="ice/ProgressBar"          TargetType="CEGUI/ProgressBar" Renderer="Falagard/ProgressBar" LookNFeel="ice/ProgressBar" />
+	<FalagardMapping WindowType="ice/VUMeter"              TargetType="CEGUI/ProgressBar" Renderer="Falagard/ProgressBar" LookNFeel="ice/VUMeter" />
+	<FalagardMapping WindowType="ice/VerticalScrollbar"   TargetType="CEGUI/Scrollbar" Renderer="Falagard/Scrollbar" LookNFeel="ice/VerticalScrollbar" />
+	<FalagardMapping WindowType="ice/HorizontalScrollbar" TargetType="CEGUI/Scrollbar" Renderer="Falagard/Scrollbar" LookNFeel="ice/HorizontalScrollbar" />
+	<FalagardMapping WindowType="ice/VerticalScrollbarThumb"   TargetType="CEGUI/Thumb" Renderer="Falagard/Button" LookNFeel="ice/VerticalScrollbarThumb" />
+	<FalagardMapping WindowType="ice/HorizontalScrollbarThumb" TargetType="CEGUI/Thumb" Renderer="Falagard/Button" LookNFeel="ice/HorizontalScrollbarThumb" />
+	<FalagardMapping WindowType="ice/LargeVerticalScrollbar"      TargetType="CEGUI/Scrollbar" Renderer="Falagard/Scrollbar" LookNFeel="ice/LargeVerticalScrollbar" />
+	<FalagardMapping WindowType="ice/LargeVerticalScrollbarThumb" TargetType="CEGUI/Thumb"     Renderer="Falagard/Button"    LookNFeel="ice/LargeVerticalScrollbarThumb" />
+	<FalagardMapping WindowType="ice/TabButton"  TargetType="CEGUI/TabButton"  Renderer="Falagard/TabButton"  LookNFeel="ice/TabButton" />
+	<FalagardMapping WindowType="ice/TabControl" TargetType="CEGUI/TabControl" Renderer="Falagard/TabControl" LookNFeel="ice/TabControl" />
+	<FalagardMapping WindowType="ice/TabContentPane"    TargetType="DefaultWindow"    Renderer="Falagard/Default"    LookNFeel="ice/TabContentPane" />
+	<FalagardMapping WindowType="ice/TabButtonPane"    TargetType="DefaultWindow"    Renderer="Falagard/Default"    LookNFeel="ice/TabButtonPane" />
+	<FalagardMapping WindowType="ice/ComboDropList" TargetType="CEGUI/ComboDropList" Renderer="Falagard/Listbox" LookNFeel="ice/ComboDropList" />
+	<FalagardMapping WindowType="ice/ComboEditbox"  TargetType="CEGUI/Editbox"	 Renderer="Falagard/Editbox" LookNFeel="ice/ComboEditbox" />
+	<FalagardMapping WindowType="ice/Combobox"	TargetType="CEGUI/Combobox"	 Renderer="Falagard/Default" LookNFeel="ice/Combobox" />
+	<FalagardMapping WindowType="ice/Listbox"           TargetType="CEGUI/Listbox"           Renderer="Falagard/Listbox"           LookNFeel="ice/Listbox" />
+	<FalagardMapping WindowType="ice/ListHeader"        TargetType="CEGUI/ListHeader"        Renderer="Falagard/ListHeader"        LookNFeel="ice/ListHeader" />
+	<FalagardMapping WindowType="ice/ListHeaderSegment" TargetType="CEGUI/ListHeaderSegment" Renderer="Falagard/ListHeaderSegment" LookNFeel="ice/ListHeaderSegment" />
+	<FalagardMapping WindowType="ice/MultiColumnList"   TargetType="CEGUI/MultiColumnList"   Renderer="Falagard/MultiColumnList"   LookNFeel="ice/MultiColumnList" />
+	<FalagardMapping WindowType="ice/Slider"      TargetType="CEGUI/Slider"      Renderer="Falagard/Slider"  LookNFeel="ice/Slider" />
+	<FalagardMapping WindowType="ice/SliderThumb" TargetType="CEGUI/Thumb" Renderer="Falagard/Button"  LookNFeel="ice/SliderThumb" />
+	<FalagardMapping WindowType="ice/ScrollablePane" TargetType="CEGUI/ScrollablePane" Renderer="Falagard/ScrollablePane" LookNFeel="ice/ScrollablePane" />
+	<FalagardMapping WindowType="ice/Spinner" TargetType="CEGUI/Spinner" Renderer="Falagard/Default" LookNFeel="ice/Spinner" />
+	<FalagardMapping WindowType="ice/Tooltip" TargetType="CEGUI/Tooltip" Renderer="Falagard/Tooltip" LookNFeel="ice/Tooltip" />
+	<FalagardMapping WindowType="ice/StaticImage" TargetType="DefaultWindow" Renderer="Falagard/StaticImage" LookNFeel="ice/StaticImage" />
+	<FalagardMapping WindowType="ice/StaticText"  TargetType="DefaultWindow" Renderer="Falagard/StaticText"  LookNFeel="ice/StaticText" />
+
+  <FalagardMapping WindowType="ice/HorzSlider"      TargetType="CEGUI/Slider" Renderer="Falagard/Slider"  LookNFeel="ice/HorzSlider" />
+  <FalagardMapping WindowType="ice/HorzSliderThumb" TargetType="CEGUI/Thumb"  Renderer="Falagard/Button"  LookNFeel="ice/HorzSliderThumb" />
+
+
+  <FalagardMapping WindowType="ice/SettingSlider"  TargetType="CEGUI/SettingSlider" Renderer="Falagard/Default"  LookNFeel="ice/SettingSlider" />
+  <FalagardMapping WindowType="ice/SettingComboBox"  TargetType="CEGUI/SettingComboBox" Renderer="Falagard/Default"  LookNFeel="ice/SettingComboBox" />
+  
+</GUIScheme>

@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<!-- rlsstd.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.renderloop.step.generic</name>
+        <implementation>csGenericRSLoader</implementation>
+        <description>Generic render loop step</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.renderloop.step.generic.type</name>
+        <implementation>csGenericRSType</implementation>
+        <description>Generic render loop step type</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.renderloop.step.lightiter</name>
+        <implementation>csLightIterRSLoader</implementation>
+        <description>Light iterator render loop step</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.renderloop.step.lightiter.type</name>
+        <implementation>csLightIterRSType</implementation>
+        <description>Light iterator render loop step type</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.renderloop.step.rendertarget</name>
+        <implementation>csTargetRSLoader</implementation>
+        <description>Render target render loop step</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.renderloop.step.shadowmap</name>
+        <implementation>csShadowmapRSLoader</implementation>
+        <description>Shadowmap target render loop step</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.renderloop.step.rendertarget.type</name>
+        <implementation>csTargetRSType</implementation>
+        <description>Render target render loop step type</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.renderloop.step.shadowmap.type</name>
+        <implementation>csShadowmapRSType</implementation>
+        <description>Shadowmap render loop step type</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.renderloop.step.fullscreenquad</name>
+        <implementation>csFullScreenQuadRSLoader</implementation>
+        <description>Full screen quad render loop step</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.renderloop.step.fullscreenquad.type</name>
+        <implementation>csFullScreenQuadRSType</implementation>
+        <description>Full screen quad render loop step type</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

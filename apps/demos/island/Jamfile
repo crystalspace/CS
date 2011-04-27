@@ -1,0 +1,6 @@
+SubDir TOP apps demos island ;
+
+Description csisland : "Crystal Space island demo" ;
+Application csisland : [ Wildcard *.cpp *.h ] ;
+LinkWith csisland : crystalspace ;
+FileListEntryApplications csisland : app-demo ;

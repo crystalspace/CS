@@ -1,0 +1,6 @@
+SubDir TOP plugins mesh animesh animnode speed ;
+
+Description speed : "Speed animation nodes plugin for an animated mesh object" ;
+Plugin speed : [ Wildcard *.cpp *.h ] ;
+LinkWith speed : crystalspace ;
+CompileGroups speed : meshes ;

@@ -1,0 +1,4 @@
+SubDir TOP plugins mesh lghtng ;
+
+SubInclude TOP plugins mesh lghtng object ;
+SubInclude TOP plugins mesh lghtng persist ;

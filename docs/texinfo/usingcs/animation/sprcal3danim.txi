@@ -1,0 +1,7 @@
+@c -*-texinfo-*-
+@node SpriteCal3D Animation, Socket Animation, Sprite3D Animation, Animation
+@subsection SpriteCal3D Animation
+@cindex SpriteCal3D
+@cindex Cal3D
+
+@sc{todo}!

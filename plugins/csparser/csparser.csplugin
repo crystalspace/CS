@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!-- csparser.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.level.threadedloader</name>
+        <implementation>csThreadedLoader</implementation>
+        <description>Threaded level and library file loader</description>
+        <requires>
+          <class>crystalspace.kernel.</class>
+          <class>crystalspace.engine.3d</class>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.level.loader</name>
+        <implementation>csLoader</implementation>
+        <description>Old level and library file loader</description>
+      </class>
+      <class>
+        <name>crystalspace.texture.loader.checkerboard</name>
+        <implementation>csCheckerTextureLoader</implementation>
+        <description>Checkerboard texture loader</description>
+        <requires>
+          <class>crystalspace.level.threadedloader</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.loader.image</name>
+        <implementation>csImageTextureLoader</implementation>
+        <description>Image texture loader</description>
+        <requires>
+          <class>crystalspace.level.threadedloader</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.loader.cubemap</name>
+        <implementation>csCubemapTextureLoader</implementation>
+        <description>Cube map texture loader</description>
+        <requires>
+          <class>crystalspace.level.threadedloader</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.loader.tex3d</name>
+        <implementation>csTexture3DLoader</implementation>
+        <description>3D texture loader</description>
+        <requires>
+          <class>crystalspace.level.threadedloader</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

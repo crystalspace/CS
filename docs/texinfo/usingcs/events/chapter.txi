@@ -1,0 +1,25 @@
+@c -*-texinfo-*-
+@node Event System, Options, SCF Chapter, Using Crystal Space
+@section Event System
+@cindex Event System
+
+@noindent
+@emph{Written by Adam D. Bradley @email{artdodge@@cs.bu.edu}.}
+
+These sections describe the Crystal Space event system. The event system is
+highly configurable and extensible, allowing clients to create and publish
+their own event types easily.
+
+@menu
+* Event Names:: Names
+* Event Scheduling:: Scheduling
+* Event Subscription:: Subscription
+* Frame phase events::
+* Event Bindings:: Bindings
+@end menu
+
+@importss{usingcs,events,names.txi}
+@importss{usingcs,events,scheduling.txi}
+@importss{usingcs,events,subscription.txi}
+@importss{usingcs,events,framephases.txi}
+@importss{usingcs,events,bindings.txi}

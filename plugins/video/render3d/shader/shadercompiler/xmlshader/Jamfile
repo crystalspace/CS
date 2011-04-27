@@ -1,0 +1,14 @@
+SubDir TOP plugins video render3d shader shadercompiler xmlshader ;
+
+Description xmlshader : "XML-format shader compiler" ;
+Plugin xmlshader : [ Wildcard *.cpp *.h ] [ Wildcard cpi : *.cpp *.h ] ;
+
+Includes xmlshader.h : $(SUBDIR)/xmlshader.tok ;
+MsvcExtraFile xmlshader : $(SUBDIR)/xmlshader.tok ;
+MsvcExtraFile xmlshader : $(SUBDIR)/cpi/condconstbuiltin.inc ;
+LinkWith xmlshader : crystalspace ;
+CompileGroups xmlshader : shaders renderers renderall openglrenderer ;
+
+SubDir TOP plugins video render3d shader shadercompiler xmlshader cpi ;
+Includes docwrap.h : $(SUBDIR)/docwrap.tok ;
+MsvcExtraFile xmlshader : $(SUBDIR)/docwrap.tok ;

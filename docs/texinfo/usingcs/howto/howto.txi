@@ -1,0 +1,19 @@
+@c -*-texinfo-*-
+@node HOWTO, , BugPlug, Using Crystal Space
+@section HOWTO
+@cindex Tutorial, HOWTO
+
+This is a list of @sc{howto}'s for Crystal Space.  They contain short questions
+with more or less short answers.  In every howto where it is relevant you can
+find a short subsection with all the include files you need to use the example
+code.
+
+@menu
+* HOWTO Clicking on Objects:: Clicking on Objects
+* HOWTO Pixmaps:: Loading Images for Pixmaps
+* HOWTO Recording Movies:: Recording Movies
+@end menu
+
+@importss{usingcs,howto,clickobj.txi}
+@importss{usingcs,howto,pixmap.txi}
+@importss{usingcs,howto,movierec.txi}

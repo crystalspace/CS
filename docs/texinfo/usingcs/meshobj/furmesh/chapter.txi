@@ -1,0 +1,22 @@
+@c -*-texinfo-*-
+@node Furmesh Mesh, , MeshObject Watermesh, MeshObject
+@subsection Furmesh Mesh
+@cindex Furmesh Mesh
+
+@emph{Written by Alexandru - Teodor Voicu,
+@email{voicualexandruteodor@@gmail.com}.}
+
+This chapter describes the whole Furmesh plugin, including creating, animating,
+advanced rendering and the structure of Furmesh Mesh Objects.
+
+@menu
+* MeshObject Furmesh:: Furmesh Mesh Object
+* Furmesh Animation:: Furmesh Animation
+* Furmesh Material:: Furmesh Material
+* HOWTO Create Furmesh:: Creating a Furmesh Mesh
+@end menu
+
+@importsss{usingcs,meshobj,furmesh,furmesh.txi}
+@importsss{usingcs,meshobj,furmesh,furmeshanimation.txi}
+@importsss{usingcs,meshobj,furmesh,furmeshmaterial.txi}
+@importsss{usingcs,meshobj,furmesh,createfurmesh.txi}

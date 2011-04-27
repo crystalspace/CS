@@ -1,0 +1,85 @@
+@c -*-texinfo-*-
+@node Walktest Configuration, , Console, Walktest
+@subsection Configuration File
+@cindex Walktest Configuration
+@cindex Configuration, Walktest
+
+The Walktest configuration file is named @file{walktest.cfg}.  It contains
+configuration options specific to the Walktest application.
+
+Options which are specific to Walktest and which may be specified in the
+configuration file are:
+
+@table @code
+@item Walktest.Settings.WorldFile = <file>
+Select the map file to be loaded at startup.
+
+@item Walktest.Settings.WorldZipType = <extension>
+The extension to use for archive files. This is required because Walktest
+tries to automatically mount unmounted world archives. Defaults to @samp{zip}.
+
+@item Walktest.Settings.Stats = <yes/no>
+Enable/disable the statistics counter (default is @samp{no}). The
+statistics counter can also be enabled/disabled with the
+@code{-stats}/@code{-nostats} commandline options.
+
+@item Walktest.Settings.Debug = <yesno>
+This option is off by default. With it you can enable debugging
+information. When this is on, there will be more information kept in
+@file{debug.txt} after a crash. Note that this feature only works on
+systems that can catch a crash (currently only Unix).
+
+@item Walktest.Settings.CollDet = <yes/no>
+Enable/disable the collision detection code which is based on the OPCODE
+library. It is enabled by default (@samp{yes}) and can also be controlled
+with the @code{-colldet}/@code{-nocolldet} commandline options or the
+@samp{colldet} console command.
+
+@item Walktest.Settings.CollDetPlugin = <plugin name>
+Set the plug-in module that is used for collision detection.
+
+@item Walktest.CollDet.JumpSpeed = <value> (default 0.08)
+Initial speed used to jump upwards.
+
+@item Walktest.CollDet.WalkAccelerate = <value> (default 0.01)
+Acceleration value for walking and strafing.
+
+@item Walktest.CollDet.WalkMaxSpeed = <value> (default 0.05)
+Maximum speed for walking and strafing.
+
+@item Walktest.CollDet.WalkBrake = <value> (default 0.02)
+Brake deceleration for walking and strafing.
+
+@item Walktest.CollDet.RotateAccelerate = <value> (default 0.005)
+Acceleration value for rotation.
+
+@item Walktest.CollDet.RotateMaxSpeed = <value> (default 0.02)
+Maximum speed for rotation.
+
+@item Walktest.CollDet.RotateBrake = <value> (default 0.01)
+Brake deceleration for rotation.
+
+@item Walktest.CollDet.LookAccelerate = <value> (default 0.02)
+Acceleration value for looking up/down.
+
+@item Walktest.CollDet.BodyHeight = <value> (default 1)
+Height of the body.
+
+@item Walktest.CollDet.BodyWidth = <value> (default 0.4)
+Width of the body.
+
+@item Walktest.CollDet.BodyDepth = <value> (default 0.3)
+Depth of the body.
+
+@item Walktest.CollDet.EyeOffset = <value> (default -0.7)
+Offset of the eye.
+
+@item Walktest.CollDet.LegsWidth = <value> (default 0.3)
+Width of the legs.
+
+@item Walktest.CollDet.LegsDepth = <value> (default 0.2)
+Depth of the legs.
+
+@item Walktest.CollDet.LegsOffset = <value> (default -1.5)
+Offset of the legs.
+@end table

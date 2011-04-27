@@ -1,0 +1,10 @@
+SubDir TOP apps import md32spr ;
+
+Description md32spr : "Quake MD3 conversion tool" ;
+
+Application md32spr
+	: [ Wildcard *.cpp *.h ]
+	: console
+;
+LinkWith md32spr : crystalspace ;
+FileListEntryApplications md32spr : app-tool ;

@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <plugins>
+    <plugin name='skeletonfact'>crystalspace.mesh.loader.factory.skeleton</plugin>
+    <plugin name='animeshfact'>crystalspace.mesh.loader.factory.animesh</plugin>
+  </plugins>
+  <shaders/>
+  <textures>
+    <texture name='sintel_face.png'>
+      <file>/lib/sintel/sintel_face.png</file>
+    </texture>
+  </textures>
+  <materials>
+    <material name='sintel_face'>
+      <texture>sintel_face.png</texture>
+    </material>
+    <material name='sintel_eyes'>
+      <texture>sintel_face.png</texture>
+    </material>
+    <material name='sintel_hairs'>
+      <texture>sintel_face.png</texture>
+    </material>
+  </materials>
+  <sounds/>
+  <library>/lib/sintel/skelsintel_rig</library>
+  <library>/lib/sintel/sintel_head</library>
+</library>

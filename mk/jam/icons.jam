@@ -1,0 +1,411 @@
+#============================================================================
+# Copyright (C)2006-2010 by Frank Richter
+#
+#    This library is free software; you can redistribute it and/or modify it
+#    under the terms of the GNU Library General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or (at your
+#    option) any later version.
+#
+#    This library is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library General Public
+#    License for more details.
+#
+#    You should have received a copy of the GNU Library General Public License
+#    along with this library; if not, write to the Free Software Foundation,
+#    Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#============================================================================
+if $(CMD.RSVG) != ""
+{
+  ## IconsFromSVG iconname
+  ##   Generate multiple PNG images suitable for icon use from an SVG file.
+  ##   The source SVG file is expected to have the name 
+  ##   icons-src/scalable/<iconname>.svg. The result files are named
+  ##   the icons/<size>/<iconname>.png for multiple common icon sizes as
+  ##   'size'. These "common sizes" include suitable sizes for icons on Linux
+  ##   desktops, Windows and MacOS/X.
+  ##   Images for certain sizes can be specified as 
+  ##   icons-src/<size>/<iconname>.png files; these are preferred over the
+  ##   automatically generated ones.
+  ##   The actual conversion is done when the "generateicons" target is
+  ##   invoked.
+  rule IconsFromSVG
+  {
+    local icon = $(1) ;
+    local iconfile = $(icon).svg ;
+    local svgscalabledir = [ ConcatDirs $(SUBDIR) icons-src scalable ] ;
+    local svgsource = $(iconfile:G=$(svgscalabledir)) ;
+    SEARCH on $(svgsource) = $(svgscalabledir) ;
+    
+    NotFile generateicons ;
+    
+    local size ;
+    # Icon sizes to generate/use:
+    # 16 - Windows small icon (Window menu, start menu)
+    # 22 - Small icon for KDE and GNOME menus
+    # 24 - Small icon for GNOME file lists(1)
+    # 32 - Normal icon for Windows
+    # 48 - Large icon for Windows XP
+    # 256 - Windows Vista icon(2)
+    # 512 - MacOS/X(3)
+    #
+    # (1) - Can be generated from 22x22 pics by adding a border.
+    # (2) - Cause icon files to be really large. Vista supports PNG compression
+    #       in icons and uses it for the 256x256 versions.
+    # (3) - OS/X 10.5 and newer. Older versions used 128x128.
+    for size in 16 22 32 48 256 512
+    {
+      local pngdir = [ ConcatDirs $(SUBDIR) icons $(size) ] ;
+      local pngfile = $(icon:G=$(pngdir)).png ;
+      MakeLocate $(pngfile) : $(pngdir) ;
+      
+      SIZE on $(pngfile) = $(size) ;
+      Depends $(pngfile) : $(svgsource) ;
+      CreateIcon $(pngfile) : $(svgsource) ;
+      
+      Depends generateicons : $(pngfile) ;
+      Always $(pngfile) ;
+    }
+    
+    # size 24 icons are a special case, see above
+    local pngdir = [ ConcatDirs $(SUBDIR) icons 24 ] ;
+    local pngfile = $(icon:G=$(pngdir)).png ;
+    if $(CMD.CONVERT) != ""
+    {
+      MakeLocate $(pngfile) : $(pngdir) ;
+      Depends $(pngfile) : $(svgsource) ;
+      CreateIcon24 $(pngfile) : $(svgsource) ;
+      
+      Depends generateicons : $(pngfile) ;
+      Always $(pngfile) ;
+    }
+    else
+    {
+      Echo "ImageMagick not available, $(pngfile) not regenerated" ;
+    }
+  }
+  
+  actions CreateIcon
+  {
+    SIZEDICONSSRC=`dirname $(>)`/../$(SIZE)
+    ICONBASE=`basename $(>) .svg`
+    if [ -e $SIZEDICONSSRC/$ICONBASE.png ] ; then
+      $(CP) $SIZEDICONSSRC/$ICONBASE.png $(<)
+    else
+      if [ -e $SIZEDICONSSRC/$ICONBASE.svg ] ; then
+	$(CMD.RSVG) -f png -w $(SIZE) -h $(SIZE)  $SIZEDICONSSRC/$ICONBASE.svg $(<).tmp
+      else
+	$(CMD.RSVG) -f png -w $(SIZE) -h $(SIZE)  $(>) $(<).tmp
+      fi
+      if [ -n "$(CMD.PNGCRUSH:E=)" ] ; then
+	$(CMD.PNGCRUSH) -rem text $(<).tmp $(<)
+	rm $(<).tmp
+      else
+	mv $(<).tmp $(<)
+      fi
+    fi
+  }
+  
+  actions CreateIcon24
+  {
+    SIZEDICONSSRC=`dirname $(>)`/../24
+    ICONBASE=`basename $(>) .svg`
+    GENSIZEDICONSSRC=`dirname $(<)`/../22
+    if [ -e $SIZEDICONSSRC/$ICONBASE.png ] ; then
+      $(CP) $SIZEDICONSSRC/$ICONBASE.png $(<)
+    else
+      if [ -e $SIZEDICONSSRC/$ICONBASE.svg ] ; then
+	$(CMD.RSVG) -f png -w 24 -h 24  $SIZEDICONSSRC/$ICONBASE.svg $(<).tmp
+      else
+	$(CMD.CONVERT) -bordercolor Transparent -border 1x1 $GENSIZEDICONSSRC/$ICONBASE.png $(<).tmp
+      fi
+      if [ -n "$(CMD.PNGCRUSH:E=)" ] ; then
+	$(CMD.PNGCRUSH) -rem text $(<).tmp $(<)
+	rm $(<).tmp
+      else
+	mv $(<).tmp $(<)
+      fi
+    fi
+  }
+}
+else
+{
+  rule IconsFromSVG { }
+}
+
+if $(CMD.ICOTOOL) != ""
+{
+  # Pad the given argument with zeroes on the left side to a length of 3 chars.
+  rule _ZeroPad
+  {
+    if [ Match ^([0-9][0-9])$ : $(<) ]
+    {
+      return 0$(<) ;
+    }
+    if [ Match ^([0-9])$ : $(<) ]
+    {
+      return 00$(<) ;
+    }
+    return $(<) ;
+  }
+
+  ## IconsMakeWin32ICO filename : iconname [: sizes]
+  ##   Generate a Win32 ICO file from multiple PNG images, such as those
+  ##   produced by IconsFromSVG.
+  ##   The source images are expected to have the names
+  ##   icons-src/<size>/<iconname>.png or icons/<size>/<iconname>.png for the
+  ##   sizes specified in `sizes'. Files in the `icons-src/' directory are
+  ##   preferred over files in the `icons/' directory.
+  ##   By default, a set of common sizes is used, currently 16, 32, 48 and 256.
+  ##   The ICO will also include 256 color images that are generated from
+  ##   the (presumably RGBA) source PNGs; however, such color-reduced images 
+  ##   can also be specified manually for certain sizes by saving them named
+  ##   icons-src/<size>/<iconname>_8.png. These user-provided reduced versions
+  ##   are preferred over the automatically reduced ones.
+  ##   The actual conversion is done when the "generateicons" target is
+  ##   invoked.
+  rule IconsMakeWin32ICO
+  { 
+    local icofile = $(1) ;
+    local icon = $(2) ;
+    local sizes = $(3) ;
+    
+    if "$(sizes)" = "" { sizes = 16 32 48 256 ; }
+    
+    local size icons ;
+    for size in $(sizes)
+    {
+      local pngdir = [ ConcatDirs $(SUBDIR) icons $(size) ] ;
+      local pngtempdir = [ ConcatDirs $(BUILDTOP) out iconstmp $(SUBDIR) $(size) ] ;
+      local pngsrcdir = [ ConcatDirs $(SUBDIR) icons-src $(size) ] ;
+      local pngfile = $(icon:G=$(pngdir)).png ;
+      local lowfile = $(icon:G=$(pngtempdir))_8.png ;
+      NoCare $(pngfile) ;
+      # Prefer icons from `icons-src/' (presumably user-provided) over icons
+      # from `icons/' (presumably auto-generated).
+      SEARCH on $(pngfile) = $(pngsrcdir) $(pngdir) ;
+      # <= is a string comparison in Jam, hence the 0 padding
+      if [ _ZeroPad $(size) ] <= 128
+      {
+	icons += "$(pngfile)" ;
+	if $(CMD.CONVERT) != ""
+	{
+	  MakeLocate $(lowfile) : $(pngtempdir) ;
+	  SIZE on $(lowfile) = $(size) ;
+	  
+	  ReduceColorDepth $(lowfile) : $(pngfile) ;
+	  Depends $(lowfile) : $(pngfile) ;
+	  icons += "$(lowfile)" ;
+	  RmTemps generateicons : $(lowfile) ;
+	}
+      }
+      else
+      {
+	if "$(ICOTOOL.SUPPORTS_RAW)" = "yes"
+	{
+	  # Special case, embed icon as PNG
+	  RAW_ICONS on $(icofile) += "$(pngfile)" ;
+	}
+      }
+    }
+    
+    MakeLocate $(icofile) : $(SUBDIR) ;
+    Depends $(icofile) : $(icons) ;
+    IcoTool $(icofile) : $(icons) ;
+    Depends generateicons : $(icofile) ;
+  }
+  
+  actions ReduceColorDepth
+  {
+    ICONSSRC=`dirname $(>)`/../../icons-src/$(SIZE)
+    ICONBASE=`basename $(>) .png`
+    if [ -e $ICONSSRC/${ICONBASE}_8.png ] ; then
+      $(CP) $ICONSSRC/${ICONBASE}_8.png $(<)
+    else
+      # Makes transparency binary and reduces colors to 256
+      $(CMD.CONVERT) $(>) \( +clone -fx a +matte -monochrome \) -compose CopyOpacity -composite -colors 256 +dither $(<)
+    fi
+  }
+  
+  actions IcoTool bind RAW_ICONS
+  {
+    $(CMD.ICOTOOL) -c -o $(<) $(>) $(RAW_ICONS)
+  }
+}
+else
+{
+  rule IconsMakeWin32ICO { }
+}
+
+if $(CMD.MAKEICNS) != "" || $(CMD.PNG2ICNS) != ""
+{
+  # DownsampleImage target : source : size ;
+  #   Returns file name of (temp) file with resampled imaged.
+  rule DownsampleImage
+  {
+    local target = $(1) ;
+    local source = $(2) ;
+    local size = $(3) ;
+    
+    local tempdir = [ ConcatDirs $(BUILDTOP) out iconstmp $(SUBDIR) $(size) ] ;
+    local outfile = $(source:G=$(tempdir)) ;
+    
+    MakeLocate $(outfile) : $(tempdir) ;
+    Depends $(outfile) : $(source) ;
+    SIZE on $(outfile) = $(size) ;
+    ConvertReduce $(outfile) : $(source) ;
+    RmTemps $(target) : $(outfile) ;
+    
+    return $(outfile) ;
+  }
+  
+  actions ConvertReduce
+  {
+    $(CMD.CONVERT) $(>) -resize $(SIZE)x$(SIZE) $(<)
+  }
+
+  ## IconsMakeMacICNS filename : iconname [: sizes]
+  ##   Generate a MacOS/X ICNS file from a PNG image such as produced by
+  ##   IconsFromSVG.
+  ##   `sizes' specify the available source image resolutions. Allowed sizes
+  ##   are 128, 256 and 512. Note that a missing size is generated
+  ##   automatically if a higher size is available. Thus, only specifying a
+  ##   512x512 is sufficient as the lower resolutions will be generated from
+  ##   that. However, upscaling will not take place: e.g. only specifying a
+  ##   size of 256 will result in an icon without a 512x512 image (forcing the
+  ##   OS to upscale the lower resolution image).
+  ##   The source images are expected to have the names
+  ##   icons-src/<size>/<iconname>.png or icons/<size>/<iconname>.png for the
+  ##   sizes specified in `sizes'. Files in the `icons-src/' directory are
+  ##   preferred over files in the `icons/' directory.
+  ##   For the conversion to happen a 3rd party tool, `makeicns' is required.
+  ##   It can be obtained from http://www.amnoid.de/icns/makeicns.html .
+  ##   The actual conversion is done when the "generateicons" target is
+  ##   invoked.
+  rule IconsMakeMacICNS
+  { 
+    local icnsfile = $(1) ;
+    local icon = $(2) ;
+    local in_sizes = $(3) ;
+    
+    # Default to the size used by Leopard and above.
+    if "$(in_sizes)" = "" { in_sizes = 512 ; }
+    # Filter out unsupported sizes (only certain sizes are allowed in ICNS
+    # icons, and we don't provide/care about images sized below 128x128)
+    local sizes ;
+    for i in $(in_sizes)
+    {
+      if [ IsElem $(i) : 128 256 512 ]
+      {
+	sizes += $(i) ;
+      }
+    }
+    if "$(sizes)" = ""
+    {
+      echo "IconsMakeMacICNS $(icnsfile): no valid size given, sizes must contain at least one of 128, 256 or 512" ;
+    }
+    else
+    {
+      local in_512 = "" ;
+      local in_256 = "" ;
+      local in_128 = "" ;
+      for size in $(sizes)
+      {
+	local pngdir = [ ConcatDirs $(SUBDIR) icons $(size) ] ;
+	local pngsrcdir = [ ConcatDirs $(SUBDIR) icons-src $(size) ] ;
+	local pngfile = $(icon:G=$(pngdir)).png ;
+      
+	SEARCH on $(pngfile) = $(pngsrcdir) $(pngdir) ;
+	NoCare $(pngfile) ;
+	Depends $(icnsfile) : $(pngfile) ;
+	in_$(size) = $(pngfile) ;
+      }
+      if $(CMD.MAKEICNS) != ""
+      {
+	# Generate ICNS using makeicns
+	
+	# If an image of a size is not available, default to the next larger size.
+	# Note that `makeicns' takes care of downsizing to the smaller size in
+	# that case.
+	if ! $(in_256) { in_256 = $(in_512) ; }
+	if ! $(in_128) { in_128 = $(in_256) ; }
+	INPUT_512 on $(icnsfile) = $(in_512) ;
+	INPUT_256 on $(icnsfile) = $(in_256) ;
+	INPUT_128 on $(icnsfile) = $(in_128) ;
+	MakeLocate $(icnsfile) : $(SUBDIR) ;
+	MakeIcns $(icnsfile) ;
+	Depends generateicons : $(icnsfile) ;
+      }
+      else
+      {
+	# Generate ICNS using png2icns
+	
+	if $(CMD.CONVERT) != ""
+	{
+	  # png2icns doesn't handle resizing, so do it ourselves
+	  if ! $(in_256)
+	  { 
+	    if $(in_512)
+	    {
+	      in_256 = [ DownsampleImage generateicons : $(in_512) : 256 ] ;
+	      Depends $(icnsfile) : $(in_256) ;
+	    }
+	  }
+	  if ! $(in_128)
+	  { 
+	    if $(in_256)
+	    {
+	      in_128 = [ DownsampleImage generateicons : $(in_256) : 128 ] ;
+	      Depends $(icnsfile) : $(in_128) ;
+	    }
+	  }
+	}
+	else
+	{
+	  # Make do with the images we have, but issue a warning
+	  local need_resize ;
+	  if $(in_512)
+	  {
+	    if ! $(in_256) || ! $(in_128) { need_resize = "yes" ; }
+	  }
+	  else if $(in_256)
+	  {
+	    if ! $(in_128) { need_resize = "yes" ; }
+	  }
+	  if $(need_resize)
+	  {
+	    Echo "ImageMagick not available, $(icnsfile) will be incomplete" ;
+	  }
+	}
+	MakeLocate $(icnsfile) : $(SUBDIR) ;
+	Png2icns $(icnsfile) : $(in_128) $(in_256) $(in_512) ;
+	Depends generateicons : $(icnsfile) ;
+      }
+    }
+  }
+  
+  actions MakeIcns bind INPUT_128 INPUT_256 INPUT_512
+  {
+    args=
+    if [ -n "$(INPUT_512)" ]; then
+      args="$args -512 $(INPUT_512)"
+    fi
+    if [ -n "$(INPUT_256)" ]; then
+      args="$args -256 $(INPUT_256)"
+    fi
+    if [ -n "$(INPUT_128)" ]; then
+      args="$args -128 $(INPUT_128)"
+    fi
+    $(CMD.MAKEICNS) $args -out $(<)
+  }
+  
+  actions Png2icns
+  {
+    $(CMD.PNG2ICNS) $(<) $(>)
+  }
+}
+else
+{
+  rule IconsMakeMacICNS { }
+}

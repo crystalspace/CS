@@ -1,0 +1,4 @@
+SubDir TOP plugins editor ;
+
+SubInclude TOP plugins editor cel ;
+SubInclude TOP plugins editor core ;

@@ -1,0 +1,18 @@
+@node Config Engine, Config Sound, Config Graphics, Specific Options
+@subsubsection Engine Configuration
+@cindex Configuration, Engine
+
+This section describes the configuration keys used by the 3D engine.
+The default values are stored in @file{CS/data/config/engine.cfg}.
+
+@subsubheading Lighting Options
+
+@table @code
+@item Engine.Lighting.Ambient.Red = [0..255]
+@itemx Engine.Lighting.Ambient.Green = [0..255]
+@itemx Engine.Lighting.Ambient.Blue = [0..255]
+These keys set the amount of ambient light that is used when lighting is
+calculated. This amount of light is present on all textures even if no light
+source shines on them.  Default values are 20 luminosity units.
+
+@end table

@@ -1,0 +1,12 @@
+SubDir TOP plugins gui cegui ;
+
+if $(CEGUI.AVAILABLE) = "yes"
+{
+Description cscegui : "CEGUI Wrapper Plugin" ;
+Plugin cscegui : 
+  [ Wildcard *.cpp *.h ] 
+  [ Wildcard [ ConcatDirs config ] : *.h *.cpp ] ;
+CFlags cscegui : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+LinkWith cscegui : crystalspace ;
+ExternalLibs cscegui : CEGUI ;
+}

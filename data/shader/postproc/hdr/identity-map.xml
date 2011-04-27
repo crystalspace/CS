@@ -1,0 +1,24 @@
+<shader compiler="xmlshader" name="postproc_hdr_identity_map">
+  <technique priority="200">
+    <pass>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      <texture destination="Texture1" name="tex diffuse" />
+      <fp plugin="glcg">
+	<cgfp>
+	  <program>
+	      <![CDATA[
+
+	      float4 main (in float2 TexCoord : TEXCOORD0,
+			   uniform sampler2D Texture1) : COLOR
+	      {
+		float4 inCol = tex2D (Texture1, TexCoord);
+		return inCol;
+	      }
+
+	      ]]>
+	  </program>
+	</cgfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>

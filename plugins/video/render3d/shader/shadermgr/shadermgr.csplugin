@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- shadermgr.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics3d.shadermanager</name>
+        <implementation>csShaderManager</implementation>
+        <description>Shader manager</description>
+        <requires>
+          <class>crystalspace.syntax.loader.service.text</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

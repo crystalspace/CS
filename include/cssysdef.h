@@ -1,0 +1,1243 @@
+/*
+    Copyright (C) 1998-2008 by Jorrit Tyberghein
+    Written by Andrew Zabolotny <bit@eltech.ru>
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#ifndef __CS_CSSYSDEF_H__
+#define __CS_CSSYSDEF_H__
+
+#define CSDEF_FRIEND
+#include "csdef.h"
+#undef CSDEF_FRIEND
+
+/** \file
+  This file should be \#included before any other Crystal Space header files. It
+  sets up a compilation environment which smooths over differences between
+  platforms, allowing the same code to compile cleanly over a variety of
+  operating systems and build tools. It also provides a number of utility
+  macros useful to projects utilizing Crystal Space and to the Crystal Space
+  code itself.
+*/
+
+/* Check whether shared or static libs should be used.
+   Relevant defines are CS_USE_SHARED_LIBS, CS_USE_STATIC_LIBS and 
+   CS_BUILD_SHARED_LIBS. While building CS they indicate whether CS is built
+   with shared or static libs; while building external applications they
+   indicate whether the used CS was built with shared or static libs.
+   
+   The reason for this multitude of defines is historical: first, there was
+   CS_BUILD_SHARED_LIBS (default being absent). However, the name is not very
+   clear when seen in the context of external projects (as CS isn't built there,
+   and it doesn't control the building of the external project). Hence,
+   the somewhat clearer CS_USE_SHARED_LIBS was added. CS_USE_STATIC_LIBS was
+   added to provide an orthogonal definition to make clear static libs are
+   used.
+   Lastly, the defaults have changed: if none of the macros are defined the
+   default is CS_USE_SHARED_LIBS. The reason is that, nowadays, shared libs
+   are the default on most platforms anyway. (Especially on MSVC people tend
+   to overlook to set the CS_BUILD_SHARED_LIBS define for an external project 
+   and experience build errors.)
+ */
+ 
+/* CS_USE_ defines have first control over shared lib building, override
+   legacy CS_BUILD_SHARED_LIBS accordingly */
+#if defined(CS_USE_SHARED_LIBS)
+#  if !defined(CS_BUILD_SHARED_LIBS)
+#    define CS_BUILD_SHARED_LIBS
+#  endif
+#elif defined(CS_USE_STATIC_LIBS)
+#  if defined(CS_BUILD_SHARED_LIBS)
+#    undef CS_BUILD_SHARED_LIBS
+#  endif
+#endif
+/* If no CS_USE_ macro is defined and no CS_BUILD_SHARED_LIBS either, default
+   to CS_USE_SHARED_LIBS */
+#if !defined(CS_USE_SHARED_LIBS) && !defined(CS_USE_STATIC_LIBS)
+#  if !defined(CS_BUILD_SHARED_LIBS)
+#    define CS_BUILD_SHARED_LIBS
+#  endif
+#  define CS_USE_SHARED_LIBS
+#endif
+// Sanity check
+#if defined(CS_USE_SHARED_LIBS) && defined(CS_USE_STATIC_LIBS)
+#  error Both CS_USE_SHARED_LIBS and CS_USE_STATIC_LIBS defined, please pick one!
+#endif
+
+/*
+ * Pull in platform-specific overrides of the requested functionality.
+ */
+#include "csutil/csosdefs.h"
+
+// Defaults for platforms that do not define their own.
+#ifndef CS_VISIBILITY_DEFAULT
+#  define CS_VISIBILITY_DEFAULT
+#endif
+#ifndef CS_VISIBILITY_HIDDEN
+#  define CS_VISIBILITY_HIDDEN
+#endif
+#ifndef CS_EXPORT_SYM_DLL
+#  define CS_EXPORT_SYM_DLL CS_VISIBILITY_DEFAULT
+#endif
+#ifndef CS_IMPORT_SYM_DLL
+#  define CS_IMPORT_SYM_DLL extern
+#endif
+#ifndef CS_EXPORT_SYM
+#  if defined(CS_USE_SHARED_LIBS)
+#    define CS_EXPORT_SYM CS_VISIBILITY_DEFAULT
+#  else
+#    define CS_EXPORT_SYM
+#  endif
+#endif
+#ifndef CS_IMPORT_SYM
+#  define CS_IMPORT_SYM
+#endif
+
+#include "csextern.h"
+
+/* On MinGW, with some versions of the MinGW runtime (3.15 and above), using
+   the STL together with -ansi is broken: the C runtime functions swprintf()
+   and vswprintf() are not declared, but an STL header (<cwchar>)
+   unconditionally references it via 'using'.
+   To work around the problem provide our own dummy declarations of these
+   functions. */
+#if defined(__STRICT_ANSI__) && \
+    (defined(CS_ANSI_BREAKS_SWPRINTF) || defined(CS_ANSI_BREAKS_VSWPRINTF))
+#if defined(CS_ANSI_BREAKS_SWPRINTF)
+int swprintf ();
+#endif
+#if defined(CS_ANSI_BREAKS_VSWPRINTF)
+int vswprintf ();
+#endif
+#include <cwchar>
+#endif
+
+/*
+ * Default definitions for requested functionality.  Platform-specific
+ * configuration files may override these.
+ */
+
+#ifndef CS_FORCEINLINE
+# ifdef CS_COMPILER_GCC
+#  define CS_FORCEINLINE inline __attribute__((always_inline))
+#  if (__GNUC__ == 3) && (__GNUC_MINOR__ == 4)
+    // Work around a gcc 3.4 issue where forcing inline doesn't always work
+#   define CS_FORCEINLINE_TEMPLATEMETHOD inline
+#  endif
+# else
+#  define CS_FORCEINLINE inline
+# endif
+#endif
+#ifndef CS_FORCEINLINE_TEMPLATEMETHOD
+# define CS_FORCEINLINE_TEMPLATEMETHOD CS_FORCEINLINE
+#endif
+
+/**\def CS_ATTRIBUTE_MALLOC
+ * Function attribute that can be used to mark a function as "malloc". See the
+ * gcc manual for the implications of that.
+ */
+#ifndef CS_ATTRIBUTE_MALLOC
+# define CS_ATTRIBUTE_MALLOC
+#endif
+
+/**\def CS_ATTRIBUTE_INIT_PRIORITY()
+ * Namespace-level object initialization priority attribute.
+ */
+#ifndef CS_ATTRIBUTE_INIT_PRIORITY
+# define CS_ATTRIBUTE_INIT_PRIORITY(PRI)
+#endif
+
+// Set up deprecation macros
+#ifdef CS_COMPILER_GCC
+#  define CS_DEPRECATED_METHOD    CS_ATTRIBUTE_DEPRECATED
+#  define CS_DEPRECATED_TYPE      CS_ATTRIBUTE_DEPRECATED
+#  define CS_DEPRECATED_VAR(decl) decl CS_ATTRIBUTE_DEPRECATED
+#  ifdef CS_ATTRIBUTE_DEPRECATED_MSG
+#    define CS_DEPRECATED_METHOD_MSG(msg)	CS_ATTRIBUTE_DEPRECATED_MSG(msg)
+#    define CS_DEPRECATED_TYPE_MSG(msg)		CS_ATTRIBUTE_DEPRECATED_MSG(msg)
+#    define CS_DEPRECATED_VAR_MSG(msg, decl)	decl CS_ATTRIBUTE_DEPRECATED_MSG(msg)
+#  endif
+#endif
+
+/**\def CS_DEPRECATED_METHOD
+ * Use the CS_DEPRECATED_METHOD macro in front of method declarations to
+ * indicate that they are deprecated. Example:
+ * \code
+ * struct iFoo : iBase {
+ *   CS_DEPRECATED_METHOD virtual void Plankton() const = 0;
+ * }
+ * \endcode
+ * Compilers which are capable of flagging deprecation will exhibit a warning
+ * when it encounters client code invoking methods so tagged.
+ */
+#if !defined(CS_DEPRECATED_METHOD) || defined(DOXYGEN_RUN)
+#  if defined(CS_COMPILER_MSVC)
+#    define CS_DEPRECATED_METHOD	__declspec(deprecated)
+      /* Unfortunately, MSVC is overzealous with warnings; it even emits one 
+	 when a deprecated method is overridden, e.g. when implementing an 
+	 interface method. 
+	 To work around this, use msvc_deprecated_warn_off.h/
+	 msvc_deprecated_warn_on.h. */
+#  else
+#    define CS_DEPRECATED_METHOD
+#  endif
+#endif
+
+/**\def CS_DEPRECATED_METHOD_MSG
+ * A variant of #CS_DEPRECATED_METHOD that also emits the message \a msg
+ * on compilers that support it.
+ */
+#if !defined(CS_DEPRECATED_METHOD_MSG) || defined(DOXYGEN_RUN)
+#  if defined(CS_COMPILER_MSVC) && _MSC_VER >= 1400
+#    define CS_DEPRECATED_METHOD_MSG(msg) __declspec(deprecated(msg))
+#  else
+#    define CS_DEPRECATED_METHOD_MSG(msg) CS_DEPRECATED_METHOD
+#  endif
+#endif
+
+/**\def CS_DEPRECATED_TYPE
+ * Use the CS_DEPRECATED_TYPE macro after type declarations to
+ * indicate that they are deprecated. Example:
+ * \code
+ * typedef CS_DEPRECATED_TYPE csFoo csBar;
+ * class CS_DEPRECATED_TYPE csBaz { };
+ * \endcode
+ * Compilers which are capable of flagging deprecation will exhibit a warning
+ * when it encounters client code using types so tagged.
+ */
+#if !defined(CS_DEPRECATED_TYPE) || defined(DOXYGEN_RUN)
+#  if defined(CS_COMPILER_MSVC)
+#    define CS_DEPRECATED_TYPE __declspec(deprecated)
+#  else
+#    define CS_DEPRECATED_TYPE
+#  endif
+#endif
+
+/**\def CS_DEPRECATED_TYPE_MSG
+ * A variant of CS_DEPRECATED_TYPE that also emits the message \a msg
+ * on compilers that support it.
+ */
+#if !defined(CS_DEPRECATED_TYPE_MSG) || defined(DOXYGEN_RUN)
+#  if defined(CS_COMPILER_MSVC) && _MSC_VER >= 1400
+#    define CS_DEPRECATED_TYPE_MSG(msg) __declspec(deprecated(msg))
+#  else
+#    define CS_DEPRECATED_TYPE_MSG(msg) CS_DEPRECATED_TYPE
+#  endif
+#endif
+
+/**\def CS_DEPRECATED_VAR
+ * Use the CS_DEPRECATED_VAR macro tol indicate that a variable or 
+ * class/struct is deprecated. Example:
+ * \code
+ * struct MyStuff
+ * {
+ *   int newStuff;
+ *   CS_DEPRECATED_VAR(int oldStuff);
+ * };
+ * \endcode
+ * Compilers which are capable of flagging deprecation will exhibit a warning
+ * when it encounters client code using types so tagged.
+ */
+#if !defined(CS_DEPRECATED_VAR) || defined(DOXYGEN_RUN)
+#  if defined(CS_COMPILER_MSVC)
+#    define CS_DEPRECATED_VAR(decl) __declspec(deprecated) decl
+#  else
+#    define CS_DEPRECATED_VAR(decl) decl
+#  endif
+#endif
+
+/**\def CS_DEPRECATED_VAR_MSG
+ * A variant of CS_DEPRECATED_VAR that also emits the message \a msg
+ * on compilers that support it.
+ */
+#if !defined(CS_DEPRECATED_VAR_MSG) || defined(DOXYGEN_RUN)
+#  if defined(CS_COMPILER_MSVC) && _MSC_VER >= 1400
+#    define CS_DEPRECATED_VAR_MSG(msg, decl) __declspec(deprecated(msg)) decl
+#  else
+#    define CS_DEPRECATED_VAR_MSG(msg, decl) CS_DEPRECATED_VAR(decl)
+#  endif
+#endif
+
+/**\def CS_NO_EXCEPTIONS
+ * This is defined when the project was compiled without support for 
+ * exceptions.
+ */
+#if defined(CS_COMPILER_MSVC) 
+  #include <exception>
+  #if !_HAS_EXCEPTIONS
+    #define CS_NO_EXCEPTIONS
+  #endif
+#elif defined(CS_COMPILER_GCC) && !defined(__EXCEPTIONS)
+  #define CS_NO_EXCEPTIONS
+#endif
+
+/**\def CS_MAXPATHLEN
+ * Maximum length of a filesystem pathname. Useful for declaring character
+ * buffers for calls to system functions which return a pathname in the buffer.
+ */
+#ifndef CS_MAXPATHLEN
+#define CS_MAXPATHLEN 1024
+#endif
+#include <stdio.h>
+#ifdef CS_HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+
+/**\def CS_ALLOC_STACK_ARRAY(type, var, size)
+ * Dynamic stack memory allocation.
+ * \param type Type of the array elements.
+ * \param var Name of the array to be allocated.
+ * \param size Number of elements to be allocated.
+ */
+#if defined(CS_COMPILER_GCC) && !defined(__STRICT_ANSI__)
+// In GCC we are able to declare stack vars of dynamic size directly
+#  define CS_ALLOC_STACK_ARRAY(type, var, size) \
+     type var [size]
+#else
+#  include <stdlib.h>
+#  define CS_ALLOC_STACK_ARRAY(type, var, size) \
+     type *var = (type *)alloca ((size) * sizeof (type))
+#  if defined(CS_COMPILER_GCC) && defined(__STRICT_ANSI__) && !defined(alloca)
+#    define alloca(x) __builtin_alloca(x)
+#  endif
+#endif
+
+
+/**\def CS_HAVE_POSIX_MMAP
+ * Platforms which support POSIX mmap() should #define CS_HAVE_POSIX_MMAP. This
+ * can be done via the platform-specific csosdef.h or via the configure script.
+ * Doing so will declare a POSIX mmap()-suitable csMemMapInfo structure. The
+ * build process on such platforms must also arrange to have
+ * CS/libs/csutil/generic/mmap.cpp incorporated into the csutil library.
+ */
+
+/**
+ * The CS_HEADER_GLOBAL() macro composes a pathname from two components and
+ * wraps the path in `<' and `>'.  This macro is useful in cases where one does
+ * not have the option of augmenting the preprocessor's header search path,
+ * even though the include path for some header file may vary from platform to
+ * platform.  For instance, on many platforms OpenGL headers are in a `GL'
+ * directory, whereas on other platforms they are in an `OpenGL' directory.  As
+ * an example, in the first case, the platform might define the preprocessor
+ * macro GLPATH with the value `GL', and in the second case GLPATH would be
+ * given the value `OpenGL'.  To actually include an OpenGL header, such as
+ * gl.h, the following code would be used:
+ * <pre>
+ * \#include CS_HEADER_GLOBAL(GLPATH,gl.h)
+ * </pre>
+ */
+#define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+#define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+
+/**
+ * The CS_HEADER_LOCAL() macro composes a pathname from two components and
+ * wraps the path in double-quotes.  This macro is useful in cases where one
+ * does not have the option of augmenting the preprocessor's header search
+ * path, even though the include path for some header file may vary from
+ * platform to platform.  For example, assuming that the preprocessor macro
+ * UTILPATH is defined with some platform-specific value, to actually include a
+ * header, such as util.h, the following code would be used:
+ * <pre>
+ * \#include CS_HEADER_LOCAL(UTILPATH,util.h)
+ * </pre>
+ */
+#define CS_HEADER_LOCAL(X,Y) CS_HEADER_LOCAL_COMPOSE1(X,Y)
+#define CS_HEADER_LOCAL_COMPOSE1(X,Y) CS_HEADER_LOCAL_COMPOSE2(X/Y)
+#define CS_HEADER_LOCAL_COMPOSE2(X) #X
+
+
+/**\def CS_EXPORTED_FUNCTION
+ * \internal A macro to export a function from a shared library.
+ * Some platforms may need to override this.  For instance, Windows requires
+ * extra `__declspec' goop when exporting a function from a plug-in module.
+ */
+#if !defined(CS_EXPORTED_FUNCTION)
+#  if defined(CS_STATIC_LINKED)
+#    define CS_EXPORTED_FUNCTION extern "C"
+#  else
+#    define CS_EXPORTED_FUNCTION extern "C" CS_EXPORT_SYM_DLL
+#  endif
+#endif
+
+/**\def CS_EXPORTED_NAME(Prefix, Suffix)
+ * \internal A macro used to build exported function names.
+ * Usually "Prefix" is derived from shared library name, thus for each library
+ * we'll have different exported names.  This prevents naming collisions when
+ * static linking is used, and on platforms where plug-in symbols are exported
+ * by default.  However, this may be bad for platforms which need to build
+ * special export-tables on-the-fly at compile-time since distinct names make
+ * the job more difficult.  Such platforms may need to override the default
+ * expansion of this macro to use only the `Suffix' and ignore the `Prefix'
+ * when composing the name.
+ */
+#if !defined(CS_EXPORTED_NAME)
+#  define CS_EXPORTED_NAME(Prefix, Suffix) Prefix ## Suffix
+#endif
+
+#ifndef CS_IMPLEMENT_PLATFORM_PLUGIN
+#  define CS_IMPLEMENT_PLATFORM_PLUGIN
+#endif
+
+#ifndef CS_IMPLEMENT_PLATFORM_APPLICATION
+#  define CS_IMPLEMENT_PLATFORM_APPLICATION
+#endif
+
+/**\def CS_INITIALIZE_PLATFORM_APPLICATION
+ * Perform platform-specific application initializations.
+ * This macro should be invoked very near to the "beginning" of the 
+ * application.
+ * \remark NB: It is invoked in csInitializer::CreateEnvironment().
+ */
+#ifndef CS_INITIALIZE_PLATFORM_APPLICATION
+#  define CS_INITIALIZE_PLATFORM_APPLICATION /* */
+/*
+  This definition may seem odd, but it's here for doxygen's sake, which
+  apparently fails to document empty macro definitions.
+ */
+#endif
+
+typedef void (*csStaticVarCleanupFN) (void (*p)());
+extern csStaticVarCleanupFN csStaticVarCleanup;
+
+#include "csutil/threading/atomicops.h"
+#include "csutil/threading/mutex.h"
+
+#define CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION_A(Name, FuncAttr)    \
+static CS::Threading::Mutex Name_ ## staticVarLock;                    \
+FuncAttr void Name (void (*p)())                                       \
+{                                                                      \
+  CS::Threading::MutexScopedLock lock (Name_ ## staticVarLock);        \
+  static void (**a)() = 0;                                             \
+  static int lastEntry = 0;                                            \
+  static int maxEntries = 0;                                           \
+                                                                       \
+  if (p != 0)                                                          \
+  {                                                                    \
+    if (lastEntry >= maxEntries)                                       \
+    {                                                                  \
+      maxEntries += 10;                                                \
+      if (a == 0)                                                      \
+        a = (void (**)())malloc(maxEntries * sizeof(void*));           \
+      else                                                             \
+        a = (void (**)())realloc(a, maxEntries * sizeof(void*));       \
+    }                                                                  \
+    a[lastEntry++] = p;                                                \
+  }                                                                    \
+  else if (a != 0)                                                     \
+  {                                                                    \
+    for (int i = lastEntry - 1; i >= 0; i--)                           \
+      a[i] ();                                                         \
+    free (a);                                                          \
+    a = 0;                                                             \
+    lastEntry = 0;                                                     \
+    maxEntries = 0;                                                    \
+  }                                                                    \
+}
+#ifndef CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION
+#  define CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(Name)              \
+      CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION_A(Name, )
+#endif
+
+#ifndef CS_DEFINE_STATIC_VARIABLE_REGISTRATION
+#  define CS_DEFINE_STATIC_VARIABLE_REGISTRATION(func) \
+    csStaticVarCleanupFN csStaticVarCleanup = &func
+#endif
+
+#ifndef CS_DECLARE_STATIC_VARIABLE_REGISTRATION
+#  define CS_DECLARE_STATIC_VARIABLE_REGISTRATION(func) \
+    void func (void (*p)())
+#endif
+
+#ifndef CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION
+#  define CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION		\
+    CS_CRYSTALSPACE_EXPORT 						\
+    CS_DECLARE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);
+#endif
+
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+#  define CS_DEFINE_MEMTRACKER_MODULE             \
+  class csMemTrackerModule;                       \
+  namespace CS                                    \
+  {                                               \
+    namespace Debug                               \
+    {                                             \
+      namespace MemTracker                        \
+      {                                           \
+	namespace Impl                            \
+	{                                         \
+	  csMemTrackerModule* thisModule = 0;     \
+	}                                         \
+      }                                           \
+    }                                             \
+  }
+#else
+#  define CS_DEFINE_MEMTRACKER_MODULE
+#endif
+
+/**\def CS_IMPLEMENT_FOREIGN_DLL
+ * The CS_IMPLEMENT_FOREIGN_DLL macro should be placed at the global scope in
+ * exactly one compilation unit comprising a foreign (non-Crystal Space)
+ * module.  For maximum portability, each such module should employ this macro.
+ * This is useful for situations in which a dynamic load library (DLL) is being
+ * built for some other facility. Obvious examples are pure extension modules
+ * for Python, Perl, and Java. For Crystal Space plugins, instead use
+ * CS_IMPLEMENT_PLUGIN.  Platforms may override the definition of this macro in
+ * order to augment the implementation of the foreign module with any special
+ * implementation details required by the platform. If the foreign module will
+ * be interacting with Crystal Space, then it also needs to initialize the
+ * global iSCF::SCF variable manually. This variable should be set to point at
+ * the single shared instance of iSCF which is created by the application's
+ * invocation of scfInitialize(), csInitializer::InitializeSCF(), or
+ * csInitializer::CreateEnvironment(). In real Crystal Space plugins (those
+ * using CS_IMPLEMENT_PLUGIN), iSCF::SCF is initialized automatically; but in
+ * foreign DLL's, it is the responsibility of the DLL's author to ensure that
+ * iSCF::SCF gets initialized.
+ */
+#ifndef CS_IMPLEMENT_FOREIGN_DLL
+#  if defined(CS_BUILD_SHARED_LIBS)
+#    define CS_IMPLEMENT_FOREIGN_DLL					    \
+       CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(csStaticVarCleanup_local); \
+       CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_local);   \
+       CS_DEFINE_MEMTRACKER_MODULE
+#  else
+#    define CS_IMPLEMENT_FOREIGN_DLL					    \
+       CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION			    \
+       CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);  \
+       CS_DEFINE_MEMTRACKER_MODULE
+#  endif
+#endif
+
+/**\def CS_IMPLEMENT_PLUGIN
+ * The CS_IMPLEMENT_PLUGIN macro should be placed at the global scope in
+ * exactly one compilation unit comprising a plugin module.  For maximum
+ * portability, each plugin module must employ this macro.  Platforms may
+ * override the definition of this macro in order to augment the implementation
+ * of the plugin module with any special implementation details required by the
+ * platform.
+ */
+#if defined(CS_STATIC_LINKED)
+
+#  ifndef CS_IMPLEMENT_PLUGIN
+#  define CS_IMPLEMENT_PLUGIN        					\
+          CS_IMPLEMENT_PLATFORM_PLUGIN 
+#  endif
+
+#elif !defined(CS_BUILD_SHARED_LIBS)
+
+#  ifndef CS_IMPLEMENT_PLUGIN
+#  define CS_IMPLEMENT_PLUGIN        					\
+          CS_IMPLEMENT_PLATFORM_PLUGIN 					\
+	  CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION		\
+	  CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);   \
+          CS_DEFINE_MEMTRACKER_MODULE
+#  endif
+
+#else
+
+#  ifndef CS_IMPLEMENT_PLUGIN
+#  define CS_IMPLEMENT_PLUGIN						\
+   CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(csStaticVarCleanup_local)	\
+   CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_local);	\
+   CS_IMPLEMENT_PLATFORM_PLUGIN                                         \
+   CS_DEFINE_MEMTRACKER_MODULE
+#  endif
+
+#endif
+
+/**\def CS_IMPLEMENT_APPLICATION
+ * The CS_IMPLEMENT_APPLICATION macro should be placed at the global scope in
+ * exactly one compilation unit comprising an application.  For maximum
+ * portability, each application should employ this macro.  Platforms may
+ * override the definition of this macro in order to augment the implementation
+ * of an application with any special implementation details required by the
+ * platform.
+ */
+#ifndef CS_IMPLEMENT_APPLICATION
+#  define CS_IMPLEMENT_APPLICATION       				\
+  CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION			\
+  CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);	\
+  CS_IMPLEMENT_PLATFORM_APPLICATION                                     \
+  CS_DEFINE_MEMTRACKER_MODULE
+#endif
+
+/**\def CS_REGISTER_STATIC_FOR_DESTRUCTION
+ * Register a method that will destruct one static variable.
+ */
+#ifndef CS_REGISTER_STATIC_FOR_DESTRUCTION
+#define CS_REGISTER_STATIC_FOR_DESTRUCTION(getterFunc)\
+        csStaticVarCleanup (getterFunc);
+#endif
+
+/**\def CS_STATIC_VARIABLE_CLEANUP
+ * Invoke the function that will call all destruction functions
+ */
+#ifndef CS_STATIC_VARIABLE_CLEANUP
+#define CS_STATIC_VARIABLE_CLEANUP  \
+        csStaticVarCleanup (0);
+#endif
+
+/* Body of getter function, mostly the same across different CS_STATIC_VAR_*
+  variants.
+  'Ptr' is a variable of type 'Type*' that receives the value of 'Val' (where
+  the actual object is stored). See CS_IMPLEMENT_STATIC_VAR for explanation
+  of initParam and kill_how.
+  
+  'Val' is read atomically. If it's 0, a new object is created. If another
+  thread concurrently requests the value, it's ensured that the value is
+  consistent (both the returned and stored value).
+*/
+#define CS_STATIC_VAR_GETTER_COMMON(Type, Ptr, initParam, Val, kill_how)\
+  while (true)								\
+  {									\
+    Ptr = reinterpret_cast<Type*> (					\
+      CS::Threading::AtomicOperations::Read (				\
+	reinterpret_cast<void**> (&Val)));				\
+    if (Ptr != 0) break;						\
+    Ptr = new Type initParam;                              		\
+    if (CS::Threading::AtomicOperations::CompareAndSet (		\
+	reinterpret_cast<void**> (&Val), Ptr, 0) != 0)			\
+    {									\
+      delete Ptr;							\
+    }									\
+    else								\
+    {									\
+      csStaticVarCleanup (kill_how);        				\
+      break;								\
+    }                                                                   \
+  }
+
+/**\def CS_IMPLEMENT_STATIC_VAR(getterFunc,Type,initParam,kill_how)
+ * Implement a file-scoped static variable that is created on demand. Defines a
+ * 'getter' function to access the variable and a 'destruction' function. The
+ * 'getter' function will register the 'destruction' function on first
+ * invocation. Example:
+ * <pre>
+ * CS_IMPLEMENT_STATIC_VAR (GetVertexPool, csVertexPool,)
+ * </pre>
+ * This will give you a file-scoped static 'getter' function GetVertexPool()
+ * that returns a pointer to a static variable.
+ */
+
+#ifndef CS_IMPLEMENT_STATIC_VAR_EXT
+#define CS_IMPLEMENT_STATIC_VAR_EXT(getterFunc,Type,initParam,kill_how) \
+namespace {                                                             \
+static Type* getterFunc ## _v = 0;                                      \
+static Type* getterFunc ();                                             \
+static void getterFunc ## _kill ();					\
+static void getterFunc ## _kill_array ();				\
+void getterFunc ## _kill ()                                      	\
+{                                                                       \
+  (void)(&getterFunc ## _kill_array);					\
+  delete getterFunc ## _v;                                              \
+  getterFunc ## _v = 0;							\
+}                                                                       \
+void getterFunc ## _kill_array ()                                	\
+{                                                                       \
+  (void)(&getterFunc ## _kill);						\
+  delete [] getterFunc ## _v;                                           \
+  getterFunc ## _v = 0;							\
+}                                                                       \
+Type* getterFunc ()                                                     \
+{                                                                       \
+  Type* p;								\
+  CS_STATIC_VAR_GETTER_COMMON(Type, p, initParam, getterFunc ## _v,	\
+    getterFunc ## kill_how);						\
+  return p;								\
+}                                                                       \
+}
+#endif
+
+#ifndef CS_IMPLEMENT_STATIC_VAR
+#define CS_IMPLEMENT_STATIC_VAR(getterFunc,Type,initParam) \
+ CS_IMPLEMENT_STATIC_VAR_EXT(getterFunc,Type,initParam,_kill)    
+#endif
+
+#ifndef CS_IMPLEMENT_STATIC_VAR_ARRAY
+#define CS_IMPLEMENT_STATIC_VAR_ARRAY(getterFunc,Type,initParam) \
+ CS_IMPLEMENT_STATIC_VAR_EXT(getterFunc,Type,initParam,_kill_array)    
+#endif
+
+/**\def CS_DECLARE_STATIC_CLASSVAR(var,getterFunc,Type)
+ * Declare a static variable inside a class. This will also declare a Getter
+ * function.  Example:
+ * <pre>
+ * CS_DECLARE_STATIC_CLASSVAR (pool, GetVertexPool, csVertexPool)
+ * </pre>
+ */
+#ifndef CS_DECLARE_STATIC_CLASSVAR
+#define CS_DECLARE_STATIC_CLASSVAR(var,getterFunc,Type)       \
+static Type *var;                                             \
+static Type *getterFunc ();                                   \
+static void getterFunc ## _kill ();              	      \
+static void getterFunc ## _kill_array ();
+#endif
+
+#ifndef CS_DECLARE_STATIC_CLASSVAR_REF
+#define CS_DECLARE_STATIC_CLASSVAR_REF(var,getterFunc,Type)   \
+static Type *var;                                             \
+static Type &getterFunc ();                                   \
+static void getterFunc ## _kill ();              	      \
+static void getterFunc ## _kill_array ();
+#endif
+
+/**\def CS_IMPLEMENT_STATIC_CLASSVAR(Class,var,getterFunc,Type,initParam)
+ * Create the static class variable that has been declared with
+ * CS_DECLARE_STATIC_CLASSVAR.  This will also create the Getter function and
+ * the destruction function.  The destruction function will be registered upon
+ * the first invocation of the Getter function.  Example:
+ * <pre>
+ * CS_IMPLEMENT_STATIC_CLASSVAR (csPolygon2D, pool, GetVertexPool,
+ *                               csVertexPool,)
+ * </pre>
+ */
+#ifndef CS_IMPLEMENT_STATIC_CLASSVAR_EXT
+#define CS_IMPLEMENT_STATIC_CLASSVAR_EXT(Class,var,getterFunc,Type,initParam,\
+  kill_how)                                                    	\
+Type* Class::var = 0;                                          	\
+void Class::getterFunc ## _kill ()               	        \
+{                                                              	\
+  delete getterFunc ();                                 	\
+  var = 0;							\
+}                                                              	\
+void Class::getterFunc ## _kill_array ()         	        \
+{                                                              	\
+  delete [] getterFunc ();                              	\
+  var = 0;							\
+}                                                              	\
+Type* Class::getterFunc ()                                     	\
+{                                                              	\
+  Type* p;							\
+  CS_STATIC_VAR_GETTER_COMMON(Type, p, initParam, var,		\
+    getterFunc ## kill_how);					\
+  return p;							\
+}
+#endif
+
+#ifndef CS_IMPLEMENT_STATIC_CLASSVAR
+#define CS_IMPLEMENT_STATIC_CLASSVAR(Class,var,getterFunc,Type,initParam) \
+  CS_IMPLEMENT_STATIC_CLASSVAR_EXT(Class,var,getterFunc,Type,initParam,_kill)
+#endif
+
+#ifndef CS_IMPLEMENT_STATIC_CLASSVAR_ARRAY
+#define CS_IMPLEMENT_STATIC_CLASSVAR_ARRAY(Class,var,getterFunc,Type,\
+  initParam) \
+  CS_IMPLEMENT_STATIC_CLASSVAR_EXT(Class,var,getterFunc,Type,initParam,\
+    _kill_array)
+#endif
+
+#ifndef CS_IMPLEMENT_STATIC_CLASSVAR_REF_EXT
+#define CS_IMPLEMENT_STATIC_CLASSVAR_REF_EXT(Class,var,getterFunc,Type,\
+  initParam,kill_how) \
+Type *Class::var = 0;                                          \
+void Class::getterFunc ## _kill ()                             \
+{                                                              \
+  delete &getterFunc ();                                       \
+  var = 0;						       \
+}                                                              \
+  void Class::getterFunc ## _kill_array ()                     \
+{                                                              \
+  delete [] &getterFunc ();                                    \
+  var = 0;						       \
+}                                                              \
+Type &Class::getterFunc ()                                     \
+{                                                              \
+  Type* p;							\
+  CS_STATIC_VAR_GETTER_COMMON(Type, p, initParam, var,		\
+    getterFunc ## kill_how);					\
+  return *p;							\
+}
+#endif
+
+#ifndef CS_IMPLEMENT_STATIC_CLASSVAR_REF
+#define CS_IMPLEMENT_STATIC_CLASSVAR_REF(Class,var,getterFunc,Type,initParam)\
+  CS_IMPLEMENT_STATIC_CLASSVAR_REF_EXT(Class,var,getterFunc,Type,\
+    initParam,_kill)
+#endif
+
+#ifndef CS_IMPLEMENT_STATIC_CLASSVAR_REF_ARRAY
+#define CS_IMPLEMENT_STATIC_CLASSVAR_REF_ARRAY(Class,var,getterFunc,Type,\
+  initParam) \
+  CS_IMPLEMENT_STATIC_CLASSVAR_REF_EXT(Class,var,getterFunc,Type,initParam,\
+    _kill_array)
+#endif
+
+/**\def CS_FUNCTION_NAME
+ * Macro that resolves to a compiler-specific variable or string that contains 
+ * the name of the current function.
+ */
+#if defined(CS_COMPILER_GCC)
+#  define CS_FUNCTION_NAME		__PRETTY_FUNCTION__
+#elif defined(__FUNCTION__)
+#  define CS_FUNCTION_NAME		__FUNCTION__
+#else
+#  define CS_FUNCTION_NAME		"<?\?\?>"
+#endif
+
+#include <stdlib.h>
+#ifdef CS_HAVE_MALLOC_H
+#include <malloc.h>
+#endif
+#include <new>
+
+#ifndef CS_NO_PTMALLOC
+//@{
+/**\name ptmalloc memory allocation
+ * Directly use the ptmalloc allocation functions. Usually, this is not needed -
+ * use cs_malloc() etc instead.
+ */
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptmalloc (size_t n);
+extern CS_CRYSTALSPACE_EXPORT void ptfree (void* p);
+extern CS_CRYSTALSPACE_EXPORT void* ptrealloc (void* p, size_t n);
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptcalloc (size_t n,
+  size_t s);
+//@}
+
+//@{
+/**\name 'Cookie' memory allocation
+ * Allocate memory with 'sentinel' values around the allocated block to detect
+ * overruns and freeing allocations across module boundaries.
+ */
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptmalloc_sentinel (
+  size_t n);
+extern CS_CRYSTALSPACE_EXPORT void ptfree_sentinel (void* p);
+extern CS_CRYSTALSPACE_EXPORT void* ptrealloc_sentinel (void* p, size_t n);
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptcalloc_sentinel (
+  size_t n, size_t s);
+//@}
+
+//@{
+/**\name 'Located' memory allocation
+ * Sentinel allocation, but also recording file name and line where the
+ * allocation occured.
+ */
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptmalloc_located (
+  size_t n);
+extern CS_CRYSTALSPACE_EXPORT void ptfree_located (void* p);
+extern CS_CRYSTALSPACE_EXPORT void* ptrealloc_located (void* p, size_t n);
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptcalloc_located (
+  size_t n, size_t s);
+//@}
+
+//@{
+/**\name 'Checking' memory allocation
+ * Located allocation, but additionally all allocated blocks are frequently
+ * checked for corruption, not just when a block is freed.
+ */
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptmalloc_checking (
+  size_t n);
+extern CS_CRYSTALSPACE_EXPORT void ptfree_checking (void* p);
+extern CS_CRYSTALSPACE_EXPORT void* ptrealloc_checking (void* p, size_t n);
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptcalloc_checking (
+  size_t n, size_t s);
+//@}
+
+#ifndef CS_DEBUG
+#  undef CS_EXTENSIVE_MEMDEBUG
+#  undef CS_REF_TRACKER
+#else
+#  if defined(CS_EXTENSIVE_MEMDEBUG) && defined(CS_MEMORY_TRACKER)
+#    error Do not use CS_EXTENSIVE_MEMDEBUG and CS_MEMORY_TRACKER together!
+#  endif
+#endif
+
+#endif // CS_NO_PTMALLOC
+
+/**\name Default Crystal Space memory allocation
+ * Always the same memory allocation functions as internally used by 
+ * Crystal Space.
+ */
+//@{
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* cs_malloc (size_t n);
+extern CS_CRYSTALSPACE_EXPORT void cs_free (void* p);
+extern CS_CRYSTALSPACE_EXPORT void* cs_realloc (void* p, size_t n);
+extern CS_CRYSTALSPACE_EXPORT void* cs_calloc (size_t n, size_t s);
+//@}
+
+#ifdef CS_USE_CUSTOM_ISDIR
+static inline bool isdir (const char *path, struct dirent *de)
+{
+  int pathlen = strlen (path);
+  char* fullname = new char[pathlen + 2 + strlen (de->d_name)];
+  memcpy (fullname, path, pathlen + 1);
+  if ((pathlen) && (fullname[pathlen-1] != CS_PATH_SEPARATOR))
+  {
+    fullname[pathlen++] = CS_PATH_SEPARATOR;
+    fullname[pathlen] = 0;
+  }
+  strcat (&fullname [pathlen], de->d_name);
+  struct stat st;
+  stat (fullname, &st);
+  delete[] fullname;
+  return ((st.st_mode & S_IFMT) == S_IFDIR);
+}
+#endif
+
+
+// The following define should only be enabled if you have defined
+// a special version of overloaded new that accepts two additional
+// parameters: a (void*) pointing to the filename and an int with the
+// line number. This is typically used for memory debugging.
+// In csutil/memdebug.cpp there is a memory debugger which can (optionally)
+// use this feature. Note that if CS_EXTENSIVE_MEMDEBUG is enabled while
+// the memory debugger is not the memory debugger will still provide the
+// needed overloaded operators so you can leave CS_EXTENSIVE_MEMDEBUG on in
+// that case and the only overhead will be a little more arguments to 'new'.
+// Do not enable CS_EXTENSIVE_MEMDEBUG if your platform or your own code
+// defines its own 'new' operator, since this version will interfere with your
+// own.
+// CS_MEMORY_TRACKER is treated like CS_EXTENSIVE_MEMDEBUG here.
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+extern CS_CRYSTALSPACE_EXPORT void operator delete (void* p);
+extern CS_CRYSTALSPACE_EXPORT void operator delete[] (void* p);
+
+extern CS_CRYSTALSPACE_EXPORT void* operator new (size_t s, 
+  void* filename, int line);
+inline void operator delete (void* p, void*, int) { operator delete (p); }
+extern CS_CRYSTALSPACE_EXPORT void* operator new[] (size_t s, 
+  void* filename, int line);
+inline void operator delete[] (void* p, void*, int) { operator delete[] (p); }
+
+inline void* operator new (size_t s)
+{ return operator new (s, (void*)__FILE__, 0); }
+inline void* operator new[] (size_t s)
+{ return operator new (s, (void*)__FILE__, 0); }
+
+#define CS_EXTENSIVE_MEMDEBUG_NEW new ((void*)CS_FUNCTION_NAME, __LINE__)
+#define new CS_EXTENSIVE_MEMDEBUG_NEW
+#endif
+
+namespace CS
+{
+  namespace Debug
+  {
+    extern void CS_CRYSTALSPACE_EXPORT AssertMessage (const char* expr, 
+      const char* filename, int line, const char* msg = 0);
+    
+    /**
+     * Break execution for debugging purposes.
+     * Causes a signal/exception/fault (which depends on the exact 
+     * nomenclature used on a platform) with the intention to break into an
+     * attached debugger.
+     */
+    static inline void DebugBreak ()
+    {
+    #  if defined (CS_PLATFORM_WIN32)
+      ::DebugBreak();
+    #  else
+      raise (SIGTRAP);
+    #  endif
+    }
+    
+    /**
+     * Verify that all memory blocks allocated with the "checking" functions
+     * did not overrun or the allocated space.
+     * \return \c true if all memory blocks are in order, \c false otherwise.
+     */
+    extern bool CS_CRYSTALSPACE_EXPORT VerifyAllMemory ();
+    /**
+     * Print all memory blocks allocated with the "checking" functions,
+     * including where they were allocated, to a file "allocations.txt".
+     */
+    extern void CS_CRYSTALSPACE_EXPORT DumpAllocateMemoryBlocks ();
+  } // namespace Debug
+} // namespace CS
+
+#if defined(CS_DEBUG) || defined(CS_WITH_ASSERTIONS)
+#  define CS_DEBUG_BREAK	CS::Debug::DebugBreak()
+#  if !defined (CS_ASSERT_MSG)
+#   define CS_ASSERT_MSG(msg,x) 					\
+      if (!(x)) CS::Debug::AssertMessage (#x, __FILE__, __LINE__, msg);
+#  endif
+#  if !defined (CS_ASSERT)
+#    define CS_ASSERT(x)	CS_ASSERT_MSG(0, x)
+#  endif
+#else
+#  undef  CS_DEBUG_BREAK
+#  define CS_DEBUG_BREAK
+#  undef  CS_ASSERT
+#  define CS_ASSERT(x)		(void)0
+#  undef  CS_ASSERT_MSG
+#  define CS_ASSERT_MSG(m,x)	(void)0
+#endif
+
+/**\def CS_DEBUG_BREAK
+ * Stops program execution and break into debugger, if present - otherwise,
+ * probably just throws an exception/signal (ie crashes).
+ */
+/**\def CS_ASSERT(expr)
+ * Assertion. If \a expr is false, a message containing the failing expression
+ * as well as a call stack is printed to <tt>stderr</tt> and a debug break is
+ * performed
+ * \remarks Breaking execution can be avoided at runtime by setting the 
+ *   environment variable <tt>"CS_ASSERT_IGNORE"</tt> to a value other than 0.
+ */
+/**\def CS_ASSERT_MSG(msg, expr)
+ * Same as #CS_ASSERT(expr), but additionally prints \a msg to <tt>stderr</tt>.
+ */
+
+// Check if the csosdefs.h defined either CS_LITTLE_ENDIAN or CS_BIG_ENDIAN
+#if !defined (CS_LITTLE_ENDIAN) && !defined (CS_BIG_ENDIAN)
+#  error No CS_XXX_ENDIAN macro defined in your OS-specific csosdefs.h!
+#endif
+
+/*
+ * This is a bit of overkill but if you're sure your CPU doesn't require
+ * strict alignment add your CPU to the !defined below to get slightly
+ * smaller and faster code in some cases.
+ *
+ * \todo In the future, this should be moved to csconfig.h and determined as
+ * part of the configuration process.
+ */
+#if defined (CS_PROCESSOR_SPARC)
+#  define CS_STRICT_ALIGNMENT
+#endif
+
+// Adjust some definitions contained in csconfig.h
+#if !defined (CS_PROCESSOR_X86) || !defined (CS_HAVE_NASM)
+#  undef CS_HAVE_MMX
+#  undef CS_HAVE_NASM
+#endif
+
+// Use special knowledge of IEEE float format in some cases for CPU's that are
+// known to support it
+#if !defined (CS_IEEE_DOUBLE_FORMAT)
+#  if defined (CS_PROCESSOR_X86) || \
+      defined (CS_PROCESSOR_POWERPC) || \
+      defined (CS_PROCESSOR_MIPS) || \
+      defined (CS_PROCESSOR_SPARC) || \
+      defined (CS_PROCESSOR_ALPHA) || \
+      defined (CS_PROCESSOR_M68K) || \
+      defined (CS_PROCESSOR_ARM)
+#    define CS_IEEE_DOUBLE_FORMAT
+#  endif
+#endif
+
+// gcc can perform usefull checking for printf/scanf format strings, just add
+// this define at the end of the function declaration
+#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4)
+/* Newer GCCs know different 'archetypes' of format string styles.
+ * CS format strings are on the level of the GNU C library, so use that
+ * archetype. */
+#  define CS_GNUC_PRINTF(format_idx, arg_idx) \
+     __attribute__((format (gnu_printf, format_idx, arg_idx)))
+#  define CS_GNUC_SCANF(format_idx, arg_idx) \
+     __attribute__((format (gnu_scanf, format_idx, arg_idx)))
+// Unfortunately, gcc doesn't support format argument checking for wide strings
+#  define CS_GNUC_WPRINTF(format_idx, arg_idx) \
+     /*__attribute__((format (__wprintf__, format_idx, arg_idx)))*/
+#  define CS_GNUC_WSCANF(format_idx, arg_idx) \
+     /*__attribute__((format (__wscanf__, format_idx, arg_idx)))*/
+#elif __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 4)
+// Use default archetype for older versions.
+#  define CS_GNUC_PRINTF(format_idx, arg_idx) \
+     __attribute__((format (__printf__, format_idx, arg_idx)))
+#  define CS_GNUC_SCANF(format_idx, arg_idx) \
+     __attribute__((format (__scanf__, format_idx, arg_idx)))
+// Unfortunately, gcc doesn't support format argument checking for wide strings
+#  define CS_GNUC_WPRINTF(format_idx, arg_idx) \
+     /*__attribute__((format (__wprintf__, format_idx, arg_idx)))*/
+#  define CS_GNUC_WSCANF(format_idx, arg_idx) \
+     /*__attribute__((format (__wscanf__, format_idx, arg_idx)))*/
+#else
+#  define CS_GNUC_PRINTF(format_idx, arg_idx)
+#  define CS_GNUC_SCANF(format_idx, arg_idx)
+#  define CS_GNUC_WPRINTF(format_idx, arg_idx)
+#  define CS_GNUC_WSCANF(format_idx, arg_idx)
+#endif
+
+// Remove __attribute__ on non GNUC compilers.
+#ifndef __GNUC__
+#define __attribute__(x)
+#endif
+
+// Support for alignment and packing of structures.
+#if !defined(CS_STRUCT_ALIGN_4BYTE_BEGIN)
+#  if defined(__GNUC__) && defined(CS_STRICT_ALIGNMENT)
+#    define CS_STRUCT_ALIGN_4BYTE_BEGIN
+#    define CS_STRUCT_ALIGN_4BYTE_END __attribute__ ((aligned(4)))
+#  else
+#    define CS_STRUCT_ALIGN_4BYTE_BEGIN
+#    define CS_STRUCT_ALIGN_4BYTE_END
+#  endif
+#endif
+
+#if defined(CS_COMPILER_MSVC)
+  #define CS_ALIGNED_MEMBER(Member, Align)				\
+    __declspec(align(Align)) Member
+  #define CS_ALIGNED_STRUCT(Kind, Align)	                        \
+    __declspec(align(Align)) Kind
+#elif defined(CS_COMPILER_GCC)
+  /**
+   * Macro to align a class member (or local variable) to a specific byte
+   * boundary.
+   *
+   * Example:
+   * \code
+   * struct MyStruct
+   * {
+   *   CS_ALIGNED_MEMBER(int x[4], 16);
+   * };
+   * \endcode
+   */
+  #define CS_ALIGNED_MEMBER(Member, Align)				\
+    Member __attribute__((aligned(Align)))
+  /**
+   * Macro to declare a struct aligned to a specific byte boundary.
+   *
+   * Example:
+   * \code
+   * CS_STRUCT_ALIGN(struct, 16) MyStruct
+   * {
+   *   int x;
+   * };
+   * \endcode
+   */
+  #define CS_ALIGNED_STRUCT(Kind, Align)	                        \
+    Kind __attribute__((aligned(Align)))
+#else
+  #define CS_ALIGNED_MEMBER(Member, Align)	Member
+  #define CS_ALIGNED_STRUCT(Kind, Align)	        Kind
+#endif
+
+// Macro used to define static implicit pointer conversion function.
+// Only use within a class declaration.
+#ifndef _CS_IMPLICITPTRCAST_NAME
+#  define _CS_IMPLICITPTRCAST_NAME __ImplicitPtrCast
+#endif
+/**
+ * Implements a static member function for a class which can be used to
+ * perform implicit pointer casts.
+ * \param classname Name of the class that the macro is being used in.
+ * \remarks
+ * This macro is intended to support typecasting within macros, allowing the
+ * compiler to provide a more descriptive error message. Use
+ * CS_IMPLEMENT_IMPLICIT_PTR_CAST() in the declaration of the class and
+ * CS_IMPLICIT_PTR_CAST() in the macro declaration.
+ * \par Example:
+ * \code
+ * struct iObjectRegistry : public iBase
+ * {
+ *   // Allow implicit casts through static function.
+ *   CS_IMPLEMENT_IMPLICIT_PTR_CAST(iObjectRegistry);
+ *   ...
+ * }
+ *
+ * #define CS_QUERY_REGISTRY_TAG(Reg, Tag) \
+ *  csPtr<iBase> (CS_IMPLICIT_PTR_CAST(iObjectRegistry, Reg)->Get (Tag))
+ * \endcode
+ */
+#define CS_IMPLEMENT_IMPLICIT_PTR_CAST(classname) \
+  inline static classname* _CS_IMPLICITPTRCAST_NAME (classname* ptr) \
+  { \
+    return ptr;\
+  }
+
+/**
+ * Perform a compiler implicit cast of a pointer to another pointer type
+ * using a static member function declared with the
+ * \c CS_IMPLEMENT_IMPLICIT_PTR_CAST macro.
+ * \param classname Name of the class to convert to
+ * \param ptr Pointer to be convereted into 
+ * \see CS_IMPLEMENT_IMPLICIT_PTR_CAST
+ */
+#define CS_IMPLICIT_PTR_CAST(classname, ptr) \
+  (classname::_CS_IMPLICITPTRCAST_NAME(ptr))
+
+/**\def CS_VA_COPY(dest, src)
+ * Copies the state of a va_list value.
+ */
+#ifdef CS_HAVE_VA_COPY
+#  define CS_VA_COPY(dest, src)		va_copy(dest, src)
+#else
+#  ifdef CS_HAVE___VA_COPY
+#    define CS_VA_COPY(dest, src)	__va_copy(dest, src)
+#  else
+#    define CS_VA_COPY(dest, src)	dest = src;
+#  endif
+#endif
+
+#define CS_STRING_TO_WIDE_(x)   L ## x
+/**\def CS_STRING_TO_WIDE
+ * Convert a string to a wide string. Also works in macros.
+ * \code
+ * void bar (const wchar_t* baz);
+ * #define FOO(x)	bar (CS_STRING_TO_WIDE (#x));
+ * \endcode
+ */
+#define CS_STRING_TO_WIDE(x)    CS_STRING_TO_WIDE_(x)
+
+#ifdef PACKAGE_NAME
+# define CS_NAMESPACE_PACKAGE_NAME       PACKAGE_NAME
+#else
+# define CS_NAMESPACE_PACKAGE_NAME       CS
+#endif
+
+/**\name Plugin namespace helpers
+ * To avoid symbol conflicts when employing static linking, it is a good
+ * idea to put everything into a private namespace. The 
+ * CS_PLUGIN_NAMESPACE_BEGIN and CS_PLUGIN_NAMESPACE_END macros help with 
+ * that by putting the plugin namespace into a sub-namespace for plugins.
+ *
+ * Use like:
+ * \code
+ * #include <...>
+ *
+ * CS_IMPLEMENT_PLUGIN
+ *
+ * CS_PLUGIN_NAMESPACE_BEGIN(MyPlugin)
+ * {
+ *   ...
+ *   MyClass::MyClass (...) { ... }
+ *   ...
+ * }
+ * CS_PLUGIN_NAMESPACE_END(MyPlugin)
+ * \endcode
+ * To refer to members of the namespace (e.g. for template specializations,
+ * use CS_PLUGIN_NAMESPACE_NAME.
+ * @{ */
+#define CS_PLUGIN_NAMESPACE_BEGIN(name)                                     \
+  namespace CS_NAMESPACE_PACKAGE_NAME { namespace Plugin { namespace name
+#define CS_PLUGIN_NAMESPACE_END(name)                                       \
+  } }
+#define CS_PLUGIN_NAMESPACE_NAME(name)                                      \
+  CS_NAMESPACE_PACKAGE_NAME::Plugin::name
+/** @} */
+
+/**\def CS_DEPRECATION_WARNINGS_DISABLE(x)
+ * Disable deprecation warnings in following statements. Always try to actually
+ * fix the root cause of a deprecation warning before employing this.
+ * Should be followed by CS_DEPRECATION_WARNINGS_ENABLE after the statements
+ * that caused the warnings.
+ * Suitable for use in macros.
+ */
+/**\def CS_DEPRECATION_WARNINGS_ENABLE(x)
+ * Enable deprecation warnings in following statements. Suitable for use in
+ * macros.
+ */
+#if defined(CS_COMPILER_GCC) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 1))
+# define CS_DEPRECATION_WARNINGS_DISABLE	\
+  _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+# define CS_DEPRECATION_WARNINGS_ENABLE	\
+  _Pragma("GCC diagnostic warning \"-Wdeprecated-declarations\"")
+#else
+# define CS_DEPRECATION_WARNINGS_DISABLE
+# define CS_DEPRECATION_WARNINGS_ENABLE
+#endif
+
+// Include nullptr fallback (for convenience).
+#include "csutil/nullptr.h"
+
+#endif // __CS_CSSYSDEF_H__

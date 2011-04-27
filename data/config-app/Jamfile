@@ -1,0 +1,9 @@
+SubDir TOP data config-app ;
+
+InstallData [ Wildcard *.cfg *.key *.xml ] : data config-app ;
+
+TOOLS_CONFIGS = heightmapgen.cfg lighter2.cfg ;
+FileListEntriesData [ Filter [ Wildcard *.cfg *.key *.xml ] : $(TOOLS_CONFIGS) ] :
+  config-app : data-demo ;
+FileListEntriesData $(TOOLS_CONFIGS) : config-app : data-tool ;
+

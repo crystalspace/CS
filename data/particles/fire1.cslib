@@ -1,0 +1,78 @@
+<library>
+    <textures>
+        <texture name="flamelet">
+            <type>crystalspace.texture.loader.fire</type>
+            <size width="16" height="32" />
+            <params>
+                <smoothing>0</smoothing>
+                <halfbase>2</halfbase>
+                <palette>
+                    <shade>
+                        <color red="0" green="0" blue="0" />
+                        <pos>0</pos>
+                    </shade>
+                    <shade>
+                        <color red="1" green="1" blue="1" />
+                        <pos>1</pos>
+                    </shade>
+                </palette>
+            </params>
+        </texture>
+    </textures>
+    <shaders>
+        <shader>
+            <file>/shader/particles/basic.xml</file>
+        </shader>
+    </shaders>
+    <materials>
+        <material name="flamelet">
+            <texture>flamelet</texture>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">particles_basic</shader>
+        </material>
+    </materials>
+    <meshfact name="fireFact">
+        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+        <params>
+            <particlesize x="0.4" y="0.6" />
+            <sortmode>none</sortmode>
+            <minbb>
+                <min x="-1" y="0" z="-1" />
+                <max x="1" y="5" z="1" />
+            </minbb>
+            <emitter type="box">
+                <emissionrate>250</emissionrate>
+                <mass min="5" max="7.5" />
+                <box>
+                    <min x="-1" y="0" z="-1" />
+                    <max x="1" y="0" z="1" />
+                </box>
+                <uniformvelocity />
+                <initialvelocity x="0" y="1" z="0" />
+                <initialttl min="1" max="1" />
+                <placement>volume</placement>
+            </emitter>
+            <effector type="lincolor">
+                <color red="0.00" green="0.00" blue="0.00" time="1" />
+                <color red="1.00" green="0.35" blue="0.00" time="0.96" />
+                <color red="1.00" green="0.22" blue="0.00" time="0.9" />
+                <color red="1.00" green="0.12" blue="0.00" time="0.8" />
+                <color red="0.80" green="0.02" blue="0.00" time="0.7" />
+                <color red="0.60" green="0.00" blue="0.00" time="0.75" />
+                <color red="0.40" green="0.00" blue="0.00" time="0.5625" />
+                <color red="0.20" green="0.05" blue="0.05" time="0.375" />
+                <color red="0.10" green="0.10" blue="0.10" time="0.1875" />
+                <color red="0.00" green="0.00" blue="0.00" time="0" />
+            </effector>
+            <effector type="force">
+                <randomacceleration x="2" y="2" z="2" />
+            </effector>
+	    <mixmode>
+		<add />
+	    </mixmode>
+	    <material>flamelet</material>
+        </params>
+	<priority>alpha</priority>
+	<ztest />
+    </meshfact>
+</library>

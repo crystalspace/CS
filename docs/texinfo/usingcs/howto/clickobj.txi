@@ -1,0 +1,53 @@
+@c -*-texinfo-*-
+@node HOWTO Clicking on Objects, HOWTO Pixmaps, HOWTO, HOWTO
+@subsection Clicking on Objects
+@cindex clicking on objects
+
+This section describes how you can find out on which object a mouse
+has clicked.
+
+@subsubheading The Code
+
+Best way to explain this is by showing code:
+
+@example
+iMeshWrapper* ClickedObject (iCamera* camera, iGraphics2D* g2d, int mousex, int mousey)
+@{
+  // Setup a 2D vector with our mouse position.  We invert the y
+  // (based on vertical screen dimension) because CS assumes y=0
+  // is down for 3D calculations.
+  csVector2 v2d (mousex, g2d->GetHeight () - mousey);
+
+  // We calculate the inverse perspective of this 2D point at
+  // z=100.  This results in a 3D position in camera space at
+  // z=100 that directly corresponds to the 2D position we
+  // clicked on.  We use z=100 to ensure that we will at least
+  // hit all objects that are before that distance.
+  csVector3 v3d = camera->InvPerspective (v2d, 100);
+
+  // We are going to cast a beam in the current sector of the
+  // camera from our camera position in the direction of the
+  // 'v3d' point.  First we transform the v3d camera space
+  // location to world space.
+  csVector3 startbeam = camera->GetTransform ().GetOrigin ();
+  csVector3 endbeam = camera->GetTransform ().This2Other (v3d);
+  iSector* beamsector = camera->GetSector ();
+  // Now do the actual intersection.
+  csSectorHitBeamResult result =
+   beamsector->HitBeamPortals(startbeam, endbeam);
+  //From the result object, return the intersected mesh.
+  iMeshWrapper* mesh = result.mesh;
+  return mesh;
+@}
+@end example
+
+@subsubheading Include Files
+
+The include files useful for this section are:
+
+@example
+#include <csgeom/transfrm.h>
+#include <iengine/camera.h>
+#include <iengine/sector.h>
+#include <iengine/mesh.h>
+@end example

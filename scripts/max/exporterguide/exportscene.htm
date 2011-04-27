@@ -1,0 +1,70 @@
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<p>Here you can find:</p>
+<ul>
+  <li><a href="#export">Export Instructions</a></li>
+  <li><a href="#tricks">Tricks</a></li>
+  <li><a href="#notes">Notes</a></li>
+</ul>
+<p>&nbsp;</p>
+<h3><a name="export"></a>Exporting a level</h3>
+<p>Select PlaneShift-&gt;Export Level.</p>
+<p>This is the export dialog:</p>
+<p><img height="273" width="303" src="pictures/3dsMaxExporters_img1.gif"></p>
+<p><b>Export Level To:</b> In the first field you should specify the export filename 
+  including its full path. Ex.: d:\myStuff\CS\levels\level1\world.txt</p>
+<p><b>Scale:</b> This indicates which is the scale to apply to the current scene 
+  while exporting, if you follow the guideline of "1 meter = 1 generic unit" you 
+  can place "1" in this field.</p>
+<p><b>Export!</b>: This button starts the export.</p>
+<p><b>Copy textures to dest dir:</b> If you check this option, a new dir will 
+  be created in the same dir of the output file and will be called &lt;filename&gt;textures. 
+  In this directory there will be copied all the textures files present in the 
+  scene (the ones used by objects). Multimaterials are supported.</p>
+<p><b>Generate Fake lights for walktest:</b> If you check this option, the exporter 
+  will add to the world file generated also some animations used to test the day/night 
+  setting of all lights present in the level. If you check this option you must 
+  add a value in the next field.</p>
+<p><b>Duration (msecs):</b> tells the exporter how much time each hour (1 frame=1 
+  hour in max) will last in the fake light simulation.</p>
+<p><br>
+  Rename the generated file as "world" and copy it and the textures in the directory 
+  you just created. <br>
+  Open a console , cd to your directory (typing cd /the/path/to/CS ) and run "walktest 
+  /this/data/my_scene_name -relight" </p>
+<p>&nbsp;</p>
+<h3><a name="tricks"></a>Tricks</h3>
+<p>If you want to fly while visiting the level in walktest you can just press 
+  '8'. This will disable gravity.</p>
+<p>If you want don't want to recalc all lights because it takes too much enable 
+  bugplug and then press CRTL-D followed by L while in 3d view. To enable bugplug 
+  you simply have to edit the walktest.cfg file located in data/config (or bin/data/config). 
+  In that file locate this line and remove the starting ';' char.<br>
+  System.Plugins.iBugPlug = crystalspace.utilities.bugplug </p>
+<p>Bugplug will also enable the FPS display in the lower left corner of the 3d 
+  view.</p>
+<h3><a name="notes"></a>Notes</h3>
+You might need to convert some <a href="object.htm">objects</a> to editable meshs 
+and define your scene as a 24 or 48 frames scene before exporting. <br>
+If you dont want to mind with the 24 frames export, and just need a preview of 
+a static scene using walktest : Open the genered file with notepad or so , go 
+to the end of it,then delete everything between the &lttrigger&gt...&lt /triggers&gt 
+and &ltsequences&gt...&lt/sequences&gt tags <br>
+Don't forget to use a target camera for setting starting point and give and add 
+roomname in the file properties ( forgetting this one would prompt you for an 
+error anyway ) <br>
+<br>
+Don't forget to enclose all your scene into a skydome and add some light in order 
+to avoid display glitches <br>
+If you can't see anything, try changing the scale factor from 0.01 to 0.1 , as 
+the camera place correspond to the emplacement of your "feet" in the walktest 
+and your starting point of view "eyes" may be stuck into a wall or the skydome 
+when loading 
+<p>&nbsp; </p>
+</body>
+</html>

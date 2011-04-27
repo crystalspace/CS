@@ -1,0 +1,4 @@
+SubDir TOP plugins mesh animesh animnode ik ;
+
+SubInclude TOP plugins mesh animesh animnode ik ccd ;
+SubInclude TOP plugins mesh animesh animnode ik physical ;

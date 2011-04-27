@@ -1,0 +1,12 @@
+SubDir TOP plugins mesh terrain persist terrain2 ;
+
+Description terrain2ldr : "Improved terrain mesh object loader" ;
+
+Plugin terrain2ldr
+        : [ Wildcard *.cpp *.h ]
+;
+LinkWith terrain2ldr : crystalspace ;
+Includes loader.h : $(SUBDIR)/loader.tok ;
+MsvcExtraFile terrain2ldr : $(SUBDIR)/loader.tok ;
+
+CompileGroups terrain2ldr :  meshes ;

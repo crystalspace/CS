@@ -1,0 +1,9 @@
+<library>
+    <textures>
+        <texture name="lightmaps_0_png">
+            <class>lightmap</class>
+            <file>lightmaps/0.png</file>
+            <mipmap>no</mipmap>
+        </texture>
+    </textures>
+</library>

@@ -1,0 +1,171 @@
+SubDir TOP plugins cscript ;
+
+if $(PYTHON.AVAILABLE) = "yes"
+{
+  if $(CMD.SWIG)
+  {
+    if $(PYTHON.VERSION) >= "2.5"
+    {
+      if $(CMD.SWIG.VERSION) >= "1.3.31"
+      {
+        DO_SWIG_PYTHON = "yes" ;
+      }
+    }
+    else
+    {
+      if $(CMD.SWIG.VERSION) >= "1.3.28"
+      {
+        DO_SWIG_PYTHON = "yes" ;
+      }
+    }
+  }
+  if $(DO_SWIG_PYTHON)
+  {
+    # global python freeze target
+    Help pythonfreeze : "Freeze generated Swig files for all python modules" ;
+  }
+  ##  PyBindingModule target : module name : glue : LinkWith : ExternalLibs : desc ;
+  rule PyBindingModule
+  {
+    local target = $(1) ;
+    local modname = $(2) ;
+    #--------
+    # Swig-generated files for 'target'.
+    #--------
+    local common = cs_$(modname).cpp ;
+    local modulepy = [ DoSourceGrist $(modname).py ] ;
+    local used_py ;
+    MakeLocate $(modulepy) : [ ConcatDirs $(LOCATE.OBJECTS) bindings python cspace ] ;
+  
+    if ! [ Property build : projgen ]
+    {
+      common = [ DoSourceGrist $(common) ] ;
+
+      if $(DO_SWIG_PYTHON)
+      {
+	Swig $(common) $(modulepy) :
+	  [ DoSourceGrist $(modname).i ] :
+	  python :
+	  -c++ -shadow -modern :
+	  [ ConcatDirs $(TOP) include ]
+	  [ ConcatDirs $(BUILDTOP) include ] :
+	  [ ConcatDirs $(TOP) include bindings ]
+	  [ ConcatDirs $(TOP) include bindings python ] :
+	  $(SEARCH_SOURCE) [ ConcatDirs $(TOP) scripts python frozen cspace ] :
+	  $(modname) :
+	  [ on $(modulepy) GetVar LOCATE ] ;
+	Depends $(modname)clean : $(modname)swigclean ;
+        used_py = $(modulepy) ;
+      }
+      else
+      {
+	SEARCH on $(common) = $(SEARCH_SOURCE) ;
+	local frozenpy = $(modulepy:G=frozenmodulepy) ;
+	SEARCH on $(frozenpy) = [ ConcatDirs $(TOP) scripts python frozen cspace ] ;
+	Copy $(modulepy) : $(frozenpy) ;
+	Depends $(modulepy) : $(frozenpy) ;
+        used_py = $(frozenpy) ;
+      }
+    }
+    Clean $(modname)clean : $(modulepy) ;
+    Depends bindingsclean : $(modname)clean ;
+    Depends clean : $(modname)clean ;
+  
+    InstallBindingsData $(modulepy) : [ on $(<) GetVar LOCATE ] : bindings python cspace ;
+    Depends filelists : [ DoFileListEntries $(used_py) : cspace : python-bindings ] ;
+    
+    #--------
+    # core -- Pure Python module
+    #--------
+    PythMod $(target) : _$(modname) : 
+	  $(3) $(common) : 
+	  bindings python cspace :
+	  crystalspace $(4) : 
+	  $(5) : 
+	  $(6) ;
+    Depends $(target) : $(modulepy) ;
+    CFlags $(target) : [ FDefines SWIG_GLOBAL ] $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) $(COMPILER.C++FLAGS.WARNING.NO_UNINITIALIZED) ;
+    Depends bindingsclean : $(target)clean ;
+    
+    FileListEntryPythMod $(target) : cspace : python-modules ;
+  }
+}
+
+SubInclude TOP plugins cscript csjava ;
+SubInclude TOP plugins cscript csperl5 ;
+SubInclude TOP plugins cscript cspython ;
+SubInclude TOP plugins cscript pycscegui ;
+SubInclude TOP plugins cscript pycore ;
+SubInclude TOP plugins cscript pyimesh ;
+SubInclude TOP plugins cscript pyisndsys ;
+SubInclude TOP plugins cscript pyivaria ;
+SubInclude TOP plugins cscript pyiengine ;
+SubInclude TOP plugins cscript pycstool ;
+SubInclude TOP plugins cscript pyivideo ;
+SubInclude TOP plugins cscript pyimap ;
+SubInclude TOP plugins cscript pycsgfx ;
+SubInclude TOP plugins cscript pycsgeom ;
+SubInclude TOP plugins cscript pyanimation ;
+
+rule PythModDepends
+{
+  for d in $(1)
+  {
+    Depends pythmod : $(1) ;
+    Depends pythmodclean : $(1)clean ;
+  }
+}
+
+if $(PYTHON.AVAILABLE) = "yes"
+{
+Description pythmod : "build all python bindings modules" ;
+PythModDepends coremod imeshmod isndsysmod ivariamod ienginemod cstoolmod
+  ivideomod imapmod csgfxmod csgeommod animationmod ;
+Depends bindings : pythmod ;
+}
+
+# rule to move __init__.py file to the generated python bindings
+# folder.
+
+rule CopyCspaceInitPy
+{
+  local init_py = __init__.py ;
+  local init_py_dir = [ ConcatDirs $(TOP) scripts python frozen cspace ] ;
+  SEARCH on $(init_py:G=src) = $(init_py_dir) ;
+  
+  MakeLocate $(init_py:G=out) : [ ConcatDirs $(LOCATE.OBJECTS) bindings python cspace ] ;
+  Copy $(init_py:G=out) : $(init_py:G=src) ;
+  Depends $(init_py:G=out) : $(init_py:G=src) ;
+  Depends pythmod : $(init_py:G=out) ;
+  Depends pythmodclean : $(init_py:G=out) ;
+  InstallBindingsData $(init_py:G=src) : $(init_py_dir) : bindings python cspace ;
+
+  Depends filelists : [ DoFileListEntries $(init_py:G=src) : cspace : python-bindings ] ;
+}
+
+# rule to generate a python .pth file on install.
+# this allows to have cspace module in cs install location, but still
+# have python find it.
+
+actions CspacePthGen bind PACKAGEPATH
+{
+  echo $(PACKAGEPATH) > $(<)
+}
+
+rule InstallCspacePth
+{
+  local cspace_pth = cspace.pth ;
+  MakeLocate $(cspace_pth) : [ ConcatDirs $(DESTDIR) $(libdir) python$(PYTHON.VERSION) site-packages ] ;
+  local destdir = [ ConcatDirs $(appdatadir) bindings python ] ;
+  NotFile $(destdir) ;
+  PACKAGEPATH on $(cspace_pth) = $(destdir) ;
+  CspacePthGen $(cspace_pth) ;
+  Depends install_bindings : $(cspace_pth) ;
+}
+
+if $(PYTHON.AVAILABLE) = "yes"
+{
+  CopyCspaceInitPy ;
+  InstallCspacePth ;
+}
+

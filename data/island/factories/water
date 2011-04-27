@@ -1,0 +1,58 @@
+<library>
+
+    <shaders>
+        <shader>
+            <file>/shader/reflect/water_plane.xml</file>
+        </shader>
+    </shaders>
+
+    <textures>
+        <texture name="normal map 1">
+            <file>/water/723-normal.jpg</file>
+        </texture>
+        <texture name="normal map 2">
+            <file>/water/w_normalmap.png</file>
+        </texture>
+        <texture name="normal map 3">
+            <file>/water/940-bump.jpg</file>
+        </texture>
+        <texture name="sky_001.dds">
+            <file>textures/sky_001.dds</file>
+        </texture>
+        <texture name="BUMPgeneric_water_001_ani">
+            <file>textures/generic_water_001_ani</file>
+            <class>normalmap</class>
+            <mipmap>no</mipmap>
+        </texture>
+        <texture name="water_envmap_01.dds">
+            <file>textures/water_envmap_01.dds</file>
+        </texture>
+    </textures>
+
+    <materials>
+        <material name="water_01">
+            <shader type="base">reflect_water_plane</shader>
+            <shader type="diffuse">reflect_water_plane</shader>
+            <shadervar name="tex normal" type="texture">BUMPgeneric_water_001_ani</shadervar>
+            <shadervar name="tex environment" type="texture">sky_001.dds</shadervar>
+            <shadervar name="water fog color" type="vector4">0.4,0.7,0.9,1</shadervar>
+            <shadervar name="water perturb scale" type="vector4">10,10,0,0</shadervar>
+	    <shadervar name="water perturb fade" type="float">0.1</shadervar>
+            <shadervar name="specular" type="vector4">0.4,0.7,0.9,1</shadervar>
+        </material>
+    </materials>
+
+    <meshfact name="water">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <zuse />
+        <params>
+            <material>water_01</material>
+            <v nx="0" ny="1" nz="0" u="0" v="0" x="-10000.0" y="0.0" z="-10000.0" />
+            <v nx="0" ny="1" nz="0" u="0" v="10000" x="-10000.0" y="0.0" z="10000.0" />
+            <v nx="0" ny="1" nz="0" u="10000" v="0" x="10000.0" y="0.0" z="-10000.0" />
+            <v nx="0" ny="1" nz="0" u="10000" v="10000" x="10000.0" y="0.0" z="10000.0" />
+            <t v1="0" v2="1" v3="3" />
+            <t v1="3" v2="2" v3="0" />
+        </params>
+    </meshfact>
+</library>

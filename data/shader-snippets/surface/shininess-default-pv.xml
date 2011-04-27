@@ -1,0 +1,86 @@
+<!--
+  Copyright (C) 2008-2011 by Frank Richter
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet>
+  <technique priority="50">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <input name="shininessFactor" type="float" default="complex" private="yes">
+      <block location="shadervars">
+	<shadervar name="shininess" type="float">32</shadervar>
+      </block>
+      
+      <block location="cg:variablemap">
+	<variablemap variable="shininess" destination="fragmentIn.shininess" />
+	<variablemap variable="shininess" destination="vertexIn.shininess" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="float" name="shininess" />
+      </block>
+      
+      <block location="cg:vertexIn">
+	<uniform type="float" name="shininess" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	shininessFactor = fragmentIn.shininess;
+      </block>
+
+      <block location="cg:vertexMain">
+	shininessFactor = vertexIn.shininess;
+      </block>
+    </input>
+      
+    <input name="shininessFactorPV" type="float" default="complex" private="yes">
+      <block location="shadervars">
+	<shadervar name="shininess vertex lighting scale" type="float">1</shadervar>
+      </block>
+      
+      <block location="cg:variablemap">
+	<variablemap variable="shininessScale" destination="vertexIn.shininessScale" />
+	<variablemap variable="shininessScale" destination="fragmentIn.shininessScale" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="float" name="shininessScale" />
+      </block>
+      
+      <block location="cg:vertexIn">
+	<uniform type="float" name="shininessScale" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	shininessFactorPV = vertexIn.shininessScale;
+      </block>
+      
+      <block location="cg:vertexMain">
+	shininessFactorPV = vertexIn.shininessScale;
+      </block>
+    </input>
+      
+    <block location="cg:vertexMain">
+      shininess = shininessFactorPV * shininessFactor;
+    </block>
+    
+    <block location="cg:fragmentMain">
+      shininess = shininessFactorPV * shininessFactor;
+    </block>
+    
+    <output name="shininess" type="float" />
+  </technique>
+</snippet>

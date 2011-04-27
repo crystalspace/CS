@@ -1,0 +1,107 @@
+TOP ?= "@CS_TOP_SRCDIR@" ;
+BUILDTOP ?= "@CS_TOP_BUILDDIR@" ;
+
+SubDir TOP ;
+
+# Common include directories.
+IncludeDir ;
+IncludeDir $(BUILDTOP) include : : literal transient ;
+IncludeDir "include" ;
+
+# Create some clean targets
+CleanDir clean : out ;
+
+Clean distclean : Jamconfig Jamfile jambuild jam$(SUFEXE) Makefile
+		  config.log config.status config.status.lineno
+		  config.cache configure.lineno
+		  include/csconfig.h ;
+CleanDir distclean : autom4te.cache ;
+Depends distclean : clean ;
+Help distclean : "Remove configuration information and built targets" ;
+
+Clean maintainerclean : aclocal.m4 configure configure.scan ;
+Depends maintainerclean : distclean ;
+
+# Installation of top-level resources.
+InstallDoc README LICENSE ;
+
+# In order to avoid alienating users by forcing them to install and use Jam,
+# the CS configure script synthesizes a makefile which implements all of
+# top-level user-visible targets provided by the Jam system; and which simply
+# forwards these target invocations over to Jam.  In addition, we also supply
+# do-nothing 'depend' and 'dep' targets to pacify users who habitually type
+# 'make depend' or 'make dep'.
+rule BuildDepend
+{
+  NotFile $(<) ;
+  Always $(<) ;
+}
+BuildDepend depend ;
+BuildDepend dep ;
+
+# msvcgen setup must occur before compile group registration.
+SubInclude TOP mk ;
+
+# Define our compile groups
+Description sndsys         : "sound system" ;
+Description imageloaders   : "image loaders" ;
+Description fontservers    : "font servers" ;
+Description canvases	   : "2D canvases" ;
+Description renderers	   : "3D renderers" ;
+Description meshes	   : "mesh plugins and loaders" ;
+Description walkall  	   : "Walktest application and all required plugins" ;
+Description openglcanvas   : "canvas for the OpenGL renderer" ;
+Description proctexes      : "procedural texture plugins" ;
+Description renderall      : "modules related to rendering" ;
+Description shaders        : "shaders and related modules" ;
+Description openglrenderer : "OpenGL renderer and related plugins" ;
+Description rendermanagers : "Render manager plugins" ;
+RegisterCompileGroups sndsys imageloaders fontservers
+		      canvases renderers meshes walkall openglcanvas 
+		      proctexes renderall shaders
+		      openglrenderer rendermanagers ;
+
+# Useful dependencies
+Depends openglrenderer : openglcanvas ;
+
+# Historic group aliases.
+NotFile drivers2d ;
+Depends drivers2d : canvases ;
+NotFile drivers3d ;
+Depends drivers3d : renderers ;
+
+# Create a string combining compiler type and version.
+# Can be used for ABI identification
+if $(COMPILER.C++.VERSION_LIST)
+{
+  CS_COMPILER_NAME_AND_VERSION = "$(COMPILER.C++.TYPE)_$(COMPILER.C++.VERSION_LIST[1]).$(COMPILER.C++.VERSION_LIST[2])" ;
+}
+else
+{
+  CS_COMPILER_NAME_AND_VERSION = "$(COMPILER.C++.TYPE)" ;
+}
+
+# Process subdirectories.  NOTE: Unfortunately, Jam rules are presently
+# order-sensitive; Library targets must be seen by Jam before Application and
+# Plugin targets, thus ordering of these SubInclude invocations is dictated by
+# this limitation.
+SubInclude TOP data ;
+SubInclude TOP libs ;
+SubInclude TOP plugins ;
+SubInclude TOP apps ;
+SubInclude TOP docs ;
+SubInclude TOP include ;
+SubInclude TOP scripts ;
+SubInclude TOP bin ;
+
+# When build directory differs from source directory, also arrange for
+# 'distclean' to remove the $(BUILDDIR)/include directory created by
+# configure.  Also ensure that 'install' installs the generated
+# $(BUILDDIR)/include/csconfig.h.
+if [ Property build : standalone ]
+{
+  CleanDir distclean : include ;
+
+  local SUBDIR = [ ConcatDirs $(BUILDTOP) include ] ; # Temporary for Recurse.
+  Recurse InstallHeader : .h ;
+}

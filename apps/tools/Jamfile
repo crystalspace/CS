@@ -1,0 +1,22 @@
+SubDir TOP apps tools ;
+
+SubInclude TOP apps tools basemapgen ;
+SubInclude TOP apps tools csfgen ;
+SubInclude TOP apps tools docconv ;
+SubInclude TOP apps tools distfieldgen ;
+SubInclude TOP apps tools editor ;
+SubInclude TOP apps tools genmeshify ;
+SubInclude TOP apps tools heightmapgen ;
+SubInclude TOP apps tools heightmapproc ;
+SubInclude TOP apps tools imagetool ;
+SubInclude TOP apps tools levtool ;
+SubInclude TOP apps tools lighter2 ;
+SubInclude TOP apps tools mocapviewer ;
+SubInclude TOP apps tools lod ;
+SubInclude TOP apps tools optimisedata ;
+SubInclude TOP apps tools partconv ;
+SubInclude TOP apps tools shagnetron ;
+SubInclude TOP apps tools startme ;
+SubInclude TOP apps tools viewmesh ;
+SubInclude TOP apps tools vsh ;
+

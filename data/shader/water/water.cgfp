@@ -1,0 +1,70 @@
+//---------------------------------------------------------------------------------
+//Input
+//---------------------------------------------------------------------------------
+
+struct vert2frag
+{
+	float4 Position    	: POSITION;
+	float4 Color	   	: COLOR;
+	float3 CamVec		: TEXCOORD0;
+	float4 TexCoord2	: TEXCOORD1;
+	float4 TexCoord3	: TEXCOORD2;
+};
+
+// Calculated from 1.3333, which is approx. refraction index for water
+// R0 is: 
+// float const R0 =  pow(1.0-refractionIndexRatio, 2.0)  
+//                 / pow(1.0+refractionIndexRatio, 2.0); 
+const float R0 = 0.02040781341208;
+
+// Copied this from a NVidia doc
+// http://developer.nvidia.com/object/fresnel_wp.html
+float fresnel(float3 view, float3 normal) 
+{ 
+    // light and normal are assumed to be normalized  
+    return saturate(R0 + (1.0-R0) * pow(1.0-dot(view, normal), 5.0));
+}
+
+// Water color
+const float3 watCol = float3(0.05, 0.15, 0.4);
+
+//---------------------------------------------------------------------------------
+//Shader entry
+//---------------------------------------------------------------------------------
+
+float4 main (vert2frag IN,
+			 uniform float4 lightPos,
+			 uniform float4 lightCol,
+			 uniform float shininess,
+			 uniform float waterAlpha,
+			 uniform sampler2D TexNormal) : COLOR        
+{     
+    float3 N = normalize(tex2D(TexNormal, IN.TexCoord2.xy).xyz 
+						- tex2D(TexNormal, IN.TexCoord3.xy).xyz);
+	
+	//reset light position
+	float3 lightVector = -lightPos.xyz;
+	
+	float3 tsCamVec = IN.CamVec;
+	tsCamVec.x += N.x;
+	tsCamVec.y += N.y;
+	tsCamVec = normalize(tsCamVec);
+	
+	//Get Specular reflection (computed in object coordinates)
+	float3 eyeDir = normalize(IN.CamVec);
+	float3 halfDir = normalize(lightVector + eyeDir);
+	float specularLight = pow(max(0.0, dot(N.xzy, halfDir)), shininess);
+	
+	float4 specularColor = {0.9, 0.8, 0.4, 1.0};
+	float4 specular = specularColor * specularLight;
+
+	float4 reflection = IN.Color + specular;
+	
+	float fresnelFactor = fresnel(tsCamVec, N);
+    return float4(reflection.rgb, 1) * fresnelFactor + float4(watCol.rgb, 1) * (1 - fresnelFactor);
+//	return float4(IN.CamVec.xyz, 1);
+}
+
+//---------------------------------------------------------------------------------
+//end
+//---------------------------------------------------------------------------------

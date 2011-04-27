@@ -1,0 +1,27 @@
+This is a MAX script for exporting genmesh skeletal animation2 from 
+3D Studio Max (tested on versions 6, 7 and 8).
+
+Some notes:
+ - Exporter support Character Studio bones (Bipeds) and
+   simple bones. Both can be used together too. Also it
+   supports Physique and Skin modifiers.
+ - In case that you use Character Studio and Physique modifier:
+   - Copy IPhysique.gup to your max_dir/plugins and restart MAX.
+   - After biped creation use `physique modifier'.
+- All vertices should be "rigid" type when rigging model.
+- The model material must be of type "Multimaterial" - each 
+  group of material faces will be exported as separate submesh.
+  This is because genmesh skeleton animation 2 supports ~40
+  bones per mesh. If your mesh consists of >40 bones you
+  can split it in 2 or more material faces groups (submaterials 
+  must be Standard materials in the multimaterial) by taking care 
+  that each material group is not connected to more than 40 
+  bones.
+- When model is done face it in Y direction.
+- Add Dummy object, call it "root" and set it as parent to 
+  the root skeleton bone (Bip01 if you use Character studio).
+- If you want relative root bone animation uncheck
+  "Parent dummy movable". In this mode you can make rotation
+  or movement in some direction relative by setting the
+  constraint checkboxes (STILL VERY EXPERIMENTAL).
+

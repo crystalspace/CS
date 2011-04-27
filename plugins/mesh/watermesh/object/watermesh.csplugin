@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- watermesh.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.watermesh</name>
+        <implementation>csWaterMeshObjectType</implementation>
+        <description>Crystal Space Water Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -1,0 +1,6 @@
+SubDir TOP plugins mesh animesh persist ;
+
+SubInclude TOP plugins mesh animesh persist body ;
+SubInclude TOP plugins mesh animesh persist skeleton2 ;
+SubInclude TOP plugins mesh animesh persist splitmorph ;
+SubInclude TOP plugins mesh animesh persist standard ;

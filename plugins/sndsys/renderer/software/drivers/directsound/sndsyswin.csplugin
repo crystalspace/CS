@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- sndsyswin.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.sndsys.software.driver.directsound</name>
+        <implementation>SndSysDriverDirectSound</implementation>
+        <description>Sound System DirectSound Software Driver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
+

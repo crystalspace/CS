@@ -1,0 +1,34 @@
+  /** Initialize "%Name%" pseudo-extension. 
+   * Check presence with csGLExtensionFlags::CS_%Name%. */
+  void Init%Name% ()
+  {
+    if (tested_CS_%Name%) return;
+    if (!extstrGL) return;
+    tested_CS_%Name% = true;
+    const char* ext = "%Name%";
+%Depcheck%
+    
+%Extcheck%
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_%Name%;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+%FunctionsInit%
+      CS_%Name% = allclear;
+      if (CS_%Name%)
+      {
+	Report (msgExtFoundAndUsed, "pseudo", CS::Quote::Single (ext));
+      }
+      else
+      {
+        Report (msgExtInitFail, "pseudo", CS::Quote::Single (ext));
+      }
+    }
+    else
+    {
+      Report (msgExtNotFound, "pseudo", CS::Quote::Single (ext));
+    }
+  }
+  

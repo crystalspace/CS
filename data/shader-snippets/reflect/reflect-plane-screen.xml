@@ -1,0 +1,179 @@
+<!--
+  Copyright (C) 2008 by Frank Richter
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet type="compound">
+  <!-- Render a reflection of the current view -->
+  <technique priority="100">
+    
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    <input id="reflectXform" type="translateScale2" default="shadervar" defsv="reflection coord xform" />
+    <!-- Factor applied to perturbance scaling.
+	 The closer the value to 0 is, the larger is the area at which perturbance is scaled. -->
+    <input id="perturbFadeScale" type="float" default="value" defval="1" />
+    
+    <!-- Put the computation of the reflection TC into a separate snippet
+	 so weaver only emits it once. -->
+    <snippet id="reflTC">
+      <technique priority="100">
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+	
+	<input name="positionO" type="position4_object" />
+	
+	<input name="ModelViewProj" type="float4x4" default="complex" private="yes">
+	  <block location="cg:vertexIn">
+	    <uniform type="float4x4" name="ModelViewProj" binding="state.matrix.mvp" />
+	  </block>
+	  
+	  <block location="cg:vertexMain">
+	    ModelViewProj = vertexIn.ModelViewProj;
+	  </block>
+	</input>
+	
+	<input name="reflectXform" type="translateScale2" default="complex">
+	  <block location="cg:vertexIn">
+	    <uniform type="float4" name="reflectXform" />
+	  </block>
+	  
+	  <block location="cg:variablemap">
+	    <variablemap variable="reflection coord xform" destination="vertexIn.reflectXform" />
+	  </block>
+	  
+	  <block location="cg:vertexMain">
+	    reflectXform = vertexIn.reflectXform;
+	  </block>
+	</input>
+	
+	<block location="cg:vertexToFragment">
+	  <varying type="texcoord4" name="reflectionTC" />
+	</block>
+	
+	<block location="cg:vertexMain">
+	  reflectionTC = mul (ModelViewProj, positionO); // == position_screen
+	  float3 reflScale = float3 (reflectXform.xy, 0.5);
+	  float3 reflXlate = float3 (reflectXform.zw, -0.5) * reflectionTC.w;
+	  reflectionTC.xyz = reflectionTC.xyz * reflScale + reflXlate;
+	</block>
+	
+	<block location="cg:fragmentMain">
+	  tcToScreen.xy = float2(1) / reflectXform.xy;
+	  tcToScreen.zw = -tcToScreen.xy*reflectXform.zw;
+	</block>
+	
+	<output name="reflectionTC" type="texcoord4" />
+	<output name="tcToScreen" type="translateScale2" />
+      </technique>
+    </snippet>
+    
+    <snippet id="actualReflect">
+      <technique priority="100">
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+	
+	<input name="positionC" type="position4_camera" />
+	
+	<input name="texReflect" type="tex2d" default="complex">
+	  <block location="pass">
+	    <texture name="tex plane reflect" destination="fragmentIn.texReflect" />
+	  </block>
+	  
+	  <block location="cg:fragmentIn">
+	    <uniform type="tex2d" name="texReflect" />
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    texReflect = fragmentIn.texReflect;
+	  </block>
+	</input>
+	<input name="texReflectDepth" type="tex2d" default="complex">
+	  <block location="pass">
+	    <texture name="tex plane reflect depth" destination="fragmentIn.texReflectDepth" />
+	  </block>
+	  
+	  <block location="cg:fragmentIn">
+	    <uniform type="tex2d" name="texReflectDepth" />
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    texReflectDepth = fragmentIn.texReflectDepth;
+	  </block>
+	</input>
+	
+	<input name="projectedToCamera" type="float4x4" default="complex" private="yes">
+	  <block location="cg:fragmentIn">
+	    <uniform type="float4x4" name="projectedToCamera" />
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    projectedToCamera = fragmentIn.projectedToCamera;
+	  </block>
+	  
+	  <block location="cg:variablemap">
+	    <variablemap destination="fragmentIn.projectedToCamera" variable="projection transform inverse" />
+	  </block>
+	</input>
+	
+	<input name="reflTC" type="texcoord4" />
+	<input name="reflTC2screen" type="translateScale2" />
+	
+	<input name="perturb" type="float2" default="value" defval="0,0" />
+	<input name="perturbFadeScale" type="float" />
+	
+	<block location="cg:vertexMain">
+	  surfaceColor = float4 (0, 0, 0, 1);
+	  surfaceColor_attr_perfragment = true;
+	  mirroredPointDist = 0;
+	  mirroredPointDistSat = 0;
+	</block>
+	
+	<block location="cg:fragmentMain">
+	  float3 tc = reflTC.xyw;
+	  float inv_reflW = 1 / reflTC.w;
+	  
+	  /* The depth offset can mitigate issues from depth precision when large scales
+	     are involved (eg csisland) */
+	  float camDepth = tex2Dproj (texReflectDepth, tc).x*-2 + 1 + (1.0/8388608.0);
+	  float2 screenPos = (reflTC.xy * reflTC2screen.xy * inv_reflW)+reflTC2screen.zw;
+	  float4 positionProjected = float4 (
+	    screenPos.x, screenPos.y, camDepth, 1);
+	  float4 positionUnprojectedC = mul (projectedToCamera, positionProjected);
+	  positionUnprojectedC /= positionUnprojectedC.w;
+	  
+	  if (positionUnprojectedC.z &gt;= positionC.z)
+	    mirroredPointDist = length (positionC.xyz - positionUnprojectedC.xyz);
+	  else
+	    mirroredPointDist = 0;
+	  
+	  float perturbWeight = saturate (mirroredPointDist * perturbFadeScale);
+	  tc.xy += perturb * perturbWeight;
+	  surfaceColor = tex2Dproj (texReflect, tc);
+	  surfaceColor_attr_perfragment = true;
+	  
+	  mirroredPointDistSat = saturate (mirroredPointDist);
+	</block>
+	
+	<output name="surfaceColor" type="rgba">
+	  <attribute name="perfragment" type="bool" />
+	</output>
+	<output name="mirroredPointDist" type="float" />
+	<output name="mirroredPointDistSat" type="float" />
+      </technique>
+    </snippet>
+    
+    <connection from="reflectXform" to="reflTC" />
+    <connection from="reflTC" to="actualReflect" />
+    <connection from="perturbFadeScale" to="actualReflect" />
+  </technique>
+</snippet>

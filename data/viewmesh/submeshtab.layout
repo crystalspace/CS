@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GUILayout>
+  <Window Type="DefaultWindow" Name="SubMeshes" >
+    <Property Name="Text" Value="SM" />
+    <Window Type="ice/StaticImage" Name="SubMeshes/main" >
+      <Property Name='UnifiedSize' Value='{{1.0,0.0},{1.0,0.0}}'/>
+      <Property Name='UnifiedPosition' Value='{{0.0,0.0},{0.0,0.0}}'/>
+
+      <Window Type="ice/Listbox" Name="SubMeshes/List" >
+        <Property Name="Text" Value="Set" />
+        <Property Name='UnifiedSize' Value='{{1.0,-10.0},{0.5,-40.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,5.0}}'/>
+      </Window>
+
+      <Window Type="ice/Button" Name="SubMeshes/AttachSMButton" >
+        <Property Name="Text" Value="Attach" />
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{0.5,-30.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="SubMeshes/DetachSMButton" >
+        <Property Name="Text" Value="Detach" />
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.502,0.0},{0.5,-30.0}}'/>
+      </Window>
+
+      <Window Type="ice/Listbox" Name="SubMeshes/MatList" >
+        <Property Name="Text" Value="SetMaterial" />
+        <Property Name='UnifiedSize' Value='{{1.0,-10.0},{0.5,-40.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.5,5.0}}'/>
+      </Window>
+
+      <Window Type="ice/Button" Name="SubMeshes/SelectMatButton" >
+        <Property Name="Text" Value="Set Material" />
+        <Property Name='UnifiedSize' Value='{{0.0,110.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{1.0,-115.0},{1.0,-30.0}}'/>
+      </Window>
+
+
+
+    </Window>
+  </Window>
+</GUILayout>
+

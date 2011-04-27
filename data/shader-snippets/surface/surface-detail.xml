@@ -1,0 +1,113 @@
+<!--
+  Copyright (C) 2008-2010 by Frank Richter
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet type="compound">
+  <alias name="surface-detail_surface" file="/shader-snippets/surface/surface-classic.xml" weak="yes"/>
+  
+  <technique priority="100">
+    <snippet id="surface_classic" filealias="surface-detail_surface" />
+    
+    <snippet id="detail">
+      <technique priority="100">
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+	
+	<input file="/shader/snippets/texCoord.inp" />
+	<input name="surfaceColorIn" type="rgba">
+	  <attribute name="perfragment" type="bool" />
+	</input>
+	
+	<input name="texDetail" type="tex2d" default="complex">
+	  <block location="pass">
+	    <texture name="tex detail" destination="fragmentIn.texDetail"
+		     fallback="standardtex gray128"/>
+	  </block>
+	  
+	  <block location="cg:fragmentIn">
+	    <uniform type="tex2d" name="texDetail" />
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    texDetail = fragmentIn.texDetail;
+	  </block>
+	</input>
+	
+	<input name="texDetailScale" type="scale2" default="complex">
+	  <block location="shadervars">
+	    <shadervar name="tex detail scale" type="vector2">10,10</shadervar>
+	  </block>
+	  
+	  <block location="cg:variablemap">
+	    <variablemap variable="tex detail scale" 
+			destination="fragmentIn.texDetailScale" />
+	  </block>
+	  
+	  <block location="cg:fragmentIn">
+	    <uniform type="float2" name="texDetailScale" />
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    texDetailScale = fragmentIn.texDetailScale;
+	  </block>
+	</input>
+	
+	<block location="cg:vertexMain">
+	  surfaceColor = surfaceColorIn;
+	  surfaceColor_attr_perfragment = surfaceColorIn_attr_perfragment;
+	</block>
+	
+	<block location="cg:fragmentMain">
+	  surfaceColor = surfaceColorIn;
+	  surfaceColor.rgb *= (tex2D (texDetail, texCoord*texDetailScale).rgb)*2;
+	  surfaceColor_attr_perfragment = true;
+	</block>
+	
+	<output name="surfaceColor" type="rgba">
+	  <attribute name="perfragment" type="bool" />
+	</output>
+      </technique>
+      
+      <!-- FIXME: currently, weaver falls through to the fallback very quickly,
+	   effectively disabling detail -->
+      <!--technique priority="50">
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+	
+	<input file="/shader/snippets/texCoord.inp" />
+	<input name="surfaceColorIn" type="rgba">
+	  <attribute name="perfragment" type="bool" />
+	</input>
+	
+	
+	<block location="cg:vertexMain">
+	  surfaceColor = surfaceColorIn;
+	  surfaceColor_attr_perfragment = surfaceColorIn_attr_perfragment;
+	</block>
+	
+	<block location="cg:fragmentMain">
+	  surfaceColor = surfaceColorIn;
+	  surfaceColor.rgb = float3 (1,0,0);
+	  surfaceColor_attr_perfragment = surfaceColorIn_attr_perfragment;
+	</block>
+	
+	<output name="surfaceColor" type="rgba">
+	  <attribute name="perfragment" type="bool" />
+	</output>
+      </technique-->
+    </snippet>
+    
+    <connection from="surface_classic" to="detail" />
+  </technique>
+</snippet>

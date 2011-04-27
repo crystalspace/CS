@@ -1,0 +1,5 @@
+SubDir TOP apps tests avatartest ;
+
+Description avatartest : "tests on animesh animation" ;
+Application avatartest : [ Wildcard *.cpp *.h ] : noinstall ;
+LinkWith avatartest : crystalspace ;

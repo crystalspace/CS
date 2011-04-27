@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- ikphysical.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.animesh.animnode.ik.physical</name>
+        <implementation>IKPhysicalManager</implementation>
+        <description>Physics based implementation of the inverse kinematics animation node</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

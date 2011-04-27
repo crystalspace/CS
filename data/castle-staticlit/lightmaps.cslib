@@ -1,0 +1,74 @@
+<library>
+    <textures>
+        <texture name="lightmaps_castle-staticlit_0_png">
+            <class>lightmap</class>
+            <file>lightmaps/castle-staticlit_0.png</file>
+            <mipmap>no</mipmap>
+        </texture>
+        <texture name="lightmaps_castle-staticlit_1_png">
+            <class>lightmap</class>
+            <file>lightmaps/castle-staticlit_1.png</file>
+            <mipmap>no</mipmap>
+        </texture>
+        <texture name="lightmaps_castle-staticlit_0_d1_png">
+            <class>lightmap</class>
+            <file>lightmaps/castle-staticlit_0_d1.png</file>
+            <mipmap>no</mipmap>
+        </texture>
+        <texture name="lightmaps_castle-staticlit_1_d1_png">
+            <class>lightmap</class>
+            <file>lightmaps/castle-staticlit_1_d1.png</file>
+            <mipmap>no</mipmap>
+        </texture>
+        <texture name="lightmaps_castle-staticlit_0_d2_png">
+            <class>lightmap</class>
+            <file>lightmaps/castle-staticlit_0_d2.png</file>
+            <mipmap>no</mipmap>
+        </texture>
+        <texture name="lightmaps_castle-staticlit_1_d2_png">
+            <class>lightmap</class>
+            <file>lightmaps/castle-staticlit_1_d2.png</file>
+            <mipmap>no</mipmap>
+        </texture>
+        <texture name="lightmaps_castle-staticlit_0_d3_png">
+            <class>lightmap</class>
+            <file>lightmaps/castle-staticlit_0_d3.png</file>
+            <mipmap>no</mipmap>
+        </texture>
+        <texture name="lightmaps_castle-staticlit_1_d3_png">
+            <class>lightmap</class>
+            <file>lightmaps/castle-staticlit_1_d3.png</file>
+            <mipmap>no</mipmap>
+        </texture>
+        <texture name="lightmaps_castle-staticlit_0_sd0_dds">
+            <class>lightmap</class>
+            <file>lightmaps/castle-staticlit_0_sd0.dds</file>
+            <mipmap>no</mipmap>
+        </texture>
+        <texture name="lightmaps_castle-staticlit_0_sd1_dds">
+            <class>lightmap</class>
+            <file>lightmaps/castle-staticlit_0_sd1.dds</file>
+            <mipmap>no</mipmap>
+        </texture>
+        <texture name="lightmaps_castle-staticlit_0_sd2_dds">
+            <class>lightmap</class>
+            <file>lightmaps/castle-staticlit_0_sd2.dds</file>
+            <mipmap>no</mipmap>
+        </texture>
+        <texture name="lightmaps_castle-staticlit_1_sd0_dds">
+            <class>lightmap</class>
+            <file>lightmaps/castle-staticlit_1_sd0.dds</file>
+            <mipmap>no</mipmap>
+        </texture>
+        <texture name="lightmaps_castle-staticlit_1_sd1_dds">
+            <class>lightmap</class>
+            <file>lightmaps/castle-staticlit_1_sd1.dds</file>
+            <mipmap>no</mipmap>
+        </texture>
+        <texture name="lightmaps_castle-staticlit_1_sd2_dds">
+            <class>lightmap</class>
+            <file>lightmaps/castle-staticlit_1_sd2.dds</file>
+            <mipmap>no</mipmap>
+        </texture>
+    </textures>
+</library>

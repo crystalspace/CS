@@ -1,0 +1,226 @@
+/*
+    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 2001 by Samuel Humphreys
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#ifndef __CS_XWINDOW_H__
+#define __CS_XWINDOW_H__
+
+#include <stdarg.h>
+#include "csutil/csstring.h"
+#include "csutil/hash.h"
+#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
+#include "csutil/weakkeyedhash.h"
+#include "csutil/weakref.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
+#include "iutil/event.h"
+#include "csutil/eventhandlers.h"
+#include "ivaria/xwindow.h"
+#include "plugins/video/canvas/xwindowcommon/xextf86vm.h"
+#include "ivideo/graph2d.h"
+
+#ifndef XK_MISCELLANY
+#define XK_MISCELLANY 1
+#endif
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/keysymdef.h>
+#include <X11/cursorfont.h>
+#include <X11/Xatom.h>
+
+class csXWindow : public scfImplementation3<csXWindow, iXWindow, 
+  iEventPlug, iComponent>
+{
+  /// The Object Registry
+  iObjectRegistry *object_reg;
+  /// The name registry
+  csRef<iEventNameRegistry> name_reg;
+  /// The Canvas
+  iGraphics2D *Canvas;
+  /// The event outlet
+  csRef<iEventOutlet> EventOutlet;
+  /// The XFree86-VidModeExtension
+  csRef<iXExtF86VM> xf86vm;
+  /// The Window Title
+  csString win_title;
+  /// The X-display
+  Display* dpy;
+  /// The Screen Number (not necessarilly the default)
+  int screen_num;
+  // Window colormap
+  Colormap cmap;
+  /// The Graphic Context
+  GC gc;
+  /// The Visual Information Structure
+  XVisualInfo *xvis;
+  /// The Context Window
+  Window ctx_win;
+  /// The Window Managers Window
+  Window wm_win;
+  /// Dimensions
+  int wm_width, wm_height;
+  // "_MOTIF_WM_HINTS" atom, for window decoration manipulation
+  Atom xaMotifWmHints;
+  
+  XEvent storedEvent;
+
+  // "WM_DELETE_WINDOW" atom
+  Atom wm_delete_window;
+
+  bool allow_resize;
+  /// Determines grab status of keyboard (only in release build)
+  int keyboard_grabbed;
+  /// Keyboard input method
+  XIM keyboardIM;
+  /// Keyboard input context
+  XIC keyboardIC;
+  //-------------------------------------------------------------
+  // Hardware mouse cursor or software emulation?
+  csGraphics2D::HWMouseMode hwMouse;
+  // Number of CS mouse cursors
+  enum { lastCursor = csmcWait, cursorNum = lastCursor+1 };
+  /// Mouse cursors (if hardware mouse cursors are used)
+  Cursor MouseCursor [cursorNum];
+  /// Empty mouse cursor (consist of EmptyPixmap)
+  Cursor EmptyMouseCursor;
+  /// A empty pixmap
+  Pixmap EmptyPixmap;
+  
+  /// Wrapper for X mouse cursors
+  class CursorWrapper : public CS::Utility::FastRefCount<CursorWrapper>
+  {
+    Display* dpy;
+    Cursor xcur;
+  public:
+    CursorWrapper (Display* dpy, Cursor xcur) : dpy (dpy), xcur (xcur) {}
+    ~CursorWrapper() { XFreeCursor (dpy, xcur); }
+    
+    operator Cursor() const { return xcur; }
+  };
+  /// List of image-based cursors
+  typedef CS::Container::WeakKeyedHash<csRef<CursorWrapper>, csWeakRef<iImage> > CursorCache;
+  CursorCache cachedCursors;
+  
+  Cursor GetXCursor (csMouseCursorID shape);
+  
+  // RGBA cursor support
+  bool haveRGBAcursors;
+  Cursor CreateRGBACursor (iImage* imageRGBA, int hotspotX, int hotspotY);
+  //------------------------------------------------------------
+  
+  typedef int (*XErrorHandler)(Display*, XErrorEvent*);
+  XErrorHandler oldErrorHandler;
+
+  void Report (int severity, const char* msg, ...);
+  void SetVideoMode (bool full, bool up, bool down);
+
+public:
+  csXWindow (iBase*);
+  virtual ~csXWindow ();
+
+  virtual bool Initialize (iObjectRegistry*);
+  virtual bool HandleEvent (iEvent& Event);
+
+  virtual bool Open ();
+  virtual void Close ();
+
+  virtual bool GetFullScreen ()
+  { return xf86vm ? xf86vm->IsFullScreen () : false; }
+
+  virtual void SetFullScreen (bool yesno)
+  { SetVideoMode (yesno, false, false); }
+
+  virtual void AllowResize (bool iAllow);
+
+  virtual void SetTitle (const char* title);
+  
+  /** Sets the icon of this window with the provided one.
+   *
+   *  @param image the iImage to set as the icon of this window.
+   */  
+  virtual void SetIcon (iImage *image);
+  virtual void SetCanvas (iGraphics2D *canvas);
+
+  virtual XEvent GetStoredEvent()
+  { return storedEvent; }
+  virtual Display *GetDisplay ()
+  { return dpy; }
+  virtual int GetScreen ()
+  { return screen_num; }
+  virtual Window GetWindow ()
+  { return ctx_win; }
+  virtual GC GetGC ()
+  { return gc; }
+
+  virtual void SetVisualInfo (XVisualInfo *vis)
+  { xvis = vis; }
+  virtual void SetColormap (Colormap cmap)
+  { this->cmap = cmap; }
+
+  // Should be in the window manager
+  virtual bool SetMousePosition (int x, int y);
+  virtual bool SetMouseCursor (csMouseCursorID iShape);
+
+  virtual bool SetMouseCursor (iImage *image, const csRGBcolor* keycolor, 
+                               int hotspot_x, int hotspot_y,
+                               csRGBcolor fg, csRGBcolor bg);
+
+  virtual bool AlertV (int type, const char* title, const char* okMsg,
+  	const char* msg, va_list arg) CS_GNUC_PRINTF (5, 0);
+#ifdef HAVE_XAW
+  bool AlertV_Xaw (int type, const char* title, const char* okMsg,
+  	const char* msg, va_list arg) CS_GNUC_PRINTF (5, 0);
+#endif
+#ifdef HAVE_GTK
+  bool AlertV_GTK (int type, const char* title, const char* okMsg,
+  	const char* msg, va_list arg) CS_GNUC_PRINTF (5, 0);
+#endif
+  void SetHWMouseMode (csGraphics2D::HWMouseMode hwMouse)
+  { this->hwMouse = hwMouse; }
+  
+  bool SetWindowDecoration (iNativeWindow::WindowDecoration decoration, bool flag);
+  bool GetWindowDecoration (iNativeWindow::WindowDecoration decoration, bool& result);
+
+  struct EventHandler : 
+    public scfImplementation1<EventHandler, iEventHandler>
+  {
+  private:
+    csWeakRef<csXWindow> parent;
+  public:
+    EventHandler (csXWindow* parent) : scfImplementationType (this)
+    {
+      EventHandler::parent = parent;
+    }
+    virtual ~EventHandler () { }
+    virtual bool HandleEvent (iEvent& e)
+    { return parent ? parent->HandleEvent(e) : false; }
+    CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.window")
+  };
+  csRef<EventHandler> scfiEventHandler;
+
+  //------------------------ iEventPlug interface ---------------------------//
+
+  virtual unsigned GetPotentiallyConflictingEvents ()
+  { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
+  virtual unsigned QueryEventPriority (unsigned /*iType*/)
+  { return 150; }
+
+};
+
+#endif // __CS_XWINDOW_H__

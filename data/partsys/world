@@ -1,0 +1,3955 @@
+<world>
+    <plugins>
+        <plugin name="plasma">crystalspace.texture.loader.plasma</plugin>
+        <plugin name="fireTexLoader">crystalspace.texture.loader.fire</plugin>
+    </plugins>
+    <library>lightmaps.cslib</library>
+    <textures>
+        <texture name="abstract_a032.jpg">
+            <file>/lib/stdtex/bricks.jpg</file>
+        </texture>
+        <texture name="andrew_wood.jpg">
+            <file>/lib/stdtex/my_wood.jpg</file>
+        </texture>
+        <texture name="raindrop">
+            <file>/lib/std/raindrop.png</file>
+        </texture>
+        <texture name="snow">
+            <file>/lib/std/snow.jpg</file>
+        </texture>
+        <texture name="spark">
+            <file>/lib/std/spark.png</file>
+        </texture>
+        <texture name="flare_picir">
+            <file>/lib/stdtex/flare_picir.jpg</file>
+        </texture>
+        <texture name="flare_center">
+            <file>/lib/stdtex/flare_center.jpg</file>
+        </texture>
+        <texture name="andrew_marble4">
+            <file>/lib/std/andrew_marble4.gif</file>
+        </texture>
+        <texture name="sky">
+            <file>/lib/stdtex/sky.jpg</file>
+        </texture>
+        <texture name="fpart">
+            <file>/lib/stdtex/fpart.png</file>
+        </texture>
+        <texture name="fp2">
+            <file>/lib/stdtex/fp2.png</file>
+        </texture>
+        <texture name="hazecirc">
+            <file>/lib/stdtex/hazecirc.jpg</file>
+        </texture>
+        <texture name="hazebasic">
+            <file>/lib/stdtex/hazebasic.png</file>
+        </texture>
+        <texture name="plasma">
+            <type>plasma</type>
+        </texture>
+        <texture name="flamelet">
+            <type>fireTexLoader</type>
+            <size width="16" height="32" />
+            <params>
+                <smoothing>0</smoothing>
+                <halfbase>2</halfbase>
+                <palette>
+                    <shade>
+                        <color red="0" green="0" blue="0" />
+                        <pos>0</pos>
+                    </shade>
+                    <shade>
+                        <color red="1" green="1" blue="1" />
+                        <pos>1</pos>
+                    </shade>
+                </palette>
+            </params>
+        </texture>
+        <texture name="dot">
+            <file>dot.png</file>
+        </texture>
+    </textures>
+    <shaders>
+        <shader>
+            <file>/shader/particles/basic.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/particles/soft-alpha.xml</file>
+        </shader>
+    </shaders>
+    <materials>
+        <material name="wood">
+            <texture>andrew_wood.jpg</texture>
+        </material>
+        <material name="abstract">
+            <texture>abstract_a032.jpg</texture>
+        </material>
+        <material name="raindrop">
+            <texture>raindrop</texture>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">particles_basic</shader>
+        </material>
+        <material name="snow">
+            <texture>snow</texture>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">particles_basic</shader>
+        </material>
+        <material name="spark">
+            <texture>spark</texture>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">particles_basic</shader>
+        </material>
+        <material name="flare_picir">
+            <texture>flare_picir</texture>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">particles_basic</shader>
+        </material>
+        <material name="flare_center">
+            <texture>flare_center</texture>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">particles_basic</shader>
+        </material>
+        <material name="andrew_marble4">
+            <texture>andrew_marble4</texture>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">particles_soft-alpha</shader>
+        </material>
+        <material name="sky">
+            <texture>sky</texture>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">particles_basic</shader>
+        </material>
+        <material name="fpart">
+            <texture>fpart</texture>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">particles_basic</shader>
+        </material>
+        <material name="fp2">
+            <texture>fp2</texture>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">particles_basic</shader>
+        </material>
+        <material name="hazecirc">
+            <texture>hazecirc</texture>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">particles_basic</shader>
+        </material>
+        <material name="hazebasic">
+            <texture>hazebasic</texture>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">particles_basic</shader>
+        </material>
+        <material name="plasma">
+            <texture>plasma</texture>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">particles_basic</shader>
+        </material>
+        <material name="flamelet">
+            <texture>flamelet</texture>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">particles_basic</shader>
+        </material>
+        <material name="particle">
+            <texture>dot</texture>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">particles_basic</shader>
+        </material>
+        <material name="dot">
+            <texture>dot</texture>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">particles_basic</shader>
+        </material>
+    </materials>
+    <plugins>
+        <plugin name="emitFact">crystalspace.mesh.loader.factory.emit</plugin>
+        <plugin name="emit">crystalspace.mesh.loader.emit</plugin>
+        <plugin name="hazeFact">crystalspace.mesh.loader.factory.haze</plugin>
+        <plugin name="haze">crystalspace.mesh.loader.haze</plugin>
+    </plugins>
+    <library>/data/particles/fire1.cslib</library>
+    <library>/data/particles/fire2.cslib</library>
+    <library>/data/particles/flame.cslib</library>
+    <library>/data/particles/rain.cslib</library>
+    <library>/data/particles/snow.cslib</library>
+    <meshfact name="emitFact">
+        <plugin>emitFact</plugin>
+        <params />
+    </meshfact>
+    <library>/data/particles/spiral.cslib</library>
+    <meshfact name="hazeFact">
+        <plugin>hazeFact</plugin>
+        <params />
+    </meshfact>
+    <library>/data/particles/fountain.cslib</library>
+    <meshfact name="factory_room_walls">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <renderbuffer name="position" checkelementcount="no" components="3" type="float">
+                <e c0="-20" c1="-1" c2="-20" />
+                <e c0="-20" c1="-1" c2="-20" />
+                <e c0="-20" c1="-1" c2="-20" />
+                <e c0="-20" c1="-1" c2="-1" />
+                <e c0="-20" c1="-1" c2="1" />
+                <e c0="-20" c1="-1" c2="20" />
+                <e c0="-20" c1="-1" c2="20" />
+                <e c0="-20" c1="-1" c2="20" />
+                <e c0="-20" c1="5" c2="-20" />
+                <e c0="-20" c1="5" c2="-20" />
+                <e c0="-20" c1="5" c2="-20" />
+                <e c0="-20" c1="5" c2="-1" />
+                <e c0="-20" c1="5" c2="1" />
+                <e c0="-20" c1="5" c2="20" />
+                <e c0="-20" c1="5" c2="20" />
+                <e c0="-20" c1="5" c2="20" />
+                <e c0="-1" c1="-1" c2="-20" />
+                <e c0="-1" c1="-1" c2="-20" />
+                <e c0="-1" c1="-1" c2="20" />
+                <e c0="-1" c1="-1" c2="20" />
+                <e c0="-1" c1="5" c2="-20" />
+                <e c0="-1" c1="5" c2="-20" />
+                <e c0="-1" c1="5" c2="20" />
+                <e c0="-1" c1="5" c2="20" />
+                <e c0="1" c1="-1" c2="-20" />
+                <e c0="1" c1="-1" c2="-20" />
+                <e c0="1" c1="-1" c2="20" />
+                <e c0="1" c1="-1" c2="20" />
+                <e c0="1" c1="5" c2="-20" />
+                <e c0="1" c1="5" c2="-20" />
+                <e c0="1" c1="5" c2="20" />
+                <e c0="1" c1="5" c2="20" />
+                <e c0="20" c1="-1" c2="-20" />
+                <e c0="20" c1="-1" c2="-20" />
+                <e c0="20" c1="-1" c2="-20" />
+                <e c0="20" c1="-1" c2="-1" />
+                <e c0="20" c1="-1" c2="1" />
+                <e c0="20" c1="-1" c2="20" />
+                <e c0="20" c1="-1" c2="20" />
+                <e c0="20" c1="-1" c2="20" />
+                <e c0="20" c1="5" c2="-20" />
+                <e c0="20" c1="5" c2="-20" />
+                <e c0="20" c1="5" c2="-20" />
+                <e c0="20" c1="5" c2="-1" />
+                <e c0="20" c1="5" c2="1" />
+                <e c0="20" c1="5" c2="20" />
+                <e c0="20" c1="5" c2="20" />
+                <e c0="20" c1="5" c2="20" />
+            </renderbuffer>
+            <renderbuffer name="normal" components="3" type="float">
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+            </renderbuffer>
+            <renderbuffer name="texture coordinate 0" components="2" type="float">
+                <e c0="-4" c1="-4" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="-4" c1="4" />
+                <e c0="4" c1="-0.2" />
+                <e c0="-4" c1="-4" />
+                <e c0="-4" c1="1" />
+                <e c0="-4" c1="1" />
+                <e c0="-0.2" c1="1" />
+                <e c0="0.2" c1="1" />
+                <e c0="-4" c1="1" />
+                <e c0="-4" c1="4" />
+                <e c0="4" c1="1" />
+                <e c0="-0.2" c1="-4" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="-0.2" c1="4" />
+                <e c0="-0.2" c1="-4" />
+                <e c0="-0.2" c1="1" />
+                <e c0="-0.2" c1="1" />
+                <e c0="-0.2" c1="4" />
+                <e c0="0.2" c1="-4" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="0.2" c1="4" />
+                <e c0="0.2" c1="-4" />
+                <e c0="0.2" c1="1" />
+                <e c0="0.2" c1="1" />
+                <e c0="0.2" c1="4" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="4" c1="-4" />
+                <e c0="4" c1="-0.2" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="4" c1="-0.2" />
+                <e c0="4" c1="-0.2" />
+                <e c0="4" c1="4" />
+                <e c0="-4" c1="1" />
+                <e c0="4" c1="-4" />
+                <e c0="4" c1="1" />
+                <e c0="-0.2" c1="1" />
+                <e c0="0.2" c1="1" />
+                <e c0="4" c1="1" />
+                <e c0="4" c1="1" />
+                <e c0="4" c1="4" />
+            </renderbuffer>
+            <renderbuffer name="tangent" components="3" type="float">
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+            </renderbuffer>
+            <renderbuffer name="bitangent" components="3" type="float">
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+            </renderbuffer>
+            <mixmode>
+                <copy />
+            </mixmode>
+            <submesh name="abstract_0">
+                <material>abstract</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="42" />
+                    <e c0="29" />
+                    <e c0="25" />
+                    <e c0="42" />
+                    <e c0="25" />
+                    <e c0="34" />
+                    <e c0="29" />
+                    <e c0="17" />
+                    <e c0="25" />
+                    <e c0="29" />
+                    <e c0="21" />
+                    <e c0="17" />
+                    <e c0="21" />
+                    <e c0="1" />
+                    <e c0="17" />
+                    <e c0="21" />
+                    <e c0="9" />
+                    <e c0="1" />
+                    <e c0="10" />
+                    <e c0="11" />
+                    <e c0="3" />
+                    <e c0="10" />
+                    <e c0="3" />
+                    <e c0="2" />
+                    <e c0="11" />
+                    <e c0="4" />
+                    <e c0="3" />
+                    <e c0="11" />
+                    <e c0="12" />
+                    <e c0="4" />
+                    <e c0="12" />
+                    <e c0="7" />
+                    <e c0="4" />
+                    <e c0="12" />
+                    <e c0="15" />
+                    <e c0="7" />
+                    <e c0="13" />
+                    <e c0="22" />
+                    <e c0="18" />
+                    <e c0="13" />
+                    <e c0="18" />
+                    <e c0="5" />
+                    <e c0="30" />
+                    <e c0="46" />
+                    <e c0="38" />
+                    <e c0="30" />
+                    <e c0="38" />
+                    <e c0="26" />
+                    <e c0="45" />
+                    <e c0="44" />
+                    <e c0="36" />
+                    <e c0="45" />
+                    <e c0="36" />
+                    <e c0="37" />
+                    <e c0="43" />
+                    <e c0="40" />
+                    <e c0="32" />
+                    <e c0="43" />
+                    <e c0="32" />
+                    <e c0="35" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="wood_0">
+                <material>wood</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="6" />
+                    <e c0="19" />
+                    <e c0="0" />
+                    <e c0="19" />
+                    <e c0="16" />
+                    <e c0="16" />
+                    <e c0="19" />
+                    <e c0="27" />
+                    <e c0="16" />
+                    <e c0="27" />
+                    <e c0="24" />
+                    <e c0="24" />
+                    <e c0="27" />
+                    <e c0="39" />
+                    <e c0="24" />
+                    <e c0="39" />
+                    <e c0="33" />
+                    <e c0="14" />
+                    <e c0="8" />
+                    <e c0="20" />
+                    <e c0="14" />
+                    <e c0="20" />
+                    <e c0="23" />
+                    <e c0="23" />
+                    <e c0="20" />
+                    <e c0="28" />
+                    <e c0="23" />
+                    <e c0="28" />
+                    <e c0="31" />
+                    <e c0="31" />
+                    <e c0="28" />
+                    <e c0="41" />
+                    <e c0="31" />
+                    <e c0="41" />
+                    <e c0="47" />
+                </indexbuffer>
+            </submesh>
+        </params>
+    </meshfact>
+    <sector name="room">
+        <meshobj name="walls">
+            <zfill />
+            <plugin>crystalspace.mesh.loader.genmesh</plugin>
+            <params>
+                <factory>factory_room_walls</factory>
+                <color red="1" green="1" blue="1" />
+                <manualcolors />
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <submesh name="abstract_0">
+                    <material>abstract</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
+                    <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
+                </submesh>
+                <submesh name="wood_0">
+                    <material>wood</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
+                    <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
+                </submesh>
+                <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                    <e c0="0.00146484" c1="0.00292969" />
+                    <e c0="0.797363" c1="0.00292969" />
+                    <e c0="0.638184" c1="0.321289" />
+                    <e c0="0.638184" c1="0.469727" />
+                    <e c0="0.638184" c1="0.485352" />
+                    <e c0="0.584473" c1="0.639648" />
+                    <e c0="0.157715" c1="0.00292969" />
+                    <e c0="0.638184" c1="0.633789" />
+                    <e c0="0.160645" c1="0.00292969" />
+                    <e c0="0.820801" c1="0.00292969" />
+                    <e c0="0.661621" c1="0.321289" />
+                    <e c0="0.661621" c1="0.469727" />
+                    <e c0="0.661621" c1="0.485352" />
+                    <e c0="0.60791" c1="0.639648" />
+                    <e c0="0.316895" c1="0.00292969" />
+                    <e c0="0.661621" c1="0.633789" />
+                    <e c0="0.00146484" c1="0.151367" />
+                    <e c0="0.797363" c1="0.151367" />
+                    <e c0="0.584473" c1="0.788086" />
+                    <e c0="0.157715" c1="0.151367" />
+                    <e c0="0.160645" c1="0.151367" />
+                    <e c0="0.820801" c1="0.151367" />
+                    <e c0="0.60791" c1="0.788086" />
+                    <e c0="0.316895" c1="0.151367" />
+                    <e c0="0.00146484" c1="0.166992" />
+                    <e c0="0.797363" c1="0.166992" />
+                    <e c0="0.584473" c1="0.793945" />
+                    <e c0="0.157715" c1="0.166992" />
+                    <e c0="0.160645" c1="0.166992" />
+                    <e c0="0.820801" c1="0.166992" />
+                    <e c0="0.60791" c1="0.793945" />
+                    <e c0="0.316895" c1="0.166992" />
+                    <e c0="0.929199" c1="0.157227" />
+                    <e c0="0.00146484" c1="0.31543" />
+                    <e c0="0.797363" c1="0.31543" />
+                    <e c0="0.929199" c1="0.305664" />
+                    <e c0="0.929199" c1="0.00292969" />
+                    <e c0="0.929199" c1="0.151367" />
+                    <e c0="0.584473" c1="0.942383" />
+                    <e c0="0.157715" c1="0.31543" />
+                    <e c0="0.952637" c1="0.157227" />
+                    <e c0="0.160645" c1="0.31543" />
+                    <e c0="0.820801" c1="0.31543" />
+                    <e c0="0.952637" c1="0.305664" />
+                    <e c0="0.952637" c1="0.00292969" />
+                    <e c0="0.952637" c1="0.151367" />
+                    <e c0="0.60791" c1="0.942383" />
+                    <e c0="0.316895" c1="0.31543" />
+                </renderbuffer>
+            </params>
+            <staticlit />
+        </meshobj>
+        <portals>
+            <portal name="front2">
+                <v x="-1" y="5" z="20" />
+                <v x="1" y="5" z="20" />
+                <v x="1" y="-1" z="20" />
+                <v x="-1" y="-1" z="20" />
+                <sector>room0,1</sector>
+                <viscull />
+            </portal>
+            <portal name="right2">
+                <v x="20" y="5" z="1" />
+                <v x="20" y="5" z="-1" />
+                <v x="20" y="-1" z="-1" />
+                <v x="20" y="-1" z="1" />
+                <sector>room1,0</sector>
+                <viscull />
+            </portal>
+        </portals>
+        <light>
+            <center x="0" y="0" z="0" />
+            <radius>40</radius>
+            <color red="1" green="1" blue="1" />
+        </light>
+        <meshobj name="flame">
+            <priority>alpha</priority>
+            <plugin>crystalspace.mesh.loader.particles</plugin>
+            <ztest />
+            <params>
+                <factory>flameFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <material>raindrop</material>
+            </params>
+            <move>
+                <v x="-10" y="0" z="-10" />
+            </move>
+        </meshobj>
+        <meshobj name="snowfall">
+            <priority>alpha</priority>
+            <plugin>crystalspace.mesh.loader.particles</plugin>
+            <ztest />
+            <params>
+                <factory>snowFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <material>snow</material>
+            </params>
+            <move>
+                <v x="10" y="0" z="10" />
+            </move>
+        </meshobj>
+        <meshobj name="rainfall">
+            <priority>alpha</priority>
+            <plugin>crystalspace.mesh.loader.particles</plugin>
+            <ztest />
+            <params>
+                <factory>rainFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <material>raindrop</material>
+            </params>
+            <move>
+                <v x="-10" y="0" z="10" />
+            </move>
+        </meshobj>
+        <meshobj name="fount2">
+            <plugin>crystalspace.mesh.loader.particles</plugin>
+            <params>
+                <factory>fountainFACT</factory>
+            </params>
+            <move>
+                <v x="10" y="0" z="-15" />
+            </move>
+        </meshobj>
+    </sector>
+    <meshfact name="factory_room0,1_walls">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <renderbuffer name="position" checkelementcount="no" components="3" type="float">
+                <e c0="-20" c1="-1" c2="20" />
+                <e c0="-20" c1="-1" c2="20" />
+                <e c0="-20" c1="-1" c2="20" />
+                <e c0="-20" c1="-1" c2="39" />
+                <e c0="-20" c1="-1" c2="41" />
+                <e c0="-20" c1="-1" c2="60" />
+                <e c0="-20" c1="-1" c2="60" />
+                <e c0="-20" c1="-1" c2="60" />
+                <e c0="-20" c1="5" c2="20" />
+                <e c0="-20" c1="5" c2="20" />
+                <e c0="-20" c1="5" c2="20" />
+                <e c0="-20" c1="5" c2="39" />
+                <e c0="-20" c1="5" c2="41" />
+                <e c0="-20" c1="5" c2="60" />
+                <e c0="-20" c1="5" c2="60" />
+                <e c0="-20" c1="5" c2="60" />
+                <e c0="-1" c1="-1" c2="20" />
+                <e c0="-1" c1="-1" c2="20" />
+                <e c0="-1" c1="-1" c2="60" />
+                <e c0="-1" c1="-1" c2="60" />
+                <e c0="-1" c1="5" c2="20" />
+                <e c0="-1" c1="5" c2="20" />
+                <e c0="-1" c1="5" c2="60" />
+                <e c0="-1" c1="5" c2="60" />
+                <e c0="1" c1="-1" c2="20" />
+                <e c0="1" c1="-1" c2="20" />
+                <e c0="1" c1="-1" c2="60" />
+                <e c0="1" c1="-1" c2="60" />
+                <e c0="1" c1="5" c2="20" />
+                <e c0="1" c1="5" c2="20" />
+                <e c0="1" c1="5" c2="60" />
+                <e c0="1" c1="5" c2="60" />
+                <e c0="20" c1="-1" c2="20" />
+                <e c0="20" c1="-1" c2="20" />
+                <e c0="20" c1="-1" c2="20" />
+                <e c0="20" c1="-1" c2="39" />
+                <e c0="20" c1="-1" c2="41" />
+                <e c0="20" c1="-1" c2="60" />
+                <e c0="20" c1="-1" c2="60" />
+                <e c0="20" c1="-1" c2="60" />
+                <e c0="20" c1="5" c2="20" />
+                <e c0="20" c1="5" c2="20" />
+                <e c0="20" c1="5" c2="20" />
+                <e c0="20" c1="5" c2="39" />
+                <e c0="20" c1="5" c2="41" />
+                <e c0="20" c1="5" c2="60" />
+                <e c0="20" c1="5" c2="60" />
+                <e c0="20" c1="5" c2="60" />
+            </renderbuffer>
+            <renderbuffer name="normal" components="3" type="float">
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+            </renderbuffer>
+            <renderbuffer name="texture coordinate 0" components="2" type="float">
+                <e c0="-4" c1="-4" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="-4" c1="4" />
+                <e c0="4" c1="-0.2" />
+                <e c0="-4" c1="-4" />
+                <e c0="-4" c1="1" />
+                <e c0="-4" c1="1" />
+                <e c0="-0.2" c1="1" />
+                <e c0="0.2" c1="1" />
+                <e c0="-4" c1="1" />
+                <e c0="-4" c1="4" />
+                <e c0="4" c1="1" />
+                <e c0="-0.2" c1="-4" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="-0.2" c1="4" />
+                <e c0="-0.2" c1="-4" />
+                <e c0="-0.2" c1="1" />
+                <e c0="-0.2" c1="1" />
+                <e c0="-0.2" c1="4" />
+                <e c0="0.2" c1="-4" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="0.2" c1="4" />
+                <e c0="0.2" c1="-4" />
+                <e c0="0.2" c1="1" />
+                <e c0="0.2" c1="1" />
+                <e c0="0.2" c1="4" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="4" c1="-4" />
+                <e c0="4" c1="-0.2" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="4" c1="-0.2" />
+                <e c0="4" c1="-0.2" />
+                <e c0="4" c1="4" />
+                <e c0="-4" c1="1" />
+                <e c0="4" c1="-4" />
+                <e c0="4" c1="1" />
+                <e c0="-0.2" c1="1" />
+                <e c0="0.2" c1="1" />
+                <e c0="4" c1="1" />
+                <e c0="4" c1="1" />
+                <e c0="4" c1="4" />
+            </renderbuffer>
+            <renderbuffer name="tangent" components="3" type="float">
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+            </renderbuffer>
+            <renderbuffer name="bitangent" components="3" type="float">
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+            </renderbuffer>
+            <mixmode>
+                <copy />
+            </mixmode>
+            <submesh name="abstract_0">
+                <material>abstract</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="45" />
+                    <e c0="44" />
+                    <e c0="36" />
+                    <e c0="45" />
+                    <e c0="36" />
+                    <e c0="37" />
+                    <e c0="44" />
+                    <e c0="35" />
+                    <e c0="36" />
+                    <e c0="44" />
+                    <e c0="43" />
+                    <e c0="35" />
+                    <e c0="43" />
+                    <e c0="32" />
+                    <e c0="35" />
+                    <e c0="43" />
+                    <e c0="40" />
+                    <e c0="32" />
+                    <e c0="10" />
+                    <e c0="11" />
+                    <e c0="3" />
+                    <e c0="10" />
+                    <e c0="3" />
+                    <e c0="2" />
+                    <e c0="11" />
+                    <e c0="4" />
+                    <e c0="3" />
+                    <e c0="11" />
+                    <e c0="12" />
+                    <e c0="4" />
+                    <e c0="12" />
+                    <e c0="7" />
+                    <e c0="4" />
+                    <e c0="12" />
+                    <e c0="15" />
+                    <e c0="7" />
+                    <e c0="13" />
+                    <e c0="22" />
+                    <e c0="18" />
+                    <e c0="13" />
+                    <e c0="18" />
+                    <e c0="5" />
+                    <e c0="30" />
+                    <e c0="46" />
+                    <e c0="38" />
+                    <e c0="30" />
+                    <e c0="38" />
+                    <e c0="26" />
+                    <e c0="42" />
+                    <e c0="29" />
+                    <e c0="25" />
+                    <e c0="42" />
+                    <e c0="25" />
+                    <e c0="34" />
+                    <e c0="21" />
+                    <e c0="9" />
+                    <e c0="1" />
+                    <e c0="21" />
+                    <e c0="1" />
+                    <e c0="17" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="wood_0">
+                <material>wood</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="6" />
+                    <e c0="19" />
+                    <e c0="0" />
+                    <e c0="19" />
+                    <e c0="16" />
+                    <e c0="16" />
+                    <e c0="19" />
+                    <e c0="27" />
+                    <e c0="16" />
+                    <e c0="27" />
+                    <e c0="24" />
+                    <e c0="24" />
+                    <e c0="27" />
+                    <e c0="39" />
+                    <e c0="24" />
+                    <e c0="39" />
+                    <e c0="33" />
+                    <e c0="14" />
+                    <e c0="8" />
+                    <e c0="20" />
+                    <e c0="14" />
+                    <e c0="20" />
+                    <e c0="23" />
+                    <e c0="23" />
+                    <e c0="20" />
+                    <e c0="28" />
+                    <e c0="23" />
+                    <e c0="28" />
+                    <e c0="31" />
+                    <e c0="31" />
+                    <e c0="28" />
+                    <e c0="41" />
+                    <e c0="31" />
+                    <e c0="41" />
+                    <e c0="47" />
+                </indexbuffer>
+            </submesh>
+        </params>
+    </meshfact>
+    <sector name="room0,1">
+        <meshobj name="walls">
+            <zfill />
+            <plugin>crystalspace.mesh.loader.genmesh</plugin>
+            <params>
+                <factory>factory_room0,1_walls</factory>
+                <color red="1" green="1" blue="1" />
+                <manualcolors />
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <submesh name="abstract_0">
+                    <material>abstract</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
+                    <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
+                </submesh>
+                <submesh name="wood_0">
+                    <material>wood</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
+                    <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
+                </submesh>
+                <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                    <e c0="0.319824" c1="0.00292969" />
+                    <e c0="0.77002" c1="0.475586" />
+                    <e c0="0.82373" c1="0.00292969" />
+                    <e c0="0.82373" c1="0.151367" />
+                    <e c0="0.82373" c1="0.166992" />
+                    <e c0="0.955566" c1="0.00292969" />
+                    <e c0="0.476074" c1="0.00292969" />
+                    <e c0="0.82373" c1="0.31543" />
+                    <e c0="0.00146484" c1="0.321289" />
+                    <e c0="0.793457" c1="0.475586" />
+                    <e c0="0.847168" c1="0.00292969" />
+                    <e c0="0.847168" c1="0.151367" />
+                    <e c0="0.847168" c1="0.166992" />
+                    <e c0="0.979004" c1="0.00292969" />
+                    <e c0="0.157715" c1="0.321289" />
+                    <e c0="0.847168" c1="0.31543" />
+                    <e c0="0.319824" c1="0.151367" />
+                    <e c0="0.77002" c1="0.624023" />
+                    <e c0="0.955566" c1="0.151367" />
+                    <e c0="0.476074" c1="0.151367" />
+                    <e c0="0.00146484" c1="0.469727" />
+                    <e c0="0.793457" c1="0.624023" />
+                    <e c0="0.979004" c1="0.151367" />
+                    <e c0="0.157715" c1="0.469727" />
+                    <e c0="0.319824" c1="0.166992" />
+                    <e c0="0.77002" c1="0.321289" />
+                    <e c0="0.955566" c1="0.157227" />
+                    <e c0="0.476074" c1="0.166992" />
+                    <e c0="0.00146484" c1="0.485352" />
+                    <e c0="0.793457" c1="0.321289" />
+                    <e c0="0.979004" c1="0.157227" />
+                    <e c0="0.157715" c1="0.485352" />
+                    <e c0="0.479004" c1="0.639648" />
+                    <e c0="0.319824" c1="0.31543" />
+                    <e c0="0.77002" c1="0.469727" />
+                    <e c0="0.479004" c1="0.788086" />
+                    <e c0="0.479004" c1="0.803711" />
+                    <e c0="0.479004" c1="0.952148" />
+                    <e c0="0.955566" c1="0.305664" />
+                    <e c0="0.476074" c1="0.31543" />
+                    <e c0="0.502441" c1="0.639648" />
+                    <e c0="0.00146484" c1="0.633789" />
+                    <e c0="0.793457" c1="0.469727" />
+                    <e c0="0.502441" c1="0.788086" />
+                    <e c0="0.502441" c1="0.803711" />
+                    <e c0="0.502441" c1="0.952148" />
+                    <e c0="0.979004" c1="0.305664" />
+                    <e c0="0.157715" c1="0.633789" />
+                </renderbuffer>
+            </params>
+            <staticlit />
+        </meshobj>
+        <portals>
+            <portal name="front2">
+                <v x="-1" y="5" z="60" />
+                <v x="1" y="5" z="60" />
+                <v x="1" y="-1" z="60" />
+                <v x="-1" y="-1" z="60" />
+                <sector>room0,2</sector>
+                <viscull />
+            </portal>
+            <portal name="back2">
+                <v x="1" y="5" z="20" />
+                <v x="-1" y="5" z="20" />
+                <v x="-1" y="-1" z="20" />
+                <v x="1" y="-1" z="20" />
+                <sector>room</sector>
+                <viscull />
+            </portal>
+        </portals>
+        <light>
+            <center x="0" y="0" z="40" />
+            <radius>40</radius>
+            <color red="0" green="0" blue="1" />
+        </light>
+        <meshobj name="emit1">
+            <priority>alpha</priority>
+            <plugin>emit</plugin>
+            <ztest />
+            <move>
+                <v x="-10" y="0" z="50" />
+            </move>
+            <params>
+                <factory>emitFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <number>50</number>
+                <material>spark</material>
+                <rectparticles w="0.12" h="0.12" />
+                <lighting>no</lighting>
+                <totaltime>5000</totaltime>
+                <startpos>
+                    <emitfixed x="0" y="0" z="0" />
+                </startpos>
+                <startspeed>
+                    <emitfixed x="0" y="0.5" z="0" />
+                </startspeed>
+                <startaccel>
+                    <emitfixed x="0" y="0" z="0" />
+                </startaccel>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>0</time>
+                    <alpha>0.3</alpha>
+                    <swirl>1</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>0.1</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="1" blue="1" />
+                    <time>1000</time>
+                    <alpha>0.3</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>1</rotspeed>
+                    <scale>0.4</scale>
+                </aging>
+                <aging>
+                    <color red="0.6" green="0" blue="1" />
+                    <time>2000</time>
+                    <alpha>0.3</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>20</rotspeed>
+                    <scale>1.5</scale>
+                </aging>
+                <aging>
+                    <color red="0.3" green="0" blue="0.5" />
+                    <time>3000</time>
+                    <alpha>0.3</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>1</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="0.3" green="0" blue="0.5" />
+                    <time>5000</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+            </params>
+        </meshobj>
+        <meshobj name="emit2">
+            <priority>alpha</priority>
+            <plugin>emit</plugin>
+            <ztest />
+            <move>
+                <v x="10" y="0" z="50" />
+            </move>
+            <params>
+                <factory>emitFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <number>50</number>
+                <material>flare_picir</material>
+                <rectparticles w="0.32" h="0.32" />
+                <lighting>no</lighting>
+                <totaltime>5000</totaltime>
+                <startpos>
+                    <emitbox>
+                        <min x="-5" y="0" z="-5" />
+                        <max x="10" y="0" z="10" />
+                    </emitbox>
+                </startpos>
+                <startspeed>
+                    <emitfixed x="0" y="1" z="0" />
+                </startspeed>
+                <startaccel>
+                    <emitfixed x="0" y="0" z="0" />
+                </startaccel>
+                <aging>
+                    <color red="0" green="0.4" blue="1" />
+                    <time>0</time>
+                    <alpha>0.3</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>0.3</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0.4" blue="0.8" />
+                    <time>3000</time>
+                    <alpha>0.3</alpha>
+                    <swirl>0.3</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0.4" blue="0.8" />
+                    <time>4000</time>
+                    <alpha>0.3</alpha>
+                    <swirl>0.3</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0.4" blue="0.8" />
+                    <time>5000</time>
+                    <alpha>1</alpha>
+                    <swirl>0.3</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>3</scale>
+                </aging>
+            </params>
+        </meshobj>
+        <meshobj name="emit3">
+            <priority>alpha</priority>
+            <plugin>emit</plugin>
+            <ztest />
+            <move>
+                <v x="-10" y="2" z="30" />
+            </move>
+            <params>
+                <factory>emitFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <number>2000</number>
+                <material>spark</material>
+                <rectparticles w="0.1" h="0.1" />
+                <lighting>no</lighting>
+                <totaltime>4000</totaltime>
+                <startpos>
+                    <emitsphere x="0" y="0" z="0" p="1.5" q="2" />
+                </startpos>
+                <startspeed>
+                    <emitfixed x="0" y="0" z="0" />
+                </startspeed>
+                <startaccel>
+                    <emitfixed x="0" y="0" z="0" />
+                </startaccel>
+                <fieldspeed>
+                    <emitcylindertangent p="0.3" q="0.4">
+                        <min x="0" y="-1" z="0" />
+                        <max x="0" y="3" z="0" />
+                    </emitcylindertangent>
+                </fieldspeed>
+                <aging>
+                    <color red="0" green="0.4" blue="0.8" />
+                    <time>0</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0.4" blue="0.8" />
+                    <time>500</time>
+                    <alpha>0.3</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0.4" blue="0.8" />
+                    <time>3500</time>
+                    <alpha>0.3</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0.4" blue="0.8" />
+                    <time>4000</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+            </params>
+        </meshobj>
+        <meshobj name="emit4">
+            <priority>alpha</priority>
+            <plugin>emit</plugin>
+            <ztest />
+            <move>
+                <v x="15" y="0" z="25" />
+            </move>
+            <params>
+                <factory>emitFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <number>500</number>
+                <material>raindrop</material>
+                <regularparticles sides="8" radius="0.2" />
+                <lighting>no</lighting>
+                <totaltime>4000</totaltime>
+                <startpos>
+                    <emitsphere x="0" y="2" z="0" p="0" q="0.5" />
+                </startpos>
+                <startspeed>
+                    <emitbox>
+                        <min x="-1" y="-1" z="-1" />
+                        <max x="1" y="1" z="1" />
+                    </emitbox>
+                </startspeed>
+                <startaccel>
+                    <emitfixed x="0" y="0" z="0" />
+                </startaccel>
+                <attractor>
+                    <emitfixed x="0" y="3" z="4" />
+                </attractor>
+                <attractorforce>0.5</attractorforce>
+                <aging>
+                    <color red="1" green="1" blue="0.2" />
+                    <time>0</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="0.2" blue="0.8" />
+                    <time>1000</time>
+                    <alpha>0.3</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="0.2" blue="0" />
+                    <time>3000</time>
+                    <alpha>0.6</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>0.8</scale>
+                </aging>
+                <aging>
+                    <color red="0.1" green="0.2" blue="0.8" />
+                    <time>4000</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>0.3</scale>
+                </aging>
+            </params>
+        </meshobj>
+    </sector>
+    <meshfact name="factory_room0,2_walls">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <renderbuffer name="position" checkelementcount="no" components="3" type="float">
+                <e c0="-20" c1="-1" c2="60" />
+                <e c0="-20" c1="-1" c2="60" />
+                <e c0="-20" c1="-1" c2="60" />
+                <e c0="-20" c1="-1" c2="79" />
+                <e c0="-20" c1="-1" c2="81" />
+                <e c0="-20" c1="-1" c2="100" />
+                <e c0="-20" c1="-1" c2="100" />
+                <e c0="-20" c1="-1" c2="100" />
+                <e c0="-20" c1="5" c2="60" />
+                <e c0="-20" c1="5" c2="60" />
+                <e c0="-20" c1="5" c2="60" />
+                <e c0="-20" c1="5" c2="79" />
+                <e c0="-20" c1="5" c2="81" />
+                <e c0="-20" c1="5" c2="100" />
+                <e c0="-20" c1="5" c2="100" />
+                <e c0="-20" c1="5" c2="100" />
+                <e c0="-1" c1="-1" c2="60" />
+                <e c0="-1" c1="-1" c2="60" />
+                <e c0="-1" c1="-1" c2="100" />
+                <e c0="-1" c1="-1" c2="100" />
+                <e c0="-1" c1="5" c2="60" />
+                <e c0="-1" c1="5" c2="60" />
+                <e c0="-1" c1="5" c2="100" />
+                <e c0="-1" c1="5" c2="100" />
+                <e c0="1" c1="-1" c2="60" />
+                <e c0="1" c1="-1" c2="60" />
+                <e c0="1" c1="-1" c2="100" />
+                <e c0="1" c1="-1" c2="100" />
+                <e c0="1" c1="5" c2="60" />
+                <e c0="1" c1="5" c2="60" />
+                <e c0="1" c1="5" c2="100" />
+                <e c0="1" c1="5" c2="100" />
+                <e c0="20" c1="-1" c2="60" />
+                <e c0="20" c1="-1" c2="60" />
+                <e c0="20" c1="-1" c2="60" />
+                <e c0="20" c1="-1" c2="79" />
+                <e c0="20" c1="-1" c2="81" />
+                <e c0="20" c1="-1" c2="100" />
+                <e c0="20" c1="-1" c2="100" />
+                <e c0="20" c1="-1" c2="100" />
+                <e c0="20" c1="5" c2="60" />
+                <e c0="20" c1="5" c2="60" />
+                <e c0="20" c1="5" c2="60" />
+                <e c0="20" c1="5" c2="79" />
+                <e c0="20" c1="5" c2="81" />
+                <e c0="20" c1="5" c2="100" />
+                <e c0="20" c1="5" c2="100" />
+                <e c0="20" c1="5" c2="100" />
+            </renderbuffer>
+            <renderbuffer name="normal" components="3" type="float">
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+            </renderbuffer>
+            <renderbuffer name="texture coordinate 0" components="2" type="float">
+                <e c0="-4" c1="-4" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="-4" c1="4" />
+                <e c0="4" c1="-0.2" />
+                <e c0="-4" c1="-4" />
+                <e c0="-4" c1="1" />
+                <e c0="-4" c1="1" />
+                <e c0="-0.2" c1="1" />
+                <e c0="0.2" c1="1" />
+                <e c0="-4" c1="1" />
+                <e c0="-4" c1="4" />
+                <e c0="4" c1="1" />
+                <e c0="-0.2" c1="-4" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="-0.2" c1="4" />
+                <e c0="-0.2" c1="-4" />
+                <e c0="-0.2" c1="1" />
+                <e c0="-0.2" c1="1" />
+                <e c0="-0.2" c1="4" />
+                <e c0="0.2" c1="-4" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="0.2" c1="4" />
+                <e c0="0.2" c1="-4" />
+                <e c0="0.2" c1="1" />
+                <e c0="0.2" c1="1" />
+                <e c0="0.2" c1="4" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="4" c1="-4" />
+                <e c0="4" c1="-0.2" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="4" c1="-0.2" />
+                <e c0="4" c1="-0.2" />
+                <e c0="4" c1="4" />
+                <e c0="-4" c1="1" />
+                <e c0="4" c1="-4" />
+                <e c0="4" c1="1" />
+                <e c0="-0.2" c1="1" />
+                <e c0="0.2" c1="1" />
+                <e c0="4" c1="1" />
+                <e c0="4" c1="1" />
+                <e c0="4" c1="4" />
+            </renderbuffer>
+            <renderbuffer name="tangent" components="3" type="float">
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+            </renderbuffer>
+            <renderbuffer name="bitangent" components="3" type="float">
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+            </renderbuffer>
+            <mixmode>
+                <copy />
+            </mixmode>
+            <submesh name="abstract_0">
+                <material>abstract</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="13" />
+                    <e c0="22" />
+                    <e c0="18" />
+                    <e c0="13" />
+                    <e c0="18" />
+                    <e c0="5" />
+                    <e c0="22" />
+                    <e c0="26" />
+                    <e c0="18" />
+                    <e c0="22" />
+                    <e c0="30" />
+                    <e c0="26" />
+                    <e c0="30" />
+                    <e c0="38" />
+                    <e c0="26" />
+                    <e c0="30" />
+                    <e c0="46" />
+                    <e c0="38" />
+                    <e c0="45" />
+                    <e c0="44" />
+                    <e c0="36" />
+                    <e c0="45" />
+                    <e c0="36" />
+                    <e c0="37" />
+                    <e c0="44" />
+                    <e c0="35" />
+                    <e c0="36" />
+                    <e c0="44" />
+                    <e c0="43" />
+                    <e c0="35" />
+                    <e c0="43" />
+                    <e c0="32" />
+                    <e c0="35" />
+                    <e c0="43" />
+                    <e c0="40" />
+                    <e c0="32" />
+                    <e c0="42" />
+                    <e c0="29" />
+                    <e c0="25" />
+                    <e c0="42" />
+                    <e c0="25" />
+                    <e c0="34" />
+                    <e c0="21" />
+                    <e c0="9" />
+                    <e c0="1" />
+                    <e c0="21" />
+                    <e c0="1" />
+                    <e c0="17" />
+                    <e c0="10" />
+                    <e c0="11" />
+                    <e c0="3" />
+                    <e c0="10" />
+                    <e c0="3" />
+                    <e c0="2" />
+                    <e c0="12" />
+                    <e c0="15" />
+                    <e c0="7" />
+                    <e c0="12" />
+                    <e c0="7" />
+                    <e c0="4" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="wood_0">
+                <material>wood</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="6" />
+                    <e c0="19" />
+                    <e c0="0" />
+                    <e c0="19" />
+                    <e c0="16" />
+                    <e c0="16" />
+                    <e c0="19" />
+                    <e c0="27" />
+                    <e c0="16" />
+                    <e c0="27" />
+                    <e c0="24" />
+                    <e c0="24" />
+                    <e c0="27" />
+                    <e c0="39" />
+                    <e c0="24" />
+                    <e c0="39" />
+                    <e c0="33" />
+                    <e c0="14" />
+                    <e c0="8" />
+                    <e c0="20" />
+                    <e c0="14" />
+                    <e c0="20" />
+                    <e c0="23" />
+                    <e c0="23" />
+                    <e c0="20" />
+                    <e c0="28" />
+                    <e c0="23" />
+                    <e c0="28" />
+                    <e c0="31" />
+                    <e c0="31" />
+                    <e c0="28" />
+                    <e c0="41" />
+                    <e c0="31" />
+                    <e c0="41" />
+                    <e c0="47" />
+                </indexbuffer>
+            </submesh>
+        </params>
+    </meshfact>
+    <sector name="room0,2">
+        <meshobj name="walls">
+            <zfill />
+            <plugin>crystalspace.mesh.loader.genmesh</plugin>
+            <params>
+                <factory>factory_room0,2_walls</factory>
+                <color red="1" green="1" blue="1" />
+                <manualcolors />
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <submesh name="abstract_0">
+                    <material>abstract</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
+                    <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
+                </submesh>
+                <submesh name="wood_0">
+                    <material>wood</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
+                    <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
+                </submesh>
+                <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                    <e c0="0.160645" c1="0.321289" />
+                    <e c0="0.796387" c1="0.475586" />
+                    <e c0="0.822754" c1="0.321289" />
+                    <e c0="0.822754" c1="0.469727" />
+                    <e c0="0.822754" c1="0.475586" />
+                    <e c0="0.664551" c1="0.321289" />
+                    <e c0="0.316895" c1="0.321289" />
+                    <e c0="0.822754" c1="0.624023" />
+                    <e c0="0.00146484" c1="0.639648" />
+                    <e c0="0.819824" c1="0.475586" />
+                    <e c0="0.846191" c1="0.321289" />
+                    <e c0="0.846191" c1="0.469727" />
+                    <e c0="0.846191" c1="0.475586" />
+                    <e c0="0.687988" c1="0.321289" />
+                    <e c0="0.157715" c1="0.639648" />
+                    <e c0="0.846191" c1="0.624023" />
+                    <e c0="0.160645" c1="0.469727" />
+                    <e c0="0.796387" c1="0.624023" />
+                    <e c0="0.664551" c1="0.469727" />
+                    <e c0="0.316895" c1="0.469727" />
+                    <e c0="0.00146484" c1="0.788086" />
+                    <e c0="0.819824" c1="0.624023" />
+                    <e c0="0.687988" c1="0.469727" />
+                    <e c0="0.157715" c1="0.788086" />
+                    <e c0="0.160645" c1="0.485352" />
+                    <e c0="0.796387" c1="0.321289" />
+                    <e c0="0.664551" c1="0.485352" />
+                    <e c0="0.316895" c1="0.485352" />
+                    <e c0="0.00146484" c1="0.803711" />
+                    <e c0="0.819824" c1="0.321289" />
+                    <e c0="0.687988" c1="0.485352" />
+                    <e c0="0.157715" c1="0.803711" />
+                    <e c0="0.505371" c1="0.639648" />
+                    <e c0="0.160645" c1="0.633789" />
+                    <e c0="0.796387" c1="0.469727" />
+                    <e c0="0.505371" c1="0.788086" />
+                    <e c0="0.505371" c1="0.803711" />
+                    <e c0="0.505371" c1="0.952148" />
+                    <e c0="0.664551" c1="0.633789" />
+                    <e c0="0.316895" c1="0.633789" />
+                    <e c0="0.528809" c1="0.639648" />
+                    <e c0="0.00146484" c1="0.952148" />
+                    <e c0="0.819824" c1="0.469727" />
+                    <e c0="0.528809" c1="0.788086" />
+                    <e c0="0.528809" c1="0.803711" />
+                    <e c0="0.528809" c1="0.952148" />
+                    <e c0="0.687988" c1="0.633789" />
+                    <e c0="0.157715" c1="0.952148" />
+                </renderbuffer>
+            </params>
+            <staticlit />
+        </meshobj>
+        <portals>
+            <portal name="back2">
+                <v x="1" y="5" z="60" />
+                <v x="-1" y="5" z="60" />
+                <v x="-1" y="-1" z="60" />
+                <v x="1" y="-1" z="60" />
+                <sector>room0,1</sector>
+                <viscull />
+            </portal>
+            <portal name="left2">
+                <v x="-20" y="5" z="79" />
+                <v x="-20" y="5" z="81" />
+                <v x="-20" y="-1" z="81" />
+                <v x="-20" y="-1" z="79" />
+                <sector>room-1,2</sector>
+                <viscull />
+            </portal>
+        </portals>
+        <light>
+            <center x="0" y="0" z="80" />
+            <radius>40</radius>
+            <color red="1" green="0" blue="1" />
+        </light>
+        <meshobj name="fire1">
+            <priority>alpha</priority>
+            <plugin>crystalspace.mesh.loader.particles</plugin>
+            <ztest />
+            <params>
+                <factory>fireFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <material>flamelet</material>
+            </params>
+            <move>
+                <v x="-10" y="0" z="70" />
+            </move>
+        </meshobj>
+        <meshobj name="fire2">
+            <plugin>crystalspace.mesh.loader.particles</plugin>
+            <params>
+                <factory>fireFACT</factory>
+                <material>particle</material>
+                <mixmode>
+                    <add />
+                </mixmode>
+            </params>
+            <move>
+                <v x="-11" y="0" z="71" />
+            </move>
+            <priority>alpha</priority>
+            <ztest />
+        </meshobj>
+        <meshobj name="spiral">
+            <plugin>crystalspace.mesh.loader.particles</plugin>
+            <params>
+                <factory>spiralFact</factory>
+                <material>raindrop</material>
+                <mixmode>
+                    <add />
+                </mixmode>
+            </params>
+            <priority>alpha</priority>
+            <ztest />
+            <move>
+                <v x="10" y="0" z="70" />
+            </move>
+        </meshobj>
+        <meshobj name="emit5">
+            <priority>alpha</priority>
+            <plugin>emit</plugin>
+            <ztest />
+            <move>
+                <v x="10" y="-1" z="90" />
+            </move>
+            <params>
+                <factory>emitFact</factory>
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <number>200</number>
+                <material>andrew_marble4</material>
+                <regularparticles sides="12" radius="0.5" />
+                <lighting>yes</lighting>
+                <totaltime>2500</totaltime>
+                <startpos>
+                    <emitcylinder p="1" q="1">
+                        <min x="0" y="0" z="0" />
+                        <max x="0" y="2" z="0" />
+                    </emitcylinder>
+                </startpos>
+                <startspeed>
+                    <emitcylindertangent p="1.7" q="1.7">
+                        <min x="0" y="0" z="0" />
+                        <max x="0" y="2" z="0" />
+                    </emitcylindertangent>
+                </startspeed>
+                <startaccel>
+                    <emitfixed x="0" y="0" z="0" />
+                </startaccel>
+                <attractor>
+                    <emitfixed x="0" y="5" z="0" />
+                </attractor>
+                <attractorforce>0.5</attractorforce>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>0</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>500</time>
+                    <alpha>0.5</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>2000</time>
+                    <alpha>0.5</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>2500</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+            </params>
+        </meshobj>
+        <meshobj name="emit6">
+            <priority>alpha</priority>
+            <plugin>emit</plugin>
+            <ztest />
+            <key name="entity_Rotate" value="0,50,0,true" />
+            <move>
+                <v x="-10" y="-1" z="90" />
+            </move>
+            <params>
+                <factory>emitFact</factory>
+                <mixmode>
+                    <multiply2 />
+                </mixmode>
+                <number>200</number>
+                <material>sky</material>
+                <regularparticles sides="4" radius="0.25" />
+                <lighting>no</lighting>
+                <totaltime>1000</totaltime>
+                <startpos>
+                    <emitcylinder p="2.9" q="3">
+                        <min x="0" y="0" z="0" />
+                        <max x="0" y="0.2" z="0" />
+                    </emitcylinder>
+                </startpos>
+                <startspeed>
+                    <emitfixed x="0" y="1" z="0" />
+                </startspeed>
+                <startaccel>
+                    <emitfixed x="0" y="0" z="0" />
+                </startaccel>
+                <attractor>
+                    <emitfixed x="0" y="0" z="0" />
+                </attractor>
+                <attractorforce>-2.5</attractorforce>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>0</time>
+                    <alpha>0</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>200</time>
+                    <alpha>0</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>1</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>800</time>
+                    <alpha>0</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>1</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>1000</time>
+                    <alpha>0</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>2</rotspeed>
+                    <scale>1</scale>
+                </aging>
+            </params>
+        </meshobj>
+    </sector>
+    <meshfact name="factory_room-1,2_walls">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <renderbuffer name="position" checkelementcount="no" components="3" type="float">
+                <e c0="-60" c1="-1" c2="60" />
+                <e c0="-60" c1="-1" c2="60" />
+                <e c0="-60" c1="-1" c2="60" />
+                <e c0="-60" c1="-1" c2="79" />
+                <e c0="-60" c1="-1" c2="81" />
+                <e c0="-60" c1="-1" c2="100" />
+                <e c0="-60" c1="-1" c2="100" />
+                <e c0="-60" c1="-1" c2="100" />
+                <e c0="-60" c1="5" c2="60" />
+                <e c0="-60" c1="5" c2="60" />
+                <e c0="-60" c1="5" c2="60" />
+                <e c0="-60" c1="5" c2="79" />
+                <e c0="-60" c1="5" c2="81" />
+                <e c0="-60" c1="5" c2="100" />
+                <e c0="-60" c1="5" c2="100" />
+                <e c0="-60" c1="5" c2="100" />
+                <e c0="-41" c1="-1" c2="60" />
+                <e c0="-41" c1="-1" c2="60" />
+                <e c0="-41" c1="-1" c2="100" />
+                <e c0="-41" c1="-1" c2="100" />
+                <e c0="-41" c1="5" c2="60" />
+                <e c0="-41" c1="5" c2="60" />
+                <e c0="-41" c1="5" c2="100" />
+                <e c0="-41" c1="5" c2="100" />
+                <e c0="-39" c1="-1" c2="60" />
+                <e c0="-39" c1="-1" c2="60" />
+                <e c0="-39" c1="-1" c2="100" />
+                <e c0="-39" c1="-1" c2="100" />
+                <e c0="-39" c1="5" c2="60" />
+                <e c0="-39" c1="5" c2="60" />
+                <e c0="-39" c1="5" c2="100" />
+                <e c0="-39" c1="5" c2="100" />
+                <e c0="-20" c1="-1" c2="60" />
+                <e c0="-20" c1="-1" c2="60" />
+                <e c0="-20" c1="-1" c2="60" />
+                <e c0="-20" c1="-1" c2="79" />
+                <e c0="-20" c1="-1" c2="81" />
+                <e c0="-20" c1="-1" c2="100" />
+                <e c0="-20" c1="-1" c2="100" />
+                <e c0="-20" c1="-1" c2="100" />
+                <e c0="-20" c1="5" c2="60" />
+                <e c0="-20" c1="5" c2="60" />
+                <e c0="-20" c1="5" c2="60" />
+                <e c0="-20" c1="5" c2="79" />
+                <e c0="-20" c1="5" c2="81" />
+                <e c0="-20" c1="5" c2="100" />
+                <e c0="-20" c1="5" c2="100" />
+                <e c0="-20" c1="5" c2="100" />
+            </renderbuffer>
+            <renderbuffer name="normal" components="3" type="float">
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+            </renderbuffer>
+            <renderbuffer name="texture coordinate 0" components="2" type="float">
+                <e c0="-4" c1="-4" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="-4" c1="4" />
+                <e c0="4" c1="-0.2" />
+                <e c0="-4" c1="-4" />
+                <e c0="-4" c1="1" />
+                <e c0="-4" c1="1" />
+                <e c0="-0.2" c1="1" />
+                <e c0="0.2" c1="1" />
+                <e c0="-4" c1="1" />
+                <e c0="-4" c1="4" />
+                <e c0="4" c1="1" />
+                <e c0="-0.2" c1="-4" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="-0.2" c1="4" />
+                <e c0="-0.2" c1="-4" />
+                <e c0="-0.2" c1="1" />
+                <e c0="-0.2" c1="1" />
+                <e c0="-0.2" c1="4" />
+                <e c0="0.2" c1="-4" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="0.2" c1="4" />
+                <e c0="0.2" c1="-4" />
+                <e c0="0.2" c1="1" />
+                <e c0="0.2" c1="1" />
+                <e c0="0.2" c1="4" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="4" c1="-4" />
+                <e c0="4" c1="-0.2" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="4" c1="-0.2" />
+                <e c0="4" c1="-0.2" />
+                <e c0="4" c1="4" />
+                <e c0="-4" c1="1" />
+                <e c0="4" c1="-4" />
+                <e c0="4" c1="1" />
+                <e c0="-0.2" c1="1" />
+                <e c0="0.2" c1="1" />
+                <e c0="4" c1="1" />
+                <e c0="4" c1="1" />
+                <e c0="4" c1="4" />
+            </renderbuffer>
+            <renderbuffer name="tangent" components="3" type="float">
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+            </renderbuffer>
+            <renderbuffer name="bitangent" components="3" type="float">
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+            </renderbuffer>
+            <mixmode>
+                <copy />
+            </mixmode>
+            <submesh name="abstract_0">
+                <material>abstract</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="13" />
+                    <e c0="22" />
+                    <e c0="18" />
+                    <e c0="13" />
+                    <e c0="18" />
+                    <e c0="5" />
+                    <e c0="22" />
+                    <e c0="26" />
+                    <e c0="18" />
+                    <e c0="22" />
+                    <e c0="30" />
+                    <e c0="26" />
+                    <e c0="30" />
+                    <e c0="38" />
+                    <e c0="26" />
+                    <e c0="30" />
+                    <e c0="46" />
+                    <e c0="38" />
+                    <e c0="42" />
+                    <e c0="29" />
+                    <e c0="25" />
+                    <e c0="42" />
+                    <e c0="25" />
+                    <e c0="34" />
+                    <e c0="29" />
+                    <e c0="17" />
+                    <e c0="25" />
+                    <e c0="29" />
+                    <e c0="21" />
+                    <e c0="17" />
+                    <e c0="21" />
+                    <e c0="1" />
+                    <e c0="17" />
+                    <e c0="21" />
+                    <e c0="9" />
+                    <e c0="1" />
+                    <e c0="10" />
+                    <e c0="11" />
+                    <e c0="3" />
+                    <e c0="10" />
+                    <e c0="3" />
+                    <e c0="2" />
+                    <e c0="11" />
+                    <e c0="4" />
+                    <e c0="3" />
+                    <e c0="11" />
+                    <e c0="12" />
+                    <e c0="4" />
+                    <e c0="12" />
+                    <e c0="7" />
+                    <e c0="4" />
+                    <e c0="12" />
+                    <e c0="15" />
+                    <e c0="7" />
+                    <e c0="45" />
+                    <e c0="44" />
+                    <e c0="36" />
+                    <e c0="45" />
+                    <e c0="36" />
+                    <e c0="37" />
+                    <e c0="43" />
+                    <e c0="40" />
+                    <e c0="32" />
+                    <e c0="43" />
+                    <e c0="32" />
+                    <e c0="35" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="wood_0">
+                <material>wood</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="6" />
+                    <e c0="19" />
+                    <e c0="0" />
+                    <e c0="19" />
+                    <e c0="16" />
+                    <e c0="16" />
+                    <e c0="19" />
+                    <e c0="27" />
+                    <e c0="16" />
+                    <e c0="27" />
+                    <e c0="24" />
+                    <e c0="24" />
+                    <e c0="27" />
+                    <e c0="39" />
+                    <e c0="24" />
+                    <e c0="39" />
+                    <e c0="33" />
+                    <e c0="14" />
+                    <e c0="8" />
+                    <e c0="20" />
+                    <e c0="14" />
+                    <e c0="20" />
+                    <e c0="23" />
+                    <e c0="23" />
+                    <e c0="20" />
+                    <e c0="28" />
+                    <e c0="23" />
+                    <e c0="28" />
+                    <e c0="31" />
+                    <e c0="31" />
+                    <e c0="28" />
+                    <e c0="41" />
+                    <e c0="31" />
+                    <e c0="41" />
+                    <e c0="47" />
+                </indexbuffer>
+            </submesh>
+        </params>
+    </meshfact>
+    <sector name="room-1,2">
+        <meshobj name="walls">
+            <zfill />
+            <plugin>crystalspace.mesh.loader.genmesh</plugin>
+            <params>
+                <factory>factory_room-1,2_walls</factory>
+                <color red="1" green="1" blue="1" />
+                <manualcolors />
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <submesh name="abstract_0">
+                    <material>abstract</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
+                    <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
+                </submesh>
+                <submesh name="wood_0">
+                    <material>wood</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
+                    <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
+                </submesh>
+                <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                    <e c0="0.319824" c1="0.321289" />
+                    <e c0="0.690918" c1="0.321289" />
+                    <e c0="0.531738" c1="0.639648" />
+                    <e c0="0.531738" c1="0.788086" />
+                    <e c0="0.531738" c1="0.803711" />
+                    <e c0="0.850098" c1="0.00292969" />
+                    <e c0="0.476074" c1="0.321289" />
+                    <e c0="0.531738" c1="0.952148" />
+                    <e c0="0.160645" c1="0.639648" />
+                    <e c0="0.714355" c1="0.321289" />
+                    <e c0="0.555176" c1="0.639648" />
+                    <e c0="0.555176" c1="0.788086" />
+                    <e c0="0.555176" c1="0.803711" />
+                    <e c0="0.873535" c1="0.00292969" />
+                    <e c0="0.316895" c1="0.639648" />
+                    <e c0="0.555176" c1="0.952148" />
+                    <e c0="0.319824" c1="0.469727" />
+                    <e c0="0.690918" c1="0.469727" />
+                    <e c0="0.850098" c1="0.151367" />
+                    <e c0="0.476074" c1="0.469727" />
+                    <e c0="0.160645" c1="0.788086" />
+                    <e c0="0.714355" c1="0.469727" />
+                    <e c0="0.873535" c1="0.151367" />
+                    <e c0="0.316895" c1="0.788086" />
+                    <e c0="0.319824" c1="0.485352" />
+                    <e c0="0.690918" c1="0.485352" />
+                    <e c0="0.850098" c1="0.166992" />
+                    <e c0="0.476074" c1="0.485352" />
+                    <e c0="0.160645" c1="0.803711" />
+                    <e c0="0.714355" c1="0.485352" />
+                    <e c0="0.873535" c1="0.166992" />
+                    <e c0="0.316895" c1="0.803711" />
+                    <e c0="0.849121" c1="0.475586" />
+                    <e c0="0.319824" c1="0.633789" />
+                    <e c0="0.690918" c1="0.633789" />
+                    <e c0="0.849121" c1="0.624023" />
+                    <e c0="0.849121" c1="0.321289" />
+                    <e c0="0.849121" c1="0.469727" />
+                    <e c0="0.850098" c1="0.31543" />
+                    <e c0="0.476074" c1="0.633789" />
+                    <e c0="0.872559" c1="0.475586" />
+                    <e c0="0.160645" c1="0.952148" />
+                    <e c0="0.714355" c1="0.633789" />
+                    <e c0="0.872559" c1="0.624023" />
+                    <e c0="0.872559" c1="0.321289" />
+                    <e c0="0.872559" c1="0.469727" />
+                    <e c0="0.873535" c1="0.31543" />
+                    <e c0="0.316895" c1="0.952148" />
+                </renderbuffer>
+            </params>
+            <staticlit />
+        </meshobj>
+        <portals>
+            <portal name="right2">
+                <v x="-20" y="5" z="81" />
+                <v x="-20" y="5" z="79" />
+                <v x="-20" y="-1" z="79" />
+                <v x="-20" y="-1" z="81" />
+                <sector>room0,2</sector>
+                <viscull />
+            </portal>
+        </portals>
+        <light>
+            <center x="-40" y="0" z="80" />
+            <radius>40</radius>
+            <color red="1" green="1" blue="0" />
+        </light>
+        <meshobj name="emit7">
+            <priority>alpha</priority>
+            <plugin>emit</plugin>
+            <ztest />
+            <move>
+                <v x="-50" y="-1" z="70" />
+            </move>
+            <params>
+                <factory>emitFact</factory>
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <number>50</number>
+                <material>andrew_marble4</material>
+                <regularparticles sides="6" radius="1" />
+                <lighting>no</lighting>
+                <totaltime>10000</totaltime>
+                <startpos>
+                    <emitbox>
+                        <min x="-2" y="0" z="-2" />
+                        <max x="2" y="2.2" z="2" />
+                    </emitbox>
+                </startpos>
+                <startspeed>
+                    <emitfixed x="0" y="0" z="0" />
+                </startspeed>
+                <startaccel>
+                    <emitfixed x="0" y="0" z="0" />
+                </startaccel>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>0</time>
+                    <alpha>1</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>200</time>
+                    <alpha>0.8</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>4300</time>
+                    <alpha>0.8</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>1</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>4700</time>
+                    <alpha>0.8</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>9800</time>
+                    <alpha>0.8</alpha>
+                    <swirl>0.2</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>10000</time>
+                    <alpha>1</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+            </params>
+        </meshobj>
+        <meshobj name="emit8">
+            <priority>alpha</priority>
+            <plugin>emit</plugin>
+            <ztest />
+            <move>
+                <v x="-30" y="-1" z="70" />
+            </move>
+            <params>
+                <factory>emitFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <number>10</number>
+                <material>spark</material>
+                <regularparticles sides="7" radius="0.04" />
+                <lighting>no</lighting>
+                <totaltime>5000</totaltime>
+                <startpos>
+                    <emitmix>
+                        <weight>2</weight>
+                        <emitline>
+                            <min x="-1" y="2" z="0" />
+                            <max x="1" y="2" z="0" />
+                        </emitline>
+                    </emitmix>
+                    <emitmix>
+                        <weight>3</weight>
+                        <emitline>
+                            <min x="0" y="0" z="0" />
+                            <max x="0" y="3" z="0" />
+                        </emitline>
+                    </emitmix>
+                </startpos>
+                <startspeed>
+                    <emitfixed x="0" y="0" z="0" />
+                </startspeed>
+                <startaccel>
+                    <emitfixed x="0" y="0" z="0" />
+                </startaccel>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>0</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>0.01</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>200</time>
+                    <alpha>0.8</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>0.3</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>4400</time>
+                    <alpha>0.8</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>0.3</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>4800</time>
+                    <alpha>0</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>10</rotspeed>
+                    <scale>5</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>5000</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+            </params>
+        </meshobj>
+        <meshobj name="emit9">
+            <priority>alpha</priority>
+            <plugin>emit</plugin>
+            <ztest />
+            <move>
+                <v x="-50" y="-1" z="90" />
+            </move>
+            <params>
+                <factory>emitFact</factory>
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <number>100</number>
+                <material>fpart</material>
+                <regularparticles sides="6" radius="1" />
+                <lighting>no</lighting>
+                <totaltime>10000</totaltime>
+                <startpos>
+                    <emitbox>
+                        <min x="-2" y="0" z="-2" />
+                        <max x="2" y="2.2" z="2" />
+                    </emitbox>
+                </startpos>
+                <startspeed>
+                    <emitfixed x="0" y="-0.2" z="0" />
+                </startspeed>
+                <startaccel>
+                    <emitfixed x="0" y="0.1" z="0" />
+                </startaccel>
+                <aging>
+                    <color red="0" green="0" blue="0.4" />
+                    <time>0</time>
+                    <alpha>1</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0" blue="0.4" />
+                    <time>200</time>
+                    <alpha>0.8</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0" blue="0.4" />
+                    <time>4300</time>
+                    <alpha>0.8</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>1</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0" blue="0.4" />
+                    <time>4700</time>
+                    <alpha>0.8</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0" blue="0.4" />
+                    <time>9800</time>
+                    <alpha>0.8</alpha>
+                    <swirl>0.2</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0" blue="0.4" />
+                    <time>10000</time>
+                    <alpha>1</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1</scale>
+                </aging>
+            </params>
+        </meshobj>
+        <meshobj name="emit10">
+            <priority>alpha</priority>
+            <plugin>emit</plugin>
+            <ztest />
+            <move>
+                <v x="-30" y="-1" z="90" />
+            </move>
+            <params>
+                <factory>emitFact</factory>
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <number>100</number>
+                <material>fp2</material>
+                <regularparticles sides="8" radius="0.9" />
+                <lighting>no</lighting>
+                <totaltime>5000</totaltime>
+                <startpos>
+                    <emitsphere x="0" y="0.5" z="0" p="0" q="0.4" />
+                </startpos>
+                <startspeed>
+                    <emitsphere x="-0.3" y="0" z="0" p="0" q="0.3" />
+                </startspeed>
+                <startaccel>
+                    <emitfixed x="0" y="0.2" z="0" />
+                </startaccel>
+                <attractor>
+                    <emitbox>
+                        <min x="-0.2" y="2" z="-0.2" />
+                        <max x="0.2" y="2" z="0.2" />
+                    </emitbox>
+                </attractor>
+                <attractorforce>0.15</attractorforce>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>0</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>0.5</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="1" />
+                    <time>200</time>
+                    <alpha>0</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>0.5</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="1" blue="0.2" />
+                    <time>1300</time>
+                    <alpha>0.2</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>1</rotspeed>
+                    <scale>1</scale>
+                </aging>
+                <aging>
+                    <color red="1" green="0.5" blue="0.2" />
+                    <time>2700</time>
+                    <alpha>0.5</alpha>
+                    <swirl>0.1</swirl>
+                    <rotspeed>1</rotspeed>
+                    <scale>0.8</scale>
+                </aging>
+                <aging>
+                    <color red="0.2" green="0.2" blue="0.2" />
+                    <time>3600</time>
+                    <alpha>0.5</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1.5</scale>
+                </aging>
+                <aging>
+                    <color red="0" green="0" blue="0" />
+                    <time>5000</time>
+                    <alpha>1</alpha>
+                    <swirl>0</swirl>
+                    <rotspeed>0</rotspeed>
+                    <scale>1.5</scale>
+                </aging>
+            </params>
+        </meshobj>
+    </sector>
+    <meshfact name="factory_room1,0_walls">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <renderbuffer name="position" checkelementcount="no" components="3" type="float">
+                <e c0="20" c1="-1" c2="-20" />
+                <e c0="20" c1="-1" c2="-20" />
+                <e c0="20" c1="-1" c2="-20" />
+                <e c0="20" c1="-1" c2="-1" />
+                <e c0="20" c1="-1" c2="1" />
+                <e c0="20" c1="-1" c2="20" />
+                <e c0="20" c1="-1" c2="20" />
+                <e c0="20" c1="-1" c2="20" />
+                <e c0="20" c1="5" c2="-20" />
+                <e c0="20" c1="5" c2="-20" />
+                <e c0="20" c1="5" c2="-20" />
+                <e c0="20" c1="5" c2="-1" />
+                <e c0="20" c1="5" c2="1" />
+                <e c0="20" c1="5" c2="20" />
+                <e c0="20" c1="5" c2="20" />
+                <e c0="20" c1="5" c2="20" />
+                <e c0="39" c1="-1" c2="-20" />
+                <e c0="39" c1="-1" c2="-20" />
+                <e c0="39" c1="-1" c2="20" />
+                <e c0="39" c1="-1" c2="20" />
+                <e c0="39" c1="5" c2="-20" />
+                <e c0="39" c1="5" c2="-20" />
+                <e c0="39" c1="5" c2="20" />
+                <e c0="39" c1="5" c2="20" />
+                <e c0="41" c1="-1" c2="-20" />
+                <e c0="41" c1="-1" c2="-20" />
+                <e c0="41" c1="-1" c2="20" />
+                <e c0="41" c1="-1" c2="20" />
+                <e c0="41" c1="5" c2="-20" />
+                <e c0="41" c1="5" c2="-20" />
+                <e c0="41" c1="5" c2="20" />
+                <e c0="41" c1="5" c2="20" />
+                <e c0="60" c1="-1" c2="-20" />
+                <e c0="60" c1="-1" c2="-20" />
+                <e c0="60" c1="-1" c2="-20" />
+                <e c0="60" c1="-1" c2="-1" />
+                <e c0="60" c1="-1" c2="1" />
+                <e c0="60" c1="-1" c2="20" />
+                <e c0="60" c1="-1" c2="20" />
+                <e c0="60" c1="-1" c2="20" />
+                <e c0="60" c1="5" c2="-20" />
+                <e c0="60" c1="5" c2="-20" />
+                <e c0="60" c1="5" c2="-20" />
+                <e c0="60" c1="5" c2="-1" />
+                <e c0="60" c1="5" c2="1" />
+                <e c0="60" c1="5" c2="20" />
+                <e c0="60" c1="5" c2="20" />
+                <e c0="60" c1="5" c2="20" />
+            </renderbuffer>
+            <renderbuffer name="normal" components="3" type="float">
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+            </renderbuffer>
+            <renderbuffer name="texture coordinate 0" components="2" type="float">
+                <e c0="-4" c1="-4" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="-4" c1="4" />
+                <e c0="4" c1="-0.2" />
+                <e c0="-4" c1="-4" />
+                <e c0="-4" c1="1" />
+                <e c0="-4" c1="1" />
+                <e c0="-0.2" c1="1" />
+                <e c0="0.2" c1="1" />
+                <e c0="-4" c1="1" />
+                <e c0="-4" c1="4" />
+                <e c0="4" c1="1" />
+                <e c0="-0.2" c1="-4" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="-0.2" c1="4" />
+                <e c0="-0.2" c1="-4" />
+                <e c0="-0.2" c1="1" />
+                <e c0="-0.2" c1="1" />
+                <e c0="-0.2" c1="4" />
+                <e c0="0.2" c1="-4" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="0.2" c1="4" />
+                <e c0="0.2" c1="-4" />
+                <e c0="0.2" c1="1" />
+                <e c0="0.2" c1="1" />
+                <e c0="0.2" c1="4" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="4" c1="-4" />
+                <e c0="4" c1="-0.2" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="4" c1="-0.2" />
+                <e c0="4" c1="-0.2" />
+                <e c0="4" c1="4" />
+                <e c0="-4" c1="1" />
+                <e c0="4" c1="-4" />
+                <e c0="4" c1="1" />
+                <e c0="-0.2" c1="1" />
+                <e c0="0.2" c1="1" />
+                <e c0="4" c1="1" />
+                <e c0="4" c1="1" />
+                <e c0="4" c1="4" />
+            </renderbuffer>
+            <renderbuffer name="tangent" components="3" type="float">
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+            </renderbuffer>
+            <renderbuffer name="bitangent" components="3" type="float">
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+            </renderbuffer>
+            <mixmode>
+                <copy />
+            </mixmode>
+            <submesh name="abstract_0">
+                <material>abstract</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="13" />
+                    <e c0="22" />
+                    <e c0="18" />
+                    <e c0="13" />
+                    <e c0="18" />
+                    <e c0="5" />
+                    <e c0="22" />
+                    <e c0="26" />
+                    <e c0="18" />
+                    <e c0="22" />
+                    <e c0="30" />
+                    <e c0="26" />
+                    <e c0="30" />
+                    <e c0="38" />
+                    <e c0="26" />
+                    <e c0="30" />
+                    <e c0="46" />
+                    <e c0="38" />
+                    <e c0="42" />
+                    <e c0="29" />
+                    <e c0="25" />
+                    <e c0="42" />
+                    <e c0="25" />
+                    <e c0="34" />
+                    <e c0="29" />
+                    <e c0="17" />
+                    <e c0="25" />
+                    <e c0="29" />
+                    <e c0="21" />
+                    <e c0="17" />
+                    <e c0="21" />
+                    <e c0="1" />
+                    <e c0="17" />
+                    <e c0="21" />
+                    <e c0="9" />
+                    <e c0="1" />
+                    <e c0="45" />
+                    <e c0="44" />
+                    <e c0="36" />
+                    <e c0="45" />
+                    <e c0="36" />
+                    <e c0="37" />
+                    <e c0="43" />
+                    <e c0="40" />
+                    <e c0="32" />
+                    <e c0="43" />
+                    <e c0="32" />
+                    <e c0="35" />
+                    <e c0="10" />
+                    <e c0="11" />
+                    <e c0="3" />
+                    <e c0="10" />
+                    <e c0="3" />
+                    <e c0="2" />
+                    <e c0="12" />
+                    <e c0="15" />
+                    <e c0="7" />
+                    <e c0="12" />
+                    <e c0="7" />
+                    <e c0="4" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="wood_0">
+                <material>wood</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="6" />
+                    <e c0="19" />
+                    <e c0="0" />
+                    <e c0="19" />
+                    <e c0="16" />
+                    <e c0="16" />
+                    <e c0="19" />
+                    <e c0="27" />
+                    <e c0="16" />
+                    <e c0="27" />
+                    <e c0="24" />
+                    <e c0="24" />
+                    <e c0="27" />
+                    <e c0="39" />
+                    <e c0="24" />
+                    <e c0="39" />
+                    <e c0="33" />
+                    <e c0="14" />
+                    <e c0="8" />
+                    <e c0="20" />
+                    <e c0="14" />
+                    <e c0="20" />
+                    <e c0="23" />
+                    <e c0="23" />
+                    <e c0="20" />
+                    <e c0="28" />
+                    <e c0="23" />
+                    <e c0="28" />
+                    <e c0="31" />
+                    <e c0="31" />
+                    <e c0="28" />
+                    <e c0="41" />
+                    <e c0="31" />
+                    <e c0="41" />
+                    <e c0="47" />
+                </indexbuffer>
+            </submesh>
+        </params>
+    </meshfact>
+    <sector name="room1,0">
+        <meshobj name="walls">
+            <zfill />
+            <plugin>crystalspace.mesh.loader.genmesh</plugin>
+            <params>
+                <factory>factory_room1,0_walls</factory>
+                <color red="1" green="1" blue="1" />
+                <manualcolors />
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <submesh name="abstract_0">
+                    <material>abstract</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
+                    <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
+                </submesh>
+                <submesh name="wood_0">
+                    <material>wood</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
+                    <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
+                </submesh>
+                <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                    <e c0="0.319824" c1="0.639648" />
+                    <e c0="0.717285" c1="0.321289" />
+                    <e c0="0.901855" c1="0.321289" />
+                    <e c0="0.901855" c1="0.469727" />
+                    <e c0="0.901855" c1="0.475586" />
+                    <e c0="0.876465" c1="0.00292969" />
+                    <e c0="0.476074" c1="0.639648" />
+                    <e c0="0.901855" c1="0.624023" />
+                    <e c0="0.479004" c1="0.00292969" />
+                    <e c0="0.740723" c1="0.321289" />
+                    <e c0="0.925293" c1="0.321289" />
+                    <e c0="0.925293" c1="0.469727" />
+                    <e c0="0.925293" c1="0.475586" />
+                    <e c0="0.899902" c1="0.00292969" />
+                    <e c0="0.635254" c1="0.00292969" />
+                    <e c0="0.925293" c1="0.624023" />
+                    <e c0="0.319824" c1="0.788086" />
+                    <e c0="0.717285" c1="0.469727" />
+                    <e c0="0.876465" c1="0.151367" />
+                    <e c0="0.476074" c1="0.788086" />
+                    <e c0="0.479004" c1="0.151367" />
+                    <e c0="0.740723" c1="0.469727" />
+                    <e c0="0.899902" c1="0.151367" />
+                    <e c0="0.635254" c1="0.151367" />
+                    <e c0="0.319824" c1="0.803711" />
+                    <e c0="0.717285" c1="0.485352" />
+                    <e c0="0.876465" c1="0.166992" />
+                    <e c0="0.476074" c1="0.803711" />
+                    <e c0="0.479004" c1="0.166992" />
+                    <e c0="0.740723" c1="0.485352" />
+                    <e c0="0.899902" c1="0.166992" />
+                    <e c0="0.635254" c1="0.166992" />
+                    <e c0="0.875488" c1="0.475586" />
+                    <e c0="0.319824" c1="0.952148" />
+                    <e c0="0.717285" c1="0.633789" />
+                    <e c0="0.875488" c1="0.624023" />
+                    <e c0="0.875488" c1="0.321289" />
+                    <e c0="0.875488" c1="0.469727" />
+                    <e c0="0.876465" c1="0.31543" />
+                    <e c0="0.476074" c1="0.952148" />
+                    <e c0="0.898926" c1="0.475586" />
+                    <e c0="0.479004" c1="0.31543" />
+                    <e c0="0.740723" c1="0.633789" />
+                    <e c0="0.898926" c1="0.624023" />
+                    <e c0="0.898926" c1="0.321289" />
+                    <e c0="0.898926" c1="0.469727" />
+                    <e c0="0.899902" c1="0.31543" />
+                    <e c0="0.635254" c1="0.31543" />
+                </renderbuffer>
+            </params>
+            <staticlit />
+        </meshobj>
+        <portals>
+            <portal name="right2">
+                <v x="60" y="5" z="1" />
+                <v x="60" y="5" z="-1" />
+                <v x="60" y="-1" z="-1" />
+                <v x="60" y="-1" z="1" />
+                <sector>room2,0</sector>
+                <viscull />
+            </portal>
+            <portal name="left2">
+                <v x="20" y="5" z="-1" />
+                <v x="20" y="5" z="1" />
+                <v x="20" y="-1" z="1" />
+                <v x="20" y="-1" z="-1" />
+                <sector>room</sector>
+                <viscull />
+            </portal>
+        </portals>
+        <light>
+            <center x="40" y="0" z="0" />
+            <radius>40</radius>
+            <color red="1" green="0" blue="0" />
+        </light>
+        <meshobj name="haze1">
+            <priority>alpha</priority>
+            <plugin>haze</plugin>
+            <ztest />
+            <move>
+                <v x="30" y="1.1" z="10" />
+            </move>
+            <params>
+                <factory>hazeFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <material>hazecirc</material>
+                <origin x="0" y="-2" z="0" />
+                <directional x="0" y="1" z="0" />
+                <layer>
+                    <scale>0.5</scale>
+                    <hazebox>
+                        <min x="-2" y="-2" z="-2" />
+                        <max x="2" y="2" z="2" />
+                    </hazebox>
+                </layer>
+            </params>
+        </meshobj>
+        <meshobj name="haze2">
+            <priority>alpha</priority>
+            <plugin>haze</plugin>
+            <ztest />
+            <move>
+                <v x="30" y="0.1" z="-10" />
+            </move>
+            <params>
+                <factory>hazeFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <material>hazebasic</material>
+                <origin x="0" y="-1" z="0" />
+                <directional x="0" y="1" z="0" />
+                <layer>
+                    <scale>0.5</scale>
+                    <hazecone p="1" q="0.3" number="17">
+                        <min x="0" y="-1" z="0" />
+                        <max x="0" y="5" z="0" />
+                    </hazecone>
+                </layer>
+            </params>
+        </meshobj>
+        <meshobj name="haze3">
+            <priority>alpha</priority>
+            <plugin>haze</plugin>
+            <ztest />
+            <move>
+                <v x="50" y="0.1" z="-10" />
+            </move>
+            <params>
+                <factory>hazeFact</factory>
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <material>fpart</material>
+                <origin x="0" y="-1" z="0" />
+                <directional x="0" y="1" z="0" />
+                <layer>
+                    <scale>0.5</scale>
+                    <hazecone p="1" q="4" number="16">
+                        <min x="0" y="-1" z="0" />
+                        <max x="0" y="5" z="0" />
+                    </hazecone>
+                </layer>
+            </params>
+        </meshobj>
+        <meshobj name="haze4">
+            <priority>alpha</priority>
+            <plugin>haze</plugin>
+            <ztest />
+            <move>
+                <v x="50" y="0.1" z="10" />
+            </move>
+            <params>
+                <factory>hazeFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <material>flare_picir</material>
+                <origin x="0" y="1" z="0" />
+                <directional x="0" y="1" z="0" />
+                <layer>
+                    <scale>0.5</scale>
+                    <hazebox>
+                        <min x="-1" y="-1" z="-0.3" />
+                        <max x="1" y="3" z="0.3" />
+                    </hazebox>
+                </layer>
+            </params>
+        </meshobj>
+    </sector>
+    <meshfact name="factory_room2,0_walls">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <renderbuffer name="position" checkelementcount="no" components="3" type="float">
+                <e c0="60" c1="-1" c2="-20" />
+                <e c0="60" c1="-1" c2="-20" />
+                <e c0="60" c1="-1" c2="-20" />
+                <e c0="60" c1="-1" c2="-1" />
+                <e c0="60" c1="-1" c2="1" />
+                <e c0="60" c1="-1" c2="20" />
+                <e c0="60" c1="-1" c2="20" />
+                <e c0="60" c1="-1" c2="20" />
+                <e c0="60" c1="5" c2="-20" />
+                <e c0="60" c1="5" c2="-20" />
+                <e c0="60" c1="5" c2="-20" />
+                <e c0="60" c1="5" c2="-1" />
+                <e c0="60" c1="5" c2="1" />
+                <e c0="60" c1="5" c2="20" />
+                <e c0="60" c1="5" c2="20" />
+                <e c0="60" c1="5" c2="20" />
+                <e c0="79" c1="-1" c2="-20" />
+                <e c0="79" c1="-1" c2="-20" />
+                <e c0="79" c1="-1" c2="20" />
+                <e c0="79" c1="-1" c2="20" />
+                <e c0="79" c1="5" c2="-20" />
+                <e c0="79" c1="5" c2="-20" />
+                <e c0="79" c1="5" c2="20" />
+                <e c0="79" c1="5" c2="20" />
+                <e c0="81" c1="-1" c2="-20" />
+                <e c0="81" c1="-1" c2="-20" />
+                <e c0="81" c1="-1" c2="20" />
+                <e c0="81" c1="-1" c2="20" />
+                <e c0="81" c1="5" c2="-20" />
+                <e c0="81" c1="5" c2="-20" />
+                <e c0="81" c1="5" c2="20" />
+                <e c0="81" c1="5" c2="20" />
+                <e c0="100" c1="-1" c2="-20" />
+                <e c0="100" c1="-1" c2="-20" />
+                <e c0="100" c1="-1" c2="-20" />
+                <e c0="100" c1="-1" c2="-1" />
+                <e c0="100" c1="-1" c2="1" />
+                <e c0="100" c1="-1" c2="20" />
+                <e c0="100" c1="-1" c2="20" />
+                <e c0="100" c1="-1" c2="20" />
+                <e c0="100" c1="5" c2="-20" />
+                <e c0="100" c1="5" c2="-20" />
+                <e c0="100" c1="5" c2="-20" />
+                <e c0="100" c1="5" c2="-1" />
+                <e c0="100" c1="5" c2="1" />
+                <e c0="100" c1="5" c2="20" />
+                <e c0="100" c1="5" c2="20" />
+                <e c0="100" c1="5" c2="20" />
+            </renderbuffer>
+            <renderbuffer name="normal" components="3" type="float">
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="-1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="-1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="-1" />
+                <e c0="0" c1="-1" c2="0" />
+            </renderbuffer>
+            <renderbuffer name="texture coordinate 0" components="2" type="float">
+                <e c0="-4" c1="-4" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="-4" c1="4" />
+                <e c0="4" c1="-0.2" />
+                <e c0="-4" c1="-4" />
+                <e c0="-4" c1="1" />
+                <e c0="-4" c1="1" />
+                <e c0="-0.2" c1="1" />
+                <e c0="0.2" c1="1" />
+                <e c0="-4" c1="1" />
+                <e c0="-4" c1="4" />
+                <e c0="4" c1="1" />
+                <e c0="-0.2" c1="-4" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="-0.2" c1="4" />
+                <e c0="-0.2" c1="-4" />
+                <e c0="-0.2" c1="1" />
+                <e c0="-0.2" c1="1" />
+                <e c0="-0.2" c1="4" />
+                <e c0="0.2" c1="-4" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="0.2" c1="4" />
+                <e c0="0.2" c1="-4" />
+                <e c0="0.2" c1="1" />
+                <e c0="0.2" c1="1" />
+                <e c0="0.2" c1="4" />
+                <e c0="-4" c1="-0.2" />
+                <e c0="4" c1="-4" />
+                <e c0="4" c1="-0.2" />
+                <e c0="-0.2" c1="-0.2" />
+                <e c0="0.2" c1="-0.2" />
+                <e c0="4" c1="-0.2" />
+                <e c0="4" c1="-0.2" />
+                <e c0="4" c1="4" />
+                <e c0="-4" c1="1" />
+                <e c0="4" c1="-4" />
+                <e c0="4" c1="1" />
+                <e c0="-0.2" c1="1" />
+                <e c0="0.2" c1="1" />
+                <e c0="4" c1="1" />
+                <e c0="4" c1="1" />
+                <e c0="4" c1="4" />
+            </renderbuffer>
+            <renderbuffer name="tangent" components="3" type="float">
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+            </renderbuffer>
+            <renderbuffer name="bitangent" components="3" type="float">
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+            </renderbuffer>
+            <mixmode>
+                <copy />
+            </mixmode>
+            <submesh name="abstract_0">
+                <material>abstract</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="13" />
+                    <e c0="22" />
+                    <e c0="18" />
+                    <e c0="13" />
+                    <e c0="18" />
+                    <e c0="5" />
+                    <e c0="22" />
+                    <e c0="26" />
+                    <e c0="18" />
+                    <e c0="22" />
+                    <e c0="30" />
+                    <e c0="26" />
+                    <e c0="30" />
+                    <e c0="38" />
+                    <e c0="26" />
+                    <e c0="30" />
+                    <e c0="46" />
+                    <e c0="38" />
+                    <e c0="42" />
+                    <e c0="29" />
+                    <e c0="25" />
+                    <e c0="42" />
+                    <e c0="25" />
+                    <e c0="34" />
+                    <e c0="29" />
+                    <e c0="17" />
+                    <e c0="25" />
+                    <e c0="29" />
+                    <e c0="21" />
+                    <e c0="17" />
+                    <e c0="21" />
+                    <e c0="1" />
+                    <e c0="17" />
+                    <e c0="21" />
+                    <e c0="9" />
+                    <e c0="1" />
+                    <e c0="45" />
+                    <e c0="44" />
+                    <e c0="36" />
+                    <e c0="45" />
+                    <e c0="36" />
+                    <e c0="37" />
+                    <e c0="44" />
+                    <e c0="35" />
+                    <e c0="36" />
+                    <e c0="44" />
+                    <e c0="43" />
+                    <e c0="35" />
+                    <e c0="43" />
+                    <e c0="32" />
+                    <e c0="35" />
+                    <e c0="43" />
+                    <e c0="40" />
+                    <e c0="32" />
+                    <e c0="10" />
+                    <e c0="11" />
+                    <e c0="3" />
+                    <e c0="10" />
+                    <e c0="3" />
+                    <e c0="2" />
+                    <e c0="12" />
+                    <e c0="15" />
+                    <e c0="7" />
+                    <e c0="12" />
+                    <e c0="7" />
+                    <e c0="4" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="wood_0">
+                <material>wood</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="6" />
+                    <e c0="19" />
+                    <e c0="0" />
+                    <e c0="19" />
+                    <e c0="16" />
+                    <e c0="16" />
+                    <e c0="19" />
+                    <e c0="27" />
+                    <e c0="16" />
+                    <e c0="27" />
+                    <e c0="24" />
+                    <e c0="24" />
+                    <e c0="27" />
+                    <e c0="39" />
+                    <e c0="24" />
+                    <e c0="39" />
+                    <e c0="33" />
+                    <e c0="14" />
+                    <e c0="8" />
+                    <e c0="20" />
+                    <e c0="14" />
+                    <e c0="20" />
+                    <e c0="23" />
+                    <e c0="23" />
+                    <e c0="20" />
+                    <e c0="28" />
+                    <e c0="23" />
+                    <e c0="28" />
+                    <e c0="31" />
+                    <e c0="31" />
+                    <e c0="28" />
+                    <e c0="41" />
+                    <e c0="31" />
+                    <e c0="41" />
+                    <e c0="47" />
+                </indexbuffer>
+            </submesh>
+        </params>
+    </meshfact>
+    <sector name="room2,0">
+        <meshobj name="walls">
+            <zfill />
+            <plugin>crystalspace.mesh.loader.genmesh</plugin>
+            <params>
+                <factory>factory_room2,0_walls</factory>
+                <color red="1" green="1" blue="1" />
+                <manualcolors />
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <submesh name="abstract_0">
+                    <material>abstract</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
+                    <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
+                </submesh>
+                <submesh name="wood_0">
+                    <material>wood</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
+                    <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
+                </submesh>
+                <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                    <e c0="0.638184" c1="0.00292969" />
+                    <e c0="0.902832" c1="0.00292969" />
+                    <e c0="0.928223" c1="0.321289" />
+                    <e c0="0.928223" c1="0.469727" />
+                    <e c0="0.95459" c1="0.321289" />
+                    <e c0="0.558105" c1="0.639648" />
+                    <e c0="0.794434" c1="0.00292969" />
+                    <e c0="0.95459" c1="0.469727" />
+                    <e c0="0.479004" c1="0.321289" />
+                    <e c0="0.92627" c1="0.00292969" />
+                    <e c0="0.95166" c1="0.321289" />
+                    <e c0="0.95166" c1="0.469727" />
+                    <e c0="0.978027" c1="0.321289" />
+                    <e c0="0.581543" c1="0.639648" />
+                    <e c0="0.635254" c1="0.321289" />
+                    <e c0="0.978027" c1="0.469727" />
+                    <e c0="0.638184" c1="0.151367" />
+                    <e c0="0.902832" c1="0.151367" />
+                    <e c0="0.558105" c1="0.788086" />
+                    <e c0="0.794434" c1="0.151367" />
+                    <e c0="0.479004" c1="0.469727" />
+                    <e c0="0.92627" c1="0.151367" />
+                    <e c0="0.581543" c1="0.788086" />
+                    <e c0="0.635254" c1="0.469727" />
+                    <e c0="0.638184" c1="0.166992" />
+                    <e c0="0.902832" c1="0.166992" />
+                    <e c0="0.558105" c1="0.803711" />
+                    <e c0="0.794434" c1="0.166992" />
+                    <e c0="0.479004" c1="0.485352" />
+                    <e c0="0.92627" c1="0.166992" />
+                    <e c0="0.581543" c1="0.803711" />
+                    <e c0="0.635254" c1="0.485352" />
+                    <e c0="0.743652" c1="0.321289" />
+                    <e c0="0.638184" c1="0.31543" />
+                    <e c0="0.902832" c1="0.31543" />
+                    <e c0="0.743652" c1="0.469727" />
+                    <e c0="0.743652" c1="0.485352" />
+                    <e c0="0.743652" c1="0.633789" />
+                    <e c0="0.558105" c1="0.952148" />
+                    <e c0="0.794434" c1="0.31543" />
+                    <e c0="0.76709" c1="0.321289" />
+                    <e c0="0.479004" c1="0.633789" />
+                    <e c0="0.92627" c1="0.31543" />
+                    <e c0="0.76709" c1="0.469727" />
+                    <e c0="0.76709" c1="0.485352" />
+                    <e c0="0.76709" c1="0.633789" />
+                    <e c0="0.581543" c1="0.952148" />
+                    <e c0="0.635254" c1="0.633789" />
+                </renderbuffer>
+            </params>
+            <staticlit />
+        </meshobj>
+        <portals>
+            <portal name="left2">
+                <v x="60" y="5" z="-1" />
+                <v x="60" y="5" z="1" />
+                <v x="60" y="-1" z="1" />
+                <v x="60" y="-1" z="-1" />
+                <sector>room1,0</sector>
+                <viscull />
+            </portal>
+        </portals>
+        <meshobj name="haze5">
+            <priority>alpha</priority>
+            <plugin>haze</plugin>
+            <ztest />
+            <move>
+                <v x="70" y="0.1" z="-10" />
+            </move>
+            <params>
+                <factory>hazeFact</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <material>plasma</material>
+                <origin x="0" y="-1" z="0" />
+                <directional x="0" y="1" z="0" />
+                <layer>
+                    <scale>0.5</scale>
+                    <hazecone p="1" q="0.3" number="17">
+                        <min x="0" y="-1" z="0" />
+                        <max x="0" y="5" z="0" />
+                    </hazecone>
+                </layer>
+            </params>
+        </meshobj>
+        <light>
+            <center x="80" y="0" z="0" />
+            <radius>40</radius>
+            <color red="0" green="1" blue="0" />
+        </light>
+    </sector>
+</world>

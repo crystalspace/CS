@@ -1,0 +1,6 @@
+    Init%Ext%();
+    if (!CS_%Ext%)
+    {
+      Report (msgDependencyNotFound, "GL", CS::Quote::Single (ext), CS::Quote::Single ("%Ext%"));
+      return;
+    }

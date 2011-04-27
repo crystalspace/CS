@@ -1,0 +1,4 @@
+<shadervars>
+  <shadervar name="tex shadow noise" type="texture">/lib/shadermgr-defaults/shadow_noise.png</shadervar>
+  <shadervar name="standardtex gray128" type="texture">/lib/shadermgr-defaults/gray128.tga</shadervar>
+</shadervars>

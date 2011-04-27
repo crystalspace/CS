@@ -1,0 +1,12 @@
+SubDir TOP plugins sndsys element speex ;
+
+if $(SPEEX.AVAILABLE) = "yes"
+{
+Plugin sndsysspeex : [ Wildcard *.cpp *.h ] ;
+Description sndsysspeex : "Speex sound element for sndsys" ;
+LinkWith sndsysspeex : crystalspace ;
+ExternalLibs sndsysspeex : SPEEX ;
+CompileGroups sndsysspeex : sndsys ;
+MsvcDefine sndsysspeex : CS_HAVE_SPEEX_HEADER_FREE ;
+}
+

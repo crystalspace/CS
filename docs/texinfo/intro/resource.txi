@@ -1,0 +1,222 @@
+@c -*-texinfo-*-
+@node Where to Get, Mailing Lists, Feature List, CS Introduction
+@section Where to Get Crystal Space
+@cindex Resources, Where to Get
+@cindex Where to Get, Resources
+
+The Crystal Space home page contains the latest development and
+official releases of Crystal Space.  Here is a small note about the
+difference between the official and the development (beta) releases: both
+the official and development versions are actually beta.  The difference is
+that the official release should be more stable and will be easier to get
+working as all documentation and makefiles are up-to-date.  The development
+release will probably have more features but it may not work very well on
+your particular system, it may not work at all, or you might not be able to
+compile it.  But the development release may also work very well.  You never
+know.
+
+@noindent
+The Crystal Space home page is located at:
+
+@uref{http://www.crystalspace3d.org/}
+
+@noindent
+The Crystal Space Developer's Project page is located at:
+
+@uref{http://sourceforge.net/projects/crystal/}
+
+@noindent
+The released Crystal Space packages can be downloaded via @sc{http}
+from the following location:
+
+@uref{http://sourceforge.net/projects/crystal/files/}
+
+@noindent
+Older release data and separate packages may be found at the old download
+site:
+
+@uref{ftp://sunsite.dk/pub/projects/crystal/}
+
+@subheading Bleeding-Edge Developmental Releases (@sc{svn})
+@cindex SVN
+@cindex Bleeding-Edge Developmental Releases
+@cindex Developmental Releases, Bleeding-Edge
+
+@anchor{SVN}
+Crystal Space is being actively developed.  You can download
+@emph{bleeding-edge} versions of the project from the @sc{svn} repository
+where the absolute latest copy is stored.  There are two ways to access the
+developmental version of the project.
+
+First, you can access the @sc{svn} repository directly via a @sc{svn} tool.
+Instructions for doing so may be found here:
+
+@uref{http://crystalspace3d.org/main/Subversion}
+
+Second, you can download a snapshot of the @sc{svn} repository using @sc{http}.
+Snapshots are generated daily and are accompanied by standard @samp{diff}-style
+@dfn{patch} files.
+
+@uref{http://www.crystalspace3d.org/cvs-snapshots/}
+
+You can also view the contents of the @sc{svn} repository online including
+all of the historical information.
+
+@uref{http://trac.crystalspace3d.org/trac/CS/browser/}
+
+@subheading Documentation
+@cindex Documentation, Obtaining
+@cindex Documentation, Online
+@cindex Obtaining Documentation
+@cindex Online Documentation
+@cindex Developer Documentation and @sc{api}
+@cindex Public @sc{api}
+@cindex @sc{api}, Public
+
+@anchor{Documentation Resources}
+Documentation is included with the Crystal Space distribution.  A gateway to
+all documentation can be found in the file @file{CS/docs/README.html}.  You can
+read the local copy of the @cite{Crystal Space User's Manual} with your
+web browser by loading the file @file{CS/docs/html/manual/index.html}, or the
+@cite{Crystal Space Public API Reference Manual} by viewing the file 
+@file{CS/docs/html/api/index.html}.
+
+Documentation is available for online viewing.  The @cite{Crystal Space
+User's Manual} is available for online viewing at this location:
+
+@url{http://www.crystalspace3d.org/docs/online/manual/}
+
+The @cite{Public @sc{api} Reference Manual} is available for online viewing
+here:
+
+@url{http://www.crystalspace3d.org/docs/online/api/}
+
+In addition, all of the above documents may be downloaded for offline viewing
+from the following location.
+
+@url{http://www.crystalspace3d.org/docs/download/}
+
+@noindent
+The downloadable documentation may be available in a number of formats.  At the
+very least, it will be available as @sc{html}.
+
+Developers can generate their own copies of these manuals from the
+Crystal Space source package by invoking certain makefile targets.  The
+@cite{Crystal Space Manual} can be converted to various output formats
+by invoking any of the targets @samp{manualhtml}, @samp{manualps},
+@samp{manualpdf}, and @samp{manualinfo}.
+
+The @cite{Public @sc{api} Reference Manual} and @cite{Developer's API
+Reference Manual} can be converted to @sc{html} format by invoking the
+@samp{apihtml} and @samp{apidevhtml} makefile targets, respectively.
+
+These makefile targets place the generated output in appropriately named
+subdirectories of @file{$@{builddir@}/out/docs}.
+
+@node Mailing Lists, IRC, Where to Get, CS Introduction
+@section Mailing Lists
+@cindex Mailing Lists
+
+There are several mailing lists for Crystal Space which may be of interest to
+users and developers.
+
+The discussion list used for general and in-depth discussion of Crystal Space
+and related projects.
+
+@noindent
+Mailing List: @email{crystal-main@@lists.sourceforge.net}.
+
+To subscribe to this list visit the mailing list administration page and
+follow the instructions there.  This page also contains instructions for
+unsubscribing.
+
+@uref{http://lists.sourceforge.net/mailman/listinfo/crystal-main/}
+
+The list for developers and others interested in discussion about actual
+implementation and design.
+
+@noindent
+Mailing List: @email{crystal-develop@@lists.sourceforge.net}.
+
+To subscribe to this list visit the mailing list administration page and
+follow the instructions there.  This page also contains instructions for
+unsubscribing.
+
+@uref{http://lists.sourceforge.net/mailman/listinfo/crystal-develop/}
+
+The announcement list is for people interested in being notified of
+important announcements which affect the Crystal Space community, such as
+new releases, new important features, and the like.
+
+@noindent
+Mailing List: @email{crystal-announce@@lists.sourceforge.net}.
+
+To subscribe to this list visit the mailing list administration page and
+follow the instructions there.  This page also contains instructions for
+unsubscribing.
+
+@uref{http://lists.sourceforge.net/mailman/listinfo/crystal-announce/}
+
+People who are interested in being notified of changes which are made to
+Crystal Space's @sc{svn} repository can subscribe to the @samp{crystal-cvs}
+mailing list.  A notification message is sent to members of this list
+each time a change is made to the resources within the @sc{svn} repository.
+This is an excellent resource for keeping up-to-date with regards to changes
+to the project. Please consider subscribing.
+
+@noindent
+Mailing List: @email{crystal-cvs@@lists.sourceforge.net}.
+
+To subscribe to this list visit the mailing list administration page and
+follow the instructions there.  This page also contains instructions for
+unsubscribing.
+
+@uref{http://lists.sourceforge.net/mailman/listinfo/crystal-cvs/}
+
+There is a mailing list which keeps track of documentation annotations.
+This mailing list receives automated messages every time someone adds a comment
+to one of the pages of the online documentation.
+
+@noindent
+Mailing List: @email{crystal-docs@@lists.sourceforge.net}.
+
+To subscribe to this list visit the mailing list administration page and
+follow the instructions there. This page also contains instructions for
+unsubscribing.
+
+@uref{http://lists.sourceforge.net/mailman/listinfo/crystal-docs/}
+
+The @emph{tracker} mailing list receives notifications each time a change is
+made to the Crystal Space bug tracker ``Trac'', and to the older SourceForge
+tracker databases, such as ``Bugs'', ``Feature Requests'', etc., which are now
+deprecated.
+
+@noindent
+Mailing List: @email{crystal-tracker@@lists.sourceforge.net}.
+
+To subscribe to this list visit the mailing list administration page and
+follow the instructions there. This page also contains instructions for
+unsubscribing.
+
+@uref{http://lists.sourceforge.net/mailman/listinfo/crystal-tracker/}
+
+@node IRC, Feedback, Mailing Lists, CS Introduction
+@section Internet Relay Chat (@sc{irc})
+@cindex Internet Relay Chat (@sc{irc})
+@cindex @sc{irc}
+
+The Crystal Space developers are often available online for live chat via the
+Internet Relay Chat (@sc{irc}) system.  If you are unfamiliar with @sc{irc}, a
+good place to learn about it is @uref{http://irchelp.org/}.  The Crystal
+Space developers inhabit a channel named @code{#CrystalSpace} on the FreeNode
+Network. You can find more information about FreeNode at
+@uref{http://freenode.net/}, including a list of servers. There are a few
+redirection servers to which you should be able to connect right away. Try
+connecting to one located closest (geographically) to you for the least lag.
+
+@example
+irc.au.freenode.net
+irc.cn.freenode.net
+irc.eu.freenode.net
+irc.us.freenode.net
+@end example

@@ -1,0 +1,8 @@
+SubDir TOP plugins collide opcode ;
+
+Description csopcode : "OPCODE collision detection plugin" ;
+Plugin csopcode : [ Wildcard *.cpp *.h ] [ Wildcard Ice : *.cpp *.h ] ;
+LinkWith csopcode : crystalspace ;
+# @@@ FIXME: Opcode breaks strict-aliasing *a lot*, but maybe it can be
+# fixed...
+CFlags csopcode : $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;

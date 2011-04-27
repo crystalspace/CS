@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- retarget.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.animesh.animnode.retarget</name>
+        <implementation>RetargetNodeManager</implementation>
+        <description>Crystal Space Retarget animation node of an animated mesh</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- reporter.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.utilities.reporter</name>
+        <implementation>csReporter</implementation>
+        <description>Reporting utility</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

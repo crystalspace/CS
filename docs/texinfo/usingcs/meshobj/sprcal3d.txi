@@ -1,0 +1,434 @@
+@c -*-texinfo-*-
+@node MeshObject SprCal3D, MeshObject Spr2D, MeshObject Portal Container, MeshObject
+@subsection SpriteCal3D Mesh Object
+@cindex MeshObject
+@cindex 3D Sprite
+@cindex Cal3D
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+
+@file{sprcal3d} is a 3D mesh plugin which can perform skeletal animation using
+the Cal3D library.
+
+@noindent
+@uref{http://cal3d.sourceforge.net/}
+
+@subsubheading Making the Model
+
+This is an example of how to load and view a Cal3d file with the
+@file{viewmesh} program.
+
+We are going to load the @file{cally} model. The data files of this model are
+part of the standard Cal3d @sc{svn} repository, and can be found within the
+Cal3D project at @file{cal3d/data/cally}. For this example, you should copy the
+files from this directory to @file{CS/cally}.
+
+Now, make a new file called @file{test.cal3d} in the @file{CS} directory with
+the following contents:
+
+@example
+<!-- The meshfact name is the CS name used to create
+     instances of this object. -->
+<meshfact name="test">
+
+<!-- The plugin line specifies the plugin to use to parse
+     the succeeding 'params' tag. -->
+<plugin>crystalspace.mesh.loader.factory.sprite.cal3d</plugin>
+
+<params>
+  <options rotate_x_axis="yes" flip_textures="no" />
+
+  <!-- Path specifies the OS-dependent directory path to
+       where all the other files are located. (optional) -->
+  <path dir="cally/" />
+
+  <!-- The cally model is much too large. -->
+  <scale value="0.01" />
+
+  <!-- Specify cal3d skeleton file used by model. -->
+  <skeleton file="cally.csf" />
+
+  <!-- Animations specify the filename to load, and the
+       CS-accessible name of this animation.  The type attribute
+       is used to distinguish various types of animations.
+       Recognized types are "idle", "travel", "cycle",
+       "style_cycle", and "action". base_vel specifies the
+       speed of translation which should be used when the
+       animation is playing alone.  min_vel and max_vel are
+       used by the blender to achieve a specified desired
+       velocity.  min_random and max_random are interval to be
+       used in idle override actions, in seconds.  idle_pct is a
+       number between 0 and 100, which is the % probability
+       of that action being the override action. -->
+  <animation
+    file="cally_idle.caf"
+    name="stand"
+    type="idle"
+    base_vel="0"
+    min_vel="0"
+    max_vel="0"
+    min_random="10"
+    max_random="30" />
+  <animation
+    file="cally_walk.caf"
+    name="walk"
+    type="travel"
+    base_vel="2"
+    min_vel="0"
+    max_vel="3" />
+  <animation
+    file="cally_strut.caf"
+    name="strut"
+    type="travel"
+    base_vel="2"
+    min_vel="0"
+    max_vel="3" />
+  <animation
+    file="cally_jog.caf"
+    name="run"
+    type="travel"
+    base_vel="5"
+    min_vel="2"
+    max_vel="5" />
+  <animation
+    file="cally_wave.caf"
+    name="greet"
+    type="action"
+    idle_pct="33" />
+  <animation
+    file="cally_tornado_kick.caf"
+    name="hurt"
+    type="action"
+    idle_pct="33" />
+  <animation
+    file="cally_shoot_arrow.caf"
+    name="shoot"
+    type="action"
+    idle_pct="34" />
+
+  <!-- Materials are VFS filenames because they are CS
+       materials and not cal3d materials. (optional) We
+       can not use the real .xrf files because CS can't load
+       that format.  -->
+  <material file="/lib/std/green.gif" name="green" />
+
+  <!-- Meshes specify each attachable part of the model.
+       The name is the CS-accessible name which will be used
+       to select/deselect it for the model.  The material
+       specified is the default CS material used by this
+       mesh.  -->
+  <mesh file="cally_calf_left.cmf"
+        name="cally_calf_left"
+        material="green" />
+  <mesh file="cally_calf_right.cmf"
+        name="cally_calf_right"
+        material="green" />
+  <mesh file="cally_chest.cmf"
+        name="cally_chest"
+        material="green" />
+  <mesh file="cally_foot_left.cmf"
+        name="cally_foot_left"
+        material="green" />
+  <mesh file="cally_foot_right.cmf"
+        name="cally_foot_right"
+        material="green" />
+  <mesh file="cally_hand_left.cmf"
+        name="cally_hand_left"
+        material="green" />
+  <mesh file="cally_hand_right.cmf"
+        name="cally_hand_right"
+        material="green" />
+  <mesh file="cally_head.cmf"
+        name="cally_head"
+        material="green" />
+  <mesh file="cally_lowerarm_left.cmf"
+        name="cally_lowerarm_left"
+        material="green" />
+  <mesh file="cally_lowerarm_right.cmf"
+        name="cally_lowerarm_right"
+        material="green" />
+  <mesh file="cally_neck.cmf"
+        name="cally_neck"
+        material="green" />
+  <mesh file="cally_pelvis.cmf"
+        name="cally_pelvis"
+        material="green" />
+  <mesh file="cally_ponytail.cmf"
+        name="cally_ponytail"
+        material="green" />
+  <mesh file="cally_thigh_left.cmf"
+        name="cally_thigh_left"
+        material="green" />
+  <mesh file="cally_thigh_right.cmf"
+        name="cally_thigh_right"
+        material="green" />
+  <mesh file="cally_upperarm_left.cmf"
+        name="cally_upperarm_left"
+        material="green" />
+  <mesh file="cally_upperarm_right.cmf"
+        name="cally_upperarm_right"
+        material="green" />
+
+  <!-- The following rotates the model and all animations around
+       the Y axis by 180 degrees.  Any axis and angle may be
+       specified, and translation may also be specified. -->
+  <hardtransform
+    rot_axis_x="0"
+    rot_axis_y="1"
+    rot_axis_z="0"
+    rot_angle="180" />
+</params>
+</meshfact>
+@end example
+
+Next, run @file{viewmesh} from the @file{CS} directory.
+Click ``Load'', select the @file{/this} directory, and
+select @file{test.cal3d}.  Alternately, to load @file{test.cal3d} from
+the command line when you launch @samp{viewmesh}:
+
+@example
+./viewmesh /this/test.cal3d
+@end example
+
+@noindent
+You should be able to see the @file{cally} model, completely green.
+
+@subsubheading Creating Your Own Cal3D Mesh
+
+Although explaining how to create your own Cal3D meshes is beyond the
+scope of this document, there are several web sites and tutorials which
+describe how to do so. These include:
+
+@table @uref
+@item http://cal3d.sourceforge.net/modeling/tutorial.html
+Describes how to create Cal3D meshes in 3D Studio @sc{max}.
+@end table
+
+@strong{Note}: The Crystal Space Cal3D plugin requires a skeleton system to
+function properly even if the mesh is not going to be animated.  If your mesh
+does not require animation, you still @emph{must} place at least one bone in
+the mesh, bind it to a part of the mesh (e.g., the body of a space ship), name
+it correctly, and export the skeleton along with the mesh. If you fail to
+create at least one bone, the @samp{sprcal3d} plugin either will fail to load
+the model or will otherwise misbehave.
+
+@subsubheading Common @file{viewmesh} Errors
+
+A good way to test your Cal3d mesh is by loading it into @file{viewmesh}.
+Since most diagnostic output is directed to the console, it is important
+to run @file{viewmesh} from the command line.  See above for how to
+do so, and substitute your @file{.cal3d} file for @file{test.cal3d}.
+
+Here are several errors which may occur when testing your mesh:
+
+@itemize @bullet
+@item
+If @file{viewmesh} crashes or aborts with a message about missing skeleton
+immediately after loading your @file{.cal3d} file, make sure that you have
+included the @code{<skeleton>} tag in your @file{.cal3d} file.
+
+@item
+If @file{viewmesh} pops up an error dialogue with a message such as:
+
+@example
+crystalspace.mesh.sprite.cal3d: Cal3d: Invalid file format...
+@end example
+
+@noindent
+and outputs to the console:
+
+@example
+Error ID: crystalspace.spritecal3dfactoryloader.parse.badfile
+Description: Could not load cal3d skeleton file <test.csf>.
+[node: meshfact(name=test),params,skeleton]
+crystalspace.mesh.sprite.cal3d: Cal3d: Invalid file format...
+@end example
+
+You likely forgot to put a bone in your mesh before exporting it.
+Open your 3D editor, add a bone somewhere in the mesh, bind it to the mesh,
+name it correctly, then re-export your mesh and try again.
+
+@item
+If @file{viewmesh} pops up the error message:
+
+@example
+crystalspace.mesh.sprite.cal3d: Cal3d: No error found in...
+@end example
+
+@noindent
+and outputs to the console:
+
+@example
+Error ID: crystalspace.spritecal3dfactoryloader.parse.badfile
+Description: Could not load cal3d skeleton file <test.csf>.
+[node: meshfact(name=test),params,skeleton]
+@end example
+
+This probably means that you entered the skeleton file name incorrectly in your
+@code{<skeleton>} tag.  Check the value of @code{<name>} in your
+@code{<skeleton>} tag and try again.
+
+@item
+If @file{viewmesh} does nothing when you try to load your @file{.cal3d} file,
+but outputs the following message to the console:
+
+@example
+Error ID: crystalspace.maploader.parse.plugin
+Description: Document system error for file 'test.cal3d':
+  Error reading Element value.
+@end example
+
+@noindent
+You probably forgot to close one of your tags properly (e.g., a missing
+``>'' at the end of a tag).  Check your @file{.cal3d} file, and try again.
+@end itemize
+
+@subsubheading Displaying the Model
+
+We now show you how to edit the @file{simple1} tutorial
+(@pxref{Tutorial Simple}) in order to load the Cal3d model programmatically.
+
+Add the following to @file{simple1.cpp}
+just after the call to @code{CreateRoom()} in @code{Simple::Application()}:
+
+@example
+csRef<iVFS> VFS(csQueryRegistry<iVFS> (object_reg));
+VFS->ChDir("/this/");
+csRef<iMeshFactoryWrapper> imeshfact(
+  loader->LoadMeshObjectFactory("/this/test.cal3d"));
+if (imeshfact == 0)
+@{
+  csReport(object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.simple1",
+      "Error loading mesh object factory!");
+  return false;
+@}
+csRef<iMeshWrapper> sprite = engine->CreateMeshWrapper(
+    imeshfact, "Hulk", room, csVector3(0, 4, 0));
+@end example
+
+Now, build @file{simple1}, and run it from the @file{CS} directory.
+You should be looking right at the model.
+
+@subsubheading Controlling the Model
+
+We can now display the model but we can not set animations, etc.
+To resolve this, insert the following code into @file{simple1.cpp} immediately
+after the code which you inserted to display the model:
+
+@example
+// Make it do something.
+csRef<iSpriteCal3DFactoryState> factstate(
+  scfQueryInterface<iSpriteCal3DFactoryState> (
+  	imeshfact->GetMeshObjectFactory());
+csRef<iSpriteCal3DState> cal3dstate(scfQueryInterface<iSpriteCal3DState> (
+  sprite->GetMeshObject()));
+cal3dstate->SetAnimCycle("walk", 1.0f);
+@end example
+
+Now, build @file{simple1} and run it from the @file{CS} directory.
+You should now see the @file{cally} model ``walking''.
+
+Note: See @file{CS/include/imesh/spritecal3d.h} for more information about the
+@sc{scf} interfaces @samp{iSpriteCal3DState} and
+@samp{iSpriteCal3DFactoryState}. Alternately, consult the Crystal Space
+@sc{api} documentation.
+
+@subsubheading Morph Animations
+
+You can add morph target meshes to each mesh.  Remember that morph target
+meshes need to have the same number of vertices and they need to be in the same
+order.  (Do not use the progressive mesh export option!).
+
+@example
+<mesh file="@dots{}" name="@dots{}" material="@dots{}">
+  <morphtarget file="@dots{}" name="@dots{}"/>
+  <morphtarget @dots{}/>
+  @dots{}
+</mesh>
+@end example
+
+Each of the morph target meshes need to be assigned to a
+@samp{morphanimnation}.  Do not add a @samp{morphtargetmesh} to more than one
+@samp{morphanimation}, since the library is not designed for this, and it would
+cause problems.
+
+@example
+<morphanimation name="@dots{}">
+  <morphtarget mesh="meshname" morph="morphname"/>
+  <morphtarget @dots{}/>
+  @dots{}
+</morphanimation>
+@end example
+
+You can test a morph animation if you load the Cal3D file in the
+@file{viewmesh} example program.
+
+Furthermore, you can use morph animations programmatically as follows:
+
+@noindent
+In this example, @samp{cal3dfactorystate} is the Cal3D factory state object of
+type @samp{iSpriteCal3DFactoryState}.  Using the state object, find the
+@samp{morphanimationid} with the given name.
+
+@example
+int morphanimationid =
+  cal3dfactorystate->FindMorphAnimationName(morphanimationname);
+@end example
+
+@noindent
+In this example, @samp{cal3dstate} is the Cal3D state object of type
+@samp{iSpriteCal3DState}.  We instruct it to fully blend (1.0f) the morph
+animation, over a period of (10.0f) ten seconds.
+
+@example
+cal3dstate->BlendMorphTarget(morphanimationid, 1.0f, 10.0f);
+@end example
+
+@noindent
+This example completely clears a morph animation, over a period of ten seconds
+(10.0f).
+
+@example
+cal3dstate->ClearMorphTarget(morphanimationid, 10.0f);
+@end example
+
+@subsubheading Sockets
+
+Sockets enable you to @dfn{attach} any mesh object to a triangle.  The attached
+mesh object then follows the triangle.  Adding a socket to a Cal3D file
+(following the mesh tags) can be done as shown here.  @samp{i}, @samp{j}, and
+@samp{k} should be numbers.  They are all indices.  The loading order of meshes
+is maintained, so you can deduce which mesh you are using.
+
+@example
+<socket name="@dots{}" mesh="i" submesh="j" tri="k"/>
+@end example
+
+You can test a socket if you load the Cal3D file in the @file{viewmesh} example
+program.
+
+Furthermore, you can use sockets in code as follows:
+
+@noindent
+In this example, @samp{cal3dstate} is the Cal3D state object of type
+@samp{iSpriteCal3DState}. Here we find a socket with a given name.
+
+@example
+iSpriteCal3DSocket* socket = cal3dstate->FindSocket(name);
+@end example
+
+For this example, @samp{sprite} is the @samp{iMeshWrapper} of the Cal3D sprite,
+and @samp{meshwrap} is the @samp{iMeshWrapper} of the mesh object you want to
+add.  This adds the @samp{meshwrap} as a hierarchical child of @samp{sprite}.
+
+@example
+sprite->GetChildren()->Add(meshwrap);
+@end example
+
+Here is how you would set a socket's mesh wrapper.
+
+@example
+socket->SetMeshWrapper(meshwrap);
+@end example

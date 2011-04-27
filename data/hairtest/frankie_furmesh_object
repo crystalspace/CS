@@ -1,0 +1,23 @@
+<library>
+	<meshobj name="frankie_furmesh_object">
+		<plugin>crystalspace.mesh.loader.furmesh</plugin>
+		<params>
+			<factory>frankie_furmesh_factory</factory>
+			<strandwidth>0.00075</strandwidth>
+			<displacement>0.0</displacement>
+			<densitymap>frankie_densitymap</densitymap>
+			<densityfactorguidefurs>100</densityfactorguidefurs>
+			<densityfactorfurstrands>100</densityfactorfurstrands>
+			<heightmap>frankie_heightmap</heightmap>
+			<heightfactor>0.05</heightfactor>
+			<averagecontrolpointscount>2</averagecontrolpointscount>
+			<pointiness>1</pointiness>
+			<controlpointsdeviation>0.005</controlpointsdeviation>
+			<smallfur />
+			<mixmode>
+				<alpha />
+			</mixmode>
+			<priority>alpha</priority>			
+		</params>
+	</meshobj>
+</library>

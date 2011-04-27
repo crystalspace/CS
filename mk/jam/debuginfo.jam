@@ -1,0 +1,146 @@
+#============================================================================
+# Rules for dealing with debugging information
+# Copyright (C)2006-2007 by Frank Richter
+#
+#    This library is free software; you can redistribute it and/or modify it
+#    under the terms of the GNU Library General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or (at your
+#    option) any later version.
+#
+#    This library is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library General Public
+#    License for more details.
+#
+#    You should have received a copy of the GNU Library General Public License
+#    along with this library; if not, write to the Free Software Foundation,
+#    Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#============================================================================
+
+##  SplitDebugInfo binary
+##    Strips the debugging information into a separate external file.
+rule SplitDebugInfo
+{
+  local binary = $(1) ;
+  local dbgfile = $(binary:S=.dbg:G=$(binary:G)) ;
+  local dir = [ on $(binary) GetVar LOCATE ] ;
+  MakeLocate $(dbgfile) : $(dir) ;
+  DEBUG_FILE on $(binary) = [ ConcatDirs $(dir) $(dbgfile:G=) ] ;
+  DoSplitDebugInfo $(binary) ;
+  Clean clean : $(dbgfile) ;
+  return $(dbgfile) ;
+}
+
+actions DoSplitDebugInfo
+{
+  $(CMD.OBJCOPY) --only-keep-debug $(<) $(DEBUG_FILE)
+  $(CMD.OBJCOPY) --strip-unneeded $(<)
+  $(CMD.OBJCOPY) $(CMD.OBJCOPY.LONG_SECTION_NAMES_ENABLE) --add-gnu-debuglink=$(DEBUG_FILE) $(<)
+  test -n "$(CHMOD)" && $(CHMOD) a-x $(DEBUG_FILE)
+}
+
+DEBUGINFOTOOLS.DUMP_SYMS.WIN32 ?= "$(TOP)/bin/dump_syms.exe" ;
+DEBUGINFOTOOLS.DUMP_SYMS ?= $(DEBUGINFOTOOLS.DUMP_SYMS.$(TARGET.OS)) ;
+DEBUGINFOTOOLS.SYMBOLSTORE ?= "$(TOP)/bin/symbolstore.py" ;
+CABARC ?= cabarc ;
+
+if $(DEBUGINFOTOOLS.SYMBOLSTORE) && $(DEBUGINFOTOOLS.DUMP_SYMS)
+{
+  ##  CollectAndDumpSymbols target : dirs [: outdir]
+  ##    Collect and dump symbol files for binaries in directories "dirs" and
+  ##    output into "outdir" (defaults to $(BUILDTOP)/out/symbols/).
+  rule CollectSymbols
+  {
+    local target = $(1) ;
+    local dirs = $(2) ;
+    local outdir = $(3) ;
+    outdir ?= "$(BUILDTOP)/out/symbols" ;
+
+    for d in $(dirs)
+    {
+      local thistarget = $(target:G=$(d)) ;
+      Depends $(target) : $(thistarget) ;
+      NotFile $(thistarget) ;
+      OUTDIR on $(thistarget) = $(outdir) ;
+      SRCDIR on $(thistarget) = $(d) ;
+      RunSymbolStore $(thistarget) ;
+      Always $(thistarget) ;
+    }
+  }
+  
+  actions RunSymbolStore
+  {
+    $(DEBUGINFOTOOLS.SYMBOLSTORE) -c -s "$(TOP)" \
+      "$(DEBUGINFOTOOLS.DUMP_SYMS)" "$(OUTDIR)" "$(SRCDIR)"      
+  }
+  
+  ##  CompressSymbols target : dir
+  ##    Compress symbol files in 'dir'.
+  rule CompressSymbols
+  {
+    local target = $(1) ;
+    local dir = $(2) ;
+    SYMDIR on $(target) = $(dir) ;
+    if $(COMPRESSSYMBOLS_VERBOSE)
+    {
+      JAMARG on $(target) = "-dx" ;
+    }
+    CompressSymbols1 $(target) ;
+  }
+  
+  JAM ?= jam ;
+  actions CompressSymbols1
+  {
+    $(JAM) "-sCOMPRESSSYMBOLS_DIR=$(SYMDIR)" $(JAMARG) _actual_compress_symbols
+  }
+  
+  if $(COMPRESSSYMBOLS_DIR)
+  {
+    rule ActualCompressSymbols
+    {
+      local target = _actual_compress_symbols ;
+      local dir = $(COMPRESSSYMBOLS_DIR) ;
+      {
+        local SUBDIR = $(dir) ; # Called rules see this new temporary value.
+	# @@@ Recurse can not recognize directories; however, symbols may be
+	#  in a directory foo.pdb/<goop>/. Assumes this is always the case.
+	#  Of course the "better" solution would be to distinguish dirs and
+	#  files ... maybe move that symbol recursion logic to a shell script?
+        Recurse SymbolsRecurse2 : .pdb ;
+      }
+    }
+ 
+    rule SymbolsRecurse2
+    {
+      local target = _actual_compress_symbols ;
+      local dir = $(SUBDIR)/$(1) ;
+      {
+        local SUBDIR = $(dir) ; # Called rules see this new temporary value.
+        Recurse CompressPDB : .pdb ;
+      }
+    }
+ 
+    rule CompressPDB
+    {
+      local f = $(1:G=$(SUBDIR)) ;
+      local compressedName = $(f:S=.pd_) ;
+      SUBDIR on $(compressedName) = $(SUBDIR) ;
+      NotFile $(1) ;
+      CabCompressAndRemove $(compressedName) : $(1) ;
+      Depends $(compressedName) : $(1) ;
+      Depends _actual_compress_symbols : $(compressedName) ;
+      Always $(compressedName) ;
+    }
+   
+    actions CabCompressAndRemove
+    {
+      cd $(SUBDIR)
+      cabarc N $(<) $(>)
+      if test $? -eq 0 ; then rm $(>) ; fi
+      cd -
+    }
+
+    ActualCompressSymbols ;
+  }
+}

@@ -1,0 +1,10 @@
+SubDir TOP plugins video render3d shader shaderplugins glshader_arb ;
+
+if $(GL.AVAILABLE) = "yes"
+{
+Description glshader_arb : "ARB vp/fp shader" ;
+Plugin glshader_arb : [ Wildcard *.cpp *.h ] ;
+LinkWith glshader_arb : crystalspace ;
+ExternalLibs glshader_arb : GL ;
+CompileGroups glshader_arb : shaders renderers renderall openglrenderer ;
+}

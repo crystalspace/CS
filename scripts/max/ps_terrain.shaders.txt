@@ -1,0 +1,3 @@
+    <shader><file>/shader/terrain/terrain.xml</file></shader>
+    <shader><file>/shader/terrain/splat.xml</file></shader>
+    <shader><file>/shader/terrain/multisplat.xml</file></shader>

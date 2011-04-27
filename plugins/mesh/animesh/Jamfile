@@ -1,0 +1,7 @@
+SubDir TOP plugins mesh animesh ;
+
+SubInclude TOP plugins mesh animesh animnode ;
+SubInclude TOP plugins mesh animesh body ;
+SubInclude TOP plugins mesh animesh object ;
+SubInclude TOP plugins mesh animesh persist ;
+SubInclude TOP plugins mesh animesh skeleton2 ;

@@ -1,0 +1,6 @@
+SubDir TOP plugins cscript pyanimation ;
+
+if $(PYTHON.AVAILABLE) = "yes"
+{
+  PyBindingModule animationmod : animation : animationmod.cpp : : : "Animation CS Python module" ;
+}

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GUILayout>
+  <Window Type="DefaultWindow" Name="Sockets" >
+    <Property Name="Text" Value="Sck" />
+    <Window Type="ice/StaticImage" Name="Sockets/main" >
+      <Property Name='UnifiedSize' Value='{{1.0,0.0},{1.0,0.0}}'/>
+      <Property Name='UnifiedPosition' Value='{{0.0,0.0},{0.0,0.0}}'/>
+
+      <Window Type="ice/Listbox" Name="Sockets/List" >
+        <Property Name="Text" Value="Set" />
+        <Property Name='UnifiedSize' Value='{{1.0,-10.0},{1.0,-250.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,5.0}}'/>
+      </Window>
+
+      <Window Type="ice/Button" Name="Sockets/AddSocket" >
+        <Property Name="Text" Value="Add" />
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{1.0,-240.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="Sockets/DelSocket" >
+        <Property Name="Text" Value="Delete" />
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.502,0.0},{1.0,-240.0}}'/>
+      </Window>
+      
+      
+
+      <Window Type="ice/StaticImage" Name="Sockets/EditSocket" >
+        <Property Name="BackgroundEnabled" Value="False" />
+        <Property Name="FrameEnabled" Value="True" />
+        <Property Name='UnifiedSize' Value='{{1.0,-10.0},{0.0,170.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,5.0},{1.0,-210.0}}'/>
+
+        <!--
+
+        <Window Type="ice/StaticText" Name="Sockets/EditSocket/Offset/StaticText" >
+          <Property Name="Text" Value="Offset" />
+          <Property Name="BackgroundEnabled" Value="False" />
+          <Property Name="FrameEnabled" Value="False" />
+          <Property Name='UnifiedSize' Value='{{0.0,60.0},{0.0,20.0}}'/>
+          <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,35.0}}'/>
+        </Window>
+        
+        <Window Type="ice/StaticText" Name="Sockets/EditSocket/Offset/X/StaticText" >
+          <Property Name="Text" Value="X" />
+          <Property Name="BackgroundEnabled" Value="False" />
+          <Property Name="FrameEnabled" Value="False" />
+          <Property Name='UnifiedSize' Value='{{0.0,10.0},{0.0,20.0}}'/>
+          <Property Name='UnifiedPosition' Value='{{0.0,65.0},{0.0,35.0}}'/>
+        </Window>
+        <Window Type="ice/Spinner" Name="Sockets/EditSocket/Offset/X/Input" >
+          <Property Name='UnifiedSize' Value='{{0.0,40.0},{0.0,28.0}}'/>
+          <Property Name='UnifiedPosition' Value='{{0.0,75.0},{0.0,35.0}}'/>
+          <Property Name='StepSize' Value='0.1'/>
+          <Property Name='TextInputMode' Value='FloatingPoint'/>
+        </Window>
+        
+        <Window Type="ice/StaticText" Name="Sockets/EditSocket/Offset/Y/StaticText" >
+          <Property Name="Text" Value="Y" />
+          <Property Name="BackgroundEnabled" Value="False" />
+          <Property Name="FrameEnabled" Value="False" />
+          <Property Name='UnifiedSize' Value='{{0.0,10.0},{0.0,20.0}}'/>
+          <Property Name='UnifiedPosition' Value='{{0.0,120.0},{0.0,35.0}}'/>
+        </Window>
+        <Window Type="ice/Spinner" Name="Sockets/EditSocket/Offset/Y/Input" >
+          <Property Name='UnifiedSize' Value='{{0.0,40.0},{0.0,28.0}}'/>
+          <Property Name='UnifiedPosition' Value='{{0.0,130.0},{0.0,35.0}}'/>
+        </Window>
+
+        <Window Type="ice/StaticText" Name="Sockets/EditSocket/Offset/Z/StaticText" >
+          <Property Name="Text" Value="Z" />
+          <Property Name="BackgroundEnabled" Value="False" />
+          <Property Name="FrameEnabled" Value="False" />
+          <Property Name='UnifiedSize' Value='{{0.0,10.0},{0.0,20.0}}'/>
+          <Property Name='UnifiedPosition' Value='{{0.0,175.0},{0.0,35.0}}'/>
+        </Window>
+        <Window Type="ice/Spinner" Name="Sockets/EditSocket/Offset/Z/Input" >
+          <Property Name='UnifiedSize' Value='{{0.0,40.0},{0.0,28.0}}'/>
+          <Property Name='UnifiedPosition' Value='{{0.0,185.0},{0.0,35.0}}'/>
+        </Window>
+        
+      -->  
+        
+
+        <Window Type="ice/Button" Name="Sockets/EditSocket/SaveButton" >
+          <Property Name="Text" Value="Save" />
+          <Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
+          <Property Name='UnifiedPosition' Value='{{1.0,-75.0},{1.0,-30.0}}'/>
+        </Window>
+        
+      </Window>
+      
+
+
+      <Window Type="ice/Button" Name="Sockets/DetachButton" >
+        <Property Name="Text" Value="Detach" />
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.02,0.0},{1.0,-30.0}}'/>
+      </Window>
+      <Window Type="ice/Button" Name="Sockets/AttachButton" >
+        <Property Name="Text" Value="Attach" />
+        <Property Name='UnifiedSize' Value='{{0.475,0.0},{0.0,25.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.502,0.0},{1.0,-30.0}}'/>
+      </Window>
+
+
+
+    </Window>
+  </Window>
+
+
+
+
+</GUILayout>
+

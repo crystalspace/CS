@@ -1,0 +1,352 @@
+@c -*-texinfo-*-
+@node MSVC7, MinGW, Unix, Platform Instructions
+@subsection Microsoft Visual C++ 8 or 9
+@cindex Windows, Building
+@cindex MSVC, Building
+
+@noindent
+Originally written by Philip Wyett @email{philwyett@@gmx.com}.
+@noindent
+@emph{Last updated September 2009.}
+
+In order to successfully compile the Crystal Space 3D Software Development Kit
+(@sc{sdk}), you will need a copy of @emph{Microsoft Visual C++ 8 (@sc{.net 2005})}
+or @emph{Microsoft Visual C++ 9 (@sc{.net 2008})}. The @emph{Express Editions} 
+are perfectly suitable to compile Crystal Space (although some extra steps are required
+for the Express Edition of @sc{msvc} 8 is, more below).
+
+@subsubheading Getting Extra Help
+
+If you need help with Crystal Space and Visual C++ or just Crystal Space in
+general.  You can subscribe and then post a message to the Crystal Space
+mailing list.  To subscribe see the following site and fill in the form:
+
+@uref{http://lists.sourceforge.net/lists/listinfo/crystal-main}
+
+@subsubheading Required/Optional External Libraries and Software
+
+All the following libraries and Software Development Kits (@sc{sdk}) unless
+stated are not required.  However, if you choose not to install them, at
+compile time you must follow the documented instructions of how to unload these
+projects from the Crystal Space build process.
+
+@subsubheading Windows @sc{sdk} - required for Microsoft Visual C++ 2005 Express Edition, Microsoft Visual Studio 2005
+
+Microsoft Visual C++ 2005 Express Edition does not ship with a version of the
+Windows @sc{sdk}. Microsoft Visual Studio 2005 (non-Express) ships with version 5.0
+of the Windows @sc{sdk} which fails when building some applications (in particular,
+the resource compiler does not support the "Vista" version of the @sc{ico} file format).
+
+The Windows @sc{sdk} can be found at the following URL:
+@noindent
+@ifnottex
+@uref{http://msdn.microsoft.com/en-us/windows/bb980924.aspx}
+@end ifnottex
+@iftex
+@code{http://msdn.microsoft.com/en-us/windows/bb980924.aspx}
+@end iftex
+
+@itemize @bullet
+@item
+@emph{Microsoft Visual C++ 2005 Express Edition}:
+With the exception of using the Windows @sc{sdk} linked above instead of the
+Platform @sc{sdk} linked in the following document, exactly follow these
+instructions to set up the @sc{sdk}:
+
+@noindent
+@ifnottex
+@uref{http://msdn2.microsoft.com/en-us/vstudio/aa700755.aspx}
+@end ifnottex
+@iftex
+@code{http://msdn2.microsoft.com/en-us/vstudio/aa700755.aspx}
+@end iftex
+
+@item
+@emph{Microsoft Visual Studio 2005}:
+After installing the Windows @sc{sdk}, configure Visual Studio to use the
+utilities from the newly installed @sc{sdk}: Select ``Options'', 
+``Projects and Solutions'', ``VC++ Directories''. Select ``Executable files''
+from ``Show directories for''. Add the @file{bin} subdirectory of the Windows
+@sc{sdk} installation directory at the top of the list. Repeat for ``x64''
+platform if desired.
+@end itemize
+
+@subsubheading cs-win32libs - Required
+
+Before you attempt to compile Crystal Space, you must download
+and install the ``cs-win32libs'' archive.  This archive contains alot of the
+third party header, pre-built libraries and dll files used by Crystal
+Space, i.e. @file{libz-cs.dll}, @file{libjpeg-cs.dll}, @file{libpng-cs.dll}, 
+etc. @xref{cs-win32libs}.
+
+Once you have downloaded the cs-win32libs package, execute the binary and
+follow the setup instructions.  You may want to select ``VC typical'' in the
+``Select Components'' screen. You can further adjust the selection of installed 
+components depending on your actual set up (e.g. install MinGW-related 
+components if you plan to also use CrystalSpace with MinGW/MSYS).
+
+@subsubheading Python - Optional
+
+Crystal Space contains support for Python scripting and thus has projects
+within it requires that Python be installed on your system.  Make sure you add
+the Python @emph{include} and @emph{libs} directories to @sc{msvc} so that the
+compiler can see those files.  If you wish to compile with Python support you
+must install Python 2.2 or later, which can be obtained from:
+
+@uref{http://www.python.org}
+
+@subsubheading Compiling Crystal Space
+
+To compile Crystal Space, you'll have to perform the following steps.  If
+anything doesn't work, see the Win32 @sc{faq}, @ref{MSVC8 FAQ}.
+
+@enumerate
+@item
+Load @file{CS\mk\msvcN\wkstypical.sln}, where @samp{N} must be replaced with
+the version number of the MSVC version you use.
+
+@item
+From the file menu select @emph{Build->Build Solution}.  @emph{Note}: If you
+want to build a debuggable version of Crystal Space, you should select the
+@emph{Debug} build mode; otherwise select the @emph{Release} build mode.  Do
+not use the special-purpose @emph{ExtensiveMemDebug} build mode.
+
+@item
+After a while the compilation should finish.  The signal for a
+successful build will be come in the form of the something similar to the
+following:
+
+@example
+Build: 1 succeeded, 0 failed, 0 skipped
+@end example
+@end enumerate
+
+@subsubheading Running the Demonstration Applications
+
+The first app you should try is Walktest.  This program shows many of the
+features of the 3D engine.  You can run it by starting it from the windows
+explorer.  It should be at @file{.../cs/walktest.exe}.  Don't start it from
+other locations or from within Visual Studio.  It won't find the required files
+if you do.
+
+If you want to run a debug session, you first have to set the working
+directory.  First select the project you wish to debug and setting it as the
+startup project. Next open @emph{Project->Properties->Debugging} and enter
+the base @file{CS\} directory as the working directory for debug sessions
+(for example, @file{C:\CS\}).  Be sure to to this for @emph{Debug} and
+@emph{Release} builds.
+
+You can now continue with the next platform-independent step.  The remaining
+Windows-specific sections are only important when you want to compile your own
+application using Crystal Space.
+
+@subsubheading Structure of the Workspace
+
+@emph{Note}: If you find bugs in the @sc{msvc} project or workspace files
+coming with Crystal Space, don't send fixes for these files to the developers.
+These files are generated automatically, so your fixes would be useless.
+Better, send a description of the bug to the mailing list.
+
+The Crystal Space workspace is divided into several projects.  They all exist
+as separate project files (@file{*.vcproj}).  The projects are collected
+together by workspaces @file{*.sln}.  A workspace will also ensure correct
+linking between the various projects.  There are several workspaces to choose
+from.  Most users should choose the @emph{typical} workspace, but the others
+are available for the adventurous.
+
+@itemize @bullet
+@item
+@file{wkstypical.sln} --- Builds the typical modules needed by most users of
+Crystal Space.
+
+@c @item
+@c @file{wksall.sln} --- Builds all modules, even the experimental ones.
+@c 
+@end itemize
+
+The workspace uses a prefix system for naming contained projects:
+
+@itemize @bullet
+@item
+@file{app} --- Prefixes application projects.
+@item
+@file{lib} --- Prefixes library projects.
+@item
+@file{plg} --- Prefixes plugin module projects.
+@item
+@file{grp} --- Prefixes psuedo-groups of related projects.
+@end itemize
+
+The @emph{Libraries} are C++ libraries that you can link into your own
+programs.  Some of these libraries are part of the core of Crystal Space.
+Their output are @file{.lib} files.
+
+The @emph{Plugins} are also programming libraries, but they use a special
+mechanism called @sc{scf} as their interface to your program.  This separates
+their interface from the internals of the library and thus allows dynamic
+linking.  In fact, some of the @emph{Libraries} also use @sc{scf}.  The rule
+for the @sc{msvc} workspace is simple: The @emph{Plugins} are projects that
+build a dynamic library (@file{.dll}).  You can find more information in the
+section of this manual dealing with plug-in modules.  @xref{SCF Chapter}.
+
+The @emph{Applications} are programs using some of these libraries, so they
+produce @file{.exe} files.
+
+@subsubheading Compiling Your Own Program Using Crystal Space
+
+There is a @sc{howto} which explains how to create an @sc{msvc} project file
+for your own program which utilizes Crystal Space.
+@xref{HOWTO Creating External MSVC Application}.
+
+@subsubheading Frequently Asked Questions (@sc{faq})
+@anchor{MSVC8 FAQ}
+
+This is the list of frequently asked questions for the Win32 port of Crystal
+Space.  Please consult this list if you are having difficulty building or using
+the project.
+
+@subsubheading Building
+
+@itemize @bullet
+@item
+Q1. @emph{I'm using the Visual C++ 2005 Express Edition and I get a lot of 
+``file not found'' errors for @file{windef.h} and others. What is wrong?}
+
+Q2. @emph{I'm using the Visual C++ 2005 Express Edition and I get a lot of 
+``unresolved symbol'' errors for names like 
+@code{SHGetSpecialFolderLocation@@12}. What is wrong?}
+
+A. These errors indicate a lacking or an incomplete installation of the 
+Platform SDK. Exactly follow the instructions given on Microsoft's 
+``Using Visual C++ 2005 Express Edition with the Microsoft Platform SDK'' 
+page:
+@ifnottex
+@uref{http://msdn.microsoft.com/vstudio/express/visualc/usingpsdk/}
+@end ifnottex
+@iftex
+@code{http://msdn.microsoft.com/vstudio/express/visualc/usingpsdk/}
+@end iftex
+Also, the instructions don't say that, but if you have Visual C++ open while 
+applying those changes you need to restart it. 
+
+@item 
+Q. @emph{I get "Errors in post link" and later "file not found" errors.}
+
+A. Some problems with non-latin directory names have been reported (e.g.
+Hebrew).  If your @file{CS} directory is under such a directory, try to move it
+to a directory which name has only Latin characters in it.
+
+@item
+Q. @emph{Where are the @file{zlib.h}, @file{png.h} and @file{jpeglib.h} files?}
+
+A. Those files are not part of the Crystal Space project, but they are
+required to build it.  You must get a version of the following packages, most
+of which can be easily found on the Internet.  You can download precompiled
+versions of these libraries i.e. @emph{cs-win32libs} or grab the source code and
+compile it yourself if you prefer.  @xref{External Libraries}.
+
+@item
+Q. @emph{Where are the files @file{libpng.lib} and @file{zlib.lib}?}
+
+A. Just look above at the question about @file{zlib.h} and @file{png.h}.
+It's the same problem, and if you have already done what is explained there,
+I can't do much for you!
+
+@item
+Q. @emph{How can I reduce build times?}
+
+A. Build only the projects you will need. You must build all the Crystal Space
+libraries, however those you may not need can be unloaded (Right click on the
+project you wish unload from the build process and click on Unload). @emph{Be
+very careful when unloading projects as some of Crystal Spaces projects e.g.
+some plugins are dependent on others}.
+
+@item
+Q. @emph{How can I reduce build sizes?}
+
+A. Build only the projects you will need.
+
+A. Turning off precompiled headers tends to save a large amount of file space
+while increasing build times somewhat.
+
+@item
+Q. @emph{It seems that there is a missing source file in the project.}
+
+A. For Crystal Space the MSVC project files are generated once every 24 hours, 
+so normally all missing sources should have been added after that time.  If 
+you can't wait that long, or the file is still missing, contact one of the 
+Crystal Space developers.
+
+For third party projects it's usually the best idea to contact one of it's
+developers, they should be able to tell you which file is missing.
+@end itemize
+
+@subsubheading Executing
+
+@itemize @bullet
+@item
+Q. @emph{I just get a black screen.}
+
+A. When I start @file{walktest} I just get a black screen, maybe with some
+text output, but after a few seconds it drops back to the normal windows
+screen without an error.
+
+This shouldn't happen any more, because in most cases now, @file{walktest} will
+display proper error messages.  Anyway, you should make sure you have set an
+appropriate directory set (see above).  Make sure you have specified the map
+file in @file{walktest.cfg} as @samp{Walktest.Settings.WorldFile=} (also keep
+in mind, that your current directory is, where the executable sits.)
+
+@item
+Q. @emph{I get the following (or similar) errors:}
+
+@example
+WARNING: could not load plugin
+  `crystalspace.graphics3d.opengl'
+WARNING: failed to initialize plugin
+  `crystalspace.engine.3d'
+FATAL: No iGraphics3D plug-in loaded!
+FATAL: No iGraphics2D plug-in loaded!
+Error initializing system!
+@end example
+
+A. You probably did not compile everything. Compiling only the @file{.exe}
+file is not sufficient!  You must also compile all plug-ins you want to use.
+In the above example the OpenGL renderer is missing.
+
+If you are certain that everything is compiled, make sure your working
+directory is set to @file{CS\}.  To do this go to the @emph{Project} menu.
+Select @emph{Settings} and go to the @emph{Debug} tab.  Change the debug
+executable to @file{X:\CS\appname} where @file{X:} is the drive letter where
+the Crystal Space project is installed.  Next set the working directory to
+@file{X:\CS}.  Click @sc{ok} and you should be all set.
+
+If after doing this, you are still getting the same error, make sure that you 
+have the @file{libz-cs.dll} installed, the @sc{vfs} plugin is dependent upon it.
+@end itemize
+
+@subsubheading Miscellaneous
+
+@itemize @bullet
+@item
+Q. @emph{My last update did compile, but now I got a new version from the
+@sc{svn} repository and everything seems to be broken.}
+
+A. When working with Crystal Space, always keep in mind, that this is a
+multiplatform project.  So sometimes not all features will work correct on all
+platforms.  Sometimes a specific port may even be broken due to changes in
+other ports.  Since the introduction of @sc{svn} (@pxref{SVN}) this is usually
+only for a short time, so if you got your version out of @sc{svn}, it usually
+pays off, to post a message describing the problems to the Crystal Space
+Mailing List describing you problem and include the exact error messages.  If
+you wait a while, this will probably be fixed, or at least be worked around.
+@xref{Mailing Lists}.
+
+@item
+Q. @emph{I have a problem that you haven't solved here!}
+
+A. Try sending a note to the Crystal Space mailing list and asking your
+question there.  @xref{Mailing Lists}.  Be sure to include any pertinent
+information, such as the operating system you are using, the compiler, which
+version of Crystal Space, and any special configuration information.
+@end itemize

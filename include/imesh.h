@@ -1,0 +1,59 @@
+/* imesh.h -- Generated automatically; do not edit. */
+#ifndef __IMESH_H__
+#define __IMESH_H__
+/*
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+  
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+  
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+/**@file 
+ * Directory master header. This header file includes all headers in a
+ * subdirectory of the top Crystal Space include directory.
+ */
+#include "cssysdef.h"
+#include "imesh/animesh.h"
+#include "imesh/animnode/debug.h"
+#include "imesh/animnode/ik.h"
+#include "imesh/animnode/lookat.h"
+#include "imesh/animnode/ragdoll.h"
+#include "imesh/animnode/retarget.h"
+#include "imesh/animnode/skeleton2anim.h"
+#include "imesh/animnode/speed.h"
+#include "imesh/bodymesh.h"
+#include "imesh/emit.h"
+#include "imesh/furmesh.h"
+#include "imesh/genmesh.h"
+#include "imesh/gmeshanim.h"
+#include "imesh/gmeshskel2.h"
+#include "imesh/haze.h"
+#include "imesh/lghtng.h"
+#include "imesh/modifiableterrain.h"
+#include "imesh/nullmesh.h"
+#include "imesh/object.h"
+#include "imesh/objmodel.h"
+#include "imesh/particle.h"
+#include "imesh/particles.h"
+#include "imesh/partsys.h"
+#include "imesh/protomesh.h"
+#include "imesh/skeleton.h"
+#include "imesh/skeleton2.h"
+#include "imesh/skeleton2anim.h"
+#include "imesh/sprite2d.h"
+#include "imesh/sprite3d.h"
+#include "imesh/spritecal3d.h"
+#include "imesh/terrain.h"
+#include "imesh/terrain2.h"
+#include "imesh/watermesh.h"
+#endif /* __IMESH_H__ */
+

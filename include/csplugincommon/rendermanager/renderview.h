@@ -1,0 +1,357 @@
+/*
+    Copyright (C) 2007-2008 by Marten Svanfeldt
+                  1998-2001 by Jorrit Tyberghein
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDERVIEW_H__
+#define __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDERVIEW_H__
+
+/**\file
+ * Standard iRenderView implementation
+ */
+
+#include "csutil/pooledscfclass.h"
+#include "csutil/scf_implementation.h"
+#include "iengine/engine.h"
+#include "iengine/portal.h"
+#include "iengine/rview.h"
+#include "ivaria/view.h"
+#include "cstool/rviewclipper.h"
+#include "csutil/refcount.h"
+#include "csutil/weakref.h"
+
+namespace CS
+{
+namespace RenderManager
+{
+
+  /**
+   * This structure represents all information needed for drawing
+   * a scene. It is modified while rendering according to
+   * portals/warping portals and such.
+   */
+  class CS_CRYSTALSPACE_EXPORT RenderView : 
+    public scfImplementationPooled<scfImplementation1<RenderView, iRenderView> >
+  {
+  private:
+    /**
+    * The following id is used to populate the context_id in every
+    * csRenderContext.
+    */
+    uint32 context_id;
+
+    /// The current render context.
+    csRenderContext* ctxt;
+
+    /// Engine handle.
+    iEngine* engine;
+    /// The 3D graphics subsystem used for drawing.
+    iGraphics3D* g3d;
+    /// The 2D graphics subsystem used for drawing.
+    iGraphics2D* g2d;
+    /**
+     * A copy to the original base camera before space warping.
+     */
+    iCamera* original_camera;
+
+    /// The view frustum as defined at z=1.
+    float leftx, rightx, topy, boty;
+
+    /**
+     * Update the frustum of the current context to the current clipper.
+     */
+    void UpdateFrustum ();
+    /**
+     * Update the frustum of the current context to a frustum clipping outside
+     * \a box.
+     */
+    void SetFrustumFromBox (const csBox2& box);
+    
+    /// Dimensions of the view being rendered to
+    int viewWidth, viewHeight;
+
+    /// Mesh filter for this view
+    CS::Utility::MeshFilter meshFilter;
+  public:
+    /// Construct.
+    RenderView ();
+    /// Construct.
+    RenderView (iCamera* c);
+    /// Construct.
+    RenderView (iCamera* c, iClipper2D* v, iGraphics3D* ig3d);
+    /// Construct.
+    RenderView (iView* v);
+    /// Copy constructor.
+    RenderView (const RenderView& other);
+    /// Copy constructor, optionally keeping the camera
+    RenderView (const RenderView& other, bool keepCamera);
+
+    virtual ~RenderView ();
+
+    /// Initialise the RenderView from an iView.
+    void InitialiseFromView (iView* view);
+
+    /// Initialise the RenderView from an iCamera.
+    void InitialiseFromCamera (iCamera* camera);
+
+    /// Set the engine.
+    void SetEngine (iEngine* engine);
+    /// Set the camera.
+    void SetCamera (iCamera* camera);
+    /// Set the original camera.
+    void SetOriginalCamera (iCamera* camera);
+    /// Get the original camera.
+    virtual iCamera* GetOriginalCamera () const { return original_camera; }
+
+    /// Get the current render context.
+    csRenderContext* GetCsRenderContext () const { return ctxt; }
+    /// Set the current render context (only for temporary override).
+    void SetCsRenderContext (csRenderContext* c) { ctxt = c; }
+
+    /**
+     * Create a new render context. This is typically used
+     * when going through a portal. Note that you should remember
+     * the old render context if you want to restore it later.
+     * The render context will get all the values from the current context
+     * (with SCF references properly incremented).
+     */
+    void CreateRenderContext ();
+    /**
+     * Restore a render context. Use this to restore a previously overwritten
+     * render context. This function will take care of properly cleaning
+     * up the current render context.
+     */
+    void RestoreRenderContext ();
+
+    /**
+     * Create a new camera in the current render context. This function
+     * will create a new camera based on the current one. The new camera
+     * reference is returned.
+     */
+    iCamera* CreateNewCamera ();
+
+    /**
+     * Set the previous sector.
+     */
+    void SetPreviousSector (iSector* s) { ctxt->previous_sector = s; }
+    /**
+     * Set the current sector.
+     */
+    void SetThisSector (iSector* s) { ctxt->this_sector = s; }
+
+    /**
+     * Get render recursion level.
+     */
+    int GetRenderRecursionLevel () const { return ctxt->draw_rec_level; }
+    /**
+     * Set render recursion level.
+     */
+    void SetRenderRecursionLevel (int rec)
+    {
+      ctxt->draw_rec_level = rec;
+    }
+    /// Set the last portal.
+    void SetLastPortal (iPortal* por)
+    {
+      ctxt->last_portal = por;
+    }
+    /// Set the 2D clipper for this view.
+    void SetClipper (iClipper2D* clip);
+    /// Set the view frustum at z=1.
+    void SetFrustum (float lx, float rx, float ty, float by);
+
+    /// Whether to enable clipping to the clip plane.
+    void UseClipPlane (bool u) { ctxt->do_clip_plane = u; }
+    /// Whether to enable clipping to the frustum.
+    void UseClipFrustum (bool u) { ctxt->do_clip_frustum = u; }
+    /**
+     * Set the 3D clip plane that should be used to clip all geometry.
+     */
+    void SetClipPlane (const csPlane3& p) { ctxt->clip_plane = p; }
+    /**
+     * Get the 3D clip plane that should be used to clip all geometry.
+     * If this function returns false then this plane is invalid and should
+     * not be used. Otherwise it must be used to clip the object before
+     * drawing.
+     */
+    bool GetClipPlane (csPlane3& pl) const
+    {
+      pl = ctxt->clip_plane;
+      return ctxt->do_clip_plane;
+    }
+    /// Get the clip plane.
+    const csPlane3& GetClipPlane () const
+    {
+      return ctxt->clip_plane;
+    }
+    /// Get the clip plane.
+    csPlane3& GetClipPlane ()
+    {
+      return ctxt->clip_plane;
+    }
+    /**
+     * If true then we have to clip all objects to the portal frustum
+     * (returned with GetClipper()). Normally this is not needed but
+     * some portals require this. If GetClipPlane() returns true then the
+     * value of this function is also implied to be true.
+     */
+    bool IsClipperRequired () const { return ctxt->do_clip_frustum; }
+
+    /**
+    * Every fogged sector we encountered results in an extra structure in the
+    * following list. This is only used if we are doing vertex based fog.
+    * This function will return the first csFogInfo instance.
+    */
+    csFogInfo* GetFirstFogInfo () { return ctxt->fog_info; }
+    /**
+     * Set the first fog info.
+     */
+    void SetFirstFogInfo (csFogInfo* fi)
+    {
+      ctxt->fog_info = fi;
+      ctxt->added_fog_info = true;
+    }
+    /**
+     * Return true if fog info has been added.
+     */
+    bool AddedFogInfo () const { return ctxt->added_fog_info; }
+    /**
+     * Reset fog info.
+     */
+    void ResetFogInfo () { ctxt->added_fog_info = false; }
+
+    /// Get the current render context.
+    virtual csRenderContext* GetRenderContext () { return ctxt; }
+
+    /// Get the engine.
+    virtual iEngine* GetEngine ();
+    /// Get the 2D graphics subsystem.
+    virtual iGraphics2D* GetGraphics2D () { return g2d; }
+    /// Get the 3D graphics subsystem.
+    virtual iGraphics3D* GetGraphics3D () { return g3d; }
+    /// Get the frustum.
+    virtual void GetFrustum (float& lx, float& rx, float& ty, float& by)
+    {
+      lx = leftx;
+      rx = rightx;
+      ty = topy;
+      by = boty;
+    }
+    
+    /// Get the width of the view rendered to
+    int GetViewWidth() const { return viewWidth; }
+    /// Get the height of the view rendered to
+    int GetViewHeight() const { return viewHeight; }
+    /**
+     * Set the dimensions of the view rendered to. Needed for pixel-bases 
+     * computations.
+     */
+    void SetViewDimensions (int w, int h) { viewWidth = w; viewHeight = h; }
+
+    //-----------------------------------------------------------------
+    // The following functions operate on the current render context.
+    //-----------------------------------------------------------------
+
+    /// Get the 2D clipper for this view.
+    virtual iClipper2D* GetClipper () { return ctxt->iview; }
+
+    /**
+    * Get the current camera.
+    */
+    virtual iCamera* GetCamera () { return ctxt->icamera; }
+
+    /**
+    * Get current sector.
+    */
+    virtual iSector* GetThisSector () { return ctxt->this_sector; }
+
+    /**
+    * Get previous sector.
+    */
+    virtual iSector* GetPreviousSector () { return ctxt->previous_sector; }
+
+    /// Get the last portal.
+    virtual iPortal* GetLastPortal () { return ctxt->last_portal; }
+
+    /// Get the number of the current frame.
+    virtual uint GetCurrentFrameNumber () const;
+
+    /// Destroy a render context created with CreateRenderContext ().
+    virtual void DestroyRenderContext (csRenderContext* context);
+
+    /// Get the mesh filter for this view.
+    const CS::Utility::MeshFilter& GetMeshFilter () const { return meshFilter; }
+
+    /// Set the mesh filter for this view.
+    void SetMeshFilter (const CS::Utility::MeshFilter& filter);
+  };
+
+  /**
+   * Stores a cache of RenderView objects, mapped by iView objects.
+   */
+  class CS_CRYSTALSPACE_EXPORT RenderViewCache
+  {
+  public:
+    /// Returns a render view for the given view.
+    RenderView* GetRenderView (iView* view);
+
+    /// Returns a render view for the given RenderView and portal.
+    RenderView* GetRenderView (RenderView* view, iPortal* portal, iCamera* camera);
+
+    /// Creates a new RenderView.
+    csPtr<RenderView> CreateRenderView ();
+
+    /// Creates a new RenderView from the given RenderView.
+    csPtr<RenderView> CreateRenderView (RenderView* view);
+
+    /// Creates a new RenderView from the given RenderView and optionally keeps the camera.
+    csPtr<RenderView> CreateRenderView (RenderView* view, bool keepCamera);
+
+  private:
+    /// Render view allocation pool.
+    RenderView::Pool renderViewPool;
+
+    struct View2RenderView : public csRefCount
+    {
+      csWeakRef<iView> view;
+      csRef<RenderView> rview;
+
+      View2RenderView (iView* view, CS::RenderManager::RenderView* rview)
+        : view (view), rview (rview) {}
+    };
+
+    /// Mapping of iView to RenderView
+    csRefArray<View2RenderView> iView2RenderViews;
+
+    struct RViewPortal2RenderView : public csRefCount
+    {
+      csWeakRef<RenderView> view;
+      csWeakRef<iPortal> portal;
+      csRef<RenderView> rview;
+
+      RViewPortal2RenderView (RenderView* view, iPortal* portal, CS::RenderManager::RenderView* rview)
+        : view (view), portal (portal), rview (rview) {}
+    };
+
+    /// Mapping of RenderView && iPortal to RenderView
+    csRefArray<RViewPortal2RenderView> rViewPortal2RenderViews;
+  };
+
+}
+}
+
+#endif

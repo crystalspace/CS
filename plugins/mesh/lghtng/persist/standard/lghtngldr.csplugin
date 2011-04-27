@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- lghtngldr.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.loader.factory.lightning</name>
+        <implementation>csLightningFactoryLoader</implementation>
+        <description>Crystal Space Lightning factory loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.loader.lightning</name>
+        <implementation>csLightningLoader</implementation>
+        <description>Crystal Space Lightning loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.factory.lightning</name>
+        <implementation>csLightningFactorySaver</implementation>
+        <description>Crystal Space Lightning factory saver</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.lightning</name>
+        <implementation>csLightningSaver</implementation>
+        <description>Crystal Space Lightning saver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

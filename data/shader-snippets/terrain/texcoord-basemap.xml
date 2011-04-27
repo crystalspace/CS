@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+  Copyright (C) 2007-2010 by Frank Richter
+	    (C) 2007 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet type="compound">
+  <technique priority="200">
+    <snippet id="basemapscale">
+      <technique priority="50">
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+
+	<input name="basemapscale" type="translateScale2" default="complex" private="yes">
+	  <block location="shadervars">
+	    <shadervar name="basemap scale" type="vector4">1,1,0,0</shadervar>
+	  </block> 
+	  
+	  <block location="cg:fragmentIn">
+	    <uniform type="float4" name="basemapscale" />
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    basemapscale = fragmentIn.basemapscale;
+	  </block>
+
+	  <block location="cg:variablemap">
+	    <variablemap variable="basemap scale" 
+	      destination="fragmentIn.basemapscale" />
+	  </block>
+	</input>
+	
+	<block location="cg:fragmentMain">
+	  scale = basemapscale;
+	</block>
+	<output name="scale" type="float4" />
+      </technique>
+    </snippet>
+    <snippet id="tc_basemapadjust" file="/shader-snippets/texcoord2-scale-xlate.xml" />
+
+    <connection from="basemapscale" to="tc_basemapadjust" />
+  </technique>
+</snippet>

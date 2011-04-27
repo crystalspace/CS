@@ -1,0 +1,8 @@
+SubDir TOP plugins utilities movierecorder ;
+
+Description movierecorder : "realtime movie recorder" ;
+
+Plugin movierecorder
+	: [ Wildcard *.cpp *.h *.c ]
+;
+LinkWith movierecorder : crystalspace ;

@@ -1,0 +1,67 @@
+<shader compiler="xmlshader" name="terrain_improved_base">
+  <technique priority="100">
+    <tag>terrain_splatting</tag>
+
+    <pass>
+      <mixmode>
+        <copy />
+      </mixmode>
+
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      <vp plugin="glcg" file="/data/terraini/geomorph.cgvp" />
+      <texture destination="unit 0" name="tex diffuse" />
+      <texture destination="unit 1" name="splat alpha map" />
+      <fp plugin="glfixed">
+        <fixedfp>
+          <layer>
+            <colorsource num="0" source="primary color" modifier="color" />
+            <colorsource num="1" source="texture" modifier="color" />
+            <coloroperation operation="modulate" />
+          </layer>
+          <layer>
+            <colorsource num="0" source="previous layer" modifier="color" />
+            <colorsource num="1" source="texture" modifier="color" />
+            <coloroperation operation="modulate" />
+            <alphasource num="0" source="texture" modifier="alpha" />
+            <alphaoperation operation="replace" />
+          </layer>
+        </fixedfp>
+      </fp>
+    </pass>
+  </technique>
+  
+  <technique priority="50">
+    <tag>terrain_splatting</tag>
+
+    <pass>
+      <mixmode>
+        <copy />
+      </mixmode>
+
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 1" />
+      <vp plugin="glfixed">
+       <fixedvp>
+       </fixedvp>
+      </vp>
+      <texture destination="unit 0" name="tex diffuse" />
+      <texture destination="unit 1" name="splat alpha map" />
+      <fp plugin="glfixed">
+        <fixedfp>
+          <layer>
+            <colorsource num="0" source="primary color" modifier="color" />
+            <colorsource num="1" source="texture" modifier="color" />
+            <coloroperation operation="modulate" />
+          </layer>
+          <layer>
+            <colorsource num="0" source="previous layer" modifier="color" />
+            <colorsource num="1" source="texture" modifier="color" />
+            <coloroperation operation="modulate" />
+            <alphasource num="0" source="texture" modifier="color" />
+            <alphaoperation operation="replace" />
+          </layer>
+        </fixedfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>

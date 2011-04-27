@@ -1,0 +1,117 @@
+<!--
+  Copyright (C) 2008 by Frank Richter
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet>
+  <technique priority="100">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <input name="Hposition" type="position4_object" default="complex">
+      <block location="cg:vertexIn">
+	<varying type="position4" name="Hposition" binding="POSITION" />
+      </block>
+      
+      <block location="cg:vertexMain">
+	Hposition = vertexIn.Hposition;
+      </block>
+    </input>
+    
+    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+	 verbatim -->
+    <input name="ModelViewProj" type="float4x4" default="complex">
+      <block location="cg:vertexIn">
+	<uniform type="float4x4" name="ModelViewProj" binding="state.matrix.mvp" />
+      </block>
+      
+      <block location="cg:vertexMain">
+	ModelViewProj = vertexIn.ModelViewProj;
+      </block>
+    </input>
+    <input name="ModelView" type="float4x4" default="complex">
+      <block location="cg:vertexIn">
+	<uniform type="float4x4" name="ModelView" binding="state.matrix.modelview" />
+      </block>
+      
+      <block location="cg:vertexMain">
+	ModelView = vertexIn.ModelView;
+      </block>
+    </input>
+
+    <input file="/shader-snippets/combiner-cg/objectToWorld.inp" private="yes" />
+    
+    <input file="/shader-snippets/normal.inp" private="yes" />
+    
+    <input name="passNumber" type="int" default="value" defval="0" />
+    <input name="totalPasses" type="int" default="value" defval="1" />
+    <input name="furLength" type="float" default="complex">
+      <block location="shadervars">
+	<shadervar name="fur length" type="float">0.05</shadervar>
+      </block>
+      
+      <block location="cg:variablemap">
+	<variablemap variable="fur length" destination="vertexIn.furLength" />
+      </block>
+      
+      <block location="cg:vertexIn">
+	<uniform type="float" name="furLength" />
+      </block>
+      
+      <block location="cg:vertexMain">
+	furLength = vertexIn.furLength;
+      </block>
+    </input>
+
+    <block location="cg:vertexToFragment">
+      <varying type="position4" name="position" binding="POSITION" />
+      <!-- This is needed since POSITION semantics can't be used for input in an FP -->
+      <varying type="position4" name="position_screen" />
+      <varying type="position4" name="position_object"/>
+      <varying type="position4" name="position_world"/>
+      <varying type="position4" name="position_camera"/>
+    </block>
+    
+    <block location="cg:clips">
+      <!-- Clip for reflection/refraction rendering -->
+      <clip space="object">
+	<plane type="shadervar">clip plane reflection</plane>
+      </clip>
+    </block>
+    
+    <block location="cg:vertexMain">
+      position_object = Hposition;
+      float furFactor = (totalPasses > 1) ? (float (passNumber)/float (totalPasses-1)) : 0;
+      position_object.xyz += Normal * furLength * furFactor;
+      position_screen = position = mul (ModelViewProj, position_object);
+      position_camera = mul (ModelView, position_object);
+      position_world = mul (objectToWorld, position_object);
+      
+      APPLY_CLIPPING_VP(position_camera, position_world, position_object);
+    </block>
+    
+    <block location="cg:fragmentMain">
+      position = position_screen;
+      
+      APPLY_CLIPPING_FP;
+    </block>
+    
+    <output name="position" type="position4_screen" />
+    <!-- @@@ FIXME: Other blocks may need the world space input as well... 
+         Pass through. But is there a better (ie automatic) way? -->
+    <output name="position_world" type="position4_world" />
+    <output name="position_object" type="position4_object" />
+    <output name="position_camera" type="position4_camera" />
+  </technique>
+</snippet>

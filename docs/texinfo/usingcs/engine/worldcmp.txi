@@ -1,0 +1,188 @@
+@c -*-texinfo-*-
+@node World Components, Renderloops, Engine, Engine
+@subsection Components of a World
+@cindex World, Components
+
+This section describes the objects used to build a world.  This is useful to
+understand the format of the Crystal Space map file
+(@pxref{XML File Format}).  To understand this you should know the basics of
+the @ref{Portal Engine}.  This section describes the components of the world
+independent from the file format, so it is also useful if you want to build a
+world from within your program.
+
+The world is built up from the following objects:
+
+@subsubheading Sectors
+@cindex sector
+@cindex @code{iSector}
+
+(@code{iSector}). For technical details, see the portal engine discussion
+(@pxref{Portal Engine}). Basically sectors define an area
+that can contain several geometrical objects. As opposed to earlier
+versions of Crystal Space, a sector does not itself represent geometry.
+Instead all geometry in a sector is made from @dfn{Mesh Objects}.
+Theoretically a sector is infinite although in practice it is usually
+logically bounded by sector walls or a sky object. You can create sectors
+using the engine (@code{iEngine}) or they can be created in a map file.
+
+@subsubheading Mesh Factories
+@cindex mesh factory
+@cindex @code{iMeshFactoryWrapper}
+@cindex @code{iMeshObjectFactory}
+
+(@code{iMeshFactoryWrapper}, @code{iMeshObjectFactory}). See the mesh object
+section for more specific information about mesh factories (@pxref{MeshObject}).
+Mesh object factories are objects that can be used to create mesh objects
+that inherit characteristics from their mesh factory. Basically a mesh
+object factory is like a blue-print for creating a mesh object. Mesh
+factories can also be hierarchical like mesh objects. In most cases
+(i.e. like genmesh (@pxref{MeshObject Genmesh}) the factory defines the
+actual geometry of an object. You can then create multiple mesh objects
+from those factories.  They will all share the same geometry.
+
+@subsubheading Mesh Objects
+@cindex mesh object
+@cindex @code{iMeshWrapper}
+@cindex @code{iMeshObject}
+
+(@code{iMeshWrapper}, @code{iMeshObject}). See the mesh object section for
+more specific information about mesh objects (@pxref{MeshObject}).
+Mesh objects represent geometry in some
+sector. Everything you can see (walls, actors, particle systems, @dots{}) is
+represented by some kind of mesh object. This is a very important concept
+in the Crystal Space engine. Mesh objects can also be hierarchical.
+A mesh object can have several children which in turn can also have children
+and so on. The children of a mesh object are positioned relative to the
+parent. So when you move the parent the children will automatically move
+with the parent. Children of a mesh can be meshes or lights.
+
+@subsubheading Textures
+@cindex texture
+@cindex @code{iTextureWrapper}
+
+(@code{iTextureWrapper}). See the material section for more information
+about textures.  (@pxref{Materials}).
+Basically a texture represents an actual image that can
+be used in materials. Textures are used to give your mesh objects a real
+appearance. Textures are never used alone but always in a material.
+
+@subsubheading Materials
+@cindex material
+@cindex @code{iMaterialWrapper}
+
+(@code{iMaterialWrapper}). See the material section for more information
+about materials.  (@pxref{Materials}).
+Basically a material represents a surface appearance
+for a polygon or triangle. A material is most typically made out of a single
+texture but it is also possible to make materials out of a combination of
+textures (using a shader) or even without any textures at all (for example
+a solid color).
+
+@subsubheading Shaders
+@cindex shader
+@cindex @code{iShader}
+
+(@code{iShader}). See the shader section for more information about shaders
+(@pxref{Shaders}). A shader is a piece of code that is typically run on
+the 3D card. It is this code that is responsible for actually rendering
+the surface attributes using the material data. A material and a shader
+work closely together.
+
+@subsubheading Renderloops
+@cindex renderloop
+@cindex @code{iRenderLoop}
+
+(@code{iRenderLoop}). See the renderloop section for more information about
+renderloops (@pxref{Renderloops}). A renderloop is an engine structure that
+tells the engine how to render the objects in a given sector. Basically it tells
+the engine the steps required to do the rendering of the mesh objects and
+also the steps required to do the lighting. You can make your own renderloops
+but typically you would use one of the standard provided renderloops
+from the @file{data/shader} directory.
+
+@subsubheading Portals
+@cindex portal
+@cindex @code{iPortalContainer}
+@cindex @code{iPortal}
+
+(@code{iPortal}, @code{iPortalContainer}). See the portal discussion
+(@pxref{Portal Engine}).
+The idea is that sectors are normally totally independent areas
+unless you connect them through portals. A portal is basically a 3D polygon
+that has no material but instead represents a view of the destination sector.
+
+@subsubheading Lights
+@cindex light
+@cindex @code{iLight}
+
+(@code{iLight}). A light is needed to illuminate your level.
+Lights can also be part of a hierarchical object (like mesh objects).
+There are different ways how lighting is applied to objects. @xref{Lighting}.
+
+@subsubheading Scene Nodes
+@cindex scene node
+@cindex @code{iSceneNode}
+
+(@code{iSceneNode}). A scene node is a generic representation of an
+object in a hierarchy. Currently mesh objects and lights are scene nodes.
+
+@subsubheading Collections
+@cindex collection
+@cindex dynamic loading
+@cindex @code{iCollection}
+
+(@code{iCollection}). A collection is a group of iObjects. A collection can contain
+textures, materials, mesh objects, mesh factories, lights, collections, sectors,
+sequences, triggers, shared variables, @dots{}. Collections are useful when you
+want to load/unload big parts of a world dynamically. This can be used in
+cases where the world is too big to fit in memory and you want to use dynamic
+loading. It is important to realize that the concept of a collection is not
+geometrical. A collection is typically a group of objects that are located
+close to each other in 3D but it doesn't have to be that way. Collections can
+be organized in any way you want. Some examples:
+
+@itemize @bullet
+@item
+One collection represents a geometrical part of the world, including sectors,
+meshes, lights, materials, @dots{}) used in that area. This is probably
+the most common usage.
+@item
+One collection represents objects of a given type. For example, all materials
+are in one collection. Meshes in another.
+@item
+One collection represents the static objects of your world. The other collection
+represents the dynamic objects (moving objects).
+@end itemize
+
+@subsubheading Key/Value pairs
+@cindex key/value pair
+@cindex @code{iKeyValuePair}
+@cindex @code{iObject}
+
+(@code{iKeyValuePair}). A key/value pair is a @{@var{key},@var{value}@}
+tuple describing some game specific concept. Key/value tuples are represented
+by a pair of strings (or one name and several named value strings). If you
+have built levels for Quake before, you are probably familiar with this concept
+from Quake's @dfn{Entities}. Almost all objects in the Crystal Space
+engine support these key/value pairs (this is done through the @code{iObject}
+system) so you can attach this kind of
+information to anything. Crystal Space itself will not use this information
+but your game can query it and perform the appropriate actions.
+In theory it is up to your program as to how these key-value tuples
+are interpreted.  However, Crystal Space has set some standards to make life
+easier for level designers and also to make levels as portable as possible
+between different Crystal Space games. Note that key value pairs actually
+allow multiple named values for a single key.
+See the section about game data for more information on this subject.
+(@pxref{Game Data}).
+
+@subsubheading Nodes
+@cindex node
+@cindex @code{iMapNode}
+@cindex @code{iObject}
+
+(@code{iMapNode}). A node represents a point in space. The engine
+itself will not use nodes but a game can use them to represent game specific
+data. See the section about game data for more information on this subject.
+(@pxref{Game Data}).
+

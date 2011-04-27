@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<?xml-stylesheet type='text/xsl' href='interface.xsl'?>
+<interface uri="http://crystalspace3d.org/0install/crystalspace-data-1.4.xml" xmlns="http://zero-install.sourceforge.net/2004/injector/interface">
+  <name>crystalspace-data-1.4</name>
+  <summary>CrystalSpace (data files)</summary>
+  <description>
+Data used by all CrystalSpace applications.
+  </description>
+  <homepage>http.//www.crystalspace3d.org/</homepage>
+  <category>Development</category>
+  <icon href="http://crystalspace3d.org/mediawiki/images/thumb/3/3e/Cs-compact.png/120px-Cs-compact.png" type="image/png"/>
+  <group license="OSI Approved :: GNU Lesser General Public License (LGPL)">
+    <implementation arch="*-*" id="sha1new=4a725834eca9dfcc104bf6819a35c42d547efd6c" released="2009-07-04" stability="testing" version="1.4.0.32542">
+      <archive extract="crystalspace-data-1.4.0.32542" href="http://crystalspace3d.org/downloads/binary/1.4/crystalspace-data-1.4.0.32542.tar.lzma" size="10491467"/>
+    </implementation>
+  </group>
+</interface>
+<!-- Base64 Signature
+iEYEABECAAYFAkpOvREACgkQnCws0dQa9bvAqACfYxVf5SmJer1ZMW3LQnwuG3MMljoAoMa/gaFb
+0mDOcshFIfu3wyn4GMGD
+
+-->

@@ -1,0 +1,9 @@
+SubDir TOP plugins engine 3d ;
+
+Description engine : "3D engine plugin" ;
+
+Plugin engine
+	: [ Wildcard *.cpp *.h ]
+	  [ Wildcard meshgen : *.cpp *.h ]
+;
+LinkWith engine : crystalspace ;

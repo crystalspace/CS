@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+  Copyright (C) 2007-2008 by Frank Richter
+	    (C) 2007 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<shader compiler="shaderweaver" name="reflect_water_plane" lights="1">
+  <shadervar name="water perturb scale" type="vector4">0.1,0.1,0,0</shadervar>
+  <shadervar name="water perturb fade" type="float">1</shadervar>
+  <shadervar name="water fog color" type="vector4">0,0.17,0.49,0.6</shadervar>
+  <shadervar name="water fog density" type="float">0.3</shadervar>
+  <technique priority="200">
+    <tag>water_complex</tag>
+    <pass>
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      
+      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
+      <!-- First pass: blend with alpha -->
+      <mixmode>
+	<blendop src="one" dst="srcalpha_inv" />
+	<alphatest>disable</alphatest>
+      </mixmode>
+      <?else?>
+      <!-- Later pass: blend with add -->
+      <mixmode>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
+      </mixmode>
+      <?endif?>
+      
+      <!-- Possible future things:
+	   - Tinted reflections/refractions?
+	   - Fresnel for specular?
+	-->
+      
+      <alias name="surface" weak="yes" file="/shader-snippets/surface/surface-clear.xml" />
+      <alias name="apply_alpha" weak="yes" file="/shader-snippets/surface/alpha-premult.xml" />
+      <alias name="lighting" weak="yes" file="/shader-snippets/lighting/lighting-ppl.xml" />
+      <alias name="staticspecular" weak="yes" file="/shader-snippets/lighting/staticspec-default.xml" />
+
+      <!-- Snippets - the building blocks of this shader. -->
+      <snippet id="position" file="/shader-snippets/position.xml" />
+      <snippet id="surface" filealias="surface" />
+      <snippet id="normalmap" file="/shader-snippets/surface/normalmap-tiled.xml" />
+      <snippet id="reflection" file="/shader-snippets/reflect/reflect-plane-screen.xml" />
+      <snippet id="refraction" file="/shader-snippets/reflect/reflect-plane-screen.xml" />
+      <snippet id="hdrscalerefl" file="/shader-snippets/hdr-prescale.xml" />
+      <snippet id="hdrscalerefr" file="/shader-snippets/hdr-prescale.xml" />
+      <snippet id="perturb_norm_refl" file="/shader-snippets/tcoffset2-perturb-normal-cam.xml" />
+      <snippet id="perturb_norm_refr" file="/shader-snippets/tcoffset2-perturb-normal-cam.xml" />
+      <snippet id="fog_refraction" file="/shader-snippets/fog/fog-distance-exp.xml" />
+      <snippet id="fresnel" file="/shader-snippets/reflect/fresnel.xml" />
+      <snippet id="fresnel_limit" file="/shader-snippets/modulate-float.xml" />
+      <snippet id="fresnel_inv" file="/shader-snippets/inverse-float.xml" />
+      <snippet id="blend_surface_refract" file="/shader-snippets/alpha-premult-blend.xml" />
+      <snippet id="lerp_reflect_refract" file="/shader-snippets/lerp.xml" />
+      <snippet id="apply_mixmode_alpha" file="/shader-snippets/mixmode-alpha.xml" />
+      <snippet id="apply_alpha" filealias="apply_alpha" />
+      <snippet id="lighting" filealias="lighting" />
+      <snippet id="fake_light_diffuse" file="/shader-snippets/rgba-black.xml" />
+      <snippet id="specular_limit" file="/shader-snippets/modulate_rgb.xml" />
+      <snippet id="ambient" file="/shader-snippets/lighting/ambient-one.xml" />
+      <snippet id="specular" file="/shader-snippets/surface/specular-default-nodiffuse.xml" />
+      <snippet id="staticspecular" filealias="staticspecular" />
+      <snippet id="add_specular" file="/shader-snippets/add.xml" />
+      <snippet id="apply_lighting" file="/shader-snippets/lighting/apply-lighting.xml" />
+      <snippet id="glow" file="/shader-snippets/lighting/glow.xml" />
+      <snippet id="sectorfog" file="/shader-snippets/fog/fog-sector.xml" />
+      <snippet id="hdrscale" file="/shader-snippets/hdr-postscale.xml" />
+      <!-- "connections" describe what snippets take input from what other
+           snippets (ie the "data flow" is modeled). The exact resolution of
+	   what output is linked to what input is done automatically. -->
+      <connection from="position" to="reflection" />
+      <connection from="position" to="refraction" />
+      <connection from="position" to="fresnel" />
+      <connection from="position" to="surface" />
+      <connection from="position" to="lighting" />
+      <connection from="position" to="staticspecular" />
+      <connection from="surface" to="apply_mixmode_alpha" />
+      <connection from="apply_mixmode_alpha" to="apply_alpha" />
+      <connection from="normalmap" to="fresnel" />
+      <connection from="normalmap" to="perturb_norm_refl" />
+      <connection from="normalmap" to="perturb_norm_refr" />
+      <connection from="normalmap" to="lighting" />
+      <connection from="normalmap" to="staticspecular" />
+      <connection from="perturb_norm_refl" to="reflection" />
+      <connection from="perturb_norm_refr" to="refraction" />
+      <connection from="reflection" to="hdrscalerefl" />
+      <connection from="refraction" to="hdrscalerefr" />
+      <connection from="refraction" to="fresnel_limit">
+	<explicit from="mirroredPointDistSat" to="b" />
+      </connection>
+      <connection from="refraction" to="fog_refraction" />
+      <connection from="hdrscalerefr" to="fog_refraction">
+        <explicit from="result" to="unfoggedColor" />
+      </connection>
+      <connection from="hdrscalerefl" to="lerp_reflect_refract">
+	<explicit from="result" to="a" />
+      </connection>
+      <connection from="fresnel" to="fresnel_limit">
+	<explicit from="result" to="a" />
+      </connection>
+      <connection from="fresnel_limit" to="fresnel_inv" />
+      <connection from="fog_refraction" to="blend_surface_refract">
+	<explicit from="foggedColor" to="a" />
+      </connection>
+      <connection from="apply_alpha" to="blend_surface_refract">
+	<explicit from="result" to="b" />
+      </connection>
+      <connection from="blend_surface_refract" to="lerp_reflect_refract">
+	<explicit from="result" to="b" />
+      </connection>
+      <connection from="fresnel_inv" to="lerp_reflect_refract" />
+      <connection from="lerp_reflect_refract" to="apply_lighting">
+	<explicit from="result" to="surfaceDiffuse" />
+      </connection>
+      <connection from="fake_light_diffuse" to="apply_lighting">
+	<explicit from="result" to="lightDiffuse" />
+      </connection>
+      <connection from="lighting" to="add_specular">
+	<explicit from="specularColor" to="a" />
+      </connection>
+      <connection from="staticspecular" to="add_specular">
+	<explicit from="specular" to="b" />
+      </connection>
+      <connection from="add_specular" to="specular_limit">
+	<explicit from="result" to="a" />
+      </connection>
+      <connection from="refraction" to="specular_limit">
+	<explicit from="mirroredPointDistSat" to="b" />
+      </connection>
+      <connection from="specular_limit" to="apply_lighting">
+	<explicit from="result" to="lightSpecular" />
+      </connection>
+      <connection from="ambient" to="apply_lighting">
+	<explicit from="ambient" to="ambient" />
+      </connection>
+      <connection from="specular" to="apply_lighting">
+	<explicit from="specularColor" to="surfaceSpecular" />
+      </connection>
+      <connection from="apply_lighting" to="glow" />
+      <connection from="glow" to="sectorfog" />
+      <connection from="sectorfog" to="hdrscale" />
+      
+      <parameter id="texRefract" type="shadervar" weavertype="tex2d">tex plane refract</parameter>
+      <connection from="texRefract" to="refraction" />
+      <parameter id="texRefractDepth" type="shadervar" weavertype="tex2d">tex plane refract depth</parameter>
+      <connection from="texRefractDepth" to="refraction" />
+      <parameter id="texRefractXform" type="shadervar" weavertype="translateScale2">refraction coord xform</parameter>
+      <connection from="texRefractXform" to="refraction" />
+      
+      <!-- Use the depth of the refraction to limit perturbation for the reflection as well -->
+      <connection from="texRefractDepth" to="reflection">
+	<explicit from="output" to="texReflectDepth" />
+      </connection>
+      <!-- @@@ FIXME: Workaround to prevent automatic pickup of refract depth as 
+	              the reflect color texture -->
+      <parameter id="texReflect" type="shadervar" weavertype="tex2d">tex plane reflect</parameter>
+      <connection from="texReflect" to="reflection">
+        <explicit from="output" to="texReflect" />
+      </connection>
+      
+      <parameter id="refractFogColor" type="shadervar" weavertype="rgba">water fog color</parameter>
+      <connection from="refractFogColor" to="fog_refraction">
+	<explicit from="output" to="fogColor" />
+      </connection>
+      <!-- @@@ Another workaround: don't pick up saturated distance -->
+      <parameter id="refractFogDensity" type="shadervar" weavertype="float">water fog density</parameter>
+      <connection from="refractFogDensity" to="fog_refraction">
+	<explicit from="output" to="fogDensity" />
+      </connection>
+      
+      <parameter id="perturbScaleSV" type="shadervar" weavertype="float4">water perturb scale</parameter>
+      <connection from="perturbScaleSV" to="perturb_norm_refl" />
+      <connection from="perturbScaleSV" to="perturb_norm_refr" />
+      
+      <parameter id="perturbFadeSV" type="shadervar" weavertype="float">water perturb fade</parameter>
+      <connection from="perturbFadeSV" to="perturb_norm_refl" />
+      <connection from="perturbFadeSV" to="perturb_norm_refr" />
+      
+      <parameter id="lightOffset" type="int">0</parameter>
+      <parameter id="maxLights" type="int">1</parameter>
+      <connection from="lightOffset" to="lighting" />
+      <connection from="maxLights" to="lighting" />
+    </pass>
+  </technique>
+  
+  <technique priority="100">
+    <tag>water_complex</tag>
+    <pass>
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      
+      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
+      <!-- First pass: blend with alpha -->
+      <mixmode>
+	<blendop src="one" dst="srcalpha_inv" />
+	<alphatest>disable</alphatest>
+      </mixmode>
+      <?else?>
+      <!-- Later pass: blend with add -->
+      <mixmode>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
+      </mixmode>
+      <?endif?>
+      
+      <!-- Possible future things:
+	   - Tinted reflections/refractions?
+	   - Fresnel for specular?
+	   - Modulate specular by depth (similar to reflection)?
+	-->
+      
+      <alias name="surface" weak="yes" file="/shader-snippets/surface/surface-clear.xml" />
+      <alias name="apply_alpha" weak="yes" file="/shader-snippets/surface/alpha-premult.xml" />
+
+      <!-- Snippets - the building blocks of this shader. -->
+      <snippet id="position" file="/shader-snippets/position.xml" />
+      <snippet id="surface" filealias="surface" />
+      <snippet id="normalmap" file="/shader-snippets/surface/normalmap.xml" />
+      <snippet id="reflection" file="/shader-snippets/reflect/reflect-plane-screen.xml" />
+      <snippet id="refraction" file="/shader-snippets/reflect/reflect-plane-screen.xml" />
+      <snippet id="hdrscalerefl" file="/shader-snippets/hdr-prescale.xml" />
+      <snippet id="hdrscalerefr" file="/shader-snippets/hdr-prescale.xml" />
+      <snippet id="perturb_norm_refl" file="/shader-snippets/tcoffset2-perturb-normal-cam.xml" />
+      <snippet id="perturb_norm_refr" file="/shader-snippets/tcoffset2-perturb-normal-cam.xml" />
+      <snippet id="fog_refraction" file="/shader-snippets/fog/fog-distance-exp.xml" />
+      <snippet id="fresnel" file="/shader-snippets/reflect/fresnel.xml" />
+      <snippet id="fresnel_limit" file="/shader-snippets/modulate-float.xml" />
+      <snippet id="fresnel_inv" file="/shader-snippets/inverse-float.xml" />
+      <snippet id="blend_surface_refract" file="/shader-snippets/alpha-premult-blend.xml" />
+      <snippet id="lerp_reflect_refract" file="/shader-snippets/lerp.xml" />
+      <snippet id="apply_mixmode_alpha" file="/shader-snippets/mixmode-alpha.xml" />
+      <snippet id="apply_alpha" filealias="apply_alpha" />
+      <snippet id="glow" file="/shader-snippets/lighting/glow.xml" />
+      <snippet id="sectorfog" file="/shader-snippets/fog/fog-sector.xml" />
+      <snippet id="hdrscale" file="/shader-snippets/hdr-postscale.xml" />
+      <!-- "connections" describe what snippets take input from what other
+           snippets (ie the "data flow" is modeled). The exact resolution of
+	   what output is linked to what input is done automatically. -->
+      <connection from="position" to="reflection" />
+      <connection from="position" to="refraction" />
+      <connection from="position" to="fresnel" />
+      <connection from="position" to="surface" />
+      <connection from="surface" to="apply_mixmode_alpha" />
+      <connection from="apply_mixmode_alpha" to="apply_alpha" />
+      <connection from="normalmap" to="fresnel" />
+      <connection from="normalmap" to="perturb_norm_refl" />
+      <connection from="normalmap" to="perturb_norm_refr" />
+      <connection from="perturb_norm_refl" to="reflection" />
+      <connection from="perturb_norm_refr" to="refraction" />
+      <connection from="reflection" to="hdrscalerefl" />
+      <connection from="refraction" to="hdrscalerefr" />
+      <connection from="refraction" to="fresnel_limit">
+	<explicit from="mirroredPointDistSat" to="b" />
+      </connection>
+      <connection from="hdrscalerefr" to="fog_refraction" />
+      <connection from="hdrscalerefl" to="lerp_reflect_refract">
+	<explicit from="result" to="a" />
+      </connection>
+      <connection from="fresnel" to="fresnel_limit">
+	<explicit from="result" to="a" />
+      </connection>
+      <connection from="fresnel_limit" to="fresnel_inv" />
+      <connection from="fog_refraction" to="blend_surface_refract">
+	<explicit from="foggedColor" to="a" />
+      </connection>
+      <connection from="apply_alpha" to="blend_surface_refract">
+	<explicit from="result" to="b" />
+      </connection>
+      <connection from="blend_surface_refract" to="lerp_reflect_refract">
+	<explicit from="result" to="b" />
+      </connection>
+      <connection from="fresnel_inv" to="lerp_reflect_refract" />
+      <connection from="lerp_reflect_refract" to="glow" />
+      <connection from="glow" to="sectorfog" />
+      <connection from="sectorfog" to="hdrscale" />
+      
+      <parameter id="texRefract" type="shadervar" weavertype="tex2d">tex framebuffer color</parameter>
+      <connection from="texRefract" to="refraction" />
+      <parameter id="texRefractDepth" type="shadervar" weavertype="tex2d">tex framebuffer depth</parameter>
+      <connection from="texRefractDepth" to="refraction" />
+      <parameter id="texRefractXform" type="shadervar" weavertype="translateScale2">framebuffer coord xform</parameter>
+      <connection from="texRefractXform" to="refraction" />
+      
+      <!-- Use the depth of the refraction to limit perturbation for the reflection as well -->
+      <connection from="texRefractDepth" to="reflection">
+	<explicit from="output" to="texReflectDepth" />
+      </connection>
+      <!-- @@@ FIXME: Workaround to prevent automatic pickup of refract depth as 
+	              the reflect color texture -->
+      <parameter id="texReflect" type="shadervar" weavertype="tex2d">tex plane reflect</parameter>
+      <connection from="texReflect" to="reflection">
+        <explicit from="output" to="texReflect" />
+      </connection>
+      
+      <parameter id="refractFogColor" type="shadervar" weavertype="rgba">water fog color</parameter>
+      <connection from="refractFogColor" to="fog_refraction">
+	<explicit from="output" to="fogColor" />
+      </connection>
+      <parameter id="refractFogDensity" type="shadervar" weavertype="float">water fog density</parameter>
+      <connection from="refractFogDensity" to="fog_refraction">
+	<explicit from="output" to="fogDensity" />
+      </connection>
+      
+      <parameter id="perturbScaleSV" type="shadervar" weavertype="float4">water perturb scale</parameter>
+      <connection from="perturbScaleSV" to="perturb_norm_refl" />
+      <connection from="perturbScaleSV" to="perturb_norm_refr" />
+      
+      <parameter id="perturbFadeSV" type="shadervar" weavertype="float">water perturb fade</parameter>
+      <connection from="perturbFadeSV" to="perturb_norm_refl" />
+      <connection from="perturbFadeSV" to="perturb_norm_refr" />
+    </pass>
+    <pass>
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      
+      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
+      <!-- First pass: blend with alpha -->
+      <mixmode>
+	<blendop src="one" dst="srcalpha_inv" />
+	<alphatest>disable</alphatest>
+      </mixmode>
+      <?else?>
+      <!-- Later pass: blend with add -->
+      <mixmode>
+	<blendop src="one" dst="one" />
+	<alphatest>disable</alphatest>
+      </mixmode>
+      <?endif?>
+      
+      <!-- Possible future things:
+	   - Tinted reflections/refractions?
+	   - Fresnel for specular?
+	   - Modulate specular by depth (similar to reflection)?
+	-->
+      
+      <alias name="surface" weak="yes" file="/shader-snippets/surface/surface-clear.xml" />
+      <alias name="apply_alpha" weak="yes" file="/shader-snippets/surface/alpha-premult.xml" />
+      <alias name="lighting" weak="yes" file="/shader-snippets/lighting/lighting-ppl.xml" />
+
+      <!-- Snippets - the building blocks of this shader. -->
+      <snippet id="position" file="/shader-snippets/position.xml" />
+      <snippet id="surface" filealias="surface" />
+      <snippet id="normalmap" file="/shader-snippets/surface/normalmap.xml" />
+      <snippet id="apply_mixmode_alpha" file="/shader-snippets/mixmode-alpha.xml" />
+      <snippet id="apply_alpha" filealias="apply_alpha" />
+      <snippet id="lighting" filealias="lighting" />
+      <snippet id="fake_light_diffuse" file="/shader-snippets/rgba-black.xml" />
+      <snippet id="ambient" file="/shader-snippets/lighting/ambient-null.xml" />
+      <snippet id="specular" file="/shader-snippets/surface/specular-default.xml" />
+      <snippet id="apply_lighting" file="/shader-snippets/lighting/apply-lighting.xml" />
+      <snippet id="glow" file="/shader-snippets/lighting/glow.xml" />
+      <snippet id="sectorfog" file="/shader-snippets/fog/fog-sector.xml" />
+      <snippet id="hdrscale" file="/shader-snippets/hdr-postscale.xml" />
+      <!-- "connections" describe what snippets take input from what other
+           snippets (ie the "data flow" is modeled). The exact resolution of
+	   what output is linked to what input is done automatically. -->
+      <connection from="position" to="surface" />
+      <connection from="position" to="lighting" />
+      <connection from="surface" to="specular" />
+      <connection from="surface" to="apply_mixmode_alpha" />
+      <connection from="apply_mixmode_alpha" to="apply_alpha" />
+      <connection from="normalmap" to="lighting" />
+      <connection from="apply_alpha" to="apply_lighting">
+	<explicit from="result" to="surfaceDiffuse" />
+      </connection>
+      <connection from="fake_light_diffuse" to="apply_lighting">
+	<explicit from="result" to="lightDiffuse" />
+      </connection>
+      <connection from="lighting" to="apply_lighting">
+	<explicit from="specularColor" to="lightSpecular" />
+      </connection>
+      <connection from="ambient" to="apply_lighting">
+	<explicit from="ambient" to="ambient" />
+      </connection>
+      <connection from="specular" to="apply_lighting">
+	<explicit from="specularColor" to="surfaceSpecular" />
+      </connection>
+      <connection from="apply_lighting" to="glow" />
+      <connection from="glow" to="sectorfog" />
+      <connection from="sectorfog" to="hdrscale" />
+      
+      <parameter id="lightOffset" type="int">0</parameter>
+      <parameter id="maxLights" type="int">1</parameter>
+      <connection from="lightOffset" to="lighting" />
+      <connection from="maxLights" to="lighting" />
+    </pass>
+  </technique>
+  
+  <fallbackshader name="reflect_water_simple_cube"
+		  file="/shader/reflect/water_simple_cube.xml" />
+</shader>

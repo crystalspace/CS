@@ -1,0 +1,6 @@
+SubDir TOP plugins cscript pycsgeom ;
+
+if $(PYTHON.AVAILABLE) = "yes"
+{
+  PyBindingModule csgeommod : csgeom : csgeommod.cpp : : : "csgeom cs Python module" ;
+}

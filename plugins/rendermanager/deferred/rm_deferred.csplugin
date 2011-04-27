@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- rm_deferred.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.rendermanager.deferred</name>
+        <implementation>RMDeferred</implementation>
+        <description>Rendermanager (deferred)</description>
+        <requires>
+          <class>crystalspace.engine.</class>
+          <class>crystalspace.graphics3d.</class>         
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

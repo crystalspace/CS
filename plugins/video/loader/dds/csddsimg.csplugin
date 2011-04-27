@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- csddsimg.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphic.image.io.dds</name>
+        <implementation>csDDSImageIO</implementation>
+        <description>DDS image format I/O plugin</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

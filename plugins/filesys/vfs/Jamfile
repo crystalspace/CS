@@ -1,0 +1,39 @@
+SubDir TOP plugins filesys vfs ;
+
+if $(ZLIB.AVAILABLE) = "yes"
+{
+Description vfs : "Virtual File System plugin" ;
+Plugin vfs : [ Wildcard *.cpp *.h ] ;
+LinkWith vfs : crystalspace ;
+CFlags vfs : [ FDefines CS_CONFIGDIR='\"$(appconfdir)\"' ] ;
+
+rule VfsCfgGen
+{
+  Depends $(<) : $(>) ;
+  Always $(<) ;
+  Clean vfsclean : $(<) ;
+}
+
+actions VfsCfgGen
+{
+  cat $(>) > $(<)
+  echo "" >> $(<)
+  echo "; Configuration-time installation paths." >> $(<)
+  echo "VFS.$(TARGET.OS.NORMALIZED).CS_SHAREDIR = $(appdatadir)" >> $(<)
+  echo "VFS.$(TARGET.OS.NORMALIZED).CS_DATADIR = $(appdatadir)/data" >> $(<)
+  echo "VFS.$(TARGET.OS.NORMALIZED).CS_CONFIGDIR = $(appconfdir)" >> $(<)
+  echo "VFS.$(TARGET.OS.NORMALIZED).CS_MAPDIR = $(appdatadir)/data/maps" >>$(<)
+}
+
+# Build our own vfs.cfg
+VFS_CONFIGFILE = vfs.cfg ;
+MakeLocate $(VFS_CONFIGFILE:G=config) : $(LOCATE_TARGET) ;
+SEARCH on $(VFS_CONFIGFILE:G=config) = $(LOCATE_TARGET) ;
+VfsCfgGen $(VFS_CONFIGFILE:G=config) : $(SUBDIR)/vfs.cfg.template ;
+Depends install_config :
+  [ DoInstall $(VFS_CONFIGFILE:G=config) : $(appconfdir) ] ;
+}
+
+SubDir TOP ;
+# Create a file list for vfs.cfg
+FileListEntriesData vfs.cfg : : vfs ;

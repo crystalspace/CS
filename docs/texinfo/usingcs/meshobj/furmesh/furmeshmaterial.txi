@@ -1,0 +1,53 @@
+@c -*-texinfo-*-
+@node Furmesh Material, HOWTO Create Furmesh, Furmesh Animation, Furmesh Mesh
+@subsubsection Furmesh Material
+@cindex @code{iFurMeshMaterialProperties}
+
+@emph{Written by Alexandru - Teodor Voicu,
+@email{voicualexandruteodor@@gmail.com}.}
+
+@subsubheading Introduction
+
+In order to render realistic hair and fur, some special shading models had to 
+be used, such as the ones proposed by Marschner or Kajiya and Kay. This shaders 
+are complex Bidirectional Scattering-Surface Reflectance Distribution Functions 
+(BSSRDF) and Bidirectional Scattering Distribution Functions (named BSDF) that
+use lookup textures in order to have real-time performances. 
+
+However, lookup textures have to be recalculated from time to time, mostly when 
+parameters change, and in order to include this option an @code{Invalidate()} 
+function had to be associated with the @code{iMaterial} interface. The easiest 
+way to do this was to create the @code{iFurMeshMaterialProperties} interface, 
+which besides giving access to a material, by @code{GetMaterial()} and 
+@code{SetMaterial()}, also provides the @code{Invalidate()} method and a function
+that is called each frame, named @code{Update()}.
+
+@subsubheading Creating Furmesh Materials
+
+Materials can be loaded from files and registered with the 
+@code{iFurMeshMaterialProperties} interface afterwards, as can be seen in the 
+following example:
+
+@example
+@dots{}  
+// Load furMesh
+csRef<CS::Mesh::iFurMeshType> furMeshType = 
+  csQueryRegistry<CS::Mesh::iFurMeshType> (hairTest->object_reg);
+if (!furMeshType)
+  return hairTest->ReportError("Failed to locate CS::Mesh::iFurMeshType plugin!");
+  
+// Load Marschner shader
+csRef<iMaterialWrapper> materialWrapper = 
+  hairTest->engine->FindMaterial("marschner_material");
+if (!materialWrapper)
+  hairTest->ReportError("Can't find marschner material!");
+@dots{} 
+// Create hairMeshProperties
+csRef<CS::Mesh::iFurMeshMaterialProperties> hairMeshProperties = 
+  furMeshType->CreateHairMeshMarschnerProperties("krsytal_marschner");
+
+hairMeshProperties->SetMaterial(materialWrapper->GetMaterial());
+@dots{} 
+furMesh->SetFurMeshProperties(hairMeshProperties);
+@dots{} 
+@end example

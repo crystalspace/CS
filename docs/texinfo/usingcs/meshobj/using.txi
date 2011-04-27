@@ -1,0 +1,217 @@
+@c -*-texinfo-*-
+@node Using MeshObject, Writing MeshObjects, MeshObject Concepts, MeshObject
+@subsection Using Mesh Objects
+@cindex Mesh Objects, Using
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+@cindex @code{iParticleState}
+@cindex @code{iMeshWrapper}
+
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@gmail.com}.}
+
+This section explains how to use Mesh Objects in general.  It doesn't go into
+detail about the specific Mesh Object Types that Crystal Space supports.
+
+@subsubheading General
+
+When the engine works with instances of Mesh Objects it does so through the
+@samp{iMeshWrapper} interface.  @samp{iMeshWrapper} holds the reference to the
+@samp{iMeshObject} instances implementing the particular type of Mesh Object.
+@samp{iMeshWrapper} is responsible for deciding when to draw a Mesh Object and
+when to light it.  @samp{iMeshWrapper} also manages the position of the object
+in the world and manages possible hierarchical transformations (i.e.
+@samp{iMeshWrapper} has an array of @samp{iMeshWrapper} children).
+
+@subsubheading Loading From Map File
+
+The easiest way to use Mesh Objects is to simply specify them in the map file
+for your level.  There are two things that you need to do for that.  First you
+have to specify an entry at top-level (directly inside the @samp{world}
+statement) like this (this example uses the @dfn{fountain} plug-in to make a
+fountain):
+
+@example
+<meshfact name="particlesFactory">
+  <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+  <params />
+</meshfact>
+@end example
+
+This will use the @dfn{mesh object loader} plug-in which is identified by the
+@sc{scf} name mentioned by the @samp{plugin} statement to load a factory
+(type @samp{iMeshObjectFactory}) and register it with the engine.  There are no
+parameters for the fountain's Mesh Object Factory so that's why the
+@samp{params} block is empty.  But you still have to specify it.  Other mesh
+object factories may accept parameters.
+
+With particle systems you have the option of specifying the parameters
+in the factory and/or the mesh object. The advantage of specifying it in
+the factory is that it then becomes easier to reuse the factory for
+different particle system instances. In this example however, we define
+the particle system in the mesh object. We still need the empty mesh
+factory however.
+
+To place a fountain in some room (sector) you use a @samp{meshobj}
+statement, within the definition of a room or sector, like this:
+
+@example
+<meshobj name="fountain">
+  <plugin>crystalspace.mesh.loader.particles</plugin>
+  <params>
+    <factory>particlesFactory</factory>
+    <material>spark</material>
+    <particlesize x="0.025" y="0.025" />
+    <transformmode>local</transformmode>
+    <mixmode>
+      <add />
+    </mixmode>
+
+    <emitter type="cone">
+      <enabled/>
+      <initialttl min="3" max="3" />
+      <emissionrate>100</emissionrate>
+      <position x="0" y="0" z="0" />
+      <placement>center</placement>
+      <extent x="0" y="1" z="0" />
+      <coneangle>0.2</coneangle>
+      <initialvelocity x="0" y="1" z="0" />
+    </emitter>
+    <effector type="force">
+      <acceleration x="0" y="-0.1" z="0" />
+    </effector>
+  </params>
+  <ztest />
+  <priority>alpha</priority>
+  <move>
+    <v x="-10" y="-1" z="14"/>
+    <matrix>
+      <rot x="1.5"/>
+    </matrix>
+  </move>
+</meshobj>
+@end example
+
+This code fragment uses the @samp{crystalspace.mesh.loader.particles} loader
+plug-in named to load a Mesh Object (type
+@samp{iMeshObject}) and register it with the engine (while placing it in the
+current sector).  In this case there are many parameters.  The first parameter
+should always be the name of the factory.  This is true for all Mesh Objects
+regardless of their type.  For a complete list of parameters available, you
+should refer to the fountain documentation.
+
+The @samp{move} statement is outside of the @samp{params} block.  The reason
+for this is that the position of Mesh Objects is controlled by the engine and
+not by the Mesh Object itself.
+
+In addition to the above statements you can also nest other @samp{meshobj}
+statements to create a hierarchy of Mesh Objects (not shown in the example
+above).  If you do that, then the @samp{move} statement must be interpreted
+relative to the parent.
+
+When you have Mesh Objects loaded into Crystal Space using the map file syntax
+illustrated above, then you can query the parameters from your application by
+using the standard @sc{api} in the @samp{iEngine} interface.
+
+@subsubheading Using Directly From Code
+
+You can also create Mesh Objects directly from your application. The engine
+has a few convenience functions you can use for that
+(@code{iEngine::CreateMeshwrapper()} and @code{iEngine::CreateMeshFactory()}).
+But here we show you the full way to create meshes from code:
+
+@itemize @bullet
+@item
+Load the Mesh Object Type with @code{csLoadPlugin} (preferably after
+checking if it is already loaded, by calling @code{csQueryPluginClass}).
+
+@item
+Create at least one Mesh Object Factory by calling @code{NewFactory()} on the
+Mesh Object Type instance.
+
+@item
+If the factory has parameters you can call @code{scfQueryInterface} to get a
+handle to the @samp{iSomethingFactoryState} interface (replace @emph{Something}
+with whatever the type name of the Mesh Object is).  Then you set the
+parameters you want on that factory.
+
+@item
+Create one or more Mesh Object instances by using one of your factories and
+calling @code{NewInstance()} on them.
+
+@item
+If the object has parameters you use @code{scfQueryInterface} to get a handle
+to the @samp{iSomethingState} interface (replace @emph{Something} with whatever
+the type name of the Mesh Object is).  Then set the parameters you want on the
+Mesh Object.
+
+@item
+For every instance of @samp{iMeshObject} you need to create a
+@samp{iMeshWrapper} instance for the engine.  Then you set up the
+@samp{iMeshWrapper} by placing it in the sector that you want it and setup its
+position and rotation (transformation).
+@end itemize
+
+Here is a code example for creating an instance of the genmesh plug-in.
+
+@example
+void Initialize ()
+@{
+  @dots{}
+  // First create the factory:
+  csRef<iMeshFactoryWrapper> fact = engine->CreateMeshFactory (
+    "crystalspace.mesh.object.genmesh", "cubeFact");
+  csRef<iGeneralFactoryState> factstate = scfQueryInterface<iGeneralFactoryState> (
+    fact->GetMeshObjectFactory ());
+
+  csEllipsoid ellips (csVector3 (0, 0, 0), csVector3 (1, 1, 1));
+  factstate->GenerateSphere (ellips, 8);
+  factstate->CalculateNormals ();
+  @dots{}
+@}
+@dots{}
+void SetupWorld ()
+@{
+  @dots{}
+  // Make a ball using the genmesh plug-in.
+  csRef<iMeshWrapper> ball =
+    engine->CreateMeshWrapper (fact, "ball", room, csVector3 (-3, 5, -3));
+  csRef<iGeneralMeshState> ballstate = scfQueryInterface<iGeneralMeshState> (
+    ball->GetMeshObject ());
+  ballstate->SetMaterialWrapper (myMaterial);
+  @dots{}
+@}
+@end example
+
+This example will load a ball using the plug-in and place it at (-3,5,-3) in
+@samp{room}.
+
+@code{iGeneralFactoryState} and @code{iGeneralMeshState} are the state
+interfaces for setting the characteristics of genmesh Mesh Objects.
+
+@anchor{Generic Mesh Creation Code}
+@subsubheading Generic Mesh Creation Code
+
+In general you should use the following code to create any kind of mesh:
+
+@example
+  // First create the factory:
+  csRef<iMeshFactoryWrapper> fact = engine->CreateMeshFactory (
+	"crystalspace.mesh.object.meshtype", "factoryName");
+  csRef<iMeshtypeFactoryState> factstate = scfQueryInterface<
+  	iMeshtypeFactoryState> (fact->GetMeshObjectFactory ());
+  @dots{}
+  // Then make one or more meshes:
+  csRef<iMeshWrapper> mesh = engine->CreateMeshWrapper (
+  	fact, "meshName", sector, csVector3 (-3, 5, -3));
+  csRef<iMeshtypeObjectState> meshstate = scfQueryInterface<
+  	iMeshtypeObjectState> (mesh->GetMeshObject ());
+  @dots{}
+@end example
+
+Replace @samp{meshtype} with the correct mesh type (like @samp{genmesh},
+@dots{}). Replace @code{iMeshtypeFactoryState} with the
+correct factory state and @code{iMeshtypeObjectState} with the correct
+object state.
+
