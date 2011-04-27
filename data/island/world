@@ -186,7 +186,7 @@
             <plugin>genmesh</plugin>
             <!--noshadowreceive /-->
             <noshadowcast />
-            <priority>alpha</priority>
+            <priority>transp</priority>
             <params>
                 <factory>water</factory>
             </params>
