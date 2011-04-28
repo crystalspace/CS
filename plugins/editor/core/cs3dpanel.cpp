@@ -120,7 +120,7 @@ bool CS3DPanel::Initialize (iObjectRegistry* obj_reg)
   panelManager->AddPanel (this);
   
   view = csPtr<iView> (new csView (engine, g3d));
-  view->SetAutoResize (true);
+  view->SetAutoResize (false);
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   // Let editor know we're interested in map load events
@@ -544,18 +544,22 @@ void CS3DPanel::OnSize (wxSizeEvent& event)
     return;
   
   wxSize size = event.GetSize();
-
-  // Update CS canvas size
   iGraphics2D* g2d = g3d->GetDriver2D ();
-  g2d->Resize (size.x, size.y);
   
   // Also resize the wxWindow
   csRef<iWxWindow> wxwin = scfQueryInterface<iWxWindow> (g2d);
   if (!wxwin->GetWindow ())
+  {
+    g2d->Resize (size.x, size.y);
     return;
+  }
   
   wxwin->GetWindow()->SetSize (size);
   
+  // Update the view ratio
+  view->GetPerspectiveCamera ()->SetFOV ((float) (size.y) / (float) (size.x), 1.0f);
+  view->SetRectangle (0, 0, size.x, size.y);
+
   event.Skip();
 }
 
@@ -621,8 +625,8 @@ void CS3DPanel::OnMapLoaded (const char* path, const char* filename)
   
   view.Invalidate ();
   view = csPtr<iView> (new csView (engine, g3d));
-  view->SetAutoResize (true);
-  
+  view->SetAutoResize (false);  
+  view->GetPerspectiveCamera ()->SetFOV ((float) (g2d->GetHeight ()) / (float) (g2d->GetWidth ()), 1.0f);
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   view->GetCamera ()->SetSector (room);
