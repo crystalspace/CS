@@ -116,15 +116,6 @@ Simple::~Simple ()
 
 void Simple::SetupFrame ()
 {
-  // TODO: remove that!
-  iGraphics2D* g2d = g3d->GetDriver2D ();
-  view = csPtr<iView> (new csView (engine, g3d));
-  view->SetAutoResize (true);
-  view->GetPerspectiveCamera ()->SetFOV ((float) (g2d->GetHeight ()) / (float) (g2d->GetWidth ()), g2d->GetWidth ());
-  view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
-  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
-
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
   // Now rotate the camera according to keyboard state
@@ -377,8 +368,8 @@ bool Simple::Initialize ()
   // Create the wxgl canvas
   iGraphics2D* g2d = g3d->GetDriver2D ();
   g2d->AllowResize (true);
-  csRef<iWxWindow> wxwin = scfQueryInterface<iWxWindow> (g2d);
-  if (!wxwin)
+  wxwindow = scfQueryInterface<iWxWindow> (g2d);
+  if (!wxwindow)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
               "crystalspace.application.wxtest",
@@ -386,9 +377,9 @@ bool Simple::Initialize ()
     return false;
   }
 
-  wxPanel* panel1 = new Simple::Panel (panel, wxwin);
+  wxPanel* panel1 = new Simple::Panel (panel, this);
   panel->GetSizer ()->Add (panel1, 1, wxALL | wxEXPAND);
-  wxwin->SetParent (panel1);
+  wxwindow->SetParent (panel1);
 
   Show (true);
 
@@ -405,7 +396,7 @@ bool Simple::Initialize ()
      This is so it receives keyboard events (and conveniently translate these
      into CS keyboard events/update the CS keyboard state).
    */
-  wxwin->GetWindow ()->SetFocus ();
+  wxwindow->GetWindow ()->SetFocus ();
 
   // Load the texture from the standard library.  This is located in
   // CS/data/standard.zip and mounted as /lib/std using the Virtual
@@ -459,7 +450,7 @@ bool Simple::Initialize ()
   SimpleStaticLighter::ShineLights (room, engine, 4);
 
   view = csPtr<iView> (new csView (engine, g3d));
-  view->SetAutoResize (true);
+  view->SetAutoResize (false);
   view->GetPerspectiveCamera ()->SetFOV ((float) (g2d->GetHeight ()) / (float) (g2d->GetWidth ()), g2d->GetWidth ());
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
@@ -482,7 +473,19 @@ void Simple::PushFrame ()
   q->Process();
 }
 
-void Simple::OnClose(wxCloseEvent& event)
+void Simple::OnSize (wxSizeEvent& event)
+{
+  if (!wxwindow->GetWindow ()) return;
+
+  wxSize size = event.GetSize();
+  wxwindow->GetWindow ()->SetSize (size); // TODO: csGraphics2DGLCommon::Resize is called here...
+
+  view->GetPerspectiveCamera ()->SetFOV ((float) (size.y) / (float) (size.x), 1.0f);
+  // TODO: ... but here the CanvasResize event has still not been catched by iGraphics3D
+  view->SetRectangle (0, 0, size.x, size.y);
+}
+
+void Simple::OnClose (wxCloseEvent& event)
 {
   csPrintf("got close event\n");
   
@@ -494,14 +497,14 @@ void Simple::OnClose(wxCloseEvent& event)
   simple = 0;
 }
 
-void Simple::OnIconize(wxIconizeEvent& event)
+void Simple::OnIconize (wxIconizeEvent& event)
 {
-  csPrintf("got iconize %d\n", (int)event.Iconized());
+  csPrintf("got iconize %d\n", (int) event.Iconized ());
 }
 
-void Simple::OnShow(wxShowEvent& event)
+void Simple::OnShow (wxShowEvent& event)
 {
-  csPrintf("got show %d\n", (int)event.GetShow());
+  csPrintf("got show %d\n", (int) event.GetShow ());
 }
 
 /* There are two ways to drive the CS event loop, from
@@ -522,7 +525,7 @@ public:
   Pump() { };
   virtual void Notify()
     {
-    s->PushFrame();
+    s->PushFrame ();
     }
 };
 #endif
@@ -534,12 +537,12 @@ class MyApp: public wxApp
 public:
   iObjectRegistry* object_reg;
 
-  virtual bool OnInit(void);
-  virtual int OnExit(void);
+  virtual bool OnInit (void);
+  virtual int OnExit (void);
 
 #ifdef USE_IDLE
-  virtual void OnIdle();
-  DECLARE_EVENT_TABLE();
+  virtual void OnIdle ();
+  DECLARE_EVENT_TABLE ();
 #endif
 };
 
@@ -555,7 +558,7 @@ IMPLEMENT_APP(MyApp)
 /*---------------------------------------------------------------------*
  * Main function
  *---------------------------------------------------------------------*/
-  bool MyApp::OnInit(void)
+  bool MyApp::OnInit (void)
 {
   wxInitAllImageHandlers ();
 
@@ -585,21 +588,21 @@ IMPLEMENT_APP(MyApp)
    the timer triggers the next frame.
   */
 
-  Pump* p = new Pump();
+  Pump* p = new Pump ();
   p->s = simple;
-  p->Start(20);
+  p->Start (20);
 #endif
 
   return true;
 }
 
 #ifdef USE_IDLE
-void MyApp::OnIdle() {
-  simple->PushFrame();
+void MyApp::OnIdle () {
+  simple->PushFrame ();
 }
 #endif
 
-int MyApp::OnExit()
+int MyApp::OnExit ()
 {
   csInitializer::DestroyApplication (object_reg);
   return 0;

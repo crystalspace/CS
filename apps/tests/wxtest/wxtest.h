@@ -49,7 +49,8 @@ private:
   csRef<iKeyboardDriver> kbd;
   csRef<iVirtualClock> vc;
   csRef<iView> view;
-  iSector* room;
+  csRef<iWxWindow> wxwindow;
+  csRef<iSector> room;
   csRef<FramePrinter> printer;
 
   float rotY;
@@ -71,24 +72,26 @@ public:
 
   bool Initialize ();
   void PushFrame ();
-  void OnClose(wxCloseEvent& event);
-  void OnIconize(wxIconizeEvent& event);
-  void OnShow(wxShowEvent& event);
+  void OnClose (wxCloseEvent& event);
+  void OnIconize (wxIconizeEvent& event);
+  void OnShow (wxShowEvent& event);
+  void OnSize (wxSizeEvent& ev);
 
-  DECLARE_EVENT_TABLE()
+  DECLARE_EVENT_TABLE ();
 
   class Panel : public wxPanel
   {
   public:
-      Panel(wxWindow* parent, iWxWindow* p, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize)
-	: wxPanel (parent, wxID_ANY, wxDefaultPosition, wxDefaultSize), p (p)
-      {}
+    Panel(wxWindow* parent, Simple* s)
+      : wxPanel (parent, wxID_ANY, wxDefaultPosition, wxDefaultSize), s (s)
+    {}
     
-      virtual void OnSize (wxSizeEvent& ev)
-      { if (p->GetWindow()) p->GetWindow()->SetSize (ev.GetSize ()); } //printf ("OnSize\n");; }
+    virtual void OnSize (wxSizeEvent& ev)
+    { s->OnSize (ev); }
+
     private:
-      iWxWindow* p;
-      
+      Simple* s;
+
       DECLARE_EVENT_TABLE()
   };
 };
