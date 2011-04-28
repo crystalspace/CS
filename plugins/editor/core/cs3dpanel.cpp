@@ -120,6 +120,7 @@ bool CS3DPanel::Initialize (iObjectRegistry* obj_reg)
   panelManager->AddPanel (this);
   
   view = csPtr<iView> (new csView (engine, g3d));
+  view->SetAutoResize (true);
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   // Let editor know we're interested in map load events
@@ -297,7 +298,7 @@ bool CS3DPanel::HandleEvent (iEvent& ev)
   }
   iCamera* camera = view->GetCamera ();
 
-  if (mouse_down)
+  if (mouse_down && csMouseEventHelper::GetButton (&ev) == 1)
   {
     iEditor::TransformStatus trans = editor->GetTransformStatus ();
     if (trans != iEditor::NOTHING && trans != iEditor::MOVING && trans != iEditor::ROTATING && trans != iEditor::SCALING)
@@ -587,6 +588,15 @@ void CS3DPanel::OnDrop (wxCoord x, wxCoord y, iEditorObject* obj)
 
 void CS3DPanel::OnMapLoaded (const char* path, const char* filename)
 {
+  // If there are no sectors then invalidate the camera
+  if (!engine->GetSectors ()->GetCount ())
+  {
+    view->GetCamera ()->SetSector (nullptr);
+    initializedColliderActor = false;
+
+    return;
+  }
+
   // Move the camera to the starting sector/position
   iSector* room;
   csVector3 pos;
@@ -601,8 +611,9 @@ void CS3DPanel::OnMapLoaded (const char* path, const char* filename)
   else
   {
     // We didn't find a valid starting position. So we default
-    // to going to room called 'room' at position (0,0,0).
+    // to going to the sector called 'room', or the first sector, at position (0,0,0).
     room = engine->GetSectors ()->FindByName ("room");
+    if (!room) room = engine->GetSectors ()->Get (0);
     pos = csVector3 (0, 0, 0);
   }
 
@@ -610,6 +621,7 @@ void CS3DPanel::OnMapLoaded (const char* path, const char* filename)
   
   view.Invalidate ();
   view = csPtr<iView> (new csView (engine, g3d));
+  view->SetAutoResize (true);
   
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
@@ -628,6 +640,11 @@ void CS3DPanel::OnMapLoaded (const char* path, const char* filename)
   collider_actor.InitializeColliders (view->GetCamera (),
                                       legs, body, shift);
   initializedColliderActor = true;
+
+  // Put back the focus on the window
+  csRef<iWxWindow> wxwin = scfQueryInterface<iWxWindow> (g3d->GetDriver2D ());
+  if (wxwin->GetWindow ())
+    wxwin->GetWindow ()->SetFocus ();
 }
 
 void CS3DPanel::OnLibraryLoaded (const char* path, const char* filename, iCollection* collection)
