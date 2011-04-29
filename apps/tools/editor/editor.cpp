@@ -31,6 +31,7 @@
 
 #include "ieditor/panelmanager.h"
 #include "objectlist.h"
+#include "menubar.h"
 #include "auipanelmanager.h"
 #include "interfacewrappermanager.h"
 #include "actionmanager.h"
@@ -71,6 +72,7 @@ bool Editor::Initialize (iObjectRegistry* reg)
   object_reg->Register (this, "iEditor");
   
   panelManager.AttachNew (new AUIPanelManager (object_reg));
+  menuBar.AttachNew (new MenuBar (object_reg));
   interfaceManager.AttachNew (new InterfaceWrapperManager (object_reg));
   actionManager.AttachNew (new ActionManager (object_reg));
   
@@ -85,6 +87,8 @@ bool Editor::Initialize (iObjectRegistry* reg)
     return false;
 
   mainFrame->SecondInitialize (object_reg);
+  
+  panelManager->SecondInitialize (object_reg);
 
   return true;
 }

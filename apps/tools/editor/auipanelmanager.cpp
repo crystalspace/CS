@@ -23,11 +23,23 @@
 
 #include "auipanelmanager.h"
 
+#include "mainframe.h"
+
+#include <wx/colordlg.h>
+#include <wx/msgdlg.h>
+#include <wx/button.h>
+#include <wx/textdlg.h>
+
+
 namespace CS {
 namespace EditorApp {
 
 AUIPanelManager::AUIPanelManager (iObjectRegistry* obj_reg)
-  : scfImplementationType (this), object_reg (obj_reg)
+  : scfImplementationType (this), 
+  object_reg (obj_reg), perspectivesMenu(0), panelsMenu(0), 
+  panelListener(new PanelListener(this)),
+  onCreatePerspective(new OnCreatePerspective(this)),
+  onRestorePerspective(new OnRestorePerspective(this))
 {
   object_reg->Register (this, "iPanelManager");
 }
@@ -45,6 +57,15 @@ void AUIPanelManager::Uninitialize ()
 void AUIPanelManager::SetManagedWindow (wxWindow* managedWindow)
 {
   mgr.SetManagedWindow (managedWindow);
+  
+  csRef<iMenuBar> menuBar = csQueryRegistry<iMenuBar> (object_reg);
+  
+  perspectivesMenu = menuBar->Append("&Views");
+  panelsMenu = perspectivesMenu->AppendSubMenu("&Panels");
+  perspectivesMenu->AppendSeparator();
+
+  createPerspective = perspectivesMenu->AppendItem("&Create Perspective");
+  createPerspective->AddListener(onCreatePerspective);
 }
 
 wxWindow* AUIPanelManager::GetManagedWindow ()
@@ -52,17 +73,67 @@ wxWindow* AUIPanelManager::GetManagedWindow ()
   return mgr.GetManagedWindow ();
 }
 
+
+bool AUIPanelManager::SecondInitialize (iObjectRegistry* obj_reg)
+{
+  if (m_perspectives.size() == 0)
+  {
+      perspectivesMenu->AppendSeparator();
+  }
+
+  {//Create default perspective, all panels in their default state at this point.
+    csRef<iMenuItem> item = perspectivesMenu->AppendItem("&Default");
+    item->AddListener(onRestorePerspective);
+    perspectiveItems.Push(item);
+    m_perspectives[item->GetwxMenuItem ()->GetId()] = mgr.SavePerspective();
+  }
+  
+  {// Let's hide the Scene and Asset panels to auto create the Terrain perspective.
+    for (size_t i = 0; i < panels.GetSize(); i++)
+    {
+      if (wxString(panels.Get(i)->GetCaption ()) == wxT("Scene Browser") || wxString(panels.Get(i)->GetCaption ()) == wxT("Asset Browser"))
+      {
+        wxAuiPaneInfo& info = mgr.GetPane (panels.Get(i)->GetWindow ());
+        info.Hide();
+      }
+    }
+    mgr.Update ();
+    
+    csRef<iMenuItem> item = perspectivesMenu->AppendItem("&Terrain");
+    item->AddListener(onRestorePerspective);
+    perspectiveItems.Push(item);
+    m_perspectives[item->GetwxMenuItem ()->GetId()] = mgr.SavePerspective();
+    
+    for (size_t i = 0; i < panels.GetSize(); i++)
+    {
+      wxAuiPaneInfo& info = mgr.GetPane (panels.Get(i)->GetWindow ());
+      info.Show();
+    }
+    mgr.Update ();
+  }
+
+  return true;
+}
+
 void AUIPanelManager::AddPanel (iPanel* panel)
 {
   wxAuiPaneInfo info;
+  info.Name(panel->GetCaption ());
   info.Direction(panel->GetDefaultDockPosition());
   info.Caption(panel->GetCaption ());
   
   mgr.AddPane (panel->GetWindow (), info);
 
   mgr.Update ();
+  
+  csRef<iMenuCheckItem> item = panelsMenu->AppendCheckItem(wxString(panel->GetCaption ()).mb_str());
+  item->Check (true);
+  item->AddListener(panelListener);
+
+  GetManagedWindow()->Connect(wxEVT_AUI_PANE_CLOSE, wxAuiManagerEventHandler(AUIPanelManager::OnClose), 0, this);
 
   panels.Push (panel);
+  items.Push (item);
 }
 
 void AUIPanelManager::RemovePanel (iPanel* panel)
@@ -71,21 +142,85 @@ void AUIPanelManager::RemovePanel (iPanel* panel)
   mgr.Update ();
 
   panels.Delete (panel);
+  size_t found = panels.Find(panel);
+  if (found != csArrayItemNotFound)
+  {
+      panels.DeleteIndex (found);
+      items.DeleteIndex (found);
+  }
 }
 
 void AUIPanelManager::SetPanelVisible (iPanel* panel, bool visible)
 {
-  wxAuiPaneInfo info = mgr.GetPane (panel->GetWindow ());
-
+  wxAuiPaneInfo& info = mgr.GetPane (panel->GetWindow ());
+ 
   if (info.IsOk ())
-  {
+  { 
     if (visible)
       info.Show ();
     else
       info.Hide ();
   }
   
+  size_t found = panels.Find(panel);
+  if (found == csArrayItemNotFound) return;
+  
+  iMenuCheckItem* m = items.Get(found);
+  if (m) m->Check (visible);
+  
   mgr.Update ();
+}
+
+void AUIPanelManager::OnClose (wxAuiManagerEvent& event)
+{
+  for (size_t i = 0; i < panels.GetSize(); i++)
+  {
+    if (panels.Get(i)->GetWindow () == event.GetPane()->window)
+      SetPanelVisible(panels.Get(i), false);
+  }
+}
+
+void AUIPanelManager::PanelListener::OnClick (iMenuItem* item)
+{
+  iMenuCheckItem* i = static_cast<iMenuCheckItem*>(item);
+  size_t found = mgr->items.Find(i);
+  if (found != csArrayItemNotFound)
+  {
+      mgr->SetPanelVisible(mgr->panels.Get(found), (static_cast<iMenuCheckItem*>(item))->IsChecked());
+  }
+}
+
+void AUIPanelManager::OnCreatePerspective::OnClick(iMenuItem*)
+{
+    wxTextEntryDialog dlg(mgr->GetManagedWindow (), wxT("Enter a name for the new perspective:"), wxT("wxAUI Test"));
+
+    dlg.SetValue(wxString::Format(wxT("Perspective %u"), unsigned(mgr->m_perspectives.size() + 1)));
+    if (dlg.ShowModal() != wxID_OK)
+        return;
+
+
+    if (mgr->m_perspectives.size() == 0)
+    {
+        mgr->perspectivesMenu->AppendSeparator();
+    }
+
+    
+    csRef<iMenuItem> item = mgr->perspectivesMenu->AppendItem(dlg.GetValue().mb_str());
+    item->AddListener(mgr->onRestorePerspective);
+    mgr->perspectiveItems.Push(item);
+    mgr->m_perspectives[item->GetwxMenuItem ()->GetId()] = mgr->mgr.SavePerspective();
+}
+
+void AUIPanelManager::OnRestorePerspective::OnClick(iMenuItem* item)
+{
+    mgr->mgr.LoadPerspective(mgr->m_perspectives.find(item->GetwxMenuItem ()->GetId())->second);
+    
+    for (size_t i = 0; i < mgr->panels.GetSize(); i++)
+    {
+      const wxAuiPaneInfo& info = mgr->mgr.GetPane (mgr->panels.Get(i)->GetWindow ());
+      iMenuCheckItem* m = mgr->items.Get(i);
+      if (m) m->Check (info.IsShown());
+    }
 }
 
 } // namespace EditorApp

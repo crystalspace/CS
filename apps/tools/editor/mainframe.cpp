@@ -44,20 +44,6 @@
 
 namespace CS {
 namespace EditorApp {
-
-enum
-{
-  ID_Quit = wxID_EXIT,
-  ID_Open = wxID_OPEN,
-  ID_Save = wxID_SAVE,
-  ID_Undo = wxID_UNDO,
-  ID_Redo = wxID_REDO,
-  ID_MoveTool = wxID_HIGHEST + 2000,
-  ID_RotateTool,
-  ID_ScaleTool,
-  ID_ToolBar,
-  ID_ImportLibrary,
-};
   
 BEGIN_EVENT_TABLE (MainFrame, wxFrame)
   EVT_MENU (ID_Open, MainFrame::OnOpen)
@@ -71,6 +57,7 @@ BEGIN_EVENT_TABLE (MainFrame, wxFrame)
   EVT_MENU (ID_MoveTool, MainFrame::OnMoveTool)
   EVT_MENU (ID_ScaleTool, MainFrame::OnScaleTool)
   EVT_MENU (ID_RotateTool, MainFrame::OnRotateTool)
+  
 END_EVENT_TABLE ()
 
 //#include "data/editor/images/trans/move_on.xpm"
@@ -126,6 +113,8 @@ MainFrame::MainFrame (const wxString& title, const wxPoint& pos, const wxSize& s
   delete scaleoff;
 }
 
+
+
 MainFrame::~MainFrame ()
 {
   delete statusBar;
@@ -140,6 +129,12 @@ bool MainFrame::Initialize (iObjectRegistry* obj_reg, Editor* editor)
   object_reg = obj_reg;
 
   this->editor = editor;
+  
+  menuBar = csQueryRegistry<iMenuBar> (object_reg);
+  if (!menuBar)
+    return false;
+    
+  menuBar->SetManagedWindow (GetMenuBar());
   
   panelManager = csQueryRegistry<iPanelManager> (object_reg);
   if (!panelManager)

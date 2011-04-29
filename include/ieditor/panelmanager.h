@@ -25,6 +25,8 @@
 #include <wx/string.h>
 
 class wxWindow;
+class wxMenu;
+class wxMenuBar;
 
 namespace CS {
 namespace EditorApp {
@@ -64,7 +66,9 @@ struct iPanel : public virtual iBase
  */
 struct iPanelManager : public virtual iBase
 {
-  SCF_INTERFACE (iPanelManager, 0, 0, 1);
+  SCF_INTERFACE (iPanelManager, 0, 1, 0);
+  
+  virtual bool SecondInitialize (iObjectRegistry* obj_reg) = 0;
   
   /// Call when the managed window is being destroyed.
   virtual void Uninitialize () = 0;

@@ -21,6 +21,7 @@
 
 #include "ieditor/editor.h"
 #include "ieditor/panelmanager.h"
+#include "ieditor/menubar.h"
 #include "ieditor/interfacewrappermanager.h"
 #include "ieditor/actionmanager.h"
 
@@ -92,6 +93,7 @@ private:
   csRef<iCollection> mainCollection;
 
   csRef<iPanelManager> panelManager;
+  csRef<iMenuBar> menuBar;
   csRef<iInterfaceWrapperManager> interfaceManager;
   csRef<iActionManager> actionManager;
 

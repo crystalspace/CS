@@ -21,6 +21,7 @@
 
 #include "ieditor/editor.h"
 #include "ieditor/panelmanager.h"
+#include "ieditor/menubar.h"
 #include "ieditor/actionmanager.h"
 
 #include "iutil/vfs.h"
@@ -36,6 +37,20 @@ namespace EditorApp {
 
 class Editor;
 class StatusBar;
+
+enum
+{
+  ID_Quit = wxID_EXIT,
+  ID_Open = wxID_OPEN,
+  ID_Save = wxID_SAVE,
+  ID_Undo = wxID_UNDO,
+  ID_Redo = wxID_REDO,
+  ID_MoveTool = wxID_HIGHEST + 2000,
+  ID_RotateTool,
+  ID_ScaleTool,
+  ID_ToolBar,
+  ID_ImportLibrary
+};
 
 class MainFrame : public wxFrame
 {
@@ -75,6 +90,7 @@ private:
   Editor* editor;
   csRef<iVFS> vfs;
   csRef<iPanelManager> panelManager;
+  csRef<iMenuBar> menuBar;
   csRef<iActionManager> actionManager;
 
   csRef<iActionListener> actionListener;
