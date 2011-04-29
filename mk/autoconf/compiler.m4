@@ -36,31 +36,47 @@
 # 'cc' in their names.
 AC_DEFUN([_CS_CC_SH],
     [CS_TR_SH_lang(_AC_CC([$1]))])
+AC_DEFUN([_CS_SEPARATE_SECTION_ENABLE],
+    [AC_ARG_ENABLE([separate-sections],
+	[AC_HELP_STRING([--enable-separate-sections],
+	    [Instruct compiler to generate separate object file sections for
+	    functions and global variables. Can reduce size of the final 
+	    linked binaries. (default YES if not annoying)])],
+	[], [enable_separate_sections=maybe])])
 AC_DEFUN([_CS_CHECK_SEPARATE_SECTION],
-    [# We need -Werror for the following checks...
-    CS_COMPILER_ERRORS([$1])
+    [AC_REQUIRE([_CS_SEPARATE_SECTION_ENABLE])
 
-    CS_CHECK_BUILD_FLAGS([if $]_AC_CC([$1])[ accepts -ffunction-sections -fdata-sections],
-	[cs_cv_prog_]_CS_CC_SH([$1])[_individual_sections],
-	[CS_CREATE_TUPLE([-ffunction-sections -fdata-sections])],
-	[C])
-    AS_IF([test "$cs_cv_prog_]_CS_CC_SH([$1])[_individual_sections" != ""],
-	[g_flag=''
-	AS_IF([test "$ac_cv_prog_]_CS_CC_SH([$1])[_g" != "no"],
-	    [g_flag='-g'])
-	CS_CHECK_BUILD(
-	    [if $cs_cv_prog_]_CS_CC_SH([$1])[_individual_sections isn't annoying],
-	    [cs_cv_prog_]_CS_CC_SH([$1])[_individual_sections_annoy],
-	    [],
-	    [CS_CREATE_TUPLE([$cs_cv_prog_]_CS_CC_SH([$1])[_individual_sections])],
-	    [C],
-	    [], [], [],
-	    [$g_flag $cs_cv_prog_]CS_TR_SH_lang([$1])[_enable_errors])
-	])
-	AS_IF([test "$cs_cv_prog_]_CS_CC_SH([$1])[_individual_sections_annoy" != "no"],
-	    [CS_EMIT_BUILD_PROPERTY([$2],
-		[$cs_cv_prog_]_CS_CC_SH([$1])[_individual_sections], [$3])
+    AS_IF([test "$enable_separate_sections" != "no"],
+	[CS_CHECK_BUILD_FLAGS([if $]_AC_CC([$1])[ accepts -ffunction-sections -fdata-sections],
+	    [cs_cv_prog_]_CS_CC_SH([$1])[_individual_sections],
+	    [CS_CREATE_TUPLE([-ffunction-sections -fdata-sections])],
+	    [$1])
+
+	AS_IF([test "$cs_cv_prog_]_CS_CC_SH([$1])[_individual_sections" != "no"],
+	    [AS_IF([test "$enable_separate_sections" = "maybe"],
+		[# We need -Werror for the following checks...
+		CS_COMPILER_ERRORS([$1])
+
+		g_flag=''
+		AS_IF([test "$ac_cv_prog_]_CS_CC_SH([$1])[_g" != "no"],
+		    [g_flag='-g'])
+		CS_CHECK_BUILD(
+		    [if $cs_cv_prog_]_CS_CC_SH([$1])[_individual_sections isn't annoying],
+		    [cs_cv_prog_]_CS_CC_SH([$1])[_individual_sections_annoy],
+		    [],
+		    [CS_CREATE_TUPLE([$cs_cv_prog_]_CS_CC_SH([$1])[_individual_sections])],
+		    [C],
+		    [], [], [],
+		    [$g_flag $cs_cv_prog_]CS_TR_SH_lang([$1])[_enable_errors])
+		enable_separate_sections_]_CS_CC_SH([$1])[=$cs_cv_prog_]_CS_CC_SH([$1])[_individual_sections_annoy
+		],
+		[enable_separate_sections_]_CS_CC_SH([$1])[=yes])
+	    AS_IF([test "$enable_separate_sections_]_CS_CC_SH([$1])[" = "yes"],
+		[CS_EMIT_BUILD_PROPERTY([$2],
+		    [$cs_cv_prog_]_CS_CC_SH([$1])[_individual_sections], [$3])
+		])
 	    ])
+	])
     ])
 
 
