@@ -36,12 +36,12 @@ namespace EditorApp {
 
 AUIPanelManager::AUIPanelManager (iObjectRegistry* obj_reg)
   : scfImplementationType (this), 
-  object_reg (obj_reg), perspectivesMenu(0), panelsMenu(0), 
-  panelListener(new PanelListener(this)),
-  onCreatePerspective(new OnCreatePerspective(this)),
-  onRestorePerspective(new OnRestorePerspective(this))
+  object_reg (obj_reg)
 {
   object_reg->Register (this, "iPanelManager");
+  panelListener.AttachNew (new PanelListener(this));
+  onCreatePerspective.AttachNew (new OnCreatePerspective(this));
+  onRestorePerspective.AttachNew (new OnRestorePerspective(this));
 }
 
 AUIPanelManager::~AUIPanelManager ()
@@ -59,10 +59,11 @@ void AUIPanelManager::SetManagedWindow (wxWindow* managedWindow)
   mgr.SetManagedWindow (managedWindow);
   
   csRef<iMenuBar> menuBar = csQueryRegistry<iMenuBar> (object_reg);
-  
-  perspectivesMenu = menuBar->Append("&Views");
+
+  perspectivesMenu = menuBar->Append("&View");
   panelsMenu = perspectivesMenu->AppendSubMenu("&Panels");
-  perspectivesMenu->AppendSeparator();
+  csRef<iMenuItem> separator = perspectivesMenu->AppendSeparator();
+  separatorItems.Push (separator);
 
   createPerspective = perspectivesMenu->AppendItem("&Create Perspective");
   createPerspective->AddListener(onCreatePerspective);
@@ -78,7 +79,8 @@ bool AUIPanelManager::SecondInitialize (iObjectRegistry* obj_reg)
 {
   if (m_perspectives.size() == 0)
   {
-      perspectivesMenu->AppendSeparator();
+    csRef<iMenuItem> separator = perspectivesMenu->AppendSeparator();
+    separatorItems.Push (separator);
   }
 
   {//Create default perspective, all panels in their default state at this point.
@@ -198,12 +200,11 @@ void AUIPanelManager::OnCreatePerspective::OnClick(iMenuItem*)
     if (dlg.ShowModal() != wxID_OK)
         return;
 
-
     if (mgr->m_perspectives.size() == 0)
     {
-        mgr->perspectivesMenu->AppendSeparator();
+	csRef<iMenuItem> separator = mgr->perspectivesMenu->AppendSeparator();
+	mgr->separatorItems.Push (separator);
     }
-
     
     csRef<iMenuItem> item = mgr->perspectivesMenu->AppendItem(dlg.GetValue().mb_str());
     item->AddListener(mgr->onRestorePerspective);

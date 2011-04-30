@@ -87,6 +87,7 @@ MainFrame::MainFrame (const wxString& title, const wxPoint& pos, const wxSize& s
   menuBar->Append (editMenu, wxT("&Edit"));
 
   SetMenuBar (menuBar);
+  menuBar->Reparent(this);
 
   statusBar = new StatusBar (this);
   SetStatusBar (statusBar);

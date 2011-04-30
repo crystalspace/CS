@@ -71,6 +71,7 @@ private:
   
   csRef<iMenuItem> createPerspective;
   csRefArray<iMenuItem> perspectiveItems;
+  csRefArray<iMenuItem> separatorItems;
   
   std::map<size_t, wxString> m_perspectives;
 

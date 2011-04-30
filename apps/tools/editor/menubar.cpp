@@ -135,20 +135,32 @@ csPtr<iMenuItem> Menu::AppendItem (const char* item)
 {
   wxString str(item, wxConvUTF8);
   wxMenuItem* i = menu->Append(wxID_ANY, str);
-  return new MenuItem(menuBar, menu, i);
+
+  csRef<iMenuItem> ref;
+  ref.AttachNew (new MenuItem (menuBar, menu, i));
+
+  return csPtr<iMenuItem> (ref);
 }
   
 csPtr<iMenuCheckItem> Menu::AppendCheckItem (const char* item)
 {
   wxString str(item, wxConvUTF8);
   wxMenuItem* i = menu->AppendCheckItem(wxID_ANY, str);
-  return new MenuCheckItem(menuBar, menu, i);
+
+  csRef<iMenuCheckItem> ref;
+  ref.AttachNew (new MenuCheckItem (menuBar, menu, i));
+
+  return csPtr<iMenuCheckItem> (ref);
 }
 
 csPtr<iMenuItem> Menu::AppendSeparator ()
 {
   wxMenuItem* i = menu->AppendSeparator();
-  return new MenuItem(menuBar, menu, i);
+
+  csRef<iMenuItem> ref;
+  ref.AttachNew (new MenuItem (menuBar, menu, i));
+
+  return csPtr<iMenuItem> (ref);
 }
 
 csPtr<iMenu> Menu::AppendSubMenu (const char* item)
@@ -156,7 +168,11 @@ csPtr<iMenu> Menu::AppendSubMenu (const char* item)
   wxMenu* m = new wxMenu();
   wxString str(item, wxConvUTF8);
   menu->AppendSubMenu(m, str);
-  return new Menu(menuBar, m, str);
+
+  csRef<iMenu> ref;
+  ref.AttachNew (new Menu (menuBar, m, str));
+
+  return csPtr<iMenu> (ref);
 }
 
 //---------------------------------------------------------------
@@ -188,7 +204,11 @@ csPtr<iMenu> MenuBar::Append (const char* item)
   wxMenu* menu = new wxMenu();
   wxString str(item, wxConvUTF8);
   menuBar->Append(menu, str);
-  return new Menu(menuBar, menu, str);
+
+  csRef<iMenu> ref;
+  ref.AttachNew (new Menu (menuBar, menu, str));
+
+  return csPtr<iMenu> (ref);
 }
 
 } // namespace EditorApp
