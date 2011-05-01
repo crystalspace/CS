@@ -10176,6 +10176,7 @@ else
   RELAYTOOL="$ac_cv_path_RELAYTOOL"
 fi
 
+	if test -n "$RELAYTOOL"; then :
 
     if test "$cs_prog_path_prepared" != yes; then :
   cs_prog_path_prepared=yes
@@ -10224,12 +10225,13 @@ fi
   test -n "$BASH" && break
 done
 
-	if test -n "$BASH"; then :
+	    if test -n "$BASH"; then :
   cs_build_prop_val="$BASH $RELAYTOOL"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then :
   cs_jamconfig_text="${cs_jamconfig_text}CMD.RELAYTOOL ?= \"$cs_build_prop_val\" ;
 "
+fi
 fi
 fi
 fi
