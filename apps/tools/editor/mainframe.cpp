@@ -67,8 +67,10 @@ END_EVENT_TABLE ()
 //#include "data/editor/images/trans/scale_on.xpm"
 #include "data/editor/images/trans/scale_off.xpm"
 
-MainFrame::MainFrame (const wxString& title, const wxPoint& pos, const wxSize& size)
-: wxFrame (NULL, -1, title, pos, size), loadingResource (nullptr)
+MainFrame::MainFrame (iObjectRegistry* object_reg, Editor* editor,
+		      const wxString& title, const wxPoint& pos, const wxSize& size)
+: wxFrame (NULL, -1, title, pos, size), object_reg (object_reg), editor (editor),
+  loadingResource (nullptr)
 {
   wxMenu* fileMenu = new wxMenu ();
 
@@ -112,6 +114,15 @@ MainFrame::MainFrame (const wxString& title, const wxPoint& pos, const wxSize& s
   delete moveoff;
   delete rotoff;
   delete scaleoff;
+
+  actionManager = csQueryRegistry<iActionManager> (object_reg);
+  if (actionManager)
+  {
+    actionListener.AttachNew (new MainFrame::ActionListener (this));
+    actionManager->AddListener (actionListener);
+
+    UpdateEditMenu ();
+  }
 }
 
 MainFrame::~MainFrame ()
@@ -121,31 +132,13 @@ MainFrame::~MainFrame ()
   delete loadingResource;
 }
 
-bool MainFrame::Initialize (iObjectRegistry* obj_reg, Editor* editor)
-{
-  object_reg = obj_reg;
-
-  this->editor = editor;
-  
-  actionManager = csQueryRegistry<iActionManager> (object_reg);
-  if (!actionManager)
-    return false;
-
-  actionListener.AttachNew (new MainFrame::ActionListener (this));
-  actionManager->AddListener (actionListener);
-
-  UpdateEditMenu ();
-
-  return true;
-}
-
-bool MainFrame::SecondInitialize (iObjectRegistry* obj_reg)
+bool MainFrame::Initialize ()
 {
   if (!vfs)
     vfs = csQueryRegistry<iVFS> (object_reg);
   vfs->Mount ("/cseditor/", "$@data$/editor$/");
   vfs->ChDir ("/cseditor/sys/");
-  csRef<iLoader> loader = csQueryRegistry<iLoader> (obj_reg);
+  csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
   if (!loader)
     return false;
   

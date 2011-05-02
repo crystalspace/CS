@@ -99,10 +99,8 @@ private:
 class MenuBar : public scfImplementation1<MenuBar,iMenuBar>, public wxEvtHandler
 {
 public:
-  MenuBar (iObjectRegistry* obj_reg);
+  MenuBar (iObjectRegistry* obj_reg, wxMenuBar* menuBar);
   virtual ~MenuBar ();
-  
-  virtual void SetManagedWindow (wxMenuBar* menuBar);
   
   virtual wxMenuBar* GetwxMenuBar () const;
   

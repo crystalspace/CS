@@ -55,11 +55,11 @@ enum
 class MainFrame : public wxFrame
 {
 public:
-  MainFrame (const wxString& title, const wxPoint& pos, const wxSize& size);
+  MainFrame (iObjectRegistry* object_reg, Editor* editor,
+	     const wxString& title, const wxPoint& pos, const wxSize& size);
   virtual ~MainFrame ();
 
-  bool Initialize (iObjectRegistry* obj_reg, Editor* editor);
-  bool SecondInitialize (iObjectRegistry* obj_reg);
+  bool Initialize ();
 
   csPtr<iProgressMeter> GetProgressMeter ();
 

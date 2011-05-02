@@ -34,14 +34,22 @@
 namespace CS {
 namespace EditorApp {
 
-AUIPanelManager::AUIPanelManager (iObjectRegistry* obj_reg)
-  : scfImplementationType (this), 
-  object_reg (obj_reg)
+  AUIPanelManager::AUIPanelManager (iObjectRegistry* obj_reg, wxWindow* parent)
+  : scfImplementationType (this), object_reg (obj_reg)
 {
   object_reg->Register (this, "iPanelManager");
   panelListener.AttachNew (new PanelListener(this));
   onCreatePerspective.AttachNew (new OnCreatePerspective(this));
   onRestorePerspective.AttachNew (new OnRestorePerspective(this));
+
+  mgr.SetManagedWindow (parent);
+  
+  csRef<iMenuBar> menuBar = csQueryRegistry<iMenuBar> (object_reg);
+
+  perspectivesMenu = menuBar->Append("&View");
+  panelsMenu = perspectivesMenu->AppendSubMenu("&Panels");
+  csRef<iMenuItem> separator = perspectivesMenu->AppendSeparator();
+  separatorItems.Push (separator);
 }
 
 AUIPanelManager::~AUIPanelManager ()
@@ -54,29 +62,11 @@ void AUIPanelManager::Uninitialize ()
   mgr.UnInit ();
 }
 
-void AUIPanelManager::SetManagedWindow (wxWindow* managedWindow)
+void AUIPanelManager::Initialize ()
 {
-  mgr.SetManagedWindow (managedWindow);
-  
-  csRef<iMenuBar> menuBar = csQueryRegistry<iMenuBar> (object_reg);
-
-  perspectivesMenu = menuBar->Append("&View");
-  panelsMenu = perspectivesMenu->AppendSubMenu("&Panels");
-  csRef<iMenuItem> separator = perspectivesMenu->AppendSeparator();
-  separatorItems.Push (separator);
-
   createPerspective = perspectivesMenu->AppendItem("&Create Perspective");
   createPerspective->AddListener(onCreatePerspective);
-}
 
-wxWindow* AUIPanelManager::GetManagedWindow ()
-{
-  return mgr.GetManagedWindow ();
-}
-
-
-bool AUIPanelManager::SecondInitialize (iObjectRegistry* obj_reg)
-{
   if (m_perspectives.size() == 0)
   {
     csRef<iMenuItem> separator = perspectivesMenu->AppendSeparator();
@@ -113,8 +103,6 @@ bool AUIPanelManager::SecondInitialize (iObjectRegistry* obj_reg)
     }
     mgr.Update ();
   }
-
-  return true;
 }
 
 void AUIPanelManager::AddPanel (iPanel* panel)
@@ -132,7 +120,7 @@ void AUIPanelManager::AddPanel (iPanel* panel)
   item->Check (true);
   item->AddListener(panelListener);
 
-  GetManagedWindow()->Connect(wxEVT_AUI_PANE_CLOSE, wxAuiManagerEventHandler(AUIPanelManager::OnClose), 0, this);
+  mgr.GetManagedWindow()->Connect(wxEVT_AUI_PANE_CLOSE, wxAuiManagerEventHandler(AUIPanelManager::OnClose), 0, this);
 
   panels.Push (panel);
   items.Push (item);
@@ -194,7 +182,7 @@ void AUIPanelManager::PanelListener::OnClick (iMenuItem* item)
 
 void AUIPanelManager::OnCreatePerspective::OnClick(iMenuItem*)
 {
-    wxTextEntryDialog dlg(mgr->GetManagedWindow (), wxT("Enter a name for the new perspective:"), wxT("wxAUI Test"));
+    wxTextEntryDialog dlg(mgr->mgr.GetManagedWindow (), wxT("Enter a name for the new perspective:"), wxT("wxAUI Test"));
 
     dlg.SetValue(wxString::Format(wxT("Perspective %u"), unsigned(mgr->m_perspectives.size() + 1)));
     if (dlg.ShowModal() != wxID_OK)

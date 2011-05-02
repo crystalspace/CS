@@ -177,8 +177,8 @@ csPtr<iMenu> Menu::AppendSubMenu (const char* item)
 
 //---------------------------------------------------------------
 
-MenuBar::MenuBar (iObjectRegistry* obj_reg)
-  : scfImplementationType (this), object_reg (obj_reg), menuBar(0)
+MenuBar::MenuBar (iObjectRegistry* obj_reg, wxMenuBar* menuBar)
+  : scfImplementationType (this), object_reg (obj_reg), menuBar (menuBar)
 {
   object_reg->Register (this, "iMenuBar");
 }
@@ -186,11 +186,6 @@ MenuBar::MenuBar (iObjectRegistry* obj_reg)
 MenuBar::~MenuBar ()
 {
   object_reg->Unregister (this, "iMenuBar");
-}
-
-void MenuBar::SetManagedWindow (wxMenuBar* menuBar)
-{
-  this->menuBar = menuBar;
 }
 
 wxMenuBar* MenuBar::GetwxMenuBar () const

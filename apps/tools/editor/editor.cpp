@@ -86,40 +86,36 @@ void Editor::Help ()
 
 bool Editor::Initialize (iObjectRegistry* reg)
 {
-  object_reg = reg;
-
   // Check for commandline help.
-  if (csCommandLineHelper::CheckHelp (object_reg))
+  if (csCommandLineHelper::CheckHelp (reg))
   {
     Help ();
     return true;
   }
 
-  selection.AttachNew (new ObjectList ());
-  objects.AttachNew (new ObjectList ());
-
+  object_reg = reg;
   object_reg->Register (this, "iEditor");
   
-  panelManager.AttachNew (new AUIPanelManager (object_reg));
-  menuBar.AttachNew (new MenuBar (object_reg));
-  interfaceManager.AttachNew (new InterfaceWrapperManager (object_reg));
   actionManager.AttachNew (new ActionManager (object_reg));
   
   // Create the main frame
-  mainFrame = new MainFrame (wxT ("Crystal Space Editor"), wxDefaultPosition, wxSize (1024, 768));
-  mainFrame->Initialize (object_reg, this);
+  mainFrame = new MainFrame (object_reg, this, wxT ("Crystal Space Editor"), wxDefaultPosition, wxSize (1024, 768));
 
-  menuBar->SetManagedWindow (mainFrame->GetMenuBar ());
-  panelManager->SetManagedWindow (mainFrame);
-
+  menuBar.AttachNew (new MenuBar (object_reg, mainFrame->GetMenuBar ()));
   mainFrame->Show ();
   
+  panelManager.AttachNew (new AUIPanelManager (object_reg, mainFrame));
+  interfaceManager.AttachNew (new InterfaceWrapperManager (object_reg));
+
+  selection.AttachNew (new ObjectList ());
+  objects.AttachNew (new ObjectList ());
+
   // Initialize CS and load plugins
   if (!InitCS ())
     return false;
 
-  mainFrame->SecondInitialize (object_reg);
-  panelManager->SecondInitialize (object_reg);
+  mainFrame->Initialize ();
+  panelManager->Initialize ();
 
   return true;
 }
@@ -219,8 +215,8 @@ bool Editor::InitCS ()
   const char* realPath = cmdline->GetOption ("R");
   if (realPath)
   {
-    vfs->Mount ("/tmp/viewmesh", realPath);
-    //vfs->ChDir ("/tmp/viewmesh");
+    vfs->Mount ("/tmp/cseditor", realPath);
+    //vfs->ChDir ("/tmp/cseditor");
   }
 
   csString filename = cmdline->GetName (0);

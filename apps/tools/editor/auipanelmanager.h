@@ -37,19 +37,13 @@ namespace EditorApp {
 class AUIPanelManager : public scfImplementation1<AUIPanelManager,iPanelManager>, public wxEvtHandler
 {
 public:
-  AUIPanelManager (iObjectRegistry* obj_reg);
+  AUIPanelManager (iObjectRegistry* obj_reg, wxWindow* parent);
   virtual ~AUIPanelManager ();
   
-  virtual bool SecondInitialize (iObjectRegistry* obj_reg);
-
+  virtual void Initialize ();
   virtual void Uninitialize ();
-  
-  virtual void SetManagedWindow (wxWindow* managedWindow);
-
-  virtual wxWindow* GetManagedWindow ();
 
   virtual void AddPanel (iPanel* panel);
-
   virtual void RemovePanel (iPanel* panel);
 
   virtual void SetPanelVisible (iPanel* panel, bool visible);
