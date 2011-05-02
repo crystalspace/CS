@@ -27,8 +27,6 @@
 #include "ivaria/collider.h"
 #include "ivideo/graph2d.h"
 
-#include <wx/textctrl.h>
-
 #include "ieditor/panelmanager.h"
 #include "objectlist.h"
 #include "menubar.h"
@@ -51,46 +49,11 @@ Editor::Editor ()
 Editor::~Editor ()
 {
   delete helper_meshes;
+
+  panelManager->Uninitialize ();
+
   // Remove ourself from object registry
   object_reg->Unregister (this, "iEditor");
-}
-
-bool Editor::Initialize (iObjectRegistry* reg)
-{
-  object_reg = reg;
-
-  // Check for commandline help.
-  if (csCommandLineHelper::CheckHelp (object_reg))
-  {
-    Help ();
-    return true;
-  }
-
-  selection.AttachNew (new ObjectList ());
-  objects.AttachNew (new ObjectList ());
-
-  object_reg->Register (this, "iEditor");
-  
-  panelManager.AttachNew (new AUIPanelManager (object_reg));
-  menuBar.AttachNew (new MenuBar (object_reg));
-  interfaceManager.AttachNew (new InterfaceWrapperManager (object_reg));
-  actionManager.AttachNew (new ActionManager (object_reg));
-  
-  // Create the main frame
-  mainFrame = new MainFrame (wxT ("Crystal Space Editor"), wxDefaultPosition, wxSize (1024, 768));
-  mainFrame->Initialize (object_reg, this);
-
-  mainFrame->Show ();
-  
-  // Initialize CS and load plugins
-  if (!InitCS ())
-    return false;
-
-  mainFrame->SecondInitialize (object_reg);
-  
-  panelManager->SecondInitialize (object_reg);
-
-  return true;
 }
 
 void Editor::Help ()
@@ -119,6 +82,46 @@ void Editor::Help ()
      "An additional real path can be provided to be mounted before loading the file."
      " This is useful for example to mount an archive in VFS before accessing the"
      " files in it.");
+}
+
+bool Editor::Initialize (iObjectRegistry* reg)
+{
+  object_reg = reg;
+
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (object_reg))
+  {
+    Help ();
+    return true;
+  }
+
+  selection.AttachNew (new ObjectList ());
+  objects.AttachNew (new ObjectList ());
+
+  object_reg->Register (this, "iEditor");
+  
+  panelManager.AttachNew (new AUIPanelManager (object_reg));
+  menuBar.AttachNew (new MenuBar (object_reg));
+  interfaceManager.AttachNew (new InterfaceWrapperManager (object_reg));
+  actionManager.AttachNew (new ActionManager (object_reg));
+  
+  // Create the main frame
+  mainFrame = new MainFrame (wxT ("Crystal Space Editor"), wxDefaultPosition, wxSize (1024, 768));
+  mainFrame->Initialize (object_reg, this);
+
+  menuBar->SetManagedWindow (mainFrame->GetMenuBar ());
+  panelManager->SetManagedWindow (mainFrame);
+
+  mainFrame->Show ();
+  
+  // Initialize CS and load plugins
+  if (!InitCS ())
+    return false;
+
+  mainFrame->SecondInitialize (object_reg);
+  panelManager->SecondInitialize (object_reg);
+
+  return true;
 }
 
 bool Editor::InitCS ()

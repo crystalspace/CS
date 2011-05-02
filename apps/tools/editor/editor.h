@@ -20,13 +20,15 @@
 #define __EDITOR_H__
 
 #include "ieditor/editor.h"
-#include "ieditor/panelmanager.h"
-#include "ieditor/menubar.h"
 #include "ieditor/interfacewrappermanager.h"
 #include "ieditor/actionmanager.h"
 
 #include "iengine/collection.h"
 #include "csutil/refarr.h"
+
+#include "auipanelmanager.h"
+#include "mainframe.h"
+#include "menubar.h"
 
 struct iObjectRegistry;
 struct iSaver;
@@ -36,15 +38,22 @@ struct csSimpleRenderMesh;
 namespace CS {
 namespace EditorApp {
 
-class MainFrame;
-
-class Editor : public scfImplementation1<Editor,iEditor>
+class Editor : public scfImplementation1<Editor, iEditor>
 {
 public:
   Editor ();
   virtual ~Editor ();
   
   virtual bool Initialize (iObjectRegistry* reg);
+
+  inline virtual wxWindow* GetWindow ()
+  { return static_cast<wxWindow*> (mainFrame); }
+
+  inline virtual iPanelManager* GetPanelManager () const
+  { return panelManager; }
+
+  inline virtual iMenuBar* GetMenuBar () const
+  { return menuBar; }
 
   virtual csPtr<iProgressMeter> GetProgressMeter ();
 
@@ -92,8 +101,8 @@ private:
 
   csRef<iCollection> mainCollection;
 
-  csRef<iPanelManager> panelManager;
-  csRef<iMenuBar> menuBar;
+  csRef<AUIPanelManager> panelManager;
+  csRef<MenuBar> menuBar;
   csRef<iInterfaceWrapperManager> interfaceManager;
   csRef<iActionManager> actionManager;
 

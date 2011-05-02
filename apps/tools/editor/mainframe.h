@@ -89,10 +89,7 @@ private:
 
   Editor* editor;
   csRef<iVFS> vfs;
-  csRef<iPanelManager> panelManager;
-  csRef<iMenuBar> menuBar;
   csRef<iActionManager> actionManager;
-
   csRef<iActionListener> actionListener;
 
   StatusBar* statusBar;

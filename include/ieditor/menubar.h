@@ -102,9 +102,7 @@ struct iMenu : public virtual iBase
 struct iMenuBar : public virtual iBase
 {
   SCF_INTERFACE (iMenuBar, 0, 0, 1);
-  
-  virtual void SetManagedWindow (wxMenuBar* menuBar) = 0;
-  
+
   /// Get the wrapped wxMenuBar.
   virtual wxMenuBar* GetwxMenuBar () const = 0;
   

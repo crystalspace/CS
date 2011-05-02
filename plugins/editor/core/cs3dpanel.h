@@ -56,7 +56,7 @@ public:
   // iPanel
   virtual wxWindow* GetWindow ();
   virtual const wxChar* GetCaption () const;
-  virtual int GetDefaultDockPosition () const;
+  virtual PanelDockPosition GetDefaultDockPosition () const;
 
   // iMapListener
   virtual void OnMapLoaded (const char* path, const char* filename);

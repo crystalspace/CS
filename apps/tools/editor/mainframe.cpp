@@ -87,7 +87,7 @@ MainFrame::MainFrame (const wxString& title, const wxPoint& pos, const wxSize& s
   menuBar->Append (editMenu, wxT("&Edit"));
 
   SetMenuBar (menuBar);
-  menuBar->Reparent(this);
+  menuBar->Reparent (this);
 
   statusBar = new StatusBar (this);
   SetStatusBar (statusBar);
@@ -114,15 +114,11 @@ MainFrame::MainFrame (const wxString& title, const wxPoint& pos, const wxSize& s
   delete scaleoff;
 }
 
-
-
 MainFrame::~MainFrame ()
 {
   delete statusBar;
   delete pump;
   delete loadingResource;
-  
-  panelManager->Uninitialize ();
 }
 
 bool MainFrame::Initialize (iObjectRegistry* obj_reg, Editor* editor)
@@ -131,18 +127,6 @@ bool MainFrame::Initialize (iObjectRegistry* obj_reg, Editor* editor)
 
   this->editor = editor;
   
-  menuBar = csQueryRegistry<iMenuBar> (object_reg);
-  if (!menuBar)
-    return false;
-    
-  menuBar->SetManagedWindow (GetMenuBar());
-  
-  panelManager = csQueryRegistry<iPanelManager> (object_reg);
-  if (!panelManager)
-    return false;
-  
-  panelManager->SetManagedWindow (this);
-
   actionManager = csQueryRegistry<iActionManager> (object_reg);
   if (!actionManager)
     return false;
@@ -374,7 +358,7 @@ void MainFrame::UpdateEditMenu ()
   const iAction* undo = actionManager->PeekUndo ();
   const iAction* redo = actionManager->PeekRedo ();
 
-  wxMenuBar* menuBar = GetMenuBar();
+  wxMenuBar* menuBar = GetMenuBar ();
   
   menuBar->Enable(ID_Undo, undo != 0);
   menuBar->Enable(ID_Redo, redo != 0);

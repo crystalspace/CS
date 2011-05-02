@@ -111,7 +111,7 @@ bool CS3DPanel::Initialize (iObjectRegistry* obj_reg)
               "Canvas is no iWxWindow plugin!");
     return false;
   }
-  window = new CS3DPanel::Panel (this, panelManager->GetManagedWindow (), -1, wxPoint(0,0), wxSize(200,150));
+  window = new CS3DPanel::Panel (this, editor->GetWindow (), -1, wxPoint(0,0), wxSize(200,150));
   wxwin->SetParent (window);
   
   window->SetDropTarget (new MyDropTarget (this));
@@ -177,7 +177,7 @@ const wxChar* CS3DPanel::GetCaption () const
   return wxT("3D View");
 }
 
-int CS3DPanel::GetDefaultDockPosition () const
+PanelDockPosition CS3DPanel::GetDefaultDockPosition () const
 {
   return DockPositionCenter;
 }
@@ -602,7 +602,7 @@ void CS3DPanel::OnMapLoaded (const char* path, const char* filename)
   }
 
   // Move the camera to the starting sector/position
-  iSector* room;
+  csRef<iSector> room;
   csVector3 pos;
   
   if (engine->GetCameraPositions ()->GetCount () > 0)
@@ -612,7 +612,8 @@ void CS3DPanel::OnMapLoaded (const char* path, const char* filename)
     room = engine->GetSectors ()->FindByName (campos->GetSector ());
     pos = campos->GetPosition ();
   }
-  else
+
+  if (!room)
   {
     // We didn't find a valid starting position. So we default
     // to going to the sector called 'room', or the first sector, at position (0,0,0).
