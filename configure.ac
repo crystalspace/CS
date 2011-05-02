@@ -1912,6 +1912,18 @@ CS_CHECK_LIB_WITH([assimp],
 
 
 #------------------------------------------------------------------------------
+# Check for libcurl (CURL)
+#------------------------------------------------------------------------------
+CS_CHECK_LIB_WITH([curl],
+    [AC_LANG_PROGRAM(
+        [[#include <curl/curl.h>]],
+        [])],
+    [], [], [CS_EMIT_BUILD_PROPERTY([CURL.AVAILABLE], [yes])
+             CS_EMIT_BUILD_RESULT([cs_cv_libcurl], [CURL])])
+
+
+
+#------------------------------------------------------------------------------
 # Check if regular expressions are available.
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD([for regexp support], [cs_cv_regexp],
