@@ -75,6 +75,9 @@ public:
   /// Create a path with p points.
   csPath (int p) : scfImplementationType(this), spline (9, p) {};
 
+  /// Setup a new path with p points.
+  void Setup (int p) { spline.Setup (9, p); }
+
   /// Destroy the path.
   virtual ~csPath ()
   { }
