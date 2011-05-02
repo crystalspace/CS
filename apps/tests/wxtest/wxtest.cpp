@@ -28,6 +28,7 @@
 #include "csutil/common_handlers.h"
 #include "csutil/cfgfile.h"
 #include "csutil/cfgmgr.h"
+#include "csutil/syspath.h"
 #include "iutil/vfs.h"
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
@@ -315,7 +316,20 @@ bool Simple::Initialize ()
 
   // Load the frame from an XRC file
   wxXmlResource::Get ()->InitAllHandlers ();
-  if (!wxXmlResource::Get ()->Load (wxT ("data/wxtest/wxtest.xrc")))
+  /* Find the file in the CS dirs.
+   * (This is slightly more complicated as there may not be "one" CS dir.) */
+  csPathsList* installPaths = csInstallationPathsHelper::GetPlatformInstallationPaths ();
+  wxString searchPath;
+  for (size_t i = 0; i < installPaths->GetSize(); i++)
+  {
+    if (!searchPath.IsEmpty()) searchPath.Append (wxPATH_SEP);
+    searchPath.Append (wxString ((*installPaths)[i].path, wxConvUTF8));
+  }
+  delete installPaths;
+  wxString resourceLocation;
+  wxFileSystem wxfs;
+  if (!wxfs.FindFileInPath (&resourceLocation, searchPath, wxT ("data/wxtest/wxtest.xrc"))
+    || !wxXmlResource::Get ()->Load (resourceLocation))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
               "crystalspace.application.wxtest",
