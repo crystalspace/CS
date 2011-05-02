@@ -32,6 +32,8 @@ csSpline::csSpline (int d, int p) :
 
 void csSpline::Setup (int d, int p)
 {
+  dimensions = d;
+  num_points = p;
   delete[] time_points;
   delete[] points;
   time_points = new float[p];
