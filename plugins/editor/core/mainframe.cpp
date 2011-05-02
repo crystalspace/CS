@@ -42,9 +42,9 @@
 
 #include "ieditor/action.h"
 
-namespace CS {
-namespace EditorApp {
-  
+CS_PLUGIN_NAMESPACE_BEGIN(CSE)
+{
+
 BEGIN_EVENT_TABLE (MainFrame, wxFrame)
   EVT_MENU (ID_Open, MainFrame::OnOpen)
   EVT_MENU (ID_Save, MainFrame::OnSave)
@@ -70,7 +70,7 @@ END_EVENT_TABLE ()
 MainFrame::MainFrame (iObjectRegistry* object_reg, Editor* editor,
 		      const wxString& title, const wxPoint& pos, const wxSize& size)
 : wxFrame (NULL, -1, title, pos, size), object_reg (object_reg), editor (editor),
-  loadingResource (nullptr)
+  loadingResource (nullptr), pump (nullptr)
 {
   wxMenu* fileMenu = new wxMenu ();
 
@@ -134,6 +134,7 @@ MainFrame::~MainFrame ()
 
 bool MainFrame::Initialize ()
 {
+/*
   if (!vfs)
     vfs = csQueryRegistry<iVFS> (object_reg);
   vfs->Mount ("/cseditor/", "$@data$/editor$/");
@@ -144,7 +145,7 @@ bool MainFrame::Initialize ()
   
   loader->LoadLibraryFile ("arrows.lib");
   vfs->ChDir ("/");
-  
+*/  
   pump = new Pump(this);
   pump->Start (20);
 
@@ -365,5 +366,5 @@ void MainFrame::UpdateEditMenu ()
         + wxString(redo->GetDescription ()) + wxT("\"\tCtrl+Y"));
 }
 
-} // namespace EditorApp
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(CSE)

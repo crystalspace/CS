@@ -32,8 +32,10 @@
 #include <wx/statusbr.h>
 #include <wx/timer.h>
 
-namespace CS {
-namespace EditorApp {
+using namespace CS::EditorApp;
+
+CS_PLUGIN_NAMESPACE_BEGIN(CSE)
+{
 
 class Editor;
 class StatusBar;
@@ -136,7 +138,7 @@ private:
   DECLARE_EVENT_TABLE()
 };
 
-} // namespace EditorApp
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(CSE)
 
 #endif

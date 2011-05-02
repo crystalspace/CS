@@ -24,6 +24,7 @@
 #include "ieditor/actionmanager.h"
 
 #include "iengine/collection.h"
+#include "iutil/comp.h"
 #include "csutil/refarr.h"
 
 #include "auipanelmanager.h"
@@ -35,16 +36,21 @@ struct iSaver;
 struct iVFS;
 struct csSimpleRenderMesh;
 
-namespace CS {
-namespace EditorApp {
+using namespace CS::EditorApp;
 
-class Editor : public scfImplementation1<Editor, iEditor>
+CS_PLUGIN_NAMESPACE_BEGIN(CSE)
+{
+
+class Editor : public scfImplementation2<Editor, iEditor, iComponent>
 {
 public:
-  Editor ();
+  Editor (iBase* parent);
   virtual ~Editor ();
   
+  // iComponent
   virtual bool Initialize (iObjectRegistry* reg);
+
+  virtual bool StartEngine ();
 
   inline virtual wxWindow* GetWindow ()
   { return static_cast<wxWindow*> (mainFrame); }
@@ -119,7 +125,7 @@ private:
 
 };
 
-} // namespace EditorApp
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(CSE)
 
 #endif

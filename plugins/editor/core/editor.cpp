@@ -38,11 +38,13 @@
 
 #include "editor.h"
 
-namespace CS {
-namespace EditorApp {
+CS_PLUGIN_NAMESPACE_BEGIN(CSE)
+{
 
-Editor::Editor ()
-  : scfImplementationType (this), helper_meshes (0), transstatus (NOTHING)
+SCF_IMPLEMENT_FACTORY (Editor)
+
+Editor::Editor (iBase* parent)
+: scfImplementationType (this, parent), helper_meshes (0), transstatus (NOTHING)
 {
 }
 
@@ -99,7 +101,7 @@ bool Editor::Initialize (iObjectRegistry* reg)
   actionManager.AttachNew (new ActionManager (object_reg));
   
   // Create the main frame
-  mainFrame = new MainFrame (object_reg, this, wxT ("Crystal Space Editor"), wxDefaultPosition, wxSize (1024, 768));
+  mainFrame = new MainFrame (object_reg, this, wxT (""), wxDefaultPosition, wxSize (1024, 768));
 
   menuBar.AttachNew (new MenuBar (object_reg, mainFrame->GetMenuBar ()));
   mainFrame->Show ();
@@ -110,23 +112,16 @@ bool Editor::Initialize (iObjectRegistry* reg)
   selection.AttachNew (new ObjectList ());
   objects.AttachNew (new ObjectList ());
 
-  // Initialize CS and load plugins
-  if (!InitCS ())
-    return false;
-
-  mainFrame->Initialize ();
-  panelManager->Initialize ();
-
   return true;
 }
 
-bool Editor::InitCS ()
+bool Editor::StartEngine ()
 {
   // Request every standard plugin except for OpenGL/WXGL canvas
   if (!csInitializer::RequestPlugins (object_reg,
         CS_REQUEST_VFS,
 	CS_REQUEST_PLUGIN ("crystalspace.graphics2d.wxgl", iGraphics2D),
-        CS_REQUEST_OPENGL3D,
+	CS_REQUEST_OPENGL3D,
         CS_REQUEST_ENGINE,
         CS_REQUEST_FONTSERVER,
         CS_REQUEST_IMAGELOADER,
@@ -204,6 +199,9 @@ bool Editor::InitCS ()
 
   mainCollection = engine->CreateCollection ("Main collection");
 
+  mainFrame->Initialize ();
+  panelManager->Initialize ();
+
   // Analyze the command line arguments
   csRef<iCommandLineParser> cmdline =
     csQueryRegistry<iCommandLineParser> (object_reg);
@@ -252,6 +250,10 @@ void Editor::LoadPlugins ()
     for (size_t i = 0; i < pluginClasses->GetSize (); i++)
     {
       const char* className = pluginClasses->Get (i);
+
+      if (strcmp (className, "crystalspace.editor.plugin.core.gui") == 0)
+	continue;
+
       csRef<iComponent> c (plugmgr->LoadPluginInstance (className,
         iPluginManager::lpiInitialize | iPluginManager::lpiReportErrors
           | iPluginManager::lpiLoadDependencies));
@@ -371,5 +373,5 @@ Editor::TransformStatus Editor::GetTransformStatus ()
   return transstatus;
 }
 
-} // namespace EditorApp
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(CSE)

@@ -23,8 +23,8 @@
 
 #include "statusbar.h"
 
-namespace CS {
-namespace EditorApp {
+CS_PLUGIN_NAMESPACE_BEGIN(CSE)
+{
 
 BEGIN_EVENT_TABLE(StatusBar, wxStatusBar)
   EVT_SIZE(StatusBar::OnSize)
@@ -56,5 +56,5 @@ void StatusBar::OnSize (wxSizeEvent& event)
   event.Skip();
 }
 
-} // namespace EditorApp
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(CSE)
