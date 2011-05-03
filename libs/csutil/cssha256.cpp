@@ -270,6 +270,12 @@ void csSHA256::Context::sha256_finish(uint8_t digest[32])
   PUT_UINT32(state[7], digest, 28);
 }
 
+void csSHA256::Context::sha256_finish(Digest &digest)
+{
+    sha256_finish(digest.data);
+}
+
+
 csSHA256::Digest csSHA256::Encode(csString const& s)
 {
   return Encode(s.GetData(), (int)s.Length());
@@ -281,7 +287,7 @@ csSHA256::Digest csSHA256::Encode(const void* data, size_t nbytes)
   Context ctx;
   ctx.sha256_starts();
   ctx.sha256_update((uint8_t*)data, nbytes);
-  ctx.sha256_finish(digest.data);
+  ctx.sha256_finish(digest);
   return digest;
 }
 

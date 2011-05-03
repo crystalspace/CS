@@ -31,33 +31,6 @@ class CS_CRYSTALSPACE_EXPORT csSHA256
 {
 public:
 
-  ///A context used to generate the hash
-  class Context
-  {
-      public:
-    uint32_t total[2];
-    uint32_t state[8];
-    uint8_t buffer[64];
-
-    /// Used to initialize the sha256 context \see context_sha256_t.
-    void sha256_starts();
-
-    /** Used to hash the input data.
-     *  \param input A pointer to an array of the input data to hash.
-     *  \param length The leght of the input data to hash (in bytes).
-     */
-    void sha256_update(uint8_t *input, uint32_t length);
-    /** Used to complete the hashing process and obtain the calculated hash.
-     *  \param digest The calculated hash.
-     */
-    void sha256_finish(uint8_t digest[32]);
-    private:
-    /** Inner function which does the processing of the hash.
-     *  \param data The data to process.
-     */
-    void sha256_process(uint8_t data[64]);
-  };
-
   /// A SHA256 digest is 32 unsigned characters (not 0-terminated).
   struct CS_CRYSTALSPACE_EXPORT Digest
   {
@@ -73,6 +46,41 @@ public:
     { return memcmp (data, other.data, sizeof (data)) == 0; }
     bool operator!=(const Digest& other) const
     { return memcmp (data, other.data, sizeof (data)) != 0; }
+  };
+
+  ///A context used to generate the hash
+  class Context
+  {
+    private:
+    uint32_t total[2];
+    uint32_t state[8];
+    uint8_t buffer[64];
+
+    public:    
+    /// Used to initialize this Context.
+    void sha256_starts();
+
+    /** Used to hash the input data.
+     *  \param input A pointer to an array of the input data to hash.
+     *  \param length The leght of the input data to hash (in bytes).
+     */
+    void sha256_update(uint8_t *input, uint32_t length);
+
+    /** Used to complete the hashing process and obtain the calculated hash.
+     *  \param digest The calculated hash.
+     */
+    void sha256_finish(uint8_t digest[32]);
+
+    /** Used to complete the hashing process and obtain the calculated hash.
+     *  \param digest A \see Digest class where to store the result.
+     */
+    void sha256_finish(Digest &digest);
+
+    private:
+    /** Inner function which does the processing of the hash.
+     *  \param data The data to process.
+     */
+    void sha256_process(uint8_t data[64]);
   };
 
   /// Encode a string.
