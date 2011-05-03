@@ -35,20 +35,20 @@
  * those are the standard FIPS-180-2 test vectors
  */
 
-static char *msg[] = 
+static const char *msg[] = 
   {
-    (char*)"abc",
-    (char*)"abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
+    "abc",
+    "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
     NULL
   };
 
-static char *val[] =
+static const char *val[] =
   {
-    (char*)"ba7816bf8f01cfea414140de5dae2223" \
+    "ba7816bf8f01cfea414140de5dae2223" \
     "b00361a396177a9cb410ff61f20015ad",
-    (char*)"248d6a61d20638b8e5c026930c3e6039" \
+    "248d6a61d20638b8e5c026930c3e6039" \
     "a33ce45964ff2167f6ecedd419db06c1",
-    (char*)"cdc76e5c9914fb9281a1c7e284d73e67" \
+    "cdc76e5c9914fb9281a1c7e284d73e67" \
     "f1809a48a497200e046d39ccc7112cd0"
   };
 
@@ -108,6 +108,6 @@ void csSHA256Test::testSHA256encode()
   //cs simplified api testing
   for(int i = 0; i < 2; i++)
   {
-      CPPUNIT_ASSERT(csSHA256::Encode(msg[i], strlen(msg[i])).HexString() == val[i]);
+      CPPUNIT_ASSERT_EQUAL(csSHA256::Encode(msg[i], strlen(msg[i])).HexString(), csString(val[i]));
   }
 }
