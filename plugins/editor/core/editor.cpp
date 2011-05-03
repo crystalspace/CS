@@ -26,6 +26,7 @@
 #include "iutil/stringarray.h"
 #include "ivaria/collider.h"
 #include "ivideo/graph2d.h"
+#include "ivideo/wxwin.h"
 
 #include "ieditor/panelmanager.h"
 #include "objectlist.h"
@@ -138,6 +139,15 @@ bool Editor::StartEngine ()
     return false;
   }
 
+  vfs = csQueryRegistry<iVFS> (object_reg);
+  if (!vfs)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+              "crystalspace.application.editor",
+              "Failed to locate iVFS plugin!");
+    return false;
+  }
+
   engine = csQueryRegistry<iEngine> (object_reg);
   if (!engine)
   {
@@ -157,27 +167,6 @@ bool Editor::StartEngine ()
               "Failed to initialize iSaver plugin!");
     return false;
   }
-
-  // Load plugins
-  LoadPlugins ();
-  
-  // Open the main system. This will open all the previously loaded plug-ins.
-  if (!csInitializer::OpenApplication (object_reg))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-              "crystalspace.application.editor",
-              "Error opening system!");
-    return false;
-  }
-
-  vfs = csQueryRegistry<iVFS> (object_reg);
-  if (!vfs)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-              "crystalspace.application.editor",
-              "Failed to locate iVFS plugin!");
-    return false;
-  }
   
   loader = csQueryRegistry<iThreadedLoader> (object_reg);
   if (!loader)
@@ -194,6 +183,39 @@ bool Editor::StartEngine ()
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
               "crystalspace.application.editor",
               "Failed to locate iSaver plugin!");
+    return false;
+  }
+
+  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
+  if (!g3d)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+              "crystalspace.application.editor",
+              "Failed to locate iGraphics3d!");
+    return false;
+  }
+
+  csRef<iWxWindow> wxwin = scfQueryInterface<iWxWindow> (g3d->GetDriver2D ());
+  if(!wxwin)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+              "crystalspace.application.editor",
+              "The drawing canvas is not a iWxWindow plugin!");
+    return false;
+  }
+  wxwin->SetParent (mainFrame);
+
+  return true;
+}
+
+bool Editor::StartApplication ()
+{
+  // Open the main system. This will open all the previously loaded plug-ins.
+  if (!csInitializer::OpenApplication (object_reg))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+              "crystalspace.application.editor",
+              "Error opening system!");
     return false;
   }
 
@@ -238,33 +260,26 @@ bool Editor::StartEngine ()
   return true;
 }
 
-void Editor::LoadPlugins ()
+bool Editor::LoadPlugin (const char* name)
 {
-  // TODO: Add additional plugin directories to scan, through settings system?
-  csRef<iStringArray> pluginClasses =
-    iSCF::SCF->QueryClassList ("crystalspace.editor.plugin.");
-  if (pluginClasses.IsValid())
-  {
-    csRef<iPluginManager> plugmgr =
-      csQueryRegistry<iPluginManager> (object_reg);
-    for (size_t i = 0; i < pluginClasses->GetSize (); i++)
-    {
-      const char* className = pluginClasses->Get (i);
+  csRef<iPluginManager> plugmgr =
+    csQueryRegistry<iPluginManager> (object_reg);
 
-      if (strcmp (className, "crystalspace.editor.plugin.core.gui") == 0)
-	continue;
-
-      csRef<iComponent> c (plugmgr->LoadPluginInstance (className,
+  csRef<iComponent> c (plugmgr->LoadPluginInstance (name,
         iPluginManager::lpiInitialize | iPluginManager::lpiReportErrors
-          | iPluginManager::lpiLoadDependencies));
-      csRef<iBase> b = scfQueryInterface<iBase> (c);
+        | iPluginManager::lpiLoadDependencies));
+  csRef<iBase> b = scfQueryInterface<iBase> (c);
 
-      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-        "crystalspace.application.editor", "Attempt to load plugin '%s' %s",
-        className, b ? "successful" : "failed");
-      if (b) b->DecRef ();
-    }
-  };
+  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	    "crystalspace.application.editor", "Attempt to load plugin '%s' %s",
+	    name, b ? "successful" : "failed");
+  if (b)
+  {
+    b->DecRef ();
+    return true;
+  }
+
+  return false;
 }
 
 csPtr<iProgressMeter> Editor::GetProgressMeter ()

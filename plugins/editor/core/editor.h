@@ -51,6 +51,8 @@ public:
   virtual bool Initialize (iObjectRegistry* reg);
 
   virtual bool StartEngine ();
+  virtual bool StartApplication ();
+  virtual bool LoadPlugin (const char* name);
 
   inline virtual wxWindow* GetWindow ()
   { return static_cast<wxWindow*> (mainFrame); }
@@ -90,8 +92,6 @@ public:
 
 private:
   void Help ();
-  bool InitCS ();
-  void LoadPlugins ();
 
   iObjectRegistry* object_reg;
 

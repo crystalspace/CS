@@ -59,6 +59,8 @@ struct iEditor : public virtual iBase
   SCF_INTERFACE (iEditor, 0, 0, 1);
 
   virtual bool StartEngine () = 0;
+  virtual bool StartApplication () = 0;
+  virtual bool LoadPlugin (const char* name) = 0;
 
   /// Get the underlying wxWindow content area of this editor.
   virtual wxWindow* GetWindow () = 0;
