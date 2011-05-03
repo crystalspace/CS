@@ -195,8 +195,8 @@ struct iSkeletonAnimPacketFactory : public virtual iBase
 
   /**
    * Find an already created animation factory and returns it's index.
-   * @param name The name of the animation to search for.
-   * @return The index of the animation, if found, else (size_t) -1.
+   * \param name The name of the animation to search for.
+   * \return The index of the animation, if found, else (size_t) -1.
    */
   virtual size_t FindAnimationIndex (const char* name) = 0;
 };
