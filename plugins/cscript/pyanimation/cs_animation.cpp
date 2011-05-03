@@ -8774,6 +8774,40 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSkeletonAnimPacketFactory_FindAnimationIndex(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::iSkeletonAnimPacketFactory *arg1 = (CS::Animation::iSkeletonAnimPacketFactory *) 0 ;
+  char *arg2 = (char *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  size_t result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonAnimPacketFactory_FindAnimationIndex",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonAnimPacketFactory, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonAnimPacketFactory_FindAnimationIndex" "', argument " "1"" of type '" "CS::Animation::iSkeletonAnimPacketFactory *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Animation::iSkeletonAnimPacketFactory * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSkeletonAnimPacketFactory_FindAnimationIndex" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  result = (arg1)->FindAnimationIndex((char const *)arg2);
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iSkeletonAnimPacketFactory_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -17630,6 +17664,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonAnimPacketFactory_CreateRandomNode", _wrap_iSkeletonAnimPacketFactory_CreateRandomNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimPacketFactory_CreateFSMNode", _wrap_iSkeletonAnimPacketFactory_CreateFSMNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimPacketFactory_RemoveAnimation", _wrap_iSkeletonAnimPacketFactory_RemoveAnimation, METH_VARARGS, NULL},
+	 { (char *)"iSkeletonAnimPacketFactory_FindAnimationIndex", _wrap_iSkeletonAnimPacketFactory_FindAnimationIndex, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimPacketFactory_scfGetVersion", _wrap_iSkeletonAnimPacketFactory_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonAnimPacketFactory", _wrap_delete_iSkeletonAnimPacketFactory, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonAnimPacketFactory_swigregister", iSkeletonAnimPacketFactory_swigregister, METH_VARARGS, NULL},

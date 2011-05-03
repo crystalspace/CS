@@ -13278,6 +13278,7 @@ sub DESTROY {
     }
 }
 
+*Setup = *cspacec::csSpline_Setup;
 *GetDimensionCount = *cspacec::csSpline_GetDimensionCount;
 *GetPointCount = *cspacec::csSpline_GetPointCount;
 *InsertPoint = *cspacec::csSpline_InsertPoint;
@@ -13332,6 +13333,7 @@ sub DESTROY {
     }
 }
 
+*Setup = *cspacec::csCubicSpline_Setup;
 *Calculate = *cspacec::csCubicSpline_Calculate;
 *GetInterpolatedDimension = *cspacec::csCubicSpline_GetInterpolatedDimension;
 sub DISOWN {
@@ -13795,6 +13797,7 @@ sub new {
     bless $self, $pkg if defined($self);
 }
 
+*Setup = *cspacec::csPath_Setup;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

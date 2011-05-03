@@ -32052,6 +32052,45 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csSpline_Setup(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csSpline *arg1 = (csSpline *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csSpline_Setup",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSpline, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSpline_Setup" "', argument " "1"" of type '" "csSpline *""'"); 
+  }
+  arg1 = reinterpret_cast< csSpline * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csSpline_Setup" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csSpline_Setup" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  (arg1)->Setup(arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csSpline_GetDimensionCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csSpline *arg1 = (csSpline *) 0 ;
@@ -32641,6 +32680,45 @@ SWIGINTERN PyObject *_wrap_delete_csCubicSpline(PyObject *SWIGUNUSEDPARM(self), 
   }
   arg1 = reinterpret_cast< csCubicSpline * >(argp1);
   delete arg1;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csCubicSpline_Setup(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csCubicSpline *arg1 = (csCubicSpline *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csCubicSpline_Setup",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csCubicSpline, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCubicSpline_Setup" "', argument " "1"" of type '" "csCubicSpline *""'"); 
+  }
+  arg1 = reinterpret_cast< csCubicSpline * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csCubicSpline_Setup" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csCubicSpline_Setup" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  (arg1)->Setup(arg2,arg3);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -42310,6 +42388,36 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csPath_Setup(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csPath *arg1 = (csPath *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csPath_Setup",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csPath, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPath_Setup" "', argument " "1"" of type '" "csPath *""'"); 
+  }
+  arg1 = reinterpret_cast< csPath * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csPath_Setup" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  (arg1)->Setup(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_csPath(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csPath *arg1 = (csPath *) 0 ;
@@ -49483,6 +49591,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"delete_csQuaternion", _wrap_delete_csQuaternion, METH_VARARGS, NULL},
 	 { (char *)"csQuaternion_swigregister", csQuaternion_swigregister, METH_VARARGS, NULL},
 	 { (char *)"delete_csSpline", _wrap_delete_csSpline, METH_VARARGS, NULL},
+	 { (char *)"csSpline_Setup", _wrap_csSpline_Setup, METH_VARARGS, NULL},
 	 { (char *)"csSpline_GetDimensionCount", _wrap_csSpline_GetDimensionCount, METH_VARARGS, NULL},
 	 { (char *)"csSpline_GetPointCount", _wrap_csSpline_GetPointCount, METH_VARARGS, NULL},
 	 { (char *)"csSpline_InsertPoint", _wrap_csSpline_InsertPoint, METH_VARARGS, NULL},
@@ -49503,6 +49612,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csSpline_swigregister", csSpline_swigregister, METH_VARARGS, NULL},
 	 { (char *)"new_csCubicSpline", _wrap_new_csCubicSpline, METH_VARARGS, NULL},
 	 { (char *)"delete_csCubicSpline", _wrap_delete_csCubicSpline, METH_VARARGS, NULL},
+	 { (char *)"csCubicSpline_Setup", _wrap_csCubicSpline_Setup, METH_VARARGS, NULL},
 	 { (char *)"csCubicSpline_Calculate", _wrap_csCubicSpline_Calculate, METH_VARARGS, NULL},
 	 { (char *)"csCubicSpline_GetInterpolatedDimension", _wrap_csCubicSpline_GetInterpolatedDimension, METH_VARARGS, NULL},
 	 { (char *)"csCubicSpline_swigregister", csCubicSpline_swigregister, METH_VARARGS, NULL},
@@ -49656,6 +49766,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"delete_csSegment3", _wrap_delete_csSegment3, METH_VARARGS, NULL},
 	 { (char *)"csSegment3_swigregister", csSegment3_swigregister, METH_VARARGS, NULL},
 	 { (char *)"new_csPath", _wrap_new_csPath, METH_VARARGS, NULL},
+	 { (char *)"csPath_Setup", _wrap_csPath_Setup, METH_VARARGS, NULL},
 	 { (char *)"delete_csPath", _wrap_delete_csPath, METH_VARARGS, NULL},
 	 { (char *)"csPath_Length", _wrap_csPath_Length, METH_VARARGS, NULL},
 	 { (char *)"csPath_QueryObject", _wrap_csPath_QueryObject, METH_VARARGS, NULL},
