@@ -77,25 +77,25 @@ void csSHA256Test::testSHA256encode()
   for(int i = 0; i < 3; i++)
   {
     char output[65];
-    csSHA256::context_sha256_t ctx;
+    csSHA256::Context ctx;
     unsigned char buf[1000];
     unsigned char sha256sum[32];
-    csSHA256::sha256_starts(&ctx);
+    ctx.sha256_starts();
 
     if(i < 2)
     {
-      csSHA256::sha256_update(&ctx, (uint8_t *) msg[i], strlen(msg[i]));
+      ctx.sha256_update((uint8_t *) msg[i], strlen(msg[i]));
     }
     else
     {
       memset(buf, 'a', 1000);
       for(int j = 0; j < 1000; j++)
       {
-        csSHA256::sha256_update(&ctx, (uint8_t *) buf, 1000);
+        ctx.sha256_update((uint8_t *) buf, 1000);
       }
     }
 
-    csSHA256::sha256_finish(&ctx, sha256sum);
+    ctx.sha256_finish(sha256sum);
 
     for(int  j = 0; j < 32; j++)
     {

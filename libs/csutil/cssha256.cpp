@@ -51,22 +51,22 @@
     (b)[(i) + 3] = (uint8_t) ((n)      );       \
 }
 
-void csSHA256::sha256_starts( context_sha256_t *ctx )
+void csSHA256::Context::sha256_starts()
 {
-  ctx->total[0] = 0;
-  ctx->total[1] = 0;
+  total[0] = 0;
+  total[1] = 0;
 
-  ctx->state[0] = 0x6A09E667;
-  ctx->state[1] = 0xBB67AE85;
-  ctx->state[2] = 0x3C6EF372;
-  ctx->state[3] = 0xA54FF53A;
-  ctx->state[4] = 0x510E527F;
-  ctx->state[5] = 0x9B05688C;
-  ctx->state[6] = 0x1F83D9AB;
-  ctx->state[7] = 0x5BE0CD19;
+  state[0] = 0x6A09E667;
+  state[1] = 0xBB67AE85;
+  state[2] = 0x3C6EF372;
+  state[3] = 0xA54FF53A;
+  state[4] = 0x510E527F;
+  state[5] = 0x9B05688C;
+  state[6] = 0x1F83D9AB;
+  state[7] = 0x5BE0CD19;
 }
 
-void csSHA256::sha256_process( context_sha256_t *ctx, uint8_t data[64] )
+void csSHA256::Context::sha256_process(uint8_t data[64])
 {
   uint32_t temp1, temp2, W[64];
   uint32_t A, B, C, D, E, F, G, H;
@@ -113,14 +113,14 @@ void csSHA256::sha256_process( context_sha256_t *ctx, uint8_t data[64] )
     d += temp1; h = temp1 + temp2;              \
 }
 
-  A = ctx->state[0];
-  B = ctx->state[1];
-  C = ctx->state[2];
-  D = ctx->state[3];
-  E = ctx->state[4];
-  F = ctx->state[5];
-  G = ctx->state[6];
-  H = ctx->state[7];
+  A = state[0];
+  B = state[1];
+  C = state[2];
+  D = state[3];
+  E = state[4];
+  F = state[5];
+  G = state[6];
+  H = state[7];
 
   P(A, B, C, D, E, F, G, H, W[ 0], 0x428A2F98);
   P(H, A, B, C, D, E, F, G, W[ 1], 0x71374491);
@@ -187,35 +187,35 @@ void csSHA256::sha256_process( context_sha256_t *ctx, uint8_t data[64] )
   P(C, D, E, F, G, H, A, B, R(62), 0xBEF9A3F7);
   P(B, C, D, E, F, G, H, A, R(63), 0xC67178F2);
 
-  ctx->state[0] += A;
-  ctx->state[1] += B;
-  ctx->state[2] += C;
-  ctx->state[3] += D;
-  ctx->state[4] += E;
-  ctx->state[5] += F;
-  ctx->state[6] += G;
-  ctx->state[7] += H;
+  state[0] += A;
+  state[1] += B;
+  state[2] += C;
+  state[3] += D;
+  state[4] += E;
+  state[5] += F;
+  state[6] += G;
+  state[7] += H;
 }
 
-void csSHA256::sha256_update( context_sha256_t *ctx, uint8_t *input, uint32_t length )
+void csSHA256::Context::sha256_update(uint8_t *input, uint32_t length)
 {
   uint32_t left, fill;
 
   if(!length) return;
 
-  left = ctx->total[0] & 0x3F;
+  left = total[0] & 0x3F;
   fill = 64 - left;
 
-  ctx->total[0] += length;
-  ctx->total[0] &= 0xFFFFFFFF;
+  total[0] += length;
+  total[0] &= 0xFFFFFFFF;
 
-  if(ctx->total[0] < length)
-    ctx->total[1]++;
+  if(total[0] < length)
+    total[1]++;
 
   if(left && length >= fill)
   {
-    memcpy((void *)(ctx->buffer + left), (void *)input, fill);
-    sha256_process(ctx, ctx->buffer);
+    memcpy((void *)(buffer + left), (void *)input, fill);
+    sha256_process(buffer);
     length -= fill;
     input  += fill;
     left = 0;
@@ -223,14 +223,14 @@ void csSHA256::sha256_update( context_sha256_t *ctx, uint8_t *input, uint32_t le
 
   while(length >= 64)
   {
-    sha256_process(ctx, input);
+    sha256_process(input);
     length -= 64;
     input  += 64;
   }
 
   if(length)
   {
-    memcpy((void *)(ctx->buffer + left), (void *)input, length);
+    memcpy((void *)(buffer + left), (void *)input, length);
   }
 }
 
@@ -242,32 +242,32 @@ static uint8_t sha256_padding[64] =
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
   };
 
-void csSHA256::sha256_finish(context_sha256_t *ctx, uint8_t digest[32])
+void csSHA256::Context::sha256_finish(uint8_t digest[32])
 {
   uint32_t last, padn;
   uint32_t high, low;
   uint8_t msglen[8];
 
-  high = (ctx->total[0] >> 29) | (ctx->total[1] <<  3);
-  low  = (ctx->total[0] <<  3);
+  high = (total[0] >> 29) | (total[1] <<  3);
+  low  = (total[0] <<  3);
 
   PUT_UINT32(high, msglen, 0);
   PUT_UINT32(low,  msglen, 4);
 
-  last = ctx->total[0] & 0x3F;
+  last = total[0] & 0x3F;
   padn = (last < 56) ? (56 - last) : (120 - last);
 
-  sha256_update(ctx, sha256_padding, padn);
-  sha256_update(ctx, msglen, 8);
+  sha256_update(sha256_padding, padn);
+  sha256_update(msglen, 8);
 
-  PUT_UINT32(ctx->state[0], digest,  0);
-  PUT_UINT32(ctx->state[1], digest,  4);
-  PUT_UINT32(ctx->state[2], digest,  8);
-  PUT_UINT32(ctx->state[3], digest, 12);
-  PUT_UINT32(ctx->state[4], digest, 16);
-  PUT_UINT32(ctx->state[5], digest, 20);
-  PUT_UINT32(ctx->state[6], digest, 24);
-  PUT_UINT32(ctx->state[7], digest, 28);
+  PUT_UINT32(state[0], digest,  0);
+  PUT_UINT32(state[1], digest,  4);
+  PUT_UINT32(state[2], digest,  8);
+  PUT_UINT32(state[3], digest, 12);
+  PUT_UINT32(state[4], digest, 16);
+  PUT_UINT32(state[5], digest, 20);
+  PUT_UINT32(state[6], digest, 24);
+  PUT_UINT32(state[7], digest, 28);
 }
 
 csSHA256::Digest csSHA256::Encode(csString const& s)
@@ -278,10 +278,10 @@ csSHA256::Digest csSHA256::Encode(csString const& s)
 csSHA256::Digest csSHA256::Encode(const void* data, size_t nbytes)
 {
   Digest digest;
-  context_sha256_t ctx;
-  sha256_starts(&ctx);
-  sha256_update(&ctx, (uint8_t*)data, nbytes);
-  sha256_finish(&ctx, digest.data);
+  Context ctx;
+  ctx.sha256_starts();
+  ctx.sha256_update((uint8_t*)data, nbytes);
+  ctx.sha256_finish(digest.data);
   return digest;
 }
 
