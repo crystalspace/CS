@@ -31,6 +31,8 @@
 
 #include <csutil/cssha256.h>
 
+using namespace CS::Utility::Checksum;
+
 /*
  * those are the standard FIPS-180-2 test vectors
  */
@@ -51,6 +53,7 @@ static const char *val[] =
     "cdc76e5c9914fb9281a1c7e284d73e67" \
     "f1809a48a497200e046d39ccc7112cd0"
   };
+
 
 /**
  * Test sha256 functionality.
@@ -77,7 +80,7 @@ void csSHA256Test::testSHA256encode()
   for(int i = 0; i < 3; i++)
   {
     char output[65];
-    csSHA256::Context ctx;
+    SHA256::Context ctx;
     unsigned char buf[1000];
     unsigned char sha256sum[32];
     ctx.sha256_starts();
@@ -108,6 +111,6 @@ void csSHA256Test::testSHA256encode()
   //cs simplified api testing
   for(int i = 0; i < 2; i++)
   {
-      CPPUNIT_ASSERT_EQUAL(csSHA256::Encode(msg[i], strlen(msg[i])).HexString(), csString(val[i]));
+      CPPUNIT_ASSERT_EQUAL(SHA256::Encode(msg[i], strlen(msg[i])).HexString(), csString(val[i]));
   }
 }
