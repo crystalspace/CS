@@ -36,24 +36,24 @@ namespace CS
 {
   namespace Utility
   {
-    uint32 Checksum::Adler32 (void* data, size_t size)
+    uint32 Checksum::Adler32 (const void* data, size_t size)
     {
       unsigned long adler = adler32 (0, 0, 0);
       return adler32 (adler, (z_Byte*)data, (uInt)size);
     }
 
-    uint32 Checksum::Adler32 (uint32 prevCheckSum, void* data, size_t size)
+    uint32 Checksum::Adler32 (uint32 prevCheckSum, const void* data, size_t size)
     {
       return adler32 (prevCheckSum, (z_Byte*)data, (uInt)size);
     }
 
-    uint32 Checksum::CRC32 (void* data, size_t size)
+    uint32 Checksum::CRC32 (const void* data, size_t size)
     {
       unsigned long crc = crc32 (0, 0, 0);
       return crc32 (crc, (z_Byte*)data, (uInt)size);
     }
 
-    uint32 Checksum::CRC32 (uint32 prevCheckSum, void* data, size_t size)
+    uint32 Checksum::CRC32 (uint32 prevCheckSum, const void* data, size_t size)
     {
       return crc32 (prevCheckSum, (z_Byte*)data, (uInt)size);
     }

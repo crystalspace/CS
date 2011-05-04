@@ -31,7 +31,7 @@ namespace CS
     {
       //@{
       /// Compute adler-32 checksum for given data buffer.
-      static CS_CRYSTALSPACE_EXPORT uint32 Adler32 (void* data, size_t size);
+      static CS_CRYSTALSPACE_EXPORT uint32 Adler32 (const void* data, size_t size);
       static inline uint32 Adler32 (iDataBuffer* data)
       {
 	if (!data) return Adler32 ((void*)0, 0);
@@ -41,7 +41,7 @@ namespace CS
       //@{
       /// Continue computing adler-32 checksum for given data buffer.
       static CS_CRYSTALSPACE_EXPORT uint32 Adler32 (uint32 prevCheckSum,
-	void* data, size_t size);
+	const void* data, size_t size);
       static inline uint32 Adler32 (uint32 prevCheckSum, iDataBuffer* data)
       {
 	if (!data) return Adler32 (prevCheckSum, 0, 0);
@@ -51,7 +51,7 @@ namespace CS
 
       //@{
       /// Compute crc-32 checksum for given data buffer.
-      static CS_CRYSTALSPACE_EXPORT uint32 CRC32 (void* data, size_t size);
+      static CS_CRYSTALSPACE_EXPORT uint32 CRC32 (const void* data, size_t size);
       static inline uint32 CRC32 (iDataBuffer* data)
       {
 	if (!data) return CRC32 ((void*)0, 0);
@@ -61,7 +61,7 @@ namespace CS
       //@{
       /// Continue computing crc-32 checksum for given data buffer.
       static CS_CRYSTALSPACE_EXPORT uint32 CRC32 (uint32 prevCheckSum,
-	void* data, size_t size);
+	const void* data, size_t size);
       static inline uint32 CRC32 (uint32 prevCheckSum, iDataBuffer* data)
       {
 	if (!data) return CRC32 (prevCheckSum, 0, 0);
