@@ -22451,6 +22451,102 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csThreadManager ##############
+
+package cspace::csThreadManager;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csThreadManager(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csThreadManager($self);
+        delete $OWNER{$self};
+    }
+}
+
+*Init = *cspacec::csThreadManager_Init;
+*Process = *cspacec::csThreadManager_Process;
+*Wait = *cspacec::csThreadManager_Wait;
+*ProcessAll = *cspacec::csThreadManager_ProcessAll;
+*PushToQueue = *cspacec::csThreadManager_PushToQueue;
+*RunNow = *cspacec::csThreadManager_RunNow;
+*GetThreadCount = *cspacec::csThreadManager_GetThreadCount;
+*SetAlwaysRunNow = *cspacec::csThreadManager_SetAlwaysRunNow;
+*GetAlwaysRunNow = *cspacec::csThreadManager_GetAlwaysRunNow;
+*Exiting = *cspacec::csThreadManager_Exiting;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csThreadReturn ##############
+
+package cspace::csThreadReturn;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csThreadReturn(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csThreadReturn($self);
+        delete $OWNER{$self};
+    }
+}
+
+*IsFinished = *cspacec::csThreadReturn_IsFinished;
+*WasSuccessful = *cspacec::csThreadReturn_WasSuccessful;
+*GetResultPtr = *cspacec::csThreadReturn_GetResultPtr;
+*GetResultRefPtr = *cspacec::csThreadReturn_GetResultRefPtr;
+*MarkFinished = *cspacec::csThreadReturn_MarkFinished;
+*MarkSuccessful = *cspacec::csThreadReturn_MarkSuccessful;
+*SetResult = *cspacec::csThreadReturn_SetResult;
+*Copy = *cspacec::csThreadReturn_Copy;
+*Wait = *cspacec::csThreadReturn_Wait;
+*SetWaitPtrs = *cspacec::csThreadReturn_SetWaitPtrs;
+*SetJob = *cspacec::csThreadReturn_SetJob;
+*GetJob = *cspacec::csThreadReturn_GetJob;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iProcTexCallback ##############
 
 package cspace::iProcTexCallback;
