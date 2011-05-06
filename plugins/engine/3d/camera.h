@@ -344,6 +344,8 @@ protected:
   /// FOV in angles (degrees).
   float fov_angle;
   static float default_fov_angle;
+  
+  float nearClip;
 
   /// Compute above angle.
   void ComputeAngle (float width);
@@ -357,7 +359,7 @@ protected:
   void UpdateMatrix ();
   void UpdateInvMatrix ();
 public:
-  PerspectiveImpl ();
+  PerspectiveImpl (csEngine* engine);
   
   /// Set the default FOV for new cameras.
   static void SetDefaultFOV (float fov, float width)
@@ -441,6 +443,10 @@ public:
   }
   
   virtual void Dirtify () { matrixDirty = true; }
+
+  float GetNearClipDistance() const { return nearClip; }
+  void SetNearClipDistance (float dist)
+  { nearClip = csMax (dist, float (SMALL_Z)); Dirtify(); }
 };
 
 // Helper to forward iCamera perspective methods to a PerspectiveImpl instance
@@ -547,8 +553,8 @@ class csCameraPerspective :
   void UpdateClipPlanes();
   void Dirtify () { PerspectiveImpl::Dirtify(); clipPlanesDirty = true; }
 public:
-  csCameraPerspective ()
-    : PerspectiveImpl (), scfImplementationType (this),
+  csCameraPerspective (csEngine* engine)
+    : PerspectiveImpl (engine), scfImplementationType (this),
       clipPlanesDirty (true) {}
 
   csCameraPerspective (const csCameraPerspective& other)

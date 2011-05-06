@@ -63,6 +63,15 @@ public K, public J, public J2
 	virtual macro_name ();
 };
 
+template <class T,class K,class J,class J2,class J3> class scfImplementationExt3 : 
+public K, public J, public J2, public J3
+{
+	SWIG_SCF_IMPL(scfImplementationExt3)
+	protected:
+	virtual macro_name ();
+};
+
+
 /* This ones are known (and chosen) not to be wrapped for the moment 
    if you need to use any of these delete the warnfilter and add the
    necessary %template directive. */

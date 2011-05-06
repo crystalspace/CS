@@ -57,9 +57,12 @@ namespace CS
        */
       static Matrix4 CSPerspective (float viewWidth, float viewHeight, 
 				    float shiftX, float shiftY,
-				    float invAspect)
+				    float invAspect,
+				    float nearClip = 0.1f)
       {
-	Matrix4 Mortho (Ortho (0, viewWidth, 0, viewHeight, -1.0f, 10.0f));
+	const float nearz = -1.0f;
+	float farz = 1.0f/nearClip;
+	Matrix4 Mortho (Ortho (0, viewWidth, 0, viewHeight, nearz, farz));
 
 	CS::Math::Matrix4 Mtranslate (
 	  1, 0, 0, shiftX,

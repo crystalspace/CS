@@ -147,6 +147,9 @@ bool DemoApplication::Application ()
 
   // Load the configuration file
   config.AddConfig (GetObjectRegistry (), "/config/demoapplication.cfg");
+  const char* appConfig = GetApplicationConfigFile();
+  if (appConfig)
+    config.AddConfig (GetObjectRegistry (), appConfig);
 
   // Load the screenshot configuration
   screenshotFormat = config->GetStr ("DemoApplication.Screenshot.ImageFormat", "jpg");

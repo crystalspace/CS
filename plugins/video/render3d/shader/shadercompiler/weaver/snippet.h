@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2003-2007 by Marten Svanfeldt
-		2004-2007 by Frank Richter
+		2004-2011 by Frank Richter
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -246,7 +246,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       const FileAliases& aliases, const char* defaultCombinerName = 0) const;
     bool ParseCombiner (iDocumentNode* child, 
       Technique::CombinerPlugin& newCombiner) const;
-    bool ParseInput (iDocumentNode* child, Technique::Input& newInput, 
+    bool ParseInput (iDocumentNode* child, AtomTechnique& newTech,
       const FileAliases& aliases, const char* defaultCombinerName) const;
     bool ParseOutput (iDocumentNode* child, 
       Technique::Output& newOutput) const;
@@ -274,6 +274,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     void HandleParameterNode (CompoundTechnique& tech, iDocumentNode* node,
       const FileAliases& aliases);
     void HandleVaryingNode (CompoundTechnique& tech, iDocumentNode* node,
+      const FileAliases& aliases);
+    void HandleCompoundInput (CompoundTechnique& tech, iDocumentNode* node,
       const FileAliases& aliases);
   };
   

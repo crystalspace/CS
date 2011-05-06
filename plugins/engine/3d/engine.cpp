@@ -504,6 +504,8 @@ THREADED_CALLABLE_IMPL1(csEngine, SyncEngineLists, csRef<iThreadedLoader> loader
 //---------------------------------------------------------------------------
 SCF_IMPLEMENT_FACTORY (csEngine)
 
+#define DEFAULT_NEAR_CLIP	0.1
+
 csEngine::csEngine (iBase *iParent) :
   scfImplementationType (this, iParent), objectRegistry (0),
   envTexHolder (this), enableEnvTex (true),
@@ -518,7 +520,8 @@ csEngine::csEngine (iBase *iParent) :
   worldSaveable (false), defaultKeepImage (false), maxAspectRatio (0),
   nextframePending (0), currentFrameNumber (0), 
   currentRenderContext (0), weakEventHandler(0),
-  bAdaptiveLODsEnabled(false), adaptiveLODsTargetFPS(30), adaptiveLODsMultiplier(1.0f)
+  bAdaptiveLODsEnabled(false), adaptiveLODsTargetFPS(30), adaptiveLODsMultiplier(1.0f),
+  defaultNearClip (DEFAULT_NEAR_CLIP)
 {
   RegisterDefaultRenderPriorities ();
 }
@@ -1617,6 +1620,9 @@ void csEngine::ReadConfig (iConfigFile *Config)
   
   enableEnvTex = 
     Config->GetBool ("Engine.AutomaticEnvironmentCube", true);
+
+  defaultNearClip = csMax (Config->GetFloat ("Engine.CameraDefault.NearClip", DEFAULT_NEAR_CLIP),
+			   SMALL_Z);
 }
 
 struct LightAndDist
@@ -2594,13 +2600,13 @@ csPtr<iCollectionArray> csEngine::GetCollections()
 
 csPtr<iCamera> csEngine::CreateCamera ()
 {
-  csCameraPerspective* cam = new csCameraPerspective ();
+  csCameraPerspective* cam = new csCameraPerspective (this);
   return csPtr<iCamera> ((iCamera*)cam);
 }
 
 csPtr<iPerspectiveCamera> csEngine::CreatePerspectiveCamera ()
 {
-  csCameraPerspective* cam = new csCameraPerspective ();
+  csCameraPerspective* cam = new csCameraPerspective (this);
   return csPtr<iPerspectiveCamera> (cam);
 }
 

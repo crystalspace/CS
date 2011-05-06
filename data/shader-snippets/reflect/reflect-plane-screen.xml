@@ -19,6 +19,12 @@
   <!-- Render a reflection of the current view -->
   <technique priority="100">
     
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    <input id="reflectXform" type="translateScale2" default="shadervar" defsv="reflection coord xform" />
+    <!-- Factor applied to perturbance scaling.
+	 The closer the value to 0 is, the larger is the area at which perturbance is scaled. -->
+    <input id="perturbFadeScale" type="float" default="value" defval="1" />
+    
     <!-- Put the computation of the reflection TC into a separate snippet
 	 so weaver only emits it once. -->
     <snippet id="reflTC">
@@ -37,7 +43,7 @@
 	  </block>
 	</input>
 	
-	<input name="reflectXform" type="float4" default="complex" private="yes">
+	<input name="reflectXform" type="translateScale2" default="complex">
 	  <block location="cg:vertexIn">
 	    <uniform type="float4" name="reflectXform" />
 	  </block>
@@ -48,26 +54,6 @@
 	  
 	  <block location="cg:vertexMain">
 	    reflectXform = vertexIn.reflectXform;
-	  </block>
-	</input>
-	
-	<input name="textureToScreen" type="float2" default="complex" private="yes">
-	  <block location="cg:fragmentIn">
-	    <uniform type="float2" name="textureToScreen" />
-	  </block>
-	  
-	  <block location="cg:variablemap">
-	    <variablemap destination="fragmentIn.textureToScreen" type="expr">
-	      <sexp>(make-vector
-		(/ 1 (elt1 "reflection coord xform"))
-		(/ 1 (elt2 "reflection coord xform"))
-		)
-	      </sexp>
-	    </variablemap>
-	  </block>
-	  
-	  <block location="cg:fragmentMain">
-	    textureToScreen = fragmentIn.textureToScreen;
 	  </block>
 	</input>
 	
@@ -83,11 +69,12 @@
 	</block>
 	
 	<block location="cg:fragmentMain">
-	  tcToScreen = textureToScreen;
+	  tcToScreen.xy = float2(1) / reflectXform.xy;
+	  tcToScreen.zw = -tcToScreen.xy*reflectXform.zw;
 	</block>
 	
 	<output name="reflectionTC" type="texcoord4" />
-	<output name="tcToScreen" type="float2" />
+	<output name="tcToScreen" type="translateScale2" />
       </technique>
     </snippet>
     
@@ -95,7 +82,7 @@
       <technique priority="100">
 	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 	
-	<input name="positionW" type="position4_world" />
+	<input name="positionC" type="position4_camera" />
 	
 	<input name="texReflect" type="tex2d" default="complex">
 	  <block location="pass">
@@ -124,26 +111,25 @@
 	  </block>
 	</input>
 	
-	<input name="projectedToWorld" type="float4x4" default="complex" private="yes">
+	<input name="projectedToCamera" type="float4x4" default="complex" private="yes">
 	  <block location="cg:fragmentIn">
-	    <uniform type="float4x4" name="projectedToWorld" />
+	    <uniform type="float4x4" name="projectedToCamera" />
 	  </block>
 	  
 	  <block location="cg:fragmentMain">
-	    projectedToWorld = fragmentIn.projectedToWorld;
+	    projectedToCamera = fragmentIn.projectedToCamera;
 	  </block>
 	  
 	  <block location="cg:variablemap">
-	    <variablemap destination="fragmentIn.projectedToWorld" type="expr">
-	      <sexp>(* "world2camera transform" "projection transform inverse")</sexp>
-	    </variablemap>
+	    <variablemap destination="fragmentIn.projectedToCamera" variable="projection transform inverse" />
 	  </block>
 	</input>
 	
 	<input name="reflTC" type="texcoord4" />
-	<input name="reflTC2screen" type="float2" />
+	<input name="reflTC2screen" type="translateScale2" />
 	
 	<input name="perturb" type="float2" default="value" defval="0,0" />
+	<input name="perturbFadeScale" type="float" />
 	
 	<block location="cg:vertexMain">
 	  surfaceColor = float4 (0, 0, 0, 1);
@@ -156,21 +142,25 @@
 	  float3 tc = reflTC.xyw;
 	  float inv_reflW = 1 / reflTC.w;
 	  
-	  float camDepth = tex2Dproj (texReflectDepth, tc).x*-2 + 1;
-	  float2 screenPos = (reflTC.xy * reflTC2screen * inv_reflW)+float2(-1,1);
+	  /* The depth offset can mitigate issues from depth precision when large scales
+	     are involved (eg csisland) */
+	  float camDepth = tex2Dproj (texReflectDepth, tc).x*-2 + 1 + (1.0/8388608.0);
+	  float2 screenPos = (reflTC.xy * reflTC2screen.xy * inv_reflW)+reflTC2screen.zw;
 	  float4 positionProjected = float4 (
 	    screenPos.x, screenPos.y, camDepth, 1);
-	  float4 positionUnprojectedW = mul (projectedToWorld, positionProjected);
-	  positionUnprojectedW /= positionUnprojectedW.w;
+	  float4 positionUnprojectedC = mul (projectedToCamera, positionProjected);
+	  positionUnprojectedC /= positionUnprojectedC.w;
 	  
-	  mirroredPointDist = length (positionW.xyz - positionUnprojectedW.xyz);
+	  if (positionUnprojectedC.z &gt;= positionC.z)
+	    mirroredPointDist = length (positionC.xyz - positionUnprojectedC.xyz);
+	  else
+	    mirroredPointDist = 0;
 	  
-	  float perturbWeight = saturate (mirroredPointDist);
+	  float perturbWeight = saturate (mirroredPointDist * perturbFadeScale);
 	  tc.xy += perturb * perturbWeight;
 	  surfaceColor = tex2Dproj (texReflect, tc);
 	  surfaceColor_attr_perfragment = true;
 	  
-	  mirroredPointDist = max (mirroredPointDist, 0);
 	  mirroredPointDistSat = saturate (mirroredPointDist);
 	</block>
 	
@@ -182,6 +172,8 @@
       </technique>
     </snippet>
     
+    <connection from="reflectXform" to="reflTC" />
     <connection from="reflTC" to="actualReflect" />
+    <connection from="perturbFadeScale" to="actualReflect" />
   </technique>
 </snippet>

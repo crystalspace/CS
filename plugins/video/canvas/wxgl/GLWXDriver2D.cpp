@@ -250,11 +250,7 @@ bool csGraphics2DWX::Open()
 
   int w, h;
   myParent->GetClientSize(&w, &h);
-  if(w < 0 || h < 0)
-  {
-    w = 0;
-    h = 0;
-  }
+
   theCanvas = new csGLCanvas(this, myParent, wxID_ANY,
                              wxPoint(0, 0), wxSize(w, h), 0, wxT(""), desired_attributes);
 
@@ -526,6 +522,7 @@ void csGraphics2DWX::SetFullScreen (bool yesno)
 void csGraphics2DWX::AllowResize (bool iAllow)
 {
   AllowResizing = iAllow;
+  // TODO: do something?
 }
 
 BEGIN_EVENT_TABLE(csGLCanvas, wxGLCanvas)
@@ -549,12 +546,12 @@ csGLCanvas::csGLCanvas(csGraphics2DWX* g, wxWindow *parent,
 {
   int w, h;
   GetClientSize(&w, &h);
-
   if(w < 0 || h < 0)
   {
     w = 0;
     h = 0;
   }
+
   // Canvas on creation not necessarily visible
   bool visible = IsShown();
   wxWindow* p = parent;
@@ -596,12 +593,12 @@ void csGLCanvas::OnSize(wxSizeEvent& event)
 
   int w, h;
   GetClientSize(&w, &h);
-
   if(w < 0 || h < 0)
   {
     w = 0;
     h = 0;
   }
+
   SetCurrent();
   g2d->Resize(w, h);
 }
@@ -620,6 +617,7 @@ void csGLCanvas::OnMouseEvent( wxMouseEvent& event )
   }
   else if(event.GetEventType() == wxEVT_LEFT_DOWN)
   {
+    SetFocus ();
     g2d->EventOutlet->Mouse(csmbLeft, true, event.GetX(), event.GetY());
   }
   else if(event.GetEventType() == wxEVT_LEFT_UP)
@@ -628,6 +626,7 @@ void csGLCanvas::OnMouseEvent( wxMouseEvent& event )
   }
   else if(event.GetEventType() == wxEVT_MIDDLE_DOWN)
   {
+    SetFocus ();
     g2d->EventOutlet->Mouse(csmbMiddle, true, event.GetX(), event.GetY());
   }
   else if(event.GetEventType() == wxEVT_MIDDLE_UP)
@@ -636,6 +635,7 @@ void csGLCanvas::OnMouseEvent( wxMouseEvent& event )
   }
   else if(event.GetEventType() == wxEVT_RIGHT_DOWN)
   {
+    SetFocus ();
     g2d->EventOutlet->Mouse(csmbRight, true, event.GetX(), event.GetY());
   }
   else if(event.GetEventType() == wxEVT_RIGHT_UP)

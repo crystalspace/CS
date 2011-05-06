@@ -119,6 +119,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     newSubmesh->visible = visible;
     submeshes.Push (newSubmesh);
 
+    // By default the first submesh gets the material of the animesh factory
+    if (submeshes.GetSize () == 1)
+      newSubmesh->SetMaterial (material);
+
     return newSubmesh;
   }
 

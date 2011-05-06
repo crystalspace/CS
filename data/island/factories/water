@@ -37,6 +37,7 @@
             <shadervar name="tex environment" type="texture">sky_001.dds</shadervar>
             <shadervar name="water fog color" type="vector4">0.4,0.7,0.9,1</shadervar>
             <shadervar name="water perturb scale" type="vector4">10,10,0,0</shadervar>
+	    <shadervar name="water perturb fade" type="float">0.1</shadervar>
             <shadervar name="specular" type="vector4">0.4,0.7,0.9,1</shadervar>
         </material>
     </materials>

@@ -66,6 +66,8 @@ namespace CS
 	  
 	  CS::ShaderVarStringID svReflXform;
 	  csRef<csShaderVariable> reflXformSV;
+	  CS::ShaderVarStringID svRefrXform;
+	  csRef<csShaderVariable> refrXformSV;
 	  bool screenFlipped;
 	  float mappingStretch;
 	  
@@ -455,6 +457,9 @@ namespace CS
 		(persist.screenFlipped ? 0.5f : -0.5f),
 		0.5f, 0.5f));
 	    }
+	    persist.refrXformSV->SetValue (csVector4 (0.5f,
+	      (persist.screenFlipped ? 0.5f : -0.5f),
+	      0.5f, 0.5f));
 	  }
 	  
 	  typename RenderTree::ContextNode* reflCtx = 0;
@@ -671,7 +676,7 @@ namespace CS
 	    // Attach refraction texture to mesh
 	    localStack[persist.svTexPlaneRefr] = svRefraction;
 	    localStack[persist.svTexPlaneRefrDepth] = svRefractionDepth;
-	    localStack[persist.svReflXform] = persist.reflXformSV;
+	    localStack[persist.svRefrXform] = persist.refrXformSV;
 	  }
 	  if ((needReflTex || needRefrTex) && doRender)
 	  {
