@@ -637,6 +637,66 @@ class csMemoryPen(iPen):
 csMemoryPen_swigregister = _cstool.csMemoryPen_swigregister
 csMemoryPen_swigregister(csMemoryPen)
 
+class scfProcTexture(core.csObject,iengine.iTextureWrapper,csgfx.iProcTexture):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def IncRef(*args): return _cstool.scfProcTexture_IncRef(*args)
+    def DecRef(*args): return _cstool.scfProcTexture_DecRef(*args)
+    def GetRefCount(*args): return _cstool.scfProcTexture_GetRefCount(*args)
+    def QueryInterface(*args): return _cstool.scfProcTexture_QueryInterface(*args)
+    def AddRefOwner(*args): return _cstool.scfProcTexture_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _cstool.scfProcTexture_RemoveRefOwner(*args)
+    def GetInterfaceMetadata(*args): return _cstool.scfProcTexture_GetInterfaceMetadata(*args)
+scfProcTexture_swigregister = _cstool.scfProcTexture_swigregister
+scfProcTexture_swigregister(scfProcTexture)
+
+class csThreadManager(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cstool.new_csThreadManager(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cstool.delete_csThreadManager
+    __del__ = lambda self : None;
+    def Init(*args): return _cstool.csThreadManager_Init(*args)
+    def Process(*args): return _cstool.csThreadManager_Process(*args)
+    def Wait(*args): return _cstool.csThreadManager_Wait(*args)
+    def ProcessAll(*args): return _cstool.csThreadManager_ProcessAll(*args)
+    def PushToQueue(*args): return _cstool.csThreadManager_PushToQueue(*args)
+    def RunNow(*args): return _cstool.csThreadManager_RunNow(*args)
+    def GetThreadCount(*args): return _cstool.csThreadManager_GetThreadCount(*args)
+    def SetAlwaysRunNow(*args): return _cstool.csThreadManager_SetAlwaysRunNow(*args)
+    def GetAlwaysRunNow(*args): return _cstool.csThreadManager_GetAlwaysRunNow(*args)
+    def Exiting(*args): return _cstool.csThreadManager_Exiting(*args)
+csThreadManager_swigregister = _cstool.csThreadManager_swigregister
+csThreadManager_swigregister(csThreadManager)
+
+class csThreadReturn(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cstool.new_csThreadReturn(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cstool.delete_csThreadReturn
+    __del__ = lambda self : None;
+    def IsFinished(*args): return _cstool.csThreadReturn_IsFinished(*args)
+    def WasSuccessful(*args): return _cstool.csThreadReturn_WasSuccessful(*args)
+    def GetResultPtr(*args): return _cstool.csThreadReturn_GetResultPtr(*args)
+    def GetResultRefPtr(*args): return _cstool.csThreadReturn_GetResultRefPtr(*args)
+    def MarkFinished(*args): return _cstool.csThreadReturn_MarkFinished(*args)
+    def MarkSuccessful(*args): return _cstool.csThreadReturn_MarkSuccessful(*args)
+    def SetResult(*args): return _cstool.csThreadReturn_SetResult(*args)
+    def Copy(*args): return _cstool.csThreadReturn_Copy(*args)
+    def Wait(*args): return _cstool.csThreadReturn_Wait(*args)
+    def SetWaitPtrs(*args): return _cstool.csThreadReturn_SetWaitPtrs(*args)
+    def SetJob(*args): return _cstool.csThreadReturn_SetJob(*args)
+    def GetJob(*args): return _cstool.csThreadReturn_GetJob(*args)
+csThreadReturn_swigregister = _cstool.csThreadReturn_swigregister
+csThreadReturn_swigregister(csThreadReturn)
+
 class iProcTexCallback(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
@@ -647,7 +707,7 @@ class iProcTexCallback(core.iBase):
 iProcTexCallback_swigregister = _cstool.iProcTexCallback_swigregister
 iProcTexCallback_swigregister(iProcTexCallback)
 
-class csProcTexture(object):
+class csProcTexture(scfProcTexture):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr

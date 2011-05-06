@@ -1086,6 +1086,7 @@ class csSpline(object):
     __repr__ = _swig_repr
     __swig_destroy__ = _csgeom.delete_csSpline
     __del__ = lambda self : None;
+    def Setup(*args): return _csgeom.csSpline_Setup(*args)
     def GetDimensionCount(*args): return _csgeom.csSpline_GetDimensionCount(*args)
     def GetPointCount(*args): return _csgeom.csSpline_GetPointCount(*args)
     def InsertPoint(*args): return _csgeom.csSpline_InsertPoint(*args)
@@ -1115,6 +1116,7 @@ class csCubicSpline(csSpline):
         except: self.this = this
     __swig_destroy__ = _csgeom.delete_csCubicSpline
     __del__ = lambda self : None;
+    def Setup(*args): return _csgeom.csCubicSpline_Setup(*args)
     def Calculate(*args): return _csgeom.csCubicSpline_Calculate(*args)
     def GetInterpolatedDimension(*args): return _csgeom.csCubicSpline_GetInterpolatedDimension(*args)
 csCubicSpline_swigregister = _csgeom.csCubicSpline_swigregister
@@ -1403,6 +1405,7 @@ class csPath(core.scfPath):
         this = _csgeom.new_csPath(*args)
         try: self.this.append(this)
         except: self.this = this
+    def Setup(*args): return _csgeom.csPath_Setup(*args)
     __swig_destroy__ = _csgeom.delete_csPath
     __del__ = lambda self : None;
     def Length(*args): return _csgeom.csPath_Length(*args)
