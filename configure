@@ -726,6 +726,7 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 enable_mno_cygwin
+enable_separate_sections
 enable_as_needed
 enable_gc_sections
 enable_large_address_aware
@@ -1421,6 +1422,11 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-mno-cygwin     Compile with the -mno-cygwin option. (default YES)
+  --enable-separate-sections
+                          Instruct compiler to generate separate object file
+                          sections for functions and global variables. Can
+                          reduce size of the final linked binaries. (default
+                          YES if not annoying)
   --enable-as-needed      Utilize --as-needed linker flag, if supported by
                           linker and if the used binutils version is recent
                           enough to support it properly (default YES)
@@ -4265,6 +4271,13 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
+# Check whether --enable-separate-sections was given.
+if test "${enable_separate_sections+set}" = set; then :
+  enableval=$enable_separate_sections;
+else
+  enable_separate_sections=maybe
+fi
+
 
 
 
@@ -4613,10 +4626,10 @@ fi
 		;;
 	esac
 
-	# The -ffunction-sections and -fdata-sections can, in conjunction with
-	# the linker flag --gc-sections, reduce the size of the final linked
-	# binaries.
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if $CC accepts -ffunction-sections -fdata-sections" >&5
+
+
+    if test "$enable_separate_sections" != "no"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if $CC accepts -ffunction-sections -fdata-sections" >&5
 $as_echo_n "checking if $CC accepts -ffunction-sections -fdata-sections... " >&6; }
 if test "${cs_cv_prog_cc_individual_sections_ok+set}" = set; then :
   $as_echo_n "(cached) " >&6
@@ -4739,6 +4752,391 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $cs_cv_prog_cc_individual_sections_ok" >&5
 $as_echo "$cs_cv_prog_cc_individual_sections_ok" >&6; }
     if test "$cs_cv_prog_cc_individual_sections_ok" != no; then :
+
+fi
+
+	if test "$cs_cv_prog_cc_individual_sections" != "no"; then :
+  if test "$enable_separate_sections" = "maybe"; then :
+  # We need -Werror for the following checks...
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking how to treat C warnings as errors" >&5
+$as_echo_n "checking how to treat C warnings as errors... " >&6; }
+if test "${cs_cv_prog_c_enable_errors_ok+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "`echo @-Werror@@ | sed 'y% %#%'`"; then :
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @-Werror@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then :
+  cs_dummy=''
+else
+  if test "$1" = filler; then :
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_libs_test=''
+else
+  if test "$1" = filler; then :
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  cs_build_ok=yes
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then :
+  break
+fi
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then :
+  cs_build_cflags=`echo x$cs_cflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_c_enable_errors=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+		cs_cv_prog_c_enable_errors_ok="$cs_cv_prog_c_enable_errors"
+else
+  cs_cv_prog_c_enable_errors=''
+		cs_cv_prog_c_enable_errors_ok=no
+fi
+else
+  cs_cv_prog_c_enable_errors=''
+            cs_cv_prog_c_enable_errors_ok=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $cs_cv_prog_c_enable_errors_ok" >&5
+$as_echo "$cs_cv_prog_c_enable_errors_ok" >&6; }
+    if test "$cs_cv_prog_c_enable_errors_ok" != no; then :
+
+fi
+
+		g_flag=''
+		if test "$ac_cv_prog_cc_g" != "no"; then :
+  g_flag='-g'
+fi
+		if test "" != yes; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if $cs_cv_prog_cc_individual_sections isn't annoying" >&5
+$as_echo_n "checking if $cs_cv_prog_cc_individual_sections isn't annoying... " >&6; }
+if test "${cs_cv_prog_cc_individual_sections_annoy+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @$cs_cv_prog_cc_individual_sections@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then :
+  cs_dummy=''
+else
+  if test "$1" = filler; then :
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_libs_test=''
+else
+  if test "$1" = filler; then :
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test $g_flag $cs_cv_prog_c_enable_errors $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  cs_build_ok=yes
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then :
+  break
+fi
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then :
+  cs_build_cflags=`echo x$cs_cflags_test $g_flag $cs_cv_prog_c_enable_errors | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cc_individual_sections_annoy=yes
+		cs_cv_prog_cc_individual_sections_annoy_cflags=$cs_build_cflags
+		cs_cv_prog_cc_individual_sections_annoy_lflags=$cs_build_lflags
+		cs_cv_prog_cc_individual_sections_annoy_libs=$cs_build_libs
+else
+  cs_cv_prog_cc_individual_sections_annoy=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $cs_cv_prog_cc_individual_sections_annoy" >&5
+$as_echo "$cs_cv_prog_cc_individual_sections_annoy" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if $cs_cv_prog_cc_individual_sections isn't annoying" >&5
+$as_echo_n "checking if $cs_cv_prog_cc_individual_sections isn't annoying... " >&6; }
+	    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @$cs_cv_prog_cc_individual_sections@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then :
+  cs_dummy=''
+else
+  if test "$1" = filler; then :
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_libs_test=''
+else
+  if test "$1" = filler; then :
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test $g_flag $cs_cv_prog_c_enable_errors $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  cs_build_ok=yes
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then :
+  break
+fi
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then :
+  cs_build_cflags=`echo x$cs_cflags_test $g_flag $cs_cv_prog_c_enable_errors | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cc_individual_sections_annoy=yes
+		cs_cv_prog_cc_individual_sections_annoy_cflags=$cs_build_cflags
+		cs_cv_prog_cc_individual_sections_annoy_lflags=$cs_build_lflags
+		cs_cv_prog_cc_individual_sections_annoy_libs=$cs_build_libs
+else
+  cs_cv_prog_cc_individual_sections_annoy=no
+fi
+	    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $cs_cv_prog_cc_individual_sections_annoy" >&5
+$as_echo "$cs_cv_prog_cc_individual_sections_annoy" >&6; }
+fi
+    if test $cs_cv_prog_cc_individual_sections_annoy = yes; then :
+
+else
+  cs_cv_prog_cc_individual_sections_annoy_cflags=''
+	cs_cv_prog_cc_individual_sections_annoy_lflags=''
+	cs_cv_prog_cc_individual_sections_annoy_libs=''
+
+fi
+		enable_separate_sections_cc=$cs_cv_prog_cc_individual_sections_annoy
+
+else
+  enable_separate_sections_cc=yes
+fi
+	    if test "$enable_separate_sections_cc" = "yes"; then :
   cs_build_prop_val="$cs_cv_prog_cc_individual_sections"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then :
@@ -4747,6 +5145,11 @@ $as_echo "$cs_cv_prog_cc_individual_sections_ok" >&6; }
 fi
 
 fi
+
+fi
+
+fi
+
 
 fi
 
@@ -9773,6 +10176,7 @@ else
   RELAYTOOL="$ac_cv_path_RELAYTOOL"
 fi
 
+	if test -n "$RELAYTOOL"; then :
 
     if test "$cs_prog_path_prepared" != yes; then :
   cs_prog_path_prepared=yes
@@ -9821,12 +10225,13 @@ fi
   test -n "$BASH" && break
 done
 
-	if test -n "$BASH"; then :
+	    if test -n "$BASH"; then :
   cs_build_prop_val="$BASH $RELAYTOOL"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then :
   cs_jamconfig_text="${cs_jamconfig_text}CMD.RELAYTOOL ?= \"$cs_build_prop_val\" ;
 "
+fi
 fi
 fi
 fi
