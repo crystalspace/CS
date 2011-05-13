@@ -122,7 +122,7 @@ struct iSkeletonDebugNodeFactory : public virtual iSkeletonAnimNodeFactory
 
   /**
    * Set wether or not random colors are used to display the bone data.
-   * The default value is 'true'.
+   * The default value is 'false'.
    */
   virtual void SetRandomColor (bool random) = 0;
 

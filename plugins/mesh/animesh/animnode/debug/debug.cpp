@@ -51,7 +51,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
   DebugNodeFactory::DebugNodeFactory (DebugNodeManager* manager, const char *name)
     : scfImplementationType (this), CS::Animation::SkeletonAnimNodeFactorySingle (name),
     manager (manager), modes (CS::Animation::DEBUG_SQUARES), image (nullptr), boneMaskUsed (false),
-    leafBonesDisplayed (true), boneRandomColor (true)
+    leafBonesDisplayed (true), boneRandomColor (false)
   {
   }
 
@@ -95,7 +95,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
 
   // --------------------------  DrawBox3D  --------------------------
 
-  static inline void DrawBox3D (iGraphics3D* G3D, 
+  static inline void DrawBox3D (iGraphics3D* g3d,
 				const csBox3& box,
 				const csReversibleTransform& tr,
 				int color)
@@ -108,19 +108,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     csVector3 vXyZ = tr * box.GetCorner (CS_BOX_CORNER_XyZ);
     csVector3 vxYZ = tr * box.GetCorner (CS_BOX_CORNER_xYZ);
     csVector3 vXYZ = tr * box.GetCorner (CS_BOX_CORNER_XYZ);
-    float fov = G3D->GetPerspectiveAspect ();
-    G3D->DrawLine (vxyz, vXyz, fov, color);
-    G3D->DrawLine (vXyz, vXYz, fov, color);
-    G3D->DrawLine (vXYz, vxYz, fov, color);
-    G3D->DrawLine (vxYz, vxyz, fov, color);
-    G3D->DrawLine (vxyZ, vXyZ, fov, color);
-    G3D->DrawLine (vXyZ, vXYZ, fov, color);
-    G3D->DrawLine (vXYZ, vxYZ, fov, color);
-    G3D->DrawLine (vxYZ, vxyZ, fov, color);
-    G3D->DrawLine (vxyz, vxyZ, fov, color);
-    G3D->DrawLine (vxYz, vxYZ, fov, color);
-    G3D->DrawLine (vXyz, vXyZ, fov, color);
-    G3D->DrawLine (vXYz, vXYZ, fov, color);
+    float fov = g3d->GetDriver2D ()->GetHeight ();
+    g3d->DrawLine (vxyz, vXyz, fov, color);
+    g3d->DrawLine (vXyz, vXYz, fov, color);
+    g3d->DrawLine (vXYz, vxYz, fov, color);
+    g3d->DrawLine (vxYz, vxyz, fov, color);
+    g3d->DrawLine (vxyZ, vXyZ, fov, color);
+    g3d->DrawLine (vXyZ, vXYZ, fov, color);
+    g3d->DrawLine (vXYZ, vxYZ, fov, color);
+    g3d->DrawLine (vxYZ, vxyZ, fov, color);
+    g3d->DrawLine (vxyz, vxyZ, fov, color);
+    g3d->DrawLine (vxYz, vxYZ, fov, color);
+    g3d->DrawLine (vXyz, vXyZ, fov, color);
+    g3d->DrawLine (vXYz, vXYZ, fov, color);
   }
 
   // --------------------------  IKDebugNode  --------------------------
@@ -139,7 +139,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
       return;
 
     csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (factory->manager->GetObjectRegistry());
-    csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (factory->manager->GetObjectRegistry());
+    csRef<iGraphics2D> g2d = g3d->GetDriver2D ();
     CS_ASSERT(g3d && g2d);
 
     // Tell the 3D driver we're going to display 2D things.
@@ -280,10 +280,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     }
 
     // Draw the object bounding box
-    csRef<iObjectModel> objectModel = scfQueryInterface<iObjectModel> (skeleton->GetAnimatedMesh ());
-    csBox3 objectBbox = objectModel->GetObjectBoundingBox ();
-    int bbox_color = g2d->FindRGB (255, 255, 0);
-    DrawBox3D (g3d, objectBbox, object2camera, bbox_color);
+    if (factory->modes & CS::Animation::DEBUG_BBOXES)
+    {
+      csRef<iObjectModel> objectModel = scfQueryInterface<iObjectModel> (skeleton->GetAnimatedMesh ());
+      csBox3 objectBbox = objectModel->GetObjectBoundingBox ();
+      int bbox_color = g2d->FindRGB (255, 255, 0);
+      DrawBox3D (g3d, objectBbox, object2camera, bbox_color);
+    }
   }
 }
 CS_PLUGIN_NAMESPACE_END(DebugNode)
