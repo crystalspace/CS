@@ -176,7 +176,7 @@ public:
  */
 struct iAnimatedMeshFactory : public virtual iBase
 {
-  SCF_INTERFACE(CS::Mesh::iAnimatedMeshFactory, 2, 2, 1);
+  SCF_INTERFACE(CS::Mesh::iAnimatedMeshFactory, 2, 2, 2);
 
   /**\name SubMesh handling
    * @{ */
@@ -434,8 +434,25 @@ struct iAnimatedMeshFactory : public virtual iBase
 
   /** @} */
 
-  /**\name Bone interface and influence
+  /**\name Bounding boxes
   * @{ */
+
+  /**
+   * Set the bounding box of the given bone, in bone space. Bone bounding boxes 
+   * are used to update the global bounding box of the animated mesh factory and 
+   * to speed up hitbeam tests. If you don't specify a bounding box for a bone,
+   * a bounding box is automatically generated: it includes all 
+   * the mesh vertices which have a non zero weight for this bone.
+   * You must call Invalidate() after modifying it.
+   * \param bone The ID of the bone.
+   * \param box The bounding box of the given bone, in bone space.
+   */
+  virtual void SetBoneBoundingBox (CS::Animation::BoneID bone, const csBox3& box) = 0; 
+
+  /**
+   * Get the bounding box of the bone with the given ID, in bone space.
+   */
+  virtual const csBox3& GetBoneBoundingBox (CS::Animation::BoneID bone) const = 0; 
 };
 
 /**
@@ -515,7 +532,7 @@ struct iAnimatedMeshSubMeshFactory : public virtual iBase
  */
 struct iAnimatedMesh : public virtual iBase
 {
-  SCF_INTERFACE(CS::Mesh::iAnimatedMesh, 1, 0, 1);
+  SCF_INTERFACE(CS::Mesh::iAnimatedMesh, 1, 0, 2);
 
   /**
    * Set the skeleton to use for this mesh.
@@ -573,6 +590,33 @@ struct iAnimatedMesh : public virtual iBase
    * Get the render buffer accessor of this mesh
    */
   virtual iRenderBufferAccessor* GetRenderBufferAccessor () const = 0;
+
+  /**
+   * Set the bounding box of the given bone, in bone space. Bone bounding boxes 
+   * are used to update the global bounding box of the animated mesh and 
+   * to speed up HitBeam tests. They should cover all vertices belonging to
+   * the bone, even when the morph targets are active.
+   *
+   * If you don't specify a bounding box for a bone, then it will be generated
+   * automatically but may not be optimized nor correct when the morph targets
+   * are active.
+   *
+   * \param bone The ID of the bone.
+   * \param box The bounding box of the given bone, in bone space.
+   */
+  virtual void SetBoneBoundingBox (CS::Animation::BoneID bone, const csBox3& box) = 0; 
+
+  /**
+   * Get the bounding box of the bone with the given ID, in bone space.
+   */
+  virtual const csBox3& GetBoneBoundingBox (CS::Animation::BoneID bone) const = 0; 
+
+  /**
+   * Unset the custom bounding box of this animated mesh. It will now be again
+   * computed and updated automatically.
+   * \sa iObjectModel::SetObjectBoundingBox()
+   */
+  virtual void UnsetObjectBoundingBox () = 0;
 };
 
 /**

@@ -13,7 +13,7 @@
 
   You should have received a copy of the GNU Library General Public
   License along with this library; if not, write to the Free
-  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.3
 */
 
 #ifndef __CS_ANIMESH_H__
@@ -118,6 +118,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     virtual CS::Mesh::iAnimatedMeshSocketFactory* GetSocket (size_t index) const;
     virtual uint FindSocket (const char* name) const;
 
+    virtual void SetBoneBoundingBox (CS::Animation::BoneID bone, const csBox3& box); 
+    virtual const csBox3& GetBoneBoundingBox (CS::Animation::BoneID bone) const; 
+
     //-- iMeshObjectFactory
     virtual csFlags& GetFlags ();
 
@@ -148,8 +151,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     }
 
     void ComputeTangents ();
-  
+
   private: 
+    void UpdateObjectBoundingBox ();
 
     // required but stupid stuff..
     AnimeshObjectType* objectType;
@@ -181,6 +185,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     // Sockets
     csRefArray<FactorySocket> sockets;
+
+    // Bounding boxes
+    struct Bone
+    {
+      csBox3 bbox;    // the bb associated with a bone
+      bool userBbox;  // the bb is defined by user
+
+      Bone () 
+        : userBbox (false)
+      {}
+    };
+
+    csArray<Bone> bones;  // list of bounding boxes linked to the mesh bones
 
     friend class AnimeshObject;
   };
@@ -313,6 +330,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     virtual CS::Mesh::iAnimatedMeshFactory* GetAnimatedMeshFactory () const;
     virtual iRenderBufferAccessor* GetRenderBufferAccessor () const;
 
+    virtual void SetBoneBoundingBox (CS::Animation::BoneID bone, const csBox3& box); 
+    virtual const csBox3& GetBoneBoundingBox (CS::Animation::BoneID bone) const; 
+
     //-- iMeshObject
     virtual iMeshObjectFactory* GetFactory () const;
 
@@ -358,6 +378,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     virtual void BuildDecal(const csVector3* pos, float decalRadius,
       iDecalBuilder* decalBuilder);
 
+    virtual void UnsetObjectBoundingBox ();
+
     //-- iObjectModel
     virtual const csBox3& GetObjectBoundingBox ();
     virtual void SetObjectBoundingBox (const csBox3& bbox);
@@ -375,7 +397,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 			      csRenderBuffer& normals);
 
   private:
-    //
     void SetupSubmeshes ();
     void SetupSockets ();
     void UpdateLocalBoneTransforms ();
@@ -393,6 +414,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     void MorphVertices ();
 
     void PreskinLF ();
+
+    void UpdateObjectBoundingBox ();
 
     class RenderBufferAccessor :
       public scfImplementation1<RenderBufferAccessor, 
@@ -507,6 +530,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     csRefArray<Submesh> submeshes;
     csRefArray<Socket> sockets;
+
+    // Array of user defined bounding boxes, indexed by a BoneID
+    // (memory is allocated only if a bounding box is associated with BoneID)
+    csHash<csBox3, CS::Animation::BoneID> boundingBoxes;
+
+    // The object bounding box
+    csBox3 boundingBox;
+    // The object bounding box is defined by user
+    bool userObjectBB;
 
     // Holder for skinned vertex buffers
     csRef<RenderBufferAccessor> bufferAccessor;
