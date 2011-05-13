@@ -32,6 +32,8 @@
 #include "iengine/mesh.h"
 #include "iengine/scenenode.h"
 #include "imesh/object.h"
+#include "imesh/objmodel.h"
+#include "imesh/animesh.h"
 #include "imesh/genmesh.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph2d.h"
@@ -42,14 +44,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
 {
   SCF_IMPLEMENT_FACTORY(DebugNodeManager);
 
-  // --------------------------  IKDebugNodeFactory  --------------------------
+  // --------------------------  DebugNodeFactory  --------------------------
 
   CS_LEAKGUARD_IMPLEMENT(DebugNodeFactory);
 
   DebugNodeFactory::DebugNodeFactory (DebugNodeManager* manager, const char *name)
     : scfImplementationType (this), CS::Animation::SkeletonAnimNodeFactorySingle (name),
     manager (manager), modes (CS::Animation::DEBUG_SQUARES), image (nullptr), boneMaskUsed (false),
-    leafBonesDisplayed (true)
+    leafBonesDisplayed (true), boneRandomColor (true)
   {
   }
 
@@ -91,6 +93,36 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     return csPtr<CS::Animation::SkeletonAnimNodeSingleBase> (new DebugNode (this, skeleton));
   }
 
+  // --------------------------  DrawBox3D  --------------------------
+
+  static inline void DrawBox3D (iGraphics3D* G3D, 
+				const csBox3& box,
+				const csReversibleTransform& tr,
+				int color)
+  {
+    csVector3 vxyz = tr * box.GetCorner (CS_BOX_CORNER_xyz);
+    csVector3 vXyz = tr * box.GetCorner (CS_BOX_CORNER_Xyz);
+    csVector3 vxYz = tr * box.GetCorner (CS_BOX_CORNER_xYz);
+    csVector3 vxyZ = tr * box.GetCorner (CS_BOX_CORNER_xyZ);
+    csVector3 vXYz = tr * box.GetCorner (CS_BOX_CORNER_XYz);
+    csVector3 vXyZ = tr * box.GetCorner (CS_BOX_CORNER_XyZ);
+    csVector3 vxYZ = tr * box.GetCorner (CS_BOX_CORNER_xYZ);
+    csVector3 vXYZ = tr * box.GetCorner (CS_BOX_CORNER_XYZ);
+    float fov = G3D->GetPerspectiveAspect ();
+    G3D->DrawLine (vxyz, vXyz, fov, color);
+    G3D->DrawLine (vXyz, vXYz, fov, color);
+    G3D->DrawLine (vXYz, vxYz, fov, color);
+    G3D->DrawLine (vxYz, vxyz, fov, color);
+    G3D->DrawLine (vxyZ, vXyZ, fov, color);
+    G3D->DrawLine (vXyZ, vXYZ, fov, color);
+    G3D->DrawLine (vXYZ, vxYZ, fov, color);
+    G3D->DrawLine (vxYZ, vxyZ, fov, color);
+    G3D->DrawLine (vxyz, vxyZ, fov, color);
+    G3D->DrawLine (vxYz, vxYZ, fov, color);
+    G3D->DrawLine (vXyz, vXyZ, fov, color);
+    G3D->DrawLine (vXYz, vXYZ, fov, color);
+  }
+
   // --------------------------  IKDebugNode  --------------------------
 
   CS_LEAKGUARD_IMPLEMENT(DebugNode);
@@ -116,7 +148,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
 
     CS::Animation::iSkeletonFactory* fact = skeleton->GetFactory ();
     float fov = g2d->GetHeight ();
-    csReversibleTransform tr_o2c =
+    csReversibleTransform object2camera =
       camera->GetTransform () / skeleton->GetSceneNode ()->GetMovable ()->GetFullTransform ();
 
     // Setup the "end" positions and child count of all bones
@@ -144,7 +176,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
       }
     }
 
-    // Now draw the bones
+    // Now draw the bones and their bounding boxes
     for (CS::Animation::BoneID i = 0; i <= lastId; i++)
     {
       if (!fact->HasBone (i)
@@ -154,11 +186,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
 	  || (!factory->leafBonesDisplayed && numChild[i] == 0))
 	continue;
 
+      // Set the color of the bone and its bounding box
+      int colorI;
+      if (!factory->boneRandomColor) 
+	colorI = g2d->FindRGB (((int) color[0] * 255.0f),
+			       ((int) color[1] * 255.0f),
+			       ((int) color[2] * 255.0f));
+      else
+      {
+	int ii = (i+1)*(i+1);
+	colorI = g2d->FindRGB (255 - (ii % 255),
+			       255 - ((ii*(i+1)) % 255),
+			       255 - ((ii*ii) % 255));
+      }
+
       csQuaternion rotation;
       csVector3 position;
       skeleton->GetTransformAbsSpace (i, rotation, position);
 
-      csVector3 bonePosition = tr_o2c * position;
+      csVector3 bonePosition = object2camera * position;
 
       if (factory->modes & CS::Animation::DEBUG_IMAGES
 	  && factory->image)
@@ -169,6 +215,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
 	int py1 = g2d->GetHeight () - 1 - csQint (y1 * iz1 + (g2d->GetHeight () / 2));
  
 	// TODO: images are not drawn correctly
+
 	if (iz1 > 0.0f)
 	  factory->image->Draw (g3d, px1 - factory->image->Width () / 2,
 				py1 - factory->image->Height () / 2);
@@ -190,19 +237,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
 	}
 
 	csVector3 endGlobal = position + rotation.Rotate (endLocal);
-	csVector3 boneEnd = tr_o2c * endGlobal;
+	csVector3 boneEnd = object2camera * endGlobal;
 
-	g3d->DrawLine (bonePosition, boneEnd, fov, g2d->FindRGB (((int) color[0] * 255.0f),
-								 ((int) color[1] * 255.0f),
-								 ((int) color[2] * 255.0f)));
+	g3d->DrawLine (bonePosition, boneEnd, fov, colorI);
       }
 
       if (factory->modes & CS::Animation::DEBUG_SQUARES)
       {
-	int colorI = g2d->FindRGB (255.0f * color[0],
-				   255.0f * color[1],
-				   255.0f * color[2]);
-
 	float x1 = bonePosition.x, y1 = bonePosition.y, z1 = bonePosition.z;
 	float iz1 = fov / z1;
 	int px1 = csQint (x1 * iz1 + (g2d->GetWidth ()  / 2));
@@ -218,7 +259,31 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
 					      colorI);
 	}
       }
+
+      // Draw the bounding boxes
+      if (factory->modes & CS::Animation::DEBUG_BBOXES)
+      {
+	csRef<CS::Mesh::iAnimatedMesh> animesh = skeleton->GetAnimatedMesh ();
+	csBox3 bbox = animesh->GetBoneBoundingBox (i);
+
+	// Bone to object space transform
+	csReversibleTransform object2bone (csMatrix3 (rotation.GetConjugate ()), position); 
+	csReversibleTransform bone2object = object2bone.GetInverse ();
+
+	// Bone to camera space transform
+	csReversibleTransform bone2camera = object2camera * bone2object;
+
+	// Draw the bounding box of the bone
+	if (!bbox.Empty ())
+	  DrawBox3D (g3d, bbox, bone2camera, colorI);
+      }
     }
+
+    // Draw the object bounding box
+    csRef<iObjectModel> objectModel = scfQueryInterface<iObjectModel> (skeleton->GetAnimatedMesh ());
+    csBox3 objectBbox = objectModel->GetObjectBoundingBox ();
+    int bbox_color = g2d->FindRGB (255, 255, 0);
+    DrawBox3D (g3d, objectBbox, object2camera, bbox_color);
   }
 }
 CS_PLUGIN_NAMESPACE_END(DebugNode)

@@ -63,6 +63,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     inline virtual iSkeletonAnimNodeFactory* GetChildNode () const
     { return CS::Animation::SkeletonAnimNodeFactorySingle::GetChildNode (); }
 
+    inline virtual void SetRandomColor (bool random)
+    { boneRandomColor = random; }
+    inline virtual bool GetRandomColor () const
+    { return boneRandomColor; }
+
     //-- CS::Animation::SkeletonAnimNodeFactorySingle
     csPtr<CS::Animation::SkeletonAnimNodeSingleBase> ActualCreateInstance (
       CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton);
@@ -73,6 +78,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     bool boneMaskUsed;
     csBitArray boneMask;
     bool leafBonesDisplayed;
+    bool boneRandomColor;
 
     friend class DebugNode;
   };

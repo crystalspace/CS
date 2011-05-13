@@ -28,6 +28,7 @@
 #include "csutil/scf_interface.h"
 #include "csutil/cscolor.h"
 #include "imesh/animnode/skeleton2anim.h"
+#include "ivideo/graph3d.h"
 
 struct iCamera;
 struct iMaterialWrapper;
@@ -64,8 +65,9 @@ enum SkeletonDebugMode
   DEBUG_NONE = 0,             /*!< No debug shapes are displayed. */
   DEBUG_2DLINES = 1 << 1,     /*!< The debug shapes displayed are 2D lines between the bones. */
   DEBUG_SQUARES = 1 << 2,     /*!< The debug shapes displayed are 2D squares at the bone positions. */
-  DEBUG_IMAGES = 1 << 3       /*!< The debug shapes displayed are images at the bone positions.
-			       * SetDebugImage() must therefore be used. */
+  DEBUG_IMAGES  = 1 << 3,     /*!< The debug shapes displayed are images at the bone positions.
+			       *   SetDebugImage() must therefore be used. */
+  DEBUG_BBOXES  = 1 << 4      /*!< The debug shapes displayed are the bounding boxes of the bones. */
 };
 
 /**
@@ -108,7 +110,8 @@ struct iSkeletonDebugNodeFactory : public virtual iSkeletonAnimNodeFactory
   virtual void SetLeafBonesDisplayed (bool displayed) = 0;
 
   /**
-   * Set the child animation node of this node. It is valid to set a null reference as chid node.
+   * Set the child animation node of this node. It is valid to set a null 
+   * reference as chid node.
    */
   virtual void SetChildNode (iSkeletonAnimNodeFactory* factory) = 0;
 
@@ -116,6 +119,17 @@ struct iSkeletonDebugNodeFactory : public virtual iSkeletonAnimNodeFactory
    * Get the child animation node of this node.
    */
   virtual iSkeletonAnimNodeFactory* GetChildNode () const = 0;
+
+  /**
+   * Set wether or not random colors are used to display the bone data.
+   * The default value is 'true'.
+   */
+  virtual void SetRandomColor (bool random) = 0;
+
+  /**
+   * Return whether or not random colors are used to display the bone data
+   */
+  virtual bool GetRandomColor () const = 0;
 };
 
 /**
