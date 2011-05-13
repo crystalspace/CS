@@ -70,7 +70,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   public:
     CS_LEAKGUARD_DECLARE(SkeletonFactory);
   
-    SkeletonFactory ();
+    SkeletonFactory (const char* name);
 
     //-- CS::Animation::iSkeletonFactory
     virtual CS::Animation::BoneID CreateBone (CS::Animation::BoneID parent = CS::Animation::InvalidBoneID);
@@ -103,6 +103,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     virtual csString Description () const;
 
     virtual const csArray<CS::Animation::BoneID>& GetBoneOrderList ();
+
+    virtual const char* GetName () const;
 
     //-- "Private"
     void UpdateCachedTransforms ();
@@ -140,6 +142,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     bool cachedTransformsDirty;
     bool orderListDirty;
+
+    csString name;
 
     friend class Skeleton;
   };

@@ -123,7 +123,7 @@ struct iSkeletonManager : public virtual iBase
  */
 struct iSkeletonFactory : public virtual iBase
 {
-  SCF_INTERFACE(CS::Animation::iSkeletonFactory, 1, 0, 3);
+  SCF_INTERFACE(CS::Animation::iSkeletonFactory, 1, 0, 4);
 
   /**\name Bone handling
    * @{ */
@@ -257,6 +257,11 @@ struct iSkeletonFactory : public virtual iBase
    * all children and sub-children bones are placed after the bone.
    */
   virtual const csArray<CS::Animation::BoneID>& GetBoneOrderList () = 0;
+
+  /**
+   * Get the name of the skeleton factory
+   */
+  virtual const char* GetName () const = 0;
 };
 
 /**

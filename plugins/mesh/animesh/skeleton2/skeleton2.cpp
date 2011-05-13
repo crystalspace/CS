@@ -43,7 +43,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   CS::Animation::iSkeletonFactory* SkeletonSystem::CreateSkeletonFactory (const char* name)
   {
     // Check name uniqueness
-    csRef<CS::Animation::iSkeletonFactory> newFact = csPtr<CS::Animation::iSkeletonFactory> (new SkeletonFactory);
+    csRef<CS::Animation::iSkeletonFactory> newFact = csPtr<CS::Animation::iSkeletonFactory> (new SkeletonFactory (name));
 
     return factoryHash.PutUnique (name, newFact);
   }
@@ -92,9 +92,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   CS_LEAKGUARD_IMPLEMENT(SkeletonFactory);
 
-  SkeletonFactory::SkeletonFactory ()
+  SkeletonFactory::SkeletonFactory (const char* name)
     : scfImplementationType (this), autostart (true), cachedTransformsDirty (true), 
-    orderListDirty (true)
+    orderListDirty (true), name (name)
   {}
 
   CS::Animation::BoneID SkeletonFactory::FindBone (const char *name) const
@@ -387,7 +387,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     orderListDirty = false;
   }
 
-
+  const char* SkeletonFactory::GetName () const
+  {
+    return name;
+  }
 
 
   CS_LEAKGUARD_IMPLEMENT(Skeleton);
