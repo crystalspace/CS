@@ -35,6 +35,11 @@ namespace Checksum
 {
   /**
    * Compute a SHA-256 message digest.
+   * 
+   * This class provides an interface to compute a digest in a "streaming"
+   * manner (the message can be split into chunks which are processed
+   * sequentially) as well as a convenient interface which allows one to
+   * create a digest in a single step.
    */
   class CS_CRYSTALSPACE_EXPORT SHA256
   {
