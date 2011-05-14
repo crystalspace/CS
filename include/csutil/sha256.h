@@ -33,47 +33,50 @@ namespace Utility
 {
 namespace Checksum
 {
+  /**
+   * Compute a SHA-256 message digest.
+   */
   class CS_CRYSTALSPACE_EXPORT SHA256
   {
+    //@{
+    /// Context used to generate the hash
+    uint32 total[2];
+    uint32 state[8];
+    uint8 buffer[64];
+    //@}
+    
+    /** 
+     * Inner function which does the processing of the hash.
+     * \param data The data to process.
+     */
+    void Process (const uint8 data[64]);
+    /// Update hash with a (at most) 4GB chunk of data
+    void AppendInternal (const uint8* input, uint32 length);
+    /** 
+     * Used to complete the hashing process and obtain the calculated hash.
+     * \param digest The calculated hash.
+     */
+    void Finish (uint8 digest[32]);
   public:
-
     /// A SHA256 digest is 32 unsigned characters (not 0-terminated).
     typedef CS::Utility::Checksum::Digest<32> Digest;
-
-    ///A context used to generate the hash
-    class Context
-    {
-      private:
-      uint32_t total[2];
-      uint32_t state[8];
-      uint8_t buffer[64];
-
-      public:    
-      /// Used to initialize this Context.
-      void sha256_starts();
-
-      /** Used to hash the input data.
-       *  \param input A pointer to an array of the input data to hash.
-       *  \param length The leght of the input data to hash (in bytes).
-       */
-      void sha256_update(uint8_t *input, uint32_t length);
-
-      /** Used to complete the hashing process and obtain the calculated hash.
-       *  \param digest The calculated hash.
-       */
-      void sha256_finish(uint8_t digest[32]);
-
-      /** Used to complete the hashing process and obtain the calculated hash.
-       *  \param digest A \see Digest class where to store the result.
-       */
-      void sha256_finish(Digest &digest);
-
-      private:
-      /** Inner function which does the processing of the hash.
-       *  \param data The data to process.
-       */
-      void sha256_process(uint8_t data[64]);
-    };
+    
+    SHA256 ();
+    
+    /**
+     * Used to update the the input data hash.
+     * \param input A pointer to an array of the input data with which to update the hash.
+     * \param length The length of the input data to hash (in bytes).
+     */
+    void Append (const uint8* input, size_t length);
+    
+    /** 
+     * Used to complete the hashing process and obtain the calculated hash.
+     * After finishing, don't append further data to the hash --
+     * the resulting digest will be bogus.
+     * \return The calculated hash.
+     */
+    Digest Finish ();
 
     /// Encode a string.
     static Digest Encode(csString const&);
@@ -88,4 +91,4 @@ namespace Checksum
 }//namespace CS
 
 
-#endif /* cssha256.h */
+#endif // _CSSHA256_H
