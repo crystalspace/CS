@@ -15678,6 +15678,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetSocket = *cspacec::iAnimatedMeshFactory_GetSocket;
 *FindSocket = *cspacec::iAnimatedMeshFactory_FindSocket;
 *ComputeTangents = *cspacec::iAnimatedMeshFactory_ComputeTangents;
+*SetBoneBoundingBox = *cspacec::iAnimatedMeshFactory_SetBoneBoundingBox;
+*GetBoneBoundingBox = *cspacec::iAnimatedMeshFactory_GetBoneBoundingBox;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -15738,6 +15740,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetSocket = *cspacec::iAnimatedMesh_GetSocket;
 *GetAnimatedMeshFactory = *cspacec::iAnimatedMesh_GetAnimatedMeshFactory;
 *GetRenderBufferAccessor = *cspacec::iAnimatedMesh_GetRenderBufferAccessor;
+*SetBoneBoundingBox = *cspacec::iAnimatedMesh_SetBoneBoundingBox;
+*GetBoneBoundingBox = *cspacec::iAnimatedMesh_GetBoneBoundingBox;
+*UnsetObjectBoundingBox = *cspacec::iAnimatedMesh_UnsetObjectBoundingBox;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);

@@ -15853,6 +15853,98 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iAnimatedMeshFactory_SetBoneBoundingBox(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Mesh::iAnimatedMeshFactory *arg1 = (CS::Mesh::iAnimatedMeshFactory *) 0 ;
+  CS::Animation::BoneID arg2 ;
+  csBox3 *arg3 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshFactory_SetBoneBoundingBox",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__iAnimatedMeshFactory, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMeshFactory_SetBoneBoundingBox" "', argument " "1"" of type '" "CS::Mesh::iAnimatedMeshFactory *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Mesh::iAnimatedMeshFactory * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__Animation__BoneID,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iAnimatedMeshFactory_SetBoneBoundingBox" "', argument " "2"" of type '" "CS::Animation::BoneID""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iAnimatedMeshFactory_SetBoneBoundingBox" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
+    } else {
+      CS::Animation::BoneID * temp = reinterpret_cast< CS::Animation::BoneID * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csBox3,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iAnimatedMeshFactory_SetBoneBoundingBox" "', argument " "3"" of type '" "csBox3 const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iAnimatedMeshFactory_SetBoneBoundingBox" "', argument " "3"" of type '" "csBox3 const &""'"); 
+  }
+  arg3 = reinterpret_cast< csBox3 * >(argp3);
+  (arg1)->SetBoneBoundingBox(arg2,(csBox3 const &)*arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iAnimatedMeshFactory_GetBoneBoundingBox(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Mesh::iAnimatedMeshFactory *arg1 = (CS::Mesh::iAnimatedMeshFactory *) 0 ;
+  CS::Animation::BoneID arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  csBox3 *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshFactory_GetBoneBoundingBox",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__iAnimatedMeshFactory, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMeshFactory_GetBoneBoundingBox" "', argument " "1"" of type '" "CS::Mesh::iAnimatedMeshFactory const *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Mesh::iAnimatedMeshFactory * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__Animation__BoneID,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iAnimatedMeshFactory_GetBoneBoundingBox" "', argument " "2"" of type '" "CS::Animation::BoneID""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iAnimatedMeshFactory_GetBoneBoundingBox" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
+    } else {
+      CS::Animation::BoneID * temp = reinterpret_cast< CS::Animation::BoneID * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  {
+    csBox3 const &_result_ref = ((CS::Mesh::iAnimatedMeshFactory const *)arg1)->GetBoneBoundingBox(arg2);
+    result = (csBox3 *) &_result_ref;
+  }
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csBox3, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *iAnimatedMeshFactory_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
@@ -16458,6 +16550,119 @@ SWIGINTERN PyObject *_wrap_iAnimatedMesh_GetRenderBufferAccessor(PyObject *SWIGU
   arg1 = reinterpret_cast< CS::Mesh::iAnimatedMesh * >(argp1);
   result = (iRenderBufferAccessor *)((CS::Mesh::iAnimatedMesh const *)arg1)->GetRenderBufferAccessor();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iRenderBufferAccessor, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iAnimatedMesh_SetBoneBoundingBox(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Mesh::iAnimatedMesh *arg1 = (CS::Mesh::iAnimatedMesh *) 0 ;
+  CS::Animation::BoneID arg2 ;
+  csBox3 *arg3 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMesh_SetBoneBoundingBox",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__iAnimatedMesh, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMesh_SetBoneBoundingBox" "', argument " "1"" of type '" "CS::Mesh::iAnimatedMesh *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Mesh::iAnimatedMesh * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__Animation__BoneID,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iAnimatedMesh_SetBoneBoundingBox" "', argument " "2"" of type '" "CS::Animation::BoneID""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iAnimatedMesh_SetBoneBoundingBox" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
+    } else {
+      CS::Animation::BoneID * temp = reinterpret_cast< CS::Animation::BoneID * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csBox3,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iAnimatedMesh_SetBoneBoundingBox" "', argument " "3"" of type '" "csBox3 const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iAnimatedMesh_SetBoneBoundingBox" "', argument " "3"" of type '" "csBox3 const &""'"); 
+  }
+  arg3 = reinterpret_cast< csBox3 * >(argp3);
+  (arg1)->SetBoneBoundingBox(arg2,(csBox3 const &)*arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iAnimatedMesh_GetBoneBoundingBox(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Mesh::iAnimatedMesh *arg1 = (CS::Mesh::iAnimatedMesh *) 0 ;
+  CS::Animation::BoneID arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  csBox3 *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMesh_GetBoneBoundingBox",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__iAnimatedMesh, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMesh_GetBoneBoundingBox" "', argument " "1"" of type '" "CS::Mesh::iAnimatedMesh const *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Mesh::iAnimatedMesh * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__Animation__BoneID,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iAnimatedMesh_GetBoneBoundingBox" "', argument " "2"" of type '" "CS::Animation::BoneID""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iAnimatedMesh_GetBoneBoundingBox" "', argument " "2"" of type '" "CS::Animation::BoneID""'");
+    } else {
+      CS::Animation::BoneID * temp = reinterpret_cast< CS::Animation::BoneID * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  {
+    csBox3 const &_result_ref = ((CS::Mesh::iAnimatedMesh const *)arg1)->GetBoneBoundingBox(arg2);
+    result = (csBox3 *) &_result_ref;
+  }
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csBox3, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iAnimatedMesh_UnsetObjectBoundingBox(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Mesh::iAnimatedMesh *arg1 = (CS::Mesh::iAnimatedMesh *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMesh_UnsetObjectBoundingBox",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__iAnimatedMesh, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMesh_UnsetObjectBoundingBox" "', argument " "1"" of type '" "CS::Mesh::iAnimatedMesh *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Mesh::iAnimatedMesh * >(argp1);
+  (arg1)->UnsetObjectBoundingBox();
+  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -46200,6 +46405,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iAnimatedMeshFactory_GetSocket", _wrap_iAnimatedMeshFactory_GetSocket, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactory_FindSocket", _wrap_iAnimatedMeshFactory_FindSocket, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactory_ComputeTangents", _wrap_iAnimatedMeshFactory_ComputeTangents, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedMeshFactory_SetBoneBoundingBox", _wrap_iAnimatedMeshFactory_SetBoneBoundingBox, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedMeshFactory_GetBoneBoundingBox", _wrap_iAnimatedMeshFactory_GetBoneBoundingBox, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactory_swigregister", iAnimatedMeshFactory_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSubMeshFactory_GetIndices", _wrap_iAnimatedMeshSubMeshFactory_GetIndices, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSubMeshFactory_GetIndexSetCount", _wrap_iAnimatedMeshSubMeshFactory_GetIndexSetCount, METH_VARARGS, NULL},
@@ -46224,6 +46431,9 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iAnimatedMesh_GetSocket", _wrap_iAnimatedMesh_GetSocket, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMesh_GetAnimatedMeshFactory", _wrap_iAnimatedMesh_GetAnimatedMeshFactory, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMesh_GetRenderBufferAccessor", _wrap_iAnimatedMesh_GetRenderBufferAccessor, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedMesh_SetBoneBoundingBox", _wrap_iAnimatedMesh_SetBoneBoundingBox, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedMesh_GetBoneBoundingBox", _wrap_iAnimatedMesh_GetBoneBoundingBox, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedMesh_UnsetObjectBoundingBox", _wrap_iAnimatedMesh_UnsetObjectBoundingBox, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMesh_swigregister", iAnimatedMesh_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSubMesh_GetFactorySubMesh", _wrap_iAnimatedMeshSubMesh_GetFactorySubMesh, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSubMesh_SetRendering", _wrap_iAnimatedMeshSubMesh_SetRendering, METH_VARARGS, NULL},

@@ -4329,6 +4329,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSkeletonFactory_GetName(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::iSkeletonFactory *arg1 = (CS::Animation::iSkeletonFactory *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  char *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonFactory_GetName",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonFactory, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonFactory_GetName" "', argument " "1"" of type '" "CS::Animation::iSkeletonFactory const *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Animation::iSkeletonFactory * >(argp1);
+  result = (char *)((CS::Animation::iSkeletonFactory const *)arg1)->GetName();
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iSkeletonFactory_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -13201,6 +13223,58 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSkeletonDebugNodeFactory_SetRandomColor(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::iSkeletonDebugNodeFactory *arg1 = (CS::Animation::iSkeletonDebugNodeFactory *) 0 ;
+  bool arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  bool val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonDebugNodeFactory_SetRandomColor",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonDebugNodeFactory, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonDebugNodeFactory_SetRandomColor" "', argument " "1"" of type '" "CS::Animation::iSkeletonDebugNodeFactory *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Animation::iSkeletonDebugNodeFactory * >(argp1);
+  ecode2 = SWIG_AsVal_bool(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSkeletonDebugNodeFactory_SetRandomColor" "', argument " "2"" of type '" "bool""'");
+  } 
+  arg2 = static_cast< bool >(val2);
+  (arg1)->SetRandomColor(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSkeletonDebugNodeFactory_GetRandomColor(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Animation::iSkeletonDebugNodeFactory *arg1 = (CS::Animation::iSkeletonDebugNodeFactory *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSkeletonDebugNodeFactory_GetRandomColor",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Animation__iSkeletonDebugNodeFactory, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSkeletonDebugNodeFactory_GetRandomColor" "', argument " "1"" of type '" "CS::Animation::iSkeletonDebugNodeFactory const *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Animation::iSkeletonDebugNodeFactory * >(argp1);
+  result = (bool)((CS::Animation::iSkeletonDebugNodeFactory const *)arg1)->GetRandomColor();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iSkeletonDebugNodeFactory_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -17507,6 +17581,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonFactory_GetAutoStart", _wrap_iSkeletonFactory_GetAutoStart, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFactory_Description", _wrap_iSkeletonFactory_Description, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFactory_GetBoneOrderList", _wrap_iSkeletonFactory_GetBoneOrderList, METH_VARARGS, NULL},
+	 { (char *)"iSkeletonFactory_GetName", _wrap_iSkeletonFactory_GetName, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFactory_scfGetVersion", _wrap_iSkeletonFactory_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonFactory", _wrap_delete_iSkeletonFactory, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonFactory_swigregister", iSkeletonFactory_swigregister, METH_VARARGS, NULL},
@@ -17820,6 +17895,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSkeletonDebugNodeFactory_SetLeafBonesDisplayed", _wrap_iSkeletonDebugNodeFactory_SetLeafBonesDisplayed, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonDebugNodeFactory_SetChildNode", _wrap_iSkeletonDebugNodeFactory_SetChildNode, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonDebugNodeFactory_GetChildNode", _wrap_iSkeletonDebugNodeFactory_GetChildNode, METH_VARARGS, NULL},
+	 { (char *)"iSkeletonDebugNodeFactory_SetRandomColor", _wrap_iSkeletonDebugNodeFactory_SetRandomColor, METH_VARARGS, NULL},
+	 { (char *)"iSkeletonDebugNodeFactory_GetRandomColor", _wrap_iSkeletonDebugNodeFactory_GetRandomColor, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonDebugNodeFactory_scfGetVersion", _wrap_iSkeletonDebugNodeFactory_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iSkeletonDebugNodeFactory", _wrap_delete_iSkeletonDebugNodeFactory, METH_VARARGS, NULL},
 	 { (char *)"iSkeletonDebugNodeFactory_swigregister", iSkeletonDebugNodeFactory_swigregister, METH_VARARGS, NULL},
@@ -19724,6 +19801,7 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "DEBUG_2DLINES",SWIG_From_int(static_cast< int >(CS::Animation::DEBUG_2DLINES)));
   SWIG_Python_SetConstant(d, "DEBUG_SQUARES",SWIG_From_int(static_cast< int >(CS::Animation::DEBUG_SQUARES)));
   SWIG_Python_SetConstant(d, "DEBUG_IMAGES",SWIG_From_int(static_cast< int >(CS::Animation::DEBUG_IMAGES)));
+  SWIG_Python_SetConstant(d, "DEBUG_BBOXES",SWIG_From_int(static_cast< int >(CS::Animation::DEBUG_BBOXES)));
   SWIG_Python_SetConstant(d, "STATE_INACTIVE",SWIG_From_int(static_cast< int >(CS::Animation::STATE_INACTIVE)));
   SWIG_Python_SetConstant(d, "STATE_DYNAMIC",SWIG_From_int(static_cast< int >(CS::Animation::STATE_DYNAMIC)));
   SWIG_Python_SetConstant(d, "STATE_KINEMATIC",SWIG_From_int(static_cast< int >(CS::Animation::STATE_KINEMATIC)));

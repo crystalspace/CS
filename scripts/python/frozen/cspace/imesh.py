@@ -734,6 +734,8 @@ class iAnimatedMeshFactory(core.iBase):
     def GetSocket(*args): return _imesh.iAnimatedMeshFactory_GetSocket(*args)
     def FindSocket(*args): return _imesh.iAnimatedMeshFactory_FindSocket(*args)
     def ComputeTangents(*args): return _imesh.iAnimatedMeshFactory_ComputeTangents(*args)
+    def SetBoneBoundingBox(*args): return _imesh.iAnimatedMeshFactory_SetBoneBoundingBox(*args)
+    def GetBoneBoundingBox(*args): return _imesh.iAnimatedMeshFactory_GetBoneBoundingBox(*args)
 iAnimatedMeshFactory_swigregister = _imesh.iAnimatedMeshFactory_swigregister
 iAnimatedMeshFactory_swigregister(iAnimatedMeshFactory)
 
@@ -770,6 +772,9 @@ class iAnimatedMesh(core.iBase):
     def GetSocket(*args): return _imesh.iAnimatedMesh_GetSocket(*args)
     def GetAnimatedMeshFactory(*args): return _imesh.iAnimatedMesh_GetAnimatedMeshFactory(*args)
     def GetRenderBufferAccessor(*args): return _imesh.iAnimatedMesh_GetRenderBufferAccessor(*args)
+    def SetBoneBoundingBox(*args): return _imesh.iAnimatedMesh_SetBoneBoundingBox(*args)
+    def GetBoneBoundingBox(*args): return _imesh.iAnimatedMesh_GetBoneBoundingBox(*args)
+    def UnsetObjectBoundingBox(*args): return _imesh.iAnimatedMesh_UnsetObjectBoundingBox(*args)
 iAnimatedMesh_swigregister = _imesh.iAnimatedMesh_swigregister
 iAnimatedMesh_swigregister(iAnimatedMesh)
 
