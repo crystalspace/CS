@@ -29,7 +29,7 @@
  *  http://www.cr0.net:8040/code/crypto/sha256/ whenever possible.
  */
 
-#include <csutil/cssha256.h>
+#include "csutil/sha256.h"
 
 using namespace CS::Utility::Checksum;
 

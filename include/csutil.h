@@ -59,7 +59,7 @@
 #include "csutil/csobject.h"
 #include "csutil/cspmeter.h"
 #include "csutil/csppulse.h"
-#include "csutil/cssha256.h"
+#include "csutil/sha256.h"
 #include "csutil/csshlib.h"
 #include "csutil/csstring.h"
 #include "csutil/cssubscription.h"

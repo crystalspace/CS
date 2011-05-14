@@ -32,7 +32,7 @@
  */
 
 #include <string.h>
-#include "csutil/cssha256.h"
+#include "csutil/sha256.h"
 #include "cssysdef.h"
 
 namespace CS
