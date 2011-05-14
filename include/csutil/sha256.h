@@ -23,7 +23,6 @@
 #define _CSSHA256_H
 
 #include "csextern.h"
-#include "cssysdef.h"
 #include "csutil/csstring.h"
 #include "csutil/hash.h"
 
