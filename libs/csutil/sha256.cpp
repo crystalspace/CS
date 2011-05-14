@@ -302,20 +302,6 @@ namespace Checksum
     return Encode(s, strlen(s));
   }
 
-  csString SHA256::Digest::HexString() const
-  {
-    csString s;
-    for (int i = 0; i < DigestLen; i++)
-      s.AppendFmt ("%02" PRIx8, data[i]);
-    return s;
-  }
-
-  csString SHA256::Digest::HEXString() const
-  {
-    csString s(HexString());
-    s.Upcase();
-    return s;
-  }
 }//namespace Checksum
 }//namespace Utility
 }//namespace CS

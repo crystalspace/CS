@@ -24,6 +24,7 @@
 
 #include "csextern.h"
 #include "csutil/csstring.h"
+#include "csutil/digest.h"
 #include "csutil/hash.h"
 
 namespace CS
@@ -37,21 +38,7 @@ namespace Checksum
   public:
 
     /// A SHA256 digest is 32 unsigned characters (not 0-terminated).
-    struct CS_CRYSTALSPACE_EXPORT Digest
-    {
-      enum { DigestLen = 32 };
-      /// The raw digest data.
-      uint8_t data[DigestLen];
-      /// Returns a lowercase hex-string representing the raw digest data.
-      csString HexString() const;
-      /// Returns an uppercase hex-string representing the raw digest data.
-      csString HEXString() const;
-      
-      bool operator==(const Digest& other) const
-      { return memcmp (data, other.data, sizeof (data)) == 0; }
-      bool operator!=(const Digest& other) const
-      { return memcmp (data, other.data, sizeof (data)) != 0; }
-    };
+    typedef CS::Utility::Checksum::Digest<32> Digest;
 
     ///A context used to generate the hash
     class Context
@@ -100,12 +87,5 @@ namespace Checksum
 }//namespace Utility
 }//namespace CS
 
-  template<>
-  class csHashComputer<CS::Utility::Checksum::SHA256::Digest> : 
-    public csHashComputerStruct<CS::Utility::Checksum::SHA256::Digest> {};
-
-  template<>
-  class csComparator<CS::Utility::Checksum::SHA256::Digest> : 
-    public csComparatorStruct<CS::Utility::Checksum::SHA256::Digest> {};
 
 #endif /* cssha256.h */

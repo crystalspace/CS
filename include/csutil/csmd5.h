@@ -66,6 +66,7 @@
 
 #include "csextern.h"
 #include "csutil/csstring.h"
+#include "csutil/digest.h"
 #include "csutil/hash.h"
 
 /**
@@ -106,21 +107,7 @@ protected:
 // Our friendly interface.
 public:
   /// An MD5 digest is 16 unsigned characters (not 0-terminated).
-  struct CS_CRYSTALSPACE_EXPORT Digest
-  {
-    enum { DigestLen = 16 };
-    /// The raw digest data.
-    md5_byte_t data[DigestLen];
-    /// Returns a lowercase hex-string representing the raw digest data.
-    csString HexString() const;
-    /// Returns an uppercase hex-string representing the raw digest data.
-    csString HEXString() const;
-    
-    bool operator==(const Digest& other) const
-    { return memcmp (data, other.data, sizeof (data)) == 0; }
-    bool operator!=(const Digest& other) const
-    { return memcmp (data, other.data, sizeof (data)) != 0; }
-  };
+  typedef CS::Utility::Checksum::Digest<16> Digest;
 
   /// Encode a string.
   static Digest Encode(csString const&);
@@ -129,14 +116,6 @@ public:
   /// Encode a buffer.
   static Digest Encode(const void*, size_t nbytes);
 };
-
-template<>
-class csHashComputer<csMD5::Digest> : 
-  public csHashComputerStruct<csMD5::Digest> {};
-
-template<>
-class csComparator<csMD5::Digest> : 
-  public csComparatorStruct<csMD5::Digest> {};
 
 #endif // __CS_CSMD5_H__
 

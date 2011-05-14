@@ -371,18 +371,3 @@ csMD5::Digest csMD5::Encode(const char* s)
 {
   return Encode(s, strlen(s));
 }
-
-csString csMD5::Digest::HexString() const
-{
-  csString s;
-  for (int i = 0; i < DigestLen; i++)
-    s.AppendFmt ("%02" PRIx8, data[i]);
-  return s;
-}
-
-csString csMD5::Digest::HEXString() const
-{
-  csString s(HexString());
-  s.Upcase();
-  return s;
-}
