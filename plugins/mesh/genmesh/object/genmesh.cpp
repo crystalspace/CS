@@ -32,7 +32,6 @@
 #include "csgfx/trianglestream.h"
 #include "csgfx/vertexlistwalker.h"
 #include "csutil/csendian.h"
-#include "csutil/csmd5.h"
 #include "csutil/memfile.h"
 #include "csutil/scfstr.h"
 #include "csutil/sysfunc.h"

@@ -20,8 +20,8 @@
 #include "cssysdef.h"
 #include "csqint.h"
 
-#include "csutil/csmd5.h"
 #include "csutil/documenthelper.h"
+#include "csutil/md5.h"
 #include "csutil/ref.h"
 #include "csutil/scfarray.h"
 #include "csutil/scf.h"
@@ -160,7 +160,8 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
   {
     csString flattened (CS::DocSystem::FlattenNode (exprNode));
 
-    csMD5::Digest md5 (csMD5::Encode (flattened));
+    CS::Utility::Checksum::MD5::Digest md5 (
+      CS::Utility::Checksum::MD5::Encode (flattened));
     cache_scope << md5.HexString ();
   }
 

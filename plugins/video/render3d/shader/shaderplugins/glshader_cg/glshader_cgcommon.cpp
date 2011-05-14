@@ -628,7 +628,7 @@ bool csShaderGLCGCommon::WriteToCacheWorker (iHierarchicalCache* cache,
   }
   
   csRef<iDataBuffer> programBuffer = GetProgramData();
-  csMD5::Digest progHash = csMD5::Encode (
+  CS::Utility::Checksum::MD5::Digest progHash = CS::Utility::Checksum::MD5::Encode (
     programBuffer->GetData(), programBuffer->GetSize());
   if (cacheFile.Write ((char*)&progHash, sizeof (progHash))
       != sizeof (progHash))
@@ -780,7 +780,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
   
   if (!GetProgramNode (node)) return iShaderProgram::loadFail;
   csRef<iDataBuffer> programBuffer = GetProgramData();
-  csMD5::Digest progHash = csMD5::Encode (
+  CS::Utility::Checksum::MD5::Digest progHash = CS::Utility::Checksum::MD5::Encode (
     programBuffer->GetData(), programBuffer->GetSize());
   
   csArray<CachedShaderWrapper> cachedProgWrappers;
@@ -808,7 +808,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagic)
       continue;
       
-    csMD5::Digest diskHash;
+    CS::Utility::Checksum::MD5::Digest diskHash;
     if (cacheFile->Read ((char*)&diskHash, sizeof (diskHash))
 	!= sizeof (diskHash)) continue;
     if (diskHash != progHash) continue;

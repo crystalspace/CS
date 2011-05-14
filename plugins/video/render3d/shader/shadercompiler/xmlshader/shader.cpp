@@ -571,7 +571,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       csString cacheID_base (source->GetAttributeValue ("_cacheid"));
       if (cacheID_base.IsEmpty())
       {
-        csMD5::Digest sourceDigest (csMD5::Encode (CS::DocSystem::FlattenNode (source)));
+        CS::Utility::Checksum::MD5::Digest sourceDigest (
+	  CS::Utility::Checksum::MD5::Encode (CS::DocSystem::FlattenNode (source)));
         cacheID_base = sourceDigest.HexString();
       }
       cacheID_header.Format ("%sXH", cacheID_base.GetData());
@@ -641,8 +642,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       if (hashStream.IsValid())
       {
 	// Hash hash stream (to get a smaller ID)
-	csMD5::Digest hashDigest (csMD5::Encode (hashStream->GetData(),
-	  hashStream->GetSize()));
+	CS::Utility::Checksum::MD5::Digest hashDigest (
+	  CS::Utility::Checksum::MD5::Encode (hashStream->GetData(),
+					      hashStream->GetSize()));
 	/* In theory, anything would work as long as (a) it changes when
 	some file the shader uses changes (b) the tag is reasonably
 	unique (also over multiple program runs).

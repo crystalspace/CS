@@ -1506,7 +1506,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   
   void Synthesizer::SynthesizeNodeTree::Collapse (TechniqueGraph& graph)
   {
-    typedef csHash<Node*, csMD5::Digest> SeenNodesHash;
+    typedef csHash<Node*, CS::Utility::Checksum::MD5::Digest> SeenNodesHash;
     bool tryCollapse = true;
 
     while (tryCollapse)

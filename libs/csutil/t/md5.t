@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "csutil/csmd5.h"
+#include "csutil/md5.h"
 
 #define ARRAY_SIZE(x)		(sizeof((x))/sizeof((x)[0]))
 
@@ -37,7 +37,7 @@ public:
 static const struct
 {
   const char* data;
-  const uint8 expected[csMD5::Digest::DigestLen];
+  const uint8 expected[CS::Utility::Checksum::MD5::Digest::DigestLen];
 } testValuesMD5[] =
 {
   { "",
@@ -61,9 +61,9 @@ void MD5Test::testMD5()
   for (size_t i = 0; i < ARRAY_SIZE(testValuesMD5); i++)
   {
     const char* data = testValuesMD5[i].data;
-    csString digestStr (csMD5::Encode (data).HexString());
-    csMD5::Digest expectedDigest;
-    memcpy (&expectedDigest, testValuesMD5[i].expected, sizeof (csMD5::Digest));
+    csString digestStr (CS::Utility::Checksum::MD5::Encode (data).HexString());
+    CS::Utility::Checksum::MD5::Digest expectedDigest;
+    memcpy (&expectedDigest, testValuesMD5[i].expected, sizeof (CS::Utility::Checksum::MD5::Digest));
     csString expectedStr (expectedDigest.HexString());
     CPPUNIT_ASSERT_EQUAL(expectedStr, digestStr);
   }
