@@ -61,61 +61,83 @@
   1999-05-03 lpd Original version.
  */
 
-#ifndef __CS_CSMD5_H__
-#define __CS_CSMD5_H__
+#ifndef __CS_MD5_H__
+#define __CS_MD5_H__
 
 #include "csextern.h"
 #include "csutil/csstring.h"
 #include "csutil/digest.h"
 #include "csutil/hash.h"
 
-/**
- * This is an encapsulation of a C-implementation of MD5 digest algorithm by
- * Peter Deutsch <ghost@aladdin.com>.  It provides the exact raw interface as
- * Peter's original code except that it is wrapped within a namespace, as well
- * as a more convenient interface which allows one to create a digest in a
- * single step.
- */
-class CS_CRYSTALSPACE_EXPORT csMD5
+namespace CS
 {
-public:
-  /// 8-bit byte
-  typedef uint8 md5_byte_t;
-  /// 32-bit word
-  typedef uint32 md5_word_t;
-
-  /** \internal
-   * Define the state of the MD5 Algorithm.
-   */
-  struct CS_CRYSTALSPACE_EXPORT md5_state_t
+  namespace Utility
   {
-    size_t count[2]; // message length in bits, lsw first
-    md5_word_t abcd[4];  // digest buffer
-    md5_byte_t buf[64];  // accumulate block
-  };
+    namespace Checksum
+    {
+      /**
+       * Compute a MD5 message digest.
+       * This is an encapsulation of a C-implementation of MD5 digest algorithm by
+       * Peter Deutsch <ghost@aladdin.com>.
+       * 
+       * It provides an interface to compute a digest in a "streaming" manner
+       * (the message can be split into chunks which are processed
+       * sequentially) as well as a convenient interface which allows one to
+       * create a digest in a single step.
+       */
+      class CS_CRYSTALSPACE_EXPORT MD5
+      {
+      protected:
+	/// 8-bit byte
+	typedef uint8 md5_byte_t;
+	/// 32-bit word
+	typedef uint32 md5_word_t;
 
-  /// Initialize the algorithm.
-  static void md5_init(md5_state_t*);
-  /// Append a string to the message.
-  static void md5_append(md5_state_t*, const md5_byte_t* data, size_t nbytes);
-  /// Finish the message and return the digest.
-  static void md5_finish(md5_state_t*, md5_byte_t digest[16]);
+	//@{
+	/// State of the MD5 Algorithm.
+	size_t count[2]; // message length in bits, lsw first
+	md5_word_t abcd[4];  // digest buffer
+	md5_byte_t buf[64];  // accumulate block
+	//@}
 
-protected:
-  static void md5_process(md5_state_t*, const md5_byte_t* data/*[64]*/);
+	void Process(const md5_byte_t* data/*[64]*/);
 
-// Our friendly interface.
-public:
-  /// An MD5 digest is 16 unsigned characters (not 0-terminated).
-  typedef CS::Utility::Checksum::Digest<16> Digest;
+	/// Update hash with a (at most) 4GB chunk of data
+	void AppendInternal (const uint8* input, uint32 length);
+      public:
+	/// An MD5 digest is 16 unsigned characters (not 0-terminated).
+	typedef CS::Utility::Checksum::Digest<16> Digest;
+	
+	MD5 ();
 
-  /// Encode a string.
-  static Digest Encode(csString const&);
-  /// Encode a null-terminated string buffer.
-  static Digest Encode(const char*);
-  /// Encode a buffer.
-  static Digest Encode(const void*, size_t nbytes);
-};
+	/**
+	 * Used to update the the input data hash.
+	 * \param input A pointer to an array of the input data with which to update the hash.
+	 * \param length The length of the input data to hash (in bytes).
+	 */
+	void Append (const uint8* input, size_t length);
+	
+	/** 
+	 * Used to complete the hashing process and obtain the calculated hash.
+	 * After finishing, don't append further data to the hash --
+	 * the resulting digest will be bogus.
+	 * \return The calculated hash.
+	 */
+	Digest Finish ();
 
-#endif // __CS_CSMD5_H__
+	/// Encode a string.
+	static Digest Encode(csString const&);
+	/// Encode a null-terminated string buffer.
+	static Digest Encode(const char*);
+	/// Encode a buffer.
+	static Digest Encode(const void*, size_t nbytes);
+      };
+    } //namespace Checksum
+  } //namespace Utility
+} //namespace CS
+
+typedef CS_DEPRECATED_TYPE_MSG("Use CS::Utility::Checksum::MD5 instead")
+  CS::Utility::Checksum::MD5 csMD5;
+
+#endif // __CS_MD5_H__
 
