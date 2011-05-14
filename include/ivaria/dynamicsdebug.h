@@ -26,20 +26,11 @@
  */
 
 #include "csutil/scf.h"
+#include "ivaria/bullet.h"
 
 struct iDynamicSystem;
 struct iSector;
 struct iMaterialWrapper;
-
-namespace CS {
-namespace Physics {
-namespace Bullet {
-
-enum BodyState;
-
-} // namespace Bullet
-} // namespace Physics
-} // namespace CS
 
 namespace CS {
 namespace Debug {

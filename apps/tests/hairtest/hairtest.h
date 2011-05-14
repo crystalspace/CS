@@ -23,7 +23,9 @@
 #define __HAIRTEST_H__
 
 #include "imesh/animesh.h"
+#include "imesh/animnode/lookat.h"
 #include "imesh/animnode/ragdoll.h"
+#include "imesh/animnode/speed.h"
 #include "imesh/furmesh.h"
 #include "ivaria/dynamics.h"
 #include "ivaria/dynamicsdebug.h"
