@@ -268,7 +268,7 @@ namespace Checksum
   #endif
   }
 
-  static const uint8_t sha256_padding[64] =
+  static const uint8 sha256_padding[64] =
     {
       0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
