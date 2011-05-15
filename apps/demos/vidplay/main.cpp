@@ -16,42 +16,15 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __VIDEOPLAY_H__
-#define __VIDEOPLAY_H__
-
 #include "crystalspace.h"
+#include "vidplay.h"
 
-#include "ivaria/icegui.h"
-
-#include <iostream>
-
-struct iEngine;
-struct iObjectRegistry;
-struct iGraphics3D;
-struct iGraphics2D;
+CS_IMPLEMENT_APPLICATION
 
 /**
- * The main class that runs the video player demo application.
+ * Main entry point to the deferred shading demo application.
  */
-class VidPlay : public CS::Utility::DemoApplication
+int main(int argc, char *argv[])
 {
- private:
-  bool CreateScene ();
-
-  bool inWater;
-  csRef<iTextureHandle> logoTex;
-
- public:
-  VidPlay ();
-
-  //-- CS::Utility::DemoApplication
-  void PrintHelp ();
-  void Frame ();
-  const char* GetApplicationConfigFile()
-  { return "/config/csisland.cfg"; }
-
-  //-- csApplicationFramework
-  bool Application ();
-};
-
-#endif // __VIDEOPLAY_H__
+  return csApplicationRunner<VidPlay>::Run(argc, argv);
+}
