@@ -57,7 +57,7 @@ class FrankieScene : public AvatarScene
   AvatarTest* avatarTest;
 
   // Debug node related
-  bool debug;
+  bool debugBones, debugBBoxes;
   csRef<CS::Animation::iSkeletonDebugNode> debugNode;
   csRef<CS::Animation::iSkeletonDebugNodeFactory> debugNodeFactory;
 
