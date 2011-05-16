@@ -1015,8 +1015,41 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   bool AnimeshObject::HitBeamOutline (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr)
   {
-    // TODO: use a pre-test on the collision boxes of each bones
+    // Pre-test on each bone bounding box
+    csQuaternion rotation;
+    csVector3 position;
+    csHitBeamResult rc;
+    bool hit = false;
+    csRef<CS::Animation::iSkeletonFactory> skeletonFactory = skeleton->GetFactory ();
+    CS::Animation::BoneID numBones = skeletonFactory->GetTopBoneID () + 1;
 
+    // Iterate all bones bounding boxes
+    for (CS::Animation::BoneID i = 0; i < numBones; i++)
+    {
+      if (skeletonFactory->HasBone (i))
+      {
+	csBox3 bbox = GetBoneBoundingBox (i);
+        if (!bbox.Empty ())
+	{
+	  // Test if the beam hits bounding box i
+	  skeletonFactory->GetTransformAbsSpace (i, rotation, position); 
+	  csReversibleTransform object2bone (csMatrix3 (rotation.GetConjugate ()), position); 
+	  csSegment3 transformedSeg (object2bone * start, object2bone * end);
+	  rc.facehit = csIntersect3::BoxSegment (bbox, transformedSeg, rc.isect, &rc.r);
+
+	  if (rc.facehit != -1)
+	  {
+	    hit = true;
+	    break;
+	  }
+	}
+      }
+    }
+
+    if (!hit) 
+      return false;
+
+    // Test each mesh triangle
     csSegment3 seg (start, end);
     csRenderBufferLock<csVector3> vrt (skeleton ? skinnedVertices : postMorphVertices);
 
@@ -1054,8 +1087,41 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csVector3& isect, float* pr, int* polygon_idx,
     iMaterialWrapper** material)
   {
-    // TODO: use a pre-test on the collision boxes of each bones
+    // Pre-test on each bone bounding box
+    csQuaternion rotation;
+    csVector3 position;
+    csHitBeamResult rc;
+    bool hit = false;
+    csRef<CS::Animation::iSkeletonFactory> skeletonFactory = skeleton->GetFactory ();
+    CS::Animation::BoneID numBones = skeletonFactory->GetTopBoneID () + 1;
 
+    // Iterate all bones bounding boxes
+    for (CS::Animation::BoneID i = 0; i < numBones; i++)
+    {
+      if (skeletonFactory->HasBone (i))
+      {
+	csBox3 bbox = GetBoneBoundingBox (i);
+        if (!bbox.Empty ())
+	{
+	  // Test if the beam hits bounding box i
+	  skeletonFactory->GetTransformAbsSpace (i, rotation, position); 
+	  csReversibleTransform object2bone (csMatrix3 (rotation.GetConjugate ()), position); 
+	  csSegment3 transformedSeg (object2bone * start, object2bone * end);
+	  rc.facehit = csIntersect3::BoxSegment (bbox, transformedSeg, rc.isect, &rc.r);
+
+	  if (rc.facehit != -1)
+	  {
+	    hit = true;
+	    break;
+	  }
+	}
+      }
+    }
+
+    if (!hit) 
+      return false;
+
+    // Test each mesh triangle
     csSegment3 seg (start, end);
     float tot_dist = csSquaredDist::PointPoint (start, end);
     float dist, temp;
@@ -1438,7 +1504,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   void AnimeshObject::UpdateObjectBoundingBox ()
   {
-    // 
     csQuaternion rot;
     csVector3 offset;
     csRef<CS::Animation::iSkeletonFactory> skeletonFactory = skeleton->GetFactory ();
