@@ -1,0 +1,37 @@
+<cgfp>
+<program>
+
+<![CDATA[
+
+struct vertex2fragment 
+{  
+  float2 TexCoord : TEXCOORD0;
+  float4 ScreenPos : TEXCOORD1;
+};
+
+float4 main(vertex2fragment IN,
+			uniform sampler2D ScreenTexture,
+			uniform sampler2D DiffuseTexture,
+			uniform sampler2D NormalTexture,
+			uniform sampler2D AmbientTexture,
+			uniform sampler2D DepthTexture)
+{
+	// Do the perspective divide and convert to texture space.
+	float2 screenXY = IN.ScreenPos.xy / IN.ScreenPos.w;
+	float2 screenUV = screenXY * 0.5 + 0.5;
+	float2 texCoord = screenUV; //IN.TexCoord;
+	
+	// Get the depth buffer value at this pixel.  
+	float4 depth = tex2D(DepthTexture, texCoord);
+	float4 diffuse = tex2D(DiffuseTexture, texCoord);
+	float4 normal = tex2D(NormalTexture, texCoord);
+	float4 ambient = tex2D(AmbientTexture, texCoord);
+	float4 screenColor = tex2D(ScreenTexture, texCoord);
+	float3 specular = float3(diffuse.a, normal.a, ambient.a);
+	
+	return float4(normal.r, normal.g, normal.b, 1);	
+}
+
+]]>
+</program>
+</cgfp>
