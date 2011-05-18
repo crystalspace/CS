@@ -307,6 +307,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       csRef<iMaterialWrapper> directionalMaterial;
       csRef<iMaterialWrapper> ambientMaterial;
 
+      /* Shader for post processing */
+      csRef<iShader> postEffectShader;      
+      csRef<csShaderVariable> accumBufferSV;
+      iTextureHandle* finalBuffer;
+
       /* Shader for drawing light volumes. */
       csRef<iShader> lightVolumeShader;
       csRef<csShaderVariable> lightVolumeColorSV;
@@ -455,6 +460,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
         iShaderVarStringSet *svStringSet = shaderManager->GetSVNameStringset ();
         lightVolumeColorSV = lightVolumeShader->GetVariableAdd (svStringSet->Request("static color"));
+
+        // Loads the post effect shader
+        if (!loader->LoadShader ("/shader/deferred/post_effect.xml"))
+        {
+          csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
+            messageID, "Could not load deferred_post_effect shader");
+        }
+
+        postEffectShader = shaderManager->GetShader ("deferred_post_effect");       
+        
+        accumBufferSV = postEffectShader->GetVariableAdd (svStringSet->Request("tex buffer color"));
       }
 
       private:

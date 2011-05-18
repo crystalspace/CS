@@ -252,7 +252,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       }
       DetachAccumBuffer ();
 
+      AttachFinalBuffer();
+      {
+        graphics3D->SetZMode (CS_ZBUF_MESH);
+
+        int drawFlags = CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER;
+        graphics3D->BeginDraw (drawFlags);
+        RenderPostEffect(context);
+        graphics3D->FinishDraw();
+      }
+      DetachAccumBuffer();
+
       contextStack.Empty ();
+    }
+
+    bool AttachFinalBuffer()
+    {
+      if (!graphics3D->SetRenderTarget (lightRenderPersistent.finalBuffer, false, 0, rtaColor0))
+        return false;
+
+      if (!graphics3D->ValidateRenderTargets ())
+        return false;
+
+      return true;
     }
 
     /**
@@ -357,6 +379,37 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     }
 
   private:
+
+    void RenderPostEffect(typename RenderTree::ContextNode *context)
+    {      
+      int subTex;
+      lightRenderPersistent.accumBufferSV->SetValue (GetAccumBuffer(context, subTex));
+
+      // is this needed to setup the SVs ???
+      csShaderVariableStack svStack = shaderMgr->GetShaderVariableStack ();
+      iShaderVariableContext* svContext = context->shadervars;
+      svStack.Clear ();
+      shaderMgr->PushVariables (svStack);
+      if (svContext) svContext->PushVariables (svStack);
+      lightRenderPersistent.postEffectShader->PushVariables (svStack);
+
+      //uint blendFuncReplace = (CS_MIXMODE_BLEND(ONE, ZERO) | CS_MIXMODE_ALPHATEST_DISABLE);
+      csReversibleTransform oldView = graphics3D->GetWorldToCamera ();
+      CS::Math::Matrix4 oldProj = graphics3D->GetProjectionMatrix ();
+
+      graphics3D->SetWorldToCamera (csReversibleTransform ());
+      graphics3D->SetProjectionMatrix (CreateOrthoProj (graphics3D));
+      
+      lightRenderPersistent.quadMesh.shader = lightRenderPersistent.postEffectShader;
+      lightRenderPersistent.quadMesh.z_buf_mode = CS_ZBUF_NONE;
+      //lightRenderPersistent.quadMesh.mixmode = blendFuncReplace;
+      
+      graphics3D->DrawSimpleMesh (lightRenderPersistent.quadMesh, 0);
+
+      // Restores old transforms.
+      graphics3D->SetWorldToCamera (oldView);
+      graphics3D->SetProjectionMatrix (oldProj);
+    }
 
     CS::RenderManager::SimpleContextRender<RenderTree> meshRender;
 

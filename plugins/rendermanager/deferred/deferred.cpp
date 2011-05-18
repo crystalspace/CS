@@ -300,6 +300,22 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
     return false;
   }
 
+  finalBuffer = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
+    graphics2D->GetHeight (),
+    csimg2D,
+    accumFmt,
+    flags,
+    &errStr);
+
+  if (!finalBuffer)
+  {
+    csReport(objRegistry, CS_REPORTER_SEVERITY_ERROR, messageID, 
+      "Could not create final buffer: %s!", errStr.GetCsString ().GetDataSafe ());
+    return false;
+  }
+
+  lightRenderPersistent.finalBuffer = finalBuffer;
+
   // Create GBuffer
   const char *gbufferFmt = cfg->GetStr ("RenderManager.Deferred.GBuffer.BufferFormat", "rgba16_f");
   int bufferCount = cfg->GetInt ("RenderManager.Deferred.GBuffer.BufferCount", 3);
@@ -421,7 +437,8 @@ bool RMDeferred::RenderView(iView *view, bool recursePortals)
   else
   {
     // Output the final result to the backbuffer.
-    DrawFullscreenTexture (accumBuffer, graphics3D);
+    //DrawFullscreenTexture (accumBuffer, graphics3D);
+    DrawFullscreenTexture (finalBuffer, graphics3D);
   }
 
   DebugFrameRender (rview, renderTree);

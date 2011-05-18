@@ -107,6 +107,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     csRef<iStringSet> stringSet;
 
     csRef<iTextureHandle> accumBuffer;
+    csRef<iTextureHandle> finalBuffer;
 
     GBuffer gbuffer;
 
