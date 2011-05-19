@@ -54,7 +54,7 @@ void VidPlay::Frame ()
   //in order to be able to draw 2D, it seems you need to do it after DemoApplication::Frame ()
   //not really major, but might help when drawing the video on-screen
 
-  int w, h;
+  int w, h; 
   logoTex->GetRendererDimensions (w, h);
 
   int screenW = g2d->GetWidth ();
