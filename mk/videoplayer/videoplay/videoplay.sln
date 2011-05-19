@@ -5,7 +5,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "plgvplthogg", "..\plgvpltho
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "plgvplloader", "..\plgvplloader\plgvplloader.vcproj", "{7DB5FF7B-A772-4A47-859E-6C43A6D72F1A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "appVidPlay", "..\appvid\appvidplay.vcproj", "{C97E6B3D-2862-40E8-A94B-714E91CE09CA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "appvideotest", "..\appvid\appvidplay.vcproj", "{C97E6B3D-2862-40E8-A94B-714E91CE09CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

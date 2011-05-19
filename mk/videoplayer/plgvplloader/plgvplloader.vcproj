@@ -189,7 +189,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\vplLoader.cpp"
+				RelativePath="..\..\..\plugins\videodecode\loader\vplLoader.cpp"
 				>
 			</File>
 		</Filter>
@@ -199,7 +199,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\vplLoader.h"
+				RelativePath="..\..\..\plugins\videodecode\loader\vplLoader.h"
 				>
 			</File>
 		</Filter>
