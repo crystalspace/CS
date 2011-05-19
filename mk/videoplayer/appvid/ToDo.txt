@@ -1,0 +1,15 @@
+-abstractize the theora ogg file format. create a plugin for that (kinda like plgsndsyswav)
+	*need to figure out the interfaces for this
+-create a loader (based on plgsndsysloader?)
+
+-a theora ogg file usually contains a bunch of information on the video and video and sound streams
+-then there are a series of streams. might be more than one audio or video stream(?)
+-gonna go for just one for now
+-use iDataBuffer to store info from theora
+
+
+
+-currently, the generic loader isn't linked with the actual cs loader, since I've yet to figure out how that works
+-the theora loader currently reads the headers and sort of decides if it's a theora vid or not
+-also, loading isn't implemented through the vfs yet
+-still need to add the plugin for the player
