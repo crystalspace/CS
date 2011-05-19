@@ -132,6 +132,7 @@ bool SelfShadowDemo::CreateScene ()
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();
 
+  // first light - vertical light
   light = engine->CreateLight (0, csVector3 (0, 20, 0), 100, csColor (1, 1, 1));
   light->SetType(CS_LIGHT_DIRECTIONAL);
 
@@ -141,11 +142,13 @@ bool SelfShadowDemo::CreateScene ()
 
   ll->Add (light);
 
-//   light = engine->CreateLight (0, csVector3 (3, 5,  0), 10, csColor (0, 0, 1));
-//   ll->Add (light);
-// 
-//   light = engine->CreateLight (0, csVector3 (0, 5, -3), 10, csColor (0, 1, 0));
-//   ll->Add (light);
+  // second light - horizontal light
+  light = engine->CreateLight (0, csVector3 (0, 20, 0), 100, csColor (1, 0, 1));
+  light->SetType(CS_LIGHT_DIRECTIONAL);
+
+  light->GetMovable()->Transform(matrixY); 
+
+  ll->Add (light);
 
   // Setup the sector and the camera
   view->GetCamera ()->SetSector (room);
