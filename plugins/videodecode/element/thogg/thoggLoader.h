@@ -2,8 +2,8 @@
 #define __THOGGLOADER_H__
 
 #include <iutil/comp.h>
-#include <ividplay/vpl_loader.h>
-#include <ividplay/vpl_structs.h>
+#include <videodecode/vpl_loader.h>
+#include <videodecode/vpl_structs.h>
 #include <csutil/scf_implementation.h>
 #include "thoggData.h"
 

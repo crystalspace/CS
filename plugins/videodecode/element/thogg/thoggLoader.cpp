@@ -127,7 +127,6 @@ csVPLvideoFormat *readTheoraHeaders(FILE *infile)
   }
 
 
-  fclose(infile);
   
   if(!format->foundVid)
 	  return NULL;
@@ -176,12 +175,12 @@ csPtr<iVPLData> thoggLoader::LoadSound (const char * pFileName, const char *pDes
 	/// check if the video is actually a theora
 	if(format==NULL)
 	{
-	csReport(object_reg, CS_REPORTER_SEVERITY_DEBUG, QUALIFIED_PLUGIN_NAME,
-      "File '%s' is not a Theora video.\n", pFileName);
-		return NULL;
+	  csReport(object_reg, CS_REPORTER_SEVERITY_DEBUG, QUALIFIED_PLUGIN_NAME,
+		"File '%s' is not a Theora video.\n", pFileName);
 	}
 	videoData->SetFormat (format);
 
+    fclose(infile);
 	return csPtr<iVPLData> (videoData);
   }
 }

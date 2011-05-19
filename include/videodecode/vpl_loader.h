@@ -20,7 +20,7 @@
 #define __CS_VPL_LOADER_H__
 
 /**\file
- * Sound system: loader
+ * Sound system: loader 
  */
 
 #include "csutil/scf.h"

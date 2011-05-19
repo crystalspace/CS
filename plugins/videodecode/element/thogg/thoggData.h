@@ -2,8 +2,8 @@
 #define __THOGGDATA_H__
 
 #include <iutil/comp.h>
-#include <ividplay/vpl_data.h>
-#include <ividplay/vpl_structs.h>
+#include <videodecode/vpl_data.h>
+#include <videodecode/vpl_structs.h>
 #include <csutil/scf_implementation.h>
 
 #define QUALIFIED_PLUGIN_NAME "crystalspace.vpl.element.thogg"

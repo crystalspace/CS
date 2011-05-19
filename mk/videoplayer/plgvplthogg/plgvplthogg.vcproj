@@ -185,7 +185,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\plugins\videoplay\element\thogg\plugin_impl.cpp"
+				RelativePath="..\..\..\plugins\videodecode\element\thogg\plugin_impl.cpp"
 				>
 			</File>
 			<File
@@ -225,7 +225,7 @@
 			Name="Other Files"
 			>
 			<File
-				RelativePath="..\..\..\plugins\videoplay\element\thogg\vplthogg.cspulgin"
+				RelativePath="..\..\..\plugins\videodecode\element\thogg\vplthogg.csplugin"
 				>
 			</File>
 		</Filter>

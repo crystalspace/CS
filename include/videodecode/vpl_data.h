@@ -20,7 +20,7 @@
 #define __CS_VPL_DATA_H__
 
 /**\file
- * Video Player: data container
+ * Video Player: data container 
  */
 
 #include "csutil/scf.h"

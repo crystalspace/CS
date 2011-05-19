@@ -48,7 +48,7 @@ struct csVPLvideoFormat
   /// the FPS of the video stream
   float FPS;
 
-  /// the target bitrate of the video stream
+  /// the target bitrate of the video stream 
   int target_bitrate;
 };
 

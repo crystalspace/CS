@@ -16,7 +16,7 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "vidplay.h"
+#include "videotest.h"
 
 #include "csutil/custom_new_disable.h"
 #include <CEGUI.h>
@@ -26,12 +26,12 @@
 
 #define WATER_LEVEL 50.0
 
-VidPlay::VidPlay ()
-  : DemoApplication ("CrystalSpace.VidPlay"), inWater (false)
+VideoTest::VideoTest ()
+  : DemoApplication ("CrystalSpace.VideoTest"), inWater (false)
 {
 }
 
-void VidPlay::PrintHelp ()
+void VideoTest::PrintHelp ()
 {
   csCommandLineHelper commandLineHelper;
 
@@ -40,7 +40,7 @@ void VidPlay::PrintHelp ()
     (GetObjectRegistry (), "csvid", "csvid", "Crystal Space's video player demo.");
 }
 
-void VidPlay::Frame ()
+void VideoTest::Frame ()
 {
   iCamera* camera = view->GetCamera ();
 
@@ -54,7 +54,7 @@ void VidPlay::Frame ()
   //in order to be able to draw 2D, it seems you need to do it after DemoApplication::Frame ()
   //not really major, but might help when drawing the video on-screen
 
-  int w, h; 
+  int w, h;
   logoTex->GetRendererDimensions (w, h);
 
   int screenW = g2d->GetWidth ();
@@ -82,7 +82,7 @@ void VidPlay::Frame ()
 
 }
 
-bool VidPlay::Application ()
+bool VideoTest::Application ()
 {
   // Default behavior from DemoApplication
   if (!DemoApplication::Application ())
@@ -111,7 +111,7 @@ bool VidPlay::Application ()
   return true;
 }
 
-bool VidPlay::CreateScene ()
+bool VideoTest::CreateScene ()
 {
   printf ("Creating level...\n");
 

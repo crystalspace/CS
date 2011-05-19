@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="appVidPlay"
+	Name="appvideotest"
 	ProjectGUID="{C97E6B3D-2862-40E8-A94B-714E91CE09CA}"
 	RootNamespace="appvidplay"
 	SccProjectName="Svn"
@@ -22,8 +22,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\..\..\out\debug9\build\appvidplay\  "
-			IntermediateDirectory="..\..\..\out\debug9\build\appvidplay\"
+			OutputDirectory="..\..\..\out\debug9\build\appvideotest\  "
+			IntermediateDirectory="..\..\..\out\debug9\build\appvideotest\"
 			ConfigurationType="1"
 			CharacterSet="1"
 			>
@@ -51,10 +51,10 @@
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile="..\..\..\out\debug9\build\appvidplay\appvidplay.pch"
-				AssemblerListingLocation="..\..\..\out\debug9\build\appvidplay\"
-				ObjectFile="..\..\..\out\debug9\build\appvidplay\"
-				ProgramDataBaseFileName="..\..\..\out\debug9\build\appvidplay\Win32\vidplay.pdb"
+				PrecompiledHeaderFile="..\..\..\out\debug9\build\appvideotest\appvideotest.pch"
+				AssemblerListingLocation="..\..\..\out\debug9\build\appvideotest\"
+				ObjectFile="..\..\..\out\debug9\build\appvideotest\"
+				ProgramDataBaseFileName="..\..\..\out\debug9\build\appvideotest\Win32\videotest.pdb"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -73,12 +73,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="zlib.lib libcrystalspace_d.lib CEGUIBase-vc9_d.lib"
-				OutputFile="..\..\..\vidplay.exe"
+				OutputFile="..\..\..\videotest.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\winlibs\x86\lib;..\..\..\win32libs\lib"
 				IgnoreDefaultLibraryNames="LIBC,LIBCD,LIBCMT,LIBCMTD,MSVCRT"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="..\..\..\out\debug9\build\appvidplay\Win32\vidplay.pdb"
+				ProgramDatabaseFile="..\..\..\out\debug9\build\appvideotest\Win32\videotest.pdb"
 				SubSystem="1"
 				LargeAddressAware="2"
 				TargetMachine="1"
@@ -88,7 +88,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
-				AdditionalManifestFiles="..\..\msvc\appvidplay.manifest"
+				AdditionalManifestFiles="..\..\msvc\appvideotest.manifest"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -215,11 +215,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\apps\demos\vidplay\main.cpp"
+				RelativePath="..\..\..\apps\tests\videotest\main.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\apps\demos\vidplay\vidplay.cpp"
+				RelativePath="..\..\..\apps\tests\videotest\videotest.cpp"
 				>
 			</File>
 		</Filter>
@@ -229,7 +229,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\apps\demos\vidplay\vidplay.h"
+				RelativePath="..\..\..\apps\tests\videotest\videotest.h"
 				>
 			</File>
 		</Filter>
@@ -239,20 +239,11 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath="..\..\msvc\appvidplay.rc"
+				RelativePath="..\..\msvc\appvideotest.rc"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCResourceCompilerTool"
-						PreprocessorDefinitions="_DEBUG;CS_DEBUG;CS_WIN32_CSCONFIG;__CRYSTAL_SPACE__;CS_SUPPORTS_MMX;_WINDOWS;PROJECTGEN_VERSION=9"
-						AdditionalIncludeDirectories=".;..\..\apps\tutorial\simple1;..\..\winlibs\x86\include;..\..\win32libs\include;..\..;..\..\include"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\ToDo.txt"
+				RelativePath="..\..\..\apps\tests\videotest\ToDo.txt"
 				>
 			</File>
 		</Filter>

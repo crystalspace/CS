@@ -185,7 +185,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\plugins\videoplay\loader\plugin_impl.cpp"
+				RelativePath="..\..\..\plugins\videodecode\loader\plugin_impl.cpp"
 				>
 			</File>
 			<File
@@ -217,7 +217,7 @@
 			Name="Other Files"
 			>
 			<File
-				RelativePath="..\..\..\plugins\videoplay\loader\vplloader.csplugin"
+				RelativePath="..\..\..\plugins\videodecode\loader\vplloader.csplugin"
 				>
 			</File>
 		</Filter>
