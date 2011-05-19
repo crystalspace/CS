@@ -1,0 +1,11 @@
+SubDir TOP apps demos selfshadow ;
+
+if $(CEGUI.AVAILABLE) = "yes"
+{
+  Description selfshadowdemo : "Demonstrates the use of Self Shadowing RM." ;
+  Application selfshadowdemo : [ Wildcard *.cpp *.h ] ;
+  CFlags selfshadowdemo : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+  LinkWith selfshadowdemo : crystalspace ;
+  ExternalLibs selfshadowdemo : CEGUI ;
+  FileListEntryApplications selfshadowdemo : app-demo ;
+}
