@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- profiler.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.vpl.element.thogg</name>
+        <implementation>thoggLoader</implementation>
+        <description>Theora OGG Video Player Element</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

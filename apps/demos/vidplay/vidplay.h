@@ -25,6 +25,10 @@
 
 #include <iostream>
 
+#include <ividplay/vpl_structs.h>
+#include <ividplay/vpl_data.h>
+#include <ividplay/vpl_loader.h>
+
 struct iEngine;
 struct iObjectRegistry;
 struct iGraphics3D;

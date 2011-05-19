@@ -52,6 +52,8 @@ void VidPlay::Frame ()
   DemoApplication::Frame ();
 
   //in order to be able to draw 2D, it seems you need to do it after DemoApplication::Frame ()
+  //not really major, but might help when drawing the video on-screen
+
   int w, h;
   logoTex->GetRendererDimensions (w, h);
 
@@ -86,19 +88,32 @@ bool VidPlay::Application ()
   if (!DemoApplication::Application ())
     return false;
 
+  if (!csInitializer::RequestPlugins (object_reg,
+        CS_REQUEST_PLUGIN ("crystalspace.vpl.loader", iVPLLoader),
+ 	CS_REQUEST_END))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.vidplaydemo",
+	"Can't initialize plugins!");
+    return false;
+  }
+
+  csRef<iVPLLoader> vlpLoader = csQueryRegistry<iVPLLoader> (object_reg);
+  csRef<iVPLData> a= vlpLoader->LoadSound("123pixel_aspect_ratio.ogg");
+
    // Create the scene
   if (!CreateScene ())
-     return false;
+    return false;
 
    // Run the application
-   Run();
+  Run();
 
-   return true;
+  return true;
 }
 
 bool VidPlay::CreateScene ()
 {
-  printf ("Loading level...\n");
+  printf ("Creating level...\n");
 
   logoTex = loader->LoadTexture ("/lib/std/cslogo2.png", CS_TEXTURE_2D, NULL);
   if (!logoTex.IsValid ())
