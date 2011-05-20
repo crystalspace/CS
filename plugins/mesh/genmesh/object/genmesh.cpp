@@ -412,7 +412,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   renderMeshes.Empty();
   renderMeshes.SetCapacity (sm.GetSize ());
 
-  const csBox3* bboxes;
+  const csBox3* bboxes = 0;
   if (anim_ctrl_bbox)
     bboxes = AnimControlGetBboxes ();
 

@@ -37,6 +37,7 @@ static void RandomColor (float& r, float& g, float& b)
   float sm2 = (float)(rand () % 1000)/1000.;
   switch ((rand ()>>3) % 3)
   {
+    default:
     case 0: r = sig; g = sm1; b = sm2; break;
     case 1: r = sm1; g = sig; b = sm2; break;
     case 2: r = sm1; g = sm2; b = sig; break;
