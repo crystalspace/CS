@@ -2862,7 +2862,61 @@ AS_IF([test $enable_make_emulation = yes],
 #------------------------------------------------------------------------------
 AC_OUTPUT
 
+#------------------------------------------------------------------------------
+# Result Summary.
+#------------------------------------------------------------------------------
 
+AC_MSG_NOTICE([
+******************************************************************************
+***             Crystal Space : Configuration Results Summary              ***
+******************************************************************************
+  Build mode  : ${cs_build_mode}
+  Version     : ${PACKAGE_VERSION} (SVN: ${cs_cv_source_is_svn})
+  CS winlibs  : ${cs_cv_cslibs}
+  zlib        : ${cs_cv_libz}
+
+  Rendering
+    OpenGL    : ${cs_cv_libgl}
+    Cg & CgGL : ${cs_cv_with_CgGL}
+
+  Sound
+    OSS       : ${cs_cv_header_soundcard_h}
+    ALSA      : ${cs_cv_libasound}
+    OpenAL    : ${cs_cv_libopenal}
+    Speex     : ${cs_cv_libspeex}
+    Ogg       : ${cs_cv_libogg}
+    Vorbis    : ${cs_cv_libvorbis}
+    Jack      : ${cs_cv_libjackasyn}
+
+  Image
+    JPEG      : ${cs_cv_libjpeg}
+    PNG       : ${cs_cv_libpng}
+    MNG       : ${cs_cv_libmng}
+    lcms      : ${cs_cv_liblcms}
+
+  External model formats
+    3DS       : ${cs_cv_lib3ds}
+    Assimp    : ${cs_cv_libassimp}
+    Cal3D     : ${cs_cv_libcal3d}
+
+  Physics
+    Bullet    : ${cs_cv_libbullet}
+    ODE       : ${cs_cv_libode}
+
+  GUI
+    CEGUI     : ${cs_cv_CEGUI_recent}
+    wxWidgets : ${cs_cv_libwx} (wxAUI: ${cs_cv_libwx_aui}, OpenGL: ${cs_cv_libwx_opengl})
+
+  Scripting & Bindings
+    Perl      : ${cs_cv_perl}
+    Python    : ${cs_cv_python}
+    Java      : ${cs_cv_java}
+
+  Miscellaneous
+    CPPUnit   : ${cs_cv_libcppunit}
+    cURL      : ${cs_cv_libcurl}
+    Linux Joystick : ${cs_cv_sys_linux_joystick}
+])
 
 #------------------------------------------------------------------------------
 # In case libbfd is used for debugging, emit a message notifying developers
