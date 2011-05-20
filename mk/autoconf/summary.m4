@@ -40,8 +40,8 @@ AC_PREREQ([2.56])
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_NOTABLE],
     [$5
-    AS_IF(m4_bmatch([$4], [^\$], [test -z "$4" || test "no" = "$4"], [$4]),
-        [_cs_sum_ok=no], [_cs_sum_ok=yes])
+    AS_IF(m4_bmatch([$4], [^\$], [test -n "$4" && test "no" != "$4"], [$4]),
+        [_cs_sum_ok=yes], [_cs_sum_ok=no])
     _cs_summary="$_cs_summary
 $1|m4_default([$2],[other])|$_cs_sum_ok|m4_default([$3],[*])"
     ])
