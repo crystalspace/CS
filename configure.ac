@@ -1136,8 +1136,7 @@ CS_NOTABLE([zlib], [], [], [$cs_cv_libz],
     [CS_CHECK_LIB_WITH([z],
 	[AC_LANG_PROGRAM([[#include <zlib.h>]], [zlibVersion()])],
 	[$srcdir/libs/zlib*], [], [CS_EMIT_BUILD_RESULT([cs_cv_libz], [ZLIB])],
-	[AC_MSG_NOTICE([*** zlib not found; VFS will be unusable])], 
-	[], [], [], [zlib])])
+	[], [], [], [], [zlib])])
 
 
 
