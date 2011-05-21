@@ -970,7 +970,7 @@ AS_IF([test $cs_cv_libx11 = yes],
     AC_PATH_XTRA
     X_LFLAGS="$X_PRE_LIBS $X_LIBS -lXext -lX11 $X_EXTRA_LIBS"])
 
-
+CS_NOTABLE([x11], [rendering], [unix], [test "yes" != "$no_x"])
 AS_IF([test "$no_x" != yes],
     [# We must be especially careful to instruct CS_EMIT_BUILD_PROPERTY() to
     # emit the following properties even if their values are empty.  This is
@@ -1108,16 +1108,17 @@ AC_DEFUN([CS_CHECK_DIRECTX],
 	    [-ldsound -ldinput8])], 
 	[C++], [CS_EMIT_BUILD_RESULT([cs_cv_libdirectx$1], [DIRECTX$1])])])
 
-AS_IF([test $cs_host_family = windows],
+m4_define([cs_dx_min_ver], [8])
+CS_NOTABLE([directx], [rendering], [windows], [$cs_cv_libdirectx]cs_dx_min_ver,
     [AC_CHECK_TYPE([int32], [AC_DEFINE([HAVE_TYPE_INT32])], [])
-    CS_CHECK_DIRECTX([8])])
+    CS_CHECK_DIRECTX(cs_dx_min_ver)])
 
 
 
 #------------------------------------------------------------------------------
 # Check for the Windows Multimedia library, used by the 'sndwaveout' plugin.
 #------------------------------------------------------------------------------
-AS_IF([test $cs_host_family = windows],
+CS_NOTABLE([waveout], [audio], [windows], [$cs_cv_libwaveout],
     [CS_CHECK_BUILD([for waveout], [cs_cv_libwaveout],
 	[AC_LANG_PROGRAM(
 	    [[#include <windows.h>
@@ -1206,23 +1207,25 @@ CS_NOTABLE([mng], [image], [], [$cs_cv_libmng],
 #------------------------------------------------------------------------------
 # Check for vgvm. (And it's dependencies, cairo and cairomm.)
 #------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([cairo],
-    [AC_LANG_PROGRAM(
-	[[#include <cairo.h>]],
-	[cairo_create (0)])],
-    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcairo], [CAIRO])])
+CS_NOTABLE([cairo], [image], [], [$cs_cv_libcairo],
+    [CS_CHECK_LIB_WITH([cairo],
+	[AC_LANG_PROGRAM(
+	    [[#include <cairo.h>]],
+	    [cairo_create (0)])],
+	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcairo], [CAIRO])])])
 
-CS_CHECK_LIB_WITH([cairomm],
-    [AC_LANG_PROGRAM(
-	[[#include <cairomm/cairomm.h>]],
-	[Cairo::Context c ((cairo_t*)0)])],
-    [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libcairomm], [CAIROMM])], [],
-    [$cs_cv_libcairo_cflags],
-    [$cs_cv_libcairo_lflags],
-    [$cs_cv_libcairo_libs],
-    [cairomm-1, cairomm-1.0])
+CS_NOTABLE([cairomm], [image], [], [$cs_cv_libcairomm],
+    [CS_CHECK_LIB_WITH([cairomm],
+	[AC_LANG_PROGRAM(
+	    [[#include <cairomm/cairomm.h>]],
+	    [Cairo::Context c ((cairo_t*)0)])],
+	[], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libcairomm], [CAIROMM])], [],
+	[$cs_cv_libcairo_cflags],
+	[$cs_cv_libcairo_lflags],
+	[$cs_cv_libcairo_libs],
+	[cairomm-1, cairomm-1.0])])
 
-CS_NOTABLE([vgvm], [], [], [$cs_cv_libvgvm],
+CS_NOTABLE([vgvm], [image], [], [$cs_cv_libvgvm],
     [CS_CHECK_LIB_WITH([vgvm],
 	[AC_LANG_PROGRAM(
 	    [[#include <vgvm/vgvm.h>]],
@@ -1483,6 +1486,8 @@ AS_IF([test $cs_cv_libbullet = yes],
 	[$cs_cv_libbullet_cflags],
 	[$cs_cv_libbullet_lflags],
 	[$cs_cv_libbullet_libs])])
+
+
 
 #------------------------------------------------------------------------------
 # Check for OpenAL.
@@ -2079,6 +2084,8 @@ CS_CHECK_BUILD([for sysconf(_SC_NPROCESSORS_ONLN)], [cs_cv_sysconf_processors],
 	[sysconf(_SC_NPROCESSORS_ONLN);])],
     [],[],
     [CS_HEADER_PROPERTY([CS_HAVE_SYSCONF_PROCESSORS])])
+
+
    
 #------------------------------------------------------------------------------
 # Check for nullptr
