@@ -10905,13 +10905,13 @@ fi
 fi
         ;;
     esac
-    if test -z "$cs_cv_cslibs" || test "no" = "$cs_cv_cslibs"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_cslibs" && test "no" != "$cs_cv_cslibs"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-cs-winlibs|other|$_cs_sum_ok"
+cs-winlibs|other|$_cs_sum_ok|windows"
 
 
 
@@ -13591,13 +13591,13 @@ fi
 fi
 
 
-    if test -z "$cs_cv_perl" || test "no" = "$cs_cv_perl"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_perl" && test "no" != "$cs_cv_perl"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-perl|bindings|$_cs_sum_ok"
+perl|bindings|$_cs_sum_ok|*"
 
 
 
@@ -14275,13 +14275,13 @@ fi
 else
   cs_cv_python=no
 fi
-    if test -z "$cs_cv_python" || test "no" = "$cs_cv_python"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_python" && test "no" != "$cs_cv_python"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-python|bindings|$_cs_sum_ok"
+python|bindings|$_cs_sum_ok|*"
 
 
 
@@ -14877,13 +14877,13 @@ done
 fi
 
 
-    if test -z "$cs_cv_java" || test "no" = "$cs_cv_java"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_java" && test "no" != "$cs_cv_java"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-java|bindings|$_cs_sum_ok"
+java|bindings|$_cs_sum_ok|*"
 
 
 
@@ -27283,6 +27283,14 @@ fi
 fi
 
 
+    if test "yes" != "$no_x"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+x11|rendering|$_cs_sum_ok|unix"
+
 if test "$no_x" != yes; then :
   # We must be especially careful to instruct CS_EMIT_BUILD_PROPERTY() to
     # emit the following properties even if their values are empty.  This is
@@ -32064,13 +32072,13 @@ else
 	cs_cv_libgl_libs=''
 
 fi
-    if test -z "$cs_cv_libgl" || test "no" = "$cs_cv_libgl"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_libgl" && test "no" != "$cs_cv_libgl"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-opengl|rendering|$_cs_sum_ok"
+opengl|rendering|$_cs_sum_ok|*"
 
 
 if test $cs_cv_libgl = yes; then :
@@ -34839,8 +34847,8 @@ fi
 # CS_CHECK_DIRECTX([DSOUND-VERSION])
 
 
-if test $cs_host_family = windows; then :
-  ac_fn_c_check_type "$LINENO" "int32" "ac_cv_type_int32" "$ac_includes_default"
+
+ac_fn_c_check_type "$LINENO" "int32" "ac_cv_type_int32" "$ac_includes_default"
 if test "x$ac_cv_type_int32" = x""yes; then :
   $as_echo "#define HAVE_TYPE_INT32 1" >>confdefs.h
 
@@ -35126,15 +35134,21 @@ else
 	cs_cv_libdirectx8_libs=''
 
 fi
+    if test -n "$cs_cv_libdirectx8" && test "no" != "$cs_cv_libdirectx8"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
+    _cs_summary="$_cs_summary
+directx|rendering|$_cs_sum_ok|windows"
+
 
 
 
 #------------------------------------------------------------------------------
 # Check for the Windows Multimedia library, used by the 'sndwaveout' plugin.
 #------------------------------------------------------------------------------
-if test $cs_host_family = windows; then :
-  if test "" != yes; then :
+if test "" != yes; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for waveout" >&5
 $as_echo_n "checking for waveout... " >&6; }
 if test "${cs_cv_libwaveout+set}" = set; then :
@@ -35398,7 +35412,14 @@ else
 	cs_cv_libwaveout_libs=''
 
 fi
+    if test -n "$cs_cv_libwaveout" && test "no" != "$cs_cv_libwaveout"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
+    _cs_summary="$_cs_summary
+waveout|audio|$_cs_sum_ok|windows"
+
 
 
 
@@ -36493,17 +36514,14 @@ fi
 "
 fi
 fi
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: *** zlib not found; VFS will be unusable" >&5
-$as_echo "$as_me: *** zlib not found; VFS will be unusable" >&6;}
 fi
-    if test -z "$cs_cv_libz" || test "no" = "$cs_cv_libz"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_libz" && test "no" != "$cs_cv_libz"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-zlib|other|$_cs_sum_ok"
+zlib|other|$_cs_sum_ok|*"
 
 
 
@@ -37606,13 +37624,13 @@ fi
 fi
 fi
 fi
-    if test -z "$cs_cv_libpng" || test "no" = "$cs_cv_libpng"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_libpng" && test "no" != "$cs_cv_libpng"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-png|image|$_cs_sum_ok"
+png|image|$_cs_sum_ok|*"
 
 
 
@@ -38713,13 +38731,13 @@ fi
 fi
 fi
 fi
-    if test -z "$cs_cv_libjpeg" || test "no" = "$cs_cv_libjpeg"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_libjpeg" && test "no" != "$cs_cv_libjpeg"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-jpeg|image|$_cs_sum_ok"
+jpeg|image|$_cs_sum_ok|*"
 
 
 
@@ -39418,13 +39436,13 @@ fi
     if test "$cs_cv_liblcms" = yes; then :
 
 fi
-    if test -z "$cs_cv_liblcms" || test "no" = "$cs_cv_liblcms"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_liblcms" && test "no" != "$cs_cv_liblcms"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-lcms|image|$_cs_sum_ok"
+lcms|image|$_cs_sum_ok|*"
 
 
 
@@ -40515,13 +40533,13 @@ fi
 fi
 fi
 fi
-    if test -z "$cs_cv_libmng" || test "no" = "$cs_cv_libmng"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_libmng" && test "no" != "$cs_cv_libmng"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-mng|image|$_cs_sum_ok"
+mng|image|$_cs_sum_ok|*"
 
 
 
@@ -41236,6 +41254,14 @@ fi
 fi
 fi
 fi
+    if test -n "$cs_cv_libcairo" && test "no" != "$cs_cv_libcairo"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+cairo|image|$_cs_sum_ok|*"
+
 
 
 # Check whether --with-cairomm was given.
@@ -42706,6 +42732,14 @@ fi
 fi
 fi
 fi
+    if test -n "$cs_cv_libcairomm" && test "no" != "$cs_cv_libcairomm"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+cairomm|image|$_cs_sum_ok|*"
+
 
 
 # Check whether --with-vgvm was given.
@@ -43414,13 +43448,13 @@ fi
 fi
 fi
 fi
-    if test -z "$cs_cv_libvgvm" || test "no" = "$cs_cv_libvgvm"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_libvgvm" && test "no" != "$cs_cv_libvgvm"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-vgvm|other|$_cs_sum_ok"
+vgvm|image|$_cs_sum_ok|*"
 
 
 
@@ -44136,13 +44170,13 @@ fi
 fi
 fi
 fi
-    if test -z "$cs_cv_libogg" || test "no" = "$cs_cv_libogg"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_libogg" && test "no" != "$cs_cv_libogg"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-ogg|audio|$_cs_sum_ok"
+ogg|audio|$_cs_sum_ok|*"
 
 
 if test "$cs_cv_libogg" = yes; then :
@@ -44854,13 +44888,13 @@ fi
 fi
 fi
 fi
-    if test -z "$cs_cv_libvorbis" || test "no" = "$cs_cv_libvorbis"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_libvorbis" && test "no" != "$cs_cv_libvorbis"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-vorbis|audio|$_cs_sum_ok"
+vorbis|audio|$_cs_sum_ok|*"
 
 
 if test "$cs_cv_libvorbis" = yes; then :
@@ -46290,13 +46324,13 @@ fi
 fi
 fi
 fi
-    if test -z "$cs_cv_libspeex" || test "no" = "$cs_cv_libspeex"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_libspeex" && test "no" != "$cs_cv_libspeex"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-speex|audio|$_cs_sum_ok"
+speex|audio|$_cs_sum_ok|*"
 
 
 if test "$cs_cv_libspeex" = yes; then :
@@ -48523,13 +48557,13 @@ else
 fi
 fi
 fi
-    if test -z "$cs_cv_lib3ds_recent" || test "no" = "$cs_cv_lib3ds_recent"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_lib3ds_recent" && test "no" != "$cs_cv_lib3ds_recent"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-3ds|models|$_cs_sum_ok"
+3ds|models|$_cs_sum_ok|*"
 
 
 
@@ -49741,13 +49775,13 @@ fi
 else
   cs_cv_libode_recent=no
 fi
-    if test -z "$cs_cv_libode_recent" || test "no" = "$cs_cv_libode_recent"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_libode_recent" && test "no" != "$cs_cv_libode_recent"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-ode|physics|$_cs_sum_ok"
+ode|physics|$_cs_sum_ok|*"
 
 
 
@@ -50662,13 +50696,13 @@ else
 
 fi
 fi
-    if test -z "$cs_cv_bullet_recent" || test "no" = "$cs_cv_bullet_recent"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_bullet_recent" && test "no" != "$cs_cv_bullet_recent"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-bullet|physics|$_cs_sum_ok"
+bullet|physics|$_cs_sum_ok|*"
 
 
 if test $cs_cv_libbullet = yes; then :
@@ -50917,6 +50951,8 @@ else
 
 fi
 fi
+
+
 
 #------------------------------------------------------------------------------
 # Check for OpenAL.
@@ -51215,13 +51251,13 @@ else
 	cs_cv_libopenal_libs=''
 
 fi
-    if test -z "$cs_cv_libopenal" || test "no" = "$cs_cv_libopenal"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_libopenal" && test "no" != "$cs_cv_libopenal"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-openal|audio|$_cs_sum_ok"
+openal|audio|$_cs_sum_ok|*"
 
 if test $cs_cv_libopenal = yes; then :
   if test "" != yes; then :
@@ -52875,13 +52911,13 @@ else
 
 fi
 fi
-    if test -z "$cs_cv_freetype2_recent" || test "no" = "$cs_cv_freetype2_recent"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_freetype2_recent" && test "no" != "$cs_cv_freetype2_recent"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-freetype2|other|$_cs_sum_ok"
+freetype2|other|$_cs_sum_ok|*"
 
 
 
@@ -53988,13 +54024,13 @@ else
 
 fi
 fi
-    if test -z "$cs_cv_cal3d_recent" || test "no" = "$cs_cv_cal3d_recent"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_cal3d_recent" && test "no" != "$cs_cv_cal3d_recent"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-cal3d|models|$_cs_sum_ok"
+cal3d|models|$_cs_sum_ok|*"
 
 
 
@@ -55125,13 +55161,13 @@ else
 fi
 
 
-    if test -z "$cs_cv_libwx_opengl" || test "no" = "$cs_cv_libwx_opengl"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_libwx_opengl" && test "no" != "$cs_cv_libwx_opengl"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-wxwidgets|gui|$_cs_sum_ok"
+wxwidgets|gui|$_cs_sum_ok|*"
 
 if test $cs_cv_libwx_opengl = yes; then :
   if test "$cs_cv_libwx_opengl" = yes; then :
@@ -56816,13 +56852,13 @@ else
 
 fi
 fi
-    if test -z "$cs_cv_CEGUI_recent" || test "no" = "$cs_cv_CEGUI_recent"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_CEGUI_recent" && test "no" != "$cs_cv_CEGUI_recent"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-cegui|gui|$_cs_sum_ok"
+cegui|gui|$_cs_sum_ok|*"
 
 
 
@@ -57918,13 +57954,13 @@ fi
 fi
 fi
 fi
-    if test -z "$cs_cv_libGTK" || test "no" = "$cs_cv_libGTK"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_libGTK" && test "no" != "$cs_cv_libGTK"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-gtk|other|$_cs_sum_ok"
+gtk|other|$_cs_sum_ok|unix"
 
 
 if test $cs_cv_libGTK = yes; then :
@@ -58455,13 +58491,13 @@ else
 	cs_cv_sys_linux_joystick_libs=''
 
 fi
-    if test -z "$cs_cv_sys_linux_joystick" || test "no" = "$cs_cv_sys_linux_joystick"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_sys_linux_joystick" && test "no" != "$cs_cv_sys_linux_joystick"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-linux-joystick|other|$_cs_sum_ok"
+linux-joystick|other|$_cs_sum_ok|unix"
 
 
 
@@ -63187,13 +63223,13 @@ fi
 fi
 
     LDFLAGS="$LDFLAGS_BACKUP"
-    if test -z "$cs_cv_libCgGL" || test "no" = "$cs_cv_libCgGL"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_libCgGL" && test "no" != "$cs_cv_libCgGL"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-cg|rendering|$_cs_sum_ok"
+cg|rendering|$_cs_sum_ok|*"
 
 
 
@@ -63237,13 +63273,13 @@ fi
 "
 fi
 fi
-    if test -z "$cs_cv_header_soundcard_h" || test "no" = "$cs_cv_header_soundcard_h"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_header_soundcard_h" && test "no" != "$cs_cv_header_soundcard_h"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-oss|audio|$_cs_sum_ok"
+oss|audio|$_cs_sum_ok|unix"
 
 
 
@@ -63960,13 +63996,13 @@ fi
 fi
 fi
 fi
-    if test -z "$cs_cv_libjackasyn" || test "no" = "$cs_cv_libjackasyn"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_libjackasyn" && test "no" != "$cs_cv_libjackasyn"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-jackasyn|audio|$_cs_sum_ok"
+jackasyn|audio|$_cs_sum_ok|unix"
 
 
 
@@ -64681,13 +64717,13 @@ fi
 fi
 fi
 fi
-    if test -z "$cs_cv_libasound" || test "no" = "$cs_cv_libasound"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_libasound" && test "no" != "$cs_cv_libasound"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-alsa|audio|$_cs_sum_ok"
+alsa|audio|$_cs_sum_ok|unix"
 
 
 
@@ -65404,13 +65440,13 @@ fi
 fi
 fi
 fi
-    if test -z "$cs_cv_libassimp" || test "no" = "$cs_cv_libassimp"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_libassimp" && test "no" != "$cs_cv_libassimp"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-assimp|models|$_cs_sum_ok"
+assimp|models|$_cs_sum_ok|*"
 
 
 
@@ -66131,13 +66167,13 @@ fi
 fi
 fi
 fi
-    if test -z "$cs_cv_libcurl" || test "no" = "$cs_cv_libcurl"; then :
-  _cs_sum_ok=no
-else
+    if test -n "$cs_cv_libcurl" && test "no" != "$cs_cv_libcurl"; then :
   _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
     _cs_summary="$_cs_summary
-curl|other|$_cs_sum_ok"
+curl|other|$_cs_sum_ok|*"
 
 
 
@@ -68473,6 +68509,8 @@ else
 
 fi
 
+
+
 #------------------------------------------------------------------------------
 # Check for nullptr
 #------------------------------------------------------------------------------
@@ -69813,14 +69851,6 @@ else
 
 fi
 fi
-    if test -z "$cs_cv_libcppunit" || test "no" = "$cs_cv_libcppunit"; then :
-  _cs_sum_ok=no
-else
-  _cs_sum_ok=yes
-fi
-    _cs_summary="$_cs_summary
-cppunit|other|$_cs_sum_ok"
-
 
 
 
@@ -78739,6 +78769,7 @@ cs_summary=`echo "$_cs_summary" | sort -i -t '|' -k 3,3r -k 1,1 |
               print "";
             print heading[ok]
           }
+	  if ($3 != "no" || ($4 == "*" || $4 == "'"$cs_host_family"'"))
 	  printf "  %-20s (%s)\n", $1, $2
 	}'
     `
