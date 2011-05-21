@@ -2111,8 +2111,7 @@ CS_CHECK_TEMPLATE_TOOLKIT2([emit])
 # library which has a subdirectory named "t/". The subdirectory should contain
 # CppUnit test fragments with file extension ".t".
 #------------------------------------------------------------------------------
-CS_NOTABLE([cppunit], [], [], [$cs_cv_libcppunit],
-    [CS_CHECK_CPPUNIT([emit])])
+CS_CHECK_CPPUNIT([emit])
 
 
 
