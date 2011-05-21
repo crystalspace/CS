@@ -86,7 +86,7 @@ bool SelfShadowDemo::CreateScene ()
   csRef<iMaterialWrapper> simpleMaterial =
     CS::Material::MaterialBuilder::CreateColorMaterial
     (object_reg,"boxmaterial",csColor(0,1,0));
-
+ 
   // We create a new sector called "room".
   room = engine->CreateSector ("room");  
 
@@ -115,11 +115,14 @@ bool SelfShadowDemo::CreateScene ()
   mesh->GetMovable()->SetPosition(csVector3(0, 2, 0));
   mesh->GetMeshObject ()->SetMaterialWrapper (simpleMaterial);
 
+  mesh->SetZBufMode(CS_ZBUF_TEST);
+  mesh->GetMeshObject()->SetMixMode(CS_FX_SETALPHA(0.1));
+
   csRef<iGeneralMeshState> meshstate = scfQueryInterface<iGeneralMeshState> (
     mesh->GetMeshObject ());
   meshstate->SetLighting (true);
 //   meshstate->SetShadowCasting(true);
-//   meshstate->SetShadowReceiving(true)
+//   meshstate->SetShadowReceiving(true);
 
   Box simpleSmallBox (csVector3 (-.1, -.1, -.1), csVector3 (.1, .1, .1));
   // Now we make a factory and a mesh at once.
