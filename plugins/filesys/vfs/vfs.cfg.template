@@ -54,6 +54,7 @@ VFS.Mount.lev/oceantest = $(CS_MAPDIR)$/oceantest$/
 VFS.Mount.lev/island = $(CS_MAPDIR)$/island$/
 VFS.Mount.lev/bias = $(CS_MAPDIR)$/bias$/world.zip
 VFS.Mount.lev/lodtest = $(CS_MAPDIR)$/lodtest$/
+VFS.Mount.lev/selfshadow = $(CS_MAPDIR)$/selfshadow$/
 
 ; Mount all libraries under the /lib/ directory
 VFS.Mount.lib/shadermgr-defaults = $(CS_DATADIR)$/shadermgr-defaults.zip
@@ -68,7 +69,6 @@ VFS.Mount.lib/krystal  = $(CS_DATADIR)$/krystal$/
 VFS.Mount.lib/sintel   = $(CS_DATADIR)$/sintel$/
 VFS.Mount.lib/startme  = $(CS_DATADIR)$/startme.zip
 VFS.Mount.lib/hairtest = $(CS_DATADIR)$/hairtest$/
-VFS.Mount.lib/selfshadow = $(CS_DATADIR)$/selfshadow$/
 
 ; General CEGUI data
 VFS.Mount.cegui  			= $(CS_DATADIR)$/cegui$/

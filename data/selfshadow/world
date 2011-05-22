@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<world>
+  <plugins>
+    <plugin name='genmesh'>crystalspace.mesh.loader.genmesh</plugin>
+    <plugin name='genmeshfact'>crystalspace.mesh.loader.factory.genmesh</plugin>
+  </plugins>
+  <shaders/>
+  <textures/>
+  <materials/>
+  <sounds/>
+  <library>factories/HairFact</library>
+  <library>factories/CubeFact</library>
+  <library>factories/PlaneFact</library>
+  <library>factories/CloudFact</library>
+  <triggers/>
+  <sector name='Scene'>
+    <cullerp plugin='crystalspace.culling.frustvis'/>
+    <meshobj name='Hair'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>HairFact</factory>
+      </params>
+      <zuse/>
+      <move>
+        <v y='1.3273' x='-4.9578' z='-0.5811'/>
+        <matrix>
+          <rotz>3.1416</rotz>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Cube'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>CubeFact</factory>
+      </params>
+      <zuse/>
+      <move>
+        <v y='1.6671' x='4.3303' z='-0.0612'/>
+      </move>
+    </meshobj>
+    <meshobj name='Plane'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>PlaneFact</factory>
+      </params>
+      <zuse/>
+      <move>
+        <v y='0.0533' x='0.0075' z='-0.0058'/>
+      </move>
+    </meshobj>
+    <meshobj name='Cloud'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>CloudFact</factory>
+      </params>
+      <zuse/>
+      <move>
+        <v y='2.2264' x='0.7562' z='0.7216'/>
+        <matrix>
+          <roty>-0.6415</roty>
+          <rotz>-1.2127</rotz>
+          <rotx>0.244</rotx>
+        </matrix>
+      </move>
+    </meshobj>
+  </sector>
+  <sequences/>
+</world>

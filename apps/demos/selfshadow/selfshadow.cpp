@@ -77,85 +77,43 @@ bool SelfShadowDemo::Application ()
 bool SelfShadowDemo::CreateScene ()
 {
   printf ("Loading level...\n");
-
-  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-    ReportError ("Error loading %s texture!",
-		 CS::Quote::Single ("stone4"));
-  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
-
-  csLoadResult rc = loader->Load ("/lib/selfshadow/cloud");
-  if (!rc.success)
-    ReportError ("Error loading %s!", CS::Quote::Single ("cube"));
+  vfs->ChDir ("/lev/selfshadow");
+  if (!loader->LoadMapFile ("world"))
+    ReportError("Error couldn't load level!");
 
   csRef<iMaterialWrapper> simpleMaterial =
     CS::Material::MaterialBuilder::CreateColorMaterial
     (object_reg,"boxmaterial",csColor(1,1,1));
  
   // We create a new sector called "room".
-  room = engine->CreateSector ("room");  
+  room = engine->FindSector ("Scene");  
+  if (!room)
+    ReportError("Sector not found!");
 
-//   // Make a simple box which cast shadows
-  using namespace CS::Geometry;
-  DensityTextureMapper mapper (0.3f);
-  TesselatedBox box (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
-  box.SetLevel (3);
-  box.SetMapper (&mapper);
-  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+  csRef<iMeshWrapper> cube =
+    engine->FindMeshObject("Cube");
+  cube->GetMeshObject ()->SetMaterialWrapper (simpleMaterial);
 
-  // Now we make a factory and a mesh at once.
-  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
-    engine, room, "walls", "walls_factory", &box);
-  walls-> GetMeshObject ()-> SetMaterialWrapper(tm);
-  csRef<iGeneralMeshState> wallsMeshstate = scfQueryInterface<iGeneralMeshState> (
-    walls->GetMeshObject ());
-  wallsMeshstate->SetLighting (true);
-//   wallsMeshstate->SetShadowCasting(true);
-//   wallsMeshstate->SetShadowReceiving(true)
-
-  csRef<iMeshFactoryWrapper> meshfact =
-    engine->FindMeshFactory ("cloudFact");
-  if (!meshfact)
-    ReportError ("Can't find cubeFact mesh factory!");
-
-  // Now create an instance:
   csRef<iMeshWrapper> mesh =
-    engine->CreateMeshWrapper (meshfact, "cube", room, csVector3(0,2,0));
+    engine->FindMeshObject("Cloud");
   mesh->GetMeshObject ()->SetMaterialWrapper (simpleMaterial);
-  mesh->SetZBufMode(CS_ZBUF_TEST);
   mesh->GetMeshObject()->SetMixMode(CS_FX_SETALPHA(0.5));
-  csRef<iGeneralMeshState> meshstate = scfQueryInterface<iGeneralMeshState> (
-    mesh->GetMeshObject ());
-  meshstate->SetLighting (true);
 
-//   Box simpleBox (3 * csVector3 (-.1, -.1, -.1), 3 * csVector3 (.1, .1, .1));
-//   // Now we make a factory and a mesh at once.
-//   csRef<iMeshWrapper> mesh = GeneralMeshBuilder::CreateFactoryAndMesh (
-//     engine, room, "cube", "cubeFact", &simpleBox);
-//   mesh->GetMovable()->SetPosition(csVector3(0, 2, 0));
-//   mesh->GetMeshObject ()->SetMaterialWrapper (simpleMaterial);
-// 
-//   mesh->SetZBufMode(CS_ZBUF_TEST);
-//   mesh->GetMeshObject()->SetMixMode(CS_FX_SETALPHA(0.5));
-// 
-//   csRef<iGeneralMeshState> meshstate = scfQueryInterface<iGeneralMeshState> (
-//     mesh->GetMeshObject ());
-//   meshstate->SetLighting (true);
-//   meshstate->SetShadowCasting(true);
-//   meshstate->SetShadowReceiving(true);
+  csRef<iMeshWrapper> plane =
+    engine->FindMeshObject("Plane");
+  plane->GetMeshObject ()->SetMaterialWrapper (simpleMaterial);
 
-//   Box simpleSmallBox (csVector3 (-.1, -.1, -.1), csVector3 (.1, .1, .1));
-//   // Now we make a factory and a mesh at once.
-//   csRef<iMeshWrapper> meshSmall = GeneralMeshBuilder::CreateFactoryAndMesh (
-//     engine, room, "cubeSmall", "cubeFactSmall", &simpleSmallBox);
-//   meshSmall->GetMovable()->SetPosition(csVector3(0, 1, 0));
-//   meshSmall->GetMeshObject ()->SetMaterialWrapper (simpleMaterial);
+  csRef<iMeshWrapper> hair =
+    engine->FindMeshObject("Hair");
+  hair->GetMeshObject ()->SetMaterialWrapper (simpleMaterial);
+  hair->GetMeshObject()->SetMixMode(CS_FX_SETALPHA(0.5));
 
   // Now we need light to see something.
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();
 
   // first light - vertical light
-  light = engine->CreateLight (0, csVector3 (0, 20, 0), 100, csColor (1, 1, 1));
+  light = engine->CreateLight (0, csVector3 (0, 10, 0), 100, csColor (1, 1, 1));
   light->SetType(CS_LIGHT_DIRECTIONAL);
 
   csMatrix3 matrixY (cos(PI/4), 0, -sin(PI/4), 0, 1, 0, sin(PI/4), 0, cos(PI/4));
@@ -164,17 +122,9 @@ bool SelfShadowDemo::CreateScene ()
 
   ll->Add (light);
 
-  // second light - horizontal light
-  light = engine->CreateLight (0, csVector3 (0, 20, 0), 100, csColor (1, 0, 1));
-  light->SetType(CS_LIGHT_DIRECTIONAL);
-
-  light->GetMovable()->Transform(matrixY); 
-
-  ll->Add (light);
-
   // Setup the sector and the camera
   view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 3, -7));
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -10));
   cameraManager->SetCamera(view->GetCamera());
   cameraManager->SetCameraMode (CS::Utility::CAMERA_ROTATE);
   cameraManager->SetMotionSpeed (10.0f);
