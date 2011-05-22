@@ -50,7 +50,11 @@ bool SelfShadowDemo::Application ()
   if (!DemoApplication::Application ())
     return false;
 
-  // Manual loading RM
+  /* NOTE: Config settings for render managers are stored in 'engine.cfg' 
+   * and are needed when loading a render manager. Normally these settings 
+   * are added by the engine when it loads a render manager. However, since
+   * we are loading the shadow_pssm render manager manually we must also manually
+   * add the proper config file. */
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
   csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (GetObjectRegistry());
   cfg->AddDomain ("/config/engine.cfg", vfs, iConfigManager::ConfigPriorityPlugin);
@@ -81,34 +85,10 @@ bool SelfShadowDemo::CreateScene ()
   if (!loader->LoadMapFile ("world"))
     ReportError("Error couldn't load level!");
 
-  // We create a new sector called "room".
-  room = engine->FindSector ("Scene");  
-  if (!room)
-    ReportError("Sector not found!");
-
-  // Now we need light to see something.
-  csRef<iLight> light;
-  iLightList* ll = room->GetLights ();
-
-  // first light - vertical light
-  light = engine->CreateLight (0, csVector3 (0, 10, 0), 100, csColor (1, 1, 1));
-  light->SetType(CS_LIGHT_DIRECTIONAL);
-
-  csMatrix3 matrixY (cos(PI/4), 0, -sin(PI/4), 0, 1, 0, sin(PI/4), 0, cos(PI/4));
-  csMatrix3 matrixX (1, 0, 0, 0, cos(PI/2), -sin(PI/2), 0, sin(PI/2), cos(PI/2));
-  light->GetMovable()->Transform(matrixY * matrixX); 
-
-  ll->Add (light);
-
-  // Setup the sector and the camera
-  view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -10));
+  // Setup the camera
   cameraManager->SetCamera(view->GetCamera());
   cameraManager->SetCameraMode (CS::Utility::CAMERA_ROTATE);
   cameraManager->SetMotionSpeed (10.0f);
-
-//   printf ("Precaching data...\n");
-//   engine->PrecacheDraw ();
 
   printf ("Ready!\n");
 

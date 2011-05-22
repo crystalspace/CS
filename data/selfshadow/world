@@ -83,6 +83,23 @@
         </matrix>
       </move>
     </meshobj>
+    <light name='Lamp'>
+      <center y='20' x='0' z='0'/>
+      <color blue='1.0' green='1.0' red='1.0'/>
+      <radius>100</radius>
+      <type>directional</type>
+      <move>
+        <matrix>
+          <roty>0</roty>
+          <rotz>0</rotz>
+          <rotx>-1.57</rotx>
+        </matrix>
+      </move>	  
+    </light>	
   </sector>
   <sequences/>
+  <start name='Camera'>
+    <sector>Scene</sector>
+    <position y='5' x='0' z='-10'/>
+  </start>  
 </world>
