@@ -81,32 +81,10 @@ bool SelfShadowDemo::CreateScene ()
   if (!loader->LoadMapFile ("world"))
     ReportError("Error couldn't load level!");
 
-  csRef<iMaterialWrapper> simpleMaterial =
-    CS::Material::MaterialBuilder::CreateColorMaterial
-    (object_reg,"boxmaterial",csColor(1,1,1));
- 
   // We create a new sector called "room".
   room = engine->FindSector ("Scene");  
   if (!room)
     ReportError("Sector not found!");
-
-  csRef<iMeshWrapper> cube =
-    engine->FindMeshObject("Cube");
-  cube->GetMeshObject ()->SetMaterialWrapper (simpleMaterial);
-
-  csRef<iMeshWrapper> mesh =
-    engine->FindMeshObject("Cloud");
-  mesh->GetMeshObject ()->SetMaterialWrapper (simpleMaterial);
-  mesh->GetMeshObject()->SetMixMode(CS_FX_SETALPHA(0.5));
-
-  csRef<iMeshWrapper> plane =
-    engine->FindMeshObject("Plane");
-  plane->GetMeshObject ()->SetMaterialWrapper (simpleMaterial);
-
-  csRef<iMeshWrapper> hair =
-    engine->FindMeshObject("Hair");
-  hair->GetMeshObject ()->SetMaterialWrapper (simpleMaterial);
-  hair->GetMeshObject()->SetMixMode(CS_FX_SETALPHA(0.5));
 
   // Now we need light to see something.
   csRef<iLight> light;

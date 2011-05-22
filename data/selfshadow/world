@@ -5,8 +5,28 @@
     <plugin name='genmeshfact'>crystalspace.mesh.loader.factory.genmesh</plugin>
   </plugins>
   <shaders/>
-  <textures/>
-  <materials/>
+  <textures>
+    <texture name="white">
+      <file>textures/white.jpg</file>
+    </texture>
+    <texture name="white_trans">
+      <file>textures/white_trans.png</file>
+    </texture>	
+    <texture name="green_trans">
+      <file>textures/green_trans.png</file>
+    </texture>	
+  </textures>
+  <materials>
+    <material name="white">
+      <texture>white</texture>
+    </material>
+    <material name="white_trans">
+      <texture>white_trans</texture>
+    </material>	
+    <material name="green_trans">
+      <texture>green_trans</texture>
+    </material>		
+  </materials>
   <sounds/>
   <library>factories/HairFact</library>
   <library>factories/CubeFact</library>
