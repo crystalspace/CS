@@ -83,9 +83,13 @@ bool SelfShadowDemo::CreateScene ()
 		 CS::Quote::Single ("stone4"));
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
+  csLoadResult rc = loader->Load ("/lib/selfshadow/cloud");
+  if (!rc.success)
+    ReportError ("Error loading %s!", CS::Quote::Single ("cube"));
+
   csRef<iMaterialWrapper> simpleMaterial =
     CS::Material::MaterialBuilder::CreateColorMaterial
-    (object_reg,"boxmaterial",csColor(0,1,0));
+    (object_reg,"boxmaterial",csColor(1,1,1));
  
   // We create a new sector called "room".
   room = engine->CreateSector ("room");  
@@ -108,28 +112,43 @@ bool SelfShadowDemo::CreateScene ()
 //   wallsMeshstate->SetShadowCasting(true);
 //   wallsMeshstate->SetShadowReceiving(true)
 
-  Box simpleBox (3 * csVector3 (-.1, -.1, -.1), 3 * csVector3 (.1, .1, .1));
-  // Now we make a factory and a mesh at once.
-  csRef<iMeshWrapper> mesh = GeneralMeshBuilder::CreateFactoryAndMesh (
-    engine, room, "cube", "cubeFact", &simpleBox);
-  mesh->GetMovable()->SetPosition(csVector3(0, 2, 0));
+  csRef<iMeshFactoryWrapper> meshfact =
+    engine->FindMeshFactory ("cloudFact");
+  if (!meshfact)
+    ReportError ("Can't find cubeFact mesh factory!");
+
+  // Now create an instance:
+  csRef<iMeshWrapper> mesh =
+    engine->CreateMeshWrapper (meshfact, "cube", room, csVector3(0,2,0));
   mesh->GetMeshObject ()->SetMaterialWrapper (simpleMaterial);
-
   mesh->SetZBufMode(CS_ZBUF_TEST);
-  mesh->GetMeshObject()->SetMixMode(CS_FX_SETALPHA(0.1));
-
+  mesh->GetMeshObject()->SetMixMode(CS_FX_SETALPHA(0.5));
   csRef<iGeneralMeshState> meshstate = scfQueryInterface<iGeneralMeshState> (
     mesh->GetMeshObject ());
   meshstate->SetLighting (true);
+
+//   Box simpleBox (3 * csVector3 (-.1, -.1, -.1), 3 * csVector3 (.1, .1, .1));
+//   // Now we make a factory and a mesh at once.
+//   csRef<iMeshWrapper> mesh = GeneralMeshBuilder::CreateFactoryAndMesh (
+//     engine, room, "cube", "cubeFact", &simpleBox);
+//   mesh->GetMovable()->SetPosition(csVector3(0, 2, 0));
+//   mesh->GetMeshObject ()->SetMaterialWrapper (simpleMaterial);
+// 
+//   mesh->SetZBufMode(CS_ZBUF_TEST);
+//   mesh->GetMeshObject()->SetMixMode(CS_FX_SETALPHA(0.5));
+// 
+//   csRef<iGeneralMeshState> meshstate = scfQueryInterface<iGeneralMeshState> (
+//     mesh->GetMeshObject ());
+//   meshstate->SetLighting (true);
 //   meshstate->SetShadowCasting(true);
 //   meshstate->SetShadowReceiving(true);
 
-  Box simpleSmallBox (csVector3 (-.1, -.1, -.1), csVector3 (.1, .1, .1));
-  // Now we make a factory and a mesh at once.
-  csRef<iMeshWrapper> meshSmall = GeneralMeshBuilder::CreateFactoryAndMesh (
-    engine, room, "cubeSmall", "cubeFactSmall", &simpleSmallBox);
-  meshSmall->GetMovable()->SetPosition(csVector3(0, 1, 0));
-  meshSmall->GetMeshObject ()->SetMaterialWrapper (simpleMaterial);
+//   Box simpleSmallBox (csVector3 (-.1, -.1, -.1), csVector3 (.1, .1, .1));
+//   // Now we make a factory and a mesh at once.
+//   csRef<iMeshWrapper> meshSmall = GeneralMeshBuilder::CreateFactoryAndMesh (
+//     engine, room, "cubeSmall", "cubeFactSmall", &simpleSmallBox);
+//   meshSmall->GetMovable()->SetPosition(csVector3(0, 1, 0));
+//   meshSmall->GetMeshObject ()->SetMaterialWrapper (simpleMaterial);
 
   // Now we need light to see something.
   csRef<iLight> light;

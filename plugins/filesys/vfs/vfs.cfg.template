@@ -68,6 +68,7 @@ VFS.Mount.lib/krystal  = $(CS_DATADIR)$/krystal$/
 VFS.Mount.lib/sintel   = $(CS_DATADIR)$/sintel$/
 VFS.Mount.lib/startme  = $(CS_DATADIR)$/startme.zip
 VFS.Mount.lib/hairtest = $(CS_DATADIR)$/hairtest$/
+VFS.Mount.lib/selfshadow = $(CS_DATADIR)$/selfshadow$/
 
 ; General CEGUI data
 VFS.Mount.cegui  			= $(CS_DATADIR)$/cegui$/
