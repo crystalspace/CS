@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- bullet2.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.physics.bullet2</name>
+        <implementation>csBulletCollisionSystem</implementation>
+        <description>Bullet collision and physics</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
