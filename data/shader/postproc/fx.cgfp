@@ -20,7 +20,7 @@ float4 main (in float2 TexCoord1 : TEXCOORD0,
 	float4 outCol = inCol;
 
 	if(option == 0) { outCol = diffuse; }
-	else if(option == 1) { outCol = float4 (ExtractNormal(normal), 1); }
+	else if(option == 1) { outCol = normal /* float4 (ExtractNormal(normal), 1) */; }
 	else if(option == 2) { outCol = ambient; }
 	else if(option == 3) { outCol = depth; }
 	else if(option == 4) { outCol = float4 (diffuse.a, normal.a, ambient.a, 1); }
