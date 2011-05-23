@@ -437,8 +437,8 @@ bool RMDeferred::RenderView(iView *view, bool recursePortals)
   else
   {
     // Output the final result to the backbuffer.
-    //DrawFullscreenTexture (accumBuffer, graphics3D);
-    DrawFullscreenTexture (finalBuffer, graphics3D);
+    DrawFullscreenTexture (accumBuffer, graphics3D);
+    //DrawFullscreenTexture (finalBuffer, graphics3D);
   }
 
   DebugFrameRender (rview, renderTree);

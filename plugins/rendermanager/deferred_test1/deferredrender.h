@@ -252,7 +252,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       }
       DetachAccumBuffer ();
 
-      AttachFinalBuffer();
+      graphics3D->CopyFromRenderTargets(1, (csRenderTargetAttachment *)rtaColor0, &lightRenderPersistent.finalBuffer);
+
+      //AttachFinalBuffer();
+      AttachAccumBuffer(context, false);
       {
         graphics3D->SetZMode (CS_ZBUF_MESH);
 
@@ -383,7 +386,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     void RenderPostEffect(typename RenderTree::ContextNode *context)
     {      
       int subTex;
-      lightRenderPersistent.accumBufferSV->SetValue (GetAccumBuffer(context, subTex));
+      //lightRenderPersistent.accumBufferSV->SetValue (GetAccumBuffer(context, subTex));
+      lightRenderPersistent.accumBufferSV->SetValue (lightRenderPersistent.finalBuffer);
 
       // is this needed to setup the SVs ???
       csShaderVariableStack svStack = shaderMgr->GetShaderVariableStack ();
@@ -393,7 +397,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       if (svContext) svContext->PushVariables (svStack);
       lightRenderPersistent.postEffectShader->PushVariables (svStack);
 
-      //uint blendFuncReplace = (CS_MIXMODE_BLEND(ONE, ZERO) | CS_MIXMODE_ALPHATEST_DISABLE);
+      uint blendFuncReplace = (CS_MIXMODE_BLEND(ONE, ZERO) | CS_MIXMODE_ALPHATEST_DISABLE);
       csReversibleTransform oldView = graphics3D->GetWorldToCamera ();
       CS::Math::Matrix4 oldProj = graphics3D->GetProjectionMatrix ();
 
@@ -402,7 +406,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       
       lightRenderPersistent.quadMesh.shader = lightRenderPersistent.postEffectShader;
       lightRenderPersistent.quadMesh.z_buf_mode = CS_ZBUF_NONE;
-      //lightRenderPersistent.quadMesh.mixmode = blendFuncReplace;
+      lightRenderPersistent.quadMesh.mixmode = blendFuncReplace;
       
       graphics3D->DrawSimpleMesh (lightRenderPersistent.quadMesh, 0);
 
