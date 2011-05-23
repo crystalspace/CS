@@ -2094,7 +2094,7 @@ CS_CHECK_BUILD([for nullptr], [cs_cv__nullptr],
     [AC_LANG_PROGRAM(
 	[[]],
 	[void* p = nullptr;])],
-    [], [],
+    [], [C++],
     [CS_HEADER_PROPERTY([CS_HAS_NULLPTR])])
 
 
