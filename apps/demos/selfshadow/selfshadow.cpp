@@ -84,6 +84,7 @@ bool SelfShadowDemo::CreateScene ()
   vfs->ChDir ("/lev/selfshadow");
   if (!loader->LoadMapFile ("world"))
     ReportError("Error couldn't load level!");
+  engine->Prepare ();
 
   // Setup the camera
   cameraManager->SetCamera(view->GetCamera());
