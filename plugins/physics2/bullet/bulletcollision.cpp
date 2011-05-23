@@ -151,6 +151,7 @@ void csBulletCollisionObject::RebuildObject ()
 {
   if (!sector)
   {
+    // kickvb: why would it fail?
     csFPrintf  (stderr, "csBulletCollisionObject: Haven't add the object to a sector.\nRebuild failed.\n");
     return;
   }

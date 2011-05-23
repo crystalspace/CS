@@ -195,8 +195,8 @@ public:
     iCollisionObject* objectB);
 
   HitBeamResult RigidHitBeam(iCollisionObject* object, 
-    const csVector3& start,
-    const csVector3& end)
+			     const csVector3& start,
+			     const csVector3& end);
 };
 
 class csBulletCollisionSystem:

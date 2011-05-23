@@ -18,6 +18,7 @@ SubInclude TOP plugins gui ;
 SubInclude TOP plugins mesh ;
 SubInclude TOP plugins misc ;
 SubInclude TOP plugins physics ;
+SubInclude TOP plugins physics2 ;
 SubInclude TOP plugins proctex ;
 SubInclude TOP plugins rendermanager ;
 SubInclude TOP plugins reporter ;
