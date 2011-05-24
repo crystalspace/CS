@@ -10897,6 +10897,14 @@ fi
 fi
         ;;
     esac
+    if test -n "$cs_cv_cslibs" && test "no" != "$cs_cv_cslibs"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+cs-winlibs|other|$_cs_sum_ok|windows"
+
 
 
 #------------------------------------------------------------------------------
@@ -13576,6 +13584,15 @@ fi
 fi
 
 
+    if test -n "$cs_cv_perl" && test "no" != "$cs_cv_perl"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+perl|bindings|$_cs_sum_ok|*"
+
+
 
 #------------------------------------------------------------------------------
 # Check if Python SDK is installed and which compiler and linker flags are
@@ -14251,6 +14268,14 @@ fi
 else
   cs_cv_python=no
 fi
+    if test -n "$cs_cv_python" && test "no" != "$cs_cv_python"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+python|bindings|$_cs_sum_ok|*"
+
 
 
 
@@ -14844,6 +14869,14 @@ done
 "
 fi
 
+
+    if test -n "$cs_cv_java" && test "no" != "$cs_cv_java"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+java|bindings|$_cs_sum_ok|*"
 
 
 
@@ -27243,6 +27276,14 @@ fi
 fi
 
 
+    if test "yes" != "$no_x"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+x11|rendering|$_cs_sum_ok|unix"
+
 if test "$no_x" != yes; then :
   # We must be especially careful to instruct CS_EMIT_BUILD_PROPERTY() to
     # emit the following properties even if their values are empty.  This is
@@ -32024,6 +32065,14 @@ else
 	cs_cv_libgl_libs=''
 
 fi
+    if test -n "$cs_cv_libgl" && test "no" != "$cs_cv_libgl"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+opengl|rendering|$_cs_sum_ok|*"
+
 
 if test $cs_cv_libgl = yes; then :
   if test "" != yes; then :
@@ -34791,8 +34840,8 @@ fi
 # CS_CHECK_DIRECTX([DSOUND-VERSION])
 
 
-if test $cs_host_family = windows; then :
-  ac_fn_c_check_type "$LINENO" "int32" "ac_cv_type_int32" "$ac_includes_default"
+
+ac_fn_c_check_type "$LINENO" "int32" "ac_cv_type_int32" "$ac_includes_default"
 if test "x$ac_cv_type_int32" = x""yes; then :
   $as_echo "#define HAVE_TYPE_INT32 1" >>confdefs.h
 
@@ -35078,15 +35127,21 @@ else
 	cs_cv_libdirectx8_libs=''
 
 fi
+    if test -n "$cs_cv_libdirectx8" && test "no" != "$cs_cv_libdirectx8"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
+    _cs_summary="$_cs_summary
+directx|rendering|$_cs_sum_ok|windows"
+
 
 
 
 #------------------------------------------------------------------------------
 # Check for the Windows Multimedia library, used by the 'sndwaveout' plugin.
 #------------------------------------------------------------------------------
-if test $cs_host_family = windows; then :
-  if test "" != yes; then :
+if test "" != yes; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for waveout" >&5
 $as_echo_n "checking for waveout... " >&6; }
 if test "${cs_cv_libwaveout+set}" = set; then :
@@ -35350,7 +35405,14 @@ else
 	cs_cv_libwaveout_libs=''
 
 fi
+    if test -n "$cs_cv_libwaveout" && test "no" != "$cs_cv_libwaveout"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
+    _cs_summary="$_cs_summary
+waveout|audio|$_cs_sum_ok|windows"
+
 
 
 
@@ -36445,10 +36507,15 @@ fi
 "
 fi
 fi
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: *** zlib not found; VFS will be unusable" >&5
-$as_echo "$as_me: *** zlib not found; VFS will be unusable" >&6;}
 fi
+    if test -n "$cs_cv_libz" && test "no" != "$cs_cv_libz"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+zlib|other|$_cs_sum_ok|*"
+
 
 
 
@@ -37550,6 +37617,14 @@ fi
 fi
 fi
 fi
+    if test -n "$cs_cv_libpng" && test "no" != "$cs_cv_libpng"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+png|image|$_cs_sum_ok|*"
+
 
 
 
@@ -38444,8 +38519,8 @@ fi
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <stddef.h>
-	#include <stdio.h>
-	#include <jpeglib.h>
+	    #include <stdio.h>
+	    #include <jpeglib.h>
 int
 main ()
 {
@@ -38562,8 +38637,8 @@ fi
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <stddef.h>
-	#include <stdio.h>
-	#include <jpeglib.h>
+	    #include <stdio.h>
+	    #include <jpeglib.h>
 int
 main ()
 {
@@ -38649,6 +38724,14 @@ fi
 fi
 fi
 fi
+    if test -n "$cs_cv_libjpeg" && test "no" != "$cs_cv_libjpeg"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+jpeg|image|$_cs_sum_ok|*"
+
 
 
 
@@ -39346,6 +39429,14 @@ fi
     if test "$cs_cv_liblcms" = yes; then :
 
 fi
+    if test -n "$cs_cv_liblcms" && test "no" != "$cs_cv_liblcms"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+lcms|image|$_cs_sum_ok|*"
+
 
 
 # Check whether --with-mng was given.
@@ -40435,6 +40526,14 @@ fi
 fi
 fi
 fi
+    if test -n "$cs_cv_libmng" && test "no" != "$cs_cv_libmng"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+mng|image|$_cs_sum_ok|*"
+
 
 
 
@@ -41148,6 +41247,14 @@ fi
 fi
 fi
 fi
+    if test -n "$cs_cv_libcairo" && test "no" != "$cs_cv_libcairo"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+cairo|image|$_cs_sum_ok|*"
+
 
 
 # Check whether --with-cairomm was given.
@@ -42618,6 +42725,14 @@ fi
 fi
 fi
 fi
+    if test -n "$cs_cv_libcairomm" && test "no" != "$cs_cv_libcairomm"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+cairomm|image|$_cs_sum_ok|*"
+
 
 
 # Check whether --with-vgvm was given.
@@ -43326,6 +43441,14 @@ fi
 fi
 fi
 fi
+    if test -n "$cs_cv_libvgvm" && test "no" != "$cs_cv_libvgvm"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+vgvm|image|$_cs_sum_ok|*"
+
 
 
 
@@ -44040,6 +44163,14 @@ fi
 fi
 fi
 fi
+    if test -n "$cs_cv_libogg" && test "no" != "$cs_cv_libogg"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+ogg|audio|$_cs_sum_ok|*"
+
 
 if test "$cs_cv_libogg" = yes; then :
 
@@ -44750,6 +44881,14 @@ fi
 fi
 fi
 fi
+    if test -n "$cs_cv_libvorbis" && test "no" != "$cs_cv_libvorbis"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+vorbis|audio|$_cs_sum_ok|*"
+
 
 if test "$cs_cv_libvorbis" = yes; then :
 
@@ -46178,6 +46317,14 @@ fi
 fi
 fi
 fi
+    if test -n "$cs_cv_libspeex" && test "no" != "$cs_cv_libspeex"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+speex|audio|$_cs_sum_ok|*"
+
 
 if test "$cs_cv_libspeex" = yes; then :
   if test "" != yes; then :
@@ -48150,7 +48297,7 @@ else
 	cs_cv_lib3ds_recent_libs=''
 
 fi
-	if test $cs_cv_lib3ds_recent = yes; then :
+	    if test $cs_cv_lib3ds_recent = yes; then :
   if test "" != yes; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for generic lib3ds data I/O callbacks" >&5
 $as_echo_n "checking for generic lib3ds data I/O callbacks... " >&6; }
@@ -48227,7 +48374,7 @@ fi
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <lib3ds/io.h>
-	        size_t DataReadFunc (void *self, void *buffer, size_t n) {}
+		    size_t DataReadFunc(void*, void*, size_t) {}
 int
 main ()
 {
@@ -48344,7 +48491,7 @@ fi
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <lib3ds/io.h>
-	        size_t DataReadFunc (void *self, void *buffer, size_t n) {}
+		    size_t DataReadFunc(void*, void*, size_t) {}
 int
 main ()
 {
@@ -48403,6 +48550,14 @@ else
 fi
 fi
 fi
+    if test -n "$cs_cv_lib3ds_recent" && test "no" != "$cs_cv_lib3ds_recent"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+3ds|models|$_cs_sum_ok|*"
+
 
 
 
@@ -49613,6 +49768,14 @@ fi
 else
   cs_cv_libode_recent=no
 fi
+    if test -n "$cs_cv_libode_recent" && test "no" != "$cs_cv_libode_recent"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+ode|physics|$_cs_sum_ok|*"
+
 
 
 
@@ -50262,8 +50425,8 @@ cs_cv_with_bullet="$with_bullet"
 
 if test $cs_cv_libbullet = yes; then :
   if test "" != yes; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if bullet is sufficiently recent (>=2.68)" >&5
-$as_echo_n "checking if bullet is sufficiently recent (>=2.68)... " >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if bullet is sufficiently recent" >&5
+$as_echo_n "checking if bullet is sufficiently recent... " >&6; }
 if test "${cs_cv_bullet_recent+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
@@ -50341,7 +50504,7 @@ int
 main ()
 {
 btManifoldPoint *p = new btManifoldPoint();
-             p->m_appliedImpulse;
+		 p->m_appliedImpulse;
   ;
   return 0;
 }
@@ -50382,8 +50545,8 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $cs_cv_bullet_recent" >&5
 $as_echo "$cs_cv_bullet_recent" >&6; }
 else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if bullet is sufficiently recent (>=2.68)" >&5
-$as_echo_n "checking if bullet is sufficiently recent (>=2.68)... " >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if bullet is sufficiently recent" >&5
+$as_echo_n "checking if bullet is sufficiently recent... " >&6; }
 	    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -50458,7 +50621,7 @@ int
 main ()
 {
 btManifoldPoint *p = new btManifoldPoint();
-             p->m_appliedImpulse;
+		 p->m_appliedImpulse;
   ;
   return 0;
 }
@@ -50526,6 +50689,14 @@ else
 
 fi
 fi
+    if test -n "$cs_cv_bullet_recent" && test "no" != "$cs_cv_bullet_recent"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+bullet|physics|$_cs_sum_ok|*"
+
 
 if test $cs_cv_libbullet = yes; then :
   if test "" != yes; then :
@@ -50773,6 +50944,8 @@ else
 
 fi
 fi
+
+
 
 #------------------------------------------------------------------------------
 # Check for OpenAL.
@@ -51071,6 +51244,14 @@ else
 	cs_cv_libopenal_libs=''
 
 fi
+    if test -n "$cs_cv_libopenal" && test "no" != "$cs_cv_libopenal"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+openal|audio|$_cs_sum_ok|*"
+
 if test $cs_cv_libopenal = yes; then :
   if test "" != yes; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for alext.h" >&5
@@ -52528,14 +52709,14 @@ fi
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <ft2build.h>
-	    #include FT_FREETYPE_H
-	    #include FT_GLYPH_H
-	    #include FT_MODULE_H
+		#include FT_FREETYPE_H
+		#include FT_GLYPH_H
+		#include FT_MODULE_H
 int
 main ()
 {
-return
-	    FT_LOAD_TARGET_MONO|FT_RENDER_MODE_NORMAL|FT_ENCODING_UNICODE
+return FT_LOAD_TARGET_MONO | FT_RENDER_MODE_NORMAL |
+                    FT_ENCODING_UNICODE
   ;
   return 0;
 }
@@ -52648,14 +52829,14 @@ fi
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <ft2build.h>
-	    #include FT_FREETYPE_H
-	    #include FT_GLYPH_H
-	    #include FT_MODULE_H
+		#include FT_FREETYPE_H
+		#include FT_GLYPH_H
+		#include FT_MODULE_H
 int
 main ()
 {
-return
-	    FT_LOAD_TARGET_MONO|FT_RENDER_MODE_NORMAL|FT_ENCODING_UNICODE
+return FT_LOAD_TARGET_MONO | FT_RENDER_MODE_NORMAL |
+                    FT_ENCODING_UNICODE
   ;
   return 0;
 }
@@ -52723,6 +52904,14 @@ else
 
 fi
 fi
+    if test -n "$cs_cv_freetype2_recent" && test "no" != "$cs_cv_freetype2_recent"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+freetype2|other|$_cs_sum_ok|*"
+
 
 
 
@@ -53828,6 +54017,14 @@ else
 
 fi
 fi
+    if test -n "$cs_cv_cal3d_recent" && test "no" != "$cs_cv_cal3d_recent"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+cal3d|models|$_cs_sum_ok|*"
+
 
 
 
@@ -54955,6 +55152,15 @@ fi
 else
   cs_cv_libwx_opengl=no
 fi
+
+
+    if test -n "$cs_cv_libwx_opengl" && test "no" != "$cs_cv_libwx_opengl"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+wxwidgets|gui|$_cs_sum_ok|*"
 
 if test $cs_cv_libwx_opengl = yes; then :
   if test "$cs_cv_libwx_opengl" = yes; then :
@@ -56158,9 +56364,9 @@ int
 main ()
 {
 CEGUI::WidgetLookManager::getSingleton();
-	    #if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR < 7)
-	    who took the ram from the ramalamadingdong?
-	    #endif
+		#if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR < 7)
+		who took the ram from the ramalamadingdong?
+		#endif
 
   ;
   return 0;
@@ -56278,9 +56484,9 @@ int
 main ()
 {
 CEGUI::WidgetLookManager::getSingleton();
-	    #if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR < 7)
-	    who took the ram from the ramalamadingdong?
-	    #endif
+		#if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR < 7)
+		who took the ram from the ramalamadingdong?
+		#endif
 
   ;
   return 0;
@@ -56349,6 +56555,14 @@ else
 
 fi
 fi
+    if test -n "$cs_cv_CEGUI_recent" && test "no" != "$cs_cv_CEGUI_recent"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+cegui|gui|$_cs_sum_ok|*"
+
 
 
 
@@ -57443,6 +57657,14 @@ fi
 fi
 fi
 fi
+    if test -n "$cs_cv_libGTK" && test "no" != "$cs_cv_libGTK"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+gtk|other|$_cs_sum_ok|unix"
+
 
 if test $cs_cv_libGTK = yes; then :
   if test "" != yes; then :
@@ -57700,8 +57922,7 @@ fi
 #------------------------------------------------------------------------------
 # Check if GNU/Linux joystick API is present.
 #------------------------------------------------------------------------------
-if test $cs_host_family != windows; then :
-  if test "" != yes; then :
+if test "" != yes; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for GNU/Linux joystick API" >&5
 $as_echo_n "checking for GNU/Linux joystick API... " >&6; }
 if test "${cs_cv_sys_linux_joystick+set}" = set; then :
@@ -57973,7 +58194,14 @@ else
 	cs_cv_sys_linux_joystick_libs=''
 
 fi
+    if test -n "$cs_cv_sys_linux_joystick" && test "no" != "$cs_cv_sys_linux_joystick"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
+    _cs_summary="$_cs_summary
+linux-joystick|other|$_cs_sum_ok|unix"
+
 
 
 
@@ -62698,14 +62926,21 @@ fi
 fi
 
     LDFLAGS="$LDFLAGS_BACKUP"
+    if test -n "$cs_cv_libCgGL" && test "no" != "$cs_cv_libCgGL"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+cg|rendering|$_cs_sum_ok|*"
+
 
 
 
 #------------------------------------------------------------------------------
 # Check for OpenSoundSystem (OSS).
 #------------------------------------------------------------------------------
-if test $cs_host_family != windows; then :
-  ac_fn_c_check_header_mongrel "$LINENO" "soundcard.h" "ac_cv_header_soundcard_h" "$ac_includes_default"
+ac_fn_c_check_header_mongrel "$LINENO" "soundcard.h" "ac_cv_header_soundcard_h" "$ac_includes_default"
 if test "x$ac_cv_header_soundcard_h" = x""yes; then :
   cs_header_text="${cs_header_text}#define CS_HAVE_SOUNDCARD_H
 "
@@ -62733,7 +62968,6 @@ fi
 fi
 
 
-
     if test $cs_cv_header_soundcard_h = yes; then :
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -62742,14 +62976,20 @@ fi
 "
 fi
 fi
+    if test -n "$cs_cv_header_soundcard_h" && test "no" != "$cs_cv_header_soundcard_h"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
+    _cs_summary="$_cs_summary
+oss|audio|$_cs_sum_ok|unix"
+
 
 
 
 #------------------------------------------------------------------------------
 # Check for JACK daemon jackasyn library (JACKASYN).
 #------------------------------------------------------------------------------
-if test $cs_host_family != windows; then :
 
 # Check whether --with-jackasyn was given.
 if test "${with_jackasyn+set}" = set; then :
@@ -63459,14 +63699,20 @@ fi
 fi
 fi
 fi
+    if test -n "$cs_cv_libjackasyn" && test "no" != "$cs_cv_libjackasyn"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
+    _cs_summary="$_cs_summary
+jackasyn|audio|$_cs_sum_ok|unix"
+
 
 
 
 #------------------------------------------------------------------------------
 # Check for Advanced GNU/Linux Sound Architecture (ALSA).
 #------------------------------------------------------------------------------
-if test $cs_host_family != windows; then :
 
 # Check whether --with-asound was given.
 if test "${with_asound+set}" = set; then :
@@ -64174,7 +64420,14 @@ fi
 fi
 fi
 fi
+    if test -n "$cs_cv_libasound" && test "no" != "$cs_cv_libasound"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
 fi
+    _cs_summary="$_cs_summary
+alsa|audio|$_cs_sum_ok|unix"
+
 
 
 
@@ -64687,7 +64940,7 @@ fi
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <assimp/assimp.h>
-          #include <assimp/aiScene.h>
+	      #include <assimp/aiScene.h>
 int
 main ()
 {
@@ -64804,7 +65057,7 @@ fi
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <assimp/assimp.h>
-          #include <assimp/aiScene.h>
+	      #include <assimp/aiScene.h>
 int
 main ()
 {
@@ -64890,6 +65143,14 @@ fi
 fi
 fi
 fi
+    if test -n "$cs_cv_libassimp" && test "no" != "$cs_cv_libassimp"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+assimp|models|$_cs_sum_ok|*"
+
 
 
 
@@ -67224,6 +67485,8 @@ else
 
 fi
 
+
+
 #------------------------------------------------------------------------------
 # Check for nullptr
 #------------------------------------------------------------------------------
@@ -67233,13 +67496,13 @@ $as_echo_n "checking for nullptr... " >&6; }
 if test "${cs_cv__nullptr+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
-  ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
+  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-    cs_cflags_save="$CFLAGS"
+    cs_cflags_save="$CXXFLAGS"
     cs_lflags_save="$LDFLAGS"
     cs_libs_save="$LIBS"
     cs_build_ok=no
@@ -67297,7 +67560,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -67311,7 +67574,7 @@ void* p = nullptr;
   return 0;
 }
 _ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
+if ac_fn_cxx_try_link "$LINENO"; then :
   cs_build_ok=yes
 fi
 rm -f core conftest.err conftest.$ac_objext \
@@ -67322,7 +67585,7 @@ fi
     done
 
 
-    CFLAGS=$cs_cflags_save
+    CXXFLAGS=$cs_cflags_save
     LDFLAGS=$cs_lflags_save
     LIBS=$cs_libs_save
     ac_ext=c
@@ -67349,13 +67612,13 @@ $as_echo "$cs_cv__nullptr" >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for nullptr" >&5
 $as_echo_n "checking for nullptr... " >&6; }
-	    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
+	    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-    cs_cflags_save="$CFLAGS"
+    cs_cflags_save="$CXXFLAGS"
     cs_lflags_save="$LDFLAGS"
     cs_libs_save="$LIBS"
     cs_build_ok=no
@@ -67413,7 +67676,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -67427,7 +67690,7 @@ void* p = nullptr;
   return 0;
 }
 _ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
+if ac_fn_cxx_try_link "$LINENO"; then :
   cs_build_ok=yes
 fi
 rm -f core conftest.err conftest.$ac_objext \
@@ -67438,7 +67701,7 @@ fi
     done
 
 
-    CFLAGS=$cs_cflags_save
+    CXXFLAGS=$cs_cflags_save
     LDFLAGS=$cs_lflags_save
     LIBS=$cs_libs_save
     ac_ext=c
@@ -77452,6 +77715,49 @@ $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
 
+
+#------------------------------------------------------------------------------
+# Result Summary.
+#------------------------------------------------------------------------------
+cs_summary=`echo "$_cs_summary" | sort -i -t '|' -k 3,3r -k 1,1 |
+    awk '
+	BEGIN {
+          FS="|";
+          heading["yes"]="Found";
+          heading["no"]="Missing";
+          ok=""
+        }
+	!/^$/ {
+	  if (ok != $3) {
+            ok=$3;
+            if (NR != 1)
+              print "";
+            print heading[ok]
+          }
+	  if ($3 != "no" || ($4 == "*" || $4 == "'"$cs_host_family"'"))
+	  printf "  %-20s (%s)\n", $1, $2
+	}'
+    `
+{ $as_echo "$as_me:${as_lineno-$LINENO}:
+******************************************************************************
+***                 Crystal Space -- Configuration Summary                 ***
+******************************************************************************
+Build mode: ${cs_build_mode}
+Version: ${PACKAGE_VERSION} (SVN: ${cs_cv_source_is_svn})
+
+Optional Dependencies
+---------------------
+$cs_summary" >&5
+$as_echo "$as_me:
+******************************************************************************
+***                 Crystal Space -- Configuration Summary                 ***
+******************************************************************************
+Build mode: ${cs_build_mode}
+Version: ${PACKAGE_VERSION} (SVN: ${cs_cv_source_is_svn})
+
+Optional Dependencies
+---------------------
+$cs_summary" >&6;}
 
 
 #------------------------------------------------------------------------------
