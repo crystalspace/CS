@@ -68520,13 +68520,13 @@ $as_echo_n "checking for nullptr... " >&6; }
 if test "${cs_cv__nullptr+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
-  ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
+  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-    cs_cflags_save="$CFLAGS"
+    cs_cflags_save="$CXXFLAGS"
     cs_lflags_save="$LDFLAGS"
     cs_libs_save="$LIBS"
     cs_build_ok=no
@@ -68584,7 +68584,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -68598,7 +68598,7 @@ void* p = nullptr;
   return 0;
 }
 _ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
+if ac_fn_cxx_try_link "$LINENO"; then :
   cs_build_ok=yes
 fi
 rm -f core conftest.err conftest.$ac_objext \
@@ -68609,7 +68609,7 @@ fi
     done
 
 
-    CFLAGS=$cs_cflags_save
+    CXXFLAGS=$cs_cflags_save
     LDFLAGS=$cs_lflags_save
     LIBS=$cs_libs_save
     ac_ext=c
@@ -68636,13 +68636,13 @@ $as_echo "$cs_cv__nullptr" >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for nullptr" >&5
 $as_echo_n "checking for nullptr... " >&6; }
-	    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
+	    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-    cs_cflags_save="$CFLAGS"
+    cs_cflags_save="$CXXFLAGS"
     cs_lflags_save="$LDFLAGS"
     cs_libs_save="$LIBS"
     cs_build_ok=no
@@ -68700,7 +68700,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -68714,7 +68714,7 @@ void* p = nullptr;
   return 0;
 }
 _ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
+if ac_fn_cxx_try_link "$LINENO"; then :
   cs_build_ok=yes
 fi
 rm -f core conftest.err conftest.$ac_objext \
@@ -68725,7 +68725,7 @@ fi
     done
 
 
-    CFLAGS=$cs_cflags_save
+    CXXFLAGS=$cs_cflags_save
     LDFLAGS=$cs_lflags_save
     LIBS=$cs_libs_save
     ac_ext=c
