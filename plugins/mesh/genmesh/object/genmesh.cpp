@@ -32,7 +32,6 @@
 #include "csgfx/trianglestream.h"
 #include "csgfx/vertexlistwalker.h"
 #include "csutil/csendian.h"
-#include "csutil/csmd5.h"
 #include "csutil/memfile.h"
 #include "csutil/scfstr.h"
 #include "csutil/sysfunc.h"
@@ -413,7 +412,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   renderMeshes.Empty();
   renderMeshes.SetCapacity (sm.GetSize ());
 
-  const csBox3* bboxes;
+  const csBox3* bboxes = 0;
   if (anim_ctrl_bbox)
     bboxes = AnimControlGetBboxes ();
 

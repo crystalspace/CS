@@ -32,10 +32,10 @@
 #include "csutil/array.h"
 #include "csutil/cfgacc.h"
 #include "csutil/csendian.h"
-#include "csutil/csmd5.h"
 #include "csutil/csstring.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/hash.h"
+#include "csutil/md5.h"
 #include "csutil/memfile.h"
 #include "csutil/stringquote.h"
 #include "csutil/timer.h"
@@ -1596,7 +1596,8 @@ csString csThing::GenerateCacheName ()
                 strlen (sect->QueryObject ()->GetName ()));
   }
 
-  csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
+  CS::Utility::Checksum::MD5::Digest digest =
+    CS::Utility::Checksum::MD5::Encode (mf.GetData (), mf.GetSize ());
   return digest.HexString();
 }
 

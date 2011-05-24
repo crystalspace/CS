@@ -286,9 +286,9 @@ struct csMGPosition
   /// Index of geometry in csMGGeom.
   size_t idInGeometry;
 
-  csMGPosition () : last_mixmode (CS_FX_COPY),
+  csMGPosition () : position(0.0f), geom_type(0), rotation(0), random(0.0f),
+    addedDist(0.0f), last_mixmode(CS_FX_COPY), lod(0),
     idInGeometry (csArrayItemNotFound) { } 
-
 };
 
 struct csMGCell;

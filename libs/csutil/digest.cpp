@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2009 by Frank Richter
+  Copyright (C) 2011 by Frank Richter
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -18,37 +18,32 @@
 
 #include "cssysdef.h"
 
-#include "csutil/checksum.h"
-
-#if defined(__cplusplus) && !defined(CS_COMPILER_BCC)
-extern "C" {
-#endif
-
-#define Byte z_Byte	/* Kludge to avoid conflicting typedef in zconf.h */
-#include <zlib.h>
-#undef Byte
-
-#if defined(__cplusplus) && !defined(CS_COMPILER_BCC)
-}
-#endif
+#include "csutil/digest.h"
 
 namespace CS
 {
   namespace Utility
   {
-
     namespace Checksum
     {
-      uint32 Adler32::Compute (uint32 prevCheckSum, const void* data, size_t size)
+      /* These methods are here (and not inline in the header) b/c
+       * usage of the PRI* macros breaks the Python bindings
+       * building... :| */
+      csString DigestFormat::HexString (const uint8* data, uint size)
       {
-	return adler32 (prevCheckSum, (z_Byte*)data, (uInt)size);
+	csString s;
+	for (uint i = 0; i < size; i++)
+	  s.AppendFmt ("%02" PRIx8, data[i]);
+	return s;
       }
-
-      uint32 CRC32::Compute (uint32 prevCheckSum, const void* data, size_t size)
+      
+      csString DigestFormat::HEXString (const uint8* data, uint size)
       {
-	return crc32 (prevCheckSum, (z_Byte*)data, (uInt)size);
+	csString s;
+	for (uint i = 0; i < size; i++)
+	  s.AppendFmt ("%02" PRIX8, data[i]);
+	return s;
       }
-
     } // namespace Checksum
   } // namespace Utility
 } // namespace CS

@@ -31,9 +31,13 @@
  *  http://www.cr0.net:8040/code/crypto/sha256/ whenever possible.
  */
 
-#include <string.h>
-#include "csutil/cssha256.h"
 #include "cssysdef.h"
+
+#include "csutil/sha256.h"
+
+#include "csgeom/math.h"
+
+#include <string.h>
 
 namespace CS
 {
@@ -43,21 +47,21 @@ namespace Checksum
 {
   #define GET_UINT32(n,b,i)                       \
   {                                               \
-      (n) = ((uint32_t) (b)[(i)    ] << 24)       \
-          | ((uint32_t) (b)[(i) + 1] << 16)       \
-          | ((uint32_t) (b)[(i) + 2] <<  8)       \
-          | ((uint32_t) (b)[(i) + 3]      );      \
+      (n) = ((uint32) (b)[(i)    ] << 24)         \
+          | ((uint32) (b)[(i) + 1] << 16)         \
+          | ((uint32) (b)[(i) + 2] <<  8)         \
+          | ((uint32) (b)[(i) + 3]      );        \
   }
 
   #define PUT_UINT32(n,b,i)                       \
   {                                               \
-      (b)[(i)    ] = (uint8_t) ((n) >> 24);       \
-      (b)[(i) + 1] = (uint8_t) ((n) >> 16);       \
-      (b)[(i) + 2] = (uint8_t) ((n) >>  8);       \
-      (b)[(i) + 3] = (uint8_t) ((n)      );       \
+      (b)[(i)    ] = (uint8) ((n) >> 24);         \
+      (b)[(i) + 1] = (uint8) ((n) >> 16);         \
+      (b)[(i) + 2] = (uint8) ((n) >>  8);         \
+      (b)[(i) + 3] = (uint8) ((n)      );         \
   }
 
-  void SHA256::Context::sha256_starts()
+  SHA256::SHA256 ()
   {
     total[0] = 0;
     total[1] = 0;
@@ -72,10 +76,10 @@ namespace Checksum
     state[7] = 0x5BE0CD19;
   }
 
-  void SHA256::Context::sha256_process(uint8_t data[64])
+  void SHA256::Process (const uint8 data[64])
   {
-    uint32_t temp1, temp2, W[64];
-    uint32_t A, B, C, D, E, F, G, H;
+    uint32 temp1, temp2, W[64];
+    uint32 A, B, C, D, E, F, G, H;
 
     GET_UINT32(W[0],  data,  0);
     GET_UINT32(W[1],  data,  4);
@@ -203,9 +207,9 @@ namespace Checksum
     state[7] += H;
   }
 
-  void SHA256::Context::sha256_update(uint8_t *input, uint32_t length)
+  void SHA256::AppendInternal (const uint8* input, uint32 length)
   {
-    uint32_t left, fill;
+    uint32 left, fill;
 
     if(!length) return;
 
@@ -221,7 +225,7 @@ namespace Checksum
     if(left && length >= fill)
     {
       memcpy((void *)(buffer + left), (void *)input, fill);
-      sha256_process(buffer);
+      Process (buffer);
       length -= fill;
       input  += fill;
       left = 0;
@@ -229,7 +233,7 @@ namespace Checksum
 
     while(length >= 64)
     {
-      sha256_process(input);
+      Process (input);
       length -= 64;
       input  += 64;
     }
@@ -240,7 +244,31 @@ namespace Checksum
     }
   }
 
-  static uint8_t sha256_padding[64] =
+  void SHA256::Append (const uint8* input, size_t length)
+  {
+  #if CS_PROCESSOR_SIZE == 32
+    AppendInternal (input, length);
+  #else
+    // Hash data in 4GB chunks
+    const uint32 u32_max = (uint32)~0;
+    
+    if (length <= u32_max)
+    {
+      AppendInternal (input, length);
+      return;
+    }
+    
+    while (length > 0)
+    {
+      uint32 chunk = csMin (length, size_t (u32_max));
+      AppendInternal (input, chunk);
+      input += chunk;
+      length -= chunk;
+    }
+  #endif
+  }
+
+  static const uint8 sha256_padding[64] =
     {
       0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -248,11 +276,11 @@ namespace Checksum
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
 
-  void SHA256::Context::sha256_finish(uint8_t digest[32])
+  void SHA256::Finish (uint8 digest[32])
   {
-    uint32_t last, padn;
-    uint32_t high, low;
-    uint8_t msglen[8];
+    uint32 last, padn;
+    uint32 high, low;
+    uint8 msglen[8];
 
     high = (total[0] >> 29) | (total[1] <<  3);
     low  = (total[0] <<  3);
@@ -263,8 +291,8 @@ namespace Checksum
     last = total[0] & 0x3F;
     padn = (last < 56) ? (56 - last) : (120 - last);
 
-    sha256_update(sha256_padding, padn);
-    sha256_update(msglen, 8);
+    Append (sha256_padding, padn);
+    Append (msglen, 8);
 
     PUT_UINT32(state[0], digest,  0);
     PUT_UINT32(state[1], digest,  4);
@@ -276,9 +304,11 @@ namespace Checksum
     PUT_UINT32(state[7], digest, 28);
   }
 
-  void SHA256::Context::sha256_finish(Digest &digest)
+  SHA256::Digest SHA256::Finish ()
   {
-      sha256_finish(digest.data);
+    Digest digest;
+    Finish (digest.data);
+    return digest;
   }
 
 
@@ -289,12 +319,9 @@ namespace Checksum
 
   SHA256::Digest SHA256::Encode(const void* data, size_t nbytes)
   {
-    Digest digest;
-    Context ctx;
-    ctx.sha256_starts();
-    ctx.sha256_update((uint8_t*)data, nbytes);
-    ctx.sha256_finish(digest);
-    return digest;
+    SHA256 ctx;
+    ctx.Append ((const uint8*)data, nbytes);
+    return ctx.Finish ();
   }
 
   SHA256::Digest SHA256::Encode(const char* s)
@@ -302,20 +329,6 @@ namespace Checksum
     return Encode(s, strlen(s));
   }
 
-  csString SHA256::Digest::HexString() const
-  {
-    csString s;
-    for (int i = 0; i < DigestLen; i++)
-      s.AppendFmt ("%02" PRIx8, data[i]);
-    return s;
-  }
-
-  csString SHA256::Digest::HEXString() const
-  {
-    csString s(HexString());
-    s.Upcase();
-    return s;
-  }
 }//namespace Checksum
 }//namespace Utility
 }//namespace CS

@@ -38,7 +38,7 @@ namespace CS
   {
     namespace ShaderCacheHelper
     {
-      csMD5::Digest ShaderDocHasher::DocStackEntry::ComputeHash ()
+      CS::Utility::Checksum::MD5::Digest ShaderDocHasher::DocStackEntry::ComputeHash ()
       {
         CS_ASSERT(docNode || sourceData);
         if (!sourceData.IsValid())
@@ -47,7 +47,7 @@ namespace CS
           size_t nodeFlatLen = nodeFlat.Length();
           sourceData.AttachNew (new csDataBuffer (nodeFlat.Detach(), nodeFlatLen));
         }
-        return csMD5::Encode (sourceData->GetData(), sourceData->GetSize());
+        return CS::Utility::Checksum::MD5::Encode (sourceData->GetData(), sourceData->GetSize());
       }
       
       //---------------------------------------------------------------------
@@ -237,8 +237,9 @@ namespace CS
         while (scanStack.GetSize() > 0)
         {
           DocStackEntry scanEntry = scanStack.PopTop();
-          csMD5::Digest entryDigest (scanEntry.ComputeHash ());
-          actualHashes.Write ((char*)&entryDigest, sizeof(csMD5::Digest));
+          CS::Utility::Checksum::MD5::Digest entryDigest (scanEntry.ComputeHash ());
+          actualHashes.Write ((char*)&entryDigest,
+			      sizeof(CS::Utility::Checksum::MD5::Digest));
 	  PushReferencedFiles (scanEntry);
         }
         return actualHashes.GetAllData();
@@ -251,17 +252,19 @@ namespace CS
         
         while (scanStack.GetSize() > 0)
         {
-          if (bytesRemaining < sizeof(csMD5::Digest)) return false;
-          csMD5::Digest diskDigest;
-          memcpy (&diskDigest, dataBytes, sizeof(csMD5::Digest));
-          dataBytes += sizeof(csMD5::Digest);
-          bytesRemaining -= sizeof(csMD5::Digest);
+          if (bytesRemaining < sizeof(CS::Utility::Checksum::MD5::Digest)) return false;
+          CS::Utility::Checksum::MD5::Digest diskDigest;
+          memcpy (&diskDigest, dataBytes, sizeof(CS::Utility::Checksum::MD5::Digest));
+          dataBytes += sizeof(CS::Utility::Checksum::MD5::Digest);
+          bytesRemaining -= sizeof(CS::Utility::Checksum::MD5::Digest);
         
           DocStackEntry scanEntry = scanStack.PopTop();
 	  PushReferencedFiles (scanEntry);
-          csMD5::Digest entryDigest (scanEntry.ComputeHash ());
-          actualHashes.Write ((char*)&entryDigest, sizeof(csMD5::Digest));
-          if (memcmp (&diskDigest, &entryDigest, sizeof(csMD5::Digest)) != 0)
+          CS::Utility::Checksum::MD5::Digest entryDigest (scanEntry.ComputeHash ());
+          actualHashes.Write ((char*)&entryDigest,
+			      sizeof(CS::Utility::Checksum::MD5::Digest));
+          if (memcmp (&diskDigest, &entryDigest,
+	      sizeof(CS::Utility::Checksum::MD5::Digest)) != 0)
             return false;
         }
         

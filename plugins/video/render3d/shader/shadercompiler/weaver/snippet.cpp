@@ -205,7 +205,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     csString hashStr;
     hashStr.Format ("__passthrough_%s_%s__", varName, type);
     AtomTechnique* newTech = new AtomTechnique (0, "(passthrough)", 
-      csMD5::Encode (hashStr));
+      CS::Utility::Checksum::MD5::Encode (hashStr));
     
     {
       Technique::Input newInput;
@@ -296,7 +296,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   {
     FileAliases aliases (_aliases);
     AtomTechnique newTech (this, GetName(),
-      csMD5::Encode (CS::DocSystem::FlattenNode (node)));
+      CS::Utility::Checksum::MD5::Encode (CS::DocSystem::FlattenNode (node)));
     
     newTech.priority = node->GetAttributeValueAsInt ("priority");
     newTech.outerCondition = node->GetAttributeValue ("condition");

@@ -29,7 +29,7 @@
  *  http://www.cr0.net:8040/code/crypto/sha256/ whenever possible.
  */
 
-#include <csutil/cssha256.h>
+#include "csutil/sha256.h"
 
 using namespace CS::Utility::Checksum;
 
@@ -80,29 +80,27 @@ void csSHA256Test::testSHA256encode()
   for(int i = 0; i < 3; i++)
   {
     char output[65];
-    SHA256::Context ctx;
+    SHA256 ctx;
     unsigned char buf[1000];
-    unsigned char sha256sum[32];
-    ctx.sha256_starts();
 
     if(i < 2)
     {
-      ctx.sha256_update((uint8_t *) msg[i], strlen(msg[i]));
+      ctx.Append ((uint8*) msg[i], strlen(msg[i]));
     }
     else
     {
       memset(buf, 'a', 1000);
       for(int j = 0; j < 1000; j++)
       {
-        ctx.sha256_update((uint8_t *) buf, 1000);
+        ctx.Append((uint8*) buf, 1000);
       }
     }
 
-    ctx.sha256_finish(sha256sum);
+    SHA256::Digest sha256sum = ctx.Finish ();
 
     for(int  j = 0; j < 32; j++)
     {
-      sprintf(output + j * 2, "%02x", sha256sum[j]);
+      sprintf(output + j * 2, "%02x", sha256sum.data[j]);
     }
 
     CPPUNIT_ASSERT(!memcmp(output, val[i], 64));
