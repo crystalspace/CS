@@ -27,7 +27,7 @@
 #define CAMERA_HIPS_DISTANCE 3.0f
 
 KrystalScene::KrystalScene (AvatarTest* avatarTest)
-  : avatarTest (avatarTest), debug (false), IKenabled (false)
+  : avatarTest (avatarTest), debugBones (false), debugBBoxes (false), IKenabled (false)
 {
   // Setup the parameters of the camera manager
   avatarTest->cameraManager->SetStartPosition (csVector3 (0.0f, 1.0f, -2.5f));
@@ -44,6 +44,7 @@ KrystalScene::KrystalScene (AvatarTest* avatarTest)
     avatarTest->hudManager->GetKeyDescriptions ()->Push ("left mouse: kill Krystal");
   }
   avatarTest->hudManager->GetKeyDescriptions ()->Push ("a: display bone positions");
+  avatarTest->hudManager->GetKeyDescriptions ()->Push ("b: display bounding boxes");
   avatarTest->hudManager->GetKeyDescriptions ()->Push ("r: reset scene");
   avatarTest->hudManager->GetKeyDescriptions ()->Push ("n: switch to next scene");
 
@@ -190,12 +191,25 @@ bool KrystalScene::OnKeyboard (iEvent &ev)
     // Switching debug modes
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'a')
     {
-      debug = !debug;
-      debugNodeFactory->SetDebugModes
-	(debug ?
-	 (CS::Animation::SkeletonDebugMode)
-	 (CS::Animation::DEBUG_2DLINES | CS::Animation::DEBUG_SQUARES)
-	 : CS::Animation::DEBUG_NONE);
+      debugBones = !debugBones;
+      int debugFlags = debugBones ? 
+	(debugNodeFactory->GetDebugModes () | 
+	 (CS::Animation::DEBUG_2DLINES | CS::Animation::DEBUG_SQUARES))
+	: (debugNodeFactory->GetDebugModes () &
+	   ~(CS::Animation::DEBUG_2DLINES | CS::Animation::DEBUG_SQUARES));
+      debugNodeFactory->SetDebugModes ((CS::Animation::SkeletonDebugMode) debugFlags);
+
+      return true;
+    }
+
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'b')
+    {
+      debugBBoxes = !debugBBoxes;
+      int debugFlags = debugBBoxes ? 
+        (debugNodeFactory->GetDebugModes () | CS::Animation::DEBUG_BBOXES)
+	: (debugNodeFactory->GetDebugModes () & ~(CS::Animation::DEBUG_BBOXES));
+      debugNodeFactory->SetDebugModes ((CS::Animation::SkeletonDebugMode) debugFlags);
+
       return true;
     }
 
@@ -412,6 +426,7 @@ bool KrystalScene::CreateAvatar ()
   // Create the 'debug' node
   debugNodeFactory = avatarTest->debugManager->CreateAnimNodeFactory ("debug");
   debugNodeFactory->SetDebugModes (CS::Animation::DEBUG_NONE);
+  debugNodeFactory->SetRandomColor (true);
   animPacketFactory->SetAnimationRoot (debugNodeFactory);
 
   // Create the 'random' node

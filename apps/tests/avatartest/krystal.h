@@ -60,7 +60,7 @@ class KrystalScene : public AvatarScene
   CS::Animation::iBodyChain* armChain;
 
   // Debug node related
-  bool debug;
+  bool debugBones, debugBBoxes;
   csRef<CS::Animation::iSkeletonDebugNode> debugNode;
   csRef<CS::Animation::iSkeletonDebugNodeFactory> debugNodeFactory;
 
