@@ -151,7 +151,7 @@ bool thoggLoader::Initialize (iObjectRegistry* r)
   return true;
 }
 
-csPtr<iVPLData> thoggLoader::LoadSound (const char * pFileName, const char *pDescription)
+csPtr<iVPLCodec> thoggLoader::LoadVideo (const char * pFileName, const char *pDescription, VideoType type)
 {
   printf("loading sound %s\n",pFileName);
 
@@ -167,10 +167,10 @@ csPtr<iVPLData> thoggLoader::LoadSound (const char * pFileName, const char *pDes
   }
   else	
   {
-	thoggData *videoData = 0;
-	videoData = new thoggData ((iBase*)this);
+	thoggCodec *videoCodec = 0;
+	videoCodec = new thoggCodec ((iBase*)this);
 
-	csVPLvideoFormat *format = readTheoraHeaders (infile);
+	/*csVPLvideoFormat *format = readTheoraHeaders (infile);
 
 	/// check if the video is actually a theora
 	if(format==NULL)
@@ -178,10 +178,23 @@ csPtr<iVPLData> thoggLoader::LoadSound (const char * pFileName, const char *pDes
 	  csReport(object_reg, CS_REPORTER_SEVERITY_DEBUG, QUALIFIED_PLUGIN_NAME,
 		"File '%s' is not a Theora video.\n", pFileName);
 	}
-	videoData->SetFormat (format);
+	videoCodec->SetFormat (format);
 
-    fclose(infile);
-	return csPtr<iVPLData> (videoData);
+    fclose(infile);*/
+
+	bool res =  videoCodec->InitCodec(infile);
+
+	if(!res)
+	{
+	  csReport(object_reg, CS_REPORTER_SEVERITY_DEBUG, QUALIFIED_PLUGIN_NAME,
+		"File '%s' is not a Theora video.\n", pFileName);
+	}
+
+	fclose(infile);
+
+	if(!res)
+	  return NULL;
+	return csPtr<iVPLCodec> (videoCodec);
   }
 }
 

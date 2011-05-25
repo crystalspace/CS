@@ -3,7 +3,7 @@
 
 #include <iutil/comp.h>
 #include <videodecode/vpl_loader.h>
-#include <videodecode/vpl_data.h>
+#include <videodecode/vpl_codec.h>
 #include <videodecode/vpl_structs.h>
 #include <csutil/scf_implementation.h>
 
@@ -29,7 +29,7 @@ public:
   virtual bool Initialize (iObjectRegistry*);
 
   
-  virtual csPtr<iVPLData> LoadSound (const char * pFileName, const char *pDescription=0);
+  virtual csPtr<iVPLCodec> LoadVideo (const char * pFileName, const char *pDescription=0, VideoType type=AutoDetect);
 };
 
 #endif // __THOGGLOADER_H__

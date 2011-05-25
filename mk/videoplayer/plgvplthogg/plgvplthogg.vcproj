@@ -189,7 +189,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggData.cpp"
+				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggCodec.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggFile.cpp"
 				>
 			</File>
 			<File
@@ -203,7 +207,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggData.h"
+				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggCodec.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggFile.h"
 				>
 			</File>
 			<File

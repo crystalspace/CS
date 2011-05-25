@@ -26,7 +26,7 @@
 #include <iostream>
 
 #include <videodecode/vpl_structs.h>
-#include <videodecode/vpl_data.h>
+#include <videodecode/vpl_codec.h>
 #include <videodecode/vpl_loader.h>
 
 struct iEngine;

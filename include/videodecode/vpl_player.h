@@ -16,40 +16,35 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_VPL_LOADER_H__
-#define __CS_VPL_LOADER_H__
+#ifndef __CS_VPL_PLAYER_H__
+#define __CS_VPL_PLAYER_H__
 
 /**\file
- * Video Player: loader 
+ * Video Player: player
  */
 
 #include "csutil/scf.h"
 #include "csutil/ref.h"
 
-enum VideoType
-{
-	AutoDetect	=1,
-	Theora		=2
-};
 /**\addtogroup vpl
  * @{ */
+
+struct iDataBuffer;
 struct iVPLCodec;
 
 /**
- * The video loader is used to initialize the decoder
+ * The video player is used to play video files
  */
-struct iVPLLoader : public virtual iBase
+struct iVPLPlayer : public virtual iBase
 {
-  SCF_INTERFACE(iVPLLoader,0,1,0);
+  SCF_INTERFACE(iVPLPlayer,0,1,0);
 
-  /// Create a codec object from raw input data.
-  //
-  //  Optional pDescription may point to a brief description that will follow this data
-  //   through any streams or sources created from it, and may be useful for display or
-  //   diagnostic purposes.
-  virtual csPtr<iVPLCodec> LoadVideo (const char * pFileName, const char *pDescription=0, VideoType type=AutoDetect) = 0;
+  /**
+   * Initialize the video player
+   */
+  virtual void InitPlayer (csPtr<iVPLCodec> codec) = 0;
 };
 
 /** @} */
 
-#endif // __CS_VPL_LOADER_H__
+#endif // __CS_VPL_PLAYER_H__

@@ -29,14 +29,28 @@ bool vplLoader::Initialize (iObjectRegistry* r)
   return true;
 }
 
-csPtr<iVPLData> vplLoader::LoadSound (const char * pFileName, const char *pDescription)
+csPtr<iVPLCodec> vplLoader::LoadVideo (const char * pFileName, const char *pDescription, VideoType type)
 {
-  csRef<iVPLData> data;
-  if(m_pThOggLoader)
+  if( type == VideoType::AutoDetect)
   {
-	data=m_pThOggLoader->LoadSound(pFileName,pDescription);
-	if(data.IsValid())
-	  return csPtr<iVPLData> (data);
+    csRef<iVPLCodec> data;
+    if(m_pThOggLoader)
+    {
+	  data=m_pThOggLoader->LoadVideo(pFileName,pDescription,type);
+	  if(data.IsValid())
+	    return csPtr<iVPLCodec> (data);
+    }
+  }
+  else
+  if( type == VideoType::Theora)
+  {
+    csRef<iVPLCodec> data;
+    if(m_pThOggLoader)
+    {
+	  data=m_pThOggLoader->LoadVideo(pFileName,pDescription,type);
+	  if(data.IsValid())
+	   return csPtr<iVPLCodec> (data);
+    }
   }
 
   return 0;

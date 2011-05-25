@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005 by Andrew Mann
+Copyright (C) 2011 by Alin Baciu
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -20,7 +20,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __CS_VPL_COMMON_STRUCTS_H__
 
 /**\file
- * Video player: types
+ * Video Player: types
  */
 
 #include "csutil/scf.h"

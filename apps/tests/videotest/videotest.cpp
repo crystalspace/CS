@@ -99,7 +99,7 @@ bool VideoTest::Application ()
   }
 
   csRef<iVPLLoader> vlpLoader = csQueryRegistry<iVPLLoader> (object_reg);
-  csRef<iVPLData> a= vlpLoader->LoadSound("123pixel_aspect_ratio.ogg");
+  csRef<iVPLCodec> a= vlpLoader->LoadVideo("123pixel_aspect_ratio.ogg");
 
    // Create the scene
   if (!CreateScene ())

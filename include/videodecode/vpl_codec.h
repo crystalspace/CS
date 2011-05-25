@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004 by Andrew Mann
+    Copyright (C) 2011 by Alin Baciu
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,11 +16,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_VPL_DATA_H__
-#define __CS_VPL_DATA_H__
+#ifndef __CS_VPL_CODEC_H__
+#define __CS_VPL_CODEC_H__
 
 /**\file
- * Video Player: data container 
+ * Video Player: data container. Each videodecode plugin must have one.
+ * This is what reads video and audio data from a file
  */
 
 #include "csutil/scf.h"
@@ -29,37 +30,24 @@
  * @{ */
 
 struct csVPLvideoFormat;
-struct iSndSysStream;
 struct vidFrameData;
 
-#define CS_VPL_DATA_UNKNOWN_SIZE -1
-
 /**
- * The sound data is an interface to the container object controlling raw
- * sound data.
- * After obtaining an iSndSysData interface (most likely by loading a sound
- * file) at least one iSndSysStream must be obtained.
- *
- * This interface is implemented at least once per Sound Element.
+ * This is an interface for the codec.
  */
-struct iVPLData : public virtual iBase
+struct iVPLCodec : public virtual iBase
 {
-  SCF_INTERFACE(iVPLData,0,2,0);
+  SCF_INTERFACE(iVPLCodec,0,1,0);
 
-  /// Get the format of the sound data.
+  /// Get the format of the video data.
   virtual const csVPLvideoFormat *GetFormat()=0;
   virtual void SetFormat(csVPLvideoFormat *vplFormat)=0;
 
-  /// Get size of this sound in frames.
+  /// Get size of this video in frames.
   virtual size_t GetFrameCount() = 0;
 
   /**
-   * Return the size of the data stored in bytes.  This is informational only
-   * and is not guaranteed to be a number usable for sound calculations.
-   * For example, an audio file compressed with variable rate compression may
-   * result in a situation where FILE_SIZE is not equal to
-   * FRAME_COUNT * FRAME_SIZE since FRAME_SIZE may vary throughout the
-   * audio data.
+   * Return the size of the data stored in bytes.
    */
   virtual size_t GetDataSize() = 0;
 
@@ -72,8 +60,9 @@ struct iVPLData : public virtual iBase
   virtual const char *GetDescription() = 0;
 
   virtual void getNextFrame(vidFrameData &data) = 0;
+  virtual void update() = 0;
 };
 
 /** @} */
 
-#endif // __CS_VPL_DATA_H__
+#endif // __CS_VPL_CODEC_H__
