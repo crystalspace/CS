@@ -428,7 +428,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 	  if (currBone >= numBones)
 	  {
 	    synldr->ReportError (msgidFactory, child2, 
-				 "Invalid bounding box index %d, expected maximum %d bones", currBone, numBones);
+				 "Invalid bounding box index %d, expected maximum %d bones",
+				 (int) currBone, (int) numBones);
 	    return false;
 	  }
 
@@ -591,12 +592,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
       
       // Write skeleton
       {
-	csRef<iDocumentNode> skeletonNode = 
-	  paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-	skeletonNode->SetValue ("skeleton");
-	csRef<iDocumentNode> skeletonNameNode = 
-	  skeletonNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-	skeletonNameNode->SetValue (factory->GetSkeletonFactory ()->GetName ());
+	CS::Animation::iSkeletonFactory* skeletonFactory =
+	  factory->GetSkeletonFactory ();
+	if (skeletonFactory)
+	{
+	  csRef<iDocumentNode> skeletonNode = 
+	    paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	  skeletonNode->SetValue ("skeleton");
+	  csRef<iDocumentNode> skeletonNameNode = 
+	    skeletonNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+	  skeletonNameNode->SetValue (skeletonFactory->GetName ());
+	}
       }
 
       // Write bone influences
@@ -678,24 +684,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
       // Write bounding boxes
       {
 	CS::Animation::iSkeletonFactory* skeletonFact = factory->GetSkeletonFactory ();
-	CS::Animation::BoneID numBones = skeletonFact->GetTopBoneID () + 1;
-
-	if (numBones > 0)
+	if (skeletonFact)
 	{
-	  csRef<iDocumentNode> bboxNode = 
-	    paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-	  bboxNode->SetValue ("bboxes");
-	
-	  for (CS::Animation::BoneID i = 0; i < numBones ; i++)
+	  CS::Animation::BoneID numBones = skeletonFact->GetTopBoneID () + 1;
+
+	  if (numBones > 0)
 	  {
-	    if (skeletonFact->HasBone (i))
+	    csRef<iDocumentNode> bboxNode = 
+	      paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	    bboxNode->SetValue ("bboxes");
+	
+	    for (CS::Animation::BoneID i = 0; i < numBones ; i++)
 	    {
-	      csRef<iDocumentNode> node = 
-		bboxNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-	      node->SetValue ("bbox");
-	      node->SetAttributeAsInt ("bone", i);
-	      csBox3 bbox = factory->GetBoneBoundingBox (i);
-	      synldr->WriteBox (node, bbox);
+	      if (skeletonFact->HasBone (i))
+	      {
+		csRef<iDocumentNode> node = 
+		  bboxNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+		node->SetValue ("bbox");
+		node->SetAttributeAsInt ("bone", i);
+		csBox3 bbox = factory->GetBoneBoundingBox (i);
+		synldr->WriteBox (node, bbox);
+	      }
 	    }
 	  }
 	}
@@ -881,7 +890,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 	  if (currBone >= numBones)
 	  {
 	    synldr->ReportError (msgid, child2, 
-				 "Invalid bounding box index %d, expected maximum %d bones", currBone, numBones);
+				 "Invalid bounding box index %d, expected maximum %d bones",
+				 (int) currBone, (int) numBones);
 	    return false;
 	  }
 
