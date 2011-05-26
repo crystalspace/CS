@@ -20,7 +20,7 @@
 #define __CS_OPENCL_CONSTS_H__
 
 // cl types required to write data to buffers (cl_float, cl_char, ...)
-#include <CL/cl_platform.h>
+#include CS_HEADER_GLOBAL(CS_OPENCL_PATH,cl_platform.h)
 
 namespace CS
 {
