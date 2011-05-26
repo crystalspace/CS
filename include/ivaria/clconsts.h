@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2010 by Matthieu Kraus
+  Copyright (C) 2011 by Matthieu Kraus
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
