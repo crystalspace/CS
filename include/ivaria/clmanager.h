@@ -53,7 +53,7 @@ namespace CL
     /// add a callback that is to be called if the event is fired
     virtual void AddCallback(Callback, void*) = 0;
     /// remove a callback that is to be called if the event is fired
-	virtual bool RemoveCallback(Callback) = 0;
+    virtual bool RemoveCallback(Callback) = 0;
     /// fire the event (only for user-defined events)
     /// @see iManager::CreateEvent
     virtual bool Fire() = 0;
