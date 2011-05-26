@@ -43,14 +43,14 @@ namespace CL
     virtual bool SetArg(size_t id, iMemoryObject*) = 0;
 
     virtual bool SetDimension(size_t) = 0;
-    virtual void SetWorkSize(const csArray<size_t>&) = 0;
-    virtual void SetWorkOffset(const csArray<size_t>&) = 0;
-    virtual int SetGroupSize(const csArray<size_t>&) = 0;
+    virtual void SetWorkSize(const size_t*) = 0;
+    virtual void SetWorkOffset(const size_t*) = 0;
+    virtual int SetGroupSize(const size_t*) = 0;
 
     virtual size_t GetDimension() const = 0;
-    virtual csArray<size_t> GetWorkSize() const = 0;
-    virtual csArray<size_t> GetWorkOffset() const = 0;
-    virtual csArray<size_t> GetGroupSize() const = 0;
+    virtual size_t* GetWorkSize() const = 0;
+    virtual size_t* GetWorkOffset() const = 0;
+    virtual size_t* GetGroupSize() const = 0;
   };
 
   struct iLibrary : public virtual iBase
