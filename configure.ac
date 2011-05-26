@@ -1792,7 +1792,28 @@ AS_IF([test $cs_host_family != windows],
 	[], [],
 	[CS_EMIT_BUILD_PROPERTY([LINUXJOYSTICK.AVAILABLE], [yes])])])
 
+#------------------------------------------------------------------------------
+# Check for OpenCL.
+#------------------------------------------------------------------------------
+# CS_CL_INCLUDE(PREFIX,HEADER)
+AC_DEFUN([CS_CL_INCLUDE],
+    [[#include <$1/$2>]])
 
+AC_CHECK_HEADER([CL/opencl.h],
+    [CS_HEADER_PROPERTY([CS_OPENCL_PATH],[CL])
+    cs_cv_header_cl_h="CL"],
+    [AC_CHECK_HEADER([OpenCL/opencl.h],
+	[CS_HEADER_PROPERTY([CS_OPENCL_PATH],[OpenCL])
+	cs_cv_header_cl_h="OpenCL"],
+	[cs_cv_header_cl_h=no])])
+
+AS_IF([test "$cs_cv_header_cl_h"],
+    [CS_CHECK_LIB_WITH([OpenCL],
+	[AC_LANG_PROGRAM(
+	    [CS_CL_INCLUDE([$cs_cv_header_cl_h],[opencl.h])],
+	    [clGetPlatformIDs(0,0,0);])],
+	[],[C],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libOpenCL],[OPENCL])])])
 
 #------------------------------------------------------------------------------
 # Check for Cg shader package.
