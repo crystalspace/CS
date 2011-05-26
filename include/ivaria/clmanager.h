@@ -70,9 +70,9 @@ namespace CL
     virtual iEvent* Queue(iKernel*, const iEventList& = iEventList()) = 0;
     virtual iEvent* QueueMarker() = 0;
     virtual bool QueueBarrier() = 0;
-    virtual bool QueueWait(const csRefArray<iStatus>&) = 0;
+    virtual bool QueueWait(const iEventList&) = 0;
 
-    virtual bool Wait(const csRefArray<iStatus>&) = 0;
+    virtual bool Wait(const iEventList&) = 0;
     virtual void Finish() = 0;
     virtual void Abort() = 0; // abort all tasks that aren't queued
 
