@@ -57,9 +57,9 @@ namespace CL
   {
     SCF_INTERFACE(iLibrary, 0, 0, 1);
 
-    virtual csArray<csString> GetSource() const = 0;
+    virtual iStringArray* GetSource() const = 0;
 
-    virtual iKernel* GetKernel(const csString&) = 0;
+    virtual iKernel* GetKernel(const char*) = 0;
     virtual void Precache() = 0;
   };
 
@@ -67,7 +67,7 @@ namespace CL
   {
     SCF_INTERFACE(iStructure, 0, 0, 1);
 
-    virtual csArray<csString> GetSource() const = 0;
+    virtual iStringArray* GetSource() const = 0;
 
     virtual iEvent* Write(iBuffer*, size_t offset = 0) = 0;
     virtual iEvent* Read(iBuffer*, size_t offset = 0) = 0;
