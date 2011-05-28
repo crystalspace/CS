@@ -29,7 +29,9 @@ using namespace CS::Collision;
 CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
 {
 
-class csBulletCollisionSector;
+class csBulletSector;
+btTriangleMesh* GenerateTriMeshData (iMeshWrapper* mesh, csStringID baseID, 
+                                     csStringID colldetID, float internalScale);
 
 class csBulletCollider:
   public scfImplementation1<csBulletCollider, CS::Collision::iCollider>
@@ -39,7 +41,7 @@ protected:
   btCollisionShape* shape;
   csVector3 scale;
   float margin;
-  csBulletCollisionSector* collSector;
+  csBulletSector* collSector;
 
 public:
   csBulletCollider ();
@@ -50,7 +52,7 @@ public:
   virtual void SetMargin (float margin);
   virtual float GetMargin () const;
   virtual void GenerateShape () = 0;
-  void SetSector(csBulletCollisionSector* sector) {collSector = sector;}
+  void SetSector(csBulletSector* sector) {collSector = sector;}
 };
 
 class csBulletColliderBox: 
@@ -60,7 +62,7 @@ class csBulletColliderBox:
   csVector3 boxSize;
 
 public:
-  csBulletColliderBox (csBulletCollisionSector* sector, const csVector3& boxSize);
+  csBulletColliderBox (const csVector3& boxSize);
   virtual ~csBulletColliderBox ();
   virtual ColliderType GetGeometryType () {return COLLIDER_BOX;}
   virtual void GenerateShape ();
@@ -74,7 +76,7 @@ class csBulletColliderSphere:
   float radius;
 
 public:
-  csBulletColliderSphere (csBulletCollisionSector* sector, float radius);
+  csBulletColliderSphere (float radius);
   virtual ~csBulletColliderSphere ();
   virtual ColliderType GetGeometryType () {return COLLIDER_SPHERE;}
   virtual void GenerateShape ();
@@ -92,7 +94,7 @@ class csBulletColliderCylinder:
   float length;
 
 public:
-  csBulletColliderCylinder (csBulletCollisionSector* sector, float length, float radius);
+  csBulletColliderCylinder (float length, float radius);
   virtual ~csBulletColliderCylinder ();
   virtual ColliderType GetGeometryType () {return COLLIDER_CYLINDER;}
   virtual void GenerateShape ();
@@ -107,7 +109,7 @@ class csBulletColliderCapsule:
   float length;
 
 public:
-  csBulletColliderCapsule (csBulletCollisionSector* sector, float length, float radius);
+  csBulletColliderCapsule (float length, float radius);
   virtual ~csBulletColliderCapsule ();
   virtual void GetCapsuleGeometry (float& length, float& radius);
   virtual void GenerateShape ();
@@ -121,7 +123,7 @@ class csBulletColliderCone:
   float length;
 
 public:
-  csBulletColliderCone (csBulletCollisionSector* sector, float length, float radius);
+  csBulletColliderCone (float length, float radius);
   virtual ~csBulletColliderCone ();
   virtual ColliderType GetGeometryType () {return COLLIDER_CONE;}
   virtual void GenerateShape ();
@@ -135,7 +137,7 @@ class csBulletColliderPlane:
   csPlane3 plane;
 
 public:
-  csBulletColliderPlane (csBulletCollisionSector* sector, const csPlane3& plane);
+  csBulletColliderPlane (const csPlane3& plane);
   virtual ~csBulletColliderPlane ();
   virtual ColliderType GetGeometryType () {return COLLIDER_PLANE;}
   virtual void GenerateShape ();
@@ -149,7 +151,7 @@ class csBulletColliderConvexMesh:
   iMeshWrapper* mesh;
   
 public:
-  csBulletColliderConvexMesh (csBulletCollisionSector* sector, iMeshWrapper* mesh);
+  csBulletColliderConvexMesh (iMeshWrapper* mesh);
   virtual ~csBulletColliderConvexMesh ();
   virtual ColliderType GetGeometryType () {return COLLIDER_CONVEX_MESH;}
   virtual void GenerateShape ();
@@ -165,7 +167,7 @@ class csBulletColliderConcaveMesh:
   iMeshWrapper* mesh;
 
 public:
-  csBulletColliderConcaveMesh (csBulletCollisionSector* sector, iMeshWrapper* mesh);
+  csBulletColliderConcaveMesh (iMeshWrapper* mesh);
   virtual ~csBulletColliderConcaveMesh ();
   virtual ColliderType GetGeometryType () {return COLLIDER_CONCAVE_MESH;}
   virtual void GenerateShape ();
@@ -179,28 +181,27 @@ class csBulletColliderConcaveMeshScaled:
   csBulletColliderConcaveMesh* originalCollider;
 
 public:
-  csBulletColliderConcaveMeshScaled (csBulletCollisionSector* sector, iColliderConcaveMesh* collider, csVector3 scale);
+  csBulletColliderConcaveMeshScaled (iColliderConcaveMesh* collider, csVector3 scale);
   virtual ~csBulletColliderConcaveMeshScaled() = 0;
   virtual ColliderType GetGeometryType () {return COLLIDER_CONCAVE_MESH_SCALED;}
   virtual void GenerateShape ();
   virtual iColliderConcaveMesh* GetCollider () {return originalCollider;}
 };
 
+//TODO: modify the terrain collider.
 class HeightMapCollider : public btHeightfieldTerrainShape
 {
   
 public:
   iTerrainCell* cell;
-  csVector3 cellPosition;
   btVector3 localScale;
   float* heightData;
 
-  HeightMapCollider (csBulletCollisionSector* sector,
-    float* gridData,
-    int gridWidth, int gridHeight,
-    csVector3 gridSize,
-    csVector3 position,
-    float minHeight, float maxHeight);
+  HeightMapCollider (csBulletSector* sector,
+    float* gridData, int gridWidth, 
+    int gridHeight, csVector3 gridSize,
+    float minHeight, float maxHeight,
+    float internalScale);
   virtual ~HeightMapCollider();
   void UpdataMinHeight (float minHeight);
   void UpdateMaxHeight (float maxHeight);
@@ -213,18 +214,18 @@ class csBulletColliderTerrain:
 {
   
   csArray<HeightMapCollider*> colliders;
-  csBulletCollisionSector* collSector;
+  csArray<btRigidBody*> bodies;
+  csBulletSector* collSector;
   iTerrainSystem* terrainSystem;
+  csOrthoTransform terrainTransform;
   float minimumHeight;
   float maximumHeight;
   bool unload;
 
   void LoadCellToCollider(iTerrainCell* cell);
 public:
-  csBulletColliderTerrain (csBulletCollisionSector* sector,
-    iTerrainSystem* terrain,
-    float minimumHeight,
-    float maximumHeight);
+  csBulletColliderTerrain (iTerrainSystem* terrain,
+    float minimumHeight, float maximumHeight);
   virtual ~csBulletColliderTerrain ();
   virtual ColliderType GetGeometryType () {return COLLIDER_TERRAIN;}
   virtual void GenerateShape ();
@@ -238,6 +239,7 @@ public:
   virtual void OnCellPreLoad (iTerrainCell *cell);
   virtual void OnCellUnload (iTerrainCell *cell);
 
+  btRigidBody* GetBulletObject (size_t index);
   const csVector3& GetCellPosition (size_t index);
 };
 }

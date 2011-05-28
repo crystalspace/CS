@@ -73,61 +73,40 @@ struct iPhysicalBody : public virtual iCollisionObject
 
   virtual iSoftBody* QuerySoftBody () = 0;
 
-  /**
-  * Disable this collision object.
-  */
+  /// Disable this collision object.
   virtual bool Disable () = 0;
 
-  /**
-  * Enable this collision object.
-  */
+  /// Enable this collision object.
   virtual bool Enable () = 0;
 
-  /**
-  * Check if the collision object is enabled.
-  */
-  virtual bool isEnabled () = 0;
+  /// Check if the collision object is enabled.
+  virtual bool IsEnabled () = 0;
 
   // move "virtual iRigidBody::RigidBodyState GetState() = 0;" here and implement it for soft bodies by switching to rigid bodies when static/dynamic?
   //Lulu: If soft body can switch to rigid body, what about the parameters? Dose user have to call functions to set the parameters of rigid body? 
   //      If iPhysicalSystem create a new rigidbody, it's based on the softbody's current shape or original shape? 
   //      And the collision system will create a collision shape for the mesh? How to decide which type of collider is appropriate?
 
-  /**
-  * Get the mass of this body.
-  */
+  /// Get the mass of this body.
   virtual float GetMass () const = 0;
 
-  /**
-  * Set the mass of this body.
-  */
+  /// Set the mass of this body.
   virtual void SetMass (float mass) = 0;
 
   virtual float GetDensity () const = 0;
 
   virtual void SetDensity (float density) = 0;
 
-  /**
-  * Return the volume of this body.
-  */
+  /// Return the volume of this body.
   virtual float GetVolume () = 0;
-
-  // AddForce/Torque? Velocities? 
-  //Lulu: soft body doesn't support AddTorque.
   
-  /**
-  * Add a force to the whole body.
-  */
+  /// Add a force to the whole body.
   virtual void AddForce (const csVector3& force) = 0;
   
-  /**
-  * Set the linear velocity (movement).
-  */
+  /// Set the linear velocity (movement).
   virtual void SetLinearVelocity (const csVector3& vel) = 0;
   
-  /**
-  * Get the linear velocity (movement).
-  */
+  /// Get the linear velocity (movement).
   virtual csVector3 GetLinearVelocity (size_t index = 0) const = 0;
 
   /**
@@ -136,9 +115,7 @@ struct iPhysicalBody : public virtual iCollisionObject
   */
   virtual void SetFriction (float friction) = 0;
 
-  /**
-  * Get the friction of this rigid body.
-  */
+  /// Get the friction of this rigid body.
   virtual void GetFriction (float& friction) = 0;
 };
 
@@ -163,55 +140,35 @@ struct iRigidBody : public iPhysicalBody
 {
   SCF_INTERFACE (CS::Physics::iRigidBody, 1, 0, 2);
 
-  /**
-  * Get the iCollisionObject pointer of this body.
-  */
+  /// Get the iCollisionObject pointer of this body.
   virtual iCollisionObject* QueryCollisionObject () = 0;
 
-  /**
-  * Get the current state of the body.
-  */
+  /// Get the current state of the body.
   virtual RigidBodyState GetState () = 0;
   
-  /**
-  * Set the current state of the body.
-  */
+  /// Set the current state of the body.
   virtual void SetState (RigidBodyState state) = 0;
 
 
-  /**
-  * Set the elasticity of this rigid body.
-  */
+  /// Set the elasticity of this rigid body.
   virtual void SetElasticity (float elasticity) = 0;
 
-  /**
-  * Get the elasticity of this rigid body.
-  */
+  /// Get the elasticity of this rigid body.
   virtual void GetElasticity (float elasticity) = 0;
 
-  /**
-  * Set the angular velocity (rotation).
-  */
+  /// Set the angular velocity (rotation).
   virtual void SetAngularVelocity (const csVector3& vel) = 0;
 
-  /**
-  * Get the angular velocity (rotation)
-  */
+  /// Get the angular velocity (rotation)
   virtual csVector3 GetAngularVelocity () const = 0;
 
-  /**
-  * Add a torque (world space) (active for one timestep).
-  */
+  /// Add a torque (world space) (active for one timestep).
   virtual void AddTorque (const csVector3& force) = 0;
 
-  /**
-  * Add a force (local space) (active for one timestep).
-  */
+  /// Add a force (local space) (active for one timestep).
   virtual void AddRelForce (const csVector3& force) = 0;
 
-  /**
-  * Add a torque (local space) (active for one timestep).
-  */
+  /// Add a torque (local space) (active for one timestep).
   virtual void AddRelTorque (const csVector3& force) = 0;
 
   /**
@@ -242,14 +199,10 @@ struct iRigidBody : public iPhysicalBody
   virtual void AddRelForceAtRelPos (const csVector3& force,
       const csVector3& pos) = 0;
 
-  /**
-  * Get total force (world space).
-  */
+  /// Get total force (world space).
   virtual csVector3 GetForce () const = 0;
 
-  /**
-  * Get total torque (world space).
-  */
+  /// Get total torque (world space).
   virtual csVector3 GetTorque () const = 0;
 
   /**
@@ -258,9 +211,7 @@ struct iRigidBody : public iPhysicalBody
   */
   virtual void SetKinematicCallback (iKinematicCallback* cb) = 0;
 
-  /**
-  * Get the callback used to update the transform of the kinematic body.
-  */
+  /// Get the callback used to update the transform of the kinematic body.
   virtual iKinematicCallback* GetKinematicCallback () = 0;
 
   /**
@@ -274,9 +225,7 @@ struct iRigidBody : public iPhysicalBody
   */
   virtual void SetLinearDampener (float d) = 0;
 
-  /**
-  * Get the linear dampener for this rigid body.
-  */
+  /// Get the linear dampener for this rigid body.
   virtual float GetLinearDampener () = 0;
 
   /**
@@ -290,9 +239,7 @@ struct iRigidBody : public iPhysicalBody
   */
   virtual void SetRollingDampener (float d) = 0;
 
-  /**
-  * Get the angular dampener for this rigid body.
-  */
+  /// Get the angular dampener for this rigid body.
   virtual float GetRollingDampener () = 0;
 };
 
@@ -311,29 +258,19 @@ struct iSoftBody : public iPhysicalBody
 {
   SCF_INTERFACE (CS::Physics::iSoftBody, 2, 0, 3);
 
-  /**
-  * Set the mass of a node by index.
-  */
+  /// Set the mass of a node by index.
   virtual void SetVertexMass (float mass, size_t index) = 0;
 
-  /**
-  * Get the mass of a node by index.
-  */
+  /// Get the mass of a node by index.
   virtual float GetVertexMass (size_t index) = 0;
 
-  /**
-  * Return the count of vertices of this soft body.
-  */
+  /// Return the count of vertices of this soft body.
   virtual size_t GetVertexCount () = 0;
 
-  /**
-  * Return the position in world coordinates of the given vertex.
-  */
+  /// Return the position in world coordinates of the given vertex.
   virtual csVector3 GetVertexPosition (size_t index) const = 0;
 
-  /**
-  * Anchor the given vertex to its current position. This vertex will no more move.
-  */
+  /// Anchor the given vertex to its current position. This vertex will no more move.
   virtual void AnchorVertex (size_t vertexIndex) = 0;
 
   /**
@@ -377,14 +314,10 @@ struct iSoftBody : public iPhysicalBody
   */
   virtual void SetRigidity (float rigidity) = 0;
 
-  /**
-  * Get the rigidity of this body.
-  */
+  /// Get the rigidity of this body.
   virtual float GetRidigity () = 0;
 
-  /**
-  * Set the linear velocity of the given vertex of the body.
-  */
+  /// Set the linear velocity of the given vertex of the body.
   virtual void SetLinearVelocity (const csVector3& velocity,
       size_t vertexIndex) = 0;
 
@@ -393,29 +326,19 @@ struct iSoftBody : public iPhysicalBody
   */
   virtual void setWindVelocity (const csVector3& velocity) = 0;
 
-  /**
-  * Get the wind velocity of the whole body.
-  */
+  /// Get the wind velocity of the whole body.
 virtual const csVector3 getWindVelocity () const = 0;
 
-  /**
-  * Add a force at the given vertex of the body.
-  */
+  /// Add a force at the given vertex of the body.
   virtual void AddForce (const csVector3& force, size_t vertexIndex) = 0;
 
-  /**
-  * Return the count of triangles of this soft body.
-  */
+  /// Return the count of triangles of this soft body.
   virtual size_t GetTriangleCount () = 0;
 
-  /**
-  * Return the triangle with the given index.
-  */
+  /// Return the triangle with the given index.
   virtual csTriangle GetTriangle (size_t index) const = 0;
 
-  /**
-  * Return the normal vector in world coordinates for the given vertex.
-  */
+  /// Return the normal vector in world coordinates for the given vertex.
   virtual csVector3 GetVertexNormal (size_t index) const = 0;
 
   /**
@@ -450,9 +373,7 @@ struct iJoint : public virtual iBase
       const csOrthoTransform& trans2,
       bool forceUpdate = true) = 0;
 
-  /**
-  * Get the attached body with the given index (valid values for body are 0 and 1).
-  */
+  /// Get the attached body with the given index (valid values for body are 0 and 1).
   virtual iPhysicalBody* GetAttachedBody (int index) = 0;
 
   /**
@@ -463,19 +384,13 @@ struct iJoint : public virtual iBase
   virtual void SetTransform (const csOrthoTransform& trans,
       bool forceUpdate = true) = 0;
 
-  /**
-  * Get the local transformation of the joint.
-  */
+  /// Get the local transformation of the joint.
   virtual csOrthoTransform GetTransform () const = 0;
 
-  /**
-  * Set the new position of the joint, in world coordinates.
-  */
+  /// Set the new position of the joint, in world coordinates.
   virtual void SetPosition (const csVector3& position) = 0;
 
-  /**
-  * Get the current position of the joint, in world coordinates.
-  */
+  /// Get the current position of the joint, in world coordinates.
   virtual csVector3 GetPosition () const = 0;
 
   /**
@@ -490,19 +405,13 @@ struct iJoint : public virtual iBase
       bool Y, bool Z, 
       bool forceUpdate = true) = 0;
 
-  /**
-  * True if this axis' translation is constrained.
-  */
+  /// True if this axis' translation is constrained.
   virtual bool IsXTransConstrained () = 0;
 
-  /**
-  * True if this axis' translation is constrained.
-  */
+  /// True if this axis' translation is constrained.
   virtual bool IsYTransConstrained () = 0;
 
-  /**
-  * True if this axis' translation is constrained.
-  */
+  /// True if this axis' translation is constrained.
   virtual bool IsZTransConstrained () = 0;
 
   /**
@@ -512,9 +421,7 @@ struct iJoint : public virtual iBase
   virtual void SetMinimumDistance (const csVector3& dist,
       bool forceUpdate = true) = 0;
 
-  /**
-  * Get the minimum allowed distance between the two bodies.
-  */
+  /// Get the minimum allowed distance between the two bodies.
   virtual csVector3 GetMinimumDistance () const = 0;
 
   /**
@@ -524,9 +431,7 @@ struct iJoint : public virtual iBase
   virtual void SetMaximumDistance (const csVector3& dist,
       bool forceUpdate = true) = 0;
 
-  /**
-  * Get the maximum allowed distance between the two bodies.
-  */
+  /// Get the maximum allowed distance between the two bodies.
   virtual csVector3 GetMaximumDistance () const = 0;
 
   /**
@@ -541,19 +446,13 @@ struct iJoint : public virtual iBase
       bool Y, bool Z, 
       bool forceUpdate = true) = 0;
 
-  /**
-  * True if this axis' rotation is constrained.
-  */
+  /// True if this axis' rotation is constrained.
   virtual bool IsXRotConstrained () = 0;
 
-  /**
-  * True if this axis' rotation is constrained.
-  */
+  /// True if this axis' rotation is constrained.
   virtual bool IsYRotConstrained () = 0;
 
-  /**
-  * True if this axis' rotation is constrained.
-  */
+  /// True if this axis' rotation is constrained.
   virtual bool IsZRotConstrained () = 0;
 
   /**
@@ -563,9 +462,7 @@ struct iJoint : public virtual iBase
   virtual void SetMinimumAngle (const csVector3& angle,
       bool forceUpdate = true) = 0;
 
-  /**
-  * Get the minimum allowed angle between the two bodies (in radian).
-  */
+  /// Get the minimum allowed angle between the two bodies (in radian).
   virtual csVector3 GetMinimumAngle () const = 0;
 
   /**
@@ -575,9 +472,7 @@ struct iJoint : public virtual iBase
   virtual void SetMaximumAngle (const csVector3& dist,
       bool forceUpdate = true) = 0;
 
-  /**
-  * Get the maximum allowed angle between the two bodies (in radian).
-  */
+  /// Get the maximum allowed angle between the two bodies (in radian).
   virtual csVector3 GetMaximumAngle () const = 0;
 
   /** 
@@ -588,9 +483,7 @@ struct iJoint : public virtual iBase
   virtual void SetBounce (const csVector3& bounce,
       bool forceUpdate = true) = 0;
 
-  /**
-  * Get the joint restitution.
-  */
+  /// Get the joint restitution.
   virtual csVector3 GetBounce () const = 0;
 
   /**
@@ -600,9 +493,7 @@ struct iJoint : public virtual iBase
   virtual void SetDesiredVelocity (const csVector3& velo,
       bool forceUpdate = true) = 0;
 
-  /**
-  * Get the desired velocity of the joint motor.
-  */
+  /// Get the desired velocity of the joint motor.
   virtual csVector3 GetDesiredVelocity () const = 0;
 
   /**
@@ -612,9 +503,7 @@ struct iJoint : public virtual iBase
   virtual void SetMaxForce (const csVector3& force,
       bool forceUpdate = true) = 0;
 
-  /**
-  * Get the maximum force that can be applied by the joint motor to reach the desired velocity.
-  */
+  /// Get the maximum force that can be applied by the joint motor to reach the desired velocity.
   virtual csVector3 GetMaxForce () const = 0;
 
   /**
@@ -624,9 +513,7 @@ struct iJoint : public virtual iBase
   virtual void SetAngularConstraintAxis (const csVector3& axis,
       bool forceUpdate = true) = 0;
 
-  /**
-  * Get the custom angular constraint axis.
-  */
+  /// Get the custom angular constraint axis.
   virtual csVector3 GetAngularConstraintAxis () const = 0;
 
   /**
@@ -646,29 +533,19 @@ struct iJoint : public virtual iBase
       bool Y, bool Z, 
       bool forceUpdate = true) = 0;
 
-  /**
-  * True if this axis has a spring constraint.
-  */
+  /// True if this axis has a spring constraint.
   virtual bool IsXSpringConstrained () = 0;
 
-  /**
-  * True if this axis has a spring constraint.
-  */
+  /// True if this axis has a spring constraint.
   virtual bool IsYSpringConstrained () = 0;
 
-  /**
-  * True if this axis has a spring constraint.
-  */
+  /// True if this axis has a spring constraint.
   virtual bool IsZSpringConstrained () = 0;
 
-  /**
-  * Set the stiffness of the spring.
-  */
+  /// Set the stiffness of the spring.
   virtual void SetStiffness (float stiff) = 0;
 
-  /**
-  * Set the damping of the spring.
-  */
+  /// Set the damping of the spring.
   virtual void SetDamping (float damp) = 0;
 
   /**
@@ -677,9 +554,7 @@ struct iJoint : public virtual iBase
   */
   virtual void SetEquilibriumPoint (int index = -1);
   
-  /**
-  * Set the value to an equilibrium point for given DOF.
-  */
+  /// Set the value to an equilibrium point for given DOF.
   virtual void SetEquilibriumPoint (int index, float value);
 
   virtual void SetBreakingImpulseThreshold (float threshold) = 0;
@@ -697,9 +572,7 @@ struct iPhysicalSystem : public virtual iBase
   */
   virtual csPtr<iRigidBody> CreateRigidBody () = 0;
 
-  /**
-  * Create a joint and add it to the simulation.
-  */
+  /// Create a joint and add it to the simulation.
   virtual csPtr<iJoint> CreateJoint () = 0;
   
   /**
@@ -769,9 +642,10 @@ struct iPhysicalSector : public virtual iBase
   */
   virtual void SetSimulationSpeed (float speed) = 0;
 
-  /**
-  * Step the simulation forward by the given duration, in second
-  */
+  virtual void SetStepParameters (float timeStep, size_t maxSteps,
+    size_t iterations) = 0;  
+
+  /// Step the simulation forward by the given duration, in second
   virtual void Step (float duration) = 0;
 
   /**
@@ -801,9 +675,7 @@ struct iPhysicalSector : public virtual iBase
   */
   virtual void SetRollingDampener (float d) = 0;
 
-  /**
-  * Get the global rolling dampener setting.
-  */
+  /// Get the global rolling dampener setting.
   virtual float GetRollingDampener () const = 0;
 
   /**
@@ -831,7 +703,7 @@ struct iPhysicalSector : public virtual iBase
   * \remark With the Bullet plugin, calling this method will not affect bodies already
   * created.
   */
-  virtual void SetAutoDisableParams (float linear, float angular, int steps,
+  virtual void SetAutoDisableParams (float linear, float angular,
       float time) = 0;
 
   /**
@@ -840,23 +712,14 @@ struct iPhysicalSector : public virtual iBase
   */
   virtual void AddRidigBody (iRigidBody* body) = 0;
 
-  /**
-  * Remove a rigid body by pointer.
-  */
+  /// Remove a rigid body by pointer.
   virtual void RemoveRigidBody (iRigidBody* body) = 0;
 
-  /**
-  * Add a soft body into the sector.
-  */
+  /// Add a soft body into the sector.
   virtual void AddSoftBody (iSoftBody* body) = 0;
 
-  /**
-  * Remove a soft body by pointer.
-  */
+  /// Remove a soft body by pointer.
   virtual void RemoveSoftBody (iSoftBody* body) = 0;
-
-  virtual void SetStepParameters (float timeStep, size_t maxSteps,
-      size_t iterations) = 0;  
 };
 }
 }

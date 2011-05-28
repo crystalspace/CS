@@ -46,7 +46,6 @@ enum CollisionObjectType
 COLLISION_OBJECT_BASE = 0,
 COLLISION_OBJECT_GHOST,
 COLLISION_OBJECT_ACTOR,
-COLLISION_OBJECT_TERRAIN,
 };
 
 struct CollisionGroup
@@ -91,7 +90,8 @@ struct HitBeamResult
 
 struct CollisionData
 {
-  csVector3 position; // in world coordinates? in object coordinates for both bodies? 
+  csVector3 positionWorldOnA;
+  csVector3 positionWorldOnB;
   csVector3 penetration; 
 };
 
@@ -270,57 +270,6 @@ struct iColliderConvexMesh : public virtual iCollider
   /// Get the mesh factory of this collider.
   virtual iMeshWrapper* GetMesh () = 0;
 };
-
-/**
-* A compound shape collider.
-*
-* Main creators of instances implementing this interface:
-* - iCollisionSystem::CreateColliderCompound()
-* 
-* Main ways to get pointers to this interface:
-* - iCollisionObject::GetCollider()
-* 
-* Main users of this interface:
-* - iCollisionObject
-*/
-// kickvb: to be removed
-// Lulu: I don't know whether I'm thinking in a correct way...
-//       So for concave object, if we call CreateColliderConcaveMesh(...), 
-//       it will always return a iCollisionConcaveMesh?
-//       In this case, we call SetAutoDecompose(true), iColliderConcaveMesh will 
-//       create a btCompoundShape. User cannot add more collision shape into the
-//       collider because iColliderConcaveMesh doesn't have this functionality.
-//
-//       And we also have a compound collider class, it also create a btCompoundShape.
-//       This class support adding colliders and it's used internal. When user add more
-//       than 1 colliders into a collision object this compound collider will be used.
-//       
-//       Is it correct?
-//struct iCompoundCollider : public virtual iCollider
-//{
-//    SCF_INTERFACE (CS::Collision::iCompoundCollider, 1, 0, 0);
-//
-//    /**
-//    * Add a child collider to the compound collider.
-//    */
-//    virtual bool AddChildCollider(iCollider* child,
-//        const csOrthoTransform& trans); = 0;
-//
-//    /**
-//    * Get a child collider by index.
-//    */
-//    virtual csRef<iCollider> GetChildCollider(size_t index) = 0;
-//
-//    /**
-//    * Get the count of child colliders.
-//    */
-//    virtual int GetChildColliderCount() = 0;
-//
-//    /**
-//    * Remove a child collider by index.
-//    */
-//    virtual bool RemoveChildCollider(size_t index) = 0;
-//};
 
 /**
 * A concave mesh collider.
@@ -531,7 +480,7 @@ struct iCollisionActor : public virtual iCollisionObject
   virtual void SetJumpSpeed (float jumpSpeed) = 0;
 
   /// Set the max jump height an actor can have.
-  virtual void setMaxJumpHeight (float maxJumpHeight) = 0;
+  virtual void SetMaxJumpHeight (float maxJumpHeight) = 0;
 
   /// Let the actor jump.
   virtual void Jump () = 0;
@@ -648,7 +597,7 @@ struct iCollisionSystem : public virtual iBase
   virtual csPtr<iColliderCapsule> CreateColliderCapsule (float length, float radius) = 0;
 
   /// Create a plane collider.
-  virtual csPtr<iColliderPlane> CreateColliderPlane (const csPlane3& plain) = 0;
+  virtual csPtr<iColliderPlane> CreateColliderPlane (const csPlane3& plane) = 0;
 
   /// Create a terrain collider.
   virtual csPtr<iColliderTerrain> CreateColliderTerrain (const iTerrainSystem* terrain,
@@ -676,9 +625,11 @@ struct iCollisionSystem : public virtual iBase
   /// Find a collision group by name.
   virtual CollisionGroup& FindCollisionGroup (const char* name) = 0;
 
+  /// Set whether the two groups collide with each other.
   virtual void SetGroupCollision (CollisionGroup& group1,
       CollisionGroup& group2, bool collide) = 0;
 
+  /// Get true if the two groups collide with each other.
   virtual bool GetGroupCollision (CollisionGroup& group1,
       CollisionGroup& group2) = 0;
 
