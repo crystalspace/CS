@@ -60,9 +60,9 @@ bool SelfShadowDemo::Application ()
   cfg->AddDomain ("/config/engine.cfg", vfs, iConfigManager::ConfigPriorityPlugin);
 
   csRef<iRenderManager> rm = csLoadPlugin<iRenderManager> (GetObjectRegistry(), 
-    "crystalspace.rendermanager.shadow_pssm");
+    "crystalspace.rendermanager.osm");
   if (!rm)
-    return ReportError("Failed to load deferred Render Manager!");
+    return ReportError("Failed to load OSM Render Manager!");
 
   cfg->RemoveDomain ("/config/engine.cfg");
 
