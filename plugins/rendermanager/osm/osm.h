@@ -21,35 +21,64 @@
 #ifndef __CS_RM_OSM_H__
 #define __CS_RM_OSM_H__
 
-#include "cssysdef.h"
-#include "itexture.h"
+#include "csplugincommon/rendermanager/debugcommon.h"
+#include "imap/loader.h"
+#include "csplugincommon/rendermanager/viscullcommon.h"
 #include "csutil/scf_implementation.h"
-#include "iengine/rendermanager.h"
 #include "iutil/comp.h"
+#include "iengine/rendermanager.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(RMOSM)
 {
-  class RMOSM : public scfImplementation2<RMOSM, iRenderManager, iComponent>
+  typedef CS::RenderManager::RenderTree<
+    CS::RenderManager::RenderTreeLightingTraits> RenderTreeType;
+
+  template<typename RenderTreeType, typename LayerConfigType>
+  class StandardContextSetup;
+
+  class RMOSM : public scfImplementation4<RMOSM, 
+    iRenderManager, 
+    scfFakeInterface<iRenderManagerVisCull>,
+    iComponent,
+    scfFakeInterface<iDebugHelper> >,
+    public CS::RenderManager::RMDebugCommon<RenderTreeType>,
+    public CS::RenderManager::RMViscullCommon
   {
   public:
+    RMOSM (iBase* parent);
 
-    /// Constructor.
-    RMOSM(iBase *parent);
+    //---- iRenderManager ----
+    virtual bool RenderView (iView* view);
+    virtual bool PrecacheView (iView* view);
 
-    //---- iComponent Interface ----
-    virtual bool Initialize(iObjectRegistry *registry);
+    //---- iComponent ----
+    virtual bool Initialize (iObjectRegistry*);
 
-    //---- iRenderManager Interface ----
-    virtual bool RenderView(iView *view);
-    virtual bool PrecacheView(iView *view);
+    typedef StandardContextSetup<RenderTreeType, 
+      CS::RenderManager::MultipleRenderLayer> ContextSetupType;
 
-  protected:
+    typedef CS::RenderManager::StandardPortalSetup<RenderTreeType, 
+      ContextSetupType> PortalSetupType;
 
-    iObjectRegistry *objRegistry;
+    typedef CS::RenderManager::LightSetup<RenderTreeType, 
+      CS::RenderManager::MultipleRenderLayer> LightSetupType;
 
-    csRef<iTextureHandle> accumBuffer;
+  public:
+    iObjectRegistry* objectReg;
 
+    bool RenderView (iView* view, bool recursePortals);
+
+    RenderTreeType::PersistentData treePersistent;
+    LightSetupType::PersistentData lightPersistent;
+
+    csRef<iShaderManager> shaderManager;
+    csRef<iLightManager> lightManager;
+
+    CS::RenderManager::MultipleRenderLayer renderLayer;
+
+    uint dbgFlagClipPlanes;
   };
+
 }
 CS_PLUGIN_NAMESPACE_END(RMOSM)
 
