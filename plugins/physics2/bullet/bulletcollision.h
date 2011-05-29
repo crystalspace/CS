@@ -19,19 +19,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
 class csBulletSector;
 class csBulletCollisionObject;
 class csBulletTerrainObject;
-class csBulletCollisionSystem;
+class csBulletSystem;
 class csBulletSoftBody;
 
 class csBulletCollisionObject: public scfImplementationExt1<
   csBulletCollisionObject, csObject, iCollisionObject>
 {
   friend class csBulletSector;
-  friend class csBulletCollisionSystem;
+  friend class csBulletSystem;
   friend class csBulletMotionState;
   friend class csBulletKinematicMotionState;
 
   csBulletSector* sector;
-  csBulletCollisionSystem* collSys;
+  csBulletSystem* collSys;
   csRefArray<csBulletCollider> colliders;
   csArray<csOrthoTransform> relaTransforms;
   csRef<iMovable> movable;
@@ -48,7 +48,7 @@ class csBulletCollisionObject: public scfImplementationExt1<
   bool isTerrain;
 
 public:
-  csBulletCollisionObject (csBulletCollisionSystem* sys);
+  csBulletCollisionObject (csBulletSystem* sys);
   virtual ~csBulletCollisionObject ();
 
   virtual iObject* QueryObject (void) { return (iObject*) this; }
@@ -180,7 +180,7 @@ class csBulletSector: public scfImplementationExt3<
   };
   iSector* sector;
   csBulletPhysicalSector* phySector;
-  csBulletCollisionSystem* sys;
+  csBulletSystem* sys;
   csVector3 gravity;
   csRefArrayObject<iCollisionObject> collisionObjects;
   csRefArrayObject<iRigidBody> rigidBodies;
@@ -214,7 +214,7 @@ class csBulletSector: public scfImplementationExt3<
 
 public:
   csBulletSector (iObjectRegistry* object_reg,
-                  csBulletCollisionSystem* sys);
+                  csBulletSystem* sys);
   virtual ~csBulletSector();
 
   virtual iObject* QueryObject () {return (iObject*) this;}
@@ -286,15 +286,20 @@ public:
 			     const csVector3& end);
 };
 
-class csBulletCollisionSystem: public scfImplementation2<
-  csBulletCollisionSystem, iCollisionSystem, iComponent>
+class csBulletSystem: public scfImplementation4<
+  csBulletSystem, CS::Collision::iCollisionSystem, 
+  CS::Physics::iPhysicalSystem, CS::Physics::Bullet::iPhysicalSystem,
+  iComponent>
 {
 
   iObjectRegistry* object_reg;
-  csRefArray<CS::Collision::iCollider> colliders;
-  csRefArray<iCollisionObject> objects;
-  csRefArray<iCollisionActor> actors;
-  csRefArray<csBulletSector> collSectors;
+  csRefArrayObject<CS::Collision::iCollider> colliders;
+  csRefArrayObject<iCollisionObject> objects;
+  csRefArrayObject<iRigidBody> rigidBodies;
+  csRefArrayObject<iSoftBody> softBodies;
+  csRefArrayObject<iJoint> joints;
+  csRefArrayObject<iCollisionActor> actors;
+  csRefArrayObject<csBulletSector> collSectors;
   //Todo: think about it..
   //csArray<CollisionGroup> groups;
 
@@ -319,8 +324,8 @@ class csBulletCollisionSystem: public scfImplementation2<
 
   void RegisterGimpact ();
 public:
-  csBulletCollisionSystem (iBase* iParent);
-  virtual ~csBulletCollisionSystem ();
+  csBulletSystem (iBase* iParent);
+  virtual ~csBulletSystem ();
 
   // iComponent
   virtual bool Initialize (iObjectRegistry* object_reg);
@@ -331,13 +336,13 @@ public:
       (iMeshWrapper* mesh, bool isStatic = false);
   virtual csPtr<iColliderConcaveMeshScaled> CreateColliderConcaveMeshScaled
       (iColliderConcaveMesh* collider, float scale);
-  virtual csPtr<iColliderCylinder> CreateColliderCylinder (float length, float radius);
-  virtual csPtr<iColliderBox> CreateColliderBox (const csVector3& size);
-  virtual csPtr<iColliderSphere> CreateColliderSphere (float radius);
-  virtual csPtr<iColliderCapsule> CreateColliderCapsule (float length, float radius);
-  virtual csPtr<iColliderCapsule> CreateColliderCone (float length, float radius);
-  virtual csPtr<iColliderPlane> CreateColliderPlane (const csPlane3& plane) = 0;
-  virtual csPtr<iColliderTerrain> CreateColliderTerrain (const iTerrainSystem* terrain,
+  virtual csRef<iColliderCylinder> CreateColliderCylinder (float length, float radius);
+  virtual csRef<iColliderBox> CreateColliderBox (const csVector3& size);
+  virtual csRef<iColliderSphere> CreateColliderSphere (float radius);
+  virtual csRef<iColliderCapsule> CreateColliderCapsule (float length, float radius);
+  virtual csRef<iColliderCapsule> CreateColliderCone (float length, float radius);
+  virtual csRef<iColliderPlane> CreateColliderPlane (const csPlane3& plane) = 0;
+  virtual csRef<iColliderTerrain> CreateColliderTerrain (const iTerrainSystem* terrain,
       float minHeight = 0, float maxHeight = 0);
 
   virtual csRef<iCollisionObject> CreateCollisionObject ();
@@ -353,6 +358,32 @@ public:
       CollisionGroup& group2);
 
   virtual void DecomposeConcaveMesh (iCollisionObject* object, iMeshWrapper* mesh); 
+
+  //iPhysicalSystem
+  virtual csRef<iRigidBody> CreateRigidBody ();
+
+  virtual csRef<iJoint> CreateJoint ();
+ 
+  virtual csRef<iSoftBody> CreateRope (csVector3 start,
+      csVector3 end, size_t segmentCount);
+  virtual csRef<iSoftBody> CreateRope (csVector3* vertices, size_t vertexCount);
+  virtual csRef<iSoftBody> CreateCloth (csVector3 corner1, csVector3 corner2,
+      csVector3 corner3, csVector3 corner4,
+      size_t segmentCount1, size_t segmentCount2,
+      bool withDiagonals = false);
+
+  virtual csRef<iSoftBody> CreateSoftBody (iGeneralFactoryState* genmeshFactory);
+
+  virtual csRef<iSoftBody> CreateSoftBody (csVector3* vertices,
+      size_t vertexCount, csTriangle* triangles,
+      size_t triangleCount);
+
+  //Bullet::iPhysicalSystem
+  virtual void StartProfile ();
+
+  virtual void StopProfile ();
+
+  virtual void DumpProfile (bool resetProfile = true);
 };
 }
 CS_PLUGIN_NAMESPACE_END(Bullet2)

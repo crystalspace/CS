@@ -581,43 +581,43 @@ struct iCollisionSystem : public virtual iBase
     iMeshWrapper* mesh, bool isStatic = false) = 0;
 
   /// Create a scaled concave mesh collider.
-  virtual csPtr<iColliderConcaveMeshScaled> CreateColliderConcaveMeshScaled (
+  virtual csRef<iColliderConcaveMeshScaled> CreateColliderConcaveMeshScaled (
     iColliderConcaveMesh* collider, float scale) = 0;
 
   /// Create a cylinder collider.
-  virtual csPtr<iColliderCylinder> CreateColliderCylinder (float length, float radius) = 0;
+  virtual csRef<iColliderCylinder> CreateColliderCylinder (float length, float radius) = 0;
 
   /// Create a box collider.
-  virtual csPtr<iColliderBox> CreateColliderBox (const csVector3& size) = 0;
+  virtual csRef<iColliderBox> CreateColliderBox (const csVector3& size) = 0;
 
   /// Create a sphere collider.
-  virtual csPtr<iColliderSphere> CreateColliderSphere (float radius) = 0;
+  virtual csRef<iColliderSphere> CreateColliderSphere (float radius) = 0;
 
   /// Create a capsule collider.
-  virtual csPtr<iColliderCapsule> CreateColliderCapsule (float length, float radius) = 0;
+  virtual csRef<iColliderCapsule> CreateColliderCapsule (float length, float radius) = 0;
 
   /// Create a plane collider.
-  virtual csPtr<iColliderPlane> CreateColliderPlane (const csPlane3& plane) = 0;
+  virtual csRef<iColliderPlane> CreateColliderPlane (const csPlane3& plane) = 0;
 
   /// Create a terrain collider.
-  virtual csPtr<iColliderTerrain> CreateColliderTerrain (const iTerrainSystem* terrain,
+  virtual csRef<iColliderTerrain> CreateColliderTerrain (const iTerrainSystem* terrain,
       float minHeight = 0, float maxHeight = 0) = 0;
 
   /**
   * Create a collision object. Without any initialization.
   * Need to call iCollisionObject::RebuildObject.
   */
-  virtual csPtr<iCollisionObject> CreateCollisionObject (
+  virtual csRef<iCollisionObject> CreateCollisionObject (
     CollisionObjectType type = COLLISION_OBJECT_BASE) = 0;
 
   /**
   * Create a collision actor.
   * Need to call iCollisionObject::RebuildObject.
   */
-  virtual csPtr<iCollisionActor> CreateCollisionActor () = 0;
+  virtual csRef<iCollisionActor> CreateCollisionActor () = 0;
   
   /// Create a collision sector.
-  virtual csPtr<iCollisionSector> CreateCollisionSector () = 0;
+  virtual csRef<iCollisionSector> CreateCollisionSector () = 0;
 
   /// Create a collision group.
   virtual CollisionGroup& CreateCollisionGroup (const char* name) = 0;

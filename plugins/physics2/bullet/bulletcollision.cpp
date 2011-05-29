@@ -26,7 +26,7 @@ const float COLLISION_THRESHOLD = 0.01f;
 CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
 {
 
-csBulletCollisionObject::csBulletCollisionObject (CollisionObjectType type, csBulletCollisionSystem* sys)
+csBulletCollisionObject::csBulletCollisionObject (CollisionObjectType type, csBulletSystem* sys)
   : scfImplementationType (this), collSys (sys)
 {
   collCb = NULL;
@@ -505,7 +505,7 @@ void csBulletCollisionObject::RemoveBulletObject ()
 #define AABB_DIMENSIONS 10000.0f
 
 csBulletSector::csBulletSector (iObjectRegistry* object_reg,
-                                csBulletCollisionSystem* sys)
+                                csBulletSystem* sys)
  :scfImplementationType (this), sys (sys), sector (NULL),
   internalScale (1.0f), debugDraw (NULL),
   inverseInternalScale (1.0f)
@@ -1169,27 +1169,27 @@ DebugMode csBulletSector::GetDebugMode ()
   return debugDraw->GetDebugMode ();
 }
 
-SCF_IMPLEMENT_FACTORY (csBulletCollisionSystem)
+SCF_IMPLEMENT_FACTORY (csBulletSystem)
 
-csBulletCollisionSystem::csBulletCollisionSystem (iBase* iParent)
+csBulletSystem::csBulletSystem (iBase* iParent)
   : scfImplementationType (this, iParent)
 {
 }
 
-csBulletCollisionSystem::~csBulletCollisionSystem ()
+csBulletSystem::~csBulletSystem ()
 {
   colliders.DeleteAll ();
   objects.DeleteAll ();
   collSectors.DeleteAll ();
 }
 
-bool csBulletCollisionSystem::Initialize (iObjectRegistry* object_reg)
+bool csBulletSystem::Initialize (iObjectRegistry* object_reg)
 {
   this->object_reg = object_reg;
   return true;
 }
 
-csPtr<iColliderConvexMesh> csBulletCollisionSystem::CreateColliderConvexMesh (iMeshWrapper* mesh)
+csPtr<iColliderConvexMesh> csBulletSystem::CreateColliderConvexMesh (iMeshWrapper* mesh)
 {
   csRef<csBulletCollider> collider;
   collider.AttachNew (new csBulletColliderConvexMesh (mesh));
@@ -1198,7 +1198,7 @@ csPtr<iColliderConvexMesh> csBulletCollisionSystem::CreateColliderConvexMesh (iM
   return collider;
 }
 
-csPtr<iColliderConcaveMesh> csBulletCollisionSystem::CreateColliderConcaveMesh (iMeshWrapper* mesh,
+csPtr<iColliderConcaveMesh> csBulletSystem::CreateColliderConcaveMesh (iMeshWrapper* mesh,
                                                                                 bool isStatic /* = false */)
 {
   csRef<csBulletCollider> collider;
@@ -1208,7 +1208,7 @@ csPtr<iColliderConcaveMesh> csBulletCollisionSystem::CreateColliderConcaveMesh (
   return collider;
 }
 
-csPtr<iColliderConcaveMeshScaled> csBulletCollisionSystem::CreateColliderConcaveMeshScaled (
+csPtr<iColliderConcaveMeshScaled> csBulletSystem::CreateColliderConcaveMeshScaled (
   iColliderConcaveMesh* collider, float scale)
 {
   csRef<csBulletCollider> coll;
@@ -1218,7 +1218,7 @@ csPtr<iColliderConcaveMeshScaled> csBulletCollisionSystem::CreateColliderConcave
   return coll;
 }
 
-csPtr<iColliderCylinder> csBulletCollisionSystem::CreateColliderCylinder (float length, float radius)
+csPtr<iColliderCylinder> csBulletSystem::CreateColliderCylinder (float length, float radius)
 {
   csRef<csBulletCollider> collider;
   collider.AttachNew (new csBulletColliderCylinder (length, radius));
@@ -1227,7 +1227,7 @@ csPtr<iColliderCylinder> csBulletCollisionSystem::CreateColliderCylinder (float 
   return collider;
 }
 
-csPtr<iColliderBox> csBulletCollisionSystem::CreateColliderBox (const csVector3& size)
+csPtr<iColliderBox> csBulletSystem::CreateColliderBox (const csVector3& size)
 {
   csRef<csBulletColliderBox> collider;
   collider.AttachNew (new csBulletColliderBox (size));
@@ -1236,7 +1236,7 @@ csPtr<iColliderBox> csBulletCollisionSystem::CreateColliderBox (const csVector3&
   return collider;
 } 
 
-csPtr<iColliderSphere> csBulletCollisionSystem::CreateColliderSphere (float radius)
+csPtr<iColliderSphere> csBulletSystem::CreateColliderSphere (float radius)
 {
   csRef<csBulletCollider> collider;
   collider.AttachNew (new csBulletColliderSphere (radius));
@@ -1245,7 +1245,7 @@ csPtr<iColliderSphere> csBulletCollisionSystem::CreateColliderSphere (float radi
   return collider;
 }
 
-csPtr<iColliderCapsule> csBulletCollisionSystem::CreateColliderCapsule (float length, float radius)
+csPtr<iColliderCapsule> csBulletSystem::CreateColliderCapsule (float length, float radius)
 {
   csRef<csBulletCollider> collider;
   collider.AttachNew (new csBulletColliderCapsule (length, radius));
@@ -1254,7 +1254,7 @@ csPtr<iColliderCapsule> csBulletCollisionSystem::CreateColliderCapsule (float le
   return collider;
 }
 
-csPtr<iColliderCapsule> csBulletCollisionSystem::CreateColliderCone (float length, float radius)
+csPtr<iColliderCapsule> csBulletSystem::CreateColliderCone (float length, float radius)
 {
   csRef<csBulletCollider> collider;
   collider.AttachNew (new csBulletColliderCone (length, radius));
@@ -1263,7 +1263,7 @@ csPtr<iColliderCapsule> csBulletCollisionSystem::CreateColliderCone (float lengt
   return collider;
 }
 
-csPtr<iColliderPlane> csBulletCollisionSystem::CreateColliderPlane (const csPlane3& plane)
+csPtr<iColliderPlane> csBulletSystem::CreateColliderPlane (const csPlane3& plane)
 {
   csRef<csBulletCollider> collider;
   collider.AttachNew (new csBulletColliderPlane (plane));
@@ -1272,7 +1272,7 @@ csPtr<iColliderPlane> csBulletCollisionSystem::CreateColliderPlane (const csPlan
   return collider;
 }
 
-csPtr<iColliderTerrain> csBulletCollisionSystem::CreateColliderTerrain (const iTerrainSystem* terrain, 
+csPtr<iColliderTerrain> csBulletSystem::CreateColliderTerrain (const iTerrainSystem* terrain, 
                                                                         float minHeight /* = 0 */, 
                                                                         float maxHeight /* = 0 */)
 {
@@ -1283,7 +1283,7 @@ csPtr<iColliderTerrain> csBulletCollisionSystem::CreateColliderTerrain (const iT
   return collider;
 }
 
-csRef<iCollisionObject> csBulletCollisionSystem::CreateCollisionObject ()
+csRef<iCollisionObject> csBulletSystem::CreateCollisionObject ()
 {
   csRef<iCollisionObject> collObject;
   collObject.AttachNew (new csBulletCollisionObject (this));
@@ -1292,7 +1292,7 @@ csRef<iCollisionObject> csBulletCollisionSystem::CreateCollisionObject ()
   return collObject;
 }
 
-csRef<iCollisionActor> csBulletCollisionSystem::CreateCollisionActor ()
+csRef<iCollisionActor> csBulletSystem::CreateCollisionActor ()
 {
   csRef<iCollisionActor> collActor;
   collActor.AttachNew (new csBulletCollisionActor (this));
@@ -1300,7 +1300,7 @@ csRef<iCollisionActor> csBulletCollisionSystem::CreateCollisionActor ()
   actors.Push (collActor);
   return collActor;
 }
-csRef<iCollisionSector> csBulletCollisionSystem::CreateCollisionSector ()
+csRef<iCollisionSector> csBulletSystem::CreateCollisionSector ()
 {
   csRef<iCollisionSector> collSector;
   collSector.AttachNew (new csBulletSector (object_reg, this));
@@ -1309,33 +1309,114 @@ csRef<iCollisionSector> csBulletCollisionSystem::CreateCollisionSector ()
   return collSector;
 }
 
-CollisionGroup& csBulletCollisionSystem::CreateCollisionGroup (const char* name)
+CollisionGroup& csBulletSystem::CreateCollisionGroup (const char* name)
 {
 //TODO
 }
 
-CollisionGroup& csBulletCollisionSystem::FindCollisionGroup (const char* name)
+CollisionGroup& csBulletSystem::FindCollisionGroup (const char* name)
 {
 //TODO
 }
 
-void csBulletCollisionSystem::SetGroupCollision (CollisionGroup& group1,
+void csBulletSystem::SetGroupCollision (CollisionGroup& group1,
                                                  CollisionGroup& group2,
                                                  bool collide)
 {
 //TODO
 }
-bool csBulletCollisionSystem::GetGroupCollision (CollisionGroup& group1,
+bool csBulletSystem::GetGroupCollision (CollisionGroup& group1,
                                                  CollisionGroup& group2);
 {
 //TODO
 }
 
-void csBulletCollisionSystem::DecomposeConcaveMesh (iCollisionObject* object, iMeshWrapper* mesh)
+void csBulletSystem::DecomposeConcaveMesh (iCollisionObject* object, iMeshWrapper* mesh)
 {
   csBulletCollisionObject* btCollObject = dynamic_cast<csBulletCollisionObject*> (object);
   //Question: This function will create btCollisionShape from the mesh.
   //But didn't know the internalScale, how to create a collision shape?
+  //TODO
+}
+
+csRef<iRigidBody> csBulletSystem::CreateRigidBody ()
+{
+  csRef<iRigidBody> body;
+  body.AttachNew (new csBulletRigidBody (this));
+
+  rigidBodies.Push (body);
+  return body;
+}
+
+csRef<iJoint> csBulletSystem::CreateJoint ()
+{
+  csRef<csBulletJoint> joint;
+  joint.AttachNew (new csBulletJoint (this));
+  joints.Push (joint);
+  return joint;  
+}
+
+csRef<iSoftBody> csBulletSystem::CreateRope (csVector3 start,
+                                             csVector3 end,
+                                             size_t segmentCount)
+{
+  //The internalScale problem came out again...
+
+//  btSoftBody* body = btSoftBodyHelpers::CreateRope
+//    (*softWorldInfo, CSToBullet (start, internalScale),
+//    CSToBullet (end, internalScale), segmentCount - 1, 0);
+//
+//  //hard-coded parameters for hair ropes
+//  body->m_cfg.kDP = 0.08f; // no elasticity
+//  body->m_cfg.piterations = 16; // no white zone
+//  body->m_cfg.timescale = 2;
+//
+//  btSoftRigidDynamicsWorld* softWorld =
+//    static_cast<btSoftRigidDynamicsWorld*> (bulletWorld);
+//  softWorld->addSoftBody (body);
+//
+//  csRef<csBulletSoftBody> csBody;
+//  csBody.AttachNew (new csBulletSoftBody (this, body));
+//
+//  softBodies.Push (csBody);
+//  return csBody;
+}
+
+csRef<iSoftBody> csBulletSystem::CreateRope (csVector3* vertices, size_t vertexCount)
+{
+
+}
+
+csRef<iSoftBody> csBulletSystem::CreateCloth (csVector3 corner1, csVector3 corner2,
+                                              csVector3 corner3, csVector3 corner4,
+                                              size_t segmentCount1, size_t segmentCount2,
+                                              bool withDiagonals /* = false */)
+{
+}
+
+csRef<iSoftBody> csBulletSystem::CreateSoftBody (iGeneralFactoryState* genmeshFactory)
+{
+
+}
+
+csRef<iSoftBody> csBulletSystem::CreateSoftBody (csVector3* vertices, size_t vertexCount,
+                                                 csTriangle* triangles, size_t triangleCount)
+{
+}
+
+void csBulletSystem::StartProfile ()
+{
+
+}
+
+void csBulletSystem::StopProfile ()
+{
+
+}
+
+void csBulletSystem::DumpProfile (bool resetProfile /* = true */)
+{
+
 }
 }
 CS_PLUGIN_NAMESPACE_END(Bullet2)

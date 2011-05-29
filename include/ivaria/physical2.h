@@ -570,10 +570,10 @@ struct iPhysicalSystem : public virtual iBase
   * Create a rigid body, if there's an iCollisionObject pointer, 
   * Need to call iCollisionObject::RebuildObject.
   */
-  virtual csPtr<iRigidBody> CreateRigidBody () = 0;
+  virtual csRef<iRigidBody> CreateRigidBody () = 0;
 
   /// Create a joint and add it to the simulation.
-  virtual csPtr<iJoint> CreateJoint () = 0;
+  virtual csRef<iJoint> CreateJoint () = 0;
   
   /**
   * Create a soft body rope.
@@ -582,7 +582,7 @@ struct iPhysicalSystem : public virtual iBase
   * \param segmentCount Number of segments in the rope.
   * \remark You must call SetSoftBodyWorld() prior to this.
   */
-  virtual iSoftBody* CreateRope (csVector3 start,
+  virtual csRef<iSoftBody> CreateRope (csVector3 start,
       csVector3 end, size_t segmentCount) = 0;
 
   /**
@@ -591,7 +591,7 @@ struct iPhysicalSystem : public virtual iBase
   * \param vertexCount The amount of vertices for the rope.
   * \remark You must call SetSoftBodyWorld() prior to this.
   */
-  virtual iSoftBody* CreateRope (csVector3* vertices, size_t vertexCount) = 0;
+  virtual csRef<iSoftBody> CreateRope (csVector3* vertices, size_t vertexCount) = 0;
 
   /**
   * Create a soft body cloth.
@@ -605,7 +605,7 @@ struct iPhysicalSystem : public virtual iBase
   * or not. Diagonal segments will make the cloth more rigid.
   * \remark You must call SetSoftBodyWorld() prior to this.
   */
-  virtual iSoftBody* CreateCloth (csVector3 corner1, csVector3 corner2,
+  virtual csRef<iSoftBody> CreateCloth (csVector3 corner1, csVector3 corner2,
       csVector3 corner3, csVector3 corner4,
       size_t segmentCount1, size_t segmentCount2,
       bool withDiagonals = false) = 0;
@@ -616,7 +616,7 @@ struct iPhysicalSystem : public virtual iBase
   * \param if there's an iCollisionObject pointer, attach the iCollisionObject to it.
   * \remark You must call SetSoftBodyWorld() prior to this.
   */
-  virtual csPtr<iSoftBody> CreateSoftBody (iGeneralFactoryState* genmeshFactory) = 0;
+  virtual csRef<iSoftBody> CreateSoftBody (iGeneralFactoryState* genmeshFactory) = 0;
 
   /**
   * Create a custom volumetric soft body.
@@ -627,7 +627,7 @@ struct iPhysicalSystem : public virtual iBase
   \param if there's an iCollisionObject pointer, attach the iCollisionObject to it.
   * \remark You must call SetSoftBodyWorld() prior to this.
   */
-  virtual csPtr<iSoftBody> CreateSoftBody (csVector3* vertices,
+  virtual csRef<iSoftBody> CreateSoftBody (csVector3* vertices,
       size_t vertexCount, csTriangle* triangles,
       size_t triangleCount) = 0;
 };

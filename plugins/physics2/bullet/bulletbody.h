@@ -1,6 +1,8 @@
 #ifndef __CS_BULLET_BODY_H__
 #define __CS_BULLET_BODY_H__
 
+#include "ivaria/physical2.h"
+#include "ivaria/bullet2.h"
 #include "bulletphysics.h"
 #include "common.h"
 
