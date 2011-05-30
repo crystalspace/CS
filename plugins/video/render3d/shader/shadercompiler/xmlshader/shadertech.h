@@ -91,9 +91,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       };
       csArray<TextureMapping> textures;
 
-      // programs
-      csRef<iShaderProgram> vp;
-      csRef<iShaderProgram> fp;
+      // Program that describes (almost) the whole pipeline using shaders:
+      // vertex, fragment, etc.
+      csRef<iShaderProgram> program;
+      // Hook
       csRef<iShaderProgram> vproc;
 
     };
