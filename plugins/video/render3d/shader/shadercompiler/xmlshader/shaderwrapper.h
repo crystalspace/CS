@@ -53,67 +53,29 @@ public:
   csXMLShaderWrapper ();
   ~csXMLShaderWrapper ();
 
-  virtual void Activate ()
-  {
-    if (vp) vp->Activate ();
-    if (fp) fp->Activate ();
-  }
+  virtual void Activate ();
+  virtual void Deactivate ();
 
   virtual bool Compile (iHierarchicalCache *cacheTo,
-                        csRef<iString> *cacheTag = 0)
-  {
-    // you're not supposed to compile a shader wrapper
-    return false;
-  }
+                        csRef<iString> *cacheTag = 0);
 
-  virtual void Deactivate ()
-  {
-    if (fp) fp->Deactivate ();
-    if (vp) vp->Deactivate ();
-  }
-
-  virtual void GetUsedShaderVars (csBitArray& bits) const
-  {
-      if (vp) vp->GetUsedShaderVars (bits);
-      if (fp) vp->GetUsedShaderVars (bits);
-  }
+  virtual void GetUsedShaderVars (csBitArray& bits) const;
 
   virtual bool Load (iShaderDestinationResolver *resolve,
                      const char *program,
-                     csArray<csShaderVarMapping> &mappings)
-  {
-    // you're not supposed to load a shader wrapper
-    return false;
-  }
-
+                     csArray<csShaderVarMapping> &mappings);
   virtual bool Load (iShaderDestinationResolver *resolve,
-                     iDocumentNode *node)
-  {
-    // you're not supposed to load a shader wrapper
-    return false;
-  }
+                     iDocumentNode *node);
 
   virtual iShaderProgram::CacheLoadResult LoadFromCache (
       iHierarchicalCache *cache, iBase *previous, iDocumentNode *programNode,
-      csRef<iString> *failReason = 0, csRef<iString> *cacheTag = 0)
-  {
-    // you're not supposed to load a shader wrapper from cache
-    return iShaderProgram::loadSuccessShaderValid; // hm.
-  }
+      csRef<iString> *failReason = 0, csRef<iString> *cacheTag = 0);
 
-  virtual void ResetState ()
-  {
-      if (vp) vp->ResetState ();
-      if (fp) fp->ResetState ();
-  }
+  virtual void ResetState ();
 
   virtual void SetupState (const CS::Graphics::RenderMesh *mesh,
                            CS::Graphics::RenderMeshModes &modes,
-                           const csShaderVariableStack &stack)
-  {
-      if (vp) vp->SetupState (mesh, modes, stack);
-      if (fp) fp->SetupState (mesh, modes, stack);
-  }
+                           const csShaderVariableStack &stack);
 
   // wrapper specific functions: set vertex/fragment shaders
   void SetVP (csRef<iShaderProgram> vp);

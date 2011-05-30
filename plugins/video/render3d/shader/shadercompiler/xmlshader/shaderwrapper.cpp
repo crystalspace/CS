@@ -33,6 +33,68 @@ csXMLShaderWrapper::~csXMLShaderWrapper ()
 {
 }
 
+void csXMLShaderWrapper::Activate ()
+{
+  if (vp) vp->Activate ();
+  if (fp) fp->Activate ();
+}
+
+void csXMLShaderWrapper::Deactivate ()
+{
+  if (fp) fp->Deactivate ();
+  if (vp) vp->Deactivate ();
+}
+
+bool csXMLShaderWrapper::Compile (iHierarchicalCache *cacheTo,
+                                  csRef<iString> *cacheTag)
+{
+  // you're not supposed to compile a shader wrapper
+  return false;
+}
+
+void csXMLShaderWrapper::GetUsedShaderVars (csBitArray& bits) const
+{
+  if (vp) vp->GetUsedShaderVars (bits);
+  if (fp) vp->GetUsedShaderVars (bits);
+}
+
+bool csXMLShaderWrapper::Load (iShaderDestinationResolver *resolve,
+                               const char *program,
+                               csArray<csShaderVarMapping> &mappings)
+{
+  // you're not supposed to load a shader wrapper
+  return false;
+}
+
+bool csXMLShaderWrapper::Load (iShaderDestinationResolver *resolve,
+                               iDocumentNode *node)
+{
+  // you're not supposed to load a shader wrapper
+  return false;
+}
+
+iShaderProgram::CacheLoadResult csXMLShaderWrapper::LoadFromCache (
+  iHierarchicalCache *cache, iBase *previous, iDocumentNode *programNode,
+  csRef<iString> *failReason, csRef<iString> *cacheTag)
+{
+  // you're not supposed to load a shader wrapper from cache
+  return iShaderProgram::loadSuccessShaderValid; // hm.
+}
+
+void csXMLShaderWrapper::ResetState ()
+{
+  if (vp) vp->ResetState ();
+  if (fp) fp->ResetState ();
+}
+
+void csXMLShaderWrapper::SetupState (const CS::Graphics::RenderMesh *mesh,
+                                     CS::Graphics::RenderMeshModes &modes,
+                                     const csShaderVariableStack &stack)
+{
+  if (vp) vp->SetupState (mesh, modes, stack);
+  if (fp) fp->SetupState (mesh, modes, stack);
+}
+
 void csXMLShaderWrapper::SetVP (csRef<iShaderProgram> vp)
 {
   this->vp = vp;
