@@ -73,7 +73,7 @@ namespace CS
     
     ~MeasureTime ()
     {
-      csTicks endTime = csGetMicroTicks ();
+      int64 endTime = csGetMicroTicks ();
       PrintTime ((text + ": ").GetData(), endTime - offsetTime, 
 	" \xC2\xB5s\n");
     }

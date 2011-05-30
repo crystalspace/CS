@@ -49,12 +49,16 @@ private:
     flagFirstShot = 2 
   };
   /// Elapsed time between last two frames
-  csTicks elapsedTime;
+  csMicroTicks elapsedTime;
   /// Virtual time in milliseconds
-  csTicks currentVirtualTime;
+  csMicroTicks currentVirtualTime;
   /// Absolute time in milliseconds
-  csTicks currentRealTime;
+  csMicroTicks currentRealTime;
   uint flags;
+
+  float elapsedSeconds;
+  bool elapsedSecondsValid;
+
 public:
   csVirtualClock ();
   virtual ~csVirtualClock ();
@@ -62,8 +66,11 @@ public:
   virtual void Advance ();
   virtual void Suspend ();
   virtual void Resume ();
-  virtual csTicks GetElapsedTicks () const { return elapsedTime; }
-  virtual csTicks GetCurrentTicks () const { return currentVirtualTime; }
+  virtual csTicks GetElapsedTicks () const { return elapsedTime / 1000; }
+  virtual csTicks GetCurrentTicks () const { return currentVirtualTime / 1000; }
+  virtual csMicroTicks GetElapsedMicroTicks () const { return elapsedTime; }
+  virtual float GetElapsedSeconds ();
+  virtual csMicroTicks GetCurrentMicroTicks () const { return currentVirtualTime; }
 };
 
 #endif // __CS_VIRTCLK_H__

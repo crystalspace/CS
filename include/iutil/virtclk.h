@@ -37,7 +37,7 @@
  */
 struct iVirtualClock : public virtual iBase
 {
-  SCF_INTERFACE(iVirtualClock, 2,0,0);
+  SCF_INTERFACE(iVirtualClock, 3,0,0);
   /**
    * Advance the engine's virtual-time clock.
    */
@@ -72,6 +72,26 @@ struct iVirtualClock : public virtual iBase
    * csGetTicks().
    */
   virtual csTicks GetCurrentTicks () const = 0;
+
+  /**
+   * Query the time elapsed between the two most recent invocations of
+   * Advance().
+   */
+  virtual csMicroTicks GetElapsedMicroTicks () const = 0;
+
+  /**
+   * Query the time elapsed between the two most recent invocations of
+   * Advance(). This version returns seconds and is calculated based
+   * on the microticks.
+   */
+  virtual float GetElapsedSeconds () = 0;
+
+  /**
+   * Returns the absolute time of the last call to Advance().
+   * For game logic you should always use this function instead of
+   * csGetMicroTicks().
+   */
+  virtual csMicroTicks GetCurrentMicroTicks () const = 0;
 };
 
 #endif // __CS_IUTIL_VIRTCLK_H__

@@ -23,7 +23,7 @@
 
 csVirtualClock::csVirtualClock () : 
   scfImplementationType (this), elapsedTime (0), currentVirtualTime (0), 
-  currentRealTime(0), flags (flagFirstShot)
+  currentRealTime(0), flags (flagFirstShot), elapsedSecondsValid (false)
 { }
 
 csVirtualClock::~csVirtualClock () { }
@@ -31,8 +31,8 @@ csVirtualClock::~csVirtualClock () { }
 void csVirtualClock::Advance ()
 {
   if (flags & flagSuspended) return;
-  csTicks last = currentRealTime;
-  currentRealTime = csGetTicks ();
+  csMicroTicks last = currentRealTime;
+  currentRealTime = csGetMicroTicks ();
   if (flags & flagFirstShot)
   {
     flags &= ~flagFirstShot;
@@ -41,12 +41,13 @@ void csVirtualClock::Advance ()
   else
   {
     if (currentRealTime < last)
-      // csTicks(-1) is the period for a unsigend value
-      elapsedTime = currentRealTime + (csTicks(-1) - last) + 1;
+      // csMicroTicks(-1) is the period for a unsigend value
+      elapsedTime = currentRealTime + (csMicroTicks(-1) - last) + 1;
     else
       elapsedTime = currentRealTime - last;
     currentVirtualTime += elapsedTime;
   }
+  elapsedSecondsValid = false;
 }
 
 void csVirtualClock::Suspend ()
@@ -63,3 +64,14 @@ void csVirtualClock::Resume ()
     flags |= flagFirstShot;
   }
 }
+
+float csVirtualClock::GetElapsedSeconds ()
+{
+  if (!elapsedSecondsValid)
+  {
+    elapsedSecondsValid = true;
+    elapsedSeconds = float (elapsedTime) / 1000000.0f;
+  }
+  return elapsedSeconds;
+}
+
