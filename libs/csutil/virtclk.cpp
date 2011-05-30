@@ -22,8 +22,10 @@
 #include "iutil/virtclk.h"
 
 csVirtualClock::csVirtualClock () : 
-  scfImplementationType (this), elapsedTime (0), currentVirtualTime (0), 
-  currentRealTime(0), flags (flagFirstShot), elapsedSecondsValid (false)
+  scfImplementationType (this),
+  elapsedTime (0), currentVirtualTime (0), currentRealTime (0),
+  elapsedTimeM (0), currentVirtualTimeM (0), currentRealTimeM (0),
+  flags (flagFirstShot), elapsedSecondsValid (false)
 { }
 
 csVirtualClock::~csVirtualClock () { }
@@ -31,18 +33,31 @@ csVirtualClock::~csVirtualClock () { }
 void csVirtualClock::Advance ()
 {
   if (flags & flagSuspended) return;
-  csMicroTicks last = currentRealTime;
-  currentRealTime = csGetMicroTicks ();
+
+  csTicks last = currentRealTime;
+  csMicroTicks lastM = currentRealTimeM;
+
+  currentRealTime = csGetTicks ();
+  currentRealTimeM = csGetMicroTicks ();
+
   if (flags & flagFirstShot)
   {
     flags &= ~flagFirstShot;
     elapsedTime = 0;
+    elapsedTimeM = 0;
   }
   else
   {
+    if (currentRealTimeM < lastM)
+      // csMicroTicks(-1) is the period for a unsigned value
+      elapsedTimeM = currentRealTimeM + (csMicroTicks(-1) - lastM) + 1;
+    else
+      elapsedTimeM = currentRealTimeM - lastM;
+    currentVirtualTimeM += elapsedTimeM;
+
     if (currentRealTime < last)
-      // csMicroTicks(-1) is the period for a unsigend value
-      elapsedTime = currentRealTime + (csMicroTicks(-1) - last) + 1;
+      // csMicroTicks(-1) is the period for a unsigned value
+      elapsedTime = currentRealTime + (csTicks(-1) - last) + 1;
     else
       elapsedTime = currentRealTime - last;
     currentVirtualTime += elapsedTime;
@@ -54,6 +69,7 @@ void csVirtualClock::Suspend ()
 {
   flags |= flagSuspended;
   elapsedTime = 0;
+  elapsedTimeM = 0;
 }
 
 void csVirtualClock::Resume ()
@@ -70,7 +86,7 @@ float csVirtualClock::GetElapsedSeconds ()
   if (!elapsedSecondsValid)
   {
     elapsedSecondsValid = true;
-    elapsedSeconds = float (elapsedTime) / 1000000.0f;
+    elapsedSeconds = float (elapsedTimeM) / 1000000.0f;
   }
   return elapsedSeconds;
 }
