@@ -63,6 +63,16 @@ struct iVideoMedia : public iMedia
    * Gets the video data for the next frame
    */
   virtual iTextureWrapper GetNextFrame () = 0;
+  
+  /**
+   * Seeks the video stream
+   */
+  virtual void Seek (long position) = 0 ;
+  
+  /**
+   * Gets the position of the video stream
+   */
+  virtual long GetPosition () = 0 ;
 }
 
 /**
@@ -86,6 +96,16 @@ struct iAudioMedia : public iMedia
    * Gets the audio data for the next frame
    */
   virtual unsigned char* GetNextFrame () = 0;
+
+  /**
+   * Seeks the audio stream
+   */
+  virtual void Seek (long position) = 0 ;
+  
+  /**
+   * Gets the position of the audio stream
+   */
+  virtual long GetPosition () = 0 ;
 }
 
 

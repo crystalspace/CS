@@ -64,6 +64,9 @@ struct iMediaPlayer : public virtual iBase
   /// Seeks the video
   virtual void Seek (long position) = 0 ;
 
+  /// get the position of the video
+  virtual long GetPosition () = 0 ;
+
   /// Returns if the video is playing or not
   virtual bool IsPlaying () = 0 ;
 };
