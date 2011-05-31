@@ -2381,6 +2381,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *Resume = *cspacec::iVirtualClock_Resume;
 *GetElapsedTicks = *cspacec::iVirtualClock_GetElapsedTicks;
 *GetCurrentTicks = *cspacec::iVirtualClock_GetCurrentTicks;
+*GetElapsedMicroTicks = *cspacec::iVirtualClock_GetElapsedMicroTicks;
+*GetElapsedSeconds = *cspacec::iVirtualClock_GetElapsedSeconds;
+*GetCurrentMicroTicks = *cspacec::iVirtualClock_GetCurrentMicroTicks;
 *scfGetVersion = *cspacec::iVirtualClock_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
