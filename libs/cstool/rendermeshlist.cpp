@@ -51,7 +51,7 @@ void csRenderMeshList::AddRenderMeshes (csRenderMesh** meshes, int num,
   for (int i = 0; i < num; ++i)
   {
     CS::Graphics::RenderPriority renderPriority = meshes[i]->renderPrio;
-    if (renderPriority < 0) renderPriority = defaultRenderPriority;
+    if (!renderPriority.IsValid()) { renderPriority = defaultRenderPriority; }
   
     //check if we have rp or need to add it
     if ((size_t)(renderPriority + 1) > renderList.GetSize () || 
