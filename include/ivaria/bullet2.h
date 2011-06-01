@@ -118,17 +118,6 @@ struct iSoftBody : public virtual iBase
   //virtual void ConfigureSoftBody(bool bending) = 0;
 };
 
-struct iPhysicalSystem : public virtual iBase
-{
-  SCF_INTERFACE (CS::Physics::Bullet::iPhysicalSystem, 1, 0, 0);
-  
-  virtual void StartProfile () = 0;
-
-  virtual void StopProfile () = 0;
-
-  virtual void DumpProfile (bool resetProfile = true) = 0;
-};
-
 struct iPhysicalSector : public virtual iBase
 {
   SCF_INTERFACE (CS::Physics::Bullet::iPhysicalSector, 1, 0, 0);
@@ -172,6 +161,12 @@ struct iPhysicalSector : public virtual iBase
 
   /// Get the current mode used when displaying debug informations.
   virtual DebugMode GetDebugMode () = 0;  
+
+  virtual void StartProfile () = 0;
+
+  virtual void StopProfile () = 0;
+
+  virtual void DumpProfile (bool resetProfile = true) = 0;
 };
 }
 }

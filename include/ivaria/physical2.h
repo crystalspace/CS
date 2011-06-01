@@ -91,7 +91,7 @@ struct iPhysicalBody : public virtual iCollisionObject
   virtual float GetMass () const = 0;
 
   /// Set the mass of this body.
-  virtual void SetMass (float mass) = 0;
+  /*virtual void SetMass (float mass) = 0;*/
 
   virtual float GetDensity () const = 0;
 
@@ -116,7 +116,7 @@ struct iPhysicalBody : public virtual iCollisionObject
   virtual void SetFriction (float friction) = 0;
 
   /// Get the friction of this rigid body.
-  virtual void GetFriction (float& friction) = 0;
+  virtual float GetFriction () = 0;
 };
 
 /**
@@ -154,7 +154,7 @@ struct iRigidBody : public iPhysicalBody
   virtual void SetElasticity (float elasticity) = 0;
 
   /// Get the elasticity of this rigid body.
-  virtual void GetElasticity (float elasticity) = 0;
+  virtual float GetElasticity () = 0;
 
   /// Set the angular velocity (rotation).
   virtual void SetAngularVelocity (const csVector3& vel) = 0;
@@ -163,13 +163,13 @@ struct iRigidBody : public iPhysicalBody
   virtual csVector3 GetAngularVelocity () const = 0;
 
   /// Add a torque (world space) (active for one timestep).
-  virtual void AddTorque (const csVector3& force) = 0;
+  virtual void AddTorque (const csVector3& torque) = 0;
 
   /// Add a force (local space) (active for one timestep).
   virtual void AddRelForce (const csVector3& force) = 0;
 
   /// Add a torque (local space) (active for one timestep).
-  virtual void AddRelTorque (const csVector3& force) = 0;
+  virtual void AddRelTorque (const csVector3& torque) = 0;
 
   /**
   * Add a force (world space) at a specific position (world space)
@@ -552,10 +552,10 @@ struct iJoint : public virtual iBase
   * Set the current constraint position/orientation as an equilibrium point.
   * If index = -1, then set equilibrium point for all DOF, else set it for given DOF.
   */
-  virtual void SetEquilibriumPoint (int index = -1);
+  virtual void SetEquilibriumPoint (int index = -1) = 0;
   
   /// Set the value to an equilibrium point for given DOF.
-  virtual void SetEquilibriumPoint (int index, float value);
+  virtual void SetEquilibriumPoint (int index, float value) = 0;
 
   virtual void SetBreakingImpulseThreshold (float threshold) = 0;
 

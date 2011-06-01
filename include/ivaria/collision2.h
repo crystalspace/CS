@@ -499,8 +499,6 @@ struct iCollisionSector : public virtual iBase
 {
   SCF_INTERFACE (CS::Collision::iCollisionSector, 1, 0, 0);
 
-  virtual void SetInternalScale (float scale) = 0;
-
   /// Set the global gravity.
   virtual void SetGravity (const csVector3& v) = 0;
 
@@ -571,7 +569,9 @@ struct iCollisionSector : public virtual iBase
 */
 struct iCollisionSystem : public virtual iBase
 {
-  SCF_INTERFACE (CS::Collision::iCollisionSystem, 2, 2, 2);
+  SCF_INTERFACE (CS::Collision::iCollisionSystem, 1, 0, 0);
+
+  virtual void SetInternalScale (float scale) = 0;
 
   /// Create a convex mesh collider.
   virtual csPtr<iColliderConvexMesh> CreateColliderConvexMesh (iMeshWrapper* mesh) = 0;

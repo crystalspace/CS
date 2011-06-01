@@ -1,14 +1,19 @@
-#ifndef __CS_BULLET_COLLISION_H__
-#define __CS_BULLET_COLLISION_H__
+#ifndef __CS_BULLET_PHYSICS_H__
+#define __CS_BULLET_PHYSICS_H__
 
 #include "iutil/comp.h"
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
 #include "ivaria/collision2.h"
+#include "ivaria/physical2.h"
+#include "ivaria/bullet2.h"
 #include "ivaria/view.h"
 #include "iengine/movable.h"
-#include "common.h"
-#include "bulletcolliders.h"
+#include "common2.h"
+#include "colliders2.h"
+#include "rigidbody2.h"
+#include "softbody2.h"
+#include "joint2.h"
 
 class btCollisionObject;
 class btCompoundShape;
@@ -21,116 +26,6 @@ class csBulletCollisionObject;
 class csBulletTerrainObject;
 class csBulletSystem;
 class csBulletSoftBody;
-
-class csBulletCollisionObject: public scfImplementationExt1<
-  csBulletCollisionObject, csObject, iCollisionObject>
-{
-  friend class csBulletSector;
-  friend class csBulletSystem;
-  friend class csBulletMotionState;
-  friend class csBulletKinematicMotionState;
-
-  csBulletSector* sector;
-  csBulletSystem* collSys;
-  csRefArray<csBulletCollider> colliders;
-  csArray<csOrthoTransform> relaTransforms;
-  csRef<iMovable> movable;
-  btCollisionObject* btObject;
-  btTransform transform;
-  csBulletMotionState* motionState;
-  csRef<iCollisionCallback> collCb;
-  btCompoundShape* compoundShape;
-  CollisionObjectType type;
-  CollisionGroup collGroup;
-  bool insideWorld;
-  bool compoundChanged;
-  bool isPhysics;
-  bool isTerrain;
-
-public:
-  csBulletCollisionObject (csBulletSystem* sys);
-  virtual ~csBulletCollisionObject ();
-
-  virtual iObject* QueryObject (void) { return (iObject*) this; }
-
-  virtual void SetObjectType (CollisionObjectType type);
-  virtual CollisionObjectType GetObjectType () {return type;}
-
-  virtual void SetAttachedMovable (iMovable* movable){this->movable = movable;}
-  virtual iMovable* GetAttachedMovable (){return movable;}
-
-  virtual void SetTransform (const csOrthoTransform& trans);
-  virtual csOrthoTransform GetTransform ();
-
-  virtual void AddCollider (CS::Collision::iCollider* collider, const csOrthoTransform& relaTrans);
-  virtual void RemoveCollider (CS::Collision::iCollider* collider);
-  virtual void RemoveCollider (size_t index);
-
-  virtual CS::Collision::iCollider* GetCollider (size_t index) ;
-  virtual size_t GetColliderCount () {return colliders.GetSize ();}
-
-  virtual void RebuildObject ();
-
-  virtual void SetCollisionGroup (const char* name);
-  virtual const char* GetCollisionGroup () const {return collGroup.name.GetData ();}
-
-  virtual void SetCollisionCallback (iCollisionCallback* cb) {collCb = cb;}
-  virtual iCollisionCallback* GetCollisionCallback () {return collCb;}
-
-  virtual bool Collide (iCollisionObject* otherObject);
-  virtual HitBeamResult HitBeam (const csVector3& start, const csVector3& end);
-
-  btCollisionObject* GetBulletCollisionPointer () {return btObject;}
-  virtual void RemoveBulletObject ();
-};
-
-//TODO collision actor
-
-/*
-class csBulletCollisionActor : public scfImplementationExt1<
-  csBulletCollisionActor, csBulletCollisionObject, iCollisionActor>
-{
-public:
-  csBulletCollisionActor (csBulletCollisionSystem* sys);
-  ~csBulletCollisionActor ();
-
-  //iCollisionObject
-  virtual void SetObjectType (CollisionObjectType type);
-  virtual CollisionObjectType GetObjectType () {return type;}
-
-  virtual void SetTransform (const csOrthoTransform& trans);
-  virtual csOrthoTransform GetTransform ();
-
-  virtual void RebuildObject ();
-
-  virtual bool Collide (iCollisionObject* otherObject);
-  virtual HitBeamResult HitBeam (const csVector3& start, const csVector3& end);
-
-  //iCollisionActor
-  virtual bool IsOnGround ();
-  virtual csVector3 GetRotation ();
-  virtual void SetRotation ();
-
-  virtual void UpdateAction (float delta);
-
-  virtual void SetUpAxis (int axis);
-
-  virtual void SetVelocity (const csVector3& dir);
-  virtual void SetVelocityForTimeInterval (const csVector3& velo, float timeInterval);
-
-  virtual void PreStep ();
-  virtual void PlayerStep (float delta);
-
-  virtual void SetFallSpeed (float fallSpeed);
-  virtual void SetJumpSpeed (float jumpSpeed);
-
-  virtual void SetMaxJumpHeight (float maxJumpHeight);
-  virtual void Jump ();
-
-  virtual void SetMaxSlope (float slopeRadians);
-  virtual float GetMaxSlope ();
-};
-*/
 
 struct PointContactResult : public btCollisionWorld::ContactResultCallback
 {
@@ -160,17 +55,6 @@ class csBulletSector: public scfImplementationExt3<
   friend class csBulletTerrainObject;
   friend class csBulletKinematicMotionState;
   friend class csBulletMotionState;
-  friend class csBulletCollider;
-  friend class csBulletColliderBox;
-  friend class csBulletColliderSphere;
-  friend class csBulletColliderCylinder;
-  friend class csBulletColliderCapsule;
-  friend class csBulletColliderConvexMesh;
-  friend class csBulletColliderConcaveMesh;
-  friend class csBulletColliderTerrain;
-  friend class csBulletColliderPlane;
-  friend class csBulletColliderCone;
-  friend class HeightMapCollider;
 
   struct CollisionPortal
   {
@@ -196,10 +80,6 @@ class csBulletSector: public scfImplementationExt3<
   btSequentialImpulseConstraintSolver* solver;
   btBroadphaseInterface* broadphase;
   btSoftBodyWorldInfo* softWorldInfo;
-  float internalScale;
-  float inverseInternalScale;
-  csStringID baseID;
-  csStringID colldetID;
 
   bool isSoftWorld;
 
@@ -219,7 +99,6 @@ public:
 
   virtual iObject* QueryObject () {return (iObject*) this;}
   //iCollisionSector
-  virtual void SetInternalScale (float scale);
   virtual void SetGravity (const csVector3& v);
   virtual csVector3 GetGravity (){return gravity;}
 
@@ -278,6 +157,12 @@ public:
   virtual void SetDebugMode (DebugMode mode);
   virtual DebugMode GetDebugMode ();
 
+  virtual void StartProfile ();
+
+  virtual void StopProfile ();
+
+  virtual void DumpProfile (bool resetProfile = true);
+
   bool BulletCollide(btCollisionObject* objectA,
     btCollisionObject* objectB);
 
@@ -286,11 +171,20 @@ public:
 			     const csVector3& end);
 };
 
-class csBulletSystem: public scfImplementation4<
+class csBulletSystem: public scfImplementation3<
   csBulletSystem, CS::Collision::iCollisionSystem, 
-  CS::Physics::iPhysicalSystem, CS::Physics::Bullet::iPhysicalSystem,
-  iComponent>
+  CS::Physics::iPhysicalSystem, iComponent>
 {
+  friend class csBulletCollider;
+  friend class csBulletColliderBox;
+  friend class csBulletColliderSphere;
+  friend class csBulletColliderCylinder;
+  friend class csBulletColliderCapsule;
+  friend class csBulletColliderConvexMesh;
+  friend class csBulletColliderConcaveMesh;
+  friend class csBulletColliderTerrain;
+  friend class csBulletColliderPlane;
+  friend class csBulletColliderCone;
 
   iObjectRegistry* object_reg;
   csRefArrayObject<CS::Collision::iCollider> colliders;
@@ -300,6 +194,11 @@ class csBulletSystem: public scfImplementation4<
   csRefArrayObject<iJoint> joints;
   csRefArrayObject<iCollisionActor> actors;
   csRefArrayObject<csBulletSector> collSectors;
+  btSoftBodyWorldInfo defaultInfo;
+  float internalScale;
+  float inverseInternalScale;
+  csStringID baseID;
+  csStringID colldetID;
   //Todo: think about it..
   //csArray<CollisionGroup> groups;
 
@@ -331,6 +230,7 @@ public:
   virtual bool Initialize (iObjectRegistry* object_reg);
 
   // iCollisionSystem
+  virtual void SetInternalScale (float scale);
   virtual csPtr<iColliderConvexMesh> CreateColliderConvexMesh (iMeshWrapper* mesh);
   virtual csPtr<iColliderConcaveMesh> CreateColliderConcaveMesh 
       (iMeshWrapper* mesh, bool isStatic = false);
@@ -377,13 +277,6 @@ public:
   virtual csRef<iSoftBody> CreateSoftBody (csVector3* vertices,
       size_t vertexCount, csTriangle* triangles,
       size_t triangleCount);
-
-  //Bullet::iPhysicalSystem
-  virtual void StartProfile ();
-
-  virtual void StopProfile ();
-
-  virtual void DumpProfile (bool resetProfile = true);
 };
 }
 CS_PLUGIN_NAMESPACE_END(Bullet2)
