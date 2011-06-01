@@ -55,7 +55,7 @@ bool csXMLShaderWrapper::Compile (iHierarchicalCache *cacheTo,
 void csXMLShaderWrapper::GetUsedShaderVars (csBitArray& bits) const
 {
   if (vp) vp->GetUsedShaderVars (bits);
-  if (fp) vp->GetUsedShaderVars (bits);
+  if (fp) fp->GetUsedShaderVars (bits);
 }
 
 bool csXMLShaderWrapper::Load (iShaderDestinationResolver *resolve,
