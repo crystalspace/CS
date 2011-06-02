@@ -1458,22 +1458,7 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadProgramFromCache (
   const CachedPlugin& cacheInfo, csRef<iShaderProgram>& prog, csString& tag,
   int passNumber)
 {
-  //load the plugin
-  csRef<iShaderProgramPlugin> plg;
-  plg = csLoadPluginCheck<iShaderProgramPlugin> (parent->compiler->objectreg,
-  	cacheInfo.pluginID, false);
-  if(!plg)
-  {
-    if (parent->compiler->do_verbose)
-      SetFailReason(
-	  "Couldn't retrieve shader plugin %s for %s in shader %s",
-	  CS::Quote::Single (cacheInfo.pluginID.GetData()),
-	  CS::Quote::Single (cacheInfo.progType.GetData()),
-	  CS::Quote::Single (parent->GetName ()));
-    return iShaderProgram::loadFail;
-  }
-
-  prog = plg->CreateProgram (cacheInfo.progType);
+  prog = cacheInfo.programPlugin->CreateProgram (cacheInfo.progType);
   csRef<iString> progTag;
   csRef<iString> failReason;
   iShaderProgram::CacheLoadResult loadRes = prog->LoadFromCache (cache, 
