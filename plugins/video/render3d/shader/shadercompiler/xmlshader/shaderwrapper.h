@@ -80,6 +80,17 @@ public:
   // wrapper specific functions: set vertex/fragment shaders
   void SetVP (csRef<iShaderProgram> vp);
   void SetFP (csRef<iShaderProgram> fp);
+
+  iShaderProgram::CacheLoadResult LoadVPFromCache (
+    csXMLShaderTech *tech,
+    iHierarchicalCache* cache, const CachedPlugin& cacheInfo,
+    csString& tag, int passNumber);
+  iShaderProgram::CacheLoadResult LoadFPFromCache (
+    csXMLShaderTech *tech,
+    iHierarchicalCache* cache, const CachedPlugin& cacheInfo,
+    csString& tag, int passNumber);
+
+  iBase* GetPrevious () const;
 };
 
 }

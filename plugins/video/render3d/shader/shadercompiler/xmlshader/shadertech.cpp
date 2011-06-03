@@ -1123,6 +1123,8 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadPassFromCache (
   
   iShaderProgram::CacheLoadResult loadRes;
 
+  iBase *previous;
+
   if (/*plugins.unified.available*/ false)
   {
     // new unified syntax
@@ -1131,6 +1133,8 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadPassFromCache (
     // used to compile the VP
 
     // assign tags
+
+    // previous = foobar;
   }
   else
   {
@@ -1143,40 +1147,35 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadPassFromCache (
     // create wrapper shader
     shader = csPtr<csXMLShaderWrapper> (new csXMLShaderWrapper ());
 
+    // load shaders
     if (plugins.fp.available)
     {
-      csRef<iHierarchicalCache> fpCache;
-      if (cache) fpCache = cache->GetRootedCache (csString().Format (
-        "/pass%dfp", GetPassNumber (pass)));
-      loadRes = LoadProgramFromCache (0, fpCache, plugins.fp,
-                                      fp, tagFP, GetPassNumber (pass));
+      loadRes = shader->LoadFPFromCache (this, cache, plugins.fp, tagFP,
+                                         GetPassNumber (pass));
       if (loadRes != iShaderProgram::loadSuccessShaderValid) return loadRes;
     }
-
     if (plugins.vp.available)
     {
-      csRef<iHierarchicalCache> vpCache;
-      if (cache) vpCache = cache->GetRootedCache (csString().Format (
-        "/pass%dvp", GetPassNumber (pass)));
-      loadRes = LoadProgramFromCache (fp, vpCache, plugins.vp,
-                                      vp, tagVP, GetPassNumber (pass));
-      if (loadRes != iShaderProgram::loadSuccessShaderValid) return loadRes;
-    }
-    if (plugins.vproc.available)
-    {
-      csRef<iHierarchicalCache> vprCache;
-      if (cache) vprCache = cache->GetRootedCache (csString().Format (
-        "/pass%dvpr", GetPassNumber (pass)));
-      loadRes = LoadProgramFromCache (vp, vprCache,
-                                      plugins.vproc, pass->vproc, tagVPr,
-                                      GetPassNumber (pass));
+      loadRes = shader->LoadVPFromCache (this, cache, plugins.vp, tagVP,
+                                         GetPassNumber (pass));
       if (loadRes != iShaderProgram::loadSuccessShaderValid) return loadRes;
     }
 
+    previous = shader->GetPrevious ();
+
     // assign wrapper
-    if (vp) shader->SetVP (vp);
-    if (fp) shader->SetFP (fp);
     pass->program = shader;
+  }
+
+  if (plugins.vproc.available)
+  {
+    csRef<iHierarchicalCache> vprCache;
+    if (cache) vprCache = cache->GetRootedCache (csString().Format (
+      "/pass%dvpr", GetPassNumber (pass)));
+    loadRes = LoadProgramFromCache (previous, vprCache,
+                                    plugins.vproc, pass->vproc, tagVPr,
+                                    GetPassNumber (pass));
+    if (loadRes != iShaderProgram::loadSuccessShaderValid) return loadRes;
   }
   
   csRef<iDataBuffer> perTagData = cache->ReadCache (

@@ -32,6 +32,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
   class csXMLShaderCompiler;
   class csXMLShader;
+  class csXMLShaderWrapper;
 
   struct CachedPlugin;
   struct CachedPlugins;
@@ -41,6 +42,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
   {
   private:
     friend class csXMLShader;
+    friend class csXMLShaderWrapper;
     friend struct PassActionPrecache;
 
     struct ShaderPassPerTag : public CS::Memory::CustomAllocated

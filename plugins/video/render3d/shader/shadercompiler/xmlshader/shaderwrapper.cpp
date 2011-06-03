@@ -25,7 +25,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 CS_LEAKGUARD_IMPLEMENT (csXMLShaderWrapper);
 
 csXMLShaderWrapper::csXMLShaderWrapper () :
-    scfImplementationType (this), vp(), fp()
+  scfImplementationType (this), vp(), fp()
 {
 }
 
@@ -103,6 +103,35 @@ void csXMLShaderWrapper::SetVP (csRef<iShaderProgram> vp)
 void csXMLShaderWrapper::SetFP (csRef<iShaderProgram> fp)
 {
   this->fp = fp;
+}
+
+iShaderProgram::CacheLoadResult csXMLShaderWrapper::LoadFPFromCache (
+  csXMLShaderTech *tech,
+  iHierarchicalCache* cache, const CachedPlugin& cacheInfo,
+  csString& tag, int passNumber)
+{
+  csRef<iHierarchicalCache> fpCache;
+  if (cache) fpCache = cache->GetRootedCache (csString().Format (
+    "/pass%dfp", passNumber));
+  return tech->LoadProgramFromCache (0, fpCache, cacheInfo, fp, tag,
+                                     passNumber);
+}
+
+iShaderProgram::CacheLoadResult csXMLShaderWrapper::LoadVPFromCache (
+  csXMLShaderTech *tech,
+  iHierarchicalCache* cache, const CachedPlugin& cacheInfo,
+  csString& tag, int passNumber)
+{
+  csRef<iHierarchicalCache> vpCache;
+  if (cache) vpCache = cache->GetRootedCache (csString().Format (
+    "/pass%dvp", passNumber));
+  return tech->LoadProgramFromCache (fp, vpCache, cacheInfo, vp, tag,
+                                     passNumber);
+}
+
+iBase* csXMLShaderWrapper::GetPrevious () const
+{
+  return vp;
 }
 
 }
