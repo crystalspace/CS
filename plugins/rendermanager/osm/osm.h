@@ -74,6 +74,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMOSM)
     csRef<iShaderManager> shaderManager;
     csRef<iLightManager> lightManager;
 
+    csRef<iTextureHandle> accumBuffer;
+
     CS::RenderManager::MultipleRenderLayer renderLayer;
 
     uint dbgFlagClipPlanes;

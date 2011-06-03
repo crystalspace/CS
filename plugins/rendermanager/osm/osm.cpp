@@ -34,15 +34,40 @@
 #include "ivaria/reporter.h"
 #include "csutil/cfgacc.h"
 #include "csutil/stringquote.h"
+#include "csutil/scfstr.h"
 
 using namespace CS::RenderManager;
 
 CS_PLUGIN_NAMESPACE_BEGIN(RMOSM)
 {
 
-  SCF_IMPLEMENT_FACTORY(RMOSM)
+SCF_IMPLEMENT_FACTORY(RMOSM)
 
-    template<typename RenderTreeType, typename LayerConfigType>
+/**
+ * Draws the given texture over the contents of the entire screen.
+ */
+void DrawFullscreenTexture(iTextureHandle *tex, iGraphics3D *graphics3D)
+{
+  iGraphics2D *graphics2D = graphics3D->GetDriver2D ();
+
+  int w, h;
+  tex->GetRendererDimensions (w, h);
+
+  graphics3D->SetZMode (CS_ZBUF_NONE);
+  graphics3D->BeginDraw (CSDRAW_2DGRAPHICS | CSDRAW_CLEARSCREEN);
+  graphics3D->DrawPixmap (tex, 
+                          0, 
+                          0,
+                          graphics2D->GetWidth (),
+                          graphics2D->GetHeight (),
+                          0,
+                          0,
+                          w,
+                          h,
+                          0);
+}
+
+  template<typename RenderTreeType, typename LayerConfigType>
   class StandardContextSetup
   {
   public:
@@ -174,6 +199,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMOSM)
       ContextSetupType contextSetup (this, renderLayer);
       ContextSetupType::PortalSetupType::ContextSetupData portalData (startContext);
 
+      startContext->renderTargets[rtaColor0].texHandle = accumBuffer;
+      startContext->renderTargets[rtaColor0].subtexture = 0;
+
       contextSetup (*startContext, portalData, recursePortals);
     }
 
@@ -185,6 +213,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMOSM)
         shaderManager);
       ForEachContextReverse (renderTree, render);
     }
+
+    // Output the final result to the backbuffer.
+    DrawFullscreenTexture (accumBuffer, G3D);
+    int w, h;
+    accumBuffer->GetRendererDimensions (w, h);
+    float aspect = (float)w / h;
+    renderTree.AddDebugTexture(accumBuffer, aspect);
 
     DebugFrameRender (rview, renderTree);
 
@@ -238,6 +273,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMOSM)
       treePersistent.debugPersist.RegisterDebugFlag ("draw.clipplanes.view");
 
     lightPersistent.Initialize (objectReg, treePersistent.debugPersist);
+
+    // Creates the accumulation buffer.
+    int flags = CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP | CS_TEXTURE_NPOTS;
+    const char *accumFmt = cfg->GetStr ("RenderManager.Deferred.AccumBufferFormat", "rgb16_f");
+    iGraphics2D *g2d = g3d->GetDriver2D ();
+
+    scfString errStr;
+    accumBuffer = g3d->GetTextureManager ()->CreateTexture (g2d->GetWidth (),
+      g2d->GetHeight (),
+      csimg2D,
+      accumFmt,
+      flags,
+      &errStr);
+
+    if (!accumBuffer)
+    {
+      csReport(objectReg, CS_REPORTER_SEVERITY_ERROR, messageID, 
+        "Could not create accumulation buffer: %s!", errStr.GetCsString ().GetDataSafe ());
+      return false;
+    }
 
     RMViscullCommon::Initialize (objectReg, "RenderManager.OSM");
 
