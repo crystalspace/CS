@@ -1148,7 +1148,7 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadPassFromCache (
       csRef<iHierarchicalCache> fpCache;
       if (cache) fpCache = cache->GetRootedCache (csString().Format (
         "/pass%dfp", GetPassNumber (pass)));
-      loadRes = LoadProgramFromCache (0, variant, fpCache, plugins.fp,
+      loadRes = LoadProgramFromCache (0, fpCache, plugins.fp,
                                       fp, tagFP, GetPassNumber (pass));
       if (loadRes != iShaderProgram::loadSuccessShaderValid) return loadRes;
     }
@@ -1158,7 +1158,7 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadPassFromCache (
       csRef<iHierarchicalCache> vpCache;
       if (cache) vpCache = cache->GetRootedCache (csString().Format (
         "/pass%dvp", GetPassNumber (pass)));
-      loadRes = LoadProgramFromCache (fp, variant, vpCache, plugins.vp,
+      loadRes = LoadProgramFromCache (fp, vpCache, plugins.vp,
                                       vp, tagVP, GetPassNumber (pass));
       if (loadRes != iShaderProgram::loadSuccessShaderValid) return loadRes;
     }
@@ -1167,7 +1167,7 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadPassFromCache (
       csRef<iHierarchicalCache> vprCache;
       if (cache) vprCache = cache->GetRootedCache (csString().Format (
         "/pass%dvpr", GetPassNumber (pass)));
-      loadRes = LoadProgramFromCache (vp, variant, vprCache,
+      loadRes = LoadProgramFromCache (vp, vprCache,
                                       plugins.vproc, pass->vproc, tagVPr,
                                       GetPassNumber (pass));
       if (loadRes != iShaderProgram::loadSuccessShaderValid) return loadRes;
@@ -1454,9 +1454,8 @@ csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (
 }
   
 iShaderProgram::CacheLoadResult csXMLShaderTech::LoadProgramFromCache (
-  iBase* previous, size_t variant, iHierarchicalCache* cache,
-  const CachedPlugin& cacheInfo, csRef<iShaderProgram>& prog, csString& tag,
-  int passNumber)
+  iBase* previous, iHierarchicalCache* cache, const CachedPlugin& cacheInfo,
+  csRef<iShaderProgram>& prog, csString& tag, int passNumber)
 {
   prog = cacheInfo.programPlugin->CreateProgram (cacheInfo.progType);
   csRef<iString> progTag;

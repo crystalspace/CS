@@ -216,7 +216,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     size_t variant);
   
   iShaderProgram::CacheLoadResult LoadProgramFromCache (iBase* previous,
-    size_t variant, iHierarchicalCache* cache, const CachedPlugin& cacheInfo,
+    iHierarchicalCache* cache, const CachedPlugin& cacheInfo,
     csRef<iShaderProgram>& prog, csString& tag, int passNumber);
   // Set reason for failure.
   void SetFailReason (const char* reason, ...) CS_GNUC_PRINTF (2, 3);
