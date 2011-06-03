@@ -150,6 +150,22 @@ public:
   {
     viewHeight = h;
   }
+
+  virtual csVector2 NormalizedToScreen (const csVector2& pos)
+  {
+    return csVector2 (
+	(pos.x + 1.0f) * float (viewWidth) / 2.0f,
+	(pos.y + 1.0f) * float (viewHeight) / 2.0f
+	);
+  }
+
+  virtual csVector2 ScreenToNormalized (const csVector2& pos)
+  {
+    return csVector2 (
+	pos.x * 2.0f / float (viewWidth) - 1.0f,
+	pos.y * 2.0f / float (viewHeight) - 1.0f
+	);
+  }
 };
 
 #endif // __CS_CSVIEW_H__
