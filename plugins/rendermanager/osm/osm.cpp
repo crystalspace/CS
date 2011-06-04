@@ -67,12 +67,40 @@ void DrawFullscreenTexture(iTextureHandle *tex, iGraphics3D *graphics3D)
                           0);
 }
 
-  template<typename RenderTreeType, typename LayerConfigType>
+/* Template magic to deal with different initializers for different
+   ShadowType::ShadowParameter types. */
+template<typename ShadowType>
+struct WrapShadowParams
+{
+  static typename ShadowType::ShadowParameters Create (
+    RMOSM::ShadowType::PersistentData& persist,
+    CS::RenderManager::RenderView* rview)
+  {
+    return typename ShadowType::ShadowParameters ();
+  }
+};
+
+template<>
+struct WrapShadowParams<RMOSM::ShadowType>
+{
+  static RMOSM::ShadowType::ViewSetup Create (
+    RMOSM::ShadowType::PersistentData& shadowPersist,
+    CS::RenderManager::RenderView* rview)
+  {
+    return RMOSM::ShadowType::ViewSetup (
+      shadowPersist, rview);
+  }
+};
+
+  template<typename RenderTreeType, typename LayerConfigType,
+    typename LightSetupType>
   class StandardContextSetup
   {
   public:
-    typedef StandardContextSetup<RenderTreeType, LayerConfigType> ThisType;
+    typedef StandardContextSetup<RenderTreeType, LayerConfigType, 
+      LightSetupType> ThisType;
     typedef StandardPortalSetup<RenderTreeType, ThisType> PortalSetupType;
+    typedef typename LightSetupType::ShadowHandlerType ShadowType;
 
     StandardContextSetup (RMOSM* rmanager, const LayerConfigType& layerConfig)
       : rmanager (rmanager), layerConfig (layerConfig)
@@ -107,6 +135,10 @@ void DrawFullscreenTexture(iTextureHandle *tex, iGraphics3D *graphics3D)
       iShaderManager* shaderManager = rmanager->shaderManager;
       iSector* sector = rview->GetThisSector ();
 
+      typename ShadowType::ShadowParameters shadowViewSetup (
+        WrapShadowParams<ShadowType>::Create (
+        rmanager->lightPersistent.shadowPersist, rview));
+
       // Sort the mesh lists  
       {
         StandardMeshSorter<RenderTreeType> mySorter (rview->GetEngine ());
@@ -134,10 +166,9 @@ void DrawFullscreenTexture(iTextureHandle *tex, iGraphics3D *graphics3D)
 
       SetupStandardShader (context, shaderManager, layerConfig);
 
-      RMOSM::LightSetupType::ShadowParamType shadowParam;
       RMOSM::LightSetupType lightSetup (
         rmanager->lightPersistent, rmanager->lightManager,
-        context.svArrays, layerConfig, shadowParam);
+        context.svArrays, layerConfig, shadowViewSetup);
 
       ForEachMeshNode (context, lightSetup);
 

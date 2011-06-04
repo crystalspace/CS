@@ -28,13 +28,16 @@
 #include "iutil/comp.h"
 #include "iengine/rendermanager.h"
 
+#include "shadow_osm.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(RMOSM)
 {
+  template<typename RenderTreeType, typename LayerConfigType,
+    typename LightSetupType>
+  class StandardContextSetup;
+
   typedef CS::RenderManager::RenderTree<
     CS::RenderManager::RenderTreeLightingTraits> RenderTreeType;
-
-  template<typename RenderTreeType, typename LayerConfigType>
-  class StandardContextSetup;
 
   class RMOSM : public scfImplementation4<RMOSM, 
     iRenderManager, 
@@ -54,14 +57,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMOSM)
     //---- iComponent ----
     virtual bool Initialize (iObjectRegistry*);
 
-    typedef StandardContextSetup<RenderTreeType, 
-      CS::RenderManager::MultipleRenderLayer> ContextSetupType;
+    typedef CS::RenderManager::ShadowOSM<RenderTreeType,
+      CS::RenderManager::MultipleRenderLayer> ShadowType;
+    typedef CS::RenderManager::LightSetup<RenderTreeType, 
+      CS::RenderManager::MultipleRenderLayer, ShadowType> LightSetupType;
 
+    typedef StandardContextSetup<RenderTreeType, 
+      CS::RenderManager::MultipleRenderLayer, LightSetupType> ContextSetupType;
     typedef CS::RenderManager::StandardPortalSetup<RenderTreeType, 
       ContextSetupType> PortalSetupType;
-
-    typedef CS::RenderManager::LightSetup<RenderTreeType, 
-      CS::RenderManager::MultipleRenderLayer> LightSetupType;
 
   public:
     iObjectRegistry* objectReg;
