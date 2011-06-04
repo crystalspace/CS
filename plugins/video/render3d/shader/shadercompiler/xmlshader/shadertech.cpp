@@ -65,7 +65,7 @@ struct CachedPlugin
 
 struct CachedPlugins
 {
-  CachedPlugin fp, vp, vproc;
+  CachedPlugin unified, fp, vp, vproc;
 };
 
 CS_IMPLEMENT_STATIC_CLASSVAR_REF (csXMLShaderTech, instParamsTargets,  
@@ -205,7 +205,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
   csRef<iShaderDestinationResolver> resolveFP;
   csRef<iShaderDestinationResolver> resolveVP;
 
-  if (/*cachedPlugins.unified.programNode*/false)
+  if (cachedPlugins.unified.programNode)
   {
     // new unified syntax detected
 
@@ -1125,7 +1125,7 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadPassFromCache (
 
   iBase *previous;
 
-  if (/*plugins.unified.available*/ false)
+  if (plugins.unified.available)
   {
     // new unified syntax
 
@@ -1488,6 +1488,15 @@ void csXMLShaderTech::GetProgramPlugins (iDocumentNode *node,
                                          CachedPlugins& cacheInfo,
                                          size_t variant)
 {
+  {
+    csRef<iDocumentNode> programNodeShader;
+    programNodeShader = node->GetNode (xmltokens.Request (
+      csXMLShaderCompiler::XMLTOKEN_SHADER));
+      
+    if (programNodeShader)
+      GetProgramPlugin (programNodeShader, cacheInfo.unified, variant);
+  }
+  
   {
     csRef<iDocumentNode> programNodeFP;
     programNodeFP = node->GetNode (xmltokens.Request (
