@@ -1,0 +1,79 @@
+<shader compiler="xmlshader" name="glslshader">
+
+  <technique priority="200">
+    <pass>
+
+      <shader plugin="glsl">
+        <vp>
+          <program>
+            <![CDATA[
+              void main (void)
+              {
+                gl_Position = ftransform ();
+              }
+            ]]>
+          </program>
+        </vp>
+      </shader>
+
+    </pass>
+  </technique>
+
+  <technique priority="100">
+    <pass>
+
+      <buffer source="texture coordinate" destination="IN.texCoord"/>
+      <texture name="tex diffuse" destination="textureDiffuse"/>
+
+      <vp plugin="glcg">
+        <cgvp>
+          <program>
+            <![CDATA[
+                     struct App2Vertex
+                     {
+                       float4 Position : POSITION;
+                       float2 texCoord;
+                     };
+                     
+                     struct Vertex2Fragment
+                     {
+                       float4 Position : POSITION;
+                       float2 texCoord;
+                     };
+
+                     Vertex2Fragment
+                       main (App2Vertex IN,
+                             uniform float4x4 ModelViewProj : state.matrix.mvp)
+                     {
+                       Vertex2Fragment OUT;
+                       OUT.Position = mul (ModelViewProj, IN.Position);
+                       OUT.texCoord = IN.texCoord;
+                       return OUT;
+                     }
+            ]]>
+          </program>
+        </cgvp>
+      </vp>
+
+      <fp plugin="glcg">
+        <cgfp>
+          <program>
+            <![CDATA[
+                     struct Vertex2Fragment
+                     {
+                       float4 Position : POSITION;
+                       float2 texCoord;
+                     };
+
+                     float4 main (Vertex2Fragment IN, sampler2D textureDiffuse) : COLOR
+                     {
+                       return tex2D (textureDiffuse, IN.texCoord);
+                     }
+            ]]>
+          </program>
+        </cgfp>
+      </fp>
+
+    </pass>
+  </technique>
+</shader>
