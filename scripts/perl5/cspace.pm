@@ -6693,6 +6693,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetHeight = *cspacec::iView_GetHeight;
 *SetWidth = *cspacec::iView_SetWidth;
 *SetHeight = *cspacec::iView_SetHeight;
+*NormalizedToScreen = *cspacec::iView_NormalizedToScreen;
+*ScreenToNormalized = *cspacec::iView_ScreenToNormalized;
 *scfGetVersion = *cspacec::iView_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -21541,6 +21543,8 @@ sub DESTROY {
 *GetHeight = *cspacec::csView_GetHeight;
 *SetWidth = *cspacec::csView_SetWidth;
 *SetHeight = *cspacec::csView_SetHeight;
+*NormalizedToScreen = *cspacec::csView_NormalizedToScreen;
+*ScreenToNormalized = *cspacec::csView_ScreenToNormalized;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);

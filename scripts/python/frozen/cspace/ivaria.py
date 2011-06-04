@@ -301,6 +301,8 @@ class iView(core.iBase):
     def GetHeight(*args): return _ivaria.iView_GetHeight(*args)
     def SetWidth(*args): return _ivaria.iView_SetWidth(*args)
     def SetHeight(*args): return _ivaria.iView_SetHeight(*args)
+    def NormalizedToScreen(*args): return _ivaria.iView_NormalizedToScreen(*args)
+    def ScreenToNormalized(*args): return _ivaria.iView_ScreenToNormalized(*args)
     scfGetVersion = staticmethod(_ivaria.iView_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iView
     __del__ = lambda self : None;
