@@ -1123,7 +1123,7 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadPassFromCache (
   
   iShaderProgram::CacheLoadResult loadRes;
 
-  iBase *previous;
+  iBase *previous = 0;
 
   if (plugins.unified.available)
   {
