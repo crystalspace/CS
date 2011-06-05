@@ -9,9 +9,23 @@ class csBulletSoftBody : scfImplementationExt2<csBulletSoftBody,
   CS::Physics::Bullet::iSoftBody>
 {
 private:
+  //CS::Physics::Bullet::BodyType bodyType;
+  float friction;
+  float density;
+  btSoftBody* btBody;   //Don't know if I should add this to rigidbody too.
+  struct AnimatedAnchor
+  {
+    AnimatedAnchor (size_t vertexIndex, iAnchorAnimationControl* controller)
+      : vertexIndex (vertexIndex), controller (controller) {}
+
+    size_t vertexIndex;
+    csRef<iAnchorAnimationControl> controller;
+    btVector3 position;
+  };
+  csArray<AnimatedAnchor> animatedAnchors;
 
 public:
-  csBulletSoftBody (csBulletSystem* phySys);
+  csBulletSoftBody (csBulletSystem* phySys, btSoftBody* body);
   ~csBulletSoftBody ();
 
   //iCollisionObject
@@ -22,15 +36,15 @@ public:
   virtual void RebuildObject ();
 
   //virtual bool Collide (iCollisionObject* otherObject);
-  //virtual HitBeamResult HitBeam (const csVector3& start, const csVector3& end);
+  virtual HitBeamResult HitBeam (const csVector3& start, const csVector3& end);
 
-  btSoftBody* GetBulletSoftPointer () {return btSoftBody::upcast (btObject);}
+  btSoftBody* GetBulletSoftPointer () {return btBody;}
   virtual void RemoveBulletObject ();
   virtual void AddBulletObject ();
 
   //iPhysicalBody
 
-  virtual PhysicalBodyType GetBodyType () {return BODY_SOFT;}
+  virtual PhysicalBodyType GetBodyType () {return bodyType;}
   virtual iRigidBody* QueryRigidBody () {return NULL;}
   virtual iSoftBody* QuerySoftBody () {return this;}
 
@@ -39,9 +53,8 @@ public:
   virtual bool IsEnabled ();
 
   virtual float GetMass ();
-  virtual void SetMass (float mass);
 
-  virtual float GetDensity ();
+  virtual float GetDensity () {return density;}
   virtual void SetDensity (float density);
 
   virtual float GetVolume ();
@@ -52,7 +65,7 @@ public:
   virtual csVector3 GetLinearVelocity (size_t index = 0);
 
   virtual void SetFriction (float friction);
-  virtual void GetFriction (float& friction);
+  virtual float GetFriction () {return friction;}
 
   //iSoftBody
   virtual void SetVertexMass (float mass, size_t index);
@@ -77,8 +90,8 @@ public:
   virtual void SetLinearVelocity (const csVector3& velocity,
     size_t vertexIndex);
 
-  virtual void setWindVelocity (const csVector3& velocity);
-  virtual const csVector3 getWindVelocity () const;
+  virtual void SetWindVelocity (const csVector3& velocity);
+  virtual const csVector3 GetWindVelocity () const;
 
   virtual void AddForce (const csVector3& force, size_t vertexIndex);
 
@@ -94,7 +107,7 @@ public:
 
   virtual void SetLinearStiff (float stiff);
   virtual void SetAngularStiff (float stiff);
-  virtual void SetVolumeStiff (float vol);
+  virtual void SetVolumeStiff (float stiff);
 
   virtual void ResetCollisionFlag ();
 

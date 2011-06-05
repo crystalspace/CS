@@ -13,13 +13,12 @@ class csBulletRigidBody : public scfImplementationExt1<
   CS::Physics::iRigidBody>
 {
 private:
-  //btRigidBody* btBody;
-  CS::Physics::PhysicalBodyType bodyType;
+  btRigidBody* btBody;
+  //CS::Physics::PhysicalBodyType bodyType;
   CS::Physics::RigidBodyState physicalState;
   float density;
   float linearDampening;
   float angularDampening;
-  float density;
   float friction;
   float softness;
   float elasticity;
@@ -40,7 +39,7 @@ public:
   //virtual bool Collide (iCollisionObject* otherObject);
   //virtual HitBeamResult HitBeam (const csVector3& start, const csVector3& end);
 
-  btRigidBody* GetBulletRigidPointer () {return btRigidBody::upcast (btObject);}
+  btRigidBody* GetBulletRigidPointer () {return btBody;}
   virtual void RemoveBulletObject ();
   virtual void AddBulletObject ();
 
@@ -73,7 +72,7 @@ public:
   virtual iCollisionObject* QueryCollisionObject () {return dynamic_cast<iPhysicalBody*> (this);}
 
   virtual RigidBodyState GetState () {return physicalState;}
-  virtual void SetState (RigidBodyState state);
+  virtual bool SetState (RigidBodyState state);
 
   virtual void SetElasticity (float elasticity);
   virtual float GetElasticity () {return elasticity;}

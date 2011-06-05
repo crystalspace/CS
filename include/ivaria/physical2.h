@@ -147,7 +147,7 @@ struct iRigidBody : public iPhysicalBody
   virtual RigidBodyState GetState () = 0;
   
   /// Set the current state of the body.
-  virtual void SetState (RigidBodyState state) = 0;
+  virtual bool SetState (RigidBodyState state) = 0;
 
 
   /// Set the elasticity of this rigid body.
@@ -324,10 +324,10 @@ struct iSoftBody : public iPhysicalBody
   /**
   * Set the wind velocity of the whole body.
   */
-  virtual void setWindVelocity (const csVector3& velocity) = 0;
+  virtual void SetWindVelocity (const csVector3& velocity) = 0;
 
   /// Get the wind velocity of the whole body.
-virtual const csVector3 getWindVelocity () const = 0;
+virtual const csVector3 GetWindVelocity () const = 0;
 
   /// Add a force at the given vertex of the body.
   virtual void AddForce (const csVector3& force, size_t vertexIndex) = 0;

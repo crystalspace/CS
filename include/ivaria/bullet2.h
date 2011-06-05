@@ -33,7 +33,7 @@ struct iSoftBody : public virtual iBase
   virtual void SetAngularStiff (float stiff) = 0;
 
   /// Set volume stiffness coefficient [0,1].
-  virtual void SetVolumeStiff (float vol) = 0;
+  virtual void SetVolumeStiff (float stiff) = 0;
 
   /// Reset the collision flag to 0.
   virtual void ResetCollisionFlag () = 0;
