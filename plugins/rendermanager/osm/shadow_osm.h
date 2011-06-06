@@ -21,6 +21,8 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_SHADOW_OSM_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_SHADOW_OSM_H__
 
+#include "csplugincommon/rendermanager/shadow_common.h"
+
 namespace CS
 {
 namespace RenderManager
@@ -32,34 +34,56 @@ namespace RenderManager
     struct PersistentData
     {
       csRef<iTextureHandle> accumBuffer;
-      csRef<iShaderManager> shaderManager;
+
+      iShaderManager* shaderManager;
+      iGraphics3D* g3d;
+
+      csString configPrefix;
+      ShadowSettings settings;
+
+      /// Set the prefix for configuration settings
+      void SetConfigPrefix (const char* configPrefix)
+      {
+        this->configPrefix = configPrefix;
+      }
 
       void Initialize (iObjectRegistry* objectReg,
         RenderTreeBase::DebugPersistent& dbgPersist)
       {
-	      csConfigAccess cfg (objectReg);
+        csRef<iShaderManager> shaderManager =
+          csQueryRegistry<iShaderManager> (objectReg);
         csRef<iGraphics3D> g3d =
           csQueryRegistry<iGraphics3D> (objectReg);
 
-        // Creates the accumulation buffer.
-        int flags = CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP | CS_TEXTURE_NPOTS;
-        const char *accumFmt = cfg->GetStr ("RenderManager.Deferred.AccumBufferFormat", "rgb16_f");
-        iGraphics2D *g2d = g3d->GetDriver2D ();
+        this->shaderManager = shaderManager;
+        this->g3d = g3d;
 
-        scfString errStr;
-        accumBuffer = g3d->GetTextureManager ()->CreateTexture (g2d->GetWidth (),
-          g2d->GetHeight (),
-          csimg2D,
-          accumFmt,
-          flags,
-          &errStr);
+        csConfigAccess cfg (objectReg);
+        if (configPrefix.IsEmpty())
+        {
+          settings.ReadSettings (objectReg, "Depth");
+        }
+        else
+        {
+          settings.ReadSettings (objectReg, 
+            cfg->GetStr (
+            csString().Format ("%s.ShadowsType", configPrefix.GetData()), "Depth"));
+        }
+          // Creates the accumulation buffer.
+          int flags = CS_TEXTURE_3D | CS_TEXTURE_CLAMP  | CS_TEXTURE_NOMIPMAPS;
+          iGraphics2D *g2d = g3d->GetDriver2D ();
 
-        if (!accumBuffer)
-          csPrintf("Error initializing accumBuffer!\n");
+          scfString errStr;
+          accumBuffer = g3d->GetTextureManager ()->CreateTexture (g2d->GetWidth (),
+            g2d->GetHeight (),
+            csimg2D,
+            "d32",
+            flags,
+            &errStr);
 
-        shaderManager = csQueryRegistry<iShaderManager> (objectReg);
+          if (!accumBuffer)
+            csPrintf("Error initializing accumBuffer!\n");
       }
-      
       void UpdateNewFrame ()
       {
       }
@@ -68,16 +92,81 @@ namespace RenderManager
     class ViewSetup
     {
     public:
-      CS::RenderManager::RenderView* rview;
-
       PersistentData& persist;
+      CS::RenderManager::RenderView* rview;
       SingleRenderLayer depthRenderLayer;
 
       ViewSetup (PersistentData& persist, CS::RenderManager::RenderView* rview)
-         : persist (persist), rview(rview)
+        : persist (persist), rview (rview),
+        depthRenderLayer (persist.settings.shadowShaderType, 
+        persist.settings.shadowDefaultShader)
       {
         
       }
+    };
+
+    class ShadowmapContextSetup
+    {
+    public:
+      ShadowmapContextSetup (const SingleRenderLayer& layerConfig,
+        iShaderManager* shaderManager, ViewSetup& viewSetup )
+        : layerConfig (layerConfig), shaderManager (shaderManager),
+        viewSetup (viewSetup)
+      {
+
+      }
+
+      void operator() (typename RenderTree::ContextNode& context)
+      {
+        CS::RenderManager::RenderView* rview = context.renderView;
+        iSector* sector = rview->GetThisSector ();
+
+        // @@@ This is somewhat "boilerplate" sector/rview setup.
+        rview->SetThisSector (sector);
+        sector->CallSectorCallbacks (rview);
+        // Make sure the clip-planes are ok
+        CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext ());
+
+        // Do the culling
+        iVisibilityCuller* culler = sector->GetVisibilityCuller ();
+        Viscull<RenderTree> (context, rview, culler);
+
+        // Sort the mesh lists  
+        {
+          StandardMeshSorter<RenderTree> mySorter (rview->GetEngine ());
+          mySorter.SetupCameraLocation (rview->GetCamera ()->GetTransform ().GetOrigin ());
+          ForEachMeshNode (context, mySorter);
+        }
+
+        // After sorting, assign in-context per-mesh indices
+        {
+          SingleMeshContextNumbering<RenderTree> numbering;
+          ForEachMeshNode (context, numbering);
+        }
+
+        // Setup the SV arrays
+        // Push the default stuff
+        SetupStandardSVs (context, layerConfig, shaderManager, sector);
+
+        // Setup the material&mesh SVs
+        {
+          StandardSVSetup<RenderTree, SingleRenderLayer> svSetup (
+            context.svArrays, layerConfig);
+
+          ForEachMeshNode (context, svSetup);
+        }
+
+        SetupStandardShader (context, shaderManager, layerConfig);
+
+        // Setup shaders and tickets
+        SetupStandardTicket (context, shaderManager, layerConfig);
+      }
+
+
+    private:
+      const SingleRenderLayer& layerConfig;
+      iShaderManager* shaderManager;
+      ViewSetup& viewSetup;
     };
 
     struct CachedLightData
@@ -96,15 +185,21 @@ namespace RenderManager
 
         uint currentFrame = viewSetup.rview->GetCurrentFrameNumber();
 
-//         CS_ALLOC_STACK_ARRAY(iTextureHandle*, texHandles, 1);
-        
-        typename RenderTree::ContextNode* shadowMapCtx = 
-          renderTree.CreateContext (viewSetup.rview);
-        shadowMapCtx->drawFlags |= (CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER);
+        typename RenderTree::ContextNode& context = meshNode->GetOwner();
 
-        shadowMapCtx->renderTargets[rtaColor1].texHandle = persist.accumBuffer;        
-        shadowMapCtx->renderTargets[rtaColor1].subtexture = 0; 
         renderTree.AddDebugTexture (persist.accumBuffer);
+
+        typename RenderTree::ContextNode* shadowMapCtx = 
+          renderTree.CreateContext (context.renderView);
+        shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
+
+        shadowMapCtx->renderTargets[rtaDepth].texHandle = persist.accumBuffer;
+
+
+        // Setup the new context
+        ShadowmapContextSetup contextFunction (layerConfig,
+          persist.shaderManager, viewSetup);
+        contextFunction (*shadowMapCtx);
 
 //         csPrintf("New Target %u!\n", currentFrame);
       }
