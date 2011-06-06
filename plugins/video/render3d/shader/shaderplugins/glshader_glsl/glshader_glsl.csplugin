@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- glshader_glsl.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics3d.shader.glsl</name>
+        <implementation>csGLShader_GLSL</implementation>
+        <description>OpenGL Shading Language shaderprogram provider for Graphics3D</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

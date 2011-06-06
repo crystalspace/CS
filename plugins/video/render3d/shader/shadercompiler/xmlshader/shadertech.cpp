@@ -208,13 +208,14 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
   if (cachedPlugins.unified.programNode)
   {
     // new unified syntax detected
+    pass->program = LoadProgram (0, cachedPlugins.unified.programNode,
+                                 pass, variant, 0, cachedPlugins.unified, tagVP);
+    if (!pass->program)
+      return false;
 
-    // problem for the resolveFP/VP queries, will be unified:
-    // resolveFP = resolveVP =
-    //   scfQueryInterface<iShaderDestinationResolver> (program);
-    // afaik names cannot collide with GLSL so it's OK then.
-
-    // assign tags
+    tagFP = tagVP;
+    resolveFP = resolveVP =
+      scfQueryInterface<iShaderDestinationResolver> (pass->program);
   }
   else
   {
@@ -1135,6 +1136,9 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadPassFromCache (
     // assign tags
 
     // previous = foobar;
+    LoadProgramFromCache (0, 0, plugins.unified, pass->program,
+                          tagVP, GetPassNumber (pass));
+    tagFP = tagVP;
   }
   else
   {
