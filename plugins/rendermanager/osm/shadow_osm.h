@@ -189,6 +189,14 @@ namespace RenderManager
 
         renderTree.AddDebugTexture (persist.accumBuffer);
 
+        int shadowMapSize = 1024;
+
+        csBox2 clipBox (0, 0, shadowMapSize, shadowMapSize);
+        csRef<iClipper2D> newView;
+        newView.AttachNew (new csBoxClipper (clipBox));
+        context.renderView->SetClipper(newView);
+        context.renderView->GetCamera()->SetTransform(light->GetMovable()->GetTransform());
+
         typename RenderTree::ContextNode* shadowMapCtx = 
           renderTree.CreateContext (context.renderView);
         shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
