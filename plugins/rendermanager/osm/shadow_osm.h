@@ -21,6 +21,8 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_SHADOW_OSM_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_SHADOW_OSM_H__
 
+#include "csutil/cfgacc.h"
+#include "csutil/scfstr.h"
 #include "csplugincommon/rendermanager/shadow_common.h"
 
 namespace CS
@@ -182,8 +184,6 @@ namespace RenderManager
         RenderTree& renderTree, iLight* light, ViewSetup& viewSetup)
       {
         if (light->GetFlags().Check (CS_LIGHT_NOSHADOWS)) return;
-
-        uint currentFrame = viewSetup.rview->GetCurrentFrameNumber();
 
         typename RenderTree::ContextNode& context = meshNode->GetOwner();
 
