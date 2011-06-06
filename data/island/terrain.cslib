@@ -1,19 +1,4 @@
 <library>
-    <shaders>
-        <shader>
-            <file>/shader/terrain/basemap.xml</file>
-        </shader>
-        <shader>
-            <file>/shader/terrain/splatbase.xml</file>
-        </shader>
-        <shader>
-            <file>/shader/terrain/splat.xml</file>
-        </shader>
-        <shader>
-            <file>/shader/terrain/splat-detail.xml</file>
-        </shader>
-    </shaders>
-
     <textures>
         <texture name="basemap_00000_00000_000.PNG">
             <file>basemaps/basemap_00000_00000_000.PNG</file>
@@ -28,44 +13,746 @@
         <texture name="ground01.jpg">
             <file>textures/ground01.jpg</file>
         </texture>
+        <texture name="basemap_00000_00000_001.PNG">
+            <file>basemaps/basemap_00000_00000_001.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_001_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_001_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_002.PNG">
+            <file>basemaps/basemap_00000_00000_002.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_002_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_002_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_003.PNG">
+            <file>basemaps/basemap_00000_00000_003.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_003_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_003_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_004.PNG">
+            <file>basemaps/basemap_00000_00000_004.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_004_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_004_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_005.PNG">
+            <file>basemaps/basemap_00000_00000_005.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_005_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_005_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_006.PNG">
+            <file>basemaps/basemap_00000_00000_006.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_006_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_006_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_007.PNG">
+            <file>basemaps/basemap_00000_00000_007.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_007_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_007_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_008.PNG">
+            <file>basemaps/basemap_00000_00000_008.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_008_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_008_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
         <texture name="generic_grass1_col.jpg">
             <file>textures/generic_grass1_col.jpg</file>
-        </texture>
-        <texture name="generic_grass4_col.jpg">
-            <file>textures/generic_grass4_col.jpg</file>
         </texture>
         <texture name="stone_cliff_tile_001_col.jpg">
             <file>textures/stone_cliff_tile_001_col.jpg</file>
         </texture>
-        <texture name="alphamap_00000_00000_000_1.PNG">
-            <file>alphamaps/alphamap_00000_00000_000_1.PNG</file>
+        <texture name="generic_grayrock1_col.jpg">
+            <file>textures/generic_grayrock1_col.jpg</file>
+        </texture>
+        <texture name="alphamap_00000_00000_008_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_008_1.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="generic_darkrock_col.jpg">
+            <file>textures/generic_darkrock_col.jpg</file>
+        </texture>
+        <texture name="generic_lightrock_col.jpg">
+            <file>textures/generic_lightrock_col.jpg</file>
+        </texture>
+        <texture name="basemap_00000_00000_009.PNG">
+            <file>basemaps/basemap_00000_00000_009.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_009_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_009_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="generic_grass4_col.jpg">
+            <file>textures/generic_grass4_col.jpg</file>
+        </texture>
+        <texture name="alphamap_00000_00000_009_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_009_1.PNG</file>
             <class>lookup</class>
             <npots />
         </texture>
         <texture name="generic_grass4_dirt2.jpg">
             <file>textures/generic_grass4_dirt2.jpg</file>
         </texture>
-        <texture name="generic_grayrock1_col.jpg">
-            <file>textures/generic_grayrock1_col.jpg</file>
-        </texture>
-        <texture name="generic_darkrock_col.jpg">
-            <file>textures/generic_darkRock_col.jpg</file>
-        </texture>
-        <texture name="generic_lightrock_col.jpg">
-            <file>textures/generic_lightRock_col.jpg</file>
-        </texture>
-        <texture name="alphamap_00000_00000_000_2.PNG">
-            <file>alphamaps/alphamap_00000_00000_000_2.PNG</file>
+        <texture name="alphamap_00000_00000_009_2.PNG">
+            <file>alphamaps/alphamap_00000_00000_009_2.PNG</file>
             <class>lookup</class>
             <npots />
         </texture>
         <texture name="grass_01.png">
             <file>textures/grass_01.png</file>
         </texture>
+        <texture name="basemap_00000_00000_010.PNG">
+            <file>basemaps/basemap_00000_00000_010.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_010_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_010_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="alphamap_00000_00000_010_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_010_1.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_011.PNG">
+            <file>basemaps/basemap_00000_00000_011.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_011_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_011_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_012.PNG">
+            <file>basemaps/basemap_00000_00000_012.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_012_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_012_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_013.PNG">
+            <file>basemaps/basemap_00000_00000_013.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_013_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_013_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_014.PNG">
+            <file>basemaps/basemap_00000_00000_014.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_014_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_014_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_015.PNG">
+            <file>basemaps/basemap_00000_00000_015.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_015_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_015_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_016.PNG">
+            <file>basemaps/basemap_00000_00000_016.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_016_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_016_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_017.PNG">
+            <file>basemaps/basemap_00000_00000_017.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_017_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_017_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="alphamap_00000_00000_017_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_017_1.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_018.PNG">
+            <file>basemaps/basemap_00000_00000_018.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_018_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_018_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="alphamap_00000_00000_018_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_018_1.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_019.PNG">
+            <file>basemaps/basemap_00000_00000_019.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_019_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_019_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="alphamap_00000_00000_019_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_019_1.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_020.PNG">
+            <file>basemaps/basemap_00000_00000_020.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_020_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_020_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_021.PNG">
+            <file>basemaps/basemap_00000_00000_021.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_021_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_021_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_022.PNG">
+            <file>basemaps/basemap_00000_00000_022.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_022_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_022_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_023.PNG">
+            <file>basemaps/basemap_00000_00000_023.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_023_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_023_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_024.PNG">
+            <file>basemaps/basemap_00000_00000_024.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_024_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_024_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_025.PNG">
+            <file>basemaps/basemap_00000_00000_025.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_025_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_025_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="alphamap_00000_00000_025_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_025_1.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_026.PNG">
+            <file>basemaps/basemap_00000_00000_026.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_026_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_026_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="alphamap_00000_00000_026_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_026_1.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_027.PNG">
+            <file>basemaps/basemap_00000_00000_027.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_027_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_027_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="alphamap_00000_00000_027_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_027_1.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="alphamap_00000_00000_027_2.PNG">
+            <file>alphamaps/alphamap_00000_00000_027_2.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_028.PNG">
+            <file>basemaps/basemap_00000_00000_028.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_028_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_028_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_029.PNG">
+            <file>basemaps/basemap_00000_00000_029.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_029_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_029_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_030.PNG">
+            <file>basemaps/basemap_00000_00000_030.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_030_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_030_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_031.PNG">
+            <file>basemaps/basemap_00000_00000_031.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_031_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_031_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_032.PNG">
+            <file>basemaps/basemap_00000_00000_032.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_032_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_032_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_033.PNG">
+            <file>basemaps/basemap_00000_00000_033.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_033_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_033_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="alphamap_00000_00000_033_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_033_1.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_034.PNG">
+            <file>basemaps/basemap_00000_00000_034.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_034_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_034_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="alphamap_00000_00000_034_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_034_1.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_035.PNG">
+            <file>basemaps/basemap_00000_00000_035.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_035_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_035_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="alphamap_00000_00000_035_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_035_1.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_036.PNG">
+            <file>basemaps/basemap_00000_00000_036.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_036_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_036_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_037.PNG">
+            <file>basemaps/basemap_00000_00000_037.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_037_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_037_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_038.PNG">
+            <file>basemaps/basemap_00000_00000_038.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_038_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_038_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_039.PNG">
+            <file>basemaps/basemap_00000_00000_039.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_039_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_039_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_040.PNG">
+            <file>basemaps/basemap_00000_00000_040.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_040_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_040_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_041.PNG">
+            <file>basemaps/basemap_00000_00000_041.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_041_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_041_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="alphamap_00000_00000_041_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_041_1.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_042.PNG">
+            <file>basemaps/basemap_00000_00000_042.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_042_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_042_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_043.PNG">
+            <file>basemaps/basemap_00000_00000_043.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_043_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_043_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="alphamap_00000_00000_043_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_043_1.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_044.PNG">
+            <file>basemaps/basemap_00000_00000_044.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_044_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_044_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_045.PNG">
+            <file>basemaps/basemap_00000_00000_045.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_045_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_045_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_046.PNG">
+            <file>basemaps/basemap_00000_00000_046.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_046_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_046_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_047.PNG">
+            <file>basemaps/basemap_00000_00000_047.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_047_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_047_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_048.PNG">
+            <file>basemaps/basemap_00000_00000_048.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_048_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_048_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_049.PNG">
+            <file>basemaps/basemap_00000_00000_049.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_049_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_049_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_050.PNG">
+            <file>basemaps/basemap_00000_00000_050.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_050_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_050_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_051.PNG">
+            <file>basemaps/basemap_00000_00000_051.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_051_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_051_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_052.PNG">
+            <file>basemaps/basemap_00000_00000_052.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_052_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_052_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_053.PNG">
+            <file>basemaps/basemap_00000_00000_053.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_053_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_053_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_054.PNG">
+            <file>basemaps/basemap_00000_00000_054.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_054_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_054_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_055.PNG">
+            <file>basemaps/basemap_00000_00000_055.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_055_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_055_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_056.PNG">
+            <file>basemaps/basemap_00000_00000_056.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_056_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_056_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_057.PNG">
+            <file>basemaps/basemap_00000_00000_057.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_057_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_057_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_058.PNG">
+            <file>basemaps/basemap_00000_00000_058.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_058_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_058_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_059.PNG">
+            <file>basemaps/basemap_00000_00000_059.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_059_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_059_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_060.PNG">
+            <file>basemaps/basemap_00000_00000_060.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_060_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_060_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_061.PNG">
+            <file>basemaps/basemap_00000_00000_061.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_061_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_061_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_062.PNG">
+            <file>basemaps/basemap_00000_00000_062.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_062_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_062_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="basemap_00000_00000_063.PNG">
+            <file>basemaps/basemap_00000_00000_063.PNG</file>
+            <class>nosharpen</class>
+            <clamp />
+        </texture>
+        <texture name="alphamap_00000_00000_063_0.PNG">
+            <file>alphamaps/alphamap_00000_00000_063_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
     </textures>
     <shaders>
         <shader>
             <file>/shader/terrain/multisplat.xml</file>
+        </shader>
+        <shader>
             <file>/shader/terrain/basemap.xml</file>
         </shader>
     </shaders>
@@ -73,26 +760,1024 @@
         <material name="basemap_00000_00000_000">
             <shader type="base">terrain_basemap</shader>
             <shadervar type="vector3" name="specular">0,0,0</shadervar>
-            <shadervar type="vector4" name="basemap scale">0.9995117188,0.9995117188,0.0002441406,0.0002441406</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
             <shadervar type="texture" name="tex diffuse">basemap_00000_00000_000.PNG</shadervar>
         </material>
         <material name="TerrainMat_00000_00000_000">
             <shader type="base">terrain_multisplat</shader>
             <shadervar type="vector3" name="specular">0,0,0</shadervar>
-            <shadervar type="vector4" name="alpha scaleoffset">0.9990243912,0.9990243912,0.0004878049,0.0004878049</shadervar>
-            <shadervar type="vector2" name="texture scale">512,512</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_000_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_001">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_001.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_001">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_001_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_002">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_002.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_002">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_002_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_003">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_003.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_003">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_003_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_004">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_004.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_004">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_004_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_005">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_005.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_005">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_005_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_006">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_006.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_006">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_006_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_007">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_007.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_007">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_007_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_008">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_008.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_008">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_008_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_008_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_lightrock_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_009">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_009.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_009">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_009_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
-            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_000_1.PNG</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_009_1.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 5">generic_grass4_dirt2.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 6">generic_grayrock1_col.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 7">generic_darkrock_col.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 8">generic_lightrock_col.jpg</shadervar>
-            <shadervar type="texture" name="tex alpha map 3">alphamap_00000_00000_000_2.PNG</shadervar>
+            <shadervar type="texture" name="tex alpha map 3">alphamap_00000_00000_009_2.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 9">grass_01.png</shadervar>
+        </material>
+        <material name="basemap_00000_00000_010">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_010.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_010">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_010_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_010_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 7">grass_01.png</shadervar>
+        </material>
+        <material name="basemap_00000_00000_011">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_011.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_011">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_011_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_012">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_012.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_012">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_012_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_013">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_013.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_013">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_013_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_014">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_014.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_014">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_014_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_015">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_015.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_015">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_015_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_016">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_016.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_016">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_016_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">grass_01.png</shadervar>
+        </material>
+        <material name="basemap_00000_00000_017">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_017.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_017">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_017_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_grass4_dirt2.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_017_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 7">grass_01.png</shadervar>
+        </material>
+        <material name="basemap_00000_00000_018">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_018.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_018">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_018_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_grass4_dirt2.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_018_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 7">grass_01.png</shadervar>
+        </material>
+        <material name="basemap_00000_00000_019">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_019.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_019">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_019_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_grass4_dirt2.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_019_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">grass_01.png</shadervar>
+        </material>
+        <material name="basemap_00000_00000_020">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_020.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_020">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_020_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_021">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_021.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_021">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_021_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_022">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_022.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_022">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_022_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_023">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_023.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_023">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_023_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_024">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_024.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_024">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_024_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">grass_01.png</shadervar>
+        </material>
+        <material name="basemap_00000_00000_025">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_025.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_025">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_025_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_grass4_dirt2.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_025_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 7">grass_01.png</shadervar>
+        </material>
+        <material name="basemap_00000_00000_026">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_026.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_026">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_026_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_026_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_lightrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 7">grass_01.png</shadervar>
+        </material>
+        <material name="basemap_00000_00000_027">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_027.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_027">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_027_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_027_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grass4_dirt2.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 7">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 8">generic_lightrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 3">alphamap_00000_00000_027_2.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 9">grass_01.png</shadervar>
+        </material>
+        <material name="basemap_00000_00000_028">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_028.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_028">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_028_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_029">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_029.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_029">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_029_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_030">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_030.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_030">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_030_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_031">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_031.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_031">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_031_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_032">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_032.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_032">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_032_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_033">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_033.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_033">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_033_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_033_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_lightrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">grass_01.png</shadervar>
+        </material>
+        <material name="basemap_00000_00000_034">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_034.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_034">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_034_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_034_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_lightrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">grass_01.png</shadervar>
+        </material>
+        <material name="basemap_00000_00000_035">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_035.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_035">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_035_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_035_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_lightrock_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_036">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_036.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_036">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_036_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_037">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_037.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_037">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_037_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_038">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_038.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_038">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_038_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_039">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_039.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_039">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_039_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_040">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_040.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_040">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_040_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_041">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_041.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_041">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_041_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_041_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_lightrock_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_042">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_042.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_042">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_042_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_lightrock_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_043">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_043.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_043">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_043_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_043_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_lightrock_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_044">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_044.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_044">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_044_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_045">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_045.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_045">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_045_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">generic_grass1_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_046">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_046.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_046">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_046_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_047">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_047.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_047">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_047_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_048">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_048.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_048">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_048_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_049">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_049.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_049">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_049_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_050">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_050.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_050">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_050_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_051">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_051.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_051">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_051_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_052">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_052.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_052">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_052_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_053">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_053.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_053">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_053_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_054">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_054.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_054">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_054_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_055">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_055.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_055">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_055_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_056">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_056.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_056">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_056_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_057">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_057.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_057">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_057_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_058">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_058.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_058">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_058_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_059">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_059.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_059">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_059_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_060">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_060.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_060">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_060_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_061">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_061.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_061">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_061_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_062">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_062.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_062">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_062_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+        </material>
+        <material name="basemap_00000_00000_063">
+            <shader type="base">terrain_basemap</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="basemap scale">0.9960937500,0.9960937500,0.0019531250,0.0019531250</shadervar>
+            <shadervar type="texture" name="tex diffuse">basemap_00000_00000_063.PNG</shadervar>
+        </material>
+        <material name="TerrainMat_00000_00000_063">
+            <shader type="base">terrain_multisplat</shader>
+            <shadervar type="vector3" name="specular">0,0,0</shadervar>
+            <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
+            <shadervar type="vector2" name="texture scale">64,64</shadervar>
+            <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_063_0.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
         </material>
     </materials>
     <meshfact name="island">
@@ -105,8 +1790,8 @@
             <maxloadedcells>-1</maxloadedcells>
             <cells>
                 <celldefault>
-                    <gridsize width="1025" height="1025" />
-                    <size x="512" y="10000" z="512" />
+                    <gridsize width="129" height="129" />
+                    <size x="64" y="10000" z="64" />
                 </celldefault>
                 <cell>
                     <name>TerrainCell_00000_00000_000</name>
@@ -114,8 +1799,638 @@
                     <basematerial>basemap_00000_00000_000</basematerial>
                     <alphasplatmaterial>TerrainMat_00000_00000_000</alphasplatmaterial>
                     <feederproperties>
-                        <param name="heightmap source">heightmaps/00000_00000.PNG</param>
-                        <param name="normalmap source">heightmaps/vnorm_00000_00000.PNG</param>
+                        <param name="heightmap source">heightmaps/00000_00000_000.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_000.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_001</name>
+                    <position x="64" y="0" />
+                    <basematerial>basemap_00000_00000_001</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_001</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_001.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_001.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_002</name>
+                    <position x="128" y="0" />
+                    <basematerial>basemap_00000_00000_002</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_002</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_002.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_002.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_003</name>
+                    <position x="192" y="0" />
+                    <basematerial>basemap_00000_00000_003</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_003</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_003.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_003.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_004</name>
+                    <position x="256" y="0" />
+                    <basematerial>basemap_00000_00000_004</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_004</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_004.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_004.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_005</name>
+                    <position x="320" y="0" />
+                    <basematerial>basemap_00000_00000_005</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_005</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_005.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_005.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_006</name>
+                    <position x="384" y="0" />
+                    <basematerial>basemap_00000_00000_006</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_006</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_006.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_006.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_007</name>
+                    <position x="448" y="0" />
+                    <basematerial>basemap_00000_00000_007</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_007</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_007.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_007.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_008</name>
+                    <position x="0" y="64" />
+                    <basematerial>basemap_00000_00000_008</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_008</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_008.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_008.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_009</name>
+                    <position x="64" y="64" />
+                    <basematerial>basemap_00000_00000_009</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_009</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_009.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_009.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_010</name>
+                    <position x="128" y="64" />
+                    <basematerial>basemap_00000_00000_010</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_010</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_010.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_010.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_011</name>
+                    <position x="192" y="64" />
+                    <basematerial>basemap_00000_00000_011</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_011</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_011.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_011.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_012</name>
+                    <position x="256" y="64" />
+                    <basematerial>basemap_00000_00000_012</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_012</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_012.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_012.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_013</name>
+                    <position x="320" y="64" />
+                    <basematerial>basemap_00000_00000_013</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_013</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_013.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_013.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_014</name>
+                    <position x="384" y="64" />
+                    <basematerial>basemap_00000_00000_014</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_014</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_014.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_014.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_015</name>
+                    <position x="448" y="64" />
+                    <basematerial>basemap_00000_00000_015</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_015</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_015.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_015.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_016</name>
+                    <position x="0" y="128" />
+                    <basematerial>basemap_00000_00000_016</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_016</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_016.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_016.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_017</name>
+                    <position x="64" y="128" />
+                    <basematerial>basemap_00000_00000_017</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_017</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_017.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_017.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_018</name>
+                    <position x="128" y="128" />
+                    <basematerial>basemap_00000_00000_018</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_018</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_018.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_018.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_019</name>
+                    <position x="192" y="128" />
+                    <basematerial>basemap_00000_00000_019</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_019</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_019.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_019.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_020</name>
+                    <position x="256" y="128" />
+                    <basematerial>basemap_00000_00000_020</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_020</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_020.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_020.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_021</name>
+                    <position x="320" y="128" />
+                    <basematerial>basemap_00000_00000_021</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_021</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_021.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_021.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_022</name>
+                    <position x="384" y="128" />
+                    <basematerial>basemap_00000_00000_022</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_022</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_022.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_022.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_023</name>
+                    <position x="448" y="128" />
+                    <basematerial>basemap_00000_00000_023</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_023</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_023.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_023.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_024</name>
+                    <position x="0" y="192" />
+                    <basematerial>basemap_00000_00000_024</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_024</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_024.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_024.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_025</name>
+                    <position x="64" y="192" />
+                    <basematerial>basemap_00000_00000_025</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_025</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_025.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_025.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_026</name>
+                    <position x="128" y="192" />
+                    <basematerial>basemap_00000_00000_026</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_026</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_026.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_026.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_027</name>
+                    <position x="192" y="192" />
+                    <basematerial>basemap_00000_00000_027</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_027</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_027.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_027.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_028</name>
+                    <position x="256" y="192" />
+                    <basematerial>basemap_00000_00000_028</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_028</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_028.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_028.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_029</name>
+                    <position x="320" y="192" />
+                    <basematerial>basemap_00000_00000_029</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_029</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_029.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_029.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_030</name>
+                    <position x="384" y="192" />
+                    <basematerial>basemap_00000_00000_030</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_030</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_030.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_030.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_031</name>
+                    <position x="448" y="192" />
+                    <basematerial>basemap_00000_00000_031</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_031</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_031.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_031.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_032</name>
+                    <position x="0" y="256" />
+                    <basematerial>basemap_00000_00000_032</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_032</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_032.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_032.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_033</name>
+                    <position x="64" y="256" />
+                    <basematerial>basemap_00000_00000_033</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_033</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_033.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_033.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_034</name>
+                    <position x="128" y="256" />
+                    <basematerial>basemap_00000_00000_034</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_034</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_034.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_034.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_035</name>
+                    <position x="192" y="256" />
+                    <basematerial>basemap_00000_00000_035</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_035</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_035.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_035.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_036</name>
+                    <position x="256" y="256" />
+                    <basematerial>basemap_00000_00000_036</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_036</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_036.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_036.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_037</name>
+                    <position x="320" y="256" />
+                    <basematerial>basemap_00000_00000_037</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_037</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_037.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_037.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_038</name>
+                    <position x="384" y="256" />
+                    <basematerial>basemap_00000_00000_038</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_038</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_038.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_038.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_039</name>
+                    <position x="448" y="256" />
+                    <basematerial>basemap_00000_00000_039</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_039</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_039.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_039.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_040</name>
+                    <position x="0" y="320" />
+                    <basematerial>basemap_00000_00000_040</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_040</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_040.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_040.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_041</name>
+                    <position x="64" y="320" />
+                    <basematerial>basemap_00000_00000_041</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_041</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_041.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_041.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_042</name>
+                    <position x="128" y="320" />
+                    <basematerial>basemap_00000_00000_042</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_042</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_042.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_042.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_043</name>
+                    <position x="192" y="320" />
+                    <basematerial>basemap_00000_00000_043</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_043</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_043.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_043.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_044</name>
+                    <position x="256" y="320" />
+                    <basematerial>basemap_00000_00000_044</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_044</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_044.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_044.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_045</name>
+                    <position x="320" y="320" />
+                    <basematerial>basemap_00000_00000_045</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_045</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_045.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_045.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_046</name>
+                    <position x="384" y="320" />
+                    <basematerial>basemap_00000_00000_046</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_046</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_046.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_046.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_047</name>
+                    <position x="448" y="320" />
+                    <basematerial>basemap_00000_00000_047</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_047</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_047.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_047.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_048</name>
+                    <position x="0" y="384" />
+                    <basematerial>basemap_00000_00000_048</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_048</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_048.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_048.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_049</name>
+                    <position x="64" y="384" />
+                    <basematerial>basemap_00000_00000_049</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_049</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_049.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_049.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_050</name>
+                    <position x="128" y="384" />
+                    <basematerial>basemap_00000_00000_050</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_050</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_050.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_050.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_051</name>
+                    <position x="192" y="384" />
+                    <basematerial>basemap_00000_00000_051</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_051</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_051.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_051.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_052</name>
+                    <position x="256" y="384" />
+                    <basematerial>basemap_00000_00000_052</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_052</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_052.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_052.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_053</name>
+                    <position x="320" y="384" />
+                    <basematerial>basemap_00000_00000_053</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_053</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_053.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_053.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_054</name>
+                    <position x="384" y="384" />
+                    <basematerial>basemap_00000_00000_054</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_054</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_054.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_054.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_055</name>
+                    <position x="448" y="384" />
+                    <basematerial>basemap_00000_00000_055</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_055</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_055.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_055.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_056</name>
+                    <position x="0" y="448" />
+                    <basematerial>basemap_00000_00000_056</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_056</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_056.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_056.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_057</name>
+                    <position x="64" y="448" />
+                    <basematerial>basemap_00000_00000_057</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_057</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_057.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_057.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_058</name>
+                    <position x="128" y="448" />
+                    <basematerial>basemap_00000_00000_058</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_058</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_058.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_058.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_059</name>
+                    <position x="192" y="448" />
+                    <basematerial>basemap_00000_00000_059</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_059</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_059.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_059.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_060</name>
+                    <position x="256" y="448" />
+                    <basematerial>basemap_00000_00000_060</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_060</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_060.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_060.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_061</name>
+                    <position x="320" y="448" />
+                    <basematerial>basemap_00000_00000_061</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_061</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_061.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_061.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_062</name>
+                    <position x="384" y="448" />
+                    <basematerial>basemap_00000_00000_062</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_062</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_062.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_062.PNG</param>
+                    </feederproperties>
+                </cell>
+                <cell>
+                    <name>TerrainCell_00000_00000_063</name>
+                    <position x="448" y="448" />
+                    <basematerial>basemap_00000_00000_063</basematerial>
+                    <alphasplatmaterial>TerrainMat_00000_00000_063</alphasplatmaterial>
+                    <feederproperties>
+                        <param name="heightmap source">heightmaps/00000_00000_063.PNG</param>
+                        <param name="normalmap source">heightmaps/vnorm_00000_00000_063.PNG</param>
                     </feederproperties>
                 </cell>
             </cells>
