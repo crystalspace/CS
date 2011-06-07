@@ -35,13 +35,14 @@ namespace RenderManager
   public:
     struct PersistentData
     {
-      csRef<iTextureHandle> accumBuffer;
-
       iShaderManager* shaderManager;
       iGraphics3D* g3d;
 
       csString configPrefix;
       ShadowSettings settings;
+
+      size_t maps;
+      size_t shadowMapSize;
 
       /// Set the prefix for configuration settings
       void SetConfigPrefix (const char* configPrefix)
@@ -70,21 +71,11 @@ namespace RenderManager
           settings.ReadSettings (objectReg, 
             cfg->GetStr (
             csString().Format ("%s.ShadowsType", configPrefix.GetData()), "Depth"));
+          maps = cfg->GetInt (
+            csString().Format ("%s.Maps", configPrefix.GetData()), 5);
+          shadowMapSize = cfg->GetInt (
+            csString().Format ("%s.ShadowMapResolution", configPrefix.GetData()), 1024);
         }
-          // Creates the accumulation buffer.
-          int flags = CS_TEXTURE_3D | CS_TEXTURE_CLAMP  | CS_TEXTURE_NOMIPMAPS;
-          iGraphics2D *g2d = g3d->GetDriver2D ();
-
-          scfString errStr;
-          accumBuffer = g3d->GetTextureManager ()->CreateTexture (g2d->GetWidth (),
-            g2d->GetHeight (),
-            csimg2D,
-            "d32",
-            flags,
-            &errStr);
-
-          if (!accumBuffer)
-            csPrintf("Error initializing accumBuffer!\n");
       }
       void UpdateNewFrame ()
       {
@@ -97,13 +88,34 @@ namespace RenderManager
       PersistentData& persist;
       CS::RenderManager::RenderView* rview;
       SingleRenderLayer depthRenderLayer;
+      csRefArray<iTextureHandle> renderTargets;
 
       ViewSetup (PersistentData& persist, CS::RenderManager::RenderView* rview)
         : persist (persist), rview (rview),
         depthRenderLayer (persist.settings.shadowShaderType, 
         persist.settings.shadowDefaultShader)
       {
-        
+        // Creates the accumulation buffer.
+        int flags = CS_TEXTURE_3D | CS_TEXTURE_CLAMP  | CS_TEXTURE_NOMIPMAPS;
+        iGraphics2D *g2d = persist.g3d->GetDriver2D ();
+
+        scfString errStr;
+
+        for (size_t i = 0 ; i < persist.maps ; i ++)
+        {
+          csRef<iTextureHandle> renderTarget = 
+            persist.g3d->GetTextureManager ()->CreateTexture (g2d->GetWidth (),
+            g2d->GetHeight (),
+            csimg2D,
+            "d32",
+            flags,
+            &errStr);
+
+          if (!renderTarget)
+            csPrintf("Error initializing renderTargets!\n");        
+
+          renderTargets.Push(renderTarget);
+        }
       }
     };
 
@@ -184,32 +196,45 @@ namespace RenderManager
         RenderTree& renderTree, iLight* light, ViewSetup& viewSetup)
       {
         if (light->GetFlags().Check (CS_LIGHT_NOSHADOWS)) return;
-
         typename RenderTree::ContextNode& context = meshNode->GetOwner();
 
-        renderTree.AddDebugTexture (persist.accumBuffer);
+        float distance = 5;
+        for (size_t i = 0 ; i < viewSetup.renderTargets.GetSize() ; i ++, distance += 10)
+        {
+          renderTree.AddDebugTexture (viewSetup.renderTargets[i]);
 
-        int shadowMapSize = 1024;
+          CS::RenderManager::RenderView* rview = context.renderView;
+          csRef<CS::RenderManager::RenderView> newRenderView;
+          newRenderView = renderTree.GetPersistentData().renderViews.CreateRenderView ();
+          newRenderView->SetEngine (rview->GetEngine ());
+          newRenderView->SetThisSector (rview->GetThisSector ());
 
-        csBox2 clipBox (0, 0, shadowMapSize, shadowMapSize);
-        csRef<iClipper2D> newView;
-        newView.AttachNew (new csBoxClipper (clipBox));
-        context.renderView->SetClipper(newView);
-        context.renderView->GetCamera()->SetTransform(light->GetMovable()->GetTransform());
+          csRef<iCustomMatrixCamera> shadowViewCam =
+            newRenderView->GetEngine()->CreateCustomMatrixCamera();
+          newRenderView->SetCamera (shadowViewCam->GetCamera());
+          shadowViewCam->SetProjectionMatrix (rview->GetCamera()->GetProjectionMatrix());
+          shadowViewCam->GetCamera()->SetTransform (light->GetMovable()->GetTransform());
+          csPlane3 farplane(0,0,-1,distance);
+          shadowViewCam->GetCamera()->SetFarPlane(&farplane);
 
-        typename RenderTree::ContextNode* shadowMapCtx = 
-          renderTree.CreateContext (context.renderView);
-        shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
+          csBox2 clipBox (0, 0, persist.shadowMapSize, persist.shadowMapSize);
+          csRef<iClipper2D> newView;
+          newView.AttachNew (new csBoxClipper (clipBox));
+          newRenderView->SetClipper (newView);
 
-        shadowMapCtx->renderTargets[rtaDepth].texHandle = persist.accumBuffer;
+          typename RenderTree::ContextNode* shadowMapCtx = 
+            renderTree.CreateContext (newRenderView);
+          shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
 
+          shadowMapCtx->renderTargets[rtaDepth].texHandle = viewSetup.renderTargets[i];
 
-        // Setup the new context
-        ShadowmapContextSetup contextFunction (layerConfig,
-          persist.shaderManager, viewSetup);
-        contextFunction (*shadowMapCtx);
+          // Setup the new context
+          ShadowmapContextSetup contextFunction (layerConfig,
+            persist.shaderManager, viewSetup);
+          contextFunction (*shadowMapCtx);
 
 //         csPrintf("New Target %u!\n", currentFrame);
+        }
       }
     };
 
