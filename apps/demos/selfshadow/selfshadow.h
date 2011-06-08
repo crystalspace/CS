@@ -35,6 +35,7 @@ class SelfShadowDemo : public CS::Utility::DemoApplication
   //-- CS::Utility::DemoApplication
   void PrintHelp ();
   void Frame ();
+  bool OnKeyboard (iEvent &event);
 
   //-- csApplicationFramework
   bool Application ();
