@@ -462,13 +462,15 @@ void csReversibleTransform::RotateThis (const csVector3 &v, float angle)
         u.z * omcauz + ca));
 }
 
-void csReversibleTransform::LookAt (
+bool csReversibleTransform::LookAtGeneric (
   const csVector3 &v,
-  const csVector3 &upNeg)
+  const csVector3 &upNeg,
+  csVector3& w1,
+  csVector3& w2,
+  csVector3& w3)
 {
-  csMatrix3 m;  /* initialized to be the identity matrix */
-  csVector3 w1, w2, w3 = v;
   csVector3 up = -upNeg;
+  w3 = v;
 
   float sqr;
   sqr = v * v;
@@ -490,19 +492,159 @@ void csReversibleTransform::LookAt (
 
     w1 *= csQisqrt (sqr);
     w2 = w3 % w1;
-
-    m.m11 = w1.x;
-    m.m12 = w2.x;
-    m.m13 = w3.x;
-    m.m21 = w1.y;
-    m.m22 = w2.y;
-    m.m23 = w3.y;
-    m.m31 = w1.z;
-    m.m32 = w2.z;
-    m.m33 = w3.z;
+    return true;
   }
+  return false;
+}
+
+bool csReversibleTransform::LookAt (
+  const csVector3 &v,
+  const csVector3 &upNeg)
+{
+  if (!LookAtZUpY (v, upNeg))
+  {
+    SetT2O (csMatrix3 ());
+    return false;
+  }
+  return true;
+}
+
+bool csReversibleTransform::LookAtZUpY (
+  const csVector3 &v,
+  const csVector3 &upNeg)
+{
+  csMatrix3 m;  /* initialized to be the identity matrix */
+  csVector3 w1, w2, w3;
+  if (!LookAtGeneric (v, upNeg, w1, w2, w3))
+    return false;
+
+  m.m11 = w1.x;
+  m.m12 = w2.x;
+  m.m13 = w3.x;
+  m.m21 = w1.y;
+  m.m22 = w2.y;
+  m.m23 = w3.y;
+  m.m31 = w1.z;
+  m.m32 = w2.z;
+  m.m33 = w3.z;
 
   SetT2O (m);
+  return true;
+}
+
+bool csReversibleTransform::LookAtZUpX (
+  const csVector3 &v,
+  const csVector3 &upNeg)
+{
+  csMatrix3 m;  /* initialized to be the identity matrix */
+  csVector3 w1, w2, w3;
+  if (!LookAtGeneric (v, upNeg, w2, w1, w3))
+    return false;
+
+  m.m11 = w1.x;
+  m.m12 = w2.x;
+  m.m13 = w3.x;
+  m.m21 = w1.y;
+  m.m22 = w2.y;
+  m.m23 = w3.y;
+  m.m31 = w1.z;
+  m.m32 = w2.z;
+  m.m33 = w3.z;
+
+  SetT2O (m);
+  return true;
+}
+
+bool csReversibleTransform::LookAtXUpZ (
+  const csVector3 &v,
+  const csVector3 &upNeg)
+{
+  csMatrix3 m;  /* initialized to be the identity matrix */
+  csVector3 w1, w2, w3;
+  if (!LookAtGeneric (v, upNeg, w2, w3, w1))
+    return false;
+
+  m.m11 = w1.x;
+  m.m12 = w2.x;
+  m.m13 = w3.x;
+  m.m21 = w1.y;
+  m.m22 = w2.y;
+  m.m23 = w3.y;
+  m.m31 = w1.z;
+  m.m32 = w2.z;
+  m.m33 = w3.z;
+
+  SetT2O (m);
+  return true;
+}
+
+bool csReversibleTransform::LookAtXUpY (
+  const csVector3 &v,
+  const csVector3 &upNeg)
+{
+  csMatrix3 m;  /* initialized to be the identity matrix */
+  csVector3 w1, w2, w3;
+  if (!LookAtGeneric (v, upNeg, w3, w2, w1))
+    return false;
+
+  m.m11 = w1.x;
+  m.m12 = w2.x;
+  m.m13 = w3.x;
+  m.m21 = w1.y;
+  m.m22 = w2.y;
+  m.m23 = w3.y;
+  m.m31 = w1.z;
+  m.m32 = w2.z;
+  m.m33 = w3.z;
+
+  SetT2O (m);
+  return true;
+}
+
+bool csReversibleTransform::LookAtYUpX (
+  const csVector3 &v,
+  const csVector3 &upNeg)
+{
+  csMatrix3 m;  /* initialized to be the identity matrix */
+  csVector3 w1, w2, w3;
+  if (!LookAtGeneric (v, upNeg, w3, w1, w2))
+    return false;
+
+  m.m11 = w1.x;
+  m.m12 = w2.x;
+  m.m13 = w3.x;
+  m.m21 = w1.y;
+  m.m22 = w2.y;
+  m.m23 = w3.y;
+  m.m31 = w1.z;
+  m.m32 = w2.z;
+  m.m33 = w3.z;
+
+  SetT2O (m);
+  return true;
+}
+
+bool csReversibleTransform::LookAtYUpZ (
+  const csVector3 &v,
+  const csVector3 &upNeg)
+{
+  csMatrix3 m;  /* initialized to be the identity matrix */
+  csVector3 w1, w2, w3;
+  if (!LookAtGeneric (v, upNeg, w2, w1, w3))
+    return false;
+
+  m.m11 = w1.x;
+  m.m12 = w2.x;
+  m.m13 = w3.x;
+  m.m21 = w1.y;
+  m.m22 = w2.y;
+  m.m23 = w3.y;
+  m.m31 = w1.z;
+  m.m32 = w2.z;
+  m.m33 = w3.z;
+
+  SetT2O (m);
+  return true;
 }
 
 //---------------------------------------------------------------------------
