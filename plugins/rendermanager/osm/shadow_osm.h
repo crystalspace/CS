@@ -64,13 +64,13 @@ namespace RenderManager
         csConfigAccess cfg (objectReg);
         if (configPrefix.IsEmpty())
         {
-          settings.ReadSettings (objectReg, "Depth");
+          settings.ReadSettings (objectReg, "Alpha");
         }
         else
         {
           settings.ReadSettings (objectReg, 
             cfg->GetStr (
-            csString().Format ("%s.ShadowsType", configPrefix.GetData()), "Depth"));
+            csString().Format ("%s.ShadowsType", configPrefix.GetData()), "Alpha"));
           maps = cfg->GetInt (
             csString().Format ("%s.Maps", configPrefix.GetData()), 5);
           shadowMapSize = cfg->GetInt (
@@ -107,7 +107,7 @@ namespace RenderManager
             persist.g3d->GetTextureManager ()->CreateTexture (g2d->GetWidth (),
             g2d->GetHeight (),
             csimg2D,
-            "d32",
+            "abgr32_f",
             flags,
             &errStr);
 
@@ -226,7 +226,7 @@ namespace RenderManager
             renderTree.CreateContext (newRenderView);
           shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
 
-          shadowMapCtx->renderTargets[rtaDepth].texHandle = viewSetup.renderTargets[i];
+          shadowMapCtx->renderTargets[rtaColor0].texHandle = viewSetup.renderTargets[i];
 
           // Setup the new context
           ShadowmapContextSetup contextFunction (layerConfig,
