@@ -13,6 +13,23 @@
         <texture name="ground01.jpg">
             <file>textures/ground01.jpg</file>
         </texture>
+        <texture name="generic_grass1_col.jpg">
+            <file>textures/generic_grass1_col.jpg</file>
+        </texture>
+        <texture name="generic_darkrock_col.jpg">
+            <file>textures/generic_darkrock_col.jpg</file>
+        </texture>
+        <texture name="stone_cliff_tile_001_col.jpg">
+            <file>textures/stone_cliff_tile_001_col.jpg</file>
+        </texture>
+        <texture name="alphamap_00000_00000_000_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_000_1.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="generic_grayrock1_col.jpg">
+            <file>textures/generic_grayrock1_col.jpg</file>
+        </texture>
         <texture name="basemap_00000_00000_001.PNG">
             <file>basemaps/basemap_00000_00000_001.PNG</file>
             <class>nosharpen</class>
@@ -23,6 +40,11 @@
             <class>lookup</class>
             <npots />
         </texture>
+        <texture name="alphamap_00000_00000_001_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_001_1.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
         <texture name="basemap_00000_00000_002.PNG">
             <file>basemaps/basemap_00000_00000_002.PNG</file>
             <class>nosharpen</class>
@@ -30,6 +52,11 @@
         </texture>
         <texture name="alphamap_00000_00000_002_0.PNG">
             <file>alphamaps/alphamap_00000_00000_002_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="alphamap_00000_00000_002_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_002_1.PNG</file>
             <class>lookup</class>
             <npots />
         </texture>
@@ -93,22 +120,10 @@
             <class>lookup</class>
             <npots />
         </texture>
-        <texture name="generic_grass1_col.jpg">
-            <file>textures/generic_grass1_col.jpg</file>
-        </texture>
-        <texture name="stone_cliff_tile_001_col.jpg">
-            <file>textures/stone_cliff_tile_001_col.jpg</file>
-        </texture>
-        <texture name="generic_grayrock1_col.jpg">
-            <file>textures/generic_grayrock1_col.jpg</file>
-        </texture>
         <texture name="alphamap_00000_00000_008_1.PNG">
             <file>alphamaps/alphamap_00000_00000_008_1.PNG</file>
             <class>lookup</class>
             <npots />
-        </texture>
-        <texture name="generic_darkrock_col.jpg">
-            <file>textures/generic_darkrock_col.jpg</file>
         </texture>
         <texture name="generic_lightrock_col.jpg">
             <file>textures/generic_lightrock_col.jpg</file>
@@ -123,13 +138,13 @@
             <class>lookup</class>
             <npots />
         </texture>
-        <texture name="generic_grass4_col.jpg">
-            <file>textures/generic_grass4_col.jpg</file>
-        </texture>
         <texture name="alphamap_00000_00000_009_1.PNG">
             <file>alphamaps/alphamap_00000_00000_009_1.PNG</file>
             <class>lookup</class>
             <npots />
+        </texture>
+        <texture name="generic_grass4_col.jpg">
+            <file>textures/generic_grass4_col.jpg</file>
         </texture>
         <texture name="generic_grass4_dirt2.jpg">
             <file>textures/generic_grass4_dirt2.jpg</file>
@@ -214,6 +229,11 @@
         </texture>
         <texture name="alphamap_00000_00000_016_0.PNG">
             <file>alphamaps/alphamap_00000_00000_016_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="alphamap_00000_00000_016_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_016_1.PNG</file>
             <class>lookup</class>
             <npots />
         </texture>
@@ -309,6 +329,11 @@
         </texture>
         <texture name="alphamap_00000_00000_024_0.PNG">
             <file>alphamaps/alphamap_00000_00000_024_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="alphamap_00000_00000_024_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_024_1.PNG</file>
             <class>lookup</class>
             <npots />
         </texture>
@@ -412,6 +437,11 @@
             <class>lookup</class>
             <npots />
         </texture>
+        <texture name="alphamap_00000_00000_032_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_032_1.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
         <texture name="basemap_00000_00000_033.PNG">
             <file>basemaps/basemap_00000_00000_033.PNG</file>
             <class>nosharpen</class>
@@ -477,6 +507,11 @@
             <class>lookup</class>
             <npots />
         </texture>
+        <texture name="alphamap_00000_00000_037_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_037_1.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
         <texture name="basemap_00000_00000_038.PNG">
             <file>basemaps/basemap_00000_00000_038.PNG</file>
             <class>nosharpen</class>
@@ -484,6 +519,11 @@
         </texture>
         <texture name="alphamap_00000_00000_038_0.PNG">
             <file>alphamaps/alphamap_00000_00000_038_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="alphamap_00000_00000_038_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_038_1.PNG</file>
             <class>lookup</class>
             <npots />
         </texture>
@@ -504,6 +544,11 @@
         </texture>
         <texture name="alphamap_00000_00000_040_0.PNG">
             <file>alphamaps/alphamap_00000_00000_040_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="alphamap_00000_00000_040_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_040_1.PNG</file>
             <class>lookup</class>
             <npots />
         </texture>
@@ -529,6 +574,11 @@
         </texture>
         <texture name="alphamap_00000_00000_042_0.PNG">
             <file>alphamaps/alphamap_00000_00000_042_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="alphamap_00000_00000_042_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_042_1.PNG</file>
             <class>lookup</class>
             <npots />
         </texture>
@@ -567,6 +617,11 @@
             <class>lookup</class>
             <npots />
         </texture>
+        <texture name="alphamap_00000_00000_045_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_045_1.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
         <texture name="basemap_00000_00000_046.PNG">
             <file>basemaps/basemap_00000_00000_046.PNG</file>
             <class>nosharpen</class>
@@ -574,6 +629,11 @@
         </texture>
         <texture name="alphamap_00000_00000_046_0.PNG">
             <file>alphamaps/alphamap_00000_00000_046_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="alphamap_00000_00000_046_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_046_1.PNG</file>
             <class>lookup</class>
             <npots />
         </texture>
@@ -594,6 +654,11 @@
         </texture>
         <texture name="alphamap_00000_00000_048_0.PNG">
             <file>alphamaps/alphamap_00000_00000_048_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="alphamap_00000_00000_048_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_048_1.PNG</file>
             <class>lookup</class>
             <npots />
         </texture>
@@ -654,6 +719,11 @@
         </texture>
         <texture name="alphamap_00000_00000_054_0.PNG">
             <file>alphamaps/alphamap_00000_00000_054_0.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
+        <texture name="alphamap_00000_00000_054_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_054_1.PNG</file>
             <class>lookup</class>
             <npots />
         </texture>
@@ -727,6 +797,11 @@
             <class>lookup</class>
             <npots />
         </texture>
+        <texture name="alphamap_00000_00000_061_1.PNG">
+            <file>alphamaps/alphamap_00000_00000_061_1.PNG</file>
+            <class>lookup</class>
+            <npots />
+        </texture>
         <texture name="basemap_00000_00000_062.PNG">
             <file>basemaps/basemap_00000_00000_062.PNG</file>
             <class>nosharpen</class>
@@ -770,6 +845,11 @@
             <shadervar type="vector2" name="texture scale">64,64</shadervar>
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_000_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_000_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_001">
             <shader type="base">terrain_basemap</shader>
@@ -784,6 +864,11 @@
             <shadervar type="vector2" name="texture scale">64,64</shadervar>
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_001_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_001_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_002">
             <shader type="base">terrain_basemap</shader>
@@ -798,6 +883,11 @@
             <shadervar type="vector2" name="texture scale">64,64</shadervar>
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_002_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_002_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_003">
             <shader type="base">terrain_basemap</shader>
@@ -883,10 +973,10 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_008_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 3">stone_cliff_tile_001_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 4">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
             <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_008_1.PNG</shadervar>
-            <shadervar type="texture" name="tex diffuse 5">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 6">generic_lightrock_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_009">
@@ -903,12 +993,12 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_009_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
             <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_009_1.PNG</shadervar>
-            <shadervar type="texture" name="tex diffuse 5">generic_grass4_dirt2.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 6">generic_grayrock1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 7">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 7">generic_grass4_dirt2.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 8">generic_lightrock_col.jpg</shadervar>
             <shadervar type="texture" name="tex alpha map 3">alphamap_00000_00000_009_2.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 9">grass_01.png</shadervar>
@@ -927,11 +1017,11 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_010_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
             <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_010_1.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 6">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_grass4_col.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 7">grass_01.png</shadervar>
         </material>
         <material name="basemap_00000_00000_011">
@@ -948,6 +1038,8 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_011_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_grass4_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_012">
             <shader type="base">terrain_basemap</shader>
@@ -962,6 +1054,8 @@
             <shadervar type="vector2" name="texture scale">64,64</shadervar>
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_012_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_013">
             <shader type="base">terrain_basemap</shader>
@@ -1019,8 +1113,11 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_016_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 4">grass_01.png</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_016_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">grass_01.png</shadervar>
         </material>
         <material name="basemap_00000_00000_017">
             <shader type="base">terrain_basemap</shader>
@@ -1035,12 +1132,12 @@
             <shadervar type="vector2" name="texture scale">64,64</shadervar>
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_017_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">generic_grass1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 2">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_darkrock_col.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 3">stone_cliff_tile_001_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 4">generic_grass4_dirt2.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_grayrock1_col.jpg</shadervar>
             <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_017_1.PNG</shadervar>
-            <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 6">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_grass4_dirt2.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 7">grass_01.png</shadervar>
         </material>
         <material name="basemap_00000_00000_018">
@@ -1056,12 +1153,12 @@
             <shadervar type="vector2" name="texture scale">64,64</shadervar>
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_018_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">generic_grass1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 2">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_darkrock_col.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 3">stone_cliff_tile_001_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 4">generic_grass4_dirt2.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_grayrock1_col.jpg</shadervar>
             <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_018_1.PNG</shadervar>
-            <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 6">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_grass4_dirt2.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 7">grass_01.png</shadervar>
         </material>
         <material name="basemap_00000_00000_019">
@@ -1078,10 +1175,11 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_019_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 4">generic_grass4_dirt2.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_grass4_col.jpg</shadervar>
             <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_019_1.PNG</shadervar>
-            <shadervar type="texture" name="tex diffuse 5">grass_01.png</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grass4_dirt2.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">grass_01.png</shadervar>
         </material>
         <material name="basemap_00000_00000_020">
             <shader type="base">terrain_basemap</shader>
@@ -1097,6 +1195,7 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_020_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_021">
             <shader type="base">terrain_basemap</shader>
@@ -1111,6 +1210,7 @@
             <shadervar type="vector2" name="texture scale">64,64</shadervar>
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_021_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_022">
             <shader type="base">terrain_basemap</shader>
@@ -1154,8 +1254,11 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_024_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 4">grass_01.png</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_024_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">grass_01.png</shadervar>
         </material>
         <material name="basemap_00000_00000_025">
             <shader type="base">terrain_basemap</shader>
@@ -1170,12 +1273,12 @@
             <shadervar type="vector2" name="texture scale">64,64</shadervar>
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_025_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">generic_grass1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 2">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_darkrock_col.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 3">stone_cliff_tile_001_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 4">generic_grass4_dirt2.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_grayrock1_col.jpg</shadervar>
             <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_025_1.PNG</shadervar>
-            <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 6">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_grass4_dirt2.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 7">grass_01.png</shadervar>
         </material>
         <material name="basemap_00000_00000_026">
@@ -1191,11 +1294,11 @@
             <shadervar type="vector2" name="texture scale">64,64</shadervar>
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_026_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">generic_grass1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 2">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_darkrock_col.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 3">stone_cliff_tile_001_col.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 4">generic_grayrock1_col.jpg</shadervar>
             <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_026_1.PNG</shadervar>
-            <shadervar type="texture" name="tex diffuse 5">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grass4_col.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 6">generic_lightrock_col.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 7">grass_01.png</shadervar>
         </material>
@@ -1213,12 +1316,12 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_027_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
             <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_027_1.PNG</shadervar>
-            <shadervar type="texture" name="tex diffuse 5">generic_grass4_dirt2.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 6">generic_grayrock1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 7">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 7">generic_grass4_dirt2.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 8">generic_lightrock_col.jpg</shadervar>
             <shadervar type="texture" name="tex alpha map 3">alphamap_00000_00000_027_2.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 9">grass_01.png</shadervar>
@@ -1237,6 +1340,7 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_028_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_029">
             <shader type="base">terrain_basemap</shader>
@@ -1251,6 +1355,7 @@
             <shadervar type="vector2" name="texture scale">64,64</shadervar>
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_029_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_030">
             <shader type="base">terrain_basemap</shader>
@@ -1294,6 +1399,11 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_032_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_032_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_grass4_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_033">
             <shader type="base">terrain_basemap</shader>
@@ -1308,12 +1418,13 @@
             <shadervar type="vector2" name="texture scale">64,64</shadervar>
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_033_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">generic_grass1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 2">generic_grass4_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 3">generic_grayrock1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 4">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_grayrock1_col.jpg</shadervar>
             <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_033_1.PNG</shadervar>
-            <shadervar type="texture" name="tex diffuse 5">generic_lightrock_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 6">grass_01.png</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_lightrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 7">grass_01.png</shadervar>
         </material>
         <material name="basemap_00000_00000_034">
             <shader type="base">terrain_basemap</shader>
@@ -1328,9 +1439,9 @@
             <shadervar type="vector2" name="texture scale">64,64</shadervar>
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_034_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">generic_grass1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 2">stone_cliff_tile_001_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 3">generic_grayrock1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 4">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_grayrock1_col.jpg</shadervar>
             <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_034_1.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 5">generic_lightrock_col.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 6">grass_01.png</shadervar>
@@ -1349,10 +1460,10 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_035_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 3">stone_cliff_tile_001_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 4">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
             <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_035_1.PNG</shadervar>
-            <shadervar type="texture" name="tex diffuse 5">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 6">generic_lightrock_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_036">
@@ -1369,6 +1480,7 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_036_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_037">
             <shader type="base">terrain_basemap</shader>
@@ -1384,6 +1496,11 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_037_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_037_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_grass4_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_038">
             <shader type="base">terrain_basemap</shader>
@@ -1399,6 +1516,11 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_038_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_038_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_grass4_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_039">
             <shader type="base">terrain_basemap</shader>
@@ -1428,6 +1550,11 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_040_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_040_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_grass4_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_041">
             <shader type="base">terrain_basemap</shader>
@@ -1443,10 +1570,12 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_041_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 3">generic_grayrock1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 4">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
             <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_041_1.PNG</shadervar>
-            <shadervar type="texture" name="tex diffuse 5">generic_lightrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 7">generic_lightrock_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_042">
             <shader type="base">terrain_basemap</shader>
@@ -1461,9 +1590,11 @@
             <shadervar type="vector2" name="texture scale">64,64</shadervar>
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_042_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">generic_grass1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 2">generic_grayrock1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 4">generic_lightrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_042_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_lightrock_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_043">
             <shader type="base">terrain_basemap</shader>
@@ -1478,11 +1609,12 @@
             <shadervar type="vector2" name="texture scale">64,64</shadervar>
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_043_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">generic_grass1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 2">stone_cliff_tile_001_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 3">generic_grayrock1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 4">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_grayrock1_col.jpg</shadervar>
             <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_043_1.PNG</shadervar>
-            <shadervar type="texture" name="tex diffuse 5">generic_lightrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grass4_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_lightrock_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_044">
             <shader type="base">terrain_basemap</shader>
@@ -1498,6 +1630,7 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_044_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_045">
             <shader type="base">terrain_basemap</shader>
@@ -1512,6 +1645,11 @@
             <shadervar type="vector2" name="texture scale">64,64</shadervar>
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_045_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_045_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grass4_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_046">
             <shader type="base">terrain_basemap</shader>
@@ -1527,6 +1665,11 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_046_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_046_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_grass4_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_047">
             <shader type="base">terrain_basemap</shader>
@@ -1555,6 +1698,12 @@
             <shadervar type="vector2" name="texture scale">64,64</shadervar>
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_048_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_048_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_grass4_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_049">
             <shader type="base">terrain_basemap</shader>
@@ -1570,6 +1719,7 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_049_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_050">
             <shader type="base">terrain_basemap</shader>
@@ -1586,6 +1736,7 @@
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">generic_grass4_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_051">
             <shader type="base">terrain_basemap</shader>
@@ -1601,6 +1752,7 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_051_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_052">
             <shader type="base">terrain_basemap</shader>
@@ -1614,9 +1766,8 @@
             <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
             <shadervar type="vector2" name="texture scale">64,64</shadervar>
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_052_0.PNG</shadervar>
-            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_grass4_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_053">
             <shader type="base">terrain_basemap</shader>
@@ -1630,9 +1781,9 @@
             <shadervar type="vector4" name="alpha scaleoffset">0.9922480583,0.9922480583,0.0038759690,0.0038759690</shadervar>
             <shadervar type="vector2" name="texture scale">64,64</shadervar>
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_053_0.PNG</shadervar>
-            <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
-            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 1">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 2">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_054">
             <shader type="base">terrain_basemap</shader>
@@ -1648,6 +1799,11 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_054_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_054_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grayrock1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 6">generic_grass4_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_055">
             <shader type="base">terrain_basemap</shader>
@@ -1719,6 +1875,7 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_059_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_060">
             <shader type="base">terrain_basemap</shader>
@@ -1734,6 +1891,7 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_060_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_grass4_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_061">
             <shader type="base">terrain_basemap</shader>
@@ -1749,6 +1907,10 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_061_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
+            <shadervar type="texture" name="tex alpha map 2">alphamap_00000_00000_061_1.PNG</shadervar>
+            <shadervar type="texture" name="tex diffuse 5">generic_grass4_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_062">
             <shader type="base">terrain_basemap</shader>
@@ -1764,6 +1926,8 @@
             <shadervar type="texture" name="tex alpha map 1">alphamap_00000_00000_062_0.PNG</shadervar>
             <shadervar type="texture" name="tex diffuse 1">ground01.jpg</shadervar>
             <shadervar type="texture" name="tex diffuse 2">generic_grass1_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 3">generic_darkrock_col.jpg</shadervar>
+            <shadervar type="texture" name="tex diffuse 4">stone_cliff_tile_001_col.jpg</shadervar>
         </material>
         <material name="basemap_00000_00000_063">
             <shader type="base">terrain_basemap</shader>
