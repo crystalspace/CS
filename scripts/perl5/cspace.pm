@@ -11864,13 +11864,21 @@ sub new {
 
 *Description = *cspacec::csMatrix3_Description;
 *Row1 = *cspacec::csMatrix3_Row1;
+*SetRow1 = *cspacec::csMatrix3_SetRow1;
 *Row2 = *cspacec::csMatrix3_Row2;
+*SetRow2 = *cspacec::csMatrix3_SetRow2;
 *Row3 = *cspacec::csMatrix3_Row3;
+*SetRow3 = *cspacec::csMatrix3_SetRow3;
 *Row = *cspacec::csMatrix3_Row;
+*SetRow = *cspacec::csMatrix3_SetRow;
 *Col1 = *cspacec::csMatrix3_Col1;
+*SetCol1 = *cspacec::csMatrix3_SetCol1;
 *Col2 = *cspacec::csMatrix3_Col2;
+*SetCol2 = *cspacec::csMatrix3_SetCol2;
 *Col3 = *cspacec::csMatrix3_Col3;
+*SetCol3 = *cspacec::csMatrix3_SetCol3;
 *Col = *cspacec::csMatrix3_Col;
+*SetCol = *cspacec::csMatrix3_SetCol;
 *Set = *cspacec::csMatrix3_Set;
 *__iadd__ = *cspacec::csMatrix3___iadd__;
 *__isub__ = *cspacec::csMatrix3___isub__;
@@ -12221,6 +12229,12 @@ sub new {
 *RotateOther = *cspacec::csReversibleTransform_RotateOther;
 *RotateThis = *cspacec::csReversibleTransform_RotateThis;
 *LookAt = *cspacec::csReversibleTransform_LookAt;
+*LookAtZUpY = *cspacec::csReversibleTransform_LookAtZUpY;
+*LookAtZUpX = *cspacec::csReversibleTransform_LookAtZUpX;
+*LookAtYUpZ = *cspacec::csReversibleTransform_LookAtYUpZ;
+*LookAtYUpX = *cspacec::csReversibleTransform_LookAtYUpX;
+*LookAtXUpZ = *cspacec::csReversibleTransform_LookAtXUpZ;
+*LookAtXUpY = *cspacec::csReversibleTransform_LookAtXUpY;
 *__mul__ = *cspacec::csReversibleTransform___mul__;
 *__div__ = *cspacec::csReversibleTransform___div__;
 sub DESTROY {
