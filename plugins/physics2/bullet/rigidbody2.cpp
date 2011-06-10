@@ -4,9 +4,9 @@ CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
 csBulletRigidBody::csBulletRigidBody (iPhysicalSystem* phySys)
 : scfImplementationType (this, phySys), density (1.0f),
-/*bodyType (CS::Physics::BODY_RIGID),*/ physicalState (CS::Physics::STATE_DYNAMIC)
+physicalState (CS::Physics::STATE_DYNAMIC)
 {
-  
+  isPhysics = true;
 }
 
 csBulletRigidBody::~csBulletRigidBody ()
@@ -14,18 +14,145 @@ csBulletRigidBody::~csBulletRigidBody ()
   RemoveBulletObject ();
 }
 
-void csBulletRigidBody::RebuildObject ()
+//Lulu: Seems like not neccessary..
+//void csBulletRigidBody::RebuildObject ()
+//{
+//  //TODO
+//  size_t colliderCount = colliders.GetSize ();
+//  if (colliderCount == 0)
+//  {  
+//    csFPrintf  (stderr, "csBulletCollisionObject: Haven't add any collider to the object.\nRebuild failed.\n");
+//    return;
+//  }
+//
+//  if(compoundShape)
+//    delete compoundShape;
+//
+//  if(colliderCount >= 2)
+//  {  
+//    compoundShape = new btCompoundShape();
+//    for (size_t i = 0; i < colliderCount; i++)
+//    {
+//      btTransform relaTrans = CSToBullet (relaTransforms[i], system->internalScale);
+//      compoundShape->addChildShape (relaTrans, colliders[i]->shape);
+//    }
+//    //Shift children shape?
+//  }
+//
+//  bool wasInWorld = false;
+//  if (insideWorld)
+//  {
+//    wasInWorld = true;
+//    RemoveBulletObject ();
+//  }
+//
+//  btCollisionShape* shape;
+//  if (compoundShape == NULL)
+//  {
+//    //only one collider.
+//    shape = colliders[0]->shape;
+//  }
+//  else if (compoundChanged)
+//  {
+//    //use compound shape.
+//    shape = compoundShape;
+//  }
+//
+//  if (wasInWorld)
+//    AddBulletObject ();
+//}
+
+void csBulletRigidBody::AddCollider (CS::Collision::iCollider* collider, 
+                                     const csOrthoTransform& relaTrans)
 {
-  //TODO
+  csRef<csBulletCollider> coll (dynamic_cast<csBulletCollider*>(collider));
+  if (physicalState != CS::Physics::STATE_STATIC)
+  {
+    CS::Collision::ColliderType type = collider->GetGeometryType ();
+    if (type == CS::Collision::COLLIDER_CONCAVE_MESH
+      ||type == CS::Collision::COLLIDER_CONCAVE_MESH_SCALED
+      ||type == CS::Collision::COLLIDER_PLANE
+      ||type == CS::Collision::COLLIDER_TERRAIN)
+    {
+      csFPrintf (stderr, "csBulletRigidBody: Can not add static collider to non-static body.\n");
+      return;
+    }
+  }
+  colliders.Push (coll);
+  relaTransforms.Push (relaTrans);
+  shapeChanged = true;
 }
 
 void csBulletRigidBody::RemoveBulletObject ()
 {
   if (insideWorld)
   {
-    sector->bulletWorld->removeRigidBody (GetBulletRigidPointer ());
+    sector->bulletWorld->removeRigidBody (btBody);
+    delete btBody;
+    btBody = btObject = NULL;
     insideWorld = false;
   }
+}
+
+void csBulletRigidBody::AddBulletObject ()
+{
+  if (insideWorld)
+    RemoveBulletObject ();
+
+  btVector3 localInertia (0.0f, 0.0f, 0.0f);
+  float mass = GetMass ();
+  //Create btRigidBody
+  if (compoundShape)
+  {
+    int shapeCount = compoundShape->getNumChildShapes ();
+    if (shapeChanged)
+    {
+      btTransform principalAxis;
+      btVector3 principalInertia;
+      compoundShape->calculatePrincipalAxisTransform
+        (mass, principalAxis, principalInertia);
+
+      // create new motion state
+      btTransform trans;
+      motionState->getWorldTransform (trans);
+      trans = trans * motionState->inversePrincipalAxis;
+      delete motionState;
+      motionState = new csBulletMotionState (this, trans * principalAxis,
+        principalAxis);
+
+      // apply principal axis
+      // creation is faster using a new compound to store the shifted children
+      btCompoundShape newCompoundShape = new btCompoundShape();
+      for (int i = 0; i < shapeCount; i++)
+      {
+        btTransform newChildTransform =
+          principalAxis.inverse() * compoundShape->getChildTransform (i);
+        newCompoundShape->addChildShape(newChildTransform,
+          compoundShape->getChildShape (i));
+        shapeChanged = false;
+      }
+      delete compoundShape;
+      compoundShape = newCompoundShape;
+    }
+
+    compoundShape->calculateLocalInertia (mass, localInertia);
+  }
+
+  btRigidBody::btRigidBodyConstructionInfo infos (mass, motionState,
+    compoundShape, localInertia);
+
+  infos.m_friction = friction;
+  infos.m_restitution = elasticity;
+  infos.m_linearDamping = linearDampening;
+  infos.m_angularDamping = angularDampening;
+
+  // create new rigid body
+  btBody = new btRigidBody (infos);
+  btObject = btBody;
+
+  sector->bulletWorld->addRigidBody (btBody);
+  btBody->setUserPointer (static_cast<iPhysicalBody*> (this));
+  insideWorld = true;
 }
 
 bool csBulletRigidBody::Disable ()
@@ -34,7 +161,7 @@ bool csBulletRigidBody::Disable ()
  SetAngularVelocity (csVector3 (0.0f));
  if (btBody)
  {
-   btBody->setInterpolationWorldTransform (body->getWorldTransform());
+   btBody->setInterpolationWorldTransform (btBody->getWorldTransform());
    btBody->setActivationState (ISLAND_SLEEPING);
  }
  return false;
@@ -136,7 +263,8 @@ bool csBulletRigidBody::SetState (RigidBodyState state)
         }
     }
 
-    RemoveBulletObject ();
+    if (insideWorld)
+      sector->bulletWorld->removeRigidBody (btBody);
 
     btVector3 linearVelocity (0.0f, 0.0f, 0.0f);
     btVector3 angularVelocity (0.0f, 0.0f, 0.0f);
@@ -199,7 +327,8 @@ bool csBulletRigidBody::SetState (RigidBodyState state)
       btBody->updateInertiaTensor ();
     }
 
-    AddBulletObject ();
+    if (insideWorld)
+      sector->bulletWorld->addRigidBody (btBody);
     physicalState = state;
     return true;
   }

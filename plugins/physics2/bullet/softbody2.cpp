@@ -6,6 +6,7 @@ csBulletSoftBody::csBulletSoftBody (csBulletSystem* phySys, btSoftBody* body)
   :scfImplementationType (this, phySys), btBody (body), btObject (body)
 {
   btBody->setUserPointer (dynamic_cast<iPhysicalBody*> (this));
+  isPhysics = true;
 }
 
 csBulletSoftBody::~csBulletSoftBody ()
@@ -16,20 +17,19 @@ csBulletSoftBody::~csBulletSoftBody ()
 
 void csBulletSoftBody::SetTransform (const csOrthoTransform& trans)
 {
-  //TODO check the transform of softbody.
   transform = CSToBullet (trans, system->internalScale);
   btBody->transform (btTrans);
 }
 
 csOrthoTransform csBulletSoftBody::GetTransform ()
 {
-//TODO check the transform of softbody.
   return BulletToCS (transform, system->inverseInternalScale);
 }
 
 void csBulletSoftBody::RebuildObject ()
 {
-//TODO
+  btBody->randomizeConstraints();
+  btBody->setCollisionFlags(0);
 }
 
 HitBeamResult csBulletSoftBody::HitBeam (const csVector3& start, const csVector3& end)
@@ -88,7 +88,14 @@ void csBulletSoftBody::RemoveBulletObject ()
 
 void csBulletSoftBody::AddBulletObject ()
 {
-  //Need to set worldInfo...
+  if (!insideWorld)
+  {
+    btBody->m_worldInfo = sector->softWorldInfo;
+    btSoftRigidDynamicsWorld* softWorld =
+      static_cast<btSoftRigidDynamicsWorld*> (sector->bulletWorld);
+    softWorld->addSoftBody (btBody);
+    insideWorld = true;
+  }
 }
 
 bool csBulletSoftBody::Disable ()
@@ -127,7 +134,6 @@ void csBulletSoftBody::SetDensity (float density)
 
 float csBulletSoftBody::GetVolume ()
 {
-//TODO softbody's getVolume()?
   if (btBody)
     return btBody->getVolume ();
   else
@@ -504,6 +510,21 @@ void csBulletSoftBody::SetShapeMatching (bool match)
     btBody->setPose (false,true);
   else
     btBody->setPose (true,false);
+}
+
+void csBulletSoftBody::SetBendingConstraint (bool bending)
+{
+  if (bending)
+  {
+    btSoftBody::Material*	pm=btBody->m_materials[0];
+    btBody->generateBendingConstraints (2,pm);
+  }
+}
+
+void csBulletSoftBody::GenerateCluster (int iter)
+{
+  if (btBody->m_cfg.collisions & (btSoftBody::fCollision::CL_RS + btSoftBody::fCollision::CL_SS))
+    btBody->generateClusters(iter);
 }
 }
 CS_PLUGIN_NAMESPACE_END (Bullet2)

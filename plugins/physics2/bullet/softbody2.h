@@ -12,6 +12,7 @@ private:
   //CS::Physics::Bullet::BodyType bodyType;
   float friction;
   float density;
+  bool bending;
   btSoftBody* btBody;   //Don't know if I should add this to rigidbody too.
   struct AnimatedAnchor
   {
@@ -26,7 +27,7 @@ private:
 
 public:
   csBulletSoftBody (csBulletSystem* phySys, btSoftBody* body);
-  ~csBulletSoftBody ();
+  virtual ~csBulletSoftBody ();
 
   //iCollisionObject
 
@@ -143,6 +144,9 @@ public:
   virtual void SetClusterIterations (int iter);
 
   virtual void SetShapeMatching (bool match);
+  virtual void SetBendingConstraint (bool bending);
+
+  virtual void GenerateCluster (int iter);
 };
 }
 CS_PLUGIN_NAMESPACE_END (Bullet2)

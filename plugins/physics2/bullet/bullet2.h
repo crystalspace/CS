@@ -263,6 +263,13 @@ public:
   virtual csRef<iRigidBody> CreateRigidBody ();
 
   virtual csRef<iJoint> CreateJoint ();
+  virtual csRef<iJoint> CreateRigidP2PJoint (const csVector3 position);
+  virtual csRef<iJoint> CreateRigidSlideJoint (const csOrthoTransform trans,
+    float minDist, float maxDist, float minAngle, float maxAngle, int axis);
+  virtual csRef<iJoint> CreateRigidHingeJoint (const csVector3 position,
+    float minAngle, float maxAngle, int axis);
+  virtual csRef<iJoint> CreateSoftLinearJoint (const csVector3 position);
+  virtual csRef<iJoint> CreateSoftAngularJoint (int axis);
  
   virtual csRef<iSoftBody> CreateRope (csVector3 start,
       csVector3 end, size_t segmentCount);

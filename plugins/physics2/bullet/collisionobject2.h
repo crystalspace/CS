@@ -25,7 +25,7 @@ class csBulletCollisionObject: public scfImplementationExt1<
   CollisionObjectType type;
   CollisionGroup collGroup;
   bool insideWorld;
-  bool compoundChanged;
+  bool shapeChanged;
   bool isPhysics;
   bool isTerrain;
 

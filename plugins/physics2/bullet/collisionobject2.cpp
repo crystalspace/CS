@@ -11,7 +11,7 @@ csBulletCollisionObject::csBulletCollisionObject (csBulletSystem* sys)
   compoundShape = NULL;
   movable = NULL;
   insideWorld = false;
-  compoundChanged = false;
+  shapeChanged = false;
   isPhysics = false;
   isTerrain = false;
   btTransform identity;
@@ -120,6 +120,7 @@ void csBulletCollisionObject::AddCollider (CS::Collision::iCollider* collider,
     colliders.Push (coll);
     relaTransforms.Push (relaTrans);
   }
+  shapeChanged = true;
   //User must call RebuildObject() after this.
 }
 
@@ -163,32 +164,35 @@ void csBulletCollisionObject::RebuildObject ()
   size_t colliderCount = colliders.GetSize ();
   if (colliderCount == 0)
   {  
-    csFPrintf  (stderr, "csBulletCollisionObject: Haven't add any collider to the object.\nRebuild failed.\n");
+    csFPrintf (stderr, "csBulletCollisionObject: Haven't add any collider to the object.\nRebuild failed.\n");
     return;
   }
 
-  if(compoundShape)
-    delete compoundShape;
-
-  if (isTerrain)
+  if (shapeChanged)
   {
-    csBulletColliderTerrain* terrainColl = dynamic_cast<csBulletColliderTerrain*> (colliders[0]);
-    for (size_t i = 0; i < terrainColl->bodies.GetSize (); i++)
-    {
-      btRigidBody* body = terrainColl->GetBulletObject (i);
-      body->setUserPointer (this);
-    }
-  }
+    if(compoundShape)
+      delete compoundShape;
 
-  else if(colliderCount >= 2)
-  {  
-    compoundShape = new btCompoundShape();
-    for (size_t i = 0; i < colliderCount; i++)
+    if (isTerrain)
     {
-      btTransform relaTrans = CSToBullet (relaTransforms[i], system->internalScale);
-      compoundShape->addChildShape (relaTrans, colliders[i]->shape);
+      csBulletColliderTerrain* terrainColl = dynamic_cast<csBulletColliderTerrain*> (colliders[0]);
+      for (size_t i = 0; i < terrainColl->bodies.GetSize (); i++)
+      {
+        btRigidBody* body = terrainColl->GetBulletObject (i);
+        body->setUserPointer (this);
+      }
     }
-    //Shift children shape?
+
+    else if(colliderCount >= 2)
+    {  
+      compoundShape = new btCompoundShape();
+      for (size_t i = 0; i < colliderCount; i++)
+      {
+        btTransform relaTrans = CSToBullet (relaTransforms[i], system->internalScale);
+        compoundShape->addChildShape (relaTrans, colliders[i]->shape);
+      }
+      //Shift children shape?
+    }
   }
 
   bool wasInWorld = false;
@@ -204,7 +208,7 @@ void csBulletCollisionObject::RebuildObject ()
     //only one collider.
     shape = colliders[0]->shape;
   }
-  else if (compoundChanged)
+  else if (shapeChanged)
   {
     //use compound shape.
     shape = compoundShape;
@@ -300,6 +304,7 @@ void csBulletCollisionObject::RemoveBulletObject ()
     else
     {
       sector->bulletWorld->removeCollisionObject (btObject);
+      delete btObject;
       btObject = NULL;
     }
     insideWorld = false;
@@ -309,11 +314,13 @@ void csBulletCollisionObject::RemoveBulletObject ()
 void csBulletCollisionObject::AddBulletObject ()
 {
   //Add to world in this function...
-  btVector3 localInertia (0.0f, 0.0f, 0.0f);
+  if (insideWorld)
+    RemoveBulletObject ();
   if (type == COLLISION_OBJECT_BASE)
   {
     if (!isTerrain)
     {
+      btVector3 localInertia (0.0f, 0.0f, 0.0f);
       btRigidBody::btRigidBodyConstructionInfo infos (0.0, motionState,
         shape, localInertia);
       btObject = new btRigidBody (infos);
@@ -326,11 +333,11 @@ void csBulletCollisionObject::AddBulletObject ()
   else if (type == COLLISION_OBJECT_GHOST)
   {
     btObject = new btPairCachingGhostObject ();
+    btObject->setTransform (transform);
     btObject->setUserPointer (static_cast<iCollisionObject*> (this));
     sector->bulletWorld->addCollisionObject (btObject, 
       short(btBroadphaseProxy::DefaultFilter), 
       short(btBroadphaseProxy::AllFilter));
-    btObject->setTransform (transform);
   }
   insideWorld = true;
 }

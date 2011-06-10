@@ -377,18 +377,19 @@ struct iJoint : public virtual iBase
   virtual iPhysicalBody* GetAttachedBody (int index) = 0;
 
   /**
-  * Set the local transformation of the joint.
+  * Set the world transformation of the joint.
   *
   * Set force_update to true if you want to apply the changes right away.
   */
   virtual void SetTransform (const csOrthoTransform& trans,
       bool forceUpdate = true) = 0;
 
-  /// Get the local transformation of the joint.
+  /// Get the world transformation of the joint.
   virtual csOrthoTransform GetTransform () const = 0;
 
   /// Set the new position of the joint, in world coordinates.
-  virtual void SetPosition (const csVector3& position) = 0;
+  virtual void SetPosition (const csVector3& position,
+    bool forceUpdate = true) = 0;
 
   /// Get the current position of the joint, in world coordinates.
   virtual csVector3 GetPosition () const = 0;
@@ -469,7 +470,7 @@ struct iJoint : public virtual iBase
   * Set the maximum allowed angle between the two bodies (in radian). Set force_update to true if 
   * you want to apply the changes right away.
   */
-  virtual void SetMaximumAngle (const csVector3& dist,
+  virtual void SetMaximumAngle (const csVector3& angle,
       bool forceUpdate = true) = 0;
 
   /// Get the maximum allowed angle between the two bodies (in radian).
@@ -507,55 +508,75 @@ struct iJoint : public virtual iBase
   virtual csVector3 GetMaxForce () const = 0;
 
   /**
-  * Set a custom angular constraint axis (have sense only with rotation free minimum along 2 axis).
-  * Set force_update to true if you want to apply the changes right away.
-  */
-  virtual void SetAngularConstraintAxis (const csVector3& axis,
-      bool forceUpdate = true) = 0;
-
-  /// Get the custom angular constraint axis.
-  virtual csVector3 GetAngularConstraintAxis () const = 0;
-
-  /**
   * Rebuild the joint using the current setup. Return true if the rebuilding operation was successful
   * (otherwise the joint won't be active).
   */
   virtual bool RebuildJoint () = 0;
 
   /**
-  * Set the spring constraints on the 3 axes. If true is
+  * Set the spring translation constraints on the 3 axes. If true is
   * passed for an axis then the Joint will have a spring constraint on
   * that axis. If false is passed in then no spring constraint on the
   * axis. Set force_update to true if you want to apply the changes 
   * right away.
   */
-  virtual void SetSpringConstraints (bool X, 
+  virtual void SetSpringTransConstraints (bool X, 
       bool Y, bool Z, 
       bool forceUpdate = true) = 0;
 
-  /// True if this axis has a spring constraint.
-  virtual bool IsXSpringConstrained () = 0;
+  /// True if this axis has a spring translation constraint.
+  virtual bool IsXSpringTransConstrained () = 0;
 
-  /// True if this axis has a spring constraint.
-  virtual bool IsYSpringConstrained () = 0;
+  /// True if this axis has a spring translation constraint.
+  virtual bool IsYSpringTransConstrained () = 0;
 
-  /// True if this axis has a spring constraint.
-  virtual bool IsZSpringConstrained () = 0;
+  /// True if this axis has a spring translation constraint.
+  virtual bool IsZSpringTransConstrained () = 0;
+
+    /**
+  * Set the spring rotation constraints on the 3 axes. If true is
+  * passed for an axis then the Joint will have a spring constraint on
+  * that axis. If false is passed in then no spring constraint on the
+  * axis. Set force_update to true if you want to apply the changes 
+  * right away.
+  */
+  virtual void SetSpringRotConstraints (bool X, 
+      bool Y, bool Z, 
+      bool forceUpdate = true) = 0;
+
+  /// True if this axis has a spring rotation constraint.
+  virtual bool IsXSpringRotConstrained () = 0;
+
+  /// True if this axis has a spring rotation constraint.
+  virtual bool IsYSpringRotConstrained () = 0;
+
+  /// True if this axis has a spring rotation constraint.
+  virtual bool IsZSpringRotConstrained () = 0;
 
   /// Set the stiffness of the spring.
-  virtual void SetStiffness (float stiff) = 0;
+  virtual void SetLinearStiffness (csVector3 stiff, bool forceUpdate = true) = 0;
+
+  virtual csVector3 GetLinearStiffness () const = 0;
+
+  virtual void SetAngularStiffness (csVector3 stiff, bool forceUpdate = true) = 0;
+
+  virtual csVector3 GetAngularStiffness () const = 0;
 
   /// Set the damping of the spring.
-  virtual void SetDamping (float damp) = 0;
+  virtual void SetLinearDamping (csVector3 damp, bool forceUpdate = true) = 0;
 
-  /**
-  * Set the current constraint position/orientation as an equilibrium point.
-  * If index = -1, then set equilibrium point for all DOF, else set it for given DOF.
-  */
-  virtual void SetEquilibriumPoint (int index = -1) = 0;
+  virtual csVector3 GetLinearDamping () const = 0;
+
+  /// Set the damping of the spring.
+  virtual void SetAngularDamping (csVector3 damp, bool forceUpdate = true) = 0;
+
+  virtual csVector3 GetAngularDamping () const = 0;
   
-  /// Set the value to an equilibrium point for given DOF.
-  virtual void SetEquilibriumPoint (int index, float value) = 0;
+  /// Set the value to an equilibrium point for translation.
+  virtual void SetLinearEquilibriumPoint (csVector3 point, bool forceUpdate = true) = 0;
+
+  /// Set the value to an equilibrium point for rotation.
+  virtual void SetAngularEquilibriumPoint (csVector3 point, bool forceUpdate = true) = 0;
 
   virtual void SetBreakingImpulseThreshold (float threshold) = 0;
 
@@ -572,8 +593,25 @@ struct iPhysicalSystem : public virtual iBase
   */
   virtual csRef<iRigidBody> CreateRigidBody () = 0;
 
-  /// Create a joint and add it to the simulation.
+  /// Create a general 6DOF joint.
   virtual csRef<iJoint> CreateJoint () = 0;
+
+  /// Create a P2P joint for rigid bodies.
+  virtual csRef<iJoint> CreateRigidP2PJoint (const csVector3 position) = 0;
+
+  /// Create a slide joint for rigid bodies.
+  virtual csRef<iJoint> CreateRigidSlideJoint (const csOrthoTransform trans,
+    float minDist, float maxDist, float minAngle, float maxAngle, int axis) = 0;
+
+  /// Create a hinge joint for rigid bodies.
+  virtual csRef<iJoint> CreateRigidHingeJoint (const csVector3 position,
+    float minAngle, float maxAngle, int axis) = 0;
+
+  /// Create a linear joint for soft body.
+  virtual csRef<iJoint> CreateSoftLinearJoint (const csVector3 position) = 0;
+
+  /// Create a angular joint for soft body.
+  virtual csRef<iJoint> CreateSoftAngularJoint (int axis) = 0;
   
   /**
   * Create a soft body rope.

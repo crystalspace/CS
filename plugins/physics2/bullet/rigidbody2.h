@@ -27,17 +27,16 @@ private:
 
 public:
   csBulletRigidBody (csBulletSystem* phySys);
-  ~csBulletRigidBody ();
+  virtual ~csBulletRigidBody ();
 
   //iCollisionObject
 
   //virtual void SetTransform (const csOrthoTransform& trans);
   //virtual csOrthoTransform GetTransform ();
 
-  virtual void RebuildObject ();
+  //virtual void RebuildObject ();
 
-  //virtual bool Collide (iCollisionObject* otherObject);
-  //virtual HitBeamResult HitBeam (const csVector3& start, const csVector3& end);
+  virtual void AddCollider (CS::Collision::iCollider* collider, const csOrthoTransform& relaTrans);
 
   btRigidBody* GetBulletRigidPointer () {return btBody;}
   virtual void RemoveBulletObject ();

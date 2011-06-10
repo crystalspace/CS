@@ -110,6 +110,10 @@ struct iSoftBody : public virtual iBase
   /// Set true if use pose matching.
   virtual void SetShapeMatching (bool match) = 0;
 
+  virtual void SetBendingConstraint (bool bending) = 0;
+
+  virtual void GenerateCluster (int iter) = 0;
+
   /**
   * Configure the soft body with parameters set above.
   * If bending constraint is used set it with true.

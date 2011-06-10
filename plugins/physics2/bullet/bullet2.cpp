@@ -493,8 +493,6 @@ void csBulletSector::AddRidigBody (iRigidBody* body)
   csRef<iRigidBody> btBody (body);
   rigidBodies.Push (btBody);
 
-  //Currenly object has to add to sector before they RebuildObject()
-  //So the add to bullet world function should be called in RebuildObject()
   csBulletCollisionObject* collObj = dynamic_cast<csBulletCollisionObject*> (body);
   collObj->sector = this;
   collObj->AddBulletObject ();
@@ -514,8 +512,6 @@ void csBulletSector::AddSoftBody (iSoftBody* body)
   csRef<iSoftBody> btBody (body);
   softBodies.Push (btBody);
 
-  //Currenly object has to add to sector before they RebuildObject()
-  //So the add to bullet world function should be called in RebuildObject()
   csBulletCollisionObject* collObj = dynamic_cast<csBulletCollisionObject*> (body);
   collObj->sector = this;
   collObj->AddBulletObject ();
@@ -1007,6 +1003,98 @@ csRef<iJoint> csBulletSystem::CreateJoint ()
   joint.AttachNew (new csBulletJoint (this));
   joints.Push (joint);
   return joint;  
+}
+
+csRef<iJoint> csBulletSystem::CreateRigidP2PJoint (const csVector3 position)
+{
+  csRef<csBulletJoint> joint;
+  joint.AttachNew (new csBulletJoint (this));
+  joint->SetTransConstraints (true, true, true);
+  csVector3 trans (0.0f,0.0f,0.0f);
+  joint->SetMaximumDistance (trans);
+  joint->SetMinimumDistance (trans);
+  joint->SetPosition (position);
+  joint->SetType (RIGID_P2P_JOINT);
+  joints.Push (joint);
+  return joint;
+}
+
+csRef<iJoint> csBulletSystem::CreateSlideJoint (const csOrthoTransform trans,
+                                                float minDist, float maxDist, 
+                                                float minAngle, float maxAngle, int axis)
+{
+  if (axis < 0 || axis > 2)
+    return;
+  csRef<csBulletJoint> joint;
+  joint.AttachNew (new csBulletJoint (this));
+  joint->SetTransConstraints (true, true, true);
+  joint->SetRotConstraints (true, true, true);
+  csVector3 minDistant (0.0f, 0.0f, 0.0f);
+  csVector3 maxDistant (0.0f, 0.0f, 0.0f);
+
+  minDistant[axis] = minDist;
+  maxDistant[axis] = maxDist;
+  joint->SetMinimumDistance (minDistant);
+  joint->SetMaximumDistance (maxDistant);
+  minDistant[axis] = minAngle;
+  maxDistant[axis] = maxAngle;
+  joint->SetMinimumAngle (minDistant);
+  joint->SetMaximumAngle (maxDistant);
+  joint->SetTransform (trans);
+  joint->SetType (RIGID_SLIDE_JOINT);
+  joints.Push (joint);
+  return joint;
+}
+
+csRef<iJoint> csBulletSystem::CreateRigidHingeJoint (const csVector3 position, 
+                                                     float minAngle, float maxAngle, int axis)
+{
+  if (axis < 0 || axis > 2)
+    return;
+  csRef<csBulletJoint> joint;
+  joint.AttachNew (new csBulletJoint (this));
+  joint->SetTransConstraints (true, true, true);
+  joint->SetRotConstraints (true, true, true);
+  csVector3 minDistant (0.0f, 0.0f, 0.0f);
+  csVector3 maxDistant (0.0f, 0.0f, 0.0f);
+  joint->SetMinimumDistance (minDistant);
+  joint->SetMaximumDistance (maxDistant);
+  minDistant[axis] = minAngle;
+  maxDistant[axis] = maxAngle;
+  joint->SetMinimumAngle (minDistant);
+  joint->SetMaximumAngle (maxDistant);
+  joint->SetPosition (position);  
+  joint->SetType (RIGID_HINGE_JOINT);
+  joints.Push (joint);
+  return joint;
+}
+
+csRef<iJoint> csBulletSystem::CreateSoftLinearJoint (const csVector3 position)
+{
+  csRef<csBulletJoint> joint;
+  joint.AttachNew (new csBulletJoint (this));
+  joint->SetPosition (position);
+  joint->SetType (SOFT_LINEAR_JOINT);
+  joints.Push (joint);
+  return joint;
+}
+
+csRef<iJoint> csBulletSystem::CreateSoftAngularJoint (int axis)
+{
+  if (axis < 0 || axis > 2)
+    return;
+  csRef<csBulletJoint> joint;
+  joint.AttachNew (new csBulletJoint (this));
+  if (axis == 0)
+    joint->SetRotConstraints (false, true, true);
+  else if (axis == 1)
+    joint->SetRotConstraints (true, false, false);
+  else if (axis == 2)
+    joint->SetRotConstraints (false, false, true);
+
+  joint->SetType (SOFT_ANGULAR_JOINT);
+  joints.Push (joint);
+  return joint;
 }
 
 csRef<iSoftBody> csBulletSystem::CreateRope (csVector3 start,
