@@ -246,7 +246,9 @@ public:
   
   /**
    * Add a number of strings to this array by splitting \a str at characters
-   * from \a delimiters.
+   * from \a delimiters. It will start from the first char and won't ignore
+   * delimiters before the first word (in other words even with delimIgnore
+   * you'll get at least an empty string if the string starts with delimiters).
    */
   size_t SplitString (const char* str, const char* delimiters, 
     ConsecutiveDelimiterMode delimMode = delimSplitEach)
@@ -313,7 +315,7 @@ public:
                size_t limit = 0, size_t threshold = 0)
     : CS::Utility::StringArray<CS::Memory::AllocatorMalloc, 
                                csArrayCapacityDefault> (str, delimiters, 
-                               delimSplitEach, limit, threshold)
+                               delimMode, limit, threshold)
   {
   }
 };
