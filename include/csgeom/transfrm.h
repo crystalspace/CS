@@ -338,6 +338,12 @@ public:
   { 
     return csVector3 (m_o2t.m31, m_o2t.m32, m_o2t.m33); 
   }
+  void SetFront (const csVector3& v)
+  {
+    m_o2t.m31 = v.x;
+    m_o2t.m32 = v.y;
+    m_o2t.m33 = v.z;
+  }
 
   /**
    * Get the up vector in 'other' space. This is basically equivalent
@@ -348,6 +354,12 @@ public:
   {
     return csVector3 (m_o2t.m21, m_o2t.m22, m_o2t.m23); 
   }
+  void SetUp (const csVector3& v)
+  {
+    m_o2t.m21 = v.x;
+    m_o2t.m22 = v.y;
+    m_o2t.m23 = v.z;
+  }
 
   /**
    * Get the right vector in 'other' space. This is basically equivalent
@@ -357,6 +369,12 @@ public:
   csVector3 GetRight () const 
   {
     return csVector3 (m_o2t.m11, m_o2t.m12, m_o2t.m13); 
+  }
+  void SetRight (const csVector3& v)
+  {
+    m_o2t.m11 = v.x;
+    m_o2t.m12 = v.y;
+    m_o2t.m13 = v.z;
   }
 };
 
