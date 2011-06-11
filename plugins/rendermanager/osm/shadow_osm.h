@@ -44,6 +44,10 @@ namespace RenderManager
       size_t maps;
       size_t shadowMapSize;
 
+//       CS::ShaderVarStringID svName;
+      csLightShaderVarCache svNames;
+      LightingVariablesHelper::PersistentData lightVarsPersist;
+
       /// Set the prefix for configuration settings
       void SetConfigPrefix (const char* configPrefix)
       {
@@ -61,24 +65,33 @@ namespace RenderManager
         this->shaderManager = shaderManager;
         this->g3d = g3d;
 
+        iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
+        svNames.SetStrings (strings);
+
+//         const char* svNameStr = "light shadow map";
+//         svName = strings->Request (svNameStr);
+
         csConfigAccess cfg (objectReg);
         if (configPrefix.IsEmpty())
         {
-          settings.ReadSettings (objectReg, "Alpha");
+          settings.ReadSettings (objectReg, "Depth");
         }
         else
         {
           settings.ReadSettings (objectReg, 
             cfg->GetStr (
-            csString().Format ("%s.ShadowsType", configPrefix.GetData()), "Alpha"));
+            csString().Format ("%s.ShadowsType", configPrefix.GetData()), "Depth"));
           maps = cfg->GetInt (
-            csString().Format ("%s.Maps", configPrefix.GetData()), 5);
+            csString().Format ("%s.Maps", configPrefix.GetData()), 1);
           shadowMapSize = cfg->GetInt (
             csString().Format ("%s.ShadowMapResolution", configPrefix.GetData()), 1024);
         }
       }
       void UpdateNewFrame ()
       {
+        csTicks time = csGetTicks ();
+        settings.AdvanceFrame (time);
+//         lightVarsPersist.UpdateNewFrame();
       }
     };
 
@@ -88,7 +101,7 @@ namespace RenderManager
       PersistentData& persist;
       CS::RenderManager::RenderView* rview;
       SingleRenderLayer depthRenderLayer;
-      csRefArray<iTextureHandle> renderTargets;
+//       csRefArray<iTextureHandle> renderTargets;
 
       ViewSetup (PersistentData& persist, CS::RenderManager::RenderView* rview)
         : persist (persist), rview (rview),
@@ -96,26 +109,26 @@ namespace RenderManager
         persist.settings.shadowDefaultShader)
       {
         // Creates the accumulation buffer.
-        int flags = CS_TEXTURE_3D | CS_TEXTURE_CLAMP  | CS_TEXTURE_NOMIPMAPS;
-        iGraphics2D *g2d = persist.g3d->GetDriver2D ();
+//         int flags = CS_TEXTURE_3D | CS_TEXTURE_CLAMP  | CS_TEXTURE_NOMIPMAPS;
+//         iGraphics2D *g2d = persist.g3d->GetDriver2D ();
+// 
+//         scfString errStr;
 
-        scfString errStr;
-
-        for (size_t i = 0 ; i < persist.maps ; i ++)
-        {
-          csRef<iTextureHandle> renderTarget = 
-            persist.g3d->GetTextureManager ()->CreateTexture (g2d->GetWidth (),
-            g2d->GetHeight (),
-            csimg2D,
-            "abgr32_f",
-            flags,
-            &errStr);
-
-          if (!renderTarget)
-            csPrintf("Error initializing renderTargets!\n");        
-
-          renderTargets.Push(renderTarget);
-        }
+//         for (size_t i = 0 ; i < persist.maps ; i ++)
+//         {
+//           csRef<iTextureHandle> renderTarget = 
+//             persist.g3d->GetTextureManager ()->CreateTexture (g2d->GetWidth (),
+//             g2d->GetHeight (),
+//             csimg2D,
+//             "d32",
+//             flags,
+//             &errStr);
+// 
+//           if (!renderTarget)
+//             csPrintf("Error initializing renderTargets!\n");        
+// 
+//           renderTargets.Push(renderTarget);
+//         }
       }
     };
 
@@ -185,7 +198,33 @@ namespace RenderManager
 
     struct CachedLightData
     {
-      void SetupFrame (RenderTree& tree, ShadowOSM& shadows, iLight* light){}
+      csRef<csShaderVariable> shadowMapProjectSV;
+      csRef<csShaderVariable> textureSVs[rtaNumAttachments];
+
+      void SetupFrame (RenderTree& tree, ShadowOSM& shadows, iLight* light)
+      {
+        ViewSetup& viewSetup = shadows.viewSetup;
+
+        LightingVariablesHelper lightVarsHelper (viewSetup.persist.lightVarsPersist);
+
+        shadowMapProjectSV = lightVarsHelper.CreateTempSV (
+          viewSetup.persist.svNames.GetLightSVId (
+          csLightShaderVarCache::lightShadowMapProjection));
+
+        shadowMapProjectSV->SetArraySize (4);
+        for (int j = 0; j < 4; j++)
+        {
+          csShaderVariable* item = lightVarsHelper.CreateTempSV (
+            CS::InvalidShaderVarStringID);
+          shadowMapProjectSV->SetArrayElement (j, item);
+        }
+
+        const ShadowSettings::Target* target =
+          viewSetup.persist.settings.targets[0];
+        textureSVs[rtaDepth] =
+          lightVarsHelper.CreateTempSV (target->svName);
+
+      }
 
       uint GetSublightNum() const { return (uint)1; }
 
@@ -198,24 +237,41 @@ namespace RenderManager
         if (light->GetFlags().Check (CS_LIGHT_NOSHADOWS)) return;
         typename RenderTree::ContextNode& context = meshNode->GetOwner();
 
-        float distance = 5;
-        for (size_t i = 0 ; i < viewSetup.renderTargets.GetSize() ; i ++, distance += 10)
+        float distance = 30;
+        for (size_t i = 0 ; i < persist.maps ; i ++, distance += 10)
         {
-          renderTree.AddDebugTexture (viewSetup.renderTargets[i]);
-
           CS::RenderManager::RenderView* rview = context.renderView;
           csRef<CS::RenderManager::RenderView> newRenderView;
           newRenderView = renderTree.GetPersistentData().renderViews.CreateRenderView ();
           newRenderView->SetEngine (rview->GetEngine ());
           newRenderView->SetThisSector (rview->GetThisSector ());
 
+          CS::Math::Matrix4 matrix = rview->GetCamera()->GetProjectionMatrix();
+
+          // this
+          for (int i = 0; i < 4; i++)
+          {
+            csShaderVariable* item = 
+              shadowMapProjectSV->GetArrayElement (i);
+            item->SetValue (matrix.Row (i));
+          }
+
           csRef<iCustomMatrixCamera> shadowViewCam =
             newRenderView->GetEngine()->CreateCustomMatrixCamera();
           newRenderView->SetCamera (shadowViewCam->GetCamera());
-          shadowViewCam->SetProjectionMatrix (rview->GetCamera()->GetProjectionMatrix());
+          shadowViewCam->SetProjectionMatrix (matrix);
           shadowViewCam->GetCamera()->SetTransform (light->GetMovable()->GetTransform());
           csPlane3 farplane(0,0,-1,distance);
           shadowViewCam->GetCamera()->SetFarPlane(&farplane);
+
+          ShadowSettings::Target* target =
+            viewSetup.persist.settings.targets[0];
+          iTextureHandle* tex = target->texCache.QueryUnusedTexture (
+            persist.shadowMapSize, persist.shadowMapSize);          
+
+          textureSVs[rtaDepth]->SetValue (tex);
+
+          renderTree.AddDebugTexture (tex);
 
           csBox2 clipBox (0, 0, persist.shadowMapSize, persist.shadowMapSize);
           csRef<iClipper2D> newView;
@@ -224,9 +280,10 @@ namespace RenderManager
 
           typename RenderTree::ContextNode* shadowMapCtx = 
             renderTree.CreateContext (newRenderView);
-          shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
 
-          shadowMapCtx->renderTargets[rtaColor0].texHandle = viewSetup.renderTargets[i];
+          shadowMapCtx->renderTargets[rtaDepth].texHandle = tex;
+
+          shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
 
           // Setup the new context
           ShadowmapContextSetup contextFunction (layerConfig,
@@ -266,7 +323,19 @@ namespace RenderManager
     uint HandleOneLight (typename RenderTree::MeshNode::SingleMesh& singleMesh,
       iLight* light, CachedLightData& lightData,
       csShaderVariableStack* lightStacks,
-      uint lightNum, uint subLightNum) { return 1; }
+      uint lightNum, uint subLightNum) 
+    { 
+      LightingVariablesHelper lightVarsHelper (viewSetup.persist.lightVarsPersist);
+
+      // Add shadow map SVs
+      lightVarsHelper.MergeAsArrayItem (lightStacks[0], 
+        lightData.shadowMapProjectSV, lightNum);
+
+      lightVarsHelper.MergeAsArrayItem (lightStacks[0], 
+        lightData.textureSVs[rtaDepth], lightNum);
+        
+      return 1; 
+    }
 
   protected:
     PersistentData& persist;
