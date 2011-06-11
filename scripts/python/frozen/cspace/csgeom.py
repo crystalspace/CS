@@ -468,8 +468,11 @@ class csTransform(object):
     def Other2This(*args): return _csgeom.csTransform_Other2This(*args)
     GetReflect = staticmethod(_csgeom.csTransform_GetReflect)
     def GetFront(*args): return _csgeom.csTransform_GetFront(*args)
+    def SetFront(*args): return _csgeom.csTransform_SetFront(*args)
     def GetUp(*args): return _csgeom.csTransform_GetUp(*args)
+    def SetUp(*args): return _csgeom.csTransform_SetUp(*args)
     def GetRight(*args): return _csgeom.csTransform_GetRight(*args)
+    def SetRight(*args): return _csgeom.csTransform_SetRight(*args)
     def __mul__(*args): return _csgeom.csTransform___mul__(*args)
     def __rmul__(*args): return _csgeom.csTransform___rmul__(*args)
     def __str__(self):

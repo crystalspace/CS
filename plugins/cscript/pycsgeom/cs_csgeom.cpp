@@ -13728,6 +13728,39 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csTransform_SetFront(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csTransform *arg1 = (csTransform *) 0 ;
+  csVector3 *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csTransform_SetFront",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csTransform, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csTransform_SetFront" "', argument " "1"" of type '" "csTransform *""'"); 
+  }
+  arg1 = reinterpret_cast< csTransform * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csTransform_SetFront" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csTransform_SetFront" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  arg2 = reinterpret_cast< csVector3 * >(argp2);
+  (arg1)->SetFront((csVector3 const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csTransform_GetUp(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csTransform *arg1 = (csTransform *) 0 ;
@@ -13750,6 +13783,39 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csTransform_SetUp(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csTransform *arg1 = (csTransform *) 0 ;
+  csVector3 *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csTransform_SetUp",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csTransform, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csTransform_SetUp" "', argument " "1"" of type '" "csTransform *""'"); 
+  }
+  arg1 = reinterpret_cast< csTransform * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csTransform_SetUp" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csTransform_SetUp" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  arg2 = reinterpret_cast< csVector3 * >(argp2);
+  (arg1)->SetUp((csVector3 const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csTransform_GetRight(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csTransform *arg1 = (csTransform *) 0 ;
@@ -13766,6 +13832,39 @@ SWIGINTERN PyObject *_wrap_csTransform_GetRight(PyObject *SWIGUNUSEDPARM(self), 
   arg1 = reinterpret_cast< csTransform * >(argp1);
   result = ((csTransform const *)arg1)->GetRight();
   resultobj = SWIG_NewPointerObj((new csVector3(static_cast< const csVector3& >(result))), SWIGTYPE_p_csVector3, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csTransform_SetRight(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csTransform *arg1 = (csTransform *) 0 ;
+  csVector3 *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csTransform_SetRight",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csTransform, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csTransform_SetRight" "', argument " "1"" of type '" "csTransform *""'"); 
+  }
+  arg1 = reinterpret_cast< csTransform * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csTransform_SetRight" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csTransform_SetRight" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  arg2 = reinterpret_cast< csVector3 * >(argp2);
+  (arg1)->SetRight((csVector3 const &)*arg2);
+  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -49809,8 +49908,11 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csTransform_Other2This", _wrap_csTransform_Other2This, METH_VARARGS, NULL},
 	 { (char *)"csTransform_GetReflect", _wrap_csTransform_GetReflect, METH_VARARGS, NULL},
 	 { (char *)"csTransform_GetFront", _wrap_csTransform_GetFront, METH_VARARGS, NULL},
+	 { (char *)"csTransform_SetFront", _wrap_csTransform_SetFront, METH_VARARGS, NULL},
 	 { (char *)"csTransform_GetUp", _wrap_csTransform_GetUp, METH_VARARGS, NULL},
+	 { (char *)"csTransform_SetUp", _wrap_csTransform_SetUp, METH_VARARGS, NULL},
 	 { (char *)"csTransform_GetRight", _wrap_csTransform_GetRight, METH_VARARGS, NULL},
+	 { (char *)"csTransform_SetRight", _wrap_csTransform_SetRight, METH_VARARGS, NULL},
 	 { (char *)"csTransform___mul__", _wrap_csTransform___mul__, METH_VARARGS, NULL},
 	 { (char *)"csTransform___rmul__", _wrap_csTransform___rmul__, METH_VARARGS, NULL},
 	 { (char *)"csTransform_swigregister", csTransform_swigregister, METH_VARARGS, NULL},

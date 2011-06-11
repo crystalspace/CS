@@ -12185,8 +12185,11 @@ sub new {
 *Other2This = *cspacec::csTransform_Other2This;
 *GetReflect = *cspacec::csTransform_GetReflect;
 *GetFront = *cspacec::csTransform_GetFront;
+*SetFront = *cspacec::csTransform_SetFront;
 *GetUp = *cspacec::csTransform_GetUp;
+*SetUp = *cspacec::csTransform_SetUp;
 *GetRight = *cspacec::csTransform_GetRight;
+*SetRight = *cspacec::csTransform_SetRight;
 *__mul__ = *cspacec::csTransform___mul__;
 sub DISOWN {
     my $self = shift;
