@@ -16,11 +16,15 @@
         </vp>
 
         <fp>
+          <variablemap destination="clr" type="float">
+            <![CDATA[0.1]]>
+          </variablemap>
           <program>
             <![CDATA[
+              uniform float clr;
               void main (void)
               {
-                gl_FragColor = vec4 (1.0, 1.0, 0.0, 0.0);
+                gl_FragColor = vec4 (clr, 0.0, 0.0, 0.0);
               }
             ]]>
           </program>

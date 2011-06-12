@@ -54,6 +54,88 @@ void csShaderGLSLProgram::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
                                       CS::Graphics::RenderMeshModes& /*modes*/,
                                       const csShaderVariableStack& stack)
 {
+  size_t i;
+  const csGLExtensionManager* ext = shaderPlug->ext;
+  csRef<csShaderVariable> var;
+
+  // set variables
+  for (i = 0; i < variablemap.GetSize (); ++i)
+  {
+    VariableMapEntry& mapping = variablemap[i];
+
+    var = csGetShaderVariableFromStack (stack, mapping.name);
+    if (!var.IsValid ())
+      var = mapping.mappingParam.var;
+
+    // If var is null now we have no const nor any passed value, ignore it
+    if (!var.IsValid ())
+      continue;
+
+    switch (var->GetType ())
+    {
+    case csShaderVariable::INT:
+      {
+        int v;
+        if (var->GetValue (v))
+          ext->glUniform1iARB (mapping.userVal, v);
+      }
+      break;    
+    case csShaderVariable::FLOAT:
+      {
+        float v;
+        if (var->GetValue (v))
+          ext->glUniform1fARB (mapping.userVal, v);
+      }
+      break;    
+    case csShaderVariable::VECTOR2:
+      {
+        csVector2 v;
+        if (var->GetValue (v))
+          ext->glUniform2fARB (mapping.userVal, v[0], v[1]);
+      }
+      break;    
+    case csShaderVariable::VECTOR3:
+      {
+        csVector3 v;
+        if (var->GetValue (v))
+          ext->glUniform3fARB (mapping.userVal, v[0], v[1], v[2]);
+      }
+      break;    
+    case csShaderVariable::VECTOR4:
+      {
+        csVector4 v;
+        if (var->GetValue (v))
+          ext->glUniform4fARB (mapping.userVal, v[0], v[1], v[2], v[3]);
+      }
+      break;    
+    case csShaderVariable::MATRIX:
+      {
+        csMatrix3 m;
+        if (var->GetValue (m))
+        {
+          float matrix[16];
+          makeGLMatrix (m, matrix);
+          ext->glUniformMatrix4fvARB (mapping.userVal, 1, GL_FALSE, matrix);
+        }
+      }
+      break;
+    case csShaderVariable::TRANSFORM:
+      {
+        csReversibleTransform t;
+        if (var->GetValue (t))
+        {
+          float matrix[16];
+          makeGLMatrix (t, matrix);
+          ext->glUniformMatrix4fvARB (mapping.userVal, 1, GL_FALSE, matrix);
+        }
+      }
+      break;
+    case csShaderVariable::ARRAY:
+      break;
+    default:
+      break;
+    }
+  }
 }
 
 void csShaderGLSLProgram::ResetState ()
@@ -105,6 +187,27 @@ bool csShaderGLSLProgram::Load (iShaderDestinationResolver*, const char* program
 {
   // makes no sense for an "unified" shader to be loaded from one single source
   return false;
+}
+
+
+void csShaderGLSLProgram::SetupVmap ()
+{
+  size_t i;
+  const csGLExtensionManager* ext = shaderPlug->ext;
+  csRef<csShaderVariable> var;
+
+  for (i = 0; i < variablemap.GetSize (); ++i)
+  {
+    VariableMapEntry& mapping = variablemap[i];
+
+    mapping.userVal = ext->glGetUniformLocationARB (program_id,
+                                                    mapping.destination.GetData ());
+    if (mapping.userVal == -1)
+    {
+      // the uniform variable doesnt exist!
+      variablemap.DeleteIndex (i);
+    }
+  }
 }
 
 csPtr<csShaderGLSLShader> csShaderGLSLProgram::CreateVP () const
@@ -175,6 +278,8 @@ bool csShaderGLSLProgram::Compile (iHierarchicalCache*, csRef<iString>* tag)
   }
 
   // glValidateProgram() ?
+
+  SetupVmap ();
 
   tag->AttachNew (new scfString ("default"));
 

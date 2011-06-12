@@ -54,6 +54,8 @@ private:
   csPtr<csShaderGLSLShader> CreateVP () const;
   csPtr<csShaderGLSLShader> CreateFP () const;
 
+  void SetupVmap ();
+
 public:
   CS_LEAKGUARD_DECLARE (csShaderGLSLProgram);
 
