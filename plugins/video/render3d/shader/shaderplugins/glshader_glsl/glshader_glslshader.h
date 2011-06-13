@@ -45,7 +45,8 @@ private:
 public:
   CS_LEAKGUARD_DECLARE (csShaderGLSLShader);
 
-  csShaderGLSLShader (csGLShader_GLSL* shaderPlug, csString name, GLenum type) :
+  csShaderGLSLShader (csGLShader_GLSL* shaderPlug, const csString& name,
+                      GLenum type) :
     scfImplementationType (this, shaderPlug->object_reg)
   {
     shader_id = 0;
