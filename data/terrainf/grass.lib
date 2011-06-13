@@ -22,7 +22,7 @@
             <file>/shader/early_z/z_only_instanced.xml</file>
         </shader>
         <shader>
-            <file>/shader/lighting/fullbright_instance.xml</file>
+            <file>/shader/lighting/fullbright_instance_binalpha.xml</file>
         </shader>
     </shaders>
     <materials>
@@ -30,12 +30,14 @@
             <texture>grass.dds</texture>
             <shader type="oc_depthwrite">*null</shader>
             <shader type="oc_depthtest">z_only_instanced</shader>
-            <shader type="base">lighting_fullbright_instance</shader>
-            <shader type="diffuse">lighting_fullbright_instance</shader>
+            <shader type="base">lighting_fullbright_instance_binalpha</shader>
+            <shader type="diffuse">lighting_fullbright_instance_binalpha</shader>
         </material>
     </materials>
     <meshfact name="Grass">
         <plugin>genmeshfact</plugin>
+        <priority>transp</priority>
+        <zuse />
         <params>
             <material>grass.dds</material>
             <numvt>56</numvt>
@@ -132,6 +134,7 @@
     <meshfact name="GrassLow">
         <plugin>genmeshfact</plugin>
 	<priority>transp</priority>
+        <zuse />
         <params>
             <material>grass.dds</material>
             <numvt>28</numvt>
@@ -187,6 +190,8 @@
     </meshfact>
     <meshfact name="TallGrass">
         <plugin>genmeshfact</plugin>
+        <priority>transp</priority>
+        <zuse />
         <params>
             <material>grass.dds</material>
             <numvt>56</numvt>
@@ -282,7 +287,8 @@
     </meshfact>
     <meshfact name="TallGrassLow">
         <plugin>genmeshfact</plugin>
-	<priority>transp</priority>
+        <priority>transp</priority>
+        <zuse />
         <params>
             <material>grass.dds</material>
             <numvt>28</numvt>
