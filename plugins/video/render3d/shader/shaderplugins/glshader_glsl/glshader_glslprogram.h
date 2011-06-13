@@ -109,7 +109,8 @@ public:
   //                      iShaderDestinationResolver
   ////////////////////////////////////////////////////////////////////
 
-  // stuff.
+  virtual csVertexAttrib ResolveBufferDestination (const char* binding);
+  virtual int ResolveTU (const char* binding);
 };
 
 

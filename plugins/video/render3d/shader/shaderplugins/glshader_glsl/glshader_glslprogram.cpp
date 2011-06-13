@@ -285,3 +285,26 @@ bool csShaderGLSLProgram::Compile (iHierarchicalCache*, csRef<iString>* tag)
 
   return true;
 }
+
+
+csVertexAttrib csShaderGLSLProgram::ResolveBufferDestination (const char* binding)
+{
+  csVertexAttrib dest = CS_VATTRIB_INVALID;
+  const csGLExtensionManager* ext = shaderPlug->ext;
+
+  if (ext)
+  {
+    GLint loc = ext->glGetAttribLocationARB (program_id, binding);
+    dest = (csVertexAttrib)(CS_VATTRIB_0 + loc);
+    // TODO: check for CS conventions about bindings between generic
+    //       attributes and specific attributes like position, texcoord, etc.
+  }
+
+  return dest;
+}
+
+int csShaderGLSLProgram::ResolveTU (const char* binding)
+{
+  // TODO
+  return 0;
+}
