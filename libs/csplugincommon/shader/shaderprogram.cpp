@@ -341,7 +341,6 @@ bool csShaderProgram::ParseCommon (iDocumentNode* child)
 	  VariableMapEntry vme (CS::InvalidShaderVarStringID, destname);
 	  if (!ParseProgramParam (child, vme.mappingParam,
 	    ParamInt | ParamFloat | ParamVector2 | ParamVector3 | ParamVector4))
-            // NOTE: ParamInt added for GLSL plugin
 	    return false;
 	  variablemap.Push (vme);
 	}
