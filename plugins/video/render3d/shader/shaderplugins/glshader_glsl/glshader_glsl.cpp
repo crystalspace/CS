@@ -63,18 +63,24 @@ void csGLShader_GLSL::Report (int severity, const char* msg, ...)
 ////////////////////////////////////////////////////////////////////
 bool csGLShader_GLSL::SupportType(const char* type)
 {
+  Open ();
   if (!enable)
     return false;
-  else if (strcasecmp (type, "vp") == 0)
-    return true;
-  else if (strcasecmp (type, "fp") == 0)
+  if (strcasecmp (type, "shader") == 0)
     return true;
   return false;
 }
 
-csPtr<iShaderProgram> csGLShader_GLSL::CreateProgram (const char*)
+csPtr<iShaderProgram> csGLShader_GLSL::CreateProgram (const char *type)
 {
-  return csPtr<iShaderProgram> (new csShaderGLSLProgram (this));
+  Open ();
+  if (!enable)
+    return 0;
+
+  if (strcasecmp (type, "shader") == 0)
+    return csPtr<iShaderProgram> (new csShaderGLSLProgram (this));
+
+  return 0;
 }
 
 void csGLShader_GLSL::Open()
