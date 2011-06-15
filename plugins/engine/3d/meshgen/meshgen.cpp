@@ -1028,7 +1028,6 @@ void csMeshGenerator::SetDefaultDensityFactor (float factor)
 void csMeshGenerator::ClearAllPositions ()
 {
   SetupSampleBox ();
-  cells = new csMGCell [cell_dim * cell_dim];
   for (int z = 0 ; z < cell_dim ; z++)
     for (int x = 0 ; x < cell_dim ; x++)
     {
