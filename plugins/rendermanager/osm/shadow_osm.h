@@ -74,10 +74,7 @@ namespace CS
           float _far = persist.farZ;
 
           for (int i = 0; i < numParts ; i ++)
-          {
             splitDists[i] = _near + ( (_far - _near) * (i + 1) ) / numParts;
-            csPrintf("%f\n", splitDists[i]);
-          }
         }
 
         ~ViewSetup() { delete[] splitDists; }
@@ -222,7 +219,7 @@ namespace CS
 
             typename RenderTree::ContextNode* shadowMapCtx = 
               renderTree.CreateContext (newRenderView);
-            shadowMapCtx->renderTargets[rtaDepth].texHandle = tex;
+            shadowMapCtx->renderTargets[target->attachment].texHandle = tex;
             shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
 
             // Setup the new context
@@ -343,13 +340,13 @@ namespace CS
           csConfigAccess cfg (objectReg);
           if (configPrefix.IsEmpty())
           {
-            settings.ReadSettings (objectReg, "Depth");
+            settings.ReadSettings (objectReg, "Alpha");
           }
           else
           {
             settings.ReadSettings (objectReg, 
               cfg->GetStr (
-              csString().Format ("%s.ShadowsType", configPrefix.GetData()), "Depth"));
+              csString().Format ("%s.ShadowsType", configPrefix.GetData()), "Alpha"));
             numSplits = cfg->GetInt (
               csString().Format ("%s.NumSplits", configPrefix.GetData()), 2);
             farZ = cfg->GetFloat (

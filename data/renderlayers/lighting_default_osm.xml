@@ -1,0 +1,39 @@
+<layerconfig>
+      <!-- Options to control lighting for static lights -->
+      <staticlights>
+	<!-- Don't draw static lights for meshes which have the 
+	    CS_ENTITY_STATICLIGHT flag set -->
+	<nodraw />
+	<!-- We could use <specularonly/> to only get specular
+	lighting from static lights, but lighter2 can provide
+	data for that, too -->
+      </staticlights>
+      <layer config="RenderManager.ZOnly.Enabled">
+            <defaultshader name="z_only" file="/shader/early_z/z_only.xml" />
+            <ambient />
+            <shadertype>depthwrite</shadertype>
+      </layer>
+	<layer>
+	        <defaultshader name="lighting_default_osm" file="/shader/lighting/lighting_default_osm.xml" />
+		<!-- Tells the shader ambient should be taken into account -
+		     this should only happen on the first pass -->
+		<shadervar name="pass do_ambient" type="integer">1</shadervar>
+	        <!-- Draw layer, even if no lights are present -->
+		<ambient />
+		<maxlightpasses>1</maxlightpasses>
+		<shadertype>base</shadertype>
+		<shadertype>ambient</shadertype>
+		<shadertype>standard</shadertype>
+		<!-- Rendering order of splatting terrain should be ensured by splat render priority -->
+		<shadertype>splatting ambient</shadertype>
+		<shadertype>terrain splat</shadertype>
+	</layer>
+	<layer>
+	        <defaultshader name="lighting_default_osm" file="/shader/lighting/lighting_default_osm.xml" />
+	        <shadertype>diffuse</shadertype>
+		<!-- Practically unlimited passes -->
+		<maxlightpasses>2147483647</maxlightpasses>
+		<!-- Rendering order of splatting terrain should be ensured by splat render priority -->
+		<shadertype>terrain splat</shadertype>
+	</layer>
+</layerconfig>

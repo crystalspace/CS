@@ -1,6 +1,6 @@
 <!--
-  Copyright (C) 2007 by Frank Richter
-	    (C) 2007 by Jorrit Tyberghein
+  Copyright (C) 2008 by Frank Richter
+	    (C) 2008 by Jorrit Tyberghein
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -20,14 +20,34 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input name="surface" type="rgba" default="value" defval="0,0,0,1"/>
-    <input name="positionProj" type="position4_screen" />
-    
-    <block location="cg:fragmentMain">
-	  float value = surface.a;
-      output = float4(value);
+    <block location="pass">
+      <?Include /shader-snippets/lighting/lighting-tools.inc ?>
+      
+      <?Generate L 0 7?>
+	<texture name="light shadow map[$L$]" destination="lightPropsSM.shadowMap[$L$]"
+		comparemode="rToTexture" comparefunc="lequal" />
+      <?Endgenerate?>
+      <texture name="tex shadow noise" destination="lightPropsSM.shadowMapNoise" />
     </block>
     
-    <output name="output" type="rgba" />
+    <block location="cg:variablemap">
+      <?Lighting_ShadowMap_Variablemaps?>
+    </block>
+    
+    <block location="cg:definitions">
+      <?Include /shader-snippets/lighting/shadow-osm.cginc ?>
+    </block>
+    
+    <block location="cg:fragmentMain">
+      ShadowShadowMapDepth shadowDepth;
+      shadow = shadowDepth;
+    </block>
+
+    <block location="cg:vertexMain">
+      ShadowShadowMapDepth shadowDepth;
+      shadow = shadowDepth;
+    </block>
+    
+    <output name="shadow" type="ShadowShadowMap" />
   </technique>
 </snippet>
