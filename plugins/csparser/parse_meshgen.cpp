@@ -94,6 +94,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           meshgen->SetSampleBox (b);
         }
         break;
+      case XMLTOKEN_DEFAULTDENSITY:
+        meshgen->SetDefaultDensityFactor (child->GetContentsValueAsFloat ());
+	break;
       case XMLTOKEN_DENSITYFACTORMAP:
 	{
 	  if (!LoadMeshGenDensityFactorMap (child, meshgen))

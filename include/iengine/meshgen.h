@@ -195,7 +195,7 @@ struct iMeshGeneratorGeometry : public virtual iBase
  */
 struct iMeshGenerator : public virtual iBase
 {
-  SCF_INTERFACE(iMeshGenerator, 1, 0, 2);
+  SCF_INTERFACE(iMeshGenerator, 1, 0, 3);
 
   /**
    * Get the iObject for this mesh generator.
@@ -332,6 +332,18 @@ struct iMeshGenerator : public virtual iBase
   virtual void AddDensityFactorMap (const char* factorMapID,
 				    iImage* mapImage,
 				    const CS::Math::Matrix4& worldToMap) = 0;
+
+  /**
+   * Set a default density factor. This factor is the final multiplier
+   * for density and so it can be used to control global density to cater
+   * for higher/lower-end hardware more easily. The default is 1.0.
+   */
+  virtual void SetDefaultDensityFactor (float factor) = 0;
+
+  /**
+   * Get the default density factor.
+   */
+  virtual float GetDefaultDensityFactor () const = 0;
 };
 
 /** @} */

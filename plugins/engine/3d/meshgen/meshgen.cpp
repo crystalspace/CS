@@ -674,7 +674,7 @@ size_t csMeshGenerator::CountPositions (int cidx, csMGCell& cell)
   size_t i, j, g;
   for (g = 0 ; g < geometries.GetSize () ; g++)
   {
-    float density = geometries[g]->GetDensity ();
+    float density = geometries[g]->GetDensity () * default_density_factor;
     size_t count = size_t (density * box_area);
     for (j = 0 ; j < count ; j++)
     {
@@ -715,7 +715,7 @@ size_t csMeshGenerator::CountAllPositions ()
       csMGCell& cell = cells[cidx];
       counter += CountPositions (cidx, cell);
     }
-    return counter;
+  return counter;
 }
 
 void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
@@ -753,7 +753,7 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
     pos.geom_type = g;
     size_t mpos_count = geometries[g]->GetManualPositionCount (cidx);
 
-    float density = geometries[g]->GetDensity ();
+    float density = geometries[g]->GetDensity () * default_density_factor;
 
     size_t count = (mpos_count > 0)? mpos_count : size_t (density * box_area);
 
@@ -1017,6 +1017,26 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
       }
     }
   }
+}
+
+void csMeshGenerator::SetDefaultDensityFactor (float factor)
+{
+  default_density_factor = factor;
+  ClearAllPositions ();
+}
+
+void csMeshGenerator::ClearAllPositions ()
+{
+  SetupSampleBox ();
+  cells = new csMGCell [cell_dim * cell_dim];
+  for (int z = 0 ; z < cell_dim ; z++)
+    for (int x = 0 ; x < cell_dim ; x++)
+    {
+      int cidx = z*cell_dim + x;
+      csMGCell& cell = cells[cidx];
+      FreeMeshesInBlock (cidx, cell);
+      cell.needPositions = true;
+    }
 }
 
 void csMeshGenerator::ClearPosition (const csVector3& pos)
