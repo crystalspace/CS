@@ -55,7 +55,7 @@ namespace CS
       public:
         int numParts;
         PersistentData& persist;
-
+        float* splitDists;
         CS::RenderManager::RenderView* rview;
 
         SingleRenderLayer depthRenderLayer;
@@ -65,10 +65,22 @@ namespace CS
           depthRenderLayer (persist.settings.shadowShaderType, 
           persist.settings.shadowDefaultShader)
         {
-          numParts = 2;
+          numParts = persist.numSplits + 1;
+	        splitDists = new float[numParts];
+
+          // linear interpolation
+
+          float _near = SMALL_Z;
+          float _far = persist.farZ;
+
+          for (int i = 0; i < numParts ; i ++)
+          {
+            splitDists[i] = _near + ( (_far - _near) * (i + 1) ) / numParts;
+            csPrintf("%f\n", splitDists[i]);
+          }
         }
 
-        ~ViewSetup() {}
+        ~ViewSetup() { delete[] splitDists; }
       };
 
       struct CachedLightData
@@ -160,13 +172,12 @@ namespace CS
             viewSetup.rview->GetCamera());
 
           LightFrustums& lightFrustums = *lightFrustumsPtr;
-          float distance = 10;
 
           typename RenderTree::ContextNode& context = meshNode->GetOwner();
 
           const SuperFrustum& superFrust = *(lightFrustums.frustums[0]);
           
-          for (int frustNum = 0 ; frustNum < superFrust.actualNumParts ; frustNum ++, distance += 10)
+          for (int frustNum = 0 ; frustNum < superFrust.actualNumParts ; frustNum ++)
           {
             const typename SuperFrustum::Frustum& lightFrust = 
               superFrust.frustums[frustNum];
@@ -184,13 +195,13 @@ namespace CS
               item->SetValue (matrix.Row (i));
             }
 
-            int shadowMapSize = 1024;
+            int shadowMapSize = viewSetup.persist.shadowMapRes;
 
             csRef<iCustomMatrixCamera> shadowViewCam =
               newRenderView->GetEngine()->CreateCustomMatrixCamera();
             newRenderView->SetCamera (shadowViewCam->GetCamera());
 
-            csPlane3 farplane(0,0,-1,distance);
+            csPlane3 farplane(0,0,-1,viewSetup.splitDists[frustNum]);
             shadowViewCam->GetCamera()->SetFarPlane(&farplane);
 
             shadowViewCam->SetProjectionMatrix (matrix);
@@ -304,6 +315,9 @@ namespace CS
         csRefArray<iTextureHandle> emptySMs;
         iGraphics3D* g3d;
 
+        int numSplits;
+        float farZ;
+        int shadowMapRes;
         csString configPrefix;
         ShadowSettings settings;
 
@@ -336,6 +350,12 @@ namespace CS
             settings.ReadSettings (objectReg, 
               cfg->GetStr (
               csString().Format ("%s.ShadowsType", configPrefix.GetData()), "Depth"));
+            numSplits = cfg->GetInt (
+              csString().Format ("%s.NumSplits", configPrefix.GetData()), 2);
+            farZ = cfg->GetFloat (
+              csString().Format ("%s.FarZ", configPrefix.GetData()), 100);
+            shadowMapRes = cfg->GetInt (
+              csString().Format ("%s.ShadowMapResolution", configPrefix.GetData()), 512);
           }
         }
         void UpdateNewFrame ()
