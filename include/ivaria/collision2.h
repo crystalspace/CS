@@ -4,11 +4,10 @@
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
 #include "csgeom/vector3.h"
+#include "csgeom/matrix3.h"
+#include "csgeom/transfrm.h"
+#include "csgeom/plane3.h"
 
-class csMatrix3;
-class csOrthoTransform;
-class csPlane3;
-class csString;
 struct iTerrainSystem;
 struct iSector;
 struct iMeshWrapper;
@@ -388,10 +387,10 @@ struct iCollisionObject : public virtual iBase
   virtual void RebuildObject () = 0;
 
   /// Set the collision group this object belongs to.
-  virtual void SetCollisionGroup (const char* name);
+  virtual void SetCollisionGroup (const char* name) = 0;
 
   /// Get the collision group this object belongs to.
-  virtual const char* GetCollisionGroup () const;
+  virtual const char* GetCollisionGroup () const = 0;
 
   /**
   * Set a callback to be executed when this body collides with another.
@@ -515,10 +514,10 @@ struct iCollisionSector : public virtual iBase
   virtual void RemoveCollisionObject (iCollisionObject* object) = 0;
 
   /// Add a portal into the sector. Collision objects crossing a portal will be switched from iCollisionSector's.
-  virtual void AddPortal (iPortal* portal);
+  virtual void AddPortal (iPortal* portal) = 0;
 
   /// Remove the given portal from this sector.
-  virtual void RemovePortal (iPortal* portal);
+  virtual void RemovePortal (iPortal* portal) = 0;
 
   /**
   * Set the engine iSector related to this collision sector. The iMovable that are 
@@ -550,8 +549,8 @@ struct iCollisionSector : public virtual iBase
   * Try to move the given object from \a fromWorld to \a toWorld and return the first collision occured if any.
   */
   // kickvb: a test only on convex colliders is probably not interesting, so remove this method if not possible to do on any collision object
-  virtual MoveResult MoveTest (iCollisionObject* object,
-      const csOrthoTransform& fromWorld, const csOrthoTransform& toWorld) = 0;
+  /*virtual MoveResult MoveTest (iCollisionObject* object,
+      const csOrthoTransform& fromWorld, const csOrthoTransform& toWorld) = 0;*/
 
 };
 
@@ -574,10 +573,10 @@ struct iCollisionSystem : public virtual iBase
   virtual void SetInternalScale (float scale) = 0;
 
   /// Create a convex mesh collider.
-  virtual csPtr<iColliderConvexMesh> CreateColliderConvexMesh (iMeshWrapper* mesh) = 0;
+  virtual csRef<iColliderConvexMesh> CreateColliderConvexMesh (iMeshWrapper* mesh) = 0;
 
   /// Create a concave mesh collider.
-  virtual csPtr<iColliderConcaveMesh> CreateColliderConcaveMesh (
+  virtual csRef<iColliderConcaveMesh> CreateColliderConcaveMesh (
     iMeshWrapper* mesh, bool isStatic = false) = 0;
 
   /// Create a scaled concave mesh collider.
@@ -596,19 +595,21 @@ struct iCollisionSystem : public virtual iBase
   /// Create a capsule collider.
   virtual csRef<iColliderCapsule> CreateColliderCapsule (float length, float radius) = 0;
 
+  /// Create a cone collider.
+  virtual csRef<iColliderCone> CreateColliderCone (float length, float radius) = 0;
+
   /// Create a plane collider.
   virtual csRef<iColliderPlane> CreateColliderPlane (const csPlane3& plane) = 0;
 
   /// Create a terrain collider.
-  virtual csRef<iColliderTerrain> CreateColliderTerrain (const iTerrainSystem* terrain,
+  virtual csRef<iColliderTerrain> CreateColliderTerrain (iTerrainSystem* terrain,
       float minHeight = 0, float maxHeight = 0) = 0;
 
   /**
   * Create a collision object. Without any initialization.
   * Need to call iCollisionObject::RebuildObject.
   */
-  virtual csRef<iCollisionObject> CreateCollisionObject (
-    CollisionObjectType type = COLLISION_OBJECT_BASE) = 0;
+  virtual csRef<iCollisionObject> CreateCollisionObject () = 0;
 
   /**
   * Create a collision actor.

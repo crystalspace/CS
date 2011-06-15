@@ -3,15 +3,22 @@
 
 #include "bullet2.h"
 #include "common2.h"
+#include "collisionobject2.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
 class csBulletPhysicalSystem;
+class csBulletDefaultKinematicCallback;
+
+using CS::Physics::iRigidBody;
+using CS::Physics::iSoftBody;
 
 class csBulletRigidBody : public scfImplementationExt1<
   csBulletRigidBody, csBulletCollisionObject, 
   CS::Physics::iRigidBody>
 {
+  friend class csBulletSoftBody;
+  friend class csBulletJoint;
 private:
   btRigidBody* btBody;
   //CS::Physics::PhysicalBodyType bodyType;
@@ -23,7 +30,7 @@ private:
   float softness;
   float elasticity;
 
-  csRef<iKinematicCallback> kinematicCb;
+  csRef<CS::Physics::iKinematicCallback> kinematicCb;
 
 public:
   csBulletRigidBody (csBulletSystem* phySys);
@@ -44,8 +51,8 @@ public:
 
   //iPhysicalBody
 
-  virtual PhysicalBodyType GetBodyType () {return BODY_RIGID;}
-  virtual iRigidBody* QueryRigidBody () {return this;}
+  virtual CS::Physics::PhysicalBodyType GetBodyType () const {return CS::Physics::BODY_RIGID;}
+  virtual iRigidBody* QueryRigidBody () {return dynamic_cast<iRigidBody*>(this);}
   virtual iSoftBody* QuerySoftBody () {return NULL;}
 
   virtual bool Disable ();
@@ -54,7 +61,7 @@ public:
 
   virtual float GetMass ();
 
-  virtual float GetDensity () {return density;}
+  virtual float GetDensity () const {return density;}
   virtual void SetDensity (float density);
 
   virtual float GetVolume ();
@@ -68,10 +75,10 @@ public:
   virtual float GetFriction () {return friction;}
 
   //iRigidBody
-  virtual iCollisionObject* QueryCollisionObject () {return dynamic_cast<iPhysicalBody*> (this);}
+  virtual iCollisionObject* QueryCollisionObject () {return dynamic_cast<iCollisionObject*>(this);}
 
-  virtual RigidBodyState GetState () {return physicalState;}
-  virtual bool SetState (RigidBodyState state);
+  virtual CS::Physics::RigidBodyState GetState () {return physicalState;}
+  virtual bool SetState (CS::Physics::RigidBodyState state);
 
   virtual void SetElasticity (float elasticity);
   virtual float GetElasticity () {return elasticity;}
@@ -97,14 +104,23 @@ public:
   virtual csVector3 GetForce () const;
   virtual csVector3 GetTorque () const;
 
-  virtual void SetKinematicCallback (iKinematicCallback* cb) {kinematicCb = cb;}
-  virtual iKinematicCallback* GetKinematicCallback () {return kinematicCb;}
+  virtual void SetKinematicCallback (CS::Physics::iKinematicCallback* cb) {kinematicCb = cb;}
+  virtual CS::Physics::iKinematicCallback* GetKinematicCallback () {return kinematicCb;}
 
   virtual void SetLinearDampener (float d);
   virtual float GetLinearDampener () {return linearDampening;}
 
   virtual void SetRollingDampener (float d);
   virtual float GetRollingDampener () {return angularDampening;}
+};
+
+class csBulletDefaultKinematicCallback : public scfImplementation1<
+  csBulletDefaultKinematicCallback, CS::Physics::iKinematicCallback>
+{
+public:
+  csBulletDefaultKinematicCallback ();
+  virtual ~csBulletDefaultKinematicCallback();
+  virtual void GetBodyTransform (CS::Physics::iRigidBody* body, csOrthoTransform& transform) const;
 };
 }
 CS_PLUGIN_NAMESPACE_END (Bullet2)

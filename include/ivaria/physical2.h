@@ -1,6 +1,15 @@
 #ifndef __IVARIA_PHYSIH__
 #define __IVARIA_PHYSIH__
 
+#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
+#include "iutil/objreg.h"
+#include "iengine/mesh.h"
+#include "iengine/engine.h"
+#include "imesh/genmesh.h"
+#include "csgeom/tri.h"
+#include "cstool/primitives.h"
+
 namespace CS
 {
 namespace Collision
@@ -36,34 +45,12 @@ enum RigidBodyState
   STATE_DYNAMIC,
   STATE_KINEMATIC
 };
-/*
-enum JointType
-{
-  JOINT_P2P;
-  JOINT_CONETWIST;
-  JOINT_6DOF;
-  JOINT_SPRING;
-};
-
-struct iJointHelper : public virtual iBase
-{
-  SCF_INTERFACE (CS::Physics::iJointHelper ,1, 0, 0);
-
-  virtual csPtr<iJoint> CreateP2PJoint();
-
-  virtual csPtr<iJoint> CreateConeTwistJoint();
-
-  virtual csPtr<iJoint> Create6DOFJoint();
-
-  virtual csPtr<iJoint> CreateSpringJoint();
-  };
-  */
 
 /**
 * A base interface of physical bodies. 
 * iRigidBody and iSoftBody will be derived from this one.
 */
-struct iPhysicalBody : public virtual iCollisionObject
+struct iPhysicalBody : public virtual iBase
 {
   SCF_INTERFACE (CS::Physics::iPhysicalBody, 1, 0, 0);
 
@@ -88,7 +75,7 @@ struct iPhysicalBody : public virtual iCollisionObject
   //      And the collision system will create a collision shape for the mesh? How to decide which type of collider is appropriate?
 
   /// Get the mass of this body.
-  virtual float GetMass () const = 0;
+  virtual float GetMass () = 0;
 
   /// Set the mass of this body.
   /*virtual void SetMass (float mass) = 0;*/
@@ -139,9 +126,6 @@ struct iPhysicalBody : public virtual iCollisionObject
 struct iRigidBody : public iPhysicalBody
 {
   SCF_INTERFACE (CS::Physics::iRigidBody, 1, 0, 2);
-
-  /// Get the iCollisionObject pointer of this body.
-  virtual iCollisionObject* QueryCollisionObject () = 0;
 
   /// Get the current state of the body.
   virtual RigidBodyState GetState () = 0;
@@ -241,6 +225,25 @@ struct iRigidBody : public iPhysicalBody
 
   /// Get the angular dampener for this rigid body.
   virtual float GetRollingDampener () = 0;
+};
+
+/**
+ * This class can be implemented in order to update the position of an anchor of a
+ * CS::Physics::Bullet::iSoftBody. This can be used to try to control manually the
+ * position of a vertex of a soft body.
+ *
+ * \warning This feature uses a hack around the physical simulation of soft bodies
+ * and may not always be stable. Use it at your own risk.
+ * \sa CS::Physics::iSoftBody::AnchorVertex(size_t,iAnchorAnimationControl)
+ */
+struct iAnchorAnimationControl : public virtual iBase
+{
+  SCF_INTERFACE(CS::Physics::iAnchorAnimationControl, 1, 0, 0);
+
+  /**
+   * Return the new position of the anchor, in world coordinates.
+   */
+  virtual csVector3 GetAnchorPosition () const = 0;
 };
 
 /**
@@ -369,8 +372,6 @@ struct iJoint : public virtual iBase
   * you want to apply the changes right away.
   */
   virtual void Attach (iPhysicalBody* body1, iPhysicalBody* body2,
-      const csOrthoTransform& trans1,
-      const csOrthoTransform& trans2,
       bool forceUpdate = true) = 0;
 
   /// Get the attached body with the given index (valid values for body are 0 and 1).
@@ -382,14 +383,14 @@ struct iJoint : public virtual iBase
   * Set force_update to true if you want to apply the changes right away.
   */
   virtual void SetTransform (const csOrthoTransform& trans,
-      bool forceUpdate = true) = 0;
+      bool forceUpdate = false) = 0;
 
   /// Get the world transformation of the joint.
   virtual csOrthoTransform GetTransform () const = 0;
 
   /// Set the new position of the joint, in world coordinates.
   virtual void SetPosition (const csVector3& position,
-    bool forceUpdate = true) = 0;
+    bool forceUpdate = false) = 0;
 
   /// Get the current position of the joint, in world coordinates.
   virtual csVector3 GetPosition () const = 0;
@@ -404,7 +405,7 @@ struct iJoint : public virtual iBase
   */
   virtual void SetTransConstraints (bool X, 
       bool Y, bool Z, 
-      bool forceUpdate = true) = 0;
+      bool forceUpdate = false) = 0;
 
   /// True if this axis' translation is constrained.
   virtual bool IsXTransConstrained () = 0;
@@ -420,7 +421,7 @@ struct iJoint : public virtual iBase
   * you want to apply the changes right away.
   */
   virtual void SetMinimumDistance (const csVector3& dist,
-      bool forceUpdate = true) = 0;
+      bool forceUpdate = false) = 0;
 
   /// Get the minimum allowed distance between the two bodies.
   virtual csVector3 GetMinimumDistance () const = 0;
@@ -430,7 +431,7 @@ struct iJoint : public virtual iBase
   * you want to apply the changes right away.
   */
   virtual void SetMaximumDistance (const csVector3& dist,
-      bool forceUpdate = true) = 0;
+      bool forceUpdate = false) = 0;
 
   /// Get the maximum allowed distance between the two bodies.
   virtual csVector3 GetMaximumDistance () const = 0;
@@ -445,7 +446,7 @@ struct iJoint : public virtual iBase
   */
   virtual void SetRotConstraints (bool X, 
       bool Y, bool Z, 
-      bool forceUpdate = true) = 0;
+      bool forceUpdate = false) = 0;
 
   /// True if this axis' rotation is constrained.
   virtual bool IsXRotConstrained () = 0;
@@ -461,7 +462,7 @@ struct iJoint : public virtual iBase
   * you want to apply the changes right away.
   */
   virtual void SetMinimumAngle (const csVector3& angle,
-      bool forceUpdate = true) = 0;
+      bool forceUpdate = false) = 0;
 
   /// Get the minimum allowed angle between the two bodies (in radian).
   virtual csVector3 GetMinimumAngle () const = 0;
@@ -471,7 +472,7 @@ struct iJoint : public virtual iBase
   * you want to apply the changes right away.
   */
   virtual void SetMaximumAngle (const csVector3& angle,
-      bool forceUpdate = true) = 0;
+      bool forceUpdate = false) = 0;
 
   /// Get the maximum allowed angle between the two bodies (in radian).
   virtual csVector3 GetMaximumAngle () const = 0;
@@ -482,7 +483,7 @@ struct iJoint : public virtual iBase
   * much it will bounce the door back closed when it hits).
   */
   virtual void SetBounce (const csVector3& bounce,
-      bool forceUpdate = true) = 0;
+      bool forceUpdate = false) = 0;
 
   /// Get the joint restitution.
   virtual csVector3 GetBounce () const = 0;
@@ -492,7 +493,7 @@ struct iJoint : public virtual iBase
   * you want to apply the changes right away.
   */
   virtual void SetDesiredVelocity (const csVector3& velo,
-      bool forceUpdate = true) = 0;
+      bool forceUpdate = false) = 0;
 
   /// Get the desired velocity of the joint motor.
   virtual csVector3 GetDesiredVelocity () const = 0;
@@ -502,7 +503,7 @@ struct iJoint : public virtual iBase
   * Set force_update to true if  you want to apply the changes right away.
   */
   virtual void SetMaxForce (const csVector3& force,
-      bool forceUpdate = true) = 0;
+      bool forceUpdate = false) = 0;
 
   /// Get the maximum force that can be applied by the joint motor to reach the desired velocity.
   virtual csVector3 GetMaxForce () const = 0;
@@ -513,74 +514,52 @@ struct iJoint : public virtual iBase
   */
   virtual bool RebuildJoint () = 0;
 
-  /**
-  * Set the spring translation constraints on the 3 axes. If true is
-  * passed for an axis then the Joint will have a spring constraint on
-  * that axis. If false is passed in then no spring constraint on the
-  * axis. Set force_update to true if you want to apply the changes 
-  * right away.
-  */
-  virtual void SetSpringTransConstraints (bool X, 
-      bool Y, bool Z, 
-      bool forceUpdate = true) = 0;
-
-  /// True if this axis has a spring translation constraint.
-  virtual bool IsXSpringTransConstrained () = 0;
-
-  /// True if this axis has a spring translation constraint.
-  virtual bool IsYSpringTransConstrained () = 0;
-
-  /// True if this axis has a spring translation constraint.
-  virtual bool IsZSpringTransConstrained () = 0;
-
-    /**
-  * Set the spring rotation constraints on the 3 axes. If true is
-  * passed for an axis then the Joint will have a spring constraint on
-  * that axis. If false is passed in then no spring constraint on the
-  * axis. Set force_update to true if you want to apply the changes 
-  * right away.
-  */
-  virtual void SetSpringRotConstraints (bool X, 
-      bool Y, bool Z, 
-      bool forceUpdate = true) = 0;
-
-  /// True if this axis has a spring rotation constraint.
-  virtual bool IsXSpringRotConstrained () = 0;
-
-  /// True if this axis has a spring rotation constraint.
-  virtual bool IsYSpringRotConstrained () = 0;
-
-  /// True if this axis has a spring rotation constraint.
-  virtual bool IsZSpringRotConstrained () = 0;
-
   /// Set the stiffness of the spring.
-  virtual void SetLinearStiffness (csVector3 stiff, bool forceUpdate = true) = 0;
+  virtual void SetLinearStiffness (csVector3 stiff, bool forceUpdate = false) = 0;
 
   virtual csVector3 GetLinearStiffness () const = 0;
 
-  virtual void SetAngularStiffness (csVector3 stiff, bool forceUpdate = true) = 0;
+  virtual void SetAngularStiffness (csVector3 stiff, bool forceUpdate = false) = 0;
 
   virtual csVector3 GetAngularStiffness () const = 0;
 
   /// Set the damping of the spring.
-  virtual void SetLinearDamping (csVector3 damp, bool forceUpdate = true) = 0;
+  virtual void SetLinearDamping (csVector3 damp, bool forceUpdate = false) = 0;
 
   virtual csVector3 GetLinearDamping () const = 0;
 
   /// Set the damping of the spring.
-  virtual void SetAngularDamping (csVector3 damp, bool forceUpdate = true) = 0;
+  virtual void SetAngularDamping (csVector3 damp, bool forceUpdate = false) = 0;
 
   virtual csVector3 GetAngularDamping () const = 0;
   
   /// Set the value to an equilibrium point for translation.
-  virtual void SetLinearEquilibriumPoint (csVector3 point, bool forceUpdate = true) = 0;
+  virtual void SetLinearEquilibriumPoint (csVector3 point, bool forceUpdate = false) = 0;
 
   /// Set the value to an equilibrium point for rotation.
-  virtual void SetAngularEquilibriumPoint (csVector3 point, bool forceUpdate = true) = 0;
+  virtual void SetAngularEquilibriumPoint (csVector3 point, bool forceUpdate = false) = 0;
 
-  virtual void SetBreakingImpulseThreshold (float threshold) = 0;
+  virtual void SetBreakingImpulseThreshold (float threshold, bool forceUpdate = false) = 0;
 
   virtual float GetBreakingImpulseThreshold () = 0;
+};
+
+/**
+ * A callback to be implemented when you are using kinematic bodies. If no
+ * callback are provided then the dynamic system will use a default one which
+ * will update the transform of the body from the position of the attached
+ * movable (see iRigidBody::AttachMovable()).
+ * \sa CS::Physics::iRigidBody::SetKinematicCallback()
+ */
+struct iKinematicCallback : public virtual iBase
+{
+  SCF_INTERFACE (CS::Physics::iKinematicCallback, 1, 0, 0);
+
+  /**
+   * Update the new transform of the rigid body.
+   */
+  virtual void GetBodyTransform (iRigidBody* body,
+				 csOrthoTransform& transform) const = 0;
 };
 
 struct iPhysicalSystem : public virtual iBase
@@ -654,7 +633,8 @@ struct iPhysicalSystem : public virtual iBase
   * \param if there's an iCollisionObject pointer, attach the iCollisionObject to it.
   * \remark You must call SetSoftBodyWorld() prior to this.
   */
-  virtual csRef<iSoftBody> CreateSoftBody (iGeneralFactoryState* genmeshFactory) = 0;
+  virtual csRef<iSoftBody> CreateSoftBody (iGeneralFactoryState* genmeshFactory, 
+    const csOrthoTransform& bodyTransform) = 0;
 
   /**
   * Create a custom volumetric soft body.

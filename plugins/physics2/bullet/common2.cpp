@@ -25,11 +25,12 @@
 #include "btBulletDynamicsCommon.h"
 #include "btBulletCollisionCommon.h"
 
-struct btSoftBodyWorldInfo;
-#include "bulletcollision.h"
-#include "common.h"
+#include "bullet2.h"
+#include "common2.h"
+#include "collisionobject2.h"
 //#include "rigidbodies.h"
 
+struct btSoftBodyWorldInfo;
 CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
 {
 
@@ -49,7 +50,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
       return;*/
 
     csOrthoTransform tr = BulletToCS (initialTransform * inversePrincipalAxis,
-				      body->sector->inverseInternalScale);
+				      body->system->getInverseInternalScale ());
 
     /*if (body->mesh)
       body->moveCb->Execute (body->mesh, tr);
@@ -68,7 +69,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
       return;*/
 
     csOrthoTransform tr = BulletToCS (trans * inversePrincipalAxis,
-				      body->sector->inverseInternalScale);
+				      body->system->getInverseInternalScale ());
 
     /*if (body->mesh)
       body->moveCb->Execute (body->mesh, tr);
@@ -84,7 +85,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
   (csBulletCollisionObject* body, const btTransform& initialTransform,
    const btTransform& principalAxis)
     : csBulletMotionState (body, initialTransform, principalAxis),
-      principalAxis (BulletToCS (principalAxis, body->sector->inverseInternalScale))
+      principalAxis (BulletToCS (principalAxis, body->system->getInverseInternalScale ()))
   {
   }
 
@@ -96,7 +97,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
     // get the body transform from the callback
     csOrthoTransform transform;
     //body->kinematicCb->GetBodyTransform (body, transform);
-    trans = CSToBullet (principalAxis * transform, body->sector->internalScale);
+    trans = CSToBullet (principalAxis * transform, body->system->getInternalScale ());
   }
 
 }

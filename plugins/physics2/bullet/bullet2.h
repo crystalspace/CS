@@ -3,56 +3,48 @@
 
 #include "iutil/comp.h"
 #include "csutil/scf.h"
+#include "csutil/nobjvec.h"
 #include "csutil/scf_implementation.h"
 #include "ivaria/collision2.h"
 #include "ivaria/physical2.h"
 #include "ivaria/bullet2.h"
 #include "ivaria/view.h"
 #include "iengine/movable.h"
-#include "common2.h"
-#include "colliders2.h"
-#include "rigidbody2.h"
-#include "softbody2.h"
-#include "joint2.h"
+#include "csutil/csobject.h"
 
+struct iSector;
 class btCollisionObject;
 class btCompoundShape;
+class btDynamicsWorld;
+class btCollisionDispatcher;
+class btDefaultCollisionConfiguration;
+class btSequentialImpulseConstraintSolver;
+class btBroadphaseInterface;
+struct btSoftBodyWorldInfo;
 
-CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
+CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
-
-class csBulletSector;
-class csBulletCollisionObject;
-class csBulletTerrainObject;
 class csBulletSystem;
+class csBulletDebugDraw;
+class csBulletRigidBody;
 class csBulletSoftBody;
+class csBulletCollisionObject;
+class csBulletCollider;
 
-struct PointContactResult : public btCollisionWorld::ContactResultCallback
-{
-  csArray<CollisionData>& colls;
-  PointContactResult(csArray<CollisionData>& collisions) : colls(collisions) 
-  {
-  }
-  virtual	btScalar	addSingleResult (btManifoldPoint& cp,	const btCollisionObject* colObj0, int partId0,int index0,const btCollisionObject* colObj1,int partId1,int index1)
-  {
-    CollisionData data;
-    data.penetration = cp.m_distance1;
-    data.positionWorldOnA = cp.m_positionWorldOnA;
-    data.positionWorldOnB = cp.m_positionWorldOnB;
-    colls.Push (data);
-    return 0;
-  }
-};
+using namespace CS::Collision;
+using namespace CS::Physics;
 
 //Will also implement iPhysicalSector...
-class csBulletSector: public scfImplementationExt3<
-  csBulletSector, csObject, iCollisionSector, 
+class csBulletSector : public scfImplementationExt3<
+  csBulletSector, csObject, CS::Collision::iCollisionSector, 
   CS::Physics::Bullet::iPhysicalSector,
   CS::Physics::iPhysicalSector>
 {
-  //TODO: Too many friend classes..I'd better user a function instead...
   friend class csBulletCollisionObject;
-  friend class csBulletTerrainObject;
+  friend class csBulletRigidBody;
+  friend class csBulletSoftBody;
+  friend class csBulletJoint;
+  friend class csBulletColliderTerrain;
   friend class csBulletKinematicMotionState;
   friend class csBulletMotionState;
 
@@ -63,15 +55,14 @@ class csBulletSector: public scfImplementationExt3<
     csBulletCollisionObject* ghostPortal2;
   };
   iSector* sector;
-  csBulletPhysicalSector* phySector;
   csBulletSystem* sys;
   csVector3 gravity;
-  csRefArrayObject<iCollisionObject> collisionObjects;
-  csRefArrayObject<iRigidBody> rigidBodies;
-  csRefArrayObject<iSoftBody> softBodies;
+  csRefArrayObject<csBulletCollisionObject> collisionObjects;
+  csRefArrayObject<csBulletRigidBody> rigidBodies;
+  csRefArrayObject<csBulletSoftBody> softBodies;
   csWeakRefArray<csBulletSoftBody> anchoredSoftBodies;
   csRefArray<iJoint> joints;
-  csRefArray<CollisionPortal> portals;
+  csArray<CollisionPortal> portals;
   csArray<CollisionData> points;
   csBulletDebugDraw* debugDraw;
   btDynamicsWorld* bulletWorld;
@@ -93,14 +84,13 @@ class csBulletSector: public scfImplementationExt3<
   float timeDisableThreshold;
 
 public:
-  csBulletSector (iObjectRegistry* object_reg,
-                  csBulletSystem* sys);
+  csBulletSector (csBulletSystem* sys);
   virtual ~csBulletSector();
 
   virtual iObject* QueryObject () {return (iObject*) this;}
   //iCollisionSector
   virtual void SetGravity (const csVector3& v);
-  virtual csVector3 GetGravity (){return gravity;}
+  virtual csVector3 GetGravity () const {return gravity;}
 
   virtual void AddCollisionObject(iCollisionObject* object);
   virtual void RemoveCollisionObject(iCollisionObject* object);
@@ -129,10 +119,10 @@ public:
   virtual void Step (float duration);
 
   virtual void SetLinearDampener (float d);
-  virtual float GetLinearDampener () {return linearDampening;}
+  virtual float GetLinearDampener () const {return linearDampening;}
 
   virtual void SetRollingDampener (float d);
-  virtual float GetRollingDampener () {return angularDampening;}
+  virtual float GetRollingDampener () const {return angularDampening;}
 
   virtual void SetAutoDisableParams (float linear,
     float angular, float time);
@@ -151,11 +141,11 @@ public:
   //virtual void SetGimpactEnabled (bool enabled);
   //virtual bool GetGimpactEnabled ();
 
-  virtual void SaveWorld (const char* filename);
+  virtual bool SaveWorld (const char* filename);
 
   virtual void DebugDraw (iView* rview);
-  virtual void SetDebugMode (DebugMode mode);
-  virtual DebugMode GetDebugMode ();
+  virtual void SetDebugMode (CS::Physics::Bullet::DebugMode mode);
+  virtual CS::Physics::Bullet::DebugMode GetDebugMode ();
 
   virtual void StartProfile ();
 
@@ -169,32 +159,26 @@ public:
   HitBeamResult RigidHitBeam(btCollisionObject* object, 
 			     const csVector3& start,
 			     const csVector3& end);
+
+  void UpdateSoftBodies (float timeStep);
 };
 
-class csBulletSystem: public scfImplementation3<
+class csBulletSystem : public scfImplementation3<
   csBulletSystem, CS::Collision::iCollisionSystem, 
   CS::Physics::iPhysicalSystem, iComponent>
 {
-  friend class csBulletCollider;
-  friend class csBulletColliderBox;
-  friend class csBulletColliderSphere;
-  friend class csBulletColliderCylinder;
-  friend class csBulletColliderCapsule;
   friend class csBulletColliderConvexMesh;
   friend class csBulletColliderConcaveMesh;
-  friend class csBulletColliderTerrain;
-  friend class csBulletColliderPlane;
-  friend class csBulletColliderCone;
 
   iObjectRegistry* object_reg;
   csRefArrayObject<CS::Collision::iCollider> colliders;
-  csRefArrayObject<iCollisionObject> objects;
-  csRefArrayObject<iRigidBody> rigidBodies;
-  csRefArrayObject<iSoftBody> softBodies;
-  csRefArrayObject<iJoint> joints;
+  csRefArrayObject<csBulletCollisionObject> objects;
+  csRefArrayObject<csBulletRigidBody> rigidBodies;
+  csRefArrayObject<csBulletSoftBody> softBodies;
+  csRefArrayObject<csBulletJoint> joints;
   csRefArrayObject<iCollisionActor> actors;
-  csRefArrayObject<csBulletSector> collSectors;
-  btSoftBodyWorldInfo defaultInfo;
+  csRefArrayObject<iCollisionSector> collSectors;
+  btSoftBodyWorldInfo* defaultInfo;
   float internalScale;
   float inverseInternalScale;
   csStringID baseID;
@@ -231,18 +215,18 @@ public:
 
   // iCollisionSystem
   virtual void SetInternalScale (float scale);
-  virtual csPtr<iColliderConvexMesh> CreateColliderConvexMesh (iMeshWrapper* mesh);
-  virtual csPtr<iColliderConcaveMesh> CreateColliderConcaveMesh 
+  virtual csRef<iColliderConvexMesh> CreateColliderConvexMesh (iMeshWrapper* mesh);
+  virtual csRef<iColliderConcaveMesh> CreateColliderConcaveMesh 
       (iMeshWrapper* mesh, bool isStatic = false);
-  virtual csPtr<iColliderConcaveMeshScaled> CreateColliderConcaveMeshScaled
+  virtual csRef<iColliderConcaveMeshScaled> CreateColliderConcaveMeshScaled
       (iColliderConcaveMesh* collider, float scale);
   virtual csRef<iColliderCylinder> CreateColliderCylinder (float length, float radius);
   virtual csRef<iColliderBox> CreateColliderBox (const csVector3& size);
   virtual csRef<iColliderSphere> CreateColliderSphere (float radius);
   virtual csRef<iColliderCapsule> CreateColliderCapsule (float length, float radius);
-  virtual csRef<iColliderCapsule> CreateColliderCone (float length, float radius);
-  virtual csRef<iColliderPlane> CreateColliderPlane (const csPlane3& plane) = 0;
-  virtual csRef<iColliderTerrain> CreateColliderTerrain (const iTerrainSystem* terrain,
+  virtual csRef<iColliderCone> CreateColliderCone (float length, float radius);
+  virtual csRef<iColliderPlane> CreateColliderPlane (const csPlane3& plane);
+  virtual csRef<iColliderTerrain> CreateColliderTerrain (iTerrainSystem* terrain,
       float minHeight = 0, float maxHeight = 0);
 
   virtual csRef<iCollisionObject> CreateCollisionObject ();
@@ -279,11 +263,14 @@ public:
       size_t segmentCount1, size_t segmentCount2,
       bool withDiagonals = false);
 
-  virtual csRef<iSoftBody> CreateSoftBody (iGeneralFactoryState* genmeshFactory);
+  virtual csRef<iSoftBody> CreateSoftBody (iGeneralFactoryState* genmeshFactory, 
+    const csOrthoTransform& bodyTransform);
 
   virtual csRef<iSoftBody> CreateSoftBody (csVector3* vertices,
       size_t vertexCount, csTriangle* triangles,
       size_t triangleCount);
+  float getInverseInternalScale() {return inverseInternalScale;}
+  float getInternalScale() {return internalScale;}
 };
 }
 CS_PLUGIN_NAMESPACE_END(Bullet2)

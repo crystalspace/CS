@@ -1,3 +1,11 @@
+#include "btBulletDynamicsCommon.h"
+#include "btBulletCollisionCommon.h"
+#include "BulletCollision/CollisionDispatch/btGhostObject.h"
+
+#include "cssysdef.h"
+#include "iengine/movable.h"
+#include "collisionobject2.h"
+#include "colliders2.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
@@ -53,7 +61,7 @@ void csBulletCollisionObject::SetTransform (const csOrthoTransform& trans)
   //      So this code may be incorrect. I have to mark this.
 
   //TODO: Think about this and RebuildObject...
-  transform = CSToBullet (trans, system->internalScale);
+  transform = CSToBullet (trans, system->getInternalScale ());
 
   if (type == COLLISION_OBJECT_BASE)
   {
@@ -80,7 +88,7 @@ void csBulletCollisionObject::SetTransform (const csOrthoTransform& trans)
 
 csOrthoTransform csBulletCollisionObject::GetTransform ()
 {
-  float inverseScale = system->internalScale;
+  float inverseScale = system->getInternalScale ();
 
   if (type == COLLISION_OBJECT_BASE)
   {
@@ -98,7 +106,7 @@ csOrthoTransform csBulletCollisionObject::GetTransform ()
     }
   }
   else if (type == COLLISION_OBJECT_GHOST)
-    return BulletToCS (btObject->getWorldTransform(), system->inverseInternalScale);
+    return BulletToCS (btObject->getWorldTransform(), system->getInverseInternalScale ());
 }
 
 void csBulletCollisionObject::AddCollider (CS::Collision::iCollider* collider,
@@ -188,7 +196,7 @@ void csBulletCollisionObject::RebuildObject ()
       compoundShape = new btCompoundShape();
       for (size_t i = 0; i < colliderCount; i++)
       {
-        btTransform relaTrans = CSToBullet (relaTransforms[i], system->internalScale);
+        btTransform relaTrans = CSToBullet (relaTransforms[i], system->getInternalScale ());
         compoundShape->addChildShape (relaTrans, colliders[i]->shape);
       }
       //Shift children shape?
@@ -322,7 +330,7 @@ void csBulletCollisionObject::AddBulletObject ()
     {
       btVector3 localInertia (0.0f, 0.0f, 0.0f);
       btRigidBody::btRigidBodyConstructionInfo infos (0.0, motionState,
-        shape, localInertia);
+        compoundShape, localInertia);
       btObject = new btRigidBody (infos);
       btObject->setUserPointer (static_cast<iCollisionObject*> (this));
       sector->bulletWorld->addRigidBody (dynamic_cast<btRigidBody*>(btObject));
@@ -333,7 +341,7 @@ void csBulletCollisionObject::AddBulletObject ()
   else if (type == COLLISION_OBJECT_GHOST)
   {
     btObject = new btPairCachingGhostObject ();
-    btObject->setTransform (transform);
+    btObject->setWorldTransform (transform);
     btObject->setUserPointer (static_cast<iCollisionObject*> (this));
     sector->bulletWorld->addCollisionObject (btObject, 
       short(btBroadphaseProxy::DefaultFilter), 

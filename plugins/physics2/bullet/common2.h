@@ -22,10 +22,7 @@
 #ifndef __CS_BULLET_COMMON_H__
 #define __CS_BULLET_COMMON_H__
 
-//#include "bulletcollision.h"
-#include "ivaria/collision2.h"
-//#include "ivaria/physical2.h"
-#include "ivaria/bullet2.h"
+#include "bullet2.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
@@ -34,6 +31,7 @@
 #include "ivaria/view.h"
 #include "iengine/camera.h"
 #include "csutil/cscolor.h"
+#include "btBulletCollisionCommon.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
 {

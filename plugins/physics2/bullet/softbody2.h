@@ -1,13 +1,22 @@
 #ifndef __CS_BULLET_SOFTBODY_H__
 #define __CS_BULLET_SOFTBODY_H__
 
+#include "bullet2.h"
+#include "common2.h"
+#include "collisionobject2.h"
+
+class btSoftBody;
+
 CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
+using CS::Physics::iRigidBody;
 
-class csBulletSoftBody : scfImplementationExt2<csBulletSoftBody, 
+class csBulletSoftBody : public scfImplementationExt2<csBulletSoftBody, 
   csBulletCollisionObject, CS::Physics::iSoftBody,
   CS::Physics::Bullet::iSoftBody>
 {
+  friend class csBulletRigidBody;
+  friend class csBulletJoint;
 private:
   //CS::Physics::Bullet::BodyType bodyType;
   float friction;
@@ -16,11 +25,11 @@ private:
   btSoftBody* btBody;   //Don't know if I should add this to rigidbody too.
   struct AnimatedAnchor
   {
-    AnimatedAnchor (size_t vertexIndex, iAnchorAnimationControl* controller)
+    AnimatedAnchor (size_t vertexIndex, CS::Physics::iAnchorAnimationControl* controller)
       : vertexIndex (vertexIndex), controller (controller) {}
 
     size_t vertexIndex;
-    csRef<iAnchorAnimationControl> controller;
+    csRef<CS::Physics::iAnchorAnimationControl> controller;
     btVector3 position;
   };
   csArray<AnimatedAnchor> animatedAnchors;
@@ -37,7 +46,7 @@ public:
   virtual void RebuildObject ();
 
   //virtual bool Collide (iCollisionObject* otherObject);
-  virtual HitBeamResult HitBeam (const csVector3& start, const csVector3& end);
+  virtual CS::Collision::HitBeamResult HitBeam (const csVector3& start, const csVector3& end);
 
   btSoftBody* GetBulletSoftPointer () {return btBody;}
   virtual void RemoveBulletObject ();
@@ -45,9 +54,9 @@ public:
 
   //iPhysicalBody
 
-  virtual PhysicalBodyType GetBodyType () {return bodyType;}
+  virtual CS::Physics::PhysicalBodyType GetBodyType () const {return CS::Physics::PhysicalBodyType::BODY_SOFT;}
   virtual iRigidBody* QueryRigidBody () {return NULL;}
-  virtual iSoftBody* QuerySoftBody () {return this;}
+  virtual CS::Physics::iSoftBody* QuerySoftBody () {return dynamic_cast<CS::Physics::iSoftBody*>(this);}
 
   virtual bool Disable ();
   virtual bool Enable ();
@@ -55,7 +64,7 @@ public:
 
   virtual float GetMass ();
 
-  virtual float GetDensity () {return density;}
+  virtual float GetDensity () const {return density;}
   virtual void SetDensity (float density);
 
   virtual float GetVolume ();
@@ -63,7 +72,7 @@ public:
   virtual void AddForce (const csVector3& force);
 
   virtual void SetLinearVelocity (const csVector3& vel);
-  virtual csVector3 GetLinearVelocity (size_t index = 0);
+  virtual csVector3 GetLinearVelocity (size_t index = 0) const;
 
   virtual void SetFriction (float friction);
   virtual float GetFriction () {return friction;}
@@ -77,16 +86,16 @@ public:
 
   virtual void AnchorVertex (size_t vertexIndex);
   virtual void AnchorVertex (size_t vertexIndex,
-    iRigidBody* body);
+    CS::Physics::iRigidBody* body);
   virtual void AnchorVertex (size_t vertexIndex,
-    iAnchorAnimationControl* controller);
+    CS::Physics::iAnchorAnimationControl* controller);
 
   virtual void UpdateAnchor (size_t vertexIndex,
     csVector3& position);
   virtual void RemoveAnchor (size_t vertexIndex);
 
-  virtual void SetRigidity (float rigidity);
   virtual float GetRidigity ();
+  virtual void SetRigidity (float rigidity);
 
   virtual void SetLinearVelocity (const csVector3& velocity,
     size_t vertexIndex);
@@ -147,6 +156,9 @@ public:
   virtual void SetBendingConstraint (bool bending);
 
   virtual void GenerateCluster (int iter);
+
+  void UpdateAnchorPositions ();
+  void UpdateAnchorInternalTick (btScalar timeStep);
 };
 }
 CS_PLUGIN_NAMESPACE_END (Bullet2)

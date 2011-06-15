@@ -1,6 +1,14 @@
 #ifndef __IVARIA_PHYSICS_BULLET_H__
 #define __IVARIA_PHYSICS_BULLET_H__
 
+#include "csutil/scf_interface.h"
+#include "iutil/objreg.h"
+#include "iengine/mesh.h"
+#include "iengine/engine.h"
+#include "imesh/genmesh.h"
+#include "csgeom/tri.h"
+#include "cstool/primitives.h"
+
 namespace CS
 {
 namespace Physics
@@ -138,15 +146,15 @@ struct iPhysicalSector : public virtual iBase
   */
   virtual bool GetSoftBodyEnabled () = 0;
 
-  virtual void SetGimpactEnabled (bool enabled) = 0; 
+  //virtual void SetGimpactEnabled (bool enabled) = 0; 
 
-  virtual bool GetGimpactEnabled () = 0; 
+  //virtual bool GetGimpactEnabled () = 0; 
 
   /**
   * Save the current state of the dynamic world in a file.
   * \return True if the operation succeeds, false otherwise.
   */
-  virtual void SaveWorld (const char* filename) = 0;
+  virtual bool SaveWorld (const char* filename) = 0;
 
   /**
   * Draw the debug informations of the dynamic system. This has to be called

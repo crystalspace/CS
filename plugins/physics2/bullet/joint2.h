@@ -1,8 +1,15 @@
 #ifndef __CS_BULLET_JOINT_H__
 #define __CS_BULLET_JOINT_H__
 
+#include "bullet2.h"
+#include "common2.h"
+#include "BulletSoftBody/btSoftBody.h"
+
+class btGeneric6DofConstraint;
+
 CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
+using CS::Physics::iPhysicalBody;
 
 enum csJointType
 {
@@ -14,7 +21,7 @@ enum csJointType
   SOFT_ANGULAR_JOINT,
 };
 
-class csBulletJoint : scfImplementation1<
+class csBulletJoint : public scfImplementation1<
   csBulletJoint, CS::Physics::iJoint>
 {
 private:
@@ -23,7 +30,7 @@ private:
   csJointType type;
   btGeneric6DofConstraint* rigidJoint;
   btSoftBody::Joint* softJoint;
-  csRef<iPhysicalBody> bodies[2];
+  iPhysicalBody* bodies[2];
   bool transConstraintX;
   bool transConstraintY;
   bool transConstraintZ;
@@ -90,11 +97,11 @@ public:
   virtual void SetMinimumDistance (const csVector3& dist,
     bool forceUpdate = false);
   virtual csVector3 GetMinimumDistance () const
-  { return BulletToCS (minDist, sys->inverseInternalScale); }
+  { return BulletToCS (minDist, sys->getInverseInternalScale ()); }
   virtual void SetMaximumDistance (const csVector3& dist,
     bool forceUpdate = false);
   virtual csVector3 GetMaximumDistance () const
-  { return BulletToCS (maxDist, sys->inverseInternalScale); }
+  { return BulletToCS (maxDist, sys->getInverseInternalScale ()); }
 
   virtual void SetRotConstraints (bool X, 
     bool Y, bool Z, bool forceUpdate = false);
@@ -138,7 +145,7 @@ public:
   virtual void SetLinearEquilibriumPoint (csVector3 point, bool forceUpdate = false);
   virtual void SetAngularEquilibriumPoint (csVector3 point, bool forceUpdate = false);
 
-  virtual void SetBreakingImpulseThreshold (float threshold);
+  virtual void SetBreakingImpulseThreshold (float threshold, bool forceUpdate = false);
   virtual float GetBreakingImpulseThreshold () {return threshold;}
 };
 }

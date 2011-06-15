@@ -1,4 +1,10 @@
+#include "cssysdef.h"
+#include "rigidbody2.h"
+#include "softbody2.h"
 #include "joint2.h"
+
+#include "btBulletDynamicsCommon.h"
+#include "btBulletCollisionCommon.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
@@ -10,7 +16,7 @@ csBulletJoint::csBulletJoint (csBulletSystem* system): scfImplementationType (th
   linearStiff (0.f, 0.f, 0.f), angularStiff (0.f, 0.f, 0.f), linearDamp (1.f, 1.f, 1.f), angularDamp (1.f, 1.f, 1.f), 
   linearEquilPoint (0.f, 0.f, 0.f), angularEquilPoint (0.f, 0.f, 0.f), type (RIGID_6DOF_JOINT)
 {
-  float squaredScale = sys->internalScale * sys->internalScale;
+  float squaredScale = sys->getInternalScale () * sys->getInternalScale ();
   maxforce = btVector3 (0.1f * squaredScale,
     0.1f * squaredScale,
     0.1f * squaredScale);
@@ -20,8 +26,9 @@ csBulletJoint::~csBulletJoint ()
 {
   if (rigidJoint)
   {
-    sector->bulletWorld->removeConstraint (constraint);
-    delete constraint;
+    sector->bulletWorld->removeConstraint (rigidJoint);
+    delete rigidJoint;
+    rigidJoint = NULL;
   }
   if (softJoint)
   {
@@ -98,8 +105,9 @@ void csBulletJoint::SetTransform (const csOrthoTransform& trans, bool forceUpdat
 void csBulletJoint::SetPosition (const csVector3& position, bool forceUpdate)
 {
   this->position = position;
-  transform.Identity ();
-  transform.SetOrigin (position);
+  csBulletCollisionObject* body = dynamic_cast<csBulletCollisionObject*> (bodies[0]);
+  this->transform = body->GetTransform ();
+  transform.SetOrigin (transform.GetOrigin () + position);
 
   if (forceUpdate)
       RebuildJoint ();
@@ -117,14 +125,14 @@ void csBulletJoint::SetTransConstraints (bool X, bool Y, bool Z, bool forceUpdat
 void csBulletJoint::SetMinimumDistance (const csVector3& dist, bool forceUpdate)
 
 {
-  minDist = CSToBullet (dist, sys->internalScale);
+  minDist = CSToBullet (dist, sys->getInternalScale ());
   if (forceUpdate)
     RebuildJoint ();
 }
 
 void csBulletJoint::SetMaximumDistance (const csVector3& dist, bool forceUpdate)
 {
-  maxDist = CSToBullet (dist, sys->internalScale);
+  maxDist = CSToBullet (dist, sys->getInternalScale ());
   if (forceUpdate)
     RebuildJoint ();
 }
@@ -168,7 +176,7 @@ void csBulletJoint::SetDesiredVelocity (const csVector3& velo, bool forceUpdate)
 
 void csBulletJoint::SetMaxForce (const csVector3& force, bool forceUpdate)
 {
-  float squaredScale = sys->internalScale * sys->internalScale;
+  float squaredScale = sys->getInternalScale () * sys->getInternalScale ();
   maxforce = btVector3 (force.x * squaredScale,
     force.y * squaredScale,
     force.z * squaredScale);
@@ -179,15 +187,14 @@ void csBulletJoint::SetMaxForce (const csVector3& force, bool forceUpdate)
 
 csVector3 csBulletJoint::GetMaxForce () const
 {
-  float squaredInverseScale = sys->inverseInternalScale * sys->inverseInternalScale;
+  float squaredInverseScale = sys->getInverseInternalScale () * sys->getInverseInternalScale ();
   return csVector3 (maxforce.getX () * squaredInverseScale,
     maxforce.getY () * squaredInverseScale,
     maxforce.getZ () * squaredInverseScale);
 }
 
-void csBulletJoint::RebuildJoint ()
+bool csBulletJoint::RebuildJoint ()
 {
-  //TODO
   if (isSoft)
   {
     csBulletSoftBody* body = dynamic_cast<csBulletSoftBody*> (bodies[0]);
@@ -202,21 +209,20 @@ void csBulletJoint::RebuildJoint ()
     rigidJoint = NULL;
   }
 
-  if (!bodies[0] || !bodies[1]) return;
+  if (!bodies[0] || !bodies[1]) return false;
 
   if (isSoft)
   {
-    btTransform jointTransform = CSToBullet (transform , sys->internalScale);
+    btTransform jointTransform = CSToBullet (transform , sys->getInternalScale ());
     csBulletSoftBody* body = dynamic_cast<csBulletSoftBody*> (bodies[0]);
     btTransform frA = body->btBody->m_initialWorldTransform.inverse() * jointTransform;
 
-    //TODO 
     if (type == SOFT_LINEAR_JOINT)
     {
       btSoftBody::LJoint::Specs	lspecs;
-      lspecs->cfm		=	1;
-      lspecs->erp		=	1;
-      lspecs->position = CSToBullet (position, sys->internalScale);
+      lspecs.cfm		=	1;
+      lspecs.erp		=	1; 
+      lspecs.position = CSToBullet (position, sys->getInternalScale ());
       if (bodies[1]->GetBodyType () == CS::Physics::BODY_RIGID)
       {  
         csBulletRigidBody* body2 = dynamic_cast<csBulletRigidBody*> (bodies[1]);
@@ -232,14 +238,14 @@ void csBulletJoint::RebuildJoint ()
     else if (type == SOFT_ANGULAR_JOINT)
     {
       btSoftBody::AJoint::Specs	aspecs;
-      aspecs->cfm		=	1;
-      aspecs->erp		=	1;
+      aspecs.cfm		=	1;
+      aspecs.erp		=	1;
       if (!rotConstraintX)
-        aspecs->axis = btVector3(1,0,0);
+        aspecs.axis = btVector3(1,0,0);
       else if (!rotConstraintY)
-        aspecs->axis = btVector3(0,1,0);
+        aspecs.axis = btVector3(0,1,0);
       else if (!rotConstraintZ)
-        aspecs->axis = btVector3(0,0,1);
+        aspecs.axis = btVector3(0,0,1);
 
       if (bodies[1]->GetBodyType () == CS::Physics::BODY_RIGID)
       {  
@@ -256,24 +262,24 @@ void csBulletJoint::RebuildJoint ()
   }
   else
   {
-    btTransform jointTransform = CSToBullet (transform , sys->internalScale);
+    btTransform jointTransform = CSToBullet (transform , sys->getInternalScale ());
     btTransform frA, frB;
     csBulletRigidBody* body1, *body2 = NULL;
     body1 = dynamic_cast<csBulletRigidBody*> (bodies[0]);
     frA = body1->btBody->getCenterOfMassTransform().inverse() * jointTransform;
     if (!body1->btBody)
-      return;
+      return false;
     if (bodies[1])
     {
       body2 = dynamic_cast<csBulletRigidBody*> (bodies[1]);
       if (!body2->btBody)
-        return;
+        return false;
       frB = body2->btBody->getCenterOfMassTransform().inverse() * jointTransform;
 
       if (isSpring)
       {
         btGeneric6DofSpringConstraint* springJoint = new btGeneric6DofSpringConstraint (
-          body1->btBody, body2->btBody, frA, frB, true);
+          *(body1->btBody), *(body2->btBody), frA, frB, true);
         if (transConstraintX)
         {
           springJoint->enableSpring (0, true);
@@ -327,15 +333,15 @@ void csBulletJoint::RebuildJoint ()
         rigidJoint = springJoint;
       }
       else
-        rigidJoint = new btGeneric6DofConstraint (body1->btBody, body2->btBody,
+        rigidJoint = new btGeneric6DofConstraint (*(body1->btBody), *(body2->btBody),
         frA, frB, true);
     }
     else
     {
       if (isSpring)
-        return;
+        return false;
       else
-        rigidJoint = new btGeneric6DofConstraint (body1->btBody, frA, true);
+        rigidJoint = new btGeneric6DofConstraint (*(body1->btBody), frA, true);
     }
 
 
@@ -412,9 +418,10 @@ void csBulletJoint::RebuildJoint ()
       motor->m_damping = 0.1f;
     }
     rigidJoint->getRotationalLimitMotor (2)->m_bounce = bounce[2];
-    rigidJoint->setBreakingImpulseThreshold (threshold * sys->internalScale);
+    rigidJoint->setBreakingImpulseThreshold (threshold * sys->getInternalScale ());
     sector->bulletWorld->addConstraint (rigidJoint, true);
   }
+  return true;
 }
 
 void csBulletJoint::SetSpring (bool isSpring, bool forceUpdate)
@@ -490,7 +497,7 @@ void csBulletJoint::SetBreakingImpulseThreshold (float threshold, bool forceUpda
 {
   this->threshold = threshold;
   if (rigidJoint)
-    rigidJoint->setBreakingImpulseThreshold (threshold * sys->internalScale);
+    rigidJoint->setBreakingImpulseThreshold (threshold * sys->getInternalScale ());
   else
     if (forceUpdate)
       RebuildJoint ();

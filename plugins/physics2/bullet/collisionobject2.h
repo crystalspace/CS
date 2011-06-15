@@ -1,17 +1,23 @@
 #ifndef __CS_BULLET_COLLISIONOBJECT_H__
 #define __CS_BULLET_COLLISIONOBJECT_H__
 
+#include "bullet2.h"
+#include "common2.h"
+#include "colliders2.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
 {
 
 class csBulletCollisionObject: public scfImplementationExt1<
-  csBulletCollisionObject, csObject, iCollisionObject>
+  csBulletCollisionObject, csObject, CS::Collision::iCollisionObject>
 {
   friend class csBulletSector;
   friend class csBulletSystem;
   friend class csBulletMotionState;
   friend class csBulletKinematicMotionState;
+  friend class csBulletJoint;
 
+protected:
   csBulletSector* sector;
   csBulletSystem* system;
   csRefArray<csBulletCollider> colliders;
@@ -20,10 +26,10 @@ class csBulletCollisionObject: public scfImplementationExt1<
   btCollisionObject* btObject;
   btTransform transform;
   csBulletMotionState* motionState;
-  csRef<iCollisionCallback> collCb;
+  csRef<CS::Collision::iCollisionCallback> collCb;
   btCompoundShape* compoundShape;
-  CollisionObjectType type;
-  CollisionGroup collGroup;
+  CS::Collision::CollisionObjectType type;
+  CS::Collision::CollisionGroup collGroup;
   bool insideWorld;
   bool shapeChanged;
   bool isPhysics;
@@ -35,8 +41,8 @@ public:
 
   virtual iObject* QueryObject (void) { return (iObject*) this; }
 
-  virtual void SetObjectType (CollisionObjectType type);
-  virtual CollisionObjectType GetObjectType () {return type;}
+  virtual void SetObjectType (CS::Collision::CollisionObjectType type);
+  virtual CS::Collision::CollisionObjectType GetObjectType () {return type;}
 
   virtual void SetAttachedMovable (iMovable* movable){this->movable = movable;}
   virtual iMovable* GetAttachedMovable (){return movable;}
@@ -56,11 +62,11 @@ public:
   virtual void SetCollisionGroup (const char* name);
   virtual const char* GetCollisionGroup () const {return collGroup.name.GetData ();}
 
-  virtual void SetCollisionCallback (iCollisionCallback* cb) {collCb = cb;}
-  virtual iCollisionCallback* GetCollisionCallback () {return collCb;}
+  virtual void SetCollisionCallback (CS::Collision::iCollisionCallback* cb) {collCb = cb;}
+  virtual CS::Collision::iCollisionCallback* GetCollisionCallback () {return collCb;}
 
   virtual bool Collide (iCollisionObject* otherObject);
-  virtual HitBeamResult HitBeam (const csVector3& start, const csVector3& end);
+  virtual CS::Collision::HitBeamResult HitBeam (const csVector3& start, const csVector3& end);
 
   btCollisionObject* GetBulletCollisionPointer () {return btObject;}
   virtual void RemoveBulletObject ();

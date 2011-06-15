@@ -7,28 +7,55 @@
 #include "iutil/objreg.h"
 #include "ivaria/view.h"
 #include "ivaria/collision2.h"
+#include "igeom/trimesh.h"
 
 #include "csutil/custom_new_disable.h"
 
 #include "btBulletDynamicsCommon.h"
 #include "btBulletCollisionCommon.h"
 #include "BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h"
-#include "BulletCollision/CollisionDispatch/btGhostObject.h"
+#include "BulletSoftBody/btSoftBody.h"
+#include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
+#include "BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h"
+#include "BulletSoftBody/btSoftBodyHelpers.h"
+#include "ConvexBuilder.h"
 
 #include "csutil/custom_new_enable.h"
 
 #include "bullet2.h"
+#include "common2.h"
+#include "colliders2.h"
+#include "rigidbody2.h"
+#include "softbody2.h"
+#include "joint2.h"
 
 const float COLLISION_THRESHOLD = 0.01f;
+#define AABB_DIMENSIONS 10000.0f
 
 CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
 {
 
-#define AABB_DIMENSIONS 10000.0f
+struct PointContactResult : public btCollisionWorld::ContactResultCallback
+{
+  csArray<CollisionData>& colls;
+  csBulletSystem* sys;
+  PointContactResult(csBulletSystem* sys, csArray<CollisionData>& collisions) : colls(collisions), sys(sys) 
+  {
+  }
+  virtual	btScalar	addSingleResult (btManifoldPoint& cp,	const btCollisionObject* colObj0, int partId0,int index0,const btCollisionObject* colObj1,int partId1,int index1)
+  {
+    CollisionData data;
+    data.penetration = cp.m_distance1 * sys->getInternalScale ();
+    data.positionWorldOnA = BulletToCS (cp.m_positionWorldOnA, sys->getInternalScale ());
+    data.positionWorldOnB = BulletToCS (cp.m_positionWorldOnB, sys->getInternalScale ());
+    colls.Push (data);
+    return 0;
+  }
+};
 
 csBulletSector::csBulletSector (csBulletSystem* sys)
  :scfImplementationType (this), sys (sys),
- sector (NULL), debugDraw (NULL),
+ sector (NULL), debugDraw (NULL)
 {
   configuration = new btDefaultCollisionConfiguration ();
   dispatcher = new btCollisionDispatcher (configuration);
@@ -36,22 +63,14 @@ csBulletSector::csBulletSector (csBulletSystem* sys)
 
   const int maxProxies = 32766;
 
-  float scale = sys->internalScale;
-
-  // update AABB world dimensions
-  btVector3 worldAabbMin (-AABB_DIMENSIONS * scale, -AABB_DIMENSIONS * scale,
-    -AABB_DIMENSIONS * scale);
-  btVector3 worldAabbMax (AABB_DIMENSIONS * scale, AABB_DIMENSIONS * scale,
-    AABB_DIMENSIONS * scale);
-
   btVector3 worldAabbMin (-AABB_DIMENSIONS, -AABB_DIMENSIONS, -AABB_DIMENSIONS);
   btVector3 worldAabbMax (AABB_DIMENSIONS, AABB_DIMENSIONS, AABB_DIMENSIONS);
   broadphase = new btAxisSweep3 (worldAabbMin, worldAabbMax, maxProxies);
 
-  bulletWorld = new btDynamicsWorld (dispatcher,
+  bulletWorld = new btDiscreteDynamicsWorld (dispatcher,
     broadphase, solver, configuration);
 
-  SetGravity (csVector3 (0.0f, =9.81f, 0.0f));
+  SetGravity (csVector3 (0.0f, -9.81f, 0.0f));
 }
 
 csBulletSector::~csBulletSector ()
@@ -73,7 +92,7 @@ csBulletSector::~csBulletSector ()
 
 void csBulletSector::SetGravity (const csVector3& v)
 {
-  btVector3 gravity = CSToBullet (v, internalScale);
+  btVector3 gravity = CSToBullet (v, sys->getInternalScale ());
   bulletWorld->setGravity (gravity);
 
   if (isSoftWorld)
@@ -82,12 +101,10 @@ void csBulletSector::SetGravity (const csVector3& v)
 
 void csBulletSector::AddCollisionObject (iCollisionObject* object)
 {
-  csRef<iCollisionObject> obj (object);
+  csRef<csBulletCollisionObject> obj (dynamic_cast<csBulletCollisionObject*>(object));
   collisionObjects.Push (obj);
-
-  csBulletCollisionObject* collObj = dynamic_cast<csBulletCollisionObject*> (object);
-  collObj->sector = this;
-  collObj->AddBulletObject ();
+  obj->sector = this;
+  obj->AddBulletObject ();
 }
 
 void csBulletSector::RemoveCollisionObject (iCollisionObject* object)
@@ -99,7 +116,7 @@ void csBulletSector::RemoveCollisionObject (iCollisionObject* object)
 
   collObject->insideWorld = false;
 
-  collisionObjects.Delete (object);
+  collisionObjects.Delete (collObject);
 }
 
 void csBulletSector::AddPortal (iPortal* portal)
@@ -117,15 +134,10 @@ void csBulletSector::SetSector (iSector* sector)
   //TODO
 }
 
-iSector* csBulletSector::GetSector ()
-{
-  //TODO
-}
-
 HitBeamResult csBulletSector::HitBeam (const csVector3& start, const csVector3& end)
 {
-  btVector3 rayFrom = CSToBullet (start, internalScale);
-  btVector3 rayTo = CSToBullet (end, internalScale);
+  btVector3 rayFrom = CSToBullet (start, sys->getInternalScale ());
+  btVector3 rayTo = CSToBullet (end, sys->getInternalScale ());
 
   btCollisionWorld::ClosestRayResultCallback rayCallback (rayFrom, rayTo);
   bulletWorld->rayTest (rayFrom, rayTo, rayCallback);
@@ -134,7 +146,7 @@ HitBeamResult csBulletSector::HitBeam (const csVector3& start, const csVector3& 
 
   if(rayCallback.hasHit ())
   {
-    csBulletCollisionObject* collObject = dynamic_cast<csBulletCollisionObject*> (
+    csBulletCollisionObject* collObject = (csBulletCollisionObject*) (
       rayCallback.m_collisionObject->getUserPointer ());
 
     if (!collObject->isPhysics)
@@ -144,17 +156,17 @@ HitBeamResult csBulletSector::HitBeam (const csVector3& start, const csVector3& 
         //Portals are not included.
         for (size_t i = 0; i < portals.GetSize (); i++)
         {
-          if (portals[i]->ghostPortal1 == collObject
-            || portals[i]->ghostPortal2 == collObject)
+          if (portals[i].ghostPortal1 == collObject
+            || portals[i].ghostPortal2 == collObject)
             return result;
         }
       }
       result.hasHit = true;
       result.object = collObject;
       result.isect = BulletToCS (rayCallback.m_hitPointWorld,
-        inverseInternalScale);
+        sys->getInverseInternalScale ());
       result.normal = BulletToCS (rayCallback.m_hitNormalWorld,
-        inverseInternalScale);
+        sys->getInverseInternalScale ());
       return result;
     }
     else
@@ -168,11 +180,11 @@ HitBeamResult csBulletSector::HitBeam (const csVector3& start, const csVector3& 
         if (body->rayTest (rayFrom, rayTo, ray))
         {
           result.hasHit = true;
-          result.body = collisionObjects;
+          result.object = collObject;
           result.isect = BulletToCS (rayCallback.m_hitPointWorld,
-            inverseInternalScale);
+            sys->getInverseInternalScale ());
           result.normal = BulletToCS (rayCallback.m_hitNormalWorld,
-            inverseInternalScale);	
+            sys->getInverseInternalScale ());	
 
           // Find the closest vertex that was hit
           // TODO: there must be something more efficient than a second ray test
@@ -209,9 +221,9 @@ HitBeamResult csBulletSector::HitBeam (const csVector3& start, const csVector3& 
         result.hasHit = true;
         result.object = collObject;
         result.isect = BulletToCS (rayCallback.m_hitPointWorld,
-          inverseInternalScale);
+          sys->getInverseInternalScale ());
         result.normal = BulletToCS (rayCallback.m_hitNormalWorld,
-          inverseInternalScale);
+          sys->getInverseInternalScale ());
         return result;
       }
     }
@@ -221,8 +233,8 @@ HitBeamResult csBulletSector::HitBeam (const csVector3& start, const csVector3& 
 
 HitBeamResult csBulletSector::HitBeamPortal (const csVector3& start, const csVector3& end)
 {
-  btVector3 rayFrom = CSToBullet (start, internalScale);
-  btVector3 rayTo = CSToBullet (end, internalScale);
+  btVector3 rayFrom = CSToBullet (start, sys->getInternalScale ());
+  btVector3 rayTo = CSToBullet (end, sys->getInternalScale ());
 
   btCollisionWorld::ClosestRayResultCallback rayCallback (rayFrom, rayTo);
   bulletWorld->rayTest (rayFrom, rayTo, rayCallback);
@@ -231,7 +243,7 @@ HitBeamResult csBulletSector::HitBeamPortal (const csVector3& start, const csVec
 
   if(rayCallback.hasHit ())
   {
-    csBulletCollisionObject* collObject = dynamic_cast<csBulletCollisionObject*> (
+    csBulletCollisionObject* collObject = static_cast<csBulletCollisionObject*> (
       rayCallback.m_collisionObject->getUserPointer ());
 
     if (!collObject->isPhysics)
@@ -239,9 +251,9 @@ HitBeamResult csBulletSector::HitBeamPortal (const csVector3& start, const csVec
       result.hasHit = true;
       result.object = collObject;
       result.isect = BulletToCS (rayCallback.m_hitPointWorld,
-        inverseInternalScale);
+        sys->getInverseInternalScale ());
       result.normal = BulletToCS (rayCallback.m_hitNormalWorld,
-        inverseInternalScale);
+        sys->getInverseInternalScale ());
       return result;
     }
     else
@@ -255,11 +267,11 @@ HitBeamResult csBulletSector::HitBeamPortal (const csVector3& start, const csVec
         if (body->rayTest (rayFrom, rayTo, ray))
         {
           result.hasHit = true;
-          result.body = collisionObjects;
+          result.object = collObject;
           result.isect = BulletToCS (rayCallback.m_hitPointWorld,
-            inverseInternalScale);
+            sys->getInverseInternalScale ());
           result.normal = BulletToCS (rayCallback.m_hitNormalWorld,
-            inverseInternalScale);	
+            sys->getInverseInternalScale ());	
 
           // Find the closest vertex that was hit
           // TODO: there must be something more efficient than a second ray test
@@ -296,9 +308,9 @@ HitBeamResult csBulletSector::HitBeamPortal (const csVector3& start, const csVec
         result.hasHit = true;
         result.object = collObject;
         result.isect = BulletToCS (rayCallback.m_hitPointWorld,
-          inverseInternalScale);
+          sys->getInverseInternalScale ());
         result.normal = BulletToCS (rayCallback.m_hitNormalWorld,
-          inverseInternalScale);
+          sys->getInverseInternalScale ());
         return result;
       }
     }
@@ -309,13 +321,13 @@ HitBeamResult csBulletSector::HitBeamPortal (const csVector3& start, const csVec
 bool csBulletSector::CollisionTest (iCollisionObject* object, csArray<CollisionData>& collisions)
 {
   size_t length = collisions.GetSize ();
-  PointContactResult result(collisions);
+  PointContactResult result(sys, collisions);
 
   csBulletCollisionObject* collObject = dynamic_cast<csBulletCollisionObject*> (object);
   if (collObject->isTerrain)
   {
     //Here is a question. Should we let user to do collision test on terrain object?
-    csBulletColliderTerrain* terrainShape = collObject->colliders[0];
+    csBulletColliderTerrain* terrainShape = dynamic_cast<csBulletColliderTerrain*> (collObject->colliders[0]);
     for (size_t i = 0; i< terrainShape->colliders.GetSize (); i++)
     {
       btRigidBody* body = terrainShape->GetBulletObject (i);
@@ -324,7 +336,7 @@ bool csBulletSector::CollisionTest (iCollisionObject* object, csArray<CollisionD
   }
   bulletWorld->contactTest (collObject->btObject, result);
   if (length != collisions.GetSize ())
-    return trus;
+    return true;
   else
     return false;
 }
@@ -335,8 +347,8 @@ bool csBulletSector::BulletCollide (btCollisionObject* objectA,
   //contactPairTest
   //Does user need the collision data?
   csArray<CollisionData> data;
-  PointContactResult result(data);
-  bulletWorld->contactPairTest (objectA, objectB, data);
+  PointContactResult result(sys, data);
+  bulletWorld->contactPairTest (objectA, objectB, result);
   if (data.IsEmpty ())
     return true;
   else
@@ -347,15 +359,22 @@ HitBeamResult csBulletSector::RigidHitBeam (btCollisionObject* object,
                                             const csVector3& start,
                                             const csVector3& end)
 {
-  btVector3 rayFrom = CSToBullet (start, internalScale);
-  btVector3 rayTo = CSToBullet (end, internalScale);
+  btVector3 rayFrom = CSToBullet (start, sys->getInternalScale ());
+  btVector3 rayTo = CSToBullet (end, sys->getInternalScale ());
 
   btCollisionWorld::ClosestRayResultCallback rayCallback (rayFrom, rayTo);
 
-  //Call RayTestSingle or use callback.process ? 
+  //Call rayTestSingle or use callback.process ? 
   //The latter calls the former, but before that it will check the collision filter.
+  btTransform	rayFromTrans;
+  btTransform	rayToTrans;
 
-  bulletWorld->rayTestSingle (rayFrom, rayTo, object,
+  rayFromTrans.setIdentity();
+  rayFromTrans.setOrigin(rayFrom);
+  rayToTrans.setIdentity();
+  rayToTrans.setOrigin(rayTo);
+
+  bulletWorld->rayTestSingle (rayFromTrans, rayToTrans, object,
                               object->getCollisionShape(),
                               object->getWorldTransform(),
                               rayCallback);
@@ -364,7 +383,7 @@ HitBeamResult csBulletSector::RigidHitBeam (btCollisionObject* object,
 
   if(rayCallback.hasHit ())
   {
-    csBulletCollisionObject* collObject = dynamic_cast<csBulletCollisionObject*> (
+    csBulletCollisionObject* collObject = static_cast<csBulletCollisionObject*> (
       rayCallback.m_collisionObject->getUserPointer ());
 
     if (!collObject->isPhysics)
@@ -372,9 +391,9 @@ HitBeamResult csBulletSector::RigidHitBeam (btCollisionObject* object,
       result.hasHit = true;
       result.object = collObject;
       result.isect = BulletToCS (rayCallback.m_hitPointWorld,
-        inverseInternalScale);
+        sys->getInverseInternalScale ());
       result.normal = BulletToCS (rayCallback.m_hitNormalWorld,
-        inverseInternalScale);
+        sys->getInverseInternalScale ());
       return result;
     }
     else
@@ -388,11 +407,11 @@ HitBeamResult csBulletSector::RigidHitBeam (btCollisionObject* object,
         if (body->rayTest (rayFrom, rayTo, ray))
         {
           result.hasHit = true;
-          result.body = collisionObjects;
+          result.object = collObject;
           result.isect = BulletToCS (rayCallback.m_hitPointWorld,
-            inverseInternalScale);
+            sys->getInverseInternalScale ());
           result.normal = BulletToCS (rayCallback.m_hitNormalWorld,
-            inverseInternalScale);	
+            sys->getInverseInternalScale ());	
 
           // Find the closest vertex that was hit
           // TODO: there must be something more efficient than a second ray test
@@ -429,9 +448,9 @@ HitBeamResult csBulletSector::RigidHitBeam (btCollisionObject* object,
         result.hasHit = true;
         result.object = collObject;
         result.isect = BulletToCS (rayCallback.m_hitPointWorld,
-          inverseInternalScale);
+          sys->getInverseInternalScale ());
         result.normal = BulletToCS (rayCallback.m_hitNormalWorld,
-          inverseInternalScale);
+          sys->getInverseInternalScale ());
         return result;
       }
     }
@@ -441,6 +460,7 @@ HitBeamResult csBulletSector::RigidHitBeam (btCollisionObject* object,
 
 void csBulletSector::SetSimulationSpeed (float speed)
 {
+  //TODO
 }
 
 void csBulletSector::SetStepParameters (float timeStep,
@@ -450,7 +470,7 @@ void csBulletSector::SetStepParameters (float timeStep,
   worldTimeStep = timeStep;
   worldMaxSteps = maxSteps;
   btContactSolverInfo& info = bulletWorld->getSolverInfo ();
-  info.m_numIterations = (int)iterations;
+  info.m_numIterations = (int)interations;
 }
 
 void csBulletSector::Step (float duration)
@@ -490,7 +510,7 @@ void csBulletSector::SetAutoDisableParams (float linear, float angular,
 
 void csBulletSector::AddRidigBody (iRigidBody* body)
 {
-  csRef<iRigidBody> btBody (body);
+  csRef<csBulletRigidBody> btBody (dynamic_cast<csBulletRigidBody*>(body));
   rigidBodies.Push (btBody);
 
   csBulletCollisionObject* collObj = dynamic_cast<csBulletCollisionObject*> (body);
@@ -509,7 +529,7 @@ void csBulletSector::RemoveRigidBody (iRigidBody* body)
 
 void csBulletSector::AddSoftBody (iSoftBody* body)
 {
-  csRef<iSoftBody> btBody (body);
+  csRef<csBulletSoftBody> btBody (dynamic_cast<csBulletSoftBody*>(body));
   softBodies.Push (btBody);
 
   csBulletCollisionObject* collObj = dynamic_cast<csBulletCollisionObject*> (body);
@@ -528,8 +548,8 @@ void csBulletSector::RemoveSoftBody (iSoftBody* body)
 
 void PreTickCallback (btDynamicsWorld* world, btScalar timeStep)
 {
-  csBulletDynamicsSystem* system = (csBulletDynamicsSystem*) world->getWorldUserInfo ();
-  system->UpdateSoftBodies (timeStep);
+  csBulletSector* sector = (csBulletSector*) (world->getWorldUserInfo ());
+  sector->UpdateSoftBodies (timeStep);
 }
 
 void csBulletSector::SetSoftBodyEnabled (bool enabled)
@@ -541,9 +561,9 @@ void csBulletSector::SetSoftBodyEnabled (bool enabled)
   if (enabled == isSoftWorld)
     return;
 
-  isSoftWorld = enabled
+  isSoftWorld = enabled;
   // re-create configuration, dispatcher & dynamics world
-  btVector3 gravity = bulletWorld->getGravity ();
+  btVector3 gra = bulletWorld->getGravity ();
   delete bulletWorld;
   delete dispatcher;
   delete configuration;
@@ -558,7 +578,7 @@ void csBulletSector::SetSoftBodyEnabled (bool enabled)
     softWorldInfo = new btSoftBodyWorldInfo ();
     softWorldInfo->m_broadphase = broadphase;
     softWorldInfo->m_dispatcher = dispatcher;
-    softWorldInfo->m_gravity = gravity;
+    softWorldInfo->m_gravity = gra;
     softWorldInfo->air_density = 1.2f;
     softWorldInfo->water_density = 0.0f;
     softWorldInfo->water_offset = 0.0f;
@@ -574,13 +594,13 @@ void csBulletSector::SetSoftBodyEnabled (bool enabled)
     delete softWorldInfo;
   }
 
-  bulletWorld->setGravity (gravity);
+  bulletWorld->setGravity (gra);
 
   // Register a pre-tick callback
   bulletWorld->setInternalTickCallback (PreTickCallback, this, true);
 }
 
-void csBulletSector::SaveWorld (const char* filename)
+bool csBulletSector::SaveWorld (const char* filename)
 {
   //What's this?
 #ifndef CS_HAVE_BULLET_SERIALIZER
@@ -611,7 +631,7 @@ void csBulletSector::DebugDraw (iView* rview)
 {
   if (!debugDraw)
   {
-    debugDraw = new csBulletDebugDraw (inverseInternalScale);
+    debugDraw = new csBulletDebugDraw (sys->getInverseInternalScale ());
     bulletWorld->setDebugDrawer (debugDraw);
   }
 
@@ -619,7 +639,7 @@ void csBulletSector::DebugDraw (iView* rview)
   debugDraw->DebugDraw (rview);
 }
 
-void csBulletSector::SetDebugMode (DebugMode mode)
+void csBulletSector::SetDebugMode (CS::Physics::Bullet::DebugMode mode)
 {
   if (mode = CS::Physics::Bullet::DEBUG_NOTHING)
   {
@@ -633,14 +653,14 @@ void csBulletSector::SetDebugMode (DebugMode mode)
   }
   if (!debugDraw)
   {
-    debugDraw = new csBulletDebugDraw (inverseInternalScale);
+    debugDraw = new csBulletDebugDraw (sys->getInverseInternalScale ());
     bulletWorld->setDebugDrawer (debugDraw);
   }
 
   debugDraw->SetDebugMode (mode);
 }
 
-DebugMode csBulletSector::GetDebugMode ()
+CS::Physics::Bullet::DebugMode csBulletSector::GetDebugMode ()
 {
   if (!debugDraw)
     return CS::Physics::Bullet::DEBUG_NOTHING;
@@ -654,7 +674,7 @@ void csBulletSector::StartProfile ()
 
   if (!debugDraw)
   {
-    debugDraw = new csBulletDebugDraw (inverseInternalScale);
+    debugDraw = new csBulletDebugDraw (sys->getInverseInternalScale ());
     bulletWorld->setDebugDrawer (debugDraw);
   }
   debugDraw->StartProfile ();
@@ -680,6 +700,15 @@ void csBulletSector::DumpProfile (bool resetProfile /* = true */)
     CProfileManager::Reset ();
 }
 
+void csBulletSector::UpdateSoftBodies (float timeStep)
+{
+  for (csWeakRefArray<csBulletSoftBody>::Iterator it = anchoredSoftBodies.GetIterator (); it.HasNext (); )
+  {
+    csBulletSoftBody* body = static_cast<csBulletSoftBody*> (it.Next ());
+    body->UpdateAnchorInternalTick (timeStep);
+  }
+}
+
 SCF_IMPLEMENT_FACTORY (csBulletSystem)
 
 csBulletSystem::csBulletSystem (iBase* iParent)
@@ -689,6 +718,7 @@ csBulletSystem::csBulletSystem (iBase* iParent)
     object_reg, "crystalspace.shared.stringset");
   baseID = strings->Request ("base");
   colldetID = strings->Request ("colldet");
+  defaultInfo = new btSoftBodyWorldInfo;
 }
 
 csBulletSystem::~csBulletSystem ()
@@ -711,95 +741,95 @@ bool csBulletSystem::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-csPtr<iColliderConvexMesh> csBulletSystem::CreateColliderConvexMesh (iMeshWrapper* mesh)
+csRef<iColliderConvexMesh> csBulletSystem::CreateColliderConvexMesh (iMeshWrapper* mesh)
 {
-  csRef<csBulletCollider> collider;
-  collider.AttachNew (new csBulletColliderConvexMesh (mesh));
+  csRef<csBulletColliderConvexMesh> collider;
+  collider.AttachNew (new csBulletColliderConvexMesh (mesh, this));
 
   colliders.Push (collider);
-  return collider;
+  return (iColliderConvexMesh*)collider;
 }
 
-csPtr<iColliderConcaveMesh> csBulletSystem::CreateColliderConcaveMesh (iMeshWrapper* mesh,
+csRef<iColliderConcaveMesh> csBulletSystem::CreateColliderConcaveMesh (iMeshWrapper* mesh,
                                                                                 bool isStatic /* = false */)
 {
-  csRef<csBulletCollider> collider;
-  collider.AttachNew (new csBulletColliderConcaveMesh (mesh));
+  csRef<csBulletColliderConcaveMesh> collider;
+  collider.AttachNew (new csBulletColliderConcaveMesh (mesh,this));
 
   colliders.Push (collider);
   return collider;
 }
 
-csPtr<iColliderConcaveMeshScaled> csBulletSystem::CreateColliderConcaveMeshScaled (
+csRef<iColliderConcaveMeshScaled> csBulletSystem::CreateColliderConcaveMeshScaled (
   iColliderConcaveMesh* collider, float scale)
 {
-  csRef<csBulletCollider> coll;
-  collider.AttachNew (new csBulletColliderConcaveMeshScaled (coll, scale));
+  csRef<csBulletColliderConcaveMeshScaled> coll;
+  coll.AttachNew (new csBulletColliderConcaveMeshScaled (collider, scale,this));
 
   colliders.Push (coll);
   return coll;
 }
 
-csPtr<iColliderCylinder> csBulletSystem::CreateColliderCylinder (float length, float radius)
+csRef<iColliderCylinder> csBulletSystem::CreateColliderCylinder (float length, float radius)
 {
-  csRef<csBulletCollider> collider;
-  collider.AttachNew (new csBulletColliderCylinder (length, radius));
+  csRef<csBulletColliderCylinder> collider;
+  collider.AttachNew (new csBulletColliderCylinder (length, radius, this));
 
   colliders.Push (collider);
   return collider;
 }
 
-csPtr<iColliderBox> csBulletSystem::CreateColliderBox (const csVector3& size)
+csRef<iColliderBox> csBulletSystem::CreateColliderBox (const csVector3& size)
 {
   csRef<csBulletColliderBox> collider;
-  collider.AttachNew (new csBulletColliderBox (size));
+  collider.AttachNew (new csBulletColliderBox (size, this));
 
   colliders.Push (collider);
   return collider;
 } 
 
-csPtr<iColliderSphere> csBulletSystem::CreateColliderSphere (float radius)
+csRef<iColliderSphere> csBulletSystem::CreateColliderSphere (float radius)
 {
-  csRef<csBulletCollider> collider;
-  collider.AttachNew (new csBulletColliderSphere (radius));
+  csRef<csBulletColliderSphere> collider;
+  collider.AttachNew (new csBulletColliderSphere (radius, this));
 
   colliders.Push (collider);
   return collider;
 }
 
-csPtr<iColliderCapsule> csBulletSystem::CreateColliderCapsule (float length, float radius)
+csRef<iColliderCapsule> csBulletSystem::CreateColliderCapsule (float length, float radius)
 {
-  csRef<csBulletCollider> collider;
-  collider.AttachNew (new csBulletColliderCapsule (length, radius));
+  csRef<csBulletColliderCapsule> collider;
+  collider.AttachNew (new csBulletColliderCapsule (length, radius, this));
   
   colliders.Push (collider);
   return collider;
 }
 
-csPtr<iColliderCapsule> csBulletSystem::CreateColliderCone (float length, float radius)
+csRef<iColliderCone> csBulletSystem::CreateColliderCone (float length, float radius)
 {
-  csRef<csBulletCollider> collider;
-  collider.AttachNew (new csBulletColliderCone (length, radius));
+  csRef<csBulletColliderCone> collider;
+  collider.AttachNew (new csBulletColliderCone (length, radius, this));
 
   colliders.Push (collider);
   return collider;
 }
 
-csPtr<iColliderPlane> csBulletSystem::CreateColliderPlane (const csPlane3& plane)
+csRef<iColliderPlane> csBulletSystem::CreateColliderPlane (const csPlane3& plane)
 {
-  csRef<csBulletCollider> collider;
-  collider.AttachNew (new csBulletColliderPlane (plane));
+  csRef<csBulletColliderPlane> collider;
+  collider.AttachNew (new csBulletColliderPlane (plane, this));
 
   colliders.Push (collider);
   return collider;
 }
 
-csPtr<iColliderTerrain> csBulletSystem::CreateColliderTerrain (const iTerrainSystem* terrain, 
-                                                                        float minHeight /* = 0 */, 
-                                                                        float maxHeight /* = 0 */)
+csRef<iColliderTerrain> csBulletSystem::CreateColliderTerrain (iTerrainSystem* terrain, 
+                                                               float minHeight /* = 0 */, 
+                                                               float maxHeight /* = 0 */)
 {
-  csRef<csBulletCollider> collider;
-  collider.AttachNew (new csBulletColliderTerrain (terrain, minHeight, maxHeight));
+  csRef<csBulletColliderTerrain> collider;
+  collider.AttachNew (new csBulletColliderTerrain (terrain, minHeight, maxHeight, this));
 
   colliders.Push (collider);
   return collider;
@@ -807,7 +837,7 @@ csPtr<iColliderTerrain> csBulletSystem::CreateColliderTerrain (const iTerrainSys
 
 csRef<iCollisionObject> csBulletSystem::CreateCollisionObject ()
 {
-  csRef<iCollisionObject> collObject;
+  csRef<csBulletCollisionObject> collObject;
   collObject.AttachNew (new csBulletCollisionObject (this));
 
   objects.Push (collObject);
@@ -817,15 +847,15 @@ csRef<iCollisionObject> csBulletSystem::CreateCollisionObject ()
 csRef<iCollisionActor> csBulletSystem::CreateCollisionActor ()
 {
   csRef<iCollisionActor> collActor;
-  collActor.AttachNew (new csBulletCollisionActor (this));
+  /*collActor.AttachNew (new csBulletCollisionActor (this));
 
-  actors.Push (collActor);
+  actors.Push (collActor);*/
   return collActor;
 }
 csRef<iCollisionSector> csBulletSystem::CreateCollisionSector ()
 {
   csRef<iCollisionSector> collSector;
-  collSector.AttachNew (new csBulletSector (object_reg, this));
+  collSector.AttachNew (new csBulletSector (this));
 
   collSectors.Push (collSector);
   return collSector;
@@ -834,23 +864,26 @@ csRef<iCollisionSector> csBulletSystem::CreateCollisionSector ()
 CollisionGroup& csBulletSystem::CreateCollisionGroup (const char* name)
 {
 //TODO
+  return CollisionGroup();
 }
 
 CollisionGroup& csBulletSystem::FindCollisionGroup (const char* name)
 {
 //TODO
+  return CollisionGroup();
 }
 
 void csBulletSystem::SetGroupCollision (CollisionGroup& group1,
-                                                 CollisionGroup& group2,
-                                                 bool collide)
+                                        CollisionGroup& group2,
+                                        bool collide)
 {
 //TODO
 }
 bool csBulletSystem::GetGroupCollision (CollisionGroup& group1,
-                                                 CollisionGroup& group2);
+                                        CollisionGroup& group2)
 {
 //TODO
+  return true;
 }
 
 void csBulletSystem::DecomposeConcaveMesh (iCollisionObject* object, iMeshWrapper* mesh)
@@ -860,6 +893,7 @@ void csBulletSystem::DecomposeConcaveMesh (iCollisionObject* object, iMeshWrappe
   class MyConvexDecomposition : public ConvexDecomposition::ConvexDecompInterface
   {
     float scale;
+    btVector3 centroid;
   public:
     btAlignedObjectArray<btConvexHullShape*> m_convexShapes;
     btAlignedObjectArray<btVector3> m_convexCentroids;
@@ -877,62 +911,62 @@ void csBulletSystem::DecomposeConcaveMesh (iCollisionObject* object, iMeshWrappe
       btTriangleMesh* trimesh = new btTriangleMesh();
       btVector3 localScaling(scale, scale, scale);
 
-        //calc centroid, to shift vertices around center of mass
-        centroid.setValue(0,0,0);
+      //calc centroid, to shift vertices around center of mass
+      centroid.setValue(0,0,0);
 
-        btAlignedObjectArray<btVector3> vertices;
-        //const unsigned int *src = result.mHullIndices;
-        for (unsigned int i=0; i<result.mHullVcount; i++)
-        {
-          btVector3 vertex(result.mHullVertices[i*3],result.mHullVertices[i*3+1],result.mHullVertices[i*3+2]);
-          vertex *= localScaling;
-          centroid += vertex;
+      btAlignedObjectArray<btVector3> vertices;
+      //const unsigned int *src = result.mHullIndices;
+      for (unsigned int i=0; i<result.mHullVcount; i++)
+      {
+        btVector3 vertex(result.mHullVertices[i*3],result.mHullVertices[i*3+1],result.mHullVertices[i*3+2]);
+        vertex *= localScaling;
+        centroid += vertex;
 
-        }
+      }
 
-        centroid *= 1.f/(float(result.mHullVcount) );
+      centroid *= 1.f/(float(result.mHullVcount) );
 
-        //const unsigned int *src = result.mHullIndices;
-        for (unsigned int i=0; i<result.mHullVcount; i++)
-        {
-          btVector3 vertex(result.mHullVertices[i*3],result.mHullVertices[i*3+1],result.mHullVertices[i*3+2]);
-          vertex *= localScaling;
-          vertex -= centroid ;
-          vertices.push_back(vertex);
-        }
+      //const unsigned int *src = result.mHullIndices;
+      for (unsigned int i=0; i<result.mHullVcount; i++)
+      {
+        btVector3 vertex(result.mHullVertices[i*3],result.mHullVertices[i*3+1],result.mHullVertices[i*3+2]);
+        vertex *= localScaling;
+        vertex -= centroid ;
+        vertices.push_back(vertex);
+      }
 
-        const unsigned int *src = result.mHullIndices;
-        for (unsigned int i=0; i<result.mHullTcount; i++)
-        {
-          unsigned int index0 = *src++;
-          unsigned int index1 = *src++;
-          unsigned int index2 = *src++;
-
-
-          btVector3 vertex0(result.mHullVertices[index0*3], result.mHullVertices[index0*3+1],result.mHullVertices[index0*3+2]);
-          btVector3 vertex1(result.mHullVertices[index1*3], result.mHullVertices[index1*3+1],result.mHullVertices[index1*3+2]);
-          btVector3 vertex2(result.mHullVertices[index2*3], result.mHullVertices[index2*3+1],result.mHullVertices[index2*3+2]);
-          vertex0 *= localScaling;
-          vertex1 *= localScaling;
-          vertex2 *= localScaling;
-
-          vertex0 -= centroid;
-          vertex1 -= centroid;
-          vertex2 -= centroid;
+      const unsigned int *src = result.mHullIndices;
+      for (unsigned int i=0; i<result.mHullTcount; i++)
+      {
+        unsigned int index0 = *src++;
+        unsigned int index1 = *src++;
+        unsigned int index2 = *src++;
 
 
-          trimesh->addTriangle(vertex0,vertex1,vertex2);
+        btVector3 vertex0(result.mHullVertices[index0*3], result.mHullVertices[index0*3+1],result.mHullVertices[index0*3+2]);
+        btVector3 vertex1(result.mHullVertices[index1*3], result.mHullVertices[index1*3+1],result.mHullVertices[index1*3+2]);
+        btVector3 vertex2(result.mHullVertices[index2*3], result.mHullVertices[index2*3+1],result.mHullVertices[index2*3+2]);
+        vertex0 *= localScaling;
+        vertex1 *= localScaling;
+        vertex2 *= localScaling;
 
-          index0+=mBaseCount;
-          index1+=mBaseCount;
-          index2+=mBaseCount;
-        }
-        btConvexHullShape* convexShape = new btConvexHullShape(&(vertices[0].getX()),vertices.size());
+        vertex0 -= centroid;
+        vertex1 -= centroid;
+        vertex2 -= centroid;
 
-        convexShape->setMargin(0.01f);
-        m_convexShapes.push_back(convexShape);
-        m_convexCentroids.push_back(centroid);
-        mBaseCount+=result.mHullVcount; // advance the 'base index' counter.
+
+        trimesh->addTriangle(vertex0,vertex1,vertex2);
+
+        index0+=mBaseCount;
+        index1+=mBaseCount;
+        index2+=mBaseCount;
+      }
+      btConvexHullShape* convexShape = new btConvexHullShape(&(vertices[0].getX()),vertices.size());
+
+      convexShape->setMargin(0.01f);
+      m_convexShapes.push_back(convexShape);
+      m_convexCentroids.push_back(centroid);
+      mBaseCount+=result.mHullVcount; // advance the 'base index' counter.
     }
 
     int   mBaseCount;
@@ -955,7 +989,7 @@ void csBulletSystem::DecomposeConcaveMesh (iCollisionObject* object, iMeshWrappe
   ConvexDecomposition::DecompDesc desc;
   desc.mVcount       = triMesh->GetVertexCount ();
   desc.mVertices     = (float*)c_vertex;
-  desc.mTcount       = triMesh->GetTriangleCount ()
+  desc.mTcount       = triMesh->GetTriangleCount ();
   desc.mIndices      = (unsigned int *)c_triangle;
   desc.mDepth        = depth;
   desc.mCpercent     = cpercent;
@@ -979,7 +1013,7 @@ void csBulletSystem::DecomposeConcaveMesh (iCollisionObject* object, iMeshWrappe
     trans.setOrigin(centroid);
     btConvexHullShape* convexShape = convexDecomposition.m_convexShapes[i];
     csRef<csBulletCollider> collider;
-    collider.AttachNew (new csBulletColliderConvexMesh (convexShape));
+    collider.AttachNew (new csBulletColliderConvexMesh (convexShape,this));
     colliders.Push (collider);
     relaTransform = BulletToCS (trans, inverseInternalScale);
     btCollObject->AddCollider (collider, relaTransform);
@@ -990,7 +1024,7 @@ void csBulletSystem::DecomposeConcaveMesh (iCollisionObject* object, iMeshWrappe
 
 csRef<iRigidBody> csBulletSystem::CreateRigidBody ()
 {
-  csRef<iRigidBody> body;
+  csRef<csBulletRigidBody> body;
   body.AttachNew (new csBulletRigidBody (this));
 
   rigidBodies.Push (body);
@@ -1019,13 +1053,13 @@ csRef<iJoint> csBulletSystem::CreateRigidP2PJoint (const csVector3 position)
   return joint;
 }
 
-csRef<iJoint> csBulletSystem::CreateSlideJoint (const csOrthoTransform trans,
-                                                float minDist, float maxDist, 
-                                                float minAngle, float maxAngle, int axis)
+csRef<iJoint> csBulletSystem::CreateRigidSlideJoint (const csOrthoTransform trans,
+                                                    float minDist, float maxDist, 
+                                                    float minAngle, float maxAngle, int axis)
 {
-  if (axis < 0 || axis > 2)
-    return;
   csRef<csBulletJoint> joint;
+  if (axis < 0 || axis > 2)
+    return joint;
   joint.AttachNew (new csBulletJoint (this));
   joint->SetTransConstraints (true, true, true);
   joint->SetRotConstraints (true, true, true);
@@ -1049,9 +1083,9 @@ csRef<iJoint> csBulletSystem::CreateSlideJoint (const csOrthoTransform trans,
 csRef<iJoint> csBulletSystem::CreateRigidHingeJoint (const csVector3 position, 
                                                      float minAngle, float maxAngle, int axis)
 {
-  if (axis < 0 || axis > 2)
-    return;
   csRef<csBulletJoint> joint;
+  if (axis < 0 || axis > 2)
+    return joint;
   joint.AttachNew (new csBulletJoint (this));
   joint->SetTransConstraints (true, true, true);
   joint->SetRotConstraints (true, true, true);
@@ -1081,9 +1115,9 @@ csRef<iJoint> csBulletSystem::CreateSoftLinearJoint (const csVector3 position)
 
 csRef<iJoint> csBulletSystem::CreateSoftAngularJoint (int axis)
 {
-  if (axis < 0 || axis > 2)
-    return;
   csRef<csBulletJoint> joint;
+  if (axis < 0 || axis > 2)
+    return joint;
   joint.AttachNew (new csBulletJoint (this));
   if (axis == 0)
     joint->SetRotConstraints (false, true, true);
@@ -1104,7 +1138,7 @@ csRef<iSoftBody> csBulletSystem::CreateRope (csVector3 start,
   //Don't know the soft world info currently. So just set it to NULL
   
   btSoftBody* body = btSoftBodyHelpers::CreateRope
-    (defaultInfo, CSToBullet (start, internalScale),
+    (*defaultInfo, CSToBullet (start, internalScale),
     CSToBullet (end, internalScale), segmentCount - 1, 0);
 
   //hard-coded parameters for hair ropes
@@ -1114,9 +1148,8 @@ csRef<iSoftBody> csBulletSystem::CreateRope (csVector3 start,
 
   csRef<csBulletSoftBody> csBody;
   csBody.AttachNew (new csBulletSoftBody (this, body));
-
   softBodies.Push (csBody);
-  return csBody;
+  return csRef<iSoftBody>(csBody->QuerySoftBody());
 }
 
 csRef<iSoftBody> csBulletSystem::CreateRope (csVector3* vertices, size_t vertexCount)
@@ -1155,7 +1188,7 @@ csRef<iSoftBody> csBulletSystem::CreateCloth (csVector3 corner1, csVector3 corne
                                               bool withDiagonals /* = false */)
 {
   btSoftBody* body = btSoftBodyHelpers::CreatePatch
-    (defaultInfo, CSToBullet (corner1, internalScale),
+    (*defaultInfo, CSToBullet (corner1, internalScale),
     CSToBullet (corner2, internalScale), CSToBullet (corner3, internalScale),
     CSToBullet (corner4, internalScale), segmentCount1, segmentCount2, 0,
     withDiagonals);
@@ -1168,7 +1201,8 @@ csRef<iSoftBody> csBulletSystem::CreateCloth (csVector3 corner1, csVector3 corne
   return csBody;
 }
 
-csRef<iSoftBody> csBulletSystem::CreateSoftBody (iGeneralFactoryState* genmeshFactory)
+csRef<iSoftBody> csBulletSystem::CreateSoftBody (iGeneralFactoryState* genmeshFactory,
+                                                 const csOrthoTransform& bodyTransform)
 {
   btScalar* vertices = new btScalar[genmeshFactory->GetVertexCount () * 3];
   for (int i = 0; i < genmeshFactory->GetVertexCount (); i++)
@@ -1190,7 +1224,7 @@ csRef<iSoftBody> csBulletSystem::CreateSoftBody (iGeneralFactoryState* genmeshFa
   }
 
   btSoftBody* body = btSoftBodyHelpers::CreateFromTriMesh
-    (defaultInfo, vertices, triangles, genmeshFactory->GetTriangleCount (),
+    (*defaultInfo, vertices, triangles, genmeshFactory->GetTriangleCount (),
     false);
 
   body->m_cfg.piterations = 10;
@@ -1226,7 +1260,7 @@ csRef<iSoftBody> csBulletSystem::CreateSoftBody (csVector3* vertices, size_t ver
   }
 
   btSoftBody* body = btSoftBodyHelpers::CreateFromTriMesh
-    (defaultInfo, btVertices, btTriangles, triangleCount, false);
+    (*defaultInfo, btVertices, btTriangles, triangleCount, false);
 
   body->m_cfg.piterations = 10;
   body->m_cfg.collisions |= btSoftBody::fCollision::VF_SS;

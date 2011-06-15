@@ -1,8 +1,12 @@
+#include "cssysdef.h"
+#include "btBulletDynamicsCommon.h"
+#include "btBulletCollisionCommon.h"
+
 #include "rigidbody2.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
-csBulletRigidBody::csBulletRigidBody (iPhysicalSystem* phySys)
+csBulletRigidBody::csBulletRigidBody (csBulletSystem* phySys)
 : scfImplementationType (this, phySys), density (1.0f),
 physicalState (CS::Physics::STATE_DYNAMIC)
 {
@@ -33,7 +37,7 @@ csBulletRigidBody::~csBulletRigidBody ()
 //    compoundShape = new btCompoundShape();
 //    for (size_t i = 0; i < colliderCount; i++)
 //    {
-//      btTransform relaTrans = CSToBullet (relaTransforms[i], system->internalScale);
+//      btTransform relaTrans = CSToBullet (relaTransforms[i], system->getInternalScale ());
 //      compoundShape->addChildShape (relaTrans, colliders[i]->shape);
 //    }
 //    //Shift children shape?
@@ -89,7 +93,8 @@ void csBulletRigidBody::RemoveBulletObject ()
   {
     sector->bulletWorld->removeRigidBody (btBody);
     delete btBody;
-    btBody = btObject = NULL;
+    btBody = NULL;
+    btObject = NULL;
     insideWorld = false;
   }
 }
@@ -110,7 +115,7 @@ void csBulletRigidBody::AddBulletObject ()
       btTransform principalAxis;
       btVector3 principalInertia;
       compoundShape->calculatePrincipalAxisTransform
-        (mass, principalAxis, principalInertia);
+        (&mass, principalAxis, principalInertia);
 
       // create new motion state
       btTransform trans;
@@ -122,7 +127,7 @@ void csBulletRigidBody::AddBulletObject ()
 
       // apply principal axis
       // creation is faster using a new compound to store the shifted children
-      btCompoundShape newCompoundShape = new btCompoundShape();
+      btCompoundShape* newCompoundShape = new btCompoundShape();
       for (int i = 0; i < shapeCount; i++)
       {
         btTransform newChildTransform =
@@ -163,6 +168,7 @@ bool csBulletRigidBody::Disable ()
  {
    btBody->setInterpolationWorldTransform (btBody->getWorldTransform());
    btBody->setActivationState (ISLAND_SLEEPING);
+   return true;
  }
  return false;
 }
@@ -170,7 +176,12 @@ bool csBulletRigidBody::Disable ()
 bool csBulletRigidBody::Enable ()
 {
   if (btBody)
+  {
     btObject->setActivationState (ACTIVE_TAG);
+    return true;
+  }
+  else
+    return false;
 }
 
 bool csBulletRigidBody::IsEnabled ()
@@ -187,10 +198,10 @@ float csBulletRigidBody::GetMass ()
 
   if (btObject)
     return 1.0f / btBody->getInvMass ();
-  return density * GetVolume ();
+  return density * this->GetVolume ();
 }
 
-float csBulletRigidBody::SetDensity (float density)
+void csBulletRigidBody::SetDensity (float density)
 {
   if (density < EPSILON)
     this->density = density;
@@ -214,9 +225,9 @@ void csBulletRigidBody::AddForce (const csVector3& force)
 {
   if (btBody)
   {
-    btBody->applyImpulse (btVector3 (force.x * system->internalScale,
-      force.y * system->internalScale,
-      force.z * system->internalScale),
+    btBody->applyImpulse (btVector3 (force.x * system->getInternalScale (),
+      force.y * system->getInternalScale (),
+      force.z * system->getInternalScale ()),
       btVector3 (0.0f, 0.0f, 0.0f));
     btBody->setActivationState(ACTIVE_TAG);
   }
@@ -227,7 +238,7 @@ void csBulletRigidBody::SetLinearVelocity (const csVector3& vel)
   CS_ASSERT (btBody);
   if (physicalState == CS::Physics::STATE_DYNAMIC)
   {
-    btBody->setLinearVelocity (CSToBullet (vel, system->internalScale));
+    btBody->setLinearVelocity (CSToBullet (vel, system->getInternalScale ()));
     btBody->activate ();
   }
 }
@@ -237,7 +248,7 @@ csVector3 csBulletRigidBody::GetLinearVelocity (size_t index /* = 0 */) const
   CS_ASSERT (btBody);
 
   const btVector3& vel = btBody->getLinearVelocity ();
-  return BulletToCS (vel, system->inverseInternalScale);
+  return BulletToCS (vel, system->getInverseInternalScale ());
 }
 
 void csBulletRigidBody::SetFriction (float friction)
@@ -245,7 +256,7 @@ void csBulletRigidBody::SetFriction (float friction)
   this->friction = friction;
 }
 
-bool csBulletRigidBody::SetState (RigidBodyState state)
+bool csBulletRigidBody::SetState (CS::Physics::RigidBodyState state)
 {
   if (btBody && physicalState != state)
   {
@@ -271,7 +282,7 @@ bool csBulletRigidBody::SetState (RigidBodyState state)
 
     if (previousState == CS::Physics::STATE_KINEMATIC)
     {
-      btBody->setCollisionFlags (body->getCollisionFlags()
+      btBody->setCollisionFlags (btBody->getCollisionFlags()
         & ~btCollisionObject::CF_KINEMATIC_OBJECT);
 
       linearVelocity = btBody->getInterpolationLinearVelocity ();
@@ -363,9 +374,9 @@ void csBulletRigidBody::AddTorque (const csVector3& torque)
 {
   CS_ASSERT (btBody);
 
-  btBody->applyTorque (btVector3 (torque.x * system->internalScale * system->internalScale,
-    torque.y * system->internalScale * system->internalScale,
-    torque.z * system->internalScale * system->internalScale));
+  btBody->applyTorque (btVector3 (torque.x * system->getInternalScale () * system->getInternalScale (),
+    torque.y * system->getInternalScale () * system->getInternalScale (),
+    torque.z * system->getInternalScale () * system->getInternalScale ()));
   btBody->setActivationState(ACTIVE_TAG);
 }
 
@@ -373,11 +384,11 @@ void csBulletRigidBody::AddRelForce (const csVector3& force)
 {
   CS_ASSERT (btBody);
 
-  csOrthoTransform trans = GetTransform ();
+  csOrthoTransform trans =  csBulletCollisionObject::GetTransform ();
   csVector3 absForce = trans.This2Other (force);
-  btBody->applyImpulse (btVector3 (absForce.x * system->internalScale,
-    absForce.y * system->internalScale,
-    absForce.z * system->internalScale),
+  btBody->applyImpulse (btVector3 (absForce.x * system->getInternalScale (),
+    absForce.y * system->getInternalScale (),
+    absForce.z * system->getInternalScale ()),
     btVector3 (0.0f, 0.0f, 0.0f));
   btBody->setActivationState(ACTIVE_TAG);
 }
@@ -386,11 +397,11 @@ void csBulletRigidBody::AddRelTorque (const csVector3& torque)
 {
   CS_ASSERT (btBody);
 
-  csOrthoTransform trans = GetTransform ();
+  csOrthoTransform trans = csBulletCollisionObject::GetTransform ();
   csVector3 absTorque = trans.This2Other (torque);
-  btBody->applyTorque (btVector3 (absTorque.x * system->internalScale * system->internalScale,
-    absTorque.y * system->internalScale * system->internalScale,
-    absTorque.z * system->internalScale * system->internalScale));
+  btBody->applyTorque (btVector3 (absTorque.x * system->getInternalScale () * system->getInternalScale (),
+    absTorque.y * system->getInternalScale () * system->getInternalScale (),
+    absTorque.z * system->getInternalScale () * system->getInternalScale ()));
   btBody->setActivationState(ACTIVE_TAG);
 }
 
@@ -400,15 +411,15 @@ void csBulletRigidBody::AddForceAtPos (const csVector3& force,
 {
   CS_ASSERT (btBody);
 
-  btVector3 btForce (force.x * system->internalScale,
-		     force.y * system->internalScale,
-		     force.z * system->internalScale);
-  csOrthoTransform trans = GetTransform ();
+  btVector3 btForce (force.x * system->getInternalScale (),
+		     force.y * system->getInternalScale (),
+		     force.z * system->getInternalScale ());
+  csOrthoTransform trans = csBulletCollisionObject::GetTransform ();
   csVector3 relPos = trans.Other2This (pos);
 
-  btBody->applyImpulse (btForce, btVector3 (relPos.x * system->internalScale,
-					  relPos.y * system->internalScale,
-					  relPos.z * system->internalScale));
+  btBody->applyImpulse (btForce, btVector3 (relPos.x * system->getInternalScale (),
+					  relPos.y * system->getInternalScale (),
+					  relPos.z * system->getInternalScale ()));
   btBody->setActivationState(ACTIVE_TAG);
 }
 
@@ -417,12 +428,12 @@ void csBulletRigidBody::AddForceAtRelPos (const csVector3& force,
 {
   CS_ASSERT (btBody);
 
-  btBody->applyImpulse (btVector3 (force.x * system->internalScale,
-			   force.y * system->internalScale,
-			   force.z * system->internalScale),
-		btVector3 (pos.x * system->internalScale,
-			   pos.y * system->internalScale,
-			   pos.z * system->internalScale));
+  btBody->applyImpulse (btVector3 (force.x * system->getInternalScale (),
+			   force.y * system->getInternalScale (),
+			   force.z * system->getInternalScale ()),
+		btVector3 (pos.x * system->getInternalScale (),
+			   pos.y * system->getInternalScale (),
+			   pos.z * system->getInternalScale ()));
   btBody->setActivationState(ACTIVE_TAG);
 }
 
@@ -431,15 +442,15 @@ void csBulletRigidBody::AddRelForceAtPos (const csVector3& force,
 {
   CS_ASSERT (btBody);
 
-  csOrthoTransform trans = GetTransform ();
+  csOrthoTransform trans = csBulletCollisionObject::GetTransform ();
   csVector3 absForce = trans.This2Other (force);
   csVector3 relPos = trans.Other2This (pos);
-  btBody->applyImpulse (btVector3 (absForce.x * system->internalScale,
-				 absForce.y * system->internalScale,
-				 absForce.z * system->internalScale),
-		      btVector3 (relPos.x * system->internalScale,
-				 relPos.y * system->internalScale,
-				 relPos.z * system->internalScale));
+  btBody->applyImpulse (btVector3 (absForce.x * system->getInternalScale (),
+				 absForce.y * system->getInternalScale (),
+				 absForce.z * system->getInternalScale ()),
+		      btVector3 (relPos.x * system->getInternalScale (),
+				 relPos.y * system->getInternalScale (),
+				 relPos.z * system->getInternalScale ()));
   btBody->setActivationState(ACTIVE_TAG);
 }
 
@@ -448,14 +459,14 @@ void csBulletRigidBody::AddRelForceAtRelPos (const csVector3& force,
 {
   CS_ASSERT (btBody);
 
-  csOrthoTransform trans = GetTransform ();
+  csOrthoTransform trans = csBulletCollisionObject::GetTransform ();
   csVector3 absForce = trans.This2Other (force);
-  btBody->applyImpulse (btVector3 (absForce.x * system->internalScale,
-				 absForce.y * system->internalScale,
-				 absForce.z * system->internalScale),
-		      btVector3 (pos.x * system->internalScale,
-				 pos.y * system->internalScale,
-				 pos.z * system->internalScale));
+  btBody->applyImpulse (btVector3 (absForce.x * system->getInternalScale (),
+				 absForce.y * system->getInternalScale (),
+				 absForce.z * system->getInternalScale ()),
+		      btVector3 (pos.x * system->getInternalScale (),
+				 pos.y * system->getInternalScale (),
+				 pos.z * system->getInternalScale ()));
   btBody->setActivationState(ACTIVE_TAG);
 }
 
@@ -465,9 +476,9 @@ csVector3 csBulletRigidBody::GetForce () const
     return csVector3 (0);
 
   btVector3 force = btBody->getTotalForce ();
-  return csVector3 (force.getX () * system->inverseInternalScale,
-    force.getY () * system->inverseInternalScale,
-    force.getZ () * system->inverseInternalScale);
+  return csVector3 (force.getX () * system->getInverseInternalScale (),
+    force.getY () * system->getInverseInternalScale (),
+    force.getZ () * system->getInverseInternalScale ());
 }
 
 csVector3 csBulletRigidBody::GetTorque () const
@@ -477,9 +488,9 @@ csVector3 csBulletRigidBody::GetTorque () const
 
   btVector3 torque = btBody->getTotalTorque ();
   return csVector3
-    (torque.getX () * system->inverseInternalScale * system->inverseInternalScale,
-    torque.getY () * system->inverseInternalScale * system->inverseInternalScale,
-    torque.getZ () * system->inverseInternalScale * system->inverseInternalScale);
+    (torque.getX () * system->getInverseInternalScale () * system->getInverseInternalScale (),
+    torque.getY () * system->getInverseInternalScale () * system->getInverseInternalScale (),
+    torque.getZ () * system->getInverseInternalScale () * system->getInverseInternalScale ());
 }
 
 void csBulletRigidBody::SetLinearDampener (float d)
@@ -496,6 +507,28 @@ void csBulletRigidBody::SetRollingDampener (float d)
 
   if (!btBody)
     btBody->setDamping (linearDampening, angularDampening);
+}
+
+csBulletDefaultKinematicCallback::csBulletDefaultKinematicCallback ()
+: scfImplementationType (this)
+{
+}
+
+csBulletDefaultKinematicCallback::~csBulletDefaultKinematicCallback ()
+{
+}
+
+void csBulletDefaultKinematicCallback::GetBodyTransform
+(iRigidBody* body, csOrthoTransform& transform) const
+{
+
+  csBulletRigidBody* rigBody = dynamic_cast<csBulletRigidBody*> (body);
+  iMovable* movable = rigBody->GetAttachedMovable ();
+  if (movable)
+  {
+    transform = movable->GetTransform ();
+    return;
+  }  
 }
 }
 CS_PLUGIN_NAMESPACE_END (Bullet2)
