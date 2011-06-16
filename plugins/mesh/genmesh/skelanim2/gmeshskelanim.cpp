@@ -182,7 +182,7 @@ void csGenmeshSkelAnimationControl::Update (csTicks current, int, uint32)
     return;
   }
 
-  if (!mesh_obj->GetMeshWrapper())
+  if (!mesh_obj->GetMeshWrapper() || !skeleton)
   {
     return;
   }
