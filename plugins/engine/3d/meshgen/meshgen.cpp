@@ -733,7 +733,7 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
   for (size_t i = 0 ; i < geometries.GetSize () ; i++)
     geoRadii[i] = geometries[i]->GetRadius();
   PositionMap positionMap (geoRadii, geometries.GetSize (),
-			   box);
+			   box, cidx);
 
   if(minRadius < 0.0f)
   {
