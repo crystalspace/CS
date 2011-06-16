@@ -1198,5 +1198,18 @@ void csMeshGenerator::AddDensityFactorMap (const char* factorMapID,
   densityFactorMaps.PutUnique (factorMapID, factorMap);
 }
 
+bool csMeshGenerator::IsValidDensityFactorMap (const char* factorMapID) const
+{
+  DensityFactorMap* factorMap = densityFactorMaps.Get (factorMapID, 0);
+  return factorMap != 0;
+}
+
+const CS::Math::Matrix4& csMeshGenerator::GetWorldToMapTransform (const char* factorMapID) const
+{
+  DensityFactorMap* factorMap = densityFactorMaps.Get (factorMapID, 0);
+  CS_ASSERT (factorMap != 0);
+  return factorMap->GetWorldToMapTransform ();
+}
+
 }
 CS_PLUGIN_NAMESPACE_END(Engine)

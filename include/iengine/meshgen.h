@@ -195,7 +195,7 @@ struct iMeshGeneratorGeometry : public virtual iBase
  */
 struct iMeshGenerator : public virtual iBase
 {
-  SCF_INTERFACE(iMeshGenerator, 1, 0, 3);
+  SCF_INTERFACE(iMeshGenerator, 1, 0, 4);
 
   /**
    * Get the iObject for this mesh generator.
@@ -332,6 +332,17 @@ struct iMeshGenerator : public virtual iBase
   virtual void AddDensityFactorMap (const char* factorMapID,
 				    iImage* mapImage,
 				    const CS::Math::Matrix4& worldToMap) = 0;
+  /**
+   * Check if a given density factor map exists.
+   */
+  virtual bool IsValidDensityFactorMap (const char* factorMapID) const = 0;
+
+  /**
+   * Return the world to map transform of a density factor map. This function
+   * does not attempt to check if the factor map actually exists so use
+   * IsValidDensityFactorMap() first!
+   */
+  virtual const CS::Math::Matrix4& GetWorldToMapTransform (const char* factorMapID) const = 0;
 
   /**
    * Set a default density factor. This factor is the final multiplier
