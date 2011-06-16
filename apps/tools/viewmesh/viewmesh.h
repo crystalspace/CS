@@ -76,7 +76,7 @@ class ViewMesh : public CS::Utility::DemoApplication
 
   void Frame ();
 
-  static void Help ();
+  void PrintHelp ();
   void HandleCommandLine();
 
   bool CreateRoom ();
