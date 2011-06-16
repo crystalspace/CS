@@ -30,7 +30,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
   PositionMap::PositionMap (const float* minRadii, size_t numMinRadii,
 			    const csBox2& box)
   {
-    posGen.Initialize();
+    posGen.Initialize(0);
     
     buckets.SetCapacity (numMinRadii);
     for (size_t b = 0; b < numMinRadii; b++)
