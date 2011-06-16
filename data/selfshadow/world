@@ -84,7 +84,7 @@
       </move>
     </meshobj>
     <light name='Lamp'>
-      <center y='20' x='0' z='0'/>
+      <center y='14.75' x='0' z='0'/>
       <color blue='1.0' green='1.0' red='1.0'/>
       <radius>100</radius>
       <type>directional</type>

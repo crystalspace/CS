@@ -92,6 +92,8 @@ namespace CS
           {
             csRef<csShaderVariable> shadowMapProjectSV;
             csRef<csShaderVariable> textureSVs[rtaNumAttachments];
+            csRef<csShaderVariable> farZSV;
+            csRef<csShaderVariable> numSplitsSV;
           };
           Frustum* frustums;
 
@@ -149,6 +151,11 @@ namespace CS
                   CS::InvalidShaderVarStringID);
                 lightFrustum.shadowMapProjectSV->SetArrayElement (j, item);
               }
+
+              lightFrustum.farZSV = lightVarsHelper.CreateTempSV (
+                viewSetup.persist.farZSVName);
+              lightFrustum.numSplitsSV = lightVarsHelper.CreateTempSV (
+                viewSetup.persist.numSplitsSVName);
 
               const ShadowSettings::Target* target =
                 viewSetup.persist.settings.targets[0];
@@ -210,6 +217,8 @@ namespace CS
               shadowMapSize, shadowMapSize);
             // and also this
             lightFrust.textureSVs[target->attachment]->SetValue (tex);
+            lightFrust.farZSV->SetValue(persist.farZ);
+            lightFrust.numSplitsSV->SetValue(persist.numSplits);
             renderTree.AddDebugTexture (tex);
 
             csBox2 clipBox (0, 0, shadowMapSize, shadowMapSize);
@@ -317,6 +326,8 @@ namespace CS
         int shadowMapRes;
         csString configPrefix;
         ShadowSettings settings;
+        CS::ShaderVarStringID farZSVName;
+        CS::ShaderVarStringID numSplitsSVName;
 
         /// Set the prefix for configuration settings
         void SetConfigPrefix (const char* configPrefix)
@@ -336,6 +347,9 @@ namespace CS
           this->g3d = g3d;
           iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
           svNames.SetStrings (strings);
+
+          farZSVName = strings->Request ("light farZ");
+          numSplitsSVName = strings->Request ("light numSplits");
 
           csConfigAccess cfg (objectReg);
           if (configPrefix.IsEmpty())
@@ -400,6 +414,11 @@ namespace CS
             viewSetup.persist.settings.targets[0];
           lightVarsHelper.MergeAsArrayItem (lightStacks[0], 
             lightFrustum.textureSVs[target->attachment], s);
+
+          lightVarsHelper.MergeAsArrayItem (lightStacks[0],
+            lightFrustum.farZSV, 0);
+          lightVarsHelper.MergeAsArrayItem (lightStacks[0],
+            lightFrustum.numSplitsSV, 0);
 
           spreadFlags |= (1 << s);
           s++;        

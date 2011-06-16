@@ -70,7 +70,7 @@ struct ShadowShadowMapDepth : ShadowShadowMap
   void Init (int lightNum, float4 vp_shadowMapCoords, float vp_gradient)
   {
     shadowMapCoords = vp_shadowMapCoords;
-    shadowMap = lightPropsSM.shadowMap[1];
+    shadowMap = lightPropsSM.shadowMap[lightNum];
     gradient = vp_gradient;
     shadowMapUnscale = lightPropsSM.shadowMapUnscale[lightNum];
     
@@ -83,6 +83,11 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     //bias *= 1 + (gradient*gradient*256);
   }
   
+  float _lerp(float a, float b, float w)
+  {
+    return a + w*(b-a);
+  }  
+
   half GetVisibility()
   {
     float2 shadowMapCoordsProjUnscaled = 
@@ -102,8 +107,65 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     //ShadowSamplerSimple sampler;
     ShadowSamplerNoisy sampler;
     sampler.Init (shadowMapCoordsProjUnscaled);
-    inLight = sampler.GetVisibility (shadowMap, shadowMapCoordsBiased.xy, compareDepth);
-    
+    //inLight = sampler.GetVisibility (shadowMap, shadowMapCoordsBiased.xy, compareDepth);
+	
+	int i;
+	int numSplits = lightPropsSM.shadowMapNumSplits[0];
+	float farZ = lightPropsSM.shadowMapFarZ[0];
+	for (i = 1 ; i <= numSplits ; i ++)
+	{
+		float previousSplit = (i - 1) * farZ / numSplits;
+		float nextSplit = i * farZ / numSplits;
+		if (-shadowMapCoords.z < nextSplit)
+		{
+			float previousMap;
+			float nextMap;
+			if (i == 1)
+			{
+				previousMap = tex2D(lightPropsSM.shadowMap[0], shadowMapCoordsBiased.xy);
+				nextMap = tex2D(lightPropsSM.shadowMap[1], shadowMapCoordsBiased.xy);
+			}
+			else if (i == 2)
+			{
+				previousMap = tex2D(lightPropsSM.shadowMap[1], shadowMapCoordsBiased.xy);
+				nextMap = tex2D(lightPropsSM.shadowMap[2], shadowMapCoordsBiased.xy);
+			}
+			else if (i == 3)
+			{
+				previousMap = tex2D(lightPropsSM.shadowMap[2], shadowMapCoordsBiased.xy);
+				nextMap = tex2D(lightPropsSM.shadowMap[3], shadowMapCoordsBiased.xy);
+			}			
+			else if (i == 4)
+			{
+				previousMap = tex2D(lightPropsSM.shadowMap[3], shadowMapCoordsBiased.xy);
+				nextMap = tex2D(lightPropsSM.shadowMap[4], shadowMapCoordsBiased.xy);
+			}	
+			else if (i == 5)
+			{
+				previousMap = tex2D(lightPropsSM.shadowMap[4], shadowMapCoordsBiased.xy);
+				nextMap = tex2D(lightPropsSM.shadowMap[5], shadowMapCoordsBiased.xy);
+			}	
+			else if (i == 6)
+			{
+				previousMap = tex2D(lightPropsSM.shadowMap[5], shadowMapCoordsBiased.xy);
+				nextMap = tex2D(lightPropsSM.shadowMap[6], shadowMapCoordsBiased.xy);
+			}	
+			else if (i == 7)
+			{
+				previousMap = tex2D(lightPropsSM.shadowMap[6], shadowMapCoordsBiased.xy);
+				nextMap = tex2D(lightPropsSM.shadowMap[7], shadowMapCoordsBiased.xy);
+			}				
+			
+			inLight = _lerp(previousMap, nextMap, nextSplit + shadowMapCoords.z - previousSplit);
+			break;
+		}
+	}
+/*
+	if (lightPropsSM.shadowMapNumSplits[0] == 2)
+		inLight = 1;
+	else
+		inLight = 0;
+*/
     return inLight;
   }
 };
