@@ -20,6 +20,7 @@
 #include "csgeom/vector3.h"
 #include "csplugincommon/opengl/glextmanager.h"
 #include "csplugincommon/opengl/glhelper.h"
+#include "csutil/scanstr.h"
 #include "csutil/databuf.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
@@ -294,10 +295,40 @@ csVertexAttrib csShaderGLSLProgram::ResolveBufferDestination (const char* bindin
 
   if (ext)
   {
-    GLint loc = ext->glGetAttribLocationARB (program_id, binding);
-    dest = (csVertexAttrib)(CS_VATTRIB_0 + loc);
-    // TODO: check for CS conventions about bindings between generic
-    //       attributes and specific attributes like position, texcoord, etc.
+    int unit;
+    if (csScanStr (binding, "gl_MultiTexCoord%d", &unit) == 1)
+    {
+      // TODO: unit might be too big for the current implementation
+      dest = (csVertexAttrib)(CS_VATTRIB_TEXCOORD0 + unit);
+    }
+    else if (strcasecmp (binding, "gl_Vertex") == 0)
+    {
+      dest = (csVertexAttrib)(CS_VATTRIB_POSITION);
+    }
+    else if (strcasecmp (binding, "gl_Color") == 0)
+    {
+      dest = (csVertexAttrib)(CS_VATTRIB_PRIMARY_COLOR);
+    }
+    else if (strcasecmp (binding, "gl_Normal") == 0)
+    {
+      dest = (csVertexAttrib)(CS_VATTRIB_NORMAL);
+    }
+    else if (strcasecmp (binding, "gl_FogCoord") == 0)
+    {
+      dest = (csVertexAttrib)(CS_VATTRIB_FOGCOORD);
+    }
+    else
+    {
+      GLint loc = ext->glGetAttribLocationARB (program_id, binding);
+      if (loc != -1)
+      {
+        dest = (csVertexAttrib)(CS_VATTRIB_0 + loc);
+      }
+      else
+      {
+        dest = CS_VATTRIB_UNUSED;
+      }
+    }
   }
 
   return dest;

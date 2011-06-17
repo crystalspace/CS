@@ -3,19 +3,16 @@
   <technique priority="200">
     <pass>
 
-      <buffer source="texture coordinate" destination="texcoord"/>
+      <buffer source="texture coordinate" destination="gl_MultiTexCoord0"/>
       <texture name="tex diffuse" destination="textureDiffuse"/>
 
       <shader plugin="glsl">
         <vp>
           <program>
             <![CDATA[
-              attribute vec2 texcoord;
-              varying vec2 tc;
-
               void main (void)
               {
-                tc = texcoord;
+                gl_TexCoord[0] = gl_MultiTexCoord0;
                 gl_Position = ftransform ();
               }
             ]]>
@@ -24,7 +21,7 @@
 
         <fp>
           <variablemap destination="coeff" type="vector3">
-            <![CDATA[0.1,1.0,0.1]]>
+            <![CDATA[1.0,1.0,0.1]]>
           </variablemap>
 
           <variablemap destination="textureDiffuse" type="int">
@@ -36,11 +33,9 @@
               uniform vec3 coeff;
               uniform sampler2D textureDiffuse;
 
-              varying vec2 tc;
-
               void main (void)
               {
-                vec4 col = texture2D (textureDiffuse, tc);
+                vec4 col = texture2D (textureDiffuse, gl_TexCoord[0].xy);
                 gl_FragColor = col * vec4 (coeff, 0.0);
               }
             ]]>
