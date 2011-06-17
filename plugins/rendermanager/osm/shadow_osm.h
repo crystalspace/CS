@@ -125,40 +125,41 @@ namespace CS
 
           LightingVariablesHelper lightVarsHelper (viewSetup.persist.lightVarsPersist);
 
-          for (uint f = 0; f < 1; f++)
+          csRef<SuperFrustum> newFrust;
+          newFrust.AttachNew (new SuperFrustum);
+          SuperFrustum& superFrustum = *(lightFrustums[lightFrustums.Push (
+            newFrust)]);
+          
+          superFrustum.actualNumParts = viewSetup.numParts;
+          superFrustum.frustums =
+            new typename SuperFrustum::Frustum[superFrustum.actualNumParts];
+
+          for (int i = 0; i < superFrustum.actualNumParts; i++)
           {
-            csRef<SuperFrustum> newFrust;
-            newFrust.AttachNew (new SuperFrustum);
-            SuperFrustum& superFrustum = *(lightFrustums[lightFrustums.Push (
-              newFrust)]);
-            
-            superFrustum.actualNumParts = viewSetup.numParts;
-            superFrustum.frustums =
-              new typename SuperFrustum::Frustum[superFrustum.actualNumParts];
+            typename SuperFrustum::Frustum& lightFrustum =
+              superFrustum.frustums[i];
+            lightFrustum.shadowMapProjectSV = lightVarsHelper.CreateTempSV (
+              viewSetup.persist.svNames.GetLightSVId (
+              csLightShaderVarCache::lightShadowMapProjection));
+            lightFrustum.shadowMapProjectSV->SetArraySize (4);
 
-            for (int i = 0; i < superFrustum.actualNumParts; i++)
+            for (int j = 0; j < 4; j++)
             {
-              typename SuperFrustum::Frustum& lightFrustum =
-                superFrustum.frustums[i];
-              lightFrustum.shadowMapProjectSV = lightVarsHelper.CreateTempSV (
-                viewSetup.persist.svNames.GetLightSVId (
-                csLightShaderVarCache::lightShadowMapProjection));
-              lightFrustum.shadowMapProjectSV->SetArraySize (4);
+              csShaderVariable* item = lightVarsHelper.CreateTempSV (
+                CS::InvalidShaderVarStringID);
+              lightFrustum.shadowMapProjectSV->SetArrayElement (j, item);
+            }
 
-              for (int j = 0; j < 4; j++)
-              {
-                csShaderVariable* item = lightVarsHelper.CreateTempSV (
-                  CS::InvalidShaderVarStringID);
-                lightFrustum.shadowMapProjectSV->SetArrayElement (j, item);
-              }
+            superFrustum.farZSV = lightVarsHelper.CreateTempSV (
+              viewSetup.persist.farZSVName);
+            superFrustum.numSplitsSV = lightVarsHelper.CreateTempSV (
+              viewSetup.persist.numSplitsSVName);
 
-              superFrustum.farZSV = lightVarsHelper.CreateTempSV (
-                viewSetup.persist.farZSVName);
-              superFrustum.numSplitsSV = lightVarsHelper.CreateTempSV (
-                viewSetup.persist.numSplitsSVName);
-
+            size_t numTex = viewSetup.persist.settings.targets.GetSize();
+            for (size_t t = 0; t < numTex; t++)
+            {
               const ShadowSettings::Target* target =
-                viewSetup.persist.settings.targets[0];
+                viewSetup.persist.settings.targets[t];
               lightFrustum.textureSVs[target->attachment] =
                 lightVarsHelper.CreateTempSV (target->svName);
             }
@@ -179,62 +180,68 @@ namespace CS
 
           typename RenderTree::ContextNode& context = meshNode->GetOwner();
 
-          const SuperFrustum& superFrust = *(lightFrustums.frustums[0]);
-          
-          for (int frustNum = 0 ; frustNum < superFrust.actualNumParts ; frustNum ++)
+          // here should be lightFrustums.frustums.GetSize()
+          for (size_t l = 0; l < 1; l++)
           {
-            const typename SuperFrustum::Frustum& lightFrust = 
-              superFrust.frustums[frustNum];
-            CS::RenderManager::RenderView* rview = context.renderView;
-            csRef<CS::RenderManager::RenderView> newRenderView;
-            newRenderView = renderTree.GetPersistentData().renderViews.CreateRenderView ();
-            newRenderView->SetEngine (rview->GetEngine ());
-            newRenderView->SetThisSector (rview->GetThisSector ());
-
-            CS::Math::Matrix4 matrix = rview->GetCamera()->GetProjectionMatrix();
-
-            for (int i = 0; i < 4; i++)
+            const SuperFrustum& superFrust = *(lightFrustums.frustums[l]);
+            
+            for (int frustNum = 0 ; frustNum < superFrust.actualNumParts ; frustNum ++)
             {
-              csShaderVariable* item = lightFrust.shadowMapProjectSV->GetArrayElement (i);
-              item->SetValue (matrix.Row (i));
+              const typename SuperFrustum::Frustum& lightFrust = 
+                superFrust.frustums[frustNum];
+              CS::RenderManager::RenderView* rview = context.renderView;
+              csRef<CS::RenderManager::RenderView> newRenderView;
+              newRenderView = renderTree.GetPersistentData().renderViews.CreateRenderView ();
+              newRenderView->SetEngine (rview->GetEngine ());
+              newRenderView->SetThisSector (rview->GetThisSector ());
+
+              CS::Math::Matrix4 matrix = rview->GetCamera()->GetProjectionMatrix();
+
+              for (int i = 0; i < 4; i++)
+              {
+                csShaderVariable* item = lightFrust.shadowMapProjectSV->GetArrayElement (i);
+                item->SetValue (matrix.Row (i));
+              }
+
+              int shadowMapSize = viewSetup.persist.shadowMapRes;
+
+              csRef<iCustomMatrixCamera> shadowViewCam =
+                newRenderView->GetEngine()->CreateCustomMatrixCamera();
+              newRenderView->SetCamera (shadowViewCam->GetCamera());
+
+              csPlane3 farplane(0,0,-1,viewSetup.splitDists[frustNum]);
+              shadowViewCam->GetCamera()->SetFarPlane(&farplane);
+
+              shadowViewCam->SetProjectionMatrix (matrix);
+              shadowViewCam->GetCamera()->SetTransform (light->GetMovable()->GetTransform());
+
+              typename RenderTree::ContextNode* shadowMapCtx = 
+                renderTree.CreateContext (newRenderView);
+
+              for (size_t t = 0; t < persist.settings.targets.GetSize(); t++)
+              {
+                ShadowSettings::Target* target =
+                  viewSetup.persist.settings.targets[t];
+                iTextureHandle* tex = target->texCache.QueryUnusedTexture (
+                  shadowMapSize, shadowMapSize);
+                // register SVs
+                lightFrust.textureSVs[target->attachment]->SetValue (tex);
+                renderTree.AddDebugTexture (tex);
+
+                shadowMapCtx->renderTargets[target->attachment].texHandle = tex;
+                shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
+              }
+
+              csBox2 clipBox (0, 0, shadowMapSize, shadowMapSize);
+              csRef<iClipper2D> newView;
+              newView.AttachNew (new csBoxClipper (clipBox));
+              newRenderView->SetClipper (newView);
+
+              // Setup the new context
+              ShadowmapContextSetup contextFunction (layerConfig,
+                persist.shaderManager, viewSetup, false);
+              contextFunction (*shadowMapCtx);
             }
-
-            int shadowMapSize = viewSetup.persist.shadowMapRes;
-
-            csRef<iCustomMatrixCamera> shadowViewCam =
-              newRenderView->GetEngine()->CreateCustomMatrixCamera();
-            newRenderView->SetCamera (shadowViewCam->GetCamera());
-
-            csPlane3 farplane(0,0,-1,viewSetup.splitDists[frustNum]);
-            shadowViewCam->GetCamera()->SetFarPlane(&farplane);
-
-            shadowViewCam->SetProjectionMatrix (matrix);
-            shadowViewCam->GetCamera()->SetTransform (light->GetMovable()->GetTransform());
-
-            ShadowSettings::Target* target =
-              viewSetup.persist.settings.targets[0];
-            iTextureHandle* tex = target->texCache.QueryUnusedTexture (
-              shadowMapSize, shadowMapSize);
-            // and also this
-            lightFrust.textureSVs[target->attachment]->SetValue (tex);
-//             lightFrust.farZSV->SetValue(persist.farZ);
-//             lightFrust.numSplitsSV->SetValue(persist.numSplits);
-            renderTree.AddDebugTexture (tex);
-
-            csBox2 clipBox (0, 0, shadowMapSize, shadowMapSize);
-            csRef<iClipper2D> newView;
-            newView.AttachNew (new csBoxClipper (clipBox));
-            newRenderView->SetClipper (newView);
-
-            typename RenderTree::ContextNode* shadowMapCtx = 
-              renderTree.CreateContext (newRenderView);
-            shadowMapCtx->renderTargets[target->attachment].texHandle = tex;
-            shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
-
-            // Setup the new context
-            ShadowmapContextSetup contextFunction (layerConfig,
-              persist.shaderManager, viewSetup, false);
-            contextFunction (*shadowMapCtx);
           }
         }
 
@@ -315,10 +322,8 @@ namespace CS
       struct PersistentData
       {
         csLightShaderVarCache svNames;
-        LightingSorter::PersistentData lightSorterPersist;
         LightingVariablesHelper::PersistentData lightVarsPersist;
         iShaderManager* shaderManager;
-        csRefArray<iTextureHandle> emptySMs;
         iGraphics3D* g3d;
 
         int numSplits;
@@ -407,24 +412,28 @@ namespace CS
         {
           typename CachedLightData::SuperFrustum::Frustum& lightFrustum =
             superFrust.frustums[f];
-          lightVarsHelper.MergeAsArrayItem (lightStacks[0],
+          lightVarsHelper.MergeAsArrayItem (lightStacks[lightNum],
             lightFrustum.shadowMapProjectSV, s);
 
-          const ShadowSettings::Target* target =
-            viewSetup.persist.settings.targets[0];
-          lightVarsHelper.MergeAsArrayItem (lightStacks[0], 
-            lightFrustum.textureSVs[target->attachment], s);
-
+          for (size_t t = 0; t < persist.settings.targets.GetSize(); t++)
+          {
+            const ShadowSettings::Target* target =
+              viewSetup.persist.settings.targets[t];
+            lightVarsHelper.MergeAsArrayItem (lightStacks[lightNum], 
+              lightFrustum.textureSVs[target->attachment], s);
+          }
           spreadFlags |= (1 << s);
           s++;        
         }
 
         CS::ShaderVarStringID name = superFrust.numSplitsSV->GetName();
-        superFrust.numSplitsSV = lightVarsHelper.CreateVarOnStack(name, lightStacks[0]);
+        superFrust.numSplitsSV = lightVarsHelper.CreateVarOnStack(name, 
+          lightStacks[lightNum]);
         superFrust.numSplitsSV->SetValue(viewSetup.persist.numSplits);
 
         name = superFrust.farZSV->GetName();
-        superFrust.farZSV = lightVarsHelper.CreateVarOnStack(name, lightStacks[0]);
+        superFrust.farZSV = lightVarsHelper.CreateVarOnStack(name, 
+          lightStacks[lightNum]);
         superFrust.farZSV->SetValue(viewSetup.persist.farZ);
 
         return spreadFlags;
