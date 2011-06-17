@@ -31,7 +31,6 @@ struct ShadowShadowMapDepth : ShadowShadowMap
   sampler2D shadowMap;
   float bias;
   float gradient;
-  float4 shadowMapUnscale;
 
   void InitVP (int lightNum, float4 surfPositionWorld,
                float3 normWorld,
@@ -72,7 +71,6 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     shadowMapCoords = vp_shadowMapCoords;
     shadowMap = lightPropsSM.shadowMap[lightNum];
     gradient = vp_gradient;
-    shadowMapUnscale = lightPropsSM.shadowMapUnscale[lightNum];
     
     // Project SM coordinates
     shadowMapCoordsProj = shadowMapCoords;
@@ -83,89 +81,49 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     //bias *= 1 + (gradient*gradient*256);
   }
   
-  float _lerp(float a, float b, float w)
+  float getMapValue(int i, float2 position)
   {
-    return a + w*(b-a);
-  }  
-
+    if (i == 0)
+      return tex2D(lightPropsSM.shadowMap[0], position);
+    else if (i == 1)
+      return tex2D(lightPropsSM.shadowMap[1], position);
+    else if (i == 2)
+      return tex2D(lightPropsSM.shadowMap[2], position);
+    else if (i == 3)
+      return tex2D(lightPropsSM.shadowMap[3], position);	
+    else if (i == 4)
+      return tex2D(lightPropsSM.shadowMap[4], position);	
+    else if (i == 5)
+      return tex2D(lightPropsSM.shadowMap[5], position);	
+    else if (i == 6)
+      return tex2D(lightPropsSM.shadowMap[6], position);	
+    
+    return tex2D(lightPropsSM.shadowMap[7], position);
+  }
+  
   half GetVisibility()
   {
-    float2 shadowMapCoordsProjUnscaled = 
-      (shadowMapCoordsProj.xy) * shadowMapUnscale.xy + shadowMapUnscale.zw;
-    
-    ShadowClipper clipper;
-    if (clipper.IsClipped (shadowMapCoordsProjUnscaled, shadowMapCoordsProj.xyz,
-        shadowMapCoords))
-      return clipper.ClippedFactor ();
-
-    float3 shadowMapCoordsBiased = (float3(0.5)*shadowMapCoordsProj.xyz) + float3(0.5);
-    // Depth to compare against
-    float compareDepth = (1-shadowMapCoordsBiased.z) - bias;
-    
-    // Depth compare with shadow map texel
+    float3 shadowMapCoordsBiased = (float3(0.5)*shadowMapCoordsProj.xyz) + float3(0.5);    
     half inLight;
-    //ShadowSamplerSimple sampler;
-    ShadowSamplerNoisy sampler;
-    sampler.Init (shadowMapCoordsProjUnscaled);
-    //inLight = sampler.GetVisibility (shadowMap, shadowMapCoordsBiased.xy, compareDepth);
 	
-	int i;
-	int numSplits = lightPropsSM.shadowMapNumSplits;
-	float farZ = lightPropsSM.shadowMapFarZ;
-	for (i = 1 ; i <= numSplits ; i ++)
-	{
-		float previousSplit = (i - 1) * farZ / numSplits;
-		float nextSplit = i * farZ / numSplits;
-		if (-shadowMapCoords.z < nextSplit)
-		{
-			float previousMap;
-			float nextMap;
-			if (i == 1)
-			{
-				previousMap = tex2D(lightPropsSM.shadowMap[0], shadowMapCoordsBiased.xy);
-				nextMap = tex2D(lightPropsSM.shadowMap[1], shadowMapCoordsBiased.xy);
-			}
-			else if (i == 2)
-			{
-				previousMap = tex2D(lightPropsSM.shadowMap[1], shadowMapCoordsBiased.xy);
-				nextMap = tex2D(lightPropsSM.shadowMap[2], shadowMapCoordsBiased.xy);
-			}
-			else if (i == 3)
-			{
-				previousMap = tex2D(lightPropsSM.shadowMap[2], shadowMapCoordsBiased.xy);
-				nextMap = tex2D(lightPropsSM.shadowMap[3], shadowMapCoordsBiased.xy);
-			}			
-			else if (i == 4)
-			{
-				previousMap = tex2D(lightPropsSM.shadowMap[3], shadowMapCoordsBiased.xy);
-				nextMap = tex2D(lightPropsSM.shadowMap[4], shadowMapCoordsBiased.xy);
-			}	
-			else if (i == 5)
-			{
-				previousMap = tex2D(lightPropsSM.shadowMap[4], shadowMapCoordsBiased.xy);
-				nextMap = tex2D(lightPropsSM.shadowMap[5], shadowMapCoordsBiased.xy);
-			}	
-			else if (i == 6)
-			{
-				previousMap = tex2D(lightPropsSM.shadowMap[5], shadowMapCoordsBiased.xy);
-				nextMap = tex2D(lightPropsSM.shadowMap[6], shadowMapCoordsBiased.xy);
-			}	
-			else if (i == 7)
-			{
-				previousMap = tex2D(lightPropsSM.shadowMap[6], shadowMapCoordsBiased.xy);
-				nextMap = tex2D(lightPropsSM.shadowMap[7], shadowMapCoordsBiased.xy);
-			}				
-			
-			inLight = _lerp(previousMap, nextMap, nextSplit + shadowMapCoords.z - previousSplit);
-			break;
-		}
-	}
-/*
-	if (lightPropsSM.shadowMapNumSplits[0] == 2)
-		inLight = 1;
-	else
-		inLight = 0;
-*/
+    int numSplits = lightPropsSM.shadowMapNumSplits;
+    float farZ = lightPropsSM.shadowMapFarZ;
+	
+    for (int i = 1 ; i <= numSplits ; i ++)
+    {
+      float previousSplit = (i - 1) * farZ / numSplits;
+      float nextSplit = i * farZ / numSplits;
+      
+      if (-shadowMapCoords.z < nextSplit)
+      {
+        float previousMap = getMapValue(i - 1, shadowMapCoordsBiased.xy);
+        float nextMap = getMapValue(i, shadowMapCoordsBiased.xy);
+		
+        inLight = lerp(previousMap, nextMap, nextSplit + shadowMapCoords.z - previousSplit);
+        break;
+      }
+    }
+
     return inLight;
   }
 };
