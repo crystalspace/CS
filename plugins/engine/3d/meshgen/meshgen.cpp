@@ -1194,7 +1194,6 @@ void csMeshGenerator::AddDensityFactorMap (const char* factorMapID,
   factorMap.AttachNew (new DensityFactorMap);
   factorMap->SetImage (mapImage);
   factorMap->SetWorldToMapTransform (worldToMap);
-  if (!factorMap->IsValid()) return;
   densityFactorMaps.PutUnique (factorMapID, factorMap);
 }
 
