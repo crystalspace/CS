@@ -388,6 +388,9 @@ private:
   float density_scale;
   float density_maxfactor;
 
+  /// Default density factor.
+  float default_density_factor;
+
   /// For alpha scaling.
   bool use_alpha_scaling;
   float alpha_mindist, sq_alpha_mindist, alpha_maxdist;
@@ -471,6 +474,8 @@ private:
   size_t CountPositions (int cidx, csMGCell& cell);
   size_t CountAllPositions ();
 
+  void ClearAllPositions ();
+
 protected:
   void InternalRemove() { SelfDestruct(); }
 
@@ -542,6 +547,14 @@ public:
   virtual void AddDensityFactorMap (const char* factorMapID,
 				    iImage* mapImage,
 				    const CS::Math::Matrix4& worldToMap);
+  virtual void UpdateDensityFactorMap (const char* factorMapID, iImage* mapImage);
+  virtual bool IsValidDensityFactorMap (const char* factorMapID) const;
+  virtual const CS::Math::Matrix4& GetWorldToMapTransform (const char* factorMapID) const;
+  virtual int GetDensityFactorMapWidth (const char* factorMapID) const;
+  virtual int GetDensityFactorMapHeight (const char* factorMapID) const;
+
+  virtual void SetDefaultDensityFactor (float factor);
+  virtual float GetDefaultDensityFactor () const { return default_density_factor; }
 
   //--------------------- iSelfDestruct implementation -------------------//
 

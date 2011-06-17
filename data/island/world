@@ -139,10 +139,10 @@
 
     <start name="start_position">
         <sector>TerrainSector</sector>
-        <position x="263" y="70" z="406" />
+	<position x="637.623" y="74.9038" z="-104.723" />
         <!--position x="10" y="70" z="10" /-->
-        <up x="-0.135703" y="0.971338" z="-0.19516" />
-        <forward x="-0.55453" y="-0.237703" z="-0.797492" />
+    	<up x="0.0119134" y="0.999872" z="-0.0106786" />
+    	<forward x="-0.744546" y="0.0159989" z="0.667377" />
     </start>
 
     <sector name="TerrainSector">

@@ -20,6 +20,18 @@
 <shader compiler="shaderweaver" name="lighting_fullbright_instance">
   <technique priority="200">
     <pass>
+      <!-- First pass: blend with alpha. -->
+      <mixmode>
+        <blendop src="srcalpha" dst="srcalpha_inv" />
+        <alphatest>disable</alphatest>
+      </mixmode>
+      <alphatocoverage/>
+      <!-- ATC provides an alpha-blending 'lookalike' -->
+      <atcmixmode>
+        <blendop src="one" dst="zero" />
+        <alphatest>disable</alphatest>
+      </atcmixmode>
+
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 
       <!-- Snippets - the building blocks of this shader. -->
@@ -29,6 +41,7 @@
       <snippet id="surface" file="/shader-snippets/surface/surface-modulate.xml" />
       <snippet id="apply_mixmode_alpha" file="/shader-snippets/mixmode-alpha.xml" />
       <snippet id="glow" file="/shader-snippets/lighting/glow.xml" />
+      <snippet id="apply_alpha_end" file="/shader-snippets/surface/alpha-modulate-instance.xml" />
       <snippet id="sectorfog" file="/shader-snippets/fog/fog-sector.xml" />
       <snippet id="hdrscale" file="/shader-snippets/hdr-postscale.xml" />
       <!-- "connections" describe what snippets take input from what other
@@ -38,7 +51,8 @@
       <connection from="parallax" to="surface" />
       <connection from="surface" to="apply_mixmode_alpha" />
       <connection from="apply_mixmode_alpha" to="glow" />
-      <connection from="glow" to="sectorfog" />
+      <connection from="glow" to="apply_alpha_end" />
+      <connection from="apply_alpha_end" to="sectorfog" />
       <connection from="sectorfog" to="hdrscale" />
     </pass>
   </technique>

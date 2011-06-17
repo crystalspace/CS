@@ -253,30 +253,15 @@
         <meshgen name="grass">
 	    <densityfactormap name="fertile">
 		<image>/lev/terrain/density_fertile.png</image>
-		<world2image>
-		    <m11>0.00390625</m11><m12>0</m12><m13>0</m13><m14>0.49609375</m14>
-		    <m21>0</m21><m22>0</m22><m23>-0.00390625</m23><m24>0.50390625</m24>
-		    <m31>0</m31><m32>0</m32><m33>0</m33><m34>0</m34>
-		    <m41>0</m41><m42>0</m42><m43>0</m43><m44>0</m44>
-		</world2image>
+		<scale w="256" h="256" />
 	    </densityfactormap>
 	    <densityfactormap name="stone">
 		<image>/lev/terrain/density_stone.png</image>
-		<world2image>
-		    <m11>0.00390625</m11><m12>0</m12><m13>0</m13><m14>0.49609375</m14>
-		    <m21>0</m21><m22>0</m22><m23>-0.00390625</m23><m24>0.50390625</m24>
-		    <m31>0</m31><m32>0</m32><m33>0</m33><m34>0</m34>
-		    <m41>0</m41><m42>0</m42><m43>0</m43><m44>0</m44>
-		</world2image>
+		<scale w="256" h="256" />
 	    </densityfactormap>
 	    <densityfactormap name="road">
 		<image>/lev/terrain/density_road.png</image>
-		<world2image>
-		    <m11>0.00390625</m11><m12>0</m12><m13>0</m13><m14>0.49609375</m14>
-		    <m21>0</m21><m22>0</m22><m23>-0.00390625</m23><m24>0.50390625</m24>
-		    <m31>0</m31><m32>0</m32><m33>0</m33><m34>0</m34>
-		    <m41>0</m41><m42>0</m42><m43>0</m43><m44>0</m44>
-		</world2image>
+		<scale w="256" h="256" />
 	    </densityfactormap>
             <geometry>
                 <factory maxdist="30" name="treebark_bare" />

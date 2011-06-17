@@ -1510,12 +1510,12 @@ AC_DEFUN([CS_CHECK_LIBOPENAL],
 	[AC_LANG_PROGRAM(
 	    [CS_AL_INCLUDE([CS_OPENAL_PATH],[AL],[alc.h])],
 	    [alcCreateContext (0,0);])],
-	[CS_CREATE_TUPLE([-DCS_OPENAL_PATH=OpenAL],[],[-framework OpenAL]) \
-	CS_CREATE_TUPLE([],[],[-lopenal]) \
+	[CS_CREATE_TUPLE([],[],[-lopenal]) \
 	CS_CREATE_TUPLE([],[],[-lopenal32]) \
 	CS_CREATE_TUPLE([],[],[-lOpenAL32]) \
 	CS_CREATE_TUPLE([],[],[-lopenal -ldsound]) \
-	CS_CREATE_TUPLE([],[],[-lopenal32 -ldsound])], [],
+	CS_CREATE_TUPLE([],[],[-lopenal32 -ldsound]) \
+    CS_CREATE_TUPLE([-DCS_OPENAL_PATH=OpenAL],[],[-framework OpenAL])], [],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libopenal], [OPENAL])], [], [],
 	[$cs_cv_sys_pthread_cflags],
 	[$cs_cv_sys_pthread_lflags],

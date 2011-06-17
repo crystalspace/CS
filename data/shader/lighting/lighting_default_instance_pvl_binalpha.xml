@@ -40,7 +40,7 @@
 	<alphatocoverage/>
 	<!-- ATC provides an alpha-blending 'lookalike' -->
 	<atcmixmode>
-	  <blendop src="one" dst="one" />
+          <blendop src="one" dst="zero" />
 	  <alphatest>disable</alphatest>
 	</atcmixmode>
       <?else?>
@@ -89,7 +89,7 @@
 	<alphatocoverage/>
 	<!-- ATC provides an alpha-blending 'lookalike' -->
 	<atcmixmode>
-	  <blendop src="one" dst="one" />
+          <blendop src="one" dst="zero" />
 	  <alphatest>disable</alphatest>
 	</atcmixmode>
       <?else?>
@@ -155,7 +155,7 @@
 	<alphatocoverage/>
 	<!-- ATC provides an alpha-blending 'lookalike' -->
 	<atcmixmode>
-	  <blendop src="one" dst="one" />
+          <blendop src="one" dst="zero" />
 	  <alphatest>disable</alphatest>
 	</atcmixmode>
       <?else?>
@@ -221,7 +221,7 @@
 	<alphatocoverage/>
 	<!-- ATC provides an alpha-blending 'lookalike' -->
 	<atcmixmode>
-	  <blendop src="one" dst="one" />
+          <blendop src="one" dst="zero" />
 	  <alphatest>disable</alphatest>
 	</atcmixmode>
       <?else?>
@@ -311,7 +311,7 @@
 	<alphatocoverage/>
 	<!-- ATC provides an alpha-blending 'lookalike' -->
 	<atcmixmode>
-	  <blendop src="one" dst="one" />
+          <blendop src="one" dst="zero" />
 	  <alphatest>disable</alphatest>
 	</atcmixmode>
       <?else?>
@@ -473,7 +473,7 @@
       <alphatocoverage/>
       <!-- ATC provides an alpha-blending 'lookalike' -->
       <atcmixmode>
-	<blendop src="one" dst="one" />
+        <blendop src="one" dst="zero" />
 	<alphatest>disable</alphatest>
       </atcmixmode>
       

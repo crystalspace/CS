@@ -674,7 +674,7 @@ size_t csMeshGenerator::CountPositions (int cidx, csMGCell& cell)
   size_t i, j, g;
   for (g = 0 ; g < geometries.GetSize () ; g++)
   {
-    float density = geometries[g]->GetDensity ();
+    float density = geometries[g]->GetDensity () * default_density_factor;
     size_t count = size_t (density * box_area);
     for (j = 0 ; j < count ; j++)
     {
@@ -715,7 +715,7 @@ size_t csMeshGenerator::CountAllPositions ()
       csMGCell& cell = cells[cidx];
       counter += CountPositions (cidx, cell);
     }
-    return counter;
+  return counter;
 }
 
 void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
@@ -733,7 +733,7 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
   for (size_t i = 0 ; i < geometries.GetSize () ; i++)
     geoRadii[i] = geometries[i]->GetRadius();
   PositionMap positionMap (geoRadii, geometries.GetSize (),
-			   box);
+			   box, cidx);
 
   if(minRadius < 0.0f)
   {
@@ -753,7 +753,7 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
     pos.geom_type = g;
     size_t mpos_count = geometries[g]->GetManualPositionCount (cidx);
 
-    float density = geometries[g]->GetDensity ();
+    float density = geometries[g]->GetDensity () * default_density_factor;
 
     size_t count = (mpos_count > 0)? mpos_count : size_t (density * box_area);
 
@@ -1019,6 +1019,25 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
   }
 }
 
+void csMeshGenerator::SetDefaultDensityFactor (float factor)
+{
+  default_density_factor = factor;
+  ClearAllPositions ();
+}
+
+void csMeshGenerator::ClearAllPositions ()
+{
+  SetupSampleBox ();
+  for (int z = 0 ; z < cell_dim ; z++)
+    for (int x = 0 ; x < cell_dim ; x++)
+    {
+      int cidx = z*cell_dim + x;
+      csMGCell& cell = cells[cidx];
+      FreeMeshesInBlock (cidx, cell);
+      cell.needPositions = true;
+    }
+}
+
 void csMeshGenerator::ClearPosition (const csVector3& pos)
 {
   SetupSampleBox ();
@@ -1175,9 +1194,47 @@ void csMeshGenerator::AddDensityFactorMap (const char* factorMapID,
   factorMap.AttachNew (new DensityFactorMap);
   factorMap->SetImage (mapImage);
   factorMap->SetWorldToMapTransform (worldToMap);
-  if (!factorMap->IsValid()) return;
   densityFactorMaps.PutUnique (factorMapID, factorMap);
 }
+
+void csMeshGenerator::UpdateDensityFactorMap (const char* factorMapID, iImage* mapImage)
+{
+  DensityFactorMap* factorMap = densityFactorMaps.Get (factorMapID, 0);
+  if (factorMap == 0) return;
+  factorMap->SetImage (mapImage);
+}
+
+bool csMeshGenerator::IsValidDensityFactorMap (const char* factorMapID) const
+{
+  DensityFactorMap* factorMap = densityFactorMaps.Get (factorMapID, 0);
+  return factorMap != 0;
+}
+
+const CS::Math::Matrix4& csMeshGenerator::GetWorldToMapTransform (const char* factorMapID) const
+{
+  DensityFactorMap* factorMap = densityFactorMaps.Get (factorMapID, 0);
+  CS_ASSERT (factorMap != 0);
+  return factorMap->GetWorldToMapTransform ();
+}
+
+int csMeshGenerator::GetDensityFactorMapWidth (const char* factorMapID) const
+{
+  DensityFactorMap* factorMap = densityFactorMaps.Get (factorMapID, 0);
+  if (factorMap)
+    return factorMap->GetWidth ();
+  else
+    return 0;
+}
+
+int csMeshGenerator::GetDensityFactorMapHeight (const char* factorMapID) const
+{
+  DensityFactorMap* factorMap = densityFactorMaps.Get (factorMapID, 0);
+  if (factorMap)
+    return factorMap->GetHeight ();
+  else
+    return 0;
+}
+
 
 }
 CS_PLUGIN_NAMESPACE_END(Engine)

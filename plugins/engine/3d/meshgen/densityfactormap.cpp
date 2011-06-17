@@ -36,7 +36,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
   
   float DensityFactorMap::GetDensity (const csVector3& worldCoord) const
   {
-    csVector4 coord4 (worldCoord);
     csVector4 mapCoord (world2map * worldCoord);
     
     int mapX = int (mapCoord.x * width);

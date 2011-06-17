@@ -195,7 +195,7 @@ struct iMeshGeneratorGeometry : public virtual iBase
  */
 struct iMeshGenerator : public virtual iBase
 {
-  SCF_INTERFACE(iMeshGenerator, 1, 0, 2);
+  SCF_INTERFACE(iMeshGenerator, 1, 0, 4);
 
   /**
    * Get the iObject for this mesh generator.
@@ -332,6 +332,47 @@ struct iMeshGenerator : public virtual iBase
   virtual void AddDensityFactorMap (const char* factorMapID,
 				    iImage* mapImage,
 				    const CS::Math::Matrix4& worldToMap) = 0;
+
+  /**
+   * Update a density factor map from an image.
+   * This function does nothing if the factor map doesn't exist.
+   */
+  virtual void UpdateDensityFactorMap (const char* factorMapID, iImage* mapImage) = 0;
+
+  /**
+   * Check if a given density factor map exists.
+   */
+  virtual bool IsValidDensityFactorMap (const char* factorMapID) const = 0;
+
+  /**
+   * Return the world to map transform of a density factor map. This function
+   * does not attempt to check if the factor map actually exists so use
+   * IsValidDensityFactorMap() first!
+   */
+  virtual const CS::Math::Matrix4& GetWorldToMapTransform (const char* factorMapID) const = 0;
+
+  /**
+   * Get the width of the density factory map. If the map doesn't exist then this
+   * will return 0.
+   */
+  virtual int GetDensityFactorMapWidth (const char* factorMapID) const = 0;
+  /**
+   * Get the height of the density factory map. If the map doesn't exist then this
+   * will return 0.
+   */
+  virtual int GetDensityFactorMapHeight (const char* factorMapID) const = 0;
+
+  /**
+   * Set a default density factor. This factor is the final multiplier
+   * for density and so it can be used to control global density to cater
+   * for higher/lower-end hardware more easily. The default is 1.0.
+   */
+  virtual void SetDefaultDensityFactor (float factor) = 0;
+
+  /**
+   * Get the default density factor.
+   */
+  virtual float GetDefaultDensityFactor () const = 0;
 };
 
 /** @} */

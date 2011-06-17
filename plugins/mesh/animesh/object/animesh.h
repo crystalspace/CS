@@ -153,7 +153,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     void ComputeTangents ();
 
   private: 
-    void UpdateObjectBoundingBox ();
+    void ComputeObjectBoundingBox ();
 
     // required but stupid stuff..
     AnimeshObjectType* objectType;
@@ -415,7 +415,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     void PreskinLF ();
 
-    void UpdateObjectBoundingBox ();
+    void ComputeObjectBoundingBox ();
 
     class RenderBufferAccessor :
       public scfImplementation1<RenderBufferAccessor, 
@@ -518,8 +518,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     csRef<CS::Animation::iSkeleton> skeleton;
     unsigned int skeletonVersion;
-    csTicks lastTick;
-    bool initialized;
+    bool animationInitialized;
 
     // Hold the bone transforms
     csRef<csShaderVariable> boneTransformArray;
@@ -560,7 +559,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     bool skinVertexLF, skinNormalLF, skinTangentBinormalLF;
 
     // LOD on the animation
-    float accumulatedTime;
+    csTicks lastUpdate;
     char accumulatedFrames;
   };
 
