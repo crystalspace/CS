@@ -220,17 +220,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         lightRender.OutputAmbientLight ();
 
         // Iterate through lights adding results into accumulation buffer.
-        for (size_t i = 0; i < ctxCount; i++)
+        /*for (size_t i = 0; i < ctxCount; i++)
         {
           typename RenderTree::ContextNode *context = contextStack[i];
 
           ForEachLight (*context, lightRender);
-        }
+        }*/
+
+        
+        // *********** TEMPORAL - SACAR!!!! ************
+
+        graphics3D->FinishDraw ();
+
+        // ********************************************
       }
       DetachAccumBuffer ();
 
       // Draws the forward shaded objects.
-      AttachAccumBuffer (context, true);
+      /*AttachAccumBuffer (context, true);
       {
         graphics3D->SetZMode (CS_ZBUF_MESH);
 
@@ -250,7 +257,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
         graphics3D->FinishDraw ();
       }
-      DetachAccumBuffer ();
+      DetachAccumBuffer ();*/
 
       contextStack.Empty ();
     }

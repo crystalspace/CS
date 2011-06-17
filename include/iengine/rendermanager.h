@@ -115,4 +115,31 @@ struct iRenderManagerVisCull : public virtual iBase
   virtual csPtr<iVisibilityCuller> GetVisCuller () = 0;
 };
 
+/**
+  * Interface for a render manager to provide access to the parameters of 
+  * global illumination techniques.
+  */
+struct iRenderManagerGlobalIllum : public virtual iBase
+{
+  SCF_INTERFACE(iRenderManagerGlobalIllum, 1, 0, 0);
+
+  virtual void SetOcclusionEffect (bool enableOcclusion) = 0;
+    
+  virtual void SetIndirectLightingEffect (bool enableIndirectLight) = 0;
+
+  virtual void SetSamplingPatternSize (int samplingPatternSize) = 0;
+
+  virtual void SetNumberOfSamples (int numberOfSamples) = 0;
+
+  virtual void SetSampleRadius (float sampleRadius) = 0;
+
+  virtual void SetOcclusionStrength (float occlusionStrength) = 0;
+
+  virtual void SetDepthBias (float depthBias) = 0;
+
+  virtual void SetMaxOccluderDistance (float maxOccluderDistance) = 0;
+
+  virtual void SetLightRotationAngle (float lightRotation) = 0;
+};
+
 #endif // __CS_IENGINE_RENDERMANAGER_H__

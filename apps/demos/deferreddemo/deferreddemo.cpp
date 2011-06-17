@@ -39,7 +39,7 @@ shouldShutdown(false)
   // Sets default cfg values.
   cfgWorldDir = DEFAULT_CFG_WORLDDIR;
   cfgWorldFile = "world";
-
+  
   cfgDrawLogo = true;
   cfgUseDeferredShading = true;
 }
@@ -99,7 +99,7 @@ bool DeferredDemo::OnInitialize(int argc, char *argv[])
   csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (GetObjectRegistry());
   cfg->AddDomain ("/config/deferreddemo.cfg", vfs, iConfigManager::ConfigPriorityPlugin);
 
-  csRef<iBugPlug> bugPlug = csQueryRegistry<iBugPlug> (GetObjectRegistry());
+  csRef<iBugPlug> bugPlug = csQueryRegistry<iBugPlug> (GetObjectRegistry());  
 
   return true;
 }
@@ -143,13 +143,24 @@ bool DeferredDemo::SetupModules()
   if (!loader) 
     return ReportError("Failed to locate CEGUI!");
 
+  csRef<iPluginManager> pluginManager = csQueryRegistry<iPluginManager> (GetObjectRegistry ());
+  hudManager = csLoadPlugin<CS::Utility::iHUDManager>(pluginManager, "crystalspace.utilities.texthud");
+  if (!hudManager)
+    return ReportError ("Failed to locate HUD manager!");
+
+  // Load the screenshot configuration
+  csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (GetObjectRegistry());
+  screenshotFormat = cfg->GetStr ("Deferreddemo.Settings.Screenshot.ImageFormat", "jpg");
+  csString screenshotMask = cfg->GetStr ("Deferreddemo.Settings.Screenshot.FilenameFormat",
+					    "/tmp/CS_DeferredDemo_0000");
+  screenshotHelper.SetMask (screenshotMask + "." + screenshotFormat);
+
   /* NOTE: Config settings for render managers are stored in 'engine.cfg' 
    * and are needed when loading a render manager. Normally these settings 
    * are added by the engine when it loads a render manager. However, since
    * we are loading the deferred render manager manually we must also manually
    * add the proper config file. */
-  csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
-  csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (GetObjectRegistry());
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());  
   cfg->AddDomain ("/config/engine.cfg", vfs, iConfigManager::ConfigPriorityPlugin);
 
   rm = csLoadPlugin<iRenderManager> (GetObjectRegistry(), "crystalspace.rendermanager.deferred");
@@ -163,6 +174,10 @@ bool DeferredDemo::SetupModules()
     return ReportError("Failed to query the deferred Render Manager debug helper!");
 
   rm_default = engine->GetRenderManager ();
+
+  rmGlobalIllum = scfQueryInterface<iRenderManagerGlobalIllum> (rm);
+  if (!rmGlobalIllum)
+    return ReportError ("Failed to query the deferred Render Manager's global illumination interface!");
 
   return true;
 }
@@ -225,6 +240,31 @@ bool DeferredDemo::LoadSettings()
 //----------------------------------------------------------------------
 bool DeferredDemo::SetupGui(bool reload)
 {
+  // Initialize the HUD manager
+  hudManager->GetKeyDescriptions ()->Empty ();
+  /*hudManager->GetStateDescriptions ()->Push ("occlusionStrength");
+  hudManager->GetStateDescriptions ()->Push ("sampleRadius");
+  hudManager->GetStateDescriptions ()->Push ("maxOccluderDistance");
+  hudManager->GetStateDescriptions ()->Push ("patternSize");
+  hudManager->GetStateDescriptions ()->Push ("depthBias");
+  hudManager->GetStateDescriptions ()->Push ("lightRotation");*/
+
+
+  configEventNotifier.AttachNew(new CS::Utility::ConfigEventNotifier(GetObjectRegistry()));
+
+  occlusionStrengthListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
+    "DeferredDemo.OcclusionStrength", occlusionStrength));
+  sampleRadiusListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
+    "DeferredDemo.SampleRadius", sampleRadius));
+  maxOccluderDistListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
+    "DeferredDemo.MaxOccluderDist", maxOccluderDistance));
+  patternSizeListener.AttachNew (new CS::Utility::ConfigListener<int>(GetObjectRegistry(), 
+    "DeferredDemo.PatternSize", patternSize));
+  depthBiasListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
+    "DeferredDemo.DepthBias", depthBias));
+  lightRotationListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
+    "DeferredDemo.LightRotation", lightRotation));
+
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
 
   if (!reload)
@@ -258,12 +298,17 @@ bool DeferredDemo::SetupGui(bool reload)
   guiDrawLightVolumes = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("DrawLightVolumes"));
   guiDrawLogo         = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("DrawLogo"));
 
+  /*guiSampleRadius     = static_cast<CEGUI::Slider*>(winMgr->getWindow ("SampleRadius"));
+  guiMaxOccluderDist  = static_cast<CEGUI::Slider*>(winMgr->getWindow ("MaxOccluderDist"));
+  guiDepthBias        = static_cast<CEGUI::Slider*>(winMgr->getWindow ("DepthBias"));*/
+
   if (!guiRoot || 
       !guiDeferred || 
       !guiForward || 
       !guiShowGBuffer || 
       !guiDrawLightVolumes || 
-      !guiDrawLogo)
+      !guiDrawLogo/* ||
+      !guiSampleRadius || !guiMaxOccluderDist || !guiDepthBias*/)
   {
     return ReportError("Could not load GUI!");
   }
@@ -276,6 +321,16 @@ bool DeferredDemo::SetupGui(bool reload)
   guiShowGBuffer->setSelected (false);
   guiDrawLightVolumes->setSelected (false);
   guiDrawLogo->setSelected (cfgDrawLogo);
+
+  /*guiSampleRadius->setCurrentValue (5.0f);
+  guiMaxOccluderDist->setCurrentValue (10.0f);
+  guiDepthBias->setCurrentValue (1.0f);*/
+  occlusionStrength = 4.0f;
+  sampleRadius = 5.0f;
+  maxOccluderDistance = 5.0f;
+  patternSize = 4;
+  depthBias = 1.0f;
+  lightRotation = 0.0f;
 
   showGBuffer = false;
   drawLightVolumes = false;
@@ -309,6 +364,11 @@ bool DeferredDemo::SetupScene()
   view->SetRectangle (0, 0, graphics2D->GetWidth (), graphics2D->GetHeight ());
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (pos);
+  
+  csPlane3 *farPlane = new csPlane3(0, 0, -1, 30);
+  view->GetCamera ()->SetFarPlane (farPlane);
+  view->GetPerspectiveCamera ()->SetNearClipDistance (0.2f);
+  delete farPlane;
 
   // Checks for support of at least 4 color buffer attachment points.
   const csGraphics3DCaps *caps = graphics3D->GetCaps();
@@ -454,6 +514,14 @@ void DeferredDemo::UpdateGui()
   {
      cfgUseDeferredShading = guiDeferred->isSelected ();
   } 
+
+  rmGlobalIllum->SetOcclusionEffect (true);
+  rmGlobalIllum->SetOcclusionStrength (occlusionStrength);
+  rmGlobalIllum->SetSampleRadius (sampleRadius);
+  rmGlobalIllum->SetMaxOccluderDistance (maxOccluderDistance);
+  rmGlobalIllum->SetSamplingPatternSize (patternSize);
+  rmGlobalIllum->SetDepthBias (depthBias);
+  rmGlobalIllum->SetLightRotationAngle (lightRotation);
 }
 
 //----------------------------------------------------------------------
@@ -554,6 +622,38 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
         eventQueue->GetEventOutlet ()->Broadcast( csevQuit(GetObjectRegistry()) );
         return true;
       }
+    }        
+    else if (code == CSKEY_F12) // Screenshot key
+    {      
+      csRef<iImage> screenshot = graphics2D->ScreenShot ();
+
+      // Convert the screenshot to the target image format
+      csRef<iImageIO> imageIO = csQueryRegistry<iImageIO> (GetObjectRegistry ());
+      if (!screenshot || !imageIO)
+	      return false;
+
+      csRef<iDataBuffer> data =
+	      imageIO->Save (screenshot, csString().Format ("image/%s", screenshotFormat.GetData()));
+
+      if (!data)
+      {
+	      ReportError ("Could not export screenshot image to format %s!",
+		      CS::Quote::Single (screenshotFormat.GetData ()));
+	      return false;
+      }
+
+      // Save the file
+      csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
+      if (!vfs) return false;
+
+      csString filename = screenshotHelper.FindNextFilename (vfs);
+      if (data && vfs->WriteFile (filename, data->GetData (), data->GetSize()))
+      {
+	      csRef<iDataBuffer> path = vfs->GetRealPath (filename.GetData ());
+	      ReportInfo ("Screenshot saved to %s...", CS::Quote::Single (path->GetData()));
+      }
+
+      return true;
     }
     else if (code == 'f')
     {

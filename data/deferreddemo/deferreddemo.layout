@@ -6,7 +6,7 @@
     <Property Name="MousePassThroughEnabled" Value="True" />
 
     <Window Type='ice/Listbox' Name='Frame'>
-      <Property Name='UnifiedSize' Value='{{0.0,240.0},{0.0,140.0}}'/>
+      <Property Name='UnifiedSize' Value='{{0.0,240.0},{0.0,240.0}}'/>
       <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,10.0}}'/>
       <Property Name='CaptionColour' Value='00FFFFFF'/>
 
@@ -54,8 +54,80 @@
         <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,100.0}}'/>
 
         <Property Name='Text' Value='Draw Logo'/>
-        <Property Name='ConfigTypes' Value='bool'/>
-        <Property Name='ConfigNames' Value='Settings.DrawLogo'/>
+        <!--<Property Name='ConfigTypes' Value='bool'/>
+        <Property Name='ConfigNames' Value='Settings.DrawLogo'/>-->
+      </Window>
+      
+      <Window Type="ice/SettingSlider" Name="OcclusionStrength" >
+        <Property Name='UnifiedSize' Value='{{0.75,0.0},{0.0,30}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,120.0}}'/>
+
+        <Property Name='Text' Value='Occlusion Strength'/>
+        <Property Name='ConfigTypes' Value='float'/>
+        <Property Name='ConfigNames' Value='DeferredDemo.OcclusionStrength'/>
+        <Property Name='MinimumValue' Value='0.0'/>
+        <Property Name='MaximumValue' Value='1.0'/>
+        <Property Name='ClickStepSize' Value='0.01'/>
+      </Window>
+	  
+      <Window Type="ice/SettingSlider" Name="SampleRadius" >
+        <Property Name='UnifiedSize' Value='{{0.75,0.0},{0.0,30}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,140.0}}'/>
+
+        <Property Name='Text' Value='Sample Radius'/>
+        <Property Name='ConfigTypes' Value='float'/>
+        <Property Name='ConfigNames' Value='DeferredDemo.SampleRadius'/>
+        <Property Name='MinimumValue' Value='0.0'/>
+        <Property Name='MaximumValue' Value='50.0'/>
+        <Property Name='ClickStepSize' Value='0.1'/>
+      </Window>
+      
+      <Window Type="ice/SettingSlider" Name="MaxOccluderDist" >
+        <Property Name='UnifiedSize' Value='{{0.75,0.0},{0.0,30}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,160.0}}'/>
+
+        <Property Name='Text' Value='Max Occluder Dist'/>
+        <Property Name='ConfigTypes' Value='float'/>
+        <Property Name='ConfigNames' Value='DeferredDemo.MaxOccluderDist'/>
+        <Property Name='MinimumValue' Value='0.0'/>
+        <Property Name='MaximumValue' Value='10.0'/>
+        <Property Name='ClickStepSize' Value='0.01'/>
+      </Window>
+      
+      <Window Type="ice/SettingSlider" Name="PatternSize" >
+        <Property Name='UnifiedSize' Value='{{1.0,0.0},{0.0,30}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,180.0}}'/>
+
+        <Property Name='Text' Value='Pattern Size'/>
+        <Property Name='ConfigTypes' Value='int'/>
+        <Property Name='ConfigNames' Value='DeferredDemo.PatternSize'/>
+        <Property Name='MinimumValue' Value='1'/>
+        <Property Name='MaximumValue' Value='256'/>
+        <Property Name='ClickStepSize' Value='1'/>
+      </Window>
+      
+      <Window Type="ice/SettingSlider" Name="DepthBias" >
+        <Property Name='UnifiedSize' Value='{{1.0,0.0},{0.0,30}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,200.0}}'/>
+
+        <Property Name='Text' Value='Depth Bias'/>
+        <Property Name='ConfigTypes' Value='float'/>
+        <Property Name='ConfigNames' Value='DeferredDemo.DepthBias'/>
+        <Property Name='MinimumValue' Value='0.0'/>
+        <Property Name='MaximumValue' Value='2.0'/>
+        <Property Name='ClickStepSize' Value='0.001'/>
+      </Window>
+      
+      <Window Type="ice/SettingSlider" Name="LightRotation" >
+        <Property Name='UnifiedSize' Value='{{1.0,0.0},{0.0,30}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,220.0}}'/>
+
+        <Property Name='Text' Value='Light Rotation'/>
+        <Property Name='ConfigTypes' Value='float'/>
+        <Property Name='ConfigNames' Value='DeferredDemo.LightRotation'/>
+        <Property Name='MinimumValue' Value='0.0'/>
+        <Property Name='MaximumValue' Value='6.28'/>
+        <Property Name='ClickStepSize' Value='0.1'/>
       </Window>
 
     </Window>

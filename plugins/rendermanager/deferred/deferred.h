@@ -46,17 +46,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
   template<typename RenderTreeType, typename LayerConfigType>
   class StandardContextSetup;
 
-  class RMDeferred : public scfImplementation5<RMDeferred, 
+  class RMDeferred : public scfImplementation6<RMDeferred, 
                                                iRenderManager,
                                                scfFakeInterface<iRenderManagerVisCull>,
                                                iComponent,
                                                scfFakeInterface<iRenderManagerPostEffects>,
+                                               iRenderManagerGlobalIllum,
                                                scfFakeInterface<iDebugHelper> >,
                      public CS::RenderManager::RMDebugCommon<RenderTreeType>,
 		     public CS::RenderManager::PostEffectsSupport,
 		     public CS::RenderManager::RMViscullCommon
   {
   public:
+
+    enum csDebugBuffer {
+      DiffuseBuffer,
+      NormalBuffer,
+      AmbientBuffer,
+      DepthBuffer,
+      SpecularBuffer,
+      ColorBuffer
+    };
 
     /// Constructor.
     RMDeferred(iBase *parent);
@@ -80,11 +90,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     //---- iDebugHelper Interface ----
     virtual bool DebugCommand(const char *cmd);
 
+    //---- iRenderManagerGlobalIllum Interface ----
+    virtual void SetOcclusionEffect (bool enable);    
+    virtual void SetIndirectLightingEffect (bool enable);
+    virtual void SetSamplingPatternSize (int samplingPatternSize);
+    virtual void SetNumberOfSamples (int numSamples);
+    virtual void SetSampleRadius (float sampleRadius);
+    virtual void SetOcclusionStrength (float occlusionStrength);
+    virtual void SetDepthBias (float depthBias);
+    virtual void SetMaxOccluderDistance (float maxOccluderDistance);
+    virtual void SetLightRotationAngle (float lightRotation);
+
   public:
 
     bool RenderView(iView *view, bool recursePortals);
     void AddDeferredLayer(CS::RenderManager::MultipleRenderLayer &layers, int &addedLayer);
     void AddZOnlyLayer(CS::RenderManager::MultipleRenderLayer &layers, int &addedLayer);
+
+    void AddPostEffectLayer();
+    void SetPostEffectShaderOption();
+    //void UpdatePostEffectsSV();    
 
     int LocateDeferredLayer(const CS::RenderManager::MultipleRenderLayer &layers);
     int LocateZOnlyLayer(const CS::RenderManager::MultipleRenderLayer &layers);
@@ -114,8 +139,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     int zonlyLayer;
     int maxPortalRecurse;
 
+    //csRef<csShaderVariable> postEffectOptionSV;
+    //PostEffectManager::Layer *postEffectLayer;
+    csStringID idPostEffectOptionSV;
+
     bool showGBuffer;
     bool drawLightVolumes;
+    csDebugBuffer debugBuffer;
   };
 }
 CS_PLUGIN_NAMESPACE_END(RMDeferred)

@@ -4,6 +4,7 @@
 <variablemap variable="specular" destination="ConstSpecular" />
 <variablemap variable="dynamic ambient" destination="DynamicAmbient" />
 <variablemap variable="combined ambient" destination="CombinedAmbient" />
+<variablemap variable="far clip distance" destination="FarClipDistance" />
 
 <program>
 
@@ -18,6 +19,7 @@ struct vertex2fragment
   float3 ViewNormal   : TEXCOORD3;
   float3 ViewTangent  : TEXCOORD4;
   float3 ViewBiNormal : TEXCOORD5;
+  //float3 WorldNormal  : TEXCOORD6;
 };
 
 struct fragmentOutput
@@ -25,6 +27,7 @@ struct fragmentOutput
   float4 Color0 : COLOR0;
   float4 Color1 : COLOR1;
   float4 Color2 : COLOR2;
+  float4 Color3 : COLOR3;
 };
 
 /**
@@ -40,7 +43,7 @@ float2 ComputeParallaxOcclusion(sampler2D texHeight,
                                 float heightMapScale)
 {
 #ifndef PROFILE_GP4FP
-    // Currently gp4fp is the only profile that suppors the ddx/ddy stuff
+    // Currently gp4fp is the only profile that supports the ddx/ddy stuff
     return texCoord;
 #else
     float2 dx = ddx (texCoord);
@@ -84,6 +87,7 @@ fragmentOutput main(vertex2fragment IN,
                     uniform float3 ConstSpecular,
                     uniform float3 DynamicAmbient,
                     uniform float3 CombinedAmbient,
+                    uniform float FarClipDistance,
                     uniform sampler2D TexDiffuse,
                     uniform sampler2D TexNormal,
                     uniform sampler2D TexNormalCompressed,
@@ -138,7 +142,7 @@ fragmentOutput main(vertex2fragment IN,
   <?else?>
     float3 normal = IN.ViewNormal;
   <?endif?>
-
+  
   <?if vars."tex lightmap dir 1".texture ?>
     float3 baseLit[3];
     baseLit[0] = tex2D (TexLightMapDir1, IN.TexCoordLM).rgb;
@@ -153,12 +157,17 @@ fragmentOutput main(vertex2fragment IN,
 
   // Normalize and map into the range [0,1].
   normal = (normalize (normal) + 1) * 0.5;
+  float3 interpVertexNormal = (normalize (IN.ViewNormal) + 1) * 0.5;  
+  
+  float linearDepth = IN.ViewPosition.z / FarClipDistance;
+  //float linearDepth = length (IN.ViewPosition);
 
   fragmentOutput output;
 
   output.Color0 = float4 (diffuse, specular.r);
   output.Color1 = float4 (normal, specular.g);
   output.Color2 = float4 (ambient, specular.b);
+  output.Color3 = float4 (interpVertexNormal, linearDepth);
 
   return output;
 }

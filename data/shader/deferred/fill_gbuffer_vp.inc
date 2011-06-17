@@ -1,4 +1,7 @@
 <include>
+
+<variablemap variable="object2world transform inverse" destination="InvObject2World" />
+
 <program>
 
 struct app2vertex 
@@ -20,12 +23,14 @@ struct vertex2fragment
   float3 ViewNormal   : TEXCOORD3;
   float3 ViewTangent  : TEXCOORD4;
   float3 ViewBiNormal : TEXCOORD5;
+  //float3 WorldNormal  : TEXCOORD6;
 };
 
 vertex2fragment main(app2vertex IN,
                      uniform float4x4 ModelView : state.matrix.modelview,
                      uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
-                     uniform float4x4 ModelViewProj : state.matrix.mvp)
+                     uniform float4x4 ModelViewProj : state.matrix.mvp/*,
+                     uniform float4x4 InvObject2World*/)
 {
   vertex2fragment OUT;
 
@@ -38,6 +43,7 @@ vertex2fragment main(app2vertex IN,
   OUT.ViewNormal    = mul (ModelViewIT, float4 (IN.Normal, 0.0)).xyz;
   OUT.ViewTangent   = mul (ModelViewIT, float4 (IN.Tangent, 0.0)).xyz;
   OUT.ViewBiNormal  = mul (ModelViewIT, float4 (IN.BiNormal, 0.0)).xyz;
+  //OUT.WorldNormal   = mul (transpose (InvObject2World), float4 (IN.Normal, 0.0)).xyz;
 
   return OUT;
 }

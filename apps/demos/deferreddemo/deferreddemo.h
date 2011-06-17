@@ -112,6 +112,7 @@ protected:
   csRef<iRenderManager> rm;
   csRef<iRenderManager> rm_default;
   csRef<iDebugHelper> rm_debug;
+  csRef<iRenderManagerGlobalIllum> rmGlobalIllum;
 
   csRef<iLoader> loader;
 
@@ -123,6 +124,11 @@ protected:
   csRef<FramePrinter> printer;
 
   csRef<iCEGUI> cegui;
+  csRef<CS::Utility::iHUDManager> hudManager;
+  csRef<iConfigListener> configEventNotifier;
+
+  CS::NumberedFilenameHelper screenshotHelper;
+  csString screenshotFormat;
 
   // Cache event names.
   csEventID quitEventID;
@@ -144,8 +150,26 @@ protected:
   CEGUI::Checkbox *guiDrawLightVolumes;
   CEGUI::Checkbox *guiDrawLogo;
 
+  /*CEGUI::Slider *guiSampleRadius;
+  CEGUI::Slider *guiMaxOccluderDist;
+  CEGUI::Slider *guiDepthBias;*/
+
   bool showGBuffer;
   bool drawLightVolumes;
+
+  float occlusionStrength;
+  float sampleRadius;
+  float maxOccluderDistance;
+  int patternSize;
+  float depthBias;
+  float lightRotation;
+
+  csRef<iEventHandler> occlusionStrengthListener;
+  csRef<iEventHandler> sampleRadiusListener;
+  csRef<iEventHandler> maxOccluderDistListener;
+  csRef<iEventHandler> patternSizeListener;
+  csRef<iEventHandler> depthBiasListener;
+  csRef<iEventHandler> lightRotationListener;
 
 protected:
 

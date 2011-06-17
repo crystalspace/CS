@@ -28,11 +28,15 @@
 
 #include "csutil/cfgacc.h"
 
+#include "csgfx/imagememory.h"
+#include "iutil/vfs.h"
+#include "igraphic/imageio.h"
+
 #include "gbuffer.h"
+#include "globalillum.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
-{
-
+{  
   /**
    * Given the cosine of the angle a, returns the cosine of the angle a / 2.
    * 
@@ -244,7 +248,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       };
 
       return false;
-  }
+  }  
 
   /**
    * Renderer for a single context where all lights are drawn
@@ -310,6 +314,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       /* Shader for drawing light volumes. */
       csRef<iShader> lightVolumeShader;
       csRef<csShaderVariable> lightVolumeColorSV;
+
+      /* Data for Screen-Space global illumination effect */
+      bool globalIllumEnabled;
+      csDeferredGlobalIllumination globalIllum;
 
       /**
        * Initialize persistent data, must be called once before using the
@@ -428,21 +436,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         quadMesh.z_buf_mode = CS_ZBUF_NONE;
         quadMesh.mixmode = CS_FX_ADD;
         quadMesh.alphaType.autoAlphaMode = false;
-        quadMesh.alphaType.alphaType = csAlphaMode::alphaNone;
+        quadMesh.alphaType.alphaType = csAlphaMode::alphaNone;       
 
-        // Creates the ambient material.
-        ambientMaterial = engine->CreateMaterial (
-          "crystalspace.rendermanager.deferred.lightrender.ambient", 
-          NULL);
-
-        if (!loader->LoadShader ("/shader/deferred/ambient_light.xml"))
-        {
-          csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
-            messageID, "Could not load deferred_ambient_light shader");
+        globalIllumEnabled = cfg->GetBool ("RenderManager.Deferred.GlobalIllum.Enable", true);        
+        
+        if (globalIllumEnabled)
+        {          
+          globalIllum.Initialize (objRegistry);
         }
+        else 
+        {
+          if (!loader->LoadShader ("/shader/deferred/ambient_light.xml"))
+          {
+            csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
+              messageID, "Could not load deferred_ambient_light shader");
+          }
 
-        iShader *ambientLightShader = shaderManager->GetShader ("deferred_ambient_light");
-        ambientMaterial->GetMaterial ()->SetShader (stringSet->Request ("gbuffer use"), ambientLightShader);
+          // Creates the ambient material.
+          ambientMaterial = engine->CreateMaterial (
+            "crystalspace.rendermanager.deferred.lightrender.ambient", NULL);
+          
+          iShader *ambientLightShader = shaderManager->GetShader ("deferred_ambient_light");
+          ambientMaterial->GetMaterial ()->SetShader (stringSet->Request ("gbuffer use"), ambientLightShader);
+        }
 
         // Loads the light volume shader.
         if (!loader->LoadShader ("/shader/deferred/dbg_light_volume.xml"))
@@ -577,7 +593,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
           svStringSet->Request ("light direction view"));
         lightDirSV->SetValue (csVector3::Unit (lightDir));
       }
-    }
+    }    
 
     void RenderPointLight(iLight *light)
     {
@@ -601,9 +617,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     }
 
     void RenderAmbientLight()
-    {
-      iMaterial *mat = persistentData.ambientMaterial->GetMaterial ();
-      iShader *shader = mat->GetShader (stringSet->Request ("gbuffer use"));
+    {     
+      iShader *shader;
+      
+      if (persistentData.globalIllumEnabled)
+      {
+        persistentData.globalIllum.UpdateShaderVars(graphics3D);
+        shader = persistentData.globalIllum.shader;
+        //shader = shaderMgr->GetShader ("deferred_globalillum");
+      }
+      else
+      {
+        iMaterial *mat = persistentData.ambientMaterial->GetMaterial ();
+        shader = mat->GetShader (stringSet->Request ("gbuffer use"));
+      }
 
       DrawFullscreenQuad (shader, CS_ZBUF_NONE);
     }
@@ -747,7 +774,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       // Restores old transforms.
       graphics3D->SetWorldToCamera (oldView);
       graphics3D->SetProjectionMatrix (oldProj);
-    }
+    }     
 
     iGraphics3D *graphics3D;
     iShaderManager *shaderMgr;
