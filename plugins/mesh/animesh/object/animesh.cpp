@@ -35,7 +35,6 @@
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
-//#include "imesh/skeleton2.h"
 #include "imesh/animnode/skeleton2anim.h"
 #include "iutil/strset.h"
 #include "ivideo/rendermesh.h"
@@ -43,7 +42,9 @@
 
 #include "animesh.h"
 
-#define MINIMUM_UPDATE_DELAY 1.0f / 50.0f
+// Maximum delay before an update of the animation, in milliseconds
+#define MAXIMUM_UPDATE_DELAY 20
+// Maximum frame skipped before an update of the animation
 #define MAXIMUM_UPDATE_FRAMES 5
 
 CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
@@ -115,7 +116,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csRef<FactorySubmesh> newSubmesh;
 
     newSubmesh.AttachNew (new FactorySubmesh(name));
-    newSubmesh->indexBuffers.Push (indices);  
+    newSubmesh->indexBuffers.Push (indices);
     newSubmesh->visible = visible;
     submeshes.Push (newSubmesh);
 
@@ -757,11 +758,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   AnimeshObject::AnimeshObject (AnimeshObjectFactory* factory)
     : scfImplementationType (this), factory (factory), logParent (0),
-    material (0), mixMode (0), skeleton (0), initialized (false),
+    material (0), mixMode (0), skeleton (0), animationInitialized (false),
     boundingBox (factory->factoryBB), userObjectBB (false), morphVersion (0), morphStateChanged (false),
     skinVertexVersion (~0), skinNormalVersion (~0), skinTangentBinormalVersion (~0),
-    morphVertexVersion (0), skinVertexLF (false), skinNormalLF (false), skinTangentBinormalLF (false),
-    accumulatedTime (0.0f), accumulatedFrames (0)
+    morphVertexVersion (0), skinVertexLF (false), skinNormalLF (false), skinTangentBinormalLF (false)
   {
     bufferAccessor.AttachNew (new RenderBufferAccessor (this));
     postMorphVertices = factory->vertexBuffer;
@@ -978,47 +978,46 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   void AnimeshObject::NextFrame (csTicks current_time, const csVector3& pos,
     uint currentFrame)
   {
-    if (skeleton)
-    {
-      if (!initialized)
-      {
-	initialized = true;
-	lastTick = current_time;
+    if (!skeleton) return;
 
-	// Check if we need to start automatically the animation
-	if (skeleton->GetFactory ()->GetAutoStart ())
+    if (!animationInitialized)
+    {
+      animationInitialized = true;
+      lastUpdate = current_time;
+      accumulatedFrames = MAXIMUM_UPDATE_FRAMES;
+
+      // Check if we need to start automatically the animation
+      if (skeleton->GetFactory ()->GetAutoStart ())
+      {
+	CS::Animation::iSkeletonAnimPacket* packet = skeleton->GetAnimationPacket ();
+	if (packet)
 	{
-	  CS::Animation::iSkeletonAnimPacket* packet = skeleton->GetAnimationPacket ();
-	  if (packet)
-	  {
-	    CS::Animation::iSkeletonAnimNode* node = packet->GetAnimationRoot ();
-	    if (node)
-	      node->Play ();
-	  }
+	  CS::Animation::iSkeletonAnimNode* node = packet->GetAnimationRoot ();
+	  if (node)
+	    node->Play ();
 	}
       }
-
-      // Check if we waited long enough since the last update
-      accumulatedTime += (current_time - lastTick) / 1000.0f;
-      accumulatedFrames++;
-      if (accumulatedTime < MINIMUM_UPDATE_DELAY
-	  && accumulatedFrames < MAXIMUM_UPDATE_FRAMES)
-	return;
-
-      // Update the skeleton
-      skeleton->UpdateSkeleton (accumulatedTime);
-      accumulatedTime = 0.0f;
-      accumulatedFrames = 0;
-
-      // Copy the skeletal state into our buffers
-      UpdateLocalBoneTransforms ();
-      UpdateSocketTransforms ();
-
-      // Update the bounding box of the mesh object
-      if (!userObjectBB && factory->bones.GetSize ())
-	ComputeObjectBoundingBox ();
     }
-    lastTick = current_time;
+
+    // Check if we waited long enough since the last update
+    accumulatedFrames++;
+    csTicks accumulatedTime = current_time - lastUpdate;
+    if (accumulatedTime < MAXIMUM_UPDATE_DELAY
+	&& accumulatedFrames < MAXIMUM_UPDATE_FRAMES)
+      return;
+
+    // Update the skeleton
+    skeleton->UpdateSkeleton (((float) accumulatedTime) / 1000.0f);
+    lastUpdate = current_time;
+    accumulatedFrames = 0;
+
+    // Copy the skeletal state into our buffers
+    UpdateLocalBoneTransforms ();
+    UpdateSocketTransforms ();
+
+    // Update the bounding box of the mesh object
+    if (!userObjectBB && factory->bones.GetSize ())
+      ComputeObjectBoundingBox ();
   }
 
   void AnimeshObject::HardTransform (const csReversibleTransform& t)
