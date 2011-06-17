@@ -332,6 +332,13 @@ struct iMeshGenerator : public virtual iBase
   virtual void AddDensityFactorMap (const char* factorMapID,
 				    iImage* mapImage,
 				    const CS::Math::Matrix4& worldToMap) = 0;
+
+  /**
+   * Update a density factor map from an image.
+   * This function does nothing if the factor map doesn't exist.
+   */
+  virtual void UpdateDensityFactorMap (const char* factorMapID, iImage* mapImage) = 0;
+
   /**
    * Check if a given density factor map exists.
    */

@@ -547,6 +547,7 @@ public:
   virtual void AddDensityFactorMap (const char* factorMapID,
 				    iImage* mapImage,
 				    const CS::Math::Matrix4& worldToMap);
+  virtual void UpdateDensityFactorMap (const char* factorMapID, iImage* mapImage);
   virtual bool IsValidDensityFactorMap (const char* factorMapID) const;
   virtual const CS::Math::Matrix4& GetWorldToMapTransform (const char* factorMapID) const;
   virtual int GetDensityFactorMapWidth (const char* factorMapID) const;
