@@ -211,8 +211,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   lightPersistent.Initialize (registry, treePersistent.debugPersist);
   lightRenderPersistent.Initialize (registry);
 
-  PostEffectsSupport::Initialize (registry, "RenderManager.Deferred");  
-  AddPostEffectLayer();
+  PostEffectsSupport::Initialize (registry, "RenderManager.Deferred");
 
   // Initialize the extra data in the persistent tree data.
   RenderTreeType::TreeTraitsType::Initialize (treePersistent, registry);
@@ -222,8 +221,6 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   maxPortalRecurse = cfg->GetInt ("RenderManager.Deferred.MaxPortalRecurse", 30);
   showGBuffer = false;
   drawLightVolumes = false;
-  debugBuffer = ColorBuffer;
-  idPostEffectOptionSV = csInvalidStringID;
 
   bool layersValid = false;
   const char *layersFile = cfg->GetStr ("RenderManager.Deferred.Layers", nullptr);
@@ -379,8 +376,6 @@ bool RMDeferred::RenderView(iView *view, bool recursePortals)
   if (showGBuffer)
     ShowGBuffer (renderTree);
 
-  //UpdatePostEffectsSV ();
-
   CS::Math::Matrix4 perspectiveFixup;
   postEffects.SetupView (view, perspectiveFixup);
 
@@ -420,9 +415,7 @@ bool RMDeferred::RenderView(iView *view, bool recursePortals)
   }
 
   if (hasPostEffects)
-  {    
-    //UpdatePostEffectsSV ();
-    SetPostEffectShaderOption ();
+  {
     postEffects.DrawPostEffects (renderTree);
   }
   else
@@ -448,55 +441,6 @@ bool RMDeferred::PrecacheView(iView *view)
 
   postEffects.ClearIntermediates ();
 }
-
-//----------------------------------------------------------------------
-void RMDeferred::AddPostEffectLayer()
-{
-  const char *messageID = "crystalspace.rendermanager.deferred";
-
-  csRef<iLoader> loader = csQueryRegistry<iLoader> (objRegistry);
-  if (!loader->LoadShader("shader/postproc/fx.xml"))
-  {
-    csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
-      messageID, "Could not load post effect shader");
-  }
-  iShader *postEffectShader = shaderManager->GetShader ("fx");
-  
-  postEffects.AddLayer (postEffectShader);
-}
-
-//----------------------------------------------------------------------
-void RMDeferred::SetPostEffectShaderOption()
-{
-  if (idPostEffectOptionSV == csInvalidStringID) 
-  {
-    iShaderVarStringSet *svStringSet = shaderManager->GetSVNameStringset ();
-    idPostEffectOptionSV = svStringSet->Request ("option");
-  }
-    
-  csShaderVariable *postEffectOptionSV = postEffects.GetLastLayer()->GetSVContext()->
-      GetVariableAdd (idPostEffectOptionSV);
-
-  postEffectOptionSV->SetValue((int)debugBuffer);
-}
-
-//----------------------------------------------------------------------
-/*void RMDeferred::UpdatePostEffectsSV()
-{
-  iShaderVarStringSet *svStringSet = shaderManager->GetSVNameStringset ();
-  
-	postEffectOptionSV.AttachNew (new csShaderVariable (svStringSet->Request ("option")));
-	postEffectOptionSV->SetValue ((int)debugBuffer);
-  postEffects.GetLastLayer()->GetSVContext()->AddVariable (postEffectOptionSV);  
-  
-  /*postEffectOptionSV->SetValue ((int)debugBuffer);
-
-  csShaderVariableStack svStack;
-  postEffects.GetLayerRenderSVs (postEffects.GetLastLayer(), svStack);
-  
-  iShader *postEffectShader = shaderManager->GetShader ("effect");
-  postEffectShader->PushVariables (svStack);*/
-//}
 
 //----------------------------------------------------------------------
 void RMDeferred::AddDeferredLayer(CS::RenderManager::MultipleRenderLayer &layers, int &addedLayer)
@@ -610,36 +554,6 @@ bool RMDeferred::DebugCommand(const char *cmd)
   else if (strcmp (cmd, "toggle_visualize_lightvolumes") == 0)
   {
     drawLightVolumes = !drawLightVolumes;
-    return true;
-  }
-  else if (strcmp (cmd, "toggle_visualize_diffusebuffer") == 0)
-  {
-    debugBuffer = DiffuseBuffer;
-    return true;
-  }
-  else if (strcmp (cmd, "toggle_visualize_normalbuffer") == 0)
-  {
-    debugBuffer = NormalBuffer;
-    return true;
-  }
-  else if (strcmp (cmd, "toggle_visualize_ambientbuffer") == 0)
-  {
-    debugBuffer = AmbientBuffer;
-    return true;
-  }
-  else if (strcmp (cmd, "toggle_visualize_depthbuffer") == 0)
-  {
-    debugBuffer = DepthBuffer;
-    return true;
-  }
-  else if (strcmp (cmd, "toggle_visualize_specularbuffer") == 0)
-  {
-    debugBuffer = SpecularBuffer;
-    return true;
-  }
-  else if (strcmp (cmd, "toggle_visualize_colorbuffer") == 0)
-  {
-    debugBuffer = ColorBuffer;
     return true;
   }
 

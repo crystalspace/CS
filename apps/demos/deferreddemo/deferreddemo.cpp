@@ -453,7 +453,7 @@ void DeferredDemo::UpdateGui()
   if (cfgUseDeferredShading != guiDeferred->isSelected ())
   {
      cfgUseDeferredShading = guiDeferred->isSelected ();
-  }
+  } 
 }
 
 //----------------------------------------------------------------------
@@ -504,20 +504,8 @@ void DeferredDemo::DrawLogo()
 }
 
 //----------------------------------------------------------------------
-static bool firstFrame = true;
-
 void DeferredDemo::Frame ()
 {
-  if (firstFrame)
-  {
-    firstFrame = false;
-    csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
-    int FRAME_HEIGHT = g3d->GetDriver2D()->GetHeight();
-    int FRAME_WIDTH = g3d->GetDriver2D()->GetWidth();
-    g3d->GetDriver2D()->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
-    SetupGui (true);
-  }
-
   UpdateCamera ();
   UpdateGui ();
 
@@ -587,30 +575,6 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
       SetupGui (true);
     }
 #endif
-    else if (code == '0')
-    {
-      rm_debug->DebugCommand ("toggle_visualize_diffusebuffer");
-    }
-    else if (code == '1')
-    {
-      rm_debug->DebugCommand ("toggle_visualize_normalbuffer");
-    }
-    else if (code == '2')
-    {
-      rm_debug->DebugCommand ("toggle_visualize_ambientbuffer");
-    }
-    else if (code == '3')
-    {
-      rm_debug->DebugCommand ("toggle_visualize_depthbuffer");
-    }
-    else if (code == '4')
-    {
-      rm_debug->DebugCommand ("toggle_visualize_specularbuffer");
-    }
-    else if (code == '5')
-    {
-      rm_debug->DebugCommand ("toggle_visualize_colorbuffer");
-    }
   }
 
   return false;

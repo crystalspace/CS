@@ -58,15 +58,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
   {
   public:
 
-    enum csDebugBuffer {
-      DiffuseBuffer,
-      NormalBuffer,
-      AmbientBuffer,
-      DepthBuffer,
-      SpecularBuffer,
-      ColorBuffer
-    };
-
     /// Constructor.
     RMDeferred(iBase *parent);
 
@@ -94,10 +85,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     bool RenderView(iView *view, bool recursePortals);
     void AddDeferredLayer(CS::RenderManager::MultipleRenderLayer &layers, int &addedLayer);
     void AddZOnlyLayer(CS::RenderManager::MultipleRenderLayer &layers, int &addedLayer);
-
-    void AddPostEffectLayer();
-    void SetPostEffectShaderOption();
-    //void UpdatePostEffectsSV();    
 
     int LocateDeferredLayer(const CS::RenderManager::MultipleRenderLayer &layers);
     int LocateZOnlyLayer(const CS::RenderManager::MultipleRenderLayer &layers);
@@ -127,13 +114,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     int zonlyLayer;
     int maxPortalRecurse;
 
-    //csRef<csShaderVariable> postEffectOptionSV;
-    //PostEffectManager::Layer *postEffectLayer;
-    csStringID idPostEffectOptionSV;
-
     bool showGBuffer;
     bool drawLightVolumes;
-    csDebugBuffer debugBuffer;
   };
 }
 CS_PLUGIN_NAMESPACE_END(RMDeferred)
