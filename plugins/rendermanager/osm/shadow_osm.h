@@ -80,8 +80,12 @@ namespace CS
         ~ViewSetup() { delete[] splitDists; }
       };
 
-      struct CachedLightData
+      struct CachedLightData :
+        public CS::Memory::CustomAllocated
       {
+        uint lastSetupFrame;
+
+        CachedLightData() : lastSetupFrame (~0) {}
         // Transform light space to post-project light space
         struct SuperFrustum : public CS::Utility::FastRefCount<SuperFrustum>
         {
@@ -113,7 +117,13 @@ namespace CS
           if (light->GetFlags().Check (CS_LIGHT_NOSHADOWS)) return;
 
           ViewSetup& viewSetup = shadows.viewSetup;
-
+          uint currentFrame = viewSetup.rview->GetCurrentFrameNumber();
+          if (lastSetupFrame != currentFrame)
+          {
+            lightFrustumsHash.DeleteAll();
+            lastSetupFrame = currentFrame;
+          }
+          
           csRef<iCamera> camera (viewSetup.rview->GetCamera());
 
           LightFrustums& lightFrustumsSettings =
