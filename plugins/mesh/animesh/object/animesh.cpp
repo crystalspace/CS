@@ -367,7 +367,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     // Fix the bounding boxe linked to each bone 
     // and the entire object bounding bone
-    UpdateObjectBoundingBox ();
+    ComputeObjectBoundingBox ();
   }
 
   void AnimeshObjectFactory::SetSkeletonFactory (CS::Animation::iSkeletonFactory* skeletonFactory)
@@ -601,82 +601,94 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     }
   }
 
-  void AnimeshObjectFactory::UpdateObjectBoundingBox ()
+  void AnimeshObjectFactory::ComputeObjectBoundingBox ()
   {
-    csQuaternion rot;
-    csVector3 offset;
-    bool generateBboxes = false;
-
-    // Initialize the bounding box of each bone
-    for (CS::Animation::BoneID i = 0; i < bones.GetSize (); i++)
-      if (!bones[i].userBbox)
-      {
-	generateBboxes = true;
-	bones[i].bbox.StartBoundingBox ();
-      }
-
-    // For each vertex j of the mesh
-    if (generateBboxes)
-    {
-      csVertexListWalker<float, csVector3> vbuf (vertexBuffer);
-      for (size_t j = 0; j < vertexCount; j++)
-      {
-	// For each bone associated with vertex j
-	for (size_t k = 0; k < 4; k++)
-	{
-	  CS::Animation::BoneID vertexBone = boneInfluences[4*j+k].bone;
-	  float boneInfluence = boneInfluences[4*j+k].influenceWeight;
-
-	  // If there is no bounding box defined by user and the bone weight is non zero
-	  if ((!bones[vertexBone].userBbox) && (boneInfluence > SMALL_EPSILON))
-	  {
-	    // Transform the vertex j from object space to bone i space
-	    skeletonFactory->GetTransformAbsSpace (vertexBone, rot, offset);
-	    csVector3 boneSpaceVertex = rot.GetConjugate ().Rotate (*vbuf - offset);
-
-	    // Add the transformed vertex to the bounding box of bone i
-	    Bone& bone = bones[vertexBone];
-	    bone.bbox.AddBoundingVertex (boneSpaceVertex);
-	  }
-	}
-
-	++vbuf;
-      }
-    }
-
     // Initialize the bounding box of the animated mesh object factory
     factoryBB.StartBoundingBox ();
 
-    // For each bone of the skeleton
-    for (CS::Animation::BoneID i = 0; i < bones.GetSize (); i++)
+    // Compute the object bounding box (without skeleton)
+    if (bones.GetSize () == 0)
     {
-      if (skeletonFactory->HasBone (i))
+      csVertexListWalker<float, csVector3> vbuf (vertexBuffer);
+      for (size_t i = 0; i < vertexCount; ++i)
       {
-	skeletonFactory->GetTransformAbsSpace (i, rot, offset); 
-	csReversibleTransform object2bone (csMatrix3 (rot.GetConjugate ()), offset); 
-	csReversibleTransform bone2object = object2bone.GetInverse ();
+	factoryBB.AddBoundingVertex (*vbuf);
+	++vbuf;
+      }
+    }
+    else
+    {
+      csQuaternion rot;
+      csVector3 offset;
+      bool generateBboxes = false;
 
-	// Add the bounding box of the bone to the object bounding box
-	csBox3 bbox = GetBoneBoundingBox (i);
-        if (!bbox.Empty ())
+      // Initialize the bounding box of each bone
+      for (CS::Animation::BoneID i = 0; i < bones.GetSize (); i++)
+	if (!bones[i].userBbox)
 	{
-	  csVector3 cornerBB;
-	  cornerBB = bone2object * bbox.GetCorner (CS_BOX_CORNER_xyz);
-	  factoryBB.AddBoundingVertex (cornerBB);
-	  cornerBB = bone2object * bbox.GetCorner (CS_BOX_CORNER_Xyz);
-	  factoryBB.AddBoundingVertex (cornerBB);
-	  cornerBB = bone2object * bbox.GetCorner (CS_BOX_CORNER_xYz);
-	  factoryBB.AddBoundingVertex (cornerBB);
-	  cornerBB = bone2object * bbox.GetCorner (CS_BOX_CORNER_xyZ);
-	  factoryBB.AddBoundingVertex (cornerBB);
-	  cornerBB = bone2object * bbox.GetCorner (CS_BOX_CORNER_XYz);
-	  factoryBB.AddBoundingVertex (cornerBB);
-	  cornerBB = bone2object * bbox.GetCorner (CS_BOX_CORNER_XyZ);
-	  factoryBB.AddBoundingVertex (cornerBB);
-	  cornerBB = bone2object * bbox.GetCorner (CS_BOX_CORNER_xYZ);
-	  factoryBB.AddBoundingVertex (cornerBB);
-	  cornerBB = bone2object * bbox.GetCorner (CS_BOX_CORNER_XYZ);
-	  factoryBB.AddBoundingVertex (cornerBB);
+	  generateBboxes = true;
+	  bones[i].bbox.StartBoundingBox ();
+	}
+
+      // Compute the bone bounding boxes
+      if (generateBboxes)
+      {
+	csVertexListWalker<float, csVector3> vbuf (vertexBuffer);
+	for (size_t j = 0; j < vertexCount; j++)
+	{
+	  for (size_t k = 0; k < 4; k++)
+	  {
+	    CS::Animation::BoneID vertexBone = boneInfluences[4*j+k].bone;
+	    float boneInfluence = boneInfluences[4*j+k].influenceWeight;
+
+	    // If there is no bounding box defined by user and the bone weight is non zero
+	    if ((!bones[vertexBone].userBbox) && (boneInfluence > SMALL_EPSILON))
+	    {
+	      // Transform the vertex from object space to bone space
+	      skeletonFactory->GetTransformAbsSpace (vertexBone, rot, offset);
+	      csVector3 boneSpaceVertex = rot.GetConjugate ().Rotate (*vbuf - offset);
+
+	      // Add the transformed vertex to the bone bounding box
+	      Bone& bone = bones[vertexBone];
+	      bone.bbox.AddBoundingVertex (boneSpaceVertex);
+	    }
+	  }
+
+	  ++vbuf;
+	}
+      }
+
+      // Compute the object bounding box (with skeleton)
+      for (CS::Animation::BoneID i = 0; i < bones.GetSize (); i++)
+      {
+	if (skeletonFactory->HasBone (i))
+	{
+	  skeletonFactory->GetTransformAbsSpace (i, rot, offset); 
+	  csReversibleTransform object2bone (csMatrix3 (rot.GetConjugate ()), offset); 
+	  csReversibleTransform bone2object = object2bone.GetInverse ();
+
+	  // Add the bounding box of the bone to the object bounding box
+	  csBox3 bbox = GetBoneBoundingBox (i);
+	  if (!bbox.Empty ())
+	  {
+	    csVector3 cornerBB;
+	    cornerBB = bone2object * bbox.GetCorner (CS_BOX_CORNER_xyz);
+	    factoryBB.AddBoundingVertex (cornerBB);
+	    cornerBB = bone2object * bbox.GetCorner (CS_BOX_CORNER_Xyz);
+	    factoryBB.AddBoundingVertex (cornerBB);
+	    cornerBB = bone2object * bbox.GetCorner (CS_BOX_CORNER_xYz);
+	    factoryBB.AddBoundingVertex (cornerBB);
+	    cornerBB = bone2object * bbox.GetCorner (CS_BOX_CORNER_xyZ);
+	    factoryBB.AddBoundingVertex (cornerBB);
+	    cornerBB = bone2object * bbox.GetCorner (CS_BOX_CORNER_XYz);
+	    factoryBB.AddBoundingVertex (cornerBB);
+	    cornerBB = bone2object * bbox.GetCorner (CS_BOX_CORNER_XyZ);
+	    factoryBB.AddBoundingVertex (cornerBB);
+	    cornerBB = bone2object * bbox.GetCorner (CS_BOX_CORNER_xYZ);
+	    factoryBB.AddBoundingVertex (cornerBB);
+	    cornerBB = bone2object * bbox.GetCorner (CS_BOX_CORNER_XYZ);
+	    factoryBB.AddBoundingVertex (cornerBB);
+	  }
 	}
       }
     }
@@ -998,7 +1010,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
       // Update the bounding box of the mesh object
       if (!userObjectBB)
-	UpdateObjectBoundingBox ();
+	ComputeObjectBoundingBox ();
     }
     lastTick = current_time;
   }
@@ -1284,7 +1296,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   void AnimeshObject::UnsetObjectBoundingBox ()
   {
     userObjectBB = false; 
-    UpdateObjectBoundingBox ();
+    ComputeObjectBoundingBox ();
   }
 
   void AnimeshObject::GetRadius (float& radius, csVector3& center)
@@ -1502,7 +1514,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     }
   }
 
-  void AnimeshObject::UpdateObjectBoundingBox ()
+  void AnimeshObject::ComputeObjectBoundingBox ()
   {
     csQuaternion rot;
     csVector3 offset;

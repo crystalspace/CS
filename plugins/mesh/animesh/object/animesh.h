@@ -153,7 +153,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     void ComputeTangents ();
 
   private: 
-    void UpdateObjectBoundingBox ();
+    void ComputeObjectBoundingBox ();
 
     // required but stupid stuff..
     AnimeshObjectType* objectType;
@@ -415,7 +415,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     void PreskinLF ();
 
-    void UpdateObjectBoundingBox ();
+    void ComputeObjectBoundingBox ();
 
     class RenderBufferAccessor :
       public scfImplementation1<RenderBufferAccessor, 
