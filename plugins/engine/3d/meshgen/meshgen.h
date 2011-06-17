@@ -549,6 +549,8 @@ public:
 				    const CS::Math::Matrix4& worldToMap);
   virtual bool IsValidDensityFactorMap (const char* factorMapID) const;
   virtual const CS::Math::Matrix4& GetWorldToMapTransform (const char* factorMapID) const;
+  virtual int GetDensityFactorMapWidth (const char* factorMapID) const;
+  virtual int GetDensityFactorMapHeight (const char* factorMapID) const;
 
   virtual void SetDefaultDensityFactor (float factor);
   virtual float GetDefaultDensityFactor () const { return default_density_factor; }

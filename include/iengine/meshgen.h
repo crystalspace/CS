@@ -345,6 +345,17 @@ struct iMeshGenerator : public virtual iBase
   virtual const CS::Math::Matrix4& GetWorldToMapTransform (const char* factorMapID) const = 0;
 
   /**
+   * Get the width of the density factory map. If the map doesn't exist then this
+   * will return 0.
+   */
+  virtual int GetDensityFactorMapWidth (const char* factorMapID) const = 0;
+  /**
+   * Get the height of the density factory map. If the map doesn't exist then this
+   * will return 0.
+   */
+  virtual int GetDensityFactorMapHeight (const char* factorMapID) const = 0;
+
+  /**
    * Set a default density factor. This factor is the final multiplier
    * for density and so it can be used to control global density to cater
    * for higher/lower-end hardware more easily. The default is 1.0.

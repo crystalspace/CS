@@ -1211,5 +1211,24 @@ const CS::Math::Matrix4& csMeshGenerator::GetWorldToMapTransform (const char* fa
   return factorMap->GetWorldToMapTransform ();
 }
 
+int csMeshGenerator::GetDensityFactorMapWidth (const char* factorMapID) const
+{
+  DensityFactorMap* factorMap = densityFactorMaps.Get (factorMapID, 0);
+  if (factorMap)
+    return factorMap->GetWidth ();
+  else
+    return 0;
+}
+
+int csMeshGenerator::GetDensityFactorMapHeight (const char* factorMapID) const
+{
+  DensityFactorMap* factorMap = densityFactorMaps.Get (factorMapID, 0);
+  if (factorMap)
+    return factorMap->GetHeight ();
+  else
+    return 0;
+}
+
+
 }
 CS_PLUGIN_NAMESPACE_END(Engine)

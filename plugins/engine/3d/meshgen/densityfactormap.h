@@ -46,6 +46,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
     
     bool IsValid() const { return mapPtr; }
     float GetDensity (const csVector3& worldCoord) const;
+    int GetWidth () const { return width; }
+    int GetHeight () const { return height; }
     
     void SetImage (iImage* image);
     void SetWorldToMapTransform (const CS::Math::Matrix4& tf);
