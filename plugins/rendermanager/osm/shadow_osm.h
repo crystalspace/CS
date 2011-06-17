@@ -87,13 +87,13 @@ namespace CS
         {
           int actualNumParts;
           // Transform world space to light space
+          csRef<csShaderVariable> farZSV;
+          csRef<csShaderVariable> numSplitsSV;
 
           struct Frustum
           {
             csRef<csShaderVariable> shadowMapProjectSV;
             csRef<csShaderVariable> textureSVs[rtaNumAttachments];
-            csRef<csShaderVariable> farZSV;
-            csRef<csShaderVariable> numSplitsSV;
           };
           Frustum* frustums;
 
@@ -152,9 +152,9 @@ namespace CS
                 lightFrustum.shadowMapProjectSV->SetArrayElement (j, item);
               }
 
-              lightFrustum.farZSV = lightVarsHelper.CreateTempSV (
+              superFrustum.farZSV = lightVarsHelper.CreateTempSV (
                 viewSetup.persist.farZSVName);
-              lightFrustum.numSplitsSV = lightVarsHelper.CreateTempSV (
+              superFrustum.numSplitsSV = lightVarsHelper.CreateTempSV (
                 viewSetup.persist.numSplitsSVName);
 
               const ShadowSettings::Target* target =
@@ -217,8 +217,8 @@ namespace CS
               shadowMapSize, shadowMapSize);
             // and also this
             lightFrust.textureSVs[target->attachment]->SetValue (tex);
-            lightFrust.farZSV->SetValue(persist.farZ);
-            lightFrust.numSplitsSV->SetValue(persist.numSplits);
+//             lightFrust.farZSV->SetValue(persist.farZ);
+//             lightFrust.numSplitsSV->SetValue(persist.numSplits);
             renderTree.AddDebugTexture (tex);
 
             csBox2 clipBox (0, 0, shadowMapSize, shadowMapSize);
@@ -415,14 +415,17 @@ namespace CS
           lightVarsHelper.MergeAsArrayItem (lightStacks[0], 
             lightFrustum.textureSVs[target->attachment], s);
 
-          lightVarsHelper.MergeAsArrayItem (lightStacks[0],
-            lightFrustum.farZSV, 0);
-          lightVarsHelper.MergeAsArrayItem (lightStacks[0],
-            lightFrustum.numSplitsSV, 0);
-
           spreadFlags |= (1 << s);
           s++;        
         }
+
+        CS::ShaderVarStringID name = superFrust.numSplitsSV->GetName();
+        superFrust.numSplitsSV = lightVarsHelper.CreateVarOnStack(name, lightStacks[0]);
+        superFrust.numSplitsSV->SetValue(viewSetup.persist.numSplits);
+
+        name = superFrust.farZSV->GetName();
+        superFrust.farZSV = lightVarsHelper.CreateVarOnStack(name, lightStacks[0]);
+        superFrust.farZSV->SetValue(viewSetup.persist.farZ);
 
         return spreadFlags;
       }

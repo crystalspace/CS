@@ -110,8 +110,8 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     //inLight = sampler.GetVisibility (shadowMap, shadowMapCoordsBiased.xy, compareDepth);
 	
 	int i;
-	int numSplits = lightPropsSM.shadowMapNumSplits[0];
-	float farZ = lightPropsSM.shadowMapFarZ[0];
+	int numSplits = lightPropsSM.shadowMapNumSplits;
+	float farZ = lightPropsSM.shadowMapFarZ;
 	for (i = 1 ; i <= numSplits ; i ++)
 	{
 		float previousSplit = (i - 1) * farZ / numSplits;

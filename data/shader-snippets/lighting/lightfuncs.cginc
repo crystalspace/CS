@@ -178,8 +178,8 @@ struct LightPropertiesShadowMap
   // Shadow map pixel size + dimensions
   float4 shadowMapPixels[MAX_LIGHTS];
   float4 shadowMapUnscale[MAX_LIGHTS];
-  float shadowMapFarZ[MAX_LIGHTS];
-  int shadowMapNumSplits[MAX_LIGHTS];
+  float shadowMapFarZ;
+  int shadowMapNumSplits;
   
   sampler2D shadowMapNoise;
 };
