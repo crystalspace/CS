@@ -50974,12 +50974,12 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @-DCS_OPENAL_PATH=OpenAL@@-framework OpenAL | sed 'y% %#%'` \
-	`echo @@@-lopenal | sed 'y% %#%'` \
+    for cs_build_item in `echo @@@-lopenal | sed 'y% %#%'` \
 	`echo @@@-lopenal32 | sed 'y% %#%'` \
 	`echo @@@-lOpenAL32 | sed 'y% %#%'` \
 	`echo @@@-lopenal -ldsound | sed 'y% %#%'` \
-	`echo @@@-lopenal32 -ldsound | sed 'y% %#%'`
+	`echo @@@-lopenal32 -ldsound | sed 'y% %#%'` \
+    `echo @-DCS_OPENAL_PATH=OpenAL@@-framework OpenAL | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -51103,12 +51103,12 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @-DCS_OPENAL_PATH=OpenAL@@-framework OpenAL | sed 'y% %#%'` \
-	`echo @@@-lopenal | sed 'y% %#%'` \
+    for cs_build_item in `echo @@@-lopenal | sed 'y% %#%'` \
 	`echo @@@-lopenal32 | sed 'y% %#%'` \
 	`echo @@@-lOpenAL32 | sed 'y% %#%'` \
 	`echo @@@-lopenal -ldsound | sed 'y% %#%'` \
-	`echo @@@-lopenal32 -ldsound | sed 'y% %#%'`
+	`echo @@@-lopenal32 -ldsound | sed 'y% %#%'` \
+    `echo @-DCS_OPENAL_PATH=OpenAL@@-framework OpenAL | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
