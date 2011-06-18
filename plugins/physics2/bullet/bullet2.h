@@ -61,7 +61,7 @@ class csBulletSector : public scfImplementationExt3<
   csRefArrayObject<csBulletRigidBody> rigidBodies;
   csRefArrayObject<csBulletSoftBody> softBodies;
   csWeakRefArray<csBulletSoftBody> anchoredSoftBodies;
-  csRefArray<iJoint> joints;
+  csRefArray<csBulletJoint> joints;
   csArray<CollisionPortal> portals;
   csArray<CollisionData> points;
   csBulletDebugDraw* debugDraw;
@@ -95,6 +95,9 @@ public:
   virtual void AddCollisionObject(iCollisionObject* object);
   virtual void RemoveCollisionObject(iCollisionObject* object);
 
+  virtual size_t GetCollisionObjectCount () {return collisionObjects.GetSize ();}
+  virtual iCollisionObject* GetCollisionObject (size_t index);
+
   virtual void AddPortal(iPortal* portal);
   virtual void RemovePortal(iPortal* portal);
 
@@ -127,16 +130,24 @@ public:
   virtual void SetAutoDisableParams (float linear,
     float angular, float time);
 
-  virtual void AddRidigBody (iRigidBody* body);
+  virtual void AddRigidBody (iRigidBody* body);
   virtual void RemoveRigidBody (iRigidBody* body);
+
+  virtual size_t GetRigidBodyCount () {return rigidBodies.GetSize ();}
+  virtual iRigidBody* GetRigidBody (size_t index);
 
   virtual void AddSoftBody (iSoftBody* body);
   virtual void RemoveSoftBody (iSoftBody* body);
 
-  //Bullet::iPhysicalSector
+  virtual size_t GetSoftBodyCount () {return softBodies.GetSize ();}
+  virtual iSoftBody* GetSoftBody (size_t index);
+
+  virtual void RemoveJoint (iJoint* joint);
+
   virtual void SetSoftBodyEnabled (bool enabled);
   virtual bool GetSoftBodyEnabled () {return isSoftWorld;}
 
+  //Bullet::iPhysicalSector
   //Currently will not use gimpact shape...
   //virtual void SetGimpactEnabled (bool enabled);
   //virtual bool GetGimpactEnabled ();

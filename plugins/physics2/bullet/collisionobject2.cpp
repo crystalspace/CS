@@ -20,7 +20,6 @@ csBulletCollisionObject::csBulletCollisionObject (csBulletSystem* sys)
   movable = NULL;
   insideWorld = false;
   shapeChanged = false;
-  isPhysics = false;
   isTerrain = false;
   btTransform identity;
   identity.setIdentity ();
@@ -50,7 +49,7 @@ void csBulletCollisionObject::SetObjectType (CollisionObjectType type)
     return;
   }
   else
-    this->type = type;
+    this->type = type; // this means you can change from rigidbody/softbody to ghostobject. I dont know if the code can do this.
 }
 
 void csBulletCollisionObject::SetTransform (const csOrthoTransform& trans)
@@ -248,7 +247,8 @@ bool csBulletCollisionObject::Collide (iCollisionObject* otherObject)
   }
 
   //no matter what kind VS Ghost, Actor.
-  if (otherObject->GetObjectType () != COLLISION_OBJECT_BASE)
+  if (otherObject->GetObjectType () != COLLISION_OBJECT_BASE 
+    || otherObject->GetObjectType () != COLLISION_OBJECT_PHYSICAL)
     return otherObject->Collide (this);
 
   csBulletCollisionObject* otherObj = dynamic_cast<csBulletCollisionObject*> (otherObject);
@@ -258,7 +258,7 @@ bool csBulletCollisionObject::Collide (iCollisionObject* otherObject)
     if (otherObj->isTerrain == true)
       return false;
 
-    //Terrain VS object.
+    //Terrain VS object/Body.
     btCollisionObject* otherBtObject = otherObj->GetBulletCollisionPointer ();
     csBulletColliderTerrain* terrainColl = dynamic_cast<csBulletColliderTerrain*> (colliders[0]);
     for (size_t i = 0; i < terrainColl->bodies.GetSize (); i++)
@@ -269,11 +269,11 @@ bool csBulletCollisionObject::Collide (iCollisionObject* otherObject)
   }
   else
   {
-    //Object CS terrain.
+    //Object/Body CS terrain.
     if (otherObj->isTerrain == true)
       return otherObject->Collide (this);
 
-    //Object VS object.
+    //Object/Body VS object.
     btCollisionObject* otherBtObject = dynamic_cast<csBulletCollisionObject*> (otherObject)->GetBulletCollisionPointer ();
     return sector->BulletCollide (btObject, otherBtObject);
   }

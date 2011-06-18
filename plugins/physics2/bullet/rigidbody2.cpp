@@ -10,7 +10,7 @@ csBulletRigidBody::csBulletRigidBody (csBulletSystem* phySys)
 : scfImplementationType (this, phySys), density (1.0f),
 physicalState (CS::Physics::STATE_DYNAMIC)
 {
-  isPhysics = true;
+  type = CS::Collision::COLLISION_OBJECT_PHYSICAL;
 }
 
 csBulletRigidBody::~csBulletRigidBody ()

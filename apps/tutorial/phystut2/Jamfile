@@ -1,0 +1,9 @@
+SubDir TOP apps tutorial phystut2 ;
+
+if $(ODE.AVAILABLE) = "yes" || $(BULLET.AVAILABLE) = "yes"
+{
+  Description phystut2 : "physics tutorial" ;
+  Application phystut2 : [ Wildcard *.cpp *.h ] : noinstall ;
+  LinkWith phystut2 : crystalspace ;
+  ExternalLibs phystut : BULLET ;
+}

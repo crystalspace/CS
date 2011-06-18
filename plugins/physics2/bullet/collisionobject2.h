@@ -32,7 +32,6 @@ protected:
   CS::Collision::CollisionGroup collGroup;
   bool insideWorld;
   bool shapeChanged;
-  bool isPhysics;
   bool isTerrain;
 
 public:
@@ -40,6 +39,7 @@ public:
   virtual ~csBulletCollisionObject ();
 
   virtual iObject* QueryObject (void) { return (iObject*) this; }
+  virtual iCollisionObject* QueryCollisionObject () {return dynamic_cast<iCollisionObject*> (this);}
 
   virtual void SetObjectType (CS::Collision::CollisionObjectType type);
   virtual CS::Collision::CollisionObjectType GetObjectType () {return type;}

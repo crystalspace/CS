@@ -5,7 +5,7 @@
     <classes>
       <class>
         <name>crystalspace.physics.bullet2</name>
-        <implementation>csBulletCollisionSystem</implementation>
+        <implementation>csBulletSystem</implementation>
         <description>Bullet collision and physics</description>
       </class>
     </classes>

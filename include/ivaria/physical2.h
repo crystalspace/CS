@@ -9,6 +9,7 @@
 #include "imesh/genmesh.h"
 #include "csgeom/tri.h"
 #include "cstool/primitives.h"
+#include "ivaria/collision2.h"
 
 namespace CS
 {
@@ -50,7 +51,7 @@ enum RigidBodyState
 * A base interface of physical bodies. 
 * iRigidBody and iSoftBody will be derived from this one.
 */
-struct iPhysicalBody : public virtual iBase
+struct iPhysicalBody : public virtual CS::Collision::iCollisionObject
 {
   SCF_INTERFACE (CS::Physics::iPhysicalBody, 1, 0, 0);
 
@@ -123,9 +124,9 @@ struct iPhysicalBody : public virtual iBase
 *
 * \sa iSoftBody
 */
-struct iRigidBody : public iPhysicalBody
+struct iRigidBody : public virtual iPhysicalBody
 {
-  SCF_INTERFACE (CS::Physics::iRigidBody, 1, 0, 2);
+  SCF_INTERFACE (CS::Physics::iRigidBody, 1, 0, 0);
 
   /// Get the current state of the body.
   virtual RigidBodyState GetState () = 0;
@@ -257,9 +258,9 @@ struct iAnchorAnimationControl : public virtual iBase
 * A soft body can neither be static or kinematic, it is always dynamic.
 * \sa iRigidBody 
 */
-struct iSoftBody : public iPhysicalBody
+struct iSoftBody : public virtual iPhysicalBody
 {
-  SCF_INTERFACE (CS::Physics::iSoftBody, 2, 0, 3);
+  SCF_INTERFACE (CS::Physics::iSoftBody, 1, 0, 0);
 
   /// Set the mass of a node by index.
   virtual void SetVertexMass (float mass, size_t index) = 0;
@@ -728,16 +729,46 @@ struct iPhysicalSector : public virtual iBase
   * Add a rigid body into the sector.
   * The rigid body has to be initialized.
   */
-  virtual void AddRidigBody (iRigidBody* body) = 0;
+  virtual void AddRigidBody (iRigidBody* body) = 0;
 
   /// Remove a rigid body by pointer.
   virtual void RemoveRigidBody (iRigidBody* body) = 0;
 
-  /// Add a soft body into the sector.
+  /// Get the count of rigid bodies.
+  virtual size_t GetRigidBodyCount () = 0;
+
+  /// Get the rigid body by index.
+  virtual iRigidBody* GetRigidBody (size_t index) = 0;
+
+  /**
+  * Add a soft body into the sector.
+  * The soft body has to be initialized.
+  */
   virtual void AddSoftBody (iSoftBody* body) = 0;
 
   /// Remove a soft body by pointer.
   virtual void RemoveSoftBody (iSoftBody* body) = 0;
+
+  /// Get the count of soft bodies.
+  virtual size_t GetSoftBodyCount () = 0;
+
+  /// Get the soft body by index.
+  virtual iSoftBody* GetSoftBody (size_t index) = 0;
+
+  /// Remove a joint by pointer.
+  virtual void RemoveJoint (iJoint* joint) = 0;
+
+  /**
+  * Set whether this dynamic world can handle soft bodies or not.
+  * \warning You have to call this method before adding any objects in the
+  * dynamic world.
+  */
+  virtual void SetSoftBodyEnabled (bool enabled) = 0; 
+
+  /**
+  * Return whether this dynamic world can handle soft bodies or not.
+  */
+  virtual bool GetSoftBodyEnabled () = 0;
 };
 }
 }

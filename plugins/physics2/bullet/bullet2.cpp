@@ -112,11 +112,25 @@ void csBulletSector::RemoveCollisionObject (iCollisionObject* object)
   csBulletCollisionObject* collObject = dynamic_cast<csBulletCollisionObject*> (object);
   CS_ASSERT (collObject);
 
-  collObject->RemoveBulletObject ();
+  if (collObject->GetObjectType () == COLLISION_OBJECT_PHYSICAL)
+  {
+    iPhysicalBody* phyBody = dynamic_cast<iPhysicalBody*> (object);
+    if (phyBody->GetBodyType () == CS::Physics::BODY_RIGID)
+      RemoveRigidBody (phyBody->QueryRigidBody ());
+    else
+      RemoveSoftBody (phyBody->QuerySoftBody ());
+  }
+  else
+  {
+    collObject->RemoveBulletObject ();
+    collObject->insideWorld = false;
+    collisionObjects.Delete (collObject);
+  }
+}
 
-  collObject->insideWorld = false;
-
-  collisionObjects.Delete (collObject);
+iCollisionObject* csBulletSector::GetCollisionObject (size_t index)
+{
+  return collisionObjects[index]->QueryCollisionObject ();
 }
 
 void csBulletSector::AddPortal (iPortal* portal)
@@ -149,7 +163,7 @@ HitBeamResult csBulletSector::HitBeam (const csVector3& start, const csVector3& 
     csBulletCollisionObject* collObject = (csBulletCollisionObject*) (
       rayCallback.m_collisionObject->getUserPointer ());
 
-    if (!collObject->isPhysics)
+    if (!collObject->GetObjectType () == COLLISION_OBJECT_PHYSICAL)
     {
       if(collObject->GetObjectType () == CS::Collision::CollisionObjectType::COLLISION_OBJECT_GHOST)
       {
@@ -246,7 +260,7 @@ HitBeamResult csBulletSector::HitBeamPortal (const csVector3& start, const csVec
     csBulletCollisionObject* collObject = static_cast<csBulletCollisionObject*> (
       rayCallback.m_collisionObject->getUserPointer ());
 
-    if (!collObject->isPhysics)
+    if (!collObject->GetObjectType () == COLLISION_OBJECT_PHYSICAL)
     {
       result.hasHit = true;
       result.object = collObject;
@@ -386,7 +400,7 @@ HitBeamResult csBulletSector::RigidHitBeam (btCollisionObject* object,
     csBulletCollisionObject* collObject = static_cast<csBulletCollisionObject*> (
       rayCallback.m_collisionObject->getUserPointer ());
 
-    if (!collObject->isPhysics)
+    if (!collObject->GetObjectType () == COLLISION_OBJECT_PHYSICAL)
     {
       result.hasHit = true;
       result.object = collObject;
@@ -508,14 +522,15 @@ void csBulletSector::SetAutoDisableParams (float linear, float angular,
   timeDisableThreshold = time;
 }
 
-void csBulletSector::AddRidigBody (iRigidBody* body)
+void csBulletSector::AddRigidBody (iRigidBody* body)
 {
   csRef<csBulletRigidBody> btBody (dynamic_cast<csBulletRigidBody*>(body));
   rigidBodies.Push (btBody);
 
-  csBulletCollisionObject* collObj = dynamic_cast<csBulletCollisionObject*> (body);
-  collObj->sector = this;
-  collObj->AddBulletObject ();
+  btBody->sector = this;
+  btBody->AddBulletObject ();
+  btBody->SetLinearDampener (linearDampening);
+  btBody->SetRollingDampener (angularDampening);
 }
 
 void csBulletSector::RemoveRigidBody (iRigidBody* body)
@@ -527,14 +542,17 @@ void csBulletSector::RemoveRigidBody (iRigidBody* body)
   rigidBodies.Delete (btBody);
 }
 
+iRigidBody* csBulletSector::GetRigidBody (size_t index)
+{
+  return rigidBodies[index]->QueryRigidBody ();
+}
+
 void csBulletSector::AddSoftBody (iSoftBody* body)
 {
   csRef<csBulletSoftBody> btBody (dynamic_cast<csBulletSoftBody*>(body));
   softBodies.Push (btBody);
-
-  csBulletCollisionObject* collObj = dynamic_cast<csBulletCollisionObject*> (body);
-  collObj->sector = this;
-  collObj->AddBulletObject ();
+  btBody->sector = this;
+  btBody->AddBulletObject ();
 }
 
 void csBulletSector::RemoveSoftBody (iSoftBody* body)
@@ -544,6 +562,20 @@ void csBulletSector::RemoveSoftBody (iSoftBody* body)
 
   btBody->RemoveBulletObject ();
   softBodies.Delete (btBody);
+}
+
+iSoftBody* csBulletSector::GetSoftBody (size_t index)
+{
+  return softBodies[index]->QuerySoftBody ();
+}
+
+void csBulletSector::RemoveJoint (iJoint* joint)
+{
+  csBulletJoint* btJoint = dynamic_cast<csBulletJoint*> (joint);
+  CS_ASSERT(btJoint);
+
+  btJoint->RemoveBulletJoint ();
+  joints.Delete (btJoint);
 }
 
 void PreTickCallback (btDynamicsWorld* world, btScalar timeStep)

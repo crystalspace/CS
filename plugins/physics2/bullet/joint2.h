@@ -61,13 +61,14 @@ private:
   bool isSoft;
   bool isSpring;
   bool equilPointSet;
+  bool insideWorld;
 
 public:
   csBulletJoint (csBulletSystem* system);
   virtual ~csBulletJoint ();
 
-  void Attach (iPhysicalBody* body, bool forceUpdate = true);
   void SetType (csJointType type) {this->type = type;}
+  void RemoveBulletJoint ();
 
   virtual void Attach (iPhysicalBody* body1, iPhysicalBody* body2,
     bool forceUpdate = true);

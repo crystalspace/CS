@@ -23,7 +23,7 @@ csBulletSoftBody::csBulletSoftBody (csBulletSystem* phySys, btSoftBody* body)
 {
   btObject = body;
   btBody->setUserPointer (dynamic_cast<iPhysicalBody*> (this));
-  isPhysics = true;
+  this->type = CS::Collision::COLLISION_OBJECT_PHYSICAL;
 }
 
 csBulletSoftBody::~csBulletSoftBody ()
@@ -60,7 +60,7 @@ HitBeamResult csBulletSoftBody::HitBeam (const csVector3& start, const csVector3
   if (btBody->rayTest (rayFrom, rayTo, ray))
   {
     result.hasHit = true;
-    result.object = dynamic_cast<iCollisionObject*>(this);
+    result.object = QueryCollisionObject ();
     result.isect = BulletToCS (rayCallback.m_hitPointWorld,
       system->getInverseInternalScale ());
     result.normal = BulletToCS (rayCallback.m_hitNormalWorld,

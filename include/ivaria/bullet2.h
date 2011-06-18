@@ -134,18 +134,6 @@ struct iPhysicalSector : public virtual iBase
 {
   SCF_INTERFACE (CS::Physics::Bullet::iPhysicalSector, 1, 0, 0);
 
-  /**
-  * Set whether this dynamic world can handle soft bodies or not.
-  * \warning You have to call this method before adding any objects in the
-  * dynamic world.
-  */
-  virtual void SetSoftBodyEnabled (bool enabled) = 0; 
-
-  /**
-  * Return whether this dynamic world can handle soft bodies or not.
-  */
-  virtual bool GetSoftBodyEnabled () = 0;
-
   //virtual void SetGimpactEnabled (bool enabled) = 0; 
 
   //virtual bool GetGimpactEnabled () = 0; 

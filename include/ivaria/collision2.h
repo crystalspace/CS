@@ -43,6 +43,7 @@ COLLIDER_TERRAIN,
 enum CollisionObjectType
 {
 COLLISION_OBJECT_BASE = 0,
+COLLISION_OBJECT_PHYSICAL,
 COLLISION_OBJECT_GHOST,
 COLLISION_OBJECT_ACTOR,
 };
@@ -347,6 +348,8 @@ struct iCollisionObject : public virtual iBase
 {
   SCF_INTERFACE (CS::Collision::iCollisionObject, 1, 0, 0);
 
+  virtual iCollisionObject* QueryCollisionObject () = 0;
+
   /// Set the type of the collision object.
   virtual void SetObjectType (CollisionObjectType type) = 0;
 
@@ -512,6 +515,12 @@ struct iCollisionSector : public virtual iBase
 
   /// Remove a collision object by pointer.
   virtual void RemoveCollisionObject (iCollisionObject* object) = 0;
+
+  /// Get the count of collision objects.
+  virtual size_t GetCollisionObjectCount () = 0;
+
+  /// Get the collision object by index.
+  virtual iCollisionObject* GetCollisionObject (size_t index) = 0;
 
   /// Add a portal into the sector. Collision objects crossing a portal will be switched from iCollisionSector's.
   virtual void AddPortal (iPortal* portal) = 0;
