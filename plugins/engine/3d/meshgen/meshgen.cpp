@@ -452,6 +452,8 @@ csMeshGenerator::csMeshGenerator (csEngine* engine) :
   cell_dim (50), inuse_blocks (0), inuse_blocks_last (0),
   max_blocks (100), engine (engine)
 {
+  default_density_factor = 1.0f;
+
   cells = new csMGCell [cell_dim * cell_dim];
 
   for (size_t i = 0 ; i < size_t (max_blocks) ; i++)
