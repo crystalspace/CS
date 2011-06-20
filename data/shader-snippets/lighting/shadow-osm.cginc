@@ -17,11 +17,10 @@
 -->
 <include>
 <?Include lightfuncs.cginc ?>
-<?Include shadowfuncs.cginc ?>
 <![CDATA[
 
-#ifndef __SHADOW_DEPTH_CG_INC__
-#define __SHADOW_DEPTH_CG_INC__
+#ifndef __SHADOW_OSM_CG_INC__
+#define __SHADOW_OSM_CG_INC__
 
 struct ShadowShadowMapDepth : ShadowShadowMap
 {
@@ -128,7 +127,7 @@ struct ShadowShadowMapDepth : ShadowShadowMap
   }
 };
 
-#endif // __SHADOW_DEPTH_CG_INC__
+#endif // __SHADOW_OSM_CG_INC__
  
 ]]>
 </include>
