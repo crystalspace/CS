@@ -47,6 +47,12 @@ struct iAnimatedMesh;
 struct iAnimatedMeshSubMesh;
 struct iAnimatedMeshMorphTarget;
 
+/// Identifier for single subset data
+typedef size_t SubsetID;
+
+/// ID for an invalid subset
+static const SubsetID InvalidSubsetID = (SubsetID)~0;
+
 /**
  * Represent a single influence of a bone on a single vertex
  */
@@ -173,10 +179,19 @@ public:
  *
  * These meshes are animated by the skeletal animation system (see
  * CS::Animation::iSkeletonFactory) and by morphing (see CS::Mesh::iAnimatedMeshMorphTarget).
+ * 
+ * To improve the morphing process, mesh factories are segmented into subsets. All
+ * vertices of a subset are influenced by the same morph targets (i.e. the offsets
+ * corresponding to these vertices in the morph targets are non-zero). All null 
+ * entries of a morph target are removed from the offset buffer. Thus, segmentation 
+ * into subsets improves memory usage and computational resources since morph targets 
+ * are only applied to a vertex when they contain deformations. Subset with ID 0
+ * regroups the vertices which are not influenced by any morph target and
+ * consequently will never be morphed.
  */
 struct iAnimatedMeshFactory : public virtual iBase
 {
-  SCF_INTERFACE(CS::Mesh::iAnimatedMeshFactory, 2, 2, 2);
+  SCF_INTERFACE(CS::Mesh::iAnimatedMeshFactory, 2, 2, 3);
 
   /**\name SubMesh handling
    * @{ */
@@ -372,17 +387,18 @@ struct iAnimatedMeshFactory : public virtual iBase
   virtual iAnimatedMeshMorphTarget* CreateMorphTarget (const char* name) = 0;
 
   /**
-   * Get a specific morph target
+   * Get a specific morph target.
    */
   virtual iAnimatedMeshMorphTarget* GetMorphTarget (uint target) = 0;
 
   /**
-   * Get number of morph targets
+   * Get number of morph targets.
    */
   virtual uint GetMorphTargetCount () const = 0;
 
   /**
-   * Remove all morph targets
+   * Remove all morph targets.
+   * You must call ClearSubsets() after clearing the morph targets.
    */
   virtual void ClearMorphTargets () = 0;
 
@@ -441,8 +457,8 @@ struct iAnimatedMeshFactory : public virtual iBase
    * Set the bounding box of the given bone, in bone space. Bone bounding boxes 
    * are used to update the global bounding box of the animated mesh factory and 
    * to speed up hitbeam tests. If you don't specify a bounding box for a bone,
-   * a bounding box is automatically generated: it includes all 
-   * the mesh vertices which have a non zero weight for this bone.
+   * a bounding box is automatically generated: it includes all the mesh vertices 
+   * which have a non zero weight for this bone.
    * You must call Invalidate() after modifying it.
    * \param bone The ID of the bone.
    * \param box The bounding box of the given bone, in bone space.
@@ -453,6 +469,60 @@ struct iAnimatedMeshFactory : public virtual iBase
    * Get the bounding box of the bone with the given ID, in bone space.
    */
   virtual const csBox3& GetBoneBoundingBox (CS::Animation::BoneID bone) const = 0; 
+
+  /** @} */
+
+  /**\name Subsets
+  * @{ */
+
+  /**
+   * Create a new subset and return its ID.
+   * The first subset (with ID 0) regroups the vertices of the mesh object 
+   * which are not influenced by any morph target, e.i. all corresponding 
+   * offsets are null.
+   */
+  virtual SubsetID AddSubset () = 0;
+
+  /**
+   * Add a vertex to a subset. 
+   * All vertices of a subset must be influenced by the same morph targets:
+   * their corresponding offsets in these morph targets are non-zero.
+   * \param subset The ID of the subset
+   * \param vertexIndex The index of the vertex to be added
+   */
+  virtual void AddSubsetVertex (const SubsetID subset, const size_t vertexIndex) = 0;
+
+  /**
+   * Get the index of a vertex in a specified subset.
+   * \param subset The ID of the subset
+   * \param vertexIndex The index of the subset vertex
+   * \returns the index of this vertex in the vertex buffer
+   */
+  virtual size_t GetSubsetVertex (const SubsetID subset, const size_t vertexIndex) const = 0;
+
+  /**
+   * Get the number of vertices belonging to a subset.
+   */
+  virtual size_t GetSubsetVertexCount (const SubsetID subset) const = 0;
+
+  /**
+   * Get the highest subset ID associated with this factory 
+   * (or InvalidSubsetID if no subset is defined on this factory).
+   */
+  virtual SubsetID GetTopSubsetID () const = 0;
+
+  /**
+   * Return true if subsets are defined for this factory.
+   */
+  virtual bool HasSubset () const = 0;
+
+  /**
+   * Remove all subsets from this factory.
+   * You must call Invalidate() after clearing the subsets.
+   */
+  virtual void ClearSubsets () = 0;
+
+  /** @} */
 };
 
 /**
@@ -664,29 +734,49 @@ struct iAnimatedMeshSubMesh : public virtual iBase
  */
 struct iAnimatedMeshMorphTarget : public virtual iBase
 {
-  SCF_INTERFACE(CS::Mesh::iAnimatedMeshMorphTarget, 2, 0, 0);
+  SCF_INTERFACE(CS::Mesh::iAnimatedMeshMorphTarget, 2, 0, 1);
 
   /**
    * Set the render buffer to use for the vertex offsets.   
-   * It must hold at least as many elements as the vertex buffer of the owning
-   * mesh object.
-   * \returns false if the buffer doesn't follow required specifications
+   * If no subset is defined on the owning mesh object, the buffer 
+   * must hold as many elements as the vertex buffer of this mesh 
+   * object.
+   * Remember to call Invalidate() after changing this data.
    */
   virtual bool SetVertexOffsets (iRenderBuffer* renderBuffer) = 0;
 
   /**
-   * Get the buffer of the vertex offsets
+   * Get the buffer of the vertex offsets.
    * Remember to call Invalidate() after changing this data.
    */
   virtual iRenderBuffer* GetVertexOffsets () = 0;
 
   /**
-   * Update the morph target after some changes to its vertex offsets
+   * Update the morph target after some changes to its vertex offsets.
    */
   virtual void Invalidate () = 0;
 
-  /// Get the name of this morph target
+  /**
+   * Get the name of this morph target.
+   */
   virtual const char* GetName () const = 0;
+
+  /**
+   * Add a subset to this morph target.
+   * The morph target must have non zero offsets for all the
+   * vertices of this subset.
+   */
+  virtual void AddSubset (const SubsetID subset) = 0;
+
+  /**
+   * Get a subset associated with this morph target.
+   */
+  virtual SubsetID GetSubset (const size_t index) const = 0;
+
+  /**
+   * Get the number of subsets associated with this morph target.
+   */
+  virtual size_t GetSubsetCount () const = 0;
 };
 
 

@@ -369,6 +369,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     // Fix the bounding box linked to each bone 
     // and the entire object bounding box
     ComputeObjectBoundingBox ();
+
+    // Compute the subsets from the current factory and morph targets
+    if (!HasSubset () && morphTargets.GetSize ()) 
+      ComputeSubsets ();
   }
 
   void AnimeshObjectFactory::SetSkeletonFactory (CS::Animation::iSkeletonFactory* skeletonFactory)
@@ -401,25 +405,33 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
     csRef<MorphTarget> newTarget;
     newTarget.AttachNew (new MorphTarget (this, name));
-    size_t targetNum = morphTargets.Push (newTarget);
+    size_t targetNum = HasSubset () ? 
+      subsetMorphTargets.Push (newTarget) : morphTargets.Push (newTarget);
     morphTargetNames.Put (name, (uint)targetNum);
     return newTarget;
   }
 
   CS::Mesh::iAnimatedMeshMorphTarget* AnimeshObjectFactory::GetMorphTarget (uint target)
   {
-    CS_ASSERT (target < morphTargets.GetSize ());
-    return morphTargets[target];
+    CS_ASSERT (target < GetMorphTargetCount ());
+    if (HasSubset ())
+      return subsetMorphTargets[target];
+    else
+      return morphTargets[target];
   }
 
   uint AnimeshObjectFactory::GetMorphTargetCount () const
   {
-    return (uint)morphTargets.GetSize();
+    if (HasSubset ())
+      return (uint)subsetMorphTargets.GetSize();
+    else
+      return (uint)morphTargets.GetSize();
   }
 
   void AnimeshObjectFactory::ClearMorphTargets ()
   {
     morphTargets.DeleteAll ();
+    subsetMorphTargets.DeleteAll ();
     morphTargetNames.DeleteAll ();
   }
 
@@ -714,6 +726,185 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   }
 
 
+  CS::Mesh::SubsetID AnimeshObjectFactory::AddSubset ()
+  {
+    Subset newSubset;
+    subsets.Push (newSubset);
+    return (CS::Mesh::SubsetID) subsets.GetSize () - 1;
+  }
+
+  void AnimeshObjectFactory::AddSubsetVertex (const CS::Mesh::SubsetID subset, 
+					      const size_t vertexIndex)
+  {
+    CS_ASSERT (HasSubset ());
+    CS_ASSERT ((subset <= GetTopSubsetID ()) && (vertexIndex < vertexCount));
+    subsets[subset].vertices.Push (vertexIndex);
+    subsets[subset].vertexCount++;
+    }
+
+  size_t AnimeshObjectFactory::GetSubsetVertex (const CS::Mesh::SubsetID subset, 
+						const size_t vertexIndex) const
+  {
+    CS_ASSERT (HasSubset ());
+    CS_ASSERT ((subset <= GetTopSubsetID ()) 
+	       && (vertexIndex < subsets[subset].vertexCount));
+    return subsets[subset].vertices[vertexIndex];
+  }
+
+  size_t AnimeshObjectFactory::GetSubsetVertexCount (const CS::Mesh::SubsetID subset) const
+  {
+    CS_ASSERT (HasSubset () && (subset <= GetTopSubsetID ())); 
+    return subsets[subset].vertexCount;
+  }
+
+  CS::Mesh::SubsetID AnimeshObjectFactory::GetTopSubsetID () const
+  {
+    if (subsets.GetSize () == 0)
+      return CS::Mesh::InvalidSubsetID;
+    else
+      return subsets.GetSize () - 1;
+  }
+
+  bool AnimeshObjectFactory::HasSubset () const
+  {
+    return (subsets.GetSize () != 0);
+  }
+
+  void AnimeshObjectFactory::ClearSubsets ()
+  {
+     subsets.DeleteAll ();
+  }
+
+  void AnimeshObjectFactory::ComputeSubsets ()
+  {
+    uint morphTargetCount = (uint) morphTargets.GetSize ();
+    CS_ASSERT (morphTargetCount != 0);
+
+    subsetMorphTargets.DeleteAll ();
+    csArray< csArray<uint> > vertexMorphTargets;
+    vertexMorphTargets.SetSize (vertexCount);
+
+    // Create subset 0 which doesn't have any associated morph target
+    ClearSubsets ();
+    uint subsetIndex = AddSubset ();
+    csArray<SubsetTargets> subsetTargets;
+    SubsetTargets emptySubset;
+    subsetTargets.Push (emptySubset);
+
+    for (size_t vi = 0; vi < vertexCount; vi++)
+    {
+      // Identify the morph targets influencing each vertex
+      for (size_t mi = 0; mi < morphTargetCount; mi++)
+      {
+	CS::Mesh::iAnimatedMeshMorphTarget* mt = morphTargets[mi]; 
+  	if (!mt) continue;
+
+	csRef<iRenderBuffer> offsetBuffer = mt->GetVertexOffsets ();
+	csVector3* offsets = (csVector3*) offsetBuffer->Lock (CS_BUF_LOCK_READ);
+
+	if (offsets[vi].Norm () > SMALL_EPSILON)   // Null offsets are ignored
+	    vertexMorphTargets[vi].Push (mi);
+
+	offsetBuffer->Release ();
+      }
+
+      // Identify and create the subsets
+      size_t mtCount = vertexMorphTargets[vi].GetSize ();
+      if (mtCount == 0)
+	// Add vertex to subset 0
+	AddSubsetVertex (0, vi);
+      else
+      {
+	// Search for an identified subset matching the vertex subset
+	bool found = false;
+	for (size_t si = 1; si <= subsetIndex; si++)
+	  if (subsetTargets[si].morphTargetCount == mtCount)
+	  {
+	    size_t mi = 0;	    
+	    while ((mi < mtCount)
+	           && (subsetTargets[si].morphTargets[mi] == vertexMorphTargets[vi][mi]))
+	      mi++;
+	    
+	    if (mi == mtCount) 
+	    {
+	      // Add vertex to subset si
+	      found = true;
+	      AddSubsetVertex (si, vi);
+	      break;
+	    }
+	  }   
+	
+	if (!found)
+	{
+	  // Add vertex to a new subset
+	  subsetIndex = AddSubset ();
+	  AddSubsetVertex (subsetIndex, vi);
+
+	  SubsetTargets newSubsetTargets;
+	  newSubsetTargets.morphTargets = vertexMorphTargets[vi];
+	  newSubsetTargets.morphTargetCount = vertexMorphTargets[vi].GetSize ();
+	  subsetTargets.Push (newSubsetTargets);
+	}
+      }
+    }
+
+    // Build morph targets with non zero offsets
+    for (size_t mti = 0; mti < morphTargetCount; mti++)
+    {
+      CS::Mesh::iAnimatedMeshMorphTarget* mt = morphTargets[mti];
+      if (!mt) continue;
+
+      csRef<iRenderBuffer> offsetBuffer = mt->GetVertexOffsets ();
+      csVector3* offsets = (csVector3*) offsetBuffer->Lock (CS_BUF_LOCK_READ);
+
+      // Create a new morph target
+      csRef<MorphTarget> newTarget;
+      newTarget.AttachNew (new MorphTarget (this, mt->GetName ()));
+
+      // Create a buffer of non zero offsets
+      size_t bufferSize = 0;
+      for (size_t si = 1; si <= subsetIndex; si++)
+	for (size_t i = 0; i < subsetTargets[si].morphTargetCount; i++)
+	  if (subsetTargets[si].morphTargets[i] == mti)
+	  {
+	    bufferSize += subsets[si].vertexCount;
+	    break;
+	  }
+
+      csRef<iRenderBuffer> buffer;
+      buffer = csRenderBuffer::CreateRenderBuffer
+	(bufferSize, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+      size_t elemOffset = 0;
+      for (CS::Mesh::SubsetID si = 1; si <= subsetIndex; si++)
+	for (size_t i = 0; i < subsetTargets[si].morphTargetCount; i++)
+	  if (subsetTargets[si].morphTargets[i] == mti)
+	  {
+	    // Add subset si to the morph target
+	    newTarget->AddSubset (si);
+
+	    // Build the morph target buffer with the non null offsets
+	    // belonging to subset si
+	    for (size_t vi = 0; vi < subsets[si].vertexCount; vi++)
+	    {
+	      uint vertexIndex = subsets[si].vertices[vi];
+	      buffer->CopyInto (&(offsets[vertexIndex]), 1, elemOffset);
+	      elemOffset++;
+	    }
+
+	    break;
+	  }
+
+      // Add the morph target to this mesh factory
+      newTarget->SetVertexOffsets (buffer);
+      newTarget->Invalidate ();
+      subsetMorphTargets.Push (newTarget);
+      offsetBuffer->Release ();
+    }
+
+    morphTargets.DeleteAll ();
+  }
+
+
   FactorySocket::FactorySocket (AnimeshObjectFactory* factory, CS::Animation::BoneID bone, 
     const char* name, csReversibleTransform transform)
     : scfImplementationType (this), factory (factory), bone (bone), name (name),
@@ -809,11 +1000,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   void AnimeshObject::SetMorphTargetWeight (uint target, float weight)
   {
-    CS_ASSERT (target < factory->morphTargets.GetSize ());
+    uint morphTargetCount = factory->GetMorphTargetCount ();
+    CS_ASSERT (target < morphTargetCount);
 
     // allocating array now saves some tiny memory and some flops at each
     // frame until morph targets are used
-    morphTargetWeights.SetSize (factory->morphTargets.GetSize(), 0.0f);
+    morphTargetWeights.SetSize (morphTargetCount, 0.0f);
 
     if (morphTargetWeights[target] != weight)
     {
@@ -1041,7 +1233,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     if (skeleton)
     {
       csRef<CS::Animation::iSkeletonFactory> skeletonFactory = skeleton->GetFactory ();
-      CS_ASSERT (skeletonFactory);
       CS::Animation::BoneID numBones = skeletonFactory->GetTopBoneID () + 1;
       bool hit = false;
 
@@ -1067,6 +1258,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 	}
       }
 
+      // Return false if no bone bounding box has been hit by the beam
       if (!hit) 
 	return false;
     }
@@ -1118,7 +1310,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     if (skeleton)
     {
       csRef<CS::Animation::iSkeletonFactory> skeletonFactory = skeleton->GetFactory ();
-      CS_ASSERT (skeletonFactory);
       CS::Animation::BoneID numBones = skeletonFactory->GetTopBoneID () + 1;
       bool hit = false;
 
@@ -1144,6 +1335,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 	}
       }
 
+      // Return false if no bone bounding box has been hit by the beam
       if (!hit) 
 	return false;
     }
@@ -1531,7 +1723,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   void AnimeshObject::ComputeObjectBoundingBox ()
   {
-    CS_ASSERT (skeleton && skeleton->GetFactory ());
+    CS_ASSERT (skeleton);
     csRef<CS::Animation::iSkeletonFactory> skeletonFactory = skeleton->GetFactory ();
 
     csQuaternion rot;

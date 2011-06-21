@@ -27,16 +27,44 @@
 CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 {
   MorphTarget::MorphTarget (AnimeshObjectFactory* parent, const char* name)
-   : scfImplementationType (this), parent (parent), name (name) {}
+  : scfImplementationType (this), parent (parent), name (name)
+  {}
 
   bool MorphTarget::SetVertexOffsets (iRenderBuffer* renderBuffer)
   {
-    if (parent.IsValid()
-	&& (renderBuffer->GetElementCount() < parent->GetVertexCountP()))
-      return false;
-
     offsets = renderBuffer;
     return true;
+  }
+
+  void MorphTarget::Invalidate ()
+  {
+    CS_ASSERT (parent.IsValid ());
+    if (parent->HasSubset ())
+    {
+      CS_ASSERT (offsets->GetElementCount() <= parent->GetVertexCountP());   
+    }
+    else
+    {
+      CS_ASSERT (offsets->GetElementCount() == parent->GetVertexCountP());
+    }
+  }
+
+  void MorphTarget::AddSubset (const CS::Mesh::SubsetID subset)
+  {
+    CS_ASSERT (parent.IsValid () && parent->HasSubset () 
+	       && (subset <= parent->GetTopSubsetID ()));
+    subsetList.Push (subset);
+  }
+
+  CS::Mesh::SubsetID MorphTarget::GetSubset (const size_t index) const
+  {
+    CS_ASSERT (index < subsetList.GetSize ());    
+    return subsetList[index];
+  }
+
+  size_t MorphTarget::GetSubsetCount () const
+  {
+    return subsetList.GetSize ();
   }
 }
 CS_PLUGIN_NAMESPACE_END(Animesh)

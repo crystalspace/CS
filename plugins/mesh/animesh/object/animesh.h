@@ -43,6 +43,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   class FactorySubmesh;
   class FactorySocket;
 
+  struct Subset
+  {
+    csArray<size_t> vertices;      // the vertices belonging to this subset
+    size_t vertexCount;            // the number of vertices belonging to this subset
+      
+    Subset ()
+    : vertexCount (0)
+    {}
+  };
+
+
   class AnimeshObjectType : 
     public scfImplementation2<AnimeshObjectType, 
                               iMeshObjectType, 
@@ -121,6 +132,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     virtual void SetBoneBoundingBox (CS::Animation::BoneID bone, const csBox3& box); 
     virtual const csBox3& GetBoneBoundingBox (CS::Animation::BoneID bone) const; 
 
+    virtual CS::Mesh::SubsetID AddSubset ();
+    virtual void AddSubsetVertex (const CS::Mesh::SubsetID subset, const size_t vertexIndex);
+    virtual size_t GetSubsetVertex (const CS::Mesh::SubsetID subset, const size_t vertexIndex) const;
+    virtual size_t GetSubsetVertexCount (const CS::Mesh::SubsetID subset) const;
+    virtual CS::Mesh::SubsetID GetTopSubsetID () const;
+    virtual bool HasSubset () const;
+    virtual void ClearSubsets ();
+
     //-- iMeshObjectFactory
     virtual csFlags& GetFlags ();
 
@@ -155,6 +174,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   private: 
     void ComputeObjectBoundingBox ();
 
+    void ComputeSubsets ();
+
     // required but stupid stuff..
     AnimeshObjectType* objectType;
     iMeshFactoryWrapper* logParent;
@@ -181,6 +202,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csRefArray<FactorySubmesh> submeshes;
 
     csRefArray<MorphTarget> morphTargets;
+    csRefArray<MorphTarget> subsetMorphTargets; 
     csHash<uint, csString> morphTargetNames;
 
     // Sockets
@@ -198,6 +220,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     };
 
     csArray<Bone> bones;  // list of bounding boxes linked to the mesh bones
+
+    // Subsets
+    csArray<Subset> subsets; 
+
+    struct SubsetTargets
+    {
+      csArray<uint> morphTargets;   // the indices of the morph targets influencing this subset
+      uint morphTargetCount;        // the number of morph targets influencing this subset
+
+      SubsetTargets ()
+      : morphTargetCount (0)
+      {}
+    };
 
     friend class AnimeshObject;
   };

@@ -62,50 +62,38 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
     }
 
-    // Allocate the walkers of the active morph targets
-    CS_ALLOC_STACK_ARRAY(uint8, morphWalkersRaw, 
-      activeMorphCount * sizeof (MorphTargetOffsetsWalker));
-
-    MorphTargetOffsetsWalker* morphWalkers =
-      (MorphTargetOffsetsWalker*) morphWalkersRaw;
-
-    CS_ALLOC_STACK_ARRAY(float, weights, activeMorphCount);
-    for (size_t m = 0, index = 0; m < morphTargetCount; m++)
-    {
-      if (morphTargetWeights[m] != 0.0f)
-      {
-	weights[index] = morphTargetWeights[m];
-	new (morphWalkers + index) MorphTargetOffsetsWalker
-	  (factory->morphTargets[m]->offsets);
-	index++;
-      }
-    }
-
     // Morph the targets
-    csVertexListWalker<float, csVector3> srcVerts (factory->vertexBuffer);
+    // Copy the vertex buffer into the destination buffer
+    csRenderBufferLock<csVector3> srcVerts (factory->vertexBuffer);
     csRenderBufferLock<csVector3> dstVerts (postMorphVertices);
-
-    for (size_t i = 0; i < factory->GetVertexCountP (); i++)
+    for (size_t vi = 0; vi < factory->vertexCount; vi++)      
+      dstVerts[vi] = srcVerts[vi];
+     
+    // Apply the morph targets to each subset 
+    // (except subset 0 which has no morph target)
+    CS_ASSERT (factory->HasSubset ());
+    for (size_t mti = 0; mti < morphTargetCount; mti++)
     {
-      csVector3 morphedVert = *srcVerts;
-
-      for (size_t m = 0; m < activeMorphCount; m++)
+      if (morphTargetWeights[mti] > SMALL_EPSILON)
       {
-        MorphTargetOffsetsWalker& walk = morphWalkers[m];
-	morphedVert += (*walk) * weights[m];
-        ++walk;
+	MorphTarget* target = factory->subsetMorphTargets[mti];
+	csVertexListWalker<float, csVector3> offsets (target->GetVertexOffsets ());
+	for (uint si = 0; si < target->subsetList.GetSize (); si++)
+	{
+	  CS::Mesh::SubsetID subsetIndex = target->subsetList[si];
+	  Subset& set = factory->subsets[subsetIndex];
+	  for (uint vi = 0; vi < set.vertexCount; vi++)
+	  {
+	    uint vertIndex = set.vertices[vi];
+	    dstVerts[vertIndex] += (*offsets) * morphTargetWeights[mti];
+	    ++offsets;
+	  }
+
+	}
+
       }
-
-      dstVerts[i] = morphedVert;
-
-      ++srcVerts;
     }
 
-    // Delete the walkers
-    for (size_t m = 0; m < activeMorphCount; m++)
-    {
-      morphWalkers[m].~MorphTargetOffsetsWalker();
-    }
   }
 
 #include "csutil/custom_new_enable.h"
