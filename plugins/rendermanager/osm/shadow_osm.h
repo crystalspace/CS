@@ -73,8 +73,16 @@ namespace CS
           float _near = SMALL_Z;
           float _far = persist.farZ;
 
+          splitDists[0] = 11;
+          splitDists[1] = 13.5;
+          splitDists[2] = 14.5;
+          splitDists[3] = 16;
+
           for (int i = 0; i < numParts ; i ++)
-            splitDists[i] = _near + ( (_far - _near) * (i + 1) ) / numParts;
+          {
+//             splitDists[i] = _near + ( (_far - _near) * (i + 1) ) / numParts;
+            csPrintf("%f\n", splitDists[i]);
+          }
         }
 
         ~ViewSetup() { delete[] splitDists; }
@@ -97,6 +105,7 @@ namespace CS
           struct Frustum
           {
             csRef<csShaderVariable> shadowMapProjectSV;
+            csRef<csShaderVariable> splitDistsSV;
             csRef<csShaderVariable> textureSVs[rtaNumAttachments];
           };
           Frustum* frustums;
@@ -160,6 +169,9 @@ namespace CS
               lightFrustum.shadowMapProjectSV->SetArrayElement (j, item);
             }
 
+            lightFrustum.splitDistsSV = lightVarsHelper.CreateTempSV(
+              viewSetup.persist.splitDistsSVName);
+
             superFrustum.farZSV = lightVarsHelper.CreateTempSV (
               viewSetup.persist.farZSVName);
             superFrustum.numSplitsSV = lightVarsHelper.CreateTempSV (
@@ -212,6 +224,8 @@ namespace CS
                 csShaderVariable* item = lightFrust.shadowMapProjectSV->GetArrayElement (i);
                 item->SetValue (matrix.Row (i));
               }
+
+              lightFrust.splitDistsSV->SetValue(viewSetup.splitDists[frustNum]);
 
               int shadowMapSize = viewSetup.persist.shadowMapRes;
 
@@ -343,6 +357,7 @@ namespace CS
         ShadowSettings settings;
         CS::ShaderVarStringID farZSVName;
         CS::ShaderVarStringID numSplitsSVName;
+        CS::ShaderVarStringID splitDistsSVName;
 
         /// Set the prefix for configuration settings
         void SetConfigPrefix (const char* configPrefix)
@@ -365,6 +380,7 @@ namespace CS
 
           farZSVName = strings->Request ("light farZ");
           numSplitsSVName = strings->Request ("light numSplits");
+          splitDistsSVName = strings->Request ("light splitDists");
 
           csConfigAccess cfg (objectReg);
           if (configPrefix.IsEmpty())
@@ -424,6 +440,9 @@ namespace CS
             superFrust.frustums[f];
           lightVarsHelper.MergeAsArrayItem (lightStacks[lightNum],
             lightFrustum.shadowMapProjectSV, s);
+
+          lightVarsHelper.MergeAsArrayItem(lightStacks[lightNum],
+            lightFrustum.splitDistsSV, s);
 
           for (size_t t = 0; t < persist.settings.targets.GetSize(); t++)
           {

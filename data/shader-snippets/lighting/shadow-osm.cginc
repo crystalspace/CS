@@ -96,8 +96,10 @@ struct ShadowShadowMapDepth : ShadowShadowMap
       return tex2D(lightPropsSM.shadowMap[5], position);	
     else if (i == 6)
       return tex2D(lightPropsSM.shadowMap[6], position);	
-    
-    return tex2D(lightPropsSM.shadowMap[7], position);
+    else if (i == 7)
+      return tex2D(lightPropsSM.shadowMap[7], position);
+      
+    return 0;
   }
   
   half GetVisibility()
@@ -107,20 +109,22 @@ struct ShadowShadowMapDepth : ShadowShadowMap
 	
     int numSplits = lightPropsSM.shadowMapNumSplits;
     float farZ = lightPropsSM.shadowMapFarZ;
-	
-    for (int i = 1 ; i <= numSplits ; i ++)
+
+    float previousSplit = 0, nextSplit;
+    
+    for (int i = 0 ; i <= numSplits ; i ++)
     {
-      float previousSplit = (i - 1) * farZ / numSplits;
-      float nextSplit = i * farZ / numSplits;
+      nextSplit = lightPropsSM.splitDists[i];
       
       if (-shadowMapCoords.z < nextSplit)
       {
-        float previousMap = getMapValue(i - 1, shadowMapCoordsBiased.xy);
-        float nextMap = getMapValue(i, shadowMapCoordsBiased.xy);
+        float previousMap = getMapValue(i - 2, shadowMapCoordsBiased.xy);
+        float nextMap = getMapValue(i - 1, shadowMapCoordsBiased.xy);
 		
-        inLight = lerp(previousMap, nextMap, nextSplit + shadowMapCoords.z - previousSplit);
+        inLight = 1 - lerp(nextMap, previousMap, (float) (nextSplit + shadowMapCoords.z) / (nextSplit - previousSplit) );
         break;
       }
+      previousSplit = nextSplit;
     }
 
     return inLight;

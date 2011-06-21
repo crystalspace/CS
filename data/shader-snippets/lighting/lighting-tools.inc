@@ -52,6 +52,8 @@
 		 destination="lightPropsSM.shadowMapFarZ" />
     <variablemap variable="light numSplits" 
 		 destination="lightPropsSM.shadowMapNumSplits" />		 
+    <variablemap variable="light splitDists" 
+		 destination="lightPropsSM.splitDists" />		 
   <?Endtemplate?>
   
   <?SEndIf?>
