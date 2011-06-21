@@ -9,7 +9,7 @@ class btGeneric6DofConstraint;
 
 CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
-using CS::Physics::iPhysicalBody;
+using CS::Physics2::iPhysicalBody;
 
 enum csJointType
 {
@@ -22,7 +22,7 @@ enum csJointType
 };
 
 class csBulletJoint : public scfImplementation1<
-  csBulletJoint, CS::Physics::iJoint>
+  csBulletJoint, CS::Physics2::iJoint>
 {
 private:
   csBulletSystem* sys;

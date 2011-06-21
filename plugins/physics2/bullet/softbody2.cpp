@@ -19,11 +19,12 @@
 CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
 csBulletSoftBody::csBulletSoftBody (csBulletSystem* phySys, btSoftBody* body)
-  :scfImplementationType (this, phySys), btBody (body)
+  :scfImplementationType (this, phySys), btBody (body), bending (false),
+  friction (5.0f), density (0.1f)
 {
   btObject = body;
   btBody->setUserPointer (dynamic_cast<iPhysicalBody*> (this));
-  this->type = CS::Collision::COLLISION_OBJECT_PHYSICAL;
+  this->type = CS::Collision2::COLLISION_OBJECT_PHYSICAL;
 }
 
 csBulletSoftBody::~csBulletSoftBody ()
@@ -51,7 +52,7 @@ void csBulletSoftBody::RebuildObject ()
 
 HitBeamResult csBulletSoftBody::HitBeam (const csVector3& start, const csVector3& end)
 {
-  CS::Collision::HitBeamResult result;
+  CS::Collision2::HitBeamResult result;
   btVector3 rayFrom = CSToBullet (start, system->getInternalScale ());
   btVector3 rayTo = CSToBullet (end, system->getInternalScale ());
   btSoftBody::sRayCast ray;
@@ -120,55 +121,41 @@ void csBulletSoftBody::AddBulletObject ()
 bool csBulletSoftBody::Disable ()
 {
   SetLinearVelocity (csVector3 (0.0f));
-  if (btBody)
-  {
-    btBody->setActivationState (ISLAND_SLEEPING);
-    return true;
-  }
-  else
-    return false;
+  CS_ASSERT (btBody);
+  btBody->setActivationState (ISLAND_SLEEPING);
+  return true;
 }
 
 bool csBulletSoftBody::Enable ()
 {
-  if (btBody)
-  {
-    btBody->setActivationState (ACTIVE_TAG);
-    return true;
-  }
-  else
-    return false;
+  CS_ASSERT (btBody);
+  btBody->setActivationState (ACTIVE_TAG);
+  return true;
 }
 
 bool csBulletSoftBody::IsEnabled ()
 {
- if (btBody)
-   return btBody->isActive ();
- else
-   return false;
+ CS_ASSERT (btBody);
+ return btBody->isActive ();
 }
 
 float csBulletSoftBody::GetMass ()
 {
-  if (btBody)
-    return btBody->getTotalMass ();
-  else
-    return 0.0f;
+  CS_ASSERT (btBody);
+  return btBody->getTotalMass ();
 }
 
 void csBulletSoftBody::SetDensity (float density)
 {
+  CS_ASSERT (btBody);
   this->density = density;
-  if (btBody)
-    btBody->setTotalDensity (density);
+  btBody->setTotalDensity (density);
 }
 
 float csBulletSoftBody::GetVolume ()
 {
-  if (btBody)
-    return btBody->getVolume ();
-  else
-    return 0;
+  CS_ASSERT (btBody);
+  return btBody->getVolume ();
 }
 
 void csBulletSoftBody::AddForce (const csVector3& force)
@@ -191,6 +178,7 @@ csVector3 csBulletSoftBody::GetLinearVelocity (size_t index /* = 0 */) const
 
 void csBulletSoftBody::SetFriction (float friction)
 {
+  CS_ASSERT (btBody);
   this->friction = friction;
   if (friction >= 0.0f && friction <= 1.0f)
     btBody->m_cfg.kDF = friction;
@@ -198,24 +186,20 @@ void csBulletSoftBody::SetFriction (float friction)
 
 void csBulletSoftBody::SetVertexMass (float mass, size_t index)
 {
-  if (btBody)
-    btBody->setMass (index, mass);
+  CS_ASSERT (btBody);
+  btBody->setMass (index, mass);
 }
 
 float csBulletSoftBody::GetVertexMass (size_t index)
 {
-  if (btBody)
-    return btBody->getMass (index);
-  else
-    return 0.0f;
+  CS_ASSERT (btBody);
+  return btBody->getMass (index);
 }
 
 size_t csBulletSoftBody::GetVertexCount ()
 {
-  if (btBody)
-    return btBody->m_nodes.size ();
-  else
-    return 0;
+  CS_ASSERT (btBody);
+  return btBody->m_nodes.size ();
 }
 
 csVector3 csBulletSoftBody::GetVertexPosition (size_t index) const
@@ -240,7 +224,7 @@ void csBulletSoftBody::AnchorVertex (size_t vertexIndex, iRigidBody* body)
 }
 
 void csBulletSoftBody::AnchorVertex (size_t vertexIndex,
-                                     CS::Physics::iAnchorAnimationControl* controller)
+                                     CS::Physics2::iAnchorAnimationControl* controller)
 {
   AnimatedAnchor anchor (vertexIndex, controller);
   animatedAnchors.Push (anchor);
@@ -299,6 +283,7 @@ void csBulletSoftBody::RemoveAnchor (size_t vertexIndex)
 
 float csBulletSoftBody::GetRidigity ()
 {
+  CS_ASSERT (btBody);
   return this->btBody->m_materials[0]->m_kLST;
 }
 
@@ -318,12 +303,14 @@ void csBulletSoftBody::SetLinearVelocity (const csVector3& velocity, size_t vert
 
 void csBulletSoftBody::SetWindVelocity (const csVector3& velocity)
 {
+  CS_ASSERT (btBody);
   btVector3 velo = CSToBullet (velocity, system->getInternalScale ());
   btBody->setWindVelocity (velo);
 }
 
 const csVector3 csBulletSoftBody::GetWindVelocity () const
 {
+  CS_ASSERT (btBody);
   csVector3 velo = BulletToCS (btBody->getWindVelocity (), system->getInternalScale ());
   return velo;
 }
@@ -337,6 +324,7 @@ void csBulletSoftBody::AddForce (const csVector3& force, size_t vertexIndex)
 
 size_t csBulletSoftBody::GetTriangleCount ()
 {
+  CS_ASSERT (btBody);
   return btBody->m_faces.size ();
 }
 
@@ -382,6 +370,7 @@ void csBulletSoftBody::SetLinearStiff (float stiff)
 
 void csBulletSoftBody::SetAngularStiff (float stiff)
 {
+  CS_ASSERT (btBody);
   if (stiff >= 0.0f && stiff <= 1.0f)
   {
     btSoftBody::Material*	pm=btBody->m_materials[0];
@@ -391,6 +380,7 @@ void csBulletSoftBody::SetAngularStiff (float stiff)
 
 void csBulletSoftBody::SetVolumeStiff (float stiff)
 {
+  CS_ASSERT (btBody);
   if (stiff >= 0.0f && stiff <= 1.0f)
   {
     btSoftBody::Material*	pm=btBody->m_materials[0];
@@ -400,11 +390,13 @@ void csBulletSoftBody::SetVolumeStiff (float stiff)
 
 void csBulletSoftBody::ResetCollisionFlag ()
 {
+  CS_ASSERT (btBody);
   btBody->m_cfg.collisions = 0;
 }
 
 void csBulletSoftBody::SetClusterCollisionRS (bool cluster)
 {
+  CS_ASSERT (btBody);
   if (cluster)
     btBody->m_cfg.collisions	+=	btSoftBody::fCollision::CL_RS;
   else
@@ -413,6 +405,7 @@ void csBulletSoftBody::SetClusterCollisionRS (bool cluster)
 
 void csBulletSoftBody::SetClusterCollisionSS (bool cluster)
 {
+  CS_ASSERT (btBody);
   if (cluster)
     btBody->m_cfg.collisions += btSoftBody::fCollision::CL_SS;
   else
@@ -421,126 +414,148 @@ void csBulletSoftBody::SetClusterCollisionSS (bool cluster)
 
 void csBulletSoftBody::SetSRHardness (float hardness)
 {
+  CS_ASSERT (btBody);
   if (hardness >= 0.0f && hardness <= 1.0f)
     btBody->m_cfg.kSRHR_CL = hardness;
 }
 
 void csBulletSoftBody::SetSKHardness (float hardness)
 {
+  CS_ASSERT (btBody);
   if (hardness >= 0.0f && hardness <= 1.0f)
     btBody->m_cfg.kSKHR_CL = hardness;
 }
 
 void csBulletSoftBody::SetSSHardness (float hardness)
 {
+  CS_ASSERT (btBody);
   if (hardness >= 0.0f && hardness <= 1.0f)
     btBody->m_cfg.kSSHR_CL = hardness;
 }
 
 void csBulletSoftBody::SetSRImpulse (float impulse)
 {
+  CS_ASSERT (btBody);
   if (impulse >= 0.0f && impulse <= 1.0f)
     btBody->m_cfg.kSR_SPLT_CL = impulse;
 }
 
 void csBulletSoftBody::SetSKImpulse (float impulse)
 {
+  CS_ASSERT (btBody);
   if (impulse >= 0.0f && impulse <= 1.0f)
     btBody->m_cfg.kSK_SPLT_CL = impulse;
 }
 
 void csBulletSoftBody::SetSSImpulse (float impulse)
 {
+  CS_ASSERT (btBody);
   if (impulse >= 0.0f && impulse <= 1.0f)
     btBody->m_cfg.kSS_SPLT_CL = impulse;
 }
 
 void csBulletSoftBody::SetVeloCorrectionFactor (float factor)
 {
+  CS_ASSERT (btBody);
   btBody->m_cfg.kVCF = factor;
 }
 
 void csBulletSoftBody::SetDamping (float damping)
 {
+  CS_ASSERT (btBody);
   if (damping >= 0.0f && damping <= 1.0f)
     btBody->m_cfg.kDP = damping;
 }
 
 void csBulletSoftBody::SetDrag (float drag)
 {
+  CS_ASSERT (btBody);
   if (drag >= 0.0f)
     btBody->m_cfg.kDG = drag;
 }
 
 void csBulletSoftBody::SetLift (float lift)
 {
+  CS_ASSERT (btBody);
   if (lift >= 0.0f)
     btBody->m_cfg.kLF = lift;
 }
 
 void csBulletSoftBody::SetPressure (float pressure)
 {
+  CS_ASSERT (btBody);
   if (pressure >= 0.0f && pressure <= 1.0f)
     btBody->m_cfg.kPR = pressure;
 }
 
 void csBulletSoftBody::SetVolumeConversationCoefficient (float conversation)
 {
+  CS_ASSERT (btBody);
   btBody->m_cfg.kVC = conversation;
 }
 
 void csBulletSoftBody::SetShapeMatchThreshold (float matching)
 {
+  CS_ASSERT (btBody);
   if (matching >= 0.0f && matching <= 1.0f)
     btBody->m_cfg.kMT = matching;
 }
 
 void csBulletSoftBody::SetRContactsHardness (float hardness)
 {
+  CS_ASSERT (btBody);
   if (hardness >= 0.0f && hardness <= 1.0f)
     btBody->m_cfg.kCHR = hardness;
 }
 
 void csBulletSoftBody::SetKContactsHardness (float hardness)
 {
+  CS_ASSERT (btBody);
   if (hardness >= 0.0f && hardness <= 1.0f)
     btBody->m_cfg.kKHR = hardness;
 }
 
 void csBulletSoftBody::SetSContactsHardness (float hardness)
 {
+  CS_ASSERT (btBody);
   if (hardness >= 0.0f && hardness <= 1.0f)
     btBody->m_cfg.kSHR = hardness;
 }
 
 void csBulletSoftBody::SetAnchorsHardness (float hardness)
 {
+  CS_ASSERT (btBody);
   if (hardness >= 0.0f && hardness <= 1.0f)
     btBody->m_cfg.kAHR = hardness;
 }
 
 void csBulletSoftBody::SetVeloSolverIterations (int iter)
 {
+  CS_ASSERT (btBody);
   btBody->m_cfg.piterations = iter;
 }
 
 void csBulletSoftBody::SetPositionIterations (int iter)
 {
+  CS_ASSERT (btBody);
   btBody->m_cfg.viterations = iter;
 }
 
 void csBulletSoftBody::SetDriftIterations (int iter)
 {
+  CS_ASSERT (btBody);
   btBody->m_cfg.diterations = iter;
 }
 
 void csBulletSoftBody::SetClusterIterations (int iter)
 {
+  CS_ASSERT (btBody);
   btBody->m_cfg.citerations = iter;
 }
 
 void csBulletSoftBody::SetShapeMatching (bool match)
 {
+  CS_ASSERT (btBody);
   if (match)
     btBody->setPose (false,true);
   else
@@ -549,6 +564,7 @@ void csBulletSoftBody::SetShapeMatching (bool match)
 
 void csBulletSoftBody::SetBendingConstraint (bool bending)
 {
+  CS_ASSERT (btBody);
   if (bending)
   {
     btSoftBody::Material*	pm=btBody->m_materials[0];
@@ -558,12 +574,14 @@ void csBulletSoftBody::SetBendingConstraint (bool bending)
 
 void csBulletSoftBody::GenerateCluster (int iter)
 {
+  CS_ASSERT (btBody);
   if (btBody->m_cfg.collisions & (btSoftBody::fCollision::CL_RS + btSoftBody::fCollision::CL_SS))
     btBody->generateClusters(iter);
 }
 
 void csBulletSoftBody::UpdateAnchorPositions ()
 {
+  CS_ASSERT (btBody);
   for (csArray<AnimatedAnchor>::Iterator it = animatedAnchors.GetIterator (); it.HasNext (); )
   {
     AnimatedAnchor& anchor = it.Next ();
@@ -573,6 +591,7 @@ void csBulletSoftBody::UpdateAnchorPositions ()
 
 void csBulletSoftBody::UpdateAnchorInternalTick (btScalar timeStep)
 {
+  CS_ASSERT (btBody);
   for (csArray<AnimatedAnchor>::Iterator it = animatedAnchors.GetIterator (); it.HasNext (); )
   {
     AnimatedAnchor& anchor = it.Next ();

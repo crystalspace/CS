@@ -12,17 +12,18 @@
 class Simple : public CS::Utility::DemoApplication
 {
 private:
-  csRef<CS::Collision::iCollisionSystem> collisionSystem;
-  csRef<CS::Physics::iPhysicalSystem> physicalSystem;
-  csRef<CS::Collision::iCollisionSector> collisionSector;
-  csRef<CS::Physics::iPhysicalSector> physicalSector;
-  csRef<CS::Physics::Bullet::iPhysicalSector> bulletSector;
+  csRef<CS::Collision2::iCollisionSystem> collisionSystem;
+  csRef<CS::Physics2::iPhysicalSystem> physicalSystem;
+  csRef<CS::Collision2::iCollisionSector> collisionSector;
+  csRef<CS::Physics2::iPhysicalSector> physicalSector;
+  csRef<CS::Physics2::Bullet2::iPhysicalSector> bulletSector;
   csRef<CS::Animation::iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
   bool isSoftBodyWorld;
 
   // Meshes
   csRef<iMeshFactoryWrapper> boxFact;
   csRef<iMeshFactoryWrapper> meshFact;
+  csRefArray<iMeshWrapper> meshes;
 
   // Environments
   int environment;
@@ -44,7 +45,7 @@ private:
 
   // Camera related
   int physicalCameraMode;
-  csRef<CS::Physics::iRigidBody> cameraBody;
+  csRef<CS::Physics2::iRigidBody> cameraBody;
   float rotX, rotY, rotZ;
 
   // Ragdoll related
@@ -55,14 +56,14 @@ private:
   // Dragging related
   bool dragging;
   bool softDragging;
-  csRef<CS::Physics::iJoint> dragJoint;
-  csRef<CS::Physics::iSoftBody> draggedBody;
+  csRef<CS::Physics2::iJoint> dragJoint;
+  csRef<CS::Physics2::iSoftBody> draggedBody;
   size_t draggedVertex;
   float dragDistance;
   float linearDampening, angularDampening;
 
   // Cut & Paste related
-  csRef<CS::Physics::iPhysicalBody> clipboardBody;
+  csRef<CS::Physics2::iPhysicalBody> clipboardBody;
   csRef<iMovable> clipboardMovable;
 
   csOrthoTransform localTrans;
@@ -79,22 +80,22 @@ private:
 
   // Spawning objects
   bool SpawnStarCollider ();
-  CS::Physics::iRigidBody* SpawnBox ();
-  CS::Physics::iRigidBody* SpawnSphere ();
-  CS::Physics::iRigidBody* SpawnCone ();
-  CS::Physics::iRigidBody* SpawnCylinder ();
-  CS::Physics::iRigidBody* SpawnCapsule (float length = rand() % 3 / 50.f + .7f,
+  CS::Physics2::iRigidBody* SpawnBox ();
+  CS::Physics2::iRigidBody* SpawnSphere ();
+  CS::Physics2::iRigidBody* SpawnCone ();
+  CS::Physics2::iRigidBody* SpawnCylinder ();
+  CS::Physics2::iRigidBody* SpawnCapsule (float length = rand() % 3 / 50.f + .7f,
     float radius = rand() % 10 / 50.f + .2f);
-  CS::Physics::iRigidBody* SpawnConcaveMesh ();
-  CS::Physics::iRigidBody* SpawnConvexMesh ();
-  CS::Physics::iRigidBody* SpawnCompound ();
-  CS::Physics::iJoint* SpawnJointed ();
+  CS::Collision2::iCollisionObject* SpawnConcaveMesh ();
+  CS::Physics2::iRigidBody* SpawnConvexMesh ();
+  CS::Physics2::iRigidBody* SpawnCompound ();
+  CS::Physics2::iJoint* SpawnJointed ();
   void SpawnChain ();
   void LoadRagdoll ();
   void SpawnRagdoll ();
   void SpawnRope ();
-  void SpawnCloth ();
-  CS::Physics::iSoftBody* SpawnSoftBody ();
+  CS::Physics2::iSoftBody* SpawnCloth ();
+  CS::Physics2::iSoftBody* SpawnSoftBody ();
 
   void CreateWalls (const csVector3& radius);
   void CreateTerrain ();
@@ -108,11 +109,11 @@ public:
   bool Application ();
 
   friend class MouseAnchorAnimationControl;
-  csRef<CS::Physics::iAnchorAnimationControl> grabAnimationControl;
+  csRef<CS::Physics2::iAnchorAnimationControl> grabAnimationControl;
 };
 
 class MouseAnchorAnimationControl : public scfImplementation1
-  <MouseAnchorAnimationControl, CS::Physics::iAnchorAnimationControl>
+  <MouseAnchorAnimationControl, CS::Physics2::iAnchorAnimationControl>
 {
 public:
   MouseAnchorAnimationControl (Simple* simple)

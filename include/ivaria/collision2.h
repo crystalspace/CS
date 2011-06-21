@@ -17,7 +17,7 @@ struct iView;
 
 namespace CS
 {
-namespace Collision
+namespace Collision2
 {
 
 struct csConvexResult;
@@ -97,7 +97,7 @@ struct CollisionData
 
 struct iCollisionCallback: public virtual iBase
 {
-  SCF_INTERFACE (iCollisionCallback, 1, 0, 0);
+  SCF_INTERFACE (CS::Collision2::iCollisionCallback, 1, 0, 0);
 
   /**
   * A collision occurred.
@@ -116,7 +116,7 @@ struct iCollisionCallback: public virtual iBase
 */
 struct iCollider : public virtual iBase
 {
-  SCF_INTERFACE (CS::Collision::iCollider, 1, 0, 0);
+  SCF_INTERFACE (CS::Collision2::iCollider, 1, 0, 0);
 
   /// Get the geometry type of this collider. 
   virtual ColliderType GetGeometryType () const = 0;
@@ -145,7 +145,7 @@ struct iCollider : public virtual iBase
 */
 struct iColliderBox : public virtual iCollider
 {
-  SCF_INTERFACE (CS::Collision::iColliderBox, 1, 0, 0);
+  SCF_INTERFACE (CS::Collision2::iColliderBox, 1, 0, 0);
 
   /// Get the box geometry of this collider.
   virtual csVector3 GetBoxGeometry ()  = 0;
@@ -165,7 +165,7 @@ struct iColliderBox : public virtual iCollider
 */
 struct iColliderSphere : public virtual iCollider
 {
-  SCF_INTERFACE (CS::Collision::iColliderSphere, 1, 0, 0);
+  SCF_INTERFACE (CS::Collision2::iColliderSphere, 1, 0, 0);
 
   /// Get the sphere geometry of this collider.
   virtual float GetSphereGeometry () = 0;
@@ -185,7 +185,7 @@ struct iColliderSphere : public virtual iCollider
 */
 struct iColliderCylinder : public virtual iCollider
 {
-  SCF_INTERFACE (CS::Collision::iColliderCylinder, 1, 0, 0);
+  SCF_INTERFACE (CS::Collision2::iColliderCylinder, 1, 0, 0);
 
   /// Get the cylinder geometry of this collider.
   virtual void GetCylinderGeometry (float& length, float& radius) = 0;
@@ -205,7 +205,7 @@ struct iColliderCylinder : public virtual iCollider
 */
 struct iColliderCapsule : public virtual iCollider
 {
-  SCF_INTERFACE (CS::Collision::iColliderCapsule, 1, 0, 0);
+  SCF_INTERFACE (CS::Collision2::iColliderCapsule, 1, 0, 0);
 
   /// Get the capsule geometry of this collider.
   virtual void GetCapsuleGeometry (float& length, float& radius) = 0;
@@ -225,7 +225,7 @@ struct iColliderCapsule : public virtual iCollider
 */
 struct iColliderCone : public virtual iCollider
 {
-  SCF_INTERFACE (CS::Collision::iColliderCone, 1, 0, 0);
+  SCF_INTERFACE (CS::Collision2::iColliderCone, 1, 0, 0);
 
   /// Get the capsule geometry of this collider.
   virtual void GetConeGeometry (float& length, float& radius) = 0;
@@ -245,7 +245,7 @@ struct iColliderCone : public virtual iCollider
 */
 struct iColliderPlane : public virtual iCollider
 {
-  SCF_INTERFACE (CS::Collision::iColliderPlane, 1, 0, 0);
+  SCF_INTERFACE (CS::Collision2::iColliderPlane, 1, 0, 0);
 
   /// Get the plane geometry of this collider.
   virtual csPlane3 GetPlaneGeometry () = 0;
@@ -265,7 +265,7 @@ struct iColliderPlane : public virtual iCollider
 */
 struct iColliderConvexMesh : public virtual iCollider
 {
-  SCF_INTERFACE (CS::Collision::iColliderConvexMesh, 1, 0, 0);
+  SCF_INTERFACE (CS::Collision2::iColliderConvexMesh, 1, 0, 0);
 
   /// Get the mesh factory of this collider.
   virtual iMeshWrapper* GetMesh () = 0;
@@ -285,7 +285,7 @@ struct iColliderConvexMesh : public virtual iCollider
 */
 struct iColliderConcaveMesh : public virtual iCollider
 {
-  SCF_INTERFACE (CS::Collision::iColliderConcaveMesh, 1, 0, 0);
+  SCF_INTERFACE (CS::Collision2::iColliderConcaveMesh, 1, 0, 0);
 
   /// Get the mesh factory of this collider.
   virtual iMeshWrapper* GetMesh () = 0;
@@ -305,7 +305,7 @@ struct iColliderConcaveMesh : public virtual iCollider
 */
 struct iColliderConcaveMeshScaled : public virtual iCollider
 {
-  SCF_INTERFACE (CS::Collision::iColliderConcaveMeshScaled, 1, 0, 0);
+  SCF_INTERFACE (CS::Collision2::iColliderConcaveMeshScaled, 1, 0, 0);
 
   /// Get the concave collider scaled by this collider.
   virtual iColliderConcaveMesh* GetCollider () = 0;
@@ -325,7 +325,7 @@ struct iColliderConcaveMeshScaled : public virtual iCollider
 */
 struct iColliderTerrain : public virtual iCollider
 {
-  SCF_INTERFACE (CS::Collision::iColliderTerrain, 1, 0, 0);
+  SCF_INTERFACE (CS::Collision2::iColliderTerrain, 1, 0, 0);
 
   /// Get the terrain system.
   virtual iTerrainSystem* GetTerrain () const = 0;
@@ -346,7 +346,7 @@ struct iColliderTerrain : public virtual iCollider
 */
 struct iCollisionObject : public virtual iBase
 {
-  SCF_INTERFACE (CS::Collision::iCollisionObject, 1, 0, 0);
+  SCF_INTERFACE (CS::Collision2::iCollisionObject, 1, 0, 0);
 
   virtual iCollisionObject* QueryCollisionObject () = 0;
 
@@ -428,7 +428,7 @@ struct iCollisionObject : public virtual iBase
 // kickvb: most of this would have to be redesigned, let's do it later
 struct iCollisionActor : public virtual iCollisionObject
 {
-  SCF_INTERFACE (CS::Collision::iCollisionActor, 1, 0, 0);
+  SCF_INTERFACE (CS::Collision2::iCollisionActor, 1, 0, 0);
 
   /// Check if we are on the ground.
   virtual bool IsOnGround () = 0;
@@ -499,7 +499,7 @@ struct iCollisionActor : public virtual iCollisionObject
 
 struct iCollisionSector : public virtual iBase
 {
-  SCF_INTERFACE (CS::Collision::iCollisionSector, 1, 0, 0);
+  SCF_INTERFACE (CS::Collision2::iCollisionSector, 1, 0, 0);
 
   /// Set the global gravity.
   virtual void SetGravity (const csVector3& v) = 0;
@@ -577,7 +577,7 @@ struct iCollisionSector : public virtual iBase
 */
 struct iCollisionSystem : public virtual iBase
 {
-  SCF_INTERFACE (CS::Collision::iCollisionSystem, 1, 0, 0);
+  SCF_INTERFACE (CS::Collision2::iCollisionSystem, 1, 0, 0);
 
   virtual void SetInternalScale (float scale) = 0;
 
@@ -585,8 +585,7 @@ struct iCollisionSystem : public virtual iBase
   virtual csRef<iColliderConvexMesh> CreateColliderConvexMesh (iMeshWrapper* mesh) = 0;
 
   /// Create a concave mesh collider.
-  virtual csRef<iColliderConcaveMesh> CreateColliderConcaveMesh (
-    iMeshWrapper* mesh, bool isStatic = false) = 0;
+  virtual csRef<iColliderConcaveMesh> CreateColliderConcaveMesh (iMeshWrapper* mesh) = 0;
 
   /// Create a scaled concave mesh collider.
   virtual csRef<iColliderConcaveMeshScaled> CreateColliderConcaveMeshScaled (

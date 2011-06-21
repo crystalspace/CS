@@ -28,7 +28,7 @@ struct iTriangleMesh;
 CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
 {
 
-using CS::Collision::ColliderType;
+using CS::Collision2::ColliderType;
 
 class csBulletSector;
 class csBulletSystem;
@@ -36,7 +36,7 @@ class csBulletSystem;
 csRef<iTriangleMesh> FindColdetTriangleMesh (iMeshWrapper* mesh, 
                                              csStringID baseID, csStringID colldetID);
 
-class csBulletCollider: public virtual CS::Collision::iCollider
+class csBulletCollider: public virtual CS::Collision2::iCollider
 {
   friend class csBulletCollisionObject;
 protected:
@@ -58,7 +58,7 @@ public:
 
 class csBulletColliderBox: 
   public scfImplementation2<csBulletColliderBox,
-  csBulletCollider, CS::Collision::iColliderBox>
+  csBulletCollider, CS::Collision2::iColliderBox>
 {
   csVector3 boxSize;
 
@@ -72,7 +72,7 @@ public:
 
 class csBulletColliderSphere:
   public scfImplementation2<csBulletColliderSphere,
-  csBulletCollider, CS::Collision::iColliderSphere>
+  csBulletCollider, CS::Collision2::iColliderSphere>
 {
   float radius;
 
@@ -88,7 +88,7 @@ public:
 
 class csBulletColliderCylinder:
   public scfImplementation2<csBulletColliderCylinder,
-  csBulletCollider, CS::Collision::iColliderCylinder>
+  csBulletCollider, CS::Collision2::iColliderCylinder>
 {
   //why Z?
   float radius;
@@ -104,7 +104,7 @@ public:
 
 class csBulletColliderCapsule: 
   public scfImplementation2<csBulletColliderCapsule,
-  csBulletCollider, CS::Collision::iColliderCapsule>
+  csBulletCollider, CS::Collision2::iColliderCapsule>
 {
   float radius;
   float length;
@@ -120,7 +120,7 @@ public:
 
 class csBulletColliderCone:
   public scfImplementation2<csBulletColliderCone,
-  csBulletCollider, CS::Collision::iColliderCone>
+  csBulletCollider, CS::Collision2::iColliderCone>
 {
   float radius;
   float length;
@@ -135,7 +135,7 @@ public:
 
 class csBulletColliderPlane:
   public scfImplementation2<csBulletColliderPlane,
-  csBulletCollider, CS::Collision::iColliderPlane>
+  csBulletCollider, CS::Collision2::iColliderPlane>
 {
   csPlane3 plane;
 
@@ -149,7 +149,7 @@ public:
 
 class csBulletColliderConvexMesh:
   public scfImplementation2<csBulletColliderConvexMesh,
-  csBulletCollider, CS::Collision::iColliderConvexMesh>
+  csBulletCollider, CS::Collision2::iColliderConvexMesh>
 {
   iMeshWrapper* mesh;
   
@@ -166,7 +166,7 @@ public:
 
 class csBulletColliderConcaveMesh:
   public scfImplementation2<csBulletColliderConcaveMesh, 
-  csBulletCollider, CS::Collision::iColliderConcaveMesh>
+  csBulletCollider, CS::Collision2::iColliderConcaveMesh>
 {
   friend class csBulletColliderConcaveMeshScaled;
 
@@ -182,16 +182,16 @@ public:
 
 class csBulletColliderConcaveMeshScaled:
   public scfImplementation2<csBulletColliderConcaveMeshScaled,
-  csBulletCollider, CS::Collision::iColliderConcaveMeshScaled>
+  csBulletCollider, CS::Collision2::iColliderConcaveMeshScaled>
 {
   csBulletColliderConcaveMesh* originalCollider;
 
 public:
-  csBulletColliderConcaveMeshScaled (CS::Collision::iColliderConcaveMesh* collider, csVector3 scale, csBulletSystem* sys);
+  csBulletColliderConcaveMeshScaled (CS::Collision2::iColliderConcaveMesh* collider, csVector3 scale, csBulletSystem* sys);
   virtual ~csBulletColliderConcaveMeshScaled();
   virtual ColliderType GetGeometryType () const {return ColliderType::COLLIDER_CONCAVE_MESH_SCALED;}
-  virtual CS::Collision::iColliderConcaveMesh* GetCollider () 
-  {return dynamic_cast<CS::Collision::iColliderConcaveMesh*>(originalCollider);}
+  virtual CS::Collision2::iColliderConcaveMesh* GetCollider () 
+  {return dynamic_cast<CS::Collision2::iColliderConcaveMesh*>(originalCollider);}
   virtual float GetVolume () {return originalCollider->GetVolume () * scale.x * scale.y * scale.z;}
 };
 
@@ -217,7 +217,7 @@ public:
 
 class csBulletColliderTerrain:
   public scfImplementation3<csBulletColliderTerrain, 
-  csBulletCollider, CS::Collision::iColliderTerrain, iTerrainCellLoadCallback>
+  csBulletCollider, CS::Collision2::iColliderTerrain, iTerrainCellLoadCallback>
 {
   friend class csBulletSector;
   friend class csBulletCollisionObject;

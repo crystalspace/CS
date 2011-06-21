@@ -143,30 +143,30 @@ public:
   virtual void draw3dText (const btVector3 &location, const char *textString)
   {}
 
-  void SetDebugMode (CS::Physics::Bullet::DebugMode mode)
+  void SetDebugMode (CS::Physics2::Bullet2::DebugMode mode)
   {
     this->mode = 0;
-    if (mode & CS::Physics::Bullet::DEBUG_COLLIDERS)
+    if (mode & CS::Physics2::Bullet2::DEBUG_COLLIDERS)
       this->mode |= DBG_DrawWireframe;
-    if (mode & CS::Physics::Bullet::DEBUG_AABB)
+    if (mode & CS::Physics2::Bullet2::DEBUG_AABB)
       this->mode |= DBG_DrawAabb;
-    if (mode & CS::Physics::Bullet::DEBUG_JOINTS)
+    if (mode & CS::Physics2::Bullet2::DEBUG_JOINTS)
       this->mode |= DBG_DrawConstraints | DBG_DrawConstraintLimits;
   }
 
-  CS::Physics::Bullet::DebugMode GetDebugMode ()
+  CS::Physics2::Bullet2::DebugMode GetDebugMode ()
   {
-    CS::Physics::Bullet::DebugMode mode =
-      CS::Physics::Bullet::DEBUG_NOTHING;
+    CS::Physics2::Bullet2::DebugMode mode =
+      CS::Physics2::Bullet2::DEBUG_NOTHING;
     if (this->mode & DBG_DrawWireframe)
-      mode = (CS::Physics::Bullet::DebugMode)
-	(mode | CS::Physics::Bullet::DEBUG_COLLIDERS);
+      mode = (CS::Physics2::Bullet2::DebugMode)
+	(mode | CS::Physics2::Bullet2::DEBUG_COLLIDERS);
     if (this->mode & DBG_DrawAabb)
-      mode = (CS::Physics::Bullet::DebugMode)
-	(mode | CS::Physics::Bullet::DEBUG_AABB);
+      mode = (CS::Physics2::Bullet2::DebugMode)
+	(mode | CS::Physics2::Bullet2::DEBUG_AABB);
     if (this->mode & DBG_DrawConstraints)
-      mode = (CS::Physics::Bullet::DebugMode)
-	(mode | CS::Physics::Bullet::DEBUG_JOINTS);
+      mode = (CS::Physics2::Bullet2::DebugMode)
+	(mode | CS::Physics2::Bullet2::DEBUG_JOINTS);
     return mode;
   }
 

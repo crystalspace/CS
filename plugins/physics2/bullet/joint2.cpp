@@ -77,14 +77,14 @@ void csBulletJoint::Attach (iPhysicalBody* body1, iPhysicalBody* body2, bool for
   isSoft = true;
   if (body2)
   {
-    if (body1->GetBodyType () == CS::Physics::BODY_SOFT)
+    if (body1->GetBodyType () == CS::Physics2::BODY_SOFT)
     {
       bodies[0] = body1;
       bodies[1] = body2;
     }
     else
     {
-      if (body2->GetBodyType () == CS::Physics::BODY_RIGID)
+      if (body2->GetBodyType () == CS::Physics2::BODY_RIGID)
         isSoft = false;
       bodies[1] = body1;
       bodies[0] = body2;
@@ -94,7 +94,7 @@ void csBulletJoint::Attach (iPhysicalBody* body1, iPhysicalBody* body2, bool for
   {
     bodies[0] = body1;
 
-    if (body1->GetBodyType () == CS::Physics::BODY_RIGID)
+    if (body1->GetBodyType () == CS::Physics2::BODY_RIGID)
       isSoft = false;
     else
     {
@@ -225,7 +225,7 @@ bool csBulletJoint::RebuildJoint ()
       lspecs.cfm		=	1;
       lspecs.erp		=	1; 
       lspecs.position = CSToBullet (position, sys->getInternalScale ());
-      if (bodies[1]->GetBodyType () == CS::Physics::BODY_RIGID)
+      if (bodies[1]->GetBodyType () == CS::Physics2::BODY_RIGID)
       {  
         csBulletRigidBody* body2 = dynamic_cast<csBulletRigidBody*> (bodies[1]);
         body->btBody->appendLinearJoint (lspecs, body2->btBody);
@@ -249,7 +249,7 @@ bool csBulletJoint::RebuildJoint ()
       else if (!rotConstraintZ)
         aspecs.axis = btVector3(0,0,1);
 
-      if (bodies[1]->GetBodyType () == CS::Physics::BODY_RIGID)
+      if (bodies[1]->GetBodyType () == CS::Physics2::BODY_RIGID)
       {  
         csBulletRigidBody* body2 = dynamic_cast<csBulletRigidBody*> (bodies[1]);
         body->btBody->appendAngularJoint (aspecs, body2->btBody);

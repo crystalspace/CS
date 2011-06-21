@@ -13,7 +13,7 @@
 
 namespace CS
 {
-namespace Collision
+namespace Collision2
 {
 struct iCollisionCallback;
 struct iCollisionObject;
@@ -24,7 +24,7 @@ struct iCollisionObject;
 
 namespace CS
 {
-namespace Physics
+namespace Physics2
 {
 
 struct iJoint;
@@ -51,9 +51,9 @@ enum RigidBodyState
 * A base interface of physical bodies. 
 * iRigidBody and iSoftBody will be derived from this one.
 */
-struct iPhysicalBody : public virtual CS::Collision::iCollisionObject
+struct iPhysicalBody : public virtual CS::Collision2::iCollisionObject
 {
-  SCF_INTERFACE (CS::Physics::iPhysicalBody, 1, 0, 0);
+  SCF_INTERFACE (CS::Physics2::iPhysicalBody, 1, 0, 0);
 
   virtual PhysicalBodyType GetBodyType () const = 0;
 
@@ -91,9 +91,6 @@ struct iPhysicalBody : public virtual CS::Collision::iCollisionObject
   /// Add a force to the whole body.
   virtual void AddForce (const csVector3& force) = 0;
   
-  /// Set the linear velocity (movement).
-  virtual void SetLinearVelocity (const csVector3& vel) = 0;
-  
   /// Get the linear velocity (movement).
   virtual csVector3 GetLinearVelocity (size_t index = 0) const = 0;
 
@@ -126,7 +123,7 @@ struct iPhysicalBody : public virtual CS::Collision::iCollisionObject
 */
 struct iRigidBody : public virtual iPhysicalBody
 {
-  SCF_INTERFACE (CS::Physics::iRigidBody, 1, 0, 0);
+  SCF_INTERFACE (CS::Physics2::iRigidBody, 1, 0, 0);
 
   /// Get the current state of the body.
   virtual RigidBodyState GetState () = 0;
@@ -140,6 +137,9 @@ struct iRigidBody : public virtual iPhysicalBody
 
   /// Get the elasticity of this rigid body.
   virtual float GetElasticity () = 0;
+
+  /// Set the linear velocity (movement).
+  virtual void SetLinearVelocity (const csVector3& vel) = 0;
 
   /// Set the angular velocity (rotation).
   virtual void SetAngularVelocity (const csVector3& vel) = 0;
@@ -230,16 +230,16 @@ struct iRigidBody : public virtual iPhysicalBody
 
 /**
  * This class can be implemented in order to update the position of an anchor of a
- * CS::Physics::Bullet::iSoftBody. This can be used to try to control manually the
+ * CS::Physics2::Bullet::iSoftBody. This can be used to try to control manually the
  * position of a vertex of a soft body.
  *
  * \warning This feature uses a hack around the physical simulation of soft bodies
  * and may not always be stable. Use it at your own risk.
- * \sa CS::Physics::iSoftBody::AnchorVertex(size_t,iAnchorAnimationControl)
+ * \sa CS::Physics2::iSoftBody::AnchorVertex(size_t,iAnchorAnimationControl)
  */
 struct iAnchorAnimationControl : public virtual iBase
 {
-  SCF_INTERFACE(CS::Physics::iAnchorAnimationControl, 1, 0, 0);
+  SCF_INTERFACE(CS::Physics2::iAnchorAnimationControl, 1, 0, 0);
 
   /**
    * Return the new position of the anchor, in world coordinates.
@@ -260,7 +260,7 @@ struct iAnchorAnimationControl : public virtual iBase
 */
 struct iSoftBody : public virtual iPhysicalBody
 {
-  SCF_INTERFACE (CS::Physics::iSoftBody, 1, 0, 0);
+  SCF_INTERFACE (CS::Physics2::iSoftBody, 1, 0, 0);
 
   /// Set the mass of a node by index.
   virtual void SetVertexMass (float mass, size_t index) = 0;
@@ -321,6 +321,9 @@ struct iSoftBody : public virtual iPhysicalBody
   /// Get the rigidity of this body.
   virtual float GetRidigity () = 0;
 
+  /// Set the linear velocity (movement).
+  virtual void SetLinearVelocity (const csVector3& vel) = 0;
+
   /// Set the linear velocity of the given vertex of the body.
   virtual void SetLinearVelocity (const csVector3& velocity,
       size_t vertexIndex) = 0;
@@ -353,6 +356,70 @@ virtual const csVector3 GetWindVelocity () const = 0;
 };
 
 /**
+ * General helper class for CS::Physics2::Bullet::iSoftBody.
+ */
+struct SoftBodyHelper
+{
+  /**
+   * Create a genmesh from the given cloth soft body.
+   * The genmesh will be double-sided, in order to have correct normals on both
+   * sides of the cloth (ie the vertices of the soft body will be duplicated for the
+   * genmesh).
+   * \warning Don't forget to use doubleSided = true in
+   * CS::Animation::iSoftBodyAnimationControl::SetSoftBody()
+   */
+  static csPtr<iMeshFactoryWrapper> CreateClothGenMeshFactory
+  (iObjectRegistry* object_reg, const char* factoryName, iSoftBody* cloth)
+  {
+    csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
+
+    // Create the cloth mesh factory.
+    csRef<iMeshFactoryWrapper> clothFact = engine->CreateMeshFactory
+      ("crystalspace.mesh.object.genmesh", factoryName);
+    if (!clothFact)
+      return 0;
+
+    csRef<iGeneralFactoryState> gmstate = scfQueryInterface<iGeneralFactoryState>
+      (clothFact->GetMeshObjectFactory ());
+
+    // Create the vertices of the genmesh
+    size_t vertexCount = cloth->GetVertexCount ();
+    gmstate->SetVertexCount (vertexCount * 2);
+    csVector3* vertices = gmstate->GetVertices ();
+    for (size_t i = 0; i < vertexCount; i++)
+    {
+      vertices[i] = cloth->GetVertexPosition (i);
+      vertices[i + vertexCount] = cloth->GetVertexPosition (i);
+    }
+
+    // Create the triangles of the genmesh
+    gmstate->SetTriangleCount (cloth->GetTriangleCount () * 2);
+    csTriangle* triangles = gmstate->GetTriangles ();
+    for (size_t i = 0; i < cloth->GetTriangleCount (); i++)
+    {
+      csTriangle triangle = cloth->GetTriangle (i);
+      triangles[i * 2] = triangle;
+      triangles[i * 2 + 1] = csTriangle (triangle[2] + vertexCount,
+					 triangle[1] + vertexCount,
+					 triangle[0] + vertexCount);
+    }
+
+    gmstate->CalculateNormals ();
+
+    // Set up the texels of the genmesh
+    csVector2* texels = gmstate->GetTexels ();
+    csVector3* normals = gmstate->GetNormals ();
+    CS::Geometry::TextureMapper* mapper = new CS::Geometry::DensityTextureMapper (1.0f);
+    for (size_t i = 0; i < vertexCount * 2; i++)
+      texels[i] = mapper->Map (vertices[i], normals[i], i);
+
+    gmstate->Invalidate ();
+
+    return csPtr<iMeshFactoryWrapper> (clothFact);
+  }
+};
+
+/**
 * A joint that can constrain the relative motion between two iRigidBody.
 * For instance if all motion in along the local X axis is constrained
 * then the bodies will stay motionless relative to each other
@@ -366,7 +433,7 @@ virtual const csVector3 GetWindVelocity () const = 0;
 */
 struct iJoint : public virtual iBase
 {
-  SCF_INTERFACE (CS::Physics::iJoint, 1, 0, 0);
+  SCF_INTERFACE (CS::Physics2::iJoint, 1, 0, 0);
 
   /**
   * Set the rigid bodies that will be affected by this joint. Set force_update to true if 
@@ -550,11 +617,11 @@ struct iJoint : public virtual iBase
  * callback are provided then the dynamic system will use a default one which
  * will update the transform of the body from the position of the attached
  * movable (see iRigidBody::AttachMovable()).
- * \sa CS::Physics::iRigidBody::SetKinematicCallback()
+ * \sa CS::Physics2::iRigidBody::SetKinematicCallback()
  */
 struct iKinematicCallback : public virtual iBase
 {
-  SCF_INTERFACE (CS::Physics::iKinematicCallback, 1, 0, 0);
+  SCF_INTERFACE (CS::Physics2::iKinematicCallback, 1, 0, 0);
 
   /**
    * Update the new transform of the rigid body.
@@ -565,7 +632,7 @@ struct iKinematicCallback : public virtual iBase
 
 struct iPhysicalSystem : public virtual iBase
 {
-  SCF_INTERFACE (CS::Physics::iPhysicalSystem, 1, 0, 0);
+  SCF_INTERFACE (CS::Physics2::iPhysicalSystem, 1, 0, 0);
 
   /**
   * Create a rigid body, if there's an iCollisionObject pointer, 
@@ -653,7 +720,7 @@ struct iPhysicalSystem : public virtual iBase
 
 struct iPhysicalSector : public virtual iBase
 {
-  SCF_INTERFACE (CS::Physics::iPhysicalSector, 1, 0, 0);
+  SCF_INTERFACE (CS::Physics2::iPhysicalSector, 1, 0, 0);
 
   /**
   * Set the simulation speed. A value of 0 means that the simulation is not made
@@ -674,7 +741,7 @@ struct iPhysicalSector : public virtual iBase
   * in one second. 0 means that the movement will not be reduced, while
   * 1 means that the object will not move.
   * The default value is 0.
-  * \sa CS::Physics::Bullet::iRigidBody::SetLinearDampener()
+  * \sa CS::Physics2::Bullet::iRigidBody::SetLinearDampener()
   */
   virtual void SetLinearDampener (float d) = 0;
 
@@ -690,7 +757,7 @@ struct iPhysicalSector : public virtual iBase
   * in one second. 0 means that the movement will not be reduced, while
   * 1 means that the object will not move.
   * The default value is 0.
-  * \sa CS::Physics::Bullet::iRigidBody::SetRollingDampener()
+  * \sa CS::Physics2::Bullet::iRigidBody::SetRollingDampener()
   */
   virtual void SetRollingDampener (float d) = 0;
 

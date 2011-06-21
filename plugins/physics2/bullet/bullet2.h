@@ -31,14 +31,14 @@ class csBulletSoftBody;
 class csBulletCollisionObject;
 class csBulletCollider;
 
-using namespace CS::Collision;
-using namespace CS::Physics;
+using namespace CS::Collision2;
+using namespace CS::Physics2;
 
 //Will also implement iPhysicalSector...
 class csBulletSector : public scfImplementationExt3<
-  csBulletSector, csObject, CS::Collision::iCollisionSector, 
-  CS::Physics::Bullet::iPhysicalSector,
-  CS::Physics::iPhysicalSector>
+  csBulletSector, csObject, CS::Collision2::iCollisionSector, 
+  CS::Physics2::Bullet2::iPhysicalSector,
+  CS::Physics2::iPhysicalSector>
 {
   friend class csBulletCollisionObject;
   friend class csBulletRigidBody;
@@ -155,8 +155,8 @@ public:
   virtual bool SaveWorld (const char* filename);
 
   virtual void DebugDraw (iView* rview);
-  virtual void SetDebugMode (CS::Physics::Bullet::DebugMode mode);
-  virtual CS::Physics::Bullet::DebugMode GetDebugMode ();
+  virtual void SetDebugMode (CS::Physics2::Bullet2::DebugMode mode);
+  virtual CS::Physics2::Bullet2::DebugMode GetDebugMode ();
 
   virtual void StartProfile ();
 
@@ -175,19 +175,19 @@ public:
 };
 
 class csBulletSystem : public scfImplementation3<
-  csBulletSystem, CS::Collision::iCollisionSystem, 
-  CS::Physics::iPhysicalSystem, iComponent>
+  csBulletSystem, CS::Collision2::iCollisionSystem, 
+  CS::Physics2::iPhysicalSystem, iComponent>
 {
   friend class csBulletColliderConvexMesh;
   friend class csBulletColliderConcaveMesh;
-
+private:
   iObjectRegistry* object_reg;
-  csRefArrayObject<CS::Collision::iCollider> colliders;
+  /*csRefArrayObject<CS::Collision2::iCollider> colliders;
   csRefArrayObject<csBulletCollisionObject> objects;
   csRefArrayObject<csBulletRigidBody> rigidBodies;
   csRefArrayObject<csBulletSoftBody> softBodies;
   csRefArrayObject<csBulletJoint> joints;
-  csRefArrayObject<iCollisionActor> actors;
+  csRefArrayObject<iCollisionActor> actors;*/
   csRefArrayObject<iCollisionSector> collSectors;
   btSoftBodyWorldInfo* defaultInfo;
   float internalScale;
@@ -227,8 +227,7 @@ public:
   // iCollisionSystem
   virtual void SetInternalScale (float scale);
   virtual csRef<iColliderConvexMesh> CreateColliderConvexMesh (iMeshWrapper* mesh);
-  virtual csRef<iColliderConcaveMesh> CreateColliderConcaveMesh 
-      (iMeshWrapper* mesh, bool isStatic = false);
+  virtual csRef<iColliderConcaveMesh> CreateColliderConcaveMesh (iMeshWrapper* mesh);
   virtual csRef<iColliderConcaveMeshScaled> CreateColliderConcaveMeshScaled
       (iColliderConcaveMesh* collider, float scale);
   virtual csRef<iColliderCylinder> CreateColliderCylinder (float length, float radius);

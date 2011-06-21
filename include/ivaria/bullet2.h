@@ -11,9 +11,9 @@
 
 namespace CS
 {
-namespace Physics
+namespace Physics2
 {
-namespace Bullet
+namespace Bullet2
 {
 
 enum DebugMode
@@ -26,7 +26,7 @@ enum DebugMode
 
 struct iSoftBody : public virtual iBase
 {
-  SCF_INTERFACE (CS::Physics::Bullet::iSoftBody, 1, 0, 0);
+  SCF_INTERFACE (CS::Physics2::Bullet2::iSoftBody, 1, 0, 0);
 
   /**
   * Draw the debug informations of this soft body. This has to be called
@@ -132,7 +132,7 @@ struct iSoftBody : public virtual iBase
 
 struct iPhysicalSector : public virtual iBase
 {
-  SCF_INTERFACE (CS::Physics::Bullet::iPhysicalSector, 1, 0, 0);
+  SCF_INTERFACE (CS::Physics2::Bullet2::iPhysicalSector, 1, 0, 0);
 
   //virtual void SetGimpactEnabled (bool enabled) = 0; 
 
@@ -153,7 +153,7 @@ struct iPhysicalSector : public virtual iBase
 
   /**
   * Set the mode to be used when displaying debug informations. The default value
-  * is 'CS::Physics::Bullet::DEBUG_COLLIDERS | CS::Physics::Bullet::DEBUG_JOINTS'.
+  * is 'CS::Physics2::Bullet2::DEBUG_COLLIDERS | CS::Physics2::Bullet2::DEBUG_JOINTS'.
   * \remark Don't forget to call DebugDraw() at each frame to effectively display
   * the debug informations.
   */

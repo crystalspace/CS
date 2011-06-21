@@ -11,16 +11,10 @@ CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
 
 csBulletCollisionObject::csBulletCollisionObject (csBulletSystem* sys)
-: scfImplementationType (this), system (sys)
+: scfImplementationType (this), system (sys), collCb (NULL), btObject (NULL),
+sector (NULL), compoundShape (NULL), movable (NULL), insideWorld (false),
+shapeChanged (false), isTerrain (false), type (COLLISION_OBJECT_BASE)
 {
-  collCb = NULL;
-  btObject = NULL;
-  sector = NULL;
-  compoundShape = NULL;
-  movable = NULL;
-  insideWorld = false;
-  shapeChanged = false;
-  isTerrain = false;
   btTransform identity;
   identity.setIdentity ();
   motionState = new csBulletMotionState (this, identity, identity);
@@ -29,10 +23,13 @@ csBulletCollisionObject::csBulletCollisionObject (csBulletSystem* sys)
 csBulletCollisionObject::~csBulletCollisionObject ()
 {
   RemoveBulletObject ();
+  colliders.DeleteAll ();
   if (btObject)
     delete btObject;
-  delete compoundShape;
-  delete motionState;
+  if (compoundShape)
+    delete compoundShape;
+  if (motionState)
+    delete motionState;
 }
 
 void csBulletCollisionObject::SetObjectType (CollisionObjectType type)
@@ -62,7 +59,7 @@ void csBulletCollisionObject::SetTransform (const csOrthoTransform& trans)
   //TODO: Think about this and RebuildObject...
   transform = CSToBullet (trans, system->getInternalScale ());
 
-  if (type == COLLISION_OBJECT_BASE)
+  if (type == COLLISION_OBJECT_BASE || type == COLLISION_OBJECT_PHYSICAL)
   {
     if (!isTerrain)
     {
@@ -87,9 +84,9 @@ void csBulletCollisionObject::SetTransform (const csOrthoTransform& trans)
 
 csOrthoTransform csBulletCollisionObject::GetTransform ()
 {
-  float inverseScale = system->getInternalScale ();
+  float inverseScale = system->getInverseInternalScale ();
 
-  if (type == COLLISION_OBJECT_BASE)
+  if (type == COLLISION_OBJECT_BASE || type == COLLISION_OBJECT_PHYSICAL)
   {
     if (!isTerrain)
     {
@@ -108,7 +105,7 @@ csOrthoTransform csBulletCollisionObject::GetTransform ()
     return BulletToCS (btObject->getWorldTransform(), system->getInverseInternalScale ());
 }
 
-void csBulletCollisionObject::AddCollider (CS::Collision::iCollider* collider,
+void csBulletCollisionObject::AddCollider (CS::Collision2::iCollider* collider,
                                            const csOrthoTransform& relaTrans)
 {
   csRef<csBulletCollider> coll (dynamic_cast<csBulletCollider*>(collider));
@@ -131,7 +128,7 @@ void csBulletCollisionObject::AddCollider (CS::Collision::iCollider* collider,
   //User must call RebuildObject() after this.
 }
 
-void csBulletCollisionObject::RemoveCollider (CS::Collision::iCollider* collider)
+void csBulletCollisionObject::RemoveCollider (CS::Collision2::iCollider* collider)
 {
   for (size_t i =0; i < colliders.GetSize(); i++)
   {
@@ -159,7 +156,7 @@ void csBulletCollisionObject::RemoveCollider (size_t index)
   //User must call RebuildObject() after this.
 }
 
-CS::Collision::iCollider* csBulletCollisionObject::GetCollider (size_t index)
+CS::Collision2::iCollider* csBulletCollisionObject::GetCollider (size_t index)
 {
   if (index < colliders.GetSize ())
     return colliders[index];

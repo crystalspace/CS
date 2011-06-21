@@ -36,7 +36,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 Simple::Simple ()
   : DemoApplication ("CrystalSpace.PhysTut"),
-    isSoftBodyWorld (false), environment (ENVIRONMENT_WALLS), solver (0),
+    isSoftBodyWorld (false), environment (ENVIRONMENT_TERRAIN), solver (0),
     autodisable (false), do_bullet_debug (false), remainingStepDuration (0.0f),
     debugMode (false), allStatic (false), pauseDynamic (false), dynamicSpeed (1.0f),
     physicalCameraMode (CAMERA_DYNAMIC), dragging (false), softDragging (false)
@@ -186,6 +186,8 @@ void Simple::Frame ()
   // (in this mode we want to control the orientation of the camera,
   // so we update the camera position by ourselves instead of using
   // 'cameraBody->AttachCamera (camera)')
+  const csOrthoTransform& tc = cameraBody->GetTransform ();
+  csVector3 a = tc.GetOrigin ();
   if (physicalCameraMode == CAMERA_DYNAMIC)
     view->GetCamera ()->GetTransform ().SetOrigin
       (cameraBody->GetTransform ().GetOrigin ());
@@ -1032,7 +1034,9 @@ void Simple::UpdateCameraMode ()
 	{
 	  cameraBody = dynamicSystem->CreateBody ();
 	  cameraBody->SetProperties (1.0f, csVector3 (0.0f), csMatrix3 ());
-	  cameraBody->SetTransform (view->GetCamera ()->GetTransform ());
+    const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+    csVector3 a = tc.GetOrigin ();
+    cameraBody->SetTransform (tc);
 	  cameraBody->AttachColliderSphere
 	    (0.8f, csVector3 (0.0f), 10.0f, 1.0f, 0.8f);
 	}
@@ -1092,6 +1096,7 @@ iRigidBody* Simple::SpawnBox ()
 {
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+  csVector3 a = tc.GetOrigin ();
 
   // Create the mesh.
   csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (boxFact, "box", room));
