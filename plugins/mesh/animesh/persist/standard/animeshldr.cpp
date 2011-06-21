@@ -32,6 +32,7 @@
 #include "iutil/plugin.h"
 #include "iutil/stringarray.h"
 #include "ivaria/reporter.h"
+#include <csutil/stringarray.h>
 
 #include "csutil/ref.h"
 
@@ -271,7 +272,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           {
             CS::Mesh::iAnimatedMeshSubMeshFactory* smf = amfact->CreateSubMesh (indexBuffer,
               child->GetAttributeValue("name"), child->GetAttributeValueAsBool("visible", true));
-            smf->SetMaterial(material);
+	    if (material)
+	      smf->SetMaterial(material);
           }
         }
         break;
@@ -297,6 +299,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           }
 
           amfact->SetSkeletonFactory (skelFact);
+        }
+        break;
+      case XMLTOKEN_SUBSET:
+        {
+	  CS::Mesh::SubsetID set = amfact->AddSubset ();
+	  const char* vertexIndices = child->GetAttributeValue ("vertices");
+	  if (vertexIndices == 0)
+	  {
+	    synldr->ReportError (msgidFactory, child, 
+				 "No vertex list defined while creating subset");
+	    return 0;
+	  }
+
+	  csStringArray indices;
+	  char space = ' ';
+	  size_t vertexCount = indices.SplitString (vertexIndices, &space);
+	  for (size_t i = 0; i < vertexCount; i++)
+	    amfact->AddSubsetVertex (set, (size_t) atoi(indices[i]));
         }
         break;
       case XMLTOKEN_MORPHTARGET:
@@ -366,6 +386,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 					       CS::Mesh::iAnimatedMeshFactory* amfact)
   {
     const char* name = child->GetAttributeValue ("name");
+    CS::Mesh::iAnimatedMeshMorphTarget* morphTarget = amfact->CreateMorphTarget (name);
 
     csRef<iRenderBuffer> offsetsBuffer;
 
@@ -378,14 +399,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
       csStringID id = xmltokens.Request (value);
       switch (id)
       {
+      case XMLTOKEN_SETS:
+	{
+	  const char* subsetIDs = child2->GetAttributeValue ("ids");
+	  if (subsetIDs == 0)
+	  {
+	    synldr->ReportError (msgidFactory, child2, 
+				 "No subset list defined while creating morph target");
+	    return false;
+	  }
+	  csStringArray subsets;
+	  char space = ' ';
+	  size_t subsetCount = subsets.SplitString (subsetIDs, &space);
+	  for (size_t i = 0; i < subsetCount; i++)
+	    morphTarget->AddSubset ((CS::Mesh::SubsetID) atoi(subsets[i]));
+	}
+	break;
       case XMLTOKEN_OFFSETS:
 	{
 	  offsetsBuffer = synldr->ParseRenderBuffer (child2);
 	  if (!offsetsBuffer)
 	  {
-	    synldr->ReportError (msgidFactory, child2, "Could not parse render buffer!");
+	    synldr->ReportError (msgidFactory, child2, "Could not parse offsets buffer!");
 	    return false;
 	  }
+	  morphTarget->SetVertexOffsets (offsetsBuffer);
+	  morphTarget->Invalidate();
 	}
 	break;
       default:
@@ -394,9 +433,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
       }
     }
 
-    CS::Mesh::iAnimatedMeshMorphTarget* morphTarget = amfact->CreateMorphTarget (name);
-    morphTarget->SetVertexOffsets (offsetsBuffer);
-    morphTarget->Invalidate();
     return true;
   }
   
@@ -417,7 +453,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
     while (it->HasNext ())
     {
       csRef<iDocumentNode> child2 = it->Next ();
-      if (child2->GetType () != CS_NODE_ELEMENT) continue;   // ??????????
+      if (child2->GetType () != CS_NODE_ELEMENT) continue;
       const char* value = child2->GetValue ();
       csStringID id = xmltokens.Request (value);
       switch (id)
@@ -494,10 +530,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 
       // Write material
       iMaterialWrapper* material = nullptr;
+
       for (size_t i = 0; i < factory->GetSubMeshCount (); i++)
       {
 	CS::Mesh::iAnimatedMeshSubMeshFactory* submesh = factory->GetSubMesh (i);
 	iMaterialWrapper* submeshMaterial = submesh->GetMaterial ();
+
 	if (submeshMaterial)
 	{
 	  material = submeshMaterial;
@@ -660,6 +698,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 	}
       }
 
+      // Write subsets
+      {
+	if (factory->HasSubset ())
+	{
+	  for (CS::Mesh::SubsetID si = 0; si <= factory->GetTopSubsetID (); si++)
+	  {
+	    csRef<iDocumentNode> subsetNode = 
+	      paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	    subsetNode->SetValue ("subset");
+
+	    // Write vertex list
+	    csStringBase vertexList;
+	    for (size_t vi = 0; vi < factory->GetSubsetVertexCount (si); vi++)
+	    {
+	      if (vi != 0) vertexList += ' ';
+	      vertexList += (int) factory->GetSubsetVertex (si, vi);
+	    }
+
+	    subsetNode->SetAttribute ("vertices", vertexList.GetData ());
+	  }
+
+	}
+      }
+
       // Write morph targets
       {
 	for (size_t i = 0; i < factory->GetMorphTargetCount (); i++)
@@ -670,7 +732,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 	    paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
 	  targetNode->SetValue ("morphtarget");
 	  targetNode->SetAttribute ("name", target->GetName ());
+	  
+	  // Write subset list
+	  if (factory->HasSubset ())
+	  {
+	    csRef<iDocumentNode> subsetsNode = 
+	      targetNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	    subsetsNode->SetValue ("sets");
+	    csStringBase subsets;
+	    for (size_t i = 0; i < target->GetSubsetCount (); i++)
+	    {
+	      if (i != 0) subsets += ' ';
+	      subsets += (int) target->GetSubset (i);
+	    }
 
+	    subsetsNode->SetAttribute ("ids", subsets.GetData ());
+	  }
+	  
+	  // Write offsets
 	  iRenderBuffer* buffer = target->GetVertexOffsets ();
 	  if (!buffer) continue;
 
@@ -879,7 +958,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
     while (it->HasNext ())
     {
       csRef<iDocumentNode> child2 = it->Next ();
-      if (child2->GetType () != CS_NODE_ELEMENT) continue;   // ??????????
+      if (child2->GetType () != CS_NODE_ELEMENT) continue;
       const char* value = child2->GetValue ();
       csStringID id = xmltokens.Request (value);
       switch (id)
