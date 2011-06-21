@@ -151,7 +151,7 @@ bool SelfShadowDemo::Application ()
 
 bool SelfShadowDemo::CreateScene ()
 {
-  char *world = "world";
+  char *world = "world_grass";
 
   printf ("Loading level...\n");
   vfs->ChDir ("/lev/selfshadow");
