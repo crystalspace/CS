@@ -82,21 +82,24 @@ struct ShadowShadowMapDepth : ShadowShadowMap
   
   float getMapValue(int i, float2 position)
   {
+    if (position.x < 0 || position.y < 0 || position.x > 1 || position.y > 1)
+      return 0;
+  
     if (i == 0)
       return tex2D(lightPropsSM.shadowMap[0], position);
-    else if (i == 1)
+    if (i == 1)
       return tex2D(lightPropsSM.shadowMap[1], position);
-    else if (i == 2)
+    if (i == 2)
       return tex2D(lightPropsSM.shadowMap[2], position);
-    else if (i == 3)
+    if (i == 3)
       return tex2D(lightPropsSM.shadowMap[3], position);	
-    else if (i == 4)
+    if (i == 4)
       return tex2D(lightPropsSM.shadowMap[4], position);	
-    else if (i == 5)
+    if (i == 5)
       return tex2D(lightPropsSM.shadowMap[5], position);	
-    else if (i == 6)
+    if (i == 6)
       return tex2D(lightPropsSM.shadowMap[6], position);	
-    else if (i == 7)
+    if (i == 7)
       return tex2D(lightPropsSM.shadowMap[7], position);
       
     return 0;
