@@ -109,6 +109,8 @@ bool SelfShadowDemo::OnKeyboard (iEvent &ev)
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'e')
       light->GetMovable()->MovePosition(csVector3(-moveFactor, 0, 0));
 
+    light->GetMovable()->UpdateMove();
+
     return true;
   }
 

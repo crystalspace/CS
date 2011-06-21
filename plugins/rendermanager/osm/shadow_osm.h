@@ -56,6 +56,8 @@ namespace CS
         int numParts;
         PersistentData& persist;
         float* splitDists;
+        csVector3 nearTrans;
+        csVector3 farTrans;
         CS::RenderManager::RenderView* rview;
 
         SingleRenderLayer depthRenderLayer;
@@ -78,10 +80,13 @@ namespace CS
           splitDists[2] = 14.5;
           splitDists[3] = 16;
 
+          nearTrans = csVector3(0, 2.5, 0);
+          farTrans = csVector3(0, -1.125, 0);
+
           for (int i = 0; i < numParts ; i ++)
           {
 //             splitDists[i] = _near + ( (_far - _near) * (i + 1) ) / numParts;
-            csPrintf("%f\n", splitDists[i]);
+//             csPrintf("%f\n", splitDists[i]);
           }
         }
 
@@ -153,6 +158,12 @@ namespace CS
           superFrustum.frustums =
             new typename SuperFrustum::Frustum[superFrustum.actualNumParts];
 
+          // setup split dists
+          float _near = (light->GetMovable()->GetPosition() - 
+            viewSetup.nearTrans).Norm();
+          float _far = (light->GetMovable()->GetPosition() - 
+            viewSetup.farTrans).Norm();
+
           for (int i = 0; i < superFrustum.actualNumParts; i++)
           {
             typename SuperFrustum::Frustum& lightFrustum =
@@ -185,6 +196,10 @@ namespace CS
               lightFrustum.textureSVs[target->attachment] =
                 lightVarsHelper.CreateTempSV (target->svName);
             }
+
+            // setup split dist
+            viewSetup.splitDists[i] = _near + (_far - _near) * 
+              ((float)i / (superFrustum.actualNumParts - 1));
           }
         }
 
@@ -226,6 +241,7 @@ namespace CS
               }
 
               lightFrust.splitDistsSV->SetValue(viewSetup.splitDists[frustNum]);
+              csPrintf("%f\n", viewSetup.splitDists[frustNum]);
 
               int shadowMapSize = viewSetup.persist.shadowMapRes;
 

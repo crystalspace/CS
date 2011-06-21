@@ -116,12 +116,13 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     {
       nextSplit = lightPropsSM.splitDists[i];
       
-      if (-shadowMapCoords.z < nextSplit)
+      if (abs(shadowMapCoords.z) < nextSplit)
       {
         float previousMap = getMapValue(i - 2, shadowMapCoordsBiased.xy);
         float nextMap = getMapValue(i - 1, shadowMapCoordsBiased.xy);
 		
-        inLight = 1 - lerp(nextMap, previousMap, (float) (nextSplit + shadowMapCoords.z) / (nextSplit - previousSplit) );
+        inLight = 1 - lerp(nextMap, previousMap, (float) (nextSplit + shadowMapCoords.z) 
+          / (nextSplit - previousSplit) );
         break;
       }
       previousSplit = nextSplit;
