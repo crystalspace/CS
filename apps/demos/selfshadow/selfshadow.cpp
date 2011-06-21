@@ -151,10 +151,29 @@ bool SelfShadowDemo::Application ()
 
 bool SelfShadowDemo::CreateScene ()
 {
+  char *world = "world";
+
   printf ("Loading level...\n");
   vfs->ChDir ("/lev/selfshadow");
-  if (!loader->LoadMapFile ("world"))
+  if (!loader->LoadMapFile (world))
     ReportError("Error couldn't load level!");
+
+  if (!strcmp(world, "world_grass"))
+  {
+    csRef<iMeshWrapper> mesh =
+      engine->FindMeshObject("Hair");
+    if (!mesh)
+      ReportError ("Can't find Hair mesh object!");
+
+    // scale isn't exported from blender
+    csMatrix3 matrix;
+    matrix = csMatrix3(	
+      0.3, 0, 0,
+      0, 0.3, 0,
+      0, 0, 0.3);
+    mesh->GetMovable()->SetTransform(matrix);
+  }
+
   engine->Prepare ();
 
   // Setup the camera
