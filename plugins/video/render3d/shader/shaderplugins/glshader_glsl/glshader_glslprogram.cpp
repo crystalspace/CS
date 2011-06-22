@@ -303,19 +303,19 @@ csVertexAttrib csShaderGLSLProgram::ResolveBufferDestination (const char* bindin
     }
     else if (strcasecmp (binding, "gl_Vertex") == 0)
     {
-      dest = (csVertexAttrib)(CS_VATTRIB_POSITION);
+      dest = CS_VATTRIB_POSITION;
     }
     else if (strcasecmp (binding, "gl_Color") == 0)
     {
-      dest = (csVertexAttrib)(CS_VATTRIB_PRIMARY_COLOR);
+      dest = CS_VATTRIB_PRIMARY_COLOR;
     }
     else if (strcasecmp (binding, "gl_Normal") == 0)
     {
-      dest = (csVertexAttrib)(CS_VATTRIB_NORMAL);
+      dest = CS_VATTRIB_NORMAL;
     }
     else if (strcasecmp (binding, "gl_FogCoord") == 0)
     {
-      dest = (csVertexAttrib)(CS_VATTRIB_FOGCOORD);
+      dest = CS_VATTRIB_FOGCOORD;
     }
     else
     {
