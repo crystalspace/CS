@@ -957,7 +957,6 @@ CS::Physics2::iRigidBody* Simple::SpawnBox ()
 {
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
-  csVector3 a = tc.GetOrigin ();
 
   // Create the mesh.
   csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (boxFact, "box", room));
@@ -1045,6 +1044,8 @@ CS::Physics2::iRigidBody* Simple::SpawnSphere ()
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
   rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+
+  rb->RebuildObject ();
   physicalSector->AddRigidBody (rb);
 
   // Update the display of the dynamics debugger
@@ -1085,6 +1086,8 @@ CS::Physics2::iRigidBody* Simple::SpawnCone ()
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
   rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+
+  rb->RebuildObject ();
   physicalSector->AddRigidBody (rb);
 
   // Update the display of the dynamics debugger
@@ -1147,6 +1150,8 @@ CS::Physics2::iRigidBody* Simple::SpawnCylinder ()
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
   rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+  
+  rb->RebuildObject ();
   physicalSector->AddRigidBody (rb);
 
   // Update the display of the dynamics debugger
@@ -1200,6 +1205,7 @@ CS::Physics2::iRigidBody* Simple::SpawnCapsule (float length, float radius)
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
   rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+
   rb->RebuildObject ();
   physicalSector->AddRigidBody (rb);
 
@@ -1219,8 +1225,10 @@ CS::Collision2::iCollisionObject* Simple::SpawnConcaveMesh ()
     loader->Load ("/lib/std/star.xml");
     starFact = engine->FindMeshFactory ("genstar");
     if (!starFact)
+    {
       ReportError ("Error loading %s!", CS::Quote::Single ("star.xml"));
-    return NULL;
+      return NULL;
+    }
   }
 
   // Use the camera transform.
@@ -1239,8 +1247,9 @@ CS::Collision2::iCollisionObject* Simple::SpawnConcaveMesh ()
   co->AddCollider (starCollider, localTrans);
   csOrthoTransform trans = tc;
   trans.SetOrigin (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 2));
-  co->SetTransform (trans);
   co->SetAttachedMovable (star->GetMovable ());
+  co->SetTransform (trans);
+
   co->RebuildObject ();
   collisionSector->AddCollisionObject (co);
   // Update the display of the dynamics debugger

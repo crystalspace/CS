@@ -531,8 +531,6 @@ void csBulletSector::AddRigidBody (iRigidBody* body)
 
   btBody->sector = this;
   btBody->AddBulletObject ();
-  btBody->SetLinearDampener (linearDampening);
-  btBody->SetRollingDampener (angularDampening);
 }
 
 void csBulletSector::RemoveRigidBody (iRigidBody* body)
@@ -930,6 +928,7 @@ void csBulletSystem::DecomposeConcaveMesh (iCollisionObject* object, iMeshWrappe
   public:
     btAlignedObjectArray<btConvexHullShape*> m_convexShapes;
     btAlignedObjectArray<btVector3> m_convexCentroids;
+    btAlignedObjectArray<float> m_convexVolume;
 
     MyConvexDecomposition (float scale)
       :scale (scale),
@@ -995,10 +994,10 @@ void csBulletSystem::DecomposeConcaveMesh (iCollisionObject* object, iMeshWrappe
         index2+=mBaseCount;
       }
       btConvexHullShape* convexShape = new btConvexHullShape(&(vertices[0].getX()),vertices.size());
-
       convexShape->setMargin(0.01f);
       m_convexShapes.push_back(convexShape);
       m_convexCentroids.push_back(centroid);
+      m_convexVolume.push_back(result.mHullVolume);
       mBaseCount+=result.mHullVcount; // advance the 'base index' counter.
     }
 
@@ -1046,7 +1045,7 @@ void csBulletSystem::DecomposeConcaveMesh (iCollisionObject* object, iMeshWrappe
     trans.setOrigin(centroid);
     btConvexHullShape* convexShape = convexDecomposition.m_convexShapes[i];
     csRef<csBulletCollider> collider;
-    collider.AttachNew (new csBulletColliderConvexMesh (convexShape,this));
+    collider.AttachNew (new csBulletColliderConvexMesh (convexShape, convexDecomposition.m_convexVolume[i], this));
     //colliders.Push (collider);
     relaTransform = BulletToCS (trans, inverseInternalScale);
     btCollObject->AddCollider (collider, relaTransform);

@@ -110,25 +110,23 @@ void csBulletRigidBody::AddBulletObject ()
 
   btVector3 localInertia (0.0f, 0.0f, 0.0f);
   float mass = GetMass ();
+
+  btCollisionShape* shape;
+  btTransform principalAxis;
+  principalAxis.setIdentity ();
+  btVector3 principalInertia(0,0,0);
+
   //Create btRigidBody
   if (compoundShape)
   {
     int shapeCount = compoundShape->getNumChildShapes ();
+    CS_ALLOC_STACK_ARRAY(btScalar, masses, shapeCount); 
+    for (int i = 0; i < shapeCount; i++)
+      masses[i] = density * colliders[i]->GetVolume ();
     if (shapeChanged)
     {
-      btTransform principalAxis;
-      btVector3 principalInertia;
       compoundShape->calculatePrincipalAxisTransform
-        (&mass, principalAxis, principalInertia);
-
-      // create new motion state
-      btTransform trans;
-      motionState->getWorldTransform (trans);
-      trans = trans * motionState->inversePrincipalAxis;
-      delete motionState;
-      motionState = new csBulletMotionState (this, trans * principalAxis,
-        principalAxis);
-
+        (masses, principalAxis, principalInertia);
       // apply principal axis
       // creation is faster using a new compound to store the shifted children
       btCompoundShape* newCompoundShape = new btCompoundShape();
@@ -144,11 +142,26 @@ void csBulletRigidBody::AddBulletObject ()
       compoundShape = newCompoundShape;
     }
 
-    compoundShape->calculateLocalInertia (mass, localInertia);
+    shape = compoundShape;
+  }
+  else
+  {
+    shape = colliders[0]->shape;
+    principalAxis = CSToBullet (relaTransforms[0], system->getInternalScale ());
   }
 
+  // create new motion state
+  btTransform trans;
+  motionState->getWorldTransform (trans);
+  trans = trans * motionState->inversePrincipalAxis;
+  delete motionState;
+  motionState = new csBulletMotionState (this, trans * principalAxis,
+    principalAxis);
+
+  shape->calculateLocalInertia (mass, localInertia);
+
   btRigidBody::btRigidBodyConstructionInfo infos (mass, motionState,
-    compoundShape, localInertia);
+    shape, localInertia);
 
   infos.m_friction = friction;
   infos.m_restitution = elasticity;

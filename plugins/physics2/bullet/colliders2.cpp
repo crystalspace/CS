@@ -88,7 +88,7 @@ btTriangleMesh* GenerateTriMeshData (iMeshWrapper* mesh, csStringID baseID,
 #include "csutil/custom_new_enable.h"
 
 csBulletCollider::csBulletCollider ()
-  : collSystem (NULL), scale (1,1,1), shape (NULL), margin(0.0)
+  : collSystem (NULL), scale (1,1,1), shape (NULL), margin(0.0), volume (0.0)
 {
   //Lulu: Create a btEmptyShape for shape is safe but not efficient...
 }
@@ -99,6 +99,7 @@ void csBulletCollider::SetLocalScale (const csVector3& scale)
   shape->setLocalScaling (btVector3(scale.x * collSystem->getInternalScale (),
   scale.y * collSystem->getInternalScale (),
   scale.z * collSystem->getInternalScale ()));
+  volume *= scale.x * scale.y * scale.z;
 }
 
 void csBulletCollider::SetMargin (float margin)
@@ -120,6 +121,7 @@ csBulletColliderBox::csBulletColliderBox (const csVector3& boxSize, csBulletSyst
 {
   collSystem = sys;
   shape = new btBoxShape (CSToBullet (boxSize*0.5f, collSystem->getInternalScale ()));
+  volume = boxSize.x * boxSize.y * boxSize.z;
 }
 
 csBulletColliderBox::~csBulletColliderBox ()
@@ -132,6 +134,7 @@ csBulletColliderSphere::csBulletColliderSphere (float radius, csBulletSystem* sy
 {
   collSystem = sys;
   shape = new btSphereShape (radius * collSystem->getInternalScale ());
+  volume = 1.333333f * PI * radius * radius * radius;
 }
 
 csBulletColliderSphere::~csBulletColliderSphere ()
@@ -145,6 +148,7 @@ void csBulletColliderSphere::SetLocalScale (const csVector3& scale)
   {
     this->scale = scale;
     dynamic_cast<btSphereShape*>(shape)->setUnscaledRadius(scale.x * collSystem->getInternalScale ());
+    volume *= scale.x * scale.x * scale.x;
   }
 }
 
@@ -155,6 +159,7 @@ csBulletColliderCylinder::csBulletColliderCylinder (float length, float radius, 
   shape = new btCylinderShapeZ (btVector3 (radius * collSystem->getInternalScale (),
     radius * collSystem->getInternalScale (),
     length * collSystem->getInternalScale () * 0.5f));
+  volume = PI * radius * radius * length;
 }
 
 csBulletColliderCylinder::~csBulletColliderCylinder ()
@@ -174,6 +179,8 @@ csBulletColliderCapsule::csBulletColliderCapsule (float length, float radius, cs
   collSystem = sys;
   shape = new btCapsuleShapeZ (radius * collSystem->getInternalScale (),
     length * collSystem->getInternalScale ());
+  volume = PI * radius * radius * length 
+    + 1.333333f * PI * radius * radius * radius;
 }
 
 csBulletColliderCapsule::~csBulletColliderCapsule ()
@@ -193,6 +200,7 @@ csBulletColliderCone::csBulletColliderCone (float length, float radius, csBullet
   collSystem = sys;
   shape = new btConeShapeZ (radius * collSystem->getInternalScale (),
     length * collSystem->getInternalScale ());
+  volume = 0.333333f * PI * radius * radius * length;
 }
 
 csBulletColliderCone::~csBulletColliderCone ()
@@ -214,6 +222,7 @@ csBulletColliderPlane::csBulletColliderPlane (const csPlane3& plane,
   csVector3 normal = plane.GetNormal ();
   shape = new btStaticPlaneShape (btVector3 (normal.x,normal.y,normal.z),
     plane.D () * collSystem->getInternalScale ());
+  volume = FLT_MAX;
 }
 
 csBulletColliderPlane::~csBulletColliderPlane ()
@@ -225,10 +234,40 @@ csBulletColliderConvexMesh::csBulletColliderConvexMesh (iMeshWrapper* mesh, csBu
   : scfImplementationType (this), mesh (mesh)
 {
   collSystem = sys;
-  btTriangleMesh* triMesh = GenerateTriMeshData (mesh, collSystem->baseID, collSystem->colldetID, collSystem->getInternalScale ());
-  if (! triMesh)
+
+  csRef<iTriangleMesh> triMesh = FindColdetTriangleMesh (mesh, 
+    collSystem->baseID, collSystem->colldetID);
+
+  if (!triMesh)
     return;
-  btConvexShape* tmpConvexShape = new btConvexTriangleMeshShape (triMesh);
+
+  size_t triangleCount = triMesh->GetTriangleCount ();
+  size_t vertexCount = triMesh->GetVertexCount ();
+
+  if (vertexCount == 0)
+    return;
+
+  csTriangle *c_triangle = triMesh->GetTriangles ();
+  csVector3 *c_vertex = triMesh->GetVertices ();
+
+  volume = 0.0f;
+  csVector3 origin = c_vertex[c_triangle[0].a];
+  for (size_t i = 1; i < triangleCount; i++)
+  {
+    csVector3 a = c_vertex[c_triangle[i].a] - origin;
+    csVector3 b = c_vertex[c_triangle[i].b] - origin;
+    csVector3 c = c_vertex[c_triangle[i].c] - origin;
+    csVector3 d;
+    d.Cross (b, c);
+    volume += fabsl (a * d);
+  }
+
+  volume /= 6.0f;
+  
+  btTriangleMesh* btTriMesh = GenerateTriMeshData (mesh, collSystem->baseID, collSystem->colldetID, collSystem->getInternalScale ());
+  if (! btTriMesh)
+    return;
+  btConvexShape* tmpConvexShape = new btConvexTriangleMeshShape (btTriMesh);
   btShapeHull* hull = new btShapeHull (tmpConvexShape);
   btScalar margin = tmpConvexShape->getMargin ();
   hull->buildHull (margin);
@@ -243,7 +282,7 @@ csBulletColliderConvexMesh::csBulletColliderConvexMesh (iMeshWrapper* mesh, csBu
 
   delete tmpConvexShape;
   delete hull;
-  delete triMesh;
+  delete btTriMesh;
 }
 
 csBulletColliderConvexMesh::~csBulletColliderConvexMesh ()
@@ -251,59 +290,30 @@ csBulletColliderConvexMesh::~csBulletColliderConvexMesh ()
   delete shape;
 }
 
-float csBulletColliderConvexMesh::GetVolume ()
-{
-  csRef<iTriangleMesh> triMesh = FindColdetTriangleMesh (mesh, 
-    collSystem->baseID, collSystem->colldetID);
-
-  if (!triMesh)
-    return 0.0f;
-
-  size_t triangleCount = triMesh->GetTriangleCount ();
-  size_t vertexCount = triMesh->GetVertexCount ();
-
-  if (vertexCount == 0)
-    return 0.0f;
-
-  csTriangle *c_triangle = triMesh->GetTriangles ();
-  csVector3 *c_vertex = triMesh->GetVertices ();
-
-  float volume = 0.0f;
-  csVector3 origin = c_vertex[c_triangle[0].a];
-  for (size_t i = 1; i < triangleCount; i++)
-  {
-    csVector3 a = c_vertex[c_triangle[i].a] - origin;
-    csVector3 b = c_vertex[c_triangle[i].b] - origin;
-    csVector3 c = c_vertex[c_triangle[i].c] - origin;
-    csVector3 d;
-    d.Cross (b, c);
-    volume += fabsl (a * d);
-  }
-
-  return volume / 6.0f;
-}
-
 csBulletColliderConcaveMesh::csBulletColliderConcaveMesh (iMeshWrapper* mesh, csBulletSystem* sys)
   : scfImplementationType (this), mesh (mesh)
 {
+  btTransform tran;
+  btVector3 aabbmin (-1000, -1000, -1000);
+  btVector3 aabbmax (1000, 1000, 1000);
+
   collSystem = sys;
-  btTriangleMesh* triMesh = GenerateTriMeshData (mesh, collSystem->baseID, collSystem->colldetID, collSystem->getInternalScale ());
-  shape = new btBvhTriangleMeshShape (triMesh,true);
+  triMesh = GenerateTriMeshData (mesh, collSystem->baseID, collSystem->colldetID, collSystem->getInternalScale ());
+  btBvhTriangleMeshShape* treeShape = new btBvhTriangleMeshShape (triMesh,true);
+  treeShape->recalcLocalAabb();
+  shape = treeShape;
+  shape->getAabb (tran, aabbmin, aabbmax);
+
+  btVector3 aabbExtents = aabbmax - aabbmin;
+  aabbExtents *= collSystem->getInverseInternalScale ();
+
+  volume = aabbExtents.x() * aabbExtents.y() * aabbExtents.z();
 }
 
 csBulletColliderConcaveMesh::~csBulletColliderConcaveMesh ()
 {
   delete shape;
-}
-
-float csBulletColliderConcaveMesh::GetVolume ()
-{
-  // TODO: this is a really rough estimation
-  btVector3 center;
-  btScalar radius;
-  shape->getBoundingSphere (center, radius);
-  radius *= collSystem->getInverseInternalScale ();
-  return 1.333333f * PI * radius * radius * radius;
+  delete triMesh;
 }
 
 csBulletColliderConcaveMeshScaled::csBulletColliderConcaveMeshScaled (iColliderConcaveMesh* collider,
@@ -323,6 +333,8 @@ csBulletColliderConcaveMeshScaled::csBulletColliderConcaveMeshScaled (iColliderC
   }
   else
     csFPrintf  (stderr, "csBulletColliderConcaveMeshScaled: Original collider is not concave mesh.\n");
+
+  volume = originalCollider->GetVolume () * scale.x * scale.y * scale.z;
 }
 
 csBulletColliderConcaveMeshScaled::~csBulletColliderConcaveMeshScaled ()
@@ -337,8 +349,7 @@ HeightMapCollider::HeightMapCollider ( float* gridData,
                                    float internalScale)
                                    : btHeightfieldTerrainShape (gridWidth, gridHeight,
                                    gridData, 1.0f, minHeight, maxHeight,
-                                   1, PHY_FLOAT, false), cell (cell), 
-                                   heightData (gridData)
+                                   1, PHY_FLOAT, false), heightData (gridData)
 {
   localScale.setValue (gridSize[0] * internalScale / (gridWidth - 1),
     internalScale,
@@ -395,6 +406,8 @@ csBulletColliderTerrain::csBulletColliderTerrain (iTerrainSystem* terrain, float
     }
     unload = true;
   }
+
+  volume = FLT_MAX;
 }
 
 csBulletColliderTerrain::~csBulletColliderTerrain ()
@@ -433,7 +446,11 @@ void csBulletColliderTerrain::OnCellUnload (iTerrainCell *cell)
   for (size_t i = 0;i<colliders.GetSize ();i++)
     if (colliders[i]->cell == cell)
     {
+      delete colliders[i];
       colliders.DeleteIndexFast (i);
+      collSector->bulletWorld->removeRigidBody (bodies[i]);
+      delete bodies[i];
+      bodies.DeleteIndexFast (i);
       break;
     }
 }
@@ -471,6 +488,7 @@ void csBulletColliderTerrain::LoadCellToCollider (iTerrainCell *cell)
     heightData, gridWidth, gridHeight,
     cell->GetSize (), minHeight, maxHeight,
     collSystem->getInternalScale ());
+  colliderData->cell = cell;
 
   colliders.Push (colliderData);
 
@@ -484,14 +502,16 @@ void csBulletColliderTerrain::LoadCellToCollider (iTerrainCell *cell)
   btRigidBody* body = new btRigidBody (0, 0, colliderData, btVector3 (0, 0, 0));
   body->setWorldTransform (tr);
 
-  //collSystem->bulletWorld->addRigidBody (body);
-  //wait until add object to sector...
+  if (collSector)
+    collSector->bulletWorld->addRigidBody (body);
+  if (collBody)
+    body->setUserPointer (collBody);
   bodies.Push (body);
 }
 
 void csBulletColliderTerrain::RemoveRigidBodies ()
 {
-  for (size_t i = 0; i < bodies.GetSize (); i++)
+  for (size_t i = 0; i < colliders.GetSize (); i++)
   {
     collSector->bulletWorld->removeRigidBody (bodies[i]);
     /*delete bodies[i];
@@ -499,11 +519,18 @@ void csBulletColliderTerrain::RemoveRigidBodies ()
   }
 }
 
-void csBulletColliderTerrain::AddRigidBodies (csBulletSector* sector)
+void csBulletColliderTerrain::AddRigidBodies (csBulletSector* sector, csBulletCollisionObject* body)
 {
   collSector = sector;
+  collBody = body;
   for (size_t i = 0; i < bodies.GetSize (); i++)
+  {
+    iTerrainCell* cell = terrainSystem->GetCell (i);
+    if (cell->GetLoadState () != iTerrainCell::Loaded)
+      continue;
     sector->bulletWorld->addRigidBody (bodies[i]);
+    bodies[i]->setUserPointer (body);
+  }
 }
 }
 CS_PLUGIN_NAMESPACE_END (Bullet2)

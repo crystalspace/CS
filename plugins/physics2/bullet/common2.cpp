@@ -45,19 +45,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
     if (body->btObject)
       body->btObject->setInterpolationWorldTransform (initialTransform);
 
-    // update attached object
-    /*if (!body->moveCb)
-      return;*/
-
     csOrthoTransform tr = BulletToCS (initialTransform * inversePrincipalAxis,
 				      body->system->getInverseInternalScale ());
 
-    /*if (body->mesh)
-      body->moveCb->Execute (body->mesh, tr);
-    if (body->light)
-      body->moveCb->Execute (body->light, tr);
-    if (body->camera)
-      body->moveCb->Execute (body->camera, tr);*/
+    iMovable* movable = body->GetAttachedMovable ();
+    if (movable)
+    {
+      // Dont do anything if nothing has changed
+      // @@@ TODO Is comparing that transform efficient and correct?
+      if (movable->GetPosition () == tr.GetOrigin () &&
+        movable->GetTransform ().GetT2O () == tr.GetT2O ())
+        return;
+
+      // Update movable
+      movable->SetFullTransform (tr);
+      movable->UpdateMove ();
+    }
   }
 
   void csBulletMotionState::setWorldTransform (const btTransform& trans)
@@ -71,6 +74,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
     csOrthoTransform tr = BulletToCS (trans * inversePrincipalAxis,
 				      body->system->getInverseInternalScale ());
 
+    iMovable* movable = body->GetAttachedMovable ();
+    if (movable)
+    {
+      // Dont do anything if nothing has changed
+      // @@@ TODO Is comparing that transform efficient and correct?
+      if (movable->GetPosition () == tr.GetOrigin () &&
+        movable->GetTransform ().GetT2O () == tr.GetT2O ())
+        return;
+
+      // Update movable
+      movable->SetFullTransform (tr);
+      movable->UpdateMove ();
+    }
     /*if (body->mesh)
       body->moveCb->Execute (body->mesh, tr);
     if (body->light)

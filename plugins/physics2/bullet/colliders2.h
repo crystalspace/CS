@@ -39,10 +39,12 @@ csRef<iTriangleMesh> FindColdetTriangleMesh (iMeshWrapper* mesh,
 class csBulletCollider: public virtual CS::Collision2::iCollider
 {
   friend class csBulletCollisionObject;
+  friend class csBulletRigidBody;
 protected:
   btCollisionShape* shape;
   csVector3 scale;
   float margin;
+  float volume;
   csBulletSystem* collSystem;
 
 public:
@@ -53,7 +55,7 @@ public:
   virtual const csVector3& GetLocalScale () const {return scale;}
   virtual void SetMargin (float margin);
   virtual float GetMargin () const;
-  virtual float GetVolume () = 0;
+  virtual float GetVolume () const {return volume;}
 };
 
 class csBulletColliderBox: 
@@ -67,7 +69,6 @@ public:
   virtual ~csBulletColliderBox ();
   virtual ColliderType GetGeometryType () const {return ColliderType::COLLIDER_BOX;}
   virtual csVector3 GetBoxGeometry () {return boxSize;}
-  virtual float GetVolume () {return boxSize.x * boxSize.y * boxSize.z;}
 };
 
 class csBulletColliderSphere:
@@ -83,7 +84,6 @@ public:
   //Lulu: Implement this for sphere? Bullet do not support local scale of sphere.
   virtual void SetLocalScale (const csVector3& scale);
   virtual float GetSphereGeometry () {return radius;}
-  virtual float GetVolume () {return 1.333333f * PI * radius * radius * radius;}
 };
 
 class csBulletColliderCylinder:
@@ -99,7 +99,6 @@ public:
   virtual ~csBulletColliderCylinder ();
   virtual ColliderType GetGeometryType () const {return ColliderType::COLLIDER_CYLINDER;}
   virtual void GetCylinderGeometry (float& length, float& radius);
-  virtual float GetVolume () {return PI * radius * radius * length;}
 };
 
 class csBulletColliderCapsule: 
@@ -114,8 +113,6 @@ public:
   virtual ~csBulletColliderCapsule ();
   virtual ColliderType GetGeometryType () const {return ColliderType::COLLIDER_CAPSULE;}
   virtual void GetCapsuleGeometry (float& length, float& radius);
-  virtual float GetVolume () {return PI * radius * radius * length 
-    + 1.333333f * PI * radius * radius * radius;}
 };
 
 class csBulletColliderCone:
@@ -130,7 +127,6 @@ public:
   virtual ~csBulletColliderCone ();
   virtual ColliderType GetGeometryType () const {return ColliderType::COLLIDER_CONE;}
   virtual void GetConeGeometry (float& length, float& radius);
-  virtual float GetVolume () {return 0.333333f * PI * radius * radius * length;}
 };
 
 class csBulletColliderPlane:
@@ -144,7 +140,7 @@ public:
   virtual ~csBulletColliderPlane ();
   virtual ColliderType GetGeometryType () const {return ColliderType::COLLIDER_PLANE;}
   virtual csPlane3 GetPlaneGeometry () {return plane;}
-  virtual float GetVolume () {return FLT_MAX;}
+  virtual void SetLocalScale (const csVector3& scale) {}
 };
 
 class csBulletColliderConvexMesh:
@@ -155,13 +151,16 @@ class csBulletColliderConvexMesh:
   
 public:
   csBulletColliderConvexMesh (iMeshWrapper* mesh, csBulletSystem* sys);
-  csBulletColliderConvexMesh (btConvexHullShape* shape, csBulletSystem* sys) 
-    : scfImplementationType (this, sys)
-  {this->shape = shape;}
+  csBulletColliderConvexMesh (btConvexHullShape* shape, float volume, csBulletSystem* sys) 
+    : scfImplementationType (this)
+  {
+    this->shape = shape; 
+    collSystem = sys;
+    this->volume = volume;
+  }
   virtual ~csBulletColliderConvexMesh ();
   virtual ColliderType GetGeometryType () const {return ColliderType::COLLIDER_CONVEX_MESH;}
   virtual iMeshWrapper* GetMesh () {return mesh;}
-  virtual float GetVolume ();
 };
 
 class csBulletColliderConcaveMesh:
@@ -169,7 +168,7 @@ class csBulletColliderConcaveMesh:
   csBulletCollider, CS::Collision2::iColliderConcaveMesh>
 {
   friend class csBulletColliderConcaveMeshScaled;
-
+  btTriangleMesh* triMesh;
   iMeshWrapper* mesh;
 
 public:
@@ -177,7 +176,6 @@ public:
   virtual ~csBulletColliderConcaveMesh ();
   virtual ColliderType GetGeometryType () const {return ColliderType::COLLIDER_CONCAVE_MESH;}
   virtual iMeshWrapper* GetMesh () {return mesh;}
-  virtual float GetVolume ();
 };
 
 class csBulletColliderConcaveMeshScaled:
@@ -192,13 +190,11 @@ public:
   virtual ColliderType GetGeometryType () const {return ColliderType::COLLIDER_CONCAVE_MESH_SCALED;}
   virtual CS::Collision2::iColliderConcaveMesh* GetCollider () 
   {return dynamic_cast<CS::Collision2::iColliderConcaveMesh*>(originalCollider);}
-  virtual float GetVolume () {return originalCollider->GetVolume () * scale.x * scale.y * scale.z;}
 };
 
 //TODO: modify the terrain collider.
 class HeightMapCollider : public btHeightfieldTerrainShape
 {
-  
 public:
   iTerrainCell* cell;
   btVector3 localScale;
@@ -226,6 +222,7 @@ class csBulletColliderTerrain:
   csArray<btRigidBody*> bodies;
   csBulletSector* collSector;
   csBulletSystem* collSystem;
+  csBulletCollisionObject* collBody;
   iTerrainSystem* terrainSystem;
   csOrthoTransform terrainTransform;
   float minimumHeight;
@@ -248,11 +245,10 @@ public:
   virtual void OnCellLoad (iTerrainCell *cell);
   virtual void OnCellPreLoad (iTerrainCell *cell);
   virtual void OnCellUnload (iTerrainCell *cell);
-  virtual float GetVolume () {return FLT_MAX;}
 
   btRigidBody* GetBulletObject (size_t index) {return bodies[index];}
   void RemoveRigidBodies ();
-  void AddRigidBodies (csBulletSector* sector);
+  void AddRigidBodies (csBulletSector* sector, csBulletCollisionObject* body);
 };
 }
 CS_PLUGIN_NAMESPACE_END(Bullet2)

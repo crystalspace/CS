@@ -206,18 +206,6 @@ void csBulletCollisionObject::RebuildObject ()
     RemoveBulletObject ();
   }
 
-  btCollisionShape* shape;
-  if (compoundShape == NULL)
-  {
-    //only one collider.
-    shape = colliders[0]->shape;
-  }
-  else if (shapeChanged)
-  {
-    //use compound shape.
-    shape = compoundShape;
-  }
-
   if (wasInWorld)
     AddBulletObject ();
 }
@@ -325,15 +313,27 @@ void csBulletCollisionObject::AddBulletObject ()
   {
     if (!isTerrain)
     {
+      btCollisionShape* shape;
+      if (compoundShape)
+        shape = compoundShape;
+      else
+        shape = colliders[0]->shape;
+
+      btTransform trans;
+      motionState->getWorldTransform (trans);
+      trans = trans * motionState->inversePrincipalAxis;
+      delete motionState;
+      motionState = new csBulletMotionState (this, trans, relaTransforms[0]);
+
       btVector3 localInertia (0.0f, 0.0f, 0.0f);
       btRigidBody::btRigidBodyConstructionInfo infos (0.0, motionState,
-        compoundShape, localInertia);
+        shape, localInertia);
       btObject = new btRigidBody (infos);
       btObject->setUserPointer (static_cast<iCollisionObject*> (this));
-      sector->bulletWorld->addRigidBody (dynamic_cast<btRigidBody*>(btObject));
+      sector->bulletWorld->addRigidBody (btRigidBody::upcast(btObject));
     }
     else
-      dynamic_cast<csBulletColliderTerrain*> (colliders[0])->AddRigidBodies (sector);
+      dynamic_cast<csBulletColliderTerrain*> (colliders[0])->AddRigidBodies (sector, this);
   }
   else if (type == COLLISION_OBJECT_GHOST)
   {
