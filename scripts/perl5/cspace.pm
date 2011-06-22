@@ -15702,6 +15702,13 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *ComputeTangents = *cspacec::iAnimatedMeshFactory_ComputeTangents;
 *SetBoneBoundingBox = *cspacec::iAnimatedMeshFactory_SetBoneBoundingBox;
 *GetBoneBoundingBox = *cspacec::iAnimatedMeshFactory_GetBoneBoundingBox;
+*AddSubset = *cspacec::iAnimatedMeshFactory_AddSubset;
+*AddSubsetVertex = *cspacec::iAnimatedMeshFactory_AddSubsetVertex;
+*GetSubsetVertex = *cspacec::iAnimatedMeshFactory_GetSubsetVertex;
+*GetSubsetVertexCount = *cspacec::iAnimatedMeshFactory_GetSubsetVertexCount;
+*GetTopSubsetID = *cspacec::iAnimatedMeshFactory_GetTopSubsetID;
+*HasSubset = *cspacec::iAnimatedMeshFactory_HasSubset;
+*ClearSubsets = *cspacec::iAnimatedMeshFactory_ClearSubsets;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -15813,6 +15820,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetVertexOffsets = *cspacec::iAnimatedMeshMorphTarget_GetVertexOffsets;
 *Invalidate = *cspacec::iAnimatedMeshMorphTarget_Invalidate;
 *GetName = *cspacec::iAnimatedMeshMorphTarget_GetName;
+*AddSubset = *cspacec::iAnimatedMeshMorphTarget_AddSubset;
+*GetSubset = *cspacec::iAnimatedMeshMorphTarget_GetSubset;
+*GetSubsetCount = *cspacec::iAnimatedMeshMorphTarget_GetSubsetCount;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -23335,6 +23345,7 @@ bless $iSCF_SCF, cspace::iSCF;
 *csInvalidStringID = *cspacec::csInvalidStringID;
 *CS_SNDSYS_STREAM_UNKNOWN_LENGTH = *cspacec::CS_SNDSYS_STREAM_UNKNOWN_LENGTH;
 *InvalidShaderVarStringID = *cspacec::InvalidShaderVarStringID;
+*InvalidSubsetID = *cspacec::InvalidSubsetID;
 
   use Carp;
 
