@@ -160,22 +160,6 @@ bool SelfShadowDemo::CreateScene ()
   if (!loader->LoadMapFile (world))
     ReportError("Error couldn't load level!");
 
-  if (!strcmp(world, "world_grass"))
-  {
-    csRef<iMeshWrapper> mesh =
-      engine->FindMeshObject("Hair");
-    if (!mesh)
-      ReportError ("Can't find Hair mesh object!");
-
-    // scale isn't exported from blender
-    csMatrix3 matrix;
-    matrix = csMatrix3(	
-      0.3, 0, 0,
-      0, 0.3, 0,
-      0, 0, 0.3);
-    mesh->GetMovable()->SetTransform(matrix);
-  }
-
   engine->Prepare ();
 
   // Setup the camera

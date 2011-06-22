@@ -24,8 +24,7 @@
 #include "ivideo/shader/shader.h"
 
 #include "csutil/cfgacc.h"
-
-#include "cstool/meshfilter.h"
+#include "crystalspace.h"
 
 #include "csplugincommon/rendermanager/operations.h"
 #include "csplugincommon/rendermanager/rendertree.h"
@@ -56,8 +55,6 @@ namespace CS
         int numParts;
         PersistentData& persist;
         float* splitDists;
-        csVector3 nearTrans;
-        csVector3 farTrans;
         CS::RenderManager::RenderView* rview;
 
         SingleRenderLayer depthRenderLayer;
@@ -72,22 +69,10 @@ namespace CS
 
           // linear interpolation
 
-          float _near = SMALL_Z;
-          float _far = persist.farZ;
-
           splitDists[0] = 11;
           splitDists[1] = 13.5;
           splitDists[2] = 14.5;
           splitDists[3] = 16;
-
-          nearTrans = csVector3(0, 2.5, 0);
-          farTrans = csVector3(0, -1.125, 0);
-
-          for (int i = 0; i < numParts ; i ++)
-          {
-//             splitDists[i] = _near + ( (_far - _near) * (i + 1) ) / numParts;
-//             csPrintf("%f\n", splitDists[i]);
-          }
         }
 
         ~ViewSetup() { delete[] splitDists; }
@@ -158,12 +143,6 @@ namespace CS
           superFrustum.frustums =
             new typename SuperFrustum::Frustum[superFrustum.actualNumParts];
 
-          // setup split dists
-          float _near = (light->GetMovable()->GetPosition() - 
-            viewSetup.nearTrans).Norm();
-          float _far = (light->GetMovable()->GetPosition() - 
-            viewSetup.farTrans).Norm();
-
           for (int i = 0; i < superFrustum.actualNumParts; i++)
           {
             typename SuperFrustum::Frustum& lightFrustum =
@@ -196,10 +175,6 @@ namespace CS
               lightFrustum.textureSVs[target->attachment] =
                 lightVarsHelper.CreateTempSV (target->svName);
             }
-
-            // setup split dist
-            viewSetup.splitDists[i] = _near + (_far - _near) * 
-              ((float)i / (superFrustum.actualNumParts - 1));
           }
         }
 
@@ -216,6 +191,39 @@ namespace CS
           LightFrustums& lightFrustums = *lightFrustumsPtr;
 
           typename RenderTree::ContextNode& context = meshNode->GetOwner();
+          CS::RenderManager::RenderView* rview = context.renderView;
+
+          float _near = FLT_MAX;
+          float _far = FLT_MIN;
+
+          // setup split dists
+          for (int i = 0 ; i < meshNode->meshes.GetSize(); i ++)
+          {
+            csVector3 meshPosition = 
+              meshNode->meshes.Get(i).meshWrapper->GetMovable()->GetPosition();
+            csRef<csRenderBufferHolder> buffers = 
+              meshNode->meshes.Get(i).renderMesh->buffers;
+            iRenderBuffer* positions = buffers->GetRenderBuffer (CS_BUFFER_POSITION);
+            csVertexListWalker<float, csVector3> positionWalker (positions);
+            csVector3 lightPositin = light->GetMovable()->GetPosition();
+
+            // only take into account translucent objects - temp hack
+            if (positions->GetElementCount() == 4) continue;
+            // Iterate on all vertices
+            for (size_t i = 0; i < positionWalker.GetSize (); i++)
+            {
+              float distance = (lightPositin - 
+                (*positionWalker) - meshPosition).Norm ();
+
+              if (distance < _near)
+                _near = distance;
+
+              if (distance > _far)
+                _far = distance;
+    
+              ++positionWalker;
+            }
+          }
 
           // here should be lightFrustums.frustums.GetSize()
           for (size_t l = 0; l < 1; l++)
@@ -224,9 +232,12 @@ namespace CS
             
             for (int frustNum = 0 ; frustNum < superFrust.actualNumParts ; frustNum ++)
             {
+
+              viewSetup.splitDists[frustNum] = _near + (_far - _near) * 
+                ((float)frustNum / (superFrust.actualNumParts - 1));
+
               const typename SuperFrustum::Frustum& lightFrust = 
                 superFrust.frustums[frustNum];
-              CS::RenderManager::RenderView* rview = context.renderView;
               csRef<CS::RenderManager::RenderView> newRenderView;
               newRenderView = renderTree.GetPersistentData().renderViews.CreateRenderView ();
               newRenderView->SetEngine (rview->GetEngine ());
@@ -241,7 +252,7 @@ namespace CS
               }
 
               lightFrust.splitDistsSV->SetValue(viewSetup.splitDists[frustNum]);
-//               csPrintf("%f\n", viewSetup.splitDists[frustNum]);
+              csPrintf("%f\n", viewSetup.splitDists[frustNum]);
 
               int shadowMapSize = viewSetup.persist.shadowMapRes;
 

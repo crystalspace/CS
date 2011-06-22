@@ -30,7 +30,7 @@ struct ShadowShadowMapDepth : ShadowShadowMap
   sampler2D shadowMap;
   float bias;
   float gradient;
-
+  
   void InitVP (int lightNum, float4 surfPositionWorld,
                float3 normWorld,
                out float4 vp_shadowMapCoords,
@@ -59,6 +59,8 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     //float3 viewDirShadow = normalize (mul (shadowMapTF, float4 (0, 0, -1, 0)).xyz);
     vp_gradientApprox = 1-saturate (dot (normShadow, float3 (0, 0, -1)));
     
+    vp_gradientApprox = view_pos.z;
+    
     /* @@@ FIXME: This should prolly be:
     float3 viewDirShadow = -normalize (shadowMapCoords.xyz);
     vp_gradientApprox = 1-saturate (dot (normShadow, viewDirShadow));
@@ -86,21 +88,21 @@ struct ShadowShadowMapDepth : ShadowShadowMap
       return 0;
   
     if (i == 0)
-      return tex2D(lightPropsSM.shadowMap[0], position);
+      return tex2D(lightPropsSM.shadowMap[0], position).r;
     if (i == 1)
-      return tex2D(lightPropsSM.shadowMap[1], position);
+      return tex2D(lightPropsSM.shadowMap[1], position).r;
     if (i == 2)
-      return tex2D(lightPropsSM.shadowMap[2], position);
+      return tex2D(lightPropsSM.shadowMap[2], position).r;
     if (i == 3)
-      return tex2D(lightPropsSM.shadowMap[3], position);	
+      return tex2D(lightPropsSM.shadowMap[3], position).r;	
     if (i == 4)
-      return tex2D(lightPropsSM.shadowMap[4], position);	
+      return tex2D(lightPropsSM.shadowMap[4], position).r;	
     if (i == 5)
-      return tex2D(lightPropsSM.shadowMap[5], position);	
+      return tex2D(lightPropsSM.shadowMap[5], position).r;	
     if (i == 6)
-      return tex2D(lightPropsSM.shadowMap[6], position);	
+      return tex2D(lightPropsSM.shadowMap[6], position).r;	
     if (i == 7)
-      return tex2D(lightPropsSM.shadowMap[7], position);
+      return tex2D(lightPropsSM.shadowMap[7], position).r;
       
     return 0;
   }
@@ -112,19 +114,20 @@ struct ShadowShadowMapDepth : ShadowShadowMap
 	
     int numSplits = lightPropsSM.shadowMapNumSplits;
     float farZ = lightPropsSM.shadowMapFarZ;
-
+    float compareDepth = (1-shadowMapCoordsBiased.z) - bias;
+    
     float previousSplit = 0, nextSplit;
     
     for (int i = 0 ; i <= numSplits ; i ++)
     {
       nextSplit = lightPropsSM.splitDists[i];
       
-      if (abs(shadowMapCoords.z) < nextSplit || i == numSplits)
+      if (gradient < nextSplit || i == numSplits)
       {
-        float previousMap = getMapValue(i - 2, shadowMapCoordsBiased.xy);
-        float nextMap = getMapValue(i - 1, shadowMapCoordsBiased.xy);
+        float previousMap = getMapValue(i - 1, shadowMapCoordsBiased.xy);
+        float nextMap = getMapValue(i, shadowMapCoordsBiased.xy);
    
-        inLight = 1 - lerp(nextMap, previousMap, (float) (nextSplit + shadowMapCoords.z) 
+        inLight = 1 - lerp(nextMap, previousMap, (float) (nextSplit - gradient) 
           / (nextSplit - previousSplit) );
         break;
       }

@@ -22,7 +22,7 @@
     </material>		
   </materials>
   <sounds/>
-  <library>factories/HairFact</library>
+  <library>factories/GrassFact</library>
   <library>factories/PlaneFact</library>
   <triggers/>
   <sector name='Scene'>
@@ -30,7 +30,7 @@
     <meshobj name='Hair'>
       <plugin>genmesh</plugin>
       <params>
-        <factory>HairFact</factory>
+        <factory>GrassFact</factory>
       </params>
       <zuse/>
       <move>
