@@ -24,7 +24,9 @@
     <input name="positionProj" type="position4_screen" />
     
     <block location="cg:fragmentMain">
-	  float value = surface.a;
+      float value = surface.a;
+      if (surface.a == 1)
+        value = 0;
       output = float4(value);
     </block>
     
