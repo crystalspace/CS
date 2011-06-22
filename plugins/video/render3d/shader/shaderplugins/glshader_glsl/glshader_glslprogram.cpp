@@ -309,6 +309,10 @@ csVertexAttrib csShaderGLSLProgram::ResolveBufferDestination (const char* bindin
     {
       dest = CS_VATTRIB_PRIMARY_COLOR;
     }
+    else if (strcasecmp (binding, "gl_SecondaryColor") == 0)
+    {
+      dest = CS_VATTRIB_SECONDARY_COLOR;
+    }
     else if (strcasecmp (binding, "gl_Normal") == 0)
     {
       dest = CS_VATTRIB_NORMAL;
