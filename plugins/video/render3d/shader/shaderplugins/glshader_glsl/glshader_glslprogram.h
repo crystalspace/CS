@@ -41,6 +41,8 @@ private:
 
   bool validProgram;                // what for
 
+  csArray<csString> tuBindings;
+
   csRef<iDataBuffer> vpSource;
   csRef<iDataBuffer> fpSource;
   // csRef<iDataBuffer> gpSource;

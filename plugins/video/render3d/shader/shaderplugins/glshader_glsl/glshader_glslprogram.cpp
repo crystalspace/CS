@@ -336,6 +336,19 @@ csVertexAttrib csShaderGLSLProgram::ResolveBufferDestination (const char* bindin
 
 int csShaderGLSLProgram::ResolveTU (const char* binding)
 {
-  // TODO
-  return 0;
+  for (unsigned int i = 0; i < tuBindings.GetSize (); i++)
+  {
+    if (strcasecmp (binding, tuBindings[i].GetData ()) == 0)
+      return i;
+  }
+
+  // Binding was not found, add it
+  int tu;
+  const csGLExtensionManager* ext = shaderPlug->ext;
+
+  tuBindings.Push (csString (binding));
+  tu = tuBindings.GetSize () - 1;
+  ext->glUniform1iARB (ext->glGetUniformLocationARB (program_id, binding), tu);
+
+  return tu;
 }
