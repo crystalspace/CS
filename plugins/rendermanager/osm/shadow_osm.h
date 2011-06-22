@@ -241,7 +241,7 @@ namespace CS
               }
 
               lightFrust.splitDistsSV->SetValue(viewSetup.splitDists[frustNum]);
-              csPrintf("%f\n", viewSetup.splitDists[frustNum]);
+//               csPrintf("%f\n", viewSetup.splitDists[frustNum]);
 
               int shadowMapSize = viewSetup.persist.shadowMapRes;
 
@@ -317,9 +317,9 @@ namespace CS
 
           // Sort the mesh lists  
           {
-            StandardMeshSorter<RenderTree> mySorter (rview->GetEngine ());
-            mySorter.SetupCameraLocation (rview->GetCamera ()->GetTransform ().GetOrigin ());
-            ForEachMeshNode (context, mySorter);
+//             StandardMeshSorter<RenderTree> mySorter (rview->GetEngine ());
+//             mySorter.SetupCameraLocation (rview->GetCamera ()->GetTransform ().GetOrigin ());
+//             ForEachMeshNode (context, mySorter);
           }
 
           // After sorting, assign in-context per-mesh indices
