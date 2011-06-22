@@ -95,6 +95,11 @@ void csGLShader_GLSL::Open()
     ext->InitGL_ARB_fragment_shader ();
     ext->InitGL_ARB_shader_objects ();
     ext->InitGL_ARB_shading_language_100 ();
+    if (ext->CS_GL_ARB_vertex_shader &&
+        ext->CS_GL_ARB_fragment_shader &&
+        ext->CS_GL_ARB_shader_objects &&
+        ext->CS_GL_ARB_shading_language_100)
+      enable = true;
   } else return;
 
   isOpen = true;
@@ -110,10 +115,8 @@ bool csGLShader_GLSL::Initialize(iObjectRegistry* reg)
   csRef<iGraphics3D> r = csQueryRegistry<iGraphics3D> (object_reg);
 
   csRef<iFactory> f = scfQueryInterfaceSafe<iFactory> (r);
-  if (f != 0 && strcmp ("crystalspace.graphics3d.opengl", 
-      f->QueryClassID ()) == 0)
-    enable = true;
-  else
+  if (f == 0 || strcmp ("crystalspace.graphics3d.opengl", 
+      f->QueryClassID ()) != 0)
     return false;
 
   r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
