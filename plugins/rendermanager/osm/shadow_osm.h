@@ -105,7 +105,10 @@ namespace CS
         typedef csRefArray<SuperFrustum> LightFrustumsArray;
         struct LightFrustums
         {
+          uint setupFrame;
           LightFrustumsArray frustums;
+
+          LightFrustums() : setupFrame (~0) {}
         };
         csHash<LightFrustums, csRef<iCamera> > lightFrustumsHash;
 
@@ -190,6 +193,12 @@ namespace CS
 
           LightFrustums& lightFrustums = *lightFrustumsPtr;
 
+          uint currentFrame = viewSetup.rview->GetCurrentFrameNumber();
+          if (lightFrustums.setupFrame
+            == currentFrame)
+            return;
+          lightFrustums.setupFrame = currentFrame;
+
           typename RenderTree::ContextNode& context = meshNode->GetOwner();
           CS::RenderManager::RenderView* rview = context.renderView;
 
@@ -207,8 +216,18 @@ namespace CS
             csVertexListWalker<float, csVector3> positionWalker (positions);
             csVector3 lightPositin = light->GetMovable()->GetPosition();
 
-            // only take into account translucent objects - temp hack
-            if (positions->GetElementCount() == 4) continue;
+            // only take into account translucent objects
+            if ( meshNode->meshes.Get(i).meshWrapper->GetMeshObject()->GetMixMode() !=
+              CS_FX_ALPHA)
+              continue;
+
+//             csPrintf("%d\n", meshNode->meshes.Get(i).meshWrapper->GetMeshObject()->GetMixMode() );
+
+//             if(positionWalker.GetSize() == 4)
+//               continue;
+
+//             csPrintf("%d\n", positionWalker.GetSize ());
+
             // Iterate on all vertices
             for (size_t i = 0; i < positionWalker.GetSize (); i++)
             {
@@ -226,6 +245,7 @@ namespace CS
           }
 
           // here should be lightFrustums.frustums.GetSize()
+//           csPrintf("%d\n", lightFrustums.frustums.GetSize());
           for (size_t l = 0; l < 1; l++)
           {
             const SuperFrustum& superFrust = *(lightFrustums.frustums[l]);
@@ -252,7 +272,7 @@ namespace CS
               }
 
               lightFrust.splitDistsSV->SetValue(viewSetup.splitDists[frustNum]);
-              csPrintf("%f\n", viewSetup.splitDists[frustNum]);
+//               csPrintf("%f\n", viewSetup.splitDists[frustNum]);
 
               int shadowMapSize = viewSetup.persist.shadowMapRes;
 
@@ -458,6 +478,8 @@ namespace CS
         typename CachedLightData::SuperFrustum& superFrust =
           *(lightFrustums[subLightNum]);
 
+//         csPrintf("sub %d\n", subLightNum);
+
         uint spreadFlags = 0;
         int s = 0;
 
@@ -492,6 +514,7 @@ namespace CS
           lightStacks[lightNum]);
         superFrust.farZSV->SetValue(viewSetup.persist.farZ);
 
+        // here might be number of lights
         return spreadFlags;
       }
 
