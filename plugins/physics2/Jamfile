@@ -1,3 +1,5 @@
 SubDir TOP plugins physics2 ;
 
 SubInclude TOP plugins physics2 bullet ;
+
+SubInclude TOP plugins physics2 softanim ;

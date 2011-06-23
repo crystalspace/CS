@@ -1,0 +1,8 @@
+SubDir TOP plugins physics2 softanim ;
+
+if $(BULLET.AVAILABLE) = "yes"
+{
+  Description softanim2 : "Generic animation of a genmesh from the simulation of soft bodies" ;
+  Plugin softanim2 : [ Wildcard *.cpp *.h ] ;
+  LinkWith softanim2 : crystalspace ;
+}

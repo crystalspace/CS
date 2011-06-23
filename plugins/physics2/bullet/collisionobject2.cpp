@@ -323,7 +323,8 @@ void csBulletCollisionObject::AddBulletObject ()
       motionState->getWorldTransform (trans);
       trans = trans * motionState->inversePrincipalAxis;
       delete motionState;
-      motionState = new csBulletMotionState (this, trans, relaTransforms[0]);
+      btTransform pricipalAxis = CSToBullet (relaTransforms[0], system->getInternalScale ());
+      motionState = new csBulletMotionState (this, trans, pricipalAxis);
 
       btVector3 localInertia (0.0f, 0.0f, 0.0f);
       btRigidBody::btRigidBodyConstructionInfo infos (0.0, motionState,

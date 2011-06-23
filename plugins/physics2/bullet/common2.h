@@ -122,7 +122,7 @@ public:
   virtual ~csBulletDebugDraw () { }
 
   virtual void drawLine (const btVector3& from, const btVector3& to,
-      const btVector3& color)
+    const btVector3& color)
   {
     csBulletDebugLine l;
     l.p1.Set (BulletToCS (from, inverseInternalScale));
@@ -132,13 +132,23 @@ public:
   }
 
   virtual void drawContactPoint (const btVector3 &PointOnB,
-				 const btVector3 &normalOnB,
-				 btScalar distance, int lifeTime,
-				 const btVector3 &color)
-  {}
+    const btVector3 &normalOnB,
+    btScalar distance, int lifeTime,
+    const btVector3 &color)
+  {
+    btVector3 to = PointOnB+normalOnB*1;//distance;
+    const btVector3& from = PointOnB;
+    csBulletDebugLine l;
+    l.p1.Set (BulletToCS (from, inverseInternalScale));
+    l.p2.Set (BulletToCS (to, inverseInternalScale));
+    l.color.Set (color.getX (), color.getY (), color.getZ ());
+    lines.Push (l);
+  }
 
   virtual void reportErrorWarning (const char *warningString)
-  {}
+  {
+    csFPrintf (stderr, warningString);
+  }
 
   virtual void draw3dText (const btVector3 &location, const char *textString)
   {}
@@ -160,13 +170,13 @@ public:
       CS::Physics2::Bullet2::DEBUG_NOTHING;
     if (this->mode & DBG_DrawWireframe)
       mode = (CS::Physics2::Bullet2::DebugMode)
-	(mode | CS::Physics2::Bullet2::DEBUG_COLLIDERS);
+      (mode | CS::Physics2::Bullet2::DEBUG_COLLIDERS);
     if (this->mode & DBG_DrawAabb)
       mode = (CS::Physics2::Bullet2::DebugMode)
-	(mode | CS::Physics2::Bullet2::DEBUG_AABB);
+      (mode | CS::Physics2::Bullet2::DEBUG_AABB);
     if (this->mode & DBG_DrawConstraints)
       mode = (CS::Physics2::Bullet2::DebugMode)
-	(mode | CS::Physics2::Bullet2::DEBUG_JOINTS);
+      (mode | CS::Physics2::Bullet2::DEBUG_JOINTS);
     return mode;
   }
 
@@ -204,15 +214,14 @@ public:
     {
       csBulletDebugLine& l = lines[i];
       int color = g2d->FindRGB (int (l.color.red * 255),
-				int (l.color.green * 255),
-				int (l.color.blue * 255));
+        int (l.color.green * 255),
+        int (l.color.blue * 255));
       g3d->DrawLine (tr_w2c * l.p1, tr_w2c * l.p2, fov, color);
     }
 
     lines.Empty ();
   }
 };
-
 //------------------------ csBulletMotionState ----------------------
 
 class csBulletMotionState : public btDefaultMotionState
