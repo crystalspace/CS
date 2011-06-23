@@ -265,6 +265,12 @@ namespace CS
 
               CS::Math::Matrix4 matrix = rview->GetCamera()->GetProjectionMatrix();
 
+              float lightCutoff = viewSetup.splitDists[frustNum];
+              float lightNear = SMALL_Z;
+
+              matrix = CS::Math::Projections::Ortho (lightCutoff, 
+                -lightCutoff, lightCutoff, -lightCutoff, -lightCutoff, -lightNear);
+
               for (int i = 0; i < 4; i++)
               {
                 csShaderVariable* item = lightFrust.shadowMapProjectSV->GetArrayElement (i);
@@ -280,8 +286,8 @@ namespace CS
                 newRenderView->GetEngine()->CreateCustomMatrixCamera();
               newRenderView->SetCamera (shadowViewCam->GetCamera());
 
-              csPlane3 farplane(0,0,-1,viewSetup.splitDists[frustNum]);
-              shadowViewCam->GetCamera()->SetFarPlane(&farplane);
+//               csPlane3 farplane(0,0,-1,viewSetup.splitDists[frustNum]);
+//               shadowViewCam->GetCamera()->SetFarPlane(&farplane);
 
               shadowViewCam->SetProjectionMatrix (matrix);
               shadowViewCam->GetCamera()->SetTransform (light->GetMovable()->GetTransform());

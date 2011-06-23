@@ -53,6 +53,7 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     shadowMapCoords = mul (shadowMapTF, view_pos);
     
     vp_shadowMapCoords = shadowMapCoords;
+    vp_shadowMapCoords = view_pos;
     
     float3 normL = mul(lightTransformInv, float4 (normWorld, 0)).xyz;
     float3 normShadow = normalize (mul (shadowMapTF, float4 (normL, 0)).xyz);
@@ -110,30 +111,51 @@ struct ShadowShadowMapDepth : ShadowShadowMap
   half GetVisibility()
   {
     float3 shadowMapCoordsBiased = (float3(0.5)*shadowMapCoordsProj.xyz) + float3(0.5);    
-    half inLight;
+    half inLight = 1;
 	
     int numSplits = lightPropsSM.shadowMapNumSplits;
-    float farZ = lightPropsSM.shadowMapFarZ;
-    float compareDepth = (1-shadowMapCoordsBiased.z) - bias;
-    
+
     float previousSplit = 0, nextSplit;
-    
+  
     for (int i = 0 ; i <= numSplits ; i ++)
     {
       nextSplit = lightPropsSM.splitDists[i];
       
       if (gradient < nextSplit || i == numSplits)
       {
-        float previousMap = getMapValue(i - 1, shadowMapCoordsBiased.xy);
-        float nextMap = getMapValue(i, shadowMapCoordsBiased.xy);
+        float4x4 flipY;
+        flipY[0] = float4 (1, 0, 0, 0);
+        flipY[1] = float4 (0, -1, 0, 0);
+        flipY[2] = float4 (0, 0, 1, 0);
+        flipY[3] = float4 (0, 0, 0, 1);        
+        
+        float4x4 shadowMapTFNext = mul (flipY, lightPropsSM.shadowMapTF[i]);
+        float4 shadowMapCoordsNext = mul (shadowMapTFNext, shadowMapCoords);      
+        float4 shadowMapCoordsProjNext = shadowMapCoordsNext;
+        shadowMapCoordsProjNext.xyz /= shadowMapCoordsProjNext.w;      
+        float3 shadowMapCoordsBiasedNext = 
+          (float3(0.5)*shadowMapCoordsProjNext.xyz) + float3(0.5);
+
+        float4x4 shadowMapTFPrev = mul (flipY, lightPropsSM.shadowMapTF[i - 1]);
+        float4 shadowMapCoordsPrev = mul (shadowMapTFPrev, shadowMapCoords);      
+        float4 shadowMapCoordsProjPrev = shadowMapCoordsPrev;
+        shadowMapCoordsProjPrev.xyz /= shadowMapCoordsProjPrev.w;      
+        float3 shadowMapCoordsBiasedPrev = 
+          (float3(0.5)*shadowMapCoordsProjPrev.xyz) + float3(0.5);          
+          
+        float previousMap = getMapValue(i - 1, shadowMapCoordsBiasedPrev.xy);
+        float nextMap = getMapValue(i, shadowMapCoordsBiasedNext.xy);
    
-        inLight = 1 - lerp(nextMap, previousMap, (float) (nextSplit - gradient) 
+        inLight = 1 - lerp(previousMap, nextMap, (float) (gradient - previousSplit) 
           / (nextSplit - previousSplit) );
+          
+        inLight = 1 - nextMap;  
+          
         break;
       }
       previousSplit = nextSplit;
     }
-
+    
     return inLight;
   }
 };
