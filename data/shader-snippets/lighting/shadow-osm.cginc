@@ -119,7 +119,8 @@ struct ShadowShadowMapDepth : ShadowShadowMap
   
     for (int i = 0 ; i <= numSplits ; i ++)
     {
-      nextSplit = lightPropsSM.splitDists[i];
+      previousSplit = lightPropsSM.splitDists[i];
+      nextSplit = lightPropsSM.splitDists[i + 1];
       
       if (gradient < nextSplit || i == numSplits)
       {
@@ -128,13 +129,6 @@ struct ShadowShadowMapDepth : ShadowShadowMap
         flipY[1] = float4 (0, -1, 0, 0);
         flipY[2] = float4 (0, 0, 1, 0);
         flipY[3] = float4 (0, 0, 0, 1);        
-        
-        float4x4 shadowMapTFNext = mul (flipY, lightPropsSM.shadowMapTF[i + 1]);
-        float4 shadowMapCoordsNext = mul (shadowMapTFNext, shadowMapCoords);      
-        float4 shadowMapCoordsProjNext = shadowMapCoordsNext;
-        shadowMapCoordsProjNext.xyz /= shadowMapCoordsProjNext.w;      
-        float3 shadowMapCoordsBiasedNext = 
-          (float3(0.5)*shadowMapCoordsProjNext.xyz) + float3(0.5);
 
         float4x4 shadowMapTFPrev = mul (flipY, lightPropsSM.shadowMapTF[i]);
         float4 shadowMapCoordsPrev = mul (shadowMapTFPrev, shadowMapCoords);      
@@ -142,12 +136,23 @@ struct ShadowShadowMapDepth : ShadowShadowMap
         shadowMapCoordsProjPrev.xyz /= shadowMapCoordsProjPrev.w;      
         float3 shadowMapCoordsBiasedPrev = 
           (float3(0.5)*shadowMapCoordsProjPrev.xyz) + float3(0.5);          
+        
+        float4x4 shadowMapTFNext = mul (flipY, lightPropsSM.shadowMapTF[i + 1]);
+        float4 shadowMapCoordsNext = mul (shadowMapTFNext, shadowMapCoords);      
+        float4 shadowMapCoordsProjNext = shadowMapCoordsNext;
+        shadowMapCoordsProjNext.xyz /= shadowMapCoordsProjNext.w;      
+        float3 shadowMapCoordsBiasedNext = 
+          (float3(0.5)*shadowMapCoordsProjNext.xyz) + float3(0.5);
           
         float previousMap = getMapValue(i, shadowMapCoordsBiasedPrev.xy);
-        float nextMap = getMapValue(i + 1, shadowMapCoordsBiasedNext.xy);
+        float nextMap = getMapValue(i + 1, shadowMapCoordsBiasedNext.xy);   
    
-        inLight = 1 - lerp(previousMap, nextMap, (float) (gradient - previousSplit) 
+        inLight = lerp(1 - previousMap, 1 - nextMap, (float) (gradient - previousSplit) 
           / (nextSplit - previousSplit) );
+          
+        inLight = inLight * (i != numSplits) + (1 - previousMap) * (i == numSplits) ;
+          
+        //inLight = 1 - previousMap;   
           
         break;
       }

@@ -248,6 +248,8 @@ namespace CS
               iRenderBuffer* positions = buffers->GetRenderBuffer (CS_BUFFER_POSITION);
               csVertexListWalker<float, csVector3> positionWalker (positions);
               csVector3 lightPositin = light->GetMovable()->GetPosition();
+              csReversibleTransform meshTransform = 
+                mesh.meshWrapper->GetMovable()->GetTransform();
 
               // only take into account translucent objects
               if ( mesh.meshWrapper->GetRenderPriority() != 
@@ -258,7 +260,7 @@ namespace CS
               for (size_t i = 0; i < positionWalker.GetSize (); i++)
               {
                 float distance = (lightPositin - 
-                  (*positionWalker) - meshPosition).Norm ();
+                  meshTransform.This2Other(*positionWalker)).Norm ();
 
                 if (distance < _near)
                   _near = distance;
