@@ -182,6 +182,9 @@ csPtr<iAnimatedMeshFactory> AnimatedMeshTools::ImportSplitMorphMesh
       continue;
   }
 
+  // Invalidate the factory of the base mesh
+  meshFact->Invalidate();
+
   return csPtr<iAnimatedMeshFactory> (meshFact);
 }
 
