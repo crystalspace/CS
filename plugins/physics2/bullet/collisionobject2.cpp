@@ -134,10 +134,7 @@ void csBulletCollisionObject::RemoveCollider (CS::Collision2::iCollider* collide
   {
     if (colliders[i] == collider)
     {
-      if (isTerrain && i == 0)
-        isTerrain = false;
-      colliders.DeleteIndex (i);
-      relaTransforms.DeleteIndex (i);
+      RemoveCollider (i);
       return;
     }
   }

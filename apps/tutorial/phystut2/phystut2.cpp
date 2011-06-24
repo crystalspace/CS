@@ -15,7 +15,7 @@
 
 Simple::Simple()
 : DemoApplication ("CrystalSpace.PhysTut2"),
-isSoftBodyWorld (true), environment (ENVIRONMENT_TERRAIN), solver (0),
+isSoftBodyWorld (true), environment (ENVIRONMENT_WALLS), solver (0),
 autodisable (false), do_bullet_debug (false), remainingStepDuration (0.0f),
 debugMode (false), allStatic (false), pauseDynamic (false), dynamicSpeed (1.0f),
 physicalCameraMode (CAMERA_DYNAMIC), dragging (false), softDragging (false)
@@ -158,6 +158,9 @@ void Simple::Frame ()
 
   hudManager->GetStateDescriptions ()->Push (csString ("Physics engine: ") + phys_engine_name);
 
+  txt.Format ("Collision objects count: %d", collisionSector->GetCollisionObjectCount ());
+  hudManager->GetStateDescriptions ()->Push (txt);
+
   txt.Format ("Rigid bodies count: %d", physicalSector->GetRigidBodyCount ());
   hudManager->GetStateDescriptions ()->Push (txt);
 
@@ -217,12 +220,10 @@ bool Simple::OnKeyboard (iEvent &event)
       case 0: SpawnBox (); break;
       case 1: SpawnSphere (); break;
       case 2: SpawnConvexMesh (); break;
-      case 3: SpawnJointed (); break;
+      case 3: SpawnConcaveMesh (); break;
       case 4: SpawnCylinder (); break;
       case 5: SpawnCapsule (); break;
-      case 6: SpawnRagdoll (); break;
-      case 7: SpawnCone (); break;
-      case 8: SpawnCompound (); break;
+      case 6: SpawnCompound (); break;
       default: break;
       }
       return true;
@@ -663,13 +664,6 @@ bool Simple::OnInitialize (int argc, char* argv[])
   if (!DemoApplication::OnInitialize (argc, argv))
     return false;
 
-  // Request plugins
-  /*if (!csInitializer::RequestPlugins (GetObjectRegistry (),
-    CS_REQUEST_PLUGIN ("crystalspace.physics.bullet2",
-    CS::Physics2::iPhysicalSystem),
-    CS_REQUEST_END))
-    return ReportError ("Failed to initialize plugins!");*/
-
   csBaseEventHandler::Initialize (GetObjectRegistry ());
   if (!RegisterQueue (GetObjectRegistry (), csevAllEvents (GetObjectRegistry ())))
     return ReportError ("Failed to set up event handler!");
@@ -682,7 +676,6 @@ bool Simple::OnInitialize (int argc, char* argv[])
   csRef<iPluginManager> plugmgr = 
     csQueryRegistry<iPluginManager> (GetObjectRegistry ());
   collisionSystem = csLoadPlugin<CS::Collision2::iCollisionSystem> (plugmgr, "crystalspace.physics.bullet2");
-  //physicalSystem = csLoadPlugin<CS::Physics2::iPhysicalSystem> (plugmgr, "crystalspace.physics.bullet2");
   physicalSystem = scfQueryInterface<CS::Physics2::iPhysicalSystem> (collisionSystem);
 
   // We have some objects of size smaller than 0.035 units, so we scale up the
@@ -695,16 +688,16 @@ bool Simple::OnInitialize (int argc, char* argv[])
   // Load the soft body animation control plugin & factory
   if (isSoftBodyWorld)
   {
-    csRef<CS::Animation::iSoftBodyAnimationControlType> softBodyAnimationType =
-      csLoadPlugin<CS::Animation::iSoftBodyAnimationControlType>
-      (plugmgr, "crystalspace.dynamics.softanim");
+    csRef<CS::Physics2::iSoftBodyAnimationControlType> softBodyAnimationType =
+      csLoadPlugin<CS::Physics2::iSoftBodyAnimationControlType>
+      (plugmgr, "crystalspace.physics.softanim2");
     if (!softBodyAnimationType)
       return ReportError ("Could not load soft body animation for genmeshes plugin!");
 
     csRef<iGenMeshAnimationControlFactory> animationFactory =
       softBodyAnimationType->CreateAnimationControlFactory ();
     softBodyAnimationFactory =
-      scfQueryInterface<CS::Animation::iSoftBodyAnimationControlFactory> (animationFactory);
+      scfQueryInterface<CS::Physics2::iSoftBodyAnimationControlFactory> (animationFactory);
   }
 
   // Load the ragdoll plugin
@@ -886,7 +879,7 @@ void Simple::UpdateCameraMode ()
       else
       {
         cameraBody = physicalSystem->CreateRigidBody ();
-        cameraBody->SetDensity (1.0f);
+        cameraBody->SetDensity (0.3f);
         const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
         csVector3 a = tc.GetOrigin ();
         cameraBody->SetTransform (tc);
@@ -1350,23 +1343,37 @@ CS::Physics2::iJoint* Simple::SpawnJointed ()
   // Already added to sector.
   CS::Physics2::iRigidBody* rb1 = SpawnBox ();
   csOrthoTransform trans = rb1->GetTransform ();
-  trans.SetOrigin (trans.GetOrigin () + csVector3 (-.5f, 0.0f, 0.0f));
+  trans.SetOrigin (trans.GetOrigin () + csVector3 (1.0f, 2.0f, 0.0f));
   rb1->SetTransform (trans);
-  rb1->SetState (CS::Physics2::STATE_STATIC);
-  rb1->RebuildObject ();
 
   CS::Physics2::iRigidBody* rb2 = SpawnSphere ();
   trans = rb2->GetTransform ();
-  trans.SetOrigin (trans.GetOrigin () + csVector3 (.5f, 0.0f, 0.0f));
+  csOrthoTransform jointTrans = trans;
+  trans.SetOrigin (trans.GetOrigin () + csVector3 (0.0f, -0.5f, 0.0f));
   rb2->SetTransform (trans);
+  rb2->SetState (CS::Physics2::STATE_STATIC);
 
+#define SLIDE
+
+#ifdef P2P
+  csRef<CS::Physics2::iJoint> joint = physicalSystem->CreateRigidP2PJoint (csVector3(0.2f, -0.4f, -0.2f));
+  joint->Attach (rb1, rb2);
+#endif
+
+#ifdef HINGE
   // Create a joint and attach the two bodies to it.
-  csOrthoTransform jointTransform (csMatrix3 (), csVector3 (-.6f, 0.5f, 0.0f));
-  csRef<CS::Physics2::iJoint> joint = physicalSystem->CreateRigidSlideJoint (jointTransform, -1.f, 1.f, 1.f, -1.f, 0);
+    csRef<CS::Physics2::iJoint> joint = physicalSystem->CreateRigidHingeJoint (csVector3(0.2f, -0.2f, 0.2f),
+    PI, -PI, 1);
   // Add a motor to the joint
-  joint->SetDesiredVelocity (csVector3 (10.0f, 0.0f, 0.0f));
-  joint->SetMaxForce (csVector3 (0.1f, 0.0f, 0.0f));
-  joint->Attach (rb1, rb2/*, true*/);
+  joint->SetDesiredVelocity (csVector3 (0.0f, -0.5f, 0.0f));
+  joint->SetMaxForce (csVector3 (0.0f, 1.0f, 0.0f));
+  joint->Attach (rb1, NULL/* rb2, true*/);
+#endif
+
+#ifdef SLIDE
+  csRef<CS::Physics2::iJoint> joint = physicalSystem->CreateRigidSlideJoint (jointTrans, -1.f, 1.f, 1.f, -1.f, 0);
+  joint->Attach (rb2, rb1);
+#endif
 
   // Update the display of the dynamics debugger
   //dynamicsDebugger->UpdateDisplay ();
@@ -1374,19 +1381,213 @@ CS::Physics2::iJoint* Simple::SpawnJointed ()
   return joint;
 }
 
+void ConstraintJoint (CS::Physics2::iJoint* joint)
+{
+  // If the axis is constrained. You should set it with axis and pass min and max value to it.
+  // Min = max means full constraint; min < max means move in the range. 
+  // The translations are fully constrained.
+  joint->SetTransConstraints (true, true, true);
+  joint->SetMinimumDistance (csVector3 (0,0,0));
+  joint->SetMaximumDistance (csVector3 (0,0,0));
+
+  // The rotations are bounded
+  joint->SetRotConstraints (true, true, true);
+  joint->SetMinimumAngle (csVector3 (-PI/4.0, -PI/6.0, -PI/6.0));
+  joint->SetMaximumAngle (csVector3 (PI/4.0, PI/6.0, PI/6.0));
+}
+
 void Simple::SpawnChain ()
 {
+  CS::Physics2::iRigidBody* rb1 = SpawnBox ();
+  csOrthoTransform trans = rb1->GetTransform ();
+  csVector3 initPos = trans.GetOrigin () + csVector3 (0.0f, 5.0f, 0.0f);
+  trans.SetOrigin (initPos);
+  rb1->SetState (CS::Physics2::STATE_STATIC);
+  rb1->SetTransform (trans);
 
+  csVector3 offset (0.0f, 1.3f, 0.0f);
+
+  CS::Physics2::iRigidBody* rb2 = SpawnCapsule (0.4f, 0.3f);
+  rb2->SetLinearVelocity (csVector3 (0.0f));
+  rb2->SetAngularVelocity (csVector3 (0.0f));
+  trans.SetOrigin (initPos - offset);
+  trans.SetO2T (csXRotMatrix3 (PI / 2.0f));
+  rb2->SetTransform (trans);
+
+  CS::Physics2::iRigidBody* rb3 = SpawnBox ();
+  rb3->SetLinearVelocity (csVector3 (0.0f));
+  rb3->SetAngularVelocity (csVector3 (0.0f));
+  trans.Identity ();
+  trans.SetOrigin (initPos - 2.0f * offset);
+  rb3->SetTransform (trans);
+
+  CS::Physics2::iRigidBody* rb4 = SpawnCapsule (0.4f, 0.3f);
+  rb4->SetLinearVelocity (csVector3 (0.0f));
+  rb4->SetAngularVelocity (csVector3 (0.0f));
+  trans.SetOrigin (initPos - 3.0f * offset);
+  trans.SetO2T (csXRotMatrix3 (PI / 2.0f));
+  rb4->SetTransform (trans);
+
+  CS::Physics2::iRigidBody* rb5 = SpawnBox ();
+  rb5->SetLinearVelocity (csVector3 (0.0f));
+  rb5->SetAngularVelocity (csVector3 (0.0f));
+  trans.Identity ();
+  trans.SetOrigin (initPos - 4.0f * offset);
+  rb5->SetTransform (trans);
+
+  // Create joints and attach bodies.
+  csOrthoTransform jointTransform;
+  csRef<CS::Physics2::iJoint> joint;
+
+  joint = physicalSystem->CreateJoint ();
+  jointTransform.Identity ();
+  jointTransform.SetOrigin (initPos - csVector3 (0.0f, 0.6f, 0.0f));
+  jointTransform = jointTransform * rb2->GetTransform ().GetInverse ();
+  joint->SetTransform (jointTransform);
+  joint->Attach (rb1, rb2, false);
+  ConstraintJoint (joint);
+  joint->RebuildJoint ();
+
+  joint = physicalSystem->CreateJoint ();
+  jointTransform.Identity ();
+  jointTransform.SetOrigin (initPos - csVector3 (0.0f, 0.6f, 0.0f) - offset);
+  jointTransform = jointTransform * rb3->GetTransform ().GetInverse ();
+  joint->SetTransform (jointTransform);
+  joint->Attach (rb2, rb3, false);
+  ConstraintJoint (joint);
+  joint->RebuildJoint ();
+
+  joint = physicalSystem->CreateJoint ();
+  jointTransform.Identity ();
+  jointTransform.SetOrigin (initPos - csVector3 (0.0f, 0.6f, 0.0f) - 2.0f * offset);
+  jointTransform = jointTransform * rb4->GetTransform ().GetInverse ();
+  joint->SetTransform (jointTransform);
+  joint->Attach (rb3, rb4, false);
+  ConstraintJoint (joint);
+  joint->RebuildJoint ();
+
+  joint = physicalSystem->CreateJoint ();
+  jointTransform.Identity ();
+  jointTransform.SetOrigin (initPos - csVector3 (0.0f, 0.6f, 0.0f) - 3.0f * offset);
+  jointTransform = jointTransform * rb5->GetTransform ().GetInverse ();
+  joint->SetTransform (jointTransform);
+  joint->Attach (rb4, rb5, false);
+  ConstraintJoint (joint);
+  joint->RebuildJoint ();
+
+  // Update the display of the dynamics debugger
+  //dynamicsDebugger->UpdateDisplay ();
 }
 
 void Simple::LoadRagdoll ()
 {
+  // Load animesh factory
+  csLoadResult rc = loader->Load ("/lib/frankie/frankie.xml");
+  if (!rc.success)
+  {
+    ReportError ("Can't load Frankie!");
+    return;
+  }
 
+  csRef<iMeshFactoryWrapper> meshfact = engine->FindMeshFactory ("franky_frankie");
+  if (!meshfact)
+    return;
+
+  csRef<CS::Mesh::iAnimatedMeshFactory> animeshFactory =
+    scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
+    (meshfact->GetMeshObjectFactory ());
+  if (!animeshFactory)
+  {
+    ReportError ("Can't find Frankie's animesh factory!");
+    return;
+  }
+
+  // Load bodymesh (animesh's physical properties)
+  rc = loader->Load ("/lib/frankie/skelfrankie_body");
+  if (!rc.success)
+  {
+    ReportError ("Can't load Frankie's body description!");
+    return;
+  }
+
+  csRef<CS::Animation::iBodyManager> bodyManager =
+    csQueryRegistry<CS::Animation::iBodyManager> (GetObjectRegistry ());
+  CS::Animation::iBodySkeleton* bodySkeleton = bodyManager->FindBodySkeleton ("frankie_body");
+  if (!bodySkeleton)
+  {
+    ReportError ("Can't find Frankie's body description!");
+    return;
+  }
+
+  // Create bone chain
+  CS::Animation::iBodyChain* chain = bodySkeleton->CreateBodyChain
+    ("body_chain", animeshFactory->GetSkeletonFactory ()->FindBone ("Frankie_Main"));
+  chain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("CTRL_Head"));
+  chain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_8"));
+
+  // Create ragdoll animation node factory
+  csRef<CS::Animation::iSkeletonRagdollNodeFactory> ragdollFactory =
+    ragdollManager->CreateAnimNodeFactory ("frankie_ragdoll");
+  ragdollFactory->SetBodySkeleton (bodySkeleton);
+  ragdollFactory->AddBodyChain (chain, CS::Animation::STATE_DYNAMIC);
+
+  // Set the ragdoll anim node as the only node of the animation tree
+  animeshFactory->GetSkeletonFactory ()->GetAnimationPacket ()
+    ->SetAnimationRoot (ragdollFactory);
 }
 
 void Simple::SpawnRagdoll ()
 {
+  //TODO----------------------------------------------------------------
+  // Load frankie's factory if not yet done
+  //csRef<iMeshFactoryWrapper> meshfact =
+  //  engine->FindMeshFactory ("franky_frankie");
+  //if (!meshfact)
+  //{
+  //  LoadRagdoll ();
+  //  meshfact = engine->FindMeshFactory ("franky_frankie");
+  //}
 
+  //if (!meshfact)
+  //  return;
+
+  //// Create animesh
+  //ragdollMesh = engine->CreateMeshWrapper (meshfact, "Frankie",
+  //  room, csVector3 (0, -4, 0));
+  //csRef<CS::Mesh::iAnimatedMesh> animesh =
+  //  scfQueryInterface<CS::Mesh::iAnimatedMesh> (ragdollMesh->GetMeshObject ());
+
+  //// Close the eyes of Frankie as he is dead
+  //csRef<CS::Mesh::iAnimatedMeshFactory> animeshFactory =
+  //  scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
+  //  (meshfact->GetMeshObjectFactory ());
+
+  //animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyelids_closed"), 0.7f);
+
+  //// Set the initial position of the body
+  //const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+  //ragdollMesh->QuerySceneNode ()->GetMovable ()->SetPosition (
+  //  tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1));
+
+  //// Start the ragdoll animation node so that the rigid bodies of the bones are created
+  //CS::Animation::iSkeletonAnimNode* root = animesh->GetSkeleton ()->GetAnimationPacket ()->
+  //  GetAnimationRoot ();
+  //csRef<CS::Animation::iSkeletonRagdollNode> ragdoll =
+  //  scfQueryInterfaceSafe<CS::Animation::iSkeletonRagdollNode> (root);
+  //ragdoll->SetDynamicSystem (dynamicSystem);
+  //ragdoll->Play ();
+
+  //// Fling the body.
+  //for (uint i = 0; i < ragdoll->GetBoneCount (CS::Animation::STATE_DYNAMIC); i++)
+  //{
+  //  CS::Animation::BoneID boneID = ragdoll->GetBone (CS::Animation::STATE_DYNAMIC, i);
+  //  iRigidBody* rb = ragdoll->GetBoneRigidBody (boneID);
+  //  rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+  //  rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 5, 0));
+  //}
+
+  //// Update the display of the dynamics debugger
+  //dynamicsDebugger->UpdateDisplay ();
 }
 
 void Simple::SpawnRope ()
@@ -1395,7 +1596,7 @@ void Simple::SpawnRope ()
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
 
   // Spawn a box
-  CS::Physics2::iRigidBody* box = SpawnBox ();
+  csRef<CS::Physics2::iRigidBody> box = SpawnBox ();
 
   // First example using ropes defined by their extremities
 #if 1
@@ -1403,7 +1604,7 @@ void Simple::SpawnRope ()
   csRef<CS::Physics2::iSoftBody> body = physicalSystem->CreateRope
     (tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 2, 0),
     tc.GetOrigin () + tc.GetT2O () * csVector3 (-0.2f, 0, 1), 20);
-  body->SetDensity (0.5f);
+  body->SetMass (2.0f);
   body->SetRigidity (0.95f);
   body->AnchorVertex (0);
   body->AnchorVertex (body->GetVertexCount () - 1, box);
@@ -1414,7 +1615,7 @@ void Simple::SpawnRope ()
   body = physicalSystem->CreateRope
     (tc.GetOrigin () + tc.GetT2O () * csVector3 (2, 2, 0),
     tc.GetOrigin () + tc.GetT2O () * csVector3 (0.2f, 0, 1), 20);
-  body->SetDensity (0.5f);
+  body->SetMass (2.0f);
   body->SetRigidity (0.95f);
   body->AnchorVertex (0);
   body->AnchorVertex (body->GetVertexCount () - 1, box);
@@ -1437,7 +1638,7 @@ void Simple::SpawnRope ()
     // Create the soft body
     CS::Physics2::iSoftBody* body = physicalSystem->CreateRope
       (nodes, vertexCount);
-    body->SetDensity (0.5f);
+    body->SetMass (2.0f);
     body->SetRigidity (0.95f);
     body->AnchorVertex (0);
     body->AnchorVertex (body->GetVertexCount () - 1, box);
@@ -1459,7 +1660,7 @@ void Simple::SpawnRope ()
     // Create the soft body
     CS::Physics2::iSoftBody* body = bulletDynamicSystem->CreateRope
       (nodes, vertexCount);
-    body->SetDensity (0.5f);
+    body->SetMass (2.0f);
     body->SetRigidity (0.95f);
     body->AnchorVertex (0);
     body->AnchorVertex (body->GetVertexCount () - 1, box);
@@ -1481,7 +1682,7 @@ CS::Physics2::iSoftBody* Simple::SpawnCloth ()
     tc.GetOrigin () + tc.GetT2O () * csVector3 (-2, 0, 1),
     tc.GetOrigin () + tc.GetT2O () * csVector3 (2, 0, 1),
     10, 10, true);
-  body->SetDensity (0.4f);
+  body->SetMass (5.0f);
 
   // Attach the two top corners
   body->AnchorVertex (0);
@@ -1490,26 +1691,26 @@ CS::Physics2::iSoftBody* Simple::SpawnCloth ()
   physicalSector->AddSoftBody (body);
 
   // Create the cloth mesh factory
-  //csRef<iMeshFactoryWrapper> clothFact =
-  //  CS::Physics2::SoftBodyHelper::CreateClothGenMeshFactory
-  //  (GetObjectRegistry (), "clothFact", body);
-  //csRef<iGeneralFactoryState> gmstate = scfQueryInterface<iGeneralFactoryState>
-  //  (clothFact->GetMeshObjectFactory ());
+  csRef<iMeshFactoryWrapper> clothFact =
+    CS::Physics2::SoftBodyHelper::CreateClothGenMeshFactory
+    (GetObjectRegistry (), "clothFact", body);
+  csRef<iGeneralFactoryState> gmstate = scfQueryInterface<iGeneralFactoryState>
+    (clothFact->GetMeshObjectFactory ());
 
   // Create the mesh
-  //gmstate->SetAnimationControlFactory (softBodyAnimationFactory);
-  //csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (
-  //  clothFact, "cloth_body", room));
-  //iMaterialWrapper* mat = CS::Material::MaterialBuilder::CreateColorMaterial
-  //  (GetObjectRegistry (), "cloth", csColor4 (1.0f, 0.0f, 0.0f, 1.0f));
-  //mesh->GetMeshObject ()->SetMaterialWrapper (mat);
+  gmstate->SetAnimationControlFactory (softBodyAnimationFactory);
+  csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (
+    clothFact, "cloth_body", room));
+  iMaterialWrapper* mat = CS::Material::MaterialBuilder::CreateColorMaterial
+    (GetObjectRegistry (), "cloth", csColor4 (1.0f, 0.0f, 0.0f, 1.0f));
+  mesh->GetMeshObject ()->SetMaterialWrapper (mat);
 
   // Init the animation control for the animation of the genmesh
-  //csRef<iGeneralMeshState> meshState =
-  //  scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ());
-  //csRef<CS::Animation::iSoftBodyAnimationControl> animationControl =
-  //  scfQueryInterface<CS::Animation::iSoftBodyAnimationControl> (meshState->GetAnimationControl ());
-  //animationControl->SetSoftBody (body, true);
+  csRef<iGeneralMeshState> meshState =
+    scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ());
+  csRef<CS::Physics2::iSoftBodyAnimationControl> animationControl =
+    scfQueryInterface<CS::Physics2::iSoftBodyAnimationControl> (meshState->GetAnimationControl ());
+  animationControl->SetSoftBody (body, true);
 
   return body;
 }
@@ -1548,19 +1749,19 @@ CS::Physics2::iSoftBody* Simple::SpawnSoftBody ()
     scfQueryInterface<CS::Physics2::Bullet2::iSoftBody> (body);
   bulletbody->SetBendingConstraint (true);
 
-  //// Create the mesh
-  //gmstate->SetAnimationControlFactory (softBodyAnimationFactory);
-  //csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (
-  //  ballFact, "soft_body", room));
-  //iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
-  //mesh->GetMeshObject ()->SetMaterialWrapper (mat);
+  // Create the mesh
+  gmstate->SetAnimationControlFactory (softBodyAnimationFactory);
+  csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (
+    ballFact, "soft_body", room));
+  iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
+  mesh->GetMeshObject ()->SetMaterialWrapper (mat);
 
-  //// Init the animation control for the animation of the genmesh
-  //csRef<iGeneralMeshState> meshState =
-  //  scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ());
-  //csRef<CS::Animation::iSoftBodyAnimationControl> animationControl =
-  //  scfQueryInterface<CS::Animation::iSoftBodyAnimationControl> (meshState->GetAnimationControl ());
-  //animationControl->SetSoftBody (body);
+  // Init the animation control for the animation of the genmesh
+  csRef<iGeneralMeshState> meshState =
+    scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ());
+  csRef<CS::Physics2::iSoftBodyAnimationControl> animationControl =
+    scfQueryInterface<CS::Physics2::iSoftBodyAnimationControl> (meshState->GetAnimationControl ());
+  animationControl->SetSoftBody (body);
 
   // Fling the body.
   body->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
@@ -1575,6 +1776,140 @@ CS::Physics2::iSoftBody* Simple::SpawnSoftBody ()
 
 void Simple::CreateWalls (const csVector3& radius)
 {
+  // Default behavior from DemoApplication for the creation of the scene
+  if (!DemoApplication::CreateRoom ())
+    return;
+
+  // First we make a primitive for our geometry.
+  using namespace CS::Geometry;
+  DensityTextureMapper mapper (0.3f);
+  TesselatedBox box (csVector3 (-5, -5, -5), csVector3 (5, 5, 5));
+  box.SetLevel (3);
+  box.SetMapper (&mapper);
+  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+  // Now we make a factory and a mesh at once.
+  walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+    engine, room, "walls", "walls_factory", &box);
+
+  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
+    ReportWarning ("Could not load texture %s",
+    CS::Quote::Single ("stone"));
+  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
+  walls->GetMeshObject ()->SetMaterialWrapper (tm);
+
+  csOrthoTransform t;
+
+#if 0
+  // Enabling this will work, however, mesh<->mesh collision
+  // requires a lot of hand tuning. When this is enabled,
+  // mesh objects created with 'm' will either sink through
+  // the floor, or stick in it.
+
+  // Some hints to make mesh<->mesh work better:
+  //  * Decrease the time step. 1/300th of a second minimum
+  //  * Slow down objects
+  //  * Play with softness, cfm, etc.
+#endif
+
+#if 0
+  // With ODE, mesh <-> plane doesn't work yet, so we will use boxes for each
+  // wall for now
+  for (int i = 0; i < walls_state->GetPolygonCount (); i++)
+  {
+    rb->AttachColliderPlane (walls_state->GetPolygonObjectPlane (i), 10, 0, 0);
+  }
+#endif
+
+  csVector3 size (10.0f, 10.0f, 10.0f); // This should be the same size as the mesh.
+  t.SetOrigin(csVector3(10.0f,0.0f,0.0f));
+
+  // Just to make sure everything works we create half of the colliders
+  // using dynsys->CreateCollider() and the other half using
+  // dynsys->AttachColliderBox().
+  csRef<CS::Collision2::iCollisionObject> co = collisionSystem->CreateCollisionObject ();
+  csRef<CS::Collision2::iColliderBox> collider = collisionSystem->CreateColliderBox (size);
+  co->AddCollider (collider, localTrans);
+  co->SetTransform (t);
+  co->RebuildObject ();
+  collisionSector->AddCollisionObject (co);
+
+  t.SetOrigin(csVector3(-10.0f, 0.0f, 0.0f));
+  co = collisionSystem->CreateCollisionObject ();
+  collider = collisionSystem->CreateColliderBox (size);
+  co->AddCollider (collider, localTrans);
+  co->SetTransform (t);
+  co->RebuildObject ();
+  collisionSector->AddCollisionObject (co);
+
+  t.SetOrigin(csVector3(0.0f, 10.0f, 0.0f));
+  co = collisionSystem->CreateCollisionObject ();
+  collider = collisionSystem->CreateColliderBox (size);
+  co->AddCollider (collider, localTrans);
+  co->SetTransform (t);
+  co->RebuildObject ();
+  collisionSector->AddCollisionObject (co);
+
+  // If we use the Bullet plugin, then use a plane collider for the floor
+  // Also, soft bodies don't work well with planes, so use a box in this case
+  csRef<CS::Collision2::iColliderPlane> planeCollider = 
+    collisionSystem->CreateColliderPlane (csPlane3 (
+    csVector3 (0.0f, 1.0f, 0.0f), -5.0f));
+  csRef<CS::Physics2::iRigidBody> floorBody = physicalSystem->CreateRigidBody ();
+  floorBody->AddCollider (planeCollider, localTrans);
+  floorBody->SetFriction (10.0f);
+  floorBody->SetElasticity (0.0f);
+  floorBody->RebuildObject ();
+  physicalSector->AddRigidBody (floorBody);
+  //You should set the state after the body is added to a sector.
+  floorBody->SetState (CS::Physics2::STATE_STATIC);
+
+  t.SetOrigin(csVector3(0.0f, 0.0f, 10.0f));
+  collider = collisionSystem->CreateColliderBox (size);
+  csRef<CS::Physics2::iRigidBody> rb = physicalSystem->CreateRigidBody ();
+  rb->AddCollider (collider, localTrans);
+  rb->SetTransform (t);
+  rb->SetFriction (10.0f);
+  rb->SetElasticity (0.0f);
+  rb->RebuildObject ();
+  physicalSector->AddRigidBody (rb);
+  rb->SetState (CS::Physics2::STATE_STATIC);
+
+  
+
+  t.SetOrigin(csVector3(0.0f, 0.0f, -10.0f));
+  collider = collisionSystem->CreateColliderBox (size);
+  rb = physicalSystem->CreateRigidBody ();
+  rb->AddCollider (collider, localTrans);
+  rb->SetTransform (t);
+  rb->RebuildObject ();
+  physicalSector->AddRigidBody (rb);
+  rb->SetState (CS::Physics2::STATE_STATIC);
+
+  // Set our own lights
+  room->SetDynamicAmbientLight (csColor (0.3, 0.3, 0.3));
+
+  csRef<iLight> light;
+  iLightList* lightList = room->GetLights ();
+  lightList->RemoveAll ();
+
+  light = engine->CreateLight(0, csVector3(10), 9000, csColor (1));
+  lightList->Add (light);
+
+  light = engine->CreateLight (0, csVector3 (3, 0, 0), 8, csColor (1, 0, 0));
+  lightList->Add (light);
+
+  light = engine->CreateLight (0, csVector3 (-3, 0,  0), 8, csColor (0, 0, 1));
+  lightList->Add (light);
+
+  light = engine->CreateLight (0, csVector3 (0, 0, 3), 8, csColor (0, 1, 0));
+  lightList->Add (light);
+
+  light = engine->CreateLight (0, csVector3 (0, -3, 0), 8, csColor (1, 1, 0));
+  lightList->Add (light);
+
+  engine->Prepare ();
+  CS::Lighting::SimpleStaticLighter::ShineLights (room, engine, 4);
 }
 
 void Simple::CreateTerrain ()

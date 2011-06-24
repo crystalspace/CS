@@ -114,6 +114,7 @@ void csBulletSoftBody::AddBulletObject ()
     btSoftRigidDynamicsWorld* softWorld =
       static_cast<btSoftRigidDynamicsWorld*> (sector->bulletWorld);
     softWorld->addSoftBody (btBody);
+    btBody->setUserPointer (this);
     insideWorld = true;
   }
 }
@@ -137,6 +138,13 @@ bool csBulletSoftBody::IsEnabled ()
 {
  CS_ASSERT (btBody);
  return btBody->isActive ();
+}
+
+void csBulletSoftBody::SetMass (float mass)
+{
+  CS_ASSERT (btBody);
+  this->totalMass == mass;
+  btBody->setTotalMass (mass);
 }
 
 float csBulletSoftBody::GetMass ()

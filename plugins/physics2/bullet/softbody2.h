@@ -21,6 +21,7 @@ private:
   //CS::Physics2::Bullet::BodyType bodyType;
   float friction;
   float density;
+  float totalMass;
   bool bending;
   btSoftBody* btBody;   //Don't know if I should add this to rigidbody too.
   struct AnimatedAnchor
@@ -83,6 +84,7 @@ public:
   virtual bool Enable ();
   virtual bool IsEnabled ();
 
+  virtual void SetMass (float mass);
   virtual float GetMass ();
 
   virtual float GetDensity () const {return density;}

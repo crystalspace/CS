@@ -1119,18 +1119,15 @@ csRef<iJoint> csBulletSystem::CreateRigidHingeJoint (const csVector3 position,
   if (axis < 0 || axis > 2)
     return joint;
   joint.AttachNew (new csBulletJoint (this));
-  joint->SetTransConstraints (true, true, true);
-  joint->SetRotConstraints (true, true, true);
   csVector3 minDistant (0.0f, 0.0f, 0.0f);
   csVector3 maxDistant (0.0f, 0.0f, 0.0f);
-  joint->SetMinimumDistance (minDistant);
-  joint->SetMaximumDistance (maxDistant);
   minDistant[axis] = minAngle;
   maxDistant[axis] = maxAngle;
   joint->SetMinimumAngle (minDistant);
   joint->SetMaximumAngle (maxDistant);
   joint->SetPosition (position);  
   joint->SetType (RIGID_HINGE_JOINT);
+  joint->axis = axis;
   //joints.Push (joint);
   return joint;
 }

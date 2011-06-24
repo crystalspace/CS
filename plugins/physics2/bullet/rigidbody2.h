@@ -31,6 +31,8 @@ private:
   float friction;
   float softness;
   float elasticity;
+  float totalMass;
+  int haveStaticColliders;
 
   csRef<CS::Physics2::iKinematicCallback> kinematicCb;
 
@@ -53,8 +55,8 @@ public:
   virtual void RebuildObject () {csBulletCollisionObject::RebuildObject ();}
 
   virtual void AddCollider (CS::Collision2::iCollider* collider, const csOrthoTransform& relaTrans);
-  virtual void RemoveCollider (CS::Collision2::iCollider* collider) {csBulletCollisionObject::RemoveCollider (collider);}
-  virtual void RemoveCollider (size_t index) {csBulletCollisionObject::RemoveCollider (index);}
+  virtual void RemoveCollider (CS::Collision2::iCollider* collider);
+  virtual void RemoveCollider (size_t index);
 
   virtual CS::Collision2::iCollider* GetCollider (size_t index) {return csBulletCollisionObject::GetCollider (index);}
   virtual size_t GetColliderCount () {return colliders.GetSize ();}
@@ -83,6 +85,7 @@ public:
   virtual bool Enable ();
   virtual bool IsEnabled ();
 
+  virtual void SetMass (float mass);
   virtual float GetMass ();
 
   virtual float GetDensity () const {return density;}

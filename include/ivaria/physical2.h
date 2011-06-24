@@ -83,6 +83,9 @@ struct iPhysicalBody : public virtual CS::Collision2::iCollisionObject
   //      If iPhysicalSystem create a new rigidbody, it's based on the softbody's current shape or original shape? 
   //      And the collision system will create a collision shape for the mesh? How to decide which type of collider is appropriate?
 
+  /// Set the total mass of this body.
+  virtual void SetMass (float mass) = 0;
+
   /// Get the mass of this body.
   virtual float GetMass () = 0;
 

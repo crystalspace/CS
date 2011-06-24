@@ -17,7 +17,7 @@ private:
   csRef<CS::Collision2::iCollisionSector> collisionSector;
   csRef<CS::Physics2::iPhysicalSector> physicalSector;
   csRef<CS::Physics2::Bullet2::iPhysicalSector> bulletSector;
-  csRef<CS::Animation::iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
+  csRef<CS::Physics2::iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
   bool isSoftBodyWorld;
 
   // Meshes
@@ -58,6 +58,7 @@ private:
   bool softDragging;
   csRef<CS::Physics2::iJoint> dragJoint;
   csRef<CS::Physics2::iSoftBody> draggedBody;
+  
   size_t draggedVertex;
   float dragDistance;
   float linearDampening, angularDampening;

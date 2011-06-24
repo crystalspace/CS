@@ -24,11 +24,12 @@ enum csJointType
 class csBulletJoint : public scfImplementation1<
   csBulletJoint, CS::Physics2::iJoint>
 {
+  friend class csBulletSystem;
 private:
   csBulletSystem* sys;
   csBulletSector* sector;
   csJointType type;
-  btGeneric6DofConstraint* rigidJoint;
+  btTypedConstraint* rigidJoint;
   btSoftBody::Joint* softJoint;
   iPhysicalBody* bodies[2];
   bool transConstraintX;
@@ -47,6 +48,7 @@ private:
   csVector3 desiredVelocity;
   btVector3 maxforce;
 
+  int axis;
   float threshold;
   csVector3 linearStiff;
   csVector3 angularStiff;
@@ -60,6 +62,7 @@ private:
 
   bool isSoft;
   bool isSpring;
+  bool positionSet;
   bool equilPointSet;
   bool insideWorld;
 

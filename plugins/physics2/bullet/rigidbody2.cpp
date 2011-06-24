@@ -7,8 +7,8 @@
 CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
 csBulletRigidBody::csBulletRigidBody (csBulletSystem* phySys)
-: scfImplementationType (this, phySys), btBody (NULL), density (0.1f),
-physicalState (CS::Physics2::STATE_DYNAMIC), softness (0.01f),
+: scfImplementationType (this, phySys), btBody (NULL), density (0.2f), totalMass (0.0f),
+physicalState (CS::Physics2::STATE_DYNAMIC), softness (0.01f), haveStaticColliders(0),
 friction (5.0f), elasticity (0.2f), linearVelocity (0.0f, 0.0f, 0.0f),
 angularVelocity (0.0f, 0.0f, 0.0f), linearDampening (0.0f), angularDampening (0.0f)
 {
@@ -72,21 +72,46 @@ void csBulletRigidBody::AddCollider (CS::Collision2::iCollider* collider,
                                      const csOrthoTransform& relaTrans)
 {
   csRef<csBulletCollider> coll (dynamic_cast<csBulletCollider*>(collider));
-  if (physicalState != CS::Physics2::STATE_STATIC)
+
+  CS::Collision2::ColliderType type = collider->GetGeometryType ();
+  if (type == CS::Collision2::COLLIDER_CONCAVE_MESH
+    ||type == CS::Collision2::COLLIDER_CONCAVE_MESH_SCALED
+    ||type == CS::Collision2::COLLIDER_PLANE)
+    haveStaticColliders ++;
+  else if (type == CS::Collision2::COLLIDER_TERRAIN)
   {
-    CS::Collision2::ColliderType type = collider->GetGeometryType ();
-    if (type == CS::Collision2::COLLIDER_CONCAVE_MESH
-      ||type == CS::Collision2::COLLIDER_CONCAVE_MESH_SCALED
-      ||type == CS::Collision2::COLLIDER_PLANE
-      ||type == CS::Collision2::COLLIDER_TERRAIN)
-    {
-      csFPrintf (stderr, "csBulletRigidBody: Can not add static collider to non-static body.\n");
-      return;
-    }
+    csFPrintf (stderr, "csBulletRigidBody: Can not add terrain collider to physical body.\n");
+    return;
   }
+
   colliders.Push (coll);
   relaTransforms.Push (relaTrans);
   shapeChanged = true;
+}
+
+void csBulletRigidBody::RemoveCollider (CS::Collision2::iCollider* collider)
+{
+  for (size_t i =0; i < colliders.GetSize(); i++)
+  {
+    if (colliders[i] == collider)
+    {
+      RemoveCollider (i);
+      return;
+    }
+  }
+}
+
+void csBulletRigidBody::RemoveCollider (size_t index)
+{
+  if (index >= colliders.GetSize ())
+    return;
+  CS::Collision2::ColliderType type = colliders[index]->GetGeometryType ();
+  if (type == CS::Collision2::COLLIDER_CONCAVE_MESH
+    ||type == CS::Collision2::COLLIDER_CONCAVE_MESH_SCALED
+    ||type == CS::Collision2::COLLIDER_PLANE)
+    haveStaticColliders --;
+  colliders.DeleteIndex (index);
+  relaTransforms.DeleteIndex (index);
 }
 
 void csBulletRigidBody::RemoveBulletObject ()
@@ -210,13 +235,23 @@ bool csBulletRigidBody::IsEnabled ()
   return false;
 }
 
+void csBulletRigidBody::SetMass (float mass)
+{
+  if (mass < EPSILON)
+    totalMass = mass;
+}
+
 float csBulletRigidBody::GetMass ()
 {
   if (physicalState != CS::Physics2::STATE_DYNAMIC)
     return 0.0f;
 
+  if (totalMass > EPSILON)
+    return totalMass;
+
   if (btObject)
     return 1.0f / btBody->getInvMass ();
+
   return density * this->GetVolume ();
 }
 
