@@ -39,7 +39,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   void MorphTarget::Invalidate ()
   {
     CS_ASSERT (parent.IsValid ());
-    if (parent->HasSubset ())
+    if (parent->GetSubsetCount ())
     {
       CS_ASSERT (offsets->GetElementCount() <= parent->GetVertexCountP());   
     }
@@ -49,14 +49,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     }
   }
 
-  void MorphTarget::AddSubset (const CS::Mesh::SubsetID subset)
+  void MorphTarget::AddSubset (const size_t subset)
   {
-    CS_ASSERT (parent.IsValid () && parent->HasSubset () 
-	       && (subset <= parent->GetTopSubsetID ()));
+    CS_ASSERT (parent.IsValid () && subset < parent->GetSubsetCount ());
     subsetList.Push (subset);
   }
 
-  CS::Mesh::SubsetID MorphTarget::GetSubset (const size_t index) const
+  size_t MorphTarget::GetSubset (const size_t index) const
   {
     CS_ASSERT (index < subsetList.GetSize ());    
     return subsetList[index];

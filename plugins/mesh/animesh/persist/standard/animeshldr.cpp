@@ -303,7 +303,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
         break;
       case XMLTOKEN_SUBSET:
         {
-	  CS::Mesh::SubsetID set = amfact->AddSubset ();
+	  size_t set = amfact->AddSubset ();
 	  const char* vertexIndices = child->GetAttributeValue ("vertices");
 	  if (vertexIndices == 0)
 	  {
@@ -401,8 +401,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
       {
       case XMLTOKEN_SETS:
 	{
-	  const char* subsetIDs = child2->GetAttributeValue ("ids");
-	  if (subsetIDs == 0)
+	  const char* subsetIndices = child2->GetAttributeValue ("ids");
+	  if (subsetIndices == 0)
 	  {
 	    synldr->ReportError (msgidFactory, child2, 
 				 "No subset list defined while creating morph target");
@@ -410,9 +410,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 	  }
 	  csStringArray subsets;
 	  char space = ' ';
-	  size_t subsetCount = subsets.SplitString (subsetIDs, &space);
+	  size_t subsetCount = subsets.SplitString (subsetIndices, &space);
 	  for (size_t i = 0; i < subsetCount; i++)
-	    morphTarget->AddSubset ((CS::Mesh::SubsetID) atoi(subsets[i]));
+	    morphTarget->AddSubset (atoi(subsets[i]));
 	}
 	break;
       case XMLTOKEN_OFFSETS:
@@ -700,9 +700,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 
       // Write subsets
       {
-	if (factory->HasSubset ())
+	if (factory->GetSubsetCount ())
 	{
-	  for (CS::Mesh::SubsetID si = 0; si <= factory->GetTopSubsetID (); si++)
+	  for (size_t si = 0; si < factory->GetSubsetCount (); si++)
 	  {
 	    csRef<iDocumentNode> subsetNode = 
 	      paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
@@ -734,7 +734,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 	  targetNode->SetAttribute ("name", target->GetName ());
 	  
 	  // Write subset list
-	  if (factory->HasSubset ())
+	  if (factory->GetSubsetCount ())
 	  {
 	    csRef<iDocumentNode> subsetsNode = 
 	      targetNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);

@@ -71,7 +71,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
      
     // Apply the morph targets to each subset 
     // (except subset 0 which has no morph target)
-    CS_ASSERT (factory->HasSubset ());
+    CS_ASSERT (factory->GetSubsetCount ());
     for (size_t mti = 0; mti < morphTargetCount; mti++)
     {
       if (morphTargetWeights[mti] > SMALL_EPSILON)
@@ -80,7 +80,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 	csVertexListWalker<float, csVector3> offsets (target->GetVertexOffsets ());
 	for (uint si = 0; si < target->subsetList.GetSize (); si++)
 	{
-	  CS::Mesh::SubsetID subsetIndex = target->subsetList[si];
+	  size_t subsetIndex = target->subsetList[si];
 	  Subset& set = factory->subsets[subsetIndex];
 	  for (uint vi = 0; vi < set.vertexCount; vi++)
 	  {

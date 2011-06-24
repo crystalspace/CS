@@ -47,11 +47,6 @@ struct iAnimatedMesh;
 struct iAnimatedMeshSubMesh;
 struct iAnimatedMeshMorphTarget;
 
-/// Identifier for single subset data
-typedef size_t SubsetID;
-
-/// ID for an invalid subset
-static const SubsetID InvalidSubsetID = (SubsetID)~0;
 
 /**
  * Represent a single influence of a bone on a single vertex
@@ -185,7 +180,7 @@ public:
  * corresponding to these vertices in the morph targets are non-zero). All null 
  * entries of a morph target are removed from the offset buffer. Thus, segmentation 
  * into subsets improves memory usage and computational resources since morph targets 
- * are only applied to a vertex when they contain deformations. Subset with ID 0
+ * are only applied to a vertex when they contain deformations. Subset with index 0
  * regroups the vertices which are not influenced by any morph target and
  * consequently will never be morphed.
  */
@@ -334,7 +329,12 @@ struct iAnimatedMeshFactory : public virtual iBase
   virtual bool SetColors (iRenderBuffer* renderBuffer) = 0;
 
   /**
-   * Update the mesh after modifying its geometry
+   * Update the mesh after modifying its geometry.
+   * It generates automatically a segmentation of the mesh and
+   * morph targets into subsets to optimize the morphing process.
+   *
+   * \warning Invalidate() must be called once all morph targets
+   *   have been created on the animated mesh factory.
    */
   virtual void Invalidate () = 0;
 
@@ -383,6 +383,9 @@ struct iAnimatedMeshFactory : public virtual iBase
    * \param name Identifier of the morph target. Can be 0 or non-unique, but 
    *   setting a unique name usually helps with finding a morph target later
    *   on.
+   *
+   * \warning You must call Invalidate() once all morph targets
+   *   are created on the animated mesh factory.
    */
   virtual iAnimatedMeshMorphTarget* CreateMorphTarget (const char* name) = 0;
 
@@ -476,48 +479,43 @@ struct iAnimatedMeshFactory : public virtual iBase
   * @{ */
 
   /**
-   * Create a new subset and return its ID.
-   * The first subset (with ID 0) regroups the vertices of the mesh object 
+   * Create a new user-defined subset and return its index.
+   * The first subset (with index 0) regroups the vertices of the mesh object 
    * which are not influenced by any morph target, e.i. all corresponding 
    * offsets are null.
    */
-  virtual SubsetID AddSubset () = 0;
+  virtual size_t AddSubset () = 0;
 
   /**
    * Add a vertex to a subset. 
    * All vertices of a subset must be influenced by the same morph targets:
    * their corresponding offsets in these morph targets are non-zero.
-   * \param subset The ID of the subset
+   * \param subset The index of the subset
    * \param vertexIndex The index of the vertex to be added
    */
-  virtual void AddSubsetVertex (const SubsetID subset, const size_t vertexIndex) = 0;
+  virtual void AddSubsetVertex (const size_t subset, const size_t vertexIndex) = 0;
 
   /**
    * Get the index of a vertex in a specified subset.
-   * \param subset The ID of the subset
+   * \param subset The index of the subset
    * \param vertexIndex The index of the subset vertex
    * \returns the index of this vertex in the vertex buffer
    */
-  virtual size_t GetSubsetVertex (const SubsetID subset, const size_t vertexIndex) const = 0;
+  virtual size_t GetSubsetVertex (const size_t subset, const size_t vertexIndex) const = 0;
 
   /**
    * Get the number of vertices belonging to a subset.
    */
-  virtual size_t GetSubsetVertexCount (const SubsetID subset) const = 0;
+  virtual size_t GetSubsetVertexCount (const size_t subset) const = 0;
 
   /**
-   * Get the highest subset ID associated with this factory 
-   * (or InvalidSubsetID if no subset is defined on this factory).
+   * Get the number of subsets associated with this factory 
    */
-  virtual SubsetID GetTopSubsetID () const = 0;
+  virtual size_t GetSubsetCount () const = 0;
 
   /**
-   * Return true if subsets are defined for this factory.
-   */
-  virtual bool HasSubset () const = 0;
-
-  /**
-   * Remove all subsets from this factory.
+   * Remove all subsets from this factory and rebuild the 
+   * original (unoptimized) morph targets.
    * You must call Invalidate() after clearing the subsets.
    */
   virtual void ClearSubsets () = 0;
@@ -766,12 +764,12 @@ struct iAnimatedMeshMorphTarget : public virtual iBase
    * The morph target must have non zero offsets for all the
    * vertices of this subset.
    */
-  virtual void AddSubset (const SubsetID subset) = 0;
+  virtual void AddSubset (const size_t subset) = 0;
 
   /**
    * Get a subset associated with this morph target.
    */
-  virtual SubsetID GetSubset (const size_t index) const = 0;
+  virtual size_t GetSubset (const size_t index) const = 0;
 
   /**
    * Get the number of subsets associated with this morph target.

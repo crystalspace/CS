@@ -132,12 +132,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     virtual void SetBoneBoundingBox (CS::Animation::BoneID bone, const csBox3& box); 
     virtual const csBox3& GetBoneBoundingBox (CS::Animation::BoneID bone) const; 
 
-    virtual CS::Mesh::SubsetID AddSubset ();
-    virtual void AddSubsetVertex (const CS::Mesh::SubsetID subset, const size_t vertexIndex);
-    virtual size_t GetSubsetVertex (const CS::Mesh::SubsetID subset, const size_t vertexIndex) const;
-    virtual size_t GetSubsetVertexCount (const CS::Mesh::SubsetID subset) const;
-    virtual CS::Mesh::SubsetID GetTopSubsetID () const;
-    virtual bool HasSubset () const;
+    virtual size_t AddSubset ();
+    virtual void AddSubsetVertex (const size_t subset, const size_t vertexIndex);
+    virtual size_t GetSubsetVertex (const size_t subset, const size_t vertexIndex) const;
+    virtual size_t GetSubsetVertexCount (const size_t subset) const;
+    virtual size_t GetSubsetCount () const;
     virtual void ClearSubsets ();
 
     //-- iMeshObjectFactory
@@ -175,6 +174,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     void ComputeObjectBoundingBox ();
 
     void ComputeSubsets ();
+    void RebuildMorphTargets ();
 
     // required but stupid stuff..
     AnimeshObjectType* objectType;
@@ -201,8 +201,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     // Submeshes
     csRefArray<FactorySubmesh> submeshes;
 
-    csRefArray<MorphTarget> morphTargets;
-    csRefArray<MorphTarget> subsetMorphTargets; 
+    csRefArray<MorphTarget> morphTargets;         // Morph targets without optimization
+    csRefArray<MorphTarget> subsetMorphTargets;   // Optimized morph targets (e.i. without null offsets)
     csHash<uint, csString> morphTargetNames;
 
     // Sockets
@@ -223,6 +223,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     // Subsets
     csArray<Subset> subsets; 
+    bool userSubsets;
 
     struct SubsetTargets
     {
