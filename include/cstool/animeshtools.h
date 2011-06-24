@@ -104,8 +104,9 @@ class CS_CRYSTALSPACE_EXPORT AnimatedMeshTools
   /**
    * Create a new morph target in an animesh by importing the vertices from
    * another animesh.
-   * You must call Invalidate() on baseMesh after creation of the
-   * morph targets.
+   * \warning You must still call iAnimatedMeshFactory::Invalidate() on
+   * \a baseMesh after the call to this method (eg after the creation of all
+   * morph targets).
    * \param object_reg The object registry
    * \param baseMesh The base animesh where the morph target will be imported.
    * \param morphMesh The animesh to import into the other as a new morph target.
