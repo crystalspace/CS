@@ -82,6 +82,8 @@ namespace CS
         public CS::Memory::CustomAllocated
       {
         uint lastSetupFrame;
+        // Transform light space to post-project light space
+        CS::Math::Matrix4 lightProject;
 
         CachedLightData() : lastSetupFrame (~0) {}
         // Transform light space to post-project light space
@@ -89,14 +91,20 @@ namespace CS
         {
           int actualNumParts;
           // Transform world space to light space
+          csReversibleTransform world2light_rotated;
+
           csRef<csShaderVariable> farZSV;
           csRef<csShaderVariable> numSplitsSV;
+
+          csBox3 castingObjectsBBoxPP;
 
           struct Frustum
           {
             csRef<csShaderVariable> shadowMapProjectSV;
             csRef<csShaderVariable> splitDistsSV;
             csRef<csShaderVariable> textureSVs[rtaNumAttachments];
+
+            csBox3 receivingObjectsBBoxPP;
           };
           Frustum* frustums;
 
@@ -124,13 +132,21 @@ namespace CS
           {
             lightFrustumsHash.DeleteAll();
             lastSetupFrame = currentFrame;
-          }
-          
+          }          
           csRef<iCamera> camera (viewSetup.rview->GetCamera());
 
           LightFrustums& lightFrustumsSettings =
             lightFrustumsHash.GetOrCreate (
             camera, LightFrustums());
+
+          float lightNear = SMALL_Z;
+          float lightCutoff = light->GetCutoffDistance();
+
+          CS::Math::Matrix4 lightProject = CS::Math::Projections::Ortho (
+            lightCutoff, -lightCutoff, lightCutoff, -lightCutoff,
+            -lightCutoff, -lightNear);
+
+          this->lightProject = lightProject;
 
           LightFrustumsArray& lightFrustums =
             lightFrustumsSettings.frustums;
@@ -145,6 +161,13 @@ namespace CS
           superFrustum.actualNumParts = viewSetup.numParts;
           superFrustum.frustums =
             new typename SuperFrustum::Frustum[superFrustum.actualNumParts];
+
+          const csReversibleTransform& world2light_base (
+            light->GetMovable()->GetFullTransform());
+
+          superFrustum.world2light_rotated = world2light_base;
+          superFrustum.world2light_rotated.SetO2T (
+            superFrustum.world2light_rotated.GetO2T());
 
           for (int i = 0; i < superFrustum.actualNumParts; i++)
           {
@@ -267,13 +290,46 @@ namespace CS
               newRenderView->SetEngine (rview->GetEngine ());
               newRenderView->SetThisSector (rview->GetThisSector ());
 
+              csBox3 castersBox = superFrust.castingObjectsBBoxPP;
+              csBox3 receiversBox = lightFrust.receivingObjectsBBoxPP;
+              // set up projection matrix
+              const float focusMinX = csMax (receiversBox.MinX(), castersBox.MinX());
+              const float focusMinY = csMax (receiversBox.MinY(), castersBox.MinY());
+              const float focusMaxX = csMin (receiversBox.MaxX(), castersBox.MaxX());
+              const float focusMaxY = csMin (receiversBox.MaxY(), castersBox.MaxY());
+              const float frustW = focusMaxX - focusMinX;
+              const float frustH = focusMaxY - focusMinY;
+              const float cropScaleX = 2.0f/frustW;
+              const float cropScaleY = 2.0f/frustH;
+              const float cropShiftX =
+                (-1.0f * (focusMaxX + focusMinX))/frustW;
+              const float cropShiftY =
+                (-1.0f * (focusMaxY + focusMinY))/frustH;
+              CS::Math::Matrix4 crop = CS::Math::Matrix4 (
+                cropScaleX, 0, 0, cropShiftX,
+                0, cropScaleY, 0, cropShiftY,
+                0, 0, 1, 0,
+                0, 0, 0, 1);
+
               CS::Math::Matrix4 matrix = rview->GetCamera()->GetProjectionMatrix();
 
-              float lightCutoff = viewSetup.splitDists[frustNum];
+              CS::Math::Matrix4 Mortho = CS::Math::Projections::Ortho (-1, 1, 1, -1, 
+                1, -1);
+
+              float lightCutoff = light->GetCutoffDistance();
               float lightNear = SMALL_Z;
 
-              matrix = CS::Math::Projections::Ortho (lightCutoff, 
-                -lightCutoff, lightCutoff, -lightCutoff, -lightCutoff, -lightNear);
+              lightProject = CS::Math::Projections::Ortho (lightCutoff, 
+                -lightCutoff, lightCutoff, -lightCutoff, 
+                -viewSetup.splitDists[frustNum], -lightNear);
+
+              matrix = (Mortho * crop * lightProject);
+
+//               lightCutoff = viewSetup.splitDists[frustNum];
+//               lightNear = SMALL_Z;
+// 
+//               matrix = CS::Math::Projections::Ortho (lightCutoff, 
+//                 -lightCutoff, lightCutoff, -lightCutoff, -lightCutoff, -lightNear);
 
               for (int i = 0; i < 4; i++)
               {
@@ -490,6 +546,30 @@ namespace CS
 
 //         csPrintf("sub %d\n", subLightNum);
 
+        csVector3 vLight;
+        csBox3 meshBboxWorld (singleMesh.renderMesh->object2world.This2Other (
+          singleMesh.renderMesh->bbox));
+        vLight = superFrust.world2light_rotated.Other2This (
+          meshBboxWorld.GetCorner (0));
+        csBox3 meshBboxLightPP;
+        csVector4 vLightPP;
+        vLightPP = lightData.lightProject * csVector4 (vLight);
+        //vLightPP /= vLightPP.w;
+        meshBboxLightPP.StartBoundingBox (csVector3 (vLightPP.x,
+          vLightPP.y, vLightPP.z));
+        for (int c = 1; c < 8; c++)
+        {
+          vLight = superFrust.world2light_rotated.Other2This (
+            meshBboxWorld.GetCorner (c));
+          vLightPP = lightData.lightProject * csVector4 (vLight);
+          //vLightPP /= vLightPP.w;
+          meshBboxLightPP.AddBoundingVertexSmart (csVector3 (vLightPP.x,
+            vLightPP.y, vLightPP.z));
+        }
+
+        // Mesh casts shadow
+        superFrust.castingObjectsBBoxPP += meshBboxLightPP;
+
         uint spreadFlags = 0;
         int s = 0;
 
@@ -497,6 +577,9 @@ namespace CS
         {
           typename CachedLightData::SuperFrustum::Frustum& lightFrustum =
             superFrust.frustums[f];
+
+          lightFrustum.receivingObjectsBBoxPP += meshBboxLightPP;
+
           lightVarsHelper.MergeAsArrayItem (lightStacks[lightNum],
             lightFrustum.shadowMapProjectSV, s);
 
