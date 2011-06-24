@@ -129,27 +129,25 @@ struct ShadowShadowMapDepth : ShadowShadowMap
         flipY[2] = float4 (0, 0, 1, 0);
         flipY[3] = float4 (0, 0, 0, 1);        
         
-        float4x4 shadowMapTFNext = mul (flipY, lightPropsSM.shadowMapTF[i]);
+        float4x4 shadowMapTFNext = mul (flipY, lightPropsSM.shadowMapTF[i + 1]);
         float4 shadowMapCoordsNext = mul (shadowMapTFNext, shadowMapCoords);      
         float4 shadowMapCoordsProjNext = shadowMapCoordsNext;
         shadowMapCoordsProjNext.xyz /= shadowMapCoordsProjNext.w;      
         float3 shadowMapCoordsBiasedNext = 
           (float3(0.5)*shadowMapCoordsProjNext.xyz) + float3(0.5);
 
-        float4x4 shadowMapTFPrev = mul (flipY, lightPropsSM.shadowMapTF[i - 1]);
+        float4x4 shadowMapTFPrev = mul (flipY, lightPropsSM.shadowMapTF[i]);
         float4 shadowMapCoordsPrev = mul (shadowMapTFPrev, shadowMapCoords);      
         float4 shadowMapCoordsProjPrev = shadowMapCoordsPrev;
         shadowMapCoordsProjPrev.xyz /= shadowMapCoordsProjPrev.w;      
         float3 shadowMapCoordsBiasedPrev = 
           (float3(0.5)*shadowMapCoordsProjPrev.xyz) + float3(0.5);          
           
-        float previousMap = getMapValue(i - 1, shadowMapCoordsBiasedPrev.xy);
-        float nextMap = getMapValue(i, shadowMapCoordsBiasedNext.xy);
+        float previousMap = getMapValue(i, shadowMapCoordsBiasedPrev.xy);
+        float nextMap = getMapValue(i + 1, shadowMapCoordsBiasedNext.xy);
    
         inLight = 1 - lerp(previousMap, nextMap, (float) (gradient - previousSplit) 
           / (nextSplit - previousSplit) );
-          
-        inLight = 1 - nextMap;  
           
         break;
       }
