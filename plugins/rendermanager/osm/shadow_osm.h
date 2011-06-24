@@ -205,42 +205,46 @@ namespace CS
           float _near = FLT_MAX;
           float _far = FLT_MIN;
 
-          // setup split dists
-          for (int i = 0 ; i < meshNode->meshes.GetSize(); i ++)
+          typename RenderTree::ContextNode::TreeType::MeshNodeTreeIteratorType it = 
+            context.meshNodes.GetIterator ();
+
+          while (it.HasNext ())
           {
-            csVector3 meshPosition = 
-              meshNode->meshes.Get(i).meshWrapper->GetMovable()->GetPosition();
-            csRef<csRenderBufferHolder> buffers = 
-              meshNode->meshes.Get(i).renderMesh->buffers;
-            iRenderBuffer* positions = buffers->GetRenderBuffer (CS_BUFFER_POSITION);
-            csVertexListWalker<float, csVector3> positionWalker (positions);
-            csVector3 lightPositin = light->GetMovable()->GetPosition();
+            typename RenderTree::ContextNode::TreeType::MeshNode *node = it.Next ();
+            CS_ASSERT_MSG("Null node encountered, should not be possible", node);
 
-            // only take into account translucent objects
-            if ( meshNode->meshes.Get(i).meshWrapper->GetMeshObject()->GetMixMode() !=
-              CS_FX_ALPHA)
-              continue;
-
-//             csPrintf("%d\n", meshNode->meshes.Get(i).meshWrapper->GetMeshObject()->GetMixMode() );
-
-//             if(positionWalker.GetSize() == 4)
-//               continue;
-
-//             csPrintf("%d\n", positionWalker.GetSize ());
-
-            // Iterate on all vertices
-            for (size_t i = 0; i < positionWalker.GetSize (); i++)
+            // setup split dists
+            for (int i = 0 ; i < node->meshes.GetSize(); i ++)
             {
-              float distance = (lightPositin - 
-                (*positionWalker) - meshPosition).Norm ();
+              typename RenderTree::ContextNode::TreeType::MeshNode::SingleMesh mesh = node->meshes.Get(i);
+              
+              csVector3 meshPosition = 
+                mesh.meshWrapper->GetMovable()->GetPosition();
+              csRef<csRenderBufferHolder> buffers = 
+                mesh.renderMesh->buffers;
+              iRenderBuffer* positions = buffers->GetRenderBuffer (CS_BUFFER_POSITION);
+              csVertexListWalker<float, csVector3> positionWalker (positions);
+              csVector3 lightPositin = light->GetMovable()->GetPosition();
 
-              if (distance < _near)
-                _near = distance;
+              // only take into account translucent objects
+              if ( mesh.meshWrapper->GetRenderPriority() != 
+                rview->GetEngine()->GetRenderPriority("alpha"))
+                continue;
 
-              if (distance > _far)
-                _far = distance;
-    
-              ++positionWalker;
+              // Iterate on all vertices
+              for (size_t i = 0; i < positionWalker.GetSize (); i++)
+              {
+                float distance = (lightPositin - 
+                  (*positionWalker) - meshPosition).Norm ();
+
+                if (distance < _near)
+                  _near = distance;
+
+                if (distance > _far)
+                  _far = distance;
+
+                ++positionWalker;
+              }
             }
           }
 
@@ -521,7 +525,7 @@ namespace CS
         superFrust.farZSV->SetValue(viewSetup.persist.farZ);
 
         // here might be number of lights
-        return spreadFlags;
+        return 1;
       }
 
       static bool NeedFinalHandleLight() { return true; }

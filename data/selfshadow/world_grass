@@ -31,11 +31,9 @@
       <plugin>genmesh</plugin>
       <params>
         <factory>GrassFact</factory>
-        <mixmode>
-          <alpha />
-        </mixmode>             
       </params>
       <zuse/>
+      <priority>alpha</priority>
       <move>
         <v y='1.3273'/>
         <matrix>
