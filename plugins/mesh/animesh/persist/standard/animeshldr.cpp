@@ -629,21 +629,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
       }
       
       // Write skeleton
+      CS::Animation::iSkeletonFactory* skeletonFactory =
+	factory->GetSkeletonFactory ();
+      if (skeletonFactory)
       {
-	CS::Animation::iSkeletonFactory* skeletonFactory =
-	  factory->GetSkeletonFactory ();
-	if (skeletonFactory)
-	{
-	  csRef<iDocumentNode> skeletonNode = 
-	    paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-	  skeletonNode->SetValue ("skeleton");
-	  csRef<iDocumentNode> skeletonNameNode = 
-	    skeletonNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-	  skeletonNameNode->SetValue (skeletonFactory->GetName ());
-	}
+	csRef<iDocumentNode> skeletonNode = 
+	  paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	skeletonNode->SetValue ("skeleton");
+	csRef<iDocumentNode> skeletonNameNode = 
+	  skeletonNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+	skeletonNameNode->SetValue (skeletonFactory->GetName ());
       }
 
       // Write bone influences
+      if (skeletonFactory && skeletonFactory->GetBoneOrderList ().GetSize ())
       {
 	CS::Mesh::AnimatedMeshBoneInfluence* influences = factory->GetBoneInfluences ();
 	if (influences)
