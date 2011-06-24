@@ -9,7 +9,7 @@ class btSoftBody;
 
 CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
-using CS::Physics2::iRigidBody;
+//using CS::Physics2::iRigidBody;
 
 class csBulletSoftBody : public scfImplementationExt2<csBulletSoftBody, 
   csBulletCollisionObject, CS::Physics2::iSoftBody,
@@ -43,7 +43,8 @@ public:
   virtual iCollisionObject* QueryCollisionObject () {return dynamic_cast<csBulletCollisionObject*> (this);}
 
   virtual void SetObjectType (CS::Collision2::CollisionObjectType type) {}
-  virtual CS::Collision2::CollisionObjectType GetObjectType () {return CS::Collision2::COLLISION_OBJECT_PHYSICAL;}
+  virtual CS::Collision2::CollisionObjectType GetObjectType ()
+  {return CS::Collision2::COLLISION_OBJECT_PHYSICAL;}
 
   virtual void SetAttachedMovable (iMovable* movable) {csBulletCollisionObject::SetAttachedMovable (movable);}
   virtual iMovable* GetAttachedMovable () {return csBulletCollisionObject::GetAttachedMovable ();}
@@ -76,7 +77,7 @@ public:
 
   //iPhysicalBody
 
-  virtual CS::Physics2::PhysicalBodyType GetBodyType () const {return CS::Physics2::PhysicalBodyType::BODY_SOFT;}
+  virtual CS::Physics2::PhysicalBodyType GetBodyType () const {return CS::Physics2::BODY_SOFT;}
   virtual iRigidBody* QueryRigidBody () {return NULL;}
   virtual CS::Physics2::iSoftBody* QuerySoftBody () {return dynamic_cast<CS::Physics2::iSoftBody*>(this);}
 

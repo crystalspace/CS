@@ -147,7 +147,7 @@ public:
 
   virtual void reportErrorWarning (const char *warningString)
   {
-    csFPrintf (stderr, warningString);
+    printf ("%s", warningString);
   }
 
   virtual void draw3dText (const btVector3 &location, const char *textString)

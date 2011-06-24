@@ -30,6 +30,7 @@ class csBulletRigidBody;
 class csBulletSoftBody;
 class csBulletCollisionObject;
 class csBulletCollider;
+class csBulletJoint;
 
 using namespace CS::Collision2;
 using namespace CS::Physics2;
