@@ -207,10 +207,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     vertexBuffer = renderBuffer;
     vertexCount = (uint)vertexBuffer->GetElementCount ();
 
-    //Update the number of bone influences
-    // TODO: don't allocate them until needed
-    boneInfluences.SetSize (vertexCount*4);//@@TODO handle
-
     return true;
   }
 
@@ -345,23 +341,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
 
     // Setup the bone weight & index buffers for cases not covered above
-    masterBWBuffer = csRenderBuffer::CreateInterleavedRenderBuffers (
-      vertexCount, CS_BUF_STATIC, 2, bufSettings, boneWeightAndIndexBuffer);
-    masterBWBuffer->CopyInto (boneInfluences.GetArray (), 
-      csMin((size_t)vertexCount, (size_t)boneInfluences.GetSize ()/4));
-    
-    // Normalize the bone weights
-    for (size_t i = 0; i < vertexCount; ++i)
+    if (boneInfluences.GetSize ())
     {
-      float sumWeight = 0;
-      for (size_t j = 0; j < 4; ++j)
+      masterBWBuffer = csRenderBuffer::CreateInterleavedRenderBuffers (
+	vertexCount, CS_BUF_STATIC, 2, bufSettings, boneWeightAndIndexBuffer);
+      masterBWBuffer->CopyInto (boneInfluences.GetArray (), 
+				csMin((size_t)vertexCount, (size_t)boneInfluences.GetSize ()/4));
+    
+      // Normalize the bone weights
+      for (size_t i = 0; i < vertexCount; ++i)
       {
-        sumWeight += boneInfluences[i*4+j].influenceWeight;
-      }
+	float sumWeight = 0;
+	for (size_t j = 0; j < 4; ++j)
+	{
+	  sumWeight += boneInfluences[i*4+j].influenceWeight;
+	}
 
-      for (size_t j = 0; j < 4; ++j)
-      {
-        boneInfluences[i*4+j].influenceWeight /= sumWeight;
+	for (size_t j = 0; j < 4; ++j)
+	{
+	  boneInfluences[i*4+j].influenceWeight /= sumWeight;
+	}
       }
     }
 
@@ -396,6 +395,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   CS::Mesh::AnimatedMeshBoneInfluence* AnimeshObjectFactory::GetBoneInfluences ()
   {
+    // Update the number of bone influences at first
+    boneInfluences.SetSize (vertexCount * 4);
+
     return boneInfluences.GetArray ();
   }
 
@@ -613,11 +615,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     // Initialize the bounding box of the animated mesh object factory
     factoryBB.StartBoundingBox ();
 
-    // Compute the object bounding box (without skeleton)
-    if (skeletonFactory && (bones.GetSize () == 0))
+    if (skeletonFactory && !bones.GetSize ())
       bones.SetSize (skeletonFactory->GetTopBoneID () + 1);
 
-    if (bones.GetSize () == 0)
+    // If there are no bone, skeleton, or bone influence, then compute
+    // only the bounding box for the whole mesh
+    if (!bones.GetSize () || !boneInfluences.GetSize ())
     {
       csVertexListWalker<float, csVector3> vbuf (vertexBuffer);
       for (size_t i = 0; i < vertexCount; ++i)
@@ -669,7 +672,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       }
     }
 
-    // Compute the object bounding box (with skeleton)
+    // Compute the bounding box of the whole mesh
     for (CS::Animation::BoneID i = 0; i < bones.GetSize (); i++)
     {
       if (skeletonFactory->HasBone (i))
@@ -1479,7 +1482,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return mixMode;
   }
 
-  void AnimeshObject::PositionChild (iMeshObject* child,csTicks current_time)
+  void AnimeshObject::PositionChild (iMeshObject* child, csTicks current_time)
   {
     // TODO
   }
