@@ -59,6 +59,11 @@ struct csMGGeom
 
   csRef<csShaderVariable> windDataVar;
   csRef<csShaderVariable> instancesNumVar;
+  /**
+   * SV contains coefficents for linear fading function <tt>opacity = dist*m + n</tt>:
+   * (fadeInM,fadeInN,fadeOutM,fadeOutN)
+   */
+  csRef<csShaderVariable> fadeInfoVar;
   csRef<iMeshWrapper> mesh;
 
   // All instances of this geometry
@@ -68,26 +73,6 @@ struct csMGGeom
     float m[12];
   };
   csDirtyAccessArray<Transform> allTransforms;
-  // @@@ These should NOT be instanced!
-  struct FadeInfo
-  {
-    //@{
-    /// Coefficents for linear fading function <tt>opacity = dist*m + n</tt>
-    float fadeInM;
-    float fadeInN;
-    float fadeOutM;
-    float fadeOutN;
-    //@}
-    
-    void Set (float fadeInM, float fadeInN, float fadeOutM, float fadeOutN)
-    {
-      this->fadeInM = fadeInM;
-      this->fadeInN = fadeInN;
-      this->fadeOutM = fadeOutM;
-      this->fadeOutN = fadeOutN;
-    }
-  };
-  csDirtyAccessArray<FadeInfo> allFadeInfo;
   struct InstanceExtra
   {
     float random;
@@ -102,10 +87,8 @@ struct csMGGeom
   // Buffers/SVs for rendering
   bool dataDirty;
   csRef<iRenderBuffer> transformBuffer;
-  csRef<iRenderBuffer> fadeInfoBuffer;
   csRef<iRenderBuffer> instanceExtraBuffer;
   csRef<csShaderVariable> transformVar;
-  csRef<csShaderVariable> fadeInfoVar;
   csRef<csShaderVariable> instanceExtraVar;
   
   csMGGeom() : dataDirty (true) {}
@@ -260,8 +243,8 @@ public:
   void MoveMesh (int cidx, const csMGPosition& pos,
 		 const csVector3& position, const csMatrix3& matrix); 
 
-  /// Set the fade params for a mesh.
-  void SetFadeParams (csMGPosition& p, float opaqueDist, float scale);
+  /// Set the fade params for the geometry.
+  void SetFadeParams (csMGGeom& geom, float opaqueDist, float scale);
 
   /**
    * Get the right lod level for the given squared distance.

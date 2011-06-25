@@ -229,13 +229,14 @@ void csMeshGeneratorGeometry::AddFactory (iMeshFactoryWrapper* factory,
   g.windDataVar.AttachNew (new csShaderVariable (generator->varWindData));
   g.windDataVar->SetType (csShaderVariable::VECTOR3);
   g.instancesNumVar.AttachNew (new csShaderVariable (generator->varInstancesNum));
-  g.transformVar.AttachNew (new csShaderVariable (generator->varTransform)); 
   g.fadeInfoVar.AttachNew (new csShaderVariable (generator->varFadeInfo)); 
+  g.fadeInfoVar->SetType (csShaderVariable::VECTOR4);
+  g.transformVar.AttachNew (new csShaderVariable (generator->varTransform)); 
   g.instanceExtraVar.AttachNew (new csShaderVariable (generator->varInstanceExtra)); 
   AddSVToMesh (g.mesh, g.windDataVar);
   AddSVToMesh (g.mesh, g.instancesNumVar);
-  AddSVToMesh (g.mesh, g.transformVar); 
   AddSVToMesh (g.mesh, g.fadeInfoVar); 
+  AddSVToMesh (g.mesh, g.transformVar); 
   AddSVToMesh (g.mesh, g.instanceExtraVar); 
 
   csBox3 bbox;
@@ -278,13 +279,7 @@ bool csMeshGeneratorGeometry::AllocMesh (
   newPos = &pos;
   
   geom.allTransforms.GetExtend (i);
-  float fadeOpaqueDist =
-    generator->use_alpha_scaling ? generator->alpha_mindist : generator->total_max_dist;
-  float fadeDistScale =
-    generator->use_alpha_scaling ? generator->alpha_scale : 0;
   geom.allInstanceExtra.GetExtend (i).Set (rng.Get());
-  geom.allFadeInfo.GetExtend (i);
-  SetFadeParams (pos, fadeOpaqueDist, fadeDistScale);
 
   geom.dataDirty = true;
   
@@ -322,39 +317,36 @@ void csMeshGeneratorGeometry::MoveMesh (int cidx,
   geom.dataDirty = true;
 }
 
-void csMeshGeneratorGeometry::SetFadeParams (csMGPosition& p, float opaqueDist, float scale)
+void csMeshGeneratorGeometry::SetFadeParams (csMGGeom& geom, float opaqueDist, float scale)
 {
-  csMGGeom& geom = factories[p.lod];
-  csMGGeom::FadeInfo& fade = geom.allFadeInfo[p.idInGeometry];
+  float fadeInM, fadeInN, fadeOutM, fadeOutN;
   float max_opaque_dist = csMin (this->max_opaque_dist, opaqueDist);
   float max_draw_dist = csMin (total_max_dist,
                                (fabsf (scale) > EPSILON ? 1.0f/scale : 0) + opaqueDist);
   float min_fade_dist = min_opaque_dist-min_draw_dist;
   if (fabsf (min_fade_dist) > EPSILON)
   {
-    float fadeInM = 1.0f/(min_fade_dist);
-    fade.fadeInM = fadeInM;
-    fade.fadeInN = -min_draw_dist * fadeInM;
+    fadeInM = 1.0f/(min_fade_dist);
+    fadeInN = -min_draw_dist * fadeInM;
   }
   else
   {
-    fade.fadeInM = 0;
-    fade.fadeInN = 1;
+    fadeInM = 0;
+    fadeInN = 1;
   }
   float max_fade_dist = max_opaque_dist-max_draw_dist;
   if (fabsf (max_fade_dist) > EPSILON)
   {
-    float fadeOutM = 1.0f/(max_fade_dist);
-    fade.fadeOutM = fadeOutM;
-    fade.fadeOutN = -max_opaque_dist*fadeOutM + 1;
+    fadeOutM = 1.0f/(max_fade_dist);
+    fadeOutN = -max_opaque_dist*fadeOutM + 1;
   }
   else
   {
-    fade.fadeOutM = 0;
-    fade.fadeOutN = 1;
+    fadeOutM = 0;
+    fadeOutN = 1;
   }
 
-  geom.dataDirty = true;
+  geom.fadeInfoVar->SetValue (csVector4 (fadeInM, fadeInN, fadeOutM, fadeOutN));
 }
 
 void csMeshGeneratorGeometry::SetWindDirection (float x, float z)
@@ -428,6 +420,11 @@ static void UpdateInstancingParams (bool allDataDirty,
 
 void csMeshGeneratorGeometry::FinishUpdate ()
 {
+  float fadeOpaqueDist =
+    generator->use_alpha_scaling ? generator->alpha_mindist : total_max_dist;
+  float fadeDistScale =
+    generator->use_alpha_scaling ? generator->alpha_scale : 0;
+
   size_t lod;
   for (lod = 0 ; lod < factories.GetSize () ; lod++)
   {
@@ -444,6 +441,7 @@ void csMeshGeneratorGeometry::FinishUpdate ()
 	geom.mesh->GetMovable ()->SetSector (generator->GetSector ()); 
       }
       
+      SetFadeParams (geom, fadeOpaqueDist, fadeDistScale);
       geom.instancesNumVar->SetValue (int (geom.allPositions.GetSize()));
 
       /* Update buffers
@@ -451,9 +449,6 @@ void csMeshGeneratorGeometry::FinishUpdate ()
          elements changes only slightly.) */
       UpdateInstancingParams (geom.dataDirty, geom.allTransforms,
                               geom.transformBuffer, geom.transformVar);
-
-      UpdateInstancingParams (geom.dataDirty, geom.allFadeInfo,
-                              geom.fadeInfoBuffer, geom.fadeInfoVar);
 
       UpdateInstancingParams (geom.dataDirty, geom.allInstanceExtra,
                               geom.instanceExtraBuffer, geom.instanceExtraVar);

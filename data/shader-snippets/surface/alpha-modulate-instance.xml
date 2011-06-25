@@ -26,20 +26,24 @@
     <input file="/shader-snippets/ModelView.inp" private="yes" />
     <input name="meshgenFadeInfo" type="float4" default="complex" private="yes">
       <block location="cg:vertexIn">
-        <varying type="float4" name="meshgenFadeInfo" />
+        <uniform type="float4" name="meshgenFadeInfo" />
+      </block>
+      <block location="cg:fragmentIn">
+        <uniform type="float4" name="meshgenFadeInfo" />
       </block>
       
       <block location="cg:vertexMain">
         meshgenFadeInfo = vertexIn.meshgenFadeInfo;
       </block>
-
-      <block location="cg:vertexToFragment">
-        <varying type="float4" name="meshgenFadeInfo" />
+      <block location="cg:fragmentMain">
+        meshgenFadeInfo = fragmentIn.meshgenFadeInfo;
       </block>
 
-      <block location="pass">
-        <instanceparam source="meshgen fade info"
+      <block location="cg:variablemap">
+        <variablemap variable="meshgen fade info" 
           destination="vertexIn.meshgenFadeInfo" />
+        <variablemap variable="meshgen fade info" 
+          destination="fragmentIn.meshgenFadeInfo" />
       </block>
     </input>
 
