@@ -49,7 +49,7 @@ struct iTerraFormer;
  */
 struct iMeshGeneratorGeometry : public virtual iBase
 {
-  SCF_INTERFACE(iMeshGeneratorGeometry, 1, 1, 2);
+  SCF_INTERFACE(iMeshGeneratorGeometry, 1, 1, 3);
 
   /**
    * Add a factory and the maximum distance after which this factory
@@ -188,6 +188,30 @@ struct iMeshGeneratorGeometry : public virtual iBase
   virtual void SetMinimumDrawDistance (float dist) = 0;
   /// Get the minimum drawing distance for any mesh in this geometry.
   virtual float GetMinimumDrawDistance () = 0;
+  
+  /**
+   * Set the minimum distance at which meshes appear opaque.
+   * A mesh, at the minimum drawing distance, is drawn fully transparent and
+   * is faded in until it reaches the minimum opacity distance (where it is
+   * drawn fully opaque).
+   */
+  virtual void SetMinimumOpaqueDistance (float dist) = 0;
+  /// Get the minimum distance at which meshes appear opaque.
+  virtual float GetMinimumOpaqueDistance () = 0;
+
+  /**
+   * Set the maximum distance at which meshes appear opaque.
+   * A mesh, at the maximum opacity distance, is drawn fully opaque and
+   * is faded out until it reaches the maximum drawing distance (where it is
+   * drawn fully transparent).
+   * 
+   * \remarks If the mesh generator has distances to fade in between set 
+   * (with iMeshGenerator::SetAlphaScale), the closer of the per-generator
+   * and per-geometry distances are used for fading.
+   */
+  virtual void SetMaximumOpaqueDistance (float dist) = 0;
+  /// Get the maximum distance at which meshes appear opaque.
+  virtual float GetMaximumOpaqueDistance () = 0;
 };
 
 /**

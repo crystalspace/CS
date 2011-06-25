@@ -37,6 +37,8 @@ csMeshGeneratorGeometry::csMeshGeneratorGeometry (
   csMeshGenerator* generator) : scfImplementationType (this),
   min_draw_dist (0),
   sq_min_draw_dist (0),
+  min_opaque_dist (0),
+  max_opaque_dist (CS::Infinity()),
   generator (generator)
 {
   colldetID = generator->GetStringSet()->Request ("colldet");
@@ -131,6 +133,16 @@ void csMeshGeneratorGeometry::SetMinimumDrawDistance (float dist)
   sq_min_draw_dist = dist*dist;
 }
 
+void csMeshGeneratorGeometry::SetMinimumOpaqueDistance (float dist)
+{
+  min_opaque_dist = dist;
+}
+
+void csMeshGeneratorGeometry::SetMaximumOpaqueDistance (float dist)
+{
+  max_opaque_dist = dist;
+}
+
 void csMeshGeneratorGeometry::AddPositionsFromMap (iTerraFormer* map,
 	const csBox2 &region, uint resx, uint resy, float value,
 	const csStringID & type)
@@ -218,10 +230,12 @@ void csMeshGeneratorGeometry::AddFactory (iMeshFactoryWrapper* factory,
   g.windDataVar->SetType (csShaderVariable::VECTOR3);
   g.instancesNumVar.AttachNew (new csShaderVariable (generator->varInstancesNum));
   g.transformVar.AttachNew (new csShaderVariable (generator->varTransform)); 
+  g.fadeInfoVar.AttachNew (new csShaderVariable (generator->varFadeInfo)); 
   g.instanceExtraVar.AttachNew (new csShaderVariable (generator->varInstanceExtra)); 
   AddSVToMesh (g.mesh, g.windDataVar);
   AddSVToMesh (g.mesh, g.instancesNumVar);
   AddSVToMesh (g.mesh, g.transformVar); 
+  AddSVToMesh (g.mesh, g.fadeInfoVar); 
   AddSVToMesh (g.mesh, g.instanceExtraVar); 
 
   csBox3 bbox;
@@ -268,7 +282,9 @@ bool csMeshGeneratorGeometry::AllocMesh (
     generator->use_alpha_scaling ? generator->alpha_mindist : generator->total_max_dist;
   float fadeDistScale =
     generator->use_alpha_scaling ? generator->alpha_scale : 0;
-  geom.allInstanceExtra.GetExtend (i).Set (rng.Get(), fadeOpaqueDist, fadeDistScale);
+  geom.allInstanceExtra.GetExtend (i).Set (rng.Get());
+  geom.allFadeInfo.GetExtend (i);
+  SetFadeParams (pos, fadeOpaqueDist, fadeDistScale);
 
   geom.dataDirty = true;
   
@@ -309,9 +325,34 @@ void csMeshGeneratorGeometry::MoveMesh (int cidx,
 void csMeshGeneratorGeometry::SetFadeParams (csMGPosition& p, float opaqueDist, float scale)
 {
   csMGGeom& geom = factories[p.lod];
-  csMGGeom::InstanceExtra& extra = geom.allInstanceExtra[p.idInGeometry];
-  extra.fadeOpaqueDist = opaqueDist;
-  extra.fadeDistScale = scale;
+  csMGGeom::FadeInfo& fade = geom.allFadeInfo[p.idInGeometry];
+  float max_opaque_dist = csMin (this->max_opaque_dist, opaqueDist);
+  float max_draw_dist = csMin (total_max_dist,
+                               (fabsf (scale) > EPSILON ? 1.0f/scale : 0) + opaqueDist);
+  float min_fade_dist = min_opaque_dist-min_draw_dist;
+  if (fabsf (min_fade_dist) > EPSILON)
+  {
+    float fadeInM = 1.0f/(min_fade_dist);
+    fade.fadeInM = fadeInM;
+    fade.fadeInN = -min_draw_dist * fadeInM;
+  }
+  else
+  {
+    fade.fadeInM = 0;
+    fade.fadeInN = 1;
+  }
+  float max_fade_dist = max_opaque_dist-max_draw_dist;
+  if (fabsf (max_fade_dist) > EPSILON)
+  {
+    float fadeOutM = 1.0f/(max_fade_dist);
+    fade.fadeOutM = fadeOutM;
+    fade.fadeOutN = -max_opaque_dist*fadeOutM + 1;
+  }
+  else
+  {
+    fade.fadeOutM = 0;
+    fade.fadeOutN = 1;
+  }
 
   geom.dataDirty = true;
 }
@@ -366,6 +407,25 @@ void csMeshGeneratorGeometry::FreeMesh (int cidx, csMGPosition& pos)
   }
 }
 
+template<typename DataArray>
+static void UpdateInstancingParams (bool allDataDirty,
+                                    const DataArray& array,
+                                    csRef<iRenderBuffer>& buffer,
+                                    csShaderVariable* sv)
+{
+  bool updateData = allDataDirty;
+  if (!buffer
+    || (buffer->GetElementCount() != array.Capacity()))
+  {
+    buffer = csRenderBuffer::CreateRenderBuffer (array.Capacity(),
+                                                 CS_BUF_STREAM, CS_BUFCOMP_FLOAT,
+                                                 sizeof (typename DataArray::ValueType) / sizeof(float));
+    sv->SetValue (buffer);
+    updateData = true;
+  }
+  if (updateData) buffer->SetData (array.GetArray());
+}
+
 void csMeshGeneratorGeometry::FinishUpdate ()
 {
   size_t lod;
@@ -389,29 +449,14 @@ void csMeshGeneratorGeometry::FinishUpdate ()
       /* Update buffers
          (Compare capacity instead of size so a buffer is kept if the number of
          elements changes only slightly.) */
-      bool updateTransformData = geom.dataDirty;
-      if (!geom.transformBuffer
-	|| (geom.transformBuffer->GetElementCount() != geom.allTransforms.Capacity()))
-      {
-	geom.transformBuffer = csRenderBuffer::CreateRenderBuffer (geom.allTransforms.Capacity(),
-								   CS_BUF_STREAM, CS_BUFCOMP_FLOAT,
-								   sizeof (csMGGeom::Transform) / sizeof(float));
-	geom.transformVar->SetValue (geom.transformBuffer);
-	updateTransformData = true;
-      }
-      if (updateTransformData) geom.transformBuffer->SetData (geom.allTransforms.GetArray());
+      UpdateInstancingParams (geom.dataDirty, geom.allTransforms,
+                              geom.transformBuffer, geom.transformVar);
 
-      bool updateExtraData = geom.dataDirty;
-      if (!geom.instanceExtraBuffer
-	|| (geom.instanceExtraBuffer->GetElementCount() != geom.allInstanceExtra.Capacity()))
-      {
-	geom.instanceExtraBuffer = csRenderBuffer::CreateRenderBuffer (geom.allInstanceExtra.Capacity(),
-								       CS_BUF_STREAM, CS_BUFCOMP_FLOAT,
-								       sizeof (csMGGeom::InstanceExtra) / sizeof(float));
-	geom.instanceExtraVar->SetValue (geom.instanceExtraBuffer);
-	updateExtraData = true;
-      }
-      if (updateExtraData) geom.instanceExtraBuffer->SetData (geom.allInstanceExtra.GetArray());
+      UpdateInstancingParams (geom.dataDirty, geom.allFadeInfo,
+                              geom.fadeInfoBuffer, geom.fadeInfoVar);
+
+      UpdateInstancingParams (geom.dataDirty, geom.allInstanceExtra,
+                              geom.instanceExtraBuffer, geom.instanceExtraVar);
 
       geom.dataDirty = false;
     }
@@ -486,6 +531,7 @@ csMeshGenerator::csMeshGenerator (csEngine* engine) :
     engine->objectRegistry, "crystalspace.shader.variablenameset");
   varInstancesNum = SVstrings->Request ("instances num");
   varTransform = SVstrings->Request ("instancing transforms");
+  varFadeInfo = SVstrings->Request ("meshgen fade info");
   varInstanceExtra = SVstrings->Request ("instance extra");
   varWindData = SVstrings->Request ("wind data");
 }

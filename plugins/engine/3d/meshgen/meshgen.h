@@ -68,17 +68,33 @@ struct csMGGeom
     float m[12];
   };
   csDirtyAccessArray<Transform> allTransforms;
+  // @@@ These should NOT be instanced!
+  struct FadeInfo
+  {
+    //@{
+    /// Coefficents for linear fading function <tt>opacity = dist*m + n</tt>
+    float fadeInM;
+    float fadeInN;
+    float fadeOutM;
+    float fadeOutN;
+    //@}
+    
+    void Set (float fadeInM, float fadeInN, float fadeOutM, float fadeOutN)
+    {
+      this->fadeInM = fadeInM;
+      this->fadeInN = fadeInN;
+      this->fadeOutM = fadeOutM;
+      this->fadeOutN = fadeOutN;
+    }
+  };
+  csDirtyAccessArray<FadeInfo> allFadeInfo;
   struct InstanceExtra
   {
-    float windRand;
-    float fadeOpaqueDist;
-    float fadeDistScale;
+    float random;
     
-    void Set (float windRand, float fadeOpaqueDist, float fadeDistScale)
+    void Set (float random)
     {
-      this->windRand = windRand;
-      this->fadeOpaqueDist = fadeOpaqueDist;
-      this->fadeDistScale = fadeDistScale;
+      this->random = random;
     }
   };
   csDirtyAccessArray<InstanceExtra> allInstanceExtra;
@@ -86,8 +102,10 @@ struct csMGGeom
   // Buffers/SVs for rendering
   bool dataDirty;
   csRef<iRenderBuffer> transformBuffer;
+  csRef<iRenderBuffer> fadeInfoBuffer;
   csRef<iRenderBuffer> instanceExtraBuffer;
   csRef<csShaderVariable> transformVar;
+  csRef<csShaderVariable> fadeInfoVar;
   csRef<csShaderVariable> instanceExtraVar;
   
   csMGGeom() : dataDirty (true) {}
@@ -115,6 +133,8 @@ private:
   
   float min_draw_dist;
   float sq_min_draw_dist;
+  float min_opaque_dist;
+  float max_opaque_dist;
 
   // Random number generator for wind randomness.
   csRandomGen rng;
@@ -195,6 +215,12 @@ public:
   void SetMinimumDrawDistance (float dist);
   float GetMinimumDrawDistance () { return min_draw_dist; }
   
+  void SetMinimumOpaqueDistance (float dist);
+  float GetMinimumOpaqueDistance () { return min_opaque_dist; }
+
+  void SetMaximumOpaqueDistance (float dist);
+  float GetMaximumOpaqueDistance () { return max_opaque_dist; }
+
   const csVector2& GetWindDirection() const { return wind_direction; }
   virtual void SetWindDirection (float x, float z);
 
@@ -492,6 +518,7 @@ public:
   CS::ShaderVarStringID varInstancesNum;
   CS::ShaderVarStringID varTransform;
   CS::ShaderVarStringID varInstanceExtra;
+  CS::ShaderVarStringID varFadeInfo;
   CS::ShaderVarStringID varWindData;
 
   csMeshGenerator (csEngine* engine);
