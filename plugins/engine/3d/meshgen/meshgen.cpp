@@ -502,7 +502,7 @@ void csMeshGeneratorGeometry::UpdatePosition (const csVector3& pos)
 
 csMeshGenerator::csMeshGenerator (csEngine* engine) : 
   scfImplementationType (this), total_max_dist (-1.0f), minRadius(-1.0f),
-  use_density_scaling (false), use_alpha_scaling (false),
+  use_alpha_scaling (false),
   last_pos (0, 0, 0), setup_cells (false),
   cell_dim (50), inuse_blocks (0), inuse_blocks_last (0),
   max_blocks (100), engine (engine)
@@ -584,13 +584,6 @@ float csMeshGenerator::GetTotalMaxDist ()
 void csMeshGenerator::SetDensityScale (float mindist, float maxdist,
                                        float maxdensityfactor)
 {
-  use_density_scaling = true;
-  density_mindist = mindist;
-  sq_density_mindist = density_mindist * density_mindist;
-  density_maxdist = maxdist;
-  density_maxfactor = maxdensityfactor;
-
-  density_scale = (1.0f-density_maxfactor) / (density_maxdist - density_mindist);
 }
 
 void csMeshGenerator::SetAlphaScale (float mindist, float maxdist)
@@ -898,7 +891,6 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
             if (rot < 0) rot = 0;
             else if (rot >= CS_GEOM_MAX_ROTATIONS) rot = CS_GEOM_MAX_ROTATIONS-1;
             pos.rotation = rot;
-            pos.random = random.Get ();
             block->positions.Push (new csMGPosition (pos));
 	    positionsUsed++;
 	    
@@ -1010,37 +1002,11 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
       if (p.idInGeometry == csArrayItemNotFound)
       {
         // We didn't have a mesh here so we allocate one.
-        // But first we test if we have density scaling.
-        bool show = true;
-        if (use_density_scaling && sqdist > sq_density_mindist)
+        if (geometries[p.geom_type]->AllocMesh (cidx, cell, sqdist, p))
         {
-          float dist = sqrt (sqdist);
-          float factor = (density_maxdist - dist) * density_scale
-            + density_maxfactor;
-          if (factor < 0) factor = 0;
-          else if (factor > 1) factor = 1;
-          if (p.random > factor)
-              show = false;
-          else
-              p.addedDist = dist;
-        }
-
-        if (show)
-        {
-          if (geometries[p.geom_type]->AllocMesh (cidx, cell, sqdist, p))
-          {
-            p.last_mixmode = ~0;
-            geometries[p.geom_type]->MoveMesh (cidx, p,
-					       p.position, rotation_matrices[p.rotation]);
-
-	    if (use_density_scaling && (p.addedDist > 0))
-	    {
-	      float correct_alpha_maxdist = p.addedDist;
-	      float correct_alpha_mindist = p.addedDist*(alpha_mindist/alpha_maxdist);
-	      float correct_scale = 1.0f/(correct_alpha_maxdist-correct_alpha_mindist);
-	      geometries[p.geom_type]->SetFadeParams (p, correct_alpha_mindist, correct_scale);
-	    }
-          }
+          p.last_mixmode = ~0;
+          geometries[p.geom_type]->MoveMesh (cidx, p,
+                                              p.position, rotation_matrices[p.rotation]);
         }
       }
       else
@@ -1073,7 +1039,6 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
       {
         geometries[p.geom_type]->FreeMesh (cidx, p);
         p.idInGeometry = csArrayItemNotFound;
-        p.addedDist = 0;
       }
     }
   }

@@ -236,18 +236,13 @@ struct iMeshGenerator : public virtual iBase
   virtual iObject *QueryObject () = 0;
 
   /**
-   * Set the density scale. If this is set then objects in the distance
-   * can have a lower density.
-   * \param mindist is the minimum distance at which density scale starts. At
-   * this distance the density factor will be 1 (meaning original density
-   * as given by the geometry itself).
-   * \param maxdist is the maximum distance at which density scale ends. At
-   * this distance the density factor will be equal to 'maxdensityfactor'.
-   * Note that this is a linear function so distances beyond 'maxdist' will get
-   * even lower density.
-   * \param maxdensityfactor is the density factor to use at 'maxdist'. 1 means
-   * full density and 0 means nothing left.
+   * \deprecated Feature removed in 2.1.
+   *   Similar functionality can be achieved by using multiple geometries with
+   *   different densities.
    */
+  CS_DEPRECATED_METHOD_MSG("Feature removed in 2.1. "
+    "Similar functionality can be achieved by using multiple geometries with "
+   "different densities.")
   virtual void SetDensityScale (float mindist, float maxdist,
   	float maxdensityfactor) = 0;
 

@@ -297,17 +297,6 @@ struct csMGPosition
   size_t rotation;
 
   /**
-   * A random number between 0 and 1 which controls fade and density
-   * scaling for this position.
-   */
-  float random;
-
-  /**
-   * The distance at which we were added. Used for density scaling.
-   */
-  float addedDist;
-
-  /**
    * Last used mixmode.
    */
   uint last_mixmode;
@@ -318,8 +307,8 @@ struct csMGPosition
   /// Index of geometry in csMGGeom.
   size_t idInGeometry;
 
-  csMGPosition () : position(0.0f), geom_type(0), rotation(0), random(0.0f),
-    addedDist(0.0f), last_mixmode(CS_FX_COPY), lod(0),
+  csMGPosition () : position(0.0f), geom_type(0), rotation(0),
+    last_mixmode(CS_FX_COPY), lod(0),
     idInGeometry (csArrayItemNotFound) { } 
 };
 
@@ -413,12 +402,6 @@ private:
   float samplefact_z;
   float samplecellwidth_x;
   float samplecellheight_z;
-
-  /// For density scaling.
-  bool use_density_scaling;
-  float density_mindist, sq_density_mindist, density_maxdist;
-  float density_scale;
-  float density_maxfactor;
 
   /// Default density factor.
   float default_density_factor;
