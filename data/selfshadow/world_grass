@@ -32,8 +32,6 @@
       <params>
         <factory>GrassFact</factory>
       </params>
-      <zuse/>
-      <priority>alpha</priority>
       <move>
         <v y='1.3273'/>
         <matrix>
@@ -46,7 +44,6 @@
       <params>
         <factory>PlaneFact</factory>
       </params>
-      <zuse/>
       <move>
         <v y='0.0533' x='0.0075' z='-0.0058'/>
       </move>

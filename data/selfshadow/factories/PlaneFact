@@ -1,6 +1,7 @@
 <library>
   <meshfact name='PlaneFact'>
     <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+    <priority>object</priority>
     <zuse/>
     <params>
       <material>white</material>	
