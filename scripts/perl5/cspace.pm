@@ -15706,8 +15706,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *AddSubsetVertex = *cspacec::iAnimatedMeshFactory_AddSubsetVertex;
 *GetSubsetVertex = *cspacec::iAnimatedMeshFactory_GetSubsetVertex;
 *GetSubsetVertexCount = *cspacec::iAnimatedMeshFactory_GetSubsetVertexCount;
-*GetTopSubsetID = *cspacec::iAnimatedMeshFactory_GetTopSubsetID;
-*HasSubset = *cspacec::iAnimatedMeshFactory_HasSubset;
+*GetSubsetCount = *cspacec::iAnimatedMeshFactory_GetSubsetCount;
 *ClearSubsets = *cspacec::iAnimatedMeshFactory_ClearSubsets;
 sub DISOWN {
     my $self = shift;
@@ -23345,7 +23344,6 @@ bless $iSCF_SCF, cspace::iSCF;
 *csInvalidStringID = *cspacec::csInvalidStringID;
 *CS_SNDSYS_STREAM_UNKNOWN_LENGTH = *cspacec::CS_SNDSYS_STREAM_UNKNOWN_LENGTH;
 *InvalidShaderVarStringID = *cspacec::InvalidShaderVarStringID;
-*InvalidSubsetID = *cspacec::InvalidSubsetID;
 
   use Carp;
 

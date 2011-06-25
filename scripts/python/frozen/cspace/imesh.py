@@ -665,8 +665,6 @@ class AnimatedMeshBoneInfluence(object):
     __del__ = lambda self : None;
 AnimatedMeshBoneInfluence_swigregister = _imesh.AnimatedMeshBoneInfluence_swigregister
 AnimatedMeshBoneInfluence_swigregister(AnimatedMeshBoneInfluence)
-cvar = _imesh.cvar
-InvalidSubsetID = cvar.InvalidSubsetID
 
 class iAnimatedMeshSocketFactory(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -742,8 +740,7 @@ class iAnimatedMeshFactory(core.iBase):
     def AddSubsetVertex(*args): return _imesh.iAnimatedMeshFactory_AddSubsetVertex(*args)
     def GetSubsetVertex(*args): return _imesh.iAnimatedMeshFactory_GetSubsetVertex(*args)
     def GetSubsetVertexCount(*args): return _imesh.iAnimatedMeshFactory_GetSubsetVertexCount(*args)
-    def GetTopSubsetID(*args): return _imesh.iAnimatedMeshFactory_GetTopSubsetID(*args)
-    def HasSubset(*args): return _imesh.iAnimatedMeshFactory_HasSubset(*args)
+    def GetSubsetCount(*args): return _imesh.iAnimatedMeshFactory_GetSubsetCount(*args)
     def ClearSubsets(*args): return _imesh.iAnimatedMeshFactory_ClearSubsets(*args)
 iAnimatedMeshFactory_swigregister = _imesh.iAnimatedMeshFactory_swigregister
 iAnimatedMeshFactory_swigregister(iAnimatedMeshFactory)

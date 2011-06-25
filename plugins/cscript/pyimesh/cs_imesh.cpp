@@ -2867,17 +2867,16 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_scfImplementation1T_csTriangleMesh_iTriangleMesh_t swig_types[344]
 #define SWIGTYPE_p_scfImplementationExt0T_csImageMemory_csImageBase_t swig_types[345]
 #define SWIGTYPE_p_scfImplementationExt1T_csPath_csObject_iPath_t swig_types[346]
-#define SWIGTYPE_p_size_t swig_types[347]
-#define SWIGTYPE_p_uint16_t swig_types[348]
-#define SWIGTYPE_p_uint32_t swig_types[349]
-#define SWIGTYPE_p_uint64_t swig_types[350]
-#define SWIGTYPE_p_uint8_t swig_types[351]
-#define SWIGTYPE_p_unsigned_char swig_types[352]
-#define SWIGTYPE_p_unsigned_int swig_types[353]
-#define SWIGTYPE_p_unsigned_long swig_types[354]
-#define SWIGTYPE_p_unsigned_long_long swig_types[355]
-static swig_type_info *swig_types[357];
-static swig_module_info swig_module = {swig_types, 356, 0, 0, 0, 0};
+#define SWIGTYPE_p_uint16_t swig_types[347]
+#define SWIGTYPE_p_uint32_t swig_types[348]
+#define SWIGTYPE_p_uint64_t swig_types[349]
+#define SWIGTYPE_p_uint8_t swig_types[350]
+#define SWIGTYPE_p_unsigned_char swig_types[351]
+#define SWIGTYPE_p_unsigned_int swig_types[352]
+#define SWIGTYPE_p_unsigned_long swig_types[353]
+#define SWIGTYPE_p_unsigned_long_long swig_types[354]
+static swig_type_info *swig_types[356];
+static swig_module_info swig_module = {swig_types, 355, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -14166,20 +14165,6 @@ SWIGINTERN PyObject *iGenMeshSkeletonControlState_swigregister(PyObject *SWIGUNU
   return SWIG_Py_Void();
 }
 
-SWIGINTERN int Swig_var_InvalidSubsetID_set(PyObject *) {
-  SWIG_Error(SWIG_AttributeError,"Variable InvalidSubsetID is read-only.");
-  return 1;
-}
-
-
-SWIGINTERN PyObject *Swig_var_InvalidSubsetID_get(void) {
-  PyObject *pyobj = 0;
-  
-  pyobj = SWIG_From_size_t(static_cast< size_t >(CS::Mesh::InvalidSubsetID));
-  return pyobj;
-}
-
-
 SWIGINTERN PyObject *_wrap_AnimatedMeshBoneInfluence_bone_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CS::Mesh::AnimatedMeshBoneInfluence *arg1 = (CS::Mesh::AnimatedMeshBoneInfluence *) 0 ;
@@ -15966,7 +15951,7 @@ SWIGINTERN PyObject *_wrap_iAnimatedMeshFactory_AddSubset(PyObject *SWIGUNUSEDPA
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  CS::Mesh::SubsetID result;
+  size_t result;
   
   if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshFactory_AddSubset",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__iAnimatedMeshFactory, 0 |  0 );
@@ -15985,7 +15970,7 @@ fail:
 SWIGINTERN PyObject *_wrap_iAnimatedMeshFactory_AddSubsetVertex(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CS::Mesh::iAnimatedMeshFactory *arg1 = (CS::Mesh::iAnimatedMeshFactory *) 0 ;
-  CS::Mesh::SubsetID arg2 ;
+  size_t arg2 ;
   size_t arg3 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -16005,9 +15990,9 @@ SWIGINTERN PyObject *_wrap_iAnimatedMeshFactory_AddSubsetVertex(PyObject *SWIGUN
   arg1 = reinterpret_cast< CS::Mesh::iAnimatedMeshFactory * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iAnimatedMeshFactory_AddSubsetVertex" "', argument " "2"" of type '" "CS::Mesh::SubsetID""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iAnimatedMeshFactory_AddSubsetVertex" "', argument " "2"" of type '" "size_t""'");
   } 
-  arg2 = static_cast< CS::Mesh::SubsetID >(val2);
+  arg2 = static_cast< size_t >(val2);
   ecode3 = SWIG_AsVal_size_t(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iAnimatedMeshFactory_AddSubsetVertex" "', argument " "3"" of type '" "size_t""'");
@@ -16024,7 +16009,7 @@ fail:
 SWIGINTERN PyObject *_wrap_iAnimatedMeshFactory_GetSubsetVertex(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CS::Mesh::iAnimatedMeshFactory *arg1 = (CS::Mesh::iAnimatedMeshFactory *) 0 ;
-  CS::Mesh::SubsetID arg2 ;
+  size_t arg2 ;
   size_t arg3 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -16045,9 +16030,9 @@ SWIGINTERN PyObject *_wrap_iAnimatedMeshFactory_GetSubsetVertex(PyObject *SWIGUN
   arg1 = reinterpret_cast< CS::Mesh::iAnimatedMeshFactory * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iAnimatedMeshFactory_GetSubsetVertex" "', argument " "2"" of type '" "CS::Mesh::SubsetID""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iAnimatedMeshFactory_GetSubsetVertex" "', argument " "2"" of type '" "size_t""'");
   } 
-  arg2 = static_cast< CS::Mesh::SubsetID >(val2);
+  arg2 = static_cast< size_t >(val2);
   ecode3 = SWIG_AsVal_size_t(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iAnimatedMeshFactory_GetSubsetVertex" "', argument " "3"" of type '" "size_t""'");
@@ -16064,7 +16049,7 @@ fail:
 SWIGINTERN PyObject *_wrap_iAnimatedMeshFactory_GetSubsetVertexCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CS::Mesh::iAnimatedMeshFactory *arg1 = (CS::Mesh::iAnimatedMeshFactory *) 0 ;
-  CS::Mesh::SubsetID arg2 ;
+  size_t arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   size_t val2 ;
@@ -16081,9 +16066,9 @@ SWIGINTERN PyObject *_wrap_iAnimatedMeshFactory_GetSubsetVertexCount(PyObject *S
   arg1 = reinterpret_cast< CS::Mesh::iAnimatedMeshFactory * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iAnimatedMeshFactory_GetSubsetVertexCount" "', argument " "2"" of type '" "CS::Mesh::SubsetID""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iAnimatedMeshFactory_GetSubsetVertexCount" "', argument " "2"" of type '" "size_t""'");
   } 
-  arg2 = static_cast< CS::Mesh::SubsetID >(val2);
+  arg2 = static_cast< size_t >(val2);
   result = ((CS::Mesh::iAnimatedMeshFactory const *)arg1)->GetSubsetVertexCount(arg2);
   resultobj = SWIG_From_size_t(static_cast< size_t >(result));
   return resultobj;
@@ -16092,44 +16077,22 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iAnimatedMeshFactory_GetTopSubsetID(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iAnimatedMeshFactory_GetSubsetCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CS::Mesh::iAnimatedMeshFactory *arg1 = (CS::Mesh::iAnimatedMeshFactory *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  CS::Mesh::SubsetID result;
+  size_t result;
   
-  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshFactory_GetTopSubsetID",1,1,&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshFactory_GetSubsetCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__iAnimatedMeshFactory, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMeshFactory_GetTopSubsetID" "', argument " "1"" of type '" "CS::Mesh::iAnimatedMeshFactory const *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMeshFactory_GetSubsetCount" "', argument " "1"" of type '" "CS::Mesh::iAnimatedMeshFactory const *""'"); 
   }
   arg1 = reinterpret_cast< CS::Mesh::iAnimatedMeshFactory * >(argp1);
-  result = ((CS::Mesh::iAnimatedMeshFactory const *)arg1)->GetTopSubsetID();
+  result = ((CS::Mesh::iAnimatedMeshFactory const *)arg1)->GetSubsetCount();
   resultobj = SWIG_From_size_t(static_cast< size_t >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iAnimatedMeshFactory_HasSubset(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  CS::Mesh::iAnimatedMeshFactory *arg1 = (CS::Mesh::iAnimatedMeshFactory *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  bool result;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshFactory_HasSubset",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__iAnimatedMeshFactory, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMeshFactory_HasSubset" "', argument " "1"" of type '" "CS::Mesh::iAnimatedMeshFactory const *""'"); 
-  }
-  arg1 = reinterpret_cast< CS::Mesh::iAnimatedMeshFactory * >(argp1);
-  result = (bool)((CS::Mesh::iAnimatedMeshFactory const *)arg1)->HasSubset();
-  resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
   return NULL;
@@ -17151,7 +17114,7 @@ fail:
 SWIGINTERN PyObject *_wrap_iAnimatedMeshMorphTarget_AddSubset(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CS::Mesh::iAnimatedMeshMorphTarget *arg1 = (CS::Mesh::iAnimatedMeshMorphTarget *) 0 ;
-  CS::Mesh::SubsetID arg2 ;
+  size_t arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   size_t val2 ;
@@ -17167,9 +17130,9 @@ SWIGINTERN PyObject *_wrap_iAnimatedMeshMorphTarget_AddSubset(PyObject *SWIGUNUS
   arg1 = reinterpret_cast< CS::Mesh::iAnimatedMeshMorphTarget * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iAnimatedMeshMorphTarget_AddSubset" "', argument " "2"" of type '" "CS::Mesh::SubsetID""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iAnimatedMeshMorphTarget_AddSubset" "', argument " "2"" of type '" "size_t""'");
   } 
-  arg2 = static_cast< CS::Mesh::SubsetID >(val2);
+  arg2 = static_cast< size_t >(val2);
   (arg1)->AddSubset(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -17188,7 +17151,7 @@ SWIGINTERN PyObject *_wrap_iAnimatedMeshMorphTarget_GetSubset(PyObject *SWIGUNUS
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  CS::Mesh::SubsetID result;
+  size_t result;
   
   if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMeshMorphTarget_GetSubset",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__iAnimatedMeshMorphTarget, 0 |  0 );
@@ -46706,8 +46669,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iAnimatedMeshFactory_AddSubsetVertex", _wrap_iAnimatedMeshFactory_AddSubsetVertex, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactory_GetSubsetVertex", _wrap_iAnimatedMeshFactory_GetSubsetVertex, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactory_GetSubsetVertexCount", _wrap_iAnimatedMeshFactory_GetSubsetVertexCount, METH_VARARGS, NULL},
-	 { (char *)"iAnimatedMeshFactory_GetTopSubsetID", _wrap_iAnimatedMeshFactory_GetTopSubsetID, METH_VARARGS, NULL},
-	 { (char *)"iAnimatedMeshFactory_HasSubset", _wrap_iAnimatedMeshFactory_HasSubset, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedMeshFactory_GetSubsetCount", _wrap_iAnimatedMeshFactory_GetSubsetCount, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactory_ClearSubsets", _wrap_iAnimatedMeshFactory_ClearSubsets, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshFactory_swigregister", iAnimatedMeshFactory_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSubMeshFactory_GetIndices", _wrap_iAnimatedMeshSubMeshFactory_GetIndices, METH_VARARGS, NULL},
@@ -48860,7 +48822,6 @@ static swig_type_info _swigt__p_int8_t = {"_p_int8_t", "int8 *|int8_t *", 0, 0, 
 static swig_type_info _swigt__p_long_long = {"_p_long_long", "longlong *|long long *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_CS__Graphics__RenderMesh = {"_p_p_CS__Graphics__RenderMesh", "CS::Graphics::RenderMesh **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_iMaterialWrapper = {"_p_p_iMaterialWrapper", "iMaterialWrapper **", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_size_t = {"_p_size_t", "size_t *|CS::Mesh::SubsetID *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint16_t = {"_p_uint16_t", "uint16 *|uint16_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint32_t = {"_p_uint32_t", "uint32_t *|uint32 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint64_t = {"_p_uint64_t", "uint64_t *|uint64 *", 0, 0, (void*)0, 0};
@@ -49218,7 +49179,6 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_scfImplementation1T_csTriangleMesh_iTriangleMesh_t,
   &_swigt__p_scfImplementationExt0T_csImageMemory_csImageBase_t,
   &_swigt__p_scfImplementationExt1T_csPath_csObject_iPath_t,
-  &_swigt__p_size_t,
   &_swigt__p_uint16_t,
   &_swigt__p_uint32_t,
   &_swigt__p_uint64_t,
@@ -49576,7 +49536,6 @@ static swig_cast_info _swigc__p_int8_t[] = {  {&_swigt__p_int8_t, 0, 0, 0},{0, 0
 static swig_cast_info _swigc__p_long_long[] = {  {&_swigt__p_long_long, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_CS__Graphics__RenderMesh[] = {  {&_swigt__p_p_CS__Graphics__RenderMesh, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_iMaterialWrapper[] = {  {&_swigt__p_p_iMaterialWrapper, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_size_t[] = {  {&_swigt__p_size_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint16_t[] = {  {&_swigt__p_uint16_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint32_t[] = {  {&_swigt__p_uint32_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint64_t[] = {  {&_swigt__p_uint64_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -49934,7 +49893,6 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_scfImplementation1T_csTriangleMesh_iTriangleMesh_t,
   _swigc__p_scfImplementationExt0T_csImageMemory_csImageBase_t,
   _swigc__p_scfImplementationExt1T_csPath_csObject_iPath_t,
-  _swigc__p_size_t,
   _swigc__p_uint16_t,
   _swigc__p_uint32_t,
   _swigc__p_uint64_t,
@@ -50479,8 +50437,6 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CS_BGT_BOX",SWIG_From_int(static_cast< int >(CS_BGT_BOX)));
   SWIG_Python_SetConstant(d, "CS_BGT_SPHERE",SWIG_From_int(static_cast< int >(CS_BGT_SPHERE)));
   SWIG_Python_SetConstant(d, "CS_BGT_CYLINDER",SWIG_From_int(static_cast< int >(CS_BGT_CYLINDER)));
-  PyDict_SetItemString(d,(char*)"cvar", SWIG_globals());
-  SWIG_addvarlink(SWIG_globals(),(char*)"InvalidSubsetID",Swig_var_InvalidSubsetID_get, Swig_var_InvalidSubsetID_set);
   SWIG_Python_SetConstant(d, "CS_SPR_LIGHTING_HQ",SWIG_From_int(static_cast< int >(CS_SPR_LIGHTING_HQ)));
   SWIG_Python_SetConstant(d, "CS_SPR_LIGHTING_LQ",SWIG_From_int(static_cast< int >(CS_SPR_LIGHTING_LQ)));
   SWIG_Python_SetConstant(d, "CS_SPR_LIGHTING_FAST",SWIG_From_int(static_cast< int >(CS_SPR_LIGHTING_FAST)));

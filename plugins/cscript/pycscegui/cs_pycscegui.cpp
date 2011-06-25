@@ -2906,16 +2906,15 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_scfImplementationExt1T_csColliderWrapper_csObject_scfFakeInterfaceT_csColliderWrapper_t_t swig_types[383]
 #define SWIGTYPE_p_scfImplementationExt1T_csPath_csObject_iPath_t swig_types[384]
 #define SWIGTYPE_p_scfImplementationExt3T_csProcTexture_csObject_iTextureWrapper_iProcTexture_iSelfDet swig_types[385]
-#define SWIGTYPE_p_size_t swig_types[386]
-#define SWIGTYPE_p_uint16_t swig_types[387]
-#define SWIGTYPE_p_uint32_t swig_types[388]
-#define SWIGTYPE_p_uint64_t swig_types[389]
-#define SWIGTYPE_p_uint8_t swig_types[390]
-#define SWIGTYPE_p_unsigned_int swig_types[391]
-#define SWIGTYPE_p_unsigned_long swig_types[392]
-#define SWIGTYPE_p_unsigned_long_long swig_types[393]
-static swig_type_info *swig_types[395];
-static swig_module_info swig_module = {swig_types, 394, 0, 0, 0, 0};
+#define SWIGTYPE_p_uint16_t swig_types[386]
+#define SWIGTYPE_p_uint32_t swig_types[387]
+#define SWIGTYPE_p_uint64_t swig_types[388]
+#define SWIGTYPE_p_uint8_t swig_types[389]
+#define SWIGTYPE_p_unsigned_int swig_types[390]
+#define SWIGTYPE_p_unsigned_long swig_types[391]
+#define SWIGTYPE_p_unsigned_long_long swig_types[392]
+static swig_type_info *swig_types[394];
+static swig_module_info swig_module = {swig_types, 393, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -5148,7 +5147,6 @@ static swig_type_info _swigt__p_int16_t = {"_p_int16_t", "int16 *|int16_t *", 0,
 static swig_type_info _swigt__p_int64_t = {"_p_int64_t", "int64_t *|int64 *|csMicroTicks *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int8_t = {"_p_int8_t", "int8 *|int8_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_long_long = {"_p_long_long", "longlong *|long long *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_size_t = {"_p_size_t", "size_t *|CS::Mesh::SubsetID *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint16_t = {"_p_uint16_t", "uint16 *|uint16_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint32_t = {"_p_uint32_t", "uint32_t *|uint32 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint64_t = {"_p_uint64_t", "uint64_t *|uint64 *", 0, 0, (void*)0, 0};
@@ -5544,7 +5542,6 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_scfImplementationExt1T_csColliderWrapper_csObject_scfFakeInterfaceT_csColliderWrapper_t_t,
   &_swigt__p_scfImplementationExt1T_csPath_csObject_iPath_t,
   &_swigt__p_scfImplementationExt3T_csProcTexture_csObject_iTextureWrapper_iProcTexture_iSelfDet,
-  &_swigt__p_size_t,
   &_swigt__p_uint16_t,
   &_swigt__p_uint32_t,
   &_swigt__p_uint64_t,
@@ -5940,7 +5937,6 @@ static swig_cast_info _swigc__p_int16_t[] = {  {&_swigt__p_int16_t, 0, 0, 0},{0,
 static swig_cast_info _swigc__p_int64_t[] = {  {&_swigt__p_int64_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_int8_t[] = {  {&_swigt__p_int8_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_long_long[] = {  {&_swigt__p_long_long, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_size_t[] = {  {&_swigt__p_size_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint16_t[] = {  {&_swigt__p_uint16_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint32_t[] = {  {&_swigt__p_uint32_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint64_t[] = {  {&_swigt__p_uint64_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -6336,7 +6332,6 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_scfImplementationExt1T_csColliderWrapper_csObject_scfFakeInterfaceT_csColliderWrapper_t_t,
   _swigc__p_scfImplementationExt1T_csPath_csObject_iPath_t,
   _swigc__p_scfImplementationExt3T_csProcTexture_csObject_iTextureWrapper_iProcTexture_iSelfDet,
-  _swigc__p_size_t,
   _swigc__p_uint16_t,
   _swigc__p_uint32_t,
   _swigc__p_uint64_t,
