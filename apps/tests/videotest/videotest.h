@@ -26,8 +26,10 @@
 #include <iostream>
 
 #include <videodecode/vpl_structs.h>
-#include <videodecode/vpl_codec.h>
-#include <videodecode/vpl_loader.h>
+#include <videodecode/medialoader.h>
+#include <videodecode/media.h>
+#include <videodecode/mediacontainer.h>
+#include <videodecode/mediaplayer.h>
 
 struct iEngine;
 struct iObjectRegistry;
@@ -44,6 +46,7 @@ class VideoTest : public CS::Utility::DemoApplication
 
   bool inWater;
   csRef<iTextureHandle> logoTex;
+  csRef<iMediaPlayer> mediaPlayer;
 
  public:
   VideoTest ();

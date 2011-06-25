@@ -2,9 +2,13 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="plgvplthogg"
-	ProjectGUID="{06FED960-25A3-43D2-8E66-F0A119AB9BA2}"
-	RootNamespace="plgvplthogg"
+	Name="plgvplplayer"
+	ProjectGUID="{5F3F8415-04E4-4DE5-A622-5A18571D6A48}"
+	RootNamespace="plgvplplayer"
+	SccProjectName="Svn"
+	SccAuxPath="Svn"
+	SccLocalPath="Svn"
+	SccProvider="SubversionScc"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -18,8 +22,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\..\..\out\debug9\build\plgvplthogg\"
-			IntermediateDirectory="..\..\..\out\debug9\build\plgvplthogg\"
+			OutputDirectory="..\..\..\out\debug9\build\plgvplplayer\"
+			IntermediateDirectory="..\..\..\out\debug9\build\plgvplplayer\"
 			ConfigurationType="2"
 			CharacterSet="1"
 			>
@@ -47,10 +51,10 @@
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile="..\..\..\out\debug9\build\plgvplthogg\plgvplthogg.pch"
-				AssemblerListingLocation="..\..\..\out\debug9\build\plgvplthogg\"
-				ObjectFile="..\..\..\out\debug9\build\plgvplthogg\"
-				ProgramDataBaseFileName="..\..\..\out\debug9\build\plgvplthogg\Win32\vplthogg.pdb"
+				PrecompiledHeaderFile="..\..\..\out\debug9\build\plgvplthogg\plgvplplayer.pch"
+				AssemblerListingLocation="..\..\..\out\debug9\build\plgvplplayer\"
+				ObjectFile="..\..\..\out\debug9\build\plgvplplayer\"
+				ProgramDataBaseFileName="..\..\..\out\debug9\build\plgvplayer\Win32\vplplayer.pdb"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -68,14 +72,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="delayimp.lib zlib.lib libcrystalspace_d.lib"
-				OutputFile="..\..\..\vplthogg.dll"
+				OutputFile="..\..\..\vplplayer.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\winlibs\x86\lib;..\..\..\win32libs\lib"
 				IgnoreDefaultLibraryNames="LIBC,LIBCD,LIBCMT,LIBCMTD,MSVCRT"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="..\..\..\out\debug9\build\plgvplthogg\Win32\vplthogg.pdb"
+				ProgramDatabaseFile="..\..\..\out\debug9\build\plgvplplayer\Win32\vplplayer.pdb"
 				SubSystem="2"
-				ImportLibrary="..\..\..\out\debug9\build\plgvplthogg\Win32\plgvplthogg.lib"
+				ImportLibrary="..\..\..\out\debug9\build\plgvplplayer\Win32\plgvplplayer.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -128,7 +132,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;PLGVPLTHOGG_EXPORTS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;PLGVPLPLAYER_EXPORTS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -185,23 +189,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\plugin_impl.cpp"
+				RelativePath="..\..\..\plugins\videodecode\player\plugin_impl.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggAudioMedia.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggLoader.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggMediaContainer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggVideoMedia.cpp"
+				RelativePath="..\..\..\plugins\videodecode\player\vplPlayer.cpp"
 				>
 			</File>
 		</Filter>
@@ -211,19 +203,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggAudioMedia.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggLoader.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggMediaContainer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggVideoMedia.h"
+				RelativePath="..\..\..\plugins\videodecode\player\vplPlayer.h"
 				>
 			</File>
 		</Filter>
@@ -233,7 +213,7 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\plgvplthogg.rc"
+				RelativePath=".\plgvplplayer.rc"
 				>
 			</File>
 		</Filter>
@@ -241,7 +221,7 @@
 			Name="Other Files"
 			>
 			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\vplthogg.csplugin"
+				RelativePath="..\..\..\plugins\videodecode\player\vplplayer.csplugin"
 				>
 			</File>
 		</Filter>

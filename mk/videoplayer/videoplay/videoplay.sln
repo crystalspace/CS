@@ -7,7 +7,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "plgvplloader", "..\plgvpllo
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "appvideotest", "..\appvid\appvidplay.vcproj", "{C97E6B3D-2862-40E8-A94B-714E91CE09CA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "plgvplplayer", "..\plgvplplayer\plgvplplayer.vcproj", "{5F3F8415-04E4-4DE5-A622-5A18571D6A48}"
+EndProject
 Global
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
 		Release|Win32 = Release|Win32
@@ -25,6 +31,10 @@ Global
 		{C97E6B3D-2862-40E8-A94B-714E91CE09CA}.Debug|Win32.Build.0 = Debug|Win32
 		{C97E6B3D-2862-40E8-A94B-714E91CE09CA}.Release|Win32.ActiveCfg = Release|Win32
 		{C97E6B3D-2862-40E8-A94B-714E91CE09CA}.Release|Win32.Build.0 = Release|Win32
+		{5F3F8415-04E4-4DE5-A622-5A18571D6A48}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5F3F8415-04E4-4DE5-A622-5A18571D6A48}.Debug|Win32.Build.0 = Debug|Win32
+		{5F3F8415-04E4-4DE5-A622-5A18571D6A48}.Release|Win32.ActiveCfg = Release|Win32
+		{5F3F8415-04E4-4DE5-A622-5A18571D6A48}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

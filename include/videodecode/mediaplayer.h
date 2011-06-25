@@ -25,9 +25,10 @@
 
 #include "csutil/scf.h"
 #include "csutil/ref.h"
+#include "crystalspace.h"
 
 struct iMediaContainer;
-struct iTextureWrapper;
+struct iTextureHandle;
 
 /**
  * The video player
@@ -37,37 +38,36 @@ struct iMediaPlayer : public virtual iBase
   SCF_INTERFACE(iMediaPlayer,0,1,0);
 
   /// Initialize the video player
-  virtual void InitializePlayer (iMediaContainer video) = 0;
+  virtual void InitializePlayer (csRef<iMediaContainer> media) = 0;
 
-  /// Sets the active video stream from inside the iMediaContainer
-  virtual void SetActiveVideoStream (int index) = 0;
+  /// Activates a stream from inside the iMediaContainer
+  virtual void SetActiveStream (int index) = 0;
 
-  /// Sets the active audio stream from inside the iMediaContainer
-  virtual void SetActiveAudioStream (int index) = 0;
+  /// Deactivates a stream from inside the iMediaContainer
+  virtual void RemoveActiveAudioStream (int index) = 0;
 
-  /// Called continously to update the player
+  /// Set the target texture
+  virtual void SetTargetTexture (csRef<iTextureHandle> target) = 0;
+
+  /// Called continuously to update the player
   virtual void Update () = 0;
 
-  /// Returns the current video frame as an iTextureWrapper, 
-  //  to be used fo texturing objects or rendered 2D
-  virtual iTextureWrapper GetVideoFrame () = 0;
-
-  /// Starts playing the video
+  /// Starts playing the media
   virtual void Play () = 0 ;
 
-  /// Pauses the video
+  /// Pauses the media
   virtual void Pause() = 0 ;
 
-  /// Stops the video and seeks to the beginning
+  /// Stops the media and seeks to the beginning
   virtual void Stop () = 0 ;
 
-  /// Seeks the video
-  virtual void Seek (long position) = 0 ;
+  /// Seeks the media
+  virtual void Seek (float time) = 0 ;
 
-  /// get the position of the video
-  virtual long GetPosition () = 0 ;
+  /// Get the position of the media
+  virtual csTicks GetPosition () = 0 ;
 
-  /// Returns if the video is playing or not
+  /// Returns if the media is playing or not
   virtual bool IsPlaying () = 0 ;
 };
 

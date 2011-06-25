@@ -22,8 +22,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\..\..\out\debug9\build\appvideotest\  "
-			IntermediateDirectory="..\..\..\out\debug9\build\appvideotest\"
+			OutputDirectory="..\..\out\debug9\build\appvideotest\  "
+			IntermediateDirectory="..\..\out\debug9\build\appvideotest\"
 			ConfigurationType="1"
 			CharacterSet="1"
 			>
@@ -52,9 +52,9 @@
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="..\..\..\out\debug9\build\appvideotest\appvideotest.pch"
-				AssemblerListingLocation="..\..\..\out\debug9\build\appvideotest\"
-				ObjectFile="..\..\..\out\debug9\build\appvideotest\"
-				ProgramDataBaseFileName="..\..\..\out\debug9\build\appvideotest\Win32\videotest.pdb"
+				AssemblerListingLocation="..\..\out\debug9\build\appvideotest\"
+				ObjectFile="..\..\out\debug9\build\appvideotest\"
+				ProgramDataBaseFileName="..\..\out\debug9\build\appvideotest\Win32\videotest.pdb"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -207,6 +207,10 @@
 			ReferencedProjectIdentifier="{7DB5FF7B-A772-4A47-859E-6C43A6D72F1A}"
 			RelativePathToProject="..\plgvplloader\plgvplloader.vcproj"
 		/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{5F3F8415-04E4-4DE5-A622-5A18571D6A48}"
+			RelativePathToProject="..\plgvplplayer\plgvplplayer.vcproj"
+		/>
 	</References>
 	<Files>
 		<Filter
@@ -244,6 +248,26 @@
 			</File>
 			<File
 				RelativePath="..\..\..\apps\tests\videotest\ToDo.txt"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Intefaces"
+			>
+			<File
+				RelativePath="..\..\..\include\videodecode\media.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\include\videodecode\mediacontainer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\include\videodecode\medialoader.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\include\videodecode\mediaplayer.h"
 				>
 			</File>
 		</Filter>

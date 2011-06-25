@@ -6,7 +6,7 @@
       <class>
         <name>crystalspace.vpl.loader</name>",
         <implementation>vplLoader</implementation>",
-        <description>Generic Video Player Loader</description>",
+        <description>Generic Media Loader</description>",
       </class>
     </classes>
   </scf>

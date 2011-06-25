@@ -25,8 +25,8 @@
 
 #include "csutil/scf.h"
 #include "csutil/ref.h"
+#include "crystalspace.h"
 
-struct iTextureWrapper;
 struct csVPLvideoFormat;
 
 /**
@@ -37,7 +37,32 @@ struct iMedia : public virtual iBase
   SCF_INTERFACE(iMedia,0,1,0);
 
   virtual const char* GetType () = 0;
-}
+
+  /**
+   * Get size of this stream in frames.
+   */
+  virtual unsigned long GetFrameCount() = 0;
+
+  /**
+   * Return the length in seconds
+   */
+  virtual float GetLength() = 0;
+  
+  /**
+   * Gets the position of the stream
+   */
+  virtual double GetPosition () = 0 ;
+  
+  /**
+   * Clears all the decoders of the stream. Done when destroying the object by the container
+   */
+  virtual void CleanMedia () = 0 ;
+
+  /**
+   * Perform frame-specific updates on the stream
+   */
+  virtual int Update () = 0 ;
+};
 
 /**
  * Video stream
@@ -47,33 +72,15 @@ struct iVideoMedia : public iMedia
   SCF_INTERFACE(iVideoMedia,0,1,0);
 
   /// Get the format of the sound data.
-  virtual const csVPLvideoFormat *GetFormat();
+  virtual const csVPLvideoFormat *GetFormat() = 0;
+
 
   /**
-   * Get size of this sound in frames.
+   * Set the texture target
    */
-  virtual size_t GetFrameCount();
-
-  /**
-   * Return the size of the data stored in bytes
-   */
-  virtual size_t GetDataSize();
-
-  /**
-   * Gets the video data for the next frame
-   */
-  virtual iTextureWrapper GetNextFrame () = 0;
+  virtual void SetVideoTarget (csRef<iTextureHandle> texture) = 0;
   
-  /**
-   * Seeks the video stream
-   */
-  virtual void Seek (long position) = 0 ;
-  
-  /**
-   * Gets the position of the video stream
-   */
-  virtual long GetPosition () = 0 ;
-}
+};
 
 /**
  * Audio stream
@@ -83,30 +90,10 @@ struct iAudioMedia : public iMedia
   SCF_INTERFACE(iAudioMedia,0,1,0);
 
   /**
-   * Get size of this sound in frames.
+   * Set the audio stream target
    */
-  virtual size_t GetFrameCount();
-
-  /**
-   * Return the size of the data stored in bytes
-   */
-  virtual size_t GetDataSize();
-
-  /**
-   * Gets the audio data for the next frame
-   */
-  virtual unsigned char* GetNextFrame () = 0;
-
-  /**
-   * Seeks the audio stream
-   */
-  virtual void Seek (long position) = 0 ;
-  
-  /**
-   * Gets the position of the audio stream
-   */
-  virtual long GetPosition () = 0 ;
-}
+  virtual void SetAudioTarget (csRef<iSndSysStream> stream) = 0;
+};
 
 
 /** @} */
