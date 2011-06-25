@@ -44,14 +44,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
                                                  CEGUI::RawDataContainer& output, 
                                                  const CEGUI::String& resourceGroup)
   {
-    csRef<iDataBuffer> buffer = vfs->ReadFile (filename.c_str());
+    // Hack around schema files not found when CEGUI is compiled with the Xerces parser
+    // TODO: this would be much cleaner to use the resource groups of CEGUI
+    CEGUI::String file = filename.c_str();
+    if (!vfs->Exists (file.c_str()))
+      file = "/cegui/" + file;
+
+    csRef<iDataBuffer> buffer = vfs->ReadFile (file.c_str());
 
     // Reading failed
     if (!buffer.IsValid ())
     {
       CEGUI::String msg= (uint8*)"ResourceProvider::loadRawDataContainer - "
         "Filename supplied for loading must be valid";
-      msg += (uint8*)" ["+filename+(uint8*)"]";
+      msg += (uint8*)" ["+ file +(uint8*)"]";
       throw CEGUI::InvalidRequestException(msg);
     }
     else

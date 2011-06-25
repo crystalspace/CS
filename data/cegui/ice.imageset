@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><Imageset Name="ice" Imagefile="ice.png" NativeHorzRes="800" NativeVertRes="600" AutoScaled="false"><Image Name="AltProgressLeft" XPos="100" YPos="125" Width="3" Height="18" />
+<?xml version="1.0" encoding="UTF-8"?>
+<Imageset Name="ice" Imagefile="ice.png" NativeHorzRes="800" NativeVertRes="600" AutoScaled="false">
+<Image Name="AltProgressLeft" XPos="100" YPos="125" Width="3" Height="18" />
 <Image Name="AltProgressMiddle" XPos="107" YPos="125" Width="10" Height="18" />
 <Image Name="AltProgressRight" XPos="133" YPos="125" Width="3" Height="18" />
 <Image Name="AltProgressHalf" XPos="56" YPos="187" Width="5" Height="10" />
@@ -207,4 +209,28 @@
 <Image Name="WindowBottomLeft" XPos="2" YPos="130" Width="10" Height="10" />
 <Image Name="WindowBottomEdge" XPos="37" YPos="134" Width="22" Height="6" />
 <Image Name="WindowBottomRight" XPos="81" YPos="126" Width="14" Height="14" />
+<!-- These are dummy entries to gag on the warning messages about missing images -->
+<Image Name="TabHorizontalTopFiller" XPos="0" YPos="0" Width="0" Height="0" />
+<Image Name="TabHorizontalBottomFiller" XPos="0" YPos="0" Width="0" Height="0" />
+<Image Name="MenuTopLeft" XPos="0" YPos="0" Width="0" Height="0" />
+<Image Name="MenuTopRight" XPos="0" YPos="0" Width="0" Height="0" />
+<Image Name="MenuBottomLeft" XPos="0" YPos="0" Width="0" Height="0" />
+<Image Name="MenuBottomRight" XPos="0" YPos="0" Width="0" Height="0" />
+<Image Name="MenuLeft" XPos="0" YPos="0" Width="0" Height="0" />
+<Image Name="MenuRight" XPos="0" YPos="0" Width="0" Height="0" />
+<Image Name="MenuTop" XPos="0" YPos="0" Width="0" Height="0" />
+<Image Name="MenuBottom" XPos="0" YPos="0" Width="0" Height="0" />
+<Image Name="MenuMiddle" XPos="0" YPos="0" Width="0" Height="0" />
+<Image Name="PopupMenuArrowRight" XPos="0" YPos="0" Width="0" Height="0" />
+<Image Name="PopupMenuArrowLeft" XPos="0" YPos="0" Width="0" Height="0" />
+<Image Name="PopupMenuFrameTopLeft" XPos="0" YPos="0" Width="0" Height="0" />
+<Image Name="PopupMenuFrameTopRight" XPos="0" YPos="0" Width="0" Height="0" />
+<Image Name="PopupMenuFrameBottomLeft" XPos="0" YPos="0" Width="0" Height="0" />
+<Image Name="PopupMenuFrameBottomRight" XPos="0" YPos="0" Width="0" Height="0" />
+<Image Name="PopupMenuFrameLeft" XPos="0" YPos="0" Width="0" Height="0" />
+<Image Name="PopupMenuFrameRight" XPos="0" YPos="0" Width="0" Height="0" />
+<Image Name="PopupMenuFrameTop" XPos="0" YPos="0" Width="0" Height="0" />
+<Image Name="PopupMenuFrameBottom" XPos="0" YPos="0" Width="0" Height="0" />
+<Image Name="PopupMenuMiddle" XPos="0" YPos="0" Width="0" Height="0" />
+<Image Name="TabButtonScrollLeftNormal" XPos="0" YPos="0" Width="0" Height="0" />
 </Imageset>
