@@ -243,13 +243,28 @@ namespace CS
               
               csVector3 meshPosition = 
                 mesh.meshWrapper->GetMovable()->GetPosition();
+              csReversibleTransform meshTransform = 
+                mesh.meshWrapper->GetMovable()->GetTransform();
               csRef<csRenderBufferHolder> buffers = 
                 mesh.renderMesh->buffers;
               iRenderBuffer* positions = buffers->GetRenderBuffer (CS_BUFFER_POSITION);
               csVertexListWalker<float, csVector3> positionWalker (positions);
-              csVector3 lightPositin = light->GetMovable()->GetPosition();
-              csReversibleTransform meshTransform = 
-                mesh.meshWrapper->GetMovable()->GetTransform();
+              csVector3 lightPosition = light->GetMovable()->GetPosition();
+              csReversibleTransform lightTransform = 
+                light->GetMovable()->GetTransform();    
+
+//               csPrintf("%f %f %f\n", lightTransform.GetO2T().Col1().x, 
+//                 lightTransform.GetO2T().Col1().y, 
+//                 lightTransform.GetO2T().Col1().z);
+//               csPrintf("%f %f %f\n", lightTransform.GetO2T().Col2().x, 
+//                 lightTransform.GetO2T().Col2().y, 
+//                 lightTransform.GetO2T().Col2().z);
+//               csPrintf("%f %f %f\n\n", lightTransform.GetO2T().Col3().x, 
+//                 lightTransform.GetO2T().Col3().y, 
+//                 lightTransform.GetO2T().Col3().z);
+
+//               csPrintf("%f %f %f\n", lightPosition.x, lightPosition.y, 
+//                 lightPosition.z);
 
               // only take into account translucent objects
               if ( mesh.meshWrapper->GetRenderPriority() != 
@@ -259,7 +274,7 @@ namespace CS
               // Iterate on all vertices
               for (size_t i = 0; i < positionWalker.GetSize (); i++)
               {
-                float distance = (lightPositin - 
+                float distance = (lightPosition - 
                   meshTransform.This2Other(*positionWalker)).Norm ();
 
                 if (distance < _near)

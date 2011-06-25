@@ -38,7 +38,6 @@
         <v y='1.3273'/>
         <matrix>
           <rotz>3.1416</rotz>
-          <rotx>1.57</rotx>
         </matrix>
       </move>
     </meshobj>
