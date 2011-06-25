@@ -112,6 +112,9 @@ private:
   float radius;
   float density;
   float total_max_dist;
+  
+  float min_draw_dist;
+  float sq_min_draw_dist;
 
   // Random number generator for wind randomness.
   csRandomGen rng;
@@ -189,6 +192,9 @@ public:
   virtual bool UseDensityFactorMap (const char* factorMapID,
 				    float factor);
 
+  void SetMinimumDrawDistance (float dist);
+  float GetMinimumDrawDistance () { return min_draw_dist; }
+  
   const csVector2& GetWindDirection() const { return wind_direction; }
   virtual void SetWindDirection (float x, float z);
 

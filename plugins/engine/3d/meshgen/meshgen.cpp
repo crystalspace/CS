@@ -35,6 +35,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 
 csMeshGeneratorGeometry::csMeshGeneratorGeometry (
   csMeshGenerator* generator) : scfImplementationType (this),
+  min_draw_dist (0),
+  sq_min_draw_dist (0),
   generator (generator)
 {
   colldetID = generator->GetStringSet()->Request ("colldet");
@@ -121,6 +123,12 @@ bool csMeshGeneratorGeometry::UseDensityFactorMap (const char* factorMapID,
   if (!factorMap) return false;
   densityFactorMaps.Push (DensityFactorMapScalePair (factorMap, factor));
   return true;
+}
+
+void csMeshGeneratorGeometry::SetMinimumDrawDistance (float dist)
+{
+  min_draw_dist = dist;
+  sq_min_draw_dist = dist*dist;
 }
 
 void csMeshGeneratorGeometry::AddPositionsFromMap (iTerraFormer* map,
@@ -244,6 +252,7 @@ bool csMeshGeneratorGeometry::AllocMesh (
   int cidx, const csMGCell& cell, float sqdist,
   csMGPosition& pos)
 {
+  if (sqdist < sq_min_draw_dist) return false;
   size_t lod = GetLODLevel (sqdist);
   if (lod == csArrayItemNotFound) return false;
   pos.lod = lod;
@@ -412,13 +421,15 @@ void csMeshGeneratorGeometry::FinishUpdate ()
 
 size_t csMeshGeneratorGeometry::GetLODLevel (float sqdist)
 {
-  size_t i;
-  for (i = 0 ; i < factories.GetSize () ; i++)
+  if (sqdist >= sq_min_draw_dist)
   {
-    csMGGeom& geom = factories[i];
-    if (sqdist <= geom.sqmaxdistance)
+    for (size_t i = 0 ; i < factories.GetSize () ; i++)
     {
-      return i;
+      csMGGeom& geom = factories[i];
+      if (sqdist <= geom.sqmaxdistance)
+      {
+        return i;
+      }
     }
   }
   return csArrayItemNotFound;
@@ -426,8 +437,7 @@ size_t csMeshGeneratorGeometry::GetLODLevel (float sqdist)
 
 bool csMeshGeneratorGeometry::IsRightLOD (float sqdist, size_t current_lod)
 {
-  // With only one lod level we are always right.
-  if (factories.GetSize () <= 1) return true;
+  if (sqdist < sq_min_draw_dist) return false;
   if (current_lod == 0)
     return (sqdist <= factories[0].sqmaxdistance);
   else
@@ -1000,6 +1010,8 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
             geometries[p.geom_type]->MoveMesh (cidx, p,
               p.position, rotation_matrices[p.rotation]);
           }
+          else
+            p.idInGeometry = csArrayItemNotFound;
         }
         else if(!delta.IsZero())
         { 

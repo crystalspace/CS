@@ -49,12 +49,13 @@ struct iTerraFormer;
  */
 struct iMeshGeneratorGeometry : public virtual iBase
 {
-  SCF_INTERFACE(iMeshGeneratorGeometry, 1, 1, 1);
+  SCF_INTERFACE(iMeshGeneratorGeometry, 1, 1, 2);
 
   /**
    * Add a factory and the maximum distance after which this factory
    * will no longer be used. The minimum distance will be calculated
    * from the maximum distance used for other factories in this geometry.
+   * \sa SetMinimumDrawDistance to set a minimum drawing distance for all factories.
    */
   virtual void AddFactory (iMeshFactoryWrapper* factory, float maxdist) = 0;
 
@@ -179,6 +180,14 @@ struct iMeshGeneratorGeometry : public virtual iBase
    */
   virtual bool UseDensityFactorMap (const char* factorMapID,
 				    float factor) = 0;
+
+  /**
+   * Set the minimum drawing distance for any mesh in this geometry.
+   * A mesh is not displayed if it is closer than this distance.
+   */
+  virtual void SetMinimumDrawDistance (float dist) = 0;
+  /// Get the minimum drawing distance for any mesh in this geometry.
+  virtual float GetMinimumDrawDistance () = 0;
 };
 
 /**
