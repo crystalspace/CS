@@ -1004,7 +1004,6 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
         // We didn't have a mesh here so we allocate one.
         if (geometries[p.geom_type]->AllocMesh (cidx, cell, sqdist, p))
         {
-          p.last_mixmode = ~0;
           geometries[p.geom_type]->MoveMesh (cidx, p,
                                               p.position, rotation_matrices[p.rotation]);
         }
@@ -1018,7 +1017,6 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
           geometries[p.geom_type]->FreeMesh (cidx, p);
           if (geometries[p.geom_type]->AllocMesh (cidx, cell, sqdist, p))
           {
-            p.last_mixmode = ~0;
             geometries[p.geom_type]->MoveMesh (cidx, p,
               p.position, rotation_matrices[p.rotation]);
           }

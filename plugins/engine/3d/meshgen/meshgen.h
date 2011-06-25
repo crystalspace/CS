@@ -296,11 +296,6 @@ struct csMGPosition
    */
   size_t rotation;
 
-  /**
-   * Last used mixmode.
-   */
-  uint last_mixmode;
-
   /// The LOD level for the mesh above.
   size_t lod;
 
@@ -308,7 +303,7 @@ struct csMGPosition
   size_t idInGeometry;
 
   csMGPosition () : position(0.0f), geom_type(0), rotation(0),
-    last_mixmode(CS_FX_COPY), lod(0),
+    lod(0),
     idInGeometry (csArrayItemNotFound) { } 
 };
 
