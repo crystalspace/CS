@@ -60,7 +60,7 @@ bool SelfShadowDemo::OnKeyboard (iEvent &ev)
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
   if (eventtype == csKeyEventTypeDown)
   {
-    if (csKeyEventHelper::GetCookedCode (&ev) == 'A')
+    if (csKeyEventHelper::GetCookedCode (&ev) == 'a')
     {
       csMatrix3 matrixX (1, 0, 0, 0, cos(rotateFactor), -sin(rotateFactor), 
         0, sin(rotateFactor), cos(rotateFactor));
@@ -68,7 +68,7 @@ bool SelfShadowDemo::OnKeyboard (iEvent &ev)
 
       light->GetMovable()->MovePosition(csVector3(0, 0, moveFactor));
     }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'Q')
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'q')
     {
       csMatrix3 matrixX (1, 0, 0, 0, cos(rotateFactor), sin(rotateFactor), 
         0, -sin(rotateFactor), cos(rotateFactor));
@@ -76,15 +76,15 @@ bool SelfShadowDemo::OnKeyboard (iEvent &ev)
 
       light->GetMovable()->MovePosition(csVector3(0, 0, -moveFactor));
     }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'S')
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 's')
     {
       light->GetMovable()->MovePosition(csVector3(0, moveFactor, 0));
     }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'W')
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'w')
     {
       light->GetMovable()->MovePosition(csVector3(0, -moveFactor, 0));
     }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'D')
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'd')
     {
       csMatrix3 matrixY (cos(rotateFactor), -sin(rotateFactor), 0,
         sin(rotateFactor), cos(rotateFactor), 0, 0, 0, 1);
@@ -92,7 +92,7 @@ bool SelfShadowDemo::OnKeyboard (iEvent &ev)
 
       light->GetMovable()->MovePosition(csVector3(-moveFactor, 0, 0));
     }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'E')
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'e')
     {
       csMatrix3 matrixY (cos(rotateFactor), sin(rotateFactor), 0,
         -sin(rotateFactor), cos(rotateFactor), 0, 0, 0, 1);
