@@ -108,6 +108,7 @@ class iSkeletonFactory(core.iBase):
     def GetAutoStart(*args): return _animation.iSkeletonFactory_GetAutoStart(*args)
     def Description(*args): return _animation.iSkeletonFactory_Description(*args)
     def GetBoneOrderList(*args): return _animation.iSkeletonFactory_GetBoneOrderList(*args)
+    def GetName(*args): return _animation.iSkeletonFactory_GetName(*args)
     scfGetVersion = staticmethod(_animation.iSkeletonFactory_scfGetVersion)
     __swig_destroy__ = _animation.delete_iSkeletonFactory
     __del__ = lambda self : None;
@@ -649,6 +650,7 @@ DEBUG_NONE = _animation.DEBUG_NONE
 DEBUG_2DLINES = _animation.DEBUG_2DLINES
 DEBUG_SQUARES = _animation.DEBUG_SQUARES
 DEBUG_IMAGES = _animation.DEBUG_IMAGES
+DEBUG_BBOXES = _animation.DEBUG_BBOXES
 class iSkeletonDebugNodeFactory(iSkeletonAnimNodeFactory):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
@@ -661,6 +663,8 @@ class iSkeletonDebugNodeFactory(iSkeletonAnimNodeFactory):
     def SetLeafBonesDisplayed(*args): return _animation.iSkeletonDebugNodeFactory_SetLeafBonesDisplayed(*args)
     def SetChildNode(*args): return _animation.iSkeletonDebugNodeFactory_SetChildNode(*args)
     def GetChildNode(*args): return _animation.iSkeletonDebugNodeFactory_GetChildNode(*args)
+    def SetRandomColor(*args): return _animation.iSkeletonDebugNodeFactory_SetRandomColor(*args)
+    def GetRandomColor(*args): return _animation.iSkeletonDebugNodeFactory_GetRandomColor(*args)
     scfGetVersion = staticmethod(_animation.iSkeletonDebugNodeFactory_scfGetVersion)
     __swig_destroy__ = _animation.delete_iSkeletonDebugNodeFactory
     __del__ = lambda self : None;

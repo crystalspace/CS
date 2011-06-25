@@ -7757,6 +7757,74 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csView_NormalizedToScreen(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csView *arg1 = (csView *) 0 ;
+  csVector2 *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  csVector2 result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csView_NormalizedToScreen",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csView, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csView_NormalizedToScreen" "', argument " "1"" of type '" "csView *""'"); 
+  }
+  arg1 = reinterpret_cast< csView * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector2,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csView_NormalizedToScreen" "', argument " "2"" of type '" "csVector2 const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csView_NormalizedToScreen" "', argument " "2"" of type '" "csVector2 const &""'"); 
+  }
+  arg2 = reinterpret_cast< csVector2 * >(argp2);
+  result = (arg1)->NormalizedToScreen((csVector2 const &)*arg2);
+  resultobj = SWIG_NewPointerObj((new csVector2(static_cast< const csVector2& >(result))), SWIGTYPE_p_csVector2, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csView_ScreenToNormalized(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csView *arg1 = (csView *) 0 ;
+  csVector2 *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  csVector2 result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csView_ScreenToNormalized",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csView, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csView_ScreenToNormalized" "', argument " "1"" of type '" "csView *""'"); 
+  }
+  arg1 = reinterpret_cast< csView * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector2,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csView_ScreenToNormalized" "', argument " "2"" of type '" "csVector2 const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csView_ScreenToNormalized" "', argument " "2"" of type '" "csVector2 const &""'"); 
+  }
+  arg2 = reinterpret_cast< csVector2 * >(argp2);
+  result = (arg1)->ScreenToNormalized((csVector2 const &)*arg2);
+  resultobj = SWIG_NewPointerObj((new csVector2(static_cast< const csVector2& >(result))), SWIGTYPE_p_csVector2, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *csView_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
@@ -23354,6 +23422,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csView_GetHeight", _wrap_csView_GetHeight, METH_VARARGS, NULL},
 	 { (char *)"csView_SetWidth", _wrap_csView_SetWidth, METH_VARARGS, NULL},
 	 { (char *)"csView_SetHeight", _wrap_csView_SetHeight, METH_VARARGS, NULL},
+	 { (char *)"csView_NormalizedToScreen", _wrap_csView_NormalizedToScreen, METH_VARARGS, NULL},
+	 { (char *)"csView_ScreenToNormalized", _wrap_csView_ScreenToNormalized, METH_VARARGS, NULL},
 	 { (char *)"csView_swigregister", csView_swigregister, METH_VARARGS, NULL},
 	 { (char *)"csfxInterference", _wrap_csfxInterference, METH_VARARGS, NULL},
 	 { (char *)"csfxFadeOut", _wrap_csfxFadeOut, METH_VARARGS, NULL},

@@ -228,6 +228,8 @@ class csView(scfView):
     def GetHeight(*args): return _cstool.csView_GetHeight(*args)
     def SetWidth(*args): return _cstool.csView_SetWidth(*args)
     def SetHeight(*args): return _cstool.csView_SetHeight(*args)
+    def NormalizedToScreen(*args): return _cstool.csView_NormalizedToScreen(*args)
+    def ScreenToNormalized(*args): return _cstool.csView_ScreenToNormalized(*args)
 csView_swigregister = _cstool.csView_swigregister
 csView_swigregister(csView)
 

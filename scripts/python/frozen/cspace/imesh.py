@@ -734,6 +734,14 @@ class iAnimatedMeshFactory(core.iBase):
     def GetSocket(*args): return _imesh.iAnimatedMeshFactory_GetSocket(*args)
     def FindSocket(*args): return _imesh.iAnimatedMeshFactory_FindSocket(*args)
     def ComputeTangents(*args): return _imesh.iAnimatedMeshFactory_ComputeTangents(*args)
+    def SetBoneBoundingBox(*args): return _imesh.iAnimatedMeshFactory_SetBoneBoundingBox(*args)
+    def GetBoneBoundingBox(*args): return _imesh.iAnimatedMeshFactory_GetBoneBoundingBox(*args)
+    def AddSubset(*args): return _imesh.iAnimatedMeshFactory_AddSubset(*args)
+    def AddSubsetVertex(*args): return _imesh.iAnimatedMeshFactory_AddSubsetVertex(*args)
+    def GetSubsetVertex(*args): return _imesh.iAnimatedMeshFactory_GetSubsetVertex(*args)
+    def GetSubsetVertexCount(*args): return _imesh.iAnimatedMeshFactory_GetSubsetVertexCount(*args)
+    def GetSubsetCount(*args): return _imesh.iAnimatedMeshFactory_GetSubsetCount(*args)
+    def ClearSubsets(*args): return _imesh.iAnimatedMeshFactory_ClearSubsets(*args)
 iAnimatedMeshFactory_swigregister = _imesh.iAnimatedMeshFactory_swigregister
 iAnimatedMeshFactory_swigregister(iAnimatedMeshFactory)
 
@@ -770,6 +778,9 @@ class iAnimatedMesh(core.iBase):
     def GetSocket(*args): return _imesh.iAnimatedMesh_GetSocket(*args)
     def GetAnimatedMeshFactory(*args): return _imesh.iAnimatedMesh_GetAnimatedMeshFactory(*args)
     def GetRenderBufferAccessor(*args): return _imesh.iAnimatedMesh_GetRenderBufferAccessor(*args)
+    def SetBoneBoundingBox(*args): return _imesh.iAnimatedMesh_SetBoneBoundingBox(*args)
+    def GetBoneBoundingBox(*args): return _imesh.iAnimatedMesh_GetBoneBoundingBox(*args)
+    def UnsetObjectBoundingBox(*args): return _imesh.iAnimatedMesh_UnsetObjectBoundingBox(*args)
 iAnimatedMesh_swigregister = _imesh.iAnimatedMesh_swigregister
 iAnimatedMesh_swigregister(iAnimatedMesh)
 
@@ -794,6 +805,9 @@ class iAnimatedMeshMorphTarget(core.iBase):
     def GetVertexOffsets(*args): return _imesh.iAnimatedMeshMorphTarget_GetVertexOffsets(*args)
     def Invalidate(*args): return _imesh.iAnimatedMeshMorphTarget_Invalidate(*args)
     def GetName(*args): return _imesh.iAnimatedMeshMorphTarget_GetName(*args)
+    def AddSubset(*args): return _imesh.iAnimatedMeshMorphTarget_AddSubset(*args)
+    def GetSubset(*args): return _imesh.iAnimatedMeshMorphTarget_GetSubset(*args)
+    def GetSubsetCount(*args): return _imesh.iAnimatedMeshMorphTarget_GetSubsetCount(*args)
 iAnimatedMeshMorphTarget_swigregister = _imesh.iAnimatedMeshMorphTarget_swigregister
 iAnimatedMeshMorphTarget_swigregister(iAnimatedMeshMorphTarget)
 
