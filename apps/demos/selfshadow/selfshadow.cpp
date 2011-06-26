@@ -54,53 +54,54 @@ bool SelfShadowDemo::OnKeyboard (iEvent &ev)
 
   csRef<iLight> light = engine->GetSectors()->Get(0)->GetLights()->Get(0);
 
-  float moveFactor = 10 * speed;
-  float rotateFactor = asin(moveFactor / light->GetMovable()->GetPosition().Norm());
+  float moveFactor = 0;
+  csMatrix3 rotateMatrix = csMatrix3();
+  float rotateFactor = speed;
 
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
   if (eventtype == csKeyEventTypeDown)
   {
     if (csKeyEventHelper::GetCookedCode (&ev) == 'a')
     {
-      csMatrix3 matrixX (1, 0, 0, 0, cos(rotateFactor), -sin(rotateFactor), 
+      rotateMatrix = csMatrix3(1, 0, 0, 0, cos(rotateFactor), -sin(rotateFactor), 
         0, sin(rotateFactor), cos(rotateFactor));
-      light->GetMovable()->Transform(matrixX);
-
-      light->GetMovable()->MovePosition(csVector3(0, 0, moveFactor));
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'q')
     {
-      csMatrix3 matrixX (1, 0, 0, 0, cos(rotateFactor), sin(rotateFactor), 
+      rotateMatrix = csMatrix3(1, 0, 0, 0, cos(rotateFactor), sin(rotateFactor), 
         0, -sin(rotateFactor), cos(rotateFactor));
-      light->GetMovable()->Transform(matrixX);
-
-      light->GetMovable()->MovePosition(csVector3(0, 0, -moveFactor));
-    }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 's')
-    {
-      light->GetMovable()->MovePosition(csVector3(0, moveFactor, 0));
-    }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'w')
-    {
-      light->GetMovable()->MovePosition(csVector3(0, -moveFactor, 0));
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'd')
     {
-      csMatrix3 matrixY (cos(rotateFactor), -sin(rotateFactor), 0,
+      rotateMatrix = csMatrix3(cos(rotateFactor), -sin(rotateFactor), 0,
         sin(rotateFactor), cos(rotateFactor), 0, 0, 0, 1);
-      light->GetMovable()->Transform(matrixY);
-
-      light->GetMovable()->MovePosition(csVector3(-moveFactor, 0, 0));
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'e')
     {
-      csMatrix3 matrixY (cos(rotateFactor), sin(rotateFactor), 0,
+      rotateMatrix = csMatrix3(cos(rotateFactor), sin(rotateFactor), 0,
         -sin(rotateFactor), cos(rotateFactor), 0, 0, 0, 1);
-      light->GetMovable()->Transform(matrixY);
-
-      light->GetMovable()->MovePosition(csVector3(moveFactor, 0, 0));
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 's')
+    {
+      moveFactor = -speed;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'w')
+    {
+      moveFactor = speed;
     }
 
+    light->GetMovable()->Transform(rotateMatrix);
+
+    csVector3 oldDirection = light->GetMovable()->GetPosition();
+    float oldLength = oldDirection.Norm();
+    oldDirection.Normalize();
+
+    csVector3 newDirection = (rotateMatrix * oldDirection);
+    float newLength = oldLength + moveFactor;
+    newDirection.Normalize();
+
+    csVector3 position = newDirection * newLength;
+    light->GetMovable()->SetPosition(position);
     light->GetMovable()->UpdateMove();
 
     return true;
