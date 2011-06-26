@@ -1380,13 +1380,14 @@ CS::Physics2::iJoint* Simple::SpawnJointed ()
   // Already added to sector.
   CS::Physics2::iRigidBody* rb1 = SpawnBox ();
   csOrthoTransform trans = rb1->GetTransform ();
-  trans.SetOrigin (trans.GetOrigin () + csVector3 (3.0f, 0.0f, 0.0f));
+  trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () *csVector3 (3.0f, 0.0f, 0.0f));
   csOrthoTransform jointTrans = trans;
+  //rb1->SetState (CS::Physics2::STATE_STATIC);
   rb1->SetTransform (trans);
 
   CS::Physics2::iRigidBody* rb2 = SpawnSphere ();
   trans = rb2->GetTransform ();
-  trans.SetOrigin (trans.GetOrigin () + csVector3 (0.0f, -0.5f, 0.0f));
+  trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () * csVector3 (0.0f, -0.5f, 0.0f));
   rb2->SetTransform (trans);
   rb2->SetState (CS::Physics2::STATE_STATIC);
   csRef<CS::Physics2::iJoint> joint = physicalSystem->CreateRigidSlideJoint (jointTrans, -2.f, 2.f, 1.f, -1.f, 0);
