@@ -89,21 +89,21 @@ struct ShadowShadowMapDepth : ShadowShadowMap
       return 0;
   
     if (i == 0)
-      return tex2D(lightPropsSM.shadowMap[0], position).r;
+      return tex2D(lightPropsSM.shadowMap[0], position).a;
     if (i == 1)
-      return tex2D(lightPropsSM.shadowMap[1], position).r;
+      return tex2D(lightPropsSM.shadowMap[1], position).a;
     if (i == 2)
-      return tex2D(lightPropsSM.shadowMap[2], position).r;
+      return tex2D(lightPropsSM.shadowMap[2], position).a;
     if (i == 3)
-      return tex2D(lightPropsSM.shadowMap[3], position).r;	
+      return tex2D(lightPropsSM.shadowMap[3], position).a;	
     if (i == 4)
-      return tex2D(lightPropsSM.shadowMap[4], position).r;	
+      return tex2D(lightPropsSM.shadowMap[4], position).a;	
     if (i == 5)
-      return tex2D(lightPropsSM.shadowMap[5], position).r;	
+      return tex2D(lightPropsSM.shadowMap[5], position).a;	
     if (i == 6)
-      return tex2D(lightPropsSM.shadowMap[6], position).r;	
+      return tex2D(lightPropsSM.shadowMap[6], position).a;	
     if (i == 7)
-      return tex2D(lightPropsSM.shadowMap[7], position).r;
+      return tex2D(lightPropsSM.shadowMap[7], position).a;
       
     return 0;
   }
@@ -152,7 +152,7 @@ struct ShadowShadowMapDepth : ShadowShadowMap
           
         inLight = inLight * (i != numSplits) + (1 - previousMap) * (i == numSplits) ;
           
-        //inLight = 1 - previousMap;   
+        //inLight = (float)i/numSplits;   
           
         break;
       }
