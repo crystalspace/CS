@@ -36,7 +36,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 Simple::Simple ()
   : DemoApplication ("CrystalSpace.PhysTut"),
-    isSoftBodyWorld (false), environment (ENVIRONMENT_WALLS), solver (0),
+    isSoftBodyWorld (true), environment (ENVIRONMENT_WALLS), solver (0),
     autodisable (false), do_bullet_debug (false), remainingStepDuration (0.0f),
     debugMode (false), allStatic (false), pauseDynamic (false), dynamicSpeed (1.0f),
     physicalCameraMode (CAMERA_DYNAMIC), dragging (false), softDragging (false)

@@ -162,7 +162,7 @@ HitBeamResult csBulletSector::HitBeam (const csVector3& start, const csVector3& 
 
   if(rayCallback.hasHit ())
   {
-    csBulletCollisionObject* collObject = (csBulletCollisionObject*) (
+    iCollisionObject* collObject = static_cast<iCollisionObject*> (
       rayCallback.m_collisionObject->getUserPointer ());
 
     if (!collObject->GetObjectType () == COLLISION_OBJECT_PHYSICAL)
@@ -187,7 +187,9 @@ HitBeamResult csBulletSector::HitBeam (const csVector3& start, const csVector3& 
     }
     else
     {
-      iPhysicalBody* phyBody = dynamic_cast<iPhysicalBody*> (collObject);
+      iPhysicalBody* phyBody = collObject->QueryPhysicalBody ();
+      CS_ASSERT (phyBody);
+
       if(phyBody->GetBodyType () == BODY_SOFT)
       {
         btSoftBody* body = btSoftBody::upcast (rayCallback.m_collisionObject);
@@ -627,6 +629,7 @@ void csBulletSector::SetSoftBodyEnabled (bool enabled)
   }
 
   bulletWorld->setGravity (gra);
+  bulletWorld->setDebugDrawer (debugDraw);
 
   // Register a pre-tick callback
   bulletWorld->setInternalTickCallback (PreTickCallback, this, true);
@@ -673,7 +676,7 @@ void csBulletSector::DebugDraw (iView* rview)
 
 void csBulletSector::SetDebugMode (CS::Physics2::Bullet2::DebugMode mode)
 {
-  if (mode = CS::Physics2::Bullet2::DEBUG_NOTHING)
+  if (mode == CS::Physics2::Bullet2::DEBUG_NOTHING)
   {
     if (debugDraw)
     {
@@ -885,7 +888,7 @@ csRef<iCollisionActor> csBulletSystem::CreateCollisionActor ()
 }
 csRef<iCollisionSector> csBulletSystem::CreateCollisionSector ()
 {
-  csRef<iCollisionSector> collSector;
+  csRef<csBulletSector> collSector;
   collSector.AttachNew (new csBulletSector (this));
 
   collSectors.Push (collSector);
@@ -1257,6 +1260,7 @@ csRef<iSoftBody> csBulletSystem::CreateSoftBody (iGeneralFactoryState* genmeshFa
     false);
 
   body->m_cfg.piterations = 10;
+  body->m_cfg.collisions |=	btSoftBody::fCollision::SDF_RS;
   body->m_cfg.collisions |= btSoftBody::fCollision::VF_SS;
   body->m_materials[0]->m_kLST = 1;
 
@@ -1292,6 +1296,7 @@ csRef<iSoftBody> csBulletSystem::CreateSoftBody (csVector3* vertices, size_t ver
     (*defaultInfo, btVertices, btTriangles, triangleCount, false);
 
   body->m_cfg.piterations = 10;
+  body->m_cfg.collisions |=	btSoftBody::fCollision::SDF_RS;
   body->m_cfg.collisions |= btSoftBody::fCollision::VF_SS;
   body->m_materials[0]->m_kLST = 1;
 

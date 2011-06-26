@@ -48,6 +48,7 @@ class csBulletSector : public scfImplementationExt3<
   friend class csBulletColliderTerrain;
   friend class csBulletKinematicMotionState;
   friend class csBulletMotionState;
+  friend class csBulletSystem;
 
   struct CollisionPortal
   {
@@ -189,7 +190,7 @@ private:
   csRefArrayObject<csBulletSoftBody> softBodies;
   csRefArrayObject<csBulletJoint> joints;
   csRefArrayObject<iCollisionActor> actors;*/
-  csRefArrayObject<iCollisionSector> collSectors;
+  csRefArrayObject<csBulletSector> collSectors;
   btSoftBodyWorldInfo* defaultInfo;
   float internalScale;
   float inverseInternalScale;

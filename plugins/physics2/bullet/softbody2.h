@@ -10,6 +10,7 @@ class btSoftBody;
 CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
 //using CS::Physics2::iRigidBody;
+using CS::Physics2::iPhysicalBody;
 
 class csBulletSoftBody : public scfImplementationExt2<csBulletSoftBody, 
   csBulletCollisionObject, CS::Physics2::iSoftBody,
@@ -40,7 +41,8 @@ public:
   virtual ~csBulletSoftBody ();
 
   //iCollisionObject
-  virtual iCollisionObject* QueryCollisionObject () {return dynamic_cast<csBulletCollisionObject*> (this);}
+  virtual iCollisionObject* QueryCollisionObject () {return dynamic_cast<csBulletCollisionObject*> (this);}  
+  virtual iPhysicalBody* QueryPhysicalBody () {return this;}
 
   virtual void SetObjectType (CS::Collision2::CollisionObjectType type) {}
   virtual CS::Collision2::CollisionObjectType GetObjectType ()

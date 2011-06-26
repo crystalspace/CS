@@ -46,7 +46,6 @@ csOrthoTransform csBulletSoftBody::GetTransform ()
 
 void csBulletSoftBody::RebuildObject ()
 {
-  btBody->randomizeConstraints();
   btBody->setCollisionFlags(0);
 }
 
@@ -114,7 +113,8 @@ void csBulletSoftBody::AddBulletObject ()
     btSoftRigidDynamicsWorld* softWorld =
       static_cast<btSoftRigidDynamicsWorld*> (sector->bulletWorld);
     softWorld->addSoftBody (btBody);
-    btBody->setUserPointer (this);
+    btBody->setUserPointer (static_cast<CS::Collision2::iCollisionObject*> (
+      dynamic_cast<iPhysicalBody*>(this)));
     insideWorld = true;
   }
 }
@@ -143,7 +143,7 @@ bool csBulletSoftBody::IsEnabled ()
 void csBulletSoftBody::SetMass (float mass)
 {
   CS_ASSERT (btBody);
-  this->totalMass == mass;
+  this->totalMass = mass;
   btBody->setTotalMass (mass);
 }
 
@@ -575,8 +575,8 @@ void csBulletSoftBody::SetBendingConstraint (bool bending)
   CS_ASSERT (btBody);
   if (bending)
   {
-    btSoftBody::Material*	pm=btBody->m_materials[0];
-    btBody->generateBendingConstraints (2,pm);
+    btBody->generateBendingConstraints (2);
+    btBody->randomizeConstraints();
   }
 }
 

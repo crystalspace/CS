@@ -10,6 +10,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 class csBulletPhysicalSystem;
 class csBulletDefaultKinematicCallback;
 
+using CS::Physics2::iPhysicalBody;
 using CS::Physics2::iRigidBody;
 using CS::Physics2::iSoftBody;
 
@@ -42,6 +43,7 @@ public:
 
   //iCollisionObject
   virtual iCollisionObject* QueryCollisionObject () {return dynamic_cast<csBulletCollisionObject*> (this);}
+  virtual iPhysicalBody* QueryPhysicalBody () {return this;}
 
   virtual void SetObjectType (CS::Collision2::CollisionObjectType type) {}
   virtual CS::Collision2::CollisionObjectType GetObjectType () {return CS::Collision2::COLLISION_OBJECT_PHYSICAL;}

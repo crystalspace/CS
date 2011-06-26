@@ -8,6 +8,8 @@
 CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
 {
 
+struct CS::Physics2::iPhysicalBody;
+
 class csBulletCollisionObject: public scfImplementationExt1<
   csBulletCollisionObject, csObject, CS::Collision2::iCollisionObject>
 {
@@ -40,6 +42,7 @@ public:
 
   virtual iObject* QueryObject (void) { return (iObject*) this; }
   virtual iCollisionObject* QueryCollisionObject () {return dynamic_cast<iCollisionObject*> (this);}
+  virtual CS::Physics2::iPhysicalBody* QueryPhysicalBody () {return NULL;}
 
   virtual void SetObjectType (CS::Collision2::CollisionObjectType type);
   virtual CS::Collision2::CollisionObjectType GetObjectType () {return type;}

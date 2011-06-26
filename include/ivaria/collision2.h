@@ -17,6 +17,14 @@ struct iView;
 
 namespace CS
 {
+namespace Physics2
+{
+struct iPhysicalBody;
+}
+}
+
+namespace CS
+{
 namespace Collision2
 {
 
@@ -349,6 +357,8 @@ struct iCollisionObject : public virtual iBase
   SCF_INTERFACE (CS::Collision2::iCollisionObject, 1, 0, 0);
 
   virtual iCollisionObject* QueryCollisionObject () = 0;
+
+  virtual CS::Physics2::iPhysicalBody* QueryPhysicalBody () = 0;
 
   /// Set the type of the collision object.
   virtual void SetObjectType (CollisionObjectType type) = 0;

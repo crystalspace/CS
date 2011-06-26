@@ -198,7 +198,8 @@ void csBulletRigidBody::AddBulletObject ()
   btObject = btBody;
 
   sector->bulletWorld->addRigidBody (btBody);
-  btBody->setUserPointer (static_cast<iPhysicalBody*> (this));
+  btBody->setUserPointer (static_cast<CS::Collision2::iCollisionObject*> (
+    dynamic_cast<iPhysicalBody*>(this)));
   SetLinearVelocity (linearVelocity);
   SetAngularVelocity (angularVelocity);
   insideWorld = true;
