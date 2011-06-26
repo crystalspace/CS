@@ -96,15 +96,11 @@ namespace CS
           csRef<csShaderVariable> farZSV;
           csRef<csShaderVariable> numSplitsSV;
 
-          csBox3 castingObjectsBBoxPP;
-
           struct Frustum
           {
             csRef<csShaderVariable> shadowMapProjectSV;
             csRef<csShaderVariable> splitDistsSV;
             csRef<csShaderVariable> textureSVs[rtaNumAttachments];
-
-            csBox3 receivingObjectsBBoxPP;
           };
           Frustum* frustums;
 
@@ -231,6 +227,9 @@ namespace CS
           typename RenderTree::ContextNode::TreeType::MeshNodeTreeIteratorType it = 
             context.meshNodes.GetIterator ();
 
+          csBox3 castingObjects;
+          csBox3 receivingObjects;
+
           while (it.HasNext ())
           {
             typename RenderTree::ContextNode::TreeType::MeshNode *node = it.Next ();
@@ -271,6 +270,30 @@ namespace CS
                 rview->GetEngine()->GetRenderPriority("alpha"))
                 continue;
 
+              csVector3 vLight;
+              csBox3 meshBboxWorld (mesh.renderMesh->object2world.This2Other (
+                mesh.renderMesh->bbox));
+              vLight = light->GetMovable()->GetFullTransform().Other2This (
+                meshBboxWorld.GetCorner (0));
+              csBox3 meshBboxLightPP;
+              csVector4 vLightPP;
+              vLightPP = lightProject * csVector4 (vLight);
+              //vLightPP /= vLightPP.w;
+              meshBboxLightPP.StartBoundingBox (csVector3 (vLightPP.x,
+                vLightPP.y, vLightPP.z));
+              for (int c = 1; c < 8; c++)
+              {
+                vLight = light->GetMovable()->GetFullTransform().Other2This (
+                  meshBboxWorld.GetCorner (c));
+                vLightPP = lightProject * csVector4 (vLight);
+                //vLightPP /= vLightPP.w;
+                meshBboxLightPP.AddBoundingVertexSmart (csVector3 (vLightPP.x,
+                  vLightPP.y, vLightPP.z));
+              }
+
+              castingObjects += meshBboxLightPP;
+              receivingObjects += meshBboxLightPP;
+                  
               // Iterate on all vertices
               for (size_t i = 0; i < positionWalker.GetSize (); i++)
               {
@@ -307,8 +330,8 @@ namespace CS
               newRenderView->SetEngine (rview->GetEngine ());
               newRenderView->SetThisSector (rview->GetThisSector ());
 
-              csBox3 castersBox = superFrust.castingObjectsBBoxPP;
-              csBox3 receiversBox = lightFrust.receivingObjectsBBoxPP;
+              csBox3 castersBox = castingObjects;
+              csBox3 receiversBox = receivingObjects;
               // set up projection matrix
               const float focusMinX = csMax (receiversBox.MinX(), castersBox.MinX());
               const float focusMinY = csMax (receiversBox.MinY(), castersBox.MinY());
@@ -336,17 +359,21 @@ namespace CS
               float lightCutoff = light->GetCutoffDistance();
               float lightNear = SMALL_Z;
 
-              lightProject = CS::Math::Projections::Ortho (lightCutoff, 
-                -lightCutoff, lightCutoff, -lightCutoff, 
-                -viewSetup.splitDists[frustNum], -lightNear);
+              {
+                lightProject = CS::Math::Projections::Ortho (lightCutoff, 
+                  -lightCutoff, lightCutoff, -lightCutoff, 
+                  -viewSetup.splitDists[frustNum], -lightNear);
 
-              matrix = (Mortho * crop * lightProject);
+                matrix = (Mortho * crop * lightProject);
+              }
 
-//               lightCutoff = viewSetup.splitDists[frustNum];
+//               lightCutoff = 100;
 //               lightNear = SMALL_Z;
 // 
-//               matrix = CS::Math::Projections::Ortho (lightCutoff, 
-//                 -lightCutoff, lightCutoff, -lightCutoff, -lightCutoff, -lightNear);
+//               lightProject = CS::Math::Projections::Ortho (lightCutoff, 
+//                 -lightCutoff, lightCutoff, -lightCutoff, -30, -lightNear);
+
+//               matrix = Mortho * crop * lightProject;
 
               for (int i = 0; i < 4; i++)
               {
@@ -369,6 +396,12 @@ namespace CS
               shadowViewCam->SetProjectionMatrix (matrix);
               shadowViewCam->GetCamera()->SetTransform (light->GetMovable()->GetTransform());
 
+              newRenderView->SetViewDimensions (shadowMapSize, shadowMapSize);
+              csBox2 clipBox (0, 0, shadowMapSize, shadowMapSize);
+              csRef<iClipper2D> newView;
+              newView.AttachNew (new csBoxClipper (clipBox));
+              newRenderView->SetClipper (newView);
+
               typename RenderTree::ContextNode* shadowMapCtx = 
                 renderTree.CreateContext (newRenderView);
 
@@ -385,11 +418,6 @@ namespace CS
                 shadowMapCtx->renderTargets[target->attachment].texHandle = tex;
                 shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
               }
-
-              csBox2 clipBox (0, 0, shadowMapSize, shadowMapSize);
-              csRef<iClipper2D> newView;
-              newView.AttachNew (new csBoxClipper (clipBox));
-              newRenderView->SetClipper (newView);
 
               // Setup the new context
               ShadowmapContextSetup contextFunction (layerConfig,
@@ -505,6 +533,7 @@ namespace CS
 
           this->shaderManager = shaderManager;
           this->g3d = g3d;
+
           iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
           svNames.SetStrings (strings);
 
@@ -561,32 +590,6 @@ namespace CS
         typename CachedLightData::SuperFrustum& superFrust =
           *(lightFrustums[subLightNum]);
 
-//         csPrintf("sub %d\n", subLightNum);
-
-        csVector3 vLight;
-        csBox3 meshBboxWorld (singleMesh.renderMesh->object2world.This2Other (
-          singleMesh.renderMesh->bbox));
-        vLight = superFrust.world2light_rotated.Other2This (
-          meshBboxWorld.GetCorner (0));
-        csBox3 meshBboxLightPP;
-        csVector4 vLightPP;
-        vLightPP = lightData.lightProject * csVector4 (vLight);
-        //vLightPP /= vLightPP.w;
-        meshBboxLightPP.StartBoundingBox (csVector3 (vLightPP.x,
-          vLightPP.y, vLightPP.z));
-        for (int c = 1; c < 8; c++)
-        {
-          vLight = superFrust.world2light_rotated.Other2This (
-            meshBboxWorld.GetCorner (c));
-          vLightPP = lightData.lightProject * csVector4 (vLight);
-          //vLightPP /= vLightPP.w;
-          meshBboxLightPP.AddBoundingVertexSmart (csVector3 (vLightPP.x,
-            vLightPP.y, vLightPP.z));
-        }
-
-        // Mesh casts shadow
-        superFrust.castingObjectsBBoxPP += meshBboxLightPP;
-
         uint spreadFlags = 0;
         int s = 0;
 
@@ -594,9 +597,7 @@ namespace CS
         {
           typename CachedLightData::SuperFrustum::Frustum& lightFrustum =
             superFrust.frustums[f];
-
-          lightFrustum.receivingObjectsBBoxPP += meshBboxLightPP;
-
+    
           lightVarsHelper.MergeAsArrayItem (lightStacks[lightNum],
             lightFrustum.shadowMapProjectSV, s);
 
