@@ -213,7 +213,7 @@ namespace CS
             CS_ASSERT_MSG("Null node encountered, should not be possible", node);
 
             // setup split dists
-            for (int i = 0 ; i < node->meshes.GetSize(); i ++)
+            for (size_t i = 0 ; i < node->meshes.GetSize(); i ++)
             {
               typename RenderTree::ContextNode::TreeType::MeshNode::SingleMesh 
                 mesh = node->meshes.Get(i);
