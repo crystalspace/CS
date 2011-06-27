@@ -22,6 +22,7 @@
 #define __LIGHTFUNCS_CG_INC__
 
 #define MAX_LIGHTS 8
+#define MAX_OSM 8
 
 half Attenuation_Linear (float d, float invLightRadius)
 {
@@ -186,10 +187,10 @@ LightPropertiesShadowMap lightPropsSM;
 struct LightPropertiesOpacityMap
 {
   // Transformation from light to shadow map space
-  float4x4 opacityMapTF[MAX_LIGHTS];
+  float4x4 opacityMapTF[MAX_OSM * MAX_LIGHTS];
   // Shadow map
-  sampler2D opacityMap[MAX_LIGHTS];
-  float splitDists[MAX_LIGHTS];
+  sampler2D opacityMap[MAX_OSM * MAX_LIGHTS];
+  float splitDists[MAX_OSM * MAX_LIGHTS];
   int opacityMapNumSplits;
 };
 LightPropertiesOpacityMap lightPropsOM;

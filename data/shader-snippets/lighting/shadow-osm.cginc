@@ -1,5 +1,7 @@
 <!--
-  Copyright (C) 2008 by Frank Richter
+  Copyright (C) 2011 Alexandru - Teodor Voicu
+      Imperial College London
+      http://www3.imperial.ac.uk/
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -24,63 +26,23 @@
 
 struct ShadowShadowMapDepth : ShadowShadowMap
 {
-  float4x4 shadowMapTF;
-  float4 shadowMapCoords;
-  float4 shadowMapCoordsProj;
-  sampler2D shadowMap;
-  float bias;
-  float gradient;
+  float4 viewPos;
   
   void InitVP (int lightNum, float4 surfPositionWorld,
                float3 normWorld,
-               out float4 vp_shadowMapCoords,
-               out float vp_gradientApprox)
+               out float4 vp_viewPos,
+               out float vp_distance)
   {
     float4x4 lightTransformInv = lightProps.transformInv[lightNum];
     // Transform world position into light space
     float4 view_pos = mul(lightTransformInv, surfPositionWorld);
-    // Transform position in light space into "shadow map space"
-    float4 shadowMapCoords;
-    shadowMapTF = lightPropsOM.opacityMapTF[lightNum];
-    /* CS' render-to-texture Y-flips render targets (so the upper left
-       gets rendered to 0,0), we need to unflip here again. */
-    float4x4 flipY;
-    flipY[0] = float4 (1, 0, 0, 0);
-    flipY[1] = float4 (0, -1, 0, 0);
-    flipY[2] = float4 (0, 0, 1, 0);
-    flipY[3] = float4 (0, 0, 0, 1);
-    shadowMapTF = mul (flipY, shadowMapTF);
-    shadowMapCoords = mul (shadowMapTF, view_pos);
-    
-    vp_shadowMapCoords = shadowMapCoords;
-    vp_shadowMapCoords = view_pos;
-    
-    float3 normL = mul(lightTransformInv, float4 (normWorld, 0)).xyz;
-    float3 normShadow = normalize (mul (shadowMapTF, float4 (normL, 0)).xyz);
-    //float3 viewDirShadow = normalize (mul (shadowMapTF, float4 (0, 0, -1, 0)).xyz);
-    vp_gradientApprox = 1-saturate (dot (normShadow, float3 (0, 0, -1)));
-    
-    vp_gradientApprox = view_pos.z;
-    
-    /* @@@ FIXME: This should prolly be:
-    float3 viewDirShadow = -normalize (shadowMapCoords.xyz);
-    vp_gradientApprox = 1-saturate (dot (normShadow, viewDirShadow));
-    */
+
+    vp_viewPos = view_pos;
   }
   
-  void Init (int lightNum, float4 vp_shadowMapCoords, float vp_gradient)
+  void Init (int lightNum, float4 vp_viewPos, float vp_distance)
   {
-    shadowMapCoords = vp_shadowMapCoords;
-    shadowMap = lightPropsOM.opacityMap[lightNum];
-    gradient = vp_gradient;
-    
-    // Project SM coordinates
-    shadowMapCoordsProj = shadowMapCoords;
-    shadowMapCoordsProj.xyz /= shadowMapCoordsProj.w;
-    
-    // FWIW, this should prolly be made some kind of setting.
-    bias = 0.0001;
-    //bias *= 1 + (gradient*gradient*256);
+    viewPos = vp_viewPos;
   }
   
   float getMapValue(int i, float2 position)
@@ -110,35 +72,33 @@ struct ShadowShadowMapDepth : ShadowShadowMap
   
   half GetVisibility()
   {
-    float3 shadowMapCoordsBiased = (float3(0.5)*shadowMapCoordsProj.xyz) + float3(0.5);    
-    half inLight = 1;
+    half inLight;
 	
     int numSplits = lightPropsOM.opacityMapNumSplits;
-
-    float previousSplit = 0, nextSplit;
+    float previousSplit, nextSplit;
+  
+    float4x4 flipY;
+    flipY[0] = float4 (1, 0, 0, 0);
+    flipY[1] = float4 (0, -1, 0, 0);
+    flipY[2] = float4 (0, 0, 1, 0);
+    flipY[3] = float4 (0, 0, 0, 1);      
   
     for (int i = 0 ; i <= numSplits ; i ++)
     {
       previousSplit = lightPropsOM.splitDists[i];
       nextSplit = lightPropsOM.splitDists[i + 1];
       
-      if (gradient < nextSplit || i == numSplits)
+      if (viewPos.z < nextSplit || i == numSplits)
       {
-        float4x4 flipY;
-        flipY[0] = float4 (1, 0, 0, 0);
-        flipY[1] = float4 (0, -1, 0, 0);
-        flipY[2] = float4 (0, 0, 1, 0);
-        flipY[3] = float4 (0, 0, 0, 1);        
-
         float4x4 shadowMapTFPrev = mul (flipY, lightPropsOM.opacityMapTF[i]);
-        float4 shadowMapCoordsPrev = mul (shadowMapTFPrev, shadowMapCoords);      
+        float4 shadowMapCoordsPrev = mul (shadowMapTFPrev, viewPos);      
         float4 shadowMapCoordsProjPrev = shadowMapCoordsPrev;
         shadowMapCoordsProjPrev.xyz /= shadowMapCoordsProjPrev.w;      
         float3 shadowMapCoordsBiasedPrev = 
           (float3(0.5)*shadowMapCoordsProjPrev.xyz) + float3(0.5);          
         
         float4x4 shadowMapTFNext = mul (flipY, lightPropsOM.opacityMapTF[i + 1]);
-        float4 shadowMapCoordsNext = mul (shadowMapTFNext, shadowMapCoords);      
+        float4 shadowMapCoordsNext = mul (shadowMapTFNext, viewPos);      
         float4 shadowMapCoordsProjNext = shadowMapCoordsNext;
         shadowMapCoordsProjNext.xyz /= shadowMapCoordsProjNext.w;      
         float3 shadowMapCoordsBiasedNext = 
@@ -147,7 +107,7 @@ struct ShadowShadowMapDepth : ShadowShadowMap
         float previousMap = getMapValue(i, shadowMapCoordsBiasedPrev.xy);
         float nextMap = getMapValue(i + 1, shadowMapCoordsBiasedNext.xy);   
    
-        inLight = lerp(1 - previousMap, 1 - nextMap, (float) (gradient - previousSplit) 
+        inLight = lerp(1 - previousMap, 1 - nextMap, (float) (viewPos.z - previousSplit) 
           / (nextSplit - previousSplit) );
           
         inLight = inLight * (i != numSplits) + (1 - previousMap) * (i == numSplits) ;
