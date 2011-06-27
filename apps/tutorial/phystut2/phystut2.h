@@ -82,15 +82,15 @@ private:
 
   // Spawning objects
   bool SpawnStarCollider ();
-  CS::Physics2::iRigidBody* SpawnBox ();
-  CS::Physics2::iRigidBody* SpawnSphere ();
-  CS::Physics2::iRigidBody* SpawnCone ();
-  CS::Physics2::iRigidBody* SpawnCylinder ();
+  CS::Physics2::iRigidBody* SpawnBox (bool setVelocity = true);
+  CS::Physics2::iRigidBody* SpawnSphere (bool setVelocity = true);
+  CS::Physics2::iRigidBody* SpawnCone (bool setVelocity = true);
+  CS::Physics2::iRigidBody* SpawnCylinder (bool setVelocity = true);
   CS::Physics2::iRigidBody* SpawnCapsule (float length = rand() % 3 / 50.f + .7f,
-    float radius = rand() % 10 / 50.f + .2f);
+    float radius = rand() % 10 / 50.f + .2f, bool setVelocity = true);
   CS::Collision2::iCollisionObject* SpawnConcaveMesh ();
-  CS::Physics2::iRigidBody* SpawnConvexMesh ();
-  CS::Physics2::iRigidBody* SpawnCompound ();
+  CS::Physics2::iRigidBody* SpawnConvexMesh (bool setVelocity = true);
+  CS::Physics2::iRigidBody* SpawnCompound (bool setVelocity = true);
   CS::Physics2::iJoint* SpawnJointed ();
   void SpawnChain ();
   void LoadRagdoll ();

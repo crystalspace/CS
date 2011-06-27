@@ -121,7 +121,7 @@ void csBulletJoint::Attach (iPhysicalBody* body1, iPhysicalBody* body2, bool for
 void csBulletJoint::SetTransform (const csOrthoTransform& trans, bool forceUpdate)
 {
   this->transform = trans;
-  
+
   if (forceUpdate)
       RebuildJoint ();
 }
@@ -130,8 +130,40 @@ void csBulletJoint::SetPosition (const csVector3& position, bool forceUpdate)
 {
   this->position = position;
   positionSet = true;
-  if (forceUpdate)
-      RebuildJoint ();
+
+  if (rigidJoint)
+  {
+    this->transform = bodies[0]->GetTransform ();
+    transform.SetOrigin (position);
+   
+    csBulletRigidBody* body1, *body2 = NULL;
+    body1 = dynamic_cast<csBulletRigidBody*> (bodies[0]);
+
+    btTransform jointTransform = CSToBullet (transform , sys->getInternalScale ());
+
+    if (!body1->btBody)
+      return;
+    btTransform frB;   
+
+    if (type == csJointType::RIGID_HINGE_JOINT)
+    {
+      btHingeConstraint* hinge = dynamic_cast<btHingeConstraint*> (rigidJoint);
+      frB = hinge->getFrameOffsetB ();
+      hinge->setFrames (jointTransform, frB);
+    }
+    else
+    {
+      btGeneric6DofConstraint* dof6 = dynamic_cast<btGeneric6DofConstraint*> (rigidJoint);
+      frB = dof6->getFrameOffsetB ();
+      dof6->setFrames (jointTransform, frB);
+    }
+
+    body1->btBody->forceActivationState (ACTIVE_TAG);
+    if (body2)
+      body2->btBody->forceActivationState (ACTIVE_TAG);
+  }
+  else if (forceUpdate)
+    RebuildJoint ();
 }
 
 void csBulletJoint::SetTransConstraints (bool X, bool Y, bool Z, bool forceUpdate)
@@ -271,24 +303,25 @@ bool csBulletJoint::RebuildJoint ()
   }
   else
   {
-    btTransform frA, frB;
     csBulletRigidBody* body1, *body2 = NULL;
     body1 = dynamic_cast<csBulletRigidBody*> (bodies[0]);
 
     if (positionSet)
     {
       this->transform = body1->GetTransform ();
-      transform.SetOrigin (transform.GetOrigin () + transform.GetT2O () * position);
+      transform.SetOrigin (position);
     }
     btTransform jointTransform = CSToBullet (transform , sys->getInternalScale ());
 
-    frA = body1->btBody->getCenterOfMassTransform().inverse() * jointTransform;
     if (!body1->btBody)
       return false;
+    frA = body1->btBody->getCenterOfMassTransform().inverse() * jointTransform;
+
     if (type == csJointType::RIGID_HINGE_JOINT)
     {
       btHingeConstraint* pHinge;
-      btVector3 btPivotA = CSToBullet (position, sys->getInternalScale ());
+      btVector3 btPivot = CSToBullet (position, sys->getInternalScale ());
+      btVector3 btPivotA = body1->btBody->getCenterOfMassTransform().inverse ()(btPivot);
       btVector3 btAxisA( 0.0f, 0.0f, 0.0f );
       btAxisA[axis] = 1.0f;
       if (bodies[1])
@@ -296,8 +329,7 @@ bool csBulletJoint::RebuildJoint ()
         body2 = dynamic_cast<csBulletRigidBody*> (bodies[1]);
         if (!body2 || !body2->btBody)
           return false;
-        btVector3 btPivotB = body1->btBody->getCenterOfMassTransform().inverse()(
-          body2->btBody->getCenterOfMassTransform()(btPivotA));
+        btVector3 btPivotB = body2->btBody->getCenterOfMassTransform().inverse()(btPivot);
         pHinge = new btHingeConstraint( *body1->btBody, *body2->btBody,
           btPivotA, btPivotB, btAxisA, btAxisA, true);
       }

@@ -403,7 +403,7 @@ bool Simple::OnKeyboard (iEvent &event)
         && hitResult.object->GetObjectType () == CS::Collision2::COLLISION_OBJECT_PHYSICAL)
       {
         // Remove the body and the mesh from the simulation, and put them in the clipboard
-        clipboardBody = scfQueryInterface<CS::Physics2::iPhysicalBody> (hitResult.object);
+        clipboardBody = hitResult.object->QueryPhysicalBody ();
         if (clipboardBody->GetBodyType () == CS::Physics2::BODY_RIGID)
           physicalSector->RemoveRigidBody (clipboardBody->QueryRigidBody ());
         else
@@ -546,6 +546,7 @@ bool Simple::OnMouseDown (iEvent &event)
       csRef<CS::Physics2::iPhysicalBody> physicalBody = hitResult.object->QueryPhysicalBody ();
       if (physicalBody->GetBodyType () == CS::Physics2::BODY_RIGID)
       {
+        csOrthoTransform trans = physicalBody->GetTransform ();
         // Check if the body hit is not static or kinematic
         csRef<CS::Physics2::iRigidBody> bulletBody =
           scfQueryInterface<CS::Physics2::iRigidBody> (physicalBody);
@@ -592,19 +593,22 @@ bool Simple::OnMouseDown (iEvent &event)
     // Check if we hit a rigid body
     if (hitResult.object->GetObjectType () == CS::Collision2::COLLISION_OBJECT_PHYSICAL)
     {
-      csRef<CS::Physics2::iPhysicalBody> physicalBody = scfQueryInterface<CS::Physics2::iPhysicalBody> (hitResult.object);
+      csRef<CS::Physics2::iPhysicalBody> physicalBody = hitResult.object->QueryPhysicalBody ();
       if (physicalBody->GetBodyType () == CS::Physics2::BODY_RIGID)
       {
+        csRef<CS::Physics2::iRigidBody> bulletBody =
+          scfQueryInterface<CS::Physics2::iRigidBody> (physicalBody);
+        if (bulletBody->GetState () != CS::Physics2::STATE_DYNAMIC)
+          return false;
+
         // Create a p2p joint at the point clicked
-        dragJoint = physicalSystem->CreateRigidP2PJoint (hitResult.isect - hitResult.object->GetTransform ().GetOrigin ());
+        dragJoint = physicalSystem->CreateRigidP2PJoint (hitResult.isect);
         dragJoint->Attach (physicalBody, NULL);
 
         dragging = true;
         dragDistance = (hitResult.isect - startBeam).Norm ();
 
         // Set some dampening on the rigid body to have a more stable dragging
-        csRef<CS::Physics2::iRigidBody> bulletBody =
-          scfQueryInterface<CS::Physics2::iRigidBody> (hitResult.object);
         linearDampening = bulletBody->GetLinearDampener ();
         angularDampening = bulletBody->GetRollingDampener ();
         bulletBody->SetLinearDampener (0.9f);
@@ -948,7 +952,7 @@ void Simple::UpdateCameraMode ()
   }
 }
 
-CS::Physics2::iRigidBody* Simple::SpawnBox ()
+CS::Physics2::iRigidBody* Simple::SpawnBox (bool setVelocity /* = true */)
 {
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
@@ -972,12 +976,15 @@ CS::Physics2::iRigidBody* Simple::SpawnBox ()
   rb->SetElasticity (0.8f);
   rb->SetFriction (10.0f);
 
-  // Fling the body.
-  rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
-  rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
-
   rb->RebuildObject ();
   physicalSector->AddRigidBody (rb);
+
+  if (setVelocity)
+  {
+    // Fling the body.
+    rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+    rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+  }
 
   // Update the display of the dynamics debugger
   //dynamicsDebugger->UpdateDisplay ();
@@ -985,7 +992,7 @@ CS::Physics2::iRigidBody* Simple::SpawnBox ()
   return rb;
 }
 
-CS::Physics2::iRigidBody* Simple::SpawnSphere ()
+CS::Physics2::iRigidBody* Simple::SpawnSphere (bool setVelocity /* = true */)
 {
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
@@ -1036,9 +1043,12 @@ CS::Physics2::iRigidBody* Simple::SpawnSphere ()
   rb->SetElasticity (0.8f);
   rb->SetFriction (10.0f);
 
-  // Fling the body.
-  rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
-  rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+  if (setVelocity)
+  {
+    // Fling the body.
+    rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+    rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+  }
 
   rb->RebuildObject ();
   physicalSector->AddRigidBody (rb);
@@ -1049,7 +1059,7 @@ CS::Physics2::iRigidBody* Simple::SpawnSphere ()
   return rb;
 }
 
-CS::Physics2::iRigidBody* Simple::SpawnCone ()
+CS::Physics2::iRigidBody* Simple::SpawnCone (bool setVelocity /* = true */)
 {
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
@@ -1078,9 +1088,12 @@ CS::Physics2::iRigidBody* Simple::SpawnCone ()
   rb->SetElasticity (0.8f);
   rb->SetFriction (10.0f);
 
-  // Fling the body.
-  rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
-  rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+  if (setVelocity)
+  {
+    // Fling the body.
+    rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+    rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+  }
 
   rb->RebuildObject ();
   physicalSector->AddRigidBody (rb);
@@ -1091,7 +1104,7 @@ CS::Physics2::iRigidBody* Simple::SpawnCone ()
   return rb;
 }
 
-CS::Physics2::iRigidBody* Simple::SpawnCylinder ()
+CS::Physics2::iRigidBody* Simple::SpawnCylinder (bool setVelocity /* = true */)
 {
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
@@ -1128,8 +1141,8 @@ CS::Physics2::iRigidBody* Simple::SpawnCylinder ()
   // Create a body and attach the mesh.
   csRef<CS::Physics2::iRigidBody> rb = physicalSystem->CreateRigidBody ();
   csOrthoTransform trans = tc;
-  trans.SetOrigin (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1));
   trans.RotateThis (csXRotMatrix3 (PI / 5.0));
+  trans.SetOrigin (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1));
   rb->SetTransform (trans);
   rb->SetAttachedMovable (mesh->GetMovable ());
 
@@ -1142,9 +1155,12 @@ CS::Physics2::iRigidBody* Simple::SpawnCylinder ()
   rb->SetElasticity (0.8f);
   rb->SetFriction (10.0f);
 
-  // Fling the body.
-  rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
-  rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+  if (setVelocity)
+  {
+    // Fling the body.
+    rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+    rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+  }
   
   rb->RebuildObject ();
   physicalSector->AddRigidBody (rb);
@@ -1155,7 +1171,7 @@ CS::Physics2::iRigidBody* Simple::SpawnCylinder ()
   return rb;
 }
 
-CS::Physics2::iRigidBody* Simple::SpawnCapsule (float length, float radius)
+CS::Physics2::iRigidBody* Simple::SpawnCapsule (float length, float radius, bool setVelocity /* = true */)
 {
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
@@ -1191,19 +1207,21 @@ CS::Physics2::iRigidBody* Simple::SpawnCapsule (float length, float radius)
   rb->SetAttachedMovable (mesh->GetMovable ());
 
   // Create and attach a cone collider.
-  csRef<CS::Collision2::iColliderCylinder> cyliner = collisionSystem->CreateColliderCylinder (length, radius);
-  rb->AddCollider (cyliner, localTrans);
+  csRef<CS::Collision2::iColliderCapsule> capsule = collisionSystem->CreateColliderCapsule (length, radius);
+  rb->AddCollider (capsule, localTrans);
   rb->SetDensity (1.0f);
   rb->SetElasticity (0.8f);
   rb->SetFriction (10.0f);
 
-  // Fling the body.
-  rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
-  rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
-
   rb->RebuildObject ();
   physicalSector->AddRigidBody (rb);
 
+  if (setVelocity)
+  {
+    // Fling the body.
+    rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+    rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+  }
   // Update the display of the dynamics debugger
   //dynamicsDebugger->UpdateDisplay ();
 
@@ -1253,7 +1271,7 @@ CS::Collision2::iCollisionObject* Simple::SpawnConcaveMesh ()
   return co;
 }
 
-CS::Physics2::iRigidBody* Simple::SpawnConvexMesh ()
+CS::Physics2::iRigidBody* Simple::SpawnConvexMesh (bool setVelocity /* = true */)
 {
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
@@ -1296,9 +1314,12 @@ CS::Physics2::iRigidBody* Simple::SpawnConvexMesh ()
   rb->SetElasticity (0.8f);
   rb->SetFriction (10.0f);
 
-  // Fling the body.
-  rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
-  rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+  if (setVelocity)
+  {
+    // Fling the body.
+    rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+    rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+  }
   rb->RebuildObject ();
   physicalSector->AddRigidBody (rb);
 
@@ -1308,7 +1329,7 @@ CS::Physics2::iRigidBody* Simple::SpawnConvexMesh ()
   return rb;
 }
 
-CS::Physics2::iRigidBody* Simple::SpawnCompound ()
+CS::Physics2::iRigidBody* Simple::SpawnCompound (bool setVelocity /* = true */)
 {
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
@@ -1329,9 +1350,12 @@ CS::Physics2::iRigidBody* Simple::SpawnCompound ()
   rb->RebuildObject ();
   physicalSector->AddRigidBody (rb);
 
-  // Fling the body.
-  rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
-  rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+  if (setVelocity)
+  {
+    // Fling the body.
+    rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+    rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 0, 0));
+  }
 
   // Update the display of the dynamics debugger
   //dynamicsDebugger->UpdateDisplay ();
@@ -1346,29 +1370,34 @@ CS::Physics2::iJoint* Simple::SpawnJointed ()
 #ifdef P2P
   // Create and position two rigid bodies
   // Already added to sector.
-  CS::Physics2::iRigidBody* rb1 = SpawnBox ();
+  CS::Physics2::iRigidBody* rb1 = SpawnBox (false);
   csOrthoTransform trans = rb1->GetTransform ();
-  trans.SetOrigin (trans.GetOrigin () + csVector3 (1.0f, 2.0f, 0.0f));
+  trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () * csVector3 (1.0f, 2.0f, 0.0f));
+  rb1->SetLinearVelocity (csVector3 (0.0f));
+  rb1->SetAngularVelocity (csVector3 (0.0f));
   rb1->SetTransform (trans);
+  csVector3 jointPosition = trans.This2Other(csVector3(-0.2f, -0.4f, -0.2f));
 
-  CS::Physics2::iRigidBody* rb2 = SpawnSphere ();
+  CS::Physics2::iRigidBody* rb2 = SpawnBox (false);
   trans = rb2->GetTransform ();
-  csOrthoTransform jointTrans = trans;
-  trans.SetOrigin (trans.GetOrigin () + csVector3 (0.0f, -0.5f, 0.0f));
+  trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () * csVector3 (0.0f, -0.5f, 0.0f));
   rb2->SetTransform (trans);
   rb2->SetState (CS::Physics2::STATE_STATIC);
-  csRef<CS::Physics2::iJoint> joint = physicalSystem->CreateRigidP2PJoint (csVector3(0.2f, -0.4f, -0.2f));
+  csRef<CS::Physics2::iJoint> joint = physicalSystem->CreateRigidP2PJoint (jointPosition);
   joint->Attach (rb1, rb2);
 #endif
 
 #ifdef HINGE
-  CS::Physics2::iRigidBody* rb1 = SpawnBox ();
+  CS::Physics2::iRigidBody* rb1 = SpawnBox (false);
   csOrthoTransform trans = rb1->GetTransform ();
   trans.SetOrigin (trans.GetOrigin () + csVector3 (1.0f, 2.0f, 0.0f));
   rb1->SetTransform (trans);
+  rb1->SetLinearVelocity (csVector3 (0.0f));
+  rb1->SetAngularVelocity (csVector3 (0.0f));
+  csVector3 jointPosition = trans.This2Other(csVector3(0.2f, -0.2f, 0.2f));
   // Create a joint and attach the two bodies to it.
-    csRef<CS::Physics2::iJoint> joint = physicalSystem->CreateRigidHingeJoint (csVector3(0.2f, -0.2f, 0.2f),
-    PI, -PI, 1);
+  csRef<CS::Physics2::iJoint> joint = physicalSystem->CreateRigidHingeJoint (jointPosition,
+  PI, -PI, 1);
   // Add a motor to the joint
   joint->SetDesiredVelocity (csVector3 (0.0f, -0.5f, 0.0f));
   joint->SetMaxForce (csVector3 (0.0f, 1.0f, 0.0f));
@@ -1378,21 +1407,23 @@ CS::Physics2::iJoint* Simple::SpawnJointed ()
 #ifdef SLIDE
   // Create and position two rigid bodies
   // Already added to sector.
-  CS::Physics2::iRigidBody* rb1 = SpawnBox ();
+  CS::Physics2::iRigidBody* rb1 = SpawnBox (false);
   csOrthoTransform trans = rb1->GetTransform ();
-  trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () *csVector3 (3.0f, 0.0f, 0.0f));
   csOrthoTransform jointTrans = trans;
-  //rb1->SetState (CS::Physics2::STATE_STATIC);
-  rb1->SetTransform (trans);
 
-  CS::Physics2::iRigidBody* rb2 = SpawnSphere ();
+  CS::Physics2::iRigidBody* rb2 = SpawnBox (false);
   trans = rb2->GetTransform ();
-  trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () * csVector3 (0.0f, -0.5f, 0.0f));
+  trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () * csVector3 (-1.5f, 0.0f, 0.0f));
   rb2->SetTransform (trans);
   rb2->SetState (CS::Physics2::STATE_STATIC);
-  csRef<CS::Physics2::iJoint> joint = physicalSystem->CreateRigidSlideJoint (jointTrans, -2.f, 2.f, 1.f, -1.f, 0);
+  csRef<CS::Physics2::iJoint> joint = physicalSystem->CreateRigidSlideJoint (jointTrans, -1.f, 1.f, 1.f, -1.f, 0);
   joint->Attach (rb2, rb1);
+
+  jointTrans = rb1->GetTransform ();
 #endif
+
+  /*CS::Physics2::iRigidBody* box = SpawnSoftBody ();
+  csOrthoTransform trans = box->GetTransform ();*/
 
   // Update the display of the dynamics debugger
   //dynamicsDebugger->UpdateDisplay ();
@@ -1417,7 +1448,7 @@ void ConstraintJoint (CS::Physics2::iJoint* joint)
 
 void Simple::SpawnChain ()
 {
-  CS::Physics2::iRigidBody* rb1 = SpawnBox ();
+  CS::Physics2::iRigidBody* rb1 = SpawnBox (false);
   csOrthoTransform trans = rb1->GetTransform ();
   csVector3 initPos = trans.GetOrigin () + csVector3 (0.0f, 5.0f, 0.0f);
   trans.SetOrigin (initPos);
@@ -1426,30 +1457,22 @@ void Simple::SpawnChain ()
 
   csVector3 offset (0.0f, 1.3f, 0.0f);
 
-  CS::Physics2::iRigidBody* rb2 = SpawnCapsule (0.4f, 0.3f);
-  rb2->SetLinearVelocity (csVector3 (0.0f));
-  rb2->SetAngularVelocity (csVector3 (0.0f));
+  CS::Physics2::iRigidBody* rb2 = SpawnCapsule (0.4f, 0.3f, false);
   trans.SetO2T (csXRotMatrix3 (PI / 2.0f));
   trans.SetOrigin (initPos - offset);
   rb2->SetTransform (trans);
 
-  CS::Physics2::iRigidBody* rb3 = SpawnBox ();
-  rb3->SetLinearVelocity (csVector3 (0.0f));
-  rb3->SetAngularVelocity (csVector3 (0.0f));
+  CS::Physics2::iRigidBody* rb3 = SpawnBox (false);
   trans.Identity ();
   trans.SetOrigin (initPos - 2.0f * offset);
   rb3->SetTransform (trans);
 
-  CS::Physics2::iRigidBody* rb4 = SpawnCapsule (0.4f, 0.3f);
-  rb4->SetLinearVelocity (csVector3 (0.0f));
-  rb4->SetAngularVelocity (csVector3 (0.0f));
+  CS::Physics2::iRigidBody* rb4 = SpawnCapsule (0.4f, 0.3f, false);
   trans.SetO2T (csXRotMatrix3 (PI / 2.0f));
   trans.SetOrigin (initPos - 3.0f * offset);
   rb4->SetTransform (trans);
 
-  CS::Physics2::iRigidBody* rb5 = SpawnBox ();
-  rb5->SetLinearVelocity (csVector3 (0.0f));
-  rb5->SetAngularVelocity (csVector3 (0.0f));
+  CS::Physics2::iRigidBody* rb5 = SpawnBox (false);
   trans.Identity ();
   trans.SetOrigin (initPos - 4.0f * offset);
   rb5->SetTransform (trans);

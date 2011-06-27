@@ -63,6 +63,9 @@ void csBulletCollisionObject::SetTransform (const csOrthoTransform& trans)
   {
     if (!isTerrain)
     {
+      if (insideWorld)
+        sector->bulletWorld->removeRigidBody (btRigidBody::upcast (btObject));
+
       btTransform principalAxis = motionState->inversePrincipalAxis.inverse ();
 
       delete motionState;
@@ -70,6 +73,9 @@ void csBulletCollisionObject::SetTransform (const csOrthoTransform& trans)
 
       if (btObject)
         dynamic_cast<btRigidBody*>(btObject)->setMotionState (motionState);
+
+      if (insideWorld)
+        sector->bulletWorld->addRigidBody (btRigidBody::upcast (btObject));
     }
     else
     {
@@ -321,7 +327,7 @@ void csBulletCollisionObject::AddBulletObject ()
       trans = trans * motionState->inversePrincipalAxis;
       delete motionState;
       btTransform pricipalAxis = CSToBullet (relaTransforms[0], system->getInternalScale ());
-      motionState = new csBulletMotionState (this, trans, pricipalAxis);
+      motionState = new csBulletMotionState (this, trans * pricipalAxis, pricipalAxis);
 
       btVector3 localInertia (0.0f, 0.0f, 0.0f);
       btRigidBody::btRigidBodyConstructionInfo infos (0.0, motionState,

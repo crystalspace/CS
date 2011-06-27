@@ -32,6 +32,7 @@ private:
   btTypedConstraint* rigidJoint;
   btSoftBody::Joint* softJoint;
   iPhysicalBody* bodies[2];
+  btTransform frA, frB;
   bool transConstraintX;
   bool transConstraintY;
   bool transConstraintZ;

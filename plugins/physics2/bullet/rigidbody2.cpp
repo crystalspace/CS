@@ -363,7 +363,10 @@ bool csBulletRigidBody::SetState (CS::Physics2::RigidBodyState state)
         & ~btCollisionObject::CF_STATIC_OBJECT);
       float mass = GetMass ();
       btVector3 localInertia (0.0f, 0.0f, 0.0f);
-      compoundShape->calculateLocalInertia (mass, localInertia);
+      if (compoundShape)
+        compoundShape->calculateLocalInertia (mass, localInertia);
+      else
+        colliders[0]->shape->calculateLocalInertia (mass, localInertia);
       btBody->setMassProps (mass, localInertia);
 
       btBody->forceActivationState (ACTIVE_TAG);
@@ -564,7 +567,7 @@ void csBulletRigidBody::SetLinearDampener (float d)
 {
   linearDampening = d;
 
-  if (!btBody)
+  if (btBody)
     btBody->setDamping (linearDampening, angularDampening);
 }
 
@@ -572,7 +575,7 @@ void csBulletRigidBody::SetRollingDampener (float d)
 {
   angularDampening = d;
 
-  if (!btBody)
+  if (btBody)
     btBody->setDamping (linearDampening, angularDampening);
 }
 
