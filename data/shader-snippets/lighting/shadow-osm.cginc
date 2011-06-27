@@ -27,6 +27,7 @@
 struct ShadowShadowMapDepth : ShadowShadowMap
 {
   float4 viewPos;
+  int lightNum;
   
   void InitVP (int lightNum, float4 surfPositionWorld,
                float3 normWorld,
@@ -40,9 +41,10 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     vp_viewPos = view_pos;
   }
   
-  void Init (int lightNum, float4 vp_viewPos, float vp_distance)
+  void Init (int lightN, float4 vp_viewPos, float vp_distance)
   {
     viewPos = vp_viewPos;
+    lightNum = lightN;
   }
   
   float getMapValue(int i, float2 position)
@@ -51,21 +53,21 @@ struct ShadowShadowMapDepth : ShadowShadowMap
       return 0;
   
     if (i == 0)
-      return tex2D(lightPropsOM.opacityMap[0], position).a;
+      return tex2D(lightPropsOM.opacityMap[8 * lightNum + 0], position).a;
     if (i == 1)
-      return tex2D(lightPropsOM.opacityMap[1], position).a;
+      return tex2D(lightPropsOM.opacityMap[8 * lightNum + 1], position).a;
     if (i == 2)
-      return tex2D(lightPropsOM.opacityMap[2], position).a;
+      return tex2D(lightPropsOM.opacityMap[8 * lightNum + 2], position).a;
     if (i == 3)
-      return tex2D(lightPropsOM.opacityMap[3], position).a;	
+      return tex2D(lightPropsOM.opacityMap[8 * lightNum + 3], position).a;	
     if (i == 4)
-      return tex2D(lightPropsOM.opacityMap[4], position).a;	
+      return tex2D(lightPropsOM.opacityMap[8 * lightNum + 4], position).a;	
     if (i == 5)
-      return tex2D(lightPropsOM.opacityMap[5], position).a;	
+      return tex2D(lightPropsOM.opacityMap[8 * lightNum + 5], position).a;	
     if (i == 6)
-      return tex2D(lightPropsOM.opacityMap[6], position).a;	
+      return tex2D(lightPropsOM.opacityMap[8 * lightNum + 6], position).a;	
     if (i == 7)
-      return tex2D(lightPropsOM.opacityMap[7], position).a;
+      return tex2D(lightPropsOM.opacityMap[8 * lightNum + 7], position).a;
       
     return 0;
   }
@@ -83,42 +85,41 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     flipY[2] = float4 (0, 0, 1, 0);
     flipY[3] = float4 (0, 0, 0, 1);      
   
-    for (int i = 0 ; i <= numSplits ; i ++)
+    int i;
+    for (i = 0 ; i <= numSplits ; i ++)
     {
       previousSplit = lightPropsOM.splitDists[i];
       nextSplit = lightPropsOM.splitDists[i + 1];
       
       if (viewPos.z < nextSplit || i == numSplits)
-      {
-        float4x4 shadowMapTFPrev = mul (flipY, lightPropsOM.opacityMapTF[i]);
-        float4 shadowMapCoordsPrev = mul (shadowMapTFPrev, viewPos);      
-        float4 shadowMapCoordsProjPrev = shadowMapCoordsPrev;
-        shadowMapCoordsProjPrev.xyz /= shadowMapCoordsProjPrev.w;      
-        float3 shadowMapCoordsBiasedPrev = 
-          (float3(0.5)*shadowMapCoordsProjPrev.xyz) + float3(0.5);          
-        
-        float4x4 shadowMapTFNext = mul (flipY, lightPropsOM.opacityMapTF[i + 1]);
-        float4 shadowMapCoordsNext = mul (shadowMapTFNext, viewPos);      
-        float4 shadowMapCoordsProjNext = shadowMapCoordsNext;
-        shadowMapCoordsProjNext.xyz /= shadowMapCoordsProjNext.w;      
-        float3 shadowMapCoordsBiasedNext = 
-          (float3(0.5)*shadowMapCoordsProjNext.xyz) + float3(0.5);
-          
-        float previousMap = getMapValue(i, shadowMapCoordsBiasedPrev.xy);
-        float nextMap = getMapValue(i + 1, shadowMapCoordsBiasedNext.xy);   
-   
-        inLight = lerp(1 - previousMap, 1 - nextMap, (float) (viewPos.z - previousSplit) 
-          / (nextSplit - previousSplit) );
-          
-        inLight = inLight * (i != numSplits) + (1 - previousMap) * (i == numSplits) ;
-          
-        //inLight = (float)i/numSplits;   
-          
         break;
-      }
+
       previousSplit = nextSplit;
     }
+    float4x4 shadowMapTFPrev = mul (flipY, lightPropsOM.opacityMapTF[i]);
+    float4 shadowMapCoordsPrev = mul (shadowMapTFPrev, viewPos);      
+    float4 shadowMapCoordsProjPrev = shadowMapCoordsPrev;
+    shadowMapCoordsProjPrev.xyz /= shadowMapCoordsProjPrev.w;      
+    float3 shadowMapCoordsBiasedPrev = 
+      (float3(0.5)*shadowMapCoordsProjPrev.xyz) + float3(0.5);          
     
+    float4x4 shadowMapTFNext = mul (flipY, lightPropsOM.opacityMapTF[i + 1]);
+    float4 shadowMapCoordsNext = mul (shadowMapTFNext, viewPos);      
+    float4 shadowMapCoordsProjNext = shadowMapCoordsNext;
+    shadowMapCoordsProjNext.xyz /= shadowMapCoordsProjNext.w;      
+    float3 shadowMapCoordsBiasedNext = 
+      (float3(0.5)*shadowMapCoordsProjNext.xyz) + float3(0.5);
+      
+    float previousMap = getMapValue(i, shadowMapCoordsBiasedPrev.xy);
+    float nextMap = getMapValue(i + 1, shadowMapCoordsBiasedNext.xy);   
+    
+    inLight = lerp(1 - previousMap, 1 - nextMap, (float) (viewPos.z - previousSplit) 
+      / (nextSplit - previousSplit) );
+      
+    inLight = inLight * (i != numSplits) + (1 - previousMap) * (i == numSplits) ;
+      
+    //inLight = (float)i/numSplits;   
+              
     return inLight;
   }
 };
