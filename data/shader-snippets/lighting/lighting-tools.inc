@@ -48,8 +48,6 @@
 		 destination="lightPropsSM.shadowMapPixels" />
     <variablemap variable="light shadow map unscale" 
 		 destination="lightPropsSM.shadowMapUnscale" />
-    <variablemap variable="light farZ" 
-		 destination="lightPropsSM.shadowMapFarZ" />
     <variablemap variable="light numSplits" 
 		 destination="lightPropsSM.shadowMapNumSplits" />		 
     <variablemap variable="light splitDists" 

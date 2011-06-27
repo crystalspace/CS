@@ -90,10 +90,7 @@ namespace CS
         struct SuperFrustum : public CS::Utility::FastRefCount<SuperFrustum>
         {
           int actualNumParts;
-          // Transform world space to light space
-          csReversibleTransform world2light_rotated;
 
-          csRef<csShaderVariable> farZSV;
           csRef<csShaderVariable> numSplitsSV;
 
           struct Frustum
@@ -158,13 +155,6 @@ namespace CS
           superFrustum.frustums =
             new typename SuperFrustum::Frustum[superFrustum.actualNumParts];
 
-          const csReversibleTransform& world2light_base (
-            light->GetMovable()->GetFullTransform());
-
-          superFrustum.world2light_rotated = world2light_base;
-          superFrustum.world2light_rotated.SetO2T (
-            superFrustum.world2light_rotated.GetO2T());
-
           for (int i = 0; i < superFrustum.actualNumParts; i++)
           {
             typename SuperFrustum::Frustum& lightFrustum =
@@ -184,8 +174,6 @@ namespace CS
             lightFrustum.splitDistsSV = lightVarsHelper.CreateTempSV(
               viewSetup.persist.splitDistsSVName);
 
-            superFrustum.farZSV = lightVarsHelper.CreateTempSV (
-              viewSetup.persist.farZSVName);
             superFrustum.numSplitsSV = lightVarsHelper.CreateTempSV (
               viewSetup.persist.numSplitsSVName);
 
@@ -232,11 +220,13 @@ namespace CS
                 rview->GetEngine()->GetRenderPriority("alpha"))
                 continue;
 
+              csReversibleTransform world2light = 
+                light->GetMovable()->GetFullTransform();
+
               csVector3 vLight;
               csBox3 meshBboxWorld (mesh.renderMesh->object2world.This2Other (
                 mesh.renderMesh->bbox));
-              vLight = light->GetMovable()->GetFullTransform().Other2This (
-                meshBboxWorld.GetCorner (0));
+              vLight = world2light.Other2This ( meshBboxWorld.GetCorner (0));
               csBox3 meshBboxLightPP;
               csVector4 vLightPP;
               vLightPP = lightProject * csVector4 (vLight);
@@ -245,8 +235,7 @@ namespace CS
                 vLightPP.y, vLightPP.z));
               for (int c = 1; c < 8; c++)
               {
-                vLight = light->GetMovable()->GetFullTransform().Other2This (
-                  meshBboxWorld.GetCorner (c));
+                vLight = world2light.Other2This ( meshBboxWorld.GetCorner (c));
                 vLightPP = lightProject * csVector4 (vLight);
                 //vLightPP /= vLightPP.w;
                 meshBboxLightPP.AddBoundingVertexSmart (csVector3 (vLightPP.x,
@@ -346,8 +335,8 @@ namespace CS
 
               CS::Math::Matrix4 matrix = rview->GetCamera()->GetProjectionMatrix();
 
-              CS::Math::Matrix4 Mortho = CS::Math::Projections::Ortho (-1, 1, 1, -1, 
-                1, -1);
+              CS::Math::Matrix4 Mortho = 
+                CS::Math::Projections::Ortho (-1, 1, 1, -1, 1, -1);
 
               float lightCutoff = light->GetCutoffDistance();
               float lightNear = SMALL_Z;
@@ -356,7 +345,7 @@ namespace CS
                 -lightCutoff, lightCutoff, -lightCutoff, 
                 -viewSetup.splitDists[frustNum], -lightNear);
 
-              matrix = (Mortho * crop * lightProject);
+              matrix = Mortho * crop * lightProject;
 
               for (int i = 0; i < 4; i++)
               {
@@ -374,7 +363,8 @@ namespace CS
               newRenderView->SetCamera (shadowViewCam->GetCamera());
 
               shadowViewCam->SetProjectionMatrix (matrix);
-              shadowViewCam->GetCamera()->SetTransform (light->GetMovable()->GetTransform());
+              shadowViewCam->GetCamera()->SetTransform 
+                (light->GetMovable()->GetTransform());
 
               newRenderView->SetViewDimensions (shadowMapSize, shadowMapSize);
               csBox2 clipBox (0, 0, shadowMapSize, shadowMapSize);
@@ -489,11 +479,9 @@ namespace CS
         iGraphics3D* g3d;
 
         int numSplits;
-        float farZ;
         int shadowMapRes;
         csString configPrefix;
         ShadowSettings settings;
-        CS::ShaderVarStringID farZSVName;
         CS::ShaderVarStringID numSplitsSVName;
         CS::ShaderVarStringID splitDistsSVName;
 
@@ -517,7 +505,6 @@ namespace CS
           iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
           svNames.SetStrings (strings);
 
-          farZSVName = strings->Request ("light farZ");
           numSplitsSVName = strings->Request ("light numSplits");
           splitDistsSVName = strings->Request ("light splitDists");
 
@@ -533,8 +520,6 @@ namespace CS
               csString().Format ("%s.ShadowsType", configPrefix.GetData()), "Alpha"));
             numSplits = cfg->GetInt (
               csString().Format ("%s.NumSplits", configPrefix.GetData()), 2);
-            farZ = cfg->GetFloat (
-              csString().Format ("%s.FarZ", configPrefix.GetData()), 100);
             shadowMapRes = cfg->GetInt (
               csString().Format ("%s.ShadowMapResolution", configPrefix.GetData()), 512);
           }
@@ -599,11 +584,6 @@ namespace CS
         superFrust.numSplitsSV = lightVarsHelper.CreateVarOnStack(name, 
           lightStacks[lightNum]);
         superFrust.numSplitsSV->SetValue(viewSetup.persist.numSplits);
-
-        name = superFrust.farZSV->GetName();
-        superFrust.farZSV = lightVarsHelper.CreateVarOnStack(name, 
-          lightStacks[lightNum]);
-        superFrust.farZSV->SetValue(viewSetup.persist.farZ);
 
         // here might be number of lights
         return 1;
