@@ -41,7 +41,7 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     float4 view_pos = mul(lightTransformInv, surfPositionWorld);
     // Transform position in light space into "shadow map space"
     float4 shadowMapCoords;
-    shadowMapTF = lightPropsSM.shadowMapTF[lightNum];
+    shadowMapTF = lightPropsOM.opacityMapTF[lightNum];
     /* CS' render-to-texture Y-flips render targets (so the upper left
        gets rendered to 0,0), we need to unflip here again. */
     float4x4 flipY;
@@ -71,7 +71,7 @@ struct ShadowShadowMapDepth : ShadowShadowMap
   void Init (int lightNum, float4 vp_shadowMapCoords, float vp_gradient)
   {
     shadowMapCoords = vp_shadowMapCoords;
-    shadowMap = lightPropsSM.shadowMap[lightNum];
+    shadowMap = lightPropsOM.opacityMap[lightNum];
     gradient = vp_gradient;
     
     // Project SM coordinates
@@ -89,21 +89,21 @@ struct ShadowShadowMapDepth : ShadowShadowMap
       return 0;
   
     if (i == 0)
-      return tex2D(lightPropsSM.shadowMap[0], position).a;
+      return tex2D(lightPropsOM.opacityMap[0], position).a;
     if (i == 1)
-      return tex2D(lightPropsSM.shadowMap[1], position).a;
+      return tex2D(lightPropsOM.opacityMap[1], position).a;
     if (i == 2)
-      return tex2D(lightPropsSM.shadowMap[2], position).a;
+      return tex2D(lightPropsOM.opacityMap[2], position).a;
     if (i == 3)
-      return tex2D(lightPropsSM.shadowMap[3], position).a;	
+      return tex2D(lightPropsOM.opacityMap[3], position).a;	
     if (i == 4)
-      return tex2D(lightPropsSM.shadowMap[4], position).a;	
+      return tex2D(lightPropsOM.opacityMap[4], position).a;	
     if (i == 5)
-      return tex2D(lightPropsSM.shadowMap[5], position).a;	
+      return tex2D(lightPropsOM.opacityMap[5], position).a;	
     if (i == 6)
-      return tex2D(lightPropsSM.shadowMap[6], position).a;	
+      return tex2D(lightPropsOM.opacityMap[6], position).a;	
     if (i == 7)
-      return tex2D(lightPropsSM.shadowMap[7], position).a;
+      return tex2D(lightPropsOM.opacityMap[7], position).a;
       
     return 0;
   }
@@ -113,14 +113,14 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     float3 shadowMapCoordsBiased = (float3(0.5)*shadowMapCoordsProj.xyz) + float3(0.5);    
     half inLight = 1;
 	
-    int numSplits = lightPropsSM.shadowMapNumSplits;
+    int numSplits = lightPropsOM.opacityMapNumSplits;
 
     float previousSplit = 0, nextSplit;
   
     for (int i = 0 ; i <= numSplits ; i ++)
     {
-      previousSplit = lightPropsSM.splitDists[i];
-      nextSplit = lightPropsSM.splitDists[i + 1];
+      previousSplit = lightPropsOM.splitDists[i];
+      nextSplit = lightPropsOM.splitDists[i + 1];
       
       if (gradient < nextSplit || i == numSplits)
       {
@@ -130,14 +130,14 @@ struct ShadowShadowMapDepth : ShadowShadowMap
         flipY[2] = float4 (0, 0, 1, 0);
         flipY[3] = float4 (0, 0, 0, 1);        
 
-        float4x4 shadowMapTFPrev = mul (flipY, lightPropsSM.shadowMapTF[i]);
+        float4x4 shadowMapTFPrev = mul (flipY, lightPropsOM.opacityMapTF[i]);
         float4 shadowMapCoordsPrev = mul (shadowMapTFPrev, shadowMapCoords);      
         float4 shadowMapCoordsProjPrev = shadowMapCoordsPrev;
         shadowMapCoordsProjPrev.xyz /= shadowMapCoordsProjPrev.w;      
         float3 shadowMapCoordsBiasedPrev = 
           (float3(0.5)*shadowMapCoordsProjPrev.xyz) + float3(0.5);          
         
-        float4x4 shadowMapTFNext = mul (flipY, lightPropsSM.shadowMapTF[i + 1]);
+        float4x4 shadowMapTFNext = mul (flipY, lightPropsOM.opacityMapTF[i + 1]);
         float4 shadowMapCoordsNext = mul (shadowMapTFNext, shadowMapCoords);      
         float4 shadowMapCoordsProjNext = shadowMapCoordsNext;
         shadowMapCoordsProjNext.xyz /= shadowMapCoordsProjNext.w;      

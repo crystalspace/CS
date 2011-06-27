@@ -48,11 +48,16 @@
 		 destination="lightPropsSM.shadowMapPixels" />
     <variablemap variable="light shadow map unscale" 
 		 destination="lightPropsSM.shadowMapUnscale" />
-    <variablemap variable="light numSplits" 
-		 destination="lightPropsSM.shadowMapNumSplits" />		 
-    <variablemap variable="light splitDists" 
-		 destination="lightPropsSM.splitDists" />		 
   <?Endtemplate?>
+  
+  <?Template Lighting_OpacityMap_Variablemaps?> 
+    <variablemap variable="light shadow map projection" 
+		 destination="lightPropsOM.opacityMapTF" />
+    <variablemap variable="light numSplits" 
+		 destination="lightPropsOM.opacityMapNumSplits" />		 
+    <variablemap variable="light splitDists" 
+		 destination="lightPropsOM.splitDists" />		      
+  <?Endtemplate?>  
   
   <?SEndIf?>
 </include>

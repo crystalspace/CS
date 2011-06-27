@@ -178,12 +178,21 @@ struct LightPropertiesShadowMap
   // Shadow map pixel size + dimensions
   float4 shadowMapPixels[MAX_LIGHTS];
   float4 shadowMapUnscale[MAX_LIGHTS];
-  float splitDists[MAX_LIGHTS];
-  int shadowMapNumSplits;
   
   sampler2D shadowMapNoise;
 };
 LightPropertiesShadowMap lightPropsSM;
+
+struct LightPropertiesOpacityMap
+{
+  // Transformation from light to shadow map space
+  float4x4 opacityMapTF[MAX_LIGHTS];
+  // Shadow map
+  sampler2D opacityMap[MAX_LIGHTS];
+  float splitDists[MAX_LIGHTS];
+  int opacityMapNumSplits;
+};
+LightPropertiesOpacityMap lightPropsOM;
 
 // Common interface for all light types
 interface Light
