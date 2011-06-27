@@ -200,35 +200,12 @@ namespace CS
           }
         }
 
-        void AddShadowMapTarget (typename RenderTree::MeshNode* meshNode,
-          PersistentData& persist, const SingleRenderLayer& layerConfig,
-          RenderTree& renderTree, iLight* light, ViewSetup& viewSetup)
+        void ProcessGeometry(typename RenderTree::ContextNode& context,
+          iLight* light, CS::RenderManager::RenderView* rview, float& _near,
+          float& _far, csBox3& castingObjects, csBox3& receivingObjects)
         {
-          if (light->GetFlags().Check (CS_LIGHT_NOSHADOWS)) return;
-
-          LightFrustums* lightFrustumsPtr =
-            lightFrustumsHash.GetElementPointer (
-            viewSetup.rview->GetCamera());
-
-          LightFrustums& lightFrustums = *lightFrustumsPtr;
-
-          uint currentFrame = viewSetup.rview->GetCurrentFrameNumber();
-          if (lightFrustums.setupFrame
-            == currentFrame)
-            return;
-          lightFrustums.setupFrame = currentFrame;
-
-          typename RenderTree::ContextNode& context = meshNode->GetOwner();
-          CS::RenderManager::RenderView* rview = context.renderView;
-
-          float _near = FLT_MAX;
-          float _far = FLT_MIN;
-
-          typename RenderTree::ContextNode::TreeType::MeshNodeTreeIteratorType it = 
-            context.meshNodes.GetIterator ();
-
-          csBox3 castingObjects;
-          csBox3 receivingObjects;
+          typename RenderTree::ContextNode::TreeType::MeshNodeTreeIteratorType 
+            it = context.meshNodes.GetIterator ();
 
           while (it.HasNext ())
           {
@@ -238,32 +215,17 @@ namespace CS
             // setup split dists
             for (int i = 0 ; i < node->meshes.GetSize(); i ++)
             {
-              typename RenderTree::ContextNode::TreeType::MeshNode::SingleMesh mesh = node->meshes.Get(i);
+              typename RenderTree::ContextNode::TreeType::MeshNode::SingleMesh 
+                mesh = node->meshes.Get(i);
               
-              csVector3 meshPosition = 
-                mesh.meshWrapper->GetMovable()->GetPosition();
               csReversibleTransform meshTransform = 
                 mesh.meshWrapper->GetMovable()->GetTransform();
               csRef<csRenderBufferHolder> buffers = 
                 mesh.renderMesh->buffers;
-              iRenderBuffer* positions = buffers->GetRenderBuffer (CS_BUFFER_POSITION);
+              iRenderBuffer* positions = 
+                buffers->GetRenderBuffer (CS_BUFFER_POSITION);
               csVertexListWalker<float, csVector3> positionWalker (positions);
               csVector3 lightPosition = light->GetMovable()->GetPosition();
-              csReversibleTransform lightTransform = 
-                light->GetMovable()->GetTransform();    
-
-//               csPrintf("%f %f %f\n", lightTransform.GetO2T().Col1().x, 
-//                 lightTransform.GetO2T().Col1().y, 
-//                 lightTransform.GetO2T().Col1().z);
-//               csPrintf("%f %f %f\n", lightTransform.GetO2T().Col2().x, 
-//                 lightTransform.GetO2T().Col2().y, 
-//                 lightTransform.GetO2T().Col2().z);
-//               csPrintf("%f %f %f\n\n", lightTransform.GetO2T().Col3().x, 
-//                 lightTransform.GetO2T().Col3().y, 
-//                 lightTransform.GetO2T().Col3().z);
-
-//               csPrintf("%f %f %f\n", lightPosition.x, lightPosition.y, 
-//                 lightPosition.z);
 
               // only take into account translucent objects
               if ( mesh.meshWrapper->GetRenderPriority() != 
@@ -310,6 +272,37 @@ namespace CS
               }
             }
           }
+        }
+
+        void AddShadowMapTarget (typename RenderTree::MeshNode* meshNode,
+          PersistentData& persist, const SingleRenderLayer& layerConfig,
+          RenderTree& renderTree, iLight* light, ViewSetup& viewSetup)
+        {
+          if (light->GetFlags().Check (CS_LIGHT_NOSHADOWS)) return;
+
+          LightFrustums* lightFrustumsPtr =
+            lightFrustumsHash.GetElementPointer (
+            viewSetup.rview->GetCamera());
+
+          LightFrustums& lightFrustums = *lightFrustumsPtr;
+
+          uint currentFrame = viewSetup.rview->GetCurrentFrameNumber();
+          if (lightFrustums.setupFrame
+            == currentFrame)
+            return;
+          lightFrustums.setupFrame = currentFrame;
+
+          typename RenderTree::ContextNode& context = meshNode->GetOwner();
+          CS::RenderManager::RenderView* rview = context.renderView;
+
+          float _near = FLT_MAX;
+          float _far = FLT_MIN;
+
+          csBox3 castingObjects;
+          csBox3 receivingObjects;
+
+          ProcessGeometry(context, light, rview, _near, _far, castingObjects, 
+            receivingObjects);
 
           // here should be lightFrustums.frustums.GetSize()
 //           csPrintf("%d\n", lightFrustums.frustums.GetSize());
@@ -359,21 +352,11 @@ namespace CS
               float lightCutoff = light->GetCutoffDistance();
               float lightNear = SMALL_Z;
 
-              {
-                lightProject = CS::Math::Projections::Ortho (lightCutoff, 
-                  -lightCutoff, lightCutoff, -lightCutoff, 
-                  -viewSetup.splitDists[frustNum], -lightNear);
+              lightProject = CS::Math::Projections::Ortho (lightCutoff, 
+                -lightCutoff, lightCutoff, -lightCutoff, 
+                -viewSetup.splitDists[frustNum], -lightNear);
 
-                matrix = (Mortho * crop * lightProject);
-              }
-
-//               lightCutoff = 100;
-//               lightNear = SMALL_Z;
-// 
-//               lightProject = CS::Math::Projections::Ortho (lightCutoff, 
-//                 -lightCutoff, lightCutoff, -lightCutoff, -30, -lightNear);
-
-//               matrix = Mortho * crop * lightProject;
+              matrix = (Mortho * crop * lightProject);
 
               for (int i = 0; i < 4; i++)
               {
@@ -389,9 +372,6 @@ namespace CS
               csRef<iCustomMatrixCamera> shadowViewCam =
                 newRenderView->GetEngine()->CreateCustomMatrixCamera();
               newRenderView->SetCamera (shadowViewCam->GetCamera());
-
-//               csPlane3 farplane(0,0,-1,viewSetup.splitDists[frustNum]);
-//               shadowViewCam->GetCamera()->SetFarPlane(&farplane);
 
               shadowViewCam->SetProjectionMatrix (matrix);
               shadowViewCam->GetCamera()->SetTransform (light->GetMovable()->GetTransform());
