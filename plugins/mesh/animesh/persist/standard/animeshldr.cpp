@@ -312,11 +312,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 	    return 0;
 	  }
 
-	  csStringArray indices;
-	  char space = ' ';
-	  size_t vertexCount = indices.SplitString (vertexIndices, &space);
-	  for (size_t i = 0; i < vertexCount; i++)
+	  csStringArray indices (vertexIndices, " ");
+	  for (size_t i = 0; i < indices.GetSize(); i++)
 	    amfact->AddSubsetVertex (set, (size_t) atoi(indices[i]));
+
         }
         break;
       case XMLTOKEN_MORPHTARGET:
@@ -408,11 +407,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 				 "No subset list defined while creating morph target");
 	    return false;
 	  }
-	  csStringArray subsets;
-	  char space = ' ';
-	  size_t subsetCount = subsets.SplitString (subsetIndices, &space);
-	  for (size_t i = 0; i < subsetCount; i++)
+
+	  csStringArray subsets (subsetIndices, " ");
+	  for (size_t i = 0; i < subsets.GetSize (); i++)
 	    morphTarget->AddSubset (atoi(subsets[i]));
+	
 	}
 	break;
       case XMLTOKEN_OFFSETS:
