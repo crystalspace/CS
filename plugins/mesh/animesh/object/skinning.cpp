@@ -46,7 +46,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     const size_t morphTargetCount = morphTargetWeights.GetSize();
     size_t activeMorphCount = 0;
     for (size_t i = 0; i < morphTargetCount; i++)
-      if (morphTargetWeights[i] != 0.0f)
+      if (morphTargetWeights[i] > SMALL_EPSILON)
 	activeMorphCount++;
 
     if (!activeMorphCount)
