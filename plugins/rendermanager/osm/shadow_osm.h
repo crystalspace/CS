@@ -106,10 +106,11 @@ namespace CS
         typedef csRefArray<SuperFrustum> LightFrustumsArray;
         struct LightFrustums
         {
+          uint frustumsSetupFrame;
           uint setupFrame;
           LightFrustumsArray frustums;
 
-          LightFrustums() : setupFrame (~0) {}
+          LightFrustums() :  frustumsSetupFrame (~0), setupFrame (~0) {}
         };
         csHash<LightFrustums, csRef<iCamera> > lightFrustumsHash;
 
@@ -132,59 +133,64 @@ namespace CS
             lightFrustumsHash.GetOrCreate (
             camera, LightFrustums());
 
-          float lightNear = SMALL_Z;
-          float lightCutoff = light->GetCutoffDistance();
-
-          CS::Math::Matrix4 lightProject = CS::Math::Projections::Ortho (
-            lightCutoff, -lightCutoff, lightCutoff, -lightCutoff,
-            -lightCutoff, -lightNear);
-
-          this->lightProject = lightProject;
-
-          LightFrustumsArray& lightFrustums =
-            lightFrustumsSettings.frustums;
-
-          LightingVariablesHelper lightVarsHelper (viewSetup.persist.lightVarsPersist);
-
-          csRef<SuperFrustum> newFrust;
-          newFrust.AttachNew (new SuperFrustum);
-          SuperFrustum& superFrustum = *(lightFrustums[lightFrustums.Push (
-            newFrust)]);
-          
-          superFrustum.actualNumParts = viewSetup.numParts;
-          superFrustum.frustums =
-            new typename SuperFrustum::Frustum[superFrustum.actualNumParts];
-
-          for (int i = 0; i < superFrustum.actualNumParts; i++)
+          if (lightFrustumsSettings.frustumsSetupFrame != currentFrame)
           {
-            typename SuperFrustum::Frustum& lightFrustum =
-              superFrustum.frustums[i];
-            lightFrustum.shadowMapProjectSV = lightVarsHelper.CreateTempSV (
-              viewSetup.persist.svNames.GetLightSVId (
-              csLightShaderVarCache::lightShadowMapProjection));
-            lightFrustum.shadowMapProjectSV->SetArraySize (4);
+            float lightNear = SMALL_Z;
+            float lightCutoff = light->GetCutoffDistance();
 
-            for (int j = 0; j < 4; j++)
+            CS::Math::Matrix4 lightProject = CS::Math::Projections::Ortho (
+              lightCutoff, -lightCutoff, lightCutoff, -lightCutoff,
+              -lightCutoff, -lightNear);
+
+            this->lightProject = lightProject;
+
+            LightFrustumsArray& lightFrustums =
+              lightFrustumsSettings.frustums;
+
+            LightingVariablesHelper lightVarsHelper (viewSetup.persist.lightVarsPersist);
+
+            csRef<SuperFrustum> newFrust;
+            newFrust.AttachNew (new SuperFrustum);
+            SuperFrustum& superFrustum = *(lightFrustums[lightFrustums.Push (
+              newFrust)]);
+
+            superFrustum.actualNumParts = viewSetup.numParts;
+            superFrustum.frustums =
+              new typename SuperFrustum::Frustum[superFrustum.actualNumParts];
+
+            for (int i = 0; i < superFrustum.actualNumParts; i++)
             {
-              csShaderVariable* item = lightVarsHelper.CreateTempSV (
-                CS::InvalidShaderVarStringID);
-              lightFrustum.shadowMapProjectSV->SetArrayElement (j, item);
+              typename SuperFrustum::Frustum& lightFrustum =
+                superFrustum.frustums[i];
+              lightFrustum.shadowMapProjectSV = lightVarsHelper.CreateTempSV (
+                viewSetup.persist.svNames.GetLightSVId (
+                csLightShaderVarCache::lightShadowMapProjection));
+              lightFrustum.shadowMapProjectSV->SetArraySize (4);
+
+              for (int j = 0; j < 4; j++)
+              {
+                csShaderVariable* item = lightVarsHelper.CreateTempSV (
+                  CS::InvalidShaderVarStringID);
+                lightFrustum.shadowMapProjectSV->SetArrayElement (j, item);
+              }
+
+              lightFrustum.splitDistsSV = lightVarsHelper.CreateTempSV(
+                viewSetup.persist.splitDistsSVName);
+
+              superFrustum.numSplitsSV = lightVarsHelper.CreateTempSV (
+                viewSetup.persist.numSplitsSVName);
+
+              size_t numTex = viewSetup.persist.settings.targets.GetSize();
+              for (size_t t = 0; t < numTex; t++)
+              {
+                const ShadowSettings::Target* target =
+                  viewSetup.persist.settings.targets[t];
+                lightFrustum.textureSVs[target->attachment] =
+                  lightVarsHelper.CreateTempSV (target->svName);
+              }
             }
 
-            lightFrustum.splitDistsSV = lightVarsHelper.CreateTempSV(
-              viewSetup.persist.splitDistsSVName);
-
-            superFrustum.numSplitsSV = lightVarsHelper.CreateTempSV (
-              viewSetup.persist.numSplitsSVName);
-
-            size_t numTex = viewSetup.persist.settings.targets.GetSize();
-            for (size_t t = 0; t < numTex; t++)
-            {
-              const ShadowSettings::Target* target =
-                viewSetup.persist.settings.targets[t];
-              lightFrustum.textureSVs[target->attachment] =
-                lightVarsHelper.CreateTempSV (target->svName);
-            }
+            lightFrustumsSettings.frustumsSetupFrame = currentFrame;
           }
         }
 
@@ -528,6 +534,7 @@ namespace CS
         {
           csTicks time = csGetTicks ();
           settings.AdvanceFrame (time);
+          lightVarsPersist.UpdateNewFrame();
         }
       };
 
