@@ -51,7 +51,7 @@ struct ShadowShadowMapDepth : ShadowShadowMap
   {
     if (position.x < 0 || position.y < 0 || position.x > 1 || position.y > 1)
       return 0;
-  
+
     if (i == 0)
       return tex2D(lightPropsOM.opacityMap[8 * lightNum + 0], position).a;
     if (i == 1)
@@ -66,17 +66,16 @@ struct ShadowShadowMapDepth : ShadowShadowMap
       return tex2D(lightPropsOM.opacityMap[8 * lightNum + 5], position).a;	
     if (i == 6)
       return tex2D(lightPropsOM.opacityMap[8 * lightNum + 6], position).a;	
-    if (i == 7)
+/*    if (i == 7)
       return tex2D(lightPropsOM.opacityMap[8 * lightNum + 7], position).a;
-      
+*/
     return 0;
   }
   
   half GetVisibility()
   {
     half inLight;
-	
-    int numSplits = lightPropsOM.opacityMapNumSplits;
+    int numSplits = lightPropsOM.opacityMapNumSplits[lightNum];
     float previousSplit, nextSplit;
   
     float4x4 flipY;
@@ -88,22 +87,22 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     int i;
     for (i = 0 ; i <= numSplits ; i ++)
     {
-      previousSplit = lightPropsOM.splitDists[i];
-      nextSplit = lightPropsOM.splitDists[i + 1];
+      previousSplit = lightPropsOM.splitDists[8 * lightNum + i];
+      nextSplit = lightPropsOM.splitDists[8 * lightNum + i + 1];
       
       if (viewPos.z < nextSplit || i == numSplits)
         break;
 
       previousSplit = nextSplit;
     }
-    float4x4 shadowMapTFPrev = mul (flipY, lightPropsOM.opacityMapTF[i]);
+    float4x4 shadowMapTFPrev = mul (flipY, lightPropsOM.opacityMapTF[8 * lightNum + i]);
     float4 shadowMapCoordsPrev = mul (shadowMapTFPrev, viewPos);      
     float4 shadowMapCoordsProjPrev = shadowMapCoordsPrev;
     shadowMapCoordsProjPrev.xyz /= shadowMapCoordsProjPrev.w;      
     float3 shadowMapCoordsBiasedPrev = 
       (float3(0.5)*shadowMapCoordsProjPrev.xyz) + float3(0.5);          
     
-    float4x4 shadowMapTFNext = mul (flipY, lightPropsOM.opacityMapTF[i + 1]);
+    float4x4 shadowMapTFNext = mul (flipY, lightPropsOM.opacityMapTF[8 * lightNum + i + 1]);
     float4 shadowMapCoordsNext = mul (shadowMapTFNext, viewPos);      
     float4 shadowMapCoordsProjNext = shadowMapCoordsNext;
     shadowMapCoordsProjNext.xyz /= shadowMapCoordsProjNext.w;      

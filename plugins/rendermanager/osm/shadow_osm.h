@@ -52,9 +52,7 @@ namespace CS
       class ViewSetup
       {
       public:
-        int numParts;
         PersistentData& persist;
-        float* splitDists;
         CS::RenderManager::RenderView* rview;
 
         SingleRenderLayer depthRenderLayer;
@@ -62,20 +60,9 @@ namespace CS
         ViewSetup (PersistentData& persist, CS::RenderManager::RenderView* rview)
           : persist (persist), rview (rview),
           depthRenderLayer (persist.settings.shadowShaderType, 
-          persist.settings.shadowDefaultShader)
-        {
-          numParts = persist.numSplits + 1;
-	        splitDists = new float[numParts];
+          persist.settings.shadowDefaultShader) { }
 
-          // linear interpolation
-
-          splitDists[0] = 11;
-          splitDists[1] = 13.5;
-          splitDists[2] = 14.5;
-          splitDists[3] = 16;
-        }
-
-        ~ViewSetup() { delete[] splitDists; }
+        ~ViewSetup() { }
       };
 
       struct CachedLightData :
@@ -95,6 +82,8 @@ namespace CS
 
           struct Frustum
           {
+            float splitDists;
+
             csRef<csShaderVariable> shadowMapProjectSV;
             csRef<csShaderVariable> splitDistsSV;
             csRef<csShaderVariable> textureSVs[rtaNumAttachments];
@@ -154,7 +143,7 @@ namespace CS
             SuperFrustum& superFrustum = *(lightFrustums[lightFrustums.Push (
               newFrust)]);
 
-            superFrustum.actualNumParts = viewSetup.numParts;
+            superFrustum.actualNumParts = viewSetup.persist.numSplits + 1;
             superFrustum.frustums =
               new typename SuperFrustum::Frustum[superFrustum.actualNumParts];
 
@@ -307,12 +296,11 @@ namespace CS
             
             for (int frustNum = 0 ; frustNum < superFrust.actualNumParts ; frustNum ++)
             {
-
-              viewSetup.splitDists[frustNum] = _near + (_far - _near) * 
+              typename SuperFrustum::Frustum& lightFrust = 
+                superFrust.frustums[frustNum];
+              lightFrust.splitDists = _near + (_far - _near) * 
                 ((float)frustNum / (superFrust.actualNumParts - 1));
 
-              const typename SuperFrustum::Frustum& lightFrust = 
-                superFrust.frustums[frustNum];
               csRef<CS::RenderManager::RenderView> newRenderView;
               newRenderView = renderTree.GetPersistentData().renderViews.CreateRenderView ();
               newRenderView->SetEngine (rview->GetEngine ());
@@ -349,7 +337,10 @@ namespace CS
 
               lightProject = CS::Math::Projections::Ortho (lightCutoff, 
                 -lightCutoff, lightCutoff, -lightCutoff, 
-                -viewSetup.splitDists[frustNum], -lightNear);
+                -lightFrust.splitDists, -lightNear);
+
+//               csPrintf("near %f far %f split %f light %s\n", _near, _far, 
+//                 lightFrust.splitDists, light->GetLightID());
 
               matrix = Mortho * crop * lightProject;
 
@@ -359,7 +350,7 @@ namespace CS
                 item->SetValue (matrix.Row (i));
               }
 
-              lightFrust.splitDistsSV->SetValue(viewSetup.splitDists[frustNum]);
+              lightFrust.splitDistsSV->SetValue(lightFrust.splitDists);
 //               csPrintf("%f\n", viewSetup.splitDists[frustNum]);
 
               int shadowMapSize = viewSetup.persist.shadowMapRes;
@@ -570,27 +561,27 @@ namespace CS
           typename CachedLightData::SuperFrustum::Frustum& lightFrustum =
             superFrust.frustums[f];
     
-          lightVarsHelper.MergeAsArrayItem (lightStacks[lightNum],
-            lightFrustum.shadowMapProjectSV, s);
+          lightVarsHelper.MergeAsArrayItem (lightStacks[0],
+            lightFrustum.shadowMapProjectSV, 8 * lightNum + s);
 
-          lightVarsHelper.MergeAsArrayItem(lightStacks[lightNum],
-            lightFrustum.splitDistsSV, s);
+          lightVarsHelper.MergeAsArrayItem(lightStacks[0],
+            lightFrustum.splitDistsSV, 8 * lightNum + s);
 
           for (size_t t = 0; t < persist.settings.targets.GetSize(); t++)
           {
             const ShadowSettings::Target* target =
               viewSetup.persist.settings.targets[t];
-            lightVarsHelper.MergeAsArrayItem (lightStacks[lightNum], 
-              lightFrustum.textureSVs[target->attachment], s);
+            lightVarsHelper.MergeAsArrayItem (lightStacks[0], 
+              lightFrustum.textureSVs[target->attachment], 8 * lightNum + s);
           }
           spreadFlags |= (1 << s);
           s++;        
         }
 
-        CS::ShaderVarStringID name = superFrust.numSplitsSV->GetName();
-        superFrust.numSplitsSV = lightVarsHelper.CreateVarOnStack(name, 
-          lightStacks[lightNum]);
         superFrust.numSplitsSV->SetValue(viewSetup.persist.numSplits);
+
+        lightVarsHelper.MergeAsArrayItem (lightStacks[0],
+          superFrust.numSplitsSV, lightNum);
 
         // here might be number of lights
         return 1;

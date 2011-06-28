@@ -191,7 +191,7 @@ struct LightPropertiesOpacityMap
   // Shadow map
   sampler2D opacityMap[MAX_OSM * MAX_LIGHTS];
   float splitDists[MAX_OSM * MAX_LIGHTS];
-  int opacityMapNumSplits;
+  int opacityMapNumSplits[MAX_LIGHTS];
 };
 LightPropertiesOpacityMap lightPropsOM;
 

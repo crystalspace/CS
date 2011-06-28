@@ -61,6 +61,21 @@
         </matrix>
       </move>	  
     </light>	
+<!--    
+    <light name='Lamp1'>
+      <center y='5' x='0' z='0'/>
+      <color blue='1.0' green='0.0' red='0.0'/>
+      <radius>100</radius>
+      <type>directional</type>
+      <move>
+        <matrix>
+          <roty>0</roty>
+          <rotz>0</rotz>
+          <rotx>-1.57</rotx>
+        </matrix>
+      </move>	  
+    </light>
+-->    
   </sector>
   <sequences/>
   <start name='Camera'>

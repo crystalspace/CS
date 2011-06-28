@@ -24,7 +24,7 @@
     <block location="pass">
       <?Include /shader-snippets/lighting/lighting-tools.inc ?>
       
-      <?Generate L 0 7?>
+      <?Generate L 0 63?>
 	<texture name="light shadow map[$L$]" destination="lightPropsOM.opacityMap[$L$]"
 		comparemode="rToTexture" comparefunc="lequal" />
       <?Endgenerate?>
