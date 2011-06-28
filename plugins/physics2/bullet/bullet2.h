@@ -231,7 +231,7 @@ public:
   virtual csRef<iColliderConvexMesh> CreateColliderConvexMesh (iMeshWrapper* mesh);
   virtual csRef<iColliderConcaveMesh> CreateColliderConcaveMesh (iMeshWrapper* mesh);
   virtual csRef<iColliderConcaveMeshScaled> CreateColliderConcaveMeshScaled
-      (iColliderConcaveMesh* collider, float scale);
+      (iColliderConcaveMesh* collider, csVector3 scale);
   virtual csRef<iColliderCylinder> CreateColliderCylinder (float length, float radius);
   virtual csRef<iColliderBox> CreateColliderBox (const csVector3& size);
   virtual csRef<iColliderSphere> CreateColliderSphere (float radius);
@@ -266,6 +266,7 @@ public:
     float minAngle, float maxAngle, int axis);
   virtual csRef<iJoint> CreateSoftLinearJoint (const csVector3 position);
   virtual csRef<iJoint> CreateSoftAngularJoint (int axis);
+  virtual csRef<iJoint> CreateRigidPivotJoint (iRigidBody* body, const csVector3 position);
  
   virtual csRef<iSoftBody> CreateRope (csVector3 start,
       csVector3 end, size_t segmentCount);
@@ -279,8 +280,8 @@ public:
     const csOrthoTransform& bodyTransform);
 
   virtual csRef<iSoftBody> CreateSoftBody (csVector3* vertices,
-      size_t vertexCount, csTriangle* triangles,
-      size_t triangleCount);
+      size_t vertexCount, csTriangle* triangles, size_t triangleCount,
+      const csOrthoTransform& bodyTransform);
   float getInverseInternalScale() {return inverseInternalScale;}
   float getInternalScale() {return internalScale;}
 };

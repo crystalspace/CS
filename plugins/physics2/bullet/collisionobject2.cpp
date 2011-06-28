@@ -333,7 +333,7 @@ void csBulletCollisionObject::AddBulletObject ()
       btRigidBody::btRigidBodyConstructionInfo infos (0.0, motionState,
         shape, localInertia);
       btObject = new btRigidBody (infos);
-      btObject->setUserPointer (static_cast<iCollisionObject*> (this));
+      btObject->setUserPointer (dynamic_cast<iCollisionObject*> (this));
       sector->bulletWorld->addRigidBody (btRigidBody::upcast(btObject));
     }
     else

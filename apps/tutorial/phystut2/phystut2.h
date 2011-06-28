@@ -18,12 +18,15 @@ private:
   csRef<CS::Physics2::iPhysicalSector> physicalSector;
   csRef<CS::Physics2::Bullet2::iPhysicalSector> bulletSector;
   csRef<CS::Physics2::iSoftBodyAnimationControlFactory> softBodyAnimationFactory;
+  csRefArray<CS::Physics2::iRigidBody> dynamicBodies;
   bool isSoftBodyWorld;
 
   // Meshes
   csRef<iMeshFactoryWrapper> boxFact;
   csRef<iMeshFactoryWrapper> meshFact;
-  csRefArray<iMeshWrapper> meshes;
+  //csRefArray<iMeshWrapper> meshes;
+  csRef<CS::Collision2::iColliderConcaveMesh> mainCollider;
+
 
   // Environments
   int environment;
@@ -39,12 +42,12 @@ private:
   float remainingStepDuration;
 
   // Dynamic simulation related
-  bool debugMode;
   bool allStatic;
   bool pauseDynamic;
   float dynamicSpeed;
 
   // Camera related
+  CS::Physics2::Bullet2::DebugMode debugMode;
   int physicalCameraMode;
   csRef<CS::Physics2::iRigidBody> cameraBody;
   float rotX, rotY, rotZ;
@@ -97,7 +100,7 @@ private:
   void SpawnRagdoll ();
   void SpawnRope ();
   CS::Physics2::iSoftBody* SpawnCloth ();
-  CS::Physics2::iSoftBody* SpawnSoftBody ();
+  CS::Physics2::iSoftBody* SpawnSoftBody (bool setVelocity = true);
 
   void CreateWalls (const csVector3& radius);
   void CreateTerrain ();

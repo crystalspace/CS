@@ -19,7 +19,7 @@
 CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
 csBulletSoftBody::csBulletSoftBody (csBulletSystem* phySys, btSoftBody* body)
-  :scfImplementationType (this, phySys), btBody (body), bending (false),
+  :scfImplementationType (this, phySys), btBody (body), setTrans (false),
   friction (5.0f), density (0.1f)
 {
   btObject = body;
@@ -35,8 +35,12 @@ csBulletSoftBody::~csBulletSoftBody ()
 
 void csBulletSoftBody::SetTransform (const csOrthoTransform& trans)
 {
-  transform = CSToBullet (trans, system->getInternalScale ());
-  btBody->transform (transform);
+  if (!setTrans)
+  {
+    transform = CSToBullet (trans, system->getInternalScale ());
+    btBody->transform (transform);
+    setTrans = true;
+  }
 }
 
 csOrthoTransform csBulletSoftBody::GetTransform ()
@@ -411,6 +415,14 @@ void csBulletSoftBody::SetClusterCollisionRS (bool cluster)
     btBody->m_cfg.collisions	+=	btSoftBody::fCollision::SDF_RS;
 }
 
+bool csBulletSoftBody::GetClusterCollisionRS ()
+{
+  CS_ASSERT (btBody);
+  if (btBody->m_cfg.collisions & btSoftBody::fCollision::CL_RS)
+    return true;
+  return false;
+}
+
 void csBulletSoftBody::SetClusterCollisionSS (bool cluster)
 {
   CS_ASSERT (btBody);
@@ -418,6 +430,14 @@ void csBulletSoftBody::SetClusterCollisionSS (bool cluster)
     btBody->m_cfg.collisions += btSoftBody::fCollision::CL_SS;
   else
     btBody->m_cfg.collisions += btSoftBody::fCollision::VF_SS;
+}
+
+bool csBulletSoftBody::GetClusterCollisionSS ()
+{
+  CS_ASSERT (btBody);
+  if (btBody->m_cfg.collisions & btSoftBody::fCollision::CL_SS)
+    return true;
+  return false;
 }
 
 void csBulletSoftBody::SetSRHardness (float hardness)

@@ -17,8 +17,8 @@ Simple::Simple()
 : DemoApplication ("CrystalSpace.PhysTut2"),
 isSoftBodyWorld (true), environment (ENVIRONMENT_WALLS), solver (0),
 do_bullet_debug (true), do_soft_debug (false), remainingStepDuration (0.0f),
-debugMode (false), allStatic (false), pauseDynamic (false), dynamicSpeed (1.0f),
-physicalCameraMode (CAMERA_DYNAMIC), dragging (false), softDragging (false)
+allStatic (false), pauseDynamic (false), dynamicSpeed (1.0f), physicalCameraMode (CAMERA_DYNAMIC), 
+dragging (false), softDragging (false), debugMode (CS::Physics2::Bullet2::DEBUG_JOINTS)
 {
   localTrans.Identity ();
 }
@@ -146,8 +146,6 @@ void Simple::Frame ()
   // (in this mode we want to control the orientation of the camera,
   // so we update the camera position by ourselves instead of using
   // 'cameraBody->AttachCamera (camera)')
-  const csOrthoTransform& tc = cameraBody->GetTransform ();
-  csVector3 a = tc.GetOrigin ();
   if (physicalCameraMode == CAMERA_DYNAMIC)
     view->GetCamera ()->GetTransform ().SetOrigin
     (cameraBody->GetTransform ().GetOrigin ());
@@ -327,21 +325,32 @@ bool Simple::OnKeyboard (iEvent &event)
       allStatic = !allStatic;
 
       if (allStatic)
-        printf ("Toggling all bodies to static mode\n");
-      else
-        printf ("Toggling all bodies to dynamic mode\n");
-
-      for (size_t i = 0; i < physicalSector->GetRigidBodyCount (); i++)
       {
-        CS::Physics2::iRigidBody* body = physicalSector->GetRigidBody (i);
-        if (allStatic)
-          body->SetState (CS::Physics2::STATE_STATIC);
-        else
+        printf ("Toggling all bodies to static mode\n");
+        dynamicBodies.DeleteAll ();
+
+        for (size_t i = 0; i < physicalSector->GetRigidBodyCount (); i++)
         {
+          CS::Physics2::iRigidBody* body = physicalSector->GetRigidBody (i);
+          if (body->GetState () == CS::Physics2::STATE_DYNAMIC)
+          {
+            body->SetState (CS::Physics2::STATE_STATIC);
+            dynamicBodies.Push (body);     
+          }   
+        }
+      }
+      else
+      {
+        for (size_t i = 0; i <dynamicBodies.GetSize (); i++)
+        {
+          CS::Physics2::iRigidBody* body = dynamicBodies[i];
           body->SetState (CS::Physics2::STATE_DYNAMIC);
           body->Enable ();
         }
+        printf ("Toggling all bodies to dynamic mode\n");
       }
+
+      
       return true;
     }
 
@@ -375,13 +384,46 @@ bool Simple::OnKeyboard (iEvent &event)
     {
       // Toggle dynamic system visual debug mode
       // TODO
+      if (do_bullet_debug)
+      {
+        switch (debugMode)
+        {
+        case CS::Physics2::Bullet2::DEBUG_NOTHING:
+          debugMode = CS::Physics2::Bullet2::DEBUG_COLLIDERS;
+          break;
+        case CS::Physics2::Bullet2::DEBUG_COLLIDERS:
+          debugMode = CS::Physics2::Bullet2::DEBUG_AABB;
+          break;
+        case CS::Physics2::Bullet2::DEBUG_AABB:
+          debugMode = CS::Physics2::Bullet2::DEBUG_JOINTS;
+          break;
+        case CS::Physics2::Bullet2::DEBUG_JOINTS:
+          debugMode = CS::Physics2::Bullet2::DEBUG_NOTHING;
+          break;
+        }
+        bulletSector->SetDebugMode (debugMode);
+      }
       return true;
     }
+    else if (csKeyEventHelper::GetCookedCode (&event) == '?')
+    {
+      // Toggle collision debug mode
+      if (do_bullet_debug)
+      {
+        do_bullet_debug = false;
+        do_soft_debug = true;
+      }
+      else if (do_soft_debug)
+        do_soft_debug = false;
+      else
+        do_bullet_debug = true;
 
+      return true;
+    }
     else if (csKeyEventHelper::GetCookedCode (&event) == 'g')
     {
       // Toggle gravity.
-      collisionSector->SetGravity (collisionSector->GetGravity () == 0 ?
+      collisionSector->SetGravity (collisionSector->GetGravity ().IsZero (EPSILON)?
         csVector3 (0.0f, -9.81f, 0.0f) : csVector3 (0));
       return true;
     }
@@ -403,15 +445,21 @@ bool Simple::OnKeyboard (iEvent &event)
         && hitResult.object->GetObjectType () == CS::Collision2::COLLISION_OBJECT_PHYSICAL)
       {
         // Remove the body and the mesh from the simulation, and put them in the clipboard
-        clipboardBody = hitResult.object->QueryPhysicalBody ();
+          
         if (clipboardBody->GetBodyType () == CS::Physics2::BODY_RIGID)
-          physicalSector->RemoveRigidBody (clipboardBody->QueryRigidBody ());
+        {
+          clipboardBody = hitResult.object->QueryPhysicalBody ();
+          clipboardMovable = hitResult.object->GetAttachedMovable ();
+
+          CS::Physics2::iRigidBody* rigidBody = clipboardBody->QueryRigidBody ();
+          if (rigidBody->GetState () == CS::Physics2::STATE_DYNAMIC)
+          {
+            physicalSector->RemoveRigidBody (clipboardBody->QueryRigidBody ());
+            room->GetMeshes ()->Remove (clipboardMovable->GetSceneNode ()->QueryMesh ());
+          }
+        }
         else
           physicalSector->RemoveSoftBody (clipboardBody->QuerySoftBody ());
-
-        clipboardMovable = hitResult.object->GetAttachedMovable ();
-        if (clipboardMovable)
-          room->GetMeshes ()->Remove (clipboardMovable->GetSceneNode ()->QueryMesh ());
 
         // Update the display of the dynamics debugger
         //dynamicsDebugger->UpdateDisplay ();
@@ -439,10 +487,9 @@ bool Simple::OnKeyboard (iEvent &event)
       // Put back the body from the clipboard to the simulation
       if (clipboardBody->GetBodyType () == CS::Physics2::BODY_RIGID)
         physicalSector->AddRigidBody (clipboardBody->QueryRigidBody ());
-      else
-        physicalSector->AddSoftBody (clipboardBody->QuerySoftBody ());
-      //TODO---------------------------------------------------------------------------
-      room->GetMeshes ()->Add (clipboardMovable->GetSceneNode ()->QueryMesh ());
+
+      if (clipboardMovable)
+        room->GetMeshes ()->Add (clipboardMovable->GetSceneNode ()->QueryMesh ());
       clipboardBody = 0;
       clipboardMovable = 0;
 
@@ -602,8 +649,7 @@ bool Simple::OnMouseDown (iEvent &event)
           return false;
 
         // Create a p2p joint at the point clicked
-        dragJoint = physicalSystem->CreateRigidP2PJoint (hitResult.isect);
-        dragJoint->Attach (physicalBody, NULL);
+        dragJoint = physicalSystem->CreateRigidPivotJoint (bulletBody, hitResult.isect);
 
         dragging = true;
         dragDistance = (hitResult.isect - startBeam).Norm ();
@@ -728,12 +774,6 @@ bool Simple::Application ()
   if (!DemoApplication::Application ())
     return false;
 
-  // Find references to main objects
-  /*debuggerManager =
-    csQueryRegistry<CS::Debug::iDynamicsDebuggerManager> (GetObjectRegistry ());
-  if (!debuggerManager)
-    return ReportError ("Failed to locate dynamic's debug manager!");*/
-
   // Create the dynamic system
   collisionSector = collisionSystem->CreateCollisionSector ();
   if (!collisionSector) return ReportError ("Error creating collision sector!");
@@ -749,15 +789,7 @@ bool Simple::Application ()
     physicalSector->SetSoftBodyEnabled (true);
 
   bulletSector = scfQueryInterface<CS::Physics2::Bullet2::iPhysicalSector> (physicalSector);
-  bulletSector->SetDebugMode (CS::Physics2::Bullet2::DEBUG_JOINTS);
-
-  //// Create the dynamic's debugger
-  //dynamicsDebugger = debuggerManager->CreateDebugger ();
-  //dynamicsDebugger->SetDynamicSystem (dynamicSystem);
-
-  //// Don't display static colliders as the z-fighting with the original mesh
-  //// is very ugly
-  //dynamicsDebugger->SetStaticBodyMaterial (0);
+  bulletSector->SetDebugMode (debugMode);
 
   // Create the environment
   if (environment == ENVIRONMENT_WALLS)
@@ -838,7 +870,6 @@ bool Simple::Application ()
   
   hudManager->GetKeyDescriptions ()->Push ("?: toggle display of collisions");
   hudManager->GetKeyDescriptions ()->Push ("g: toggle gravity");
-  hudManager->GetKeyDescriptions ()->Push ("I: toggle autodisable");
   
 #ifdef CS_HAVE_BULLET_SERIALIZER
   if (phys_engine_id == BULLET_ID)
@@ -959,7 +990,7 @@ CS::Physics2::iRigidBody* Simple::SpawnBox (bool setVelocity /* = true */)
 
   // Create the mesh.
   csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (boxFact, "box", room));
-  meshes.Push (mesh);
+  //meshes.Push (mesh);
 
   // Create a body and attach the mesh.
   csRef<CS::Physics2::iRigidBody> rb = physicalSystem->CreateRigidBody ();
@@ -1022,7 +1053,7 @@ CS::Physics2::iRigidBody* Simple::SpawnSphere (bool setVelocity /* = true */)
 
   // Create the mesh.
   csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (ballFact, "ball", room));
-  meshes.Push (mesh);
+  //meshes.Push (mesh);
 
   iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
   mesh->GetMeshObject ()->SetMaterialWrapper (mat);
@@ -1133,7 +1164,7 @@ CS::Physics2::iRigidBody* Simple::SpawnCylinder (bool setVelocity /* = true */)
   // Create the mesh.
   csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (
     cylinderFact, "cylinder", room));
-  meshes.Push (mesh);
+  //meshes.Push (mesh);
 
   iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
   mesh->GetMeshObject ()->SetMaterialWrapper (mat);
@@ -1194,7 +1225,7 @@ CS::Physics2::iRigidBody* Simple::SpawnCapsule (float length, float radius, bool
   // Create the mesh.
   csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (
     capsuleFact, "capsule", room));
-  meshes.Push (mesh);
+  //meshes.Push (mesh);
   iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
   mesh->GetMeshObject ()->SetMaterialWrapper (mat);
 
@@ -1251,12 +1282,21 @@ CS::Collision2::iCollisionObject* Simple::SpawnConcaveMesh ()
   // Create the mesh.
   csRef<iMeshWrapper> star = engine->CreateMeshWrapper (starFact, "star",
     room);
-  meshes.Push (star);
+  //meshes.Push (star);
   star->GetMovable ()->SetTransform (tc);
   star->GetMovable ()->UpdateMove ();
 
   csRef<CS::Collision2::iCollisionObject> co = collisionSystem->CreateCollisionObject ();
-  csRef<CS::Collision2::iColliderConcaveMesh> starCollider = collisionSystem->CreateColliderConcaveMesh (star);
+  csRef<CS::Collision2::iCollider> starCollider;
+  if (mainCollider == NULL)
+  {
+    mainCollider = collisionSystem->CreateColliderConcaveMesh (star);
+    starCollider = mainCollider;
+  }
+  else
+  {
+    starCollider = collisionSystem->CreateColliderConcaveMeshScaled (mainCollider, 1.0f);
+  }  
   co->AddCollider (starCollider, localTrans);
   csOrthoTransform trans = tc;
   trans.SetOrigin (tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 2));
@@ -1296,7 +1336,7 @@ CS::Physics2::iRigidBody* Simple::SpawnConvexMesh (bool setVelocity /* = true */
   // Create the mesh.
   csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (
     capsuleFact, "capsule", room));
-  meshes.Push (mesh);
+  //meshes.Push (mesh);
   iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
   mesh->GetMeshObject ()->SetMaterialWrapper (mat);
 
@@ -1336,7 +1376,7 @@ CS::Physics2::iRigidBody* Simple::SpawnCompound (bool setVelocity /* = true */)
 
   // Create the mesh.
   csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (meshFact, "mesh", room));
-  meshes.Push (mesh);
+  //meshes.Push (mesh);
 
   // Create a body and attach the mesh.
   // Create a body and attach the mesh.
@@ -1365,7 +1405,7 @@ CS::Physics2::iRigidBody* Simple::SpawnCompound (bool setVelocity /* = true */)
 
 CS::Physics2::iJoint* Simple::SpawnJointed ()
 {
-#define SLIDE
+#define SOFT_ANGULAR
 
 #ifdef P2P
   // Create and position two rigid bodies
@@ -1418,15 +1458,60 @@ CS::Physics2::iJoint* Simple::SpawnJointed ()
   rb2->SetState (CS::Physics2::STATE_STATIC);
   csRef<CS::Physics2::iJoint> joint = physicalSystem->CreateRigidSlideJoint (jointTrans, -1.f, 1.f, 1.f, -1.f, 0);
   joint->Attach (rb2, rb1);
-
-  jointTrans = rb1->GetTransform ();
 #endif
 
-  /*CS::Physics2::iRigidBody* box = SpawnSoftBody ();
-  csOrthoTransform trans = box->GetTransform ();*/
+#ifdef SOFT_LINEAR
+  csRef<CS::Physics2::iSoftBody> sb1 = SpawnSoftBody (false);
+  csRef<CS::Physics2::Bullet2::iSoftBody> bulletSoftBody = scfQueryInterface<CS::Physics2::Bullet2::iSoftBody> (sb1);
+  //bulletSoftBody->ResetCollisionFlag ();
+  //// The soft body need to use cluster collision.
+  //bulletSoftBody->SetClusterCollisionRS (true);
+  //bulletSoftBody->SetClusterCollisionSS (true);
+  //bulletSoftBody->GenerateCluster (32);
+  
+  //CS::Physics2::iRigidBody* rb2 = SpawnBox (false);
+  //csOrthoTransform trans = rb2->GetTransform ();
+  //trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () * csVector3 (0.0f,2.0f,0.0f));
+  //rb2->SetTransform (trans);
+  //rb2->SetLinearDampener (0.8f);
+  //rb2->SetRollingDampener (0.8f);
 
-  // Update the display of the dynamics debugger
-  //dynamicsDebugger->UpdateDisplay ();
+  //Or you can attach it with a softbody.
+  CS::Physics2::iSoftBody* rb2 = SpawnSoftBody (false);
+  // SetTransform can only be called once in iSoftBody. And this is a local transform.
+  csOrthoTransform trans;
+  trans.SetOrigin (csVector3 (0.0f,1.0f,-0.5f));
+  rb2->SetTransform (trans);
+  bulletSoftBody = scfQueryInterface<CS::Physics2::Bullet2::iSoftBody> (rb2);
+  //bulletSoftBody->ResetCollisionFlag ();
+  //bulletSoftBody->SetClusterCollisionRS (true);
+  //bulletSoftBody->SetClusterCollisionSS (true);
+  //bulletSoftBody->GenerateCluster (32);
+
+  //Use local position when it's soft joint.
+  csRef<CS::Physics2::iJoint> joint = 
+    physicalSystem->CreateSoftLinearJoint (rb2->GetVertexPosition (0));
+  joint->Attach (sb1, rb2);
+#endif
+
+#ifdef SOFT_ANGULAR
+  csRef<CS::Physics2::iSoftBody> sb1 = SpawnSoftBody (false);
+  csRef<CS::Physics2::Bullet2::iSoftBody> bulletSoftBody = scfQueryInterface<CS::Physics2::Bullet2::iSoftBody> (sb1);
+  bulletSoftBody->ResetCollisionFlag ();
+  bulletSoftBody->SetClusterCollisionRS (true);
+  bulletSoftBody->SetClusterCollisionSS (true);
+  bulletSoftBody->GenerateCluster (16);
+
+  CS::Physics2::iRigidBody* rb2 = SpawnBox (false);
+  csOrthoTransform trans = rb2->GetTransform ();
+  trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () * csVector3 (0.0f,2.0f,0.0f));
+  rb2->SetTransform (trans);
+  rb2->SetLinearDampener (0.8f);
+  rb2->SetRollingDampener (0.8f);
+
+  csRef<CS::Physics2::iJoint> joint = physicalSystem->CreateSoftAngularJoint (1);
+  joint->Attach (sb1, rb2);
+#endif
 
   return joint;
 }
@@ -1577,6 +1662,7 @@ void Simple::LoadRagdoll ()
 void Simple::SpawnRagdoll ()
 {
   //TODO----------------------------------------------------------------
+  // I haven't implement animated mesh yet.
   // Load frankie's factory if not yet done
   //csRef<iMeshFactoryWrapper> meshfact =
   //  engine->FindMeshFactory ("franky_frankie");
@@ -1753,7 +1839,7 @@ CS::Physics2::iSoftBody* Simple::SpawnCloth ()
   return body;
 }
 
-CS::Physics2::iSoftBody* Simple::SpawnSoftBody ()
+CS::Physics2::iSoftBody* Simple::SpawnSoftBody (bool setVelocity /* = true */)
 {
   // Create the ball mesh factory.
   csRef<iMeshFactoryWrapper> ballFact = engine->CreateMeshFactory(
@@ -1775,21 +1861,24 @@ CS::Physics2::iSoftBody* Simple::SpawnSoftBody ()
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
 
   // Create the soft body
-  csRef<CS::Physics2::iSoftBody> body = physicalSystem->CreateSoftBody(gmstate,
-    csOrthoTransform (csMatrix3 (), csVector3 (0.0f, 0.0f, 1.0f)) * tc);
+  //csRef<CS::Physics2::iSoftBody> body = physicalSystem->CreateSoftBody(gmstate,
+  //  csOrthoTransform (csMatrix3 (), csVector3 (0.0f, 0.0f, 1.0f)) * tc);
   // This would have worked too
-  /*csRef<CS::Physics2::iSoftBody> body = physicalSystem->CreateSoftBody
+  csRef<CS::Physics2::iSoftBody> body = physicalSystem->CreateSoftBody
     (gmstate->GetVertices (), gmstate->GetVertexCount (),
-     gmstate->GetTriangles (), gmstate->GetTriangleCount ());
-  body->SetTransform (csOrthoTransform (csMatrix3 (), csVector3 (0.0f, 0.0f, 1.0f)) * tc);*/
+     gmstate->GetTriangles (), gmstate->GetTriangleCount (),
+     csOrthoTransform (csMatrix3 (), csVector3 (0.0f, 0.0f, 1.0f)) * tc);
   body->SetMass (5.0f);
   body->SetRigidity (0.8f);
   csRef<CS::Physics2::Bullet2::iSoftBody> bulletbody = 
     scfQueryInterface<CS::Physics2::Bullet2::iSoftBody> (body);
   bulletbody->SetBendingConstraint (true);
   
-  // Fling the body.
-  body->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+  if (setVelocity)
+  {
+    // Fling the body.
+    body->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+  }
   body->RebuildObject ();
   physicalSector->AddSoftBody (body);
 

@@ -219,7 +219,7 @@ public:
   virtual ~HeightMapCollider();
   void UpdataMinHeight (float minHeight);
   void UpdateMaxHeight (float maxHeight);
-  void SetLocalScale (csVector3& scale);
+  void SetLocalScale (const csVector3& scale);
 };
 
 class csBulletColliderTerrain:

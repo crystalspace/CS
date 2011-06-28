@@ -49,8 +49,14 @@ struct iSoftBody : public virtual iBase
   /// Set true if use cluster vs convex handling for rigid vs soft collision detection.
   virtual void SetClusterCollisionRS (bool cluster) = 0;
 
+  /// Get true if use cluster vs convex handling for rigid vs soft collision detection.
+  virtual bool GetClusterCollisionRS () = 0;
+
   /// Set true if use cluster vs cluster handling for soft vs soft collision detection.
   virtual void SetClusterCollisionSS (bool cluster) = 0;
+
+  /// Get true if use cluster vs cluster handling for soft vs soft collision detection.
+  virtual bool GetClusterCollisionSS () = 0;
 
   /// Set soft vs rigid hardness [0,1] (cluster only).
   virtual void SetSRHardness (float hardness) = 0;

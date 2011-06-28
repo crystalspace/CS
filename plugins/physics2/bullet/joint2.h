@@ -13,6 +13,7 @@ using CS::Physics2::iPhysicalBody;
 
 enum csJointType
 {
+  RIGID_PIVOT_JOINT,
   RIGID_P2P_JOINT,
   RIGID_HINGE_JOINT,
   RIGID_SLIDE_JOINT,

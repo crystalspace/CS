@@ -96,9 +96,7 @@ csBulletCollider::csBulletCollider ()
 void csBulletCollider::SetLocalScale (const csVector3& scale)
 {
   this->scale = scale;
-  shape->setLocalScaling (btVector3(scale.x * collSystem->getInternalScale (),
-  scale.y * collSystem->getInternalScale (),
-  scale.z * collSystem->getInternalScale ()));
+  shape->setLocalScaling (btVector3(scale.x, scale.y, scale.z));
   volume *= scale.x * scale.y * scale.z;
 }
 
@@ -147,7 +145,7 @@ void csBulletColliderSphere::SetLocalScale (const csVector3& scale)
   if ((scale.x - scale.y) < EPSILON && (scale.y - scale.z) < EPSILON) //x == y == z
   {
     this->scale = scale;
-    dynamic_cast<btSphereShape*>(shape)->setUnscaledRadius(scale.x * collSystem->getInternalScale ());
+    dynamic_cast<btSphereShape*>(shape)->setUnscaledRadius(scale.x);
     volume *= scale.x * scale.x * scale.x;
   }
 }
@@ -327,9 +325,7 @@ csBulletColliderConcaveMeshScaled::csBulletColliderConcaveMeshScaled (iColliderC
   {
     btBvhTriangleMeshShape* meshShape = dynamic_cast<btBvhTriangleMeshShape*> (originalCollider->shape);
     shape = new btScaledBvhTriangleMeshShape (meshShape, 
-      btVector3 (scale[0] * collSystem->getInternalScale (),
-      scale[1] * collSystem->getInternalScale (),
-      scale[2] * collSystem->getInternalScale ()));
+      btVector3 (scale[0], scale[1] , scale[2]));
   }
   else
     csFPrintf  (stderr, "csBulletColliderConcaveMeshScaled: Original collider is not concave mesh.\n");
@@ -362,7 +358,7 @@ HeightMapCollider::~HeightMapCollider ()
   delete heightData;
 }
 
-void HeightMapCollider::SetLocalScale (csVector3& scale)
+void HeightMapCollider::SetLocalScale (const csVector3& scale)
 {
   this->setLocalScaling (btVector3(localScale.getX () * scale.x,
     localScale.getY () * scale.y,
@@ -422,7 +418,7 @@ void csBulletColliderTerrain::SetLocalScale (const csVector3& scale)
 {
   this->scale = scale;
   for (size_t i = 0; i < colliders.GetSize (); i++)
-    colliders[i]->SetLocalScale (scale * collSystem->getInternalScale ());
+    colliders[i]->SetLocalScale (scale);
 }
 
 void csBulletColliderTerrain::SetMargin (float margin)

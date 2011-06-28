@@ -198,8 +198,8 @@ void csBulletRigidBody::AddBulletObject ()
   btObject = btBody;
 
   sector->bulletWorld->addRigidBody (btBody);
-  btBody->setUserPointer (static_cast<CS::Collision2::iCollisionObject*> (
-    dynamic_cast<iPhysicalBody*>(this)));
+  btBody->setUserPointer (dynamic_cast<CS::Collision2::iCollisionObject*> (
+    dynamic_cast<csBulletCollisionObject*>(this)));
   SetLinearVelocity (linearVelocity);
   SetAngularVelocity (angularVelocity);
   insideWorld = true;
@@ -249,9 +249,6 @@ float csBulletRigidBody::GetMass ()
 
   if (totalMass > EPSILON)
     return totalMass;
-
-  if (btObject)
-    return 1.0f / btBody->getInvMass ();
 
   return density * this->GetVolume ();
 }
@@ -319,6 +316,7 @@ bool csBulletRigidBody::SetState (CS::Physics2::RigidBodyState state)
   if (btBody && physicalState != state)
   {
     CS::Physics2::RigidBodyState previousState = physicalState;
+    physicalState = state;
     if (previousState == CS::Physics2::STATE_STATIC)
     {
       bool hasTrimesh = false;
@@ -401,7 +399,6 @@ bool csBulletRigidBody::SetState (CS::Physics2::RigidBodyState state)
 
     if (insideWorld)
       sector->bulletWorld->addRigidBody (btBody);
-    physicalState = state;
     return true;
   }
   else

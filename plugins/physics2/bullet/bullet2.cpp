@@ -94,6 +94,7 @@ csBulletSector::~csBulletSector ()
 
 void csBulletSector::SetGravity (const csVector3& v)
 {
+  gravity = v;
   btVector3 gravity = CSToBullet (v, sys->getInternalScale ());
   bulletWorld->setGravity (gravity);
 
@@ -676,16 +677,6 @@ void csBulletSector::DebugDraw (iView* rview)
 
 void csBulletSector::SetDebugMode (CS::Physics2::Bullet2::DebugMode mode)
 {
-  if (mode == CS::Physics2::Bullet2::DEBUG_NOTHING)
-  {
-    if (debugDraw)
-    {
-      delete debugDraw;
-      debugDraw = 0;
-      bulletWorld->setDebugDrawer (0);
-    }
-    return;
-  }
   if (!debugDraw)
   {
     debugDraw = new csBulletDebugDraw (sys->getInverseInternalScale ());
@@ -795,7 +786,7 @@ csRef<iColliderConcaveMesh> csBulletSystem::CreateColliderConcaveMesh (iMeshWrap
 }
 
 csRef<iColliderConcaveMeshScaled> csBulletSystem::CreateColliderConcaveMeshScaled (
-  iColliderConcaveMesh* collider, float scale)
+  iColliderConcaveMesh* collider, csVector3 scale)
 {
   csRef<csBulletColliderConcaveMeshScaled> coll;
   coll.AttachNew (new csBulletColliderConcaveMeshScaled (collider, scale,this));
@@ -1163,6 +1154,21 @@ csRef<iJoint> csBulletSystem::CreateSoftAngularJoint (int axis)
   return joint;
 }
 
+csRef<iJoint> csBulletSystem::CreateRigidPivotJoint (iRigidBody* body, const csVector3 position)
+{
+  csRef<csBulletJoint> joint;
+  joint.AttachNew (new csBulletJoint (this));
+  joint->SetTransConstraints (true, true, true);
+  csVector3 trans (0.0f,0.0f,0.0f);
+  joint->SetMaximumDistance (trans);
+  joint->SetMinimumDistance (trans);
+  joint->SetPosition (position);
+  joint->SetType (RIGID_PIVOT_JOINT);
+  joint->Attach (body, NULL);
+  //joints.Push (joint);
+  return joint;
+}
+
 csRef<iSoftBody> csBulletSystem::CreateRope (csVector3 start,
                                              csVector3 end,
                                              size_t segmentCount)
@@ -1272,15 +1278,17 @@ csRef<iSoftBody> csBulletSystem::CreateSoftBody (iGeneralFactoryState* genmeshFa
 }
 
 csRef<iSoftBody> csBulletSystem::CreateSoftBody (csVector3* vertices, size_t vertexCount,
-                                                 csTriangle* triangles, size_t triangleCount)
+                                                 csTriangle* triangles, size_t triangleCount,
+                                                 const csOrthoTransform& bodyTransform)
 {
   btScalar* btVertices = new btScalar[vertexCount * 3];
   for (size_t i = 0; i < vertexCount; i++)
   {
-    csVector3& vertex = vertices[i];
-    btVertices[i * 3] = vertex[0] * internalScale;
-    btVertices[i * 3 + 1] = vertex[1] * internalScale;
-    btVertices[i * 3 + 2] = vertex[2] * internalScale;
+    csVector3& vertex = vertices[i]
+    * bodyTransform.GetInverse() * internalScale;
+    btVertices[i * 3] = vertex[0];
+    btVertices[i * 3 + 1] = vertex[1];
+    btVertices[i * 3 + 2] = vertex[2];
   }
 
   int* btTriangles = new int[triangleCount * 3];

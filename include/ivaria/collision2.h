@@ -81,7 +81,7 @@ struct HitBeamResult
   bool hasHit;
 
   /// The collision object that was hit, or \a nullptr if no object was hit.
-  iCollisionObject* object;
+  csRef<iCollisionObject> object;
 
   /// Intersection point in world space.
   csVector3 isect;
@@ -599,7 +599,7 @@ struct iCollisionSystem : public virtual iBase
 
   /// Create a scaled concave mesh collider.
   virtual csRef<iColliderConcaveMeshScaled> CreateColliderConcaveMeshScaled (
-    iColliderConcaveMesh* collider, float scale) = 0;
+    iColliderConcaveMesh* collider, csVector3 scale) = 0;
 
   /// Create a cylinder collider.
   virtual csRef<iColliderCylinder> CreateColliderCylinder (float length, float radius) = 0;

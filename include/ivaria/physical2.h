@@ -670,6 +670,8 @@ struct iPhysicalSystem : public virtual iBase
 
   /// Create a angular joint for soft body.
   virtual csRef<iJoint> CreateSoftAngularJoint (int axis) = 0;
+
+  virtual csRef<iJoint> CreateRigidPivotJoint (iRigidBody* body, const csVector3 position) = 0;
   
   /**
   * Create a soft body rope.
@@ -726,7 +728,7 @@ struct iPhysicalSystem : public virtual iBase
   */
   virtual csRef<iSoftBody> CreateSoftBody (csVector3* vertices,
       size_t vertexCount, csTriangle* triangles,
-      size_t triangleCount) = 0;
+      size_t triangleCount, const csOrthoTransform& bodyTransform) = 0;
 };
 
 struct iPhysicalSector : public virtual iBase

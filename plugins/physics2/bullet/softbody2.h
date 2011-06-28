@@ -23,7 +23,7 @@ private:
   float friction;
   float density;
   float totalMass;
-  bool bending;
+  bool setTrans;
   btSoftBody* btBody;   //Don't know if I should add this to rigidbody too.
   struct AnimatedAnchor
   {
@@ -148,7 +148,9 @@ public:
   virtual void ResetCollisionFlag ();
 
   virtual void SetClusterCollisionRS (bool cluster);
+  virtual bool GetClusterCollisionRS ();
   virtual void SetClusterCollisionSS (bool cluster);
+  virtual bool GetClusterCollisionSS ();
 
   virtual void SetSRHardness (float hardness);
   virtual void SetSKHardness (float hardness);
