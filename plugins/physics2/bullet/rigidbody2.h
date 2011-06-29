@@ -33,7 +33,6 @@ private:
   float softness;
   float elasticity;
   float totalMass;
-  int haveStaticColliders;
 
   csRef<CS::Physics2::iKinematicCallback> kinematicCb;
 
@@ -45,7 +44,7 @@ public:
   virtual iCollisionObject* QueryCollisionObject () {return dynamic_cast<csBulletCollisionObject*> (this);}
   virtual iPhysicalBody* QueryPhysicalBody () {return this;}
 
-  virtual void SetObjectType (CS::Collision2::CollisionObjectType type) {}
+  virtual void SetObjectType (CS::Collision2::CollisionObjectType type, bool forceRebuild = true) {}
   virtual CS::Collision2::CollisionObjectType GetObjectType () {return CS::Collision2::COLLISION_OBJECT_PHYSICAL;}
 
   virtual void SetAttachedMovable (iMovable* movable) {csBulletCollisionObject::SetAttachedMovable (movable);}

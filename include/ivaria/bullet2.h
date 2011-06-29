@@ -21,7 +21,7 @@ enum DebugMode
   DEBUG_NOTHING = 0,     /*!< Nothing will be displayed. */
   DEBUG_COLLIDERS = 1,   /*!< Display the colliders of the bodies. */
   DEBUG_AABB = 2,        /*!< Display the axis aligned bounding boxes of the bodies. */
-  DEBUG_JOINTS = 4       /*!< Display the joint positions and limits. */
+  DEBUG_JOINTS = 4,      /*!< Display the joint positions and limits. */
 };
 
 struct iSoftBody : public virtual iBase

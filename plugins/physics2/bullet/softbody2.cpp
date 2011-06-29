@@ -53,7 +53,7 @@ void csBulletSoftBody::RebuildObject ()
   btBody->setCollisionFlags(0);
 }
 
-HitBeamResult csBulletSoftBody::HitBeam (const csVector3& start, const csVector3& end)
+CS::Collision2::HitBeamResult csBulletSoftBody::HitBeam (const csVector3& start, const csVector3& end)
 {
   CS::Collision2::HitBeamResult result;
   btVector3 rayFrom = CSToBullet (start, system->getInternalScale ());

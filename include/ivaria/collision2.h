@@ -31,7 +31,7 @@ namespace Collision2
 struct csConvexResult;
 struct iCollisionCallback;
 struct iCollisionObject;
-typedef size_t CollisionGroupMask;
+typedef short CollisionGroupMask;
 
 enum ColliderType
 {
@@ -60,6 +60,12 @@ struct CollisionGroup
 {
   csString name;
   CollisionGroupMask value;
+
+  CollisionGroup () {}
+
+  CollisionGroup (const char* name)
+    : name (name)
+  {}
 };
 
 struct MoveResult
@@ -361,7 +367,7 @@ struct iCollisionObject : public virtual iBase
   virtual CS::Physics2::iPhysicalBody* QueryPhysicalBody () = 0;
 
   /// Set the type of the collision object.
-  virtual void SetObjectType (CollisionObjectType type) = 0;
+  virtual void SetObjectType (CollisionObjectType type, bool forceRebuild = true) = 0;
 
   /// Return the type of the collision object.
   virtual CollisionObjectType GetObjectType () = 0;
@@ -564,6 +570,19 @@ struct iCollisionSector : public virtual iBase
   */
   virtual bool CollisionTest (iCollisionObject* object, csArray<CollisionData>& collisions) = 0;
 
+  /// Create a collision group.
+  virtual CollisionGroup& CreateCollisionGroup (const char* name) = 0;
+
+  /// Find a collision group by name.
+  virtual CollisionGroup& FindCollisionGroup (const char* name) = 0;
+
+  /// Set whether the two groups collide with each other.
+  virtual void SetGroupCollision (const char* name1,
+    const char* name2, bool collide) = 0;
+
+  /// Get true if the two groups collide with each other.
+  virtual bool GetGroupCollision (const char* name1, const char* name2) = 0;
+
   /**
   * Try to move the given object from \a fromWorld to \a toWorld and return the first collision occured if any.
   */
@@ -637,20 +656,6 @@ struct iCollisionSystem : public virtual iBase
   
   /// Create a collision sector.
   virtual csRef<iCollisionSector> CreateCollisionSector () = 0;
-
-  /// Create a collision group.
-  virtual CollisionGroup& CreateCollisionGroup (const char* name) = 0;
-
-  /// Find a collision group by name.
-  virtual CollisionGroup& FindCollisionGroup (const char* name) = 0;
-
-  /// Set whether the two groups collide with each other.
-  virtual void SetGroupCollision (CollisionGroup& group1,
-      CollisionGroup& group2, bool collide) = 0;
-
-  /// Get true if the two groups collide with each other.
-  virtual bool GetGroupCollision (CollisionGroup& group1,
-      CollisionGroup& group2) = 0;
 
   /**
   * Decompose a concave mesh in convex parts. Each convex part will be added to

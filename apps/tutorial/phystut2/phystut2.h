@@ -24,7 +24,6 @@ private:
   // Meshes
   csRef<iMeshFactoryWrapper> boxFact;
   csRef<iMeshFactoryWrapper> meshFact;
-  //csRefArray<iMeshWrapper> meshes;
   csRef<CS::Collision2::iColliderConcaveMesh> mainCollider;
 
 

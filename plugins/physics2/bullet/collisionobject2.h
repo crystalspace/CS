@@ -32,6 +32,7 @@ protected:
   btCompoundShape* compoundShape;
   CS::Collision2::CollisionObjectType type;
   CS::Collision2::CollisionGroup collGroup;
+  int haveStaticColliders;
   bool insideWorld;
   bool shapeChanged;
   bool isTerrain;
@@ -44,7 +45,7 @@ public:
   virtual iCollisionObject* QueryCollisionObject () {return dynamic_cast<iCollisionObject*> (this);}
   virtual CS::Physics2::iPhysicalBody* QueryPhysicalBody () {return NULL;}
 
-  virtual void SetObjectType (CS::Collision2::CollisionObjectType type);
+  virtual void SetObjectType (CS::Collision2::CollisionObjectType type, bool forceRebuild = true);
   virtual CS::Collision2::CollisionObjectType GetObjectType () {return type;}
 
   virtual void SetAttachedMovable (iMovable* movable){this->movable = movable;}

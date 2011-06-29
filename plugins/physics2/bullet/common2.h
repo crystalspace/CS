@@ -156,11 +156,11 @@ public:
   void SetDebugMode (CS::Physics2::Bullet2::DebugMode mode)
   {
     this->mode = 0;
-    if (mode == CS::Physics2::Bullet2::DEBUG_COLLIDERS)
+    if (mode & CS::Physics2::Bullet2::DEBUG_COLLIDERS)
       this->mode |= DBG_DrawWireframe;
-    else if (mode == CS::Physics2::Bullet2::DEBUG_AABB)
+    if (mode & CS::Physics2::Bullet2::DEBUG_AABB)
       this->mode |= DBG_DrawAabb;
-    else if (mode == CS::Physics2::Bullet2::DEBUG_JOINTS)
+    if (mode & CS::Physics2::Bullet2::DEBUG_JOINTS)
       this->mode |= DBG_DrawConstraints | DBG_DrawConstraintLimits;
   }
 
@@ -169,11 +169,14 @@ public:
     CS::Physics2::Bullet2::DebugMode mode =
       CS::Physics2::Bullet2::DEBUG_NOTHING;
     if (this->mode & DBG_DrawWireframe)
-      mode = CS::Physics2::Bullet2::DEBUG_COLLIDERS;
-    else if (this->mode & DBG_DrawAabb)
-      mode = CS::Physics2::Bullet2::DEBUG_AABB;
-    else if (this->mode & DBG_DrawConstraints)
-      mode = CS::Physics2::Bullet2::DEBUG_JOINTS;
+      mode = (CS::Physics2::Bullet2::DebugMode)
+      (mode | CS::Physics2::Bullet2::DEBUG_COLLIDERS);
+    if (this->mode & DBG_DrawAabb)
+      mode = (CS::Physics2::Bullet2::DebugMode)
+      (mode | CS::Physics2::Bullet2::DEBUG_AABB);
+    if (this->mode & DBG_DrawConstraints)
+      mode = (CS::Physics2::Bullet2::DebugMode)
+      (mode | CS::Physics2::Bullet2::DEBUG_JOINTS);
     return mode;
   }
 

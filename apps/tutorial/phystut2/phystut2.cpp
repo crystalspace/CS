@@ -16,9 +16,9 @@
 Simple::Simple()
 : DemoApplication ("CrystalSpace.PhysTut2"),
 isSoftBodyWorld (true), environment (ENVIRONMENT_WALLS), solver (0),
-do_bullet_debug (true), do_soft_debug (false), remainingStepDuration (0.0f),
-allStatic (false), pauseDynamic (false), dynamicSpeed (1.0f), physicalCameraMode (CAMERA_DYNAMIC), 
-dragging (false), softDragging (false), debugMode (CS::Physics2::Bullet2::DEBUG_JOINTS)
+do_bullet_debug (false), do_soft_debug (true), allStatic (false), 
+pauseDynamic (false), dynamicSpeed (1.0f), physicalCameraMode (CAMERA_DYNAMIC), 
+dragging (false), softDragging (false), remainingStepDuration (0.0f), debugMode (CS::Physics2::Bullet2::DEBUG_COLLIDERS)
 {
   localTrans.Identity ();
 }
@@ -55,7 +55,7 @@ void Simple::Frame ()
   const float speed = elapsed_time / 1000.0;
 
   // Camera is controlled by a rigid body
-  if (physicalCameraMode == CAMERA_DYNAMIC)
+  if (physicalCameraMode == CAMERA_DYNAMIC || physicalCameraMode == CAMERA_KINEMATIC)
   {
     if (kbd->GetKeyState (CSKEY_RIGHT))
       view->GetCamera()->GetTransform().RotateThis (CS_VEC_ROT_RIGHT, speed);
@@ -65,15 +65,32 @@ void Simple::Frame ()
       view->GetCamera()->GetTransform().RotateThis (CS_VEC_TILT_UP, speed);
     if (kbd->GetKeyState (CSKEY_PGDN))
       view->GetCamera()->GetTransform().RotateThis (CS_VEC_TILT_DOWN, speed);
-    if (kbd->GetKeyState (CSKEY_UP))
+    if (physicalCameraMode == CAMERA_DYNAMIC)
     {
-      cameraBody->SetLinearVelocity (view->GetCamera()->GetTransform()
-        .GetT2O () * csVector3 (0, 0, 5));
+      if (kbd->GetKeyState (CSKEY_UP))
+      {
+        cameraBody->SetLinearVelocity (view->GetCamera()->GetTransform()
+          .GetT2O () * csVector3 (0, 0, 5));
+      }
+      if (kbd->GetKeyState (CSKEY_DOWN))
+      {
+        cameraBody->SetLinearVelocity (view->GetCamera()->GetTransform()
+          .GetT2O () * csVector3 (0, 0, -5));
+      }
     }
-    if (kbd->GetKeyState (CSKEY_DOWN))
+    else
     {
-      cameraBody->SetLinearVelocity (view->GetCamera()->GetTransform()
-        .GetT2O () * csVector3 (0, 0, -5));
+      csOrthoTransform trans = view->GetCamera()->GetTransform();
+      if (kbd->GetKeyState (CSKEY_UP))
+      {
+        trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () * csVector3 (0, 0, 5) * speed);
+        cameraBody->SetTransform (trans);
+      }
+      if (kbd->GetKeyState (CSKEY_DOWN))
+      {
+        trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () * csVector3 (0, 0, -5) * speed);
+        cameraBody->SetTransform (trans);
+      }
     }
   }
 
@@ -142,11 +159,7 @@ void Simple::Frame ()
   if (!pauseDynamic)
     physicalSector->Step (speed / dynamicSpeed);
 
-  // Update camera position if it is controlled by a rigid body.
-  // (in this mode we want to control the orientation of the camera,
-  // so we update the camera position by ourselves instead of using
-  // 'cameraBody->AttachCamera (camera)')
-  if (physicalCameraMode == CAMERA_DYNAMIC)
+  if (physicalCameraMode == CAMERA_DYNAMIC || physicalCameraMode == CAMERA_KINEMATIC)
     view->GetCamera ()->GetTransform ().SetOrigin
     (cameraBody->GetTransform ().GetOrigin ());
 
@@ -198,7 +211,7 @@ void Simple::Frame ()
       CS::Physics2::iSoftBody* softBody = physicalSector->GetSoftBody (i);
       csRef<CS::Physics2::Bullet2::iSoftBody> bulletSoftBody = 
         scfQueryInterface<CS::Physics2::Bullet2::iSoftBody> (softBody);
-      if (softBody->GetTriangleCount ())
+      if (softBody->GetVertexCount ())
         bulletSoftBody->DebugDraw (view);
     }
 }
@@ -445,21 +458,19 @@ bool Simple::OnKeyboard (iEvent &event)
         && hitResult.object->GetObjectType () == CS::Collision2::COLLISION_OBJECT_PHYSICAL)
       {
         // Remove the body and the mesh from the simulation, and put them in the clipboard
-          
+        
+        clipboardBody = hitResult.object->QueryPhysicalBody ();
+        clipboardMovable = hitResult.object->GetAttachedMovable ();
+
         if (clipboardBody->GetBodyType () == CS::Physics2::BODY_RIGID)
         {
-          clipboardBody = hitResult.object->QueryPhysicalBody ();
-          clipboardMovable = hitResult.object->GetAttachedMovable ();
-
           CS::Physics2::iRigidBody* rigidBody = clipboardBody->QueryRigidBody ();
           if (rigidBody->GetState () == CS::Physics2::STATE_DYNAMIC)
           {
             physicalSector->RemoveRigidBody (clipboardBody->QueryRigidBody ());
-            room->GetMeshes ()->Remove (clipboardMovable->GetSceneNode ()->QueryMesh ());
+            //room->GetMeshes ()->Remove (clipboardMovable->GetSceneNode ()->QueryMesh ());
           }
         }
-        else
-          physicalSector->RemoveSoftBody (clipboardBody->QuerySoftBody ());
 
         // Update the display of the dynamics debugger
         //dynamicsDebugger->UpdateDisplay ();
@@ -488,8 +499,6 @@ bool Simple::OnKeyboard (iEvent &event)
       if (clipboardBody->GetBodyType () == CS::Physics2::BODY_RIGID)
         physicalSector->AddRigidBody (clipboardBody->QueryRigidBody ());
 
-      if (clipboardMovable)
-        room->GetMeshes ()->Add (clipboardMovable->GetSceneNode ()->QueryMesh ());
       clipboardBody = 0;
       clipboardMovable = 0;
 
@@ -803,8 +812,7 @@ bool Simple::Application ()
     view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 30, -3));
   }
 
-  // Initialize the dynamics debugger
-  //dynamicsDebugger->SetDebugSector (room);
+  collisionSector->SetSector (room);
 
   // Preload some meshes and materials
   iTextureWrapper* txt = loader->LoadTexture ("spark",
@@ -966,11 +974,11 @@ void Simple::UpdateCameraMode ()
       cameraBody->SetElasticity (0.8f);
       cameraBody->SetFriction (10.0f);
       cameraBody->RebuildObject ();
-      physicalSector->AddRigidBody (cameraBody);
 
       // Make it kinematic
       cameraBody->SetState (CS::Physics2::STATE_KINEMATIC);
 
+      physicalSector->AddRigidBody (cameraBody);
       // Attach the camera to the body so as to benefit of the default
       // kinematic callback
       cameraBody->SetAttachedMovable (view->GetCamera ()->QuerySceneNode ()->GetMovable ());
@@ -989,8 +997,7 @@ CS::Physics2::iRigidBody* Simple::SpawnBox (bool setVelocity /* = true */)
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
 
   // Create the mesh.
-  csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (boxFact, "box", room));
-  //meshes.Push (mesh);
+  csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (boxFact, "box"));
 
   // Create a body and attach the mesh.
   csRef<CS::Physics2::iRigidBody> rb = physicalSystem->CreateRigidBody ();
@@ -1052,8 +1059,7 @@ CS::Physics2::iRigidBody* Simple::SpawnSphere (bool setVelocity /* = true */)
   ballFact->HardTransform (t);
 
   // Create the mesh.
-  csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (ballFact, "ball", room));
-  //meshes.Push (mesh);
+  csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (ballFact, "ball"));
 
   iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
   mesh->GetMeshObject ()->SetMaterialWrapper (mat);
@@ -1163,8 +1169,7 @@ CS::Physics2::iRigidBody* Simple::SpawnCylinder (bool setVelocity /* = true */)
 
   // Create the mesh.
   csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (
-    cylinderFact, "cylinder", room));
-  //meshes.Push (mesh);
+    cylinderFact, "cylinder"));
 
   iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
   mesh->GetMeshObject ()->SetMaterialWrapper (mat);
@@ -1224,8 +1229,7 @@ CS::Physics2::iRigidBody* Simple::SpawnCapsule (float length, float radius, bool
 
   // Create the mesh.
   csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (
-    capsuleFact, "capsule", room));
-  //meshes.Push (mesh);
+    capsuleFact, "capsule"));
   iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
   mesh->GetMeshObject ()->SetMaterialWrapper (mat);
 
@@ -1280,9 +1284,7 @@ CS::Collision2::iCollisionObject* Simple::SpawnConcaveMesh ()
   tc.SetOrigin (tc.This2Other (csVector3 (0, 0, 3)));
 
   // Create the mesh.
-  csRef<iMeshWrapper> star = engine->CreateMeshWrapper (starFact, "star",
-    room);
-  //meshes.Push (star);
+  csRef<iMeshWrapper> star = engine->CreateMeshWrapper (starFact, "star");
   star->GetMovable ()->SetTransform (tc);
   star->GetMovable ()->UpdateMove ();
 
@@ -1335,8 +1337,7 @@ CS::Physics2::iRigidBody* Simple::SpawnConvexMesh (bool setVelocity /* = true */
 
   // Create the mesh.
   csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (
-    capsuleFact, "capsule", room));
-  //meshes.Push (mesh);
+    capsuleFact, "capsule"));
   iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
   mesh->GetMeshObject ()->SetMaterialWrapper (mat);
 
@@ -1375,8 +1376,7 @@ CS::Physics2::iRigidBody* Simple::SpawnCompound (bool setVelocity /* = true */)
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
 
   // Create the mesh.
-  csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (meshFact, "mesh", room));
-  //meshes.Push (mesh);
+  csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (meshFact, "mesh"));
 
   // Create a body and attach the mesh.
   // Create a body and attach the mesh.
@@ -1405,7 +1405,7 @@ CS::Physics2::iRigidBody* Simple::SpawnCompound (bool setVelocity /* = true */)
 
 CS::Physics2::iJoint* Simple::SpawnJointed ()
 {
-#define SOFT_ANGULAR
+#define SLIDE
 
 #ifdef P2P
   // Create and position two rigid bodies
@@ -1811,8 +1811,6 @@ CS::Physics2::iSoftBody* Simple::SpawnCloth ()
   // Attach the two top corners
   body->AnchorVertex (0);
   body->AnchorVertex (9);
-  body->RebuildObject ();
-  physicalSector->AddSoftBody (body);
 
   // Create the cloth mesh factory
   csRef<iMeshFactoryWrapper> clothFact =
@@ -1824,12 +1822,18 @@ CS::Physics2::iSoftBody* Simple::SpawnCloth ()
   // Create the mesh
   gmstate->SetAnimationControlFactory (softBodyAnimationFactory);
   csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (
-    clothFact, "cloth_body", room));
+    clothFact, "cloth_body"));
   iMaterialWrapper* mat = CS::Material::MaterialBuilder::CreateColorMaterial
     (GetObjectRegistry (), "cloth", csColor4 (1.0f, 0.0f, 0.0f, 1.0f));
   mesh->GetMeshObject ()->SetMaterialWrapper (mat);
 
+  body->SetAttachedMovable (mesh->GetMovable ());
+
+  body->RebuildObject ();
+  physicalSector->AddSoftBody (body);
+
   // Init the animation control for the animation of the genmesh
+  // If it's a double-side soft body like cloth, you have to call SetSoftBody (body, true);
   csRef<iGeneralMeshState> meshState =
     scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ());
   csRef<CS::Physics2::iSoftBodyAnimationControl> animationControl =
@@ -1879,22 +1883,25 @@ CS::Physics2::iSoftBody* Simple::SpawnSoftBody (bool setVelocity /* = true */)
     // Fling the body.
     body->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
   }
-  body->RebuildObject ();
-  physicalSector->AddSoftBody (body);
 
   // Create the mesh
   gmstate->SetAnimationControlFactory (softBodyAnimationFactory);
   csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (
-    ballFact, "soft_body", room));
+    ballFact, "soft_body"));
   iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
   mesh->GetMeshObject ()->SetMaterialWrapper (mat);
 
+  body->SetAttachedMovable (mesh->GetMovable ());
+
+  body->RebuildObject ();
+  physicalSector->AddSoftBody (body);
+
   // Init the animation control for the animation of the genmesh
-  csRef<iGeneralMeshState> meshState =
+  /*csRef<iGeneralMeshState> meshState =
     scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ());
   csRef<CS::Physics2::iSoftBodyAnimationControl> animationControl =
     scfQueryInterface<CS::Physics2::iSoftBodyAnimationControl> (meshState->GetAnimationControl ());
-  animationControl->SetSoftBody (body);
+  animationControl->SetSoftBody (body);*/
 
 
   // This would have worked too

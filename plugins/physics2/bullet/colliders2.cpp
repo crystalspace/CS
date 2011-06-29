@@ -314,7 +314,7 @@ csBulletColliderConcaveMesh::~csBulletColliderConcaveMesh ()
   delete triMesh;
 }
 
-csBulletColliderConcaveMeshScaled::csBulletColliderConcaveMeshScaled (iColliderConcaveMesh* collider,
+csBulletColliderConcaveMeshScaled::csBulletColliderConcaveMeshScaled (CS::Collision2::iColliderConcaveMesh* collider,
                                                                       csVector3 scale, csBulletSystem* sys)
   : scfImplementationType (this)
 {

@@ -128,7 +128,7 @@ void csBulletJoint::SetPosition (const csVector3& position, bool forceUpdate)
   this->position = position;
   positionSet = true;
 
-  if (rigidJoint && type == csJointType::RIGID_PIVOT_JOINT)
+  if (rigidJoint && type == RIGID_PIVOT_JOINT)
   {
     this->transform = bodies[0]->GetTransform ();
     transform.SetOrigin (position);
@@ -298,6 +298,9 @@ bool csBulletJoint::RebuildJoint ()
     csBulletRigidBody* body1, *body2 = NULL;
     body1 = dynamic_cast<csBulletRigidBody*> (bodies[0]);
 
+    if (type == RIGID_PIVOT_JOINT)
+      bodies[1] = NULL;
+
     if (positionSet)
     {
       this->transform = body1->GetTransform ();
@@ -309,7 +312,7 @@ bool csBulletJoint::RebuildJoint ()
       return false;
     frA = body1->btBody->getCenterOfMassTransform().inverse() * jointTransform;
 
-    if (type == csJointType::RIGID_HINGE_JOINT)
+    if (type == RIGID_HINGE_JOINT)
     {
       btHingeConstraint* pHinge;
       btVector3 btPivot = CSToBullet (position, sys->getInternalScale ());

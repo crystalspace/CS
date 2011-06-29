@@ -44,7 +44,7 @@ public:
   virtual iCollisionObject* QueryCollisionObject () {return dynamic_cast<csBulletCollisionObject*> (this);}  
   virtual iPhysicalBody* QueryPhysicalBody () {return this;}
 
-  virtual void SetObjectType (CS::Collision2::CollisionObjectType type) {}
+  virtual void SetObjectType (CS::Collision2::CollisionObjectType type, bool forceRebuild = true) {}
   virtual CS::Collision2::CollisionObjectType GetObjectType ()
   {return CS::Collision2::COLLISION_OBJECT_PHYSICAL;}
 
@@ -80,7 +80,7 @@ public:
   //iPhysicalBody
 
   virtual CS::Physics2::PhysicalBodyType GetBodyType () const {return CS::Physics2::BODY_SOFT;}
-  virtual iRigidBody* QueryRigidBody () {return NULL;}
+  virtual CS::Physics2::iRigidBody* QueryRigidBody () {return NULL;}
   virtual CS::Physics2::iSoftBody* QuerySoftBody () {return dynamic_cast<CS::Physics2::iSoftBody*>(this);}
 
   virtual bool Disable ();
