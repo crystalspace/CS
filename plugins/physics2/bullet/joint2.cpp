@@ -10,7 +10,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
 csBulletJoint::csBulletJoint (csBulletSystem* system): scfImplementationType (this), sys (system), 
   rigidJoint (NULL), threshold (FLT_MAX), transConstraintX (false), transConstraintY (false), positionSet (false),
-  transConstraintZ (false), minDist (1.0f, 1.0f, 1.0f), maxDist (-1.0f, -1.0f, -1.0f), rotConstraintX (false), 
+  transConstraintZ (false), minDist (1.0f, 1.0f, 1.0f), maxDist (1.0f, 1.0f, 1.0f), rotConstraintX (false), 
   rotConstraintY (false), rotConstraintZ (false), minAngle (PI / 2.0f), maxAngle (PI / 2.0f), bounce (0.0f), 
   desiredVelocity (0.0f), isSoft (false), isSpring (false), equilPointSet (false), softJoint (NULL),
   linearStiff (0.f, 0.f, 0.f), angularStiff (0.f, 0.f, 0.f), linearDamp (1.f, 1.f, 1.f), angularDamp (1.f, 1.f, 1.f), 
@@ -349,7 +349,7 @@ bool csBulletJoint::RebuildJoint ()
         {
           btGeneric6DofSpringConstraint* springJoint = new btGeneric6DofSpringConstraint (
             *(body1->btBody), *(body2->btBody), frA, frB, true);
-          if (transConstraintX)
+          if (transConstraintX && abs(linearStiff[0]) > EPSILON)
           {
             springJoint->enableSpring (0, true);
             springJoint->setStiffness (0, linearStiff[0]);
@@ -357,7 +357,7 @@ bool csBulletJoint::RebuildJoint ()
             if (equilPointSet)
               springJoint->setEquilibriumPoint (0, linearEquilPoint[0]);
           }
-          if (transConstraintY)
+          if (transConstraintY && abs(linearStiff[1]) > EPSILON)
           {
             springJoint->enableSpring (1, true);
             springJoint->setStiffness (1, linearStiff[1]);
@@ -365,7 +365,7 @@ bool csBulletJoint::RebuildJoint ()
             if (equilPointSet)
               springJoint->setEquilibriumPoint (1, linearEquilPoint[1]);
           }
-          if (transConstraintZ)
+          if (transConstraintZ && abs(linearStiff[2]) > EPSILON)
           {
             springJoint->enableSpring (2, true);
             springJoint->setStiffness (2, linearStiff[2]);
@@ -373,7 +373,7 @@ bool csBulletJoint::RebuildJoint ()
             if (equilPointSet)
               springJoint->setEquilibriumPoint (2, linearEquilPoint[2]);
           }
-          if (rotConstraintX)
+          if (rotConstraintX && abs(angularStiff[0]) > EPSILON)
           {
             springJoint->enableSpring (3, true);
             springJoint->setStiffness (3, angularStiff[0]);
@@ -381,7 +381,7 @@ bool csBulletJoint::RebuildJoint ()
             if (equilPointSet)
               springJoint->setEquilibriumPoint (3, angularEquilPoint[0]);
           }
-          if (rotConstraintY)
+          if (rotConstraintY && abs(angularStiff[1]) > EPSILON)
           {
             springJoint->enableSpring (4, true);
             springJoint->setStiffness (4, angularStiff[1]);
@@ -389,7 +389,7 @@ bool csBulletJoint::RebuildJoint ()
             if (equilPointSet)
               springJoint->setEquilibriumPoint (4, angularEquilPoint[1]);
           }
-          if (rotConstraintZ)
+          if (rotConstraintZ && abs(angularStiff[2]) > EPSILON)
           {
             springJoint->enableSpring (5, true);
             springJoint->setStiffness (5, angularStiff[2]);

@@ -72,6 +72,10 @@ public:
   virtual CS::Collision2::HitBeamResult HitBeam (const csVector3& start, const csVector3& end)
   { return csBulletCollisionObject::HitBeam (start, end);}
 
+  virtual size_t GetContactObjectsCount () {return contactObjects.GetSize ();}
+  virtual CS::Collision2::iCollisionObject* GetContactObject (size_t index) {
+    return csBulletCollisionObject::GetContactObject (index);}
+
   btRigidBody* GetBulletRigidPointer () {return btBody;}
   virtual void RemoveBulletObject ();
   virtual void AddBulletObject ();

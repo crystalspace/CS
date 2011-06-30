@@ -116,7 +116,11 @@ void csBulletSoftBody::AddBulletObject ()
     btBody->m_worldInfo = sector->softWorldInfo;
     btSoftRigidDynamicsWorld* softWorld =
       static_cast<btSoftRigidDynamicsWorld*> (sector->bulletWorld);
-    softWorld->addSoftBody (btBody);
+
+    bool isDefault = (collGroup.value == sector->collGroups[0].value);
+    CS::Collision2::CollisionGroupMask collisionFilterMask = isDefault? sector->allFilter : sector->allFilter ^ collGroup.value;
+
+    softWorld->addSoftBody (btBody, collGroup.value, collisionFilterMask);
     btBody->setUserPointer (static_cast<CS::Collision2::iCollisionObject*> (
       dynamic_cast<iPhysicalBody*>(this)));
     insideWorld = true;

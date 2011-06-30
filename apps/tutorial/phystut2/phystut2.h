@@ -70,7 +70,11 @@ private:
   csRef<CS::Physics2::iPhysicalBody> clipboardBody;
   csRef<iMovable> clipboardMovable;
 
+  // Collider
   csOrthoTransform localTrans;
+
+  // Ghost
+  csRef<CS::Collision2::iCollisionObject> ghostObject;
 
 private:
   void Frame ();
@@ -94,6 +98,7 @@ private:
   CS::Physics2::iRigidBody* SpawnConvexMesh (bool setVelocity = true);
   CS::Physics2::iRigidBody* SpawnCompound (bool setVelocity = true);
   CS::Physics2::iJoint* SpawnJointed ();
+  CS::Physics2::iRigidBody* SpawnFilterBody (bool setVelocity = true);
   void SpawnChain ();
   void LoadRagdoll ();
   void SpawnRagdoll ();

@@ -23,6 +23,7 @@ protected:
   csBulletSector* sector;
   csBulletSystem* system;
   csRefArray<csBulletCollider> colliders;
+  csRefArray<csBulletCollisionObject> contactObjects;
   csArray<csOrthoTransform> relaTransforms;
   csWeakRef<iMovable> movable;
   btCollisionObject* btObject;
@@ -71,6 +72,9 @@ public:
 
   virtual bool Collide (iCollisionObject* otherObject);
   virtual CS::Collision2::HitBeamResult HitBeam (const csVector3& start, const csVector3& end);
+
+  virtual size_t GetContactObjectsCount ();
+  virtual CS::Collision2::iCollisionObject* GetContactObject (size_t index);
 
   btCollisionObject* GetBulletCollisionPointer () {return btObject;}
   virtual void RemoveBulletObject ();

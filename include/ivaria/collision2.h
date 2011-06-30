@@ -405,7 +405,7 @@ struct iCollisionObject : public virtual iBase
   /// Rebuild this collision object.
   virtual void RebuildObject () = 0;
 
-  /// Set the collision group this object belongs to.
+  /// Set the collision group this object belongs to by name.
   virtual void SetCollisionGroup (const char* name) = 0;
 
   /// Get the collision group this object belongs to.
@@ -426,6 +426,10 @@ struct iCollisionObject : public virtual iBase
   /// Follow a beam from start to end and return whether this body was hit.
   virtual HitBeamResult HitBeam (
       const csVector3& start, const csVector3& end) = 0;
+
+  virtual size_t GetContactObjectsCount () = 0;
+
+  virtual iCollisionObject* GetContactObject (size_t index) = 0;
 };
 
 /**

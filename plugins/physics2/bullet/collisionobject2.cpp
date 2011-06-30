@@ -236,8 +236,20 @@ void csBulletCollisionObject::RebuildObject ()
 
 void csBulletCollisionObject::SetCollisionGroup (const char* name)
 {
-  //TODO
+  if (!sector)
+    return;
+
   CS::Collision2::CollisionGroup& group = sector->FindCollisionGroup (name);
+  this->collGroup = group;
+
+  if (btObject && insideWorld)
+  {
+    btObject->getBroadphaseHandle ()->m_collisionFilterGroup = collGroup.value;
+    if (collGroup.value == sector->collGroups[0].value)
+      btObject->getBroadphaseHandle ()->m_collisionFilterGroup = sector->allFilter;
+    else
+      btObject->getBroadphaseHandle ()->m_collisionFilterMask = sector->allFilter ^ collGroup.value;
+  }
 }
 
 bool csBulletCollisionObject::Collide (iCollisionObject* otherObject)
@@ -310,6 +322,47 @@ CS::Collision2::HitBeamResult csBulletCollisionObject::HitBeam (const csVector3&
     return sector->RigidHitBeam (btObject, start, end);
 }
 
+size_t csBulletCollisionObject::GetContactObjectsCount ()
+{
+  if (type == CS::Collision2::COLLISION_OBJECT_BASE 
+    || type == CS::Collision2::COLLISION_OBJECT_PHYSICAL)
+    return contactObjects.GetSize ();
+  else
+  {
+    btGhostObject* ghost = btGhostObject::upcast (btObject);
+    if (ghost)
+      return ghost->getNumOverlappingObjects ();
+    else 
+      return 0;
+  }
+}
+
+CS::Collision2::iCollisionObject* csBulletCollisionObject::GetContactObject (size_t index)
+{
+  if (type == CS::Collision2::COLLISION_OBJECT_BASE 
+    || type == CS::Collision2::COLLISION_OBJECT_PHYSICAL)
+  {
+    if (index < contactObjects.GetSize () && index >= 0)
+      return contactObjects[index];
+    else
+      return NULL;
+  }
+  else
+  {
+    btGhostObject* ghost = btGhostObject::upcast (btObject);
+    if (ghost)
+    {
+      ghost->getOverlappingObject (index);
+      if (ghost)
+        return static_cast<CS::Collision2::iCollisionObject*> (ghost->getUserPointer ());
+      else 
+        return NULL;
+    }
+    else 
+      return NULL;
+  }
+}
+
 void csBulletCollisionObject::RemoveBulletObject ()
 {
   if (insideWorld)
@@ -378,7 +431,7 @@ void csBulletCollisionObject::AddBulletObject ()
     btObject->setUserPointer (static_cast<iCollisionObject*> (this));
     btObject->setCollisionShape (shape);
     sector->broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
-    sector->bulletWorld->addCollisionObject (btObject);
+    sector->bulletWorld->addCollisionObject (btObject, collGroup.value, sector->allFilter ^ collGroup.value);
   }
   insideWorld = true;
 }

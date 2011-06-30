@@ -593,6 +593,9 @@ struct iJoint : public virtual iBase
   */
   virtual bool RebuildJoint () = 0;
 
+  /// Set this joint to a spring joint.
+  virtual void SetSpring(bool isSpring, bool forceUpdate = false) = 0;
+
   /// Set the stiffness of the spring.
   virtual void SetLinearStiffness (csVector3 stiff, bool forceUpdate = false) = 0;
 

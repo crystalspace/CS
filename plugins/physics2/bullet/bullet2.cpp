@@ -17,7 +17,7 @@
 
 #include "btBulletDynamicsCommon.h"
 #include "btBulletCollisionCommon.h"
-#include "BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h"
+#include "BulletCollision/CollisionDispatch/btGhostObject.h"
 #include "BulletSoftBody/btSoftBody.h"
 #include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
 #include "BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h"
@@ -61,7 +61,7 @@ csBulletSector::csBulletSector (csBulletSystem* sys)
  :scfImplementationType (this), sys (sys), isSoftWorld (false),
  sector (NULL), softWorldInfo (NULL), worldTimeStep (1.0f / 60.0f),
  worldMaxSteps (1), linearDampening (0.0f), angularDampening (0.0f), linearDisableThreshold (0.8f),
- angularDisableThreshold (1.0f), timeDisableThreshold (0.0f), debugDraw (NULL)
+ angularDisableThreshold (1.0f), timeDisableThreshold (0.0f), debugDraw (NULL), allFilter (-1)
 {
   configuration = new btDefaultCollisionConfiguration ();
   dispatcher = new btCollisionDispatcher (configuration);
@@ -101,6 +101,8 @@ csBulletSector::csBulletSector (csBulletSystem* sys)
   CS::Collision2::CollisionGroup characterGroup ("Character");
   characterGroup.value = 32;
   collGroups.Push (characterGroup);
+
+  systemFilterCount = 6;
 }
 
 csBulletSector::~csBulletSector ()
@@ -135,6 +137,7 @@ void csBulletSector::AddCollisionObject (CS::Collision2::iCollisionObject* objec
   csRef<csBulletCollisionObject> obj (dynamic_cast<csBulletCollisionObject*>(object));
   collisionObjects.Push (obj);
   obj->sector = this;
+  obj->collGroup = collGroups[1]; // Static Group.
   obj->AddBulletObject ();
 
   AddMovableToSector (object);
@@ -276,8 +279,7 @@ CS::Collision2::HitBeamResult csBulletSector::HitBeamPortal (const csVector3& st
 
 CS::Collision2::CollisionGroup& csBulletSector::CreateCollisionGroup (const char* name)
 {
-  //TODO
-  size_t groupCount = 1 << collGroups.GetSize ();
+  size_t groupCount = collGroups.GetSize ();
   if (groupCount >= sizeof (CS::Collision2::CollisionGroupMask) * 8)
     return collGroups[0];
 
@@ -291,9 +293,9 @@ CS::Collision2::CollisionGroup& csBulletSector::FindCollisionGroup (const char* 
 {
   size_t index = collGroups.FindKey (CollisionGroupVector::KeyCmp (name));
   if (index == csArrayItemNotFound)
-    return collGroups[index];
-  else
     return collGroups[0];
+  else
+    return collGroups[index];
 }
 
 void csBulletSector::SetGroupCollision (const char* name1,
@@ -306,13 +308,17 @@ void csBulletSector::SetGroupCollision (const char* name1,
     return;
   if (collide)
   {
-    collGroups[index1].value &= ~(1 << index2);
-    collGroups[index2].value &= ~(1 << index1);
+    if (index1 >= systemFilterCount)
+      collGroups[index1].value &= ~(1 << index2);
+    if (index2 >= systemFilterCount)
+      collGroups[index2].value &= ~(1 << index1);
   }
   else
   {
-    collGroups[index1].value |= 1 << index2;
-    collGroups[index2].value |= 1 << index1;
+    if (index1 >= systemFilterCount)
+      collGroups[index1].value |= 1 << index2;
+    if (index2 >= systemFilterCount)
+      collGroups[index2].value |= 1 << index1;
   }
 }
 
@@ -324,10 +330,10 @@ bool csBulletSector::GetGroupCollision (const char* name1,
   if (index1 == csArrayItemNotFound || index2 == csArrayItemNotFound)
     return false;
   if ((collGroups[index1].value & (1 << index2)) != 0 
-    && (collGroups[index2].value & (1 << index1)) != 0)
-    return true;
-  else
+    || (collGroups[index2].value & (1 << index1)) != 0)
     return false;
+  else
+    return true;
 }
 
 bool csBulletSector::CollisionTest (CS::Collision2::iCollisionObject* object, 
@@ -337,17 +343,49 @@ bool csBulletSector::CollisionTest (CS::Collision2::iCollisionObject* object,
   PointContactResult result(sys, collisions);
 
   csBulletCollisionObject* collObject = dynamic_cast<csBulletCollisionObject*> (object);
-  if (collObject->isTerrain)
+  if (collObject->GetObjectType () == CS::Collision2::COLLISION_OBJECT_BASE
+    || collObject->GetObjectType () == CS::Collision2::COLLISION_OBJECT_PHYSICAL)
   {
-    //Here is a question. Should we let user to do collision test on terrain object?
-    csBulletColliderTerrain* terrainShape = dynamic_cast<csBulletColliderTerrain*> (collObject->colliders[0]);
-    for (size_t i = 0; i< terrainShape->colliders.GetSize (); i++)
+    if (collObject->isTerrain)
     {
-      btRigidBody* body = terrainShape->GetBulletObject (i);
-      bulletWorld->contactTest (body, result);
+      //Here is a question. Should we let user to do collision test on terrain object?
+      csBulletColliderTerrain* terrainShape = dynamic_cast<csBulletColliderTerrain*> (collObject->colliders[0]);
+      for (size_t i = 0; i< terrainShape->colliders.GetSize (); i++)
+      {
+        btRigidBody* body = terrainShape->GetBulletObject (i);
+        bulletWorld->contactTest (body, result);
+      }
+    }
+    else
+      bulletWorld->contactTest (collObject->btObject, result);
+  }
+  else
+  {
+    btPairCachingGhostObject* ghost = dynamic_cast<btPairCachingGhostObject*> (
+      btGhostObject::upcast (collObject->btObject));
+    for (int i = 0; i < ghost->getOverlappingPairCache()->getNumOverlappingPairs(); i++)
+    {
+      btManifoldArray manifoldArray;
+      btBroadphasePair* collisionPair = &ghost->getOverlappingPairCache()->getOverlappingPairArray()[i];
+
+      if (collisionPair->m_algorithm)
+        collisionPair->m_algorithm->getAllContactManifolds(manifoldArray);
+
+      for (int j=0;j<manifoldArray.size();j++)
+      {
+        btPersistentManifold* manifold = manifoldArray[j];
+        for (int p=0;p<manifold->getNumContacts();p++)
+        {
+          const btManifoldPoint& pt = manifold->getContactPoint(p);
+          CS::Collision2::CollisionData data;
+          data.penetration = pt.m_distance1 * sys->getInternalScale ();
+          data.positionWorldOnA = BulletToCS (pt.m_positionWorldOnA, sys->getInternalScale ());
+          data.positionWorldOnB = BulletToCS (pt.m_positionWorldOnB, sys->getInternalScale ());
+          collisions.Push (data);
+        }
+      }
     }
   }
-  bulletWorld->contactTest (collObject->btObject, result);
   if (length != collisions.GetSize ())
     return true;
   else
@@ -423,6 +461,8 @@ CS::Collision2::HitBeamResult csBulletSector::RigidHitBeam (btCollisionObject* o
   {
     btCollisionWorld::ClosestRayResultCallback rayCallback (rayFrom, rayTo);
 
+    //Ghost Object part?
+
     btTransform	rayFromTrans;
     btTransform	rayToTrans;
 
@@ -478,8 +518,7 @@ void csBulletSector::Step (float duration)
   bulletWorld->stepSimulation (duration, (int)worldMaxSteps, worldTimeStep);
 
   // Check for collisions
-  // Collision detection is already did in stepSimulation.
-  //CheckCollisions();
+  CheckCollisions();
 }
 
 void csBulletSector::SetLinearDampener (float d)
@@ -506,6 +545,7 @@ void csBulletSector::AddRigidBody (CS::Physics2::iRigidBody* body)
   rigidBodies.Push (btBody);
 
   btBody->sector = this;
+  btBody->collGroup = collGroups[0]; // Default Group.
   btBody->AddBulletObject ();
 
   AddMovableToSector (body);
@@ -532,6 +572,7 @@ void csBulletSector::AddSoftBody (CS::Physics2::iSoftBody* body)
   csRef<csBulletSoftBody> btBody (dynamic_cast<csBulletSoftBody*>(body));
   softBodies.Push (btBody);
   btBody->sector = this;
+  btBody->collGroup = collGroups[0];
   btBody->AddBulletObject ();
 
   iMovable* movable = body->GetAttachedMovable ();
@@ -755,6 +796,49 @@ void csBulletSector::RemoveMovableFromSector (CS::Collision2::iCollisionObject* 
       sector->GetMeshes ()->Remove (mesh);
     else
       sector->GetLights ()->Remove (light);
+  }
+}
+
+void csBulletSector::CheckCollisions ()
+{
+  int numManifolds = bulletWorld->getDispatcher()->getNumManifolds();
+
+  for (size_t i = 0; i < collisionObjects.GetSize (); i++)
+    collisionObjects[i]->contactObjects.Empty ();
+  for (size_t i = 0; i < rigidBodies.GetSize (); i++)
+    rigidBodies[i]->contactObjects.Empty ();
+  for (size_t i = 0; i < softBodies.GetSize (); i++)
+    softBodies[i]->contactObjects.Empty ();
+
+  for (int i = 0; i < numManifolds; i++)
+  {
+    btPersistentManifold* contactManifold =
+      bulletWorld->getDispatcher ()->getManifoldByIndexInternal (i);
+    if (contactManifold->getNumContacts ())
+    {
+      btCollisionObject* obA =
+        static_cast<btCollisionObject*> (contactManifold->getBody0 ());
+      btCollisionObject* obB =
+        static_cast<btCollisionObject*> (contactManifold->getBody1 ());
+
+      CS::Collision2::iCollisionObject* cs_obA = 
+        static_cast<CS::Collision2::iCollisionObject*> (obA->getUserPointer ());
+      CS::Collision2::iCollisionObject* cs_obB = 
+        static_cast<CS::Collision2::iCollisionObject*> (obB->getUserPointer ());
+      
+      csBulletCollisionObject* csCOA = dynamic_cast<csBulletCollisionObject*> (cs_obA);
+      csBulletCollisionObject* csCOB = dynamic_cast<csBulletCollisionObject*> (cs_obB);
+
+      if (csCOA->GetObjectType () == CS::Collision2::COLLISION_OBJECT_BASE
+        || csCOA->GetObjectType () == CS::Collision2::COLLISION_OBJECT_PHYSICAL)
+        if (csCOA->contactObjects.Contains (csCOB) == csArrayItemNotFound)
+          csCOA->contactObjects.Push (csCOB);
+
+      if (csCOB->GetObjectType () == CS::Collision2::COLLISION_OBJECT_BASE
+        || csCOB->GetObjectType () == CS::Collision2::COLLISION_OBJECT_PHYSICAL)
+        if (csCOB->contactObjects.Contains (csCOA) == csArrayItemNotFound)
+          csCOB->contactObjects.Push (csCOA);
+    }
   }
 }
 

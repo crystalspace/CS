@@ -284,6 +284,11 @@ bool Simple::OnKeyboard (iEvent &event)
       SpawnJointed ();
       return true;
     }
+    else if (csKeyEventHelper::GetCookedCode (&event) == 'k')
+    {
+      SpawnFilterBody ();
+      return true;
+    }
     else if (csKeyEventHelper::GetCookedCode (&event) == 'h')
     {
       SpawnChain ();
@@ -814,6 +819,13 @@ bool Simple::Application ()
 
   collisionSector->SetSector (room);
 
+  collisionSector->CreateCollisionGroup ("Box");
+  collisionSector->CreateCollisionGroup ("BoxFiltered");
+
+  bool coll = collisionSector->GetGroupCollision ("Box", "BoxFiltered");
+  if (coll)
+    collisionSector->SetGroupCollision ("Box", "BoxFiltered", false);
+
   // Preload some meshes and materials
   iTextureWrapper* txt = loader->LoadTexture ("spark",
     "/lib/std/spark.png");
@@ -852,7 +864,8 @@ bool Simple::Application ()
   hudManager->GetKeyDescriptions ()->Push ("m: spawn a static concave mesh");
   
   hudManager->GetKeyDescriptions ()->Push ("q: spawn a compound body");
-  hudManager->GetKeyDescriptions ()->Push ("j: spawn a joint with motor");
+  hudManager->GetKeyDescriptions ()->Push ("j: spawn a joint");
+  hudManager->GetKeyDescriptions ()->Push ("k: spawn a filter sphere");
   
   hudManager->GetKeyDescriptions ()->Push ("h: spawn a chain");
   hudManager->GetKeyDescriptions ()->Push ("r: spawn a Frankie's ragdoll");
@@ -894,7 +907,7 @@ bool Simple::Application ()
   
   // Pre-load the animated mesh and the ragdoll animation node data
   
-    LoadRagdoll ();
+  LoadRagdoll ();
 
   // Run the application
   Run();
@@ -1405,22 +1418,22 @@ CS::Physics2::iRigidBody* Simple::SpawnCompound (bool setVelocity /* = true */)
 
 CS::Physics2::iJoint* Simple::SpawnJointed ()
 {
-#define SLIDE
+#define P2P
 
 #ifdef P2P
   // Create and position two rigid bodies
   // Already added to sector.
   CS::Physics2::iRigidBody* rb1 = SpawnBox (false);
   csOrthoTransform trans = rb1->GetTransform ();
-  trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () * csVector3 (1.0f, 2.0f, 0.0f));
+  trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () * csVector3 (0.5f, 0.5f, 0.0f));
   rb1->SetLinearVelocity (csVector3 (0.0f));
   rb1->SetAngularVelocity (csVector3 (0.0f));
   rb1->SetTransform (trans);
-  csVector3 jointPosition = trans.This2Other(csVector3(-0.2f, -0.4f, -0.2f));
+  csVector3 jointPosition = trans.This2Other(csVector3(-0.2f, 0.4f, 0.2f));
 
   CS::Physics2::iRigidBody* rb2 = SpawnBox (false);
   trans = rb2->GetTransform ();
-  trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () * csVector3 (0.0f, -0.5f, 0.0f));
+  trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () * csVector3 (0.0f, 0.0f, 0.0f));
   rb2->SetTransform (trans);
   rb2->SetState (CS::Physics2::STATE_STATIC);
   csRef<CS::Physics2::iJoint> joint = physicalSystem->CreateRigidP2PJoint (jointPosition);
@@ -1453,10 +1466,37 @@ CS::Physics2::iJoint* Simple::SpawnJointed ()
 
   CS::Physics2::iRigidBody* rb2 = SpawnBox (false);
   trans = rb2->GetTransform ();
-  trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () * csVector3 (-1.5f, 0.0f, 0.0f));
+  trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () * csVector3 (-0.5f, 0.0f, 0.0f));
   rb2->SetTransform (trans);
   rb2->SetState (CS::Physics2::STATE_STATIC);
   csRef<CS::Physics2::iJoint> joint = physicalSystem->CreateRigidSlideJoint (jointTrans, -1.f, 1.f, 1.f, -1.f, 0);
+  joint->Attach (rb2, rb1);
+#endif
+
+#ifdef SPRING
+  CS::Physics2::iRigidBody* rb1 = SpawnBox (false);
+  csOrthoTransform jointTrans = rb1->GetTransform ();
+  jointTrans.SetOrigin (jointTrans.GetOrigin () + jointTrans.GetT2O () * csVector3 (0.0f, 0.0f, 0.0f));
+
+  CS::Physics2::iRigidBody* rb2 = SpawnBox (false);
+  csOrthoTransform trans = rb2->GetTransform ();
+  trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () * csVector3 (-1.0f, 0.0f, 0.0f));
+  rb2->SetTransform (trans);
+  rb2->SetState (CS::Physics2::STATE_STATIC);
+
+  csRef<CS::Physics2::iJoint> joint = physicalSystem->CreateJoint ();
+  joint->SetTransform (jointTrans);
+  joint->SetSpring (true);
+  joint->SetTransConstraints (true, true, true);
+  joint->SetMinimumDistance (csVector3(-1.0f, 0.0f, 0.0f));
+  joint->SetMaximumDistance (csVector3(1.0f, 0.0f, 0.0f));
+  joint->SetLinearStiffness (csVector3(9.478f, 0.0f, 0.0f));
+  joint->SetLinearDamping (csVector3(0.5f, 0.0f, 0.0f));
+  joint->SetRotConstraints (true, true, true);
+  joint->SetMinimumAngle (csVector3(-PI/2.0f, 0.0f, 0.0f));
+  joint->SetMaximumAngle (csVector3(PI/2.0f, 0.0f, 0.0f));
+  joint->SetAngularStiffness (csVector3(9.478f, 0.0f, 0.0f));
+  joint->SetAngularDamping (csVector3(0.5f, 0.0f, 0.0f));
   joint->Attach (rb2, rb1);
 #endif
 
@@ -1514,6 +1554,26 @@ CS::Physics2::iJoint* Simple::SpawnJointed ()
 #endif
 
   return joint;
+}
+
+CS::Physics2::iRigidBody* Simple::SpawnFilterBody (bool setVelocity)
+{
+  CS::Physics2::iRigidBody* rb;
+  if (rand() % 2)
+  {
+    rb = SpawnSphere (setVelocity);
+    rb->SetCollisionGroup ("BoxFiltered");
+  }
+  else
+  {
+    rb = SpawnBox (setVelocity);
+    // This is another way to avoid sphere collide with box.
+    // We usually put these things in the same group.
+    //rb->SetCollisionGroup ("BoxFiltered");
+    rb->SetCollisionGroup ("Box");
+  }
+
+  return rb;
 }
 
 void ConstraintJoint (CS::Physics2::iJoint* joint)

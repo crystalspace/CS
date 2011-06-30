@@ -100,7 +100,11 @@ class csBulletSector : public scfImplementationExt3<
   };
 
   CollisionGroupVector collGroups;
+  CS::Collision2::CollisionGroupMask allFilter; 
+  int systemFilterCount;
   //csArray<size_t> collGroupMasks;
+
+  void CheckCollisions();
 
 public:
   csBulletSector (csBulletSystem* sys);
