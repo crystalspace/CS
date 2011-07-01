@@ -264,6 +264,14 @@ bool DeferredDemo::SetupGui(bool reload)
     "DeferredDemo.DepthBias", depthBias));
   lightRotationListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
     "DeferredDemo.LightRotation", lightRotation));
+  bounceStrengthListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
+    "DeferredDemo.BounceStrength", bounceStrength));
+  blurKernelSizeListener.AttachNew (new CS::Utility::ConfigListener<int>(GetObjectRegistry(), 
+    "DeferredDemo.KernelSize", blurKernelSize));
+  blurPositionThresholdListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
+    "DeferredDemo.PositionThreshold", blurPositionThreshold));
+  blurNormalThresholdListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
+    "DeferredDemo.NormalThreshold", blurNormalThreshold));
 
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
 
@@ -331,6 +339,10 @@ bool DeferredDemo::SetupGui(bool reload)
   patternSize = 4;
   depthBias = 1.0f;
   lightRotation = 0.0f;
+  bounceStrength = 1.0f;
+  blurKernelSize = 2;
+  blurPositionThreshold = 0.5f;
+  blurNormalThreshold = 0.5f;
 
   showGBuffer = false;
   drawLightVolumes = false;
@@ -365,9 +377,9 @@ bool DeferredDemo::SetupScene()
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (pos);
   
-  csPlane3 *farPlane = new csPlane3(0, 0, -1, 30);
-  view->GetCamera ()->SetFarPlane (farPlane);
-  view->GetPerspectiveCamera ()->SetNearClipDistance (0.2f);
+  csPlane3 *farPlane = new csPlane3 (0, 0, -1, 30);
+  view->GetCamera()->SetFarPlane (farPlane);
+  view->GetPerspectiveCamera()->SetNearClipDistance (0.2f);
   delete farPlane;
 
   // Checks for support of at least 4 color buffer attachment points.
@@ -515,13 +527,17 @@ void DeferredDemo::UpdateGui()
      cfgUseDeferredShading = guiDeferred->isSelected ();
   } 
 
-  rmGlobalIllum->SetOcclusionEffect (true);
+  //rmGlobalIllum->EnableGlobalIllumination (true);
   rmGlobalIllum->SetOcclusionStrength (occlusionStrength);
   rmGlobalIllum->SetSampleRadius (sampleRadius);
   rmGlobalIllum->SetMaxOccluderDistance (maxOccluderDistance);
   rmGlobalIllum->SetSamplingPatternSize (patternSize);
   rmGlobalIllum->SetDepthBias (depthBias);
   rmGlobalIllum->SetLightRotationAngle (lightRotation);
+  rmGlobalIllum->SetBounceStrength (bounceStrength);
+  rmGlobalIllum->SetBlurKernelSize (blurKernelSize);
+  rmGlobalIllum->SetBlurPositionThreshold (blurPositionThreshold);
+  rmGlobalIllum->SetBlurNormalThreshold (blurNormalThreshold);
 }
 
 //----------------------------------------------------------------------
@@ -659,20 +675,24 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
     {
       cfgUseDeferredShading = false;
       guiForward->setSelected (true);
+      return true;
     }
     else if (code == 'd')
     {
       cfgUseDeferredShading = true;
       guiDeferred->setSelected (true);
+      return true;
     }
     else if (code == 'g')
     {
       cfgShowGui = !cfgShowGui;
+      return true;
     }
 #ifdef CS_DEBUG
     else if (code == 'r')
     {
       SetupGui (true);
+      return true;
     }
 #endif
   }

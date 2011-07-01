@@ -121,11 +121,9 @@ struct iRenderManagerVisCull : public virtual iBase
   */
 struct iRenderManagerGlobalIllum : public virtual iBase
 {
-  SCF_INTERFACE(iRenderManagerGlobalIllum, 1, 0, 0);
-
-  virtual void SetOcclusionEffect (bool enableOcclusion) = 0;
+  SCF_INTERFACE(iRenderManagerGlobalIllum, 1, 0, 0);  
     
-  virtual void SetIndirectLightingEffect (bool enableIndirectLight) = 0;
+  virtual void EnableGlobalIllumination (bool enable) = 0;
 
   virtual void SetSamplingPatternSize (int samplingPatternSize) = 0;
 
@@ -140,6 +138,14 @@ struct iRenderManagerGlobalIllum : public virtual iBase
   virtual void SetMaxOccluderDistance (float maxOccluderDistance) = 0;
 
   virtual void SetLightRotationAngle (float lightRotation) = 0;
+
+  virtual void SetBounceStrength (float bounceStrength) = 0;
+
+  virtual void SetBlurKernelSize (int kernelSize) = 0;
+
+  virtual void SetBlurPositionThreshold (float positionThreshold) = 0;
+
+  virtual void SetBlurNormalThreshold (float normalThreshold) = 0;
 };
 
 #endif // __CS_IENGINE_RENDERMANAGER_H__

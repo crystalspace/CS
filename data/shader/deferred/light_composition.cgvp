@@ -8,15 +8,13 @@
 struct app2vertex 
 {
   float3 Position : POSITION;
-  float2 TexCoord : TEXCOORD0;
 };
 
 struct vertex2fragment 
 { 
   float4 Position : POSITION;
-  float2 TexCoord : TEXCOORD0;
-  float4 ScreenPos : TEXCOORD1;
-  float4 ViewPos : TEXCOORD2;
+  float4 ScreenPos : TEXCOORD0;
+  float4 ViewPos : TEXCOORD1;
 };
 
 vertex2fragment main(app2vertex IN,
@@ -28,7 +26,6 @@ vertex2fragment main(app2vertex IN,
 
   float4 pos = mul (ModelViewProj, float4 (IN.Position, 1.0));
   OUT.Position = pos;
-  OUT.TexCoord = IN.TexCoord;
   OUT.ScreenPos = pos;
   OUT.ViewPos = mul (ProjInv, float4 (IN.Position, 1.0));
 

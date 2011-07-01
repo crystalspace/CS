@@ -1,0 +1,114 @@
+<cgfp>
+
+<variablemap variable="projection transform inverse" destination="ProjInv" />
+<variablemap variable="far clip distance" destination="FarClipDistance" />
+<variablemap variable="inv viewport size" destination="InvViewportSize" />
+<variablemap variable="ssao blur kernelsize" destination="KernelSize" />
+<variablemap variable="ssao blur position threshold" destination="PositionThreshold" />
+<variablemap variable="ssao blur normal threshold" destination="NormalThreshold" />
+
+<program>
+
+<?Include /shader/deferred/light_common.cginc?>
+
+<![CDATA[
+
+struct vertex2fragment 
+{
+  float4 ScreenPos : TEXCOORD0;
+  float4 ViewPos : TEXCOORD1;
+};
+
+float4 main(vertex2fragment IN,
+            //uniform float4x4 ProjInv, //: state.matrix.inverse.projection,
+            uniform sampler2D NormalBuffer,        
+            //uniform sampler2D DepthBuffer,
+            uniform sampler2D DirectRadianceBuffer,
+            uniform sampler2D GlobalIllumBuffer,
+            uniform float FarClipDistance,
+            uniform float2 InvViewportSize, // (1/viewport.width, 1/viewport.height)
+            uniform float KernelSize,
+            uniform float PositionThreshold,
+            uniform float NormalThreshold) : COLOR
+{
+  //InvViewportSize = float2 (1.0f / 1024.0f, 1.0f / 768.0f);
+  //PositionThreshold = 0.3f;
+  //NormalThreshold = 0.7f;
+#define KernelSize 1
+
+  // Do the perspective divide and convert to texture space.
+  //float2 screenXY = IN.ScreenPos.xy / IN.ScreenPos.w;
+  float2 texCoord = /*screenXY*/(IN.ScreenPos.xy / IN.ScreenPos.w) * 0.5f + 0.5f;
+  
+  float3 directRadiance = tex2D (DirectRadianceBuffer, texCoord).rgb;
+  //float4 globalIllum = tex2D (GlobalIllumBuffer, texCoord);
+  
+  //float4 depth = tex2D (DepthBuffer, texCoord);  
+  //float3 screen = GetScreenPosition (screenXY, depth);    
+  //float3 pixelPosVS = ScreenToWorldPosition (screen, ProjInv);
+  float4 normalDepthVS = tex2D (NormalBuffer, texCoord);
+  float3 pixelNormalVS = normalDepthVS.rgb * 2.0f - 1.0f;
+  float pixelDepth = normalDepthVS.a;
+  
+  float weightedAO = 0.0f;
+  float AO = 0.0f;
+  float3 weightedRadiance = float3(0.0f);
+  float3 radiance = float3(0.0f);
+  float weightSum = 0.0f;
+  
+  for (int j = -KernelSize; j <= KernelSize; j++)
+  {
+    for (int i = -KernelSize; i <= KernelSize; i++)
+    {
+      float2 sampleTexCoord = texCoord + float2 (i * InvViewportSize.x, j * InvViewportSize.y);
+      
+      //screenXY = (sampleTexCoord - 0.5f) * 2.0f;
+      //depth = tex2D (DepthBuffer, sampleTexCoord);  
+      //screen = GetScreenPosition (screenXY, depth);    
+      //float3 samplePosVS = ScreenToWorldPosition (screen, ProjInv);
+      float4 sampleDepthNormalVS = tex2D (NormalBuffer, sampleTexCoord);
+      float3 sampleNormalVS = sampleDepthNormalVS.rgb * 2.0f - 1.0f;
+      float sampleDepth = sampleDepthNormalVS.a;
+      
+      float4 sampleGI = tex2D (GlobalIllumBuffer, sampleTexCoord);
+      
+      //if (length (samplePosVS - pixelPosVS) < PositionThreshold &&
+      if (abs (sampleDepth - pixelDepth) < PositionThreshold &&
+          dot (pixelNormalVS, sampleNormalVS) > 1.0f - NormalThreshold)
+      {
+        weightedAO += sampleGI.a;
+        weightedRadiance += sampleGI.rgb;
+        weightSum += 1.0f;
+      }
+      
+      AO += sampleGI.a;
+      radiance += sampleGI.rgb;
+    }
+  }  
+  
+  if (weightSum > 0.0f)
+  {
+    AO = weightedAO / weightSum;
+    radiance = weightedRadiance / weightSum;
+  }
+  else
+  {
+    float totalKernelSize = 2 * KernelSize + 1;
+    AO /= totalKernelSize * totalKernelSize;
+    radiance /= totalKernelSize * totalKernelSize;
+  }
+  
+  //float3 ambientRadiance = globalIllum.rgb;
+  //float ambientOcclusion = globalIllum.a;
+  
+  
+  
+  return float4 ((AO * directRadiance) + radiance, 1.0f);
+  //return float4 (ambientRadiance, 1.0f);
+  //return float4 (FarClipDistance.xxx /*100.0f * InvViewportSize, 0.0f*/, 1.0f);
+}            
+
+]]>
+</program>
+</cgfp>
+         

@@ -163,6 +163,10 @@ protected:
   int patternSize;
   float depthBias;
   float lightRotation;
+  float bounceStrength;
+  int blurKernelSize;
+  float blurPositionThreshold;
+  float blurNormalThreshold;
 
   csRef<iEventHandler> occlusionStrengthListener;
   csRef<iEventHandler> sampleRadiusListener;
@@ -170,6 +174,10 @@ protected:
   csRef<iEventHandler> patternSizeListener;
   csRef<iEventHandler> depthBiasListener;
   csRef<iEventHandler> lightRotationListener;
+  csRef<iEventHandler> bounceStrengthListener;
+  csRef<iEventHandler> blurKernelSizeListener;
+  csRef<iEventHandler> blurPositionThresholdListener;
+  csRef<iEventHandler> blurNormalThresholdListener;
 
 protected:
 

@@ -24,16 +24,10 @@
   Seidel, 2009.
 -->
 
-<shader compiler="xmlshader" name="deferred_globalillum">
+<shader compiler="xmlshader" name="deferred_light_composition">
   
   <shadervars>
-    <shadervar name="sample radius" type="float">50.0</shadervar>
-    <shadervar name="sample count" type="int">16</shadervar>
-    <shadervar name="pattern size" type="int">4</shadervar>
-    <shadervar name="depth bias" type="float">1.0</shadervar>
-    <shadervar name="occlusion strength" type="float">4.0</shadervar>
-    <shadervar name="max occluder distance" type="float">50.0</shadervar>
-    <shadervar name="light rotation angle" type="float">30.0</shadervar>
+    
   </shadervars>
   
   <technique priority="200">
@@ -44,17 +38,13 @@
         <alphatest>disable</alphatest>
       </mixmode>	
       
-      <vp plugin="glcg" file="/shader/deferred/globalillum.cgvp" />
+      <vp plugin="glcg" file="/shader/deferred/light_composition.cgvp" />
       
       <texture destination="DirectRadianceBuffer" name="tex direct radiance" />
-      <texture destination="DiffuseBuffer" name="tex gbuffer 0" />
-      <texture destination="AmbientBuffer" name="tex gbuffer 2" />
+      <texture destination="GlobalIllumBuffer" name="tex global illumination" />
       <texture destination="NormalBuffer" name="tex gbuffer 3" />
       <texture destination="DepthBuffer" name="tex gbuffer depth" />
-      <texture destination="SeedTexture" name="tex sample directions" />
-      <texture destination="EnvmapTexture" name="tex globalillum envmap" />
-      <texture destination="RandNormalsTexture" name="tex random normals" />      
-      <fp plugin="glcg" file="/shader/deferred/globalillum.cgfp" />
+      <fp plugin="glcg" file="/shader/deferred/light_composition.cgfp" />
 
     </pass>
   </technique>

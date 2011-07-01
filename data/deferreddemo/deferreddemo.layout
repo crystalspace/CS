@@ -6,7 +6,7 @@
     <Property Name="MousePassThroughEnabled" Value="True" />
 
     <Window Type='ice/Listbox' Name='Frame'>
-      <Property Name='UnifiedSize' Value='{{0.0,240.0},{0.0,240.0}}'/>
+      <Property Name='UnifiedSize' Value='{{0.0,280.0},{0.0,325.0}}'/>
       <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,10.0}}'/>
       <Property Name='CaptionColour' Value='00FFFFFF'/>
 
@@ -78,8 +78,8 @@
         <Property Name='ConfigTypes' Value='float'/>
         <Property Name='ConfigNames' Value='DeferredDemo.SampleRadius'/>
         <Property Name='MinimumValue' Value='0.0'/>
-        <Property Name='MaximumValue' Value='50.0'/>
-        <Property Name='ClickStepSize' Value='0.1'/>
+        <Property Name='MaximumValue' Value='20.0'/>
+        <Property Name='ClickStepSize' Value='0.01'/>
       </Window>
       
       <Window Type="ice/SettingSlider" Name="MaxOccluderDist" >
@@ -90,7 +90,7 @@
         <Property Name='ConfigTypes' Value='float'/>
         <Property Name='ConfigNames' Value='DeferredDemo.MaxOccluderDist'/>
         <Property Name='MinimumValue' Value='0.0'/>
-        <Property Name='MaximumValue' Value='10.0'/>
+        <Property Name='MaximumValue' Value='20.0'/>
         <Property Name='ClickStepSize' Value='0.01'/>
       </Window>
       
@@ -114,8 +114,8 @@
         <Property Name='ConfigTypes' Value='float'/>
         <Property Name='ConfigNames' Value='DeferredDemo.DepthBias'/>
         <Property Name='MinimumValue' Value='0.0'/>
-        <Property Name='MaximumValue' Value='2.0'/>
-        <Property Name='ClickStepSize' Value='0.001'/>
+        <Property Name='MaximumValue' Value='0.2'/>
+        <Property Name='ClickStepSize' Value='0.000001'/>
       </Window>
       
       <Window Type="ice/SettingSlider" Name="LightRotation" >
@@ -128,6 +128,54 @@
         <Property Name='MinimumValue' Value='0.0'/>
         <Property Name='MaximumValue' Value='6.28'/>
         <Property Name='ClickStepSize' Value='0.1'/>
+      </Window>
+      
+      <Window Type="ice/SettingSlider" Name="BounceStrength" >
+        <Property Name='UnifiedSize' Value='{{1.0,0.0},{0.0,30}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,240.0}}'/>
+
+        <Property Name='Text' Value='Bounce Strength'/>
+        <Property Name='ConfigTypes' Value='float'/>
+        <Property Name='ConfigNames' Value='DeferredDemo.BounceStrength'/>
+        <Property Name='MinimumValue' Value='0.0'/>
+        <Property Name='MaximumValue' Value='10.0'/>
+        <Property Name='ClickStepSize' Value='0.1'/>
+      </Window>
+      
+      <Window Type="ice/SettingSlider" Name="KernelSize" >
+        <Property Name='UnifiedSize' Value='{{1.0,0.0},{0.0,30}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,260.0}}'/>
+
+        <Property Name='Text' Value='Blur Kernel Size'/>
+        <Property Name='ConfigTypes' Value='int'/>
+        <Property Name='ConfigNames' Value='DeferredDemo.KernelSize'/>
+        <Property Name='MinimumValue' Value='1'/>
+        <Property Name='MaximumValue' Value='4'/>
+        <Property Name='ClickStepSize' Value='1'/>
+      </Window>
+      
+      <Window Type="ice/SettingSlider" Name="PositionThreshold" >
+        <Property Name='UnifiedSize' Value='{{1.0,0.0},{0.0,30}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,280.0}}'/>
+
+        <Property Name='Text' Value='Blur Position Threshold'/>
+        <Property Name='ConfigTypes' Value='float'/>
+        <Property Name='ConfigNames' Value='DeferredDemo.PositionThreshold'/>
+        <Property Name='MinimumValue' Value='0.0'/>
+        <Property Name='MaximumValue' Value='1.0'/>
+        <Property Name='ClickStepSize' Value='0.01'/>
+      </Window>
+      
+      <Window Type="ice/SettingSlider" Name="NormalThreshold" >
+        <Property Name='UnifiedSize' Value='{{1.0,0.0},{0.0,30}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,300.0}}'/>
+
+        <Property Name='Text' Value='Blur Normal Threshold'/>
+        <Property Name='ConfigTypes' Value='float'/>
+        <Property Name='ConfigNames' Value='DeferredDemo.NormalThreshold'/>
+        <Property Name='MinimumValue' Value='0.0'/>
+        <Property Name='MaximumValue' Value='1.0'/>
+        <Property Name='ClickStepSize' Value='0.01'/>
       </Window>
 
     </Window>
