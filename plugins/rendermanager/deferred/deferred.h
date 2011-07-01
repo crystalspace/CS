@@ -37,6 +37,7 @@
 #include "gbuffer.h"
 #include "deferredtreetraits.h"
 #include "deferredlightrender.h"
+#include "globalillum.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 {
@@ -91,8 +92,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     virtual bool DebugCommand(const char *cmd);
 
     //---- iRenderManagerGlobalIllum Interface ----
-    virtual void SetOcclusionEffect (bool enable);    
-    virtual void SetIndirectLightingEffect (bool enable);
+    virtual void EnableGlobalIllumination (bool enable);
     virtual void SetSamplingPatternSize (int samplingPatternSize);
     virtual void SetNumberOfSamples (int numSamples);
     virtual void SetSampleRadius (float sampleRadius);
@@ -100,6 +100,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     virtual void SetDepthBias (float depthBias);
     virtual void SetMaxOccluderDistance (float maxOccluderDistance);
     virtual void SetLightRotationAngle (float lightRotation);
+    virtual void SetBlurKernelSize (int kernelSize);
+    virtual void SetBlurPositionThreshold (float positionThreshold);
+    virtual void SetBlurNormalThreshold (float normalThreshold);
+    virtual void SetBounceStrength (float bounceStrength);
 
   public:
 
@@ -134,6 +138,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     csRef<iTextureHandle> accumBuffer;
 
     GBuffer gbuffer;
+    csGlobalIllumRenderer globalIllum;
 
     int deferredLayer;
     int zonlyLayer;

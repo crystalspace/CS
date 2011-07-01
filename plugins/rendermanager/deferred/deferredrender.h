@@ -27,6 +27,7 @@
 #include "deferredlightrender.h"
 #include "deferredoperations.h"
 #include "gbuffer.h"
+#include "globalillum.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 {
@@ -113,6 +114,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
                          iShaderManager *shaderMgr,
                          iStringSet *stringSet,
                          GBuffer &gbuffer,
+                         csGlobalIllumRenderer &globalIllum,
                          DeferredLightRenderer::PersistentData &lightRenderPersistent,
                          int deferredLayer,
                          int zonlyLayer,
@@ -123,6 +125,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     shaderMgr(shaderMgr),
     stringSet(stringSet),
     gbuffer(gbuffer),
+    globalIllum(globalIllum),
     lightRenderPersistent(lightRenderPersistent),
     deferredLayer(deferredLayer),
     zonlyLayer(zonlyLayer),
@@ -179,6 +182,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
                                          gbuffer,
                                          lightRenderPersistent);
 
+      UpdateShaderVars (context);
+
       // Fill the gbuffer
       gbuffer.Attach ();
       {
@@ -217,27 +222,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         graphics3D->BeginDraw (drawFlags);
         graphics3D->SetWorldToCamera (context->cameraTransform.GetInverse ());
         
-        lightRender.OutputAmbientLight ();
+        if (!globalIllum.IsEnabled())
+          lightRender.OutputAmbientLight ();
 
         // Iterate through lights adding results into accumulation buffer.
-        /*for (size_t i = 0; i < ctxCount; i++)
+        for (size_t i = 0; i < ctxCount; i++)
         {
           typename RenderTree::ContextNode *context = contextStack[i];
 
           ForEachLight (*context, lightRender);
-        }*/
-
-        
-        // *********** TEMPORAL - SACAR!!!! ************
-
-        graphics3D->FinishDraw ();
-
-        // ********************************************
+        }
       }
       DetachAccumBuffer ();
 
+      globalIllum.RenderGlobalIllum();
+
       // Draws the forward shaded objects.
-      /*AttachAccumBuffer (context, true);
+      if (!globalIllum.IsEnabled())
+        AttachAccumBuffer (context, true);
+      else
+        globalIllum.AttachCompositionBuffer (true);
+
       {
         graphics3D->SetZMode (CS_ZBUF_MESH);
 
@@ -257,9 +262,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
         graphics3D->FinishDraw ();
       }
-      DetachAccumBuffer ();*/
+      if (!globalIllum.IsEnabled())
+        DetachAccumBuffer ();
+      else
+        globalIllum.DetachCompositionBuffer();
 
       contextStack.Empty ();
+    }
+
+    /// Updates shader variables.
+    void UpdateShaderVars(typename RenderTree::ContextNode *context)
+    {      
+      ShaderVarStringID accumBufferSVName (shaderMgr->GetSVNameStringset()->Request ("tex direct radiance"));
+      csShaderVariable *accumBufferSV = shaderMgr->GetVariableAdd (accumBufferSVName);
+
+      int subtex;
+      accumBufferSV->SetValue (GetAccumBuffer (context, subtex));
+
+      globalIllum.UpdateShaderVars();
     }
 
     /**
@@ -372,6 +392,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     iStringSet *stringSet;
 
     GBuffer &gbuffer;
+    csGlobalIllumRenderer &globalIllum;
     DeferredLightRenderer::PersistentData &lightRenderPersistent;
 
     csArray<typename RenderTree::ContextNode*> contextStack;

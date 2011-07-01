@@ -33,7 +33,6 @@
 #include "igraphic/imageio.h"
 
 #include "gbuffer.h"
-#include "globalillum.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 {  
@@ -313,11 +312,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
       /* Shader for drawing light volumes. */
       csRef<iShader> lightVolumeShader;
-      csRef<csShaderVariable> lightVolumeColorSV;
-
-      /* Data for Screen-Space global illumination effect */
-      bool globalIllumEnabled;
-      csDeferredGlobalIllumination globalIllum;
+      csRef<csShaderVariable> lightVolumeColorSV;      
 
       /**
        * Initialize persistent data, must be called once before using the
@@ -436,29 +431,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         quadMesh.z_buf_mode = CS_ZBUF_NONE;
         quadMesh.mixmode = CS_FX_ADD;
         quadMesh.alphaType.autoAlphaMode = false;
-        quadMesh.alphaType.alphaType = csAlphaMode::alphaNone;       
-
-        globalIllumEnabled = cfg->GetBool ("RenderManager.Deferred.GlobalIllum.Enable", true);        
+        quadMesh.alphaType.alphaType = csAlphaMode::alphaNone;                
         
-        if (globalIllumEnabled)
-        {          
-          globalIllum.Initialize (objRegistry);
-        }
-        else 
+        if (!loader->LoadShader ("/shader/deferred/ambient_light.xml"))
         {
-          if (!loader->LoadShader ("/shader/deferred/ambient_light.xml"))
-          {
-            csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
-              messageID, "Could not load deferred_ambient_light shader");
-          }
-
-          // Creates the ambient material.
-          ambientMaterial = engine->CreateMaterial (
-            "crystalspace.rendermanager.deferred.lightrender.ambient", NULL);
-          
-          iShader *ambientLightShader = shaderManager->GetShader ("deferred_ambient_light");
-          ambientMaterial->GetMaterial ()->SetShader (stringSet->Request ("gbuffer use"), ambientLightShader);
+          csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
+            messageID, "Could not load deferred_ambient_light shader");
         }
+
+        // Creates the ambient material.
+        ambientMaterial = engine->CreateMaterial (
+          "crystalspace.rendermanager.deferred.lightrender.ambient", NULL);
+          
+        iShader *ambientLightShader = shaderManager->GetShader ("deferred_ambient_light");
+        ambientMaterial->GetMaterial ()->SetShader (stringSet->Request ("gbuffer use"), ambientLightShader);        
 
         // Loads the light volume shader.
         if (!loader->LoadShader ("/shader/deferred/dbg_light_volume.xml"))
@@ -481,7 +467,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
                           iShaderManager *shaderMgr,
                           iStringSet *stringSet,
                           CS::RenderManager::RenderView *rview,
-                          GBuffer &gbuffer,
+                          GBuffer &gbuffer,                          
                           PersistentData &persistent)
       : 
     graphics3D(g3d),
@@ -618,19 +604,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
     void RenderAmbientLight()
     {     
-      iShader *shader;
-      
-      if (persistentData.globalIllumEnabled)
-      {
-        persistentData.globalIllum.UpdateShaderVars(graphics3D);
-        shader = persistentData.globalIllum.shader;
-        //shader = shaderMgr->GetShader ("deferred_globalillum");
-      }
-      else
-      {
-        iMaterial *mat = persistentData.ambientMaterial->GetMaterial ();
-        shader = mat->GetShader (stringSet->Request ("gbuffer use"));
-      }
+      iMaterial *mat = persistentData.ambientMaterial->GetMaterial ();
+      iShader *shader = mat->GetShader (stringSet->Request ("gbuffer use"));
 
       DrawFullscreenQuad (shader, CS_ZBUF_NONE);
     }
@@ -757,7 +732,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     /**
      * Draws a fullscreen quad using the supplied shader.
      */
-    void DrawFullscreenQuad(iShader *shader, csZBufMode zmode)
+    void DrawFullscreenQuad(iShader *shader, csZBufMode zmode = CS_ZBUF_MESH, uint mixmode = CS_FX_ADD)
     {
       // Switches to using orthographic projection. 
       csReversibleTransform oldView = graphics3D->GetWorldToCamera ();
@@ -768,6 +743,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       
       persistentData.quadMesh.shader = shader;
       persistentData.quadMesh.z_buf_mode = zmode;
+      persistentData.quadMesh.mixmode = mixmode;
       
       graphics3D->DrawSimpleMesh (persistentData.quadMesh, 0);
 

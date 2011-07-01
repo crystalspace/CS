@@ -149,7 +149,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         return false;
       }
 
-      if (!Detach ())
+      if (!Detach ()) 
       {
         csReport(registry, CS_REPORTER_SEVERITY_WARNING, messageID, 
             "Failed to detach GBuffer!");
