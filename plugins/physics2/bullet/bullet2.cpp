@@ -810,6 +810,7 @@ void csBulletSector::CheckCollisions ()
   for (size_t i = 0; i < softBodies.GetSize (); i++)
     softBodies[i]->contactObjects.Empty ();
 
+  // Could not get contacted softBody?
   for (int i = 0; i < numManifolds; i++)
   {
     btPersistentManifold* contactManifold =

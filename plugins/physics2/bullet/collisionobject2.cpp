@@ -92,8 +92,12 @@ void csBulletCollisionObject::SetTransform (const csOrthoTransform& trans)
     }
   }
   else if (type == CS::Collision2::COLLISION_OBJECT_GHOST)
+  {
+    if (movable)
+      movable->SetTransform (trans);
     if (btObject)
       btObject->setWorldTransform(transform);
+  }
 }
 
 csOrthoTransform csBulletCollisionObject::GetTransform ()
@@ -352,9 +356,9 @@ CS::Collision2::iCollisionObject* csBulletCollisionObject::GetContactObject (siz
     btGhostObject* ghost = btGhostObject::upcast (btObject);
     if (ghost)
     {
-      ghost->getOverlappingObject (index);
+      btCollisionObject* obj = ghost->getOverlappingObject (index);
       if (ghost)
-        return static_cast<CS::Collision2::iCollisionObject*> (ghost->getUserPointer ());
+        return static_cast<CS::Collision2::iCollisionObject*> (obj->getUserPointer ());
       else 
         return NULL;
     }
@@ -428,6 +432,7 @@ void csBulletCollisionObject::AddBulletObject ()
   {
     btObject = new btPairCachingGhostObject ();
     btObject->setWorldTransform (transform);
+    movable->SetTransform (BulletToCS(transform, system->getInverseInternalScale ()));
     btObject->setUserPointer (static_cast<iCollisionObject*> (this));
     btObject->setCollisionShape (shape);
     sector->broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());

@@ -109,6 +109,9 @@ private:
   void CreateWalls (const csVector3& radius);
   void CreateTerrain ();
 
+  void CreateGhostCapsule ();
+  void GripContactBodies ();
+
 public:
   Simple ();
   virtual ~Simple ();

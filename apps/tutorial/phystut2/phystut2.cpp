@@ -159,6 +159,8 @@ void Simple::Frame ()
   if (!pauseDynamic)
     physicalSector->Step (speed / dynamicSpeed);
 
+  GripContactBodies ();
+
   if (physicalCameraMode == CAMERA_DYNAMIC || physicalCameraMode == CAMERA_KINEMATIC)
     view->GetCamera ()->GetTransform ().SetOrigin
     (cameraBody->GetTransform ().GetOrigin ());
@@ -851,6 +853,8 @@ bool Simple::Application ()
   // Initialize the camera
   UpdateCameraMode ();
 
+  CreateGhostCapsule ();
+
   // Initialize the HUD manager
   hudManager->GetKeyDescriptions ()->Empty ();
   hudManager->GetKeyDescriptions ()->Push ("b: spawn a box");
@@ -1001,6 +1005,73 @@ void Simple::UpdateCameraMode ()
 
   default:
     break;
+  }
+}
+
+void Simple::CreateGhostCapsule ()
+{
+  // Create the cylinder mesh factory.
+  csRef<iMeshFactoryWrapper> cylinderFact = engine->CreateMeshFactory(
+    "crystalspace.mesh.object.genmesh", "cylinderFact");
+
+  if (!cylinderFact)
+  {
+    ReportError ("Error creating mesh object factory!");
+    return;
+  }
+
+  csRef<iGeneralFactoryState> gmstate = scfQueryInterface<
+    iGeneralFactoryState> (cylinderFact->GetMeshObjectFactory ());
+  const float radius (1.5f);
+  const float length (4.0f);
+  gmstate->GenerateCylinder (length, radius, 10);
+
+  // Create the mesh.
+  csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (
+    cylinderFact, "cylinder"));
+
+  iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
+  mesh->GetMeshObject ()->SetMaterialWrapper (mat);
+
+  // Create a body and attach the mesh.
+  ghostObject = collisionSystem->CreateCollisionObject ();
+  ghostObject->SetObjectType (CS::Collision2::COLLISION_OBJECT_GHOST, false);
+  csMatrix3 m;
+  csOrthoTransform trans (m, csVector3 (0, -3, 5));
+  if (this->environment == ENVIRONMENT_TERRAIN)
+    trans.SetOrigin (csVector3 (0, 1.0, 5));
+  ghostObject->SetTransform (trans);
+  ghostObject->SetAttachedMovable (mesh->GetMovable ());
+
+  // Create and attach a cone collider.
+  csRef<CS::Collision2::iColliderCylinder> cyliner = collisionSystem->CreateColliderCylinder (length, radius);
+  ghostObject->AddCollider (cyliner, localTrans);
+  ghostObject->RebuildObject ();
+  collisionSector->AddCollisionObject (ghostObject);
+}
+
+void Simple::GripContactBodies ()
+{
+  size_t count = ghostObject->GetContactObjectsCount ();
+  for (size_t i = 0; i < count; i++)
+  {
+    CS::Physics2::iPhysicalBody* pb = ghostObject->GetContactObject (i)->QueryPhysicalBody ();
+    if (pb)
+    {
+      if (pb->GetBodyType () == CS::Physics2::BODY_RIGID)
+      {
+        CS::Physics2::iRigidBody* rb = pb->QueryRigidBody ();
+        csVector3 velo = pb->GetLinearVelocity ();
+        velo = - velo;
+        rb->Disable ();
+        //rb->SetLinearVelocity (csVector3 (0,0,-1.0f));
+      }
+      else
+      {
+        CS::Physics2::iSoftBody* sb = pb->QuerySoftBody ();
+        sb->SetLinearVelocity (csVector3 (0,0,-1.0f));
+      }
+    }
   }
 }
 
