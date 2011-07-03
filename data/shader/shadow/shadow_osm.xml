@@ -22,7 +22,7 @@
   <technique priority="200">
     <pass>
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
-      <mixmode><premultalpha/></mixmode>
+      <mixmode><add/></mixmode>
       
       <snippet id="position" file="/shader-snippets/position.xml" />
       <snippet id="surface" file="/shader-snippets/surface/surface-classic.xml" />

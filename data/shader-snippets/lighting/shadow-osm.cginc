@@ -157,7 +157,8 @@ struct ShadowShadowMapDepth : ShadowShadowMap
       / (nextSplit - previousSplit) );
       
     inLight = inLight * (i != numSplits) + previousMap * (i == numSplits);
-    inLight = 1 - inLight;
+    inLight = exp(-1.0 * inLight);
+    //inLight = 1 - inLight;
       
     //inLight = (float)i/numSplits;   
     //inLight = 1 - previousMap;
