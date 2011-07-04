@@ -73,17 +73,17 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     if (i == 0)
       return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 0], position).r;
     if (i == 1)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 1], position).r;
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 1], position).g;
     if (i == 2)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 2], position).r;
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 2], position).b;
     if (i == 3)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 3], position).r;	
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 3], position).a;	
     if (i == 4)
       return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 4], position).r;	
     if (i == 5)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 5], position).r;	
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 5], position).g;	
     if (i == 6)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 6], position).r;	
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 6], position).b;	
 /*
     if (i == 7)
       return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 7], position).a;

@@ -259,7 +259,7 @@ namespace CS
         }
 
         void AddShadowMapTarget (typename RenderTree::MeshNode* meshNode,
-          PersistentData& persist, const SingleRenderLayer& layerConfig,
+          PersistentData& persist, SingleRenderLayer& layerConfig,
           RenderTree& renderTree, iLight* light, ViewSetup& viewSetup)
         {
           if (light->GetFlags().Check (CS_LIGHT_NOSHADOWS)) return;
@@ -386,9 +386,18 @@ namespace CS
                 shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
               }
 
-              // Setup the new context
+              int index = frustNum % 4;
+              if (index == 0)
+                layerConfig.SetDefaultShader(persist.osmRedPass);
+              else if (index == 1)
+                layerConfig.SetDefaultShader(persist.osmGreenPass);
+              else if (index == 2)
+                layerConfig.SetDefaultShader(persist.osmBluePass);
+              else if (index == 3)
+                layerConfig.SetDefaultShader(persist.osmAlphaPass);
+
               ShadowmapContextSetup contextFunction (layerConfig,
-                persist.shaderManager, viewSetup, false);
+                persist.shaderManager, viewSetup);
               contextFunction (*shadowMapCtx);
             }
           }
@@ -402,10 +411,9 @@ namespace CS
       {
       public:
         ShadowmapContextSetup (const SingleRenderLayer& layerConfig,
-          iShaderManager* shaderManager, ViewSetup& viewSetup,
-          bool doIDTexture)
+          iShaderManager* shaderManager, ViewSetup& viewSetup)
           : layerConfig (layerConfig), shaderManager (shaderManager),
-          viewSetup (viewSetup), doIDTexture (doIDTexture)
+          viewSetup (viewSetup)
         {
         }
 
@@ -460,7 +468,6 @@ namespace CS
         const SingleRenderLayer& layerConfig;
         iShaderManager* shaderManager;
         ViewSetup& viewSetup;
-        bool doIDTexture;
       };
     public:
 
@@ -481,6 +488,11 @@ namespace CS
         ShadowSettings settings;
         CS::ShaderVarStringID numSplitsSVName;
         CS::ShaderVarStringID splitDistsSVName;
+
+        csRef<iShader> osmRedPass;
+        csRef<iShader> osmGreenPass;
+        csRef<iShader> osmBluePass;
+        csRef<iShader> osmAlphaPass;
 
         /// Set the prefix for configuration settings
         void SetConfigPrefix (const char* configPrefix)
@@ -520,6 +532,13 @@ namespace CS
             shadowMapRes = cfg->GetInt (
               csString().Format ("%s.ShadowMapResolution", configPrefix.GetData()), 512);
           }
+
+          csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
+
+          osmRedPass = loader->LoadShader ("/shader/shadow/shadow_osm_redpass.xml");
+          osmGreenPass = loader->LoadShader ("/shader/shadow/shadow_osm_greenpass.xml");
+          osmBluePass = loader->LoadShader ("/shader/shadow/shadow_osm_bluepass.xml");
+          osmAlphaPass = loader->LoadShader ("/shader/shadow/shadow_osm_alphapass.xml");
         }
         void UpdateNewFrame ()
         {

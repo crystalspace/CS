@@ -1,6 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?> 
 <!--
   Copyright (C) 2011 by Alexandru Voicu
-      (C) 2007 by Frank Richter
+      (C) 2007-2008 by Frank Richter
 	    (C) 2007 by Jorrit Tyberghein
 
   This library is free software; you can redistribute it and/or
@@ -17,20 +18,19 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
-<snippet>
-  <technique priority="100">
-    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
-    
-    <input name="surface" type="rgba" default="value" defval="0,0,0,1"/>
-    <input name="positionProj" type="position4_screen" />
-    
-    <block location="cg:fragmentMain">
-      float value = surface.a;
-      if (surface.a == 1)
-        value = 0;
-      output = float4(value);
-    </block>
-    
-    <output name="output" type="rgba" />
+<shader compiler="shaderweaver" name="shadow_osm_alphapass">
+  <technique priority="200">
+    <pass>
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      <mixmode><add/></mixmode>
+      
+      <snippet id="position" file="/shader-snippets/position.xml" />
+      <snippet id="surface" file="/shader-snippets/surface/surface-classic.xml" />
+      <snippet id="shadowfrag" file="/shader-snippets/shadow/fragment-osm-alphapass.xml" />
+      
+      <connection from="position" to="shadowfrag" />
+      <connection from="surface" to="shadowfrag" />
+    </pass>
   </technique>
-</snippet>
+  
+</shader>
