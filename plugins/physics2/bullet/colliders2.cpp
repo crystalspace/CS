@@ -20,6 +20,7 @@
 #include "BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h"
 
 #include "colliders2.h"
+#include "collisionobject2.h"
 #include "bullet2.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
@@ -524,7 +525,7 @@ void csBulletColliderTerrain::AddRigidBodies (csBulletSector* sector, csBulletCo
     iTerrainCell* cell = terrainSystem->GetCell (i);
     if (cell->GetLoadState () != iTerrainCell::Loaded)
       continue;
-    sector->bulletWorld->addRigidBody (bodies[i]);
+    sector->bulletWorld->addRigidBody (bodies[i], body->collGroup.value, sector->allFilter ^ body->collGroup.value);
     bodies[i]->setUserPointer (body);
   }
 }

@@ -49,6 +49,7 @@ private:
   CS::Physics2::Bullet2::DebugMode debugMode;
   int physicalCameraMode;
   csRef<CS::Physics2::iRigidBody> cameraBody;
+  csRef<CS::Collision2::iCollisionActor> cameraActor;
   float rotX, rotY, rotZ;
 
   // Ragdoll related

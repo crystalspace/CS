@@ -30,6 +30,7 @@ class csBulletDebugDraw;
 class csBulletRigidBody;
 class csBulletSoftBody;
 class csBulletCollisionObject;
+class csBulletCollisionActor;
 class csBulletCollider;
 class csBulletJoint;
 
@@ -40,6 +41,7 @@ class csBulletSector : public scfImplementationExt3<
   CS::Physics2::iPhysicalSector>
 {
   friend class csBulletCollisionObject;
+  friend class csBulletCollisionActor;
   friend class csBulletRigidBody;
   friend class csBulletSoftBody;
   friend class csBulletJoint;
@@ -61,6 +63,7 @@ class csBulletSector : public scfImplementationExt3<
   csRefArrayObject<csBulletRigidBody> rigidBodies;
   csRefArrayObject<csBulletSoftBody> softBodies;
   csWeakRefArray<csBulletSoftBody> anchoredSoftBodies;
+  csRef<csBulletCollisionActor> collisionActor;
   csRefArray<csBulletJoint> joints;
   csArray<CollisionPortal> portals;
   csArray<CS::Collision2::CollisionData> points;
@@ -143,6 +146,10 @@ public:
 
   virtual bool CollisionTest(CS::Collision2::iCollisionObject* object, 
     csArray<CS::Collision2::CollisionData>& collisions);
+
+  virtual void AddCollisionActor (CS::Collision2::iCollisionActor* actor);
+  virtual void RemoveCollisionActor ();
+  virtual CS::Collision2::iCollisionActor* GetCollisionActor ();
 
   /*virtual MoveResult MoveTest (iCollisionObject* object,
     const csOrthoTransform& fromWorld, const csOrthoTransform& toWorld);*/

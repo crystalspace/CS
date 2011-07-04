@@ -13,6 +13,7 @@ struct iSector;
 struct iMeshWrapper;
 struct iMovable;
 struct iPortal;
+struct iCamera;
 struct iView;
 
 namespace CS
@@ -104,9 +105,12 @@ struct HitBeamResult
 
 struct CollisionData
 {
+  iCollisionObject* objectA;
+  iCollisionObject* objectB;
   csVector3 positionWorldOnA;
   csVector3 positionWorldOnB;
-  csVector3 penetration; 
+  csVector3 normalWorldOnB;
+  float penetration; 
 };
 
 struct iCollisionCallback: public virtual iBase
@@ -456,14 +460,15 @@ struct iCollisionActor : public virtual iCollisionObject
   /// Set the onground status.
   //virtual void SetOnGround (bool og) = 0;
 
-  /// Get current rotation in angles around every axis.
-  virtual csVector3 GetRotation () const = 0;
+  virtual void SetCamera (iCamera* camera) = 0;
 
   /**
   * Set current rotation in angles around every axis and set to actor.
   * If a camera is used, set it to camera too.
   */
-  virtual void SetRotation (const csVector3& rot) = 0;
+  virtual void SetRotation (const csMatrix3& rot) = 0;
+
+  virtual void Rotate (const csVector3& v, float angle) = 0;
 
   /// Move the actor.
   virtual void UpdateAction (float delta) = 0;
@@ -472,15 +477,7 @@ struct iCollisionActor : public virtual iCollisionObject
   virtual void SetUpAxis (int axis) = 0;
 
   /// Set the walking velocity of the actor.
-  virtual void SetVelocity (const csVector3& dir) = 0;
-
-  /**
-  * Set the walking velocity with which the character should move for
-  * the given time period. After the time period, velocity is reset to zero.
-  * Negative time intervals will result in no motion.
-  */
-  virtual void SetVelocityForTimeInterval (const csVector3& velo,
-      float timeInterval) = 0;
+  virtual void SetVelocity (float speed) = 0;
 
   /**
   * This is used by UpdateAction() but you can also call it manually.
@@ -586,6 +583,18 @@ struct iCollisionSector : public virtual iBase
 
   /// Get true if the two groups collide with each other.
   virtual bool GetGroupCollision (const char* name1, const char* name2) = 0;
+
+  /**
+  * Add a collision actor into the sector.
+  * The collision actor has to be initialized.
+  */
+  virtual void AddCollisionActor (iCollisionActor* actor) = 0;
+
+  /// Remove a collision object by pointer.
+  virtual void RemoveCollisionActor () = 0;
+
+  /// Get the collision object by index.
+  virtual iCollisionActor* GetCollisionActor () = 0;
 
   /**
   * Try to move the given object from \a fromWorld to \a toWorld and return the first collision occured if any.

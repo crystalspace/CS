@@ -31,6 +31,7 @@
 #include "colliders2.h"
 #include "rigidbody2.h"
 #include "softbody2.h"
+#include "collisionactor2.h"
 #include "joint2.h"
 
 const float COLLISION_THRESHOLD = 0.01f;
@@ -49,9 +50,12 @@ struct PointContactResult : public btCollisionWorld::ContactResultCallback
   virtual	btScalar	addSingleResult (btManifoldPoint& cp,	const btCollisionObject* colObj0, int partId0,int index0,const btCollisionObject* colObj1,int partId1,int index1)
   {
     CS::Collision2::CollisionData data;
-    data.penetration = cp.m_distance1 * sys->getInternalScale ();
-    data.positionWorldOnA = BulletToCS (cp.m_positionWorldOnA, sys->getInternalScale ());
-    data.positionWorldOnB = BulletToCS (cp.m_positionWorldOnB, sys->getInternalScale ());
+    data.objectA = static_cast<CS::Collision2::iCollisionObject*>(colObj0->getUserPointer ());
+    data.objectB = static_cast<CS::Collision2::iCollisionObject*>(colObj1->getUserPointer ());
+    data.penetration = cp.m_distance1 * sys->getInverseInternalScale ();
+    data.positionWorldOnA = BulletToCS (cp.m_positionWorldOnA, sys->getInverseInternalScale ());
+    data.positionWorldOnB = BulletToCS (cp.m_positionWorldOnB, sys->getInverseInternalScale ());
+    data.normalWorldOnB = BulletToCS (cp.m_normalWorldOnB, sys->getInverseInternalScale ());
     colls.Push (data);
     return 0;
   }
@@ -75,6 +79,8 @@ csBulletSector::csBulletSector (csBulletSystem* sys)
 
   bulletWorld = new btDiscreteDynamicsWorld (dispatcher,
     broadphase, solver, configuration);
+
+  broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
 
   SetGravity (csVector3 (0.0f, -9.81f, 0.0f));
 
@@ -112,6 +118,7 @@ csBulletSector::~csBulletSector ()
   softBodies.DeleteAll ();
   collisionObjects.DeleteAll ();
   portals.DeleteAll ();
+  collisionActor = NULL;
   
   delete bulletWorld;
   delete debugDraw;
@@ -363,6 +370,10 @@ bool csBulletSector::CollisionTest (CS::Collision2::iCollisionObject* object,
   {
     btPairCachingGhostObject* ghost = dynamic_cast<btPairCachingGhostObject*> (
       btGhostObject::upcast (collObject->btObject));
+
+    bulletWorld->getDispatcher()->dispatchAllCollisionPairs(
+      ghost->getOverlappingPairCache(), bulletWorld->getDispatchInfo(), bulletWorld->getDispatcher());
+
     for (int i = 0; i < ghost->getOverlappingPairCache()->getNumOverlappingPairs(); i++)
     {
       btManifoldArray manifoldArray;
@@ -374,13 +385,21 @@ bool csBulletSector::CollisionTest (CS::Collision2::iCollisionObject* object,
       for (int j=0;j<manifoldArray.size();j++)
       {
         btPersistentManifold* manifold = manifoldArray[j];
+        btCollisionObject* objA = static_cast<btCollisionObject*> (manifold->getBody0 ());
+        btCollisionObject* objB = static_cast<btCollisionObject*> (manifold->getBody1 ());
+        CS::Collision2::iCollisionObject* csCOA = static_cast<CS::Collision2::iCollisionObject*>(objA->getUserPointer ());
+        CS::Collision2::iCollisionObject* csCOB = static_cast<CS::Collision2::iCollisionObject*>(objB->getUserPointer ());
         for (int p=0;p<manifold->getNumContacts();p++)
         {
-          const btManifoldPoint& pt = manifold->getContactPoint(p);
           CS::Collision2::CollisionData data;
-          data.penetration = pt.m_distance1 * sys->getInternalScale ();
-          data.positionWorldOnA = BulletToCS (pt.m_positionWorldOnA, sys->getInternalScale ());
-          data.positionWorldOnB = BulletToCS (pt.m_positionWorldOnB, sys->getInternalScale ());
+          data.objectA = csCOA;
+          data.objectB = csCOB;
+
+          const btManifoldPoint& pt = manifold->getContactPoint(p);
+          data.penetration = pt.m_distance1 * sys->getInverseInternalScale ();
+          data.positionWorldOnA = BulletToCS (pt.m_positionWorldOnA, sys->getInverseInternalScale ());
+          data.positionWorldOnB = BulletToCS (pt.m_positionWorldOnB, sys->getInverseInternalScale ());
+          data.normalWorldOnB = BulletToCS (pt.m_normalWorldOnB, sys->getInverseInternalScale ());
           collisions.Push (data);
         }
       }
@@ -390,6 +409,27 @@ bool csBulletSector::CollisionTest (CS::Collision2::iCollisionObject* object,
     return true;
   else
     return false;
+}
+
+void csBulletSector::AddCollisionActor (CS::Collision2::iCollisionActor* actor)
+{
+  csRef<csBulletCollisionActor> obj (dynamic_cast<csBulletCollisionActor*>(actor));
+  collisionActor = obj;
+  obj->sector = this;
+  obj->collGroup = collGroups[5]; // Actor Group.
+  obj->AddBulletObject ();
+}
+
+void csBulletSector::RemoveCollisionActor ()
+{
+  collisionActor->RemoveBulletObject ();
+  collisionActor->insideWorld = false;
+  collisionActor = NULL;
+}
+
+CS::Collision2::iCollisionActor* csBulletSector::GetCollisionActor ()
+{
+  return collisionActor;
 }
 
 bool csBulletSector::BulletCollide (btCollisionObject* objectA,
@@ -980,9 +1020,8 @@ csRef<CS::Collision2::iCollisionObject> csBulletSystem::CreateCollisionObject ()
 csRef<CS::Collision2::iCollisionActor> csBulletSystem::CreateCollisionActor ()
 {
   csRef<CS::Collision2::iCollisionActor> collActor;
-  /*collActor.AttachNew (new csBulletCollisionActor (this));
+  collActor.AttachNew (new csBulletCollisionActor (this));
 
-  actors.Push (collActor);*/
   return collActor;
 }
 csRef<CS::Collision2::iCollisionSector> csBulletSystem::CreateCollisionSector ()

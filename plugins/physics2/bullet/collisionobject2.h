@@ -18,6 +18,7 @@ class csBulletCollisionObject: public scfImplementationExt1<
   friend class csBulletMotionState;
   friend class csBulletKinematicMotionState;
   friend class csBulletJoint;
+  friend class csBulletColliderTerrain;
 
 protected:
   csBulletSector* sector;
@@ -80,54 +81,6 @@ public:
   virtual void RemoveBulletObject ();
   virtual void AddBulletObject ();
 };
-
-//TODO collision actor
-
-/*
-class csBulletCollisionActor : public scfImplementationExt1<
-  csBulletCollisionActor, csBulletCollisionObject, iCollisionActor>
-{
-public:
-  csBulletCollisionActor (csBulletCollisionSystem* sys);
-  ~csBulletCollisionActor ();
-
-  //iCollisionObject
-  virtual void SetObjectType (CollisionObjectType type);
-  virtual CollisionObjectType GetObjectType () {return type;}
-
-  virtual void SetTransform (const csOrthoTransform& trans);
-  virtual csOrthoTransform GetTransform ();
-
-  virtual void RebuildObject ();
-
-  virtual bool Collide (iCollisionObject* otherObject);
-  virtual HitBeamResult HitBeam (const csVector3& start, const csVector3& end);
-
-  //iCollisionActor
-  virtual bool IsOnGround ();
-  virtual csVector3 GetRotation ();
-  virtual void SetRotation ();
-
-  virtual void UpdateAction (float delta);
-
-  virtual void SetUpAxis (int axis);
-
-  virtual void SetVelocity (const csVector3& dir);
-  virtual void SetVelocityForTimeInterval (const csVector3& velo, float timeInterval);
-
-  virtual void PreStep ();
-  virtual void PlayerStep (float delta);
-
-  virtual void SetFallSpeed (float fallSpeed);
-  virtual void SetJumpSpeed (float jumpSpeed);
-
-  virtual void SetMaxJumpHeight (float maxJumpHeight);
-  virtual void Jump ();
-
-  virtual void SetMaxSlope (float slopeRadians);
-  virtual float GetMaxSlope ();
-};
-*/
 }
 CS_PLUGIN_NAMESPACE_END (Bullet2)
 #endif

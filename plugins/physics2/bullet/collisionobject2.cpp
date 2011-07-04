@@ -91,7 +91,7 @@ void csBulletCollisionObject::SetTransform (const csOrthoTransform& trans)
       //Currently in CS it's not supported.
     }
   }
-  else if (type == CS::Collision2::COLLISION_OBJECT_GHOST)
+  else // ghost or actor
   {
     if (movable)
       movable->SetTransform (trans);
@@ -119,7 +119,7 @@ csOrthoTransform csBulletCollisionObject::GetTransform ()
       return terrainCollider->terrainTransform;      
     }
   }
-  else
+  else // ghost or actor
     return BulletToCS (btObject->getWorldTransform(), system->getInverseInternalScale ());
 }
 
@@ -259,7 +259,8 @@ void csBulletCollisionObject::SetCollisionGroup (const char* name)
 bool csBulletCollisionObject::Collide (iCollisionObject* otherObject)
 {
   //Ghost VS no matter what kind.
-  if (type == CS::Collision2::COLLISION_OBJECT_GHOST)
+  if (type == CS::Collision2::COLLISION_OBJECT_GHOST
+    || type == CS::Collision2::COLLISION_OBJECT_ACTOR)
   {
     btGhostObject* ghost = btGhostObject::upcast (btObject);
     btAlignedObjectArray<btCollisionObject*>& overObjects = ghost->getOverlappingPairs ();
@@ -423,16 +424,18 @@ void csBulletCollisionObject::AddBulletObject ()
         shape, localInertia);
       btObject = new btRigidBody (infos);
       btObject->setUserPointer (dynamic_cast<iCollisionObject*> (this));
-      sector->bulletWorld->addRigidBody (btRigidBody::upcast(btObject));
+      sector->bulletWorld->addRigidBody (btRigidBody::upcast(btObject), collGroup.value, sector->allFilter ^ collGroup.value);
     }
     else
       dynamic_cast<csBulletColliderTerrain*> (colliders[0])->AddRigidBodies (sector, this);
   }
-  else if (type == CS::Collision2::COLLISION_OBJECT_GHOST)
+  else if (type == CS::Collision2::COLLISION_OBJECT_GHOST 
+    || type == CS::Collision2::COLLISION_OBJECT_ACTOR)
   {
     btObject = new btPairCachingGhostObject ();
     btObject->setWorldTransform (transform);
-    movable->SetTransform (BulletToCS(transform, system->getInverseInternalScale ()));
+    if (movable)
+      movable->SetTransform (BulletToCS(transform, system->getInverseInternalScale ()));
     btObject->setUserPointer (static_cast<iCollisionObject*> (this));
     btObject->setCollisionShape (shape);
     sector->broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());

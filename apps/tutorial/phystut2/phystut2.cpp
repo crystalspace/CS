@@ -9,6 +9,7 @@
 #define CAMERA_DYNAMIC 1
 #define CAMERA_KINEMATIC 2
 #define CAMERA_FREE 3
+#define CAMERA_ACTOR 4
 
 #define ENVIRONMENT_WALLS 1
 #define ENVIRONMENT_TERRAIN 2
@@ -93,6 +94,21 @@ void Simple::Frame ()
       }
     }
   }
+  else if (physicalCameraMode == CAMERA_ACTOR)
+  {
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+      cameraActor->Rotate (CS_VEC_ROT_RIGHT, speed);
+    if (kbd->GetKeyState (CSKEY_LEFT))
+      cameraActor->Rotate (CS_VEC_ROT_LEFT, speed);
+    if (kbd->GetKeyState (CSKEY_PGUP))
+      cameraActor->Rotate (CS_VEC_TILT_UP, speed);
+    if (kbd->GetKeyState (CSKEY_PGDN))
+      cameraActor->Rotate (CS_VEC_TILT_DOWN, speed);
+    if (kbd->GetKeyState (CSKEY_UP))
+      cameraActor->SetVelocity (5);
+    if (kbd->GetKeyState (CSKEY_DOWN))
+      cameraActor->SetVelocity (-5);
+  }
 
   // Camera is free
   else
@@ -164,6 +180,8 @@ void Simple::Frame ()
   if (physicalCameraMode == CAMERA_DYNAMIC || physicalCameraMode == CAMERA_KINEMATIC)
     view->GetCamera ()->GetTransform ().SetOrigin
     (cameraBody->GetTransform ().GetOrigin ());
+  if (physicalCameraMode == CAMERA_ACTOR)
+    cameraActor->UpdateAction (speed);
 
   // Update the demo's state information
   hudManager->GetStateDescriptions ()->Empty ();
@@ -196,6 +214,9 @@ void Simple::Frame ()
   case CAMERA_KINEMATIC:
     hudManager->GetStateDescriptions ()->Push (csString ("Camera mode: kinematic"));
     break;
+
+  case CAMERA_ACTOR:
+    hudManager->GetStateDescriptions ()->Push (csString ("Camera mode: actor"));
 
   default:
     break;
@@ -327,7 +348,11 @@ bool Simple::OnKeyboard (iEvent &event)
         break;
 
       case CAMERA_FREE:
-          physicalCameraMode = CAMERA_KINEMATIC;
+          physicalCameraMode = CAMERA_ACTOR;
+        break;
+
+      case CAMERA_ACTOR:
+        physicalCameraMode = CAMERA_KINEMATIC;
         break;
 
       case CAMERA_KINEMATIC:
@@ -942,9 +967,6 @@ void Simple::UpdateCameraMode ()
       {
         cameraBody = physicalSystem->CreateRigidBody ();
         cameraBody->SetDensity (0.3f);
-        const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
-        csVector3 a = tc.GetOrigin ();
-        cameraBody->SetTransform (tc);
         csRef<CS::Collision2::iColliderSphere> sphere = collisionSystem->CreateColliderSphere (0.8f);
         cameraBody->AddCollider (sphere, localTrans);
         cameraBody->SetElasticity (0.8f);
@@ -952,6 +974,9 @@ void Simple::UpdateCameraMode ()
         cameraBody->RebuildObject ();
         physicalSector->AddRigidBody (cameraBody);
       }
+
+      const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+      cameraBody->SetTransform (tc);
 
       break;
     }
@@ -977,9 +1002,26 @@ void Simple::UpdateCameraMode ()
       break;
     }
 
+  case CAMERA_ACTOR:
+    {
+     
+      cameraActor = collisionSystem->CreateCollisionActor ();
+
+      csRef<CS::Collision2::iColliderSphere> sphere = collisionSystem->CreateColliderSphere (0.8f);
+      csOrthoTransform localTrans;
+      cameraActor->AddCollider (sphere, localTrans);
+      cameraActor->SetCamera (view->GetCamera ());
+      cameraActor->RebuildObject ();
+
+      collisionSector->AddCollisionActor (cameraActor);
+      
+      break;
+    }
+
     // The camera is kinematic
   case CAMERA_KINEMATIC:
     {
+      collisionSector->RemoveCollisionActor ();
       // Create a body
       cameraBody = physicalSystem->CreateRigidBody ();
       cameraBody->SetTransform (view->GetCamera ()->GetTransform ());
