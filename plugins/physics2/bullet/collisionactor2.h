@@ -19,28 +19,35 @@ private:
   float jumpSpeed;
   float speed;
   float maxJumpHeight;
+  float stepHeight;
+  float currentStepOffset;
 
   float maxSlopeRadians;
   float maxSlopeCosine;
+  float recoveringFactor;
 
-  int upAxis;
   bool touchingContact;
   bool wasOnGround;
   bool wasJumping;
+  bool useGhostSweep;
 
   csWeakRef<iCamera> camera;
 
-  csVector3 currentPosition;
-  csVector3 targetPosition;
+  btVector3 currentPosition;
+  btVector3 targetPosition;
+  btVector3 upVector;
+  btVector3 frontVector;
 
   bool RecoverFromPenetration ();
-  void StepUp ();
-  void StepForwardAndStrafe (float dt);
-  void StepDown (float dt);
+  btVector3 StepUp ();
+  btVector3 StepForwardAndStrafe (float dt);
+  btVector3 StepDown (float dt);
+
+  float AddFallOffset (bool wasOnGround, float currentStepOffset, float dt);
 
 public:
   csBulletCollisionActor (csBulletSystem* sys);
-  ~csBulletCollisionActor ();
+  virtual ~csBulletCollisionActor ();
 
   //iCollisionObject
   virtual CS::Collision2::iCollisionObject* QueryCollisionObject () {return dynamic_cast<csBulletCollisionObject*> (this);}
@@ -61,10 +68,9 @@ public:
 
   virtual void RebuildObject () {csBulletCollisionObject::RebuildObject ();}
 
-  virtual void AddCollider (CS::Collision2::iCollider* collider, const csOrthoTransform& relaTrans)
-  { csBulletCollisionObject::AddCollider (collider, relaTrans);}
-  virtual void RemoveCollider (CS::Collision2::iCollider* collider) {csBulletCollisionObject::RemoveCollider (collider);}
-  virtual void RemoveCollider (size_t index) {csBulletCollisionObject::RemoveCollider (index);}
+  virtual void AddCollider (CS::Collision2::iCollider* collider, const csOrthoTransform& relaTrans);
+  virtual void RemoveCollider (CS::Collision2::iCollider* collider);
+  virtual void RemoveCollider (size_t index);
 
   virtual CS::Collision2::iCollider* GetCollider (size_t index) {return csBulletCollisionObject::GetCollider (index);}
   virtual size_t GetColliderCount () {return colliders.GetSize ();}
@@ -96,18 +102,21 @@ public:
 
   virtual void UpdateAction (float delta);
 
-  virtual void SetUpAxis (int axis);
-
-  virtual void SetVelocity (float speed) {this->speed = speed;}
+  virtual void SetVelocity (float speed) 
+  {this->speed = speed * system->getInternalScale ();}
 
   virtual void PreStep ();
   virtual void PlayerStep (float delta);
 
-  virtual void SetFallSpeed (float fallSpeed) {this->fallSpeed = fallSpeed;}
-  virtual void SetJumpSpeed (float jumpSpeed) {this->jumpSpeed = jumpSpeed;}
+  virtual void SetFallSpeed (float fallSpeed) 
+  {this->fallSpeed = fallSpeed * system->getInternalScale ();}
+  virtual void SetJumpSpeed (float jumpSpeed) 
+  {this->jumpSpeed = jumpSpeed * system->getInternalScale ();}
 
   virtual void SetMaxJumpHeight (float maxJumpHeight)
-  {this->maxJumpHeight = maxJumpHeight;}
+  {this->maxJumpHeight = maxJumpHeight * system->getInternalScale ();}
+  virtual void StepHeight (float stepHeight)
+  {this->stepHeight = stepHeight * system->getInternalScale ();}
   virtual void Jump ();
 
   virtual void SetMaxSlope (float slopeRadians);

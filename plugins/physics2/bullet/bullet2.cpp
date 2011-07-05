@@ -1055,8 +1055,6 @@ void csBulletSystem::DecomposeConcaveMesh (CS::Collision2::iCollisionObject* obj
 
     virtual void ConvexDecompResult(ConvexDecomposition::ConvexResult &result)
     {
-
-      btTriangleMesh* trimesh = new btTriangleMesh();
       btVector3 localScaling(scale, scale, scale);
 
       //calc centroid, to shift vertices around center of mass
@@ -1074,22 +1072,12 @@ void csBulletSystem::DecomposeConcaveMesh (CS::Collision2::iCollisionObject* obj
 
       centroid *= 1.f/(float(result.mHullVcount) );
 
-      //const unsigned int *src = result.mHullIndices;
-      for (unsigned int i=0; i<result.mHullVcount; i++)
-      {
-        btVector3 vertex(result.mHullVertices[i*3],result.mHullVertices[i*3+1],result.mHullVertices[i*3+2]);
-        vertex *= localScaling;
-        vertex -= centroid ;
-        vertices.push_back(vertex);
-      }
-
       const unsigned int *src = result.mHullIndices;
       for (unsigned int i=0; i<result.mHullTcount; i++)
       {
         unsigned int index0 = *src++;
         unsigned int index1 = *src++;
         unsigned int index2 = *src++;
-
 
         btVector3 vertex0(result.mHullVertices[index0*3], result.mHullVertices[index0*3+1],result.mHullVertices[index0*3+2]);
         btVector3 vertex1(result.mHullVertices[index1*3], result.mHullVertices[index1*3+1],result.mHullVertices[index1*3+2]);
@@ -1102,13 +1090,16 @@ void csBulletSystem::DecomposeConcaveMesh (CS::Collision2::iCollisionObject* obj
         vertex1 -= centroid;
         vertex2 -= centroid;
 
-
-        trimesh->addTriangle(vertex0,vertex1,vertex2);
+        //TODO this will add duplicate vertices to convex shape. But the debug draw result is right now.
+        vertices.push_back(vertex0);
+        vertices.push_back(vertex1);
+        vertices.push_back(vertex2);
 
         index0+=mBaseCount;
         index1+=mBaseCount;
         index2+=mBaseCount;
       }
+
       btConvexHullShape* convexShape = new btConvexHullShape(&(vertices[0].getX()),vertices.size());
       convexShape->setMargin(0.01f);
       m_convexShapes.push_back(convexShape);

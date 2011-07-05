@@ -110,7 +110,7 @@ private:
   void CreateWalls (const csVector3& radius);
   void CreateTerrain ();
 
-  void CreateGhostCapsule ();
+  void CreateGhostCylinder ();
   void GripContactBodies ();
 
 public:

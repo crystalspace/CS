@@ -94,7 +94,7 @@ void csBulletCollisionObject::SetTransform (const csOrthoTransform& trans)
   else // ghost or actor
   {
     if (movable)
-      movable->SetTransform (trans);
+      movable->SetTransform (BulletToCS (transform * invPricipalAxis, system->getInverseInternalScale ()));
     if (btObject)
       btObject->setWorldTransform(transform);
   }
@@ -408,6 +408,14 @@ void csBulletCollisionObject::AddBulletObject ()
   else
     shape = colliders[0]->shape;
 
+  btTransform pricipalAxis;
+  if (compoundShape)
+    pricipalAxis.setIdentity ();
+  else
+    pricipalAxis = CSToBullet (relaTransforms[0], system->getInternalScale ());
+
+  invPricipalAxis = pricipalAxis.inverse ();
+
   if (type == CS::Collision2::COLLISION_OBJECT_BASE)
   {
     if (!isTerrain)
@@ -416,7 +424,6 @@ void csBulletCollisionObject::AddBulletObject ()
       motionState->getWorldTransform (trans);
       trans = trans * motionState->inversePrincipalAxis;
       delete motionState;
-      btTransform pricipalAxis = CSToBullet (relaTransforms[0], system->getInternalScale ());
       motionState = new csBulletMotionState (this, trans * pricipalAxis, pricipalAxis);
 
       btVector3 localInertia (0.0f, 0.0f, 0.0f);
@@ -432,10 +439,11 @@ void csBulletCollisionObject::AddBulletObject ()
   else if (type == CS::Collision2::COLLISION_OBJECT_GHOST 
     || type == CS::Collision2::COLLISION_OBJECT_ACTOR)
   {
+
     btObject = new btPairCachingGhostObject ();
     btObject->setWorldTransform (transform);
     if (movable)
-      movable->SetTransform (BulletToCS(transform, system->getInverseInternalScale ()));
+      movable->SetTransform (BulletToCS(transform * invPricipalAxis, system->getInverseInternalScale ()));
     btObject->setUserPointer (static_cast<iCollisionObject*> (this));
     btObject->setCollisionShape (shape);
     sector->broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());

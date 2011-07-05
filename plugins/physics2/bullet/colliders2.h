@@ -41,6 +41,7 @@ csRef<iTriangleMesh> FindColdetTriangleMesh (iMeshWrapper* mesh,
 class csBulletCollider: public virtual CS::Collision2::iCollider
 {
   friend class csBulletCollisionObject;
+  friend class csBulletCollisionActor;
   friend class csBulletRigidBody;
 protected:
   btCollisionShape* shape;
@@ -85,8 +86,7 @@ public:
   virtual ~csBulletColliderSphere ();
   virtual CS::Collision2::ColliderType GetGeometryType () const
   {return CS::Collision2::COLLIDER_SPHERE;}
-  //Lulu: Implement this for sphere? Bullet do not support local scale of sphere.
-  virtual void SetLocalScale (const csVector3& scale);
+  virtual void SetMargin (float margin);
   virtual float GetSphereGeometry () {return radius;}
 };
 

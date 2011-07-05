@@ -1,20 +1,129 @@
 #include "cssysdef.h"
 #include "collisionactor2.h"
+#include "btBulletDynamicsCommon.h"
+#include "btBulletCollisionCommon.h"
+#include "BulletCollision/CollisionDispatch/btGhostObject.h"
+
+class btKinematicClosestNotMeRayResultCallback : public btCollisionWorld::ClosestRayResultCallback
+{
+public:
+  btKinematicClosestNotMeRayResultCallback (btCollisionObject* me) : btCollisionWorld::ClosestRayResultCallback(btVector3(0.0, 0.0, 0.0), btVector3(0.0, 0.0, 0.0))
+  {
+    m_me[0] = me;
+    count = 1;
+  }
+
+  btKinematicClosestNotMeRayResultCallback (btCollisionObject* me[], int count_) : btCollisionWorld::ClosestRayResultCallback(btVector3(0.0, 0.0, 0.0), btVector3(0.0, 0.0, 0.0))
+  {
+    count = count_;
+
+    for(int i = 0; i < count; i++)
+      m_me[i] = me[i];
+  }
+
+  virtual btScalar addSingleResult(btCollisionWorld::LocalRayResult& rayResult,bool normalInWorldSpace)
+  {
+    for(int i = 0; i < count; i++)
+      if (rayResult.m_collisionObject == m_me[i])
+        return 1.0;
+
+    return ClosestRayResultCallback::addSingleResult (rayResult, normalInWorldSpace);
+  }
+protected:
+  btCollisionObject* m_me[10];
+  int count;
+};
+
+class btKinematicClosestNotMeConvexResultCallback : public btCollisionWorld::ClosestConvexResultCallback
+{
+public:
+  btKinematicClosestNotMeConvexResultCallback( btCollisionObject* me, const btVector3& up, btScalar minSlopeDot )
+    : btCollisionWorld::ClosestConvexResultCallback( btVector3( 0.0, 0.0, 0.0 ), btVector3( 0.0, 0.0, 0.0 ) ),
+    m_me( me ), m_up( up ), m_minSlopeDot( minSlopeDot )
+  {
+  }
+
+  virtual btScalar addSingleResult(btCollisionWorld::LocalConvexResult& convexResult,bool normalInWorldSpace)
+  {
+    if( convexResult.m_hitCollisionObject == m_me )
+      return btScalar( 1 );
+
+    btVector3 hitNormalWorld;
+    if( normalInWorldSpace )
+    {
+      hitNormalWorld = convexResult.m_hitNormalLocal;
+    }
+    else
+    {
+      ///need to transform normal into worldspace
+      hitNormalWorld = m_hitCollisionObject->getWorldTransform().getBasis()*convexResult.m_hitNormalLocal;
+    }
+
+    // NOTE : m_hitNormalLocal is not always vertical on the ground with a capsule or a box...
+
+    btScalar dotUp = m_up.dot(hitNormalWorld);
+    if( dotUp < m_minSlopeDot )
+      return btScalar( 1 );
+
+    return ClosestConvexResultCallback::addSingleResult (convexResult, normalInWorldSpace);
+  }
+
+protected:
+  btCollisionObject* m_me;
+  const btVector3 m_up;
+  btScalar m_minSlopeDot;
+};
 
 CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
 
 csBulletCollisionActor::csBulletCollisionActor (csBulletSystem* sys)
-: scfImplementationType (this, sys), upAxis (1), camera (NULL), wasOnGround (true),
-wasJumping (false), verticalVelocity (0), fallSpeed (0), jumpSpeed (0), maxJumpHeight (0),
-touchingContact (false), speed (0)
+: scfImplementationType (this, sys), camera (NULL), wasOnGround (true),
+wasJumping (false), verticalVelocity (0), maxJumpHeight (0),
+touchingContact (false), speed (0), useGhostSweep (true), recoveringFactor (0.2f)
 {
   type = CS::Collision2::COLLISION_OBJECT_ACTOR;
+  SetMaxSlope (btRadians (45.0f));
+  fallSpeed = 55.0f * system->getInternalScale ();
+  jumpSpeed = 9.8f * system->getInternalScale ();
+  stepHeight = 0.5f * system->getInternalScale ();
 }
 
 csBulletCollisionActor::~csBulletCollisionActor ()
 {
   RemoveBulletObject ();
+}
+
+void csBulletCollisionActor::AddCollider (CS::Collision2::iCollider* collider, const csOrthoTransform& relaTrans)
+{
+  csBulletCollider* coll = dynamic_cast<csBulletCollider*> (collider);
+
+  if (coll->shape->isConvex ())
+  {
+    if (colliders.GetSize () == 0)
+    {
+      colliders.Push(coll);
+      relaTransforms.Push(relaTrans);
+    }
+    else
+    {
+      colliders[0] = coll;
+      relaTransforms[0] = relaTrans;
+    }
+    shapeChanged = true;
+  }
+}
+
+void csBulletCollisionActor::RemoveCollider (CS::Collision2::iCollider* collider)
+{
+  if (collider == colliders[0])
+    colliders.Empty ();
+}
+
+void csBulletCollisionActor::RemoveCollider (size_t index)
+{
+  if (index == 0)
+    colliders.Empty ();
 }
 
 bool csBulletCollisionActor::IsOnGround ()
@@ -44,33 +153,20 @@ void csBulletCollisionActor::SetCamera (iCamera* camera)
 
 void csBulletCollisionActor::UpdateAction (float delta)
 {
+  csVector3 upVec = GetTransform ().GetUp ();
+  upVector.setValue (upVec.x, upVec.y, upVec.z);
+  
+  csVector3 frVec = GetTransform ().GetFront ();
+  frontVector.setValue (frVec.x, frVec.y, frVec.z);
+
   PreStep ();
   PlayerStep (delta);
   speed = 0;
 }
 
-void csBulletCollisionActor::SetUpAxis (int axis)
-{
-  if (axis < 0)
-    axis = 0;
-  if (axis > 2)
-    axis = 2;
-  upAxis = axis;
-}
-
 void csBulletCollisionActor::PreStep ()
 {
-  int numPenetrationLoops = 0;
-  touchingContact = false;
-  while (RecoverFromPenetration ())
-  {
-    numPenetrationLoops++;
-    touchingContact = true;
-    if (numPenetrationLoops > 4)
-      break;
-  }
-  currentPosition = GetTransform ().GetOrigin ();
-  targetPosition = currentPosition;
+  for (int i = 0; i < 4 && RecoverFromPenetration (); i++);
 }
 
 void csBulletCollisionActor::PlayerStep (float delta)
@@ -79,8 +175,8 @@ void csBulletCollisionActor::PlayerStep (float delta)
   wasOnGround = IsOnGround();
 
   // Update fall velocity.
-  csVector3 grav = sector->GetGravity ();
-  verticalVelocity += grav[upAxis];
+  btVector3 grav = sector->bulletWorld->getGravity ();
+  verticalVelocity += grav[1] * delta;
   if(verticalVelocity > 0.0 && verticalVelocity > jumpSpeed)
   {
     verticalVelocity = jumpSpeed;
@@ -93,17 +189,15 @@ void csBulletCollisionActor::PlayerStep (float delta)
 
   csOrthoTransform xform;
   xform = GetTransform ();
+  currentPosition = CSToBullet (xform.GetOrigin (), system->getInternalScale ());
 
-  //	printf("walkDirection(%f,%f,%f)\n",walkDirection[0],walkDirection[1],walkDirection[2]);
-  //	printf("walkSpeed=%f\n",walkSpeed);
-
-  StepUp ();
+  currentPosition = StepUp ();
   
-  StepForwardAndStrafe (delta);
+  currentPosition = StepForwardAndStrafe (delta);
   
-  StepDown (delta);
+  currentPosition = StepDown (delta);
 
-  xform.SetOrigin (currentPosition);
+  xform.SetOrigin (BulletToCS (currentPosition, system->getInverseInternalScale ()));
   SetTransform (xform);
 }
 
@@ -125,49 +219,259 @@ void csBulletCollisionActor::SetMaxSlope (float slopeRadians)
 bool csBulletCollisionActor::RecoverFromPenetration ()
 {
   bool penetration = false;
-  float maxPen = 0.0f;
 
-  csOrthoTransform trans = GetTransform ();
-  currentPosition = trans.GetOrigin ();
+  btPairCachingGhostObject* ghost = dynamic_cast<btPairCachingGhostObject*> (btObject);
+  sector->bulletWorld->getDispatcher()->dispatchAllCollisionPairs( 
+    ghost->getOverlappingPairCache(),
+    sector->bulletWorld->getDispatchInfo(),
+    sector->bulletWorld->getDispatcher() );
 
-  csArray<CS::Collision2::CollisionData> collisions;
-  sector->CollisionTest (QueryCollisionObject (), collisions);
+  currentPosition = btObject->getWorldTransform().getOrigin();
 
-  for (size_t i = 0; i < collisions.GetSize (); i++)
+  for( int i = 0; i < ghost->getOverlappingPairCache()->getNumOverlappingPairs(); i++ )
   {
-    float dist = collisions[i].penetration;
-    btScalar directionSign = collisions[i].objectA == QueryCollisionObject () ? -1.0f : 1.0f;
-    if (dist < 0.0)
+    btManifoldArray manifoldArray;
+
+    btBroadphasePair* collisionPair = &ghost->getOverlappingPairCache()->getOverlappingPairArray()[i];
+
+    if( collisionPair->m_algorithm )
+      collisionPair->m_algorithm->getAllContactManifolds(manifoldArray);
+
+    for( int j = 0; j < manifoldArray.size(); j++ )
     {
-      if (dist < maxPen)
+      btPersistentManifold* manifold = manifoldArray[j];
+
+      btScalar directionSign = manifold->getBody0() == ghost ? btScalar( -1.0 ) : btScalar( 1.0 );
+
+      for( int p = 0; p < manifold->getNumContacts(); p++ )
       {
-        maxPen = dist;
+        const btManifoldPoint &pt = manifold->getContactPoint( p );
+
+        btScalar dist = pt.getDistance();
+
+        if( dist < 0.0 )
+        {
+          // NOTE : btScalar affects the stairs but the parkinson...
+          // 0.0 , the capsule can break the walls...
+          currentPosition += pt.m_normalWorldOnB * directionSign * dist * recoveringFactor;          
+
+          penetration = true;
+        }
       }
-      currentPosition += collisions[i].normalWorldOnB * dist * directionSign * 0.2f;
-      penetration = true;
     }
   }
-  trans.SetOrigin(currentPosition);
-  SetTransform(trans);
+
+  btTransform trans = ghost->getWorldTransform();
+  trans.setOrigin( currentPosition );
+
+  SetTransform (BulletToCS (trans, system->getInverseInternalScale ()));
 
   return penetration;
 }
 
-void csBulletCollisionActor::StepUp ()
+btVector3 csBulletCollisionActor::StepUp ()
 {
 //TODO
+  targetPosition = currentPosition + upVector * (stepHeight + 
+    verticalOffset > EPSILON ? verticalOffset : 0.0f);
+
+  btCollisionShape* collisionShape = colliders[0]->shape;
+  // Add this to add collider. Ghost object can only have convex shape.
+  btAssert (collisionShape->isConvex ());
+  btConvexShape* convexShape = dynamic_cast<btConvexShape*> (collisionShape);
+
+  btTransform start;
+  start.setIdentity ();
+  start.setOrigin (currentPosition + upVector * colliders[0]->GetMargin () * system->getInternalScale ());
+
+  btTransform end;
+  end.setIdentity ();
+  end.setOrigin (targetPosition);
+
+  btKinematicClosestNotMeConvexResultCallback callback( btGhostObject::upcast (btObject), -upVector, maxSlopeCosine );
+  callback.m_collisionFilterGroup = btObject->getBroadphaseHandle()->m_collisionFilterGroup;
+  callback.m_collisionFilterMask = btObject->getBroadphaseHandle()->m_collisionFilterMask;
+
+  if( useGhostSweep )
+    btGhostObject::upcast (btObject)->convexSweepTest( convexShape, start, 
+    end, callback, sector->bulletWorld->getDispatchInfo().m_allowedCcdPenetration );
+
+  else
+    sector->bulletWorld->convexSweepTest( convexShape, start, end, callback );
+
+  if( callback.hasHit() )
+  {
+    // Only modify the position if the hit was a slope and not a wall or ceiling.
+    //
+    if( callback.m_hitNormalWorld.dot(upVector) > btScalar( 0.0 ) )
+    {
+
+      currentStepOffset = stepHeight * callback.m_closestHitFraction;
+      return currentPosition.lerp( targetPosition, callback.m_closestHitFraction );
+    }
+
+    verticalVelocity = btScalar( 0.0 );
+    verticalOffset = btScalar( 0.0 );
+
+    return currentPosition;
+  }
+  else
+  {
+    currentStepOffset = stepHeight;
+    return targetPosition;
+  }
 }
 
-void csBulletCollisionActor::StepForwardAndStrafe (float dt)
+///////////////////
+
+///Reflect the vector d around the vector r
+inline btVector3 reflect( const btVector3& d, const btVector3& r )
+{
+  return d - ( btScalar( 2.0 ) * d.dot( r ) ) * r;
+}
+
+
+///Project a vector u on another vector v
+inline btVector3 project( const btVector3& u, const btVector3& v )
+{
+  return v * u.dot( v );
+}
+
+
+///Helper for computing the character sliding
+inline btVector3 slide( const btVector3& direction, const btVector3& planeNormal )
+{
+  return direction - project( direction, planeNormal );
+}
+
+btVector3 slideOnCollision( const btVector3& fromPosition, const btVector3& toPosition, const btVector3& hitNormal )
+{
+  btVector3 moveDirection = toPosition - fromPosition;
+  btScalar moveLength = moveDirection.length();
+
+  if( moveLength <= btScalar( SIMD_EPSILON ) )
+    return toPosition;
+
+  moveDirection.normalize();
+
+  btVector3 reflectDir = reflect( moveDirection, hitNormal );
+  reflectDir.normalize();
+
+  return fromPosition + slide( reflectDir, hitNormal ) * moveLength;
+}
+
+///////////////////
+
+btVector3 csBulletCollisionActor::StepForwardAndStrafe (float dt)
 {
   //TODO
-  csOrthoTransform trans = GetTransform ();
-  currentPosition += trans.GetT2O () * csVector3 (0, 0, speed * dt);
+
+  targetPosition = currentPosition + frontVector * speed * dt;
+
+  btCollisionShape* collisionShape = colliders[0]->shape;
+  btAssert (collisionShape->isConvex ());
+  btConvexShape* convexShape = dynamic_cast<btConvexShape*> (collisionShape);
+
+  btTransform start;
+  start.setIdentity ();
+
+  btTransform end;
+  end.setIdentity ();
+
+  float fraction = 1.0f;
+
+  for (int i = 0; i < 4 && fraction > 0.01f; i++)
+  {
+    start.setOrigin( currentPosition );
+    end.setOrigin( targetPosition );
+
+    btVector3 sweepDirNegative = currentPosition - targetPosition;
+
+    btKinematicClosestNotMeConvexResultCallback callback( btGhostObject::upcast (btObject), sweepDirNegative, 0.0f);
+    callback.m_collisionFilterGroup = btObject->getBroadphaseHandle()->m_collisionFilterGroup;
+    callback.m_collisionFilterMask = btObject->getBroadphaseHandle()->m_collisionFilterMask;
+
+    if( useGhostSweep )
+      btGhostObject::upcast (btObject)->convexSweepTest( convexShape, start, end, callback, sector->bulletWorld->getDispatchInfo().m_allowedCcdPenetration );
+
+    else
+      sector->bulletWorld->convexSweepTest( convexShape, start, end, callback, sector->bulletWorld->getDispatchInfo().m_allowedCcdPenetration );
+
+    if( callback.hasHit() )
+    {
+      // Try another target position
+      //
+      targetPosition = slideOnCollision( currentPosition, targetPosition, callback.m_hitNormalWorld );
+      fraction = callback.m_closestHitFraction;
+    }
+    else
+
+      // Move to the valid target position
+      //
+      return targetPosition;
+  }
+  // Don't move if you can't find a valid target position...
+  // It prevents some flickering.
+  return currentPosition;
 }
 
-void csBulletCollisionActor::StepDown (float dt)
+btVector3 csBulletCollisionActor::StepDown (float dt)
 {
-//TODO
+  btVector3 stepDrop = upVector * currentStepOffset;
+
+  // Be sure we are falling from the last m_currentPosition
+  // It prevents some flickering
+  targetPosition = currentPosition - stepDrop;
+
+  btCollisionShape* collisionShape = colliders[0]->shape;
+  // Add this to add collider. Ghost object can only have convex shape.
+  btAssert (collisionShape->isConvex ());
+  btConvexShape* convexShape = dynamic_cast<btConvexShape*> (collisionShape);
+
+  btTransform start;
+  start.setIdentity();
+  start.setOrigin( currentPosition );
+
+  btTransform end;
+  end.setIdentity();
+  end.setOrigin( targetPosition );
+
+  btKinematicClosestNotMeConvexResultCallback callback( btGhostObject::upcast (btObject), upVector, maxSlopeCosine );
+  callback.m_collisionFilterGroup = btObject->getBroadphaseHandle()->m_collisionFilterGroup;
+  callback.m_collisionFilterMask = btObject->getBroadphaseHandle()->m_collisionFilterMask;
+
+  if( useGhostSweep )
+    btGhostObject::upcast (btObject)->convexSweepTest( convexShape, start, 
+    end, callback, sector->bulletWorld->getDispatchInfo().m_allowedCcdPenetration );
+
+  else
+    sector->bulletWorld->convexSweepTest( convexShape, start, end, callback );
+  
+  if( callback.hasHit() )
+  {
+    verticalVelocity = 0.0f;
+    verticalOffset = 0.0f;
+    wasJumping = false;
+
+    // We dropped a fraction of the height -> hit floor
+    //
+    return currentPosition.lerp( targetPosition, callback.m_closestHitFraction );
+  }
+  else
+
+    // We dropped the full height
+    //		
+    return targetPosition;
+}
+
+float csBulletCollisionActor::AddFallOffset (bool wasOnGround, btScalar currentStepOffset, btScalar dt)
+{
+  float downVelocity = ( verticalVelocity < 0.0 ? -verticalVelocity :  0.0f ) * dt;
+
+  if( downVelocity > 0.0f && downVelocity < stepHeight && ( wasOnGround || !wasJumping ) )
+    downVelocity = stepHeight;
+
+  return currentStepOffset + downVelocity;
 }
 }
 CS_PLUGIN_NAMESPACE_END (Bullet2)

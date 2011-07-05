@@ -878,7 +878,7 @@ bool Simple::Application ()
   // Initialize the camera
   UpdateCameraMode ();
 
-  CreateGhostCapsule ();
+  CreateGhostCylinder ();
 
   // Initialize the HUD manager
   hudManager->GetKeyDescriptions ()->Empty ();
@@ -894,7 +894,7 @@ bool Simple::Application ()
   
   hudManager->GetKeyDescriptions ()->Push ("q: spawn a compound body");
   hudManager->GetKeyDescriptions ()->Push ("j: spawn a joint");
-  hudManager->GetKeyDescriptions ()->Push ("k: spawn a filter sphere");
+  hudManager->GetKeyDescriptions ()->Push ("k: spawn a filter body");
   
   hudManager->GetKeyDescriptions ()->Push ("h: spawn a chain");
   hudManager->GetKeyDescriptions ()->Push ("r: spawn a Frankie's ragdoll");
@@ -1050,7 +1050,7 @@ void Simple::UpdateCameraMode ()
   }
 }
 
-void Simple::CreateGhostCapsule ()
+void Simple::CreateGhostCylinder ()
 {
   // Create the cylinder mesh factory.
   csRef<iMeshFactoryWrapper> cylinderFact = engine->CreateMeshFactory(
@@ -1078,7 +1078,7 @@ void Simple::CreateGhostCapsule ()
   // Create a body and attach the mesh.
   ghostObject = collisionSystem->CreateCollisionObject ();
   ghostObject->SetObjectType (CS::Collision2::COLLISION_OBJECT_GHOST, false);
-  csMatrix3 m;
+  csYRotMatrix3 m (PI/2.0);
   csOrthoTransform trans (m, csVector3 (0, -3, 5));
   if (this->environment == ENVIRONMENT_TERRAIN)
     trans.SetOrigin (csVector3 (0, 1.0, 5));
@@ -1087,7 +1087,9 @@ void Simple::CreateGhostCapsule ()
 
   // Create and attach a cone collider.
   csRef<CS::Collision2::iColliderCylinder> cyliner = collisionSystem->CreateColliderCylinder (length, radius);
-  ghostObject->AddCollider (cyliner, localTrans);
+  //It won't work for ghost and actor.
+  ghostObject->AddCollider (cyliner, csReversibleTransform(csYRotMatrix3 (PI/2.0), csVector3 (0,0,0)));
+  //ghostObject->AddCollider (cyliner, trans)
   ghostObject->RebuildObject ();
   collisionSector->AddCollisionObject (ghostObject);
 }
@@ -1135,6 +1137,7 @@ CS::Physics2::iRigidBody* Simple::SpawnBox (bool setVelocity /* = true */)
   // Create and attach a box collider.
   csVector3 size (0.4f, 0.8f, 0.4f); // This should be the same size as the mesh
   csRef<CS::Collision2::iColliderBox> box = collisionSystem->CreateColliderBox (size);
+  box->SetMargin (0.05);
   rb->AddCollider (box, localTrans);
   rb->SetDensity (1.0f);
   rb->SetElasticity (0.8f);
@@ -1198,7 +1201,8 @@ CS::Physics2::iRigidBody* Simple::SpawnSphere (bool setVelocity /* = true */)
   rb->SetAttachedMovable (mesh->GetMovable ());
 
   // Create and attach a sphere collider.
-  csRef<CS::Collision2::iColliderSphere> sphere = collisionSystem->CreateColliderSphere (r);
+  csRef<CS::Collision2::iColliderSphere> sphere = collisionSystem->CreateColliderSphere (1.0);
+  sphere->SetLocalScale (radius);
   trans = localTrans;
   trans.SetOrigin (artificialOffset);
   rb->AddCollider (sphere, trans);
@@ -1227,13 +1231,11 @@ CS::Physics2::iRigidBody* Simple::SpawnCone (bool setVelocity /* = true */)
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
 
-  const float radius (rand() % 10 / 50. + .2);
-  const float length (rand() % 3 / 50. + .7);
+  const float radius (0.4);
+  const float length (0.8);
 
   // We do a hardtransform here to make sure our cylinder has an artificial
   // offset. That way we can test if the physics engine supports that.
-  csVector3 artificialOffset (3, 3, 3);
-  csReversibleTransform hardTransform (csYRotMatrix3 (PI/2.0), artificialOffset);
  
   // Create a body and attach the mesh.
   csRef<CS::Physics2::iRigidBody> rb = physicalSystem->CreateRigidBody ();
@@ -1244,9 +1246,8 @@ CS::Physics2::iRigidBody* Simple::SpawnCone (bool setVelocity /* = true */)
 
   // Create and attach a cone collider.
   csRef<CS::Collision2::iColliderCone> cone = collisionSystem->CreateColliderCone (length, radius);
-  csMatrix3 m;
-  csReversibleTransform t = csReversibleTransform (m, artificialOffset);
-  rb->AddCollider (cone, t);
+  cone->SetLocalScale (csVector3 (rand()%5/10. + .2, rand()%5/10. + .2, rand()%5/10. + .2));
+  rb->AddCollider (cone, localTrans);
   rb->SetDensity (1.0f);
   rb->SetElasticity (0.8f);
   rb->SetFriction (10.0f);

@@ -473,9 +473,6 @@ struct iCollisionActor : public virtual iCollisionObject
   /// Move the actor.
   virtual void UpdateAction (float delta) = 0;
 
-  /// Set the up axis of the actor.
-  virtual void SetUpAxis (int axis) = 0;
-
   /// Set the walking velocity of the actor.
   virtual void SetVelocity (float speed) = 0;
 
@@ -500,6 +497,9 @@ struct iCollisionActor : public virtual iCollisionObject
 
   /// Set the max jump height an actor can have.
   virtual void SetMaxJumpHeight (float maxJumpHeight) = 0;
+
+  /// Set the step up height an actor can have.
+  virtual void StepHeight (float stepHeight) = 0;
 
   /// Let the actor jump.
   virtual void Jump () = 0;

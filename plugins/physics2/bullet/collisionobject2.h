@@ -29,6 +29,7 @@ protected:
   csWeakRef<iMovable> movable;
   btCollisionObject* btObject;
   btTransform transform;
+  btTransform invPricipalAxis;
   csBulletMotionState* motionState;
   csRef<CS::Collision2::iCollisionCallback> collCb;
   btCompoundShape* compoundShape;
