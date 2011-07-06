@@ -292,8 +292,8 @@ namespace CS
 //           csPrintf("%d\n", lightFrustums.frustums.GetSize());
           for (size_t l = 0; l < 1; l++)
           {
-            const SuperFrustum& superFrust = *(lightFrustums.frustums[l]);
-            
+            const SuperFrustum& superFrust = *(lightFrustums.frustums[l]);            
+
             for (int frustNum = 0 ; frustNum < superFrust.actualNumParts ; frustNum ++)
             {
               typename SuperFrustum::Frustum& lightFrust = 
@@ -353,6 +353,18 @@ namespace CS
               lightFrust.splitDistsSV->SetValue(lightFrust.splitDists);
 //               csPrintf("%f\n", viewSetup.splitDists[frustNum]);
 
+              // fill in split dists for osm
+              persist.settings.shadowDefaultShader->GetVariableAdd(persist.numSplitsSVName)->
+                SetValue(viewSetup.persist.numSplits);
+
+              csRef<csShaderVariable> passColorSV =
+                persist.settings.shadowDefaultShader->GetVariableAdd(persist.passColorSVName);
+
+              passColorSV->SetArrayElement(frustNum, lightFrust.splitDistsSV);
+
+              if( !( frustNum % 4 == 3 || frustNum == superFrust.actualNumParts - 1 ) )
+                continue;
+
               int shadowMapSize = viewSetup.persist.shadowMapRes;
 
               csRef<iCustomMatrixCamera> shadowViewCam =
@@ -374,27 +386,20 @@ namespace CS
 
               for (size_t t = 0; t < persist.settings.targets.GetSize(); t++)
               {
-                ShadowSettings::Target* target =
+                ShadowSettings::Target* target = 
                   viewSetup.persist.settings.targets[t];
                 iTextureHandle* tex = target->texCache.QueryUnusedTexture (
-                  shadowMapSize, shadowMapSize);
+                    shadowMapSize, shadowMapSize);
+                renderTree.AddDebugTexture (tex);
                 // register SVs
                 lightFrust.textureSVs[target->attachment]->SetValue (tex);
-                renderTree.AddDebugTexture (tex);
+//                 csPrintf("%d %d\n", frustNum, tex);
 
                 shadowMapCtx->renderTargets[target->attachment].texHandle = tex;
                 shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
               }
 
-              int index = frustNum % 4;
-              if (index == 0)
-                layerConfig.SetDefaultShader(persist.osmRedPass);
-              else if (index == 1)
-                layerConfig.SetDefaultShader(persist.osmGreenPass);
-              else if (index == 2)
-                layerConfig.SetDefaultShader(persist.osmBluePass);
-              else if (index == 3)
-                layerConfig.SetDefaultShader(persist.osmAlphaPass);
+              layerConfig.SetDefaultShader(persist.settings.shadowDefaultShader);
 
               ShadowmapContextSetup contextFunction (layerConfig,
                 persist.shaderManager, viewSetup);
@@ -488,11 +493,7 @@ namespace CS
         ShadowSettings settings;
         CS::ShaderVarStringID numSplitsSVName;
         CS::ShaderVarStringID splitDistsSVName;
-
-        csRef<iShader> osmRedPass;
-        csRef<iShader> osmGreenPass;
-        csRef<iShader> osmBluePass;
-        csRef<iShader> osmAlphaPass;
+        CS::ShaderVarStringID passColorSVName;
 
         /// Set the prefix for configuration settings
         void SetConfigPrefix (const char* configPrefix)
@@ -516,6 +517,7 @@ namespace CS
 
           numSplitsSVName = strings->Request ("light numSplits");
           splitDistsSVName = strings->Request ("light splitDists");
+          passColorSVName = strings->Request ("pass color");
 
           csConfigAccess cfg (objectReg);
           if (configPrefix.IsEmpty())
@@ -532,13 +534,6 @@ namespace CS
             shadowMapRes = cfg->GetInt (
               csString().Format ("%s.ShadowMapResolution", configPrefix.GetData()), 512);
           }
-
-          csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
-
-          osmRedPass = loader->LoadShader ("/shader/shadow/shadow_osm_redpass.xml");
-          osmGreenPass = loader->LoadShader ("/shader/shadow/shadow_osm_greenpass.xml");
-          osmBluePass = loader->LoadShader ("/shader/shadow/shadow_osm_bluepass.xml");
-          osmAlphaPass = loader->LoadShader ("/shader/shadow/shadow_osm_alphapass.xml");
         }
         void UpdateNewFrame ()
         {
@@ -580,19 +575,23 @@ namespace CS
           typename CachedLightData::SuperFrustum::Frustum& lightFrustum =
             superFrust.frustums[f];
     
-          lightVarsHelper.MergeAsArrayItem (lightStacks[0],
-            lightFrustum.shadowMapProjectSV, 8 * lightNum + s);
+          if (f % 4 == 3 || f == superFrust.actualNumParts - 1)
+          {
+            lightVarsHelper.MergeAsArrayItem (lightStacks[0],
+              lightFrustum.shadowMapProjectSV, 8 * lightNum + s / 4);
+
+            for (size_t t = 0; t < persist.settings.targets.GetSize(); t++)
+            {
+              const ShadowSettings::Target* target =
+                viewSetup.persist.settings.targets[t];
+              lightVarsHelper.MergeAsArrayItem (lightStacks[0], 
+                lightFrustum.textureSVs[target->attachment], 8 * lightNum + s / 4);
+            }
+          }
 
           lightVarsHelper.MergeAsArrayItem(lightStacks[0],
             lightFrustum.splitDistsSV, 8 * lightNum + s);
 
-          for (size_t t = 0; t < persist.settings.targets.GetSize(); t++)
-          {
-            const ShadowSettings::Target* target =
-              viewSetup.persist.settings.targets[t];
-            lightVarsHelper.MergeAsArrayItem (lightStacks[0], 
-              lightFrustum.textureSVs[target->attachment], 8 * lightNum + s);
-          }
           spreadFlags |= (1 << s);
           s++;        
         }

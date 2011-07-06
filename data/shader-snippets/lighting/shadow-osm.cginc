@@ -62,7 +62,7 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     color += tex2D(tex, position + float2(-bias, 0));    
     color /= 9;
     
-    return color;
+    return tex2D(tex, position);
   }
   
   float getMapValue(int i, float2 position)
@@ -73,35 +73,54 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     if (i == 0)
       return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 0], position).r;
     if (i == 1)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 1], position).g;
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 0], position).g;
     if (i == 2)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 2], position).b;
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 0], position).b;
     if (i == 3)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 3], position).a;	
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 0], position).a;	
     if (i == 4)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 4], position).r;	
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 1], position).r;	
     if (i == 5)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 5], position).g;	
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 1], position).g;	
     if (i == 6)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 6], position).b;	
-/*
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 1], position).b;	
+
     if (i == 7)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 7], position).a;
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 1], position).a;
     if (i == 8)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 8], position).a;
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 2], position).r;
     if (i == 9)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 9], position).a;
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 2], position).g;
     if (i == 10)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 10], position).a;
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 2], position).b;
     if (i == 11)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 11], position).a;	
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 2], position).a;	
     if (i == 12)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 12], position).a;	
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 3], position).r;	
     if (i == 13)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 13], position).a;	
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 3], position).g;	
     if (i == 14)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 14], position).a;	
-*/      
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 3], position).b;	
+    if (i == 15)
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 3], position).a;	
+
+    if (i == 16)
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 4], position).r;
+    if (i == 17)
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 4], position).g;
+    if (i == 18)
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 4], position).b;
+    if (i == 19)
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 4], position).a;
+    if (i == 20)
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 5], position).r;	
+    if (i == 21)
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 5], position).g;	
+    if (i == 22)
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 5], position).b;	
+    if (i == 23)
+      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 5], position).a;	
+      
     return 0;
   }
   
@@ -129,17 +148,22 @@ struct ShadowShadowMapDepth : ShadowShadowMap
 
       previousSplit = nextSplit;
     }
-    float4x4 shadowMapTFPrev = mul (flipY, lightPropsOM.opacityMapTF[8 * lightNum + i]);
-    float4 viewPosOld = viewPos;
-    viewPosOld.z = viewPosOld.z - (nextSplit - previousSplit);
-    viewPosOld.z = 1000;
+
+    int index = (i / 4);
+    if (index > numSplits) 
+      index = numSplits;
+    
+    float4x4 shadowMapTFPrev = mul (flipY, lightPropsOM.opacityMapTF[index]);
     float4 shadowMapCoordsPrev = mul (shadowMapTFPrev, viewPos);      
     float4 shadowMapCoordsProjPrev = shadowMapCoordsPrev;
     shadowMapCoordsProjPrev.xyz /= shadowMapCoordsProjPrev.w;      
     float3 shadowMapCoordsBiasedPrev = 
       (float3(0.5)*shadowMapCoordsProjPrev.xyz) + float3(0.5);          
     
-    float4x4 shadowMapTFNext = mul (flipY, lightPropsOM.opacityMapTF[8 * lightNum + i + 1]);
+    index = (i + 1) / 4;
+    if (index > numSplits) 
+      index = numSplits;
+    float4x4 shadowMapTFNext = mul (flipY, lightPropsOM.opacityMapTF[index]);
     float4 shadowMapCoordsNext = mul (shadowMapTFNext, viewPos);      
     float4 shadowMapCoordsProjNext = shadowMapCoordsNext;
     shadowMapCoordsProjNext.xyz /= shadowMapCoordsProjNext.w;      
@@ -148,21 +172,14 @@ struct ShadowShadowMapDepth : ShadowShadowMap
       
     float previousMap = getMapValue(i, shadowMapCoordsBiasedPrev.xy);
     float nextMap = getMapValue(i + 1, shadowMapCoordsBiasedNext.xy);   
-/*
-    bias = 0.001;
-    previousMap += (i == numSplits) * getMapValue(i, shadowMapCoordsBiasedPrev.xy);
-    nextMap += ((i + 1) == numSplits) * getMapValue(i + 1, shadowMapCoordsBiasedNext.xy);
-*/    
+    
     inLight = lerp(previousMap, nextMap, (float) (viewPos.z - previousSplit) 
       / (nextSplit - previousSplit) );
       
     inLight = inLight * (i != numSplits) + previousMap * (i == numSplits);
     inLight = exp(-1.0 * inLight);
-    //inLight = 1 - inLight;
       
     //inLight = (float)i/numSplits;   
-    //inLight = 1 - previousMap;
-    //inLight = inLight * (i != numSplits) + (1 - previousMap) * (i == numSplits) ;
       
     return inLight;
   }

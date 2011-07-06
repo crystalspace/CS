@@ -23,14 +23,44 @@
     
     <input name="surface" type="rgba" default="value" defval="0,0,0,1"/>
     <input name="positionProj" type="position4_screen" />
+    <input name="positionCamera" type="position4_camera" />
+    
+    <block location="cg:definitions">
+      float passColor[64];
+      int numSplits;
+    </block>
+    
+    <block location="cg:variablemap">
+      <variablemap variable="pass color" 
+        destination="passColor" />
+      <variablemap variable="light numSplits" 
+        destination="numSplits" />
+    </block>    
 
     <block location="cg:fragmentMain">
+    <![CDATA[
       float value = surface.a;
       if (surface.a == 1)
         value = 0;
-      output = float4(0, value, 0, 0);
+
+      int i;
+      for (i = 0 ; i <= numSplits ; i ++)
+        if (passColor[i] > positionCamera.z)
+          break;
+      
+      int index = i % 4;
+      float4 color = value;
+      
+      if (index >= 1)
+        color.r = 0;
+      if (index >= 2)
+        color.g = 0;
+      if (index >= 3)
+        color.b = 0;
+          
+      output = color;
+    ]]>
     </block>
-    
     <output name="output" type="rgba" />
   </technique>
 </snippet>
