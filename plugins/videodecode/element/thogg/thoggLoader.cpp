@@ -313,7 +313,6 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
   times=0;
   while (times!=container->GetMediaCount ())
   {
-    int ret;
     for (uint i=0;i<container->GetMediaCount ();i++)
     {
 
@@ -342,7 +341,7 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
 
 void thoggLoader::ComputeStreamLength (csRef<TheoraMediaContainer> container)
 {
-  for (int i=0;i<container->GetMediaCount ();i++)
+  for (size_t i=0;i<container->GetMediaCount ();i++)
   {
     if ( strcmp (container->GetMedia (i)->GetType (), "TheoraVideo")==0)
     {

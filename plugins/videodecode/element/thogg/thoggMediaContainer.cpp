@@ -212,7 +212,7 @@ void TheoraMediaContainer::DoSeek ()
   // This is important, because of the nature of seeking in theora
   bool hasVideo;
   int videoIndex=-1;
-  for (int i=0;i<activeStreams.GetSize ();i++)
+  for (size_t i=0;i<activeStreams.GetSize ();i++)
   {
     if ( strcmp (media[activeStreams[i]]->GetType (), "TheoraVideo")==0)
     {
@@ -238,7 +238,7 @@ void TheoraMediaContainer::DoSeek ()
       vidStream = static_cast<TheoraVideoMedia*> ( (iVideoMedia*)media);
     }
   }
-  int frame,targetFrame=(int) (vidStream->GetFrameCount () * timeToSeek / vidStream->GetLength ());
+  unsigned long frame,targetFrame=(int) (vidStream->GetFrameCount () * timeToSeek / vidStream->GetLength ());
 
   //check if we're seeking outside the video
   if (targetFrame>vidStream->GetFrameCount ())
@@ -251,11 +251,11 @@ void TheoraMediaContainer::DoSeek ()
 
   frame = vidStream->SeekPage (targetFrame,1,&oy,mSize);
   if (frame != -1)
-    vidStream->SeekPage (std::max (0,frame),0,&oy,mSize);
+    vidStream->SeekPage (std::max ( (unsigned long)0,frame),0,&oy,mSize);
 
   float time= ((float) targetFrame/vidStream->GetFrameCount ()) *vidStream->GetLength ();
 
-  for (int i=0;i<activeStreams.GetSize ();i++)
+  for (size_t i=0;i<activeStreams.GetSize ();i++)
   {
     if ( strcmp (media[activeStreams[i]]->GetType (),"TheoraAudio") ==0)
     {
@@ -275,11 +275,11 @@ void TheoraMediaContainer::AutoActivateStreams ()
 {
   if (activeStreams.GetSize () == 0)
   {
-    for (int i=0;i<media.GetSize ();i++)
+    for (size_t i=0;i<media.GetSize ();i++)
     {
       bool ok = true;
 
-      for(int j=0;j<activeStreams.GetSize ();j++)
+      for(size_t j=0;j<activeStreams.GetSize ();j++)
       {
         if( strcmp(media[i]->GetType (), media[activeStreams[j]]->GetType ())==0)
         {
