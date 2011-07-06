@@ -124,18 +124,30 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     return 0;
   }
   
+  float2 getPosition(int index)
+  {
+    float4x4 flipY;
+    flipY[0] = float4 (1, 0, 0, 0);
+    flipY[1] = float4 (0, -1, 0, 0);
+    flipY[2] = float4 (0, 0, 1, 0);
+    flipY[3] = float4 (0, 0, 0, 1);      
+    
+    float4x4 shadowMapTF = mul (flipY, lightPropsOM.opacityMapTF[index]);
+    float4 shadowMapCoords = mul (shadowMapTF, viewPos);      
+    float4 shadowMapCoordsProj = shadowMapCoords;
+    shadowMapCoordsProj.xyz /= shadowMapCoordsProj.w;      
+    float3 shadowMapCoordsBiased = 
+      (float3(0.5)*shadowMapCoordsProj.xyz) + float3(0.5);
+
+    return shadowMapCoordsBiased.xy;
+  }
+  
   half GetVisibility()
   {
     bias = 1.0 / 512.0;
     half inLight;
     int numSplits = lightPropsOM.opacityMapNumSplits[lightNum];
     float previousSplit, nextSplit;
-  
-    float4x4 flipY;
-    flipY[0] = float4 (1, 0, 0, 0);
-    flipY[1] = float4 (0, -1, 0, 0);
-    flipY[2] = float4 (0, 0, 1, 0);
-    flipY[3] = float4 (0, 0, 0, 1);      
   
     int i;
     for (i = 0 ; i <= numSplits ; i ++)
@@ -151,36 +163,21 @@ struct ShadowShadowMapDepth : ShadowShadowMap
 
     float previousMap = 0, nextMap = 0;
     
-    int index = (i / 4);
-    if (index > numSplits) 
-      index = numSplits;
+    int prevIndex = min((i / 4), numSplits);
+    float2 prevPos = getPosition(prevIndex);
     
-    float4x4 shadowMapTFPrev = mul (flipY, lightPropsOM.opacityMapTF[index]);
-    float4 shadowMapCoordsPrev = mul (shadowMapTFPrev, viewPos);      
-    float4 shadowMapCoordsProjPrev = shadowMapCoordsPrev;
-    shadowMapCoordsProjPrev.xyz /= shadowMapCoordsProjPrev.w;      
-    float3 shadowMapCoordsBiasedPrev = 
-      (float3(0.5)*shadowMapCoordsProjPrev.xyz) + float3(0.5);          
+    for (int j = 0 ; j < prevIndex ; j ++)
+      previousMap += getMapValue(4 * (j + 1) - 1, prevPos);
     
-    for (int j = 0 ; j < index ; j ++)
-      previousMap += getMapValue(4 * (j + 1) - 1, shadowMapCoordsBiasedPrev.xy);
+    int nextIndex = min((i + 1) / 4, numSplits);
+    float2 nextPos = getPosition(nextIndex);
     
-    index = (i + 1) / 4;
-    if (index > numSplits) 
-      index = numSplits;
-    float4x4 shadowMapTFNext = mul (flipY, lightPropsOM.opacityMapTF[index]);
-    float4 shadowMapCoordsNext = mul (shadowMapTFNext, viewPos);      
-    float4 shadowMapCoordsProjNext = shadowMapCoordsNext;
-    shadowMapCoordsProjNext.xyz /= shadowMapCoordsProjNext.w;      
-    float3 shadowMapCoordsBiasedNext = 
-      (float3(0.5)*shadowMapCoordsProjNext.xyz) + float3(0.5);
-
-    for (int j = 0 ; j < index ; j ++)
-      nextMap += getMapValue(4 * (j + 1) - 1, shadowMapCoordsBiasedNext.xy);
+    nextMap = previousMap;
+    for (int j = prevIndex ; j < nextIndex ; j ++)
+      nextMap += getMapValue(4 * (j + 1) - 1, nextPos);
       
-    previousMap += getMapValue(i, shadowMapCoordsBiasedPrev.xy);
-    nextMap += getMapValue(i + 1, shadowMapCoordsBiasedNext.xy);   
-    
+    previousMap += getMapValue(i, prevPos);
+    nextMap += getMapValue(i + 1, nextPos);   
     
     inLight = lerp(previousMap, nextMap, (float) (viewPos.z - previousSplit) 
       / (nextSplit - previousSplit) );

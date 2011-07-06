@@ -40,8 +40,7 @@
     <block location="cg:fragmentMain">
     <![CDATA[
       float value = surface.a;
-      if (surface.a == 1)
-        value = 0;
+      value = value * (surface.a != 1);
 
       int i;
       for (i = 0 ; i <= numSplits ; i ++)
@@ -50,14 +49,8 @@
       
       int index = i % 4;
       float4 color = value;
-      
-      if (index >= 1)
-        color.r = 0;
-      if (index >= 2)
-        color.g = 0;
-      if (index >= 3)
-        color.b = 0;
-          
+      color = color * float4(index < 1, index < 2, index < 3, 1);
+
       output = color;
     ]]>
     </block>
