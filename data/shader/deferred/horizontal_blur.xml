@@ -22,7 +22,11 @@
   Seidel, 2009.
 -->
 
-<shader compiler="xmlshader" name="deferred_light_composition">  
+<shader compiler="xmlshader" name="deferred_horizontal_blur">
+  
+  <shadervars>
+    
+  </shadervars>
   
   <technique priority="200">
     <pass>
@@ -32,13 +36,12 @@
         <alphatest>disable</alphatest>
       </mixmode>	
       
-      <vp plugin="glcg" file="/shader/deferred/light_composition.cgvp" />
+      <vp plugin="glcg" file="/shader/deferred/horizontal_blur.cgvp" />      
       
-      <texture destination="DirectRadianceBuffer" name="tex direct radiance" />
-      <texture destination="GlobalIllumBuffer" name="tex horizontal blur" />
+      <texture destination="GlobalIllumBuffer" name="tex global illumination" />
       <texture destination="NormalBuffer" name="tex gbuffer 3" />
       <texture destination="DepthBuffer" name="tex gbuffer depth" />
-      <fp plugin="glcg" file="/shader/deferred/light_composition.cgfp" />      
+      <fp plugin="glcg" file="/shader/deferred/horizontal_blur.cgfp" />
 
     </pass>
   </technique>

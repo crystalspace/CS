@@ -6,7 +6,7 @@
     <Property Name="MousePassThroughEnabled" Value="True" />
 
     <Window Type='ice/Listbox' Name='Frame'>
-      <Property Name='UnifiedSize' Value='{{0.0,280.0},{0.0,325.0}}'/>
+      <Property Name='UnifiedSize' Value='{{0.0,280.0},{0.0,345.0}}'/>
       <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,10.0}}'/>
       <Property Name='CaptionColour' Value='00FFFFFF'/>
 
@@ -81,10 +81,22 @@
         <Property Name='MaximumValue' Value='20.0'/>
         <Property Name='ClickStepSize' Value='0.01'/>
       </Window>
+	  
+	  <Window Type="ice/SettingSlider" Name="SampleCount" >
+        <Property Name='UnifiedSize' Value='{{0.75,0.0},{0.0,30}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,160.0}}'/>
+
+        <Property Name='Text' Value='Sample Count'/>
+        <Property Name='ConfigTypes' Value='int'/>
+        <Property Name='ConfigNames' Value='DeferredDemo.SampleCount'/>
+        <Property Name='MinimumValue' Value='1'/>
+        <Property Name='MaximumValue' Value='4'/>
+        <Property Name='ClickStepSize' Value='1'/>
+      </Window>
       
       <Window Type="ice/SettingSlider" Name="MaxOccluderDist" >
         <Property Name='UnifiedSize' Value='{{0.75,0.0},{0.0,30}}'/>
-        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,160.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,180.0}}'/>
 
         <Property Name='Text' Value='Max Occluder Dist'/>
         <Property Name='ConfigTypes' Value='float'/>
@@ -96,7 +108,7 @@
       
       <Window Type="ice/SettingSlider" Name="PatternSize" >
         <Property Name='UnifiedSize' Value='{{1.0,0.0},{0.0,30}}'/>
-        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,180.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,200.0}}'/>
 
         <Property Name='Text' Value='Pattern Size'/>
         <Property Name='ConfigTypes' Value='int'/>
@@ -108,7 +120,7 @@
       
       <Window Type="ice/SettingSlider" Name="DepthBias" >
         <Property Name='UnifiedSize' Value='{{1.0,0.0},{0.0,30}}'/>
-        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,200.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,220.0}}'/>
 
         <Property Name='Text' Value='Depth Bias'/>
         <Property Name='ConfigTypes' Value='float'/>
@@ -120,7 +132,7 @@
       
       <Window Type="ice/SettingSlider" Name="LightRotation" >
         <Property Name='UnifiedSize' Value='{{1.0,0.0},{0.0,30}}'/>
-        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,220.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,240.0}}'/>
 
         <Property Name='Text' Value='Light Rotation'/>
         <Property Name='ConfigTypes' Value='float'/>
@@ -132,7 +144,7 @@
       
       <Window Type="ice/SettingSlider" Name="BounceStrength" >
         <Property Name='UnifiedSize' Value='{{1.0,0.0},{0.0,30}}'/>
-        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,240.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,260.0}}'/>
 
         <Property Name='Text' Value='Bounce Strength'/>
         <Property Name='ConfigTypes' Value='float'/>
@@ -144,38 +156,38 @@
       
       <Window Type="ice/SettingSlider" Name="KernelSize" >
         <Property Name='UnifiedSize' Value='{{1.0,0.0},{0.0,30}}'/>
-        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,260.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,280.0}}'/>
 
         <Property Name='Text' Value='Blur Kernel Size'/>
         <Property Name='ConfigTypes' Value='int'/>
         <Property Name='ConfigNames' Value='DeferredDemo.KernelSize'/>
         <Property Name='MinimumValue' Value='1'/>
-        <Property Name='MaximumValue' Value='4'/>
+        <Property Name='MaximumValue' Value='8'/>
         <Property Name='ClickStepSize' Value='1'/>
       </Window>
       
       <Window Type="ice/SettingSlider" Name="PositionThreshold" >
         <Property Name='UnifiedSize' Value='{{1.0,0.0},{0.0,30}}'/>
-        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,280.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,300.0}}'/>
 
         <Property Name='Text' Value='Blur Position Threshold'/>
         <Property Name='ConfigTypes' Value='float'/>
         <Property Name='ConfigNames' Value='DeferredDemo.PositionThreshold'/>
         <Property Name='MinimumValue' Value='0.0'/>
         <Property Name='MaximumValue' Value='1.0'/>
-        <Property Name='ClickStepSize' Value='0.01'/>
+        <Property Name='ClickStepSize' Value='0.001'/>
       </Window>
       
       <Window Type="ice/SettingSlider" Name="NormalThreshold" >
         <Property Name='UnifiedSize' Value='{{1.0,0.0},{0.0,30}}'/>
-        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,300.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,320.0}}'/>
 
         <Property Name='Text' Value='Blur Normal Threshold'/>
         <Property Name='ConfigTypes' Value='float'/>
         <Property Name='ConfigNames' Value='DeferredDemo.NormalThreshold'/>
-        <Property Name='MinimumValue' Value='0.0'/>
-        <Property Name='MaximumValue' Value='1.0'/>
-        <Property Name='ClickStepSize' Value='0.01'/>
+        <Property Name='MinimumValue' Value='1.0'/>
+        <Property Name='MaximumValue' Value='64.0'/>
+        <Property Name='ClickStepSize' Value='1'/>
       </Window>
 
     </Window>

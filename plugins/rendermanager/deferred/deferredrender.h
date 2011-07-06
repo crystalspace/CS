@@ -232,10 +232,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
           ForEachLight (*context, lightRender);
         }
+
+        //if (globalIllum.IsEnabled())
+        //  graphics3D->FinishDraw ();
       }
       DetachAccumBuffer ();
 
-      globalIllum.RenderGlobalIllum();
+      globalIllum.RenderGlobalIllum (context->drawFlags);
 
       // Draws the forward shaded objects.
       if (!globalIllum.IsEnabled())
@@ -244,7 +247,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         globalIllum.AttachCompositionBuffer (true);
 
       {
-        graphics3D->SetZMode (CS_ZBUF_MESH);
+        graphics3D->SetZMode (CS_ZBUF_MESH);        
+
+        /*int drawFlags = CSDRAW_3DGRAPHICS | context->drawFlags;
+        drawFlags |= CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
+        graphics3D->BeginDraw (drawFlags);*/
 
         ForwardMeshTreeRenderer<RenderTree> render (graphics3D, shaderMgr, deferredLayer);
         LightVolumeRenderer lightVolumeRender (lightRender, true, 0.2f);

@@ -640,7 +640,17 @@ bool RMDeferred::DebugCommand(const char *cmd)
     drawLightVolumes = !drawLightVolumes;
     return true;
   }
-  else if (strcmp (cmd, "toggle_visualize_diffusebuffer") == 0)
+  else if (strcmp (cmd, "toggle_visualize_ambient_occlusion") == 0)
+  {
+    globalIllum.showAmbientOcclusion = !globalIllum.showAmbientOcclusion;
+    return true;
+  }
+  else if (strcmp (cmd, "toggle_visualize_global_illumination") == 0)
+  {
+    globalIllum.showGlobalIllumination = !globalIllum.showGlobalIllumination;
+    return true;
+  }
+  /*else if (strcmp (cmd, "toggle_visualize_diffusebuffer") == 0)
   {
     debugBuffer = DiffuseBuffer;
     return true;
@@ -669,7 +679,7 @@ bool RMDeferred::DebugCommand(const char *cmd)
   {
     debugBuffer = ColorBuffer;
     return true;
-  }
+  }*/
 
   return false;
 }

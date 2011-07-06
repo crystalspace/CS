@@ -30,16 +30,13 @@ struct vertex2fragment
 };
 
 float4 main(vertex2fragment IN,
-            uniform float4x4 Projection : state.matrix.projection,
-            uniform float4x4 ModelView : state.matrix.modelview,
-            uniform float4x4 ProjInv, //: state.matrix.inverse.projection,
+            //uniform float4x4 Projection : state.matrix.projection,            
+            //uniform float4x4 ProjInv, //: state.matrix.inverse.projection,
             uniform sampler2D DiffuseBuffer,
             uniform sampler2D NormalBuffer,
             uniform sampler2D AmbientBuffer,
-            uniform sampler2D DepthBuffer,
-            uniform sampler2D DirectRadianceBuffer,
-            uniform sampler2D SeedTexture,
-            //uniform samplerCUBE EnvmapTexture
+            //uniform sampler2D DepthBuffer,
+            uniform sampler2D DirectRadianceBuffer,                        
             uniform sampler2D EnvmapTexture,
             uniform sampler2D RandNormalsTexture,
             uniform float farClipDistance,
@@ -85,9 +82,9 @@ float4 main(vertex2fragment IN,
   float3 directRadiance = float3 (0.0f);
   float3 indirectRadiance = float3 (0.0f);
 
-#define NUM_PASSES 2
+//#define NUM_PASSES 2
 
-	for ( int j = 0; j < NUM_PASSES; j++ )
+	for ( int j = 0; j < sampleCount; j++ )
 	{
 		float3 random = tex2D (RandNormalsTexture, texCoord * (patternSize + (float)j)).rgb;
 		random = random * 2.0f - 1.0f;
@@ -138,9 +135,9 @@ float4 main(vertex2fragment IN,
 		}
 	}
 
-  //float solidAngle = TWO_PI / (NUM_PASSES * 8.0f);
-	occlusion /= (NUM_PASSES * 8.0f);
-  directRadiance /= NUM_PASSES * 8.0f;
+  float solidAngle = TWO_PI / (sampleCount * 8.0f);
+	occlusion *= solidAngle;
+  directRadiance *= solidAngle;
   //indirectRadiance *= solidAngle;
 	
   //return float4 (indirectRadiance, 1.0f);

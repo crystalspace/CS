@@ -249,13 +249,14 @@ bool DeferredDemo::SetupGui(bool reload)
   hudManager->GetStateDescriptions ()->Push ("depthBias");
   hudManager->GetStateDescriptions ()->Push ("lightRotation");*/
 
-
   configEventNotifier.AttachNew(new CS::Utility::ConfigEventNotifier(GetObjectRegistry()));
 
   occlusionStrengthListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
     "DeferredDemo.OcclusionStrength", occlusionStrength));
   sampleRadiusListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
     "DeferredDemo.SampleRadius", sampleRadius));
+  sampleCountListener.AttachNew (new CS::Utility::ConfigListener<int>(GetObjectRegistry(), 
+    "DeferredDemo.SampleCount", sampleCount));
   maxOccluderDistListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
     "DeferredDemo.MaxOccluderDist", maxOccluderDistance));
   patternSizeListener.AttachNew (new CS::Utility::ConfigListener<int>(GetObjectRegistry(), 
@@ -335,6 +336,7 @@ bool DeferredDemo::SetupGui(bool reload)
   guiDepthBias->setCurrentValue (1.0f);*/
   occlusionStrength = 4.0f;
   sampleRadius = 5.0f;
+  sampleCount = 16;
   maxOccluderDistance = 5.0f;
   patternSize = 4;
   depthBias = 1.0f;
@@ -346,6 +348,9 @@ bool DeferredDemo::SetupGui(bool reload)
 
   showGBuffer = false;
   drawLightVolumes = false;
+  showAmbientOcclusion = false;
+  showGlobalIllumination = false;
+  enableGlobalIllum = true;
 
   return true;
 }
@@ -522,14 +527,25 @@ void DeferredDemo::UpdateGui()
     rm_debug->DebugCommand ("toggle_visualize_lightvolumes");
   }
 
+  if (showAmbientOcclusion)
+  {
+    rm_debug->DebugCommand ("toggle_visualize_ambient_occlusion");
+  }
+
+  if (showGlobalIllumination)
+  {
+    rm_debug->DebugCommand ("toggle_visualize_global_illumination");
+  }
+
   if (cfgUseDeferredShading != guiDeferred->isSelected ())
   {
      cfgUseDeferredShading = guiDeferred->isSelected ();
   } 
 
-  //rmGlobalIllum->EnableGlobalIllumination (true);
+  rmGlobalIllum->EnableGlobalIllumination (enableGlobalIllum);
   rmGlobalIllum->SetOcclusionStrength (occlusionStrength);
   rmGlobalIllum->SetSampleRadius (sampleRadius);
+  rmGlobalIllum->SetNumberOfSamples (sampleCount);
   rmGlobalIllum->SetMaxOccluderDistance (maxOccluderDistance);
   rmGlobalIllum->SetSamplingPatternSize (patternSize);
   rmGlobalIllum->SetDepthBias (depthBias);
@@ -671,6 +687,11 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
 
       return true;
     }
+    else if (code == CSKEY_F9)
+    {
+      hudManager->SetEnabled (!hudManager->GetEnabled());
+      return true;
+    }
     else if (code == 'f')
     {
       cfgUseDeferredShading = false;
@@ -686,6 +707,26 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
     else if (code == 'g')
     {
       cfgShowGui = !cfgShowGui;
+      return true;
+    }
+    else if (code == 'a')
+    {
+      showAmbientOcclusion = !showAmbientOcclusion;
+      showGlobalIllumination = false;
+      // TODO: use combo box
+      return true;
+    }
+    else if (code == 's')
+    {
+      showGlobalIllumination = !showGlobalIllumination;
+      showAmbientOcclusion = false;
+      // TODO: use combo box
+      return true;
+    }
+    else if (code == 'e')
+    {
+      enableGlobalIllum = !enableGlobalIllum;
+      // TODO: use combo box
       return true;
     }
 #ifdef CS_DEBUG

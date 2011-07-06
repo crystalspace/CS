@@ -6,8 +6,6 @@
 <variablemap variable="ssao blur kernelsize" destination="KernelSize" />
 <variablemap variable="ssao blur position threshold" destination="PositionThreshold" />
 <variablemap variable="ssao blur normal threshold" destination="NormalThreshold" />
-<variablemap variable="debug show ambocc" destination="ShowAO" />
-<variablemap variable="debug show globalillum" destination="ShowGlobalIllum" />
 
 <program>
 
@@ -32,17 +30,15 @@ float4 main(vertex2fragment IN,
             //uniform float4x4 ProjInv, //: state.matrix.inverse.projection,
             uniform sampler2D NormalBuffer,        
             //uniform sampler2D DepthBuffer,
-            uniform sampler2D DirectRadianceBuffer,
+            //uniform sampler2D DirectRadianceBuffer,
             uniform sampler2D GlobalIllumBuffer,
             uniform float FarClipDistance,
             uniform float2 InvViewportSize, // (1/viewport.width, 1/viewport.height)
             uniform int KernelSize,
             uniform float PositionThreshold,
-            uniform float NormalThreshold,
-            uniform int ShowAO,
-            uniform int ShowGlobalIllum) : COLOR
+            uniform float NormalThreshold) : COLOR
 {
-  float2 texCoord = (IN.ScreenPos.xy / IN.ScreenPos.w) * 0.5f + 0.5f;  
+  float2 texCoord = (IN.ScreenPos.xy / IN.ScreenPos.w) * 0.5f + 0.5f;
   float4 normalDepthVS = tex2D (NormalBuffer, texCoord);
   float3 pixelNormalVS = normalDepthVS.rgb * 2.0f - 1.0f;
   float pixelDepth = normalDepthVS.a;
@@ -52,11 +48,11 @@ float4 main(vertex2fragment IN,
   float3 weightedRadiance = float3(0.0f);
   float3 radiance = float3(0.0f);
   float weightSum = 0.0f;
-  float gaussianSigma = KernelSize * 0.3333f; 
+  float gaussianSigma = KernelSize * 0.3333f;
   
 	for (int i = -KernelSize; i <= KernelSize; i++)
 	{
-	  float2 sampleTexCoord = texCoord + float2 (0.0f, i * InvViewportSize.y);
+	  float2 sampleTexCoord = texCoord + float2 (i * InvViewportSize.x, 0.0f);
 	  float4 sampleDepthNormalVS = tex2D (NormalBuffer, sampleTexCoord);
 	  float3 sampleNormalVS = sampleDepthNormalVS.rgb * 2.0f - 1.0f;
 	  float sampleDepth = sampleDepthNormalVS.a;
@@ -94,18 +90,9 @@ float4 main(vertex2fragment IN,
     radiance *= weightSum;
   }
   
-  float3 directRadiance = tex2D (DirectRadianceBuffer, texCoord).rgb;
-  
-  if (ShowAO != 0)
-    //return float4(directRadiance, 1.0f);
-    //return tex2D (GlobalIllumBuffer, texCoord);
-    return float4 (AO.xxx, 1.0f);
-  else if (ShowGlobalIllum != 0)
-    return float4 (radiance, 1.0f);
-  else
-    return float4 ((AO * directRadiance) + radiance, 1.0f);  
-    
-}
+  //return tex2D (GlobalIllumBuffer, texCoord);
+  return float4 (radiance, AO);
+}            
 
 ]]>
 </program>

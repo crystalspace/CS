@@ -156,9 +156,13 @@ protected:
 
   bool showGBuffer;
   bool drawLightVolumes;
+  bool showAmbientOcclusion;
+  bool showGlobalIllumination;
+  bool enableGlobalIllum;
 
   float occlusionStrength;
   float sampleRadius;
+  int sampleCount;
   float maxOccluderDistance;
   int patternSize;
   float depthBias;
@@ -170,6 +174,7 @@ protected:
 
   csRef<iEventHandler> occlusionStrengthListener;
   csRef<iEventHandler> sampleRadiusListener;
+  csRef<iEventHandler> sampleCountListener;
   csRef<iEventHandler> maxOccluderDistListener;
   csRef<iEventHandler> patternSizeListener;
   csRef<iEventHandler> depthBiasListener;
