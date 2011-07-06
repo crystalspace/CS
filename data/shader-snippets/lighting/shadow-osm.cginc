@@ -69,57 +69,20 @@ struct ShadowShadowMapDepth : ShadowShadowMap
   {
     if (position.x < 0 || position.y < 0 || position.x > 1 || position.y > 1)
       return 0;
-
-    if (i == 0)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 0], position).r;
-    if (i == 1)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 0], position).g;
-    if (i == 2)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 0], position).b;
-    if (i == 3)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 0], position).a;	
-    if (i == 4)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 1], position).r;	
-    if (i == 5)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 1], position).g;	
-    if (i == 6)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 1], position).b;	
-
-    if (i == 7)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 1], position).a;
-    if (i == 8)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 2], position).r;
-    if (i == 9)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 2], position).g;
-    if (i == 10)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 2], position).b;
-    if (i == 11)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 2], position).a;	
-    if (i == 12)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 3], position).r;	
-    if (i == 13)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 3], position).g;	
-    if (i == 14)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 3], position).b;	
-    if (i == 15)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 3], position).a;	
-
-    if (i == 16)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 4], position).r;
-    if (i == 17)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 4], position).g;
-    if (i == 18)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 4], position).b;
-    if (i == 19)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 4], position).a;
-    if (i == 20)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 5], position).r;	
-    if (i == 21)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 5], position).g;	
-    if (i == 22)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 5], position).b;	
-    if (i == 23)
-      return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + 5], position).a;	
+]]>      
+  
+    <?Generate I 0 14?>
+      if (i == 4 * $I$)
+        return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + $I$], position).r;
+      if (i == 4 * $I$ + 1)
+        return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + $I$], position).g;
+      if (i == 4 * $I$ + 2)
+        return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + $I$], position).b;
+      if (i == 4 * $I$ + 3)
+        return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + $I$], position).a;	    
+    <?Endgenerate?>
+        
+<![CDATA[  
       
     return 0;
   }
