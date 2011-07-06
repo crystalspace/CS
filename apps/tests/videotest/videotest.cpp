@@ -39,163 +39,174 @@ VideoTest::VideoTest ()
 
 void VideoTest::PrintHelp ()
 {
-	csCommandLineHelper commandLineHelper;
+  csCommandLineHelper commandLineHelper;
 
-	// Printing help
-	commandLineHelper.PrintApplicationHelp
-		(GetObjectRegistry (), "csvid", "csvid", "Crystal Space's video player demo.");
+  // Printing help
+  commandLineHelper.PrintApplicationHelp
+    (GetObjectRegistry (), "csvid", "csvid", "Crystal Space's video player demo.");
 }
 
 void VideoTest::Frame ()
 {
-	iCamera* camera = view->GetCamera ();
+  iCamera* camera = view->GetCamera ();
 
-	//draw the room
-	view->Draw();
+  //draw the room
+  view->Draw();
 
-	mediaPlayer->Update ();
+  mediaPlayer->Update ();
 
 
-	// Default behavior from DemoApplication
-	DemoApplication::Frame ();
+  // Default behavior from DemoApplication
+  DemoApplication::Frame ();
 
-	//in order to be able to draw 2D, it seems you need to do it after DemoApplication::Frame ()
-	//not really major, but might help when drawing the video on-screen
+  //in order to be able to draw 2D, it seems you need to do it after DemoApplication::Frame ()
+  //not really major, but might help when drawing the video on-screen
 
-	int w, h;
-	logoTex->GetRendererDimensions (w, h);
+  int w, h;
+  logoTex->GetRendererDimensions (w, h);
 
-	int screenW = g2d->GetWidth ();
+  int screenW = g2d->GetWidth ();
 
-	// Margin to the edge of the screen, as a fraction of screen width
-	const float marginFraction = 0.01f;
-	const int margin = (int)screenW * marginFraction;
+  // Margin to the edge of the screen, as a fraction of screen width
+  const float marginFraction = 0.01f;
+  const int margin = (int)screenW * marginFraction;
 
-	// Width of the logo, as a fraction of screen width
-	const float widthFraction = 0.3f;
-	const int width = (int)screenW * widthFraction;
-	const int height = width * h / w;
+  // Width of the logo, as a fraction of screen width
+  const float widthFraction = 0.3f;
+  const int width = (int)screenW * widthFraction;
+  const int height = width * h / w;
 
-	g3d->BeginDraw (CSDRAW_2DGRAPHICS);
-	g3d->DrawPixmap (logoTex, 
-		10, 
-		10,
-		width,
-		height,
-		0,
-		0,
-		w,
-		h,
-		0);
+  g3d->BeginDraw (CSDRAW_2DGRAPHICS);
+  g3d->DrawPixmap (logoTex, 
+    10, 
+    10,
+    width,
+    height,
+    0,
+    0,
+    w,
+    h,
+    0);
 
 }
 
 bool VideoTest::Application ()
 {
-	// Default behavior from DemoApplication
-	if (!DemoApplication::Application ())
-		return false;
+  // Default behavior from DemoApplication
+  if (!DemoApplication::Application ())
+    return false;
 
-	if (!csInitializer::RequestPlugins (object_reg,
-		CS_REQUEST_PLUGIN ("crystalspace.vpl.loader", iMediaLoader),
-		CS_REQUEST_PLUGIN ("crystalspace.vpl.player", iMediaPlayer),
-		CS_REQUEST_END))
-	{
-		csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-			"crystalspace.application.vidplaydemo",
-			"Can't initialize plugins!");
-		return false;
-	}
+  if (!csInitializer::RequestPlugins (object_reg,
+    CS_REQUEST_PLUGIN ("crystalspace.vpl.loader", iMediaLoader),
+    CS_REQUEST_PLUGIN ("crystalspace.vpl.player", iMediaPlayer),
+    CS_REQUEST_END))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.vidplaydemo",
+      "Can't initialize plugins!");
+    return false;
+  }
 
-	csRef<iMediaLoader> vlpLoader = csQueryRegistry<iMediaLoader> (object_reg);
-	csRef<iMediaContainer> video = vlpLoader->LoadMedia("123pixel_aspect_ratio.ogg");
+  csRef<iTextureManager> texManager = g3d->GetTextureManager ();
+  csRef<iMediaLoader> vlpLoader = csQueryRegistry<iMediaLoader> (object_reg);
+  csRef<iMediaContainer> video = vlpLoader->LoadMedia("123pixel_aspect_ratio.ogg");
 
-	if (video.IsValid ())
-	{
-		printf ("%d streams in media container\n",video->GetMediaCount ());
-	}
+  if (video.IsValid ())
+  {
+    printf ("%d streams in media container\n",video->GetMediaCount ());
+  }
 
-	mediaPlayer = csQueryRegistry<iMediaPlayer> (object_reg);
-	mediaPlayer->InitializePlayer (video);
+  mediaPlayer = csQueryRegistry<iMediaPlayer> (object_reg);
+  mediaPlayer->InitializePlayer (video);
 
-	// Specifying -1 as index triggers auto stream activation
-	mediaPlayer->SetActiveStream (-1);
-	mediaPlayer->Play ();
-	mediaPlayer->Seek (15.0f);
+  // Specifying -1 as index triggers auto stream activation
+  mediaPlayer->SetActiveStream (-1);
+  mediaPlayer->SetTargetTexture (logoTex);
+  mediaPlayer->Play ();
+  mediaPlayer->Seek (15.0f);
 
+  //logoTex = NULL;
+  /*csRef<iTextureHandle> pie;
 
-	// Create the scene
-	if (!CreateScene ())
-		return false;
+  csPtr<iTextureHandle> test = texManager->CreateTexture (256,102,0,csimg3D,"r5g6b5",
+  CS_TEXTURE_3D);
+  logoTex.AttachNew (test);
+  pie = logoTex;*/
 
-	// Run the application
-	Run();
+  //cout<<pie.IsValid ()<<endl<<pie->GetRefCount ()<<endl;
 
-	return true;
+  // Create the scene
+  if (!CreateScene ())
+    return false;
+
+  // Run the application
+  Run();
+
+  return true;
 }
 
 bool VideoTest::CreateScene ()
 {
-	printf ("Creating level...\n");
+  printf ("Creating level...\n");
 
-	logoTex = loader->LoadTexture ("/lib/std/cslogo2.png", CS_TEXTURE_2D, NULL);
-	if (!logoTex.IsValid ())
-	{
-		return ReportError("Could not load logo %s!",
-			"/lib/std/cslogo2.png");
-	}
+  logoTex = loader->LoadTexture ("/lib/std/cslogo2.png", CS_TEXTURE_2D, NULL);
+  if (!logoTex.IsValid ())
+  {
+  return ReportError("Could not load logo %s!",
+  "/lib/std/cslogo2.png");
+  }
 
-	// Load the texture from the standard library.  This is located in
-	// CS/data/standard.zip and mounted as /lib/std using the Virtual
-	// File System (VFS) plugin.
-	if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-		ReportError ("Error loading %s texture!",
-		CS::Quote::Single ("stone4"));
-	iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
+  // Load the texture from the standard library.  This is located in
+  // CS/data/standard.zip and mounted as /lib/std using the Virtual
+  // File System (VFS) plugin.
+  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
+    ReportError ("Error loading %s texture!",
+    CS::Quote::Single ("stone4"));
+  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
-	// We create a new sector called "room".
-	room = engine->CreateSector ("room");
+  // We create a new sector called "room".
+  room = engine->CreateSector ("room");
 
-	// Creating the walls for our room.
+  // Creating the walls for our room.
 
-	// First we make a primitive for our geometry.
-	using namespace CS::Geometry;
-	DensityTextureMapper mapper (0.3f);
-	TesselatedBox box (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
-	box.SetLevel (3);
-	box.SetMapper (&mapper);
-	box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+  // First we make a primitive for our geometry.
+  using namespace CS::Geometry;
+  DensityTextureMapper mapper (0.3f);
+  TesselatedBox box (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
+  box.SetLevel (3);
+  box.SetMapper (&mapper);
+  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
 
-	// Now we make a factory and a mesh at once.
-	csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
-		engine, room, "walls", "walls_factory", &box);
-	walls->GetMeshObject ()->SetMaterialWrapper (tm);
+  // Now we make a factory and a mesh at once.
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+    engine, room, "walls", "walls_factory", &box);
+  walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
-	// Now we need light to see something.
-	csRef<iLight> light;
-	iLightList* ll = room->GetLights ();
+  // Now we need light to see something.
+  csRef<iLight> light;
+  iLightList* ll = room->GetLights ();
 
-	light = engine->CreateLight (0, csVector3 (-3, 5, 0), 10, csColor (1, 0, 0));
-	ll->Add (light);
+  light = engine->CreateLight (0, csVector3 (-3, 5, 0), 10, csColor (1, 0, 0));
+  ll->Add (light);
 
-	light = engine->CreateLight (0, csVector3 (3, 5,  0), 10, csColor (0, 0, 1));
-	ll->Add (light);
+  light = engine->CreateLight (0, csVector3 (3, 5,  0), 10, csColor (0, 0, 1));
+  ll->Add (light);
 
-	light = engine->CreateLight (0, csVector3 (0, 5, -3), 10, csColor (0, 1, 0));
-	ll->Add (light);
+  light = engine->CreateLight (0, csVector3 (0, 5, -3), 10, csColor (0, 1, 0));
+  ll->Add (light);
 
-	// Setup the sector and the camera
-	view->GetCamera ()->SetSector (room);
-	cameraManager->SetStartPosition (csVector3 (0,3,-4.5));
-	cameraManager->SetCamera (view->GetCamera ());
-	cameraManager->SetCameraMode (CS::Utility::CAMERA_MOVE_FREE);
-	cameraManager->SetMotionSpeed (10.0f);
+  // Setup the sector and the camera
+  view->GetCamera ()->SetSector (room);
+  cameraManager->SetStartPosition (csVector3 (0,3,-4.5));
+  cameraManager->SetCamera (view->GetCamera ());
+  cameraManager->SetCameraMode (CS::Utility::CAMERA_MOVE_FREE);
+  cameraManager->SetMotionSpeed (10.0f);
 
-	printf ("Precaching data...\n");
-	engine->PrecacheDraw ();
+  printf ("Precaching data...\n");
+  engine->PrecacheDraw ();
 
-	printf ("Ready!\n");
+  printf ("Ready!\n");
 
-	return true;
+  return true;
 }
 //---------------------------------------------------------------------------

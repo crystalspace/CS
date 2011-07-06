@@ -39,13 +39,15 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 struct iObjectRegistry;
 
 /**
-* This is the implementation for our API and
-* also the implementation of the plugin.
-*/
+  * This is the implementation for our API and
+  * also the implementation of the plugin.
+  */
 class thoggLoader : public scfImplementation2<thoggLoader,iMediaLoader,iComponent>
 {
 private:
   iObjectRegistry* object_reg;
+
+  csRef<iTextureManager> texManager;
 
   //ogg stuff
   ogg_sync_state   oy;
@@ -62,16 +64,17 @@ private:
   //------------------
 
   FILE *infile;
+  csRef<iGraphics3D> _g3d;
 
 private:
-	
-/* Helper; just grab some more compressed bitstream and sync it for
-   page extraction */
+
+  /* Helper; just grab some more compressed bitstream and sync it for
+  page extraction */
   int BufferData(ogg_sync_state *oy);
 
   bool StartParsing(csRef<TheoraMediaContainer> container);
   bool ParseHeaders(csRef<TheoraMediaContainer> container);
-	void ComputeStreamLength(csRef<TheoraMediaContainer> container);
+  void ComputeStreamLength(csRef<TheoraMediaContainer> container);
 
 public:
   thoggLoader (iBase* parent);
@@ -80,7 +83,7 @@ public:
   // From iComponent.
   virtual bool Initialize (iObjectRegistry*);
 
-  
+
   virtual csRef<iMediaContainer> LoadMedia (const char * pFileName, const char *pDescription=0, const char* pMediaType = "AutoDetect");
 };
 

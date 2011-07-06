@@ -20,44 +20,44 @@ vplLoader::~vplLoader ()
 
 bool vplLoader::Initialize (iObjectRegistry* r)
 {
-	object_reg = r;
+  object_reg = r;
 
-	csRef<iPluginManager> mgr=csQueryRegistry<iPluginManager> (object_reg);
-	m_pThOggLoader=csLoadPlugin<iMediaLoader> (mgr,
-		"crystalspace.vpl.element.thogg");
+  csRef<iPluginManager> mgr=csQueryRegistry<iPluginManager> (object_reg);
+  m_pThOggLoader=csLoadPlugin<iMediaLoader> (mgr,
+    "crystalspace.vpl.element.thogg");
 
-	return true;
+  return true;
 }
 
 csRef<iMediaContainer> vplLoader::LoadMedia (const char * pFileName, const char *pDescription, const char* pMediaType)
 {
-	if (strcmp (pMediaType,"AutoDetect") == 0)
-	{
-		csRef<iMediaContainer> data;
-		if (m_pThOggLoader)
-		{
-			data=m_pThOggLoader->LoadMedia(pFileName,pDescription,pMediaType);
+  if (strcmp (pMediaType,"AutoDetect") == 0)
+  {
+    csRef<iMediaContainer> data;
+    if (m_pThOggLoader)
+    {
+      data=m_pThOggLoader->LoadMedia(pFileName,pDescription,pMediaType);
 
-			if (data.IsValid ())
-			{
-				return data;
-			}
-		}
-	}
-	else
-		if (strcmp (pMediaType,"TheoraVideo") == 0)
-		{
-			csRef<iMediaContainer> data;
-			if (m_pThOggLoader)
-			{
-				data=m_pThOggLoader->LoadMedia (pFileName,pDescription,pMediaType);
-				if (data.IsValid ())
-				{
-					return data;
-				}
-			}
-		}
+      if (data.IsValid ())
+      {
+        return data;
+      }
+    }
+  }
+  else
+    if (strcmp (pMediaType,"TheoraVideo") == 0)
+    {
+      csRef<iMediaContainer> data;
+      if (m_pThOggLoader)
+      {
+        data=m_pThOggLoader->LoadMedia (pFileName,pDescription,pMediaType);
+        if (data.IsValid ())
+        {
+          return data;
+        }
+      }
+    }
 
-		return NULL;
+    return NULL;
 }
 
