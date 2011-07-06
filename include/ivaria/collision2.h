@@ -624,7 +624,8 @@ struct iCollisionSystem : public virtual iBase
   virtual void SetInternalScale (float scale) = 0;
 
   /// Create a convex mesh collider.
-  virtual csRef<iColliderConvexMesh> CreateColliderConvexMesh (iMeshWrapper* mesh) = 0;
+  virtual csRef<iColliderConvexMesh> CreateColliderConvexMesh (
+    iMeshWrapper* mesh, bool simplify = false) = 0;
 
   /// Create a concave mesh collider.
   virtual csRef<iColliderConcaveMesh> CreateColliderConcaveMesh (iMeshWrapper* mesh) = 0;
@@ -674,7 +675,8 @@ struct iCollisionSystem : public virtual iBase
   * Decompose a concave mesh in convex parts. Each convex part will be added to
   * the collision object as a separate iColliderConvexMesh.
   */
-  virtual void DecomposeConcaveMesh (iCollisionObject* object, iMeshWrapper* mesh) = 0;
+  virtual void DecomposeConcaveMesh (iCollisionObject* object, 
+    iMeshWrapper* mesh, bool simplify = false) = 0;
 };
 }
 }

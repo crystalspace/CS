@@ -248,7 +248,8 @@ public:
 
   // iCollisionSystem
   virtual void SetInternalScale (float scale);
-  virtual csRef<CS::Collision2::iColliderConvexMesh> CreateColliderConvexMesh (iMeshWrapper* mesh);
+  virtual csRef<CS::Collision2::iColliderConvexMesh> CreateColliderConvexMesh (
+    iMeshWrapper* mesh, bool simplify = false);
   virtual csRef<CS::Collision2::iColliderConcaveMesh> CreateColliderConcaveMesh (iMeshWrapper* mesh);
   virtual csRef<CS::Collision2::iColliderConcaveMeshScaled> CreateColliderConcaveMeshScaled
       (CS::Collision2::iColliderConcaveMesh* collider, csVector3 scale);
@@ -265,7 +266,8 @@ public:
   virtual csRef<CS::Collision2::iCollisionActor> CreateCollisionActor ();
   virtual csRef<CS::Collision2::iCollisionSector> CreateCollisionSector ();
 
-  virtual void DecomposeConcaveMesh (CS::Collision2::iCollisionObject* object, iMeshWrapper* mesh); 
+  virtual void DecomposeConcaveMesh (CS::Collision2::iCollisionObject* object,
+    iMeshWrapper* mesh, bool simplify = false); 
 
   //iPhysicalSystem
   virtual csRef<CS::Physics2::iRigidBody> CreateRigidBody ();

@@ -233,7 +233,7 @@ csBulletColliderPlane::~csBulletColliderPlane ()
   delete shape;
 }
 
-csBulletColliderConvexMesh::csBulletColliderConvexMesh (iMeshWrapper* mesh, csBulletSystem* sys)
+csBulletColliderConvexMesh::csBulletColliderConvexMesh (iMeshWrapper* mesh, csBulletSystem* sys, bool simplify)
   : scfImplementationType (this), mesh (mesh)
 {
   collSystem = sys;
@@ -266,27 +266,36 @@ csBulletColliderConvexMesh::csBulletColliderConvexMesh (iMeshWrapper* mesh, csBu
   }
 
   volume /= 6.0f;
+
+  btConvexHullShape* convexShape = new btConvexHullShape ();
   
   btTriangleMesh* btTriMesh = GenerateTriMeshData (mesh, collSystem->baseID, collSystem->colldetID, collSystem->getInternalScale ());
   if (! btTriMesh)
     return;
-  //btConvexShape* tmpConvexShape = new btConvexTriangleMeshShape (btTriMesh);
-  //btShapeHull* hull = new btShapeHull (tmpConvexShape);
-  //btScalar marg = tmpConvexShape->getMargin ();
-  //hull->buildHull (marg);
-  //tmpConvexShape->setUserPointer (hull);
+  if (simplify)
+  {
+    btConvexShape* tmpConvexShape = new btConvexTriangleMeshShape (btTriMesh);
+    btShapeHull* hull = new btShapeHull (tmpConvexShape);
+    btScalar marg = tmpConvexShape->getMargin ();
+    hull->buildHull (marg);
+    tmpConvexShape->setUserPointer (hull);
 
-  btConvexHullShape* convexShape = new btConvexHullShape ();
-  /*for  (int i=0 ; i < hull->numVertices ();i++)
-  {
-    convexShape->addPoint (hull->getVertexPointer ()[i]);	
-  }*/
-  for (int i = 0; i < vertexCount; i++)
-  {
-    convexShape->addPoint (CSToBullet (c_vertex[i], collSystem->getInternalScale ()));
+    for  (int i=0 ; i < hull->numVertices ();i++)
+    {
+      convexShape->addPoint (hull->getVertexPointer ()[i]);	
+    }
+
+    delete tmpConvexShape;
+    delete hull;
   }
+  else
+    for (int i = 0; i < vertexCount; i++)
+    {
+      convexShape->addPoint (CSToBullet (c_vertex[i], collSystem->getInternalScale ()));
+    }
   shape = convexShape;
   margin = 0.04 * collSystem->getInverseInternalScale ();
+
 
   delete btTriMesh;
 }

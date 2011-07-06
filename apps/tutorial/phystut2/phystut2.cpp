@@ -1476,6 +1476,7 @@ CS::Physics2::iRigidBody* Simple::SpawnConvexMesh (bool setVelocity /* = true */
   rb->SetAttachedMovable (mesh->GetMovable ());
 
   // Create and attach a cone collider.
+  // If you simplify a convex CS mesh, you may get a wrong convex hull.
   csRef<CS::Collision2::iColliderConvexMesh> cyliner = collisionSystem->CreateColliderConvexMesh (mesh);
   rb->AddCollider (cyliner, localTrans);
   rb->SetDensity (1.0f);
@@ -1513,7 +1514,7 @@ CS::Physics2::iRigidBody* Simple::SpawnCompound (bool setVelocity /* = true */)
   rb->SetTransform (trans);
   rb->SetAttachedMovable (mesh->GetMovable ());
 
-  collisionSystem->DecomposeConcaveMesh (rb, mesh);
+  collisionSystem->DecomposeConcaveMesh (rb, mesh, true);
   rb->RebuildObject ();
   physicalSector->AddRigidBody (rb);
 

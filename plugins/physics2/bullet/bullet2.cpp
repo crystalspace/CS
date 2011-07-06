@@ -915,10 +915,10 @@ bool csBulletSystem::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-csRef<CS::Collision2::iColliderConvexMesh> csBulletSystem::CreateColliderConvexMesh (iMeshWrapper* mesh)
+csRef<CS::Collision2::iColliderConvexMesh> csBulletSystem::CreateColliderConvexMesh (iMeshWrapper* mesh, bool simplify)
 {
   csRef<csBulletColliderConvexMesh> collider;
-  collider.AttachNew (new csBulletColliderConvexMesh (mesh, this));
+  collider.AttachNew (new csBulletColliderConvexMesh (mesh, this, simplify));
 
   //colliders.Push (collider);
   return (CS::Collision2::iColliderConvexMesh*)collider;
@@ -1033,7 +1033,7 @@ csRef<CS::Collision2::iCollisionSector> csBulletSystem::CreateCollisionSector ()
   return collSector;
 }
 
-void csBulletSystem::DecomposeConcaveMesh (CS::Collision2::iCollisionObject* object, iMeshWrapper* mesh)
+void csBulletSystem::DecomposeConcaveMesh (CS::Collision2::iCollisionObject* object, iMeshWrapper* mesh, bool simplify)
 {
   csBulletCollisionObject* btCollObject = dynamic_cast<csBulletCollisionObject*> (object);
 
@@ -1041,15 +1041,17 @@ void csBulletSystem::DecomposeConcaveMesh (CS::Collision2::iCollisionObject* obj
   {
     float scale;
     btVector3 centroid;
+    bool simp;
   public:
     btAlignedObjectArray<btConvexHullShape*> m_convexShapes;
     btAlignedObjectArray<btVector3> m_convexCentroids;
     btAlignedObjectArray<float> m_convexVolume;
 
-    MyConvexDecomposition (float scale)
+    MyConvexDecomposition (float scale, bool simplify)
       :scale (scale),
       mBaseCount (0),
-      mHullCount (0)
+      mHullCount (0),
+      simp (simplify)
     {
     }
 
@@ -1072,32 +1074,43 @@ void csBulletSystem::DecomposeConcaveMesh (CS::Collision2::iCollisionObject* obj
 
       centroid *= 1.f/(float(result.mHullVcount) );
 
-      const unsigned int *src = result.mHullIndices;
-      for (unsigned int i=0; i<result.mHullTcount; i++)
+      if (simp)
+        for (unsigned int i=0; i<result.mHullVcount; i++)
+        {
+          btVector3 vertex(result.mHullVertices[i*3],result.mHullVertices[i*3+1],result.mHullVertices[i*3+2]);
+          vertex *= localScaling;
+          vertex -= centroid;
+          vertices.push_back(vertex);
+        }
+      else
       {
-        unsigned int index0 = *src++;
-        unsigned int index1 = *src++;
-        unsigned int index2 = *src++;
+        const unsigned int *src = result.mHullIndices;
+        for (unsigned int i=0; i<result.mHullTcount; i++)
+        {
+          unsigned int index0 = *src++;
+          unsigned int index1 = *src++;
+          unsigned int index2 = *src++;
 
-        btVector3 vertex0(result.mHullVertices[index0*3], result.mHullVertices[index0*3+1],result.mHullVertices[index0*3+2]);
-        btVector3 vertex1(result.mHullVertices[index1*3], result.mHullVertices[index1*3+1],result.mHullVertices[index1*3+2]);
-        btVector3 vertex2(result.mHullVertices[index2*3], result.mHullVertices[index2*3+1],result.mHullVertices[index2*3+2]);
-        vertex0 *= localScaling;
-        vertex1 *= localScaling;
-        vertex2 *= localScaling;
+          btVector3 vertex0(result.mHullVertices[index0*3], result.mHullVertices[index0*3+1],result.mHullVertices[index0*3+2]);
+          btVector3 vertex1(result.mHullVertices[index1*3], result.mHullVertices[index1*3+1],result.mHullVertices[index1*3+2]);
+          btVector3 vertex2(result.mHullVertices[index2*3], result.mHullVertices[index2*3+1],result.mHullVertices[index2*3+2]);
+          vertex0 *= localScaling;
+          vertex1 *= localScaling;
+          vertex2 *= localScaling;
 
-        vertex0 -= centroid;
-        vertex1 -= centroid;
-        vertex2 -= centroid;
+          vertex0 -= centroid;
+          vertex1 -= centroid;
+          vertex2 -= centroid;
 
-        //TODO this will add duplicate vertices to convex shape. But the debug draw result is right now.
-        vertices.push_back(vertex0);
-        vertices.push_back(vertex1);
-        vertices.push_back(vertex2);
+          //TODO this will add duplicate vertices to convex shape. But the debug draw result is right now.
+          vertices.push_back(vertex0);
+          vertices.push_back(vertex1);
+          vertices.push_back(vertex2);
 
-        index0+=mBaseCount;
-        index1+=mBaseCount;
-        index2+=mBaseCount;
+          index0+=mBaseCount;
+          index1+=mBaseCount;
+          index2+=mBaseCount;
+        }
       }
 
       btConvexHullShape* convexShape = new btConvexHullShape(&(vertices[0].getX()),vertices.size());
@@ -1136,7 +1149,7 @@ void csBulletSystem::DecomposeConcaveMesh (CS::Collision2::iCollisionObject* obj
   desc.mMaxVertices  = maxv;
   desc.mSkinWidth    = skinWidth;
 
-  MyConvexDecomposition	convexDecomposition(internalScale);
+  MyConvexDecomposition	convexDecomposition(internalScale, simplify);
   desc.mCallback = &convexDecomposition;
 
   ConvexBuilder cb(desc.mCallback);

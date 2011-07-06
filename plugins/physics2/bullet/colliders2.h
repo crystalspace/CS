@@ -158,7 +158,7 @@ class csBulletColliderConvexMesh:
   iMeshWrapper* mesh;
   
 public:
-  csBulletColliderConvexMesh (iMeshWrapper* mesh, csBulletSystem* sys);
+  csBulletColliderConvexMesh (iMeshWrapper* mesh, csBulletSystem* sys, bool simplify);
   csBulletColliderConvexMesh (btConvexHullShape* shape, float volume, csBulletSystem* sys) 
     : scfImplementationType (this)
   {
