@@ -293,6 +293,7 @@ namespace CS
           for (size_t l = 0; l < 1; l++)
           {
             const SuperFrustum& superFrust = *(lightFrustums.frustums[l]);            
+            float previousSplit = SMALL_Z;
 
             for (int frustNum = 0 ; frustNum < superFrust.actualNumParts ; frustNum ++)
             {
@@ -333,7 +334,7 @@ namespace CS
                 CS::Math::Projections::Ortho (-1, 1, 1, -1, 1, -1);
 
               float lightCutoff = light->GetCutoffDistance();
-              float lightNear = SMALL_Z;
+              float lightNear = previousSplit;
 
               lightProject = CS::Math::Projections::Ortho (lightCutoff, 
                 -lightCutoff, lightCutoff, -lightCutoff, 
@@ -364,6 +365,8 @@ namespace CS
 
               if( !( frustNum % 4 == 3 || frustNum == superFrust.actualNumParts - 1 ) )
                 continue;
+
+              previousSplit = lightFrust.splitDists;
 
               int shadowMapSize = viewSetup.persist.shadowMapRes;
 

@@ -149,6 +149,8 @@ struct ShadowShadowMapDepth : ShadowShadowMap
       previousSplit = nextSplit;
     }
 
+    float previousMap = 0, nextMap = 0;
+    
     int index = (i / 4);
     if (index > numSplits) 
       index = numSplits;
@@ -160,6 +162,9 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     float3 shadowMapCoordsBiasedPrev = 
       (float3(0.5)*shadowMapCoordsProjPrev.xyz) + float3(0.5);          
     
+    for (int j = 0 ; j < index ; j ++)
+      previousMap += getMapValue(4 * (j + 1) - 1, shadowMapCoordsBiasedPrev.xy);
+    
     index = (i + 1) / 4;
     if (index > numSplits) 
       index = numSplits;
@@ -169,9 +174,13 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     shadowMapCoordsProjNext.xyz /= shadowMapCoordsProjNext.w;      
     float3 shadowMapCoordsBiasedNext = 
       (float3(0.5)*shadowMapCoordsProjNext.xyz) + float3(0.5);
+
+    for (int j = 0 ; j < index ; j ++)
+      nextMap += getMapValue(4 * (j + 1) - 1, shadowMapCoordsBiasedNext.xy);
       
-    float previousMap = getMapValue(i, shadowMapCoordsBiasedPrev.xy);
-    float nextMap = getMapValue(i + 1, shadowMapCoordsBiasedNext.xy);   
+    previousMap += getMapValue(i, shadowMapCoordsBiasedPrev.xy);
+    nextMap += getMapValue(i + 1, shadowMapCoordsBiasedNext.xy);   
+    
     
     inLight = lerp(previousMap, nextMap, (float) (viewPos.z - previousSplit) 
       / (nextSplit - previousSplit) );
