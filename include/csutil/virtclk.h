@@ -54,7 +54,18 @@ private:
   csTicks currentVirtualTime;
   /// Absolute time in milliseconds
   csTicks currentRealTime;
+
+  /// Elapsed time between last two frames
+  csMicroTicks elapsedTimeM;
+  /// Virtual time in milliseconds
+  csMicroTicks currentVirtualTimeM;
+  /// Absolute time in milliseconds
+  csMicroTicks currentRealTimeM;
   uint flags;
+
+  float elapsedSeconds;
+  bool elapsedSecondsValid;
+
 public:
   csVirtualClock ();
   virtual ~csVirtualClock ();
@@ -64,6 +75,9 @@ public:
   virtual void Resume ();
   virtual csTicks GetElapsedTicks () const { return elapsedTime; }
   virtual csTicks GetCurrentTicks () const { return currentVirtualTime; }
+  virtual csMicroTicks GetElapsedMicroTicks () const { return elapsedTimeM; }
+  virtual float GetElapsedSeconds ();
+  virtual csMicroTicks GetCurrentMicroTicks () const { return currentVirtualTimeM; }
 };
 
 #endif // __CS_VIRTCLK_H__

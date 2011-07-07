@@ -77,7 +77,7 @@ bool SceneBrowserPanel::Initialize (iObjectRegistry* obj_reg)
     return false;
 
   // Create the panel
-  Create (panelManager->GetManagedWindow (), -1, wxPoint (0, 0), wxSize (250, 250));
+  Create (editor->GetWindow (), -1, wxPoint (0, 0), wxSize (250, 250));
   
   // Create the controls
   treectrl = new SceneBrowserTreeCtrl (object_reg, editor, this, SceneBrowser_Ctrl,
@@ -103,7 +103,7 @@ const wxChar* SceneBrowserPanel::GetCaption () const
   return wxT("Scene Browser");
 }
 
-int SceneBrowserPanel::GetDefaultDockPosition () const
+PanelDockPosition SceneBrowserPanel::GetDefaultDockPosition () const
 {
   return DockPositionLeft;
 }

@@ -1,8 +1,8 @@
 /*
-  Copyright (C) 2010 Christian Van Brussel, Communications and Remote
-      Sensing Laboratory of the School of Engineering at the 
-      Universite catholique de Louvain, Belgium
-      http://www.tele.ucl.ac.be
+  Copyright (C) 2010 Christian Van Brussel, Institute of Information
+      and Communication Technologies, Electronics and Applied Mathematics
+      at Universite catholique de Louvain, Belgium
+      http://www.uclouvain.be/en-icteam.html
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -32,7 +32,7 @@
 #define ROTATION_IMMEDIATE 3
 
 FrankieScene::FrankieScene (AvatarTest* avatarTest)
-  : avatarTest (avatarTest), debug (false), targetReached (false),
+  : avatarTest (avatarTest), debugBones (false), debugBBoxes (false), targetReached (false),
     lookAtListener (this), decalsEnabled (false), decal (nullptr), decalPosition (0.0f)
 {
   // Setup the parameters of the camera manager
@@ -57,6 +57,7 @@ FrankieScene::FrankieScene (AvatarTest* avatarTest)
     avatarTest->hudManager->GetKeyDescriptions ()->Push ("d: display active colliders");
   }
   avatarTest->hudManager->GetKeyDescriptions ()->Push ("a: display bone positions");
+  avatarTest->hudManager->GetKeyDescriptions ()->Push ("b: display bounding boxes");
   if (avatarTest->decalManager)
     avatarTest->hudManager->GetKeyDescriptions ()->Push ("c: toggle decals under the mouse");
   avatarTest->hudManager->GetKeyDescriptions ()->Push ("r: reset scene");
@@ -281,12 +282,25 @@ bool FrankieScene::OnKeyboard (iEvent &ev)
     // Switching debug modes
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'a')
     {
-      debug = !debug;
-      debugNodeFactory->SetDebugModes
-	(debug ?
-	 (CS::Animation::SkeletonDebugMode)
-	 (CS::Animation::DEBUG_2DLINES | CS::Animation::DEBUG_SQUARES)
-	 : CS::Animation::DEBUG_NONE);
+      debugBones = !debugBones;
+      int debugFlags = debugBones ? 
+	(debugNodeFactory->GetDebugModes () | 
+	 (CS::Animation::DEBUG_2DLINES | CS::Animation::DEBUG_SQUARES))
+	: (debugNodeFactory->GetDebugModes () &
+	   ~(CS::Animation::DEBUG_2DLINES | CS::Animation::DEBUG_SQUARES));
+      debugNodeFactory->SetDebugModes ((CS::Animation::SkeletonDebugMode) debugFlags);
+
+      return true;
+    }
+
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'b')
+    {
+      debugBBoxes = !debugBBoxes;
+      int debugFlags = debugBBoxes ? 
+        (debugNodeFactory->GetDebugModes () | CS::Animation::DEBUG_BBOXES)
+	: (debugNodeFactory->GetDebugModes () & ~(CS::Animation::DEBUG_BBOXES));
+      debugNodeFactory->SetDebugModes ((CS::Animation::SkeletonDebugMode) debugFlags);
+
       return true;
     }
 
@@ -439,6 +453,7 @@ bool FrankieScene::CreateAvatar ()
   // Create the 'debug' node
   debugNodeFactory = avatarTest->debugManager->CreateAnimNodeFactory ("debug");
   debugNodeFactory->SetDebugModes (CS::Animation::DEBUG_NONE);
+  debugNodeFactory->SetRandomColor (true);
   animPacketFactory->SetAnimationRoot (debugNodeFactory);
 
   // Create the 'LookAt' animation node

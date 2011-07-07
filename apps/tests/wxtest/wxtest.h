@@ -21,6 +21,7 @@
 
 #include <stdarg.h>
 #include "csutil/ref.h"
+#include "ivideo/wxwin.h"
 
 #include "csutil/custom_new_disable.h"
 #include <wx/wx.h>
@@ -35,6 +36,7 @@ struct iObjectRegistry;
 struct iEvent;
 struct iSector;
 struct iView;
+struct iWxWindow;
 class FramePrinter;
 
 class Simple : public wxFrame
@@ -47,7 +49,8 @@ private:
   csRef<iKeyboardDriver> kbd;
   csRef<iVirtualClock> vc;
   csRef<iView> view;
-  iSector* room;
+  csRef<iWxWindow> wxwindow;
+  csRef<iSector> room;
   csRef<FramePrinter> printer;
 
   float rotY;
@@ -69,11 +72,28 @@ public:
 
   bool Initialize ();
   void PushFrame ();
-  void OnClose(wxCloseEvent& event);
-  void OnIconize(wxIconizeEvent& event);
-  void OnShow(wxShowEvent& event);
+  void OnClose (wxCloseEvent& event);
+  void OnIconize (wxIconizeEvent& event);
+  void OnShow (wxShowEvent& event);
+  void OnSize (wxSizeEvent& ev);
 
-  DECLARE_EVENT_TABLE()
+  DECLARE_EVENT_TABLE ();
+
+  class Panel : public wxPanel
+  {
+  public:
+    Panel(wxWindow* parent, Simple* s)
+      : wxPanel (parent, wxID_ANY, wxDefaultPosition, wxDefaultSize), s (s)
+    {}
+    
+    virtual void OnSize (wxSizeEvent& ev)
+    { s->OnSize (ev); }
+
+    private:
+      Simple* s;
+
+      DECLARE_EVENT_TABLE()
+  };
 };
 
 #endif // __SIMPLE1_H__

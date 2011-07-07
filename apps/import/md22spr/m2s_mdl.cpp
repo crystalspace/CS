@@ -665,5 +665,6 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
   fclose(f);
   delete [] BS_verts;
   delete [] verts;
+  delete [] spritefilename;
   return true;
 }

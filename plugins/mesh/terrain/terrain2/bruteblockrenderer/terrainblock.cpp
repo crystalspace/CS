@@ -627,7 +627,7 @@ void TerrainBlock::CullRenderMeshes (iRenderView* rview, const csPlane3* cullPla
   for (int j = -2; j < (int)palette.GetSize (); ++j)
   {
     iMaterialWrapper* mat = 0;
-    iShaderVariableContext* svContext;
+    iShaderVariableContext* svContext = 0;
 
     if (!renderSplatting)
     {

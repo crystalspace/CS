@@ -29,7 +29,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/bitarray.h"
 #include "csutil/cfgacc.h"
 #include "csutil/csendian.h"
-#include "csutil/csmd5.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/memfile.h"
 #include "csutil/randomgen.h"

@@ -229,6 +229,14 @@ typedef uint_least64_t ulonglong;
  */
 typedef unsigned int csTicks;
 
+/**
+ * A time value measured in microseconds (1/1000000 of a second).  Ticks do not
+ * represent wall clock time or any other Epoch-based time.  Instead, ticks are
+ * useful only for measuring differences between points on a timeline, or for
+ * specifying intervals.
+ */
+typedef int64 csMicroTicks;
+
 /// Shortcut for default unsigned int.
 typedef unsigned int uint;
 /** @} */

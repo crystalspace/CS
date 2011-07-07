@@ -28,9 +28,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
   CS_IMPLEMENT_STATIC_VAR(GetBoxAlloc, BoxAllocator, )
 
   PositionMap::PositionMap (const float* minRadii, size_t numMinRadii,
-			    const csBox2& box)
+			    const csBox2& box, int randomSeed)
   {
-    posGen.Initialize();
+    posGen.Initialize (randomSeed);
     
     buckets.SetCapacity (numMinRadii);
     for (size_t b = 0; b < numMinRadii; b++)

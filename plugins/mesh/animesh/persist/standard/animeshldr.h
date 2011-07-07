@@ -48,6 +48,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
     bool ParseMorphTarget (iDocumentNode* child,
       CS::Mesh::iAnimatedMeshFactory* amfact);
 
+    bool ParseBoundingBoxes (iDocumentNode* child,
+      CS::Mesh::iAnimatedMeshFactory* amfact);
+
     //-- iComponent
     virtual bool Initialize (iObjectRegistry*);
 
@@ -102,6 +105,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
       iBase* context);
 
     virtual bool IsThreadSafe() { return true; }
+
+    bool ParseBoundingBoxes (iDocumentNode* child,
+      CS::Mesh::iAnimatedMesh* amesh);
 
     //-- iComponent
     virtual bool Initialize (iObjectRegistry*);

@@ -24,8 +24,8 @@
 
 #include "iutil/hiercache.h"
 
-#include "csutil/csmd5.h"
 #include "csutil/fifo.h"
+#include "csutil/md5.h"
 #include "csutil/memfile.h"
 #include "csutil/mempool.h"
 #include "csutil/ref.h"
@@ -59,7 +59,7 @@ namespace CS
           csRef<iDataBuffer> sourceData;
           csString fullPath;
           
-          csMD5::Digest ComputeHash ();
+          CS::Utility::Checksum::MD5::Digest ComputeHash ();
         };
         csFIFO<DocStackEntry> scanStack;
         void PushReferencedFiles (DocStackEntry& entry);

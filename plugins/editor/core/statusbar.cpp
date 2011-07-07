@@ -16,45 +16,45 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __PANELMANAGER_H__
-#define __PANELMANAGER_H__
+#include <cssysdef.h>
+#include "csutil/scf.h"
 
-#include <csutil/refarr.h>
+#include <wx/event.h>
 
-#include "wx/aui/aui.h"
+#include "statusbar.h"
 
-#include "ieditor/panelmanager.h"
-
-namespace CS {
-namespace EditorApp {
-
-class AUIPanelManager : public scfImplementation1<AUIPanelManager,iPanelManager>
+CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {
-public:
-  AUIPanelManager (iObjectRegistry* obj_reg);
-  virtual ~AUIPanelManager ();
 
-  virtual void Uninitialize ();
-  
-  virtual void SetManagedWindow (wxWindow* managedWindow);
+BEGIN_EVENT_TABLE(StatusBar, wxStatusBar)
+  EVT_SIZE(StatusBar::OnSize)
+END_EVENT_TABLE()
 
-  virtual wxWindow* GetManagedWindow ();
+StatusBar::StatusBar (wxWindow* parent)
+  : wxStatusBar (parent)
+{
+  static const int widths[Field_Max] = {-1, 150, 30};
 
-  virtual void AddPanel (iPanel* panel);
+  SetFieldsCount(Field_Max);
+  SetStatusWidths(Field_Max, widths);
 
-  virtual void RemovePanel (iPanel* panel);
+  gauge = new wxGauge(this, wxID_ANY, 100);
+  gauge->SetValue(0);
+}
 
-  virtual void SetPanelVisible (iPanel* panel, bool visible);
+StatusBar::~StatusBar ()
+{
+}
 
-private:
-  iObjectRegistry* object_reg;
-  
-  wxAuiManager mgr;
-  csRefArray<iPanel> panels;
-  
-};
+void StatusBar::OnSize (wxSizeEvent& event)
+{
+  wxRect gaugeRect;
+  GetFieldRect(Field_Gauge, gaugeRect);
 
-} // namespace EditorApp
-} // namespace CS
+  gauge->SetSize(gaugeRect);
 
-#endif
+  event.Skip();
+}
+
+}
+CS_PLUGIN_NAMESPACE_END(CSE)

@@ -20,9 +20,9 @@
 #ifndef __CS_SNIPPET_H__
 #define __CS_SNIPPET_H__
 
-#include "csutil/csmd5.h"
 #include "csutil/csstring.h"
 #include "csutil/customallocated.h"
+#include "csutil/md5.h"
 #include "csutil/noncopyable.h"
 #include "csutil/parray.h"
 #include "csutil/strhash.h"
@@ -117,17 +117,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     class AtomTechnique : public Snippet::Technique
     {
       friend class Snippet;
-      csMD5::Digest id;
+      CS::Utility::Checksum::MD5::Digest id;
       CombinerPlugin combiner;
       csArray<Block> blocks;
       csArray<Input> inputs;
       csArray<Output> outputs;
     public:
       AtomTechnique (const Snippet* owner, const char* snippetName,
-        const csMD5::Digest& id) : Technique (owner, snippetName), id (id) {}
+        const CS::Utility::Checksum::MD5::Digest& id) : Technique (owner, snippetName), id (id) {}
     
       virtual bool IsCompound() const { return false; }
-      const csMD5::Digest& GetID() const { return id; }
+      const CS::Utility::Checksum::MD5::Digest& GetID() const { return id; }
       
       void SetCombiner (const CombinerPlugin& comb) { combiner = comb; }
       void AddBlock (const Block& block) { blocks.Push (block); }

@@ -34,6 +34,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
    */
   class DensityFactorMap : public CS::Utility::FastRefCount<DensityFactorMap>
   {
+  private:
     csRef<iBase> mapDataKeeper;
     const uint8* mapPtr;
     int width;
@@ -45,9 +46,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
     
     bool IsValid() const { return mapPtr; }
     float GetDensity (const csVector3& worldCoord) const;
+    int GetWidth () const { return width; }
+    int GetHeight () const { return height; }
     
     void SetImage (iImage* image);
     void SetWorldToMapTransform (const CS::Math::Matrix4& tf);
+    const CS::Math::Matrix4& GetWorldToMapTransform () const { return world2map; }
   };
 }
 CS_PLUGIN_NAMESPACE_END(Engine)

@@ -31,8 +31,7 @@
     <!-- 1 pass, 6 lights -->
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: blend with alpha.
-	     Note that the 'binalpha' part is provided by the alphakill snippet -->
+	<!-- First pass: blend with alpha. -->
 	<mixmode>
 	  <blendop src="srcalpha" dst="srcalpha_inv" />
 	  <alphatest>disable</alphatest>
@@ -40,7 +39,7 @@
 	<alphatocoverage/>
 	<!-- ATC provides an alpha-blending 'lookalike' -->
 	<atcmixmode>
-	  <blendop src="one" dst="one" />
+	  <blendop src="one" dst="zero" />
 	  <alphatest>disable</alphatest>
 	</atcmixmode>
       <?else?>
@@ -81,8 +80,7 @@
     <!-- 2 passes, 4+2 lights -->
     <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: blend with alpha.
-	     Note that the 'binalpha' part is provided by the alphakill snippet -->
+	<!-- First pass: blend with alpha. -->
 	<mixmode>
 	  <blendop src="srcalpha" dst="srcalpha_inv" />
 	  <alphatest>disable</alphatest>
@@ -90,7 +88,7 @@
 	<alphatocoverage/>
 	<!-- ATC provides an alpha-blending 'lookalike' -->
 	<atcmixmode>
-	  <blendop src="one" dst="one" />
+          <blendop src="one" dst="zero" />
 	  <alphatest>disable</alphatest>
 	</atcmixmode>
       <?else?>
@@ -148,8 +146,7 @@
     <!-- 2 passes, 3+3 lights -->
     <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: blend with alpha.
-	     Note that the 'binalpha' part is provided by the alphakill snippet -->
+	<!-- First pass: blend with alpha. -->
 	<mixmode>
 	  <blendop src="srcalpha" dst="srcalpha_inv" />
 	  <alphatest>disable</alphatest>
@@ -157,7 +154,7 @@
 	<alphatocoverage/>
 	<!-- ATC provides an alpha-blending 'lookalike' -->
 	<atcmixmode>
-	  <blendop src="one" dst="one" />
+          <blendop src="one" dst="zero" />
 	  <alphatest>disable</alphatest>
 	</atcmixmode>
       <?else?>
@@ -215,8 +212,7 @@
     <!-- 3 passes, 2+2+2 lights -->
     <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: blend with alpha.
-	     Note that the 'binalpha' part is provided by the alphakill snippet -->
+	<!-- First pass: blend with alpha. -->
 	<mixmode>
 	  <blendop src="srcalpha" dst="srcalpha_inv" />
 	  <alphatest>disable</alphatest>
@@ -224,7 +220,7 @@
 	<alphatocoverage/>
 	<!-- ATC provides an alpha-blending 'lookalike' -->
 	<atcmixmode>
-	  <blendop src="one" dst="one" />
+          <blendop src="one" dst="zero" />
 	  <alphatest>disable</alphatest>
 	</atcmixmode>
       <?else?>
@@ -306,8 +302,7 @@
     <!-- 6 passes, 1+1+1+1+1+1 lights -->
     <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: blend with alpha.
-	     Note that the 'binalpha' part is provided by the alphakill snippet -->
+	<!-- First pass: blend with alpha. -->
 	<mixmode>
 	  <blendop src="srcalpha" dst="srcalpha_inv" />
 	  <alphatest>disable</alphatest>
@@ -315,7 +310,7 @@
 	<alphatocoverage/>
 	<!-- ATC provides an alpha-blending 'lookalike' -->
 	<atcmixmode>
-	  <blendop src="one" dst="one" />
+          <blendop src="one" dst="zero" />
 	  <alphatest>disable</alphatest>
 	</atcmixmode>
       <?else?>
@@ -469,8 +464,7 @@
   <technique priority="50">
     <tag>per_pixel_lighting</tag>
     <pass>
-      <!-- First (only) pass: blend with alpha.
-	   Note that the 'binalpha' part is provided by the alphakill snippet -->
+      <!-- First (only) pass: blend with alpha. -->
       <mixmode>
 	<blendop src="srcalpha" dst="srcalpha_inv" />
 	<alphatest>disable</alphatest>
@@ -478,7 +472,7 @@
       <alphatocoverage/>
       <!-- ATC provides an alpha-blending 'lookalike' -->
       <atcmixmode>
-	<blendop src="one" dst="one" />
+        <blendop src="one" dst="zero" />
 	<alphatest>disable</alphatest>
       </atcmixmode>
       

@@ -82,7 +82,7 @@ bool AssetBrowserPanel::Initialize (iObjectRegistry* obj_reg)
     return false;
 
   // Create the panel
-  Create (panelManager->GetManagedWindow (), -1, wxPoint (0, 0), wxSize (250, 250));
+  Create (editor->GetWindow (), -1, wxPoint (0, 0), wxSize (250, 250));
   
   // Create the controls
   treectrl = new AssetBrowserTreeCtrl (object_reg, editor, this, AssetBrowser_Ctrl,
@@ -108,7 +108,7 @@ const wxChar* AssetBrowserPanel::GetCaption () const
   return wxT("Asset Browser");
 }
 
-int AssetBrowserPanel::GetDefaultDockPosition () const
+PanelDockPosition AssetBrowserPanel::GetDefaultDockPosition () const
 {
   return DockPositionRight;
 }
@@ -151,7 +151,6 @@ AssetBrowserTreeCtrl::AssetBrowserTreeCtrl(iObjectRegistry* obj_reg, iEditor* ed
   int rootIconIdx = imageList->Add (sceneBmp);
   AddRoot (wxT("Assets"), rootIconIdx);
 }
-
 
 void AssetBrowserTreeCtrl::OnObjectAdded (iObjectList* list, iEditorObject* obj)
 {

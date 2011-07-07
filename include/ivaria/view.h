@@ -51,7 +51,7 @@ struct iPerspectiveCamera;
  */
 struct iView : public virtual iBase
 {
-  SCF_INTERFACE(iView, 3,0,0);
+  SCF_INTERFACE(iView, 3,0,1);
   /// Get engine handle.
   virtual iEngine* GetEngine () = 0;
   /// Set engine handle.
@@ -133,6 +133,18 @@ struct iView : public virtual iBase
 
   // Set the view height.
   virtual void SetHeight (int h) = 0;
+
+  /**
+   * Transform a normalized screenspace coordinate (-1 to 1) to real pixels in this
+   * viewport.
+   */
+  virtual csVector2 NormalizedToScreen (const csVector2& pos) = 0;
+
+  /**
+   * Transform a screenspace coordinate in pixels to a normalized screen
+   * coordinate (-1 to 1).
+   */
+  virtual csVector2 ScreenToNormalized (const csVector2& pos) = 0;
 };
 
 #endif // __CS_IVARIA_VIEW_H__

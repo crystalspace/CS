@@ -24,7 +24,7 @@
 #include "iutil/hiercache.h"
 #include "csplugincommon/shader/shadercachehelper.h"
 #include "csutil/csendian.h"
-#include "csutil/csmd5.h"
+#include "csutil/md5.h"
 
 #include "profile_limits.h"
 
@@ -178,7 +178,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     }
   #endif // PROG_CACHE_STORE_SOURCE
     
-    csMD5::Digest sourceMD5 = csMD5::Encode (source);
+    CS::Utility::Checksum::MD5::Digest sourceMD5 =
+      CS::Utility::Checksum::MD5::Encode (source);
     csString cacheArcPath;
     cacheArcPath.Format ("/%s",
       sourceMD5.HexString().GetData());
@@ -331,7 +332,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     }
   #endif
     
-    csMD5::Digest sourceMD5 = csMD5::Encode (source);
+    CS::Utility::Checksum::MD5::Digest sourceMD5 =
+      CS::Utility::Checksum::MD5::Encode (source);
     csString cacheArcPath;
     cacheArcPath.Format ("/%s", sourceMD5.HexString().GetData());
     

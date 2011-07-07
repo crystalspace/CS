@@ -17,7 +17,6 @@
 */
 
 #include <csutil/array.h>
-#include <limits>
 
 /**
  * Test array functionality.

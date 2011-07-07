@@ -1,0 +1,11 @@
+SubDir TOP plugins network http ;
+
+#TODO: Add native WinHTTP support
+#if $(TARGET.OS) = "WIN32"                            
+#{
+#    SubInclude TOP plugins network http win32 ;
+#} else
+if $(CURL.AVAILABLE) = "yes"
+{
+  SubInclude TOP plugins network http curl ;
+}

@@ -529,6 +529,8 @@ class iEngine(core.iBase):
     def SyncEngineLists(*args): return _iengine.iEngine_SyncEngineLists(*args)
     def SyncEngineListsWait(*args): return _iengine.iEngine_SyncEngineListsWait(*args)
     def SyncEngineListsNow(*args): return _iengine.iEngine_SyncEngineListsNow(*args)
+    def GetDefaultNearClipDistance(*args): return _iengine.iEngine_GetDefaultNearClipDistance(*args)
+    def SetDefaultNearClipDistance(*args): return _iengine.iEngine_SetDefaultNearClipDistance(*args)
     scfGetVersion = staticmethod(_iengine.iEngine_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iEngine
     __del__ = lambda self : None;
@@ -632,6 +634,8 @@ class iPerspectiveCamera(core.iBase):
     def GetShiftX(*args): return _iengine.iPerspectiveCamera_GetShiftX(*args)
     def GetShiftY(*args): return _iengine.iPerspectiveCamera_GetShiftY(*args)
     def SetPerspectiveCenter(*args): return _iengine.iPerspectiveCamera_SetPerspectiveCenter(*args)
+    def GetNearClipDistance(*args): return _iengine.iPerspectiveCamera_GetNearClipDistance(*args)
+    def SetNearClipDistance(*args): return _iengine.iPerspectiveCamera_SetNearClipDistance(*args)
     __swig_destroy__ = _iengine.delete_iPerspectiveCamera
     __del__ = lambda self : None;
 iPerspectiveCamera_swigregister = _iengine.iPerspectiveCamera_swigregister
