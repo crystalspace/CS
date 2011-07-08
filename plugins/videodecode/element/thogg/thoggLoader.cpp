@@ -119,8 +119,8 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
         //create an empty texture for this video stream
 
         csPtr<iTextureHandle> test = texManager->CreateTexture 
-          (ti.pic_width,ti.pic_height,0,csimg3D,"r5g6b5",
-          CS_TEXTURE_3D|CS_TEXTURE_NPOTS);
+          (ti.frame_width,ti.frame_height,0,csimg2D,"rgb8",
+          CS_TEXTURE_2D|CS_TEXTURE_NPOTS);
 
         videoStream->_texture.AttachNew (test);
 

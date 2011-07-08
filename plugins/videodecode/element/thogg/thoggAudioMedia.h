@@ -24,10 +24,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
   */
 
 #include <iutil/comp.h>
-#include <videodecode/medialoader.h>
-#include <videodecode/mediacontainer.h>
-#include <videodecode/media.h>
-#include <videodecode/vpl_structs.h>
+#include <ivideodecode/medialoader.h>
+#include <ivideodecode/mediacontainer.h>
+#include <ivideodecode/media.h>
 #include <csutil/scf_implementation.h>
 
 #include <vorbis/codec.h>
@@ -76,35 +75,16 @@ public:
 
   virtual const char* GetType ();
 
-  /**
-    * Get size of this sound in frames.
-    */
   virtual unsigned long GetFrameCount();
 
-  /**
-    * Return the length in seconds
-    */
   virtual float GetLength();
 
-  /**
-    * Set the audio stream target
-    */
   virtual void SetAudioTarget (csRef<iSndSysStream> stream);
 
-
-  /**
-    * Gets the position of the video stream
-    */
   virtual double GetPosition ();
 
-  /**
-    * Clears all the decoders of the stream. Done when destroying the object by the container
-    */
   virtual void CleanMedia () ;
 
-  /**
-    * Perform frame-specific updates on the stream
-    */
   virtual int Update () ;
 
 

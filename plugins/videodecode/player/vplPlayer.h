@@ -19,10 +19,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __VPLPLAYER_H__
 
 #include <iutil/comp.h>
-#include <videodecode/mediaplayer.h>
-#include <videodecode/mediacontainer.h>
-#include <videodecode/media.h>
-#include <videodecode/vpl_structs.h>
+#include <ivideodecode/mediaplayer.h>
+#include <ivideodecode/mediacontainer.h>
+#include <ivideodecode/media.h>
 #include <csutil/scf_implementation.h>
 
 struct iObjectRegistry;
@@ -51,40 +50,28 @@ public:
   // From iComponent.
   virtual bool Initialize (iObjectRegistry*);
 
-  /// Initialize the video player
   virtual void InitializePlayer (csRef<iMediaContainer> media) ;
 
-  /// Activates a stream from inside the iMediaContainer
   virtual void SetActiveStream (int index) ;
 
-  /// Deactivates a stream from inside the iMediaContainer
   virtual void RemoveActiveAudioStream (int index) ;
 
-  /// Set the target texture
   virtual void SetTargetTexture (csRef<iTextureHandle> &target) ;
 
-  /// Called continuously to update the player
   virtual void Update ();
 
-  /// Enable/disable looping
   virtual void Loop (bool shouldLoop) ;
 
-  /// Starts playing the media
   virtual void Play () ;
 
-  /// Pauses the media
   virtual void Pause() ;
 
-  /// Stops the media and seeks to the beginning
   virtual void Stop () ;
 
-  /// Seeks the media
   virtual void Seek (float time) ;
 
-  /// Get the position of the media
   virtual csTicks GetPosition () ;
 
-  /// Returns if the media is playing or not
   virtual bool IsPlaying () ;
 };
 

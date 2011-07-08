@@ -255,19 +255,23 @@
 			Name="Intefaces"
 			>
 			<File
-				RelativePath="..\..\..\include\videodecode\media.h"
+				RelativePath="..\..\..\include\ivideodecode\media.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\include\videodecode\mediacontainer.h"
+				RelativePath="..\..\..\include\ivideodecode\mediacontainer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\include\videodecode\medialoader.h"
+				RelativePath="..\..\..\include\ivideodecode\medialoader.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\include\videodecode\mediaplayer.h"
+				RelativePath="..\..\..\include\ivideodecode\mediaplayer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\include\ivideodecode\mediastructs.h"
 				>
 			</File>
 		</Filter>

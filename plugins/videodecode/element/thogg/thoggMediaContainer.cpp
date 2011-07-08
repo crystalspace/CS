@@ -202,6 +202,7 @@ void TheoraMediaContainer::Seek (float time)
     return;
   }
   timeToSeek=time;
+  endOfFile=false;
 }
 
 void TheoraMediaContainer::DoSeek ()
@@ -238,7 +239,7 @@ void TheoraMediaContainer::DoSeek ()
       vidStream = static_cast<TheoraVideoMedia*> ( (iVideoMedia*)media);
     }
   }
-  unsigned long frame,targetFrame=(int) (vidStream->GetFrameCount () * timeToSeek / vidStream->GetLength ());
+  unsigned long frame,targetFrame=(unsigned long) (vidStream->GetFrameCount () * timeToSeek / vidStream->GetLength ());
 
   //check if we're seeking outside the video
   if (targetFrame>vidStream->GetFrameCount ())

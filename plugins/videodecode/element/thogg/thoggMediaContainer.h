@@ -24,10 +24,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include <iutil/comp.h>
-#include <videodecode/medialoader.h>
-#include <videodecode/mediacontainer.h>
-#include <videodecode/media.h>
-#include <videodecode/vpl_structs.h>
+#include <ivideodecode/medialoader.h>
+#include <ivideodecode/mediacontainer.h>
+#include <ivideodecode/media.h>
 #include <csutil/scf_implementation.h>
 #include <csutil/refarr.h>
 #include <csutil/array.h>
@@ -76,15 +75,11 @@ public:
   virtual bool Initialize (iObjectRegistry*);
 
 
-  /// Returns the number of iMedia objects inside the iMediaContainer
   virtual size_t GetMediaCount ();
 
-  /// Gets the iMedia object at an index
   virtual csRef<iMedia> GetMedia (size_t index);
 
-  /// Gets the description of the media conainer
   virtual const char* GetDescription ();
-  /// Set the description of the media conainer
   virtual void SetDescription (const char* pDescription)
   {
     this->pDescription=pDescription;
@@ -93,25 +88,18 @@ public:
   void AddMedia (csRef<iMedia> media);
 
 
-  /// Set the target texture
   virtual void SetTargetTexture (csRef<iTextureHandle> &target) ;
 
-  /// Sets an active stream. In case there's already a stream of that type, it's replaced
   virtual void SetActiveStream (size_t index);
 
-  /// Removes an active stream.
   virtual bool RemoveActiveStream (size_t index);
 
-  /// Updates the active streams
   virtual void Update ();
 
-  /// Checks if end of file has been reached
   virtual bool Eof ();
 
-  /// Triggers a seek for the active iMedia streams, resolved at the next update
   virtual void Seek (float time) ;
 
-  /// Automatically picks the first stream of every kind from inside the container
   virtual void AutoActivateStreams () ;
 
   /// Does a seek on the active media

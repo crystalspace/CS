@@ -24,10 +24,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include <iutil/comp.h>
-#include <videodecode/medialoader.h>
-#include <videodecode/mediacontainer.h>
-#include <videodecode/media.h>
-#include <videodecode/vpl_structs.h>
+#include <ivideodecode/medialoader.h>
+#include <ivideodecode/mediacontainer.h>
+#include <ivideodecode/media.h>
 #include <csutil/scf_implementation.h>
 
 // theora headers
@@ -36,6 +35,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <iostream>
 using namespace std;
+
+#define QUALIFIED_PLUGIN_NAME "crystalspace.vpl.element.thogg"
 
 struct iTextureWrapper; 
 struct csVPLvideoFormat;
@@ -80,37 +81,18 @@ public:
 
   virtual const char* GetType ();
 
-  /// Get the format of the sound data.
   virtual const csVPLvideoFormat *GetFormat();
 
-  /**
-    * Get size of this sound in frames.
-    */
   virtual unsigned long GetFrameCount();
 
-  /**
-    * Return the length in seconds
-    */
   virtual float GetLength();
 
-  /**
-    * Set the texture target
-    */
   virtual void SetVideoTarget (csRef<iTextureHandle> &texture);
 
-  /**
-    * Gets the position of the video stream
-    */
   virtual double GetPosition ();
 
-  /**
-    * Clears all the decoders of the stream. Done when destroying the object by the container
-    */
   virtual void CleanMedia () ;
 
-  /**
-    * Perform frame-specific updates on the stream
-    */
   virtual int Update () ;
 
 

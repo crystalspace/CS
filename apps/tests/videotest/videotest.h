@@ -25,11 +25,10 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <iostream>
 
-#include <videodecode/vpl_structs.h>
-#include <videodecode/medialoader.h>
-#include <videodecode/media.h>
-#include <videodecode/mediacontainer.h>
-#include <videodecode/mediaplayer.h>
+#include <ivideodecode/medialoader.h>
+#include <ivideodecode/media.h>
+#include <ivideodecode/mediacontainer.h>
+#include <ivideodecode/mediaplayer.h>
 
 struct iEngine;
 struct iObjectRegistry;

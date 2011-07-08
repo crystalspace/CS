@@ -37,7 +37,6 @@ void vplPlayer::InitializePlayer (csRef<iMediaContainer> media)
     _mediaFile = media;
 }
 
-/// Activates a stream from inside the iMediaContainer
 void vplPlayer::SetActiveStream (int index) 
 {
   if (_mediaFile.IsValid ())
@@ -49,56 +48,55 @@ void vplPlayer::SetActiveStream (int index)
   }
 }
 
-/// Deactivates a stream from inside the iMediaContainer
 void vplPlayer::RemoveActiveAudioStream (int index) 
 {
   if (_mediaFile.IsValid ())
     _mediaFile->RemoveActiveStream (index);
 }
 
-/// Set the target texture
 void vplPlayer::SetTargetTexture (csRef<iTextureHandle> &target) 
 {
   _mediaFile->SetTargetTexture (target);
 }
 
-/// Called continuously to update the player
 void vplPlayer::Update ()
 {
   if (_playing)
+  {
     if (_mediaFile.IsValid ())
     {
       if (_mediaFile->Eof ())
       {
-        if (_shouldLoop)
+        if (_shouldLoop) 
+        {
           Seek (0.0f);
+          _mediaFile->Update ();
+          _playing=true;
+        }
         else
           _playing=false;
       }
-      else
-        _mediaFile->Update ();
+
+      _mediaFile->Update ();
     }
+  }
 }
 
-/// Enable/disable looping
 void vplPlayer::Loop (bool shouldLoop)
 {
   _shouldLoop = shouldLoop;
 }
 
-/// Starts playing the media
 void vplPlayer::Play () 
 {
   _playing=true;
 }
 
-/// Pauses the media
 void vplPlayer::Pause() 
 {
   _playing=false;
 }
 
-/// Stops the media and seeks to the beginning
 void vplPlayer::Stop () 
 {
   // Stop playing
@@ -107,20 +105,20 @@ void vplPlayer::Stop ()
   _mediaFile->Seek (0.0f);
 }
 
-/// Seeks the media
 void vplPlayer::Seek (float time)
 {
   if (_mediaFile.IsValid ())
+  {
     _mediaFile->Seek (time);
+    _playing = true;
+  }
 }
 
-/// Get the position of the media
 csTicks vplPlayer::GetPosition () 
 {
   return 0;
 }
 
-/// Returns if the media is playing or not
 bool vplPlayer::IsPlaying () 
 {
   return _playing;

@@ -63,7 +63,7 @@ void VideoTest::Frame ()
   //not really major, but might help when drawing the video on-screen
 
   int w, h;
-  logoTex->GetRendererDimensions (w, h);
+  logoTex->GetOriginalDimensions (w, h);
 
   int screenW = g2d->GetWidth ();
 
@@ -72,7 +72,7 @@ void VideoTest::Frame ()
   const int margin = (int)screenW * marginFraction;
 
   // Width of the logo, as a fraction of screen width
-  const float widthFraction = 0.3f;
+  const float widthFraction = 0.5f;
   const int width = (int)screenW * widthFraction;
   const int height = width * h / w;
 
@@ -109,7 +109,7 @@ bool VideoTest::Application ()
 
   csRef<iTextureManager> texManager = g3d->GetTextureManager ();
   csRef<iMediaLoader> vlpLoader = csQueryRegistry<iMediaLoader> (object_reg);
-  csRef<iMediaContainer> video = vlpLoader->LoadMedia("123pixel_aspect_ratio.ogg");
+  csRef<iMediaContainer> video = vlpLoader->LoadMedia("vid420.ogg");
 
   if (video.IsValid ())
   {
@@ -122,18 +122,9 @@ bool VideoTest::Application ()
   // Specifying -1 as index triggers auto stream activation
   mediaPlayer->SetActiveStream (-1);
   mediaPlayer->SetTargetTexture (logoTex);
+  mediaPlayer->Loop (false);
   mediaPlayer->Play ();
-  mediaPlayer->Seek (15.0f);
-
-  //logoTex = NULL;
-  /*csRef<iTextureHandle> pie;
-
-  csPtr<iTextureHandle> test = texManager->CreateTexture (256,102,0,csimg3D,"r5g6b5",
-  CS_TEXTURE_3D);
-  logoTex.AttachNew (test);
-  pie = logoTex;*/
-
-  //cout<<pie.IsValid ()<<endl<<pie->GetRefCount ()<<endl;
+  //mediaPlayer->Seek (15.0f);
 
   // Create the scene
   if (!CreateScene ())
@@ -148,13 +139,6 @@ bool VideoTest::Application ()
 bool VideoTest::CreateScene ()
 {
   printf ("Creating level...\n");
-
-  logoTex = loader->LoadTexture ("/lib/std/cslogo2.png", CS_TEXTURE_2D, NULL);
-  if (!logoTex.IsValid ())
-  {
-  return ReportError("Could not load logo %s!",
-  "/lib/std/cslogo2.png");
-  }
 
   // Load the texture from the standard library.  This is located in
   // CS/data/standard.zip and mounted as /lib/std using the Virtual
