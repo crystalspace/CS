@@ -183,6 +183,7 @@ int TheoraVideoMedia::Update ()
 
 
         _texture->Blit (ti.pic_x,ti.pic_y,ti.pic_width,ti.pic_height,(unsigned char *)pixels);
+        delete pixels;
     }
     else
       //if the video is in 4:2:2 pixel format
@@ -216,6 +217,7 @@ int TheoraVideoMedia::Update ()
 
 
           _texture->Blit (ti.pic_x,ti.pic_y,ti.pic_width,ti.pic_height,(unsigned char *)pixels);
+          delete pixels;
       }
       else
         //if the video is in 4:4:4 pixel format
@@ -249,6 +251,7 @@ int TheoraVideoMedia::Update ()
 
 
             _texture->Blit (ti.pic_x,ti.pic_y,ti.pic_width,ti.pic_height,(unsigned char *)pixels);
+            delete pixels;
         }
         else
           csReport(object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
