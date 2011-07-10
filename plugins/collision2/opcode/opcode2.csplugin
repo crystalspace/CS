@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- opcode2.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.collision.opcode2</name>
+        <implementation>Opcode2CollisionSystem</implementation>
+        <description>OPCODE collision system</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

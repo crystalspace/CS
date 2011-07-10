@@ -199,8 +199,7 @@ CS::Collision2::HitBeamResult csBulletSector::HitBeam (const csVector3& start, c
       //Portals are not included.
       for (size_t i = 0; i < portals.GetSize (); i++)
       {
-        if (portals[i].ghostPortal1 == result.object
-          || portals[i].ghostPortal2 == result.object)
+        if (portals[i].ghostPortal1 == result.object)
         {
           result.hasHit = false;
           break;

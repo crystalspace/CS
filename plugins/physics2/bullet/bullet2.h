@@ -54,7 +54,6 @@ class csBulletSector : public scfImplementationExt3<
   {
     iPortal* portal;
     csBulletCollisionObject* ghostPortal1;
-    csBulletCollisionObject* ghostPortal2;
   };
   csRef<iSector> sector;
   csBulletSystem* sys;
@@ -66,7 +65,6 @@ class csBulletSector : public scfImplementationExt3<
   csRef<csBulletCollisionActor> collisionActor;
   csRefArray<csBulletJoint> joints;
   csArray<CollisionPortal> portals;
-  csArray<CS::Collision2::CollisionData> points;
   csBulletDebugDraw* debugDraw;
   btDynamicsWorld* bulletWorld;
   btCollisionDispatcher* dispatcher;
@@ -105,13 +103,12 @@ class csBulletSector : public scfImplementationExt3<
   CollisionGroupVector collGroups;
   CS::Collision2::CollisionGroupMask allFilter; 
   int systemFilterCount;
-  //csArray<size_t> collGroupMasks;
 
   void CheckCollisions();
 
 public:
   csBulletSector (csBulletSystem* sys);
-  virtual ~csBulletSector();
+  virtual ~csBulletSector ();
 
   virtual iObject* QueryObject () {return (iObject*) this;}
   //iCollisionSector
@@ -238,7 +235,6 @@ private:
   csStringID baseID;
   csStringID colldetID;
 
-  void RegisterGimpact ();
 public:
   csBulletSystem (iBase* iParent);
   virtual ~csBulletSystem ();
