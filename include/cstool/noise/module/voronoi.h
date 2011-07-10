@@ -103,6 +103,8 @@ namespace Module {
         /// CS::Math::Noise::Module::DEFAULT_VORONOI_SEED.
         Voronoi ();
 
+	virtual ~Voronoi () { }
+
         /// Enables or disables applying the distance from the nearest seed
         /// point to the output value.
         ///

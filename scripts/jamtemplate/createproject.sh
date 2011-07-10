@@ -210,7 +210,7 @@ meta-information.  The libbfd library carries a GPL license, therefore it can
 be used legally only with projects also carrying a GPL or GPL-compatible
 license. If your project is not compatible with GPL, then Crystal Space needs
 to be instructed not to fallback to using libbfd for extracting
-meta-information if the built-in ELF reader is unavailable. Avoding libbfd, in
+meta-information if the built-in ELF reader is unavailable. Avoiding libbfd, in
 this case, will prevent its GPL license from infecting your non-GPL project.
 Your response to this question controls whether or not it is safe to fall back
 to using libbfd in the event that the ELF-based reader is unusable.  (Note,
@@ -226,7 +226,7 @@ cat << __EOF__
 
 **** Dependencies
 The Crystal Entity Layer (CEL) is a set of classes and modules which layer
-game-oriented facilities atop Crystal Space. (http://cel.crystalspace3d.org/)
+game-oriented facilities atop Crystal Space. (http://www.crystalspace3d.org/main/CEL)
 The Autoconf configuration script and Jam build system can be set up to work
 with CEL if your project will utilize this SDK.
 

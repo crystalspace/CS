@@ -1,0 +1,8 @@
+SubDir TOP plugins network http curl ;
+
+Description cshttpconnection : "CS HTTP Connection Plugin" ;
+
+Plugin cshttpconnection : [ Wildcard *.cpp *.h ] ;
+LinkWith cshttpconnection : crystalspace ;
+ExternalLibs cshttpconnection : CURL ;
+

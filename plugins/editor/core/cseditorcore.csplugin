@@ -4,6 +4,11 @@
   <scf>
     <classes>
       <class>
+        <name>crystalspace.editor.plugin.core.gui</name>
+        <implementation>Editor</implementation>
+        <description>CSEditor GUI</description>
+      </class>
+      <class>
         <name>crystalspace.editor.plugin.core.cs3dpanel</name>
         <implementation>CS3DPanel</implementation>
         <description>CSEditor 3D Panel</description>

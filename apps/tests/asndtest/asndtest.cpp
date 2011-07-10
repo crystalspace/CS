@@ -20,7 +20,7 @@
 
 CS_IMPLEMENT_APPLICATION
 
-ASndTest::ASndTest ()
+ASndTest::ASndTest () : rotYaw (0.0f)
 {
   SetApplicationName ("CrystalSpace.ASndTest");
 }

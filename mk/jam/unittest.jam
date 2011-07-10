@@ -551,7 +551,7 @@ EOF
 #   `check_target'.
 actions UnitTestRun
 {
-  LD_LIBRARY_PATH=$(LOCATE.OBJECTS)/libs:$LD_LIBRARY_PATH
+  LD_LIBRARY_PATH=$(LOCATE.OBJECTS)/libs:$LD_LIBRARY_PATH \
   $(>) $(UNITTEST_RUNFLAGS)
 }
 

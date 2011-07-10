@@ -148,7 +148,7 @@ CS_CRYSTALSPACE_EXPORT csTicks csGetTicks ();
  * The first call to this or csGetTicks() must complete before multiple 
  * threads may call this function.
 */
-CS_CRYSTALSPACE_EXPORT int64 csGetMicroTicks ();
+CS_CRYSTALSPACE_EXPORT csMicroTicks csGetMicroTicks ();
 
 /**
  * This function will freeze your application for given number of 1/1000

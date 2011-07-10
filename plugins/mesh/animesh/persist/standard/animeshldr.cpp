@@ -32,6 +32,7 @@
 #include "iutil/plugin.h"
 #include "iutil/stringarray.h"
 #include "ivaria/reporter.h"
+#include <csutil/stringarray.h>
 
 #include "csutil/ref.h"
 
@@ -271,7 +272,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           {
             CS::Mesh::iAnimatedMeshSubMeshFactory* smf = amfact->CreateSubMesh (indexBuffer,
               child->GetAttributeValue("name"), child->GetAttributeValueAsBool("visible", true));
-            smf->SetMaterial(material);
+	    if (material)
+	      smf->SetMaterial(material);
           }
         }
         break;
@@ -299,8 +301,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           amfact->SetSkeletonFactory (skelFact);
         }
         break;
+      case XMLTOKEN_SUBSET:
+        {
+	  size_t set = amfact->AddSubset ();
+	  const char* vertexIndices = child->GetAttributeValue ("vertices");
+	  if (vertexIndices == 0)
+	  {
+	    synldr->ReportError (msgidFactory, child, 
+				 "No vertex list defined while creating subset");
+	    return 0;
+	  }
+
+	  csStringArray indices (vertexIndices, " ");
+	  for (size_t i = 0; i < indices.GetSize(); i++)
+	    amfact->AddSubsetVertex (set, (size_t) atoi(indices[i]));
+
+        }
+        break;
       case XMLTOKEN_MORPHTARGET:
         if (!ParseMorphTarget (child, amfact))
+	  return 0;
+	break;
+      case XMLTOKEN_BBOXES:
+        if (!ParseBoundingBoxes (child, amfact))
 	  return 0;
 	break;
       case XMLTOKEN_SOCKET:
@@ -362,6 +385,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 					       CS::Mesh::iAnimatedMeshFactory* amfact)
   {
     const char* name = child->GetAttributeValue ("name");
+    CS::Mesh::iAnimatedMeshMorphTarget* morphTarget = amfact->CreateMorphTarget (name);
 
     csRef<iRenderBuffer> offsetsBuffer;
 
@@ -374,14 +398,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
       csStringID id = xmltokens.Request (value);
       switch (id)
       {
+      case XMLTOKEN_SETS:
+	{
+	  const char* subsetIndices = child2->GetAttributeValue ("ids");
+	  if (subsetIndices == 0)
+	  {
+	    synldr->ReportError (msgidFactory, child2, 
+				 "No subset list defined while creating morph target");
+	    return false;
+	  }
+
+	  csStringArray subsets (subsetIndices, " ");
+	  for (size_t i = 0; i < subsets.GetSize (); i++)
+	    morphTarget->AddSubset (atoi(subsets[i]));
+	
+	}
+	break;
       case XMLTOKEN_OFFSETS:
 	{
 	  offsetsBuffer = synldr->ParseRenderBuffer (child2);
 	  if (!offsetsBuffer)
 	  {
-	    synldr->ReportError (msgidFactory, child2, "Could not parse render buffer!");
+	    synldr->ReportError (msgidFactory, child2, "Could not parse offsets buffer!");
 	    return false;
 	  }
+	  morphTarget->SetVertexOffsets (offsetsBuffer);
+	  morphTarget->Invalidate();
 	}
 	break;
       default:
@@ -390,12 +432,57 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
       }
     }
 
-    CS::Mesh::iAnimatedMeshMorphTarget* morphTarget = amfact->CreateMorphTarget (name);
-    morphTarget->SetVertexOffsets (offsetsBuffer);
-    morphTarget->Invalidate();
     return true;
   }
   
+  bool AnimeshFactoryLoader::ParseBoundingBoxes (iDocumentNode* child,
+						 CS::Mesh::iAnimatedMeshFactory* amfact)
+  {
+    CS::Animation::iSkeletonFactory* skeletonFact = amfact->GetSkeletonFactory ();
+    if (!skeletonFact)
+    {
+      synldr->ReportError (msgidFactory, child, "Factory does not have a skeleton while creating bounding boxes");
+      return 0;
+    }
+
+    CS::Animation::BoneID numBones = skeletonFact->GetTopBoneID () + 1;
+    CS::Animation::BoneID currBone = 0;
+
+    csRef<iDocumentNodeIterator> it = child->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child2 = it->Next ();
+      if (child2->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child2->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+        case XMLTOKEN_BBOX:
+	{
+	  currBone = child2->GetAttributeValueAsInt("bone");
+	  if (currBone >= numBones)
+	  {
+	    synldr->ReportError (msgidFactory, child2, 
+				 "Invalid bounding box index %d, expected maximum %d bones",
+				 (int) currBone, (int) numBones);
+	    return false;
+	  }
+
+	  csBox3 bbox;
+	  if (!synldr->ParseBox (child2, bbox))
+	    return false;
+
+	  amfact->SetBoneBoundingBox (currBone, bbox);
+	}
+	break;
+      default:
+	synldr->ReportBadToken (child2);
+	return false;
+      }
+    }
+    return true;
+  }
+
   bool AnimeshFactoryLoader::Initialize (iObjectRegistry* objReg)
   {
     object_reg = objReg;
@@ -440,12 +527,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
       if (!factory) return false;
       if (!meshfact) return false;
 
+      // Write material
       iMaterialWrapper* material = nullptr;
+
       for (size_t i = 0; i < factory->GetSubMeshCount (); i++)
       {
 	CS::Mesh::iAnimatedMeshSubMeshFactory* submesh = factory->GetSubMesh (i);
-
 	iMaterialWrapper* submeshMaterial = submesh->GetMaterial ();
+
 	if (submeshMaterial)
 	{
 	  material = submeshMaterial;
@@ -538,74 +627,164 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 	}
       }
       
-      // Write bone influences
-      CS::Mesh::AnimatedMeshBoneInfluence* influences = factory->GetBoneInfluences ();
-      if (influences)
+      // Write skeleton
+      CS::Animation::iSkeletonFactory* skeletonFactory =
+	factory->GetSkeletonFactory ();
+      if (skeletonFactory)
       {
-	csRef<iDocumentNode> influenceNode = 
+	csRef<iDocumentNode> skeletonNode = 
 	  paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-	influenceNode->SetValue ("boneinfluences");
+	skeletonNode->SetValue ("skeleton");
+	csRef<iDocumentNode> skeletonNameNode = 
+	  skeletonNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+	skeletonNameNode->SetValue (skeletonFactory->GetName ());
+      }
 
-	size_t count = factory->GetBoneInfluencesPerVertex () * factory->GetVertexCount ();
-	for (size_t i = 0; i < count; i++)
+      // Write bone influences
+      if (skeletonFactory && skeletonFactory->GetBoneOrderList ().GetSize ())
+      {
+	CS::Mesh::AnimatedMeshBoneInfluence* influences = factory->GetBoneInfluences ();
+	if (influences)
 	{
-	  csRef<iDocumentNode> node = 
-	    influenceNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-	  node->SetValue ("bi");
-	  node->SetAttributeAsInt ("bone", influences[i].bone);
-	  node->SetAttributeAsFloat ("weight", influences[i].influenceWeight);
+	  csRef<iDocumentNode> influenceNode = 
+	    paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	  influenceNode->SetValue ("boneinfluences");
+
+	  size_t count = factory->GetBoneInfluencesPerVertex () * factory->GetVertexCount ();
+	  for (size_t i = 0; i < count; i++)
+	  {
+	    csRef<iDocumentNode> node = 
+	      influenceNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	    node->SetValue ("bi");
+	    node->SetAttributeAsInt ("bone", influences[i].bone);
+	    node->SetAttributeAsFloat ("weight", influences[i].influenceWeight);
+	  }
 	}
       }
 
       // Write submeshes
-      for (size_t i = 0; i < factory->GetSubMeshCount (); i++)
       {
-	CS::Mesh::iAnimatedMeshSubMeshFactory* submesh = factory->GetSubMesh (i);
-
-	csRef<iDocumentNode> submeshNode = 
-	  paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-	submeshNode->SetValue ("submesh");
-
-	if (submesh->GetIndexSetCount () == 0) continue;
-	iRenderBuffer* buffer = submesh->GetIndices (0);
-	// TODO: missing indice sets in loader and saver
-	if (!buffer) continue;
-
-	csRef<iDocumentNode> indexNode = 
-	  submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-	indexNode->SetValue ("index");
-	indexNode->SetAttribute ("indices", "yes");
-	synldr->WriteRenderBuffer (indexNode, buffer);
-
-	iMaterialWrapper* material = submesh->GetMaterial ();
-	if (material)
+	for (size_t i = 0; i < factory->GetSubMeshCount (); i++)
 	{
-	  csRef<iDocumentNode> materialNode = 
+	  CS::Mesh::iAnimatedMeshSubMeshFactory* submesh = factory->GetSubMesh (i);
+
+	  csRef<iDocumentNode> submeshNode = 
+	    paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	  submeshNode->SetValue ("submesh");
+
+	  if (submesh->GetIndexSetCount () == 0) continue;
+	  iRenderBuffer* buffer = submesh->GetIndices (0);
+	  // TODO: missing indice sets in loader and saver
+	  if (!buffer) continue;
+
+	  csRef<iDocumentNode> indexNode = 
 	    submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-	  materialNode->SetValue ("material");
-	  csRef<iDocumentNode> materialNameNode = 
-	    materialNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-	  materialNameNode->SetValue (material->QueryObject()->GetName());
+	  indexNode->SetValue ("index");
+	  indexNode->SetAttribute ("indices", "yes");
+	  synldr->WriteRenderBuffer (indexNode, buffer);
+
+	  iMaterialWrapper* material = submesh->GetMaterial ();
+	  if (material)
+	  {
+	    csRef<iDocumentNode> materialNode = 
+	      submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	    materialNode->SetValue ("material");
+	    csRef<iDocumentNode> materialNameNode = 
+	      materialNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+	    materialNameNode->SetValue (material->QueryObject()->GetName());
+	  }
+	}
+      }
+
+      // Write subsets
+      {
+	if (factory->GetSubsetCount ())
+	{
+	  for (size_t si = 0; si < factory->GetSubsetCount (); si++)
+	  {
+	    csRef<iDocumentNode> subsetNode = 
+	      paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	    subsetNode->SetValue ("subset");
+
+	    // Write vertex list
+	    csStringBase vertexList;
+	    for (size_t vi = 0; vi < factory->GetSubsetVertexCount (si); vi++)
+	    {
+	      if (vi != 0) vertexList += ' ';
+	      vertexList += (int) factory->GetSubsetVertex (si, vi);
+	    }
+
+	    subsetNode->SetAttribute ("vertices", vertexList.GetData ());
+	  }
+
 	}
       }
 
       // Write morph targets
-      for (size_t i = 0; i < factory->GetMorphTargetCount (); i++)
       {
-	CS::Mesh::iAnimatedMeshMorphTarget* target = factory->GetMorphTarget (i);
+	for (size_t i = 0; i < factory->GetMorphTargetCount (); i++)
+	{
+	  CS::Mesh::iAnimatedMeshMorphTarget* target = factory->GetMorphTarget (i);
 
-	csRef<iDocumentNode> targetNode = 
-	  paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-	targetNode->SetValue ("morphtarget");
-	targetNode->SetAttribute ("name", target->GetName ());
+	  csRef<iDocumentNode> targetNode = 
+	    paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	  targetNode->SetValue ("morphtarget");
+	  targetNode->SetAttribute ("name", target->GetName ());
+	  
+	  // Write subset list
+	  if (factory->GetSubsetCount ())
+	  {
+	    csRef<iDocumentNode> subsetsNode = 
+	      targetNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	    subsetsNode->SetValue ("sets");
+	    csStringBase subsets;
+	    for (size_t i = 0; i < target->GetSubsetCount (); i++)
+	    {
+	      if (i != 0) subsets += ' ';
+	      subsets += (int) target->GetSubset (i);
+	    }
 
-	iRenderBuffer* buffer = target->GetVertexOffsets ();
-	if (!buffer) continue;
+	    subsetsNode->SetAttribute ("ids", subsets.GetData ());
+	  }
+	  
+	  // Write offsets
+	  iRenderBuffer* buffer = target->GetVertexOffsets ();
+	  if (!buffer) continue;
 
-	csRef<iDocumentNode> offsetsNode = 
-	  targetNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-	offsetsNode->SetValue ("offsets");
-	synldr->WriteRenderBuffer (offsetsNode, buffer);
+	  csRef<iDocumentNode> offsetsNode = 
+	    targetNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	  offsetsNode->SetValue ("offsets");
+	  synldr->WriteRenderBuffer (offsetsNode, buffer);
+	}
+      }
+
+      // Write bounding boxes
+      {
+	CS::Animation::iSkeletonFactory* skeletonFact = factory->GetSkeletonFactory ();
+	if (skeletonFact)
+	{
+	  CS::Animation::BoneID numBones = skeletonFact->GetTopBoneID () + 1;
+
+	  if (numBones > 0)
+	  {
+	    csRef<iDocumentNode> bboxNode = 
+	      paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	    bboxNode->SetValue ("bboxes");
+	
+	    for (CS::Animation::BoneID i = 0; i < numBones ; i++)
+	    {
+	      if (skeletonFact->HasBone (i))
+	      {
+		csRef<iDocumentNode> node = 
+		  bboxNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+		node->SetValue ("bbox");
+		node->SetAttributeAsInt ("bone", i);
+		csBox3 bbox = factory->GetBoneBoundingBox (i);
+		synldr->WriteBox (node, bbox);
+	      }
+	    }
+	  }
+	}
       }
     }
 
@@ -613,6 +792,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
   }
   
 
+  static const char* msgid = "crystalspace.animeshloader";
 
   AnimeshObjectLoader::AnimeshObjectLoader (iBase* parent)
     : scfImplementationType (this, parent)
@@ -622,7 +802,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
     iStreamSource* ssource, iLoaderContext* ldr_context,
     iBase* context)
   {
-    static const char* msgid = "crystalspace.animeshloader";
 
     csRef<iMeshObject> mesh;
     csRef<CS::Mesh::iAnimatedMesh> ammesh;
@@ -745,6 +924,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           skeleton->SetAnimationPacket (packet);
         }
         break;
+      case XMLTOKEN_BBOXES:
+        {
+          if (!ParseBoundingBoxes (child, ammesh))
+            return 0;
+        }
+        break;
       default:
         synldr->ReportBadToken (child);
         return 0;
@@ -752,6 +937,54 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
     }
 
     return csPtr<iBase> (mesh);    
+  }
+
+  bool AnimeshObjectLoader::ParseBoundingBoxes (iDocumentNode* child,
+						CS::Mesh::iAnimatedMesh* amesh)
+  {
+    CS::Animation::iSkeleton* skeleton = amesh->GetSkeleton ();
+    if (!skeleton)
+    {
+      synldr->ReportError (msgid, child, "Mesh does not have a skeleton while creating bounding boxes");
+      return false;
+    }
+
+    CS::Animation::BoneID numBones = skeleton->GetFactory ()->GetTopBoneID () + 1;
+    CS::Animation::BoneID currBone;
+
+    csRef<iDocumentNodeIterator> it = child->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child2 = it->Next ();
+      if (child2->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child2->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+        case XMLTOKEN_BBOX:
+	{
+	  currBone = child2->GetAttributeValueAsInt ("bone");
+	  if (currBone >= numBones)
+	  {
+	    synldr->ReportError (msgid, child2, 
+				 "Invalid bounding box index %d, expected maximum %d bones",
+				 (int) currBone, (int) numBones);
+	    return false;
+	  }
+
+	  csBox3 bbox;
+	  if (!synldr->ParseBox (child2, bbox))
+	    return false;
+
+	  amesh->SetBoneBoundingBox (currBone, bbox);
+	}
+	break;
+      default:
+	synldr->ReportBadToken (child2);
+	return false;
+      }
+    }
+    return true;
   }
 
   bool AnimeshObjectLoader::Initialize (iObjectRegistry* objReg)

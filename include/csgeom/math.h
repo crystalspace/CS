@@ -211,6 +211,22 @@ namespace CS
   #endif
   #endif
   }
+  
+  /// Return Infinity.
+  CS_FORCEINLINE float Infinity()
+  {
+  #ifdef CS_IEEE_DOUBLE_FORMAT
+    union
+    {
+      uint32 ui32;
+      float f;
+    } u;
+    u.ui32 = 0x7f800000;
+    return u.f;
+  #else
+    return std::numeric_limits<float>::infinity();
+  #endif
+  }
   /** @} */
 } // namespace CS
 

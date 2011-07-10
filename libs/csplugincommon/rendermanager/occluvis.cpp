@@ -89,6 +89,10 @@ namespace CS
 
       // Save the current zmode.
       csZBufMode oldZMode = g3d->GetZMode ();
+      // Also, make sure wireframe is off.
+      bool wireframe = g3d->GetEdgeDrawing();
+      if (wireframe)
+	g3d->SetEdgeDrawing (false);
 
       for (int iCurrRenderMesh = 0, m = 0; m < nodeMeshList->numMeshes; ++m)
       {
@@ -260,6 +264,9 @@ namespace CS
 
       // Restore the zmode.
       g3d->SetZMode (oldZMode);
+      // And wireframe.
+      if (wireframe)
+	g3d->SetEdgeDrawing (true);
 
       if (bQueryVisibility)
       {
@@ -809,6 +816,10 @@ namespace CS
 
       // Reset rendering settings.
       g3d->SetWriteMask (true, true, true, true);
+      
+      // In wireframe mode force a depth clear, for the Authentic Wireframe Experience
+      if (g3d->GetEdgeDrawing())
+	g3d->BeginDraw (g3d->GetCurrentDrawFlags() | CSDRAW_CLEARZBUFFER);
     }
 
     bool F2BSorter::operator() (csOccluvis::NodeMeshList* const& m1,

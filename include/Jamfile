@@ -67,6 +67,7 @@ CS_MASTER_HEADER_REJECTS =
 # are deprecated.
 CS_MASTER_HEADER_REJECTS +=
   [ ConcatDirs iengine collectn.h     ]
+  [ ConcatDirs csutil   csmd5.h           ]
   [ ConcatDirs csutil   scopedmutexlock.h ]
   [ ConcatDirs csutil   win32 msvc_deprecated_warn_off.h ]
   [ ConcatDirs csutil   win32 msvc_deprecated_warn_on.h ]

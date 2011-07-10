@@ -338,6 +338,12 @@ public:
   { 
     return csVector3 (m_o2t.m31, m_o2t.m32, m_o2t.m33); 
   }
+  void SetFront (const csVector3& v)
+  {
+    m_o2t.m31 = v.x;
+    m_o2t.m32 = v.y;
+    m_o2t.m33 = v.z;
+  }
 
   /**
    * Get the up vector in 'other' space. This is basically equivalent
@@ -348,6 +354,12 @@ public:
   {
     return csVector3 (m_o2t.m21, m_o2t.m22, m_o2t.m23); 
   }
+  void SetUp (const csVector3& v)
+  {
+    m_o2t.m21 = v.x;
+    m_o2t.m22 = v.y;
+    m_o2t.m23 = v.z;
+  }
 
   /**
    * Get the right vector in 'other' space. This is basically equivalent
@@ -357,6 +369,12 @@ public:
   csVector3 GetRight () const 
   {
     return csVector3 (m_o2t.m11, m_o2t.m12, m_o2t.m13); 
+  }
+  void SetRight (const csVector3& v)
+  {
+    m_o2t.m11 = v.x;
+    m_o2t.m12 = v.y;
+    m_o2t.m13 = v.z;
   }
 };
 
@@ -382,6 +400,10 @@ protected:
    */
   csReversibleTransform (const csMatrix3& o2t, const csMatrix3& t2o,
     const csVector3& pos) : csTransform (o2t,pos), m_t2o (t2o) {}
+
+private:
+  bool LookAtGeneric (const csVector3 &v, const csVector3 &upNeg,
+      csVector3& w1, csVector3& w2, csVector3& w3);
 
 public:
   /**
@@ -536,8 +558,51 @@ public:
    * located at pos=(3,1,9) and you want it to look at location
    * loc=(10,2,8) while keeping the orientation so that the up-vector is
    * upwards then you can use: LookAt (loc-pos, csVector3 (0, 1, 0)).
+   *
+   * Returns false if the lookat couldn't be calculated for some reason.
+   * In that case the transform will be reset to identity.
+   *
+   * This function is equivalent to LookAtZUpY() except that the latter
+   * will not modify the transform if the lookat calculation fails.
    */
-  void LookAt (const csVector3& v, const csVector3& up);
+  bool LookAt (const csVector3& v, const csVector3& up);
+
+  /**
+   * Let the Z vector of this transform look into a given direction
+   * with the Y vector of this transform as the 'up' orientation.
+   * This function will not modify the transform if it returns false.
+   */
+  bool LookAtZUpY (const csVector3& v, const csVector3& up);
+  /**
+   * Let the Z vector of this transform look into a given direction
+   * with the X vector of this transform as the 'up' orientation.
+   * This function will not modify the transform if it returns false.
+   */
+  bool LookAtZUpX (const csVector3& v, const csVector3& up);
+  /**
+   * Let the Y vector of this transform look into a given direction
+   * with the Z vector of this transform as the 'up' orientation.
+   * This function will not modify the transform if it returns false.
+   */
+  bool LookAtYUpZ (const csVector3& v, const csVector3& up);
+  /**
+   * Let the Y vector of this transform look into a given direction
+   * with the X vector of this transform as the 'up' orientation.
+   * This function will not modify the transform if it returns false.
+   */
+  bool LookAtYUpX (const csVector3& v, const csVector3& up);
+  /**
+   * Let the X vector of this transform look into a given direction
+   * with the Z vector of this transform as the 'up' orientation.
+   * This function will not modify the transform if it returns false.
+   */
+  bool LookAtXUpZ (const csVector3& v, const csVector3& up);
+  /**
+   * Let the X vector of this transform look into a given direction
+   * with the Y vector of this transform as the 'up' orientation.
+   * This function will not modify the transform if it returns false.
+   */
+  bool LookAtXUpY (const csVector3& v, const csVector3& up);
 
   /**
    * Reverse a transformation on a 3D vector. This corresponds exactly

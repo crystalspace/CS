@@ -59,7 +59,8 @@
  */
 
 #include "cssysdef.h"
-#include "csutil/csmd5.h"
+#include "csgeom/math.h"
+#include "csutil/md5.h"
 
 // T-values were computed with this code:
 //   for (int i = 1; i <= 64; ++i) {
@@ -131,11 +132,18 @@
 #define T63 0x2ad7d2bb
 #define T64 0xeb86d391
 
-void csMD5::md5_process(md5_state_t *pms, const md5_byte_t *data /*[64]*/)
+namespace CS
+{
+namespace Utility
+{
+namespace Checksum
+{
+
+void MD5::Process(const md5_byte_t *data /*[64]*/)
 {
     md5_word_t
-	a = pms->abcd[0], b = pms->abcd[1],
-	c = pms->abcd[2], d = pms->abcd[3];
+	a = abcd[0], b = abcd[1],
+	c = abcd[2], d = abcd[3];
     md5_word_t t;
 
 #if defined(CS_BIG_ENDIAN)
@@ -277,61 +285,87 @@ void csMD5::md5_process(md5_state_t *pms, const md5_byte_t *data /*[64]*/)
      /* Then perform the following additions. (That is increment each
         of the four registers by the value it had before this block
         was started.) */
-    pms->abcd[0] += a;
-    pms->abcd[1] += b;
-    pms->abcd[2] += c;
-    pms->abcd[3] += d;
+    abcd[0] += a;
+    abcd[1] += b;
+    abcd[2] += c;
+    abcd[3] += d;
 }
 
-void csMD5::md5_init(md5_state_t *pms)
+MD5::MD5 ()
 {
-    pms->count[0] = pms->count[1] = 0;
-    pms->abcd[0] = 0x67452301;
-    pms->abcd[1] = 0xefcdab89;
-    pms->abcd[2] = 0x98badcfe;
-    pms->abcd[3] = 0x10325476;
+    count[0] = count[1] = 0;
+    abcd[0] = 0x67452301;
+    abcd[1] = 0xefcdab89;
+    abcd[2] = 0x98badcfe;
+    abcd[3] = 0x10325476;
 }
 
-void csMD5::md5_append(md5_state_t *pms, const md5_byte_t *data, size_t nbytes)
+void MD5::AppendInternal (const uint8* data, uint32 nbytes)
 {
     const md5_byte_t *p = data;
     size_t left = nbytes;
-    size_t offset = (pms->count[0] >> 3) & 63;
+    size_t offset = (count[0] >> 3) & 63;
     md5_word_t nbits = (md5_word_t)(nbytes << 3);
 
     if (nbytes <= 0)
 	return;
 
     /* Update the message length. */
-    pms->count[1] += nbytes >> 29;
-    pms->count[0] += nbits;
-    if (pms->count[0] < nbits)
-	pms->count[1]++;
+    count[1] += nbytes >> 29;
+    count[0] += nbits;
+    if (count[0] < nbits)
+	count[1]++;
 
     /* Process an initial partial block. */
     if (offset) 
     {
 	size_t copy = (offset + nbytes > 64 ? 64 - offset : nbytes);
 
-	memcpy(pms->buf + offset, p, copy);
+	memcpy(buf + offset, p, copy);
 	if (offset + copy < 64)
 	    return;
 	p += copy;
 	left -= copy;
-	md5_process(pms, pms->buf);
+	Process(buf);
     }
 
     /* Process full blocks. */
     for (; left >= 64; p += 64, left -= 64)
-	md5_process(pms, p);
+      Process (p);
 
     /* Process a final partial block. */
     if (left)
-	memcpy(pms->buf, p, left);
+	memcpy(buf, p, left);
 }
 
-void csMD5::md5_finish(md5_state_t *pms, md5_byte_t digest[16])
+void MD5::Append (const uint8* input, size_t length)
 {
+#if CS_PROCESSOR_SIZE == 32
+  AppendInternal (input, length);
+#else
+  // Hash data in 4GB chunks
+  const uint32 u32_max = (uint32)~0;
+  
+  if (length <= u32_max)
+  {
+    AppendInternal (input, length);
+    return;
+  }
+  
+  while (length > 0)
+  {
+    uint32 chunk = csMin (length, size_t (u32_max));
+    AppendInternal (input, chunk);
+    input += chunk;
+    length -= chunk;
+  }
+#endif
+}
+
+MD5::Digest MD5::Finish()
+{
+    Digest digest;
+  
     static const md5_byte_t pad[64] = {
 	0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -343,46 +377,33 @@ void csMD5::md5_finish(md5_state_t *pms, md5_byte_t digest[16])
 
     /* Save the length before padding. */
     for (i = 0; i < 8; ++i)
-	data[i] = (md5_byte_t)(pms->count[i >> 2] >> ((i & 3) << 3));
+	data[i] = (md5_byte_t)(count[i >> 2] >> ((i & 3) << 3));
     /* Pad to 56 bytes mod 64. */
-    md5_append(pms, pad, ((55 - (pms->count[0] >> 3)) & 63) + 1);
+    Append (pad, ((55 - (count[0] >> 3)) & 63) + 1);
     /* Append the length. */
-    md5_append(pms, data, 8);
+    Append (data, 8);
     for (i = 0; i < 16; ++i)
-	digest[i] = (md5_byte_t)(pms->abcd[i >> 2] >> ((i & 3) << 3));
+	digest.data[i] = (md5_byte_t)(abcd[i >> 2] >> ((i & 3) << 3));
+    return digest;
 }
 
-csMD5::Digest csMD5::Encode(csString const& s)
+MD5::Digest MD5::Encode(csString const& s)
 {
   return Encode(s.GetData(), (int)s.Length());
 }
 
-csMD5::Digest csMD5::Encode(const void* data, size_t nbytes)
+MD5::Digest MD5::Encode(const void* data, size_t nbytes)
 {
-  Digest digest;
-  md5_state_t state;
-  md5_init(&state);
-  md5_append(&state, (const md5_byte_t*)data, nbytes);
-  md5_finish(&state, digest.data);
-  return digest;
+  MD5 state;
+  state.Append ((const md5_byte_t*)data, nbytes);
+  return state.Finish();
 }
 
-csMD5::Digest csMD5::Encode(const char* s)
+MD5::Digest MD5::Encode(const char* s)
 {
   return Encode(s, strlen(s));
 }
 
-csString csMD5::Digest::HexString() const
-{
-  csString s;
-  for (int i = 0; i < DigestLen; i++)
-    s.AppendFmt ("%02" PRIx8, data[i]);
-  return s;
-}
-
-csString csMD5::Digest::HEXString() const
-{
-  csString s(HexString());
-  s.Upcase();
-  return s;
-}
+} //namespace Checksum
+} //namespace Utility
+} //namespace CS

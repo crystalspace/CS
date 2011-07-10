@@ -16,33 +16,33 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <cssysdef.h>
+#include "cssysdef.h"
 #include "csutil/scf.h"
 
-#include <cstool/enginetools.h>
-#include <csgeom/plane3.h>
-#include <csgeom/math3d.h>
-#include <csutil/event.h>
-#include <csutil/sysfunc.h>
-#include <cstool/csview.h>
-#include <iutil/csinput.h>
-#include <iutil/eventq.h>
-#include <iutil/objreg.h>
-#include <iutil/plugin.h>
-#include <iutil/virtclk.h>
-#include <iengine/campos.h>
-#include <iengine/sector.h>
-#include <iengine/scenenode.h>
-#include <iengine/mesh.h>
-#include <iengine/movable.h>
-#include <iengine/engine.h>
-#include <iengine/camera.h>
-#include <imesh/object.h>
-#include <imesh/objmodel.h>
-#include <ivideo/graph3d.h>
-#include <ivideo/graph2d.h>
-#include <ivideo/natwin.h>
-#include <ivideo/wxwin.h>
+#include "cstool/enginetools.h"
+#include "csgeom/plane3.h"
+#include "csgeom/math3d.h"
+#include "csutil/event.h"
+#include "csutil/sysfunc.h"
+#include "cstool/csview.h"
+#include "iutil/csinput.h"
+#include "iutil/eventq.h"
+#include "iutil/objreg.h"
+#include "iutil/plugin.h"
+#include "iutil/virtclk.h"
+#include "iengine/campos.h"
+#include "iengine/sector.h"
+#include "iengine/scenenode.h"
+#include "iengine/mesh.h"
+#include "iengine/movable.h"
+#include "iengine/engine.h"
+#include "iengine/camera.h"
+#include "imesh/object.h"
+#include "imesh/objmodel.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/natwin.h"
+#include "ivideo/wxwin.h"
 
 #include "cs3dpanel.h"
 
@@ -100,7 +100,9 @@ bool CS3DPanel::Initialize (iObjectRegistry* obj_reg)
   if (!q)
     return false;
 
-  iGraphics2D* g2d = g3d->GetDriver2D();
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  g2d->AllowResize (true);
+
   csRef<iWxWindow> wxwin = scfQueryInterface<iWxWindow> (g2d);
   if( !wxwin )
   {
@@ -109,7 +111,7 @@ bool CS3DPanel::Initialize (iObjectRegistry* obj_reg)
               "Canvas is no iWxWindow plugin!");
     return false;
   }
-  window = new CS3DPanel::Panel (this, panelManager->GetManagedWindow (), -1, wxPoint(0,0), wxSize(200,150));
+  window = new CS3DPanel::Panel (this, editor->GetWindow (), -1, wxPoint(0,0), wxSize(200,150));
   wxwin->SetParent (window);
   
   window->SetDropTarget (new MyDropTarget (this));
@@ -118,6 +120,7 @@ bool CS3DPanel::Initialize (iObjectRegistry* obj_reg)
   panelManager->AddPanel (this);
   
   view = csPtr<iView> (new csView (engine, g3d));
+  view->SetAutoResize (false);
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   // Let editor know we're interested in map load events
@@ -174,7 +177,7 @@ const wxChar* CS3DPanel::GetCaption () const
   return wxT("3D View");
 }
 
-int CS3DPanel::GetDefaultDockPosition () const
+PanelDockPosition CS3DPanel::GetDefaultDockPosition () const
 {
   return DockPositionCenter;
 }
@@ -295,7 +298,7 @@ bool CS3DPanel::HandleEvent (iEvent& ev)
   }
   iCamera* camera = view->GetCamera ();
 
-  if (mouse_down)
+  if (mouse_down && csMouseEventHelper::GetButton (&ev) == 1)
   {
     iEditor::TransformStatus trans = editor->GetTransformStatus ();
     if (trans != iEditor::NOTHING && trans != iEditor::MOVING && trans != iEditor::ROTATING && trans != iEditor::SCALING)
@@ -479,8 +482,8 @@ void CS3DPanel::ProcessFrame ()
     return;
   
   csTransform tr_w2c = view->GetCamera ()->GetTransform ();
-  float fov = g3d->GetPerspectiveAspect ();
-  
+  int fov = g3d->GetDriver2D ()->GetHeight ();
+
   csRef<iEditorObjectIterator> it = selection->GetIterator ();
   while (it->HasNext ())
   {
@@ -541,25 +544,65 @@ void CS3DPanel::OnSize (wxSizeEvent& event)
     return;
   
   wxSize size = event.GetSize();
-
-  // Update CS canvas size
   iGraphics2D* g2d = g3d->GetDriver2D ();
-  g2d->Resize (size.x, size.y);
   
   // Also resize the wxWindow
   csRef<iWxWindow> wxwin = scfQueryInterface<iWxWindow> (g2d);
   if (!wxwin->GetWindow ())
+  {
+    g2d->Resize (size.x, size.y);
     return;
+  }
   
   wxwin->GetWindow()->SetSize (size);
   
+  // Update the view ratio
+  view->GetPerspectiveCamera ()->SetFOV ((float) (size.y) / (float) (size.x), 1.0f);
+  view->SetRectangle (0, 0, size.x, size.y);
+
   event.Skip();
+}
+
+void CS3DPanel::OnDrop (wxCoord x, wxCoord y, iEditorObject* obj)
+{
+  printf ("CS3DPanel::OnDrop\n");
+
+  iCamera* camera = view->GetCamera ();
+    
+  if (camera->GetSector ())
+  {
+    csScreenTargetResult result = csEngineTools::FindScreenTarget (
+      csVector2 (x, y), 100000.0f, camera);
+      
+    csRef<iMeshFactoryWrapper> meshFact = scfQueryInterface<iMeshFactoryWrapper> (obj->GetIBase ());
+  
+    csRef<iMeshWrapper> mesh = engine->CreateMeshWrapper (meshFact, obj->GetName(),
+							  result.mesh->GetMovable ()->GetSectors()->Get(0), result.isect);
+    
+    if (!mesh)
+      return;
+  
+    wxBitmap* meshBmp = new wxBitmap (wxBITMAP(meshIcon));
+    csRef<iEditorObject> editorObject (editor->CreateEditorObject (mesh, meshBmp));
+    objects->Add (editorObject);
+    
+    delete meshBmp;
+  }
 }
 
 void CS3DPanel::OnMapLoaded (const char* path, const char* filename)
 {
+  // If there are no sectors then invalidate the camera
+  if (!engine->GetSectors ()->GetCount ())
+  {
+    view->GetCamera ()->SetSector (nullptr);
+    initializedColliderActor = false;
+
+    return;
+  }
+
   // Move the camera to the starting sector/position
-  iSector* room;
+  csRef<iSector> room;
   csVector3 pos;
   
   if (engine->GetCameraPositions ()->GetCount () > 0)
@@ -569,11 +612,13 @@ void CS3DPanel::OnMapLoaded (const char* path, const char* filename)
     room = engine->GetSectors ()->FindByName (campos->GetSector ());
     pos = campos->GetPosition ();
   }
-  else
+
+  if (!room)
   {
     // We didn't find a valid starting position. So we default
-    // to going to room called 'room' at position (0,0,0).
+    // to going to the sector called 'room', or the first sector, at position (0,0,0).
     room = engine->GetSectors ()->FindByName ("room");
+    if (!room) room = engine->GetSectors ()->Get (0);
     pos = csVector3 (0, 0, 0);
   }
 
@@ -581,7 +626,8 @@ void CS3DPanel::OnMapLoaded (const char* path, const char* filename)
   
   view.Invalidate ();
   view = csPtr<iView> (new csView (engine, g3d));
-  
+  view->SetAutoResize (false);  
+  view->GetPerspectiveCamera ()->SetFOV ((float) (g2d->GetHeight ()) / (float) (g2d->GetWidth ()), 1.0f);
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   view->GetCamera ()->SetSector (room);
@@ -599,6 +645,11 @@ void CS3DPanel::OnMapLoaded (const char* path, const char* filename)
   collider_actor.InitializeColliders (view->GetCamera (),
                                       legs, body, shift);
   initializedColliderActor = true;
+
+  // Put back the focus on the window
+  csRef<iWxWindow> wxwin = scfQueryInterface<iWxWindow> (g3d->GetDriver2D ());
+  if (wxwin->GetWindow ())
+    wxwin->GetWindow ()->SetFocus ();
 }
 
 void CS3DPanel::OnLibraryLoaded (const char* path, const char* filename, iCollection* collection)

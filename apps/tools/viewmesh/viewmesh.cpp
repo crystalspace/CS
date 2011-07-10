@@ -144,7 +144,7 @@ bool ViewMesh::OnMouseUp (iEvent &event)
   return false;
 }
 
-void ViewMesh::Help ()
+void ViewMesh::PrintHelp ()
 {
   csCommandLineHelper commandLineHelper;
 
@@ -165,7 +165,7 @@ void ViewMesh::Help ()
 
   // Printing help
   commandLineHelper.PrintApplicationHelp
-    (object_reg, "viewmesh", "viewmesh [OPTIONS] [filename]",
+    (GetObjectRegistry (), "viewmesh", "viewmesh [OPTIONS] [filename]",
      "Crystal Space's tool for the visualization and the manipulation of meshes\n\n"
      "If provided, it will load the given file from the specified VFS directory."
      " If no VFS directory is provided then it will assume the one of the file. "
@@ -611,8 +611,12 @@ void ViewMesh::SaveSprite (const char* filename, bool binary)
   iMeshFactoryWrapper* meshfactwrap = asset->GetMesh()->GetFactory();
   iMeshObjectFactory*  meshfact = meshfactwrap->GetMeshObjectFactory();
 
-  //Create the Tag for the MeshObj
-  csRef<iDocumentNode> factNode = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  //Create a tag for the file type
+  csRef<iDocumentNode> typeNode = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  typeNode->SetValue("library");
+
+  //Create the tag for the MeshObj
+  csRef<iDocumentNode> factNode = typeNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   factNode->SetValue("meshfact");
 
   //Add the mesh's name to the MeshObj tag

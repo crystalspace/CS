@@ -25,6 +25,8 @@
 
 #include "ieditor/editorobject.h"
 
+class wxWindow;
+
 struct iCollection;
 struct iProgressMeter;
 struct iThreadReturn;
@@ -34,6 +36,8 @@ namespace CS {
 namespace EditorApp {
 
 struct iObjectList;
+struct iPanelManager;
+struct iMenuBar;
 
 /// Listens for map actions
 struct iMapListener : public virtual iBase
@@ -53,6 +57,19 @@ struct iMapListener : public virtual iBase
 struct iEditor : public virtual iBase
 {
   SCF_INTERFACE (iEditor, 0, 0, 1);
+
+  virtual bool StartEngine () = 0;
+  virtual bool StartApplication () = 0;
+  virtual bool LoadPlugin (const char* name) = 0;
+
+  /// Get the underlying wxWindow content area of this editor.
+  virtual wxWindow* GetWindow () = 0;
+
+  /// Get the panel manager associated with this editor
+  virtual iPanelManager* GetPanelManager () const = 0;
+
+  /// Get the panel manager associated with this editor
+  virtual iMenuBar* GetMenuBar () const = 0;
 
   /// Get a progress meter to be notified of the progress of an action
   virtual csPtr<iProgressMeter> GetProgressMeter () = 0;
@@ -82,6 +99,7 @@ struct iEditor : public virtual iBase
   /// Get the list of objects registered with the editor.
   virtual iObjectList* GetObjects () = 0;
 
+  // TODO: remove all of that
   virtual void SetHelperMeshes (csArray<csSimpleRenderMesh>* helpers) = 0;
   virtual csArray<csSimpleRenderMesh>* GetHelperMeshes () = 0;
   

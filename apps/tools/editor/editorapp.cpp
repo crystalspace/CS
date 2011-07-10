@@ -1,5 +1,5 @@
-/*  -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
-    Copyright (C) 2004 by Peter Amstutz, Jorrit Tyberghein
+/*
+    Copyright (C) 2011 by Jorrit Tyberghein, Jelle Hellemans, Christian Van Brussel
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -26,7 +26,7 @@
 #include "cstool/initapp.h"
 #include "iutil/objreg.h"
 
-#include "editor.h"
+#include "ieditor/editor.h"
 
 /* Fun fact: should occur after csutil/event.h, otherwise, gcc may report
  * missing csMouseEventHelper symbols. */
@@ -54,14 +54,14 @@ int main (int argc, const char* const argv[])
 
 
 // Define a new application type
-class EditorApp: public wxApp
+class EditorApp : public wxApp
 {
 public:
   iObjectRegistry* object_reg;
-  CS::EditorApp::Editor* editor;
+  csRef<CS::EditorApp::iEditor> editor;
 
-  virtual bool OnInit(void);
-  virtual int OnExit(void);
+  virtual bool OnInit (void);
+  virtual int OnExit (void);
 };
 
 
@@ -70,7 +70,7 @@ IMPLEMENT_APP(EditorApp)
 /*---------------------------------------------------------------------*
  * Main function
  *---------------------------------------------------------------------*/
-bool EditorApp::OnInit(void)
+bool EditorApp::OnInit (void)
 {
   wxInitAllImageHandlers ();
 
@@ -87,16 +87,37 @@ bool EditorApp::OnInit(void)
   object_reg = csInitializer::CreateEnvironment (argc, argv);
 #endif
 
-  editor = new CS::EditorApp::Editor ();
-  if (!editor->Initialize (object_reg))
-    return false;
+  // Load the iEditor plugin
+  csRef<iPluginManager> plugmgr = 
+    csQueryRegistry<iPluginManager> (object_reg);
+  if (!plugmgr) return false;
+
+  editor = csLoadPlugin<CS::EditorApp::iEditor>
+    (plugmgr, "crystalspace.editor.plugin.core.gui");
+  if (!editor) return false;
+
+  // The main frame of the editor is now opened, we can setup some parameters such as
+  // the title of the frame
+  (dynamic_cast<wxFrame*> (editor->GetWindow ()))->SetTitle (wxT ("Crystal Space Editor"));
+
+  // Start the engine
+  if (!editor->StartEngine ()) return false;
+
+  // Load the specific plugins for the Crystal Space editor
+  if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.cs3dpanel")) return false;
+  if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.scenebrowserpanel")) return false;
+  if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.assetbrowserpanel")) return false;
+  if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.csobjectmaplistener")) return false;
+  if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.csinterfacewrappers")) return false;
+
+  // Start the application
+  if (!editor->StartApplication ()) return false;
 
   return true;
 }
 
-int EditorApp::OnExit()
+int EditorApp::OnExit ()
 {
-  delete editor;
   csInitializer::DestroyApplication (object_reg);
   return 0;
 }

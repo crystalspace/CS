@@ -170,14 +170,14 @@ namespace lighter
       color = c;
     }
 
-    inline const csMD5::Digest& GetLightID () const
+    inline const CS::Utility::Checksum::MD5::Digest& GetLightID () const
     {
       return lightId;
     }
 
     inline void SetLightID (const char* id)
     {
-      memcpy (lightId.data, id, csMD5::Digest::DigestLen);
+      memcpy (lightId.data, id, CS::Utility::Checksum::MD5::Digest::DigestLen);
     }
 
     inline const csSphere& GetBoundingSphere () const 
@@ -228,7 +228,7 @@ namespace lighter
     Sector* ownerSector;
     csVector3 position;
     csColor color;
-    csMD5::Digest lightId;
+    CS::Utility::Checksum::MD5::Digest lightId;
     csSphere boundingSphere;
     csString name;
 

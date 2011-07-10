@@ -2381,6 +2381,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *Resume = *cspacec::iVirtualClock_Resume;
 *GetElapsedTicks = *cspacec::iVirtualClock_GetElapsedTicks;
 *GetCurrentTicks = *cspacec::iVirtualClock_GetCurrentTicks;
+*GetElapsedMicroTicks = *cspacec::iVirtualClock_GetElapsedMicroTicks;
+*GetElapsedSeconds = *cspacec::iVirtualClock_GetElapsedSeconds;
+*GetCurrentMicroTicks = *cspacec::iVirtualClock_GetCurrentMicroTicks;
 *scfGetVersion = *cspacec::iVirtualClock_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -6690,6 +6693,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetHeight = *cspacec::iView_GetHeight;
 *SetWidth = *cspacec::iView_SetWidth;
 *SetHeight = *cspacec::iView_SetHeight;
+*NormalizedToScreen = *cspacec::iView_NormalizedToScreen;
+*ScreenToNormalized = *cspacec::iView_ScreenToNormalized;
 *scfGetVersion = *cspacec::iView_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -11859,13 +11864,21 @@ sub new {
 
 *Description = *cspacec::csMatrix3_Description;
 *Row1 = *cspacec::csMatrix3_Row1;
+*SetRow1 = *cspacec::csMatrix3_SetRow1;
 *Row2 = *cspacec::csMatrix3_Row2;
+*SetRow2 = *cspacec::csMatrix3_SetRow2;
 *Row3 = *cspacec::csMatrix3_Row3;
+*SetRow3 = *cspacec::csMatrix3_SetRow3;
 *Row = *cspacec::csMatrix3_Row;
+*SetRow = *cspacec::csMatrix3_SetRow;
 *Col1 = *cspacec::csMatrix3_Col1;
+*SetCol1 = *cspacec::csMatrix3_SetCol1;
 *Col2 = *cspacec::csMatrix3_Col2;
+*SetCol2 = *cspacec::csMatrix3_SetCol2;
 *Col3 = *cspacec::csMatrix3_Col3;
+*SetCol3 = *cspacec::csMatrix3_SetCol3;
 *Col = *cspacec::csMatrix3_Col;
+*SetCol = *cspacec::csMatrix3_SetCol;
 *Set = *cspacec::csMatrix3_Set;
 *__iadd__ = *cspacec::csMatrix3___iadd__;
 *__isub__ = *cspacec::csMatrix3___isub__;
@@ -12172,8 +12185,11 @@ sub new {
 *Other2This = *cspacec::csTransform_Other2This;
 *GetReflect = *cspacec::csTransform_GetReflect;
 *GetFront = *cspacec::csTransform_GetFront;
+*SetFront = *cspacec::csTransform_SetFront;
 *GetUp = *cspacec::csTransform_GetUp;
+*SetUp = *cspacec::csTransform_SetUp;
 *GetRight = *cspacec::csTransform_GetRight;
+*SetRight = *cspacec::csTransform_SetRight;
 *__mul__ = *cspacec::csTransform___mul__;
 sub DISOWN {
     my $self = shift;
@@ -12216,6 +12232,12 @@ sub new {
 *RotateOther = *cspacec::csReversibleTransform_RotateOther;
 *RotateThis = *cspacec::csReversibleTransform_RotateThis;
 *LookAt = *cspacec::csReversibleTransform_LookAt;
+*LookAtZUpY = *cspacec::csReversibleTransform_LookAtZUpY;
+*LookAtZUpX = *cspacec::csReversibleTransform_LookAtZUpX;
+*LookAtYUpZ = *cspacec::csReversibleTransform_LookAtYUpZ;
+*LookAtYUpX = *cspacec::csReversibleTransform_LookAtYUpX;
+*LookAtXUpZ = *cspacec::csReversibleTransform_LookAtXUpZ;
+*LookAtXUpY = *cspacec::csReversibleTransform_LookAtXUpY;
 *__mul__ = *cspacec::csReversibleTransform___mul__;
 *__div__ = *cspacec::csReversibleTransform___div__;
 sub DESTROY {
@@ -13278,6 +13300,7 @@ sub DESTROY {
     }
 }
 
+*Setup = *cspacec::csSpline_Setup;
 *GetDimensionCount = *cspacec::csSpline_GetDimensionCount;
 *GetPointCount = *cspacec::csSpline_GetPointCount;
 *InsertPoint = *cspacec::csSpline_InsertPoint;
@@ -13332,6 +13355,7 @@ sub DESTROY {
     }
 }
 
+*Setup = *cspacec::csCubicSpline_Setup;
 *Calculate = *cspacec::csCubicSpline_Calculate;
 *GetInterpolatedDimension = *cspacec::csCubicSpline_GetInterpolatedDimension;
 sub DISOWN {
@@ -13795,6 +13819,7 @@ sub new {
     bless $self, $pkg if defined($self);
 }
 
+*Setup = *cspacec::csPath_Setup;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -15675,6 +15700,14 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetSocket = *cspacec::iAnimatedMeshFactory_GetSocket;
 *FindSocket = *cspacec::iAnimatedMeshFactory_FindSocket;
 *ComputeTangents = *cspacec::iAnimatedMeshFactory_ComputeTangents;
+*SetBoneBoundingBox = *cspacec::iAnimatedMeshFactory_SetBoneBoundingBox;
+*GetBoneBoundingBox = *cspacec::iAnimatedMeshFactory_GetBoneBoundingBox;
+*AddSubset = *cspacec::iAnimatedMeshFactory_AddSubset;
+*AddSubsetVertex = *cspacec::iAnimatedMeshFactory_AddSubsetVertex;
+*GetSubsetVertex = *cspacec::iAnimatedMeshFactory_GetSubsetVertex;
+*GetSubsetVertexCount = *cspacec::iAnimatedMeshFactory_GetSubsetVertexCount;
+*GetSubsetCount = *cspacec::iAnimatedMeshFactory_GetSubsetCount;
+*ClearSubsets = *cspacec::iAnimatedMeshFactory_ClearSubsets;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -15735,6 +15768,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetSocket = *cspacec::iAnimatedMesh_GetSocket;
 *GetAnimatedMeshFactory = *cspacec::iAnimatedMesh_GetAnimatedMeshFactory;
 *GetRenderBufferAccessor = *cspacec::iAnimatedMesh_GetRenderBufferAccessor;
+*SetBoneBoundingBox = *cspacec::iAnimatedMesh_SetBoneBoundingBox;
+*GetBoneBoundingBox = *cspacec::iAnimatedMesh_GetBoneBoundingBox;
+*UnsetObjectBoundingBox = *cspacec::iAnimatedMesh_UnsetObjectBoundingBox;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -15783,6 +15819,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetVertexOffsets = *cspacec::iAnimatedMeshMorphTarget_GetVertexOffsets;
 *Invalidate = *cspacec::iAnimatedMeshMorphTarget_Invalidate;
 *GetName = *cspacec::iAnimatedMeshMorphTarget_GetName;
+*AddSubset = *cspacec::iAnimatedMeshMorphTarget_AddSubset;
+*GetSubset = *cspacec::iAnimatedMeshMorphTarget_GetSubset;
+*GetSubsetCount = *cspacec::iAnimatedMeshMorphTarget_GetSubsetCount;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -19344,6 +19383,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SyncEngineLists = *cspacec::iEngine_SyncEngineLists;
 *SyncEngineListsWait = *cspacec::iEngine_SyncEngineListsWait;
 *SyncEngineListsNow = *cspacec::iEngine_SyncEngineListsNow;
+*GetDefaultNearClipDistance = *cspacec::iEngine_GetDefaultNearClipDistance;
+*SetDefaultNearClipDistance = *cspacec::iEngine_SetDefaultNearClipDistance;
 *scfGetVersion = *cspacec::iEngine_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -19555,6 +19596,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetShiftX = *cspacec::iPerspectiveCamera_GetShiftX;
 *GetShiftY = *cspacec::iPerspectiveCamera_GetShiftY;
 *SetPerspectiveCenter = *cspacec::iPerspectiveCamera_SetPerspectiveCenter;
+*GetNearClipDistance = *cspacec::iPerspectiveCamera_GetNearClipDistance;
+*SetNearClipDistance = *cspacec::iPerspectiveCamera_SetNearClipDistance;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -21526,6 +21569,8 @@ sub DESTROY {
 *GetHeight = *cspacec::csView_GetHeight;
 *SetWidth = *cspacec::csView_SetWidth;
 *SetHeight = *cspacec::csView_SetHeight;
+*NormalizedToScreen = *cspacec::csView_NormalizedToScreen;
+*ScreenToNormalized = *cspacec::csView_ScreenToNormalized;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -22418,6 +22463,128 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::scfProcTexture ##############
+
+package cspace::scfProcTexture;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::csObject cspace::iTextureWrapper cspace::iProcTexture cspace );
+%OWNER = ();
+*IncRef = *cspacec::scfProcTexture_IncRef;
+*DecRef = *cspacec::scfProcTexture_DecRef;
+*GetRefCount = *cspacec::scfProcTexture_GetRefCount;
+*QueryInterface = *cspacec::scfProcTexture_QueryInterface;
+*AddRefOwner = *cspacec::scfProcTexture_AddRefOwner;
+*RemoveRefOwner = *cspacec::scfProcTexture_RemoveRefOwner;
+*GetInterfaceMetadata = *cspacec::scfProcTexture_GetInterfaceMetadata;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csThreadManager ##############
+
+package cspace::csThreadManager;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csThreadManager(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csThreadManager($self);
+        delete $OWNER{$self};
+    }
+}
+
+*Init = *cspacec::csThreadManager_Init;
+*Process = *cspacec::csThreadManager_Process;
+*Wait = *cspacec::csThreadManager_Wait;
+*ProcessAll = *cspacec::csThreadManager_ProcessAll;
+*PushToQueue = *cspacec::csThreadManager_PushToQueue;
+*RunNow = *cspacec::csThreadManager_RunNow;
+*GetThreadCount = *cspacec::csThreadManager_GetThreadCount;
+*SetAlwaysRunNow = *cspacec::csThreadManager_SetAlwaysRunNow;
+*GetAlwaysRunNow = *cspacec::csThreadManager_GetAlwaysRunNow;
+*Exiting = *cspacec::csThreadManager_Exiting;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csThreadReturn ##############
+
+package cspace::csThreadReturn;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csThreadReturn(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csThreadReturn($self);
+        delete $OWNER{$self};
+    }
+}
+
+*IsFinished = *cspacec::csThreadReturn_IsFinished;
+*WasSuccessful = *cspacec::csThreadReturn_WasSuccessful;
+*GetResultPtr = *cspacec::csThreadReturn_GetResultPtr;
+*GetResultRefPtr = *cspacec::csThreadReturn_GetResultRefPtr;
+*MarkFinished = *cspacec::csThreadReturn_MarkFinished;
+*MarkSuccessful = *cspacec::csThreadReturn_MarkSuccessful;
+*SetResult = *cspacec::csThreadReturn_SetResult;
+*Copy = *cspacec::csThreadReturn_Copy;
+*Wait = *cspacec::csThreadReturn_Wait;
+*SetWaitPtrs = *cspacec::csThreadReturn_SetWaitPtrs;
+*SetJob = *cspacec::csThreadReturn_SetJob;
+*GetJob = *cspacec::csThreadReturn_GetJob;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iProcTexCallback ##############
 
 package cspace::iProcTexCallback;
@@ -22454,7 +22621,7 @@ sub ACQUIRE {
 
 package cspace::csProcTexture;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace );
+@ISA = qw( cspace::scfProcTexture cspace );
 %OWNER = ();
 %ITERATORS = ();
 *swig_last_cur_time_get = *cspacec::csProcTexture_last_cur_time_get;

@@ -20,7 +20,7 @@
 #ifndef __CS_MATRIX3_H__
 #define __CS_MATRIX3_H__
 
-/**\file 
+/**\file
  * 3x3 matrix.
  */
 /**
@@ -60,7 +60,7 @@ public:
   {}
 
   /// Copy constructor.
-  csMatrix3 (csMatrix3 const& o) 
+  csMatrix3 (csMatrix3 const& o)
     : m11(o.m11), m12(o.m12), m13(o.m13),
       m21(o.m21), m22(o.m22), m23(o.m23),
       m31(o.m31), m32(o.m32), m33(o.m33)
@@ -70,50 +70,62 @@ public:
   csMatrix3 (float x,float y, float z, float angle);
 
   /// Construct a matrix with a quaternion.
-  explicit csMatrix3 (const csQuaternion &quat) 
+  explicit csMatrix3 (const csQuaternion &quat)
   { Set (quat); }
 
   /// Return a textual representation of the matrix
   csString Description() const;
-  
+
   /// Get the first row of this matrix as a vector.
-  inline csVector3 Row1() const 
-  { return csVector3 (m11, m12, m13); }
+  inline csVector3 Row1() const { return csVector3 (m11, m12, m13); }
+  void SetRow1 (const csVector3& r) { m11 = r.x; m12 = r.y; m13 = r.z; }
 
   /// Get the second row of this matrix as a vector.
-  inline csVector3 Row2() const 
-  { return csVector3 (m21, m22, m23); }
+  inline csVector3 Row2() const { return csVector3 (m21, m22, m23); }
+  void SetRow2 (const csVector3& r) { m21 = r.x; m22 = r.y; m23 = r.z; }
 
   /// Get the third row of this matrix as a vector.
-  inline csVector3 Row3() const 
-  { return csVector3 (m31, m32, m33); }
+  inline csVector3 Row3() const { return csVector3 (m31, m32, m33); }
+  void SetRow3 (const csVector3& r) { m31 = r.x; m32 = r.y; m33 = r.z; }
 
   /// Get a row from this matrix as a vector.
   inline csVector3 Row(size_t n) const
   {
-    return !n ? csVector3 (m11, m12, m13) : 
+    return !n ? csVector3 (m11, m12, m13) :
       n&1 ? csVector3 (m21, m22, m23) :
-      csVector3 (m31, m32, m33);    
+      csVector3 (m31, m32, m33);
+  }
+  void SetRow (size_t n, const csVector3& r)
+  {
+    if (n == 0) SetRow1 (r);
+    else if (n == 1) SetRow2 (r);
+    else SetRow3 (r);
   }
 
   /// Get the first column of this matrix as a vector.
-  inline csVector3 Col1() const 
-  { return csVector3 (m11, m21, m31); }
+  inline csVector3 Col1() const { return csVector3 (m11, m21, m31); }
+  void SetCol1 (const csVector3& c) { m11 = c.x; m21 = c.y; m31 = c.z; }
 
   /// Get the second column of this matrix as a vector.
-  inline csVector3 Col2() const 
-  { return csVector3 (m12, m22, m32); }
+  inline csVector3 Col2() const { return csVector3 (m12, m22, m32); }
+  void SetCol2 (const csVector3& c) { m12 = c.x; m22 = c.y; m32 = c.z; }
 
   /// Get the third column of this matrix as a vector.
-  inline csVector3 Col3() const 
-  { return csVector3 (m13, m23, m33); }
+  inline csVector3 Col3() const { return csVector3 (m13, m23, m33); }
+  void SetCol3 (const csVector3& c) { m13 = c.x; m23 = c.y; m33 = c.z; }
 
   /// Get a column from this matrix as a vector.
   inline csVector3 Col(size_t n) const
   {
-    return !n ? csVector3 (m11, m21, m31) : 
+    return !n ? csVector3 (m11, m21, m31) :
       n&1 ? csVector3 (m12, m22, m32) :
-      csVector3 (m13, m23, m33);    
+      csVector3 (m13, m23, m33);
+  }
+  void SetCol (size_t n, const csVector3& c)
+  {
+    if (n == 0) SetCol1 (c);
+    else if (n == 1) SetCol2 (c);
+    else SetCol3 (c);
   }
 
   /// Set matrix values.
@@ -138,7 +150,7 @@ public:
   void Set (const csQuaternion&);
 
   /// Assign another matrix to this one.
-  inline csMatrix3& operator= (const csMatrix3& o) 
+  inline csMatrix3& operator= (const csMatrix3& o)
   { Set(o); return *this; }
 
   /// Add another matrix to this matrix.
@@ -205,7 +217,7 @@ public:
   }
 
   /// Unary + operator.
-  inline csMatrix3 operator+ () const 
+  inline csMatrix3 operator+ () const
   { return *this; }
 
   /// Unary - operator.
@@ -247,7 +259,7 @@ public:
   }
 
   /// Invert this matrix.
-  inline void Invert() 
+  inline void Invert()
   { *this = GetInverse (); }
 
   /// Compute the determinant of this matrix.
@@ -268,7 +280,7 @@ public:
   /// Check if the matrix is identity
   inline bool IsIdentity () const
   {
-    return (m11 == 1.0) && (m12 == 0.0) && (m13 == 0.0) && 
+    return (m11 == 1.0) && (m12 == 0.0) && (m13 == 0.0) &&
            (m21 == 0.0) && (m22 == 1.0) && (m23 == 0.0) &&
            (m31 == 0.0) && (m32 == 0.0) && (m33 == 1.0);
   }
@@ -281,7 +293,7 @@ public:
       m1.m21 + m2.m21, m1.m22 + m2.m22, m1.m23 + m2.m23,
       m1.m31 + m2.m31, m1.m32 + m2.m32, m1.m33 + m2.m33);
   }
-  
+
   /// Subtract two matricies.
   inline friend csMatrix3 operator- (const csMatrix3& m1, const csMatrix3& m2)
   {
@@ -290,7 +302,7 @@ public:
       m1.m21 - m2.m21, m1.m22 - m2.m22, m1.m23 - m2.m23,
       m1.m31 - m2.m31, m1.m32 - m2.m32, m1.m33 - m2.m33);
   }
-  
+
   /// Multiply two matricies.
   inline friend csMatrix3 operator* (const csMatrix3& m1, const csMatrix3& m2)
   {
@@ -424,8 +436,8 @@ public:
   /**
    * Return a matrix which scales in the X dimension.
    */
-  csXScaleMatrix3 (float scaler) 
-    : csMatrix3(scaler, 0, 0, 0, 1, 0, 0, 0, 1) 
+  csXScaleMatrix3 (float scaler)
+    : csMatrix3(scaler, 0, 0, 0, 1, 0, 0, 0, 1)
   {}
 };
 
@@ -436,8 +448,8 @@ public:
   /**
    * Return a matrix which scales in the Y dimension.
    */
-  csYScaleMatrix3 (float scaler) 
-    : csMatrix3(1, 0, 0, 0, scaler, 0, 0, 0, 1) 
+  csYScaleMatrix3 (float scaler)
+    : csMatrix3(1, 0, 0, 0, scaler, 0, 0, 0, 1)
   {}
 };
 
@@ -448,8 +460,8 @@ public:
   /**
    * Return a matrix which scales in the Z dimension.
    */
-  csZScaleMatrix3 (float scaler) 
-    : csMatrix3(1, 0, 0, 0, 1, 0, 0, 0, scaler) 
+  csZScaleMatrix3 (float scaler)
+    : csMatrix3(1, 0, 0, 0, 1, 0, 0, 0, scaler)
   {}
 };
 

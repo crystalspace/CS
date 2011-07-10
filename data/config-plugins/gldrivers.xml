@@ -662,11 +662,14 @@
 	* 2011-01-07: GeForce 8800M GTX/PCI/SSE2, Linux 64-bit, 
 	              OpenGL 3.3.0 NVIDIA 260.19.29
 	              Issue is still present.
+        * 2011-06-25: GeForce 8800M GTX/PCI/SSE2, Linux 64-bit, 
+                      OpenGL 3.3.0 NVIDIA 270.41.06
+                      Issue is still present.
 	-->
     <rule description="NVidia: ARB_seamless_cube_map broken">
       <conditions>
 	<regexp	string="vendor" pattern="NVIDIA" />
-        <comparever version="glvendor" relation="le 260.19.29" />
+        <comparever version="glvendor" relation="le 270.41.06" />
       </conditions>
       <applicable>
 	<usecfg>disableSeamlessCubemaps</usecfg>

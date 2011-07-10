@@ -35,7 +35,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
   {
   public:
     PositionMap(const float* minRadii, size_t numMinRadii,
-		const csBox2& box);
+		const csBox2& box, int randomSeed);
     ~PositionMap ();
 
     typedef csTuple2<size_t, size_t> AreaID;

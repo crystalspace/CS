@@ -108,7 +108,7 @@
                 <Property Name="ColumnHeader" Value="text:Ping width:{0.2,0} id:2" />
             </Window>
             <Window Type="ice/StaticImage" Name="Demo7/Window2/Image1" >
-                <Property Name="Image" Value="set:BackgroundImage image:full_image" />
+                <!--Property Name="Image" Value="set:BackgroundImage image:full_image" /-->
                 <Property Name="FrameEnabled" Value="False" />
                 <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
                 <Property Name="UnifiedAreaRect" Value="{{0.56,0},{0.35,0},{0.86,0},{0.55,0}}" />

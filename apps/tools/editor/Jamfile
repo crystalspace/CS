@@ -19,8 +19,6 @@ if $(WX.AVAILABLE) = "yes" && $(WX.AUI.AVAILABLE) = "yes"
   # To locate wx.rc
   Win32RcFlags cseditor : [ Match ^(-I.*) ^(-D.*) : [ SplitToList $(WX.CFLAGS) ] ] ;
 
-  IncludeDir : cseditor ;
-
   #CompileGroups cseditorcore : cseditorall ;
   #CompileGroups cseditor : cseditorall ;
 }

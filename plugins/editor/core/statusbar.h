@@ -27,8 +27,8 @@
 #include <wx/event.h>
 #include <wx/gauge.h>
 
-namespace CS {
-namespace EditorApp {
+CS_PLUGIN_NAMESPACE_BEGIN(CSE)
+{
 
 /// Custom status bar which shows a progress gauge
 class StatusBar : public wxStatusBar
@@ -149,7 +149,7 @@ private:
   int tick_scale;
 };
 
-} // namespace EditorApp
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(CSE)
 
 #endif
