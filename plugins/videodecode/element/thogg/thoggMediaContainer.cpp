@@ -269,7 +269,7 @@ void TheoraMediaContainer::DoSeek ()
       }
     }
   }
-  cout<<"seeked to: "<<frame<<' '<<time<<endl;
+  //cout<<"seeked to: "<<frame<<' '<<time<<endl;
 }
 
 void TheoraMediaContainer::AutoActivateStreams ()
@@ -314,11 +314,7 @@ float TheoraMediaContainer::GetPosition ()
   {
     if( strcmp("TheoraVideo",media[activeStreams[i]]->GetType ())==0)
     {
-      csRef<iVideoMedia> video = scfQueryInterface<iVideoMedia>(media[activeStreams[i]]); 
-      if(video.IsValid()) 
-      {
-        position = video->GetPosition ();
-      }
+      position = media[activeStreams[i]]->GetPosition ();
     }
   }
 
@@ -331,11 +327,7 @@ float TheoraMediaContainer::GetLength ()
   {
     if( strcmp("TheoraVideo",media[activeStreams[i]]->GetType ())==0)
     {
-      csRef<iVideoMedia> video = scfQueryInterface<iVideoMedia>(media[activeStreams[i]]); 
-      if(video.IsValid()) 
-      {
-        length = video->GetLength ();
-      }
+      length = media[activeStreams[i]]->GetLength ();
     }
   }
 
