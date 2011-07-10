@@ -52,7 +52,7 @@ private:
   unsigned long					frameCount;
 
   ogg_int64_t						videobuf_granulepos;
-  bool									skipToKeyframe;
+  ogg_int64_t           frameToSkip;
 
   // these will be private and have getters and setters, but for now, it's faster like this
 public:

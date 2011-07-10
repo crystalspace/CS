@@ -197,11 +197,10 @@ void TheoraMediaContainer::Seek (float time)
   // the next update
   if(time<0)
   {
-    csReport(object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
-      "Cannot seek before the start of the stream.\n");
-    return;
+    timeToSeek=0;
   }
-  timeToSeek=time;
+  else
+    timeToSeek=time;
   endOfFile=false;
 }
 
@@ -244,11 +243,12 @@ void TheoraMediaContainer::DoSeek ()
   //check if we're seeking outside the video
   if (targetFrame>vidStream->GetFrameCount ())
   {
-    csReport(object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
-      "Cannot seek outside the stream.\n");
-    return;
+    /*csReport(object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
+      "Cannot seek outside the stream.\n");*/
+    targetFrame = vidStream->GetFrameCount ();
+    //return;
   }
-  cout<<targetFrame<<endl;
+  //cout<<targetFrame<<endl;
 
   frame = vidStream->SeekPage (targetFrame,1,&oy,mSize);
   if (frame != -1)
@@ -269,7 +269,7 @@ void TheoraMediaContainer::DoSeek ()
       }
     }
   }
-  cout<<frame<<' '<<time<<endl;
+  cout<<"seeked to: "<<frame<<' '<<time<<endl;
 }
 
 void TheoraMediaContainer::AutoActivateStreams ()
@@ -306,4 +306,38 @@ void TheoraMediaContainer::SetTargetTexture (csRef<iTextureHandle> &target)
       }
     }
   }
+}
+float TheoraMediaContainer::GetPosition ()
+{
+  float position = 0;
+  for (size_t i =0;i<activeStreams.GetSize ();i++)
+  {
+    if( strcmp("TheoraVideo",media[activeStreams[i]]->GetType ())==0)
+    {
+      csRef<iVideoMedia> video = scfQueryInterface<iVideoMedia>(media[activeStreams[i]]); 
+      if(video.IsValid()) 
+      {
+        position = video->GetPosition ();
+      }
+    }
+  }
+
+  return position;
+}
+float TheoraMediaContainer::GetLength ()
+{
+  float length = 0;
+  for (size_t i =0;i<activeStreams.GetSize ();i++)
+  {
+    if( strcmp("TheoraVideo",media[activeStreams[i]]->GetType ())==0)
+    {
+      csRef<iVideoMedia> video = scfQueryInterface<iVideoMedia>(media[activeStreams[i]]); 
+      if(video.IsValid()) 
+      {
+        length = video->GetLength ();
+      }
+    }
+  }
+
+  return length;
 }

@@ -55,6 +55,14 @@ void VideoTest::Frame ()
 
   mediaPlayer->Update ();
 
+  if(updateSeeker)
+  {
+    float videoPos = mediaPlayer->GetPosition ();
+    CEGUI::Scrollbar * seeker = 
+      static_cast<CEGUI::Scrollbar*>(CEGUI::WindowManager::getSingleton().getWindow("Video/Window1/Seek"));
+    seeker->setScrollPosition (videoPos);
+  }
+
 
   // Default behavior from DemoApplication
   DemoApplication::Frame ();
@@ -87,7 +95,6 @@ void VideoTest::Frame ()
     w,
     h,
     0);
-
 }
 
 bool VideoTest::Application ()
@@ -97,8 +104,10 @@ bool VideoTest::Application ()
     return false;
 
   if (!csInitializer::RequestPlugins (object_reg,
+    CS_REQUEST_VFS,
     CS_REQUEST_PLUGIN ("crystalspace.vpl.loader", iMediaLoader),
     CS_REQUEST_PLUGIN ("crystalspace.vpl.player", iMediaPlayer),
+    CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
     CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -107,9 +116,23 @@ bool VideoTest::Application ()
     return false;
   }
 
-  csRef<iTextureManager> texManager = g3d->GetTextureManager ();
+  vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
+  if (!vfs) return ReportError("Failed to locate VFS!");
+
+  cegui = csQueryRegistry<iCEGUI> (GetObjectRegistry());
+  if (!cegui) return ReportError("Failed to locate CEGUI plugin");
+
+  // Set the working directory
+  vfs->ChDir ("/videodecode/");
+
+  //Get the path of the video we want to load
+  csRef<iDataBuffer> path;
+  path = vfs->GetRealPath ("vid420.ogg");
+
+  // Get the loader and load the video
   csRef<iMediaLoader> vlpLoader = csQueryRegistry<iMediaLoader> (object_reg);
-  csRef<iMediaContainer> video = vlpLoader->LoadMedia("vid420.ogg");
+  csRef<iMediaContainer> video = vlpLoader->LoadMedia(path->GetData ());
+
 
   if (video.IsValid ())
   {
@@ -124,7 +147,13 @@ bool VideoTest::Application ()
   mediaPlayer->SetTargetTexture (logoTex);
   mediaPlayer->Loop (false);
   mediaPlayer->Play ();
-  //mediaPlayer->Seek (15.0f);
+  mediaPlayer->Seek (-10.0f);
+
+  // For some reason, CEGUI stopped working properly after I merged the trunk
+  // Not using it for now
+  InitializeCEGUI ();
+
+  updateSeeker=true;
 
   // Create the scene
   if (!CreateScene ())
@@ -134,6 +163,70 @@ bool VideoTest::Application ()
   Run();
 
   return true;
+}
+
+void VideoTest::InitializeCEGUI ()
+{
+  // Initialize CEGUI wrapper
+  cegui->Initialize ();
+
+  /* Let CEGUI plugin install an event handler that takes care of rendering
+     every frame */
+  cegui->SetAutoRender (true);
+  
+  // Set the logging level 
+  cegui->GetLoggerPtr ()->setLoggingLevel(CEGUI::Informative);
+
+  vfs->ChDir ("/cegui/");
+
+  // Load the ice skin (which uses Falagard skinning system)
+  cegui->GetSchemeManagerPtr ()->create("ice.scheme");
+
+  cegui->GetSystemPtr ()->setDefaultMouseCursor("ice", "MouseArrow");
+
+  cegui->GetFontManagerPtr ()->createFreeTypeFont("DejaVuSans", 10, true, "/fonts/ttf/DejaVuSans.ttf");
+
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  // Load layout and set as root
+  vfs->ChDir ("/videodecode/");
+  cegui->GetSystemPtr ()->setGUISheet(winMgr->loadWindowLayout("ice.layout"));
+
+  // Subscribe to the events that we need
+  CEGUI::Window* btn = winMgr->getWindow("Video/Window1/Quit");
+
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&VideoTest::OnExitButtonClicked, this));
+
+  CEGUI::Window* btn2 = winMgr->getWindow("Video/Window1/Play");
+
+  btn2->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&VideoTest::OnPlayButtonClicked, this));
+
+  CEGUI::Window* btn3 = winMgr->getWindow("Video/Window1/Pause");
+
+  btn3->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&VideoTest::OnPauseButtonClicked, this));
+
+  CEGUI::Window* btn4 = winMgr->getWindow("Video/Window1/Stop");
+
+  btn4->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&VideoTest::OnStopButtonClicked, this));
+
+  CEGUI::Window* btn5 = winMgr->getWindow("Video/Window1/Loop");
+
+  btn5->subscribeEvent(CEGUI::Checkbox::EventCheckStateChanged,
+    CEGUI::Event::Subscriber(&VideoTest::OnLoopToggle, this));
+
+  CEGUI::Scrollbar* slider = (CEGUI::Scrollbar*)winMgr->getWindow("Video/Window1/Seek");
+
+  slider->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackStarted ,
+    CEGUI::Event::Subscriber(&VideoTest::OnSeekingStart, this));
+  slider->subscribeEvent(CEGUI::Scrollbar::EventThumbTrackEnded ,
+    CEGUI::Event::Subscriber(&VideoTest::OnSeekingEnd, this));
+  slider->setDocumentSize (mediaPlayer->GetLength ());
+  slider->setStepSize (0.1f);
+  slider->setTooltipText ("Seek");
 }
 
 bool VideoTest::CreateScene ()
@@ -191,6 +284,62 @@ bool VideoTest::CreateScene ()
 
   printf ("Ready!\n");
 
+  cegui->EnableMouseCapture ();
+
+  return true;
+}
+
+// CEGUI listeners
+bool VideoTest::OnExitButtonClicked (const CEGUI::EventArgs&)
+{
+  csRef<iEventQueue> q =
+    csQueryRegistry<iEventQueue> (GetObjectRegistry());
+  if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
+  return true;
+}
+bool VideoTest::OnPlayButtonClicked (const CEGUI::EventArgs&)
+{
+  mediaPlayer->Play ();
+  return true;
+}
+bool VideoTest::OnPauseButtonClicked (const CEGUI::EventArgs&)
+{
+  mediaPlayer->Pause ();
+  return true;
+}
+bool VideoTest::OnStopButtonClicked (const CEGUI::EventArgs&)
+{
+  mediaPlayer->Stop ();
+  return true;
+}
+bool VideoTest::OnLoopToggle (const CEGUI::EventArgs& e)
+{
+  CEGUI::RadioButton * radioButton1 = 
+    static_cast<CEGUI::RadioButton*>(CEGUI::WindowManager::getSingleton().getWindow("Video/Window1/Loop"));
+
+  if (radioButton1->isSelected())
+  {
+    mediaPlayer->Loop (true);
+  }
+  else
+  {
+    mediaPlayer->Loop (false);
+  }
+  return true;
+}
+bool VideoTest::OnSeekingStart (const CEGUI::EventArgs&)
+{
+  updateSeeker=false;
+  return true;
+}
+bool VideoTest::OnSeekingEnd (const CEGUI::EventArgs&)
+{
+
+  CEGUI::Scrollbar * seeker = 
+    static_cast<CEGUI::Scrollbar*>(CEGUI::WindowManager::getSingleton().getWindow("Video/Window1/Seek"));
+
+  mediaPlayer->Seek (seeker->getScrollPosition ());
+  updateSeeker=true;
   return true;
 }
 //---------------------------------------------------------------------------

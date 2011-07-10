@@ -65,6 +65,12 @@ struct iMediaContainer : public virtual iBase
 
   /// Triggers a seek for the active iMedia streams, resolved at the next update
   virtual void Seek (float time) = 0 ;
+
+  /// Get the position of the media
+  virtual float GetPosition () = 0 ;
+
+  /// Get the length of the media
+  virtual float GetLength () = 0 ;
 };
 
 /** @} */

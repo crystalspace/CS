@@ -256,7 +256,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
     }
     else
     {
-      CEGUI::System::create (*this, rp, 0, ic, nullptr, "", logFile.GetData ());
+       CEGUI::System::create (*this, rp, 0, ic, nullptr, "", logFile.GetData ());
     }
 
     settingsSliderFact.obj_reg = obj_reg;

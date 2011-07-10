@@ -114,12 +114,16 @@ void vplPlayer::Seek (float time)
   }
 }
 
-csTicks vplPlayer::GetPosition () 
+float vplPlayer::GetPosition () 
 {
-  return 0;
+  return _mediaFile->GetPosition ();
 }
 
 bool vplPlayer::IsPlaying () 
 {
   return _playing;
+}
+float vplPlayer::GetLength ()
+{
+  return _mediaFile->GetLength ();
 }

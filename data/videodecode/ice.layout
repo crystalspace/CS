@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GUILayout>
+    <Window Type="DefaultWindow" Name="root">
+        <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+        <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+        <Property Name="MousePassThroughEnabled" Value="True" />
+      
+        <Window Type="ice/FrameWindow" Name="Video/Window1" >
+            <Property Name="Text" Value="Media player" />
+            <Property Name="UnifiedMaxSize" Value="{{0.8,0},{0.8,0}}" />
+            <Property Name="UnifiedMinSize" Value="{{0.2,0},{0.2,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.7,0},{0.2,0},{0.7,0},{0.8,0}}" />
+            <Property Name="CloseButtonEnabled" Value="False" />
+            <Window Type="ice/Button" Name="Video/Window1/Quit" >
+                <Property Name="Text" Value="Exit Demo" />
+                <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+                <Property Name="UnifiedAreaRect" Value="{{0.02,0},{0.05,0},{0.57,0},{0.15,0}}" />
+            </Window>
+            <Window Type="ice/Button" Name="Video/Window1/Play" >
+                <Property Name="Text" Value="Play" />
+                <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+                <Property Name="UnifiedAreaRect" Value="{{0.02,0},{0.2,0},{0.57,0},{0.3,0}}" />
+            </Window>
+            <Window Type="ice/Button" Name="Video/Window1/Pause" >
+                <Property Name="Text" Value="Pause" />
+                <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+                <Property Name="UnifiedAreaRect" Value="{{0.02,0},{0.3,0},{0.57,0},{0.4,0}}" />
+            </Window>
+            <Window Type="ice/Button" Name="Video/Window1/Stop" >
+                <Property Name="Text" Value="Stop" />
+                <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+                <Property Name="UnifiedAreaRect" Value="{{0.02,0},{0.4,0},{0.57,0},{0.5,0}}" />
+            </Window>
+            <Window Type="ice/Checkbox" Name="Video/Window1/Loop" >
+                <Property Name="Text" Value="can loop" />
+                <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+                <Property Name="UnifiedAreaRect" Value="{{0.05,0},{0.50,0},{0.57,0},{0.62,0}}" />
+            </Window>
+			
+            <Window Type="ice/StaticText" Name="Video/Window1/SeekLabel" >
+                <Property Name="Text" Value="Seek bar:" />
+                <Property Name="FrameEnabled" Value="False" />
+                <Property Name="HorzFormatting" Value="WordWrapCentred" />
+                <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+                <Property Name="UnifiedAreaRect" Value="{{0.02,0},{0.7,0},{0.95,0},{0.8,0}}" />
+                <Property Name="BackgroundEnabled" Value="False" />
+            </Window>
+			
+            <Window Type="ice/HorizontalScrollbar" Name="Video/Window1/Seek" >
+                <Property Name="PageSize" Value="0" />
+                <Property Name="StepSize" Value="1" />
+                <Property Name="OverlapSize" Value="0" />
+                <Property Name="DocumentSize" Value="1" />
+                <Property Name="ScrollPosition" Value="0" />
+                <Property Name="UnifiedMaxSize" Value="{{1,0},{0.03,0}}" />
+                <Property Name="UnifiedMinSize" Value="{{0.1,0},{0.01,0}}" />
+                <Property Name="UnifiedAreaRect" Value="{{0.00,0},{0.8,0},{1.0,0},{0.9,0}}" />
+				<Property Name="Tooltip" Value="Seek" />
+            </Window>
+        </Window>
+    </Window>
+</GUILayout>

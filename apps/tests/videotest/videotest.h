@@ -47,12 +47,36 @@ private:
   csRef<iTextureHandle> logoTex;
   csRef<iMediaPlayer> mediaPlayer;
 
+  csRef<iVFS> vfs;
+  csRef<iCEGUI> cegui;
+
+  // We need this to make the seeking slider work properly
+  bool updateSeeker;
+
+private:
+  void InitializeCEGUI ();
+
+  // Handle exit button clicked event
+  bool OnExitButtonClicked (const CEGUI::EventArgs& e);
+  // Handle play button clicked event
+  bool OnPlayButtonClicked (const CEGUI::EventArgs& e);
+  // Handle pause button clicked event
+  bool OnPauseButtonClicked (const CEGUI::EventArgs& e);
+  // Handle stop button clicked event
+  bool OnStopButtonClicked (const CEGUI::EventArgs& e);
+  // Handle the loop radio button
+  bool OnLoopToggle (const CEGUI::EventArgs& e);
+  // Handle seeking
+  bool OnSeekingStart (const CEGUI::EventArgs& e);
+  bool OnSeekingEnd (const CEGUI::EventArgs& e);
+
 public:
   VideoTest ();
 
   //-- CS::Utility::DemoApplication
   void PrintHelp ();
   void Frame ();
+
   const char* GetApplicationConfigFile()
   { return "/config/csisland.cfg"; }
 

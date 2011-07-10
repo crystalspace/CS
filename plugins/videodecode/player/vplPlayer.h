@@ -70,9 +70,11 @@ public:
 
   virtual void Seek (float time) ;
 
-  virtual csTicks GetPosition () ;
+  virtual float GetPosition () ;
 
   virtual bool IsPlaying () ;
+
+  virtual float GetLength () ;
 };
 
 #endif // __VPLPLAYER_H__

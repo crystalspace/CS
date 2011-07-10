@@ -56,6 +56,7 @@ bool TheoraVideoMedia::Initialize (iObjectRegistry* r)
     decodersStarted=true;
     videobuf_granulepos=-1;
     videobuf_time=0;
+    frameToSkip=-1;
   }else
   {
     /* tear down the partial theora setup */
@@ -108,40 +109,32 @@ int clamp(int number)
 }
 int TheoraVideoMedia::Update ()
 {
-  //static int frames=0;
   videobuf_ready=false;
 
 
   while(theora_p && !videobuf_ready)
   {
-    /* theora is one in, one out... */
     if(ogg_stream_packetout(&to,&op)>0)
     {
-      if (skipToKeyframe)
-      {
-        int nSeekSkippedFrames = 0;
-        int keyframe=th_packet_iskeyframe(&op);
-        if (!keyframe) 
-        { 
-          nSeekSkippedFrames++; 
-          continue; 
-        }
-        skipToKeyframe=false;
-        if (nSeekSkippedFrames > 0)
-          cout<<+"[seek]: skipped "<<nSeekSkippedFrames<<" frames while searching for keyframe";
-      }
-
       if(th_decode_packetin(td,&op,&videobuf_granulepos)>=0)
       {
         videobuf_time=th_granule_time(td,videobuf_granulepos);
-        cout<<videobuf_time<<'-'<<th_granule_frame (td,videobuf_granulepos)<<endl;
-        videobuf_ready=1;
+
+        if(th_granule_frame (td,videobuf_granulepos)<frameToSkip)
+        {
+          videobuf_ready=0;
+          return 0;
+        }
+        else
+        {
+          cout<<videobuf_time<<'-'<<th_granule_frame (td,videobuf_granulepos)<<endl;
+          videobuf_ready=1;
+          frameToSkip = -1;
+        }
       }
 
     }else
       break;
-
-    //videobuf_ready=0;
   }
 
   if(videobuf_ready)
@@ -305,7 +298,10 @@ long TheoraVideoMedia::SeekPage(long targetFrame,bool return_keyframe, ogg_sync_
             if (fineseek && frame >= targetFrame)
               break;
 
-            if (fineseek) continue;
+            if (fineseek) 
+            {
+              continue;
+            }
             if (targetFrame-1 > frame) seek_min=(seek_min+seek_max)/2;
             else				       seek_max=(seek_min+seek_max)/2;
             break;
@@ -322,13 +318,19 @@ long TheoraVideoMedia::SeekPage(long targetFrame,bool return_keyframe, ogg_sync_
     }
     if (fineseek) break;
   }
-  if (return_keyframe) return (long) (granule >> ti.keyframe_granule_shift);
 
   ogg_stream_pagein(&to,&og);
   //granule=frame << mInfo->TheoraInfo.keyframe_granule_shift;
   th_decode_ctl(td,TH_DECCTL_SET_GRANPOS,&granule,sizeof(granule));
 
-  skipToKeyframe=true;
+  //make sure we skip to the keyframe we need
+  if(return_keyframe)
+  {
+    frameToSkip = targetFrame;
+    cout<<"want to skip to :"<<frameToSkip<<endl;
+  }
+
+  if (return_keyframe) return (long) (granule >> ti.keyframe_granule_shift);
 
   return -1;
 }

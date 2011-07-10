@@ -68,7 +68,10 @@ struct iMediaPlayer : public virtual iBase
   virtual void Seek (float time) = 0 ;
 
   /// Get the position of the media
-  virtual csTicks GetPosition () = 0 ;
+  virtual float GetPosition () = 0 ;
+
+  /// Get the length of the media
+  virtual float GetLength () = 0 ;
 
   /// Returns if the media is playing or not
   virtual bool IsPlaying () = 0 ;

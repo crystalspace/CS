@@ -102,6 +102,10 @@ public:
 
   virtual void AutoActivateStreams () ;
 
+  virtual float GetPosition () ;
+
+  virtual float GetLength () ;
+
   /// Does a seek on the active media
   void DoSeek ();
 
@@ -119,6 +123,7 @@ public:
   {
     mSize=size;
   }
+
 };
 
 /** @} */
