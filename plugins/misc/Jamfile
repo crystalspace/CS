@@ -1,2 +1,3 @@
 SubInclude TOP plugins misc pathloader ;
+SubInclude TOP plugins misc opencl ;
 

@@ -42,12 +42,23 @@ namespace CL
 
   enum ImageChannelType
   {
-    FMT_SIZE    = 3,
-    FMT_SIGNED  = 1 << 2,
-    FMT_NORMAL  = 1 << 3,
-    FMT_PACKED  = 1 << 4,
-    FMT_FLOAT   = 1 << 5,
+    // logarithm dualis of the
+    // channel size in bytes
+    FMT_SIZE    = 0x03,
+    FMT_SIGNED  = 0x04,
+    FMT_NORMAL  = 0x08,
+    FMT_PACKED  = 0x10,
+    FMT_FLOAT   = 0x20,
 
+    // only used to differentiate those where all
+    // other flags and the size are equal
+    FMT_SPECIAL = 0x40,
+
+    // flag to be used to get the channel
+    // type from a format mask
+    FMT_TYPE    = 0xFF,
+
+    // normalized formats
     FMT_UINT8_N  = 0 | FMT_NORMAL,
     FMT_UINT16_N = 1 | FMT_NORMAL,
     FMT_SINT8_N  = 0 | FMT_SIGNED | FMT_NORMAL,
@@ -55,10 +66,12 @@ namespace CL
     FMT_HALF     = 1 | FMT_FLOAT | FMT_SIGNED | FMT_NORMAL,
     FMT_FLOAT    = 2 | FMT_FLOAT | FMT_SIGNED | FMT_NORMAL,
 
-    FMT_UINT16_N_565    = 0 | FMT_PACKED,
-    FMT_UINT16_N_555    = 1 | FMT_PACKED,
-    FMT_UINT32_N_101010 = 2 | FMT_PACKED,
+    // packed formats
+    FMT_UINT16_N_565    = 1 | FMT_PACKED | FMT_NORMAL | FMT_SPECIAL,
+    FMT_UINT16_N_555    = 1 | FMT_PACKED | FMT_NORMAL,
+    FMT_UINT32_N_101010 = 2 | FMT_PACKED | FMT_NORMAL,
 
+    // unnormalized formats
     FMT_UINT8  = 0,
     FMT_UINT16 = 1,
     FMT_UINT32 = 2,
@@ -69,41 +82,61 @@ namespace CL
 
   enum ImageChannelOrder
   {
-    FMT_R    = 0x1 << 8,
-    FMT_Rx   = 0x2 << 8,
-    FMT_A    = 0x3 << 8,
-    FMT_RG   = 0x4 << 8,
-    FMT_RGx  = 0x5 << 8,
-    FMT_RA   = 0x6 << 8,
-    FMT_RGBA = 0x7 << 8,
+    // flag to be used to get the channel
+    // order from a format mask
+    FMT_ORDER = 0xFF00,
+
+    // flag to be used to get the channel
+    // count from a format mask
+    // (similiar to FMT_SIZE)
+    FMT_COUNT = 0x0300,
+
+    // not valid with FMT_PACKED
+    // single channel
+    FMT_R    = 0x0400,
+    FMT_Rx   = 0x0800,
+    FMT_A    = 0x0C00,
+
+    // not valid with FMT_PACKED
+    // dual channel
+    FMT_RG   = 0x0500,
+    FMT_RGx  = 0x0900,
+    FMT_RA   = 0x0D00,
+
+    // not valid with FMT_PACKED
+    // 4 channels
+    FMT_RGBA = 0x0700,
 
     // only valid with FMT_{U,S}INT8{_N,}
-    // (FMT_SIZE = 0 && !(FMT_PACKED|FMT_FLOAT))
-    FMT_ARGB = 0x10 << 8,
-    FMT_BGRA = 0x11 << 8,
+    // 4 channels
+    FMT_ARGB = 0x1300,
+    FMT_BGRA = 0x1700,
 
     // only valid with FMT_PACKED
-    FMT_RGB  = 0x20 << 8,
-    FMT_RGBx = 0x21 << 8,
+    // "single" channel (packed)
+    FMT_RGB  = 0x2000,
+    FMT_RGBx = 0x2400,
 
     // only valid with FMT_NORMAL
-    FMT_INT  = 0x30 << 8,
-    FMT_LUM  = 0x31 << 8
+    // not valid with FMT_PACKED
+    // single channel
+    FMT_INT  = 0x3000,
+    FMT_LUM  = 0x3400
   };
 
   enum SamplerFilterMode
   {
-    FILTER_LINEAR,
-    FILTER_NEAREST
+    FILTER_LINEAR = CL_FILTER_LINEAR,
+    FILTER_NEAREST = CL_FILTER_NEAREST
   };
 
   enum SamplerAddressMode
   {
-    ADDR_MIRRORED_REPEAT,
-    ADDR_REPEAT,
-    ADDR_CLAMP_TO_EDGE,
-    ADDR_CLAMP,
-    ADDR_NONE
+    ADDR_MIRRORED_REPEAT = CL_ADDRESS_MIRRORED_REPEAT,
+    ADDR_REPEAT          = CL_ADDRESS_REPEAT,
+    ADDR_CLAMP_TO_EDGE   = CL_ADDRESS_CLAMP_TO_EDGE,
+    ADDR_CLAMP           = CL_ADDRESS_CLAMP,
+    ADDR_NONE            = CL_ADDRESS_NONE
   };
 } // namespace CL
 } // namespace CS

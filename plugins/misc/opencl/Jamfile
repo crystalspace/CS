@@ -1,0 +1,7 @@
+SubDir TOP plugins misc opencl ;
+
+Plugin opencl
+       : [ Wildcard *.cpp *.h ] ;
+
+LinkWith opencl : OpenCL ;
+

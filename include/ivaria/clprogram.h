@@ -19,6 +19,8 @@
 #ifndef __CS_OPENCL_PROGRAM_H__
 #define __CS_OPENCL_PROGRAM_H__
 
+struct iStringArray;
+
 namespace CS
 {
 namespace CL
@@ -45,7 +47,7 @@ namespace CL
     virtual bool SetDimension(size_t) = 0;
     virtual void SetWorkSize(const size_t*) = 0;
     virtual void SetWorkOffset(const size_t*) = 0;
-    virtual int SetGroupSize(const size_t*) = 0;
+    virtual void SetGroupSize(const size_t*) = 0;
 
     virtual size_t GetDimension() const = 0;
     virtual size_t* GetWorkSize() const = 0;
@@ -59,7 +61,7 @@ namespace CL
 
     virtual iStringArray* GetSource() const = 0;
 
-    virtual iKernel* GetKernel(const char*) = 0;
+    virtual csPtr<iKernel> CreateKernel(const char*) = 0;
     virtual void Precache() = 0;
   };
 
@@ -69,9 +71,9 @@ namespace CL
 
     virtual iStringArray* GetSource() const = 0;
 
-    virtual iEvent* Write(iBuffer*, size_t offset = 0) = 0;
-    virtual iEvent* Read(iBuffer*, size_t offset = 0) = 0;
-    virtual iEvent* WriteToBuffer() = 0;
+    virtual csRef<iEvent> Write(iBuffer*, size_t offset = 0) = 0;
+    virtual csRef<iEvent> Read(iBuffer*, size_t offset = 0) = 0;
+    virtual csRef<iEvent> WriteToBuffer() = 0;
   };
 } // namespace CL
 } // namespace CS

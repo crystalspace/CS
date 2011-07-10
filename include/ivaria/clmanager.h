@@ -19,6 +19,7 @@
 #ifndef __CS_OPENCL_MANAGER_H__
 #define __CS_OPENCL_MANAGER_H__
 
+#include "csutil/ref.h"
 #include "csutil/refarr.h"
 #include "csutil/nullptr.h"
 #include "clconsts.h"
@@ -56,7 +57,7 @@ namespace CL
     virtual bool RemoveCallback(Callback) = 0;
     /// fire the event (only for user-defined events)
     /// @see iManager::CreateEvent
-    virtual bool Fire() = 0;
+    virtual bool Fire(bool success) = 0;
     /// query result if there is any
     virtual iBase* GetResult() = 0;
   };
@@ -67,8 +68,8 @@ namespace CL
   {
     SCF_INTERFACE(iManager, 0, 0, 1);
 
-    virtual iEvent* Queue(iKernel*, const iEventList& = iEventList()) = 0;
-    virtual iEvent* QueueMarker() = 0;
+    virtual csRef<iEvent> Queue(iKernel*, const iEventList& = iEventList()) = 0;
+    virtual csPtr<iEvent> QueueMarker() = 0;
     virtual bool QueueBarrier() = 0;
     virtual bool QueueWait(const iEventList&) = 0;
 
@@ -79,25 +80,27 @@ namespace CL
     virtual void Purge() = 0; // free not strictly required memory
     virtual void FreeCompiler() = 0;
 
-    virtual iEvent* CreateEventFromThreadReturn(iThreadReturn*) = 0;
-    virtual iEvent* CreateUserEvent() = 0;
+    virtual csPtr<iEvent> CreateUserEvent(iThreadReturn*) = 0;
+    virtual csPtr<iEvent> CreateUserEvent() = 0;
 
-    virtual iBuffer* CreateBuffer(size_t size, int access = MEM_READ_WRITE,
-                                  void* src = nullptr) = 0;
-    virtual iBuffer* CreateBuffer(iBuffer*, size_t size, size_t offset,
-                                  int access = MEM_READ_WRITE) = 0;
+    virtual csPtr<iLibrary> CreateLibrary(iStringArray* source) = 0;
 
-    virtual iImage* CreateImage(size_t width, size_t height, int format,
-                                int access = MEM_READ_WRITE,
-                                void* src = nullptr, size_t offset = 0) = 0;
-    virtual iImage* CreateImage(size_t width, size_t height, size_t depth,
-                                int format, int acces = MEM_READ_WRITE,
-                                void* src = nullptr, const size_t row_pitch = 0,
-                                size_t slice_pitch = 0) = 0;
-    virtual iImage* CreateImage(::iImage, int access = MEM_READ_WRITE) = 0;
+    virtual csPtr<iBuffer> CreateBuffer(size_t size, int access = MEM_READ_WRITE,
+                                        void* src = nullptr) = 0;
+    virtual csPtr<iBuffer> CreateBuffer(iBuffer*, size_t size, size_t offset,
+                                        int access = MEM_READ_WRITE) = 0;
 
-    virtual iSampler* CreateSampler(int addressMode, int filterMode = FILTER_NEAREST,
-                                    bool normalized = false) = 0;
+    virtual csPtr<iImage> CreateImage(size_t width, size_t height, int format,
+                                      int access = MEM_READ_WRITE,
+                                      void* src = nullptr, size_t row_pitch = 0) = 0;
+    virtual csPtr<iImage> CreateImage(size_t width, size_t height, size_t depth,
+                                      int format, int access = MEM_READ_WRITE,
+                                      void* src = nullptr, size_t row_pitch = 0,
+                                      size_t slice_pitch = 0) = 0;
+    virtual csPtr<iImage> CreateImage(::iImage, int access = MEM_READ_WRITE) = 0;
+
+    virtual csPtr<iSampler> CreateSampler(int addressMode, int filterMode = FILTER_NEAREST,
+                                          bool normalized = false) = 0;
   };
 } // namespace CL
 } // namespace CS

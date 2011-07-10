@@ -37,15 +37,16 @@ namespace CL
     virtual size_t GetOffset(int dimension = 0) const = 0;
     virtual size_t GetSize(int dimension = 0) const = 0;
     virtual size_t GetPitch(int dimesion = 0) const = 0;
+    virtual csPtr<iEvent> Release(const iEventList& = iEventList()) = 0;
   };
 
   struct iMemoryObject : public virtual iBase
   {
     SCF_INTERFACE(iMemoryObject, 0, 0, 1);
 
-    virtual iMemoryObject* Clone() = 0;
+    virtual csPtr<iMemoryObject> Clone() = 0;
 
-    virtual iEvent* Flush() = 0;
+    virtual csRef<iEvent> Flush() = 0;
     virtual void Purge() = 0; // free not strictly required data
 
     virtual int GetAccessMode() const = 0;
@@ -61,33 +62,21 @@ namespace CL
 
     virtual size_t GetSize() const = 0;
 
-    virtual iEvent* Request(size_t offset, size_t size,
-                            const iEventList& = iEventList()) = 0;
+    virtual csPtr<iEvent> Request(size_t offset, size_t size,
+                                  const iEventList& = iEventList()) = 0;
 
-    virtual iEvent* Read(size_t offset, size_t size, void* dst,
-                         const iEventList& = iEventList()) = 0;
-    /*virtual iEvent* Read(void* dst, const size_t size[3],
-                         const size_t src_offset[3], const size_t src_pitch[2],
-                         const size_t dst_offset[3], const size_t dst_pitch[2],
-                         const iEventList& = iEventList()) = 0;*/
+    virtual csRef<iEvent> Read(size_t offset, size_t size, void* dst,
+                               const iEventList& = iEventList()) = 0;
 
-    virtual iEvent* Write(size_t offset, size_t size, void* src,
-                          const iEventList& = iEventList()) = 0;
-    /*virtual iEvent* Write(void* src, const size_t size[3],
-                          const size_t dst_offset[3], const size_t dst_pitch[2],
-                          const size_t src_offset[3], const size_t src_pitch[2],
-                          const iEventList& = iEventList()) = 0;*/
+    virtual csRef<iEvent> Write(size_t offset, size_t size, void* src,
+                                const iEventList& = iEventList()) = 0;
 
-    virtual iEvent* Copy(iBuffer* dst, size_t size,
-                         size_t src_offset, size_t dst_offset,
-                         const iEventList& = iEventList()) = 0;
-    /*virtual iEvent* Copy(iBuffer* dst, const size_t size[3],
-                         const size_t src_offset[3], const size_t src_pitch[2],
-                         const size_t dst_offset[3], const size_t dst_pitch[2],
-                         const iEventList& = iEventList()) = 0;*/
-    virtual iEvent* Copy(iImage* dst, size_t src_offset,
-                         const size_t dst_offset[3], const size_t dst_size[3],
-                         const iEventList& = iEventList()) = 0;
+    virtual csRef<iEvent> Copy(iBuffer* dst, size_t size,
+                               size_t src_offset, size_t dst_offset,
+                               const iEventList& = iEventList()) = 0;
+    virtual csRef<iEvent> Copy(iImage* dst, size_t src_offset,
+                               const size_t dst_offset[3], const size_t dst_size[3],
+                               const iEventList& = iEventList()) = 0;
   };
 
   struct iImage : public iMemoryObject
@@ -98,24 +87,25 @@ namespace CL
     virtual size_t GetWidth() const = 0;
     virtual size_t GetHeight() const = 0;
     virtual size_t GetDepth() const = 0;
+    virtual size_t GetElementSize() const = 0;
 
-    virtual iEvent* Request(const size_t offset[3], const size_t size[3],
-                            const iEventList& = iEventList()) = 0;
+    virtual csPtr<iEvent> Request(const size_t offset[3], const size_t size[3],
+                                  const iEventList& = iEventList()) = 0;
 
-    virtual iEvent* Read(void* dst, const size_t size[3],
-                         const size_t src_offset[3], const size_t dst_pitch[2],
-                         const iEventList& = iEventList()) = 0;
+    virtual csRef<iEvent> Read(void* dst, const size_t size[3],
+                               const size_t src_offset[3], const size_t dst_pitch[2],
+                               const iEventList& = iEventList()) = 0;
 
-    virtual iEvent* Write(void* src, const size_t size[3],
-                          const size_t dst_offset[3], const size_t src_pitch[2],
-                          const iEventList& = iEventList()) = 0;
+    virtual csRef<iEvent> Write(void* src, const size_t size[3],
+                                const size_t dst_offset[3], const size_t src_pitch[2],
+                                const iEventList& = iEventList()) = 0;
 
-    virtual iEvent* Copy(iImage* dst, const size_t size[3],
-                         const size_t src_offset[3], const size_t dst_offset[3],
-                         const iEventList& = iEventList()) = 0;
-    virtual iEvent* Copy(iBuffer* dst, size_t dst_offset,
-                         const size_t src_offset[3], const size_t src_size[3],
-                         const iEventList& = iEventList()) = 0;
+    virtual csRef<iEvent> Copy(iImage* dst, const size_t size[3],
+                               const size_t src_offset[3], const size_t dst_offset[3],
+                               const iEventList& = iEventList()) = 0;
+    virtual csRef<iEvent> Copy(iBuffer* dst, size_t dst_offset,
+                               const size_t src_offset[3], const size_t src_size[3],
+                               const iEventList& = iEventList()) = 0;
   };
 
   struct iSampler : public iMemoryObject

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- opencl.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.addons.opencl</name>
+        <implementation>Manager</implementation>
+        <description>OpenCL Abstraction Layer</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
