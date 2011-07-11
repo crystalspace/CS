@@ -126,7 +126,7 @@ bool VideoTest::Application ()
 
   //Get the path of the video we want to load
   csRef<iDataBuffer> path;
-  path = vfs->GetRealPath ("vid422.ogg");
+  path = vfs->GetRealPath ("vid420.ogg");
 
   // Get the loader and load the video
   csRef<iMediaLoader> vlpLoader = csQueryRegistry<iMediaLoader> (object_reg);
@@ -145,7 +145,6 @@ bool VideoTest::Application ()
   mediaPlayer->SetTargetTexture (logoTex);
   mediaPlayer->Loop (false);
   mediaPlayer->Play ();
-  mediaPlayer->Seek (-10.0f);
 
   // For some reason, CEGUI stopped working properly after I merged the trunk
   // Not using it for now

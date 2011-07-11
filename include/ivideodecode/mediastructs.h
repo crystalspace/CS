@@ -30,9 +30,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 struct csVPLvideoFormat
 {
-  /// a boolean I use to tell if a theora video stream was found
-  bool foundVid;
-
   /// frame width and height
   uint32 fWidth, 
          fHeight;

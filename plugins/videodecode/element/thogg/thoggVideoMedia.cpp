@@ -147,34 +147,31 @@ int TheoraVideoMedia::Update ()
     //if the video is in 4:2:0 pixel format
     if (ti.pixel_fmt==TH_PF_420)
     {
-      int uv_offset;
-
-      uv_offset=(ti.pic_x/2)+(yuv[1].stride)*(ti.pic_y/2);
+      int uv_offset=(ti.pic_x/2)+(yuv[1].stride)*(ti.pic_y/2);
 
       int size = ti.frame_width*ti.frame_height;
 
-      unsigned char * pixels = new unsigned char[size*4];
-      
-      unsigned char* d = pixels;
+      size_t dstSize;
+      uint8 * pixels = _texture->QueryBlitBuffer (ti.pic_x,ti.pic_y,ti.pic_width,ti.pic_height,dstSize);
+
       for (ogg_uint32_t y = 0 ; y < ti.frame_height ; y++)
         for (ogg_uint32_t x = 0 ; x < ti.frame_width ; x++)
         {
-//          int uvOff = uv_offset+x/2;
+          //          int uvOff = uv_offset+x/2;
           int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
           int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y/2))[x/2];
           int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y/2))[x/2];
 
-          int R = clamp(Y + 1.402f*(V-128));
-          int G = clamp(Y - 0.334f*(U-128) - 0.714f*(V-128));
-          int B = clamp(Y + 1.772f*(U-128));
-          *d++ = R;
-          *d++ = G;
-          *d++ = B;
-          *d++ = 0xff;
+          int R = (Y + 1.402f*(V-128));
+          int G = (Y - 0.334f*(U-128) - 0.714f*(V-128));
+          int B = (Y + 1.772f*(U-128));
+          *pixels++ = (uint8)R;
+          *pixels++ = (uint8)G;
+          *pixels++ = (uint8)B;
+          *pixels++ = 0xff;
         }
 
-      _texture->Blit (ti.pic_x,ti.pic_y,ti.pic_width,ti.pic_height,(unsigned char *)pixels);
-      delete pixels;
+        _texture->ApplyBlitBuffer (pixels);
     }
     //if the video is in 4:2:2 pixel format
     else if (ti.pixel_fmt==TH_PF_422)
@@ -185,28 +182,27 @@ int TheoraVideoMedia::Update ()
 
       int size = ti.frame_width*ti.frame_height;
 
-      unsigned char * pixels = new unsigned char[size*4];
+      size_t dstSize;
+      uint8 * pixels = _texture->QueryBlitBuffer (ti.pic_x,ti.pic_y,ti.pic_width,ti.pic_height,dstSize);
 
-      unsigned char* d = pixels;
       for (ogg_uint32_t y = 0 ; y < ti.frame_height ; y++)
-	for (ogg_uint32_t x = 0 ; x < ti.frame_width ; x++)
-	{
-//            int uvOff = uv_offset+x/2;
-	  int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
-	  int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y))[x/2];
-	  int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y))[x/2];
+        for (ogg_uint32_t x = 0 ; x < ti.frame_width ; x++)
+        {
+          //            int uvOff = uv_offset+x/2;
+          int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
+          int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y))[x/2];
+          int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y))[x/2];
 
-	  int R = clamp(Y + 1.402f*(V-128));
-	  int G = clamp(Y - 0.334f*(U-128) - 0.714f*(V-128));
-	  int B = clamp(Y + 1.772f*(U-128));
-	  *d++ = R;
-	  *d++ = G;
-	  *d++ = B;
-	  *d++ = 0xff;
-	}
+          int R = (Y + 1.402f*(V-128));
+          int G = (Y - 0.334f*(U-128) - 0.714f*(V-128));
+          int B = (Y + 1.772f*(U-128));
+          *pixels++ = (uint8)R;
+          *pixels++ = (uint8)G;
+          *pixels++ = (uint8)B;
+          *pixels++ = 0xff;
+        }
 
-      _texture->Blit (ti.pic_x,ti.pic_y,ti.pic_width,ti.pic_height,(unsigned char *)pixels);
-      delete pixels;
+        _texture->ApplyBlitBuffer (pixels);
     }
     //if the video is in 4:4:4 pixel format
     else if (ti.pixel_fmt==TH_PF_444)
@@ -217,32 +213,31 @@ int TheoraVideoMedia::Update ()
 
       int size = ti.frame_width*ti.frame_height;
 
-      unsigned char * pixels = new unsigned char[size*4];
+      size_t dstSize;
+      uint8 * pixels = _texture->QueryBlitBuffer (ti.pic_x,ti.pic_y,ti.pic_width,ti.pic_height,dstSize);
 
-      unsigned char* d = pixels;
       for (ogg_uint32_t y = 0 ; y < ti.frame_height ; y++)
-	for (ogg_uint32_t x = 0 ; x < ti.frame_width ; x++)
-	{
-//              int uvOff = uv_offset+x/2;
-	  int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
-	  int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y))[x];
-	  int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y))[x];
+        for (ogg_uint32_t x = 0 ; x < ti.frame_width ; x++)
+        {
+          //              int uvOff = uv_offset+x/2;
+          int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
+          int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y))[x];
+          int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y))[x];
 
-	  int R = clamp(Y + 1.402f*(V-128));
-	  int G = clamp(Y - 0.334f*(U-128) - 0.714f*(V-128));
-	  int B = clamp(Y + 1.772f*(U-128));
-	  *d++ = R;
-	  *d++ = G;
-	  *d++ = B;
-	  *d++ = 0xff;
-	}
+          int R = (Y + 1.402f*(V-128));
+          int G = (Y - 0.334f*(U-128) - 0.714f*(V-128));
+          int B = (Y + 1.772f*(U-128));
+          *pixels++ = R;
+          *pixels++ = G;
+          *pixels++ = B;
+          *pixels++ = 0xff;
+        }
 
-      _texture->Blit (ti.pic_x,ti.pic_y,ti.pic_width,ti.pic_height,(unsigned char *)pixels);
-      delete pixels;
+        _texture->ApplyBlitBuffer (pixels);
     }
     else
       csReport(object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
-	       "The Theora video stream has an unsupported pixel format.\n");
+      "The Theora video stream has an unsupported pixel format.\n");
   }
 
   if (videobuf_ready)
