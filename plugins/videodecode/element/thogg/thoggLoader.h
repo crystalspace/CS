@@ -15,6 +15,7 @@ You should have received a copy of the GNU Library General Public
 License along with this library; if not, write to the Free
 Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #ifndef __THOGGLOADER_H__
 #define __THOGGLOADER_H__
 
@@ -24,14 +25,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <ivideodecode/media.h>
 #include <csutil/scf_implementation.h>
 #include "thoggMediaContainer.h"
-#include "thoggVideoMedia.h"
-#include "thoggAudioMedia.h"
 #include <csutil/nobjvec.h>
 
-
-#include "theora/theora.h"
 #include "vorbis/codec.h"
-
 
 
 #define QUALIFIED_PLUGIN_NAME "crystalspace.vpl.element.thogg"

@@ -2,8 +2,8 @@
 #include "vplLoader.h"
 #include <iutil/objreg.h>
 #include <iutil/plugin.h>
-
 #include <iostream>
+
 using namespace std;
 
 SCF_IMPLEMENT_FACTORY (vplLoader)
@@ -44,20 +44,19 @@ csRef<iMediaContainer> vplLoader::LoadMedia (const char * pFileName, const char 
       }
     }
   }
-  else
-    if (strcmp (pMediaType,"TheoraVideo") == 0)
+  else if (strcmp (pMediaType,"TheoraVideo") == 0)
+  {
+    csRef<iMediaContainer> data;
+    if (m_pThOggLoader)
     {
-      csRef<iMediaContainer> data;
-      if (m_pThOggLoader)
+      data=m_pThOggLoader->LoadMedia (pFileName,pDescription,pMediaType);
+      if (data.IsValid ())
       {
-        data=m_pThOggLoader->LoadMedia (pFileName,pDescription,pMediaType);
-        if (data.IsValid ())
-        {
-          return data;
-        }
+        return data;
       }
     }
+  }
 
-    return NULL;
+  return NULL;
 }
 

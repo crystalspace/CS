@@ -6,7 +6,6 @@
 
 SCF_IMPLEMENT_FACTORY (TheoraMediaContainer)
 
-
 TheoraMediaContainer::TheoraMediaContainer (iBase* parent) :
 scfImplementationType (this, parent),
 object_reg(0)
@@ -53,6 +52,7 @@ const char* TheoraMediaContainer::GetDescription ()
 {
   return 0;
 }
+
 void TheoraMediaContainer::AddMedia (csRef<iMedia> media)
 {
   this->media.Push (media);
@@ -69,6 +69,7 @@ void TheoraMediaContainer::SetActiveStream (size_t index)
       activeStreams[i]=index;
     }
   }
+
   if (!found)
     activeStreams.Push (index);
 }
@@ -108,14 +109,15 @@ void TheoraMediaContainer::Update ()
       {
         QueuePage (&og);
       }
+
     }
   }
 }
+
 void TheoraMediaContainer::QueuePage (ogg_page *page)
 {
   // If there are no active stream (i.e. the video file is currently being loaded), 
   // queue the page to every stream
-
   if (activeStreams.GetSize () == 0)
   {
     for (uint i=0;i<media.GetSize();i++)
@@ -131,7 +133,7 @@ void TheoraMediaContainer::QueuePage (ogg_page *page)
           res = ogg_stream_pagein (& buff->to ,page);
         }
       }
-      if( strcmp (media[i]->GetType (),"TheoraAudio")==0)
+      if (strcmp (media[i]->GetType (),"TheoraAudio")==0)
       {
         csRef<iAudioMedia> media = scfQueryInterface<iAudioMedia> (this->GetMedia (i) ); 
         if (media.IsValid ()) 
@@ -143,13 +145,14 @@ void TheoraMediaContainer::QueuePage (ogg_page *page)
         }
       }
     }
+
   }
   // Otherwise, queue the page only to the active streams
   else
   {
     for (uint i=0;i<activeStreams.GetSize();i++)
     {
-      if ( strcmp (media[activeStreams[i]]->GetType (),"TheoraVideo")==0)
+      if (strcmp (media[activeStreams[i]]->GetType (),"TheoraVideo")==0)
       {
         csRef<iVideoMedia> media = scfQueryInterface<iVideoMedia> (this->GetMedia (activeStreams[i]) ); 
         if (media.IsValid ()) 
@@ -162,7 +165,7 @@ void TheoraMediaContainer::QueuePage (ogg_page *page)
         }
 
       }
-      if ( strcmp (media[activeStreams[i]]->GetType (),"TheoraAudio")==0)
+      if (strcmp (media[activeStreams[i]]->GetType (),"TheoraAudio")==0)
       {
         csRef<iAudioMedia> media = scfQueryInterface<iAudioMedia> (this->GetMedia (activeStreams[i]) ); 
         if (media.IsValid ()) 
@@ -176,6 +179,7 @@ void TheoraMediaContainer::QueuePage (ogg_page *page)
         }
       }
     }
+
   }
 }
 
@@ -191,11 +195,12 @@ bool TheoraMediaContainer::Eof ()
 {
   return endOfFile;
 }
+
 void TheoraMediaContainer::Seek (float time)
 {
   // Seeking is triggered and will be executed at the beginning of
   // the next update
-  if(time<0)
+  if (time<0)
   {
     timeToSeek=0;
   }
@@ -214,7 +219,7 @@ void TheoraMediaContainer::DoSeek ()
   int videoIndex=-1;
   for (size_t i=0;i<activeStreams.GetSize ();i++)
   {
-    if ( strcmp (media[activeStreams[i]]->GetType (), "TheoraVideo")==0)
+    if (strcmp (media[activeStreams[i]]->GetType (), "TheoraVideo")==0)
     {
       hasVideo=true;
       videoIndex=activeStreams[i];
@@ -230,7 +235,7 @@ void TheoraMediaContainer::DoSeek ()
 
   // If a video stream is present, seek
   csRef<TheoraVideoMedia> vidStream;
-  if ( strcmp (media[videoIndex]->GetType (),"TheoraVideo")==0)
+  if (strcmp (media[videoIndex]->GetType (),"TheoraVideo")==0)
   {
     csRef<iVideoMedia> media = scfQueryInterface<iVideoMedia> (this->GetMedia (videoIndex) ); 
     if (media.IsValid ()) 
@@ -259,7 +264,7 @@ void TheoraMediaContainer::DoSeek ()
 
   for (size_t i=0;i<activeStreams.GetSize ();i++)
   {
-    if ( strcmp (media[activeStreams[i]]->GetType (),"TheoraAudio") ==0)
+    if (strcmp (media[activeStreams[i]]->GetType (),"TheoraAudio") ==0)
     {
       csRef<iAudioMedia> media = scfQueryInterface<iAudioMedia> (this->GetMedia (i) ); 
       if (media.IsValid ()) 
@@ -270,6 +275,7 @@ void TheoraMediaContainer::DoSeek ()
       }
     }
   }
+
   //cout<<"seeked to: "<<frame<<' '<<time<<endl;
 }
 
@@ -281,16 +287,18 @@ void TheoraMediaContainer::AutoActivateStreams ()
     {
       bool ok = true;
 
-      for(size_t j=0;j<activeStreams.GetSize ();j++)
+      for (size_t j=0;j<activeStreams.GetSize ();j++)
       {
         if( strcmp(media[i]->GetType (), media[activeStreams[j]]->GetType ())==0)
         {
           ok = false;
         }
       }
-      if(ok)
+
+      if (ok)
         SetActiveStream (i);
     }
+
   }
 }
 
@@ -298,22 +306,24 @@ void TheoraMediaContainer::SetTargetTexture (csRef<iTextureHandle> &target)
 {
   for (size_t i =0;i<activeStreams.GetSize ();i++)
   {
-    if( strcmp("TheoraVideo",media[activeStreams[i]]->GetType ())==0)
+    if (strcmp("TheoraVideo",media[activeStreams[i]]->GetType ())==0)
     {
       csRef<iVideoMedia> video = scfQueryInterface<iVideoMedia>(media[activeStreams[i]]); 
-      if(video.IsValid()) 
+      if (video.IsValid()) 
       {
         video->SetVideoTarget (target);
       }
     }
   }
+
 }
+
 float TheoraMediaContainer::GetPosition ()
 {
   float position = 0;
   for (size_t i =0;i<activeStreams.GetSize ();i++)
   {
-    if( strcmp("TheoraVideo",media[activeStreams[i]]->GetType ())==0)
+    if (strcmp("TheoraVideo",media[activeStreams[i]]->GetType ())==0)
     {
       position = media[activeStreams[i]]->GetPosition ();
     }
@@ -321,12 +331,13 @@ float TheoraMediaContainer::GetPosition ()
 
   return position;
 }
+
 float TheoraMediaContainer::GetLength ()
 {
   float length = 0;
   for (size_t i =0;i<activeStreams.GetSize ();i++)
   {
-    if( strcmp("TheoraVideo",media[activeStreams[i]]->GetType ())==0)
+    if (strcmp("TheoraVideo",media[activeStreams[i]]->GetType ())==0)
     {
       length = media[activeStreams[i]]->GetLength ();
     }

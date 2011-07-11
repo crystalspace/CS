@@ -24,17 +24,12 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include <iutil/comp.h>
-#include <ivideodecode/medialoader.h>
 #include <ivideodecode/mediacontainer.h>
-#include <ivideodecode/media.h>
 #include <csutil/scf_implementation.h>
 #include <csutil/refarr.h>
 #include <csutil/array.h>
 
-
-#include "theora/theora.h"
 #include "vorbis/codec.h"
-
 #include "thoggVideoMedia.h"
 #include "thoggAudioMedia.h"
 
@@ -74,56 +69,28 @@ public:
   // From iComponent.
   virtual bool Initialize (iObjectRegistry*);
 
-
   virtual size_t GetMediaCount ();
-
   virtual csRef<iMedia> GetMedia (size_t index);
-
   virtual const char* GetDescription ();
   virtual void SetDescription (const char* pDescription)
-  {
-    this->pDescription=pDescription;
-  }
-
+    { this->pDescription=pDescription; }
   void AddMedia (csRef<iMedia> media);
-
-
   virtual void SetTargetTexture (csRef<iTextureHandle> &target) ;
-
   virtual void SetActiveStream (size_t index);
-
   virtual bool RemoveActiveStream (size_t index);
-
   virtual void Update ();
-
   virtual bool Eof ();
-
   virtual void Seek (float time) ;
-
   virtual void AutoActivateStreams () ;
-
   virtual float GetPosition () ;
-
   virtual float GetLength () ;
 
   /// Does a seek on the active media
   void DoSeek ();
-
   void QueuePage (ogg_page *page);
-
-  void ClearMedia()
-  {
-    media.Empty ();
-  }
-  unsigned long GetFileSize ()
-  {
-    return mSize;
-  }
-  void SetFileSize (unsigned long size)
-  {
-    mSize=size;
-  }
-
+  void ClearMedia()  { media.Empty (); }
+  unsigned long GetFileSize ()  { return mSize; }
+  void SetFileSize (unsigned long size)  { mSize=size; }
 };
 
 /** @} */

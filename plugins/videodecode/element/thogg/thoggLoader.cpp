@@ -2,7 +2,6 @@
 #include "thoggLoader.h"
 #include <iutil/objreg.h>
 #include <iutil/plugin.h>
-
 #include <iostream>
 using namespace std;
 
@@ -98,11 +97,9 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
       ogg_stream_packetout (&test,&op);
 
       /* identify the codec: try theora */
-
       if (th_decode_headerin(&ti,&tc,&ts,&op)>=0)
       {
         // it is theora 
-
         csRef<TheoraVideoMedia> videoStream;
         videoStream.AttachNew ( new TheoraVideoMedia ( (iBase*)this));
 
@@ -117,7 +114,6 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
         videoStream->infile = infile;
 
         //create an empty texture for this video stream
-
         csPtr<iTextureHandle> test = texManager->CreateTexture 
           (ti.frame_width,ti.frame_height,0,csimg2D,"rgb8",
           CS_TEXTURE_2D|CS_TEXTURE_NPOTS);
@@ -130,17 +126,15 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
 
         foundVideo=true;
 
-
         //reinitialize Theora structures for next stream, if there is one
         th_comment_init (&tc);
         th_info_init (&ti);
-
-      }else
+      }
+      else
         if (/*(got_packet==1) &&  (vorbis_processing_headers=*/ 
-          (vorbis_synthesis_headerin(&vi,&vc,&op))>=0)
+           (vorbis_synthesis_headerin(&vi,&vc,&op))>=0)
         {
           // it is vorbis 
-
           csRef<TheoraAudioMedia> audioStream;
           audioStream.AttachNew ( new TheoraAudioMedia ( (iBase*)this));
 
@@ -152,21 +146,21 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
 
           audioStream->decodersStarted = false;
 
-
           //printf("found audio stream!\n");
           container->AddMedia (audioStream);
-
 
           //reinitialize Vorbis structures for next stream, if there is one
           vorbis_info_init(&vi);
           vorbis_comment_init(&vc);
-        }else
+        }
+        else
         {
           //cout<<"other stream detected!\n";
           /* whatever it is, we don't care about it */
           ogg_stream_clear(&test);
         }
     }
+
   }
 
   /// if there isn't a Theora video stream in the file, we don't care anymore
@@ -188,7 +182,7 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
   while (times!=container->GetMediaCount())
   {
     int ret;
-    for(uint i=0;i<container->GetMediaCount();i++)
+    for (uint i=0;i<container->GetMediaCount();i++)
     {
       // Read extra headers for video
       if (strcmp (container->GetMedia (i)->GetType (), "TheoraVideo")==0)
@@ -198,7 +192,7 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
         { 
           csRef<TheoraVideoMedia> buff = static_cast<TheoraVideoMedia*> ( (iVideoMedia*)media);
 
-          while(buff->theora_p && (buff->theora_p<3) && (ret=ogg_stream_packetpeek (&buff->to,&op)))
+          while (buff->theora_p && (buff->theora_p<3) && (ret=ogg_stream_packetpeek (&buff->to,&op)))
           {
             if (ret<0)
             {
@@ -222,10 +216,11 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
               break;
             }
           }
+
         }
       }
       // Read extra headers for audio
-      if( strcmp (container->GetMedia(i)->GetType(), "TheoraAudio") == 0)
+      if (strcmp (container->GetMedia(i)->GetType(), "TheoraAudio") == 0)
       {
         csRef<iAudioMedia> media = scfQueryInterface<iAudioMedia> (container->GetMedia (i)); 
         if (media.IsValid ()) 
@@ -270,10 +265,8 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
     }
   }
 
-
   //Compute the length in seconds and frame count (where applicable) of the streams
   ComputeStreamLength (container);
-
 
   //In order to get everything back in order, we need to reparse the headers
   //Streams aren't recreated, but we need to get the sync state in the proper position
@@ -281,7 +274,6 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
   ts=0;
 
   /* Parse the headers */
-
   while (!stateflag)
   {
     int ret=BufferData (&oy);
@@ -309,6 +301,7 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
       ogg_stream_clear (&test);
     }
   }
+
   /// Next, parse secondary headers.
   times=0;
   while (times!=container->GetMediaCount ())
@@ -331,6 +324,7 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
         }
       }
     }
+
   }
 
   //copy the ogg sync state to the container
@@ -343,7 +337,7 @@ void thoggLoader::ComputeStreamLength (csRef<TheoraMediaContainer> container)
 {
   for (size_t i=0;i<container->GetMediaCount ();i++)
   {
-    if ( strcmp (container->GetMedia (i)->GetType (), "TheoraVideo")==0)
+    if (strcmp (container->GetMedia (i)->GetType (), "TheoraVideo")==0)
     {
       csRef<iVideoMedia> media = scfQueryInterface<iVideoMedia> (container->GetMedia (i)); 
       if (media.IsValid ()) 
@@ -366,7 +360,7 @@ void thoggLoader::ComputeStreamLength (csRef<TheoraMediaContainer> container)
           ogg_sync_wrote (&oy, bytesRead );
           ogg_sync_pageseek (&oy,&og);
 
-          while (1)
+          while (true)
           {
             int ret=ogg_sync_pageout (&oy, &og);
             if (ret == 0) break;
@@ -380,11 +374,11 @@ void thoggLoader::ComputeStreamLength (csRef<TheoraMediaContainer> container)
               mNumFrames= (unsigned long) th_granule_frame (buff->td,granule)+1;
             }
           }
+
           if (mDuration > 0) break;
-
         }
-        cout<<"Media file duration: "<<mDuration<<" Frame count: "<<mNumFrames<<endl;
 
+        cout<<"Media file duration: "<<mDuration<<" Frame count: "<<mNumFrames<<endl;
 
         buff->SetLength (mDuration);
         buff->SetFrameCount (mNumFrames);
@@ -393,7 +387,7 @@ void thoggLoader::ComputeStreamLength (csRef<TheoraMediaContainer> container)
         fseek (infile,0,SEEK_SET);
       }
     }
-    if ( strcmp (container->GetMedia (i)->GetType (),"TheoraAudio")==0 )
+    if (strcmp (container->GetMedia (i)->GetType (),"TheoraAudio")==0 )
     {
       csRef<iAudioMedia> media2 = scfQueryInterface<iAudioMedia> (container->GetMedia(i)); 
       if (media2.IsValid ()) 
@@ -414,7 +408,7 @@ void thoggLoader::ComputeStreamLength (csRef<TheoraMediaContainer> container)
           ogg_sync_wrote (&oy, bytesRead );
           ogg_sync_pageseek (&oy,&og);
 
-          while (1)
+          while (true)
           {
             int ret=ogg_sync_pageout ( &oy, &og );
             if (ret == 0) break;
@@ -428,11 +422,11 @@ void thoggLoader::ComputeStreamLength (csRef<TheoraMediaContainer> container)
               // mNumFrames=(unsigned long) th_granule_frame(&buff->vd,granule)+1;
             }
           }
+
           if (mDuration > 0) break;
-
         }
-        cout<<"Audio duration: "<<mDuration<<endl;
 
+        cout<<"Audio duration: "<<mDuration<<endl;
 
         buff->SetLength (mDuration);
 
@@ -441,6 +435,7 @@ void thoggLoader::ComputeStreamLength (csRef<TheoraMediaContainer> container)
       }
     }
   }
+
 }
 
 bool thoggLoader::Initialize (iObjectRegistry* r)
@@ -462,10 +457,8 @@ csRef<iMediaContainer> thoggLoader::LoadMedia (const char * pFileName, const cha
 
   infile = fopen(pFileName,"rb");
 
-
-
   /// checking if the file exists
-  if(infile==NULL)
+  if (infile==NULL)
   {
     csReport(object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
       "Unable to open '%s' for playback.\n", pFileName);
@@ -479,18 +472,12 @@ csRef<iMediaContainer> thoggLoader::LoadMedia (const char * pFileName, const cha
     container->Initialize (object_reg);
 
     bool res=false;
-
     res = StartParsing(container);
-    if (res)
-    {
-
-      container->SetDescription (pDescription);
-    }
 
     if (!res)
-    {
       return NULL;
-    }
+
+    container->SetDescription (pDescription);
     return container;
   }
 }

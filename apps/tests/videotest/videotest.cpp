@@ -126,12 +126,11 @@ bool VideoTest::Application ()
 
   //Get the path of the video we want to load
   csRef<iDataBuffer> path;
-  path = vfs->GetRealPath ("vid420.ogg");
+  path = vfs->GetRealPath ("vid422.ogg");
 
   // Get the loader and load the video
   csRef<iMediaLoader> vlpLoader = csQueryRegistry<iMediaLoader> (object_reg);
   csRef<iMediaContainer> video = vlpLoader->LoadMedia(path->GetData ());
-
 
   if (video.IsValid ())
   {

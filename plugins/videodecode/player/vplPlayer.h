@@ -15,13 +15,13 @@ You should have received a copy of the GNU Library General Public
 License along with this library; if not, write to the Free
 Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #ifndef __VPLPLAYER_H__
 #define __VPLPLAYER_H__
 
 #include <iutil/comp.h>
 #include <ivideodecode/mediaplayer.h>
 #include <ivideodecode/mediacontainer.h>
-#include <ivideodecode/media.h>
 #include <csutil/scf_implementation.h>
 
 struct iObjectRegistry;
@@ -51,29 +51,17 @@ public:
   virtual bool Initialize (iObjectRegistry*);
 
   virtual void InitializePlayer (csRef<iMediaContainer> media) ;
-
   virtual void SetActiveStream (int index) ;
-
   virtual void RemoveActiveAudioStream (int index) ;
-
   virtual void SetTargetTexture (csRef<iTextureHandle> &target) ;
-
   virtual void Update ();
-
   virtual void Loop (bool shouldLoop) ;
-
   virtual void Play () ;
-
   virtual void Pause() ;
-
   virtual void Stop () ;
-
   virtual void Seek (float time) ;
-
   virtual float GetPosition () ;
-
   virtual bool IsPlaying () ;
-
   virtual float GetLength () ;
 };
 

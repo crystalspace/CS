@@ -15,13 +15,13 @@ You should have received a copy of the GNU Library General Public
 License along with this library; if not, write to the Free
 Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #ifndef __VPLLOADER_H__
 #define __VPLLOADER_H__
 
 #include <iutil/comp.h>
 #include <ivideodecode/medialoader.h>
 #include <ivideodecode/mediacontainer.h>
-#include <ivideodecode/media.h>
 #include <csutil/scf_implementation.h>
 
 struct iObjectRegistry;
@@ -44,7 +44,6 @@ public:
 
   // From iComponent.
   virtual bool Initialize (iObjectRegistry*);
-
 
   virtual csRef<iMediaContainer> LoadMedia (const char * pFileName, const char *pDescription=0, const char* pMediaType = "AutoDetect");
 };

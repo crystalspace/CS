@@ -2,8 +2,8 @@
 #include "vplPlayer.h"
 #include <iutil/objreg.h>
 #include <iutil/plugin.h>
-
 #include <iostream>
+
 using namespace std;
 
 
@@ -31,8 +31,8 @@ bool vplPlayer::Initialize (iObjectRegistry* r)
 void vplPlayer::InitializePlayer (csRef<iMediaContainer> media)
 {
   if (!media.IsValid())
-    csReport(object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
-    "Media container is not valid!");
+    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
+              "Media container is not valid!");
   else
     _mediaFile = media;
 }
@@ -123,6 +123,7 @@ bool vplPlayer::IsPlaying ()
 {
   return _playing;
 }
+
 float vplPlayer::GetLength ()
 {
   return _mediaFile->GetLength ();

@@ -6,7 +6,6 @@
 
 SCF_IMPLEMENT_FACTORY (TheoraAudioMedia)
 
-
 TheoraAudioMedia::TheoraAudioMedia (iBase* parent) :
 scfImplementationType (this, parent),
 object_reg(0)
@@ -16,6 +15,7 @@ object_reg(0)
 TheoraAudioMedia::~TheoraAudioMedia ()
 {
 }
+
 void TheoraAudioMedia::CleanMedia ()
 {
   ogg_stream_clear(&vo);
@@ -36,14 +36,15 @@ bool TheoraAudioMedia::Initialize (iObjectRegistry* r)
   object_reg = r;
 
   // initialize the decoders
-  if(vorbis_p)
+  if (vorbis_p)
   {
     vorbis_synthesis_init(&vd,&vi);
     vorbis_block_init(&vd,&vb);
     printf("Ogg logical stream %ld is Vorbis %d channel %ld Hz audio.\n",
       vo.serialno,vi.channels,vi.rate);
     decodersStarted = true;
-  }else
+  }
+  else
   {
     /* tear down the partial vorbis setup */
     vorbis_info_clear(&vi);
@@ -82,18 +83,18 @@ double TheoraAudioMedia::GetPosition ()
 int TheoraAudioMedia::Update ()
 {
   audiobuf_ready=false;
-  while(vorbis_p && !audiobuf_ready)
+  while (vorbis_p && !audiobuf_ready)
   {
     float **pcm;
     int ret=vorbis_synthesis_pcmout(&vd,&pcm);
 
     /* if there's pending, decoded audio, grab it */
-    if(ret>0)
+    if (ret>0)
     {
       int i,j;
 //      int count=0;
-      for(i=0;i<ret && i<(256/vi.channels);i++)
-        for(j=0;j<vi.channels;j++)
+      for (i=0;i<ret && i<(256/vi.channels);i++)
+        for (j=0;j<vi.channels;j++)
         {
           int val=(int)(pcm[j][i]*32767.f);
           if(val>32767)
@@ -104,19 +105,22 @@ int TheoraAudioMedia::Update ()
         }
         audiobuf_ready=1;
         vorbis_synthesis_read(&vd,i);
-    }else
+    }
+    else
     {
       /* no pending audio; is there a pending packet to decode? */
-      if(ogg_stream_packetout(&vo,&op)>0)
+      if (ogg_stream_packetout(&vo,&op)>0)
       {
-        if(vorbis_synthesis(&vb,&op)==0) /* test for success! */
+        if (vorbis_synthesis(&vb,&op)==0) /* test for success! */
           vorbis_synthesis_blockin(&vd,&vb);
-      }else   /* we need more data; break out to suck in another page */
+      }
+      else   /* we need more data; break out to suck in another page */
         break;
     }
 
   }
-  if(audiobuf_ready)
+
+  if (audiobuf_ready)
   {
     //cout<<vorbis_granule_time (&vd,ogg_page_granulepos (og))<<endl;
     return 0;
@@ -134,7 +138,7 @@ void TheoraAudioMedia::Seek(float time, ogg_sync_state *oy,ogg_page *op,ogg_stre
   // let's decode some pages and seek to the appropriate PCM sample
   ogg_int64_t granule=0;
   float last_page_time=time;
-  for (;;)
+  while (true)
   {
     int ret=ogg_sync_pageout( oy, op );
     if (ret == 1)
@@ -166,4 +170,5 @@ void TheoraAudioMedia::Seek(float time, ogg_sync_state *oy,ogg_page *op,ogg_stre
       ogg_sync_wrote( oy, bytesRead );
     }
   }
+
 }
