@@ -58,6 +58,18 @@ namespace CS
           IsReferenceHelper1 (Wrap<T>()))) == 1;
       };
 
+      template <class T> T*(* IsPointerHelper1(Wrap<T>) )(Wrap<T>);
+      char IsPointerHelper1(...);
+
+      template <class T> NoType IsPointerHelper2(T*(*)(Wrap<T>));
+      YesType IsPointerHelper2(...);
+
+      template <class T>
+      struct IsPointerImpl
+      {
+        static const bool value = sizeof(IsPointerHelper2 (
+          IsPointerHelper1 (Wrap<T>()))) == 1;
+      };
 
       template <bool b1, bool b2, bool b3 = true, bool b4 = true, bool b5 = true, 
                 bool b6 = true, bool b7 = true>
@@ -139,6 +151,16 @@ namespace CS
     };
 
     /**
+     * Check if Type is a pointer or simple type.
+     */
+    template <class Type>
+    struct IsPointer
+    {
+      static const bool value = CS::Meta::Implementation
+	::IsPointerImpl<Type>::value;
+    };
+
+    /**
      * Check if two types are the same.
      */
     template <class Type1, class Type2>
@@ -155,7 +177,7 @@ namespace CS
     struct IsBaseOf
     {
       static const bool value = CS::Meta::Implementation
-        ::IsBaseOfImpl<Type1, Type2>::value;
+    ::IsBaseOfImpl<Type1, Type2>::value;
     };
   } // namespace TypeTraits
 
