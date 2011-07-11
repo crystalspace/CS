@@ -1,6 +1,7 @@
 SubDir TOP apps tests videotest ;
 
 if $(CEGUI.AVAILABLE) = "yes"
+  && $(THEORADEC.AVAILABLE) = "yes" && $(VORBIS.AVAILABLE) = "yes"
 {
 Description videotest : "Video Decode Test" ;
 Application videotest : [ Wildcard *.cpp *.h ] : console noinstall ;

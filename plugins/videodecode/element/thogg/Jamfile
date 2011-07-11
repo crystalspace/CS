@@ -1,15 +1,9 @@
 SubDir TOP plugins videodecode element thogg ;
 
-Description thogg : "thogg video decode" ;
-Plugin thogg : [ Wildcard *.cpp *.h ] ;
-LinkWith thogg : crystalspace ;
-
-if $(VORBISFILE.AVAILABLE) = "yes"
+if $(THEORADEC.AVAILABLE) = "yes" && $(VORBIS.AVAILABLE) = "yes"
 {
-ExternalLibs thogg : VORBISFILE ;
-}
-
-if $(THEORA.AVAILABLE) = "yes"
-{
-ExternalLibs thogg : THEORA ;
+  Description thogg : "theora-ogg video decoder" ;
+  Plugin thogg : [ Wildcard *.cpp *.h ] ;
+  LinkWith thogg : crystalspace ;
+  ExternalLibs thogg : THEORADEC VORBIS ;
 }
