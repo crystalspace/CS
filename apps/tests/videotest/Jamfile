@@ -1,0 +1,13 @@
+SubDir TOP apps tests videotest ;
+
+if $(CEGUI.AVAILABLE) = "yes"
+{
+Description videotest : "Video Decode Test" ;
+Application videotest : [ Wildcard *.cpp *.h ] : console noinstall ;
+LinkWith videotest : crystalspace ;
+CFlags videotest : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+LinkWith videotest : crystalspace ;
+ExternalLibs videotest : CEGUI ;
+FileListEntryApplications videotest : app-demo ;
+}
+
