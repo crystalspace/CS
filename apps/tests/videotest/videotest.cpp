@@ -232,13 +232,10 @@ bool VideoTest::CreateScene ()
 {
   printf ("Creating level...\n");
 
-  // Load the texture from the standard library.  This is located in
-  // CS/data/standard.zip and mounted as /lib/std using the Virtual
-  // File System (VFS) plugin.
-  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-    ReportError ("Error loading %s texture!",
-    CS::Quote::Single ("stone4"));
-  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
+  // Create a MaterialWrapper from the video texture
+  iTextureList* texList = engine->GetTextureList();
+  iTextureWrapper* texWrapper = texList->NewTexture (logoTex);
+  iMaterialWrapper* vidMaterial = engine->CreateMaterial ("vidMaterial",texWrapper);
 
   // We create a new sector called "room".
   room = engine->CreateSector ("room");
@@ -256,7 +253,9 @@ bool VideoTest::CreateScene ()
   // Now we make a factory and a mesh at once.
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
     engine, room, "walls", "walls_factory", &box);
-  walls->GetMeshObject ()->SetMaterialWrapper (tm);
+
+  // Set the material to each wall of the room
+  walls->GetMeshObject ()->SetMaterialWrapper (vidMaterial);
 
   // Now we need light to see something.
   csRef<iLight> light;
