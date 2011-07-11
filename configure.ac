@@ -1275,6 +1275,19 @@ AS_IF([test "$cs_cv_libvorbis" = yes],
 
 
 #------------------------------------------------------------------------------
+# Check for the Theora Video Compression Codec decoder library
+#------------------------------------------------------------------------------
+CS_NOTABLE([theoradec], [image], [], [$cs_cv_libtheoradec],
+    [CS_CHECK_LIB_WITH([theoradec],
+	[AC_LANG_PROGRAM(
+	    [[#include <theora/codec.h>]],
+	    [th_comment tc; th_comment_init (&tc);])],
+    	    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libtheoradec], [THEORADEC])],
+	[], [], [], [], [libtheoradec])])
+
+
+
+#------------------------------------------------------------------------------
 # Check for Speex.  In addition to the standard installed locations, we
 # also search CS/libs/libspeex*
 #------------------------------------------------------------------------------
