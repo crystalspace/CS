@@ -572,6 +572,8 @@ CONFIG_LIB3DS_120
 CONFIG_LIB3DS
 CONFIG_3DS
 CONFIG_SPEEX
+CONFIG_LIBTHEORADEC
+CONFIG_THEORADEC
 CONFIG_VORBISFILE
 CONFIG_VORBIS
 CONFIG_OGG
@@ -763,6 +765,7 @@ with_vgvm
 with_ogg
 with_vorbis
 with_vorbisfile
+with_theoradec
 with_speex
 with_3ds
 with_ode
@@ -1571,6 +1574,9 @@ Optional Packages:
                           not detected automatically; directories searched
                           include dir/include, dir/lib, and dir
   --with-vorbisfile=dir   specify additional location to search libvorbisfile
+                          if not detected automatically; directories searched
+                          include dir/include, dir/lib, and dir
+  --with-theoradec=dir    specify additional location to search libtheoradec
                           if not detected automatically; directories searched
                           include dir/include, dir/lib, and dir
   --with-speex=dir        specify additional location to search libspeex if
@@ -45608,6 +45614,1107 @@ fi
 fi
 fi
 fi
+
+
+
+#------------------------------------------------------------------------------
+# Check for the Theora Video Compression Codec decoder library
+#------------------------------------------------------------------------------
+
+# Check whether --with-theoradec was given.
+if test "${with_theoradec+set}" = set; then :
+  withval=$with_theoradec;
+fi
+
+
+    # Backward compatibility: Recognize --with-libtheoradec as alias for --with-theoradec.
+    if test -n "$with_libtheoradec" &&
+           test -z "$with_theoradec"; then :
+  with_theoradec="$with_libtheoradec"
+fi
+
+    if test -z "$with_theoradec"; then :
+  with_theoradec=yes
+fi
+    if test "$with_theoradec" != no; then :
+
+	# If --with-theoradec value is same as cached value, then assume other
+	 # cached values are also valid; otherwise, ignore all cached values.
+	if test "$with_theoradec" != "$cs_cv_with_theoradec"; then :
+  cs_ignore_cache=yes
+else
+  cs_ignore_cache=no
+fi
+
+	# Put relevant subdirs of the library directory into PATH and PKGCONFIG
+	PATH_SAVE="$PATH"
+	if test $with_theoradec != yes; then :
+  PATH="$with_theoradec/bin$PATH_SEPARATOR$PATH"
+	    PKG_CONFIG_PATH_SAVE_1="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="/usr/local/lib/pkgconfig$PATH_SEPARATOR/sw/lib/pkgconfig$PATH_SEPARATOR/opt/local/lib/pkgconfig$PATH_SEPARATOR/opt/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$with_theoradec$PATH_SEPARATOR$with_theoradec/lib/pkgconfig$PATH_SEPARATOR$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH
+fi
+
+	cs_check_lib_flags=''
+	if test "$cs_prog_pkg_config_checked" != yes; then :
+
+    if test "$cs_prog_path_prepared" != yes; then :
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin"
+	export PATH
+fi
+    if test -n "$ac_tool_prefix"; then
+  for ac_prog in pkg-config
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_prog_PKG_CONFIG+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$PKG_CONFIG"; then
+  ac_cv_prog_PKG_CONFIG="$PKG_CONFIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_PKG_CONFIG="$ac_tool_prefix$ac_prog"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+PKG_CONFIG=$ac_cv_prog_PKG_CONFIG
+if test -n "$PKG_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PKG_CONFIG" >&5
+$as_echo "$PKG_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+    test -n "$PKG_CONFIG" && break
+  done
+fi
+if test -z "$PKG_CONFIG"; then
+  ac_ct_PKG_CONFIG=$PKG_CONFIG
+  for ac_prog in pkg-config
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_prog_ac_ct_PKG_CONFIG+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$ac_ct_PKG_CONFIG"; then
+  ac_cv_prog_ac_ct_PKG_CONFIG="$ac_ct_PKG_CONFIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_ac_ct_PKG_CONFIG="$ac_prog"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+ac_ct_PKG_CONFIG=$ac_cv_prog_ac_ct_PKG_CONFIG
+if test -n "$ac_ct_PKG_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_ct_PKG_CONFIG" >&5
+$as_echo "$ac_ct_PKG_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$ac_ct_PKG_CONFIG" && break
+done
+
+  if test "x$ac_ct_PKG_CONFIG" = x; then
+    PKG_CONFIG=""
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    PKG_CONFIG=$ac_ct_PKG_CONFIG
+  fi
+fi
+
+	cs_prog_pkg_config_checked=yes
+fi
+    if test -z "$cs_cv_prog_pkg_config_ok"; then :
+  if test -n "$PKG_CONFIG"; then :
+  if $PKG_CONFIG --atleast-pkgconfig-version=0.9.0; then :
+  cs_cv_prog_pkg_config_ok=yes
+else
+  cs_cv_prog_pkg_config_ok=no
+fi
+else
+  cs_cv_prog_pkg_config_ok=no
+fi
+fi
+    if test $cs_cv_prog_pkg_config_ok = yes; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if $PKG_CONFIG recognizes theoradec" >&5
+$as_echo_n "checking if $PKG_CONFIG recognizes theoradec... " >&6; }
+if test "${cs_cv_prog_pkg_config_theoradec+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if $PKG_CONFIG --exists theoradec; then :
+  cs_cv_prog_pkg_config_theoradec=yes
+else
+  cs_cv_prog_pkg_config_theoradec=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $cs_cv_prog_pkg_config_theoradec" >&5
+$as_echo "$cs_cv_prog_pkg_config_theoradec" >&6; }
+	if test $cs_cv_prog_pkg_config_theoradec = yes; then :
+  if test -z "$cs_cv_prog_pkg_config_theoradec_flags"; then :
+  cs_check_lib_cflag=`{ { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --cflags theoradec"; } >&5
+  ($PKG_CONFIG --cflags theoradec) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
+	cs_check_lib_lflag=''
+	cs_check_lib_libs=`{ { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --libs theoradec"; } >&5
+  ($PKG_CONFIG --libs theoradec) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_pkg_config_theoradec_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
+fi
+    cs_check_lib_flags="$cs_check_lib_flags $cs_cv_prog_pkg_config_theoradec_flags"
+fi
+fi
+
+    if test "$cs_prog_path_prepared" != yes; then :
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin"
+	export PATH
+fi
+    if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}theoradec-config", so it can be a program name with args.
+set dummy ${ac_tool_prefix}theoradec-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_path_CONFIG_THEORADEC+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $CONFIG_THEORADEC in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_CONFIG_THEORADEC="$CONFIG_THEORADEC" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_CONFIG_THEORADEC="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+CONFIG_THEORADEC=$ac_cv_path_CONFIG_THEORADEC
+if test -n "$CONFIG_THEORADEC"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CONFIG_THEORADEC" >&5
+$as_echo "$CONFIG_THEORADEC" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+fi
+if test -z "$ac_cv_path_CONFIG_THEORADEC"; then
+  ac_pt_CONFIG_THEORADEC=$CONFIG_THEORADEC
+  # Extract the first word of "theoradec-config", so it can be a program name with args.
+set dummy theoradec-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_path_ac_pt_CONFIG_THEORADEC+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $ac_pt_CONFIG_THEORADEC in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_ac_pt_CONFIG_THEORADEC="$ac_pt_CONFIG_THEORADEC" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_ac_pt_CONFIG_THEORADEC="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+ac_pt_CONFIG_THEORADEC=$ac_cv_path_ac_pt_CONFIG_THEORADEC
+if test -n "$ac_pt_CONFIG_THEORADEC"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_pt_CONFIG_THEORADEC" >&5
+$as_echo "$ac_pt_CONFIG_THEORADEC" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+  if test "x$ac_pt_CONFIG_THEORADEC" = x; then
+    CONFIG_THEORADEC=""
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    CONFIG_THEORADEC=$ac_pt_CONFIG_THEORADEC
+  fi
+else
+  CONFIG_THEORADEC="$ac_cv_path_CONFIG_THEORADEC"
+fi
+
+    if test -n "$CONFIG_THEORADEC"; then :
+  if test -z "$cs_cv_prog_config_theoradec_ok"; then :
+  if $CONFIG_THEORADEC --cflags --libs >/dev/null 2>&1; then :
+  cs_cv_prog_config_theoradec_ok=yes
+else
+  cs_cv_prog_config_theoradec_ok=no
+fi
+fi
+	if test $cs_cv_prog_config_theoradec_ok = yes; then :
+  if test -z "$cs_cv_prog_config_theoradec_flags"; then :
+  cs_check_lib_cflag=`{ { $as_echo "$as_me:${as_lineno-$LINENO}: \$CONFIG_THEORADEC --cflags "; } >&5
+  ($CONFIG_THEORADEC --cflags ) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
+	cs_check_lib_lflag=''
+	cs_check_lib_libs=`{ { $as_echo "$as_me:${as_lineno-$LINENO}: \$CONFIG_THEORADEC --libs "; } >&5
+  ($CONFIG_THEORADEC --libs ) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_config_theoradec_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
+fi
+    cs_check_lib_flags="$cs_check_lib_flags $cs_cv_prog_config_theoradec_flags"
+fi
+fi
+	    if test "$cs_prog_pkg_config_checked" != yes; then :
+
+    if test "$cs_prog_path_prepared" != yes; then :
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin"
+	export PATH
+fi
+    if test -n "$ac_tool_prefix"; then
+  for ac_prog in pkg-config
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_prog_PKG_CONFIG+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$PKG_CONFIG"; then
+  ac_cv_prog_PKG_CONFIG="$PKG_CONFIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_PKG_CONFIG="$ac_tool_prefix$ac_prog"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+PKG_CONFIG=$ac_cv_prog_PKG_CONFIG
+if test -n "$PKG_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PKG_CONFIG" >&5
+$as_echo "$PKG_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+    test -n "$PKG_CONFIG" && break
+  done
+fi
+if test -z "$PKG_CONFIG"; then
+  ac_ct_PKG_CONFIG=$PKG_CONFIG
+  for ac_prog in pkg-config
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_prog_ac_ct_PKG_CONFIG+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$ac_ct_PKG_CONFIG"; then
+  ac_cv_prog_ac_ct_PKG_CONFIG="$ac_ct_PKG_CONFIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_ac_ct_PKG_CONFIG="$ac_prog"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+ac_ct_PKG_CONFIG=$ac_cv_prog_ac_ct_PKG_CONFIG
+if test -n "$ac_ct_PKG_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_ct_PKG_CONFIG" >&5
+$as_echo "$ac_ct_PKG_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$ac_ct_PKG_CONFIG" && break
+done
+
+  if test "x$ac_ct_PKG_CONFIG" = x; then
+    PKG_CONFIG=""
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    PKG_CONFIG=$ac_ct_PKG_CONFIG
+  fi
+fi
+
+	cs_prog_pkg_config_checked=yes
+fi
+    if test -z "$cs_cv_prog_pkg_config_ok"; then :
+  if test -n "$PKG_CONFIG"; then :
+  if $PKG_CONFIG --atleast-pkgconfig-version=0.9.0; then :
+  cs_cv_prog_pkg_config_ok=yes
+else
+  cs_cv_prog_pkg_config_ok=no
+fi
+else
+  cs_cv_prog_pkg_config_ok=no
+fi
+fi
+    if test $cs_cv_prog_pkg_config_ok = yes; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if $PKG_CONFIG recognizes libtheoradec" >&5
+$as_echo_n "checking if $PKG_CONFIG recognizes libtheoradec... " >&6; }
+if test "${cs_cv_prog_pkg_config_libtheoradec+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if $PKG_CONFIG --exists libtheoradec; then :
+  cs_cv_prog_pkg_config_libtheoradec=yes
+else
+  cs_cv_prog_pkg_config_libtheoradec=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $cs_cv_prog_pkg_config_libtheoradec" >&5
+$as_echo "$cs_cv_prog_pkg_config_libtheoradec" >&6; }
+	if test $cs_cv_prog_pkg_config_libtheoradec = yes; then :
+  if test -z "$cs_cv_prog_pkg_config_libtheoradec_flags"; then :
+  cs_check_lib_cflag=`{ { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --cflags libtheoradec"; } >&5
+  ($PKG_CONFIG --cflags libtheoradec) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
+	cs_check_lib_lflag=''
+	cs_check_lib_libs=`{ { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --libs libtheoradec"; } >&5
+  ($PKG_CONFIG --libs libtheoradec) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_pkg_config_libtheoradec_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
+fi
+    cs_check_lib_flags="$cs_check_lib_flags $cs_cv_prog_pkg_config_libtheoradec_flags"
+fi
+fi
+
+    if test "$cs_prog_path_prepared" != yes; then :
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin"
+	export PATH
+fi
+    if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}libtheoradec-config", so it can be a program name with args.
+set dummy ${ac_tool_prefix}libtheoradec-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_path_CONFIG_LIBTHEORADEC+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $CONFIG_LIBTHEORADEC in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_CONFIG_LIBTHEORADEC="$CONFIG_LIBTHEORADEC" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_CONFIG_LIBTHEORADEC="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+CONFIG_LIBTHEORADEC=$ac_cv_path_CONFIG_LIBTHEORADEC
+if test -n "$CONFIG_LIBTHEORADEC"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CONFIG_LIBTHEORADEC" >&5
+$as_echo "$CONFIG_LIBTHEORADEC" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+fi
+if test -z "$ac_cv_path_CONFIG_LIBTHEORADEC"; then
+  ac_pt_CONFIG_LIBTHEORADEC=$CONFIG_LIBTHEORADEC
+  # Extract the first word of "libtheoradec-config", so it can be a program name with args.
+set dummy libtheoradec-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_path_ac_pt_CONFIG_LIBTHEORADEC+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $ac_pt_CONFIG_LIBTHEORADEC in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_ac_pt_CONFIG_LIBTHEORADEC="$ac_pt_CONFIG_LIBTHEORADEC" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_ac_pt_CONFIG_LIBTHEORADEC="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+ac_pt_CONFIG_LIBTHEORADEC=$ac_cv_path_ac_pt_CONFIG_LIBTHEORADEC
+if test -n "$ac_pt_CONFIG_LIBTHEORADEC"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_pt_CONFIG_LIBTHEORADEC" >&5
+$as_echo "$ac_pt_CONFIG_LIBTHEORADEC" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+  if test "x$ac_pt_CONFIG_LIBTHEORADEC" = x; then
+    CONFIG_LIBTHEORADEC=""
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    CONFIG_LIBTHEORADEC=$ac_pt_CONFIG_LIBTHEORADEC
+  fi
+else
+  CONFIG_LIBTHEORADEC="$ac_cv_path_CONFIG_LIBTHEORADEC"
+fi
+
+    if test -n "$CONFIG_LIBTHEORADEC"; then :
+  if test -z "$cs_cv_prog_config_libtheoradec_ok"; then :
+  if $CONFIG_LIBTHEORADEC --cflags --libs >/dev/null 2>&1; then :
+  cs_cv_prog_config_libtheoradec_ok=yes
+else
+  cs_cv_prog_config_libtheoradec_ok=no
+fi
+fi
+	if test $cs_cv_prog_config_libtheoradec_ok = yes; then :
+  if test -z "$cs_cv_prog_config_libtheoradec_flags"; then :
+  cs_check_lib_cflag=`{ { $as_echo "$as_me:${as_lineno-$LINENO}: \$CONFIG_LIBTHEORADEC --cflags "; } >&5
+  ($CONFIG_LIBTHEORADEC --cflags ) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
+	cs_check_lib_lflag=''
+	cs_check_lib_libs=`{ { $as_echo "$as_me:${as_lineno-$LINENO}: \$CONFIG_LIBTHEORADEC --libs "; } >&5
+  ($CONFIG_LIBTHEORADEC --libs ) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_config_libtheoradec_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
+fi
+    cs_check_lib_flags="$cs_check_lib_flags $cs_cv_prog_config_libtheoradec_flags"
+fi
+fi
+
+
+	if test $with_theoradec != yes; then :
+  cs_check_lib_paths=$with_theoradec
+else
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib \
+    /sw/include|/sw/lib \
+    /opt/local/include|/opt/local/lib \
+    /opt/include|/opt/lib "
+fi
+	for cs_lib_item in $cs_check_lib_paths
+    do
+	case $cs_lib_item in
+	    *\|*)
+    set filler `echo "$cs_lib_item" | awk 'BEGIN { FS="|" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then :
+  cs_check_incdir=''
+else
+  if test "$1" = filler; then :
+  cs_check_incdir=''
+else
+  cs_check_incdir=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_check_libdir=''
+else
+  if test "$1" = filler; then :
+  cs_check_libdir=''
+else
+  cs_check_libdir=$1
+fi
+	shift
+fi
+
+		if test -n "$cs_check_incdir"; then :
+  cs_check_lib_cflag="-I$cs_check_incdir"
+else
+  cs_check_lib_cflag=''
+fi
+    if test -n "$cs_check_libdir"; then :
+  cs_check_lib_lflag="-L$cs_check_libdir"
+else
+  cs_check_lib_lflag=''
+fi
+    if test -n "theoradec"; then :
+  cs_check_lib_libs="-ltheoradec"
+	cs_check_lib_framework="-framework theoradec"
+	cs_check_lib_framework_define="-DCS_THEORADEC_PATH=theoradec"
+else
+  cs_check_lib_libs=''
+	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
+fi
+    cs_check_lib_flags="$cs_check_lib_flags
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		;;
+	    *)  if test -n "$cs_lib_item/include"; then :
+  cs_check_lib_cflag="-I$cs_lib_item/include"
+else
+  cs_check_lib_cflag=''
+fi
+    if test -n "$cs_lib_item/lib"; then :
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
+else
+  cs_check_lib_lflag=''
+fi
+    if test -n "theoradec"; then :
+  cs_check_lib_libs="-ltheoradec"
+	cs_check_lib_framework="-framework theoradec"
+	cs_check_lib_framework_define="-DCS_THEORADEC_PATH=theoradec"
+else
+  cs_check_lib_libs=''
+	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
+fi
+    cs_check_lib_flags="$cs_check_lib_flags
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		if test -n "$cs_lib_item"; then :
+  cs_check_lib_cflag="-I$cs_lib_item"
+else
+  cs_check_lib_cflag=''
+fi
+    if test -n "$cs_lib_item"; then :
+  cs_check_lib_lflag="-L$cs_lib_item"
+else
+  cs_check_lib_lflag=''
+fi
+    if test -n "theoradec"; then :
+  cs_check_lib_libs="-ltheoradec"
+	cs_check_lib_framework="-framework theoradec"
+	cs_check_lib_framework_define="-DCS_THEORADEC_PATH=theoradec"
+else
+  cs_check_lib_libs=''
+	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
+fi
+    cs_check_lib_flags="$cs_check_lib_flags
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		;;
+	esac
+    done
+	    for cs_lib_item in $cs_check_lib_paths
+    do
+	case $cs_lib_item in
+	    *\|*)
+    set filler `echo "$cs_lib_item" | awk 'BEGIN { FS="|" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then :
+  cs_check_incdir=''
+else
+  if test "$1" = filler; then :
+  cs_check_incdir=''
+else
+  cs_check_incdir=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_check_libdir=''
+else
+  if test "$1" = filler; then :
+  cs_check_libdir=''
+else
+  cs_check_libdir=$1
+fi
+	shift
+fi
+
+		if test -n "$cs_check_incdir"; then :
+  cs_check_lib_cflag="-I$cs_check_incdir"
+else
+  cs_check_lib_cflag=''
+fi
+    if test -n "$cs_check_libdir"; then :
+  cs_check_lib_lflag="-L$cs_check_libdir"
+else
+  cs_check_lib_lflag=''
+fi
+    if test -n "libtheoradec"; then :
+  cs_check_lib_libs="-llibtheoradec"
+	cs_check_lib_framework="-framework libtheoradec"
+	cs_check_lib_framework_define="-DCS_THEORADEC_PATH=libtheoradec"
+else
+  cs_check_lib_libs=''
+	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
+fi
+    cs_check_lib_flags="$cs_check_lib_flags
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		;;
+	    *)  if test -n "$cs_lib_item/include"; then :
+  cs_check_lib_cflag="-I$cs_lib_item/include"
+else
+  cs_check_lib_cflag=''
+fi
+    if test -n "$cs_lib_item/lib"; then :
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
+else
+  cs_check_lib_lflag=''
+fi
+    if test -n "libtheoradec"; then :
+  cs_check_lib_libs="-llibtheoradec"
+	cs_check_lib_framework="-framework libtheoradec"
+	cs_check_lib_framework_define="-DCS_THEORADEC_PATH=libtheoradec"
+else
+  cs_check_lib_libs=''
+	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
+fi
+    cs_check_lib_flags="$cs_check_lib_flags
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		if test -n "$cs_lib_item"; then :
+  cs_check_lib_cflag="-I$cs_lib_item"
+else
+  cs_check_lib_cflag=''
+fi
+    if test -n "$cs_lib_item"; then :
+  cs_check_lib_lflag="-L$cs_lib_item"
+else
+  cs_check_lib_lflag=''
+fi
+    if test -n "libtheoradec"; then :
+  cs_check_lib_libs="-llibtheoradec"
+	cs_check_lib_framework="-framework libtheoradec"
+	cs_check_lib_framework_define="-DCS_THEORADEC_PATH=libtheoradec"
+else
+  cs_check_lib_libs=''
+	cs_check_lib_framework=''
+	cs_check_lib_framework_define=''
+fi
+    cs_check_lib_flags="$cs_check_lib_flags
+	`echo @$cs_check_lib_cflag $cs_check_lib_framework_define@$cs_check_lib_lflag@$cs_check_lib_framework | sed 'y% %#%'`
+	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		;;
+	esac
+    done
+
+
+	if test "$cs_ignore_cache" != yes; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for libtheoradec" >&5
+$as_echo_n "checking for libtheoradec... " >&6; }
+if test "${cs_cv_libtheoradec+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in $cs_check_lib_flags
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then :
+  cs_dummy=''
+else
+  if test "$1" = filler; then :
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_libs_test=''
+else
+  if test "$1" = filler; then :
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <theora/codec.h>
+int
+main ()
+{
+th_comment tc; th_comment_init (&tc);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  cs_build_ok=yes
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then :
+  break
+fi
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then :
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libtheoradec=yes
+		cs_cv_libtheoradec_cflags=$cs_build_cflags
+		cs_cv_libtheoradec_lflags=$cs_build_lflags
+		cs_cv_libtheoradec_libs=$cs_build_libs
+else
+  cs_cv_libtheoradec=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $cs_cv_libtheoradec" >&5
+$as_echo "$cs_cv_libtheoradec" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for libtheoradec" >&5
+$as_echo_n "checking for libtheoradec... " >&6; }
+	    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in $cs_check_lib_flags
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then :
+  cs_dummy=''
+else
+  if test "$1" = filler; then :
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_libs_test=''
+else
+  if test "$1" = filler; then :
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <theora/codec.h>
+int
+main ()
+{
+th_comment tc; th_comment_init (&tc);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  cs_build_ok=yes
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then :
+  break
+fi
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then :
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libtheoradec=yes
+		cs_cv_libtheoradec_cflags=$cs_build_cflags
+		cs_cv_libtheoradec_lflags=$cs_build_lflags
+		cs_cv_libtheoradec_libs=$cs_build_libs
+else
+  cs_cv_libtheoradec=no
+fi
+	    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $cs_cv_libtheoradec" >&5
+$as_echo "$cs_cv_libtheoradec" >&6; }
+fi
+    if test $cs_cv_libtheoradec = yes; then :
+
+else
+  cs_cv_libtheoradec_cflags=''
+	cs_cv_libtheoradec_lflags=''
+	cs_cv_libtheoradec_libs=''
+
+fi
+
+	PATH="$PATH_SAVE"
+	if test $with_theoradec != yes; then :
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH_SAVE_1"
+    export PKG_CONFIG_PATH
+fi
+
+else
+  cs_cv_libtheoradec=no
+fi
+
+    cs_cv_with_theoradec="$with_theoradec"
+    if test "$cs_cv_libtheoradec" = yes; then :
+  if test "$cs_cv_libtheoradec" = yes; then :
+  cs_build_prop_val="yes"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then :
+  cs_jamconfig_text="${cs_jamconfig_text}THEORADEC.AVAILABLE ?= $cs_build_prop_val ;
+"
+fi
+	cs_build_prop_val="$cs_cv_libtheoradec_cflags"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then :
+  cs_jamconfig_text="${cs_jamconfig_text}THEORADEC.CFLAGS ?= $cs_build_prop_val ;
+"
+fi
+	cs_build_prop_val="$cs_cv_libtheoradec_lflags $cs_cv_libtheoradec_libs"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then :
+  cs_jamconfig_text="${cs_jamconfig_text}THEORADEC.LFLAGS ?= $cs_build_prop_val ;
+"
+fi
+fi
+fi
+    if test -n "$cs_cv_libtheoradec" && test "no" != "$cs_cv_libtheoradec"; then :
+  _cs_sum_ok=yes
+else
+  _cs_sum_ok=no
+fi
+    _cs_summary="$_cs_summary
+theoradec|image|$_cs_sum_ok|*"
 
 
 
