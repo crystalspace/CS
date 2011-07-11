@@ -48,7 +48,7 @@ bool TheoraVideoMedia::Initialize (iObjectRegistry* r)
 
     //Initialize the decoders and print the info on the stream
 
-    printf("Ogg logical stream %x is Theora %dx%d %.02f fps video\n"
+    printf("Ogg logical stream %ld is Theora %dx%d %.02f fps video\n"
       "  Frame content is %dx%d with offset (%d,%d).\n",
       to.serialno,ti.pic_width,ti.pic_height, (double)ti.fps_numerator/ti.fps_denominator,
       ti.frame_width, ti.frame_height, ti.pic_x, ti.pic_y);
@@ -160,7 +160,7 @@ int TheoraVideoMedia::Update ()
       for (ogg_uint32_t y = 0 ; y < ti.frame_height ; y++)
         for (ogg_uint32_t x = 0 ; x < ti.frame_width ; x++)
         {
-          int uvOff = uv_offset+x/2;
+//          int uvOff = uv_offset+x/2;
           int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
           int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y/2))[x/2];
           int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y/2))[x/2];
@@ -194,7 +194,7 @@ int TheoraVideoMedia::Update ()
         for (ogg_uint32_t y = 0 ; y < ti.frame_height ; y++)
           for (ogg_uint32_t x = 0 ; x < ti.frame_width ; x++)
           {
-            int uvOff = uv_offset+x/2;
+//            int uvOff = uv_offset+x/2;
             int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
             int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y))[x/2];
             int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y))[x/2];
@@ -228,7 +228,7 @@ int TheoraVideoMedia::Update ()
           for (ogg_uint32_t y = 0 ; y < ti.frame_height ; y++)
             for (ogg_uint32_t x = 0 ; x < ti.frame_width ; x++)
             {
-              int uvOff = uv_offset+x/2;
+//              int uvOff = uv_offset+x/2;
               int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
               int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y))[x];
               int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y))[x];

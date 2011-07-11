@@ -29,6 +29,8 @@ SubInclude TOP plugins terraformer ;
 SubInclude TOP plugins translator ;
 SubInclude TOP plugins utilities ;
 SubInclude TOP plugins video ;
+SubInclude TOP plugins videodecode ;
+
 
 # Assemble big static plugins lib
 if [ Property build : projgen ] = msvc

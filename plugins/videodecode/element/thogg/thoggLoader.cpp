@@ -184,7 +184,7 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
 
 
   /// Next, parse secondary headers.
-  int times=0;
+  size_t times=0;
   while (times!=container->GetMediaCount())
   {
     int ret;
@@ -402,7 +402,7 @@ void thoggLoader::ComputeStreamLength (csRef<TheoraMediaContainer> container)
         buff->Initialize (this->object_reg);
 
         float mDuration=0;
-        unsigned long mNumFrames=0;
+//        unsigned long mNumFrames=0;
 
         for (int i=1;i<=10;i++)
         {

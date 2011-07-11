@@ -40,7 +40,7 @@ bool TheoraAudioMedia::Initialize (iObjectRegistry* r)
   {
     vorbis_synthesis_init(&vd,&vi);
     vorbis_block_init(&vd,&vb);
-    printf("Ogg logical stream %x is Vorbis %d channel %d Hz audio.\n",
+    printf("Ogg logical stream %ld is Vorbis %d channel %ld Hz audio.\n",
       vo.serialno,vi.channels,vi.rate);
     decodersStarted = true;
   }else
@@ -91,7 +91,7 @@ int TheoraAudioMedia::Update ()
     if(ret>0)
     {
       int i,j;
-      int count=0;
+//      int count=0;
       for(i=0;i<ret && i<(256/vi.channels);i++)
         for(j=0;j<vi.channels;j++)
         {
