@@ -23,11 +23,10 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <CEGUIWindowManager.h>
 #include <CEGUILogger.h>
 #include "csutil/custom_new_enable.h"
-
 #include <csutil/array.h>
 #include <csutil/nobjvec.h>
-
 #include <iostream>
+
 using namespace std;
 
 #define WATER_LEVEL 50.0
@@ -48,7 +47,7 @@ void VideoTest::PrintHelp ()
 
 void VideoTest::Frame ()
 {
-  iCamera* camera = view->GetCamera ();
+//  iCamera* camera = view->GetCamera ();
 
   //draw the room
   view->Draw();
@@ -76,8 +75,8 @@ void VideoTest::Frame ()
   int screenW = g2d->GetWidth ();
 
   // Margin to the edge of the screen, as a fraction of screen width
-  const float marginFraction = 0.01f;
-  const int margin = (int)screenW * marginFraction;
+//  const float marginFraction = 0.01f;
+//  const int margin = (int)screenW * marginFraction;
 
   // Width of the logo, as a fraction of screen width
   const float widthFraction = 0.5f;
@@ -136,7 +135,7 @@ bool VideoTest::Application ()
 
   if (video.IsValid ())
   {
-    printf ("%d streams in media container\n",video->GetMediaCount ());
+    printf ("%d streams in media container\n",(int)video->GetMediaCount ());
   }
 
   mediaPlayer = csQueryRegistry<iMediaPlayer> (object_reg);
