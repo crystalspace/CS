@@ -1,0 +1,3 @@
+SubDir TOP plugins videodecode element ;
+
+SubInclude TOP plugins videodecode element thogg ;

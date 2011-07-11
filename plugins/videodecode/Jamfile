@@ -1,0 +1,5 @@
+SubDir TOP plugins videodecode ;
+
+SubInclude TOP plugins videodecode element ;
+SubInclude TOP plugins videodecode loader ;
+SubInclude TOP plugins videodecode player ;

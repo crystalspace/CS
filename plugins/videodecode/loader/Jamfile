@@ -1,0 +1,5 @@
+SubDir TOP plugins videodecode loader ;
+
+Description loader : "loader video decode" ;
+Plugin loader : [ Wildcard *.cpp *.h ] ;
+LinkWith loader : crystalspace ;
