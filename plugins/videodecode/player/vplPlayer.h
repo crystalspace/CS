@@ -26,10 +26,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 struct iObjectRegistry;
 
-#ifdef WIN32
-  CS_IMPLEMENT_PLUGIN
-#endif
-
 #define QUALIFIED_PLUGIN_NAME "crystalspace.vpl.player"
 
 /**

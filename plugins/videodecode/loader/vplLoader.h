@@ -24,10 +24,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <ivideodecode/media.h>
 #include <csutil/scf_implementation.h>
 
-#ifdef WIN32
-  CS_IMPLEMENT_PLUGIN
-#endif
-
 struct iObjectRegistry;
 
 /**

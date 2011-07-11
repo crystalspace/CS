@@ -42,7 +42,6 @@ struct iObjectRegistry;
   #pragma comment(lib,"libtheora_static.lib")
   #pragma comment(lib,"ogg.lib")
   #pragma comment(lib,"vorbis.lib")
-  CS_IMPLEMENT_PLUGIN
 #endif
 
 /**

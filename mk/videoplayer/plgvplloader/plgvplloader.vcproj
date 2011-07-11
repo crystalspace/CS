@@ -185,6 +185,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\msvc\plugin_impl.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\plugins\videodecode\loader\vplLoader.cpp"
 				>
 			</File>
