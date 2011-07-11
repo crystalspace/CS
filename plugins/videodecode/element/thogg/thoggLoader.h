@@ -32,10 +32,16 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "theora/theora.h"
 #include "vorbis/codec.h"
 
+#pragma comment(lib,"libtheora_static.lib")
+#pragma comment(lib,"ogg.lib")
+#pragma comment(lib,"vorbis.lib")
+
 
 #define QUALIFIED_PLUGIN_NAME "crystalspace.vpl.element.thogg"
 
 struct iObjectRegistry;
+
+CS_IMPLEMENT_PLUGIN
 
 /**
   * This is the implementation for our API and
