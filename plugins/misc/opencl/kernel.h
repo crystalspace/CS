@@ -1,13 +1,25 @@
-#ifndef __CS_OPENCL_QUEUE_IMPL_H__
-#define __CS_OPENCL_QUEUE_IMPL_H__
+#ifndef __CS_OPENCL_KERNEL_IMPL_H__
+#define __CS_OPENCL_KERNEL_IMPL_H__
 
-#include <csutil/clprogram.h>
-#include <csutil/clmemory.h>
-#include <csutil/clconsts.h>
-#include "library.h"
+#include <ivaria/clprogram.h>
+#include <ivaria/clconsts.h>
+#include <csutil/csstring.h>
+#include <csutil/scf_implementation.h>
+
+namespace CS
+{
+  namespace CL
+  {
+    struct iMemoryObject;
+  } // CL
+} // CS
 
 CS_PLUGIN_NAMESPACE_BEGIN(CL)
 {
+  class Library;
+  class Event;
+  class Context;
+
   struct KernelMetaData
   {
     enum // arg type
@@ -43,23 +55,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     //@@@todo: add required/preferred extensions/device type/...
   };
 
-  class Kernel : public scfImplementation1<Kernel,iKernel>
+  class Kernel : public scfImplementation1<Kernel,CS::CL::iKernel>
   {
   public:
+    SCF_INTERFACE(Kernel, 0, 0, 1);
+
     Kernel(Library*, const KernelMetaData&);
     ~Kernel();
 
+    CS::CL::iLibrary* GetLibrary() const;
+
     bool SetArg(size_t id, const void* arg, size_t size);
-    bool SetArg(size_t id, iMemoryObject*);
+    bool SetArg(size_t id, CS::CL::iMemoryObject*);
 
     bool SetDimension(size_t d)
     {
+      if(d > 3)
+        return false;
+
       dimension = d;
 
       // adjust array sizes
       workSize.SetSize(d);
       workOffset.SetSize(d);
       groupSize.SetSize(d);
+
+      return true;
     }
 
     void SetWorkSize(const size_t* sizes);
@@ -82,7 +103,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     const KernelMetaData& data;
     csArray<size_t> argsSize;
     csArray<void*> args;
-    csRefArray<iMemoryObject> objArgs;
+    csRefArray<CS::CL::iMemoryObject> objArgs;
     size_t argCount;
 
     size_t dimension;
@@ -91,10 +112,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     csArray<size_t> groupSize;
 
     bool SetInstanceArg(cl_kernel kernel, size_t id, const void* arg, size_t size);
-    bool SetInstanceArg(cl_kernel kernel, size_t id, iMemoryObject*,
+    bool SetInstanceArg(cl_kernel kernel, size_t id, CS::CL::iMemoryObject*,
                         Context* c, csRefArray<Event>&);
   };
 }
 CS_PLUGIN_NAMESPACE_END(CL)
 
-#endif
+#endif // __CS_OPENCL_KERNEL_IMPL_H__
+

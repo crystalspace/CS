@@ -1,16 +1,23 @@
+#include "cssysdef.h"
+
 #include "kernel.h"
+#include "event.h"
+#include "library.h"
+#include "memory.h"
+#include "context.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(CL)
 {
-  Kernel::Kernel(Library* p,const KernelMetaData& metaData)
+  Kernel::Kernel(Library* p, const KernelMetaData& metaData)
               : scfImplementationType(this, p), parent(p), data(metaData),
-                argsSize(data->argCount), args(data->argCount),
-                objArgs(data->argCount), dimension(0)
+                argsSize(data.argCount), args(data.argCount),
+                objArgs(data.argCount), dimension(0)
   {
-    for(size_t i = 0; i < data->argCount; ++i)
+    for(size_t i = 0; i < data.argCount; ++i)
     {
       argsSize[i] = 0;
       args[i] = nullptr;
+      objArgs[i] = nullptr;
     }
   }
 
@@ -18,21 +25,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
   {
     for(size_t i = 0; i < args.GetSize(); ++i)
     {
-      csFree(args[i]);
+      cs_free(args[i]);
     }
   }
 
-  bool Kernel::SetArg(cl_kernel kernel, size_t id, const void* arg, size_t size)
+  iLibrary* Kernel::GetLibrary() const
   {
-    if(id >= data->argCount)
+    return static_cast<Library*>(parent);
+  }
+
+  bool Kernel::SetArg(size_t id, const void* arg, size_t size)
+  {
+    if(id >= data.argCount)
     {
       // out of bounds
       return false;
     }
 
-    switch(args->[id] & ARG_STORAGE_MASK)
+    switch(data.args[id] & KernelMetaData::ARG_STORAGE_MASK)
     {
-    case ARG_LOCAL:
+    case KernelMetaData::ARG_LOCAL:
       if(arg != nullptr)
       {
         // local arguments mustn't point to any data
@@ -54,9 +66,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       break;
     }
 
-    switch(args->[id] & ARG_TYPE_MASK)
+    switch(data.args[id] & KernelMetaData::ARG_TYPE_MASK)
     {
-    case ARG_DATA:
+    case KernelMetaData::ARG_DATA:
       // matches
       break;
 
@@ -70,7 +82,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     if(arg != nullptr)
     {
       // allocate copy
-      void* argCopy = csAlloc(size);
+      void* argCopy = cs_malloc(size);
       if(argCopy == nullptr)
       {
         // OOM
@@ -90,9 +102,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     return true;
   }
 
-  bool Kernel::SetArg(cl_kernel kernel, size_t id, iMemoryObject* obj)
+  bool Kernel::SetArg(size_t id, iMemoryObject* obj)
   {
-    if(id >= data->argCount)
+    if(id >= data.argCount)
     {
       return false;
     }
@@ -102,47 +114,47 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return false;
     }
 
-    switch(data->args[id] & ARG_STORAGE_MASK)
+    switch(data.args[id] & KernelMetaData::ARG_STORAGE_MASK)
     {
-    case ARG_LOCAL:
+    case KernelMetaData::ARG_LOCAL:
       return false;
 
-    default.
+    default:
       break;
     }
 
     // validate argument
-    switch(data->args[id] & ARG_TYPE_MASK)
+    switch(data.args[id] & KernelMetaData::ARG_TYPE_MASK)
     {
-    case ARG_BUFFER:
+    case KernelMetaData::ARG_BUFFER:
       if(obj->GetObjectType() != MEM_BUFFER)
       {
         return false;
       }
       break;
 
-    case ARG_SAMPLER:
+    case KernelMetaData::ARG_SAMPLER:
       if(obj->GetObjectType() != MEM_SAMPLER)
       {
         return false;
       }
       break;
 
-    case ARG_IMAGE2D:
-    case ARG_IMAGE3D:
+    case KernelMetaData::ARG_IMAGE2D:
+    case KernelMetaData::ARG_IMAGE3D:
       if(obj->GetObjectType() != MEM_IMAGE)
       {
         return false;
       }
       break;
 
-    case ARG_DATA:
+    case KernelMetaData::ARG_DATA:
     default:
       return false;
     }
 
     // keep a ref to the object
-    objArgs[i] = obj;
+    objArgs[id] = obj;
 
     return true;
   }
@@ -176,7 +188,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       // argument was declared as memory object, but size != sizeof(cl_mem) or
       // argument was declared as sampler, but size != sizeof(cl_sampler) or
       // argument was declared as __local, but size is 0
-    case CL_OUT_OF_RESSOURCES:
+    case CL_OUT_OF_RESOURCES:
       // device OOM
     case CL_OUT_OF_HOST_MEMORY:
       // host OOM
@@ -205,7 +217,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       }
 
       cl_sampler handle = impl->GetHandle(c);
-      return SetInstanceArg(id, &handle, sizeof(cl_sampler));
+      return SetInstanceArg(kernel, id, &handle, sizeof(cl_sampler));
     }
 
     case MEM_BUFFER:
@@ -218,11 +230,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       }
 
       cl_mem handle = impl->GetHandle(c);
-      csRef<Event> e = scfQueryInterfaceSafe<Event>(impl->MoveTo(c, eventList));
+      
+      iEventList events;
+      for(size_t i = 0; i < eventList.GetSize(); ++i)
+      {
+        events.Push(eventList[i]);
+      }
+
+      csRef<Event> e = scfQueryInterfaceSafe<Event>(impl->MoveTo(c, events));
       if(e.IsValid())
       {
         eventList.Push(e);
-        return SetInstanceArg(id, &handle, sizeof(cl_mem));
+        return SetInstanceArg(kernel, id, &handle, sizeof(cl_mem));
       }
       else
       {
@@ -233,6 +252,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     default:
       // unknown object type
       return false;
+    }
   }
 
   cl_kernel Kernel::CreateHandle(Context* c, csRefArray<Event>& eventList)
@@ -246,19 +266,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     e->Wait();
     CS_ASSERT(e->WasSuccessful());
 
-    cl_kernel kernel = clCreateKernel(program, data->name.GetData(), &error);
+    cl_kernel kernel = clCreateKernel(program, data.name.GetData(), &error);
     CS_ASSERT(error == CL_SUCCESS);
 
     bool success = true;
     for(size_t i = 0; i < argCount; ++i)
     {
-      if(objArgs[i].IsValid())
+      if(objArgs[i] != nullptr)
       {
-        success &&= SetInstanceArg(kernel, i, objArgs[i], c, eventList);
+        success &= SetInstanceArg(kernel, i, objArgs[i], c, eventList);
       }
       else
       {
-        success &&= SetInstanceArg(kernel, i, args[i], argsSize[i]);
+        success &= SetInstanceArg(kernel, i, args[i], argsSize[i]);
       }
     }
     CS_ASSERT(success == true);

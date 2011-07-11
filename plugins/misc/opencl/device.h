@@ -3,10 +3,13 @@
 
 #include <ivaria/clconsts.h>
 #include <csutil/typetraits.h>
+#include <csutil/csstring.h>
+#include <csutil/set.h>
+#include <csutil/refcount.h>
 
 CS_PLUGIN_NAMESPACE_BEGIN(CL)
 {
-  class Device
+  class Device : public CS::Utility::FastRefCount<Device>
   {
   public:
     struct Version
@@ -27,11 +30,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     }
 
     // general properties
-    bool IsAvailable() const { return available; } // CL_DEVICE_AVAILABLE
-    const char* GetName() const { return name; } // CL_DEVICE_NAME
-    const char* GetVendor() const { return vendor; } // CL_DEVICE_VENDOR
-    cl_device_type GetType() const { return type; } // CL_DEVICE_TYPE
-    size_t GetID() const { return id; } // CL_DEVICE_VENDOR_ID
+    bool IsAvailable() const { return available; }
+    const char* GetName() const { return name; }
+    const char* GetVendor() const { return vendor; }
+    cl_device_type GetType() const { return type; }
+    size_t GetID() const { return id; }
 
     // versions
     Version GetDiverVersion() const { return driverVersion; }
@@ -55,7 +58,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
 
     // execution properties
     size_t GetComputeUnits() const { return computeUnits; }
-    size_t GetFrequency() const { return Frequency; } // in MHz
+    size_t GetFrequency() const { return frequency; } // in MHz
 
     // parameter memory properties
     size_t GetParameterSize() const { return paramSize; }
@@ -65,7 +68,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     // image processing properties
     size_t ImageReadArgs() const { return imageReadArgs; }
     size_t ImageWriteArgs() const { return imageWriteArgs; }
-    size_t ImageSamplers() const; { return samplerArgs; }
+    size_t ImageSamplers() const { return samplerArgs; }
     const size_t* GetImage2dSize() const { return image2DSize; }
     const size_t* GetImage3dSize() const { return image3DSize; }
 
@@ -114,25 +117,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     csSet<csString> extensions;
 
     void* QueryRawInfo(cl_device_info);
-    template<typename T, typename U> bool QueryInfo(cl_device_info i, U& obj)
-    {
-      if(CS::Meta::IsPointer<T>::value)
-      {
-        obj = static_cast<T>(QueryRawInfo(i));
-        return (obj != nullptr);
-      }
-      else
-      {
-        T* src = static_cast<T*>(QueryRawInfo(i));
-        if(src != nullptr)
-        {
-          obj = *src;
-          csFree(src);
-          return true;
-        }
-      }
-      return false;
-    }
+
+    // a little template magic to ease converting the raw info to the actual type
+    template<typename T, typename U> bool QueryInfo(cl_device_info i, U& obj);
+    template<typename T, typename U> bool QueryInfo(cl_device_info i, U*& obj);
   };
 }
 CS_PLUGIN_NAMESPACE_END(CL)

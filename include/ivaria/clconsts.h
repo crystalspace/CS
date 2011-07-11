@@ -20,7 +20,7 @@
 #define __CS_OPENCL_CONSTS_H__
 
 // cl types required to write data to buffers (cl_float, cl_char, ...)
-#include CS_HEADER_GLOBAL(CS_OPENCL_PATH,cl_platform.h)
+#include CS_HEADER_GLOBAL(CS_OPENCL_PATH,cl.h)
 
 namespace CS
 {
@@ -48,7 +48,7 @@ namespace CL
     FMT_SIGNED  = 0x04,
     FMT_NORMAL  = 0x08,
     FMT_PACKED  = 0x10,
-    FMT_FLOAT   = 0x20,
+    FMT_FP      = 0x20,
 
     // only used to differentiate those where all
     // other flags and the size are equal
@@ -63,8 +63,8 @@ namespace CL
     FMT_UINT16_N = 1 | FMT_NORMAL,
     FMT_SINT8_N  = 0 | FMT_SIGNED | FMT_NORMAL,
     FMT_SINT16_N = 1 | FMT_SIGNED | FMT_NORMAL,
-    FMT_HALF     = 1 | FMT_FLOAT | FMT_SIGNED | FMT_NORMAL,
-    FMT_FLOAT    = 2 | FMT_FLOAT | FMT_SIGNED | FMT_NORMAL,
+    FMT_HALF     = 1 | FMT_FP | FMT_SIGNED | FMT_NORMAL,
+    FMT_FLOAT    = 2 | FMT_FP | FMT_SIGNED | FMT_NORMAL,
 
     // packed formats
     FMT_UINT16_N_565    = 1 | FMT_PACKED | FMT_NORMAL | FMT_SPECIAL,
@@ -75,7 +75,7 @@ namespace CL
     FMT_UINT8  = 0,
     FMT_UINT16 = 1,
     FMT_UINT32 = 2,
-    FMT_SINT8  = 0 | FMG_SIGNED,
+    FMT_SINT8  = 0 | FMT_SIGNED,
     FMT_SINT16 = 1 | FMT_SIGNED,
     FMT_SINT32 = 2 | FMT_SIGNED
   };

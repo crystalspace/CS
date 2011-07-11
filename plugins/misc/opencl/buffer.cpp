@@ -1,4 +1,8 @@
+#include "cssysdef.h"
+
 #include "memory.h"
+#include "context.h"
+#include "event.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(CL)
 {
@@ -30,7 +34,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     {
       if(data == nullptr)
       {
-        data = csAlloc(size);
+        data = cs_malloc(size);
         if(data == nullptr)
         {
           // OOM
@@ -58,6 +62,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       }
 
       // queue the write
+      cl_mem obj = GetHandle(c);
       cl_event handle;
       cl_int error = clEnqueueWriteBuffer(q->GetHandle(), obj, CL_FALSE, 0, size,
                                           src, eventList.GetSize(), handleList, &handle);
@@ -89,11 +94,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return csPtr<iEvent>(nullptr);
     }
 
-    CS::Threading::ScopedLock lock(useLock);
+    CS::Threading::RecursiveMutexScopedLock lock(useLock);
 
-    csRef<iEvent> e; // holds the event the user shall wait on
+    csRef<Event> e; // holds the event the user shall wait on
     csRef<MappedMemory> map; // holds the new map object
-    csRef<iEvent> unmapEvent; // holds the event further usages should wait on
+    csRef<Event> unmapEvent; // holds the event further usages should wait on
     unmapEvent.AttachNew(new Event());
 
     csRefArray<Event> eventList;
@@ -102,7 +107,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return csPtr<iEvent>(nullptr);
     }
 
-    if(lastWriteContext == nullptr)
+    if(status.Get(nullptr,false))
     {
       // most recent version is located on host
 
@@ -119,12 +124,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       size_t mapSize[3] = {size, 0, 0};
       size_t mapOffset[3] = {offset, 0, 0};
       size_t mapPitch[2] = {0,0};
-      map.AttachNew(new MappedMemory(nullptr, this, data+offset, mapSize,
+      map.AttachNew(new MappedMemory(nullptr, this, (uint8*)data+offset, mapSize,
                                      mapOffset, mapPitch, unmapEvent));
     }
     else
     {
-      cl_event* handleList = CreateEventHandleList(eventList, c);
+      cl_event* handleList = CreateEventHandleList(eventList, lastWriteContext);
       if(!eventList.IsEmpty() && handleList == nullptr)
       {
         // OOM
@@ -186,7 +191,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return csRef<iEvent>(nullptr);
     }
 
-    CS::Threading::ScopedLock lock(useLock);
+    CS::Threading::RecursiveMutexScopedLock lock(useLock);
 
     // convert event list
     csRefArray<Event> eventList;
@@ -195,7 +200,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return csRef<iEvent>(nullptr);
     }
 
-    csRef<iEvent> e;
+    csRef<Event> e;
     Context* c = nullptr;
     if(status.Get(nullptr,false))
     {
@@ -204,7 +209,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
 
       e->Wait(); // block for now
 
-      memcpy(dst, data+offset, size);
+      memcpy(dst, (uint8*)data+offset, size);
     }
     else
     {
@@ -255,7 +260,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return csRef<iEvent>(nullptr);
     }
 
-    CS::Threading::ScopedLock lock(useLock);
+    CS::Threading::RecursiveMutexScopedLock lock(useLock);
 
     // convert event list
     csRefArray<Event> eventList;
@@ -264,7 +269,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return csRef<iEvent>(nullptr);
     }
 
-    csRef<iEvent> e;
+    csRef<Event> e;
     Context* c = nullptr;
     if(status.Get(nullptr,false))
     {
@@ -273,7 +278,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
 
       e->Wait(); // block for now
 
-      memcpy(data+offset, src, size);
+      memcpy((uint8*)data+offset, src, size);
     }
     else
     {
@@ -327,19 +332,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return csRef<iEvent>(nullptr);
     }
 
-    CS::Threading::ScopedLock lock(useLock);
-    CS::Threading::ScopedLock dstLock(dst->useLock);
+    CS::Threading::RecursiveMutexScopedLock lock(useLock);
+    CS::Threading::RecursiveMutexScopedLock dstLock(dst->useLock);
 
     if(status.Get(nullptr,false))
     {
       iEventList list(events);
-      if(lastWriteEvent.IsValid())
+      if(lastWrite.IsValid())
       {
-        list.Push(lastWriteEvent);
+        list.Push(lastWrite);
       }
 
-      csRef<iEvent> e = dst->Write(dst_offset, size, data+src_offset, list);
-      Use(nullptr, e, MEM_READ);
+      csRef<Event> e = scfQueryInterfaceSafe<Event>(dst->Write(dst_offset, size, (uint8*)data+src_offset, list));
+      if(e.IsValid())
+      {
+        Use(nullptr, e, MEM_READ);
+      }
       return e;
     }
     else if(dst->status.Get(nullptr,false))
@@ -350,7 +358,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
         list.Push(dst->reads[i]);
       }
 
-      csRef<iEvent> e = Read(src_offset, size, dst->data+dst_offset, list);
+      csRef<Event> e = scfQueryInterfaceSafe<Event>(Read(src_offset, size, (uint8*)(dst->data)+dst_offset, list));
       if(e.IsValid())
       {
         dst->Use(nullptr, e, MEM_WRITE);
@@ -369,8 +377,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     // get queue for the context
     csRef<Queue> q = c->GetQueue();
 
-    cl_mem src = GetHandle(c);
-    cl_mem dst = dst->GetHandle(c);
+    cl_mem src_obj = GetHandle(c);
+    cl_mem dst_obj = dst->GetHandle(c);
 
     cl_event* handleList = CreateEventHandleList(eventList, c);
     if(!eventList.IsEmpty() && handleList == nullptr)
@@ -379,7 +387,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     }
 
     cl_event handle;
-    cl_int error = clEnqueueCopyBuffer(q->GetHandle(), src, dst, src_offset, dst_offset,
+    cl_int error = clEnqueueCopyBuffer(q->GetHandle(), src_obj, dst_obj, src_offset, dst_offset,
                                        size, eventList.GetSize(), handleList, &handle);
     delete [] handleList;
 
@@ -402,7 +410,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
   }
 
   csRef<iEvent> Buffer::Copy(iImage* dstImage, size_t src_offset, const size_t dst_offset[3],
-                             const size_t dst_size[3], const iEventList& origEvents)
+                             const size_t dst_size[3], const iEventList& events)
   {
     csRef<Image> dst = scfQueryInterfaceSafe<Image>(dstImage);
     if(!dst.IsValid())
@@ -426,18 +434,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return csRef<iEvent>(nullptr);
     }
 
-    CS::Threading::ScopedLock lock(useLock);
-    CS::Threading::ScopedLock dstLock(dst->useLock);
+    CS::Threading::RecursiveMutexScopedLock lock(useLock);
+    CS::Threading::RecursiveMutexScopedLock dstLock(dst->useLock);
 
     if(status.Get(nullptr,false))
     {
       iEventList list(events);
-      if(lastWriteEvent.IsValid())
+      if(lastWrite.IsValid())
       {
-        list.Push(lastWriteEvent);
+        list.Push(lastWrite);
       }
 
-      csRef<iEvent> e = dst->Write(data+src_offset, dst_size, dst_offset, list);
+      size_t pitch[2] = {0,0};
+      csRef<Event> e = scfQueryInterfaceSafe<Event>(dst->Write((uint8*)data+src_offset, dst_size, dst_offset, pitch, list));
       if(e.IsValid())
       {
         Use(nullptr, e, MEM_READ);
@@ -457,8 +466,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     // get queue for the context
     csRef<Queue> q = c->GetQueue();
 
-    cl_mem src = GetHandle(c);
-    cl_mem dst = dst->GetHandle(c);
+    cl_mem src_obj = GetHandle(c);
+    cl_mem dst_obj = dst->GetHandle(c);
 
     cl_event* handleList = CreateEventHandleList(eventList, c);
     if(!eventList.IsEmpty() && handleList == nullptr)
@@ -467,7 +476,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     }
 
     cl_event handle;
-    cl_int error = clEnqueueCopyBufferToImage(q->GetHandle(), src, dst, src_offset,
+    cl_int error = clEnqueueCopyBufferToImage(q->GetHandle(), src_obj, dst_obj, src_offset,
                            dst_offset, dst_size, eventList.GetSize(), handleList, &handle);
     delete [] handleList;
 

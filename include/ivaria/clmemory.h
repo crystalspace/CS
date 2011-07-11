@@ -25,15 +25,17 @@ namespace CS
 {
 namespace CL
 {
-  struct iEvent;
+  struct iImage;
+  struct iBuffer;
+  struct iSampler;
 
   struct iMappedMemory : public virtual iBase
   {
     SCF_INTERFACE(iMappedMemory, 0, 0, 1);
 
     virtual void* GetPointer() const = 0;
-    virtual iBuffer* GetBuffer() const = 0;
-    virtual iImage* GetImage() const = 0;
+    virtual iBuffer* GetBuffer() = 0;
+    virtual iImage* GetImage() = 0;
     virtual size_t GetOffset(int dimension = 0) const = 0;
     virtual size_t GetSize(int dimension = 0) const = 0;
     virtual size_t GetPitch(int dimesion = 0) const = 0;
@@ -51,12 +53,12 @@ namespace CL
 
     virtual int GetAccessMode() const = 0;
     virtual int GetObjectType() const = 0;
-    virtual iBuffer* GetBuffer() const = 0;
-    virtual iImage* GetImage() const = 0;
-    virtual iSampler* GetSampler() const = 0;
+    virtual iBuffer* GetBuffer() = 0;
+    virtual iImage* GetImage() = 0;
+    virtual iSampler* GetSampler() = 0;
   };
 
-  struct iBuffer : public iMemoryObject
+  struct iBuffer : public virtual iBase
   {
     SCF_INTERFACE(iBuffer, 0, 0, 1);
 
@@ -79,7 +81,7 @@ namespace CL
                                const iEventList& = iEventList()) = 0;
   };
 
-  struct iImage : public iMemoryObject
+  struct iImage : public virtual iBase
   {
     SCF_INTERFACE(iImage, 0, 0, 1);
 
@@ -108,7 +110,7 @@ namespace CL
                                const iEventList& = iEventList()) = 0;
   };
 
-  struct iSampler : public iMemoryObject
+  struct iSampler : public virtual iBase
   {
     SCF_INTERFACE(iSampler, 0, 0, 1);
 

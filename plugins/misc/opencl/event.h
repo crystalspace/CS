@@ -3,17 +3,23 @@
 
 #include <ivaria/clmanager.h>
 #include <ivaria/clconsts.h>
+#include <csutil/hash.h>
 #include <csutil/threading/mutex.h>
-#include "context.h"
+#include <csutil/threading/condition.h>
+#include <csutil/scf_implementation.h>
 
 CS_PLUGIN_NAMESPACE_BEGIN(CL)
 {
-  class Event : public scfImplementation1<Event,iEvent>
+  class Context;
+
+  class Event : public scfImplementation1<Event,CS::CL::iEvent>
   {
   public:
+    SCF_INTERFACE(Event, 0, 0, 1);
+
     Event(Context*, cl_event); // cl event
     Event(const csRefArray<Event>&); // meta event
-    Event(const iEventList&); // meta event
+    Event(const CS::CL::iEventList&); // meta event
     Event(); // user-created event
     ~Event();
 
@@ -54,19 +60,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return result;
     }
 
-    void AddCallback(Callback listener, void* data);
-    bool RemoveCallback(Callback listener);
+    void AddCallback(CS::CL::Callback listener, void* data);
+    bool RemoveCallback(CS::CL::Callback listener);
 
   private:
     // handles to actual event objects in the contexts
-    csHash<csRef<Context>, cl_event> handles;
+    csHash<cl_event, csRef<Context> > handles;
 
     // events this event depends on
-    iEventList dependencies;
+    CS::CL::iEventList dependencies;
     CS::Threading::Mutex depLock;
 
     // callback data
-    csArray<Callback> callbacks;
+    csArray<CS::CL::Callback> callbacks;
     csArray<void*> callbackData;
 
     // source event if this is created from a cl event
@@ -83,7 +89,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     csRef<iBase> result;
 
     // helper function that validates cl errors
-    bool CheckError(cl_int);
+    static bool CheckError(cl_int);
 
     // helper function for the meta-event constructor
     void AddCallbacks();
@@ -99,9 +105,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
   };
 
   // little helper functions
-  csRefArray<Event> CreateEventList(const iEventList&);
+  csRefArray<Event> CreateEventList(const CS::CL::iEventList&);
   cl_event* CreateEventHandleList(const csRefArray<Event>&, Context*);
 }
 CS_PLUGIN_NAMESPACE_END(CL)
 
 #endif // __CS_OPENCL_EVENT_IMPL_H__
+

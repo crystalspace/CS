@@ -1,3 +1,6 @@
+#include "cssysdef.h"
+#include <csutil/stringarray.h>
+
 #include "platform.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(CL)
@@ -7,7 +10,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     csString profile = QueryInfo(CL_PLATFORM_PROFILE);
     if(profile == "FULL_PROFILE")
     {
-      fullProfile = true
+      fullProfile = true;
     }
     else if(profile == "EMBEDDED_PROFILE")
     {
@@ -20,8 +23,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
 
     csString version = QueryInfo(CL_PLATFORM_VERSION);
     // "OpenCL <major>.<minor> <platform specific info>"
-    csStringArray parts(version, ' ');
-    if(parts[0] != "OpenCL")
+    csStringArray parts(version, " ");
+    if(csString("OpenCL") != parts[0])
     {
       return false;
     }
@@ -31,11 +34,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     vendor = QueryInfo(CL_PLATFORM_VENDOR);
 
     // parse extensions
-    csString extString = QueryInfo(CL_PLATFORM_EXTENSION);
-    csStringArray extArray(extString, ' ');
+    csString extString = QueryInfo(CL_PLATFORM_EXTENSIONS);
+    csStringArray extArray(extString, " ");
     for(size_t i = 0; i < extArray.GetSize(); ++i)
     {
-      extensions.Push(extArray[i]);
+      extensions.Add(extArray[i]);
     }
 
     // get size of the device list
@@ -57,7 +60,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       // shouldn't occur
     case CL_DEVICE_NOT_FOUND:
       // empty platform
-    case CL_OUT_OF_RESSOURCES:
+    case CL_OUT_OF_RESOURCES:
       // device OOM
     case CL_OUT_OF_HOST_MEMORY:
       // host OOM
@@ -97,7 +100,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       // shouldn't occur
     case CL_DEVICE_NOT_FOUND:
       // empty platform
-    case CL_OUT_OF_RESSOURCES:
+    case CL_OUT_OF_RESOURCES:
       // device OOM
     case CL_OUT_OF_HOST_MEMORY:
       // host OOM
@@ -129,10 +132,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     return !devices.IsEmpty();
   }
 
-  csString QueryInfo(cl_platform_info info)
+  csString Platform::QueryInfo(cl_platform_info info)
   {
     cl_int result;
-    cl_uint size;
+    size_t size;
 
     result = clGetPlatformInfo(platform, info, 0, nullptr, &size);
 
@@ -148,7 +151,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       // info is not a proper value
     case CL_OUT_OF_HOST_MEMORY:
       // host OOM
-    case default:
+    default:
       // driver bug
       return csString();
     }
@@ -185,3 +188,5 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     return infoStr;
   }
 }
+CS_PLUGIN_NAMESPACE_END(CL)
+

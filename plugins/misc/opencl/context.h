@@ -1,30 +1,27 @@
 #ifndef __CS_OPENCL_CONTEXT_IMPL_H__
 #define __CS_OPENCL_CONTEXT_IMPL_H__
 
-#include <ivaria/csconsts.h>
+#include <ivaria/clconsts.h>
+#include <csutil/refarr.h>
+#include <csutil/weakrefarr.h>
+#include <csutil/refcount.h>
+
 #include "platform.h"
 #include "device.h"
 #include "queue.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(CL)
 {
-  class Context
+  class Context : public csRefCount
   {
   public:
-    Context(Platform* p,const csRefArray<Device>& devices) : context(nullptr),
-                                                             platform(p),
-                                                             devices(devices)
+    Context(Platform* p, const csRefArray<Device>& devices) : context(nullptr),
+                                                              platform(p),
+                                                              devices(devices)
     {
     }
 
-    ~Context()
-    {
-      if(context != nullptr)
-      {
-        cl_int error = clReleaseContext(context);
-        CS_ASSERT(error == CL_SUCCESS);
-      }
-    }
+    ~Context();
 
     bool Initialize();
 

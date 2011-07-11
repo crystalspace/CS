@@ -1,6 +1,11 @@
+#include "cssysdef.h"
 #include <csutil/regexp.h>
+#include <csutil/stringarray.h>
+
 #include "library.h"
-#include "kernel.h"
+#include "manager.h"
+#include "context.h"
+#include "event.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(CL)
 {
@@ -8,10 +13,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
                                                        parent(p), source(source)
   {
     // base regex to find the kernel declarations
-    csRegExpMatcher kernelExp("(__)?kernel[:space:]+(__attribute__\({2}.+\){2}[:space:]+)*void[:space:]+\(.*?\)[:space:]+{",true);
+    csRegExpMatcher kernelExp("(__)?kernel[:space:]+(__attribute__\\({2}.+\\){2}[:space:]+)*void[:space:]+\\(.*?\\)[:space:]+{",true);
 
     // regex to find macros/etc.
-    csRegExpMatcher macroExp("[:alpha:]+\(.*\)",true);
+    csRegExpMatcher macroExp("[:alpha:]+\\(.*\\)",true);
 
     // access mode expression
     csRegExpMatcher accessExp("(^|[[:space:]*])(__)?(write|read)_only([[:space:]*]|$)",true);
@@ -71,7 +76,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
         name.RTrim(); // strip trailing whitespaces from the name
 
         match.DeleteAt(0, open+1); // strip name and leading (
-        match.DeleteAt(match.GetSize() - 1); // strip trailing )
+        match.DeleteAt(match.Length() - 1); // strip trailing )
         match.Trim();
 
         // check for macro calls
@@ -108,16 +113,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
             if(argString.FindFirst("write", result[0].startOffset)
                < result[0].endOffset)
             {
-              data.args[k] |= ARG_WRITE;
+              data.args[k] |= KernelMetaData::ARG_WRITE;
             }
             else
             {
-              data.args[k] |= ARG_READ;
+              data.args[k] |= KernelMetaData::ARG_READ;
             }
           }
           else
           {
-            data.args[k] |= ARG_READ_WRITE;
+            data.args[k] |= KernelMetaData::ARG_READ_WRITE;
           }
 
           // check for image types
@@ -126,61 +131,61 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
             if(argString.FindFirst("image2d_t", result[0].startOffset)
                < result[0].endOffset)
             {
-              data.args[k] |= ARG_IMAGE2D;
+              data.args[k] |= KernelMetaData::ARG_IMAGE2D;
             }
             else
             {
-              data.args[k] |= ARG_IMAGE3D;
+              data.args[k] |= KernelMetaData::ARG_IMAGE3D;
             }
           }
           // check for sampler type
           else if(samplerExp.Match(argString.GetData()) == csrxNoError)
           {
-            data.args[k] |= ARG_SAMPLER;
+            data.args[k] |= KernelMetaData::ARG_SAMPLER;
           }
           else if(argString.FindFirst("*") != (size_t)-1)
           {
-            data.args[k] |= ARG_BUFFER;
+            data.args[k] |= KernelMetaData::ARG_BUFFER;
           }
           else
           {
-            data.args[k] |= ARG_DATA;
+            data.args[k] |= KernelMetaData::ARG_DATA;
           }
 
           // parse address mode
           if(addressExp.Match(argString.GetData(), result) == csrxNoError)
           {
             size_t start = result[0].startOffset;
-            size_t end = result[0].endOffseT;
+            size_t end = result[0].endOffset;
 
             if(argString.FindFirst("global", start) < end)
             {
-              data.args[k] |= ARG_GLOBAL;
+              data.args[k] |= KernelMetaData::ARG_GLOBAL;
             }
             else if(argString.FindFirst("local", start) < end)
             {
-              data.args[k] |= ARG_LOCAL;
+              data.args[k] |= KernelMetaData::ARG_LOCAL;
             }
             else if(argString.FindFirst("constant", start) < end)
             {
-              data.args[k] |= ARG_CONST;
+              data.args[k] |= KernelMetaData::ARG_CONST;
             }
             else
             {
-              data.args[k] &= ~ARG_STORAGE_MASK; // ARG_PRIVATE
+              data.args[k] &= ~KernelMetaData::ARG_STORAGE_MASK; // ARG_PRIVATE
             }
           }
           else
           {
-            switch(data.args[k] & ARG_TYPE_MASK)
+            switch(data.args[k] & KernelMetaData::ARG_TYPE_MASK)
             {
-            case ARG_IMAGE2D:
-            case ARG_IMAGE3D:
-              data.args[k] |= ARG_GLOBAL;
+            case KernelMetaData::ARG_IMAGE2D:
+            case KernelMetaData::ARG_IMAGE3D:
+              data.args[k] |= KernelMetaData::ARG_GLOBAL;
               break;
 
             default:
-              data.args[k] &= ~ARG_STORAGE_MASK; // ARG_PRIVATE
+              data.args[k] &= ~KernelMetaData::ARG_STORAGE_MASK; // ARG_PRIVATE
             }
           }
         }
@@ -190,7 +195,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
 
   Library::~Library()
   {
-    csHash<csRef<Context>, cl_program>::Iterator it = handles.GetIterator();
+    csHash<cl_program, csRef<Context> >::GlobalIterator it = handles.GetIterator();
     while(it.HasNext())
     {
       cl_program p = it.Next();
@@ -198,14 +203,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       CS_ASSERT(error == CL_SUCCESS);
     }
 
-    csHash<csString, KernelMetaData>::Iterator kernelIt = kernelData.GetIterator();
-    while(it.HasNext())
+    csHash<KernelMetaData, csString>::GlobalIterator kernelIt = kernelData.GetIterator();
+    while(kernelIt.HasNext())
     {
-      delete [] it.Next().args;
+      delete [] kernelIt.Next().args;
     }
   }
 
-  csRef<Event> GetHandle(Context*, cl_program& p);
+  csRef<Event> Library::GetHandle(Context* c, cl_program& p)
   {
     if(handles.Contains(c))
     {
@@ -214,7 +219,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     }
     else
     {
-      const char** strings = new char*[source->GetSize()];
+      const char** strings = new const char*[source->GetSize()];
       if(strings == nullptr)
       {
         // OOM
@@ -237,7 +242,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       // build for all devices in context
       //@@@todo: maybe we want to somehow specify options here?
       csRef<Event> e = csPtr<Event>(new Event());
-      error = clBuildProgram(p, /* devices */ nullptr, /* deviceCount */ 0,
+      error = clBuildProgram(p, /* deviceCount */ 0, /* devices */ nullptr,
                              /* options */ "", BuildHandler, (void*)e);
 
       if(error != CL_SUCCESS)
@@ -284,7 +289,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     return csPtr<iKernel>(kernel);
   }
 
-  static void Library::BuildHandler(cl_program p, void* data)
+  void Library::BuildHandler(cl_program p, void* data)
   {
     csRef<Event> e = static_cast<Event*>(data);
 
@@ -335,7 +340,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     e->Fire(success);
   }
 
-  static cl_device_id* Library::GetDevices(cl_program p, cl_uint& deviceCount)
+  cl_device_id* Library::GetDevices(cl_program p, cl_uint& deviceCount)
   {
     // get devices this program is associated with
     cl_int error;
@@ -369,10 +374,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     return devices;
   }
 
-  static void Library::PrintLog(cl_program p, cl_device_id d)
+  void Library::PrintLog(cl_program p, cl_device_id d)
   {
     // get the size of the build log
     size_t logSize;
+    cl_int error;
     error = clGetProgramBuildInfo(p, d, CL_PROGRAM_BUILD_LOG,
                                   0, nullptr, &logSize);
     if(error != CL_SUCCESS)
@@ -381,7 +387,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     }
 
     // allocate resssources to hold the log
-    char* buildLog = csAlloc(logSize);
+    char* buildLog = (char*)cs_malloc(logSize);
     if(buildLog == nullptr)
     {
       // OOM
@@ -397,7 +403,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     }
 
     // free ressources allocated for the build log
-    csFree(buildLog);
+    cs_free(buildLog);
   }
 }
 CS_PLUGIN_NAMESPACE_END(CL)
+

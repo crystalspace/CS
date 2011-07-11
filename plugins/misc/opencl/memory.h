@@ -2,105 +2,48 @@
 #define __CS_OPENCL_MEMORY_IMPL_H__
 
 #include <ivaria/clmemory.h>
+#include <csutil/hash.h>
+#include <csutil/scf_implementation.h>
 
 CS_PLUGIN_NAMESPACE_BEGIN(CL)
 {
-  class MappedMemory : public scfImplementation1<MappedMemory,iMappedMemory>
+  using namespace CS::CL;
+
+  class MappedMemory;
+  class Context;
+  class Event;
+  class Image;
+  class Buffer;
+
+  class MemoryObject : public scfImplementation1<MemoryObject, iMemoryObject>
   {
+  friend class MappedMemory;
   public:
-    MappedMemory(Context* c, MemoryObject* p, void* data, const size_t size[3],
-                 const size_t offset[3], const size_t pitch[2], Event* e)
-               : scfImplementationType(this,p),
-                 done(e), data(data), parent(p), context(c),
-                 size(size), offset(offset), pitch(pitch)
-    {
-    }
-
-    ~MappedMemory()
-    {
-      csRef<iEvent> e = Release();
-      if(e.IsValid())
-      {
-        // retain a copy to the unmap event so it'll
-        // stay alive until the release is done
-        done->IncRef();
-
-        e->AddCallback(HandleUnmap, (void*)done);
-      }
-      else
-      {
-        done->Fire(true);
-      }
-    }
-
-    csPtr<iEvent> Release(const iEventList& = iEventList());
-
-    void* GetPointer() const
-    {
-      return data;
-    }
-
-    iBuffer* GetBuffer() const
-    {
-      return parent->GetBuffer();
-    }
-
-    iImage* GetImage() const
-    {
-      return parent->GetImage();
-    }
-
-    size_t GetOffset(int dimension = 0) const
-    {
-      return offset[dimension];
-    }
-
-    size_t GetSize(int dimension = 0) const
-    {
-      return size[dimension];
-    }
-
-    size_t GetPitch(int dimesion = 0) const
-    {
-      return pitch[dimension];
-    }
-
-  private:
-    csRef<Event> done;
-    void* data;
-    csRef<MemoryObject> parent;
-    csRef<Context> context;
-    size_t size[3];
-    size_t offset[3];
-    size_t pitch[2];
-
-    static void HandleUnmap(iEvent*, void*);
-  };
-
-  class MemoryObject
-  {
-  friend MappedMemory;
-  public:
-    MemoryObject(int accessMode, void* data) : accessMode(accessMode), data(data)
+    MemoryObject() : scfImplementationType(this)
     {
       status.PutUnique(nullptr, true); // start with host being up to date
     }
 
     ~MemoryObject();
 
-    virtual iBuffer* GetBuffer() const
+    virtual iBuffer* GetBuffer()
     {
       return nullptr;
     }
 
-    virtual iImage* GetImage() const
+    virtual iImage* GetImage()
     {
       return nullptr;
     }
 
-    iSampler* GetSampler() const
+    virtual iSampler* GetSampler()
     {
       return nullptr;
+    }
+    
+    virtual csPtr<iMemoryObject> Clone()
+    {
+      return csPtr<iMemoryObject>(nullptr); // stub
     }
 
     int GetAccessMode() const
@@ -137,11 +80,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     int accessMode;
 
     void* data;
-    csHash<csRef<Context>, cl_mem> handles;
+    csHash<cl_mem, csRef<Context> > handles;
 
     // hash that holds information on whether
     // a handle is up-to-date or not
-    csHash<csRef<Context>, bool> status;
+    csHash<bool, csRef<Context> > status;
 
     // holds the last context this object was written in
     Context* lastWriteContext;
@@ -157,14 +100,82 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     static void EventHandler(iEvent*, void*);
   };
 
-  class Buffer : public MemoryObject,
-                 public scfImplementation2<Buffer,
-                                           iBuffer,
-                                           iMemoryObject>
+  class MappedMemory : public scfImplementation1<MappedMemory,iMappedMemory>
   {
   public:
-    Buffer(size_t size, int accessMode) : size(size), MemoryObject(accessMode, csAlloc(size))
+    MappedMemory(Context* c, MemoryObject* p, void* data, const size_t size[3],
+                 const size_t offset[3], const size_t pitch[2], Event* e)
+               : scfImplementationType(this,nullptr),
+                 done(e), data(data), parent(p), context(c)
     {
+      for(size_t i = 0; i < 3; ++i)
+      {
+        this->size[i] = size[i];
+        this->offset[i] = offset[i];
+      }
+
+      for(size_t i = 0; i < 2; ++i)
+        this->pitch[i] = pitch[i];
+    }
+
+    ~MappedMemory();
+
+    csPtr<iEvent> Release(const iEventList& = iEventList());
+
+    void* GetPointer() const
+    {
+      return data;
+    }
+
+    iBuffer* GetBuffer()
+    {
+      return parent->GetBuffer();
+    }
+
+    iImage* GetImage()
+    {
+      return parent->GetImage();
+    }
+
+    size_t GetOffset(int dimension = 0) const
+    {
+      return offset[dimension];
+    }
+
+    size_t GetSize(int dimension = 0) const
+    {
+      return size[dimension];
+    }
+
+    size_t GetPitch(int dimension = 0) const
+    {
+      return pitch[dimension];
+    }
+
+  private:
+    csRef<Event> done;
+    void* data;
+    csRef<MemoryObject> parent;
+    csRef<Context> context;
+    size_t size[3];
+    size_t offset[3];
+    size_t pitch[2];
+
+    static void HandleUnmap(iEvent*, void*);
+  };
+
+  class Buffer : public scfImplementationExt1<Buffer, MemoryObject,
+                                              iBuffer>
+  {
+  friend class Image;
+  public:
+    SCF_INTERFACE(Buffer, 0, 0, 1);
+
+    Buffer(size_t size, int accessMode) : scfImplementationType(this),
+                                          size(size)
+    {
+      this->accessMode = accessMode;
+      data = cs_malloc(size);
     }
 
     int GetObjectType() const
@@ -172,9 +183,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return MEM_BUFFER;
     }
 
-    iBuffer* GetBuffer() const
+    iBuffer* GetBuffer()
     {
       return this;
+    }
+
+    size_t GetSize() const
+    {
+      return size;
     }
 
     csPtr<iEvent> Request(size_t offset, size_t size,
@@ -204,15 +220,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     size_t size;
   };
 
-  class Image : public MemoryObject,
-                public scfImplementation<Image,
-                                         iMemoryObject,
-                                         iImage>
+  class Image : public scfImplementationExt1<Image, MemoryObject,
+                                             iImage>
   {
+  friend class Buffer;
   public:
-    Image(const size_t size[3], int format, int accessMode) : size(size), format(format),
-                              MemoryObject(accessMode, csAlloc(GetSize()))
+    SCF_INTERFACE(Image, 0, 0, 1);
+
+    Image(const size_t size[3], int format, int accessMode) : scfImplementationType(this),
+                                                              format(format)
     {
+      this->accessMode = accessMode;
+
+      for(size_t i = 0; i < 3; ++i)
+        this->size[i] = size[i];
+
+      data = cs_malloc(GetSize());
     }
 
     int GetObjectType() const
@@ -220,7 +243,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return MEM_IMAGE;
     }
 
-    iImage* GetImage() const
+    iImage* GetImage()
     {
       return this;
     }
@@ -245,7 +268,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return size[2];
     }
 
-    size_t GetElementsize() const
+    size_t GetElementSize() const
     {
       size_t elementSize = 1;
       elementSize <<= format & FMT_SIZE;
@@ -291,7 +314,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
                                             iSampler>
   {
   public:
-    Sampler(int addressMode, int filterMode, bool normalized) : addressMode(addressMode),
+    SCF_INTERFACE(Sampler, 0, 0, 1);
+
+    Sampler(int addressMode, int filterMode, bool normalized) : scfImplementationType(this,nullptr),
+                                                                addressMode(addressMode),
                                                                 filterMode(filterMode),
                                                                 normalized(normalized)
     {
@@ -302,17 +328,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       Purge();
     }
 
-    iBuffer* GetBuffer() const
+    iBuffer* GetBuffer()
     {
       return nullptr;
     }
 
-    iImage* GetImage() const
+    iImage* GetImage()
     {
       return nullptr;
     }
 
-    iSampler* GetSampler() const
+    iSampler* GetSampler()
     {
       return this;
     }
@@ -360,7 +386,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     cl_sampler GetHandle(Context*);
 
   private:
-    csHash<csRef<Context>, cl_sampler> handles;
+    csHash<cl_sampler, csRef<Context> > handles;
 
     int addressMode;
     int filterMode;
@@ -370,3 +396,4 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
 CS_PLUGIN_NAMESPACE_END(CL)
 
 #endif // __CS_OPENCL_MEMORY_IMPL_H__
+

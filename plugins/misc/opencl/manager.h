@@ -2,15 +2,18 @@
 #define __CS_OPENCL_MANAGER_IMPL_H__
 
 #include <ivaria/clmanager.h>
+#include <iutil/comp.h>
 #include <csutil/scf_implementation.h>
-#include "context.h"
-#include "queue.h"
+
 #include "event.h"
-#include "sampler.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(CL)
 {
-  using CS::CL;
+  using namespace CS::CL;
+
+  class Context;
+  class Queue;
+  class Library;
 
   class Manager : public scfImplementation2<Manager,
                                             iManager,
@@ -57,12 +60,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return csPtr<iEvent>(ev);
     }
 
-    csPtr<iLibrary> CreateLibrary(iStringArray* source)
-    {
-      csRef<iLibrary> l;
-      l.AttachNew(new Library(source));
-      return csPtr<iLibrary>(l);
-    }
+    csPtr<iLibrary> CreateLibrary(iStringArray* source);
 
     csPtr<iBuffer> CreateBuffer(size_t size, int access = MEM_READ_WRITE,
                                 void* src = nullptr);
@@ -80,19 +78,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
                               int format, int access = MEM_READ_WRITE,
                               void* src = nullptr, size_t row_pitch = 0,
                               size_t slice_pitch = 0);
-    csPtr<iImage> CreateImage(::iImage, int access = MEM_READ_WRITE)
+
+    csPtr<iImage> CreateImage(::iImage*, int access = MEM_READ_WRITE)
     {
       CS_ASSERT(false);
       return csPtr<iImage>(nullptr); // stub
     }
 
     csPtr<iSampler> CreateSampler(int addressMode, int filterMode = FILTER_NEAREST,
-                                  bool normalized = false)
-    {
-      csRef<iSampler> s;
-      s.AttachNew(new Sampler(addressMode, filterMode, normalized));
-      return csPtr<iSampler>(s);
-    }
+                                  bool normalized = false);
 
     // internal accessors
     const csRefArray<Context>& GetContexts() const
@@ -103,7 +97,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
   private:
     csRefArray<Context> contexts;
     //@@@todo: maybe seperate the queues by type/context here?
-    csRefArray<Queue> queues;
+    csRefArray<CS_PLUGIN_NAMESPACE_NAME(CL)::Queue> queues;
 
     //@@@todo: keep track of jobs queued in a given queue
     //         so we can at least do a round-robin

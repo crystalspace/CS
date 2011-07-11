@@ -19,6 +19,8 @@
 #ifndef __CS_OPENCL_MANAGER_H__
 #define __CS_OPENCL_MANAGER_H__
 
+#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
 #include "csutil/nullptr.h"
@@ -31,14 +33,14 @@ namespace CS
 {
 namespace CL
 {
-  struct iBuffer;
+  struct iEvent;
   struct iImage;
+  struct iBuffer;
   struct iSampler;
-  struct ImageFormat;
-
   struct iKernel;
+  struct iLibrary;
 
-  typedef void (*Callback)(iEvent*,void*);
+  typedef void(*Callback)(iEvent*,void*);
 
   /// structure that holds information about an event
   struct iEvent : public virtual iBase
@@ -97,7 +99,7 @@ namespace CL
                                       int format, int access = MEM_READ_WRITE,
                                       void* src = nullptr, size_t row_pitch = 0,
                                       size_t slice_pitch = 0) = 0;
-    virtual csPtr<iImage> CreateImage(::iImage, int access = MEM_READ_WRITE) = 0;
+    virtual csPtr<iImage> CreateImage(::iImage*, int access = MEM_READ_WRITE) = 0;
 
     virtual csPtr<iSampler> CreateSampler(int addressMode, int filterMode = FILTER_NEAREST,
                                           bool normalized = false) = 0;

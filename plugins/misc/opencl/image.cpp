@@ -1,4 +1,9 @@
+#include "cssysdef.h"
+
 #include "memory.h"
+#include "context.h"
+#include "queue.h"
+#include "event.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(CL)
 {
@@ -97,9 +102,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
 
   csPtr<iEvent> Image::Write(void* src, Context* c, const iEventList& events)
   {
-    // obtain target handle
-    cl_mem handle = *handles.GetElementPointer(c);
-
     // convert event list
     csRefArray<Event> eventList;
     if(!BuildEventList(events, eventList, 0))
@@ -112,7 +114,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     {
       if(data == nullptr)
       {
-        data = csAlloc(GetSize());
+        data = cs_malloc(GetSize());
         if(data == nullptr)
         {
           // OOM
@@ -141,6 +143,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
 
       // queue the write
       cl_event handle;
+      cl_mem obj = GetHandle(c);
       size_t offset[3] = {0,0,0};
       cl_int error = clEnqueueWriteImage(q->GetHandle(), obj, CL_FALSE, offset, size, 0, 0,
                                          src, eventList.GetSize(), handleList, &handle);
@@ -173,21 +176,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       }
     }
 
-    CS::Threading::ScopedLock lock(useLock);
+    CS::Threading::RecursiveMutexScopedLock lock(useLock);
 
     // convert event list
     csRefArray<Event> eventList;
-    if(!BuildEventList(events, eventList))
+    if(!BuildEventList(events, eventList, MEM_READ_WRITE))
     {
       return csPtr<iEvent>(nullptr);
     }
 
-    csRef<iEvent> e; // holds the event the user shall wait on
+    csRef<Event> e; // holds the event the user shall wait on
     csRef<MappedMemory> map; // holds the new map object
-    csRef<iEvent> unmapEvent; // holds the event further usages should wait on
+    csRef<Event> unmapEvent; // holds the event further usages should wait on
     unmapEvent.AttachNew(new Event());
 
-    if(lastWriteContext == nullptr)
+    if(status.Get(nullptr,false))
     {
       // most recent version is located on host
 
@@ -204,10 +207,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       size_t rowPitch = GetWidth()*GetElementSize();
       size_t slicePitch = GetHeight()*rowPitch;
       size_t pitch[2] = { rowPitch, slicePitch };
-      void* map = data + offset[0]*GetElementSize()
-                       + offset[1]*rowPitch
-                       + offset[2]*slicePitch;
-      map.AttachNew(new MappedMemory(nullptr, this, map, size, offset, pitch, unmapEvent));
+      void* result = (uint8*)data + offset[0]*GetElementSize()
+                                  + offset[1]*rowPitch
+                                  + offset[2]*slicePitch;
+      map.AttachNew(new MappedMemory(nullptr, this, result, size, offset, pitch, unmapEvent));
     }
     else
     {
@@ -222,7 +225,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       cl_mem obj = GetHandle(lastWriteContext);
 
       // obtain queue
-      csRef<Queue> q = lastContext->GetQueue();
+      csRef<Queue> q = lastWriteContext->GetQueue();
 
       // map buffer
       cl_int error;
@@ -289,7 +292,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return csRef<iEvent>(nullptr);
     }
 
-    CS::Threading::ScopedLock lock(useLock);
+    CS::Threading::RecursiveMutexScopedLock lock(useLock);
 
     // convert event list
     csRefArray<Event> eventList;
@@ -298,7 +301,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return csRef<iEvent>(nullptr);
     }
 
-    csRef<iEvent> e;
+    csRef<Event> e;
     Context* c = nullptr;
     if(status.Get(nullptr,false))
     {
@@ -317,11 +320,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       size_t sliceSkip = slicePitch - size[1]*rowPitch;
       size_t srcSliceSkip = srcSlicePitch - size[1]*srcRowPitch;
 
-      void* source = data + offset[0]*GetElementSize();
+      uint8* source = (uint8*)data + offset[0]*GetElementSize();
       source += offset[1]*srcRowPitch;
       source += offset[2]*srcSlicePitch;
 
-      void* target = dst;
+      uint8* target = (uint8*)dst;
 
       // copy the according line parts
       for(size_t z = 0; z < size[2]; ++z)
@@ -407,16 +410,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return csRef<iEvent>(nullptr);
     }
 
-    CS::Threading::ScopedLock lock(useLock);
+    CS::Threading::RecursiveMutexScopedLock lock(useLock);
 
     // convert event list
     csRefArray<Event> eventList;
-    if(!BuildEventList(events, eventList))
+    if(!BuildEventList(events, eventList, MEM_WRITE))
     {
       return csRef<iEvent>(nullptr);
     }
 
-    csRef<iEvent> e;
+    csRef<Event> e;
     Context* c = nullptr;
     if(status.Get(nullptr,false))
     {
@@ -435,11 +438,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       size_t sliceSkip = slicePitch - size[1]*rowPitch;
       size_t dstSliceSkip = dstSlicePitch - size[1]*dstRowPitch;
 
-      void* target = data + offset[0]*GetElementSize();
+      uint8* target = (uint8*)data + offset[0]*GetElementSize();
       target += offset[1]*dstRowPitch;
       target += offset[2]*dstSlicePitch;
 
-      void* source = src;
+      uint8* source = (uint8*)src;
 
       // copy the according line parts
       for(size_t z = 0; z < size[2]; ++z)
@@ -448,8 +451,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
         {
           memcpy(target, source, lineSize);
 
-          target += dstrowPitch;
-          source += RowPitch;
+          target += dstRowPitch;
+          source += rowPitch;
         }
         target += dstSliceSkip;
         source += sliceSkip;
@@ -461,7 +464,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       cl_mem obj = GetHandle(c);
 
       // get queue for target device
-      csRef<Queue> q = lastContext->GetQueue();
+      csRef<Queue> q = c->GetQueue();
 
       cl_event* handleList = CreateEventHandleList(eventList, c);
       if(!eventList.IsEmpty() && handleList == nullptr)
@@ -472,7 +475,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
 
       cl_event handle;
       cl_int error = clEnqueueWriteImage(q->GetHandle(), obj, CL_FALSE, offset, size,
-                                         rowPitch, slicePitch, dst, eventList.GetSize(),
+                                         rowPitch, slicePitch, src, eventList.GetSize(),
                                          handleList, &handle);
       delete [] handleList;
 
@@ -496,7 +499,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
   csRef<iEvent> Image::Copy(iImage* dstObj, const size_t size[3], const size_t src_offset[3],
                             const size_t dst_offset[3], const iEventList& events)
   {
-    csRef<Image> dst = scfQueryInterfaceSafe(dstObj);
+    csRef<Image> dst = scfQueryInterfaceSafe<Image>(dstObj);
     if(!dst.IsValid())
     {
       // invalid destination
@@ -519,24 +522,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return csRef<iEvent>(nullptr);
     }
 
-    CS::Threading::ScopedLock lock(useLock);
-    CS::Threading::ScopedLock dstLock(dst->useLock);
+    CS::Threading::RecursiveMutexScopedLock lock(useLock);
+    CS::Threading::RecursiveMutexScopedLock dstLock(dst->useLock);
 
     if(status.Get(nullptr, false))
     {
       iEventList list(events);
-      if(lastWriteEvent.IsValid())
+      if(lastWrite.IsValid())
       {
-        list.Push(lastWriteEvent);
+        list.Push(lastWrite);
       }
 
       size_t rowPitch = GetElementSize()*GetWidth();
       size_t slicePitch = rowPitch*GetHeight();
-      void* src = data + src_offset[0]*GetElementSize()
-                       + src_offset[1]*rowPitch
-                       + src_offset[2]*slicePitch;
+      uint8* src = (uint8*)data + src_offset[0]*GetElementSize()
+                                + src_offset[1]*rowPitch
+                                + src_offset[2]*slicePitch;
       size_t pitch[2] = {rowPitch, slicePitch};
-      csRef<iEvent> e = dst->Write(src, size, dst_offset, pitch, list);
+      csRef<Event> e = scfQueryInterfaceSafe<Event>(dst->Write(src, size, dst_offset, pitch, list));
       if(e.IsValid())
       {
         Use(nullptr, e, MEM_READ);
@@ -553,11 +556,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
 
       size_t rowPitch = dst->GetElementSize()*dst->GetWidth();
       size_t slicePitch = rowPitch*dst->GetHeight();
-      void* dst = data + dst_offset[0]*dst->GetElementSize()
-                       + dst_offset[1]*rowPitch
-                       + dst_offset[2]*slicePitch;
+      uint8* target = (uint8*)data + dst_offset[0]*dst->GetElementSize()
+                                   + dst_offset[1]*rowPitch
+                                   + dst_offset[2]*slicePitch;
       size_t pitch[2] = {rowPitch, slicePitch};
-      csRef<iEvent> e = Read(dst, size, src_offset, pitch, list);
+      csRef<Event> e = scfQueryInterfaceSafe<Event>(Read(target, size, src_offset, pitch, list));
       if(e.IsValid())
       {
         dst->Use(nullptr, e, MEM_WRITE);
@@ -566,7 +569,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     }
 
     csRefArray<Event> eventList;
-    if(!BuildEventList(events, eventList, dst))
+    if(!BuildEventList(events, eventList, MEM_READ, dst, MEM_WRITE))
     {
       return csRef<iEvent>(nullptr);
     }
@@ -576,8 +579,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     // get queue for the context
     csRef<Queue> q = c->GetQueue();
 
-    cl_mem src = GetHandle(c);
-    cl_mem dst = dst->GetHandle(c);
+    cl_mem src_obj = GetHandle(c);
+    cl_mem dst_obj = dst->GetHandle(c);
 
     cl_event* handleList = CreateEventHandleList(eventList, c);
     if(!eventList.IsEmpty() && handleList == nullptr)
@@ -586,7 +589,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     }
 
     cl_event handle;
-    cl_int error = clEnqueueCopyImage(q->GetHandle(), src, dst, src_offset, dst_offset,
+    cl_int error = clEnqueueCopyImage(q->GetHandle(), src_obj, dst_obj, src_offset, dst_offset,
                                       size, eventList.GetSize(), handleList, &handle);
     delete [] handleList;
 
@@ -634,8 +637,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return csRef<iEvent>(nullptr);
     }
 
-    CS::Threading::ScopedLock lock(useLock);
-    CS::Threading::ScopedLock dstLock(dst->useLock);
+    CS::Threading::RecursiveMutexScopedLock lock(useLock);
+    CS::Threading::RecursiveMutexScopedLock dstLock(dst->useLock);
 
     //@@@todo: add specialization in case lastContext == nullptr
     if(dst->status.Get(nullptr, false))
@@ -647,7 +650,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       }
 
       size_t pitch[2] = {0,0}; // automatically computed
-      csRef<iEvent> e = Read(dst->data + dst_offset, src_size, src_offset, pitch, list);
+      csRef<Event> e = scfQueryInterfaceSafe<Event>(Read((uint8*)(dst->data) + dst_offset, src_size, src_offset, pitch, list));
       if(e.IsValid())
       {
         dst->Use(nullptr, e, MEM_WRITE);
@@ -656,7 +659,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     }
 
     csRefArray<Event> eventList;
-    if(!BuildEventList(events, eventList, dst))
+    if(!BuildEventList(events, eventList, MEM_READ, dst, MEM_WRITE))
     {
       return csRef<iEvent>(nullptr);
     }
@@ -672,11 +675,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return csRef<iEvent>(nullptr);
     }
 
-    cl_mem src = GetHandle(c);
-    cl_mem dst = dst->GetHandle(c);
+    cl_mem src_obj = GetHandle(c);
+    cl_mem dst_obj = dst->GetHandle(c);
 
     cl_event handle;
-    cl_int error = clEnqueueCopyImageToBuffer(q->GetHandle(), src, dst, src_offset,
+    cl_int error = clEnqueueCopyImageToBuffer(q->GetHandle(), src_obj, dst_obj, src_offset,
                                               src_size, dst_offset, eventList.GetSize(),
                                               handleList, &handle);
     delete [] handleList;
@@ -690,7 +693,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return csRef<iEvent>(nullptr);
     }
 
-    csRef<iEvent> e = csPtr<iEvent>(new Event(c, handle));
+    csRef<Event> e = csPtr<Event>(new Event(c, handle));
 
     // update usage events
     Use(c, e, MEM_READ);

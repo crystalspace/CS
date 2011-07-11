@@ -1,9 +1,18 @@
 #ifndef __CS_OPENCL_QUEUE_IMPL_H__
 #define __CS_OPENCL_QUEUE_IMPL_H__
 
+#include <ivaria/clconsts.h>
+#include <csutil/refarr.h>
+#include <csutil/refcount.h>
+#include <csutil/weakreferenced.h>
+
 CS_PLUGIN_NAMESPACE_BEGIN(CL)
 {
-  class Queue
+  class Context;
+  class Device;
+  class Event;
+
+  class Queue : public csRefCount, public CS::Utility::WeakReferenced
   {
   public:
     Queue(Context* c, Device* d, cl_command_queue q) : queue(q),
@@ -12,11 +21,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     {
     }
 
-    ~Queue()
-    {
-      cl_int error = clReleaseCommandQueue(queue);
-      CS_ASSERT(error == CL_SUCCESS);
-    }
+    ~Queue();
 
     Context* GetContext() const
     {

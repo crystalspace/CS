@@ -19,15 +19,17 @@
 #ifndef __CS_OPENCL_PROGRAM_H__
 #define __CS_OPENCL_PROGRAM_H__
 
+#include "clmanager.h"
+
 struct iStringArray;
 
 namespace CS
 {
 namespace CL
 {
-  struct iEvent;
   struct iBuffer;
   struct iLibrary;
+  struct iMemoryObject;
 
   struct iKernel : public virtual iBase
   {
@@ -59,7 +61,7 @@ namespace CL
   {
     SCF_INTERFACE(iLibrary, 0, 0, 1);
 
-    virtual iStringArray* GetSource() const = 0;
+    virtual const iStringArray* GetSource() const = 0;
 
     virtual csPtr<iKernel> CreateKernel(const char*) = 0;
     virtual void Precache() = 0;

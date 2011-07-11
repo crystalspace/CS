@@ -1,8 +1,18 @@
+#include "cssysdef.h"
+
 #include "queue.h"
+#include "context.h"
+#include "event.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(CL)
 {
-  bool Queue::CheckError(cl_int)
+  Queue::~Queue()
+  {
+    cl_int error = clReleaseCommandQueue(queue);
+    CS_ASSERT(error == CL_SUCCESS);
+  }
+
+  bool Queue::CheckError(cl_int error)
   {
     switch(error)
     {
@@ -16,7 +26,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       // (e.g. comes from another queue that wasn't flushed)
     case CL_INVALID_COMMAND_QUEUE:
       // this object isn't valid
-    case CL_OUT_OF_RESSOURCES:
+    case CL_OUT_OF_RESOURCES:
       // device OOM
     case CL_OUT_OF_HOST_MEMORY:
       // host OOM
@@ -56,7 +66,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     {
       csRef<Event> ev;
       ev.AttachNew(new Event(context, e));
-      return csPtr<Event> ev;
+      return csPtr<Event>(ev);
     }
 
     return csPtr<Event>(nullptr);
@@ -69,7 +79,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return true;
     }
 
-    cl_event* events = CreateEventHandleList(eventList);
+    cl_event* events = CreateEventHandleList(eventList, context);
     if(events == nullptr)
     {
       // OOM
@@ -84,3 +94,4 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
   }
 }
 CS_PLUGIN_NAMESPACE_END(CL)
+

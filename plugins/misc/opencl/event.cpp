@@ -1,8 +1,11 @@
+#include "cssysdef.h"
+
 #include "event.h"
+#include "context.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(CL)
 {
-  bool Event::CheckError(cl_int)
+  bool Event::CheckError(cl_int error)
   {
     switch(error)
     {
@@ -12,7 +15,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
 
     case CL_INVALID_COMMAND_QUEUE:
       // this object isn't valid
-    case CL_OUT_OF_RESSOURCES:
+    case CL_OUT_OF_RESOURCES:
       // device OOM
     case CL_OUT_OF_HOST_MEMORY:
       // host OOM
@@ -32,7 +35,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     IncRef();
 
     // add the original event to our handles list
-    handles.Push(c,e);
+    handles.PutUnique(c,e);
 
     // add a callback so we're notified once we're done
     cl_int error = clSetEventCallback(e, CL_COMPLETE, NotifyHandler, (void*)this);
@@ -76,9 +79,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
   }
 
   // meta event constructor
-  Event::Event(const iEventList& deps) : scfImplementationType(this,nullptr),
-                                         dependencies(deps), origin(nullptr),
-                                         finished(false), success(true)
+  Event::Event(const CS::CL::iEventList& deps) : scfImplementationType(this,nullptr),
+                                                 dependencies(deps), origin(nullptr),
+                                                 finished(false), success(true)
   {
     AddCallbacks();
   }
@@ -100,7 +103,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     }
 
     // release all the events we own
-    csHash<csRef<Context>, cl_event>::GlobalIterator it = handles.GetIterator();
+    csHash<cl_event, csRef<Context> >::GlobalIterator it = handles.GetIterator();
     while(it.HasNext())
     {
       cl_event e = it.Next();
@@ -109,21 +112,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     }
   }
 
-  static void Event::NotifyHandler(cl_event e, cl_int status, void* data)
+  void Event::NotifyHandler(cl_event e, cl_int status, void* data)
   {
     Event* obj = static_cast<Event*>(data);
     obj->FireEvents(CheckError(status));
     obj->DecRef(); // release our self-reference
   }
 
-  static void Event::DependencyHandler(iEvent* e, void* data)
+  void Event::DependencyHandler(iEvent* e, void* data)
   {
     Event* obj = static_cast<Event*>(data);
     {
-      CS::Threading::ScopedLock lock(obj->statusLock);
-      obj->success &&= e->WasSuccessful();
+      CS::Threading::MutexScopedLock lock(obj->statusLock);
+      obj->success &= e->WasSuccessful();
     }
-    CS::Threading::ScopedLock lock(obj->depLock);
+    CS::Threading::MutexScopedLock lock(obj->depLock);
     obj->dependencies.Delete(e);
     if(obj->dependencies.IsEmpty())
     {
@@ -135,7 +138,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
   void Event::FireEvents(bool success)
   {
     {
-      CS::Threading::ScopedLock lock(obj->statusLock);
+      CS::Threading::MutexScopedLock lock(statusLock);
       if(finished)
       {
         // fired already
@@ -147,7 +150,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     }
     cl_int status = success ? CL_COMPLETE : -1;
 
-    csHash<csRef<Context>, cl_event>::GlobalIterator it = handles.GetIterator();
+    csHash<cl_event, csRef<Context> >::GlobalIterator it = handles.GetIterator();
     while(it.HasNext())
     {
       cl_event e = it.Next();
@@ -182,7 +185,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return false;
     }
 
-    CS::Threading::ScopedLock lock(obj->statusLock);
+    CS::Threading::MutexScopedLock lock(statusLock);
     if(finished)
     {
       // fired already
@@ -201,7 +204,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       if(!submitted && e == origin)
       {
         // check whether the job has been submitted already
-        cl_int status = CL_COMMAND_QUEUED;
+        cl_int status = CL_QUEUED;
         clGetEventInfo(e, CL_EVENT_COMMAND_EXECUTION_STATUS,
                        sizeof(cl_int), &status, nullptr);
 
@@ -239,12 +242,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     }
   }
 
-  void Event::AddCallback(Callback listener, void* data)
+  void Event::AddCallback(CS::CL::Callback listener, void* data)
   {
     callbacks.Push(listener);
     callbackData.Push(data);
 
-    CS::Threading::ScopedLock lock(statusLock);
+    CS::Threading::MutexScopedLock lock(statusLock);
     if(finished)
     {
       // if we're done already, call it straight away
@@ -252,7 +255,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     }
   }
 
-  bool Event::RemoveCallback(Callback listener)
+  bool Event::RemoveCallback(CS::CL::Callback listener)
   {
     size_t index = callbacks.Find(listener);
     if(index == csArrayItemNotFound)
@@ -268,7 +271,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     }
   }
 
-  csRefArray<Event> CreateEventList(const iEventList& events)
+  csRefArray<Event> CreateEventList(const CS::CL::iEventList& events)
   {
     csRefArray<Event> eventList;
     for(size_t i = 0; i < events.GetSize(); ++i)

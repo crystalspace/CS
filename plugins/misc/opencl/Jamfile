@@ -3,5 +3,6 @@ SubDir TOP plugins misc opencl ;
 Plugin opencl
        : [ Wildcard *.cpp *.h ] ;
 
-LinkWith opencl : OpenCL ;
+LinkWith opencl : crystalspace ;
+ExternalLibs opencl : OpenCL ;
 

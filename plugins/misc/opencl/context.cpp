@@ -1,11 +1,23 @@
+#include "cssysdef.h"
+
 #include "context.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(CL)
 {
-  static void Context::NotifyHandler(const char* error, const void* data,
-                                     size_t dataSize, void* userData)
+  Context::~Context()
+  {
+    if(context != nullptr)
+    {
+      cl_int error = clReleaseContext(context);
+      CS_ASSERT(error == CL_SUCCESS);
+    }
+  }
+
+  void Context::NotifyHandler(const char* error, const void* data,
+                              size_t dataSize, void* userData)
   {
     Context* c = static_cast<Context*>(userData);
+    (void)c;
     // error is a printable string
     // data is dataSize in bytes and contains implementation specific data
     // which may be used for debugging purposes
@@ -37,7 +49,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       CL_CONTEXT_PLATFORM,
       (cl_context_properties)(platform->GetHandle()),
       0
-    }
+    };
 
     cl_int error;
     context = clCreateContext(properties, devices.GetSize(), deviceList,
@@ -60,7 +72,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       // invalid device in device list
     case CL_DEVICE_NOT_AVAILABLE:
       // one of the devices isn't available
-    case CL_OUT_OF_RESSOURCES:
+    case CL_OUT_OF_RESOURCES:
       // OOM on one of the devices
     case CL_OUT_OF_HOST_MEMORY:
       // host OOM
@@ -72,7 +84,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
 
     // try to find a device with out of order support
     // for the main queue
-    for(size_t i = 0; < devices; ++i)
+    for(size_t i = 0; i < devices.GetSize(); ++i)
     {
       if(devices[i]->OutOfOrderSupport())
       {
@@ -90,7 +102,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     return contextQueue.IsValid();
   }
 
-  csPtr<Queue> CreateQueue(Device* d)
+  csPtr<Queue> Context::CreateQueue(Device* d)
   {
     if(!devices.Contains(d))
     {
@@ -126,7 +138,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       // either Notify or Initialize failed
     case CL_INVALID_DEVICE:
       // device is either invalid or doesn't belong to this context
-    case CL_OUT_OF_RESSOURCES:
+    case CL_OUT_OF_RESOURCES:
       // device OOM
     case CL_OUT_OF_HOST_MEMORY:
       // host OOM
@@ -136,9 +148,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     }
 
     csRef<Queue> q;
-    q.AttachNew(new Queue(this, device, queue));
-    queues.PushBack(q);
-    return q;
+    q.AttachNew(new Queue(this, d, queue));
+    queues.Push(q);
+    return csPtr<Queue>(q);
   }
 }
 CS_PLUGIN_NAMESPACE_END(CL)

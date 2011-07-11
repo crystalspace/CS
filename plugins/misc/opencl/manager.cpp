@@ -1,7 +1,11 @@
-#include <ivaria/clconsts.h>
+#include "cssysdef.h"
+
 #include "manager.h"
-#include "buffer.h"
-#include "image.h"
+#include "memory.h"
+#include "library.h"
+#include "kernel.h"
+#include "queue.h"
+#include "context.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(CL)
 {
@@ -57,7 +61,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return false;
     }
 
-    for(cl_uint i = 0; i < platfromCount; ++i)
+    for(cl_uint i = 0; i < platformCount; ++i)
     {
       csRef<Platform> p;
       p.AttachNew(new Platform(platforms[i]));
@@ -65,13 +69,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       {
         continue;
       }
-      // validate whether this platform shall be used
+      //@@@todo: validate whether this platform shall be used
       // e.g. isn't blacklisted (intel), is sufficiently recent, ...
 
       csRefArray<Device> devices = p->GetDevices();
-      for(cl_uint j = 0; j < deviceCount; ++j)
+      for(cl_uint j = 0; j < devices.GetSize(); ++j)
       {
-        // validate device and remove it if it's invalid
+        //@@@todo: validate device and remove it if it's invalid
       }
 
       if(!devices.IsEmpty())
@@ -79,7 +83,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
         csRef<Context> c;
         c.AttachNew(new Context(p, devices));
 
-        if(!c->Initialiaze())
+        if(!c->Initialize())
         {
           continue;
         }
@@ -90,7 +94,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
         // create queues for devices
         for(size_t j = 0; j < devices.GetSize(); ++j)
         {
-          queues.Push(c->CreateQueue(d));
+          csRef<CS_PLUGIN_NAMESPACE_NAME(CL)::Queue> q = c->CreateQueue(devices[j]);
+          queues.Push(q);
         }
       }
     }
@@ -106,7 +111,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     bool success = true;
     for(size_t i = 0; i < queues.GetSize(); ++i)
     {
-      success &&= queues[i]->QueueWait(events);
+      success &= queues[i]->QueueWait(events);
     }
     return success;
   }
@@ -121,15 +126,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     CS_ASSERT(!contexts.IsEmpty())
 
     csRefArray<Event> events = CreateEventList(list);
-    cl_event* list = CreateEventHandleList(events, contexts[0]);
-    if(list == nullptr)
+    cl_event* handleList = CreateEventHandleList(events, contexts[0]);
+    if(handleList == nullptr)
     {
       return false;
     }
 
     // wait for the events
-    cl_int error = clWaitForEvents(events.GetSize(), list);
-    delete [] list;
+    cl_int error = clWaitForEvents(events.GetSize(), handleList);
+    delete [] handleList;
 
     // validate success
     switch(error)
@@ -170,7 +175,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     bool success = true;
     for(size_t i = 0; i < queues.GetSize(); ++i)
     {
-      success &&= queues[i]->QueueBarrier();
+      success &= queues[i]->QueueBarrier();
     }
     return success;
   }
@@ -197,8 +202,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     CS_ASSERT(result == CL_SUCCESS);
   }
 
-  csPtr<iBuffer> Manager::CreateBuffer(size_t size, int access = MEM_READ_WRITE,
-                              void* src)
+  csPtr<iBuffer> Manager::CreateBuffer(size_t size, int access, void* src)
   {
     csRef<iBuffer> b;
     b.AttachNew(new Buffer(size, access));
@@ -229,7 +233,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
   {
     csRef<iImage> image;
     const size_t size[3] = {width, height, depth};
-    image.AttachNew(size, format, access);
+    image.AttachNew(new Image(size, format, access));
     if(image.IsValid() && src != nullptr)
     {
       const size_t offset[3] = {0,0,0};
@@ -246,6 +250,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     }
     return csPtr<iImage>(image);
   }
+  
+  csPtr<iSampler> Manager::CreateSampler(int addressMode, int filterMode, bool normalized)
+  {
+    csRef<iSampler> s;
+    s.AttachNew(new Sampler(addressMode, filterMode, normalized));
+    return csPtr<iSampler>(s);
+  }
+
+  csPtr<iLibrary> Manager::CreateLibrary(iStringArray* source)
+  {
+    csRef<iLibrary> l;
+    l.AttachNew(new Library(this, source));
+    return csPtr<iLibrary>(l);
+  }
 
   csRef<iEvent> Manager::Queue(iKernel* kernel, const iEventList& events)
   {
@@ -256,11 +274,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
 
     // find a suitable device to queue this kernel
     // just pick some gpu device with image support for now
-    csRef<Queue> q;
-    csRefArray<Queue> candidates;
+    csRef<CS_PLUGIN_NAMESPACE_NAME(CL)::Queue> q;
+    csRefArray<CS_PLUGIN_NAMESPACE_NAME(CL)::Queue> candidates;
     for(size_t i = 0; i < queues.GetSize(); ++i)
     {
-      Device* d = queues[i]->GetSize();
+      Device* d = queues[i]->GetDevice();
       if(!d->ImageSupport())
       {
         continue;
@@ -300,8 +318,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
       return csRef<iEvent>(nullptr);
     }
 
-    Context* c = queue->GetContext();
-    cl_kernel k = kernel->CreateHandle(c, eventList);
+    csRef<Kernel> kernelObj = scfQueryInterface<Kernel>(kernel);
+    CS_ASSERT(kernelObj.IsValid());
+
+    Context* c = q->GetContext();
+    cl_kernel k = kernelObj->CreateHandle(c, eventList);
 
     cl_event* handleList = CreateEventHandleList(eventList, c);
     if(!eventList.IsEmpty() && handleList == nullptr)

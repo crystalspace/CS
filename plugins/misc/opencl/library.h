@@ -1,16 +1,21 @@
 #ifndef __CS_OPENCL_LIBRARY_IMPL_H__
 #define __CS_OPENCL_LIBRARY_IMPL_H__
 
-#include <csutil/hash.h>
 #include <iutil/stringarray.h>
 #include <ivaria/clprogram.h>
 #include <ivaria/clconsts.h>
-#include "context.h"
+#include <csutil/hash.h>
+#include <csutil/scf_implementation.h>
+
 #include "kernel.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(CL)
 {
-  class Library : public scfImplementation1<Library,iLibrary>
+  class Manager;
+  class Context;
+  class Event;
+
+  class Library : public scfImplementation1<Library,CS::CL::iLibrary>
   {
   public:
     Library(Manager* parent, iStringArray* source);
@@ -18,7 +23,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
 
     void Precache();
     csRef<Event> GetHandle(Context*, cl_program&);
-    csPtr<iKernel> CreateKernel(const char*);
+    csPtr<CS::CL::iKernel> CreateKernel(const char*);
 
     const iStringArray* GetSource() const
     {
@@ -28,9 +33,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
   private:
     csRef<Manager> parent;
     csRef<iStringArray> source;
-    csHash<csRef<Context>, cl_program> handles;
-    csHash<cl_program, csRef<Event> > buildEvents;
-    csHash<csString, KernelMetaData> kernelData;
+    csHash<cl_program, csRef<Context> > handles;
+    csHash<csRef<Event>, cl_program > buildEvents;
+    csHash<KernelMetaData, csString> kernelData;
 
     // callback for clBuildProgram
     static void BuildHandler(cl_program, void*);
@@ -47,4 +52,4 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
 }
 CS_PLUGIN_NAMESPACE_END(CL)
 
-#endif __CS_OPENCL_LIBRARY_IMPL_H__
+#endif // __CS_OPENCL_LIBRARY_IMPL_H__

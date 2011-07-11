@@ -1,12 +1,15 @@
 #ifndef __CS_OPENCL_PLATFORM_IMPL_H__
 #define __CS_OPENCL_PLATFORM_IMPL_H__
 
-#include <csutil/csconsts.h>
+#include <ivaria/clconsts.h>
+#include <csutil/refarr.h>
+#include <csutil/refcount.h>
+
 #include "device.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(CL)
 {
-  class Platform
+  class Platform : public CS::Utility::FastRefCount<Platform>
   {
   public:
     Platform(cl_platform_id p) : platform(p)
@@ -62,5 +65,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(CL)
     csString QueryInfo(cl_platform_info);
   };
 }
+CS_PLUGIN_NAMESPACE_END(CL)
 
 #endif // __CS_OPENCL_PLATFORM_IMPL_H__
