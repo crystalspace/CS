@@ -108,6 +108,7 @@ int clamp(int number)
     number=255;
   return number;
 }
+
 int TheoraVideoMedia::Update ()
 {
   videobuf_ready=false;
@@ -122,13 +123,13 @@ int TheoraVideoMedia::Update ()
 
         if (th_granule_frame (td,videobuf_granulepos)<frameToSkip)
         {
-          videobuf_ready=0;
+          videobuf_ready=false;
           return 0;
         }
         else
         {
           cout<<videobuf_time<<'-'<<th_granule_frame (td,videobuf_granulepos)<<endl;
-          videobuf_ready=1;
+          videobuf_ready=true;
           frameToSkip = -1;
         }
       }

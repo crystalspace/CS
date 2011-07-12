@@ -43,13 +43,14 @@ size_t TheoraMediaContainer::GetMediaCount ()
 
 csRef<iMedia> TheoraMediaContainer::GetMedia (size_t index)
 {
-  if (index<=media.GetSize ()-1)
+  if (index < media.GetSize ())
     return media[index];
   return NULL;
 }
 
 const char* TheoraMediaContainer::GetDescription ()
 {
+  // TO DO
   return 0;
 }
 
@@ -60,13 +61,16 @@ void TheoraMediaContainer::AddMedia (csRef<iMedia> media)
 
 void TheoraMediaContainer::SetActiveStream (size_t index)
 {
-  bool found=false;
+  if (index >= media.GetSize ())
+    return;
+
+  bool found = false;
   for (uint i=0;i<activeStreams.GetSize ();i++)
   {
     if (media [activeStreams [i]]->GetType () == media [index]->GetType ())
     {
       found = true;
-      activeStreams[i]=index;
+      activeStreams[i] = index;
     }
   }
 
@@ -93,7 +97,7 @@ void TheoraMediaContainer::Update ()
     int ok=0;
     for (uint i=0;i<activeStreams.GetSize ();i++)
     {
-      ok+=media [ activeStreams [i]]->Update ();
+      ok+=media [activeStreams [i]]->Update ();
     }
 
     /* buffer compressed data every loop */
@@ -122,26 +126,24 @@ void TheoraMediaContainer::QueuePage (ogg_page *page)
   {
     for (uint i=0;i<media.GetSize();i++)
     {
-      if ( strcmp (media[i]->GetType(),"TheoraVideo")==0)
+      if (strcmp (media[i]->GetType(),"TheoraVideo")==0)
       {
         csRef<iVideoMedia> media = scfQueryInterface<iVideoMedia> (this->GetMedia (i) ); 
         if (media.IsValid()) 
         { 
           csRef<TheoraVideoMedia> buff = static_cast<TheoraVideoMedia*> ( (iVideoMedia*)media);
 
-          int res;
-          res = ogg_stream_pagein (& buff->to ,page);
+          ogg_stream_pagein (& buff->to ,page);
         }
       }
-      if (strcmp (media[i]->GetType (),"TheoraAudio")==0)
+      else if (strcmp (media[i]->GetType (),"TheoraAudio")==0)
       {
         csRef<iAudioMedia> media = scfQueryInterface<iAudioMedia> (this->GetMedia (i) ); 
         if (media.IsValid ()) 
         { 
           csRef<TheoraAudioMedia> buff = static_cast<TheoraAudioMedia*>((iAudioMedia*)media);
 
-          int res;
-          res = ogg_stream_pagein (& buff->vo ,page);
+          ogg_stream_pagein (& buff->vo ,page);
         }
       }
     }
@@ -159,23 +161,19 @@ void TheoraMediaContainer::QueuePage (ogg_page *page)
         { 
           csRef<TheoraVideoMedia> buff = static_cast<TheoraVideoMedia*> ( (iVideoMedia*)media);
 
-          int res;
-          res=ogg_stream_pagein (& buff->to ,page);
-          //cout<<"page in res vid: "<<res<<endl;
+          ogg_stream_pagein (& buff->to ,page);
         }
 
       }
-      if (strcmp (media[activeStreams[i]]->GetType (),"TheoraAudio")==0)
+      else if (strcmp (media[activeStreams[i]]->GetType (),"TheoraAudio")==0)
       {
         csRef<iAudioMedia> media = scfQueryInterface<iAudioMedia> (this->GetMedia (activeStreams[i]) ); 
         if (media.IsValid ()) 
         { 
           csRef<TheoraAudioMedia> buff = static_cast<TheoraAudioMedia*> ( (iAudioMedia*)media);
 
-          int res;
-          res=ogg_stream_pagein (& buff->vo ,page);
+          ogg_stream_pagein (& buff->vo ,page);
           buff->og = page;
-          //cout<<"page in res aud: "<<res<<endl;
         }
       }
     }
@@ -201,9 +199,7 @@ void TheoraMediaContainer::Seek (float time)
   // Seeking is triggered and will be executed at the beginning of
   // the next update
   if (time<0)
-  {
     timeToSeek=0;
-  }
   else
     timeToSeek=time;
   endOfFile=false;
@@ -215,7 +211,7 @@ void TheoraMediaContainer::DoSeek ()
   // This is because we first have to seek the video stream and
   // sync the rest of the streams to that frame
   // This is important, because of the nature of seeking in theora
-  bool hasVideo;
+  bool hasVideo=false;
   int videoIndex=-1;
   for (size_t i=0;i<activeStreams.GetSize ();i++)
   {
@@ -285,17 +281,18 @@ void TheoraMediaContainer::AutoActivateStreams ()
   {
     for (size_t i=0;i<media.GetSize ();i++)
     {
-      bool ok = true;
+      bool found = false;
 
       for (size_t j=0;j<activeStreams.GetSize ();j++)
       {
-        if( strcmp(media[i]->GetType (), media[activeStreams[j]]->GetType ())==0)
+        if (strcmp(media[i]->GetType (), media[activeStreams[j]]->GetType ())==0)
         {
-          ok = false;
+          found = true;
+          break;
         }
       }
 
-      if (ok)
+      if (!found)
         SetActiveStream (i);
     }
 
