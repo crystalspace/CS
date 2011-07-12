@@ -444,7 +444,7 @@ void csBulletCollisionObject::AddBulletObject ()
     btObject->setWorldTransform (transform);
     if (movable)
       movable->SetTransform (BulletToCS(transform * invPricipalAxis, system->getInverseInternalScale ()));
-    btObject->setUserPointer (static_cast<iCollisionObject*> (this));
+    btObject->setUserPointer (dynamic_cast<CS::Collision2::iCollisionObject*> (this));
     btObject->setCollisionShape (shape);
     sector->broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
     sector->bulletWorld->addCollisionObject (btObject, collGroup.value, sector->allFilter ^ collGroup.value);

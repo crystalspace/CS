@@ -175,7 +175,10 @@ void csBulletSector::RemoveCollisionObject (CS::Collision2::iCollisionObject* ob
 
 CS::Collision2::iCollisionObject* csBulletSector::GetCollisionObject (size_t index)
 {
-  return collisionObjects[index]->QueryCollisionObject ();
+  if (index >= 0 && index < collisionObjects.GetSize ())
+    return collisionObjects[index]->QueryCollisionObject ();
+  else
+    return NULL;
 }
 
 void csBulletSector::AddPortal (iPortal* portal)

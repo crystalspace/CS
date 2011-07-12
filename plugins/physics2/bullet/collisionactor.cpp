@@ -436,6 +436,8 @@ btVector3 csBulletCollisionActor::StepDown (float dt)
   end.setIdentity();
   end.setOrigin( targetPosition );
 
+  //Fix me (in terrain mode the phystut2 demo will crush)
+
   btKinematicClosestNotMeConvexResultCallback callback( btGhostObject::upcast (btObject), upVector, maxSlopeCosine );
   callback.m_collisionFilterGroup = btObject->getBroadphaseHandle()->m_collisionFilterGroup;
   callback.m_collisionFilterMask = btObject->getBroadphaseHandle()->m_collisionFilterMask;

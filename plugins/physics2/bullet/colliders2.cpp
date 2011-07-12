@@ -482,10 +482,10 @@ void csBulletColliderTerrain::LoadCellToCollider (iTerrainCell *cell)
   int gridHeight = cell->GetGridHeight ();
 
   float* heightData = new float[gridHeight*gridWidth];
-  for (int i=0;i<gridWidth;i++)
-    for (int j=0;j<gridHeight;j++)
+  for (int i=0;i<gridHeight;i++)
+    for (int j=0;j<gridWidth;j++)
     {
-      float height = heightData[ (gridWidth-i-1) * gridWidth + j]
+      float height = heightData[ (gridHeight-i-1) * gridWidth + j]
       = gridData.data[i * gridWidth + j];
 
       if (needExtremum)
@@ -521,7 +521,7 @@ void csBulletColliderTerrain::LoadCellToCollider (iTerrainCell *cell)
   if (collSector)
     collSector->bulletWorld->addRigidBody (body);
   if (collBody)
-    body->setUserPointer (collBody);
+    body->setUserPointer (dynamic_cast<CS::Collision2::iCollisionObject*> (collBody));
   bodies.Push (body);
 }
 
@@ -544,8 +544,8 @@ void csBulletColliderTerrain::AddRigidBodies (csBulletSector* sector, csBulletCo
     iTerrainCell* cell = terrainSystem->GetCell (i);
     if (cell->GetLoadState () != iTerrainCell::Loaded)
       continue;
+    bodies[i]->setUserPointer (dynamic_cast<CS::Collision2::iCollisionObject*> (body));
     sector->bulletWorld->addRigidBody (bodies[i], body->collGroup.value, sector->allFilter ^ body->collGroup.value);
-    bodies[i]->setUserPointer (body);
   }
 }
 }
