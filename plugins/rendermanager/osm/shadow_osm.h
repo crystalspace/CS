@@ -408,7 +408,7 @@ namespace CS
               typename RenderTree::ContextNode* shadowMapCtx = 
                 renderTree.CreateContext (newRenderView);
 
-              for (size_t t = 0; t < persist.mrt; t++)
+              for (int t = 0; t < persist.mrt; t++)
                 if (texHandles[t] != 0)
                 {
                   renderTree.AddDebugTexture (texHandles[t]);
