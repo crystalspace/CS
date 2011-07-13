@@ -84,10 +84,11 @@ namespace CS
           {
             float splitDists;
 
-            csRef<csShaderVariable> shadowMapProjectSV;
             csRef<csShaderVariable> splitDistsSV;
             csRef<csShaderVariable> textureSVs[rtaNumAttachments];
           };
+
+          csRef<csShaderVariable> shadowMapProjectSV;
           Frustum* frustums;
 
           ~SuperFrustum() { delete[] frustums; }
@@ -147,22 +148,22 @@ namespace CS
             superFrustum.frustums =
               new typename SuperFrustum::Frustum[superFrustum.actualNumParts];
 
+            superFrustum.shadowMapProjectSV = lightVarsHelper.CreateTempSV (
+              viewSetup.persist.svNames.GetLightSVId (
+              csLightShaderVarCache::lightShadowMapProjection));
+            superFrustum.shadowMapProjectSV->SetArraySize (4);
+
+            for (int j = 0; j < 4; j++)
+            {
+              csShaderVariable* item = lightVarsHelper.CreateTempSV (
+                CS::InvalidShaderVarStringID);
+              superFrustum.shadowMapProjectSV->SetArrayElement (j, item);
+            }
+
             for (int i = 0; i < superFrustum.actualNumParts; i++)
             {
               typename SuperFrustum::Frustum& lightFrustum =
                 superFrustum.frustums[i];
-              lightFrustum.shadowMapProjectSV = lightVarsHelper.CreateTempSV (
-                viewSetup.persist.svNames.GetLightSVId (
-                csLightShaderVarCache::lightShadowMapProjection));
-              lightFrustum.shadowMapProjectSV->SetArraySize (4);
-
-              for (int j = 0; j < 4; j++)
-              {
-                csShaderVariable* item = lightVarsHelper.CreateTempSV (
-                  CS::InvalidShaderVarStringID);
-                lightFrustum.shadowMapProjectSV->SetArrayElement (j, item);
-              }
-
               lightFrustum.splitDistsSV = lightVarsHelper.CreateTempSV(
                 viewSetup.persist.splitDistsSVName);
 
@@ -345,11 +346,13 @@ namespace CS
 
               matrix = Mortho * crop * lightProject;
 
-              for (int i = 0; i < 4; i++)
-              {
-                csShaderVariable* item = lightFrust.shadowMapProjectSV->GetArrayElement (i);
-                item->SetValue (matrix.Row (i));
-              }
+              // we only need one shadow map project sv per light
+              if (frustNum == 0)
+                for (int i = 0; i < 4; i++)
+                {
+                  csShaderVariable* item = superFrust.shadowMapProjectSV->GetArrayElement (i);
+                  item->SetValue (matrix.Row (i));
+                }
 
               lightFrust.splitDistsSV->SetValue(lightFrust.splitDists);
 //               csPrintf("%f\n", viewSetup.splitDists[frustNum]);
@@ -364,6 +367,7 @@ namespace CS
               passColorSV->SetArrayElement(frustNum, lightFrust.splitDistsSV);
 
               if( !( frustNum % 4 == 3 || frustNum == superFrust.actualNumParts - 1 ) )
+//               if( !(frustNum == superFrust.actualNumParts - 1 ) )
                 continue;
 
               previousSplit = lightFrust.splitDists;
@@ -490,6 +494,7 @@ namespace CS
         iShaderManager* shaderManager;
         iGraphics3D* g3d;
 
+        int mrt;
         int numSplits;
         int shadowMapRes;
         csString configPrefix;
@@ -514,6 +519,9 @@ namespace CS
 
           this->shaderManager = shaderManager;
           this->g3d = g3d;
+
+          const csGraphics3DCaps *caps = g3d->GetCaps();
+          mrt = caps->MaxRTColorAttachments;
 
           iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
           svNames.SetStrings (strings);
@@ -577,11 +585,10 @@ namespace CS
         {
           typename CachedLightData::SuperFrustum::Frustum& lightFrustum =
             superFrust.frustums[f];
-    
-          if (f % 4 == 3 || f == superFrust.actualNumParts - 1)
+          
+          if (f % 4 == 3 || f == superFrust.actualNumParts - 1)    
+//           if (f == superFrust.actualNumParts - 1)
           {
-            lightVarsHelper.MergeAsArrayItem (lightStacks[0],
-              lightFrustum.shadowMapProjectSV, 8 * lightNum + s / 4);
 
             for (size_t t = 0; t < persist.settings.targets.GetSize(); t++)
             {
@@ -600,6 +607,9 @@ namespace CS
         }
 
         superFrust.numSplitsSV->SetValue(viewSetup.persist.numSplits);
+
+        lightVarsHelper.MergeAsArrayItem (lightStacks[0],
+          superFrust.shadowMapProjectSV, lightNum);
 
         lightVarsHelper.MergeAsArrayItem (lightStacks[0],
           superFrust.numSplitsSV, lightNum);
