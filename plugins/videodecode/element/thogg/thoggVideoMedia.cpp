@@ -101,15 +101,6 @@ double TheoraVideoMedia::GetPosition () const
   return videobuf_time;
 }
 
-int clamp (int number)
-{
-  if (number<0)
-    number=0;
-  if (number>255)
-    number=255;
-  return number;
-}
-
 int TheoraVideoMedia::Update ()
 {
   videobuf_ready=false;
@@ -169,6 +160,15 @@ int TheoraVideoMedia::Update ()
         int R = (Y + 1.402f*(V-128));
         int G = (Y - 0.334f*(U-128) - 0.714f*(V-128));
         int B = (Y + 1.772f*(U-128));
+
+        // Clamping the values here is faster than calling a function
+        if(R<0) R=0;
+        else if(R>255) R=255;
+        if(G<0) G=0;
+        else if(G>255) G=255;
+        if(R<0) B=0;
+        else if(B>255) B=255;
+
         *pixels++ = (uint8)R;
         *pixels++ = (uint8)G;
         *pixels++ = (uint8)B;
@@ -198,6 +198,15 @@ int TheoraVideoMedia::Update ()
         int R = (Y + 1.402f*(V-128));
         int G = (Y - 0.334f*(U-128) - 0.714f*(V-128));
         int B = (Y + 1.772f*(U-128));
+
+        // Clamping the values here is faster than calling a function
+        if(R<0) R=0;
+        else if(R>255) R=255;
+        if(G<0) G=0;
+        else if(G>255) G=255;
+        if(R<0) B=0;
+        else if(B>255) B=255;
+
         *pixels++ = (uint8)R;
         *pixels++ = (uint8)G;
         *pixels++ = (uint8)B;
@@ -227,6 +236,15 @@ int TheoraVideoMedia::Update ()
         int R = (Y + 1.402f*(V-128));
         int G = (Y - 0.334f*(U-128) - 0.714f*(V-128));
         int B = (Y + 1.772f*(U-128));
+
+        // Clamping the values here is faster than calling a function
+        if(R<0) R=0;
+        else if(R>255) R=255;
+        if(G<0) G=0;
+        else if(G>255) G=255;
+        if(R<0) B=0;
+        else if(B>255) B=255;
+
         *pixels++ = R;
         *pixels++ = G;
         *pixels++ = B;
