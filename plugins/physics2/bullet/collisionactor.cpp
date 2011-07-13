@@ -4,16 +4,16 @@
 #include "btBulletCollisionCommon.h"
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
 
-class btKinematicClosestNotMeRayResultCallback : public btCollisionWorld::ClosestRayResultCallback
+class KinematicClosestNotMeRayResultCallback : public btCollisionWorld::ClosestRayResultCallback
 {
 public:
-  btKinematicClosestNotMeRayResultCallback (btCollisionObject* me) : btCollisionWorld::ClosestRayResultCallback(btVector3(0.0, 0.0, 0.0), btVector3(0.0, 0.0, 0.0))
+  KinematicClosestNotMeRayResultCallback (btCollisionObject* me) : btCollisionWorld::ClosestRayResultCallback(btVector3(0.0, 0.0, 0.0), btVector3(0.0, 0.0, 0.0))
   {
     m_me[0] = me;
     count = 1;
   }
 
-  btKinematicClosestNotMeRayResultCallback (btCollisionObject* me[], int count_) : btCollisionWorld::ClosestRayResultCallback(btVector3(0.0, 0.0, 0.0), btVector3(0.0, 0.0, 0.0))
+  KinematicClosestNotMeRayResultCallback (btCollisionObject* me[], int count_) : btCollisionWorld::ClosestRayResultCallback(btVector3(0.0, 0.0, 0.0), btVector3(0.0, 0.0, 0.0))
   {
     count = count_;
 
@@ -34,10 +34,10 @@ protected:
   int count;
 };
 
-class btKinematicClosestNotMeConvexResultCallback : public btCollisionWorld::ClosestConvexResultCallback
+class KinematicClosestNotMeConvexResultCallback : public btCollisionWorld::ClosestConvexResultCallback
 {
 public:
-  btKinematicClosestNotMeConvexResultCallback( btCollisionObject* me, const btVector3& up, btScalar minSlopeDot )
+  KinematicClosestNotMeConvexResultCallback( btCollisionObject* me, const btVector3& up, btScalar minSlopeDot )
     : btCollisionWorld::ClosestConvexResultCallback( btVector3( 0.0, 0.0, 0.0 ), btVector3( 0.0, 0.0, 0.0 ) ),
     m_me( me ), m_up( up ), m_minSlopeDot( minSlopeDot )
   {
@@ -56,7 +56,7 @@ public:
     else
     {
       ///need to transform normal into worldspace
-      hitNormalWorld = m_hitCollisionObject->getWorldTransform().getBasis()*convexResult.m_hitNormalLocal;
+      hitNormalWorld = convexResult.m_hitCollisionObject->getWorldTransform().getBasis()*convexResult.m_hitNormalLocal;
     }
 
     // NOTE : m_hitNormalLocal is not always vertical on the ground with a capsule or a box...
@@ -288,7 +288,7 @@ btVector3 csBulletCollisionActor::StepUp ()
   end.setIdentity ();
   end.setOrigin (targetPosition);
 
-  btKinematicClosestNotMeConvexResultCallback callback( btGhostObject::upcast (btObject), -upVector, maxSlopeCosine );
+  KinematicClosestNotMeConvexResultCallback callback( btGhostObject::upcast (btObject), -upVector, maxSlopeCosine );
   callback.m_collisionFilterGroup = btObject->getBroadphaseHandle()->m_collisionFilterGroup;
   callback.m_collisionFilterMask = btObject->getBroadphaseHandle()->m_collisionFilterMask;
 
@@ -387,7 +387,7 @@ btVector3 csBulletCollisionActor::StepForwardAndStrafe (float dt)
 
     btVector3 sweepDirNegative = currentPosition - targetPosition;
 
-    btKinematicClosestNotMeConvexResultCallback callback( btGhostObject::upcast (btObject), sweepDirNegative, 0.0f);
+    KinematicClosestNotMeConvexResultCallback callback( btGhostObject::upcast (btObject), sweepDirNegative, 0.0f);
     callback.m_collisionFilterGroup = btObject->getBroadphaseHandle()->m_collisionFilterGroup;
     callback.m_collisionFilterMask = btObject->getBroadphaseHandle()->m_collisionFilterMask;
 
@@ -436,9 +436,7 @@ btVector3 csBulletCollisionActor::StepDown (float dt)
   end.setIdentity();
   end.setOrigin( targetPosition );
 
-  //Fix me (in terrain mode the phystut2 demo will crush)
-
-  btKinematicClosestNotMeConvexResultCallback callback( btGhostObject::upcast (btObject), upVector, maxSlopeCosine );
+  KinematicClosestNotMeConvexResultCallback callback( btGhostObject::upcast (btObject), upVector, maxSlopeCosine );
   callback.m_collisionFilterGroup = btObject->getBroadphaseHandle()->m_collisionFilterGroup;
   callback.m_collisionFilterMask = btObject->getBroadphaseHandle()->m_collisionFilterMask;
 
