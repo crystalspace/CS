@@ -289,6 +289,13 @@ namespace CS
           ProcessGeometry(context, light, rview, _near, _far, castingObjects, 
             receivingObjects);
 
+          int shadowMapSize = viewSetup.persist.shadowMapRes;
+          CS_ALLOC_STACK_ARRAY(iTextureHandle*, texHandles, persist.mrt);
+
+          // pass mrt number to shader
+          persist.settings.shadowDefaultShader->
+            GetVariableAdd(persist.mrtSVName)->SetValue(persist.mrt);
+
           // here should be lightFrustums.frustums.GetSize()
 //           csPrintf("%d\n", lightFrustums.frustums.GetSize());
           for (size_t l = 0; l < 1; l++)
@@ -298,25 +305,42 @@ namespace CS
 
             for (int frustNum = 0 ; frustNum < superFrust.actualNumParts ; frustNum ++)
             {
-              typename SuperFrustum::Frustum& lightFrust = 
-                superFrust.frustums[frustNum];
-              lightFrust.splitDists = _near + (_far - _near) * 
-                ((float)frustNum / (superFrust.actualNumParts - 1));
+              typename SuperFrustum::Frustum lightFrust;             
 
-              lightFrust.splitDistsSV->SetValue(lightFrust.splitDists);
+              for (int attachments = 0 ; attachments < persist.mrt ; attachments ++)
+                texHandles[attachments] = 0;
 
-              // fill in split dists for osm
-              persist.settings.shadowDefaultShader->GetVariableAdd(persist.numSplitsSVName)->
-                SetValue(viewSetup.persist.numSplits);
+              for (int attachments = 0 ; attachments < persist.mrt && 
+                frustNum < superFrust.actualNumParts ; frustNum++, attachments ++)
+              {
+                for (int channels = 0 ; channels < 4 && 
+                  frustNum < superFrust.actualNumParts ; frustNum++, channels ++)
+                {
+                  lightFrust = superFrust.frustums[frustNum];
+                  lightFrust.splitDists = _near + (_far - _near) * 
+                    ((float)frustNum / (superFrust.actualNumParts - 1));
 
-              csRef<csShaderVariable> passColorSV =
-                persist.settings.shadowDefaultShader->GetVariableAdd(persist.passColorSVName);
+                  lightFrust.splitDistsSV->SetValue(lightFrust.splitDists);
 
-              passColorSV->SetArrayElement(frustNum, lightFrust.splitDistsSV);
+                  // fill in split dists for osm
+                  persist.settings.shadowDefaultShader->GetVariableAdd(persist.numSplitsSVName)->
+                    SetValue(viewSetup.persist.numSplits);
 
-              if( !( frustNum % 4 == 3 || frustNum == superFrust.actualNumParts - 1 ) )
-//               if( !(frustNum == superFrust.actualNumParts - 1 ) )
-                continue;
+                  csRef<csShaderVariable> passColorSV =
+                    persist.settings.shadowDefaultShader->GetVariableAdd(persist.passColorSVName);
+
+                  passColorSV->SetArrayElement(frustNum, lightFrust.splitDistsSV);
+                }
+                frustNum --;
+
+                ShadowSettings::Target* target = 
+                  viewSetup.persist.settings.targets[0];
+                iTextureHandle* tex = target->texCache.QueryUnusedTexture (
+                  shadowMapSize, shadowMapSize);
+                lightFrust.textureSVs[target->attachment]->SetValue (tex);
+                texHandles[attachments] = tex;
+              }
+              frustNum --;
 
               csRef<CS::RenderManager::RenderView> newRenderView;
               newRenderView = renderTree.GetPersistentData().renderViews.CreateRenderView ();
@@ -359,16 +383,13 @@ namespace CS
               matrix = Mortho * crop * lightProject;
 
               // we only need one shadow map project sv per light
-             if (frustNum == 3)
-                for (int i = 0; i < 4; i++)
-                {
-                  csShaderVariable* item = superFrust.shadowMapProjectSV->GetArrayElement (i);
-                  item->SetValue (matrix.Row (i));
-                }
+              for (int i = 0; i < 4; i++)
+              {
+                csShaderVariable* item = superFrust.shadowMapProjectSV->GetArrayElement (i);
+                item->SetValue (matrix.Row (i));
+              }
 
               previousSplit = lightFrust.splitDists;
-
-              int shadowMapSize = viewSetup.persist.shadowMapRes;
 
               csRef<iCustomMatrixCamera> shadowViewCam =
                 newRenderView->GetEngine()->CreateCustomMatrixCamera();
@@ -387,19 +408,14 @@ namespace CS
               typename RenderTree::ContextNode* shadowMapCtx = 
                 renderTree.CreateContext (newRenderView);
 
-              for (size_t t = 0; t < persist.settings.targets.GetSize(); t++)
-              {
-                ShadowSettings::Target* target = 
-                  viewSetup.persist.settings.targets[t];
-                iTextureHandle* tex = target->texCache.QueryUnusedTexture (
-                    shadowMapSize, shadowMapSize);
-                renderTree.AddDebugTexture (tex);
-                // register SVs
-                lightFrust.textureSVs[target->attachment]->SetValue (tex);
-
-                shadowMapCtx->renderTargets[target->attachment].texHandle = tex;
-                shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
-              }
+              for (size_t t = 0; t < persist.mrt; t++)
+                if (texHandles[t] != 0)
+                {
+                  renderTree.AddDebugTexture (texHandles[t]);
+                  // register SVs
+                  shadowMapCtx->renderTargets[rtaColor0 + t].texHandle = texHandles[t];
+                  shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
+                }
 
 //               layerConfig.SetDefaultShader(persist.settings.shadowDefaultShader);
 
@@ -497,6 +513,7 @@ namespace CS
         CS::ShaderVarStringID numSplitsSVName;
         CS::ShaderVarStringID splitDistsSVName;
         CS::ShaderVarStringID passColorSVName;
+        CS::ShaderVarStringID mrtSVName;
 
         /// Set the prefix for configuration settings
         void SetConfigPrefix (const char* configPrefix)
@@ -524,6 +541,7 @@ namespace CS
           numSplitsSVName = strings->Request ("light numSplits");
           splitDistsSVName = strings->Request ("light splitDists");
           passColorSVName = strings->Request ("pass color");
+          mrtSVName = strings->Request ("mrt");
 
           csConfigAccess cfg (objectReg);
           if (configPrefix.IsEmpty())

@@ -18,18 +18,110 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
-<shader compiler="shaderweaver" name="shadow_osm">
+<shader compiler="xmlshader" name="shadow_osm">
   <technique priority="200">
     <pass>
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       <mixmode><add/></mixmode>
-      
-      <snippet id="position" file="/shader-snippets/position.xml" />
-      <snippet id="surface" file="/shader-snippets/surface/surface-classic.xml" />
-      <snippet id="shadowfrag" file="/shader-snippets/shadow/fragment-osm.xml" />
-      
-      <connection from="position" to="shadowfrag" />
-      <connection from="surface" to="shadowfrag" />
+      <texture name="tex diffuse" destination="TexDiffuse" />
+      <vp plugin="glcg">
+        <cgvp>
+          <program>
+          <![CDATA[
+          
+          struct app2vertex {
+            float4 Position : POSITION;
+            float2 TexCoord : TEXCOORD0;
+          };
+          struct vertex2fragment {
+            float4 Hposition : POSITION;
+            float2 TexCoord : TEXCOORD0;
+            float4 position_camera : TEXCOORD1;
+          };          
+          
+          vertex2fragment main (app2vertex IN,
+            uniform float4x4 ModelView : state.matrix.modelview,
+            uniform float4x4 ModelViewProj : state.matrix.mvp)
+          {
+            vertex2fragment OUT;
+            OUT.Hposition = mul (ModelViewProj, IN.Position);
+            OUT.position_camera = mul (ModelView, IN.Position);
+            OUT.TexCoord = IN.TexCoord;
+            return OUT;
+          }
+          ]]>
+          </program>
+        </cgvp>
+      </vp>
+      <fp plugin="glcg">
+        <cgfp>
+        <variablemap variable="pass color" destination="passColor" />
+        <variablemap variable="light numSplits" destination="numSplits" />        
+        <variablemap variable="mrt" destination="mrt" />        
+          <program>
+          <![CDATA[
+          float passColor[64];
+          int numSplits;
+          int mrt;
+          struct vertex2fragment {
+            float4 Hposition : POSITION;
+            float2 TexCoord : TEXCOORD0;
+            float4 position_camera : TEXCOORD1;
+          };  
+          struct fragmentOutput
+          {
+            float4 Color0 : COLOR0;
+            float4 Color1 : COLOR1;
+            float4 Color2 : COLOR2;
+            float4 Color3 : COLOR3;
+            float4 Color4 : COLOR4;
+            float4 Color5 : COLOR5;
+            float4 Color6 : COLOR6;
+            float4 Color7 : COLOR7;
+            float4 Color8 : COLOR8;
+          };
+          fragmentOutput main (vertex2fragment IN,
+            uniform sampler2D TexDiffuse)
+          {
+            fragmentOutput output;
+            float4 surface = tex2D (TexDiffuse, IN.TexCoord);
+            
+            float value = surface.a;
+            value = value * (surface.a != 1);
+              
+            int i;
+            for (i = 0 ; i <= numSplits ; i ++)
+              if (passColor[i] > IN.position_camera.z)
+                break;
+
+            int index = i % 4;
+            float4 color = value;
+            color = color * float4(index < 1, index < 2, index < 3, 1);
+
+            // write in the correct render target
+            int renderTarget = (i / 4) % mrt;
+            
+            output.Color0 = color * (renderTarget == 0);
+            output.Color1 = color * (renderTarget == 1);
+            output.Color2 = color * (renderTarget == 2);
+            output.Color3 = color * (renderTarget == 3);
+            output.Color4 = color * (renderTarget == 4);
+            output.Color5 = color * (renderTarget == 5);
+            output.Color6 = color * (renderTarget == 6);
+            output.Color7 = color * (renderTarget == 7);
+          ]]>
+        <?if vars."light numSplits"?>
+          <![CDATA[            
+            output.Color8 = color * (renderTarget == 8);
+          ]]>
+        <?endif?>
+          <![CDATA[                      
+            return output;
+          }
+          ]]>
+          </program>
+        </cgfp>
+      </fp>      
     </pass>
   </technique>
   
