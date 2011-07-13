@@ -115,8 +115,8 @@ float4 main(vertex2fragment IN,
   //float3 ambientColor = tex2D (AmbientBuffer, texCoord).rgb;
   
   float4 normalDepthVS = tex2D (NormalBuffer, texCoord);
-  if (normalDepthVS.r == 0.0f && normalDepthVS.g == 0.0f && normalDepthVS.b == 0.0f)
-    return float4(0.0f, 0.0f, 0.0f, 1.0f);
+  //if (normalDepthVS.r == 0.0f && normalDepthVS.g == 0.0f && normalDepthVS.b == 0.0f)
+  //  return float4(0.0f, 0.0f, 0.0f, 1.0f);
   
   float3 normalVS = normalDepthVS.rgb * 2.0f - 1.0f;
 	float pixelDepth = normalDepthVS.a;
