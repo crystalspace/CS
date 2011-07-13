@@ -303,6 +303,21 @@ namespace CS
               lightFrust.splitDists = _near + (_far - _near) * 
                 ((float)frustNum / (superFrust.actualNumParts - 1));
 
+              lightFrust.splitDistsSV->SetValue(lightFrust.splitDists);
+
+              // fill in split dists for osm
+              persist.settings.shadowDefaultShader->GetVariableAdd(persist.numSplitsSVName)->
+                SetValue(viewSetup.persist.numSplits);
+
+              csRef<csShaderVariable> passColorSV =
+                persist.settings.shadowDefaultShader->GetVariableAdd(persist.passColorSVName);
+
+              passColorSV->SetArrayElement(frustNum, lightFrust.splitDistsSV);
+
+              if( !( frustNum % 4 == 3 || frustNum == superFrust.actualNumParts - 1 ) )
+//               if( !(frustNum == superFrust.actualNumParts - 1 ) )
+                continue;
+
               csRef<CS::RenderManager::RenderView> newRenderView;
               newRenderView = renderTree.GetPersistentData().renderViews.CreateRenderView ();
               newRenderView->SetEngine (rview->GetEngine ());
@@ -341,34 +356,15 @@ namespace CS
                 -lightCutoff, lightCutoff, -lightCutoff, 
                 -lightFrust.splitDists, -lightNear);
 
-//               csPrintf("near %f far %f split %f light %s\n", _near, _far, 
-//                 lightFrust.splitDists, light->GetLightID());
-
               matrix = Mortho * crop * lightProject;
 
               // we only need one shadow map project sv per light
-              if (frustNum == 0)
+             if (frustNum == 3)
                 for (int i = 0; i < 4; i++)
                 {
                   csShaderVariable* item = superFrust.shadowMapProjectSV->GetArrayElement (i);
                   item->SetValue (matrix.Row (i));
                 }
-
-              lightFrust.splitDistsSV->SetValue(lightFrust.splitDists);
-//               csPrintf("%f\n", viewSetup.splitDists[frustNum]);
-
-              // fill in split dists for osm
-              persist.settings.shadowDefaultShader->GetVariableAdd(persist.numSplitsSVName)->
-                SetValue(viewSetup.persist.numSplits);
-
-              csRef<csShaderVariable> passColorSV =
-                persist.settings.shadowDefaultShader->GetVariableAdd(persist.passColorSVName);
-
-              passColorSV->SetArrayElement(frustNum, lightFrust.splitDistsSV);
-
-              if( !( frustNum % 4 == 3 || frustNum == superFrust.actualNumParts - 1 ) )
-//               if( !(frustNum == superFrust.actualNumParts - 1 ) )
-                continue;
 
               previousSplit = lightFrust.splitDists;
 
@@ -400,13 +396,12 @@ namespace CS
                 renderTree.AddDebugTexture (tex);
                 // register SVs
                 lightFrust.textureSVs[target->attachment]->SetValue (tex);
-//                 csPrintf("%d %d\n", frustNum, tex);
 
                 shadowMapCtx->renderTargets[target->attachment].texHandle = tex;
                 shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
               }
 
-              layerConfig.SetDefaultShader(persist.settings.shadowDefaultShader);
+//               layerConfig.SetDefaultShader(persist.settings.shadowDefaultShader);
 
               ShadowmapContextSetup contextFunction (layerConfig,
                 persist.shaderManager, viewSetup);
