@@ -41,14 +41,14 @@ void vplPlayer::SetActiveStream (int index)
 {
   if (_mediaFile.IsValid ())
   {
-    if(index==-1)
+    if (index==-1)
       _mediaFile->AutoActivateStreams ();
     else
       _mediaFile->SetActiveStream (index);
   }
 }
 
-void vplPlayer::RemoveActiveAudioStream (int index) 
+void vplPlayer::RemoveActiveStream (int index) 
 {
   if (_mediaFile.IsValid ())
     _mediaFile->RemoveActiveStream (index);
@@ -114,7 +114,7 @@ void vplPlayer::Seek (float time)
   }
 }
 
-float vplPlayer::GetPosition () 
+float vplPlayer::GetPosition () const
 {
   return _mediaFile->GetPosition ();
 }
@@ -124,7 +124,7 @@ bool vplPlayer::IsPlaying ()
   return _playing;
 }
 
-float vplPlayer::GetLength ()
+float vplPlayer::GetLength () const
 {
   return _mediaFile->GetLength ();
 }

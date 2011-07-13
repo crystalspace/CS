@@ -70,22 +70,23 @@ bool TheoraVideoMedia::Initialize (iObjectRegistry* r)
   return 0;
 }
 
-const char* TheoraVideoMedia::GetType ()
+const char* TheoraVideoMedia::GetType () const
 {
   return "TheoraVideo";
 }
 
-const csVPLvideoFormat *TheoraVideoMedia::GetFormat()
+const csVPLvideoFormat *TheoraVideoMedia::GetFormat() const
 {
+  // TO DO
   return 0;
 }
 
-unsigned long TheoraVideoMedia::GetFrameCount()
+unsigned long TheoraVideoMedia::GetFrameCount() const
 {
   return frameCount;
 }
 
-float TheoraVideoMedia::GetLength ()
+float TheoraVideoMedia::GetLength () const
 {
   return length;
 }
@@ -95,12 +96,12 @@ void TheoraVideoMedia::SetVideoTarget (csRef<iTextureHandle> &texture)
   texture = _texture;
 }
 
-double TheoraVideoMedia::GetPosition ()
+double TheoraVideoMedia::GetPosition () const
 {
   return videobuf_time;
 }
 
-int clamp(int number)
+int clamp (int number)
 {
   if (number<0)
     number=0;
@@ -138,127 +139,122 @@ int TheoraVideoMedia::Update ()
       break;
   }
 
-  if (videobuf_ready)
+  if (!videobuf_ready)
+    return 1;
+
+
+  th_ycbcr_buffer yuv;
+  th_decode_ycbcr_out(td,yuv);
+
+  int y_offset=(ti.pic_x&~1)+yuv[0].stride*(ti.pic_y&~1);
+
+  //if the video is in 4:2:0 pixel format
+  if (ti.pixel_fmt==TH_PF_420)
   {
-    th_ycbcr_buffer yuv;
-    th_decode_ycbcr_out(td,yuv);
+    int uv_offset=(ti.pic_x/2)+(yuv[1].stride)*(ti.pic_y/2);
 
-    int y_offset=(ti.pic_x&~1)+yuv[0].stride*(ti.pic_y&~1);
+//    int size = ti.frame_width*ti.frame_height;
 
-    //if the video is in 4:2:0 pixel format
-    if (ti.pixel_fmt==TH_PF_420)
-    {
-      int uv_offset=(ti.pic_x/2)+(yuv[1].stride)*(ti.pic_y/2);
+    size_t dstSize;
+    uint8 * pixels = _texture->QueryBlitBuffer (ti.pic_x,ti.pic_y,ti.pic_width,ti.pic_height,dstSize);
 
-      int size = ti.frame_width*ti.frame_height;
+    for (ogg_uint32_t y = 0 ; y < ti.frame_height ; y++)
+      for (ogg_uint32_t x = 0 ; x < ti.frame_width ; x++)
+      {
+        //          int uvOff = uv_offset+x/2;
+        int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
+        int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y/2))[x/2];
+        int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y/2))[x/2];
 
-      size_t dstSize;
-      uint8 * pixels = _texture->QueryBlitBuffer (ti.pic_x,ti.pic_y,ti.pic_width,ti.pic_height,dstSize);
+        int R = (Y + 1.402f*(V-128));
+        int G = (Y - 0.334f*(U-128) - 0.714f*(V-128));
+        int B = (Y + 1.772f*(U-128));
+        *pixels++ = (uint8)R;
+        *pixels++ = (uint8)G;
+        *pixels++ = (uint8)B;
+        *pixels++ = 0xff;
+      }
 
-      for (ogg_uint32_t y = 0 ; y < ti.frame_height ; y++)
-        for (ogg_uint32_t x = 0 ; x < ti.frame_width ; x++)
-        {
-          //          int uvOff = uv_offset+x/2;
-          int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
-          int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y/2))[x/2];
-          int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y/2))[x/2];
-
-          int R = (Y + 1.402f*(V-128));
-          int G = (Y - 0.334f*(U-128) - 0.714f*(V-128));
-          int B = (Y + 1.772f*(U-128));
-          *pixels++ = (uint8)R;
-          *pixels++ = (uint8)G;
-          *pixels++ = (uint8)B;
-          *pixels++ = 0xff;
-        }
-
-        _texture->ApplyBlitBuffer (pixels);
-    }
-    //if the video is in 4:2:2 pixel format
-    else if (ti.pixel_fmt==TH_PF_422)
-    {
-      int uv_offset;
-
-      uv_offset=(ti.pic_x/2)+(yuv[1].stride)*(ti.pic_y);
-
-      int size = ti.frame_width*ti.frame_height;
-
-      size_t dstSize;
-      uint8 * pixels = _texture->QueryBlitBuffer (ti.pic_x,ti.pic_y,ti.pic_width,ti.pic_height,dstSize);
-
-      for (ogg_uint32_t y = 0 ; y < ti.frame_height ; y++)
-        for (ogg_uint32_t x = 0 ; x < ti.frame_width ; x++)
-        {
-          //            int uvOff = uv_offset+x/2;
-          int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
-          int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y))[x/2];
-          int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y))[x/2];
-
-          int R = (Y + 1.402f*(V-128));
-          int G = (Y - 0.334f*(U-128) - 0.714f*(V-128));
-          int B = (Y + 1.772f*(U-128));
-          *pixels++ = (uint8)R;
-          *pixels++ = (uint8)G;
-          *pixels++ = (uint8)B;
-          *pixels++ = 0xff;
-        }
-
-        _texture->ApplyBlitBuffer (pixels);
-    }
-    //if the video is in 4:4:4 pixel format
-    else if (ti.pixel_fmt==TH_PF_444)
-    {
-      int uv_offset;
-
-      uv_offset=(ti.pic_x/2)+(yuv[1].stride)*(ti.pic_y);
-
-      int size = ti.frame_width*ti.frame_height;
-
-      size_t dstSize;
-      uint8 * pixels = _texture->QueryBlitBuffer (ti.pic_x,ti.pic_y,ti.pic_width,ti.pic_height,dstSize);
-
-      for (ogg_uint32_t y = 0 ; y < ti.frame_height ; y++)
-        for (ogg_uint32_t x = 0 ; x < ti.frame_width ; x++)
-        {
-          //              int uvOff = uv_offset+x/2;
-          int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
-          int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y))[x];
-          int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y))[x];
-
-          int R = (Y + 1.402f*(V-128));
-          int G = (Y - 0.334f*(U-128) - 0.714f*(V-128));
-          int B = (Y + 1.772f*(U-128));
-          *pixels++ = R;
-          *pixels++ = G;
-          *pixels++ = B;
-          *pixels++ = 0xff;
-        }
-
-        _texture->ApplyBlitBuffer (pixels);
-    }
-    else
-      csReport(object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
-      "The Theora video stream has an unsupported pixel format.\n");
+    _texture->ApplyBlitBuffer (pixels);
   }
+  //if the video is in 4:2:2 pixel format
+  else if (ti.pixel_fmt==TH_PF_422)
+  {
+    int uv_offset=(ti.pic_x/2)+(yuv[1].stride)*(ti.pic_y);
 
-  if (videobuf_ready)
-    return 0;
-  return 1;
+//    int size = ti.frame_width*ti.frame_height;
+
+    size_t dstSize;
+    uint8 * pixels = _texture->QueryBlitBuffer (ti.pic_x,ti.pic_y,ti.pic_width,ti.pic_height,dstSize);
+
+    for (ogg_uint32_t y = 0 ; y < ti.frame_height ; y++)
+      for (ogg_uint32_t x = 0 ; x < ti.frame_width ; x++)
+      {
+        //            int uvOff = uv_offset+x/2;
+        int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
+        int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y))[x/2];
+        int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y))[x/2];
+
+        int R = (Y + 1.402f*(V-128));
+        int G = (Y - 0.334f*(U-128) - 0.714f*(V-128));
+        int B = (Y + 1.772f*(U-128));
+        *pixels++ = (uint8)R;
+        *pixels++ = (uint8)G;
+        *pixels++ = (uint8)B;
+        *pixels++ = 0xff;
+      }
+
+    _texture->ApplyBlitBuffer (pixels);
+  }
+  //if the video is in 4:4:4 pixel format
+  else if (ti.pixel_fmt==TH_PF_444)
+  {
+    int uv_offset=(ti.pic_x/2)+(yuv[1].stride)*(ti.pic_y);
+
+//    int size = ti.frame_width*ti.frame_height;
+
+    size_t dstSize;
+    uint8 * pixels = _texture->QueryBlitBuffer (ti.pic_x,ti.pic_y,ti.pic_width,ti.pic_height,dstSize);
+
+    for (ogg_uint32_t y = 0 ; y < ti.frame_height ; y++)
+      for (ogg_uint32_t x = 0 ; x < ti.frame_width ; x++)
+      {
+        //              int uvOff = uv_offset+x/2;
+        int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
+        int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y))[x];
+        int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y))[x];
+
+        int R = (Y + 1.402f*(V-128));
+        int G = (Y - 0.334f*(U-128) - 0.714f*(V-128));
+        int B = (Y + 1.772f*(U-128));
+        *pixels++ = R;
+        *pixels++ = G;
+        *pixels++ = B;
+        *pixels++ = 0xff;
+      }
+
+    _texture->ApplyBlitBuffer (pixels);
+  }
+  else
+    csReport(object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
+             "The Theora video stream has an unsupported pixel format.\n");
+
+  return 0;
 }
 
-long TheoraVideoMedia::SeekPage(long targetFrame,bool return_keyframe, ogg_sync_state *oy,unsigned long fileSize)
+long TheoraVideoMedia::SeekPage (long targetFrame,bool return_keyframe, ogg_sync_state *oy,unsigned long fileSize)
 {
   ogg_stream_reset (&to);
   th_decode_free (td);
   td=th_decode_alloc(&ti,ts);
 
-  int i,seek_min=0, seek_max=fileSize;
+  int seek_min=0, seek_max=fileSize;
   long frame;
   ogg_int64_t granule=0;
-  bool fineseek=0;
+  bool fineseek=false;
   ogg_page og;
 
-  for (i=0;i<100;i++)
+  for (int i=0;i<100;i++)
   {
     ogg_sync_reset( oy );
 
@@ -280,16 +276,16 @@ long TheoraVideoMedia::SeekPage(long targetFrame,bool return_keyframe, ogg_sync_
             frame=(long) th_granule_frame(td,granule);
             if (frame < targetFrame-1 && targetFrame-frame < 10)
             {
-              fineseek=1;
+              fineseek=true;
               if (!return_keyframe) break;
             }
+
             if (fineseek && frame >= targetFrame)
               break;
 
             if (fineseek) 
-            {
               continue;
-            }
+
             if (targetFrame-1 > frame) 
               seek_min=(seek_min+seek_max)/2;
             else
@@ -318,10 +314,8 @@ long TheoraVideoMedia::SeekPage(long targetFrame,bool return_keyframe, ogg_sync_
   {
     frameToSkip = targetFrame;
     cout<<"want to skip to :"<<frameToSkip<<endl;
-  }
-
-  if (return_keyframe) 
     return (long) (granule >> ti.keyframe_granule_shift);
+  }
 
   return -1;
 }

@@ -52,7 +52,7 @@ public:
 
   virtual void InitializePlayer (csRef<iMediaContainer> media) ;
   virtual void SetActiveStream (int index) ;
-  virtual void RemoveActiveAudioStream (int index) ;
+  virtual void RemoveActiveStream (int index) ;
   virtual void SetTargetTexture (csRef<iTextureHandle> &target) ;
   virtual void Update ();
   virtual void Loop (bool shouldLoop) ;
@@ -60,9 +60,9 @@ public:
   virtual void Pause() ;
   virtual void Stop () ;
   virtual void Seek (float time) ;
-  virtual float GetPosition () ;
+  virtual float GetPosition () const;
   virtual bool IsPlaying () ;
-  virtual float GetLength () ;
+  virtual float GetLength () const;
 };
 
 #endif // __VPLPLAYER_H__

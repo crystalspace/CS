@@ -44,7 +44,7 @@ struct iMediaPlayer : public virtual iBase
   virtual void SetActiveStream (int index) = 0;
 
   /// Deactivates a stream from inside the iMediaContainer
-  virtual void RemoveActiveAudioStream (int index) = 0;
+  virtual void RemoveActiveStream (int index) = 0;
 
   /// Set the target texture
   virtual void SetTargetTexture (csRef<iTextureHandle> &target) = 0;
@@ -68,10 +68,10 @@ struct iMediaPlayer : public virtual iBase
   virtual void Seek (float time) = 0 ;
 
   /// Get the position of the media
-  virtual float GetPosition () = 0 ;
+  virtual float GetPosition () const = 0 ;
 
   /// Get the length of the media
-  virtual float GetLength () = 0 ;
+  virtual float GetLength () const = 0 ;
 
   /// Returns if the media is playing or not
   virtual bool IsPlaying () = 0 ;

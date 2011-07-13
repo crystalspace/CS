@@ -70,14 +70,15 @@ public:
   // From iComponent.
   virtual bool Initialize (iObjectRegistry*);
 
-  virtual const char* GetType ();
-  virtual unsigned long GetFrameCount ();
-  virtual float GetLength();
+  virtual const char* GetType () const;
+  virtual unsigned long GetFrameCount () const;
+  virtual float GetLength() const;
   virtual void SetAudioTarget (csRef<iSndSysStream> stream);
-  virtual double GetPosition ();
+  virtual double GetPosition () const;
   virtual void CleanMedia () ;
   virtual int Update () ;
-  void SetLength (float length)  { this->length=length; }
+
+  inline void SetLength (float length)  { this->length=length; }
   void Seek (float time, ogg_sync_state *oy,ogg_page *op,ogg_stream_state *thState);
 };
 

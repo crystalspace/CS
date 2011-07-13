@@ -35,22 +35,22 @@ struct iMedia : public virtual iBase
 {
   SCF_INTERFACE (iMedia,0,1,0);
 
-  virtual const char* GetType () = 0;
+  virtual const char* GetType () const = 0;
 
   /**
     * Get size of this stream in frames.
     */
-  virtual unsigned long GetFrameCount() = 0;
+  virtual unsigned long GetFrameCount() const = 0;
 
   /**
     * Return the length in seconds
     */
-  virtual float GetLength() = 0;
+  virtual float GetLength() const = 0;
 
   /**
     * Gets the position of the stream
     */
-  virtual double GetPosition () = 0 ;
+  virtual double GetPosition () const = 0 ;
 
   /**
     * Clears all the decoders of the stream. Done when destroying the object by the container
@@ -71,7 +71,7 @@ struct iVideoMedia : public iMedia
   SCF_INTERFACE(iVideoMedia,0,1,0);
 
   /// Get the format of the sound data.
-  virtual const csVPLvideoFormat *GetFormat() = 0;
+  virtual const csVPLvideoFormat* GetFormat() const = 0;
 
 
   /**

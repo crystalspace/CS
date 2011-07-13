@@ -60,10 +60,9 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
   fseek(infile,0,SEEK_SET);
   container->SetFileSize (mSize);
 
-  th_setup_info    *ts;
+  th_setup_info *ts=0;
   ogg_packet op;
   int stateflag=0;
-  ts=0;
 
   //since we're loading a Theora video, we expect video to be present
   //otherwise, everything will be dropped.
@@ -196,7 +195,7 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
           {
             if (ret<0)
             {
-              printf("Error parsing Theora stream headers; corrupt stream1?\n");
+              printf("Error parsing Theora stream headers; corrupt stream?\n");
               return false;
             }
             int res=th_decode_headerin (&buff->ti,&buff->tc,&buff->ts,&op);

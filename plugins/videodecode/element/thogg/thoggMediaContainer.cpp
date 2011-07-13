@@ -36,7 +36,7 @@ bool TheoraMediaContainer::Initialize (iObjectRegistry* r)
   _target = NULL;
   return 0;
 }
-size_t TheoraMediaContainer::GetMediaCount ()
+size_t TheoraMediaContainer::GetMediaCount () const
 {
   return media.GetSize ();
 }
@@ -48,7 +48,7 @@ csRef<iMedia> TheoraMediaContainer::GetMedia (size_t index)
   return NULL;
 }
 
-const char* TheoraMediaContainer::GetDescription ()
+const char* TheoraMediaContainer::GetDescription () const
 {
   // TO DO
   return 0;
@@ -189,7 +189,7 @@ int TheoraMediaContainer::BufferData (ogg_sync_state *oy)
   return (bytes);
 }
 
-bool TheoraMediaContainer::Eof ()
+bool TheoraMediaContainer::Eof () const
 {
   return endOfFile;
 }
@@ -252,9 +252,9 @@ void TheoraMediaContainer::DoSeek ()
   }
   //cout<<targetFrame<<endl;
 
-  frame = vidStream->SeekPage (targetFrame,1,&oy,mSize);
+  frame = vidStream->SeekPage (targetFrame,true,&oy,mSize);
   if (frame != -1)
-    vidStream->SeekPage (std::max ( (long)0,frame),0,&oy,mSize);
+    vidStream->SeekPage (std::max ( (long)0,frame),false,&oy,mSize);
 
   float time= ((float) targetFrame/vidStream->GetFrameCount ()) *vidStream->GetLength ();
 
@@ -315,7 +315,7 @@ void TheoraMediaContainer::SetTargetTexture (csRef<iTextureHandle> &target)
 
 }
 
-float TheoraMediaContainer::GetPosition ()
+float TheoraMediaContainer::GetPosition () const
 {
   float position = 0;
   for (size_t i =0;i<activeStreams.GetSize ();i++)
@@ -329,7 +329,7 @@ float TheoraMediaContainer::GetPosition ()
   return position;
 }
 
-float TheoraMediaContainer::GetLength ()
+float TheoraMediaContainer::GetLength () const
 {
   float length = 0;
   for (size_t i =0;i<activeStreams.GetSize ();i++)

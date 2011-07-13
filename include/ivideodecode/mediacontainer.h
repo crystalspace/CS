@@ -37,13 +37,13 @@ struct iMediaContainer : public virtual iBase
   SCF_INTERFACE (iMediaContainer,0,1,0);
 
   /// Returns the number of iMedia objects inside the iMediaContainer
-  virtual size_t GetMediaCount () = 0;
+  virtual size_t GetMediaCount () const = 0;
 
   /// Gets the iMedia object at an index
   virtual csRef<iMedia> GetMedia (size_t index) = 0;
 
   /// Gets the description of the media container
-  virtual const char* GetDescription () = 0;
+  virtual const char* GetDescription () const = 0;
 
   /// Sets an active stream. In case there's already a stream of that type, it's replaced
   virtual void SetActiveStream (size_t index) = 0;
@@ -61,16 +61,16 @@ struct iMediaContainer : public virtual iBase
   virtual void Update () = 0;
 
   /// Checks if end of file has been reached
-  virtual bool Eof () = 0;
+  virtual bool Eof () const = 0;
 
   /// Triggers a seek for the active iMedia streams, resolved at the next update
   virtual void Seek (float time) = 0 ;
 
   /// Get the position of the media
-  virtual float GetPosition () = 0 ;
+  virtual float GetPosition () const = 0 ;
 
   /// Get the length of the media
-  virtual float GetLength () = 0 ;
+  virtual float GetLength () const = 0 ;
 };
 
 /** @} */

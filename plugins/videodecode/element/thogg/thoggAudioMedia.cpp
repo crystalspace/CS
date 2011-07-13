@@ -55,17 +55,17 @@ bool TheoraAudioMedia::Initialize (iObjectRegistry* r)
   return 0;
 }
 
-const char* TheoraAudioMedia::GetType ()
+const char* TheoraAudioMedia::GetType () const
 {
   return "TheoraAudio";
 }
 
-unsigned long TheoraAudioMedia::GetFrameCount()
+unsigned long TheoraAudioMedia::GetFrameCount() const
 {
   return 0;
 }
 
-float TheoraAudioMedia::GetLength ()
+float TheoraAudioMedia::GetLength () const
 {
   return length;
 }
@@ -75,7 +75,7 @@ void TheoraAudioMedia::SetAudioTarget (csRef<iSndSysStream> stream)
   _stream = stream;
 }
 
-double TheoraAudioMedia::GetPosition ()
+double TheoraAudioMedia::GetPosition () const
 {
   return vo.granulepos;
 }

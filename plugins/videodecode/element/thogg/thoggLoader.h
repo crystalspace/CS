@@ -74,9 +74,9 @@ private:
   page extraction */
   int BufferData(ogg_sync_state *oy);
 
-  bool StartParsing(csRef<TheoraMediaContainer> container);
-  bool ParseHeaders(csRef<TheoraMediaContainer> container);
-  void ComputeStreamLength(csRef<TheoraMediaContainer> container);
+  bool StartParsing (csRef<TheoraMediaContainer> container);
+  bool ParseHeaders (csRef<TheoraMediaContainer> container);
+  void ComputeStreamLength (csRef<TheoraMediaContainer> container);
 
 public:
   thoggLoader (iBase* parent);

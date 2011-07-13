@@ -75,16 +75,17 @@ public:
   // From iComponent.
   virtual bool Initialize (iObjectRegistry*);
 
-  virtual const char* GetType ();
-  virtual const csVPLvideoFormat *GetFormat();
-  virtual unsigned long GetFrameCount();
-  virtual float GetLength();
+  virtual const char* GetType () const;
+  virtual const csVPLvideoFormat* GetFormat() const;
+  virtual unsigned long GetFrameCount() const;
+  virtual float GetLength() const;
   virtual void SetVideoTarget (csRef<iTextureHandle> &texture);
-  virtual double GetPosition ();
+  virtual double GetPosition () const;
   virtual void CleanMedia () ;
   virtual int Update () ;
-  void SetFrameCount (unsigned long count)  { frameCount=count; }
-  void SetLength (float length)  { this->length=length; }
+
+  inline void SetFrameCount (unsigned long count)  { frameCount=count; }
+  inline void SetLength (float length)  { this->length=length; }
   long SeekPage(long targetFrame,bool return_keyframe, ogg_sync_state *oy,unsigned  long fileSize);
 };
 
