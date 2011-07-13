@@ -97,7 +97,8 @@ void TheoraMediaContainer::Update ()
     int ok=0;
     for (uint i=0;i<activeStreams.GetSize ();i++)
     {
-      ok+=media [activeStreams [i]]->Update ();
+      if( media [activeStreams [i]]->Update ())
+        ok++;
     }
 
     /* buffer compressed data every loop */

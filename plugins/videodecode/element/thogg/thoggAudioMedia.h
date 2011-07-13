@@ -76,7 +76,9 @@ public:
   virtual void SetAudioTarget (csRef<iSndSysStream> stream);
   virtual double GetPosition () const;
   virtual void CleanMedia () ;
-  virtual int Update () ;
+  virtual bool Update () ;
+
+  virtual void SwapBuffers() ;
 
   inline void SetLength (float length)  { this->length=length; }
   void Seek (float time, ogg_sync_state *oy,ogg_page *op,ogg_stream_state *thState);

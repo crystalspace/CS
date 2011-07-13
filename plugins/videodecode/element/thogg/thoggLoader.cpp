@@ -112,12 +112,20 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
         videoStream->decodersStarted = false;
         videoStream->infile = infile;
 
-        //create an empty texture for this video stream
-        csPtr<iTextureHandle> test = texManager->CreateTexture 
+        //create the buffers needed for double buffering
+        csPtr<iTextureHandle> tex1 = texManager->CreateTexture 
           (ti.frame_width,ti.frame_height,0,csimg2D,"rgb8",
           CS_TEXTURE_2D|CS_TEXTURE_NPOTS);
+        videoStream->_buffer1.AttachNew(tex1);
 
-        videoStream->_texture.AttachNew (test);
+        csPtr<iTextureHandle> tex2 = texManager->CreateTexture 
+          (ti.frame_width,ti.frame_height,0,csimg2D,"rgb8",
+          CS_TEXTURE_2D|CS_TEXTURE_NPOTS);
+        videoStream->_buffer2.AttachNew(tex2);
+
+        videoStream->_texture = videoStream->_buffer1;
+
+        videoStream->activeBuffer = 1;
 
         //printf("found video stream!\n");
 

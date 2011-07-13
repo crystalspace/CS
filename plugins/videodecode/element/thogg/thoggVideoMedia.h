@@ -54,6 +54,8 @@ private:
   // these will be private and have getters and setters, but for now, it's faster like this
 public:
   csRef<iTextureHandle> _texture;
+  csRef<iTextureHandle> _buffer1,_buffer2;
+  int activeBuffer;
 
   ogg_stream_state  to;
   th_info           ti;
@@ -82,7 +84,9 @@ public:
   virtual void SetVideoTarget (csRef<iTextureHandle> &texture);
   virtual double GetPosition () const;
   virtual void CleanMedia () ;
-  virtual int Update () ;
+  virtual bool Update () ;
+
+  virtual void SwapBuffers() ;
 
   inline void SetFrameCount (unsigned long count)  { frameCount=count; }
   inline void SetLength (float length)  { this->length=length; }

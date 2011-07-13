@@ -58,9 +58,14 @@ struct iMedia : public virtual iBase
   virtual void CleanMedia () = 0 ;
 
   /**
-    * Perform frame-specific updates on the stream
+    * Perform frame-specific updates on the stream.
     */
-  virtual int Update () = 0 ;
+  virtual bool Update () = 0 ;
+  
+  /**
+    * Swaps the active buffer for the one that was written to last
+    */
+  virtual void SwapBuffers() = 0;
 };
 
 /**

@@ -80,7 +80,7 @@ double TheoraAudioMedia::GetPosition () const
   return vo.granulepos;
 }
 
-int TheoraAudioMedia::Update ()
+bool TheoraAudioMedia::Update ()
 {
   audiobuf_ready=false;
   while (vorbis_p && !audiobuf_ready)
@@ -170,5 +170,11 @@ void TheoraAudioMedia::Seek(float time, ogg_sync_state *oy,ogg_page *op,ogg_stre
       ogg_sync_wrote( oy, bytesRead );
     }
   }
+
+}
+
+
+void TheoraAudioMedia::SwapBuffers()
+{
 
 }
