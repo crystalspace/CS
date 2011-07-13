@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!--
+<!--  
   (C) 2011 by Santiago Sanchez
 
   This library is free software; you can redistribute it and/or
@@ -22,41 +22,25 @@
   Seidel, 2009.
 -->
 
-<shader compiler="xmlshader" name="deferred_horizontal_blur">
-  
-  <shadervars>
-    
-  </shadervars>
-  
+<shader compiler="xmlshader" name="deferred_composition">  
   <technique priority="200">
     <pass>
       <!-- no blending -->
       <mixmode>
         <blendop src="one" dst="zero" />
         <alphatest>disable</alphatest>
-      </mixmode>	
+      </mixmode>
       
-      <vp plugin="glcg" file="/shader/deferred/horizontal_blur.cgvp" />      
+      <vp plugin="glcg" file="/shader/deferred/composition.cgvp" />
       
       <texture destination="GlobalIllumBuffer" name="tex global illumination" />
+      <texture destination="DirectRadianceBuffer" name="tex direct radiance" />
+      <texture destination="DiffuseBuffer" name="tex gbuffer 0" />
+      <texture destination="AmbientBuffer" name="tex gbuffer 2" />
       <texture destination="NormalBuffer" name="tex gbuffer 3" />
-      <texture destination="DepthBuffer" name="tex gbuffer depth" />
-      <!--<fp plugin="glcg" file="/shader/deferred/horizontal_blur.cgfp" />-->
-      <fp plugin="glcg">
-        <cgfp>
-          <variablemap variable="projection transform inverse" destination="ProjInv" />
-          <variablemap variable="far clip distance" destination="FarClipDistance" />
-          <variablemap variable="inv viewport size" destination="InvViewportSize" />
-          <variablemap variable="ssao blur kernelsize" destination="KernelSize" />
-          <variablemap variable="ssao blur position threshold" destination="PositionThreshold" />
-          <variablemap variable="ssao blur normal threshold" destination="NormalThreshold" />
-          <variablemap name="Direction" destination="Direction" type="vector2">1,0</variablemap>          
-          <program>          
-            <?Include blur.cginc ?>          
-          </program>
-        </cgfp>
-      </fp>
+      <!--<texture destination="DepthBuffer" name="tex gbuffer depth" />-->            
+      <fp plugin="glcg" file="/shader/deferred/composition.cgfp" />
+
     </pass>
   </technique>
-
 </shader>

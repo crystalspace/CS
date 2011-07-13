@@ -22,11 +22,7 @@
   Seidel, 2009.
 -->
 
-<shader compiler="xmlshader" name="deferred_horizontal_blur">
-  
-  <shadervars>
-    
-  </shadervars>
+<shader compiler="xmlshader" name="deferred_vertical_blur">  
   
   <technique priority="200">
     <pass>
@@ -36,12 +32,16 @@
         <alphatest>disable</alphatest>
       </mixmode>	
       
-      <vp plugin="glcg" file="/shader/deferred/horizontal_blur.cgvp" />      
+      <vp plugin="glcg" file="/shader/deferred/vertical_blur.cgvp" />
       
-      <texture destination="GlobalIllumBuffer" name="tex global illumination" />
+      <texture destination="DirectRadianceBuffer" name="tex direct radiance" />
+      <texture destination="GlobalIllumBuffer" name="tex horizontal blur" />
+      <!--<texture destination="GlobalIllumBuffer" name="tex global illumination" />-->
+      <texture destination="DiffuseBuffer" name="tex gbuffer 0" />
+      <texture destination="AmbientBuffer" name="tex gbuffer 2" />
       <texture destination="NormalBuffer" name="tex gbuffer 3" />
       <texture destination="DepthBuffer" name="tex gbuffer depth" />
-      <!--<fp plugin="glcg" file="/shader/deferred/horizontal_blur.cgfp" />-->
+      <!--<fp plugin="glcg" file="/shader/deferred/vertical_blur.cgfp" />-->
       <fp plugin="glcg">
         <cgfp>
           <variablemap variable="projection transform inverse" destination="ProjInv" />
@@ -50,12 +50,16 @@
           <variablemap variable="ssao blur kernelsize" destination="KernelSize" />
           <variablemap variable="ssao blur position threshold" destination="PositionThreshold" />
           <variablemap variable="ssao blur normal threshold" destination="NormalThreshold" />
-          <variablemap name="Direction" destination="Direction" type="vector2">1,0</variablemap>          
+          <variablemap variable="debug show ambocc" destination="ShowAO" />
+          <variablemap variable="debug show globalillum" destination="ShowGlobalIllum" />
+          <variablemap name="Direction" destination="Direction" type="vector2">0,1</variablemap>
+          <variablemap name="Combine" destination="Combine" type="float">1</variablemap>
           <program>          
-            <?Include blur.cginc ?>          
-          </program>
+            <?Include blur.cginc ?>
+          </program>          
         </cgfp>
       </fp>
+
     </pass>
   </technique>
 

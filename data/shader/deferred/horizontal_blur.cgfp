@@ -56,22 +56,21 @@ float4 main(vertex2fragment IN,
 	  float4 sampleDepthNormalVS = tex2D (NormalBuffer, sampleTexCoord);
 	  float3 sampleNormalVS = sampleDepthNormalVS.rgb * 2.0f - 1.0f;
 	  float sampleDepth = sampleDepthNormalVS.a;
-	  
-	  //float4 sampleGI = tex2D (GlobalIllumBuffer, sampleTexCoord);
-	  float deltaZ = abs (sampleDepth - pixelDepth);
-    float dotN = dot (pixelNormalVS, sampleNormalVS);
-    //float totalWeight = GaussianCoeff (i, gaussianSigma) * pow (dotN, 32.0f) / (EPSILON + deltaZ);    
+	  	  
+	  float deltaZ = /*abs*/ (sampleDepth - pixelDepth);
+    float dotN = dot (pixelNormalVS, sampleNormalVS);       
+    float4 sampleGI = tex2D (GlobalIllumBuffer, sampleTexCoord);
     
-	  //if (deltaZ < PositionThreshold && dotN > 1.0f - NormalThreshold)
-	  //{ 
-      float4 sampleGI = tex2D (GlobalIllumBuffer, sampleTexCoord);
-      float totalWeight = /*GaussianCoeff (i, gaussianSigma) **/ pow (dotN, 32.0f) / 
-          (EPSILON + deltaZ);
+	  if (deltaZ < PositionThreshold && dotN > 1.0f - NormalThreshold)
+	  {      
+      float totalWeight = GaussianCoeff (i, gaussianSigma); // * pow (dotN, 32.0f) / 
+          //(EPSILON + deltaZ);
+      //float totalWeight = exp (-i * i * NormalThreshold - deltaZ * deltaZ * PositionThreshold * 1024.0f);
       
       weightedAO += sampleGI.a * totalWeight;
       weightedRadiance += sampleGI.rgb * totalWeight;
       weightSum += totalWeight;
-	  //}
+	  }
 	  
 	  AO += sampleGI.a;
 	  radiance += sampleGI.rgb;

@@ -122,7 +122,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       blurNormalThreshold = cfg->GetFloat ("RenderManager.Deferred.GlobalIllum.SSDO.BlurNormalThreshold", 0.5f);
       
       csRef<iLoader> loader = csQueryRegistry<iLoader> (objRegistry);
-      csRef<iShaderManager> shaderManager = csQueryRegistry<iShaderManager> (objRegistry);     
+      shaderManager = csQueryRegistry<iShaderManager> (objRegistry);     
 
       globalIllumShader = loader->LoadShader ("/shader/deferred/globalillum.xml");
       if (!globalIllumShader)
@@ -142,80 +142,40 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         return false;
       }
 
-      lightCompositionShader = loader->LoadShader ("/shader/deferred/light_composition.xml");
-      if (!lightCompositionShader)
+      verticalBlurShader = loader->LoadShader ("/shader/deferred/vertical_blur.xml");
+      if (!verticalBlurShader)
       {
         csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING, reporterMessageID, 
-          "Could not load deferred_light_composition shader");
+          "Could not load deferred_vertical_blur shader");
         enabled = false;
         return false;
       }
 
-      iShaderVarStringSet *svStringSet = shaderManager->GetSVNameStringset ();
-      
-      globalIllumBufferSV = horizontalBlurShader->GetVariableAdd (
-          svStringSet->Request ("tex global illumination"));
-      intermediateBufferSV = lightCompositionShader->GetVariableAdd (
-          svStringSet->Request ("tex horizontal blur"));
-      //compositionBufferSV = lightCompositionShader->GetVariableAdd (
-      //    svStringSet->Request ("tex light composition"));
-      randomNormalsTextureSV = globalIllumShader->GetVariableAdd (
-          svStringSet->Request ("tex random normals"));
-      sampleDirectionsTextureSV = globalIllumShader->GetVariableAdd (
-          svStringSet->Request ("tex sample directions"));
-      irradianceEnvironmentMapSV = globalIllumShader->GetVariableAdd (
-          svStringSet->Request ("tex globalillum envmap"));
+      lightCompositionShader = loader->LoadShader ("/shader/deferred/composition.xml");
+      if (!lightCompositionShader)
+      {
+        csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING, reporterMessageID, 
+          "Could not load deferred_composition shader");
+        enabled = false;
+        return false;
+      }
 
-      patternSizeSV = globalIllumShader->GetVariableAdd (
-          svStringSet->Request ("pattern size"));
-      sampleCountSV = globalIllumShader->GetVariableAdd (
-          svStringSet->Request ("sample count"));
-      sampleRadiusSV = globalIllumShader->GetVariableAdd (
-          svStringSet->Request ("sample radius"));
-      depthBiasSV = globalIllumShader->GetVariableAdd (
-          svStringSet->Request ("depth bias"));
-      occlusionStrengthSV = globalIllumShader->GetVariableAdd (
-          svStringSet->Request ("occlusion strength"));
-      maxOccluderDistanceSV = globalIllumShader->GetVariableAdd (
-          svStringSet->Request ("max occluder distance"));
-      lightRotationAngleSV = globalIllumShader->GetVariableAdd (
-          svStringSet->Request ("light rotation angle"));
-      bounceStrengthSV = globalIllumShader->GetVariableAdd (
-          svStringSet->Request ("bounce strength"));
-      
-      blurKernelSizeSV = lightCompositionShader->GetVariableAdd (
-          svStringSet->Request ("ssao blur kernelsize"));
-      blurPositionThresholdSV = lightCompositionShader->GetVariableAdd (
-          svStringSet->Request ("ssao blur position threshold"));
-      blurNormalThresholdSV = lightCompositionShader->GetVariableAdd (
-          svStringSet->Request ("ssao blur normal threshold"));
-
-      showAmbientOcclusionSV = lightCompositionShader->GetVariableAdd (
-          svStringSet->Request ("debug show ambocc"));
-      showGlobalIlluminationSV = lightCompositionShader->GetVariableAdd (
-          svStringSet->Request ("debug show globalillum"));
-      
       LoadRandomNormalsTexture(loader, graphics3D);
       LoadIrradianceEnvironmentMap(loader, graphics3D);
       //GenerateSampleDirections (graphics3D);
+      
+      SetupShaderVars();           
 
       CreateFullscreenQuad();
 
       isInitialized = true;
       return true;
-    }
+    }    
 
     void UpdateShaderVars()
     {
       if (!enabled)
-        return;
-
-      globalIllumBufferSV->SetValue (globalIllumBuffer);
-      intermediateBufferSV->SetValue (intermediateBuffer);
-      //compositionBufferSV->SetValue (compositionBuffer);
-      randomNormalsTextureSV->SetValue (randomNormalsTexture);
-      sampleDirectionsTextureSV->SetValue (sampleDirectionsTexture);
-      irradianceEnvironmentMapSV->SetValue (irradianceEnvironmentMap);
+        return;      
 
       patternSizeSV->SetValue (patternSize);
       sampleCountSV->SetValue (sampleCount <= maxSamples ? sampleCount : maxSamples);
@@ -268,16 +228,31 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       DetachIntermediateBuffer();
 
 	    // Apply vertical edge-aware blur and combine with accum buffer
-      AttachCompositionBuffer();
+      //AttachCompositionBuffer();
+      AttachGlobalIllumBuffer();
       {
         graphics3D->SetZMode (CS_ZBUF_MESH);
         int drawFlags = CSDRAW_3DGRAPHICS | contextDrawFlags;
         drawFlags |= CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
         //graphics3D->BeginDraw (drawFlags);
 
-		    DrawFullscreenQuad (lightCompositionShader);
+		    DrawFullscreenQuad (verticalBlurShader);
 
         //graphics3D->FinishDraw();
+      }
+      //DetachCompositionBuffer();
+      DetachGlobalIllumBuffer();
+      
+      AttachCompositionBuffer();      
+      {
+        graphics3D->SetZMode (CS_ZBUF_MESH);
+        int drawFlags = CSDRAW_3DGRAPHICS | contextDrawFlags;
+        drawFlags |= CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
+        //graphics3D->BeginDraw (drawFlags);
+
+        DrawFullscreenQuad (lightCompositionShader);
+
+        graphics3D->FinishDraw();
       }
       DetachCompositionBuffer();
     }
@@ -409,6 +384,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       globalIllumBufferFormat = cfg->GetStr ("RenderManager.Deferred.GlobalIllum.GlobalIllumBufferFormat", "rgba16_f");
       compositionBufferFormat = cfg->GetStr ("RenderManager.Deferred.GlobalIllum.CompositionBufferFormat", 
         "rgb16_f");
+      float giBufferRes = 0.5f;
 
       const int flags = CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP | CS_TEXTURE_NPOTS;
       scfString errString;
@@ -416,8 +392,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
       if (!globalIllumBuffer)
       {
-        globalIllumBuffer = graphics3D->GetTextureManager()->CreateTexture (g2D->GetWidth() * 0.5f, 
-          g2D->GetHeight() * 0.5f, csimg2D, globalIllumBufferFormat, flags, &errString);
+        globalIllumBuffer = graphics3D->GetTextureManager()->CreateTexture (g2D->GetWidth() * giBufferRes, 
+          g2D->GetHeight() * giBufferRes, csimg2D, globalIllumBufferFormat, flags, &errString);
       }
       if (!globalIllumBuffer)
       {
@@ -428,8 +404,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
       if (!intermediateBuffer)
       {
-        intermediateBuffer = graphics3D->GetTextureManager()->CreateTexture (g2D->GetWidth(), g2D->GetHeight(), 
-          csimg2D, globalIllumBufferFormat, flags, &errString);
+        intermediateBuffer = graphics3D->GetTextureManager()->CreateTexture (g2D->GetWidth() * giBufferRes,
+          g2D->GetHeight() * giBufferRes, csimg2D, globalIllumBufferFormat, flags, &errString);
       }
       if (!intermediateBuffer)
       {
@@ -502,6 +478,62 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       return true;
     }
 
+    void SetupShaderVars()
+    {
+      iShaderVarStringSet *svStringSet = shaderManager->GetSVNameStringset ();  
+
+      // Add variables to shaders
+      globalIllumBufferSV = shaderManager->GetVariableAdd (
+          svStringSet->Request ("tex global illumination"));
+      intermediateBufferSV = verticalBlurShader->GetVariableAdd (
+          svStringSet->Request ("tex horizontal blur"));
+      //compositionBufferSV = lightCompositionShader->GetVariableAdd (
+      //    svStringSet->Request ("tex light composition"));
+      randomNormalsTextureSV = globalIllumShader->GetVariableAdd (
+          svStringSet->Request ("tex random normals"));
+      sampleDirectionsTextureSV = globalIllumShader->GetVariableAdd (
+          svStringSet->Request ("tex sample directions"));
+      irradianceEnvironmentMapSV = globalIllumShader->GetVariableAdd (
+          svStringSet->Request ("tex globalillum envmap"));
+
+      patternSizeSV = globalIllumShader->GetVariableAdd (
+          svStringSet->Request ("pattern size"));
+      sampleCountSV = globalIllumShader->GetVariableAdd (
+          svStringSet->Request ("sample count"));
+      sampleRadiusSV = globalIllumShader->GetVariableAdd (
+          svStringSet->Request ("sample radius"));
+      depthBiasSV = globalIllumShader->GetVariableAdd (
+          svStringSet->Request ("depth bias"));
+      occlusionStrengthSV = globalIllumShader->GetVariableAdd (
+          svStringSet->Request ("occlusion strength"));
+      maxOccluderDistanceSV = globalIllumShader->GetVariableAdd (
+          svStringSet->Request ("max occluder distance"));
+      lightRotationAngleSV = globalIllumShader->GetVariableAdd (
+          svStringSet->Request ("light rotation angle"));
+      bounceStrengthSV = globalIllumShader->GetVariableAdd (
+          svStringSet->Request ("bounce strength"));
+      
+      blurKernelSizeSV = shaderManager->GetVariableAdd (
+          svStringSet->Request ("ssao blur kernelsize"));
+      blurPositionThresholdSV = shaderManager->GetVariableAdd (
+          svStringSet->Request ("ssao blur position threshold"));
+      blurNormalThresholdSV = shaderManager->GetVariableAdd (
+          svStringSet->Request ("ssao blur normal threshold"));
+
+      showAmbientOcclusionSV = lightCompositionShader->GetVariableAdd (
+          svStringSet->Request ("debug show ambocc"));
+      showGlobalIlluminationSV = lightCompositionShader->GetVariableAdd (
+          svStringSet->Request ("debug show globalillum"));
+
+      // Set values
+      globalIllumBufferSV->SetValue (globalIllumBuffer);
+      intermediateBufferSV->SetValue (intermediateBuffer);
+      //compositionBufferSV->SetValue (compositionBuffer);
+      randomNormalsTextureSV->SetValue (randomNormalsTexture);
+      sampleDirectionsTextureSV->SetValue (sampleDirectionsTexture);
+      irradianceEnvironmentMapSV->SetValue (irradianceEnvironmentMap);
+    }
+
     void CreateFullscreenQuad()
     {
       // Builds the quad.
@@ -529,7 +561,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       csRef<iImage> image;
       int flags = CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS;
 
-      randomNormalsTexture = loader->LoadTexture ("/data/random_normals.dds", flags, 
+      randomNormalsTexture = loader->LoadTexture ("/data/random_normals.png", flags, 
         graphics3D->GetTextureManager(), &image);
       if (!randomNormalsTexture)
       {
@@ -811,7 +843,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
   private:
     csRef<iShader> globalIllumShader;
-	csRef<iShader> horizontalBlurShader;
+    csRef<iShader> horizontalBlurShader;    
+    csRef<iShader> verticalBlurShader;
     csRef<iShader> lightCompositionShader;
 
     csSimpleRenderMesh quadMesh;
@@ -862,6 +895,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     csRef<csShaderVariable> showGlobalIlluminationSV;
 
     iGraphics3D *graphics3D;
+    csRef<iShaderManager> shaderManager;
     iObjectRegistry *objectRegistry;
 
     const char *reporterMessageID;

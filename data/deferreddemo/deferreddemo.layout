@@ -78,7 +78,7 @@
         <Property Name='ConfigTypes' Value='float'/>
         <Property Name='ConfigNames' Value='DeferredDemo.SampleRadius'/>
         <Property Name='MinimumValue' Value='0.0'/>
-        <Property Name='MaximumValue' Value='20.0'/>
+        <Property Name='MaximumValue' Value='1.0'/>
         <Property Name='ClickStepSize' Value='0.01'/>
       </Window>
 	  
@@ -102,8 +102,8 @@
         <Property Name='ConfigTypes' Value='float'/>
         <Property Name='ConfigNames' Value='DeferredDemo.MaxOccluderDist'/>
         <Property Name='MinimumValue' Value='0.0'/>
-        <Property Name='MaximumValue' Value='20.0'/>
-        <Property Name='ClickStepSize' Value='0.01'/>
+        <Property Name='MaximumValue' Value='1.0'/>
+        <Property Name='ClickStepSize' Value='0.001'/>
       </Window>
       
       <Window Type="ice/SettingSlider" Name="PatternSize" >
@@ -126,8 +126,8 @@
         <Property Name='ConfigTypes' Value='float'/>
         <Property Name='ConfigNames' Value='DeferredDemo.DepthBias'/>
         <Property Name='MinimumValue' Value='0.0'/>
-        <Property Name='MaximumValue' Value='0.2'/>
-        <Property Name='ClickStepSize' Value='0.000001'/>
+        <Property Name='MaximumValue' Value='1.0'/>
+        <Property Name='ClickStepSize' Value='0.0001'/>
       </Window>
       
       <Window Type="ice/SettingSlider" Name="LightRotation" >
@@ -151,7 +151,7 @@
         <Property Name='ConfigNames' Value='DeferredDemo.BounceStrength'/>
         <Property Name='MinimumValue' Value='0.0'/>
         <Property Name='MaximumValue' Value='10.0'/>
-        <Property Name='ClickStepSize' Value='0.1'/>
+        <Property Name='ClickStepSize' Value='0.01'/>
       </Window>
       
       <Window Type="ice/SettingSlider" Name="KernelSize" >
@@ -162,8 +162,8 @@
         <Property Name='ConfigTypes' Value='int'/>
         <Property Name='ConfigNames' Value='DeferredDemo.KernelSize'/>
         <Property Name='MinimumValue' Value='1'/>
-        <Property Name='MaximumValue' Value='8'/>
-        <Property Name='ClickStepSize' Value='1'/>
+        <Property Name='MaximumValue' Value='33'/>
+        <Property Name='ClickStepSize' Value='2'/>
       </Window>
       
       <Window Type="ice/SettingSlider" Name="PositionThreshold" >
@@ -185,9 +185,9 @@
         <Property Name='Text' Value='Blur Normal Threshold'/>
         <Property Name='ConfigTypes' Value='float'/>
         <Property Name='ConfigNames' Value='DeferredDemo.NormalThreshold'/>
-        <Property Name='MinimumValue' Value='1.0'/>
-        <Property Name='MaximumValue' Value='64.0'/>
-        <Property Name='ClickStepSize' Value='1'/>
+        <Property Name='MinimumValue' Value='0.0'/>
+        <Property Name='MaximumValue' Value='1.0'/>
+        <Property Name='ClickStepSize' Value='0.01'/>
       </Window>
 
     </Window>

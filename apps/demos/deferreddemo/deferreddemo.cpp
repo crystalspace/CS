@@ -382,7 +382,7 @@ bool DeferredDemo::SetupScene()
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (pos);
   
-  csPlane3 *farPlane = new csPlane3 (0, 0, -1, 30);
+  csPlane3 *farPlane = new csPlane3 (0, 0, -1, 1000);
   view->GetCamera()->SetFarPlane (farPlane);
   view->GetPerspectiveCamera()->SetNearClipDistance (0.2f);
   delete farPlane;

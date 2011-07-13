@@ -454,7 +454,7 @@ bool RMDeferred::RenderView(iView *view, bool recursePortals)
     iTextureHandle *finalBuffer = accumBuffer;
 
     if (globalIllum.IsEnabled())
-      finalBuffer = globalIllum.GetLightCompositionBuffer();
+      finalBuffer = globalIllum.GetLightCompositionBuffer(); //GetGlobalIllumBuffer();
 
     DrawFullscreenTexture (finalBuffer, graphics3D);
   }
