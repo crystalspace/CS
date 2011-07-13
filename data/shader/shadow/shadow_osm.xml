@@ -71,14 +71,23 @@
           struct fragmentOutput
           {
             float4 Color0 : COLOR0;
+          ]]>            
+        <?if vars."mrt".int &gt; 1?>
+          <![CDATA[          
             float4 Color1 : COLOR1;
             float4 Color2 : COLOR2;
             float4 Color3 : COLOR3;
+          ]]>            
+        <?if vars."mrt".int &gt; 4?>
+          <![CDATA[          
             float4 Color4 : COLOR4;
             float4 Color5 : COLOR5;
             float4 Color6 : COLOR6;
             float4 Color7 : COLOR7;
-            float4 Color8 : COLOR8;
+          ]]>
+        <?endif?>
+        <?endif?>
+          <![CDATA[               
           };
           fragmentOutput main (vertex2fragment IN,
             uniform sampler2D TexDiffuse)
@@ -102,20 +111,23 @@
             int renderTarget = (i / 4) % mrt;
             
             output.Color0 = color * (renderTarget == 0);
+          ]]>            
+        <?if vars."mrt".int &gt; 1?>
+          <![CDATA[                      
             output.Color1 = color * (renderTarget == 1);
             output.Color2 = color * (renderTarget == 2);
             output.Color3 = color * (renderTarget == 3);
+          ]]>            
+        <?if vars."mrt".int &gt; 4?>
+          <![CDATA[                      
             output.Color4 = color * (renderTarget == 4);
             output.Color5 = color * (renderTarget == 5);
             output.Color6 = color * (renderTarget == 6);
             output.Color7 = color * (renderTarget == 7);
-          ]]>
-        <?if vars."light numSplits"?>
-          <![CDATA[            
-            output.Color8 = color * (renderTarget == 8);
-          ]]>
+            ]]>
         <?endif?>
-          <![CDATA[                      
+        <?endif?>
+          <![CDATA[     
             return output;
           }
           ]]>

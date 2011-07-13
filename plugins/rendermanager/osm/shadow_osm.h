@@ -292,10 +292,6 @@ namespace CS
           int shadowMapSize = viewSetup.persist.shadowMapRes;
           CS_ALLOC_STACK_ARRAY(iTextureHandle*, texHandles, persist.mrt);
 
-          // pass mrt number to shader
-          persist.settings.shadowDefaultShader->
-            GetVariableAdd(persist.mrtSVName)->SetValue(persist.mrt);
-
           // here should be lightFrustums.frustums.GetSize()
 //           csPrintf("%d\n", lightFrustums.frustums.GetSize());
           for (size_t l = 0; l < 1; l++)
@@ -558,6 +554,11 @@ namespace CS
             shadowMapRes = cfg->GetInt (
               csString().Format ("%s.ShadowMapResolution", configPrefix.GetData()), 512);
           }
+
+          // pass mrt number to shader
+          csShaderVariable* mrtVar = new csShaderVariable(mrtSVName); 
+          mrtVar->SetValue(mrt);
+          shaderManager->AddVariable(mrtVar);
         }
         void UpdateNewFrame ()
         {
