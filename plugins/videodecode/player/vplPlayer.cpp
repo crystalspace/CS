@@ -17,6 +17,13 @@ object_reg(0)
 
 vplPlayer::~vplPlayer ()
 {
+  // Unregister the Frame event listener
+  if (frameEventHandler)
+  {
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
+    if (q)
+      q->RemoveListener (frameEventHandler);
+  }
 }
 
 bool vplPlayer::Initialize (iObjectRegistry* r)
@@ -35,6 +42,20 @@ void vplPlayer::InitializePlayer (csRef<iMediaContainer> media)
               "Media container is not valid!");
   else
     _mediaFile = media;
+
+  CS_INITIALIZE_FRAME_EVENT_SHORTCUTS (object_reg);
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
+
+  // Register the Frame event listener
+  if (!frameEventHandler)
+  {
+    frameEventHandler.AttachNew (new FrameEventHandler (this));
+  }
+  if (q != 0)
+  {
+    csEventID events[2] = { Frame, CS_EVENTLIST_END };
+    q->RegisterListener (frameEventHandler, events);
+  }
 }
 
 void vplPlayer::SetActiveStream (int index) 
@@ -127,4 +148,9 @@ bool vplPlayer::IsPlaying ()
 float vplPlayer::GetLength () const
 {
   return _mediaFile->GetLength ();
+}
+
+void vplPlayer::SwapBuffers ()
+{
+  _mediaFile->SwapBuffers ();
 }

@@ -263,7 +263,7 @@ bool TheoraVideoMedia::Update ()
     csReport(object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
              "The Theora video stream has an unsupported pixel format.\n");
 
-  SwapBuffers ();
+  //SwapBuffers ();
 
   return 0;
 }

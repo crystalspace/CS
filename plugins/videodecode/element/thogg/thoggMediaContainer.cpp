@@ -95,10 +95,19 @@ void TheoraMediaContainer::Update ()
   if (!endOfFile && activeStreams.GetSize () > 0)
   {
     int ok=0;
-    for (uint i=0;i<activeStreams.GetSize ();i++)
+    for (size_t i=0;i<activeStreams.GetSize ();i++)
     {
       if( media [activeStreams [i]]->Update ())
         ok++;
+    }
+
+    if (ok==0)
+    {
+      canSwap=true;
+      /*for (size_t i=0;i<activeStreams.GetSize ();i++)
+      {
+        media [activeStreams [i]]->SwapBuffers ();
+      }*/
     }
 
     /* buffer compressed data every loop */
@@ -342,4 +351,16 @@ float TheoraMediaContainer::GetLength () const
   }
 
   return length;
+}
+
+void TheoraMediaContainer::SwapBuffers()
+{
+  if(canSwap)
+  {
+    canSwap=false;
+    for (size_t i =0;i<activeStreams.GetSize ();i++)
+    {
+      media[activeStreams[i]]->SwapBuffers ();
+    }
+  }
 }

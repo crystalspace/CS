@@ -71,6 +71,9 @@ struct iMediaContainer : public virtual iBase
 
   /// Get the length of the media
   virtual float GetLength () const = 0 ;
+
+  /// Swaps the active buffer for the one that was written to last inside the active iMedia
+  virtual void SwapBuffers() = 0;
 };
 
 /** @} */

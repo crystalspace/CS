@@ -58,6 +58,7 @@ public:
   csRef<iTextureHandle> _target;
 
 private:
+  bool canSwap;
   int hasDataToBuffer;
 
   //helper for buffering data
@@ -85,6 +86,7 @@ public:
   virtual void AutoActivateStreams () ;
   virtual float GetPosition () const;
   virtual float GetLength () const;
+  virtual void SwapBuffers() ;
 
   /// Does a seek on the active media
   void DoSeek ();

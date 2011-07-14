@@ -24,6 +24,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <ivideodecode/mediacontainer.h>
 #include <csutil/scf_implementation.h>
 
+#include <iostream>
+using namespace std;
+
 struct iObjectRegistry;
 
 #define QUALIFIED_PLUGIN_NAME "crystalspace.vpl.player"
@@ -63,6 +66,33 @@ public:
   virtual float GetPosition () const;
   virtual bool IsPlaying () ;
   virtual float GetLength () const;
+
+  void SwapBuffers();
+
+  /**
+   * Embedded iEventHandler interface that handles keyboard events
+   */
+  class FrameEventHandler : 
+    public scfImplementation1<FrameEventHandler, 
+    iEventHandler>
+  {
+  private:
+    vplPlayer* parent;
+  public:
+    FrameEventHandler (vplPlayer* parent) :
+        scfImplementationType (this), parent (parent) { }
+        virtual ~FrameEventHandler () { }
+        virtual bool HandleEvent (iEvent& ev)
+        {
+          parent->SwapBuffers (); 
+
+          return false;
+        }
+        CS_EVENTHANDLER_PHASE_FRAME("crystalspace.videodecode.frame")
+  };
+  csRef<FrameEventHandler> frameEventHandler;
+
+  CS_DECLARE_FRAME_EVENT_SHORTCUTS;
 };
 
 #endif // __VPLPLAYER_H__
