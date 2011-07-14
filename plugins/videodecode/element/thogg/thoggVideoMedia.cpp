@@ -93,7 +93,7 @@ float TheoraVideoMedia::GetLength () const
 
 void TheoraVideoMedia::SetVideoTarget (csRef<iTextureHandle> &texture)
 {
-  texture = _texture;
+  texture = _texture;   // a Set method should do '_texture = texture' otherwise it's a Get method ?????
 }
 
 double TheoraVideoMedia::GetPosition () const
@@ -116,7 +116,7 @@ bool TheoraVideoMedia::Update ()
         if (th_granule_frame (td,videobuf_granulepos)<frameToSkip)
         {
           videobuf_ready=false;
-          return 0;
+          return false;
         }
         else
         {
@@ -131,29 +131,20 @@ bool TheoraVideoMedia::Update ()
   }
 
   if (!videobuf_ready)
-    return 1;
+    return true;
 
-  csRef<iTextureHandle> texToWrite;
-
-  if(activeBuffer==1)
-    texToWrite=_buffer2;
-  else
-    texToWrite=_buffer1;
+  csRef<iTextureHandle> texToWrite = activeBuffer==1 ? _buffer2 : _buffer1;
+  size_t dstSize;
+  uint8* pixels = texToWrite->QueryBlitBuffer (ti.pic_x,ti.pic_y,ti.pic_width,ti.pic_height,dstSize);
 
   th_ycbcr_buffer yuv;
   th_decode_ycbcr_out(td,yuv);
-
   int y_offset=(ti.pic_x&~1)+yuv[0].stride*(ti.pic_y&~1);
 
-  //if the video is in 4:2:0 pixel format
+  // 4:2:0 pixel format
   if (ti.pixel_fmt==TH_PF_420)
   {
     int uv_offset=(ti.pic_x/2)+(yuv[1].stride)*(ti.pic_y/2);
-
-//    int size = ti.frame_width*ti.frame_height;
-
-    size_t dstSize;
-    uint8 * pixels = texToWrite->QueryBlitBuffer (ti.pic_x,ti.pic_y,ti.pic_width,ti.pic_height,dstSize);
 
     for (ogg_uint32_t y = 0 ; y < ti.frame_height ; y++)
       for (ogg_uint32_t x = 0 ; x < ti.frame_width ; x++)
@@ -181,17 +172,11 @@ bool TheoraVideoMedia::Update ()
         *pixels++ = 0xff;
       }
 
-    texToWrite->ApplyBlitBuffer (pixels);
   }
-  //if the video is in 4:2:2 pixel format
+  // 4:2:2 pixel format
   else if (ti.pixel_fmt==TH_PF_422)
   {
     int uv_offset=(ti.pic_x/2)+(yuv[1].stride)*(ti.pic_y);
-
-//    int size = ti.frame_width*ti.frame_height;
-
-    size_t dstSize;
-    uint8 * pixels = texToWrite->QueryBlitBuffer (ti.pic_x,ti.pic_y,ti.pic_width,ti.pic_height,dstSize);
 
     for (ogg_uint32_t y = 0 ; y < ti.frame_height ; y++)
       for (ogg_uint32_t x = 0 ; x < ti.frame_width ; x++)
@@ -219,17 +204,11 @@ bool TheoraVideoMedia::Update ()
         *pixels++ = 0xff;
       }
 
-    texToWrite->ApplyBlitBuffer (pixels);
   }
-  //if the video is in 4:4:4 pixel format
+  // 4:4:4 pixel format
   else if (ti.pixel_fmt==TH_PF_444)
   {
     int uv_offset=(ti.pic_x/2)+(yuv[1].stride)*(ti.pic_y);
-
-//    int size = ti.frame_width*ti.frame_height;
-
-    size_t dstSize;
-    uint8 * pixels = texToWrite->QueryBlitBuffer (ti.pic_x,ti.pic_y,ti.pic_width,ti.pic_height,dstSize);
 
     for (ogg_uint32_t y = 0 ; y < ti.frame_height ; y++)
       for (ogg_uint32_t x = 0 ; x < ti.frame_width ; x++)
@@ -257,15 +236,18 @@ bool TheoraVideoMedia::Update ()
         *pixels++ = 0xff;
       }
 
-    texToWrite->ApplyBlitBuffer (pixels);
   }
   else
+  {
     csReport(object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
              "The Theora video stream has an unsupported pixel format.\n");
+    return false;
+  }
 
+  texToWrite->ApplyBlitBuffer (pixels);
   //SwapBuffers ();
 
-  return 0;
+  return false;
 }
 
 long TheoraVideoMedia::SeekPage (long targetFrame,bool return_keyframe, ogg_sync_state *oy,unsigned long fileSize)
@@ -345,15 +327,15 @@ long TheoraVideoMedia::SeekPage (long targetFrame,bool return_keyframe, ogg_sync
 
   return -1;
 }
+
 void TheoraVideoMedia::SwapBuffers()
 {
-  if(activeBuffer==1)
+  if (activeBuffer==1)
   {
     _texture = _buffer2;
     activeBuffer = 2;
   }
   else
-  if(activeBuffer==2)
   {
     _texture = _buffer1;
     activeBuffer = 1;
