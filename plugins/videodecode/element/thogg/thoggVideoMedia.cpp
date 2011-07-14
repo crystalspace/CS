@@ -163,7 +163,7 @@ bool TheoraVideoMedia::Update ()
         else if(R>255) R=255;
         if(G<0) G=0;
         else if(G>255) G=255;
-        if(R<0) B=0;
+        if(B<0) B=0;
         else if(B>255) B=255;
 
         *pixels++ = (uint8)R;
@@ -195,7 +195,7 @@ bool TheoraVideoMedia::Update ()
         else if(R>255) R=255;
         if(G<0) G=0;
         else if(G>255) G=255;
-        if(R<0) B=0;
+        if(B<0) B=0;
         else if(B>255) B=255;
 
         *pixels++ = (uint8)R;
@@ -227,7 +227,7 @@ bool TheoraVideoMedia::Update ()
         else if(R>255) R=255;
         if(G<0) G=0;
         else if(G>255) G=255;
-        if(R<0) B=0;
+        if(B<0) B=0;
         else if(B>255) B=255;
 
         *pixels++ = R;
