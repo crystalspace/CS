@@ -54,7 +54,8 @@
       <texture destination="SeedTexture" name="tex sample directions" />
       <texture destination="EnvmapTexture" name="tex globalillum envmap" />
       <texture destination="RandNormalsTexture" name="tex random normals" />      
-      <fp plugin="glcg" file="/shader/deferred/globalillum.cgfp" />
+      <!--<fp plugin="glcg" file="/shader/deferred/globalillum.cgfp" />-->
+      <fp plugin="glcg" file="/shader/deferred/ssao2.cgfp" />
 
     </pass>
   </technique>

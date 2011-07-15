@@ -31,7 +31,7 @@
         <alphatest>disable</alphatest>
       </mixmode>
       
-      <vp plugin="glcg" file="/shader/deferred/composition.cgvp" />
+      <vp plugin="glcg" file="/shader/deferred/globalillum.cgvp" />
       
       <texture destination="GlobalIllumBuffer" name="tex global illumination" />
       <texture destination="DirectRadianceBuffer" name="tex direct radiance" />

@@ -32,7 +32,7 @@
         <alphatest>disable</alphatest>
       </mixmode>	
       
-      <vp plugin="glcg" file="/shader/deferred/vertical_blur.cgvp" />
+      <vp plugin="glcg" file="/shader/deferred/globalillum.cgvp" />
       
       <texture destination="DirectRadianceBuffer" name="tex direct radiance" />
       <texture destination="GlobalIllumBuffer" name="tex horizontal blur" />

@@ -28,7 +28,8 @@ vertex2fragment main(app2vertex IN,
 
   float4 pos = mul (ModelViewProj, float4 (IN.Position, 1.0));
   OUT.Position = pos;
-  OUT.TexCoord = IN.TexCoord;
+  //OUT.TexCoord = IN.TexCoord;
+  OUT.TexCoord = (pos.xy / pos.w) * 0.5f + 0.5f;
   OUT.ScreenPos = pos;
   OUT.ViewPos = mul (ProjInv, float4 (IN.Position, 1.0));
 

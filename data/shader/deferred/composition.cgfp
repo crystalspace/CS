@@ -34,10 +34,10 @@ float4 main(vertex2fragment IN,
     float4( 1/16, 3/16, 3/16, 9/16 ) 
   };
   
-  float2 screenXY = IN.ScreenPos.xy / IN.ScreenPos.w;
-  float2 texCoord = screenXY * 0.5f + 0.5f; //IN.TexCoord;   
+  //float2 screenXY = IN.ScreenPos.xy / IN.ScreenPos.w;
+  float2 texCoord = IN.TexCoord; //screenXY * 0.5f + 0.5f; //IN.TexCoord;   
   
-  float4 normalDepthVS = tex2D (NormalBuffer, texCoord);  
+  /*float4 normalDepthVS = tex2D (NormalBuffer, texCoord);  
   float3 pixelNormalVS = normalDepthVS.rgb * 2.0f - 1.0f;
 	float pixelDepth = normalDepthVS.a;
   
@@ -61,7 +61,7 @@ float4 main(vertex2fragment IN,
       float dotN = dot (pixelNormalVS, sampleNormalVS);       
       float4 sampleGI = tex2D (GlobalIllumBuffer, sampleTexCoord);     
            
-      float weight = /*bilinearWeights[nSample]*/ 0.25f * pow (dotN, 32.0f) / 
+      float weight = 0.25f * pow (dotN, 32.0f) / 
           (EPSILON + deltaZ);      
       
       weightedAO += sampleGI.a * weight;
@@ -84,20 +84,23 @@ float4 main(vertex2fragment IN,
   {    
     AO *= 0.25f;
     radiance *= 0.25f;
-  }
+  }*/
   
   float3 directRadiance = tex2D (DirectRadianceBuffer, texCoord).rgb;  
   float3 diffuseColor = tex2D (DiffuseBuffer, texCoord).rgb;  
   float3 ambientColor = tex2D (AmbientBuffer, texCoord).rgb;  
   
-  radiance = diffuseColor * AO * (ambientColor + radiance);
+  float4 radiance = tex2D (GlobalIllumBuffer, texCoord);
+  float AO = radiance.a;
+  
+  radiance.rgb = diffuseColor * AO * (ambientColor + radiance.rgb);
   
   if (ShowAO != 0)
     return float4 (AO);
-  else if (ShowGlobalIllum != 0)
-    return float4 (radiance, 1.0f);
-  else
-    return float4 (directRadiance + radiance, 1.0f);
+  if (ShowGlobalIllum != 0)
+    return float4 (radiance.rgb, 1.0f);
+  
+  return float4 (directRadiance + radiance.rgb, 1.0f);
 }
 
 ]]>

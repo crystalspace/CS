@@ -106,8 +106,8 @@ float4 main(vertex2fragment IN,
 		float3(0.0975089, 	-0.329594, 	0.609803)
 	};*/
   
-  float2 screenXY = IN.ScreenPos.xy / IN.ScreenPos.w;
-  float2 texCoord = screenXY * 0.5f + 0.5f; //IN.TexCoord;  
+  //float2 screenXY = IN.ScreenPos.xy / IN.ScreenPos.w;
+  float2 texCoord = IN.TexCoord; //screenXY * 0.5f + 0.5f; //IN.TexCoord;  
   //float3 screen = GetScreenPosition (screenXY, tex2D (DepthBuffer, texCoord));
   //float3 pixelPosVS = ScreenToWorldPosition (screen, ProjInv);
   
@@ -122,7 +122,7 @@ float4 main(vertex2fragment IN,
 	float pixelDepth = normalDepthVS.a;
   //farClipDistance = 29.8f;
 	float depth = pixelDepth * farClipDistance;
-  float3 pixelPos = float3 (screenXY.x, -screenXY.y, pixelDepth);
+  //float3 pixelPos = float3 (screenXY.x, -screenXY.y, pixelDepth);
 
 	float3 kernelScale = float3 (sampleRadius / depth, sampleRadius / depth, sampleRadius / farClipDistance);
 
@@ -134,7 +134,7 @@ float4 main(vertex2fragment IN,
 
 	for ( int j = 0; j < sampleCount; j++ )
 	{
-		float3 random = tex2D (RandNormalsTexture, texCoord * (float2(16,12) + (float)j)).rgb;
+		float3 random = tex2D (RandNormalsTexture, texCoord * (float2(8,6) + (float)j)).rgb;
 		random = random * 2.0f - 1.0f;
 
 		for ( int i = 0; i < 8/*16*/; i++ )

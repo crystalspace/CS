@@ -41,7 +41,7 @@ float WeightSample(float sampleDist, float2 sampleTexCoord, sampler2D NormalBuff
   return totalWeight;
 }
 
-float4 main(in float4 ScreenPos : TEXCOORD0,
+float4 main(in float2 texCoord : TEXCOORD0, //in float4 ScreenPos : TEXCOORD0,
             //uniform float4x4 ProjInv, //: state.matrix.inverse.projection,
             uniform sampler2D NormalBuffer,
             uniform sampler2D DiffuseBuffer,
@@ -59,7 +59,8 @@ float4 main(in float4 ScreenPos : TEXCOORD0,
             uniform int ShowAO,
             uniform int ShowGlobalIllum) : COLOR
 {
-  float2 texCoord = (ScreenPos.xy / ScreenPos.w) * 0.5f + 0.5f;
+  //return tex2D (GlobalIllumBuffer, texCoord);
+  //float2 texCoord = (ScreenPos.xy / ScreenPos.w) * 0.5f + 0.5f;  
   float4 normalDepthVS = tex2D (NormalBuffer, texCoord);
   float3 pixelNormalVS = normalDepthVS.rgb * 2.0f - 1.0f;
   float pixelDepth = normalDepthVS.a;  

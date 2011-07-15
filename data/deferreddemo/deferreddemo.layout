@@ -66,7 +66,7 @@
         <Property Name='ConfigTypes' Value='float'/>
         <Property Name='ConfigNames' Value='DeferredDemo.OcclusionStrength'/>
         <Property Name='MinimumValue' Value='0.0'/>
-        <Property Name='MaximumValue' Value='1.0'/>
+        <Property Name='MaximumValue' Value='10.0'/>
         <Property Name='ClickStepSize' Value='0.01'/>
       </Window>
 	  
@@ -90,7 +90,7 @@
         <Property Name='ConfigTypes' Value='int'/>
         <Property Name='ConfigNames' Value='DeferredDemo.SampleCount'/>
         <Property Name='MinimumValue' Value='1'/>
-        <Property Name='MaximumValue' Value='4'/>
+        <Property Name='MaximumValue' Value='32'/>
         <Property Name='ClickStepSize' Value='1'/>
       </Window>
       
@@ -102,7 +102,7 @@
         <Property Name='ConfigTypes' Value='float'/>
         <Property Name='ConfigNames' Value='DeferredDemo.MaxOccluderDist'/>
         <Property Name='MinimumValue' Value='0.0'/>
-        <Property Name='MaximumValue' Value='1.0'/>
+        <Property Name='MaximumValue' Value='10.0'/>
         <Property Name='ClickStepSize' Value='0.001'/>
       </Window>
       
@@ -130,7 +130,7 @@
         <Property Name='ClickStepSize' Value='0.0001'/>
       </Window>
       
-      <Window Type="ice/SettingSlider" Name="LightRotation" >
+      <Window Type="ice/SettingSlider" Name="LightRotation">
         <Property Name='UnifiedSize' Value='{{1.0,0.0},{0.0,30}}'/>
         <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,240.0}}'/>
 
@@ -139,7 +139,7 @@
         <Property Name='ConfigNames' Value='DeferredDemo.LightRotation'/>
         <Property Name='MinimumValue' Value='0.0'/>
         <Property Name='MaximumValue' Value='6.28'/>
-        <Property Name='ClickStepSize' Value='0.1'/>
+        <Property Name='ClickStepSize' Value='0.01'/>
       </Window>
       
       <Window Type="ice/SettingSlider" Name="BounceStrength" >

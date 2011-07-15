@@ -252,7 +252,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
         DrawFullscreenQuad (lightCompositionShader);
 
-        graphics3D->FinishDraw();
+        //graphics3D->FinishDraw();
       }
       DetachCompositionBuffer();
     }
@@ -561,7 +561,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       csRef<iImage> image;
       int flags = CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS;
 
-      randomNormalsTexture = loader->LoadTexture ("/data/random_normals.png", flags, 
+      randomNormalsTexture = loader->LoadTexture ("/data/regularSphereJittered16.png", flags, 
         graphics3D->GetTextureManager(), &image);
       if (!randomNormalsTexture)
       {
