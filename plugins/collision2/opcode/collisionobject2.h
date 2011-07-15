@@ -2,30 +2,39 @@
 #define __CS_OPCODE_COLLISIONOBJECT_H__
 
 #include "csOpcode2.h"
+#include "colliders2.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN (Opcode2)
 {
+class csOpcodeCollisionSector;
+class csOpcodeCollisionSystem;
+class csOpcodeCollider;
+
 class csOpcodeCollisionObject: public scfImplementationExt1<
   csOpcodeCollisionObject, csObject, CS::Collision2::iCollisionObject>
 {
-class csOpcodeCollisionSector;
-class csOpcodeCollisionSystem;
-
+  friend class csOpcodeCollisionSector;
 private:
   csOpcodeCollisionSystem* system;
   csOpcodeCollisionSector* sector;
   csWeakRef<iMovable> movable;
+  csRef<CS::Collision2::iCollider> collider;
   CS::Collision2::CollisionObjectType type;
   CS::Collision2::CollisionGroup collGroup;
   csRef<CS::Collision2::iCollisionCallback> collCb;
+  csRefArray<csOpcodeCollisionObject> contactObjects;
   csOrthoTransform transform;
+  CS::Collision2::CollisionGroupMask mask;
+
+  bool insideWorld;
+  bool isTerrain;
 
 public:
   csOpcodeCollisionObject (csOpcodeCollisionSystem* sys);
   virtual ~csOpcodeCollisionObject ();
 
   virtual iObject* QueryObject (void) { return (iObject*) this; }
-  virtual iCollisionObject* QueryCollisionObject () {return dynamic_cast<iCollisionObject*> (this);}
+  virtual CS::Collision2::iCollisionObject* QueryCollisionObject () {return dynamic_cast<iCollisionObject*> (this);}
   virtual CS::Physics2::iPhysicalBody* QueryPhysicalBody () {return NULL;}
 
   virtual void SetObjectType (CS::Collision2::CollisionObjectType type, bool forceRebuild = true);

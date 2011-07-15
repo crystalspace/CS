@@ -9,7 +9,6 @@
 #include "iengine/sector.h"
 #include "iengine/movable.h"
 #include "csutil/csobject.h"
-#include "collisionobject2.h"
 #include "Opcode.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN (Opcode2)
@@ -20,10 +19,49 @@ class csOpcodeCollisionObject;
 class csOpcodeCollisionSector : public scfImplementationExt1<
   csOpcodeCollisionSector, csObject, CS::Collision2::iCollisionSector>
 {
+
+  friend class csOpcodeCollisionObject;
+  Opcode::AABBTreeCollider TreeCollider;
+  Opcode::RayCollider RayCol;
+  Opcode::LSSCollider LSSCol;
+  Opcode::OBBCollider OBBCol;
+  Opcode::BVTCache ColCache;
+  Opcode::LSSCache LSSCache;
+  Opcode::OBBCache OBBCache;
+
+  struct CollisionPortal
+  {
+    iPortal* portal;
+    csOpcodeCollisionObject* ghostPortal1;
+  };
+
+  class CollisionGroupVector : public csArray<CS::Collision2::CollisionGroup>
+  {
+  public:
+    CollisionGroupVector () : csArray<CS::Collision2::CollisionGroup> () {}
+    static int CompareKey (CS::Collision2::CollisionGroup const& item,
+      char const* const& key)
+    {
+      return strcmp (item.name.GetData (), key);
+    }
+    static csArrayCmp<CS::Collision2::CollisionGroup, char const*>
+      KeyCmp(char const* k)
+    {
+      return csArrayCmp<CS::Collision2::CollisionGroup, char const*> (k,CompareKey);
+    }
+  };
+
+  CollisionGroupVector collGroups;
+  CS::Collision2::CollisionGroupMask allFilter; 
+  int systemFilterCount;
+
   csRef<iSector> sector;
   csOpcodeCollisionSystem* sys;
   csVector3 gravity;
   csRefArrayObject<csOpcodeCollisionObject> collisionObjects;
+  csArray<CollisionPortal> portals;
+  csArray<int> collision_faces;
+  CS::Collision2::CollisionData curCollisionData;
   //actor?
   //TODO portal, collision group
 
@@ -69,12 +107,40 @@ public:
   virtual void AddCollisionActor (CS::Collision2::iCollisionActor* actor);
   virtual void RemoveCollisionActor ();
   virtual CS::Collision2::iCollisionActor* GetCollisionActor ();
+
+  void AddMovableToSector (CS::Collision2::iCollisionObject* obj);
+
+  void RemoveMovableFromSector (CS::Collision2::iCollisionObject* obj);
+
+  CS::Collision2::HitBeamResult HitBeamCollider (Opcode::Model* model, Point* vertholder, udword* indexholder,
+    const csOrthoTransform& trans, const csVector3& start, const csVector3& end, float& depth);
+
+  CS::Collision2::HitBeamResult HitBeamTerrain (csOpcodeCollisionObject* terrainObj, 
+    const csVector3& start, const csVector3& end, float& depth);
+
+  CS::Collision2::HitBeamResult HitBeamObject (csOpcodeCollisionObject* object,
+    const csVector3& start, const csVector3& end, float& depth);
+
+  bool CollideDetect (Opcode::Model* modelA, Opcode::Model* modelB,
+    const csOrthoTransform& transA, const csOrthoTransform& transB);
+
+  void GetCollisionData (Opcode::Model* modelA, Opcode::Model* modelB,
+    Point* vertholderA, Point* vertholderB,
+    udword* indexholderA, udword* indexholderB,
+    const csOrthoTransform& transA, const csOrthoTransform& transB);
+
+  bool CollideObject (csOpcodeCollisionObject* objA, csOpcodeCollisionObject* objB, 
+    csArray<CS::Collision2::CollisionData>& collisions, bool recordData = true);
+
+  bool CollideTerrain (csOpcodeCollisionObject* objA, csOpcodeCollisionObject* objB, 
+    csArray<CS::Collision2::CollisionData>& collisions, bool recordData = true);
 };
 
 class csOpcodeCollisionSystem : public scfImplementation2<
   csOpcodeCollisionSystem, CS::Collision2::iCollisionSystem,
   iComponent>
 {
+friend class csOpcodeCollider;
 private:
   iObjectRegistry* object_reg;
   csRefArrayObject<csOpcodeCollisionSector> collSectors;
