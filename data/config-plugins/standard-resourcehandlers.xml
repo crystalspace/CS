@@ -1,6 +1,9 @@
 <resourcehandlers>
   <resourcehandler classID="crystalspace.engine.persist">
+    <resource-node>image</resource-node>
+    <resource-node>texture</resource-node>
     <resource-node>textures</resource-node>
+    <resource-node>material</resource-node>
     <resource-node>materials</resource-node>
   </resourcehandler>
 </resourcehandlers>

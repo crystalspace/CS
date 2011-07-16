@@ -29,6 +29,7 @@
  */
 
 #include "csutil/scf.h"
+#include "imap/resource.h"
 
 struct iDataBuffer;
 struct csRGBpixel;
@@ -101,7 +102,7 @@ enum csImageType
  * \sa csImageMemory, csImageManipulate, csImageTools, csImageCubeMapMaker,
  *   csImageVolumeMaker
  */
-struct iImage : public virtual iBase
+struct iImage : public virtual iResource
 {
   SCF_INTERFACE (iImage, 4, 0, 1);
 

@@ -32,6 +32,7 @@
 
 #include "csutil/util.h"
 #include "csutil/databuf.h"
+#include "csutil/resource.h"
 #include "csutil/scf_implementation.h"
 
 #include "igraphic/image.h"
@@ -41,7 +42,8 @@
  * Base class for iImage implementations. Cannot be instantiated itself.
  */
 class csImageBase :
-  public scfImplementation1<csImageBase, iImage>
+  public scfImplementation2<csImageBase, iImage, scfFakeInterface<iResource> >,
+  CS::Resource::NoDepResource
 {
 protected:
   /// Name of the image file.

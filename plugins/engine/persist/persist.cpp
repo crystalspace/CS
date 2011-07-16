@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 #include "persist.h"
 
@@ -40,18 +41,49 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
     objectReg = objectReg_;
     syntaxService = csQueryRegistry<iSyntaxService> (objectReg);
 
+    imageLoader = csQueryRegistry<iImageIO> (objectReg);
+    if (!imageLoader)
+    {
+      csReport (objectReg, CS_REPORTER_SEVERITY_ERROR,
+        "crystalspace.engine.persist", "Failed to find an image loader!");
+      return false;
+    }
+
     InitTokenTable (xmltokens);
     return true;
   }
 
-  csPtr<iBase> Persist::Load (iDocumentNode* node)
+  csPtr<iResource> Persist::Load (iDocumentNode* node)
   {
+    csRef<iResource> resource;
+
+    if (resource = LoadImage (node)) return resource;
+
     return 0;
   }
 
-  bool Persist::Save (iBase* resource, iDocumentNode* node)
+  csPtr<iResource> Persist::Load (iDataBuffer* buf)
   {
-    return true;
+    csRef<iResource> resource;
+
+    if (resource = LoadImage (buf)) return resource;
+
+    return 0;
+  }
+
+  bool Persist::Save (iResource* resource, iDocumentNode* node)
+  {
+    if (SaveImage (resource, node)) return true;
+    return false;
+  }
+
+  csPtr<iDataBuffer> Persist::Save (iResource* resource)
+  {
+    csRef<iDataBuffer> buf;
+
+    if (buf = SaveImage (buf)) return buf;
+
+    return 0;
   }
 }
 CS_PLUGIN_NAMESPACE_END (Engine)

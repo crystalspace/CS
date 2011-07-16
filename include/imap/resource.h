@@ -59,7 +59,7 @@ struct iResourceLoader : public virtual iBase
    * Loads a resource from a data buffer.
    * Returns an invalid object on failure.
    */
-  virtual csPtr<iResource> Load (iDataBuffer* node) = 0;
+  virtual csPtr<iResource> Load (iDataBuffer* buf) = 0;
 };
 
 struct iResourceSaver : public virtual iBase
@@ -71,6 +71,12 @@ struct iResourceSaver : public virtual iBase
    * Returns success.
    */
   virtual bool Save (iResource* resource, iDocumentNode* node) = 0;
+
+  /**
+   * Saves a resource to a data buffer.
+   * Returns an invalid object on failure.
+   */
+  virtual csPtr<iDataBuffer> Save (iResource* resource) = 0;
 };
 
 #endif // __CS_IMAP_RESOURCE_H__

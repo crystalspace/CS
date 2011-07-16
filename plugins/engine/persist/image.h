@@ -20,7 +20,6 @@
 #define __CS_ENGINE_PERSIST_H__
 
 #include "csutil/scf_implementation.h"
-#include "igraphic/imageio.h"
 #include "imap/resource.h"
 #include "imap/services.h"
 #include "iutil/comp.h"
@@ -48,7 +47,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 
     //// iResourceSaver ////
     virtual bool Save (iResource* resource, iDocumentNode* node);
-    virtual csPtr<iDataBuffer> Save (iResource* resource);
 
     //// iResourceLoader & iResourceSaver ////
     virtual bool IsThreadSafe() const { return true; }
@@ -57,14 +55,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
     csPtr<iResource> LoadImage (iDocumentNode* node);
     csPtr<iResource> LoadImage (iDataBuffer* buf);
     bool SaveImage (iResource* resource, iDocumentNode* node);
-    csPtr<iDataBuffer> SaveImage (iResource* resource);
 
   private:
     iObjectRegistry* objectReg;
     csRef<iSyntaxService> syntaxService;
-
-    // Image loader.
-    csRef<iImageIO> imageLoader;
 
     csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE \
@@ -75,4 +69,4 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 }
 CS_PLUGIN_NAMESPACE_END (Engine)
 
-#endif // __CS_ENGINE_PERSIST_H__
+#endif // __CS_ENGINE_IMAGE_H__
