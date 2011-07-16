@@ -24,6 +24,7 @@
 #include "imap/resource.h"
 #include "imap/services.h"
 #include "iutil/comp.h"
+#include "iutil/vfs.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 {
@@ -59,6 +60,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
   private:
     iObjectRegistry* objectReg;
     csRef<iSyntaxService> syntaxService;
+
+    // VFS
+    csRef<iVFS> vfs;
 
     // Image loader.
     csRef<iImageIO> imageLoader;

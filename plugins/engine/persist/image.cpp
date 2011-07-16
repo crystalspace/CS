@@ -27,7 +27,41 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 {
   csPtr<iResource> Persist::LoadImage (iDocumentNode* node)
   {
-    return 0;
+    /**
+     * <image>/path/to/image</image>
+     */
+
+    // Sanity check.
+    if (strcmp (node->GetValue (), "image") != 0)
+    {
+      csReport (objectReg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.engine.persist",
+        "Invalid document node passed to 'LoadImage' - missing 'image' root node!");
+      return 0;
+    }
+
+    // Load the file.
+    const char* filePath = node->GetContentsValue ();
+    csRef<iDataBuffer> dataBuffer = vfs->ReadFile (filePath, false);
+    if (!dataBuffer.IsValid())
+    {
+      csReport (objectReg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.engine.persist",
+        "Invalid image path '%s'!", filePath);
+      return 0;
+    }
+
+    csRef<iImage> image (imageLoader->Load (dataBuffer, CS_IMGFMT_ANY));
+    if (!image)
+    {
+      csReport (objectReg, CS_REPORTER_SEVERITY_WARNING,
+        "crystalspace.engine.persist", "Unknown image format!");
+      return 0;
+    }
+
+    // Set the image name from the file path.
+    csRef<iDataBuffer> xname = vfs->ExpandPath (filePath);
+    image->SetName (**xname);
+
+    return csPtr<iResource> (image); 
   }
 
   csPtr<iResource> Persist::LoadImage (iDataBuffer* buf)
@@ -39,7 +73,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
       return 0;
     }
 
-    // we don't use csRef because we need to return an Increfed object later
     csRef<iImage> image (imageLoader->Load (buf, CS_IMGFMT_ANY));
     if (!image)
     {
@@ -56,10 +89,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
     csRef<iImage> image = scfQueryInterface<iImage> (resource);
     if (image.IsValid ())
     {
-      // Only do something if there's raw data to be written.
-      if (image->GetRawData ())
+      // Get a data buffer of the image.
+      csRef<iDataBuffer> buf = SaveImage (resource);
+      
+      // If the buffer is valid, then write out the buffer.
+      if (buf.IsValid ())
       {
-        // TODO: Write out the raw data.
+        const char* imageName = image->GetName ();
+
+        csRef<iFile> file = vfs->Open (imageName, VFS_FILE_WRITE);
+        if (file)
+        {
+          file->Write (buf->GetData (), buf->GetSize ());
+          file->Flush ();
+
+          // Write the the image info to the document.
+          csRef<iDocumentNode> iNode = node->CreateNodeBefore (CS_NODE_ELEMENT);
+          iNode->SetValue ("image");
+          iNode = iNode->CreateNodeBefore (CS_NODE_TEXT);
+          iNode->SetValue (imageName);
+        }
       }
 
       return true;
@@ -73,7 +122,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
     csRef<iImage> image = scfQueryInterface<iImage> (resource);
     if (image.IsValid ())
     {
-      return imageLoader->Save (image);
+      return imageLoader->Save (image, "image/png");
     }
 
     return 0;

@@ -40,6 +40,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
   {
     objectReg = objectReg_;
     syntaxService = csQueryRegistry<iSyntaxService> (objectReg);
+    vfs = csQueryRegistry<iVFS> (objectReg);
 
     imageLoader = csQueryRegistry<iImageIO> (objectReg);
     if (!imageLoader)
@@ -55,18 +56,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 
   csPtr<iResource> Persist::Load (iDocumentNode* node)
   {
-    csRef<iResource> resource;
+    csRef<iResource> r;
 
-    if (resource = LoadImage (node)) return resource;
+    if (r = LoadImage (node)) return csPtr<iResource> (r);
 
     return 0;
   }
 
   csPtr<iResource> Persist::Load (iDataBuffer* buf)
   {
-    csRef<iResource> resource;
+    csRef<iResource> r;
 
-    if (resource = LoadImage (buf)) return resource;
+    if (r = LoadImage (buf)) return csPtr<iResource> (r);
 
     return 0;
   }
@@ -79,9 +80,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 
   csPtr<iDataBuffer> Persist::Save (iResource* resource)
   {
-    csRef<iDataBuffer> buf;
+    csRef<iDataBuffer> db;
 
-    if (buf = SaveImage (resource)) return buf;
+    if (db = SaveImage (resource)) return csPtr<iDataBuffer> (db);
 
     return 0;
   }
