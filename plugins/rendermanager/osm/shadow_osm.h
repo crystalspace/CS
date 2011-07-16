@@ -170,14 +170,8 @@ namespace CS
               superFrustum.numSplitsSV = lightVarsHelper.CreateTempSV (
                 viewSetup.persist.numSplitsSVName);
 
-              size_t numTex = viewSetup.persist.settings.targets.GetSize();
-              for (size_t t = 0; t < numTex; t++)
-              {
-                const ShadowSettings::Target* target =
-                  viewSetup.persist.settings.targets[t];
-                lightFrustum.textureSVs[target->attachment] =
-                  lightVarsHelper.CreateTempSV (target->svName);
-              }
+              lightFrustum.textureSVs[rtaColor0] =
+                lightVarsHelper.CreateTempSV (viewSetup.persist.textureSVName);
             }
 
             lightFrustumsSettings.frustumsSetupFrame = currentFrame;
@@ -290,7 +284,6 @@ namespace CS
             receivingObjects);
 
           int shadowMapSize = viewSetup.persist.shadowMapRes;
-          CS_ALLOC_STACK_ARRAY(iTextureHandle*, texHandles, persist.mrt);
 
           // here should be lightFrustums.frustums.GetSize()
 //           csPrintf("%d\n", lightFrustums.frustums.GetSize());
@@ -312,21 +305,14 @@ namespace CS
                 lightFrust.splitDistsSV->SetValue(lightFrust.splitDists);
 
                 // fill in split dists for osm
-                persist.settings.shadowDefaultShader->GetVariableAdd(persist.numSplitsSVName)->
-                  SetValue(viewSetup.persist.numSplits);
-
                 csRef<csShaderVariable> passColorSV =
                   persist.settings.shadowDefaultShader->GetVariableAdd(persist.passColorSVName);
 
                 passColorSV->SetArrayElement(frustNum, lightFrust.splitDistsSV);
               }
 
-              ShadowSettings::Target* target = 
-                viewSetup.persist.settings.targets[0];
-              iTextureHandle* tex = target->texCache.QueryUnusedTexture (
-                shadowMapSize, shadowMapSize);
-              lightFrust.textureSVs[target->attachment]->SetValue (tex);
-              texHandles[attachments] = tex;
+              iTextureHandle *tex=viewSetup.persist.texs[attachments];
+              lightFrust.textureSVs[rtaColor0]->SetValue (tex);
             }
 
             csRef<CS::RenderManager::RenderView> newRenderView;
@@ -395,18 +381,16 @@ namespace CS
 
             for (int t = 0; t < persist.mrt; t++)
             {
-              renderTree.AddDebugTexture (texHandles[t]);
+              renderTree.AddDebugTexture (viewSetup.persist.texs[t]);
               // register SVs
-              shadowMapCtx->renderTargets[rtaColor0 + t].texHandle = texHandles[t];
+              shadowMapCtx->renderTargets[rtaColor0 + t].texHandle = 
+                viewSetup.persist.texs[t];
               shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
             }
 
-//             layerConfig.SetDefaultShader(persist.settings.shadowDefaultShader);
-
             ShadowmapContextSetup contextFunction (layerConfig,
               persist.shaderManager, viewSetup);
-            contextFunction (*shadowMapCtx);
-            
+            contextFunction (*shadowMapCtx);            
           }
         }
 
@@ -498,6 +482,9 @@ namespace CS
         CS::ShaderVarStringID splitDistsSVName;
         CS::ShaderVarStringID passColorSVName;
         CS::ShaderVarStringID mrtSVName;
+        CS::ShaderVarStringID textureSVName;
+
+        csRefArray<iTextureHandle> texs;
 
         /// Set the prefix for configuration settings
         void SetConfigPrefix (const char* configPrefix)
@@ -526,6 +513,7 @@ namespace CS
           splitDistsSVName = strings->Request ("light splitDists");
           passColorSVName = strings->Request ("pass color");
           mrtSVName = strings->Request ("mrt");
+          textureSVName = strings->Request("light shadow map");
 
           csConfigAccess cfg (objectReg);
           if (configPrefix.IsEmpty())
@@ -542,6 +530,17 @@ namespace CS
           }
 
           numSplits = 4 * mrt;
+
+          for (int i = 0 ; i < mrt ; i ++)
+          {
+            csRef<iTextureHandle> tex = g3d->GetTextureManager()->
+              CreateTexture(shadowMapRes, shadowMapRes, csimg2D, "abgr32_f", 
+              CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS);
+            texs.Push(tex);
+          }
+
+          settings.shadowDefaultShader->GetVariableAdd(numSplitsSVName)->
+            SetValue(numSplits);
 
           // pass mrt number to shader
           csShaderVariable* mrtVar = new csShaderVariable(mrtSVName); 
@@ -586,15 +585,8 @@ namespace CS
             superFrust.frustums[f];
           
           if (f % 4 == 3)    
-          {
-            for (size_t t = 0; t < persist.settings.targets.GetSize(); t++)
-            {
-              const ShadowSettings::Target* target =
-                viewSetup.persist.settings.targets[t];
-              lightVarsHelper.MergeAsArrayItem (lightStacks[0], 
-                lightFrustum.textureSVs[target->attachment], 8 * lightNum + f / 4);
-            }
-          }
+            lightVarsHelper.MergeAsArrayItem (lightStacks[0], 
+              lightFrustum.textureSVs[rtaColor0], 8 * lightNum + f / 4);
 
           lightVarsHelper.MergeAsArrayItem(lightStacks[0],
             lightFrustum.splitDistsSV, 8 * lightNum + f);
