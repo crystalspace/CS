@@ -22,6 +22,8 @@
 #include <csutil/scf.h>
 #include <csutil/scf_implementation.h>
 
+struct iDataBuffer;
+
 
 namespace CS {
 namespace Network {
@@ -40,19 +42,17 @@ enum ResponseState
  */
 struct iResponse : public virtual iBase
 {
-  SCF_INTERFACE(iResponse, 0, 0, 1);
+  SCF_INTERFACE(iResponse, 0, 1, 0);
 
   virtual int GetCode () = 0;
   
   virtual const ResponseState& GetState () = 0;
   
   virtual const char* GetError () = 0;
-
-  virtual const char* GetHeader () = 0;
   
-  virtual const char* GetData () = 0;
+  virtual csRef<iDataBuffer> GetHeader () = 0;
   
-  virtual size_t GetDataLength () = 0;
+  virtual csRef<iDataBuffer> GetData () = 0;
 };
 
 
@@ -67,7 +67,7 @@ struct iHTTPConnection : public virtual iBase
    * Perform a GET request.
    * Example: bool success = Get("search", "term=hello&lang=world");
    */
-  virtual csRef<iResponse> Get(const char* location, const char* params=0) = 0;
+  virtual csRef<iResponse> Get(const char* location, const char* params=0, iStringArray* headers=0) = 0;
   
   /**
    * Perform a HEAD request.

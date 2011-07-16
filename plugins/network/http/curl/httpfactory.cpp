@@ -25,8 +25,6 @@
 
 #include "httpfactory.h"
 
-#include "httpconnection.h"
-
 
 CS_PLUGIN_NAMESPACE_BEGIN(CSHTTP)
 {
@@ -51,18 +49,28 @@ HTTPConnectionFactory::~HTTPConnectionFactory ()
 
 csRef<iHTTPConnection> HTTPConnectionFactory::Create (const char* uri)
 {
+  //CURL internally manages connections for reuse which is a lot faster for 
+  //sequential requests to the same server, but curl handles aren't threadsafe
+  //so return different connections for different threads.
+  CS::Threading::ScopedReadLock lock(mutex);
   csRef<HTTPConnection> connection;
-  connection.AttachNew(new HTTPConnection(uri));
-  if (setting == CustomProxy)
+  ThreadConnections::const_iterator found = connections.find(CS::Threading::Thread::GetThreadID());
+  if (found == connections.end()) 
   {
-    connection->SetProxy(proxyURI, proxyUser, proxyPass);
+    connection.AttachNew(new HTTPConnection(uri));
+    if (setting == CustomProxy)
+    {
+      connection->SetProxy(proxyURI, proxyUser, proxyPass);
+    }
+    else if (setting == NoProxy)
+    {
+      connection->SetProxy("", "", "");
+    }
+    CS::Threading::ScopedUpgradeableLock writelock(mutex);
+    connections[CS::Threading::Thread::GetThreadID()] = connection;
+    return connection;
   }
-  else if (setting == NoProxy)
-  {
-    connection->SetProxy("", "", "");
-  }
-  
-  return connection;
+  return found->second;
 }
 
 void HTTPConnectionFactory::UseProxy (ProxySetting setting)
