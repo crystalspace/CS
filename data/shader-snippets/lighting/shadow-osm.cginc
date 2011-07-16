@@ -92,7 +92,7 @@ struct ShadowShadowMapDepth : ShadowShadowMap
       return 0;
 ]]>      
   
-    <?Generate I 0 14?>
+    <?Generate I 0 7?>
       if (i == 4 * $I$)
         return blurTex2D(lightPropsOM.opacityMap[8 * lightNum + $I$], position).r;
       if (i == 4 * $I$ + 1)

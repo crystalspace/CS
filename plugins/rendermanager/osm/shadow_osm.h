@@ -83,11 +83,10 @@ namespace CS
           struct Frustum
           {
             float splitDists;
-
             csRef<csShaderVariable> splitDistsSV;
-            csRef<csShaderVariable> textureSVs[rtaNumAttachments];
           };
 
+          csRef<csShaderVariable> textureSV[rtaNumAttachments];
           csRef<csShaderVariable> shadowMapProjectSV;
           Frustum* frustums;
 
@@ -137,7 +136,8 @@ namespace CS
             LightFrustumsArray& lightFrustums =
               lightFrustumsSettings.frustums;
 
-            LightingVariablesHelper lightVarsHelper (viewSetup.persist.lightVarsPersist);
+            LightingVariablesHelper lightVarsHelper
+              (viewSetup.persist.lightVarsPersist);
 
             csRef<SuperFrustum> newFrust;
             newFrust.AttachNew (new SuperFrustum);
@@ -160,6 +160,9 @@ namespace CS
               superFrustum.shadowMapProjectSV->SetArrayElement (j, item);
             }
 
+            superFrustum.numSplitsSV = lightVarsHelper.CreateTempSV (
+              viewSetup.persist.numSplitsSVName);
+
             for (int i = 0; i < superFrustum.actualNumParts; i++)
             {
               typename SuperFrustum::Frustum& lightFrustum =
@@ -167,11 +170,9 @@ namespace CS
               lightFrustum.splitDistsSV = lightVarsHelper.CreateTempSV(
                 viewSetup.persist.splitDistsSVName);
 
-              superFrustum.numSplitsSV = lightVarsHelper.CreateTempSV (
-                viewSetup.persist.numSplitsSVName);
-
-              lightFrustum.textureSVs[rtaColor0] =
-                lightVarsHelper.CreateTempSV (viewSetup.persist.textureSVName);
+              if (i % 4 == 3)
+                superFrustum.textureSV[rtaColor0 + i / 4] =
+                  lightVarsHelper.CreateTempSV (viewSetup.persist.textureSVName);
             }
 
             lightFrustumsSettings.frustumsSetupFrame = currentFrame;
@@ -187,7 +188,7 @@ namespace CS
 
           while (it.HasNext ())
           {
-            typename RenderTree::ContextNode::TreeType::MeshNode *node = it.Next ();
+            typename RenderTree::ContextNode::TreeType::MeshNode *node = it.Next();
             CS_ASSERT_MSG("Null node encountered, should not be possible", node);
 
             // setup split dists
@@ -266,8 +267,7 @@ namespace CS
           LightFrustums& lightFrustums = *lightFrustumsPtr;
 
           uint currentFrame = viewSetup.rview->GetCurrentFrameNumber();
-          if (lightFrustums.setupFrame
-            == currentFrame)
+          if (lightFrustums.setupFrame == currentFrame)
             return;
           lightFrustums.setupFrame = currentFrame;
 
@@ -305,36 +305,38 @@ namespace CS
                 lightFrust.splitDistsSV->SetValue(lightFrust.splitDists);
 
                 // fill in split dists for osm
-                csRef<csShaderVariable> passColorSV =
-                  persist.settings.shadowDefaultShader->GetVariableAdd(persist.passColorSVName);
+                csRef<csShaderVariable> passColorSV = 
+                  persist.settings.shadowDefaultShader->
+                  GetVariableAdd(persist.passColorSVName);
 
                 passColorSV->SetArrayElement(frustNum, lightFrust.splitDistsSV);
               }
 
               iTextureHandle *tex=viewSetup.persist.texs[attachments];
-              lightFrust.textureSVs[rtaColor0]->SetValue (tex);
+              superFrust.textureSV[rtaColor0 + attachments]->SetValue (tex);
             }
 
             csRef<CS::RenderManager::RenderView> newRenderView;
-            newRenderView = renderTree.GetPersistentData().renderViews.CreateRenderView ();
+            newRenderView = 
+              renderTree.GetPersistentData().renderViews.CreateRenderView ();
             newRenderView->SetEngine (rview->GetEngine ());
             newRenderView->SetThisSector (rview->GetThisSector ());
 
             csBox3 castersBox = castingObjects;
             csBox3 receiversBox = receivingObjects;
             // set up projection matrix
-            const float focusMinX = csMax (receiversBox.MinX(), castersBox.MinX());
-            const float focusMinY = csMax (receiversBox.MinY(), castersBox.MinY());
-            const float focusMaxX = csMin (receiversBox.MaxX(), castersBox.MaxX());
-            const float focusMaxY = csMin (receiversBox.MaxY(), castersBox.MaxY());
+            const float focusMinX = csMax(receiversBox.MinX(), castersBox.MinX());
+            const float focusMinY = csMax(receiversBox.MinY(), castersBox.MinY());
+            const float focusMaxX = csMin(receiversBox.MaxX(), castersBox.MaxX());
+            const float focusMaxY = csMin(receiversBox.MaxY(), castersBox.MaxY());
             const float frustW = focusMaxX - focusMinX;
             const float frustH = focusMaxY - focusMinY;
-            const float cropScaleX = 2.0f/frustW;
-            const float cropScaleY = 2.0f/frustH;
+            const float cropScaleX = 2.0f / frustW;
+            const float cropScaleY = 2.0f / frustH;
             const float cropShiftX =
-              (-1.0f * (focusMaxX + focusMinX))/frustW;
+              (-1.0f * (focusMaxX + focusMinX) ) / frustW;
             const float cropShiftY =
-              (-1.0f * (focusMaxY + focusMinY))/frustH;
+              (-1.0f * (focusMaxY + focusMinY) ) / frustH;
             CS::Math::Matrix4 crop = CS::Math::Matrix4 (
               cropScaleX, 0, 0, cropShiftX,
               0, cropScaleY, 0, cropShiftY,
@@ -358,7 +360,8 @@ namespace CS
             // we only need one shadow map project sv per light
             for (int i = 0; i < 4; i++)
             {
-              csShaderVariable* item = superFrust.shadowMapProjectSV->GetArrayElement (i);
+              csShaderVariable* item = 
+                superFrust.shadowMapProjectSV->GetArrayElement (i);
               item->SetValue (matrix.Row (i));
             }
 
@@ -426,7 +429,8 @@ namespace CS
           // Sort the mesh lists  
           {
             StandardMeshSorter<RenderTree> mySorter (rview->GetEngine ());
-            mySorter.SetupCameraLocation (rview->GetCamera ()->GetTransform ().GetOrigin ());
+            mySorter.SetupCameraLocation 
+              (rview->GetCamera ()->GetTransform ().GetOrigin ());
             ForEachMeshNode (context, mySorter);
           }
 
@@ -523,10 +527,10 @@ namespace CS
           else
           {
             settings.ReadSettings (objectReg, 
-              cfg->GetStr (
-              csString().Format ("%s.ShadowsType", configPrefix.GetData()), "Alpha"));
-            shadowMapRes = cfg->GetInt (
-              csString().Format ("%s.ShadowMapResolution", configPrefix.GetData()), 512);
+              cfg->GetStr ( csString().Format (
+                "%s.ShadowsType", configPrefix.GetData()), "Alpha"));
+            shadowMapRes = cfg->GetInt ( csString().Format (
+              "%s.ShadowMapResolution", configPrefix.GetData()), 512);
           }
 
           numSplits = 4 * mrt;
@@ -535,7 +539,7 @@ namespace CS
           {
             csRef<iTextureHandle> tex = g3d->GetTextureManager()->
               CreateTexture(shadowMapRes, shadowMapRes, csimg2D, "abgr32_f", 
-              CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS);
+              CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
             texs.Push(tex);
           }
 
@@ -571,7 +575,8 @@ namespace CS
         csShaderVariableStack* lightStacks,
         uint lightNum, uint subLightNum)
       {
-        LightingVariablesHelper lightVarsHelper (viewSetup.persist.lightVarsPersist);
+        LightingVariablesHelper lightVarsHelper 
+          (viewSetup.persist.lightVarsPersist);
 
         typename CachedLightData::LightFrustumsArray& lightFrustums =
           lightData.lightFrustumsHash.GetElementPointer (
@@ -586,7 +591,7 @@ namespace CS
           
           if (f % 4 == 3)    
             lightVarsHelper.MergeAsArrayItem (lightStacks[0], 
-              lightFrustum.textureSVs[rtaColor0], 8 * lightNum + f / 4);
+              superFrust.textureSV[rtaColor0 + f / 4], 8 * lightNum + f / 4);
 
           lightVarsHelper.MergeAsArrayItem(lightStacks[0],
             lightFrustum.splitDistsSV, 8 * lightNum + f);
