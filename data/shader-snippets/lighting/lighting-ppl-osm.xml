@@ -1,0 +1,176 @@
+<!--
+  Copyright (C) 2008 by Frank Richter
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet type="compound">
+  <technique priority="100">
+    <snippet id="eyeVec" file="/shader-snippets/eye-direction-world.xml" />
+    <snippet id="surface" file="/shader-snippets/surface/surface-classic.xml" />    
+    
+    <snippet id="forward_normal">
+      <technique priority="100">
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+	
+	<!-- Surface normal -->
+	<input name="i_normal" type="normal_tangent" default="value" defval="0,0,1"/>
+	<output name="o_normal" type="normal_tangent" />
+	
+	<block location="cg:vertexMain">
+	  o_normal = i_normal;
+	</block>
+	<block location="cg:fragmentMain">
+	  o_normal = i_normal;
+	</block>
+      </technique>
+    </snippet>
+    
+    <snippet id="lighting">
+      <technique priority="100">
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      
+	<!-- Vector from eye to position -->
+	<input name="eyeToSurf" type="direction_world" />
+	<input name="positionW" type="position4_world" />
+	<!-- Surface normal -->
+	<input name="normal" type="normal_world" />
+  <input name="surface" type="rgba" default="value" defval="0,0,0,1"/>  
+	<input name="shadow" type="ShadowShadowMap" default="complex">
+	  <block location="cg:vertexMain">
+	    ShadowShadowMapNone noShadow;
+	    shadow = noShadow;
+	  </block>
+	  <block location="cg:fragmentMain">
+	    ShadowShadowMapNone noShadow;
+	    shadow = noShadow;
+	  </block>
+	</input>
+	
+	<block location="cg:clips"
+	       file="/shader-snippets/lighting/shadowclip.block" />
+	
+	<input name="lightOffset" type="int" default="value" defval="0"/>
+	<input name="maxLights" type="int" default="value" defval="3"/>
+	<input name="minLights" type="int" default="value" defval="0"/>
+	<!-- Shininess value for specular reflection -->
+	<input name="shininess" type="float" default="value" defval="32" />
+	
+	<block location="pass">
+	  <?Include /shader-snippets/lighting/lighting-tools.inc ?>
+	</block>
+	
+	<block location="cg:variablemap">
+	  <?Lighting_Variablemaps?>
+	</block>
+	
+	<block location="cg:definitions">
+	  <?Include /shader-snippets/lighting/lightfuncs.cginc ?>
+	</block>
+	
+	<block location="cg:vertexToFragment">
+	  <!--varying type="float4" name="surfToLight[8]" /-->
+	  <varying type="float4" name="lightDir[8]" />
+	  <varying type="float4" name="shadowMapCoords[8]" />
+	</block>
+	
+	<block location="cg:vertexMain">
+	  diffuseColor = float3(0);
+	  specularColor = float3(0);
+	  
+	  <![CDATA[
+          for (int l = 0; l < maxLights; l++)
+	  {
+	    int i = lightOffset + l;
+	    if ((i >= minLights) && (i >= lightProps.count)) break;
+	  ]]>
+	    
+	    float4 vp_shadowMapCoords;
+	    float vp_gradient;
+	    shadow.InitVP (i, positionW, normal, vp_shadowMapCoords, vp_gradient);
+	    shadowMapCoords[l] = vp_shadowMapCoords;
+	    lightDir[l].w = vp_gradient;
+	  }
+	  diffuseColor_attr_perfragment = true;
+	  specularColor_attr_perfragment = true;
+	</block>
+	
+	<block location="cg:fragmentMain">
+	  diffuseColor = float3(0);
+	  specularColor = float3(0);
+	  half3 myEyeToSurf = eyeToSurf;
+	  myEyeToSurf = normalize (eyeToSurf);
+	  <![CDATA[
+          for (int l = 0; l < maxLights; l++)
+	  {
+	    int i = lightOffset + l;
+	    if ((i >= minLights) && (i >= lightProps.count)) break;
+	  ]]>
+	    LightSpaceWorld lightSpace;
+	    lightSpace.Init (i, positionW);
+	    
+	    shadow.Init (l, shadowMapCoords[l], lightDir[l].w);
+	    
+	    float3 lightDiffuse = lightProps.colorDiffuse[i];
+	    #if 0
+	    // Force light color. Can be useful when  debugging point
+	    // light shadow frustums.
+	    if (i == 0)
+	      lightDiffuse = float3 (1, 1, 0);
+	    else if (i == 1)
+	      lightDiffuse = float3 (0, 1, 1);
+	    else if (i == 2)
+	      lightDiffuse = float3 (1, 0, 1);
+	    else if (i == 3)
+	      lightDiffuse = float3 (1, 0, 0);
+	    else if (i == 4)
+	      lightDiffuse = float3 (0, 1, 0);
+	    else if (i == 5)
+	      lightDiffuse = float3 (0, 0, 1);
+	    #endif
+	    
+      half shadowFactor = shadow.GetVisibility();
+	    Light light = GetCurrentLight (lightSpace, i);
+	    float4 lightAttenuationVec = lightProps.attenuationVec[i];
+	    float3 d, s;
+	    ComputeLight (lightSpace, light, myEyeToSurf, normal, shininess,
+	      lightDiffuse, lightProps.colorSpecular[i],
+	      lightAttenuationVec, shadowFactor, d, s);
+
+      // translucent objects don't have diffuse light
+      diffuseColor += shadowFactor * (surface.a != 1) + d * (surface.a == 1);
+	    specularColor += s;
+	  }
+	  diffuseColor_attr_perfragment = true;
+	  specularColor_attr_perfragment = true;
+	</block>
+	
+	<output name="diffuseColor" type="rgb">
+	  <attribute name="perfragment" type="bool" />
+	</output>
+	<output name="specularColor" type="rgb">
+	  <attribute name="perfragment" type="bool" />
+	</output>
+      </technique>
+    </snippet>
+    <connection from="forward_normal" to="lighting">
+      <explicit from="o_normal" to="normal" />
+    </connection>
+    <connection from="eyeVec" to="lighting">
+      <explicit from="eyeDirectionWorld" to="eyeToSurf" />
+    </connection>
+
+    <connection from="surface" to="lighting" />    
+  </technique>
+</snippet>

@@ -294,10 +294,6 @@ void ComputeLight (LightSpace lightSpace, Light light,
 
   d = lightDiffuse * lightCoeff.y * spot * attn;
   s = lightSpecular * lightCoeff.z * spot * attn;
-  
-  // temp hack to remove specular and diffuse
-  d = shadowFactor;
-  s = 0;
 }
 
 #endif // __LIGHTFUNCS_CG_INC__
