@@ -170,7 +170,39 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         eventHandler);
     }
 
+    // Init the map of resource loaders.
+    InitLoadableResources ();
+
     return true;
+  }
+
+  bool csThreadedLoader::InitLoadableResources ()
+  {
+    // Init the map of resource loaders.
+    resourceLoaders.Initialize (object_reg);
+
+    // Load the standard set of name -> loadable mappings
+    const char* standardResourceHandlers = "/config/standard-resourcehandlers.xml";
+    csRef<iDataBuffer> dataBuffer = vfs->ReadFile (standardResourceHandlers, false);
+    if (!dataBuffer.IsValid())
+    {
+      ReportError("crystalspace.level.threadedloader",
+        "Could not open standard resources file!");
+      return false;
+    }
+
+    csRef<iDocument> doc;
+    if (!LoadStructuredDoc (standardResourceHandlers, dataBuffer, doc))
+      return false;
+
+    if (!doc->GetRoot () || !doc->GetRoot ()->GetNode ("resourcehandlers"))
+    {
+      ReportError("crystalspace.level.threadedloader",
+        "Invalid standard resources files!");
+      return false;
+    }
+
+    return resourceLoaders.Register (doc->GetRoot ()->GetNode ("resourcehandlers"));
   }
 
   bool csThreadedLoader::HandleEvent (iEvent& event)

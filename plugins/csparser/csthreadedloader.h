@@ -21,6 +21,7 @@
 #define __CS_THREADED_LOADER_H__
 
 #include "csutil/cscolor.h"
+#include "csutil/resourcemapper.h"
 #include "csutil/threadmanager.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/strhash.h"
@@ -493,6 +494,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     // Weak event handler
     csRef<iEventHandler> eventHandler;
 
+    // Maps document nodes to iResourceLoaders.
+    CS::Resource::LoaderMapper resourceLoaders;
+
     // For checking whether to schedule a engine list sync.
     CS::Threading::ReadWriteMutex listSyncLock;
     bool listSync;
@@ -533,6 +537,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       bool always_animate;
       ProxyKeyColour keyColour;
     };
+
+    // Initializes the set of loadable resources.
+    bool InitLoadableResources ();
 
     // Parses the data to find all materials and meshfacts.
     void ParseAvailableObjects(csLoaderContext* ldr_context, iDocumentNode* doc,
