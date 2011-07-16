@@ -96,7 +96,6 @@
             float4 surface = tex2D (TexDiffuse, IN.TexCoord);
             
             float value = surface.a;
-            value = value * (surface.a != 1);
               
             int i;
             for (i = 0 ; i < numSplits ; i ++)

@@ -77,8 +77,8 @@ namespace CS
         struct SuperFrustum : public CS::Utility::FastRefCount<SuperFrustum>
         {
           int actualNumParts;
-
           csRef<csShaderVariable> numSplitsSV;
+	        CS::Utility::MeshFilter meshFilter;
 
           struct Frustum
           {
@@ -144,6 +144,7 @@ namespace CS
             SuperFrustum& superFrustum = *(lightFrustums[lightFrustums.Push (
               newFrust)]);
 
+	          superFrustum.meshFilter.SetFilterMode (CS::Utility::MESH_FILTER_INCLUDE);
             superFrustum.actualNumParts = viewSetup.persist.numSplits;
             superFrustum.frustums =
               new typename SuperFrustum::Frustum[superFrustum.actualNumParts];
@@ -179,9 +180,10 @@ namespace CS
           }
         }
 
-        void ProcessGeometry(typename RenderTree::ContextNode& context,
-          iLight* light, CS::RenderManager::RenderView* rview, float& _near,
-          float& _far, csBox3& castingObjects, csBox3& receivingObjects)
+        void ProcessGeometry(SuperFrustum* superFrust, 
+          typename RenderTree::ContextNode& context, iLight* light, 
+          CS::RenderManager::RenderView* rview, float& _near, float& _far, 
+          csBox3& castingObjects, csBox3& receivingObjects)
         {
           typename RenderTree::ContextNode::TreeType::MeshNodeTreeIteratorType 
             it = context.meshNodes.GetIterator ();
@@ -210,6 +212,9 @@ namespace CS
               if ( mesh.meshWrapper->GetRenderPriority() != 
                 rview->GetEngine()->GetRenderPriority("alpha"))
                 continue;
+
+              // add to mesh filter include
+	            superFrust->meshFilter.AddFilterMesh (mesh.meshWrapper);
 
               csReversibleTransform world2light = 
                 light->GetMovable()->GetFullTransform();
@@ -280,8 +285,8 @@ namespace CS
           csBox3 castingObjects;
           csBox3 receivingObjects;
 
-          ProcessGeometry(context, light, rview, _near, _far, castingObjects, 
-            receivingObjects);
+          ProcessGeometry(lightFrustums.frustums[0], context, light, rview, 
+            _near, _far, castingObjects, receivingObjects);
 
           int shadowMapSize = viewSetup.persist.shadowMapRes;
 
@@ -321,7 +326,7 @@ namespace CS
               renderTree.GetPersistentData().renderViews.CreateRenderView ();
             newRenderView->SetEngine (rview->GetEngine ());
             newRenderView->SetThisSector (rview->GetThisSector ());
-
+  
             csBox3 castersBox = castingObjects;
             csBox3 receiversBox = receivingObjects;
             // set up projection matrix
@@ -378,6 +383,7 @@ namespace CS
             csRef<iClipper2D> newView;
             newView.AttachNew (new csBoxClipper (clipBox));
             newRenderView->SetClipper (newView);
+            newRenderView->SetMeshFilter(superFrust.meshFilter);
 
             typename RenderTree::ContextNode* shadowMapCtx = 
               renderTree.CreateContext (newRenderView);
