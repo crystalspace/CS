@@ -16,27 +16,43 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_IMAP_LOADABLE_H__
-#define __CS_IMAP_LOADABLE_H__
+#ifndef __CS_IMAP_RESOURCE_H__
+#define __CS_IMAP_RESOURCE_H__
 
 #include "csutil/ref.h"
 #include "csutil/scf_interface.h"
 #include "iutil/document.h"
 
-struct iLoadable : public virtual iBase
+struct iResourceLoader : public virtual iBase
 {
-  SCF_INTERFACE(iLoadable, 1, 0, 0);
+  SCF_INTERFACE(iResourceLoader, 1, 0, 0);
 
   /**
-   * Loads an object from a document node.
+   * Loads a resource from a document node.
    * Returns an invalid object on failure.
    */
   virtual csPtr<iBase> Load (iDocumentNode* node) = 0;
 
   /**
-   * Returns whether this loadable is thread-safe.
+   * Returns whether this loader is thread-safe.
    */
   virtual bool IsThreadSafe () const = 0;
 };
 
-#endif // __CS_IMAP_LOADABLE_H__
+struct iResourceSaver : public virtual iBase
+{
+  SCF_INTERFACE(iResourceSaver, 1, 0, 0);
+
+  /**
+   * Saves a resource to a document node.
+   * Returns success.
+   */
+  virtual bool Save (iBase* resource, iDocumentNode* node) = 0;
+
+  /**
+   * Returns whether this saver is thread-safe.
+   */
+  virtual bool IsThreadSafe () const = 0;
+};
+
+#endif // __CS_IMAP_RESOURCE_H__
