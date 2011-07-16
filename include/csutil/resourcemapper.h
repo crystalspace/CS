@@ -36,7 +36,7 @@ namespace CS
     class Mapper
     {
     public:
-      void Initialise (iObjectRegistry* objectReg_)
+      void Initialize (iObjectRegistry* objectReg_)
       {
         objectReg = objectReg_;
         pluginManager = csQueryRegistry<iPluginManager> (objectReg);
@@ -48,33 +48,33 @@ namespace CS
       bool Register (iDocumentNode* node)
       {
         /**
-         * <resources>
-         *   <resource classID="crystalspace.blah.foo.bar">
-         *     <tag>foo</tag>
-         *     <tag>bar</tag>
-         *   </resource>
-         * </resources>
+         * <resourcehandlers>
+         *   <resourcehandler classID="crystalspace.blah.foo.bar">
+         *     <resource-node>foo</resource-node>
+         *     <resource-node>bar</resource-node>
+         *   </resourcehandler>
+         * </resourcehandlers>
          */
 
         // Sanity check.
-        if (strcmp (node->GetValue (), "resources") != 0)
+        if (strcmp (node->GetValue (), "resourcehandlers") != 0)
         {
           csReport (objectReg, CS_REPORTER_SEVERITY_ERROR, "CS::Resource::Mapper",
             "Invalid document node passed to 'Register' - missing 'resources' root node.");
           return false;
         }
 
-        csRef<iDocumentNodeIterator> resourceNodes = node->GetNodes ("resource");
-        while (resourceNodes->HasNext ())
+        csRef<iDocumentNodeIterator> resourceHandlerNodes = node->GetNodes ("resourcehandler");
+        while (resourceHandlerNodes->HasNext ())
         {
-          csRef<iDocumentNode> resourceNode = resourceNodes->Next ();
+          csRef<iDocumentNode> resourceHandlerNode = resourceHandlerNodes->Next ();
 
           // Get the class ID of the loadable.
-          const char* classID = resourceNode->GetAttributeValue ("classID");
+          const char* classID = resourceHandlerNode->GetAttributeValue ("classID");
           if (!classID)
           {
             csReport (objectReg, CS_REPORTER_SEVERITY_ERROR, "CS::Resource::Mapper",
-              "Missing class ID in resource!");
+              "Missing class ID in resource handler!");
             return false;
           }
 
@@ -83,13 +83,13 @@ namespace CS
           if (!plugin.IsValid ())
             return false;
 
-          // Register each loadable-tag pair.
-          csRef<iDocumentNodeIterator> tagNodes = resourceNode->GetNodes ("tag");
-          while (tagNodes->HasNext ())
+          // Register each plugin-name pair.
+          csRef<iDocumentNodeIterator> resourceNodes = resourceHandlerNode->GetNodes ("resource-node");
+          while (resourceNodes->HasNext ())
           {
-            csRef<iDocumentNode> tagNode = tagNodes->Next ();
+            csRef<iDocumentNode> resourceNode = resourceNodes->Next ();
 
-            Register (plugin, tagNode->GetContentsValue ());
+            Register (plugin, resourceNode->GetContentsValue ());
           }
         }
 
@@ -154,8 +154,8 @@ namespace CS
       }
 
     private:
-      // Object register for error reporting.
-      csRef<iObjectRegistry> objectReg;
+      // Object registry for error reporting.
+      iObjectRegistry* objectReg;
 
       // Plugin manager for plugin lookups/loading.
       csRef<iPluginManager> pluginManager;

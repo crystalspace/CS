@@ -19,9 +19,31 @@
 #ifndef __CS_IMAP_RESOURCE_H__
 #define __CS_IMAP_RESOURCE_H__
 
-#include "csutil/ref.h"
-#include "csutil/scf_interface.h"
+#include "csutil/csstring.h"
+#include "csutil/refarr.h"
 #include "iutil/document.h"
+#include "iutil/strset.h"
+
+struct ResourceReference
+{
+  // Resource type name.
+  csString type;
+
+  // Resource unique ID.
+  csString id;
+
+  // The property that refers to this resource.
+  csStringID property;
+};
+
+struct iResource : public virtual iBase
+{
+  SCF_INTERFACE(iResource, 1, 0, 0);
+
+  virtual const csArray<ResourceReference>& GetDependencies () const = 0;
+
+  virtual void SetProperty (csStringID propery, iResource* resource) = 0;
+};
 
 struct iResourceLoader : public virtual iBase
 {
@@ -31,12 +53,7 @@ struct iResourceLoader : public virtual iBase
    * Loads a resource from a document node.
    * Returns an invalid object on failure.
    */
-  virtual csPtr<iBase> Load (iDocumentNode* node) = 0;
-
-  /**
-   * Returns whether this loader is thread-safe.
-   */
-  virtual bool IsThreadSafe () const = 0;
+  virtual csPtr<iResource> Load (iDocumentNode* node) = 0;
 };
 
 struct iResourceSaver : public virtual iBase
@@ -47,12 +64,7 @@ struct iResourceSaver : public virtual iBase
    * Saves a resource to a document node.
    * Returns success.
    */
-  virtual bool Save (iBase* resource, iDocumentNode* node) = 0;
-
-  /**
-   * Returns whether this saver is thread-safe.
-   */
-  virtual bool IsThreadSafe () const = 0;
+  virtual bool Save (iResource* resource, iDocumentNode* node) = 0;
 };
 
 #endif // __CS_IMAP_RESOURCE_H__
