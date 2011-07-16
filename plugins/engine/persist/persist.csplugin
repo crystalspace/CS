@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- persist.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.engine.persist</name>
+        <implementation>Persist</implementation>
+        <description>Crystal Space Engine Core Resource Loader/Saver</description>
+        <requires>
+          <class>crystalspace.engine.3d</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>
