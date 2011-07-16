@@ -18,6 +18,8 @@
 
 #include "cssysdef.h"
 
+#include "iutil/objreg.h"
+
 #include "persist.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Engine)
@@ -42,12 +44,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
     return true;
   }
 
-  virtual csPtr<iBase> Persist::Load (iDocumentNode* node)
+  csPtr<iBase> Persist::Load (iDocumentNode* node)
   {
-    return csRef<iBase> ();
+    return 0;
   }
 
-  virtual bool Persist::Save (iBase* resource, iDocumentNode* node)
+  bool Persist::Save (iBase* resource, iDocumentNode* node)
   {
     return true;
   }

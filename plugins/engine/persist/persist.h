@@ -19,6 +19,11 @@
 #ifndef __CS_ENGINE_PERSIST_H__
 #define __CS_ENGINE_PERSIST_H__
 
+#include "csutil/scf_implementation.h"
+#include "imap/resource.h"
+#include "imap/services.h"
+#include "iutil/comp.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 {
   class Persist : 
@@ -53,7 +58,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
     virtual bool Save (iBase* resource, iDocumentNode* node);
 
     //// iResourceLoader & iResourceSaver ////
-    virtual bool IsThreadSafe() { return true; }
+    virtual bool IsThreadSafe() const { return true; }
   };
 }
 CS_PLUGIN_NAMESPACE_END (Engine)
