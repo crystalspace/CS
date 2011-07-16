@@ -54,6 +54,12 @@ struct iResourceLoader : public virtual iBase
    * Returns an invalid object on failure.
    */
   virtual csPtr<iResource> Load (iDocumentNode* node) = 0;
+
+  /**
+   * Loads a resource from a data buffer.
+   * Returns an invalid object on failure.
+   */
+  virtual csPtr<iResource> Load (iDataBuffer* node) = 0;
 };
 
 struct iResourceSaver : public virtual iBase
