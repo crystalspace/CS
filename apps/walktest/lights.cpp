@@ -176,7 +176,7 @@ void WalkTestLights::EnableFlashlight (bool enable)
       CS_LIGHT_DYNAMICTYPE_DYNAMIC);
     flashlight->SetType (CS_LIGHT_SPOTLIGHT);
     flashlight->SetAttenuationMode (CS_ATTN_INVERSE);
-    flashlight->SetSpotLightFalloff (1, cosf ((25.0/180.0)*PI));
+    flashlight->SetSpotLightFalloff (1, cosf ((25.0f/180.0f)*PI));
       
     iLightList* ll = walktest->views->GetCamera ()->GetSector ()->GetLights ();
     ll->Add (flashlight);
