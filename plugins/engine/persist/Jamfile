@@ -1,6 +1,6 @@
 SubDir TOP plugins engine persist ;
 
-Description persist : "Engine core resource loader and saver" ;
-Plugin persist : [ Wildcard *.cpp *.h ] ;
-Includes persist .h : $(SUBDIR)/persist.tok ;
-LinkWith persist : crystalspace ;
+Description enginepersist : "Engine core resource loader and saver" ;
+Plugin enginepersist : [ Wildcard *.cpp *.h ] ;
+Includes enginepersist .h : $(SUBDIR)/persist.tok ;
+LinkWith enginepersist : crystalspace ;
