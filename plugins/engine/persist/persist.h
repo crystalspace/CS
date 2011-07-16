@@ -50,9 +50,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
     virtual bool Save (iResource* resource, iDocumentNode* node);
     virtual csPtr<iDataBuffer> Save (iResource* resource);
 
-    //// iResourceLoader & iResourceSaver ////
-    virtual bool IsThreadSafe() const { return true; }
-
   protected:
     csPtr<iResource> LoadImage (iDocumentNode* node);
     csPtr<iResource> LoadImage (iDataBuffer* buf);

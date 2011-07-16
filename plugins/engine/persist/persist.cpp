@@ -81,7 +81,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
   {
     csRef<iDataBuffer> buf;
 
-    if (buf = SaveImage (buf)) return buf;
+    if (buf = SaveImage (resource)) return buf;
 
     return 0;
   }

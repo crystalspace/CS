@@ -19,13 +19,16 @@
 #ifndef __PROXYIMAGE_H__
 #define __PROXYIMAGE_H__
 
+#include "csutil/resource.h"
 #include "iutil/databuff.h"
 
 struct iBase;
 
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
-  class ProxyImage : public scfImplementation1<ProxyImage, iImage>
+  class ProxyImage :
+    public scfImplementation2<ProxyImage, iImage, scfFakeInterface<iResource> >,
+    CS::Resource::NoDepResource    
   {
     csString filename;
     
