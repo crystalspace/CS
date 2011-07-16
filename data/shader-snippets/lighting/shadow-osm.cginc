@@ -116,12 +116,12 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     float previousSplit, nextSplit;
   
     int i;
-    for (i = 0 ; i <= numSplits ; i ++)
+    for (i = 0 ; i < numSplits ; i ++)
     {
       previousSplit = lightPropsOM.splitDists[8 * lightNum + i];
       nextSplit = lightPropsOM.splitDists[8 * lightNum + i + 1];
       
-      if (distance < nextSplit || i == numSplits)
+      if (distance < nextSplit || i == numSplits - 1)
         break;
 
       previousSplit = nextSplit;
@@ -132,12 +132,12 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     
     float previousMap = 0, nextMap = 0;
     
-    int prevIndex = min((i / 4), numSplits);
+    int prevIndex = min((i / 4), numSplits - 1);
     
     for (int j = 0 ; j < prevIndex ; j ++)
       previousMap += getMapValue(4 * (j + 1) - 1, position);
     
-    int nextIndex = min((i + 1) / 4, numSplits);
+    int nextIndex = min((i + 1) / 4, numSplits - 1);
     
     nextMap = previousMap;
     for (int j = prevIndex ; j < nextIndex ; j ++)
@@ -149,10 +149,10 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     inLight = lerp(previousMap, nextMap, (float) (distance - previousSplit) 
       / (nextSplit - previousSplit) );
       
-    inLight = inLight * (i != numSplits) + previousMap * (i == numSplits);
+    inLight = inLight * (i != numSplits - 1) + previousMap * (i == numSplits - 1);
     inLight = exp(-1.0 * inLight);
       
-    //inLight = (float)i/numSplits;   
+    //inLight = (float)i / (numSplits - 1);   
       
     return inLight;
   }

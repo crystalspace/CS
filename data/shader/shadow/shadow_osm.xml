@@ -99,7 +99,7 @@
             value = value * (surface.a != 1);
               
             int i;
-            for (i = 0 ; i <= numSplits ; i ++)
+            for (i = 0 ; i < numSplits ; i ++)
               if (passColor[i] > IN.position_camera.z)
                 break;
 

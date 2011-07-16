@@ -144,7 +144,7 @@ namespace CS
             SuperFrustum& superFrustum = *(lightFrustums[lightFrustums.Push (
               newFrust)]);
 
-            superFrustum.actualNumParts = viewSetup.persist.numSplits + 1;
+            superFrustum.actualNumParts = viewSetup.persist.numSplits;
             superFrustum.frustums =
               new typename SuperFrustum::Frustum[superFrustum.actualNumParts];
 
@@ -297,128 +297,116 @@ namespace CS
           for (size_t l = 0; l < 1; l++)
           {
             const SuperFrustum& superFrust = *(lightFrustums.frustums[l]);            
-            float previousSplit = SMALL_Z;
 
-            for (int frustNum = 0 ; frustNum < superFrust.actualNumParts ; frustNum ++)
+            typename SuperFrustum::Frustum lightFrust;             
+
+            for (int attachments = 0 ; attachments < persist.mrt ; attachments ++)
             {
-              typename SuperFrustum::Frustum lightFrust;             
-
-              for (int attachments = 0 ; attachments < persist.mrt ; attachments ++)
-                texHandles[attachments] = 0;
-
-              for (int attachments = 0 ; attachments < persist.mrt && 
-                frustNum < superFrust.actualNumParts ; frustNum++, attachments ++)
+              for (int channels = 0 ; channels < 4 ; channels ++)
               {
-                for (int channels = 0 ; channels < 4 && 
-                  frustNum < superFrust.actualNumParts ; frustNum++, channels ++)
-                {
-                  lightFrust = superFrust.frustums[frustNum];
-                  lightFrust.splitDists = _near + (_far - _near) * 
-                    ((float)frustNum / (superFrust.actualNumParts - 1));
+                int frustNum = 4 * attachments + channels;
+                lightFrust = superFrust.frustums[frustNum];
+                lightFrust.splitDists = _near + (_far - _near) * 
+                  ((float)frustNum / (superFrust.actualNumParts - 1));
 
-                  lightFrust.splitDistsSV->SetValue(lightFrust.splitDists);
+                lightFrust.splitDistsSV->SetValue(lightFrust.splitDists);
 
-                  // fill in split dists for osm
-                  persist.settings.shadowDefaultShader->GetVariableAdd(persist.numSplitsSVName)->
-                    SetValue(viewSetup.persist.numSplits);
+                // fill in split dists for osm
+                persist.settings.shadowDefaultShader->GetVariableAdd(persist.numSplitsSVName)->
+                  SetValue(viewSetup.persist.numSplits);
 
-                  csRef<csShaderVariable> passColorSV =
-                    persist.settings.shadowDefaultShader->GetVariableAdd(persist.passColorSVName);
+                csRef<csShaderVariable> passColorSV =
+                  persist.settings.shadowDefaultShader->GetVariableAdd(persist.passColorSVName);
 
-                  passColorSV->SetArrayElement(frustNum, lightFrust.splitDistsSV);
-                }
-                frustNum --;
-
-                ShadowSettings::Target* target = 
-                  viewSetup.persist.settings.targets[0];
-                iTextureHandle* tex = target->texCache.QueryUnusedTexture (
-                  shadowMapSize, shadowMapSize);
-                lightFrust.textureSVs[target->attachment]->SetValue (tex);
-                texHandles[attachments] = tex;
-              }
-              frustNum --;
-
-              csRef<CS::RenderManager::RenderView> newRenderView;
-              newRenderView = renderTree.GetPersistentData().renderViews.CreateRenderView ();
-              newRenderView->SetEngine (rview->GetEngine ());
-              newRenderView->SetThisSector (rview->GetThisSector ());
-
-              csBox3 castersBox = castingObjects;
-              csBox3 receiversBox = receivingObjects;
-              // set up projection matrix
-              const float focusMinX = csMax (receiversBox.MinX(), castersBox.MinX());
-              const float focusMinY = csMax (receiversBox.MinY(), castersBox.MinY());
-              const float focusMaxX = csMin (receiversBox.MaxX(), castersBox.MaxX());
-              const float focusMaxY = csMin (receiversBox.MaxY(), castersBox.MaxY());
-              const float frustW = focusMaxX - focusMinX;
-              const float frustH = focusMaxY - focusMinY;
-              const float cropScaleX = 2.0f/frustW;
-              const float cropScaleY = 2.0f/frustH;
-              const float cropShiftX =
-                (-1.0f * (focusMaxX + focusMinX))/frustW;
-              const float cropShiftY =
-                (-1.0f * (focusMaxY + focusMinY))/frustH;
-              CS::Math::Matrix4 crop = CS::Math::Matrix4 (
-                cropScaleX, 0, 0, cropShiftX,
-                0, cropScaleY, 0, cropShiftY,
-                0, 0, 1, 0,
-                0, 0, 0, 1);
-
-              CS::Math::Matrix4 matrix = rview->GetCamera()->GetProjectionMatrix();
-
-              CS::Math::Matrix4 Mortho = 
-                CS::Math::Projections::Ortho (-1, 1, 1, -1, 1, -1);
-
-              float lightCutoff = light->GetCutoffDistance();
-              float lightNear = previousSplit;
-
-              lightProject = CS::Math::Projections::Ortho (lightCutoff, 
-                -lightCutoff, lightCutoff, -lightCutoff, 
-                -lightFrust.splitDists, -lightNear);
-
-              matrix = Mortho * crop * lightProject;
-
-              // we only need one shadow map project sv per light
-              for (int i = 0; i < 4; i++)
-              {
-                csShaderVariable* item = superFrust.shadowMapProjectSV->GetArrayElement (i);
-                item->SetValue (matrix.Row (i));
+                passColorSV->SetArrayElement(frustNum, lightFrust.splitDistsSV);
               }
 
-              previousSplit = lightFrust.splitDists;
-
-              csRef<iCustomMatrixCamera> shadowViewCam =
-                newRenderView->GetEngine()->CreateCustomMatrixCamera();
-              newRenderView->SetCamera (shadowViewCam->GetCamera());
-
-              shadowViewCam->SetProjectionMatrix (matrix);
-              shadowViewCam->GetCamera()->SetTransform 
-                (light->GetMovable()->GetTransform());
-
-              newRenderView->SetViewDimensions (shadowMapSize, shadowMapSize);
-              csBox2 clipBox (0, 0, shadowMapSize, shadowMapSize);
-              csRef<iClipper2D> newView;
-              newView.AttachNew (new csBoxClipper (clipBox));
-              newRenderView->SetClipper (newView);
-
-              typename RenderTree::ContextNode* shadowMapCtx = 
-                renderTree.CreateContext (newRenderView);
-
-              for (int t = 0; t < persist.mrt; t++)
-                if (texHandles[t] != 0)
-                {
-                  renderTree.AddDebugTexture (texHandles[t]);
-                  // register SVs
-                  shadowMapCtx->renderTargets[rtaColor0 + t].texHandle = texHandles[t];
-                  shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
-                }
-
-//               layerConfig.SetDefaultShader(persist.settings.shadowDefaultShader);
-
-              ShadowmapContextSetup contextFunction (layerConfig,
-                persist.shaderManager, viewSetup);
-              contextFunction (*shadowMapCtx);
+              ShadowSettings::Target* target = 
+                viewSetup.persist.settings.targets[0];
+              iTextureHandle* tex = target->texCache.QueryUnusedTexture (
+                shadowMapSize, shadowMapSize);
+              lightFrust.textureSVs[target->attachment]->SetValue (tex);
+              texHandles[attachments] = tex;
             }
+
+            csRef<CS::RenderManager::RenderView> newRenderView;
+            newRenderView = renderTree.GetPersistentData().renderViews.CreateRenderView ();
+            newRenderView->SetEngine (rview->GetEngine ());
+            newRenderView->SetThisSector (rview->GetThisSector ());
+
+            csBox3 castersBox = castingObjects;
+            csBox3 receiversBox = receivingObjects;
+            // set up projection matrix
+            const float focusMinX = csMax (receiversBox.MinX(), castersBox.MinX());
+            const float focusMinY = csMax (receiversBox.MinY(), castersBox.MinY());
+            const float focusMaxX = csMin (receiversBox.MaxX(), castersBox.MaxX());
+            const float focusMaxY = csMin (receiversBox.MaxY(), castersBox.MaxY());
+            const float frustW = focusMaxX - focusMinX;
+            const float frustH = focusMaxY - focusMinY;
+            const float cropScaleX = 2.0f/frustW;
+            const float cropScaleY = 2.0f/frustH;
+            const float cropShiftX =
+              (-1.0f * (focusMaxX + focusMinX))/frustW;
+            const float cropShiftY =
+              (-1.0f * (focusMaxY + focusMinY))/frustH;
+            CS::Math::Matrix4 crop = CS::Math::Matrix4 (
+              cropScaleX, 0, 0, cropShiftX,
+              0, cropScaleY, 0, cropShiftY,
+              0, 0, 1, 0,
+              0, 0, 0, 1);
+
+            CS::Math::Matrix4 matrix = rview->GetCamera()->GetProjectionMatrix();
+
+            CS::Math::Matrix4 Mortho = 
+              CS::Math::Projections::Ortho (-1, 1, 1, -1, 1, -1);
+
+            float lightCutoff = light->GetCutoffDistance();
+            float lightNear = SMALL_Z;
+
+            lightProject = CS::Math::Projections::Ortho (lightCutoff, 
+              -lightCutoff, lightCutoff, -lightCutoff, 
+              -lightFrust.splitDists, -lightNear);
+
+            matrix = Mortho * crop * lightProject;
+
+            // we only need one shadow map project sv per light
+            for (int i = 0; i < 4; i++)
+            {
+              csShaderVariable* item = superFrust.shadowMapProjectSV->GetArrayElement (i);
+              item->SetValue (matrix.Row (i));
+            }
+
+            csRef<iCustomMatrixCamera> shadowViewCam =
+              newRenderView->GetEngine()->CreateCustomMatrixCamera();
+            newRenderView->SetCamera (shadowViewCam->GetCamera());
+
+            shadowViewCam->SetProjectionMatrix (matrix);
+            shadowViewCam->GetCamera()->SetTransform 
+              (light->GetMovable()->GetTransform());
+
+            newRenderView->SetViewDimensions (shadowMapSize, shadowMapSize);
+            csBox2 clipBox (0, 0, shadowMapSize, shadowMapSize);
+            csRef<iClipper2D> newView;
+            newView.AttachNew (new csBoxClipper (clipBox));
+            newRenderView->SetClipper (newView);
+
+            typename RenderTree::ContextNode* shadowMapCtx = 
+              renderTree.CreateContext (newRenderView);
+
+            for (int t = 0; t < persist.mrt; t++)
+            {
+              renderTree.AddDebugTexture (texHandles[t]);
+              // register SVs
+              shadowMapCtx->renderTargets[rtaColor0 + t].texHandle = texHandles[t];
+              shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
+            }
+
+//             layerConfig.SetDefaultShader(persist.settings.shadowDefaultShader);
+
+            ShadowmapContextSetup contextFunction (layerConfig,
+              persist.shaderManager, viewSetup);
+            contextFunction (*shadowMapCtx);
+            
           }
         }
 
@@ -453,9 +441,9 @@ namespace CS
 
           // Sort the mesh lists  
           {
-//             StandardMeshSorter<RenderTree> mySorter (rview->GetEngine ());
-//             mySorter.SetupCameraLocation (rview->GetCamera ()->GetTransform ().GetOrigin ());
-//             ForEachMeshNode (context, mySorter);
+            StandardMeshSorter<RenderTree> mySorter (rview->GetEngine ());
+            mySorter.SetupCameraLocation (rview->GetCamera ()->GetTransform ().GetOrigin ());
+            ForEachMeshNode (context, mySorter);
           }
 
           // After sorting, assign in-context per-mesh indices
@@ -549,11 +537,11 @@ namespace CS
             settings.ReadSettings (objectReg, 
               cfg->GetStr (
               csString().Format ("%s.ShadowsType", configPrefix.GetData()), "Alpha"));
-            numSplits = cfg->GetInt (
-              csString().Format ("%s.NumSplits", configPrefix.GetData()), 2);
             shadowMapRes = cfg->GetInt (
               csString().Format ("%s.ShadowMapResolution", configPrefix.GetData()), 512);
           }
+
+          numSplits = 4 * mrt;
 
           // pass mrt number to shader
           csShaderVariable* mrtVar = new csShaderVariable(mrtSVName); 
@@ -592,32 +580,24 @@ namespace CS
         typename CachedLightData::SuperFrustum& superFrust =
           *(lightFrustums[subLightNum]);
 
-        uint spreadFlags = 0;
-        int s = 0;
-
         for (int f = 0; f < superFrust.actualNumParts; f++)
         {
           typename CachedLightData::SuperFrustum::Frustum& lightFrustum =
             superFrust.frustums[f];
           
-          if (f % 4 == 3 || f == superFrust.actualNumParts - 1)    
-//           if (f == superFrust.actualNumParts - 1)
+          if (f % 4 == 3)    
           {
-
             for (size_t t = 0; t < persist.settings.targets.GetSize(); t++)
             {
               const ShadowSettings::Target* target =
                 viewSetup.persist.settings.targets[t];
               lightVarsHelper.MergeAsArrayItem (lightStacks[0], 
-                lightFrustum.textureSVs[target->attachment], 8 * lightNum + s / 4);
+                lightFrustum.textureSVs[target->attachment], 8 * lightNum + f / 4);
             }
           }
 
           lightVarsHelper.MergeAsArrayItem(lightStacks[0],
-            lightFrustum.splitDistsSV, 8 * lightNum + s);
-
-          spreadFlags |= (1 << s);
-          s++;        
+            lightFrustum.splitDistsSV, 8 * lightNum + f);
         }
 
         superFrust.numSplitsSV->SetValue(viewSetup.persist.numSplits);
