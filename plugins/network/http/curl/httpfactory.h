@@ -23,7 +23,14 @@
 
 #include <csutil/scf_implementation.h>
 
+#include <csutil/threading/thread.h>
+
+#include <csutil/threading/rwmutex.h>
+
 #include <string>
+#include <map>
+
+#include "httpconnection.h"
 
 using namespace CS::Network::HTTP;
 
@@ -49,6 +56,9 @@ private:
   std::string proxyURI;
   std::string proxyUser;
   std::string proxyPass;
+  typedef std::map<CS::Threading::ThreadID, csRef<HTTPConnection> > ThreadConnections;
+  ThreadConnections connections;
+  CS::Threading::ReadWriteMutex mutex;
 };
 }
 CS_PLUGIN_NAMESPACE_END(CSHTTP)

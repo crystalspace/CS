@@ -22,8 +22,12 @@
 
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
+#include "iutil/stringarray.h"
+
+#include "csutil/databuf.h"
 
 #include "httpconnection.h"
+
 
 #include <string.h>
 #include <iostream>
@@ -54,9 +58,8 @@ Response::~Response ()
 int Response::GetCode () { return code; }
 const ResponseState& Response::GetState () { return state; }
 const char* Response::GetError () { return error; }
-const char* Response::GetHeader () { return header.c_str(); }
-const char* Response::GetData () { return data.c_str(); }
-size_t Response::GetDataLength () { return data.size(); }
+csRef<iDataBuffer> Response::GetHeader () { return header; }
+csRef<iDataBuffer> Response::GetData () { return data; }
 
 //----------------------------------------------------------------------------
 HTTPConnection::HTTPConnection (const char* uri)
@@ -85,7 +88,7 @@ HTTPConnection::~HTTPConnection ()
   curl_easy_cleanup(curl);
 }
 
-csRef<iResponse> HTTPConnection::Get(const char* location, const char* params)
+csRef<iResponse> HTTPConnection::Get(const char* location, const char* params, iStringArray* headersArray)
 {
   std::stringstream source;
   source << uri << location;
@@ -93,8 +96,26 @@ csRef<iResponse> HTTPConnection::Get(const char* location, const char* params)
   if (params) source << "?" << params;
 
   curl_easy_setopt(curl, CURLOPT_URL, source.str().c_str());
+  
+  struct curl_slist* headers=0;
+  if (headersArray)
+  {
+    for (size_t i = 0; i < headersArray->GetSize(); i++)
+    {
+      headers = curl_slist_append(headers, headersArray->Get(i));
+    }
+  }
+
+  // pass our list of custom made headers
+  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
   csRef<iResponse> reponse = Perform(source.str());
+  
+  // free the header list
+  curl_slist_free_all(headers);  
+  
+  //Reset some stuffv
+  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, 0);
 
   return reponse;    
 }
@@ -144,7 +165,7 @@ csRef<iResponse> HTTPConnection::Post(const char* location, const char* pdata, c
   // free the header list
   curl_slist_free_all(headers);  
   
-  //Reset some stuff
+  //Reset some stuffv
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, 0);
   
   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, 0);
@@ -227,12 +248,15 @@ csRef<Response> HTTPConnection::Perform(const std::string& source)
   csRef<Response> response;
   response.AttachNew(new Response());
   
+  csString header("");
+  csString buffer("");
+  
   // Direct to buffers.
   response->error = new char[CURL_ERROR_SIZE];
   curl_easy_setopt (curl, CURLOPT_ERRORBUFFER, response->error);
   
-  curl_easy_setopt(curl, CURLOPT_WRITEHEADER, &response->header);
-  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response->data);
+  curl_easy_setopt(curl, CURLOPT_WRITEHEADER, &header);
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
 
   // Perform
   CURLcode result = curl_easy_perform(curl);
@@ -247,6 +271,11 @@ csRef<Response> HTTPConnection::Perform(const std::string& source)
     else
       response->state = Other;
   }
+  size_t hlength = header.Length ();
+  response->header.AttachNew(new csDataBuffer(header.Detach(), hlength));
+  
+  size_t dlength = buffer.Length ();
+  response->data.AttachNew(new csDataBuffer(buffer.Detach(), dlength));
 
   // We're done so broadcast 100%.
   ProgressCallback(this, 1.0, 1.0, 1.0, 1.0);
@@ -277,13 +306,13 @@ int HTTPConnection::Read(void* ptr, size_t size, size_t nitems, void* stream)
   return len;
 }
 
-int HTTPConnection::Write(char *data, size_t size, size_t nmemb, std::string *buffer)
+int HTTPConnection::Write(char *data, size_t size, size_t nmemb, csString* buffer)
 {
   int result = 0;
 
   if(buffer != NULL) 
   {
-    buffer->append(data, size * nmemb);
+    buffer->Append(data, size * nmemb);
     result = size * nmemb;
   }
 

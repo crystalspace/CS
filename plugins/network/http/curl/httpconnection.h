@@ -43,16 +43,15 @@ public:
   virtual int GetCode ();
   virtual const ResponseState& GetState ();
   virtual const char* GetError () ;
-  virtual const char* GetHeader ();
-  virtual const char* GetData ();
-  virtual size_t GetDataLength ();
+  virtual csRef<iDataBuffer> GetHeader ();
+  virtual csRef<iDataBuffer> GetData ();
 
 private:
   int code; 
   ResponseState state;
   char* error;
-  std::string header;
-  std::string data;
+  csRef<iDataBuffer> header; 
+  csRef<iDataBuffer> data; 
   friend class HTTPConnection;
 };
 
@@ -63,7 +62,7 @@ public:
   virtual ~HTTPConnection ();
   
   // iHTTPConnection
-  virtual csRef<iResponse> Get(const char* location, const char* params=0);
+  virtual csRef<iResponse> Get(const char* location, const char* params=0, iStringArray* headers=0);
   virtual csRef<iResponse> Head(const char* location, const char* params=0);
   virtual csRef<iResponse> Post(const char* location, const char* pdata=0, const char* format=0);
   virtual csRef<iResponse> Put(const char* location, const char* pdata=0, const char* format=0);
@@ -82,7 +81,7 @@ private:
   CURL* curl;
 
   static int ProgressCallback(HTTPConnection* clientp, double dltotal, double dlnow, double ultotal, double ulnow);
-  static int Write(char *data, size_t size, size_t nmemb, std::string *buffer);
+  static int Write(char *data, size_t size, size_t nmemb, csString* buffer);
   static int Read(void* ptr, size_t size, size_t nitems, void* stream);
 
   csRef<Response> Perform(const std::string& source);   
