@@ -49,15 +49,6 @@ struct csVPLvideoFormat
   int target_bitrate;
 };
 
-struct vidFrameData
-{
-  unsigned char * data;
-
-  int width;
-  int height;
-  int stride;
-};
-
 /** @} */
 
 #endif // __CS_VPL_COMMON_STRUCTS_H__
