@@ -1,0 +1,12 @@
+SubDir TOP plugins editor damn ;
+
+SubInclude TOP plugins editor damn json ;
+
+if $(WX.AVAILABLE) = "yes"
+{
+  Description cseditordamn : "CSEditor DAMN Plugin" ;
+
+  Plugin cseditordamn : [ Wildcard *.cpp *.h ] ;
+  LinkWith cseditordamn : crystalspace libjsoncpp ;
+  ExternalLibs cseditordamn : WX ;
+}

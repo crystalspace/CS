@@ -109,6 +109,7 @@ bool EditorApp::OnInit (void)
   if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.assetbrowserpanel")) return false;
   if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.csobjectmaplistener")) return false;
   if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.csinterfacewrappers")) return false;
+  if (!editor->LoadPlugin ("crystalspace.editor.plugin.damn.damnpanel")) return false;
 
   // Start the application
   if (!editor->StartApplication ()) return false;

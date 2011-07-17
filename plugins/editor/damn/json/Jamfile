@@ -1,0 +1,6 @@
+SubDir TOP plugins editor damn json ;
+
+
+Description libjsoncpp: "jsoncpp" ;
+Library libjsoncpp : [ Wildcard *.cpp *.h ] ;
+

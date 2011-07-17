@@ -11,7 +11,7 @@ if $(WX.AVAILABLE) = "yes" && $(WX.AUI.AVAILABLE) = "yes"
 
   Description : "Crystal Space Editor" ;
   Application cseditor : [ Wildcard *.cpp *.h ] ;
-  ExternalLibs cseditor : CRYSTAL WX ;
+  ExternalLibs cseditor : CRYSTAL WX CURL ;
   CFlags cseditor : $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;
 #  LinkWith cseditor : propgrid crystalspace ;
   LinkWith cseditor : crystalspace ;

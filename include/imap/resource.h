@@ -79,4 +79,47 @@ struct iResourceSaver : public virtual iBase
   virtual csPtr<iDataBuffer> Save (iResource* resource) = 0;
 };
 
+struct iLoading;
+
+/**
+ * The iResourceCache interface.
+ */
+struct iResourceCache : public virtual iBase
+{
+  SCF_INTERFACE (iResourceCache, 1,0,0);
+  
+  /**
+   * Add a given resource to the cache.
+   * @param name The resource name.
+   */
+  virtual void Add (const char* name, iLoading* resource) = 0;
+
+  /**
+   * Get a Resource by name.
+   * @param name The resource name.
+   */
+  virtual csRef<iLoading> Get (const char* name) = 0;
+
+  /**
+   * Mark a resource as a candidate for removal.
+   * @param name The resource name.
+   */
+  virtual void Release (const char* name) = 0;
+};
+
+/**
+ * The iResourceManager interface.
+ */
+struct iResourceManager : public virtual iBase
+{
+  SCF_INTERFACE (iResourceManager, 1,0,0);
+
+  /**
+   * Get a Resource by name.
+   * Begins loading the resource if not already loading or loaded.
+   * @param name The resource name.
+   */
+  virtual csRef<iLoading> Get (const char* name) = 0;
+};
+
 #endif // __CS_IMAP_RESOURCE_H__
