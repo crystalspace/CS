@@ -102,32 +102,7 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
         csRef<TheoraVideoMedia> videoStream;
         videoStream.AttachNew ( new TheoraVideoMedia ( (iBase*)this));
 
-
-        memcpy(&videoStream->to,&test,sizeof(test));
-        memcpy(&videoStream->ti,&ti,sizeof(ti));
-        memcpy(&videoStream->tc,&tc,sizeof(tc));
-        memcpy(&videoStream->ts,&ts,sizeof(ts));
-        videoStream->theora_p=1;
-
-        videoStream->decodersStarted = false;
-        videoStream->infile = infile;
-
-        //create the buffers needed for double buffering
-        csPtr<iTextureHandle> tex1 = texManager->CreateTexture 
-          (ti.frame_width,ti.frame_height,0,csimg2D,"rgb8",
-          CS_TEXTURE_2D|CS_TEXTURE_NPOTS);
-        videoStream->_buffer1.AttachNew(tex1);
-
-        csPtr<iTextureHandle> tex2 = texManager->CreateTexture 
-          (ti.frame_width,ti.frame_height,0,csimg2D,"rgb8",
-          CS_TEXTURE_2D|CS_TEXTURE_NPOTS);
-        videoStream->_buffer2.AttachNew(tex2);
-
-        videoStream->_texture = videoStream->_buffer1;
-
-        videoStream->activeBuffer = 1;
-
-        //printf("found video stream!\n");
+        videoStream->InitializeStream (test, ti, tc, ts, infile, texManager);
 
         container->AddMedia (videoStream);
 
@@ -144,16 +119,9 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
           // it is vorbis 
           csRef<TheoraAudioMedia> audioStream;
           audioStream.AttachNew ( new TheoraAudioMedia ( (iBase*)this));
+          
+          audioStream->InitializeStream (test, vi, vc, infile);
 
-          memcpy(&audioStream->vo,&test,sizeof(test));
-          memcpy(&audioStream->vi,&vi,sizeof(vi));
-          memcpy(&audioStream->vc,&vc,sizeof(vc));
-          audioStream->vorbis_p=1;
-          audioStream->infile = infile;
-
-          audioStream->decodersStarted = false;
-
-          //printf("found audio stream!\n");
           container->AddMedia (audioStream);
 
           //reinitialize Vorbis structures for next stream, if there is one
@@ -199,25 +167,25 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
         { 
           csRef<TheoraVideoMedia> buff = static_cast<TheoraVideoMedia*> ( (iVideoMedia*)media);
 
-          while (buff->theora_p && (buff->theora_p<3) && (ret=ogg_stream_packetpeek (&buff->to,&op)))
+          while (buff->_theora_p && (buff->_theora_p<3) && (ret=ogg_stream_packetpeek (&buff->_streamState,&op)))
           {
             if (ret<0)
             {
               printf("Error parsing Theora stream headers; corrupt stream?\n");
               return false;
             }
-            int res=th_decode_headerin (&buff->ti,&buff->tc,&buff->ts,&op);
+            int res=th_decode_headerin (&buff->_streamInfo,&buff->_streamComments,&buff->_setupInfo,&op);
             if (res>0)
             {
-              ogg_stream_packetout (&buff->to,&op);
+              ogg_stream_packetout (&buff->_streamState,&op);
             }
             else
             {
               printf ("Error parsing Theora stream headers; corrupt stream?\n");
               return false;
             }
-            buff->theora_p++;
-            if (buff->theora_p==3)
+            buff->_theora_p++;
+            if (buff->_theora_p==3)
             {
               times++;
               break;
@@ -234,20 +202,20 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
         { 
           csRef<TheoraAudioMedia> buff = static_cast<TheoraAudioMedia*> ( (iAudioMedia*)media);
 
-          while (buff->vorbis_p && (buff->vorbis_p<3) && (ret=ogg_stream_packetout (&buff->vo,&op)))
+          while (buff->_vorbis_p && (buff->_vorbis_p<3) && (ret=ogg_stream_packetout (&buff->_streamState,&op)))
           {
             if (ret<0)
             {
               fprintf (stderr,"Error parsing Vorbis stream headers; corrupt stream?\n");
               return false;
             }
-            if (vorbis_synthesis_headerin (&buff->vi,&buff->vc,&op))
+            if (vorbis_synthesis_headerin (&buff->_streamInfo,&buff->_streamComments,&op))
             {
               fprintf (stderr,"Error parsing Vorbis stream headers; corrupt stream?\n");
               return false;
             }
-            buff->vorbis_p++;
-            if (buff->vorbis_p==3)
+            buff->_vorbis_p++;
+            if (buff->_vorbis_p==3)
             {
               times++;
               break;
@@ -335,7 +303,7 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
   }
 
   //copy the ogg sync state to the container
-  memcpy (&container->oy,&oy,sizeof (oy));
+  memcpy (&container->_syncState,&oy,sizeof (oy));
 
   return true;
 }
@@ -372,13 +340,13 @@ void thoggLoader::ComputeStreamLength (csRef<TheoraMediaContainer> container)
             int ret=ogg_sync_pageout (&oy, &og);
             if (ret == 0) break;
             // if page is not a theora page, skip it
-            if (ogg_page_serialno (&og) != buff->to.serialno) continue;
+            if (ogg_page_serialno (&og) != buff->_streamState.serialno) continue;
 
             unsigned long granule= (unsigned long) ogg_page_granulepos (&og);
             if (granule >= 0)
             {
-              mDuration= (float) th_granule_time (buff->td,granule);
-              mNumFrames= (unsigned long) th_granule_frame (buff->td,granule)+1;
+              mDuration= (float) th_granule_time (buff->_decodeControl,granule);
+              mNumFrames= (unsigned long) th_granule_frame (buff->_decodeControl,granule)+1;
             }
           }
 
@@ -420,12 +388,12 @@ void thoggLoader::ComputeStreamLength (csRef<TheoraMediaContainer> container)
             int ret=ogg_sync_pageout ( &oy, &og );
             if (ret == 0) break;
             // if page is not a theora page, skip it
-            if (ogg_page_serialno (&og) != buff->vo.serialno) continue;
+            if (ogg_page_serialno (&og) != buff->_streamState.serialno) continue;
 
             unsigned long granule= (unsigned long) ogg_page_granulepos (&og);
             if (granule >= 0)
             {
-              mDuration= (float) vorbis_granule_time (&buff->vd,granule);
+              mDuration= (float) vorbis_granule_time (&buff->_dspState,granule);
               // mNumFrames=(unsigned long) th_granule_frame(&buff->vd,granule)+1;
             }
           }

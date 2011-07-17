@@ -22,16 +22,16 @@ TheoraVideoMedia::~TheoraVideoMedia ()
 
 void TheoraVideoMedia::CleanMedia ()
 {
-  ogg_stream_clear(&to);
+  ogg_stream_clear(&_streamState);
 
-  if (decodersStarted)
+  if (_decodersStarted)
   {
-    th_decode_free(td);
+    th_decode_free(_decodeControl);
   }
 
-  th_comment_clear(&tc);
-  th_info_clear(&ti);
-  th_setup_free(ts);
+  th_comment_clear(&_streamComments);
+  th_info_clear(&_streamInfo);
+  th_setup_free(_setupInfo);
   printf("video stream is clean\n");
 }
 
@@ -40,31 +40,31 @@ bool TheoraVideoMedia::Initialize (iObjectRegistry* r)
   object_reg = r;
 
   // initialize the decoders
-  if (theora_p)
+  if (_theora_p)
   {
     //Clear the theora state in case it contains previous data
-    td=NULL;
+    _decodeControl=NULL;
 
-    td=th_decode_alloc(&ti,ts);
+    _decodeControl=th_decode_alloc(&_streamInfo,_setupInfo);
 
     //Initialize the decoders and print the info on the stream
     printf("Ogg logical stream %ld is Theora %dx%d %.02f fps video\n"
       "  Frame content is %dx%d with offset (%d,%d).\n",
-      to.serialno,ti.pic_width,ti.pic_height, (double)ti.fps_numerator/ti.fps_denominator,
-      ti.frame_width, ti.frame_height, ti.pic_x, ti.pic_y);
+      _streamState.serialno,_streamInfo.pic_width,_streamInfo.pic_height, (double)_streamInfo.fps_numerator/_streamInfo.fps_denominator,
+      _streamInfo.frame_width, _streamInfo.frame_height, _streamInfo.pic_x, _streamInfo.pic_y);
 
-    decodersStarted=true;
-    videobuf_granulepos=-1;
-    videobuf_time=0;
-    frameToSkip=-1;
+    _decodersStarted=true;
+    _videobuf_granulepos=-1;
+    _videobufTime=0;
+    _frameToSkip=-1;
   }
   else
   {
     /* tear down the partial theora setup */
-    th_info_clear(&ti);
-    th_comment_clear(&tc);
+    th_info_clear(&_streamInfo);
+    th_comment_clear(&_streamComments);
 
-    decodersStarted=false;
+    _decodersStarted=false;
   }
 
   return 0;
@@ -98,31 +98,31 @@ void TheoraVideoMedia::SetVideoTarget (csRef<iTextureHandle> &texture)
 
 double TheoraVideoMedia::GetPosition () const
 {
-  return videobuf_time;
+  return _videobufTime;
 }
 
 bool TheoraVideoMedia::Update ()
 {
-  videobuf_ready=false;
+  _videobufReady=false;
 
-  while (theora_p && !videobuf_ready)
+  while (_theora_p && !_videobufReady)
   {
-    if (ogg_stream_packetout(&to,&op)>0)
+    if (ogg_stream_packetout(&_streamState,&_oggPacket)>0)
     {
-      if (th_decode_packetin(td,&op,&videobuf_granulepos)>=0)
+      if (th_decode_packetin(_decodeControl,&_oggPacket,&_videobuf_granulepos)>=0)
       {
-        videobuf_time=th_granule_time(td,videobuf_granulepos);
+        _videobufTime=th_granule_time(_decodeControl,_videobuf_granulepos);
 
-        if (th_granule_frame (td,videobuf_granulepos)<frameToSkip)
+        if (th_granule_frame (_decodeControl,_videobuf_granulepos)<_frameToSkip)
         {
-          videobuf_ready=false;
+          _videobufReady=false;
           return false;
         }
         else
         {
-          cout<<videobuf_time<<'-'<<th_granule_frame (td,videobuf_granulepos)<<endl;
-          videobuf_ready=true;
-          frameToSkip = -1;
+          cout<<_videobufTime<<'-'<<th_granule_frame (_decodeControl,_videobuf_granulepos)<<endl;
+          _videobufReady=true;
+          _frameToSkip = -1;
         }
       }
     }
@@ -130,24 +130,24 @@ bool TheoraVideoMedia::Update ()
       break;
   }
 
-  if (!videobuf_ready)
+  if (!_videobufReady)
     return true;
 
   csRef<iTextureHandle> texToWrite = activeBuffer==1 ? _buffer2 : _buffer1;
   size_t dstSize;
-  uint8* pixels = texToWrite->QueryBlitBuffer (ti.pic_x,ti.pic_y,ti.pic_width,ti.pic_height,dstSize);
+  uint8* pixels = texToWrite->QueryBlitBuffer (_streamInfo.pic_x,_streamInfo.pic_y,_streamInfo.pic_width,_streamInfo.pic_height,dstSize);
 
   th_ycbcr_buffer yuv;
-  th_decode_ycbcr_out(td,yuv);
-  int y_offset=(ti.pic_x&~1)+yuv[0].stride*(ti.pic_y&~1);
+  th_decode_ycbcr_out(_decodeControl,yuv);
+  int y_offset=(_streamInfo.pic_x&~1)+yuv[0].stride*(_streamInfo.pic_y&~1);
 
   // 4:2:0 pixel format
-  if (ti.pixel_fmt==TH_PF_420)
+  if (_streamInfo.pixel_fmt==TH_PF_420)
   {
-    int uv_offset=(ti.pic_x/2)+(yuv[1].stride)*(ti.pic_y/2);
+    int uv_offset=(_streamInfo.pic_x/2)+(yuv[1].stride)*(_streamInfo.pic_y/2);
 
-    for (ogg_uint32_t y = 0 ; y < ti.frame_height ; y++)
-      for (ogg_uint32_t x = 0 ; x < ti.frame_width ; x++)
+    for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
+      for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
       {
         //          int uvOff = uv_offset+x/2;
         int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
@@ -174,12 +174,12 @@ bool TheoraVideoMedia::Update ()
 
   }
   // 4:2:2 pixel format
-  else if (ti.pixel_fmt==TH_PF_422)
+  else if (_streamInfo.pixel_fmt==TH_PF_422)
   {
-    int uv_offset=(ti.pic_x/2)+(yuv[1].stride)*(ti.pic_y);
+    int uv_offset=(_streamInfo.pic_x/2)+(yuv[1].stride)*(_streamInfo.pic_y);
 
-    for (ogg_uint32_t y = 0 ; y < ti.frame_height ; y++)
-      for (ogg_uint32_t x = 0 ; x < ti.frame_width ; x++)
+    for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
+      for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
       {
         //            int uvOff = uv_offset+x/2;
         int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
@@ -206,12 +206,12 @@ bool TheoraVideoMedia::Update ()
 
   }
   // 4:4:4 pixel format
-  else if (ti.pixel_fmt==TH_PF_444)
+  else if (_streamInfo.pixel_fmt==TH_PF_444)
   {
-    int uv_offset=(ti.pic_x/2)+(yuv[1].stride)*(ti.pic_y);
+    int uv_offset=(_streamInfo.pic_x/2)+(yuv[1].stride)*(_streamInfo.pic_y);
 
-    for (ogg_uint32_t y = 0 ; y < ti.frame_height ; y++)
-      for (ogg_uint32_t x = 0 ; x < ti.frame_width ; x++)
+    for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
+      for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
       {
         //              int uvOff = uv_offset+x/2;
         int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
@@ -252,9 +252,9 @@ bool TheoraVideoMedia::Update ()
 
 long TheoraVideoMedia::SeekPage (long targetFrame,bool return_keyframe, ogg_sync_state *oy,unsigned long fileSize)
 {
-  ogg_stream_reset (&to);
-  th_decode_free (td);
-  td=th_decode_alloc(&ti,ts);
+  ogg_stream_reset (&_streamState);
+  th_decode_free (_decodeControl);
+  _decodeControl=th_decode_alloc(&_streamInfo,_setupInfo);
 
   int seek_min=0, seek_max=fileSize;
   long frame;
@@ -266,7 +266,7 @@ long TheoraVideoMedia::SeekPage (long targetFrame,bool return_keyframe, ogg_sync
   {
     ogg_sync_reset( oy );
 
-    fseek (infile,(seek_min+seek_max)/2,SEEK_SET);
+    fseek (_infile,(seek_min+seek_max)/2,SEEK_SET);
     memset(&og, 0, sizeof(ogg_page));
     ogg_sync_pageseek(oy,&og);
 
@@ -276,12 +276,12 @@ long TheoraVideoMedia::SeekPage (long targetFrame,bool return_keyframe, ogg_sync
       if (ret == 1)
       {
         int serno=ogg_page_serialno(&og);
-        if (serno == to.serialno)
+        if (serno == _streamState.serialno)
         {
           granule=ogg_page_granulepos(&og);
           if (granule >= 0)
           {
-            frame=(long) th_granule_frame(td,granule);
+            frame=(long) th_granule_frame(_decodeControl,granule);
             if (frame < targetFrame-1 && targetFrame-frame < 10)
             {
               fineseek=true;
@@ -305,7 +305,7 @@ long TheoraVideoMedia::SeekPage (long targetFrame,bool return_keyframe, ogg_sync
       else
       {
         char *buffer = ogg_sync_buffer( oy, 4096);
-        int bytesRead = fread (buffer,1,4096,infile);
+        int bytesRead = fread (buffer,1,4096,_infile);
         if (bytesRead == 0) break;
         ogg_sync_wrote( oy, bytesRead );
       }
@@ -313,16 +313,16 @@ long TheoraVideoMedia::SeekPage (long targetFrame,bool return_keyframe, ogg_sync
     if (fineseek) break;
   }
 
-  ogg_stream_pagein(&to,&og);
+  ogg_stream_pagein(&_streamState,&og);
   //granule=frame << mInfo->TheoraInfo.keyframe_granule_shift;
-  th_decode_ctl(td,TH_DECCTL_SET_GRANPOS,&granule,sizeof(granule));
+  th_decode_ctl(_decodeControl,TH_DECCTL_SET_GRANPOS,&granule,sizeof(granule));
 
   //make sure we skip to the keyframe we need
   if (return_keyframe)
   {
-    frameToSkip = targetFrame;
-    cout<<"want to skip to :"<<frameToSkip<<endl;
-    return (long) (granule >> ti.keyframe_granule_shift);
+    _frameToSkip = targetFrame;
+    cout<<"want to skip to :"<<_frameToSkip<<endl;
+    return (long) (granule >> _streamInfo.keyframe_granule_shift);
   }
 
   return -1;
@@ -340,4 +340,32 @@ void TheoraVideoMedia::SwapBuffers()
     _texture = _buffer1;
     activeBuffer = 1;
   }
+}
+
+void TheoraVideoMedia::InitializeStream (ogg_stream_state &state, th_info &info, th_comment &comments,
+                                         th_setup_info *setupInfo, FILE *source, csRef<iTextureManager> texManager)
+{
+  memcpy(&_streamState,&state,sizeof(state));
+  memcpy(&_streamInfo,&info,sizeof(info));
+  memcpy(&_streamComments,&comments,sizeof(comments));
+  memcpy(&_setupInfo,&setupInfo,sizeof(setupInfo));
+  _theora_p=1;
+
+  _decodersStarted = false;
+  _infile = source;
+
+  //create the buffers needed for double buffering
+  csPtr<iTextureHandle> tex1 = texManager->CreateTexture 
+    (_streamInfo.frame_width, _streamInfo.frame_height, 0, csimg2D,"rgb8",
+    CS_TEXTURE_2D|CS_TEXTURE_NPOTS);
+  _buffer1.AttachNew(tex1);
+
+  csPtr<iTextureHandle> tex2 = texManager->CreateTexture 
+    (_streamInfo.frame_width, _streamInfo.frame_height,0,csimg2D,"rgb8",
+    CS_TEXTURE_2D|CS_TEXTURE_NPOTS);
+  _buffer2.AttachNew(tex2);
+
+  _texture = _buffer1;
+
+  activeBuffer = 1;
 }

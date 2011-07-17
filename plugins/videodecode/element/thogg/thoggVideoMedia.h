@@ -48,8 +48,8 @@ private:
   float            length;
   unsigned long    frameCount;
 
-  ogg_int64_t      videobuf_granulepos;
-  ogg_int64_t      frameToSkip;
+  ogg_int64_t      _videobuf_granulepos;
+  ogg_int64_t      _frameToSkip;
 
   // these will be private and have getters and setters, but for now, it's faster like this
 public:
@@ -57,18 +57,20 @@ public:
   csRef<iTextureHandle> _buffer1,_buffer2;
   int activeBuffer;
 
-  ogg_stream_state  to;
-  th_info           ti;
-  th_comment        tc;
-  th_dec_ctx       *td;
-  ogg_packet        op;
-  th_setup_info    *ts;
-  int               theora_p;
-  FILE *out,
-       *infile;
-  bool    decodersStarted;
-  bool    videobuf_ready;
-  double  videobuf_time;
+  ogg_stream_state  _streamState;
+  th_info           _streamInfo;
+  th_comment        _streamComments;
+  th_dec_ctx       *_decodeControl;
+  ogg_packet        _oggPacket;
+  th_setup_info    *_setupInfo;
+  int               _theora_p;
+  FILE    *_infile;
+  bool    _decodersStarted;
+  bool    _videobufReady;
+  double  _videobufTime;
+
+  void InitializeStream (ogg_stream_state &state, th_info &info, th_comment &comments, th_setup_info *setupInfo,
+    FILE *source, csRef<iTextureManager> texManager);
 
 public:
   TheoraVideoMedia (iBase* parent);

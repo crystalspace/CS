@@ -51,10 +51,13 @@ private:
   unsigned long mSize;
   float timeToSeek;
 
+  csRef<TheoraVideoMedia> _activeTheoraStream;
+  csRef<TheoraAudioMedia> _activeVorbisStream;
+
 public:
-  ogg_sync_state   oy;
-  ogg_page         og;
-  FILE *infile;
+  ogg_sync_state        _syncState;
+  ogg_page              _oggPage;
+  FILE                  *infile;
   csRef<iTextureHandle> _target;
 
 private:

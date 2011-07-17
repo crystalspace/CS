@@ -48,20 +48,22 @@ private:
   float                 length;
 
 public:
-  ogg_stream_state  vo;
-  vorbis_info       vi;
-  vorbis_dsp_state  vd;
-  vorbis_block      vb;
-  vorbis_comment    vc;
-  ogg_packet        op;
-  ogg_page         *og;
-  int               vorbis_p;
+  ogg_stream_state  _streamState;
+  vorbis_info       _streamInfo;
+  vorbis_dsp_state  _dspState;
+  vorbis_block      _vorbisBlock;
+  vorbis_comment    _streamComments;
+  ogg_packet        _oggPacket;
+  ogg_page         *_oggPage;
+  int               _vorbis_p;
 
-  FILE  *out,
-        *infile;
+  FILE  *_infile;
 
-  bool decodersStarted;
-  bool audiobuf_ready;
+  bool _decodersStarted;
+  bool _audiobuf_ready;
+
+  void InitializeStream (ogg_stream_state &state, vorbis_info &info, vorbis_comment &comments, 
+    FILE *source);
 
 public:
   TheoraAudioMedia (iBase* parent);
