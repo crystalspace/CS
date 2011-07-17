@@ -51,10 +51,11 @@ private:
   ogg_int64_t      _videobuf_granulepos;
   ogg_int64_t      _frameToSkip;
 
+  csRef<iTextureHandle> _texture;
+  csRefArray<iTextureHandle> _buffers;
+
   // these will be private and have getters and setters, but for now, it's faster like this
 public:
-  csRef<iTextureHandle> _texture;
-  csRef<iTextureHandle> _buffer1,_buffer2;
   int activeBuffer;
 
   ogg_stream_state  _streamState;

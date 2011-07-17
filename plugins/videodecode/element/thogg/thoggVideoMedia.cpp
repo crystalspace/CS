@@ -133,9 +133,8 @@ bool TheoraVideoMedia::Update ()
   if (!_videobufReady)
     return true;
 
-  csRef<iTextureHandle> texToWrite = activeBuffer==1 ? _buffer2 : _buffer1;
   size_t dstSize;
-  uint8* pixels = texToWrite->QueryBlitBuffer (_streamInfo.pic_x,_streamInfo.pic_y,_streamInfo.pic_width,_streamInfo.pic_height,dstSize);
+  uint8* pixels = _buffers[activeBuffer]->QueryBlitBuffer (_streamInfo.pic_x,_streamInfo.pic_y,_streamInfo.pic_width,_streamInfo.pic_height,dstSize);
 
   th_ycbcr_buffer yuv;
   th_decode_ycbcr_out(_decodeControl,yuv);
@@ -244,8 +243,7 @@ bool TheoraVideoMedia::Update ()
     return false;
   }
 
-  texToWrite->ApplyBlitBuffer (pixels);
-  //SwapBuffers ();
+  _buffers[activeBuffer]->ApplyBlitBuffer (pixels);
 
   return false;
 }
@@ -330,15 +328,15 @@ long TheoraVideoMedia::SeekPage (long targetFrame,bool return_keyframe, ogg_sync
 
 void TheoraVideoMedia::SwapBuffers()
 {
-  if (activeBuffer==1)
+  if (activeBuffer==0)
   {
-    _texture = _buffer2;
-    activeBuffer = 2;
+    activeBuffer = 1;
+    _texture = _buffers[activeBuffer];
   }
   else
   {
-    _texture = _buffer1;
-    activeBuffer = 1;
+    activeBuffer = 0;
+    _texture = _buffers[activeBuffer];
   }
 }
 
@@ -355,17 +353,25 @@ void TheoraVideoMedia::InitializeStream (ogg_stream_state &state, th_info &info,
   _infile = source;
 
   //create the buffers needed for double buffering
+
+  csRef<iTextureHandle> _buffer1,_buffer2;
+
   csPtr<iTextureHandle> tex1 = texManager->CreateTexture 
     (_streamInfo.frame_width, _streamInfo.frame_height, 0, csimg2D,"rgb8",
     CS_TEXTURE_2D|CS_TEXTURE_NPOTS);
   _buffer1.AttachNew(tex1);
+
+  _buffers.Push (_buffer1);
 
   csPtr<iTextureHandle> tex2 = texManager->CreateTexture 
     (_streamInfo.frame_width, _streamInfo.frame_height,0,csimg2D,"rgb8",
     CS_TEXTURE_2D|CS_TEXTURE_NPOTS);
   _buffer2.AttachNew(tex2);
 
-  _texture = _buffer1;
+  _buffers.Push (_buffer2);
 
-  activeBuffer = 1;
+  activeBuffer = 0;
+
+  _texture = _buffers[activeBuffer];
+
 }
