@@ -35,7 +35,7 @@
 #include <imap/resource.h>
 
 #include "include/wrapjob.h"
-#include <tr1/functional>
+#include <functional>
 
 #include "memcache.h"
 
