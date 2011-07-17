@@ -32,7 +32,6 @@
 
 #include <igraphic/image.h>
 #include <csutil/databuf.h>
-//#include <csgfx/imageautoconvert.h>
 
 #include <ivaria/pmeter.h>
 
@@ -40,8 +39,8 @@
 
 #include <wx/wx.h>
 #include <wx/dnd.h>
-#include <wx/treectrl.h>
 #include <wx/srchctrl.h>
+#include <wx/sizer.h>
 
 #include <wx/mstream.h>
 
@@ -52,7 +51,6 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-
 
 const int ICONSIZE = 128;
 
@@ -68,7 +66,7 @@ END_EVENT_TABLE()
 
 
 DAMNPanel::DAMNPanel (iBase* parent)
- : scfImplementationType (this, parent), sizer(0), listCtrl(0), srchCtrl(0), imageListNormal(0)
+ : scfImplementationType (this, parent), sizer(0), srchCtrl(0), previewList(0)
 {
 }
 
@@ -99,30 +97,28 @@ bool DAMNPanel::Initialize (iObjectRegistry* obj_reg)
   abs->AddAbstraction("mesh", "format=application/x-crystalspace.library%2Bxml");
 
   // Create the panel
-  Create (editor->GetWindow (), -1, wxPoint (0, 0), wxSize (250, 250));
+  Create (editor->GetWindow (), -1, wxPoint (0, 0), wxSize (ICONSIZE*2, 250));
 
   // Add it to the panel manager
   panelManager->AddPanel (this);
   
+  wxBoxSizer* box = new wxBoxSizer(wxVERTICAL);
+  SetSizer(box);
  
   srchCtrl = new wxSearchCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxSize(250, -1), 0);
   srchCtrl->ShowCancelButton(true);
   
   this->Connect(srchCtrl->GetId(), wxEVT_COMMAND_SEARCHCTRL_SEARCH_BTN, wxCommandEventHandler(DAMNPanel::OnSearchButton), 0, this);
   this->Connect(srchCtrl->GetId(), wxEVT_COMMAND_SEARCHCTRL_CANCEL_BTN, wxCommandEventHandler(DAMNPanel::OnCancelButton), 0, this);
- 
-  listCtrl = new wxListCtrl(this, wxID_ANY, wxDefaultPosition,  wxSize(250, 250), wxLC_ICON | wxSUNKEN_BORDER | wxLC_SINGLE_SEL /*| wxLC_ALIGN_TOP*/);
+  box->Add(srchCtrl, 0, wxTOP|wxEXPAND, 0);
   
   
-  sizer = new wxBoxSizer(wxVERTICAL);
-  sizer->Add(srchCtrl, 0, wxTOP|wxEXPAND, 0);
-  sizer->Add(listCtrl, 1,  wxALL|wxEXPAND, 0);
-  SetSizer(sizer);
+  previewList = new wxScrolledWindow(this);
+  previewList->SetScrollbars(0, 1, 0, 0);
+  box->Add(previewList, 1, wxALL|wxEXPAND, 0);
   
-  imageListNormal = new wxImageList(ICONSIZE, ICONSIZE, true);
-  
-  listCtrl->SetImageList(imageListNormal, wxIMAGE_LIST_NORMAL);
-
+  sizer = new wxGridSizer(1, 2, 0, 0);
+  previewList->SetSizer(sizer);
     
   return true;
 }
@@ -152,7 +148,10 @@ void DAMNPanel::OnSize (wxSizeEvent& event)
   /*if (listCtrl)
     listCtrl->SetSize (event.GetSize());*/
   if (sizer)
-    sizer->SetMinSize (event.GetSize());
+  {
+    //TODO: this should really be in the previewList::OnSize
+    sizer->SetCols(std::max(1, event.GetSize().GetWidth()/128));
+  }
   event.Skip();
 }
 
@@ -167,35 +166,9 @@ void DAMNPanel::OnLoaded (iLoadingResource* resource)
       subName =  found->second;
     }
     
-    size_t width = image->GetWidth (); 
-    size_t height = image->GetHeight (); 
-    size_t total = width * height;
-    
-    bool alphac = true;
-    int channels = 4;
- 
-    wxImage wximage(width, height);
-
-    unsigned char* rgb = 0;
-    unsigned char* alpha = 0;
-    rgb = (unsigned char*) malloc (total * 3); //Memory owned and free()d by wxImage
-    if (alphac)
-      alpha = (unsigned char*) malloc (total); //Memory owned and free()d by wxImage
-    unsigned char* source = (unsigned char*)image->GetImageData();
-    for (size_t i = 0; i < total; i++)
-    {
-      rgb[3*i] = source[channels*i];
-      rgb[(3*i)+1] = source[(channels*i)+1];
-      rgb[(3*i)+2] = source[(channels*i)+2];
-      if (alphac)
-        alpha[i] = source[(channels*i)+3];
-    }
-    wximage.SetData(rgb);
-    if (alphac) wximage.SetAlpha(alpha);
-
-    imageListNormal->Add(wxBitmap(wximage));
-    listCtrl->InsertItem(current, wxString(subName.c_str(), wxConvUTF8), current);
-    current++;
+    Preview* preview = new Preview(previewList, image, subName);
+    sizer->Add(preview, 1, wxSHAPED);
+    previewList->FitInside();
   }
   meter->Step();
   if (meter->GetCurrent () == meter->GetTotal ())
@@ -208,11 +181,8 @@ void DAMNPanel::OnSearchButton (wxCommandEvent& event)
   std::string searchTerm((const char*)srchCtrl->GetValue().mb_str());
   
   if (searchTerm == "") searchTerm = "shield";
-  
-  current = 0;
-  listCtrl->DeleteAllItems();
-  imageListNormal->RemoveAll();
-  
+
+  sizer->Clear();
   SearchResults::const_iterator it = searchResults.begin();
   for(; it != searchResults.end();it++)
   {
@@ -277,6 +247,61 @@ void DAMNPanel::OnCancelButton (wxCommandEvent& event)
 
 // ----------------------------------------------------------------------------
 
+Preview::Preview(wxWindow* parent, csRef<iImage> image, const std::string& label) : wxPanel(parent), bitmapBtn(0), text(0), sizer(0)
+{
+  size_t width = image->GetWidth (); 
+  size_t height = image->GetHeight (); 
+  size_t total = width * height;
+  
+  bool alphac = true;
+  int channels = 4;
 
+  wxImage wximage = wxImage(width, height, false);
+
+  unsigned char* rgb = 0;
+  unsigned char* alpha = 0;
+  rgb = (unsigned char*) malloc (total * 3); //Memory owned and free()d by wxImage
+  if (alphac)
+    alpha = (unsigned char*) malloc (total); //Memory owned and free()d by wxImage
+  unsigned char* source = (unsigned char*)image->GetImageData();
+  for (size_t i = 0; i < total; i++)
+  {
+    rgb[3*i] = source[channels*i];
+    rgb[(3*i)+1] = source[(channels*i)+1];
+    rgb[(3*i)+2] = source[(channels*i)+2];
+    if (alphac)
+      alpha[i] = source[(channels*i)+3];
+  }
+  wximage.SetData(rgb);
+  if (alphac) wximage.SetAlpha(alpha);
+  
+  sizer = new wxBoxSizer(wxVERTICAL);
+  bitmapBtn = new wxBitmapButton(this, -1, wxBitmap(wximage), wxDefaultPosition, wxSize(ICONSIZE,ICONSIZE));
+  
+  sizer->Add(bitmapBtn, 1, wxEXPAND | wxALL, 3);
+  
+  text = new wxStaticText(this, wxID_ANY, wxString(label.c_str(), wxConvUTF8));
+  sizer->Add(text, 0, wxALIGN_CENTRE | wxALL, 3);
+  SetSizer(sizer);
+  sizer->SetSizeHints(this);
+  this->Connect(bitmapBtn->GetId(), wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(Preview::OnClicked), 0, this);
+  this->Connect(this->GetId(), wxEVT_SIZE, wxSizeEventHandler(Preview::OnSize), 0, this);
+}
+
+void Preview::OnClicked (wxCommandEvent& event)
+{
+  printf("OnClicked\n");
+}
+
+void Preview::OnSize (wxSizeEvent& event)
+{
+/*
+  printf("Preview::OnSize %d - %d\n", event.GetSize().GetWidth(), event.GetSize().GetHeight());
+  bitmapBtn->SetSize (event.GetSize());
+  event.Skip();
+*/
+}
+
+  // ----------------------------------------------------------------------------
 }
 CS_PLUGIN_NAMESPACE_END(CSE)

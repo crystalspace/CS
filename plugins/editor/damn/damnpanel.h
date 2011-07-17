@@ -32,9 +32,7 @@
 
 #include <wx/event.h>
 #include <wx/panel.h>
-#include <wx/treectrl.h>
-#include <wx/imaglist.h>
-#include <wx/listctrl.h>
+
 
 #include <map>
 
@@ -68,11 +66,9 @@ public:
 private:
   iObjectRegistry* object_reg;
   
-  wxSizer* sizer;
-  wxListCtrl* listCtrl;
+  wxGridSizer* sizer;
   wxSearchCtrl* srchCtrl;
-  
-  wxImageList* imageListNormal;
+  wxScrolledWindow* previewList;
 
   csRef<iEditor> editor;
   csRef<iPanelManager> panelManager;
@@ -90,6 +86,18 @@ private:
   void OnCancelButton (wxCommandEvent& event);
   
   DECLARE_EVENT_TABLE()
+};
+
+class Preview : public wxPanel
+{
+  wxImage wximage;
+  wxBitmapButton* bitmapBtn;
+  wxStaticText* text;
+  wxBoxSizer* sizer;
+public:
+  Preview(wxWindow* parent, csRef<iImage> image, const std::string& label);
+  void OnClicked (wxCommandEvent& event);
+  void OnSize (wxSizeEvent& event);
 };
 
 }
