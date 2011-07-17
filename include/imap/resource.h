@@ -24,13 +24,21 @@
 #include "iutil/document.h"
 #include "iutil/strset.h"
 
+namespace CS
+{
+  namespace Resource
+  {
+    typedef size_t TypeID;
+  }
+}
+
 struct ResourceReference
 {
-  // Resource type name.
-  csString type;
-
-  // Resource unique ID.
+  // Resource name (unique within a type).
   csString id;
+
+  // Resource type ID.
+  CS::Resource::TypeID typeID;
 
   // The property that refers to this resource.
   csStringID property;
@@ -39,6 +47,8 @@ struct ResourceReference
 struct iResource : public virtual iBase
 {
   SCF_INTERFACE(iResource, 1, 0, 0);
+
+  virtual const CS::Resource::TypeID GetTypeID () const = 0;
 
   virtual const csArray<ResourceReference>& GetDependencies () const = 0;
 
@@ -59,7 +69,7 @@ struct iResourceLoader : public virtual iBase
    * Loads a resource from a data buffer.
    * Returns an invalid object on failure.
    */
-  virtual csPtr<iResource> Load (iDataBuffer* buf) = 0;
+  virtual csPtr<iResource> Load (CS::Resource::TypeID typeID, iDataBuffer* buf) = 0;
 };
 
 struct iResourceSaver : public virtual iBase
@@ -121,21 +131,24 @@ struct iResourceCache : public virtual iBase
   
   /**
    * Add a given resource to the cache.
+   * @param typeID The resource type ID.
    * @param name The resource name.
    */
-  virtual void Add (const char* type, const char* name, iLoadingResource* resource) = 0;
+  virtual void Add (CS::Resource::TypeID typeID, const char* name, iLoadingResource* resource) = 0;
 
   /**
    * Get a Resource by name.
+   * @param typeID The resource type ID.
    * @param name The resource name.
    */
-  virtual csRef<iLoadingResource> Get (const char* type, const char* name) = 0;
+  virtual csRef<iLoadingResource> Get (CS::Resource::TypeID typeID, const char* name) = 0;
 
   /**
    * Mark a resource as a candidate for removal.
+   * @param typeID The resource type ID.
    * @param name The resource name.
    */
-  virtual void Release (const char* type, const char* name) = 0;
+  virtual void Release (CS::Resource::TypeID typeID, const char* name) = 0;
 };
 
 /**
@@ -148,9 +161,10 @@ struct iResourceManager : public virtual iBase
   /**
    * Get a Resource by name.
    * Begins loading the resource if not already loading or loaded.
+   * @param typeID The resource type ID.
    * @param name The resource name.
    */
-  virtual csRef<iLoadingResource> Get (const char* type, const char* name) = 0;
+  virtual csRef<iLoadingResource> Get (CS::Resource::TypeID typeID, const char* name) = 0;
   
   /**
    * Add a given resource to the manager.

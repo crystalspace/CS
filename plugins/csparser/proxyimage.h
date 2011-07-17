@@ -28,7 +28,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
   class ProxyImage :
     public scfImplementation2<ProxyImage, iImage, scfFakeInterface<iResource> >,
-    CS::Resource::NoDepResource    
+    CS::Resource::NoDepResource
   {
     csString filename;
     
@@ -89,6 +89,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     { return GetProxiedImage()->GetCookedImageFormat (); }
     csRef<iDataBuffer> GetCookedImageData()
     { return GetProxiedImage()->GetCookedImageData (); }
+
+    //// iResource //// 
+    virtual const CS::Resource::TypeID GetTypeID () const
+    {
+      return CS::Resource::HashID ("image");
+    }
   };
 }
 CS_PLUGIN_NAMESPACE_END(csparser)

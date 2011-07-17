@@ -45,7 +45,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 
     //// iResourceLoader ////
     virtual csPtr<iResource> Load (iDocumentNode* node);
-    virtual csPtr<iResource> Load (iDataBuffer* node);
+    virtual csPtr<iResource> Load (CS::Resource::TypeID typeID, iDataBuffer* node);
 
     //// iResourceSaver ////
     virtual bool Save (iResource* resource, iDocumentNode* node);

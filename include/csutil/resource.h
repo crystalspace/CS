@@ -22,11 +22,39 @@
 #include "imap/resource.h"
 
 #include "csutil/threading/future.h"
+#include "csutil/scf_implementation.h"
 
 namespace CS
 {
   namespace Resource
   {
+    template<size_t N, size_t I = 0>
+    struct HashIDCalc
+    {
+      CS_FORCEINLINE_TEMPLATEMETHOD
+      static TypeID hash (const char (&s)[N])
+      {
+        return (HashIDCalc<N, I+1>::hash (s) ^ s[I]) * 16777619u;
+      }
+    };
+
+    template<size_t N>
+    struct HashIDCalc<N, N>
+    {
+      CS_FORCEINLINE_TEMPLATEMETHOD
+      static TypeID hash (const char (&s)[N])
+      {
+        return 2166136261u;
+      }
+    };
+
+    template<size_t N>
+    CS_FORCEINLINE_TEMPLATEMETHOD
+    TypeID HashID (const char (&s)[N])
+    {
+      return HashIDCalc<N>::hash (s);
+    }
+
     /**
      * Class which can be inherited by resources with
      * no resource dependencies.

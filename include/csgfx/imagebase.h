@@ -94,6 +94,12 @@ public:
 
   const char* GetCookedImageFormat () { return GetRawFormat(); }
   csRef<iDataBuffer> GetCookedImageData () { return GetCookedImageData(); }
+
+  //// iResource //// 
+  virtual const CS::Resource::TypeID GetTypeID () const
+  {
+    return CS::Resource::HashID ("image");
+  }
 };
 
 /** @} */

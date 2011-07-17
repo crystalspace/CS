@@ -50,8 +50,8 @@ namespace CS
         /**
          * <resourcehandlers>
          *   <resourcehandler classID="crystalspace.blah.foo.bar">
-         *     <resource-node>foo</resource-node>
-         *     <resource-node>bar</resource-node>
+         *     <resourcetype>foo</resourcetype>
+         *     <resourcetype>bar</resourcetype>
          *   </resourcehandler>
          * </resourcehandlers>
          */
@@ -83,13 +83,12 @@ namespace CS
           if (!plugin.IsValid ())
             return false;
 
-          // Register each plugin-name pair.
-          csRef<iDocumentNodeIterator> resourceNodes = resourceHandlerNode->GetNodes ("resource-node");
+          // Register each plugin-TypeID pair.
+          csRef<iDocumentNodeIterator> resourceNodes = resourceHandlerNode->GetNodes ("resourcetype");
           while (resourceNodes->HasNext ())
           {
             csRef<iDocumentNode> resourceNode = resourceNodes->Next ();
-
-            Register (plugin, resourceNode->GetContentsValue ());
+            Register (plugin, CS::Resource::HashID (resourceNode->GetContentsValue ()));
           }
         }
 
@@ -98,59 +97,37 @@ namespace CS
 
       /**
        * Registers a plugin with the mapper from a plugin classID
-       * and name.
+       * and resource TypeID.
        */
-      bool Register (const char* classID, const char* name)
+      bool Register (const char* classID, CS::Resource::TypeID typeID)
       {
         // Load this plugin if not already loaded.
         csRef<PluginType> loadable = csLoadPluginCheck<PluginType> (pluginManager, classID);
         if (!loadable.IsValid ())
           return false;
 
-        // Register the loadable-tag pair.
-        Register (loadable, name);
+        // Register the plugin-typeID pair.
+        Register (loadable, typeID);
       }
 
       /**
-      * Registers a plugin with the mapper from a plugin classID
-      * and an array of names.
-      */
-      bool Register (const char* classID, const iStringArray* names)
-      {
-        // Load this plugin if not already loaded.
-        csRef<PluginType> loadable = csLoadPluginCheck<PluginType> (pluginManager, classID);
-        if (!loadable.IsValid ())
-          return false;
-
-        // Register each loadable-tag pair.
-        for (size_t i = 0; i < names->GetSize (); ++i)
-        {
-          Register (loadable, names->Get (i));
-        }
-      }
-
-      /**
-       * Finds the appropriate plugin for the specified name.
+       * Finds the appropriate plugin for the specified resource TypeID.
        * Returns nullptr if none found.
        */
-      PluginType* GetLoadable (const char* name)
+      PluginType* GetLoadable (CS::Resource::TypeID typeID)
       {
-        csStringID id = stringHash.Request (name);
-        csRef<PluginType> plugin = plugins.Get (id, csRef<PluginType> ());
+        csRef<PluginType> plugin = plugins.Get (typeID, csRef<PluginType> ());
         return plugin;
       }
 
     protected:
       /**
-       * Registers a name with a plugin.
+       * Registers a resource TypeID with a plugin.
        */
-      void Register (PluginType* plugin, const char* name)
+      void Register (PluginType* plugin, CS::Resource::TypeID typeID)
       {
-        // Get the string ID for this tag.
-        csStringID id = stringHash.Request (name);
-
         // Add to the hash.
-        plugins.Put (id, plugin);
+        plugins.Put (typeID, plugin);
       }
 
     private:
@@ -160,11 +137,8 @@ namespace CS
       // Plugin manager for plugin lookups/loading.
       csRef<iPluginManager> pluginManager;
 
-      // Provides string-id lookups.
-      csStringHash stringHash;
-
       // Maps a stringID tag to a plugin.
-      csHash<csRef<PluginType>, csStringID> plugins;
+      csHash<csRef<PluginType>, CS::Resource::TypeID> plugins;
     };
 
     typedef Mapper<iResourceLoader> LoaderMapper;

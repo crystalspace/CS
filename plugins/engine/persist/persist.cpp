@@ -18,10 +18,13 @@
 
 #include "cssysdef.h"
 
+#include "csutil/resource.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 
 #include "persist.h"
+
+using namespace CS;
 
 CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 {
@@ -56,33 +59,38 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 
   csPtr<iResource> Persist::Load (iDocumentNode* node)
   {
-    csRef<iResource> r;
+    Resource::TypeID typeID = Resource::HashID (node->GetContentsValue ());
 
-    if (r = LoadImage (node)) return csPtr<iResource> (r);
+    if (typeID == Resource::HashID ("image"))
+      return csPtr<iResource> (LoadImage (node));
 
     return 0;
   }
 
-  csPtr<iResource> Persist::Load (iDataBuffer* buf)
+  csPtr<iResource> Persist::Load (Resource::TypeID typeID, iDataBuffer* buf)
   {
-    csRef<iResource> r;
-
-    if (r = LoadImage (buf)) return csPtr<iResource> (r);
+    if (typeID == Resource::HashID ("image"))
+      return csPtr<iResource> (LoadImage (buf));
 
     return 0;
   }
 
   bool Persist::Save (iResource* resource, iDocumentNode* node)
   {
-    if (SaveImage (resource, node)) return true;
+    Resource::TypeID typeID = resource->GetTypeID ();
+
+    if (typeID == Resource::HashID ("image"))
+      return SaveImage (resource, node);
+
     return false;
   }
 
   csPtr<iDataBuffer> Persist::Save (iResource* resource)
   {
-    csRef<iDataBuffer> db;
+    Resource::TypeID typeID = resource->GetTypeID ();
 
-    if (db = SaveImage (resource)) return csPtr<iDataBuffer> (db);
+    if (typeID == Resource::HashID ("image"))
+      return SaveImage (resource);
 
     return 0;
   }

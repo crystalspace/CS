@@ -31,14 +31,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
      * <image>/path/to/image</image>
      */
 
-    // Sanity check.
-    if (strcmp (node->GetValue (), "image") != 0)
-    {
-      csReport (objectReg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.engine.persist",
-        "Invalid document node passed to 'LoadImage' - missing 'image' root node!");
-      return 0;
-    }
-
     // Load the file.
     const char* filePath = node->GetContentsValue ();
     csRef<iDataBuffer> dataBuffer = vfs->ReadFile (filePath, false);
