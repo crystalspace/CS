@@ -25,7 +25,7 @@
       <?Include /shader-snippets/lighting/lighting-tools.inc ?>
       
       <?Generate L 0 63?>
-	<texture name="light shadow map[$L$]" destination="lightPropsOM.opacityMap[$L$]"
+	<texture name="light osm[$L$]" destination="lightPropsOM.opacityMap[$L$]"
 		comparemode="rToTexture" comparefunc="lequal" />
       <?Endgenerate?>
       <texture name="tex shadow noise" destination="lightPropsSM.shadowMapNoise" />
