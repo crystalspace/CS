@@ -86,6 +86,7 @@ namespace CS
             csRef<csShaderVariable> splitDistsSV;
           };
 
+          csRef<csShaderVariable> depthSV;
           csRef<csShaderVariable> textureSV[rtaNumAttachments];
           csRef<csShaderVariable> shadowMapProjectSV;
           Frustum* frustums;
@@ -163,6 +164,9 @@ namespace CS
 
             superFrustum.numSplitsSV = lightVarsHelper.CreateTempSV (
               viewSetup.persist.numSplitsSVName);
+
+            superFrustum.depthSV =
+              lightVarsHelper.CreateTempSV(viewSetup.persist.depthSVName);
 
             for (int i = 0; i < superFrustum.actualNumParts; i++)
             {
@@ -317,6 +321,8 @@ namespace CS
 
           typename RenderTree::ContextNode& context = meshNode->GetOwner();
           CS::RenderManager::RenderView* rview = context.renderView;
+          PersistentData& persist = viewSetup.persist;
+          SingleRenderLayer& layerConfig = viewSetup.depthRenderLayer;
 
           float _near = FLT_MAX;
           float _far = FLT_MIN;
@@ -332,8 +338,8 @@ namespace CS
 
           AddShadowMapTarget(meshNode, renderTree, light, viewSetup, matrix);
 
-          PersistentData& persist = viewSetup.persist;
-          SingleRenderLayer& layerConfig = viewSetup.depthRenderLayer;
+          persist.osmShader->GetVariableAdd(persist.depthSVName)
+            ->SetValue(persist.depth);
 
           int shadowMapSize = persist.shadowMapRes;
 
@@ -366,6 +372,8 @@ namespace CS
               superFrust.textureSV[rtaColor0 + attachments]->SetValue (tex);
             }
 
+            superFrust.depthSV->SetValue(persist.depth);
+
             csRef<CS::RenderManager::RenderView> newRenderView;
             newRenderView = 
               renderTree.GetPersistentData().renderViews.CreateRenderView ();
@@ -379,6 +387,9 @@ namespace CS
                 superFrust.shadowMapProjectSV->GetArrayElement (i);
               item->SetValue (matrix.Row (i));
             }
+
+            // pass the matrix to the shader that generates OSMs
+            persist.osmShader->AddVariable(superFrust.shadowMapProjectSV);
 
             csRef<iCustomMatrixCamera> shadowViewCam =
               newRenderView->GetEngine()->CreateCustomMatrixCamera();
@@ -463,7 +474,7 @@ namespace CS
 
             renderTree.AddDebugTexture (persist.depth);
             // register SVs
-            shadowMapCtx->renderTargets[rtaDepth].texHandle = persist.depth;
+            shadowMapCtx->renderTargets[rtaColor0].texHandle = persist.depth;
             shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
 
             SingleRenderLayer layerConfig(persist.shadowShaderType, 
@@ -564,6 +575,7 @@ namespace CS
         CS::ShaderVarStringID passColorSVName;
         CS::ShaderVarStringID mrtSVName;
         CS::ShaderVarStringID osmSVName;
+        CS::ShaderVarStringID depthSVName;        
         /// Shader for rendering to OSM
         csRef<iShader> osmShader;
         /// Shader type for rendering to OSM
@@ -604,6 +616,7 @@ namespace CS
           passColorSVName = strings->Request ("pass color");
           mrtSVName = strings->Request ("mrt");
           osmSVName = strings->Request("light osm");
+          depthSVName = strings->Request("light shadow map");
 
           csConfigAccess cfg (objectReg);
           shadowMapRes = 512;
@@ -616,14 +629,13 @@ namespace CS
 
           osmShader = loader->LoadShader ("/shader/shadow/shadow_osm.xml");
           osmShaderType = strings->Request ("osm");
-          shadowShader = loader->LoadShader ("/shader/shadow/shadow_depth.xml");
+          shadowShader = loader->LoadShader ("/shader/shadow/shadow_vsm.xml");
           shadowShaderType = strings->Request ("shadow");
 
           numSplits = 4 * mrt;
 
           depth = g3d->GetTextureManager()-> CreateTexture(shadowMapRes, 
-            shadowMapRes, csimg2D, "d32", CS_TEXTURE_3D | CS_TEXTURE_CLAMP |
-            CS_TEXTURE_NOMIPMAPS);
+            shadowMapRes, csimg2D, "abgr32_f", CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
 
           for (int i = 0 ; i < mrt ; i ++)
           {
@@ -633,7 +645,7 @@ namespace CS
             texs.Push(tex);
           }
 
-          osmShader->GetVariableAdd(numSplitsSVName)-> SetValue(numSplits);
+          osmShader->GetVariableAdd(numSplitsSVName)->SetValue(numSplits);
 
           // pass mrt number to shader
           csShaderVariable* mrtVar = new csShaderVariable(mrtSVName); 
@@ -684,6 +696,9 @@ namespace CS
           lightVarsHelper.MergeAsArrayItem(lightStacks[0],
             lightFrustum.splitDistsSV, 8 * lightNum + f);
         }
+
+        lightVarsHelper.MergeAsArrayItem (lightStacks[0],
+          superFrust.depthSV, lightNum);
 
         superFrust.numSplitsSV->SetValue(viewSetup.persist.numSplits);
 

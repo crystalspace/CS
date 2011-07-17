@@ -28,7 +28,10 @@
 	<texture name="light osm[$L$]" destination="lightPropsOM.opacityMap[$L$]"
 		comparemode="rToTexture" comparefunc="lequal" />
       <?Endgenerate?>
-      <texture name="tex shadow noise" destination="lightPropsSM.shadowMapNoise" />
+      <?Generate L 0 7?>
+	<texture name="light shadow map[$L$]" destination="lightPropsOM.shadowMap[$L$]"
+		comparemode="rToTexture" comparefunc="lequal" />
+      <?Endgenerate?>
     </block>
     
     <block location="cg:variablemap">

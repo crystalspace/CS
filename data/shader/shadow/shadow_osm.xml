@@ -24,6 +24,7 @@
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       <mixmode><add/></mixmode>
       <texture name="tex diffuse" destination="TexDiffuse" />
+      <texture name="light shadow map" destination="DepthMap" />
       <vp plugin="glcg">
         <cgvp>
           <program>
@@ -58,11 +59,13 @@
         <variablemap variable="pass color" destination="passColor" />
         <variablemap variable="light numSplits" destination="numSplits" />        
         <variablemap variable="mrt" destination="mrt" />        
-          <program>
+        <variablemap variable="light shadow map projection" destination="projection" />   
+        <program>
           <![CDATA[
           float passColor[64];
           int numSplits;
           int mrt;
+          float4x4 projection;
           struct vertex2fragment {
             float4 Hposition : POSITION;
             float2 TexCoord : TEXCOORD0;
@@ -90,12 +93,38 @@
           <![CDATA[               
           };
           fragmentOutput main (vertex2fragment IN,
-            uniform sampler2D TexDiffuse)
+            uniform sampler2D TexDiffuse,
+            uniform sampler2D DepthMap)
           {
             fragmentOutput output;
             float4 surface = tex2D (TexDiffuse, IN.TexCoord);
             
             float value = surface.a;
+
+            // compute the projection for the depth map
+            float4x4 flipY;
+            flipY[0] = float4 (1, 0, 0, 0);
+            flipY[1] = float4 (0, -1, 0, 0);
+            flipY[2] = float4 (0, 0, 1, 0);
+            flipY[3] = float4 (0, 0, 0, 1);
+            float4x4 proj = mul (flipY, projection);
+            float4 shadowMapCoords = mul (proj, IN.position_camera);            
+            float4 shadowMapCoordsProj = shadowMapCoords;
+            shadowMapCoordsProj.xyz /= shadowMapCoordsProj.w;                
+            float3 shadowMapCoordsBiased = (float3(0.5)*shadowMapCoordsProj.xyz) 
+              + float3(0.5);
+            float2 position = shadowMapCoordsBiased.xy;
+            
+            float compareDepth = (shadowMapCoordsBiased.z);
+            float depth = tex2D(DepthMap, position).x;
+    
+            if (position.x < 0 || position.y < 0 || position.x > 1 || position.y > 1)
+              depth = 0;    
+    
+//            int i = (abs(depth) - abs(compareDepth)) * 32;
+            
+            if (projection[0][0] == 0)
+              mrt = 1;              
               
             int i;
             for (i = 0 ; i < numSplits ; i ++)
@@ -105,7 +134,7 @@
             int index = i % 4;
             float4 color = value;
             color = color * float4(index < 1, index < 2, index < 3, 1);
-
+            
             // write in the correct render target
             int renderTarget = (i / 4) % mrt;
             

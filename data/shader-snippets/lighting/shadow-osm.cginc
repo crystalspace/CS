@@ -115,7 +115,22 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     int numSplits = lightPropsOM.opacityMapNumSplits[lightNum];
     float previousSplit, nextSplit;
   
+    float3 shadowMapCoordsBiased = (float3(0.5)*shadowMapCoordsProj.xyz) + float3(0.5);
+    float2 position = shadowMapCoordsBiased.xy;
+   
     int i;
+/*
+    float compareDepth = (1 - shadowMapCoordsBiased.z);
+    float depth = tex2D(lightPropsOM.shadowMap[lightNum], position).x;
+
+    if (position.x < 0 || position.y < 0 || position.x > 1 || position.y > 1)
+      depth = 1;    
+
+    //i = (abs(depth) - abs(compareDepth)) * 32;   
+    //previousSplit = i * 0.05;
+    //nextSplit = (i + 1) * 0.05;    
+
+*/
     for (i = 0 ; i < numSplits ; i ++)
     {
       previousSplit = lightPropsOM.splitDists[8 * lightNum + i];
@@ -127,9 +142,6 @@ struct ShadowShadowMapDepth : ShadowShadowMap
       previousSplit = nextSplit;
     }
 
-    float3 shadowMapCoordsBiased = (float3(0.5)*shadowMapCoordsProj.xyz) + float3(0.5);
-    float2 position = shadowMapCoordsBiased.xy;
-    
     float previousMap = 0, nextMap = 0;
     
     int prevIndex = min((i / 4), numSplits - 1);
@@ -148,12 +160,17 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     
     inLight = lerp(previousMap, nextMap, (float) (distance - previousSplit) 
       / (nextSplit - previousSplit) );
+    //inLight = nextMap;
       
     inLight = inLight * (i != numSplits - 1) + previousMap * (i == numSplits - 1);
     inLight = exp(-1.0 * inLight);
-      
-    //inLight = (float)i / (numSplits - 1);   
-      
+/*   
+    inLight = 1;
+    if ((compareDepth) > (depth)) 
+      inLight = 0;
+inLight = 1 - tex2D(lightPropsOM.shadowMap[lightNum], float3(position, compareDepth)).x;
+*/
+    //inLight = 1 - ((float)i / (numSplits - 1));
     return inLight;
   }
 };
