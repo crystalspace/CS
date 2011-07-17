@@ -54,10 +54,9 @@ private:
   csRef<iTextureHandle> _texture;
   csRefArray<iTextureHandle> _buffers;
 
-  // these will be private and have getters and setters, but for now, it's faster like this
-public:
   int activeBuffer;
 
+  // Theora-related stuff
   ogg_stream_state  _streamState;
   th_info           _streamInfo;
   th_comment        _streamComments;
@@ -65,11 +64,24 @@ public:
   ogg_packet        _oggPacket;
   th_setup_info    *_setupInfo;
   int               _theora_p;
-  FILE    *_infile;
+  FILE              *_infile;
+
   bool    _decodersStarted;
   bool    _videobufReady;
   double  _videobufTime;
 
+public:
+
+  // Provide access to the Theora specific members
+  // Inline because it's faster, although a bit slow
+  inline ogg_stream_state* StreamState()     { return &_streamState; }
+  inline th_info*          StreamInfo()      { return &_streamInfo; }
+  inline th_comment*       StreamComments()  { return &_streamComments; }
+  inline th_dec_ctx *      DecodeControl()   { return _decodeControl; }
+  inline th_setup_info**   SetupInfo()       { return &_setupInfo; }
+  inline int&              Theora_p()        { return _theora_p; }
+
+  // An easy way to initialize the stream
   void InitializeStream (ogg_stream_state &state, th_info &info, th_comment &comments, th_setup_info *setupInfo,
     FILE *source, csRef<iTextureManager> texManager);
 

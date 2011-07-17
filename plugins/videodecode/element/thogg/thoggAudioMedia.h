@@ -47,21 +47,30 @@ private:
   csRef<iSndSysStream>	_stream;
   float                 length;
 
-public:
   ogg_stream_state  _streamState;
   vorbis_info       _streamInfo;
   vorbis_dsp_state  _dspState;
   vorbis_block      _vorbisBlock;
   vorbis_comment    _streamComments;
   ogg_packet        _oggPacket;
-  ogg_page         *_oggPage;
+  ogg_page          *_oggPage;
   int               _vorbis_p;
+  FILE              *_infile;
+  bool              _decodersStarted;
+  bool              _audiobuf_ready;
+  
+public:
+  
+  // Provide access to the Vorbis specific members
+  // Inline because it's faster, although a bit slow
+  inline ogg_stream_state*   StreamState()    { return &_streamState; }
+  inline vorbis_info*        StreamInfo()     { return &_streamInfo; }
+  inline vorbis_dsp_state*   DspState()       { return &_dspState; }
+  inline vorbis_block*       VorbisBlock()    { return &_vorbisBlock; }
+  inline vorbis_comment*     StreamComments() { return &_streamComments; }
+  inline int&                Vorbis_p()       { return _vorbis_p; }
 
-  FILE  *_infile;
-
-  bool _decodersStarted;
-  bool _audiobuf_ready;
-
+  // An easy way to initialize the stream
   void InitializeStream (ogg_stream_state &state, vorbis_info &info, vorbis_comment &comments, 
     FILE *source);
 

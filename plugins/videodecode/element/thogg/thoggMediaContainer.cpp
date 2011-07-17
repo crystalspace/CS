@@ -167,7 +167,7 @@ void TheoraMediaContainer::QueuePage (ogg_page *page)
         { 
           csRef<TheoraVideoMedia> buff = static_cast<TheoraVideoMedia*> ( (iVideoMedia*)media);
 
-          ogg_stream_pagein (& buff->_streamState ,page);
+          ogg_stream_pagein ( buff->StreamState() ,page);
         }
       }
       else if (strcmp (media[i]->GetType (),"TheoraAudio")==0)
@@ -177,7 +177,7 @@ void TheoraMediaContainer::QueuePage (ogg_page *page)
         { 
           csRef<TheoraAudioMedia> buff = static_cast<TheoraAudioMedia*>((iAudioMedia*)media);
 
-          ogg_stream_pagein (& buff->_streamState ,page);
+          ogg_stream_pagein ( buff->StreamState () ,page);
         }
       }
     }
@@ -188,12 +188,12 @@ void TheoraMediaContainer::QueuePage (ogg_page *page)
   {
     if(_activeTheoraStream.IsValid ())
     {
-      ogg_stream_pagein (& _activeTheoraStream->_streamState ,page);
+      ogg_stream_pagein ( _activeTheoraStream->StreamState () ,page);
     }
 
     if(_activeVorbisStream.IsValid ())
     {
-      ogg_stream_pagein (& _activeVorbisStream->_streamState ,page);
+      ogg_stream_pagein ( _activeVorbisStream->StreamState () ,page);
     }
   }
 }
@@ -254,7 +254,7 @@ void TheoraMediaContainer::DoSeek ()
   float time= ((float) targetFrame/_activeTheoraStream->GetFrameCount ()) *_activeTheoraStream->GetLength ();
   
   if(_activeVorbisStream.IsValid ())
-    _activeVorbisStream->Seek (time,&_syncState,&_oggPage,&_activeTheoraStream->_streamState);
+    _activeVorbisStream->Seek (time,&_syncState,&_oggPage, _activeTheoraStream->StreamState());
 }
 
 void TheoraMediaContainer::AutoActivateStreams ()
