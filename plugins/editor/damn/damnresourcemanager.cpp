@@ -121,7 +121,7 @@ void DAMNResourceManager::ToBeProccessed (csRef<iLoadingResource> res)
   toBeProccessed.Push(res);
 }
 
-csRef<iLoadingResource> DAMNResourceManager::Get (const char* type, const char* name)
+csRef<iLoadingResource> DAMNResourceManager::Get (CS::Resource::TypeID type, const char* name)
 {
   csRef<iLoadingResource> res = cache->Get(type, name);
   if (!res.IsValid())
@@ -129,9 +129,11 @@ csRef<iLoadingResource> DAMNResourceManager::Get (const char* type, const char* 
     using namespace CS::Threading;
     using namespace std::tr1;
     
-    std::string id(name);
-    std::string format = GetFormat(type);
-    Future<csRef<iResource> > job = Queue(bind(&DAMNResourceManager::_Get, this, id, format));
+    std::string id;
+    std::string format;
+    SplitName(name, id, format);
+    format = GetFormat(format.c_str());
+    Future<csRef<iResource> > job = Queue(bind(&DAMNResourceManager::_Get, this, type, id, format));
     
     res.AttachNew(new CS::Resource::LoadingResource(job));
     
@@ -145,12 +147,12 @@ csRef<iLoadingResource> DAMNResourceManager::Get (const char* type, const char* 
 }
 
 
-csRef<iResource> DAMNResourceManager::_Get (std::string id, std::string format)
+csRef<iResource> DAMNResourceManager::_Get (CS::Resource::TypeID type, std::string id, std::string format)
 {
   csRef<iDataBuffer> data = _GetData(id, format);
   csRef<iResource> image;
   if (data)
-    image = loader->Load (data);
+    image = loader->Load (type, data);
   return image;
 }
 
@@ -247,14 +249,14 @@ void DAMNResourceManager::SplitName(const std::string& name, std::string& id, st
   }
 }
 
-void DAMNResourceManager::AddAbstraction (const char* abstraction, const char* format)
+void DAMNResourceManager::AddAbstraction (const char* type, const char* format)
 {
-  formats[abstraction] = format;
+  formats[type] = format;
 }
 
-const char* DAMNResourceManager::GetFormat (const char* abstraction) const
+const char* DAMNResourceManager::GetFormat (const char* type) const
 {
-  Formats::const_iterator found = formats.find(abstraction);
+  Formats::const_iterator found = formats.find(type);
   if (found != formats.end()) return found->second.c_str();
   return 0;
 }

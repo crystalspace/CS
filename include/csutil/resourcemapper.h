@@ -21,6 +21,7 @@
 
 #include "csutil/strhash.h"
 #include "imap/resource.h"
+#include "csutil/resource.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "iutil/stringarray.h"

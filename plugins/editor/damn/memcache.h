@@ -38,11 +38,11 @@ public:
   virtual ~MemoryCache ();
 
   // iResourceCache
-  virtual void Add (const char* type, const char* name, iLoadingResource* resource);
+  virtual void Add (CS::Resource::TypeID type, const char* name, iLoadingResource* resource);
 
-  virtual csRef<iLoadingResource> Get (const char* type, const char* name);
+  virtual csRef<iLoadingResource> Get (CS::Resource::TypeID type, const char* name);
 
-  virtual void Release (const char* type, const char* name);
+  virtual void Release (CS::Resource::TypeID type, const char* name);
 
 
 private:

@@ -26,6 +26,8 @@
 
 #include "inetwork/http.h"
 
+#include "csutil/resource.h"
+
 #include "include/resource.h"
 
 #include <igraphic/image.h>
@@ -93,6 +95,7 @@ bool DAMNPanel::Initialize (iObjectRegistry* obj_reg)
   
   csRef<iFormatAbstractor> abs = scfQueryInterface<iFormatAbstractor>(damn);
   abs->AddAbstraction("preview", "format=image/png&sizex=128&sizey=128&angley=1.54");
+  abs->AddAbstraction("image", "format=image/png&sizex=512&sizey=512");
   abs->AddAbstraction("mesh", "format=application/x-crystalspace.library%2Bxml");
 
   // Create the panel
@@ -248,7 +251,7 @@ void DAMNPanel::OnSearchButton (wxCommandEvent& event)
         std::string pk = root[index]["pk"].asString();
         std::string subName = root[index]["fields"]["subName"].asString();
         //printf("test1 %s\n", pk.c_str());
-        csRef<iLoadingResource> image = damn->Get("preview", pk.c_str());
+        csRef<iLoadingResource> image = damn->Get(CS::Resource::HashID ("image"), (pk+"::preview").c_str());
         searchResults[image] = subName;
         image->AddListener(this);
       }
@@ -268,7 +271,7 @@ void DAMNPanel::OnSearchButton (wxCommandEvent& event)
 void DAMNPanel::OnCancelButton (wxCommandEvent& event)
 {
    printf("success c\n");
-   csRef<iLoadingResource> image = damn->Get("mesh", "782b83441a749df48b085f35655558700d1f1f17");
+   csRef<iLoadingResource> image = damn->Get(CS::Resource::HashID ("factory"), "782b83441a749df48b085f35655558700d1f1f17::mesh");
 }
 
 

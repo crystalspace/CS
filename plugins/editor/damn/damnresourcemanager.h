@@ -64,13 +64,13 @@ public:
   virtual bool Initialize (iObjectRegistry* obj_reg);
 
   // iResourceManager
-  virtual csRef<iLoadingResource> Get (const char* type, const char* name);
+  virtual csRef<iLoadingResource> Get (CS::Resource::TypeID type, const char* name);
   
   virtual void Add (iResource* resource) {}
   
   // iFormatAbstractor
-  virtual void AddAbstraction (const char* abstraction, const char* format);
-  virtual const char* GetFormat (const char* abstraction) const;
+  virtual void AddAbstraction (const char* type, const char* format);
+  virtual const char* GetFormat (const char* type) const;
   
   
   void ToBeProccessed (csRef<iLoadingResource> res);
@@ -83,6 +83,8 @@ private:
   typedef std::map<std::string, std::string> Formats;
   Formats formats;
   
+  std::string CleanFileName(const std::string& name);
+  void SplitName(const std::string& name, std::string& id, std::string& format);
   
 private:
   iObjectRegistry* object_reg;
@@ -94,7 +96,7 @@ private:
   
   csRef<iResourceCache> cache;
   
-  csRef<iResource> _Get (std::string id, std::string format);
+  csRef<iResource> _Get (CS::Resource::TypeID type, std::string id, std::string format);
   csRef<iDataBuffer> _GetData (std::string id, std::string format);
 
   /// The queue of events waiting to be handled.
@@ -106,9 +108,6 @@ private:
   CS_EVENTHANDLER_NIL_CONSTRAINTS
 
 public: 
-  void SplitName(const std::string& name, std::string& id, std::string& format); 
-  std::string CleanFileName(const std::string& name);
-  
   template<typename Callable>
   CS::Threading::Future<typename std::tr1::result_of<Callable()>::type> Queue(Callable function)
   {

@@ -49,13 +49,13 @@ struct iFormatAbstractor : public virtual iBase
    * @param abstraction The abstraction's name.
    * @param format The underlying format for the abstraction.
    */
-  virtual void AddAbstraction (const char* abstraction, const char* format) = 0;
+  virtual void AddAbstraction (const char* type, const char* format) = 0;
 
   /**
    * Add a given resource to the cache.
    * @param abstraction The abstraction of the format you want to query.
    */
-  virtual const char* GetFormat (const char* abstraction) const = 0;
+  virtual const char* GetFormat (const char* type) const = 0;
 };
 
 #endif // __CS_IMAP_RESOURCE_H__

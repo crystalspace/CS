@@ -34,6 +34,7 @@
 #include <wx/panel.h>
 #include <wx/treectrl.h>
 #include <wx/imaglist.h>
+#include <wx/listctrl.h>
 
 #include <map>
 
@@ -90,6 +91,7 @@ private:
   
   DECLARE_EVENT_TABLE()
 };
+
 }
 CS_PLUGIN_NAMESPACE_END(CSE)
 
