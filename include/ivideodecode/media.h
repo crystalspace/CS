@@ -80,9 +80,9 @@ struct iVideoMedia : public iMedia
 
 
   /**
-    * Set the texture target
+    * Makes "texture" point to the internal iTextureHandle of the stream
     */
-  virtual void SetVideoTarget (csRef<iTextureHandle> &texture) = 0;
+  virtual void GetVideoTarget (csRef<iTextureHandle> &texture) = 0;
 
 };
 

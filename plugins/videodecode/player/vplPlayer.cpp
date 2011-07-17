@@ -75,9 +75,9 @@ void vplPlayer::RemoveActiveStream (int index)
     _mediaFile->RemoveActiveStream (index);
 }
 
-void vplPlayer::SetTargetTexture (csRef<iTextureHandle> &target) 
+void vplPlayer::GetTargetTexture (csRef<iTextureHandle> &target) 
 {
-  _mediaFile->SetTargetTexture (target);
+  _mediaFile->GetTargetTexture (target);
 }
 
 void vplPlayer::Update ()

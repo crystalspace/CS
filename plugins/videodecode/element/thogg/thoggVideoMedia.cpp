@@ -91,9 +91,10 @@ float TheoraVideoMedia::GetLength () const
   return length;
 }
 
-void TheoraVideoMedia::SetVideoTarget (csRef<iTextureHandle> &texture)
+void TheoraVideoMedia::GetVideoTarget (csRef<iTextureHandle> &texture)
 {
-  texture = _texture;   // a Set method should do '_texture = texture' otherwise it's a Get method ?????
+  // We want "texture" to point to its internal representation in the stream
+  texture = _texture;
 }
 
 double TheoraVideoMedia::GetPosition () const

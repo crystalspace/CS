@@ -41,7 +41,6 @@ private:
   iObjectRegistry* object_reg;
 
   csRef<iMediaContainer> _mediaFile;
-  csRef<iTextureHandle> _target;
 
   bool _playing;
   bool _shouldLoop;
@@ -56,7 +55,7 @@ public:
   virtual void InitializePlayer (csRef<iMediaContainer> media) ;
   virtual void SetActiveStream (int index) ;
   virtual void RemoveActiveStream (int index) ;
-  virtual void SetTargetTexture (csRef<iTextureHandle> &target) ;
+  virtual void GetTargetTexture (csRef<iTextureHandle> &target) ;
   virtual void Update ();
   virtual void Loop (bool shouldLoop) ;
   virtual void Play () ;

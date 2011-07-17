@@ -280,10 +280,10 @@ void TheoraMediaContainer::AutoActivateStreams ()
   }
 }
 
-void TheoraMediaContainer::SetTargetTexture (csRef<iTextureHandle> &target) 
+void TheoraMediaContainer::GetTargetTexture (csRef<iTextureHandle> &target) 
 {
   if(_activeTheoraStream.IsValid ())
-    _activeTheoraStream->SetVideoTarget (target);
+    _activeTheoraStream->GetVideoTarget (target);
 }
 
 float TheoraMediaContainer::GetPosition () const

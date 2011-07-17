@@ -142,7 +142,7 @@ bool VideoTest::Application ()
 
   // Specifying -1 as index triggers auto stream activation
   mediaPlayer->SetActiveStream (-1);
-  mediaPlayer->SetTargetTexture (logoTex);
+  mediaPlayer->GetTargetTexture (logoTex);
   mediaPlayer->Loop (false);
   mediaPlayer->Play ();
 

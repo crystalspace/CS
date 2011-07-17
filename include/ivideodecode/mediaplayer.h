@@ -46,8 +46,8 @@ struct iMediaPlayer : public virtual iBase
   /// Deactivates a stream from inside the iMediaContainer
   virtual void RemoveActiveStream (int index) = 0;
 
-  /// Set the target texture
-  virtual void SetTargetTexture (csRef<iTextureHandle> &target) = 0;
+  /// Makes "Target" point to the internal iTextureHandle of the active stream
+  virtual void GetTargetTexture (csRef<iTextureHandle> &target) = 0;
 
   /// Called continuously to update the player
   virtual void Update () = 0;

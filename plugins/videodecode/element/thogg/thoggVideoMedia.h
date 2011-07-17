@@ -96,7 +96,7 @@ public:
   virtual const csVPLvideoFormat* GetFormat() const;
   virtual unsigned long GetFrameCount() const;
   virtual float GetLength() const;
-  virtual void SetVideoTarget (csRef<iTextureHandle> &texture);
+  virtual void GetVideoTarget (csRef<iTextureHandle> &texture);
   virtual double GetPosition () const;
   virtual void CleanMedia () ;
   virtual bool Update () ;

@@ -54,8 +54,8 @@ struct iMediaContainer : public virtual iBase
   /// Automatically picks the first stream of every kind from inside the container
   virtual void AutoActivateStreams () = 0;
 
-  /// Set the target texture
-  virtual void SetTargetTexture (csRef<iTextureHandle> &target) = 0;
+  /// Makes "texture" point to the internal iTextureHandle of the active video stream
+  virtual void GetTargetTexture (csRef<iTextureHandle> &target) = 0;
 
   /// Updates the active streams
   virtual void Update () = 0;

@@ -80,7 +80,7 @@ public:
   inline virtual void SetDescription (const char* pDescription)
     { this->pDescription=pDescription; }
   void AddMedia (csRef<iMedia> media);
-  virtual void SetTargetTexture (csRef<iTextureHandle> &target) ;
+  virtual void GetTargetTexture (csRef<iTextureHandle> &target) ;
   virtual void SetActiveStream (size_t index);
   virtual bool RemoveActiveStream (size_t index);
   virtual void Update ();
