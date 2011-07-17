@@ -51,7 +51,6 @@
 #include <sstream>
 #include <string>
 
-#include "include/future.h"
 
 const int ICONSIZE = 128;
 
@@ -154,7 +153,7 @@ void DAMNPanel::OnSize (wxSizeEvent& event)
   event.Skip();
 }
 
-void DAMNPanel::OnLoaded (iLoading* resource)
+void DAMNPanel::OnLoaded (iLoadingResource* resource)
 {
   if (resource->Get()) {
     csRef<iImage> image = scfQueryInterface<iImage>(resource->Get());
@@ -249,7 +248,7 @@ void DAMNPanel::OnSearchButton (wxCommandEvent& event)
         std::string pk = root[index]["pk"].asString();
         std::string subName = root[index]["fields"]["subName"].asString();
         //printf("test1 %s\n", pk.c_str());
-        csRef<iLoading> image = damn->Get((pk+"::preview").c_str());
+        csRef<iLoadingResource> image = damn->Get("preview", pk.c_str());
         searchResults[image] = subName;
         image->AddListener(this);
       }
@@ -269,7 +268,7 @@ void DAMNPanel::OnSearchButton (wxCommandEvent& event)
 void DAMNPanel::OnCancelButton (wxCommandEvent& event)
 {
    printf("success c\n");
-   csRef<iLoading> image = damn->Get("782b83441a749df48b085f35655558700d1f1f17::mesh");
+   csRef<iLoadingResource> image = damn->Get("mesh", "782b83441a749df48b085f35655558700d1f1f17");
 }
 
 

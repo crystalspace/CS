@@ -58,8 +58,8 @@ public:
   virtual PanelDockPosition GetDefaultDockPosition () const;
   
   // iResourceListener
-  virtual void OnLoaded (iLoading* resource);
-  typedef std::map<csRef<iLoading>, std::string> SearchResults;
+  virtual void OnLoaded (iLoadingResource* resource);
+  typedef std::map<csRef<iLoadingResource>, std::string> SearchResults;
   SearchResults searchResults;
   size_t current;
   csRef<iProgressMeter> meter;

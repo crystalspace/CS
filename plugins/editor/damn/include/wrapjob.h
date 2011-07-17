@@ -21,7 +21,7 @@
 
 #include "csutil/scf_interface.h"
 #include "iutil/job.h"
-#include "future.h"
+#include "csutil/threading/future.h"
 
 
 namespace CS

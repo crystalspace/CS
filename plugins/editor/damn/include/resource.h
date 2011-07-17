@@ -22,108 +22,20 @@
 #include "csutil/scf_interface.h"
 #include <csutil/scf_implementation.h>
 
-//#include "csutil/threading/future.h"
-#include "future.h"
 
-struct iResource;
-struct iResourceListener;
+#include "imap/resource.h"
+
 struct iMeshFactoryWrapper;
 
-/**
- * The iLoading interface.
- */
-struct iLoading : public virtual iBase
-{
-  SCF_INTERFACE (iLoading, 1,0,0);
-  virtual const char* GetName() = 0;
-  virtual bool Ready () const = 0;
-  virtual csRef<iResource> Get() = 0;
-  /**
-   * The OnLoaded will always be trigger in the mainloop
-   * so you don't have to worry about locking the engine 
-   * or the resource itself.
-   */
-  virtual void AddListener(iResourceListener* listener) = 0;
-  virtual void RemoveListener(iResourceListener* listener) = 0;
 
-protected:
-  friend void iResourceTrigger(iLoading*);
-  virtual void TriggerCallback() = 0;
-};
 
-inline void iResourceTrigger(iLoading* b)
+inline void iResourceTrigger(iLoadingResource* b)
 {
   b->TriggerCallback();
 }
 
-/**
- * The iResourceListener interface.
- */
-struct iResourceListener : public virtual iBase
-{
-  SCF_INTERFACE (iResourceListener, 1,0,0);
-  virtual void OnLoaded (iLoading* resource) = 0;
-};
 
 
-class Loading : public scfImplementation1<Loading, iLoading>
-{
-public:
-  Loading() : scfImplementationType(this)
-  {
-  }
-  
-  Loading(const CS::Threading::Future<csRef<iResource> >& ref) : scfImplementationType(this)
-  {
-    p = ref;
-  }
-  
-  csRef<iResource> operator->()
-  {
-      return p.Get();
-  }
-  
-  virtual csRef<iResource> Get()
-  {
-      p.Wait();
-      return p.Get();
-  }
-  
-  virtual const char* GetName()
-  {
-    return 0;
-  }
-  
-  virtual bool Ready() const 
-  {
-    return p.Ready();
-  }
-  
-  
-  virtual void AddListener(iResourceListener* listener)
-  {
-    if (Ready())
-      listener->OnLoaded(this);
-    else
-      listeners.Push(listener);
-  }
-  
-  virtual void RemoveListener(iResourceListener* listener) 
-  {
-    listeners.Delete(listener);
-  }
-  
-private:
-  CS::Threading::Future<csRef<iResource> > p;
-  
-  csRefArray<iResourceListener> listeners;
-  virtual void TriggerCallback() 
-  {
-    for (size_t i = 0; i < listeners.GetSize(); i++)
-      listeners.Get(i)->OnLoaded(this);
-    listeners.DeleteAll();
-  }
-};
 
 /**
  * The iResourceCache interface.

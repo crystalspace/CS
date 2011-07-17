@@ -21,6 +21,8 @@
 
 #include "imap/resource.h"
 
+#include "csutil/threading/future.h"
+
 namespace CS
 {
   namespace Resource
@@ -41,6 +43,68 @@ namespace CS
 
     private:
       csArray<ResourceReference> emptyDeps;
+    };
+    
+    /**
+     * Default implementation of the iLoading interface, for use with ResourceManagers.
+     */
+    class LoadingResource : public scfImplementation1<LoadingResource, iLoadingResource>
+    {
+    public:
+      LoadingResource() : scfImplementationType(this)
+      {
+      }
+      
+      LoadingResource(const CS::Threading::Future<csRef<iResource> >& ref) : scfImplementationType(this)
+      {
+        p = ref;
+      }
+      
+      csRef<iResource> operator->()
+      {
+          return p.Get();
+      }
+      
+      virtual csRef<iResource> Get()
+      {
+          p.Wait();
+          return p.Get();
+      }
+      
+      virtual const char* GetName()
+      {
+        return 0;
+      }
+      
+      virtual bool Ready() const 
+      {
+        return p.Ready();
+      }
+      
+      
+      virtual void AddListener(iResourceListener* listener)
+      {
+        if (Ready())
+          listener->OnLoaded(this);
+        else
+          listeners.Push(listener);
+      }
+      
+      virtual void RemoveListener(iResourceListener* listener) 
+      {
+        listeners.Delete(listener);
+      }
+      
+    private:
+      CS::Threading::Future<csRef<iResource> > p;
+      
+      csRefArray<iResourceListener> listeners;
+      virtual void TriggerCallback() 
+      {
+        for (size_t i = 0; i < listeners.GetSize(); i++)
+          listeners.Get(i)->OnLoaded(this);
+        listeners.DeleteAll();
+      }
     };
   }
 }

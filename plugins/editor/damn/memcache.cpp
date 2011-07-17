@@ -44,12 +44,12 @@ MemoryCache::~MemoryCache ()
 {
 }
 
-void MemoryCache::Add (const char* name, iLoading* resource)
+void MemoryCache::Add (const char* type, const char* name, iLoadingResource* resource)
 {
   resources[name] = resource;
 }
 
-csRef<iLoading> MemoryCache::Get (const char* name)
+csRef<iLoadingResource> MemoryCache::Get (const char* type, const char* name)
 {
   Resources::const_iterator found = resources.find(name);
   if (found != resources.end())
@@ -59,7 +59,7 @@ csRef<iLoading> MemoryCache::Get (const char* name)
   return 0;
 }
 
-void MemoryCache::Release (const char* name)
+void MemoryCache::Release (const char* type, const char* name)
 {
 }
 

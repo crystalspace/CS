@@ -35,7 +35,12 @@
 #include <imap/resource.h>
 
 #include "include/wrapjob.h"
+
+#ifdef CS_COMPILER_MSVC
 #include <functional>
+#else
+#include <tr1/functional>
+#endif
 
 #include "memcache.h"
 
@@ -59,18 +64,20 @@ public:
   virtual bool Initialize (iObjectRegistry* obj_reg);
 
   // iResourceManager
-  virtual csRef<iLoading> Get (const char* name);
+  virtual csRef<iLoadingResource> Get (const char* type, const char* name);
+  
+  virtual void Add (iResource* resource) {}
   
   // iFormatAbstractor
   virtual void AddAbstraction (const char* abstraction, const char* format);
   virtual const char* GetFormat (const char* abstraction) const;
   
   
-  void ToBeProccessed (csRef<iLoading> res);
+  void ToBeProccessed (csRef<iLoadingResource> res);
 private:
   mutable CS::Threading::Mutex mutex_;
   bool HandleEvent(iEvent& ev);
-  csRefArray<iLoading> toBeProccessed;
+  csRefArray<iLoadingResource> toBeProccessed;
 
 private:
   typedef std::map<std::string, std::string> Formats;

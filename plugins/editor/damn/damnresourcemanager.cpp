@@ -37,6 +37,7 @@
 #include <iutil/cfgmgr.h>
 
 #include <csutil/csevent.h>
+#include <csutil/resource.h>
 
 #include "json/json.h"
 
@@ -106,7 +107,7 @@ bool DAMNResourceManager::HandleEvent(iEvent& ev)
   CS::Threading::MutexScopedLock lock(mutex_);
   for (size_t i = 0; i < toBeProccessed.GetSize(); i++)
   {
-    csRef<iLoading> l = toBeProccessed.Pop();
+    csRef<iLoadingResource> l = toBeProccessed.Pop();
     csRef<iResource> res = l->Get();
     //if (res->GetDependencies().GetSize() == 0);
     iResourceTrigger(l);  //No dependencies, trigger the resource as ready.
@@ -114,31 +115,29 @@ bool DAMNResourceManager::HandleEvent(iEvent& ev)
   return true;
 } 
 
-void DAMNResourceManager::ToBeProccessed (csRef<iLoading> res)
+void DAMNResourceManager::ToBeProccessed (csRef<iLoadingResource> res)
 {
   CS::Threading::MutexScopedLock lock(mutex_);
   toBeProccessed.Push(res);
 }
 
-csRef<iLoading> DAMNResourceManager::Get (const char* name)
+csRef<iLoadingResource> DAMNResourceManager::Get (const char* type, const char* name)
 {
-  csRef<iLoading> res = cache->Get(name);
+  csRef<iLoadingResource> res = cache->Get(type, name);
   if (!res.IsValid())
   {
     using namespace CS::Threading;
     using namespace std::tr1;
     
-    std::string id;
-    std::string format;
-    SplitName(name, id, format);
-    format = GetFormat(format.c_str());
+    std::string id(name);
+    std::string format = GetFormat(type);
     Future<csRef<iResource> > job = Queue(bind(&DAMNResourceManager::_Get, this, id, format));
     
-    res.AttachNew(new Loading(job));
+    res.AttachNew(new CS::Resource::LoadingResource(job));
     
-    cache->Add(name, res);
+    cache->Add(type, name, res);
     
-    csRef<iLoading> t = res;
+    csRef<iLoadingResource> t = res;
     Callback(job, bind(&DAMNResourceManager::ToBeProccessed, this, t));
   }
 

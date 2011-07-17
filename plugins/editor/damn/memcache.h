@@ -38,17 +38,17 @@ public:
   virtual ~MemoryCache ();
 
   // iResourceCache
-  virtual void Add (const char* name, iLoading* resource);
+  virtual void Add (const char* type, const char* name, iLoadingResource* resource);
 
-  virtual csRef<iLoading> Get (const char* name);
+  virtual csRef<iLoadingResource> Get (const char* type, const char* name);
 
-  virtual void Release (const char* name);
+  virtual void Release (const char* type, const char* name);
 
 
 private:
   iObjectRegistry* object_reg;
   
-  typedef std::map<std::string, csRef<iLoading> > Resources;
+  typedef std::map<std::string, csRef<iLoadingResource> > Resources;
   Resources resources;
 };
 }

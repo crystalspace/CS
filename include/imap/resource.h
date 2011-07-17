@@ -79,7 +79,38 @@ struct iResourceSaver : public virtual iBase
   virtual csPtr<iDataBuffer> Save (iResource* resource) = 0;
 };
 
-struct iLoading;
+struct iLoadingResource;
+/**
+ * The iResourceListener interface.
+ */
+struct iResourceListener : public virtual iBase
+{
+  SCF_INTERFACE (iResourceListener, 1,0,0);
+  virtual void OnLoaded (iLoadingResource* resource) = 0;
+};
+
+/**
+ * The iLoading interface.
+ */
+struct iLoadingResource : public virtual iBase
+{
+  SCF_INTERFACE (iLoadingResource, 1,0,0);
+  virtual const char* GetName() = 0;
+  virtual bool Ready () const = 0;
+  virtual csRef<iResource> Get() = 0;
+  /**
+   * The OnLoaded will always be trigger in the mainloop
+   * so you don't have to worry about locking the engine 
+   * or the resource itself.
+   */
+  virtual void AddListener(iResourceListener* listener) = 0;
+  virtual void RemoveListener(iResourceListener* listener) = 0;
+
+protected:
+  friend void iResourceTrigger(iLoadingResource*);
+  virtual void TriggerCallback() = 0;
+};
+
 
 /**
  * The iResourceCache interface.
@@ -92,19 +123,19 @@ struct iResourceCache : public virtual iBase
    * Add a given resource to the cache.
    * @param name The resource name.
    */
-  virtual void Add (const char* name, iLoading* resource) = 0;
+  virtual void Add (const char* type, const char* name, iLoadingResource* resource) = 0;
 
   /**
    * Get a Resource by name.
    * @param name The resource name.
    */
-  virtual csRef<iLoading> Get (const char* name) = 0;
+  virtual csRef<iLoadingResource> Get (const char* type, const char* name) = 0;
 
   /**
    * Mark a resource as a candidate for removal.
    * @param name The resource name.
    */
-  virtual void Release (const char* name) = 0;
+  virtual void Release (const char* type, const char* name) = 0;
 };
 
 /**
@@ -119,7 +150,13 @@ struct iResourceManager : public virtual iBase
    * Begins loading the resource if not already loading or loaded.
    * @param name The resource name.
    */
-  virtual csRef<iLoading> Get (const char* name) = 0;
+  virtual csRef<iLoadingResource> Get (const char* type, const char* name) = 0;
+  
+  /**
+   * Add a given resource to the manager.
+   * @param resource.
+   */
+  virtual void Add (iResource* resource) = 0;
 };
 
 #endif // __CS_IMAP_RESOURCE_H__
