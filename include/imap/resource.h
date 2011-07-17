@@ -28,7 +28,7 @@ namespace CS
 {
   namespace Resource
   {
-    typedef size_t TypeID;
+    typedef int TypeID;
   }
 }
 

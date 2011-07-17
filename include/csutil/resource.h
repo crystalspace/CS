@@ -21,6 +21,7 @@
 
 #include "imap/resource.h"
 
+#include "csutil/hashcomputer.h"
 #include "csutil/threading/future.h"
 #include "csutil/scf_implementation.h"
 
@@ -28,31 +29,42 @@ namespace CS
 {
   namespace Resource
   {
-    template<size_t N, size_t I = 0>
-    struct HashIDCalc
+    namespace Impl
     {
-      CS_FORCEINLINE_TEMPLATEMETHOD
-      static TypeID hash (const char (&s)[N])
+      // Implements the DJB hash algorithm.
+      template<size_t N, size_t I = 1>
+      struct HashIDCalc
       {
-        return (HashIDCalc<N, I+1>::hash (s) ^ s[I]) * 16777619u;
-      }
-    };
+        CS_FORCEINLINE_TEMPLATEMETHOD
+          static TypeID hash (const char (&s)[N])
+        {
+          TypeID typeID = HashIDCalc<N, I+1>::hash (s);
+          return ((typeID << 5) + typeID) + s[N-I];
+        }
+      };
 
-    template<size_t N>
-    struct HashIDCalc<N, N>
-    {
-      CS_FORCEINLINE_TEMPLATEMETHOD
-      static TypeID hash (const char (&s)[N])
+      template<size_t N>
+      struct HashIDCalc<N, N>
       {
-        return 2166136261u;
-      }
-    };
+        CS_FORCEINLINE_TEMPLATEMETHOD
+          static TypeID hash (const char (&s)[N])
+        {
+          return s[0];
+        }
+      };
+    }
 
     template<size_t N>
     CS_FORCEINLINE_TEMPLATEMETHOD
     TypeID HashID (const char (&s)[N])
     {
-      return HashIDCalc<N>::hash (s);
+      return Impl::HashIDCalc<N>::hash (s);
+    }
+
+    CS_FORCEINLINE
+    TypeID HashID (const char* s)
+    {
+      return csHashCompute (s);
     }
 
     /**
