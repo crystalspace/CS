@@ -126,9 +126,9 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     if (position.x < 0 || position.y < 0 || position.x > 1 || position.y > 1)
       depth = 0;    
 
-    i = min(((compareDepth + 0.03 - depth) * 4) * numSplits, numSplits - 1);
-    previousSplit = (float)i / numSplits;
-    nextSplit = (float)(i + 1) / numSplits;    
+    i = min(((compareDepth - depth) * 4) * 25, numSplits - 1);
+    previousSplit = (float)i / 25;
+    nextSplit = (float)(i + 1) / 25;    
 
 /*
     for (i = 0 ; i < numSplits ; i ++)
@@ -158,7 +158,7 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     previousMap += getMapValue(i, position);
     nextMap += getMapValue(i + 1, position);   
     
-    inLight = lerp(previousMap, nextMap, (float) (((compareDepth + 0.03 - depth) * 4) - previousSplit) 
+    inLight = lerp(previousMap, nextMap, (float) (((compareDepth - depth) * 4) - previousSplit) 
       / (nextSplit - previousSplit) );
     //inLight = previousMap;
       
@@ -167,13 +167,13 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     
 /*
     inLight = 1;
-    if (compareDepth + 0.03 > depth && depth > 0) 
+    if (compareDepth > depth && depth > 0) 
       inLight = 0;
     //inLight = 1 - tex2D(lightPropsOM.shadowMap[lightNum], float2(position)).x;
 */
     //inLight = ((float)i / (numSplits - 1));
     
-    inLight = inLight * (depth != 0) + (depth == 0);
+    inLight = inLight * (depth != 0) + (depth == 0 || compareDepth < depth);
     return inLight;
   }
 };
