@@ -115,14 +115,14 @@
               + float3(0.5);
             float2 position = shadowMapCoordsBiased.xy;
             
-            float compareDepth = (1 - shadowMapCoordsBiased.z);
+            float compareDepth = (1 - shadowMapCoordsBiased.z) ;
             float depth = tex2D(DepthMap, position).x;
     
             if (position.x < 0 || position.y < 0 || position.x > 1 || position.y > 1)
               return output;  
     
             int i;
-            i = min(((compareDepth - depth) * 4) * 25, numSplits - 1);  
+            i = min(((compareDepth - depth) * 4) * 75, numSplits - 1);  
 
 //            int i = (abs(depth) - abs(compareDepth)) * 32;
 /*            
@@ -141,20 +141,20 @@
             // write in the correct render target
             int renderTarget = (i / 4) % mrt;
             
-            output.Color0 = color * (renderTarget == 0);
+            output.Color0 = color * (renderTarget <= 0);
           ]]>            
         <?if vars."mrt".int &gt; 1?>
           <![CDATA[                      
-            output.Color1 = color * (renderTarget == 1);
-            output.Color2 = color * (renderTarget == 2);
-            output.Color3 = color * (renderTarget == 3);
+            output.Color1 = color * (renderTarget <= 1);
+            output.Color2 = color * (renderTarget <= 2);
+            output.Color3 = color * (renderTarget <= 3);
           ]]>            
         <?if vars."mrt".int &gt; 4?>
           <![CDATA[                      
-            output.Color4 = color * (renderTarget == 4);
-            output.Color5 = color * (renderTarget == 5);
-            output.Color6 = color * (renderTarget == 6);
-            output.Color7 = color * (renderTarget == 7);
+            output.Color4 = color * (renderTarget <= 4);
+            output.Color5 = color * (renderTarget <= 5);
+            output.Color6 = color * (renderTarget <= 6);
+            output.Color7 = color * (renderTarget <= 7);
             ]]>
         <?endif?>
         <?endif?>
