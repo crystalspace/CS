@@ -607,6 +607,7 @@ namespace CS
 
           const csGraphics3DCaps *caps = g3d->GetCaps();
           mrt = caps->MaxRTColorAttachments;
+          mrt = 1;
 
           iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
           svNames.SetStrings (strings);

@@ -119,18 +119,18 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     float2 position = shadowMapCoordsBiased.xy;
    
     int i;
-/*
+
     float compareDepth = (1 - shadowMapCoordsBiased.z);
     float depth = tex2D(lightPropsOM.shadowMap[lightNum], position).x;
 
     if (position.x < 0 || position.y < 0 || position.x > 1 || position.y > 1)
-      depth = 1;    
+      depth = 0;    
 
-    //i = (abs(depth) - abs(compareDepth)) * 32;   
-    //previousSplit = i * 0.05;
-    //nextSplit = (i + 1) * 0.05;    
+    i = min(((compareDepth + 0.03 - depth) * 4) * numSplits, numSplits - 1);
+    previousSplit = (float)i / numSplits;
+    nextSplit = (float)(i + 1) / numSplits;    
 
-*/
+/*
     for (i = 0 ; i < numSplits ; i ++)
     {
       previousSplit = lightPropsOM.splitDists[8 * lightNum + i];
@@ -141,7 +141,7 @@ struct ShadowShadowMapDepth : ShadowShadowMap
 
       previousSplit = nextSplit;
     }
-
+*/
     float previousMap = 0, nextMap = 0;
     
     int prevIndex = min((i / 4), numSplits - 1);
@@ -158,19 +158,22 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     previousMap += getMapValue(i, position);
     nextMap += getMapValue(i + 1, position);   
     
-    inLight = lerp(previousMap, nextMap, (float) (distance - previousSplit) 
+    inLight = lerp(previousMap, nextMap, (float) (((compareDepth + 0.03 - depth) * 4) - previousSplit) 
       / (nextSplit - previousSplit) );
-    //inLight = nextMap;
+    //inLight = previousMap;
       
     inLight = inLight * (i != numSplits - 1) + previousMap * (i == numSplits - 1);
     inLight = exp(-1.0 * inLight);
-/*   
+    
+/*
     inLight = 1;
-    if ((compareDepth) > (depth)) 
+    if (compareDepth + 0.03 > depth && depth > 0) 
       inLight = 0;
-inLight = 1 - tex2D(lightPropsOM.shadowMap[lightNum], float3(position, compareDepth)).x;
+    //inLight = 1 - tex2D(lightPropsOM.shadowMap[lightNum], float2(position)).x;
 */
-    //inLight = 1 - ((float)i / (numSplits - 1));
+    //inLight = ((float)i / (numSplits - 1));
+    
+    inLight = inLight * (depth != 0) + (depth == 0);
     return inLight;
   }
 };
