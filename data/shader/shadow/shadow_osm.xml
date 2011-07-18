@@ -27,8 +27,10 @@
       <texture name="light shadow map" destination="DepthMap" />
       <vp plugin="glcg">
         <cgvp>
+          <variablemap variable="light shadow map projection" destination="projection" />           
           <program>
           <![CDATA[
+          float4x4 projection;
           
           struct app2vertex {
             float4 Position : POSITION;
@@ -37,7 +39,7 @@
           struct vertex2fragment {
             float4 Hposition : POSITION;
             float2 TexCoord : TEXCOORD0;
-            float4 position_camera : TEXCOORD1;
+            float4 shadowMapCoordsProj : TEXCOORD1;
           };          
           
           vertex2fragment main (app2vertex IN,
@@ -46,8 +48,20 @@
           {
             vertex2fragment OUT;
             OUT.Hposition = mul (ModelViewProj, IN.Position);
-            OUT.position_camera = mul (ModelView, IN.Position);
+            float4 position_camera = mul (ModelView, IN.Position);
             OUT.TexCoord = IN.TexCoord;
+            
+            // compute the projection for the depth map
+            float4x4 flipY;
+            flipY[0] = float4 (1, 0, 0, 0);
+            flipY[1] = float4 (0, -1, 0, 0);
+            flipY[2] = float4 (0, 0, 1, 0);
+            flipY[3] = float4 (0, 0, 0, 1);
+            float4x4 proj = mul (flipY, projection);
+            float4 shadowMapCoords = mul (proj, position_camera);            
+            OUT.shadowMapCoordsProj = shadowMapCoords;
+            OUT.shadowMapCoordsProj.xyz /= OUT.shadowMapCoordsProj.w;             
+            
             return OUT;
           }
           ]]>
@@ -59,17 +73,15 @@
         <variablemap variable="pass color" destination="passColor" />
         <variablemap variable="light numSplits" destination="numSplits" />        
         <variablemap variable="mrt" destination="mrt" />        
-        <variablemap variable="light shadow map projection" destination="projection" />   
         <program>
           <![CDATA[
           float passColor[64];
           int numSplits;
           int mrt;
-          float4x4 projection;
           struct vertex2fragment {
             float4 Hposition : POSITION;
             float2 TexCoord : TEXCOORD0;
-            float4 position_camera : TEXCOORD1;
+            float4 shadowMapCoordsProj : TEXCOORD1;
           };  
           struct fragmentOutput
           {
@@ -101,39 +113,20 @@
             
             float value = surface.a;
 
-            // compute the projection for the depth map
-            float4x4 flipY;
-            flipY[0] = float4 (1, 0, 0, 0);
-            flipY[1] = float4 (0, -1, 0, 0);
-            flipY[2] = float4 (0, 0, 1, 0);
-            flipY[3] = float4 (0, 0, 0, 1);
-            float4x4 proj = mul (flipY, projection);
-            float4 shadowMapCoords = mul (proj, IN.position_camera);            
-            float4 shadowMapCoordsProj = shadowMapCoords;
-            shadowMapCoordsProj.xyz /= shadowMapCoordsProj.w;                
-            float3 shadowMapCoordsBiased = (float3(0.5)*shadowMapCoordsProj.xyz) 
+            // compute the projection for the depth map              
+            float3 shadowMapCoordsBiased = (float3(0.5)*IN.shadowMapCoordsProj.xyz) 
               + float3(0.5);
             float2 position = shadowMapCoordsBiased.xy;
             
             float compareDepth = (1 - shadowMapCoordsBiased.z) ;
             float depth = tex2D(DepthMap, position).x;
-    
+/*    
             if (position.x < 0 || position.y < 0 || position.x > 1 || position.y > 1)
               return output;  
-    
+*/    
             int i;
-            i = min(((compareDepth - depth) * 4) * 75, numSplits - 1);  
+            i = min(((compareDepth - depth) * 9.36 * numSplits), numSplits - 1);  
 
-//            int i = (abs(depth) - abs(compareDepth)) * 32;
-/*            
-            if (projection[0][0] == 0)
-              mrt = 1;              
-
-            int i;
-            for (i = 0 ; i < numSplits ; i ++)
-              if (passColor[i] > IN.position_camera.z)
-                break;
-*/
             int index = i % 4;
             float4 color = value;
             color = color * float4(index < 1, index < 2, index < 3, 1);

@@ -604,9 +604,7 @@ namespace CS
 
           this->shaderManager = shaderManager;
           this->g3d = g3d;
-
-          const csGraphics3DCaps *caps = g3d->GetCaps();
-          mrt = caps->MaxRTColorAttachments;
+          mrt = 0;
 
           iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
           svNames.SetStrings (strings);
@@ -622,9 +620,16 @@ namespace CS
           shadowMapRes = 512;
           if (!configPrefix.IsEmpty())
           {
+            mrt = cfg->GetInt ( csString().Format (
+              "%s.ForceTextureNumber", configPrefix.GetData()), 0);
             shadowMapRes = cfg->GetInt ( csString().Format (
               "%s.ShadowMapResolution", configPrefix.GetData()), 512);
           }
+          
+          const csGraphics3DCaps *caps = g3d->GetCaps();
+          if (!mrt)  
+            mrt = caps->MaxRTColorAttachments;
+
           csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
 
           osmShader = loader->LoadShader ("/shader/shadow/shadow_osm.xml");
