@@ -135,7 +135,12 @@ bool TheoraVideoMedia::Update ()
     return true;
 
   size_t dstSize;
-  uint8* pixels = _buffers[activeBuffer]->QueryBlitBuffer (_streamInfo.pic_x,_streamInfo.pic_y,_streamInfo.pic_width,_streamInfo.pic_height,dstSize);
+  cout<<"writing to "<<activeBuffer<<endl;
+  canSwap=false;
+
+  
+  iTextureHandle* tex = _buffers.Get (activeBuffer);
+  uint8* pixels = tex->QueryBlitBuffer (_streamInfo.pic_x,_streamInfo.pic_y,_streamInfo.pic_width,_streamInfo.pic_height,dstSize);
 
   th_ycbcr_buffer yuv;
   th_decode_ycbcr_out(_decodeControl,yuv);
@@ -244,7 +249,8 @@ bool TheoraVideoMedia::Update ()
     return false;
   }
 
-  _buffers[activeBuffer]->ApplyBlitBuffer (pixels);
+  tex->ApplyBlitBuffer (pixels);
+  canSwap=true;
 
   return false;
 }
@@ -329,15 +335,19 @@ long TheoraVideoMedia::SeekPage (long targetFrame,bool return_keyframe, ogg_sync
 
 void TheoraVideoMedia::SwapBuffers()
 {
+  //override for testing purposes
+    return;
   if (activeBuffer==0)
   {
-    activeBuffer = 1;
     _texture = _buffers[activeBuffer];
+    activeBuffer = 1;
+    canSwap=false;
   }
   else
   {
-    activeBuffer = 0;
     _texture = _buffers[activeBuffer];
+    activeBuffer = 0;
+    canSwap=false;
   }
 }
 
@@ -371,8 +381,9 @@ void TheoraVideoMedia::InitializeStream (ogg_stream_state &state, th_info &info,
 
   _buffers.Push (_buffer2);
 
-  activeBuffer = 0;
+  activeBuffer = 1;
 
-  _texture = _buffers[activeBuffer];
+  _texture = _buffers[0];
 
+  canSwap=false;
 }

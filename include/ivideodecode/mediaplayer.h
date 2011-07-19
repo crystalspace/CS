@@ -25,7 +25,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "csutil/scf.h"
 #include "csutil/ref.h"
-#include "crystalspace.h"
+#include "crystalspace.h" 	
+
+#include "iutil/threadmanager.h"
 
 struct iMediaContainer;
 struct iTextureHandle;
@@ -50,7 +52,8 @@ struct iMediaPlayer : public virtual iBase
   virtual void GetTargetTexture (csRef<iTextureHandle> &target) = 0;
 
   /// Called continuously to update the player
-  virtual void Update () = 0;
+  //virtual void Update () = 0;
+  THREADED_INTERFACE( Update );
 
   /// Enable/disable looping
   virtual void Loop (bool shouldLoop) = 0 ;

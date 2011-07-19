@@ -80,8 +80,12 @@ void vplPlayer::GetTargetTexture (csRef<iTextureHandle> &target)
   _mediaFile->GetTargetTexture (target);
 }
 
-void vplPlayer::Update ()
+//void vplPlayer::Update ()
+THREADED_CALLABLE_IMPL(vplPlayer, Update)
 {
+  while (true)
+  {
+
   if (_playing)
   {
     if (_mediaFile.IsValid ())
@@ -100,6 +104,7 @@ void vplPlayer::Update ()
 
       _mediaFile->Update ();
     }
+  }
   }
 }
 

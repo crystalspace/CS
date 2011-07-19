@@ -55,6 +55,7 @@ private:
   csRefArray<iTextureHandle> _buffers;
 
   int activeBuffer;
+  bool canSwap;
 
   // Theora-related stuff
   ogg_stream_state  _streamState;

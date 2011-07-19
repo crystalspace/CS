@@ -29,8 +29,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 using namespace std;
 
-#define WATER_LEVEL 50.0
-
+csRef<iThreadReturn> ret;
 VideoTest::VideoTest ()
 : DemoApplication ("CrystalSpace.VideoTest"), inWater (false)
 {
@@ -52,7 +51,11 @@ void VideoTest::Frame ()
   //draw the room
   view->Draw();
 
-  mediaPlayer->Update ();
+  if (!ret.IsValid ())
+  {
+    ret = mediaPlayer->Update ();
+  }
+
 
   if(updateSeeker)
   {
@@ -155,6 +158,8 @@ bool VideoTest::Application ()
   // Create the scene
   if (!CreateScene ())
     return false;
+
+
 
   // Run the application
   Run();

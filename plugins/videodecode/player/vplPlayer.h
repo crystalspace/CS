@@ -24,6 +24,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <ivideodecode/mediacontainer.h>
 #include <csutil/scf_implementation.h>
 
+
+#include "csutil/threadmanager.h"
+
 #include <iostream>
 using namespace std;
 
@@ -35,7 +38,8 @@ struct iObjectRegistry;
   * This is the implementation for our API and
   * also the implementation of the plugin.
   */
-class vplPlayer : public scfImplementation2<vplPlayer,iMediaPlayer,iComponent>
+class vplPlayer :  public ThreadedCallable<vplPlayer>,
+  public scfImplementation2<vplPlayer,iMediaPlayer,iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -46,6 +50,9 @@ private:
   bool _shouldLoop;
 
 public:
+  iObjectRegistry* GetObjectRegistry() const
+  { return object_reg; }
+
   vplPlayer (iBase* parent);
   virtual ~vplPlayer ();
 
@@ -56,7 +63,9 @@ public:
   virtual void SetActiveStream (int index) ;
   virtual void RemoveActiveStream (int index) ;
   virtual void GetTargetTexture (csRef<iTextureHandle> &target) ;
-  virtual void Update ();
+  
+  THREADED_CALLABLE_DECL(vplPlayer, Update, csThreadReturn, THREADED, false, false);
+  //virtual void Update ();
   virtual void Loop (bool shouldLoop) ;
   virtual void Play () ;
   virtual void Pause() ;
