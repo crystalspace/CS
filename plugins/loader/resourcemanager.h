@@ -16,11 +16,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __DAMN_DAMNRESOURCEMANAGER_H__
-#define __DAMN_DAMNRESOURCEMANAGER_H__
+#ifndef __CS_LOADER_RESOURCE_MANAGER_H__
+#define __CS_LOADER_RESOURCE_MANAGER_H__
 
-//#include "imap/resource.h"
-#include "include/resource.h"
+#include "csutil/resource.h"
 
 #include <csutil/scf_implementation.h>
 #include <iutil/comp.h>
@@ -34,29 +33,19 @@
 
 #include <imap/resource.h>
 
-#include "include/wrapjob.h"
-
-#ifdef CS_COMPILER_MSVC
-#include <functional>
-#else
-#include <tr1/functional>
-#endif
-
-namespace CS { namespace Network { namespace HTTP {
-  struct iHTTPConnectionFactory;
-}}}
-
 struct iVFS;
 struct iLoader;
 struct iJobQueue;
 
-CS_PLUGIN_NAMESPACE_BEGIN(CSE)
+CS_PLUGIN_NAMESPACE_BEGIN(csloader)
 {
-class DAMNResourceManager : public scfImplementation4<DAMNResourceManager,iResourceManager,iFormatAbstractor, iEventHandler,iComponent>
+
+class ResourceManager
+  : public scfImplementation3<ResourceManager, iResourceManager, iEventHandler, iComponent>
 {
 public:
-  DAMNResourceManager (iBase* parent);
-  virtual ~DAMNResourceManager ();
+  ResourceManager (iBase* parent);
+  virtual ~ResourceManager ();
 
   // iComponent
   virtual bool Initialize (iObjectRegistry* obj_reg);
@@ -65,45 +54,34 @@ public:
   virtual csRef<iLoadingResource> Get (CS::Resource::TypeID type, const char* name);
   
   virtual void Add (iResource* resource) {}
+
   virtual void Remove (iResource* resource) {}
   
-  // iFormatAbstractor
-  virtual void AddAbstraction (const char* type, const char* format);
-  virtual const char* GetFormat (const char* type) const;
-  
-  
   void ToBeProccessed (csRef<iLoadingResource> res);
+
 private:
   mutable CS::Threading::Mutex mutex_;
   bool HandleEvent(iEvent& ev);
   csRefArray<iLoadingResource> toBeProccessed;
 
 private:
-  typedef std::map<std::string, std::string> Formats;
-  Formats formats;
-  
   std::string CleanFileName(const std::string& name);
   void SplitName(const std::string& name, std::string& id, std::string& format);
   
 private:
   iObjectRegistry* object_reg;
-  csRef<CS::Network::HTTP::iHTTPConnectionFactory> http;
+
   csRef<iVFS> vfs;
-  //csRef<iLoader> loader;
-  csRef<iResourceLoader> loader;
   csRef<iJobQueue> jobQueue;
-  
   csRef<iResourceCache> cache;
-  
-  csRef<iResource> _Get (CS::Resource::TypeID type, std::string id, std::string format);
-  csRef<iDataBuffer> _GetData (std::string id, std::string format);
 
   /// The queue of events waiting to be handled.
   csRef<iEventQueue> eventQueue;
+
   /// The event name registry, used to convert event names to IDs and back.
   csRef<iEventNameRegistry> nameRegistry;
 
-  CS_EVENTHANDLER_NAMES ("crystalspace.resources.managers.damn")
+  CS_EVENTHANDLER_NAMES ("crystalspace.loader")
   CS_EVENTHANDLER_NIL_CONSTRAINTS
 
 public: 
@@ -133,6 +111,6 @@ public:
   }
 };
 }
-CS_PLUGIN_NAMESPACE_END(CSE)
+CS_PLUGIN_NAMESPACE_END(csloader)
 
-#endif
+#endif // __CS_LOADER_RESOURCE_MANAGER_H__

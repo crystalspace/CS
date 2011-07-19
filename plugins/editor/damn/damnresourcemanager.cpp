@@ -25,6 +25,7 @@
 #include "iutil/plugin.h"
 #include "ivideo/material.h"
 
+#include "csutil/memcache.h"
 #include "csutil/threadjobqueue.h"
 #include "csutil/scfstringarray.h"
 
@@ -93,7 +94,7 @@ bool DAMNResourceManager::Initialize (iObjectRegistry* obj_reg)
   //Register for the Frame event, for Handle().
   eventQueue->RegisterListener (this, nameRegistry->GetID("crystalspace.frame"));
   
-  cache.AttachNew(new MemoryCache());
+  cache.AttachNew(new CS::Resource::MemoryCache());
  
   return true;
 }

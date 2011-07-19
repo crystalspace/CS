@@ -171,6 +171,14 @@ struct iResourceManager : public virtual iBase
    * @param resource.
    */
   virtual void Add (iResource* resource) = 0;
+
+  /**
+   * Mark a resource as a candidate for removal.
+   * Calling this function makes no guarantees as to the removal of the resource.
+   * @param typeID The resource type ID.
+   * @param name The resource name.
+   */
+  virtual void Remove (iResource* resource) = 0;
 };
 
 #endif // __CS_IMAP_RESOURCE_H__
