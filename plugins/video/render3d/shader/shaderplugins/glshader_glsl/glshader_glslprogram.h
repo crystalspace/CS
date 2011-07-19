@@ -45,16 +45,17 @@ private:
 
   csRef<iDataBuffer> vpSource;
   csRef<iDataBuffer> fpSource;
-  // csRef<iDataBuffer> gpSource;
+  csRef<iDataBuffer> gpSource;
 
   csRef<csShaderGLSLShader> vp;
   csRef<csShaderGLSLShader> fp;
-  // csRef<csShaderGLSLShader> gp;
+  csRef<csShaderGLSLShader> gp;
 
   csRef<iDataBuffer> LoadSource (iDocumentNode* node);
 
   csPtr<csShaderGLSLShader> CreateVP () const;
   csPtr<csShaderGLSLShader> CreateFP () const;
+  csPtr<csShaderGLSLShader> CreateGP () const;
 
   void SetupVmap ();
 

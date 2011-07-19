@@ -180,6 +180,14 @@ bool csShaderGLSLProgram::Load (iShaderDestinationResolver*,
       return false;
   }
 
+  program = node->GetNode ("gp");
+  if (program)
+  {
+    gpSource = LoadSource (program);
+    if (!gpSource)
+      return false;
+  }
+
   return true;
 }
 
@@ -221,6 +229,11 @@ csPtr<csShaderGLSLShader> csShaderGLSLProgram::CreateFP () const
   return csPtr<csShaderGLSLShader> (
     new csShaderGLSLShader (shaderPlug, "fragment", GL_FRAGMENT_SHADER_ARB));
 }
+csPtr<csShaderGLSLShader> csShaderGLSLProgram::CreateGP () const
+{
+  return csPtr<csShaderGLSLShader> (
+    new csShaderGLSLShader (shaderPlug, "geometry", GL_GEOMETRY_SHADER_EXT));
+}
 
 bool csShaderGLSLProgram::Compile (iHierarchicalCache*, csRef<iString>* tag)
 {
@@ -256,6 +269,17 @@ bool csShaderGLSLProgram::Compile (iHierarchicalCache*, csRef<iString>* tag)
       return false;
 
     ext->glAttachObjectARB (program_id, fp->GetID ());
+  }
+  if (gpSource)
+  {
+    if (!ext->CS_GL_EXT_geometry_shader4)
+      return false;
+
+    gp = CreateGP ();
+    if (!gp->Compile (gpSource->GetData ()))
+      return false;
+
+    ext->glAttachObjectARB (program_id, gp->GetID ());
   }
 
   ext->glLinkProgramARB (program_id);

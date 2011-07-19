@@ -10501,6 +10501,97 @@ typedef GLvoid (csAPIENTRY* csGLGETACTIVEATTRIBARB) (GLhandleARB programObj, GLu
 typedef GLint (csAPIENTRY* csGLGETATTRIBLOCATIONARB) (GLhandleARB programObj, const GLcharARB* name);
 
 /** @} */
+/**\name GL_EXT_geometry_shader4 constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/EXT/geometry_shader4.txt">http://www.opengl.org/registry/specs/EXT/geometry_shader4.txt</a>.
+ * @{ */
+#ifndef GL_GEOMETRY_SHADER_EXT
+#define GL_GEOMETRY_SHADER_EXT                                       0x8DD9
+#endif
+
+#ifndef GL_GEOMETRY_VERTICES_OUT_EXT
+#define GL_GEOMETRY_VERTICES_OUT_EXT                                 0x8DDA
+#endif
+
+#ifndef GL_GEOMETRY_INPUT_TYPE_EXT
+#define GL_GEOMETRY_INPUT_TYPE_EXT                                   0x8DDB
+#endif
+
+#ifndef GL_GEOMETRY_OUTPUT_TYPE_EXT
+#define GL_GEOMETRY_OUTPUT_TYPE_EXT                                  0x8DDC
+#endif
+
+#ifndef GL_MAX_GEOMETRY_TEXTURE_IMAGE_UNITS_EXT
+#define GL_MAX_GEOMETRY_TEXTURE_IMAGE_UNITS_EXT                      0x8C29
+#endif
+
+#ifndef GL_MAX_GEOMETRY_VARYING_COMPONENTS_EXT
+#define GL_MAX_GEOMETRY_VARYING_COMPONENTS_EXT                       0x8DDD
+#endif
+
+#ifndef GL_MAX_VERTEX_VARYING_COMPONENTS_EXT
+#define GL_MAX_VERTEX_VARYING_COMPONENTS_EXT                         0x8DDE
+#endif
+
+#ifndef GL_MAX_VARYING_COMPONENTS_EXT
+#define GL_MAX_VARYING_COMPONENTS_EXT                                0x8B4B
+#endif
+
+#ifndef GL_MAX_GEOMETRY_UNIFORM_COMPONENTS_EXT
+#define GL_MAX_GEOMETRY_UNIFORM_COMPONENTS_EXT                       0x8DDF
+#endif
+
+#ifndef GL_MAX_GEOMETRY_OUTPUT_VERTICES_EXT
+#define GL_MAX_GEOMETRY_OUTPUT_VERTICES_EXT                          0x8DE0
+#endif
+
+#ifndef GL_MAX_GEOMETRY_TOTAL_OUTPUT_COMPONENTS_EXT
+#define GL_MAX_GEOMETRY_TOTAL_OUTPUT_COMPONENTS_EXT                  0x8DE1
+#endif
+
+#ifndef GL_LINES_ADJACENCY_EXT
+#define GL_LINES_ADJACENCY_EXT                                          0xA
+#endif
+
+#ifndef GL_LINE_STRIP_ADJACENCY_EXT
+#define GL_LINE_STRIP_ADJACENCY_EXT                                     0xB
+#endif
+
+#ifndef GL_TRIANGLES_ADJACENCY_EXT
+#define GL_TRIANGLES_ADJACENCY_EXT                                      0xC
+#endif
+
+#ifndef GL_TRIANGLE_STRIP_ADJACENCY_EXT
+#define GL_TRIANGLE_STRIP_ADJACENCY_EXT                                 0xD
+#endif
+
+#ifndef GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS_EXT
+#define GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS_EXT                  0x8DA8
+#endif
+
+#ifndef GL_FRAMEBUFFER_INCOMPLETE_LAYER_COUNT_EXT
+#define GL_FRAMEBUFFER_INCOMPLETE_LAYER_COUNT_EXT                    0x8DA9
+#endif
+
+#ifndef GL_FRAMEBUFFER_ATTACHMENT_LAYERED_EXT
+#define GL_FRAMEBUFFER_ATTACHMENT_LAYERED_EXT                        0x8DA7
+#endif
+
+#ifndef GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER_EXT
+#define GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER_EXT                  0x8CD4
+#endif
+
+#ifndef GL_PROGRAM_POINT_SIZE_EXT
+#define GL_PROGRAM_POINT_SIZE_EXT                                    0x8642
+#endif
+
+
+/** @} */
+
+/**\name GL_EXT_geometry_shader4 functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/EXT/geometry_shader4.txt">http://www.opengl.org/registry/specs/EXT/geometry_shader4.txt</a>.
+ * @{ */
+
+/** @} */
 /**\name GL_ARB_pixel_buffer_object constants
  * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/pixel_buffer_object.txt">http://www.opengl.org/registry/specs/ARB/pixel_buffer_object.txt</a>.
  * @{ */
@@ -17246,6 +17337,11 @@ public:
 
 
   /** @} */
+  /**\name GL_EXT_geometry_shader4 functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/EXT/geometry_shader4.txt">http://www.opengl.org/registry/specs/EXT/geometry_shader4.txt</a>.
+   * @{ */
+
+  /** @} */
   /**\name GL_ARB_pixel_buffer_object functions
    * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/pixel_buffer_object.txt">http://www.opengl.org/registry/specs/ARB/pixel_buffer_object.txt</a>.
    * @{ */
@@ -18116,6 +18212,9 @@ public:
   /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/vertex_shader.txt">GL_ARB_vertex_shader</a> extension was found. 
    * Set by csGLExtensionManager::InitGL_ARB_vertex_shader(). */
   bool CS_GL_ARB_vertex_shader;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/EXT/geometry_shader4.txt">GL_EXT_geometry_shader4</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_geometry_shader4(). */
+  bool CS_GL_EXT_geometry_shader4;
   /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/pixel_buffer_object.txt">GL_ARB_pixel_buffer_object</a> extension was found. 
    * Set by csGLExtensionManager::InitGL_ARB_pixel_buffer_object(). */
   bool CS_GL_ARB_pixel_buffer_object;
@@ -18372,6 +18471,7 @@ protected:
   bool tested_CS_GL_ARB_shader_objects;
   bool tested_CS_GL_ARB_fragment_shader;
   bool tested_CS_GL_ARB_vertex_shader;
+  bool tested_CS_GL_EXT_geometry_shader4;
   bool tested_CS_GL_ARB_pixel_buffer_object;
   bool tested_CS_GL_ARB_texture_rectangle;
   bool tested_CS_GL_EXT_framebuffer_object;
@@ -24420,6 +24520,35 @@ public:
       EXTMGR_FUNC_INIT(glGetVertexAttribPointervARB, GLGETVERTEXATTRIBPOINTERVARB);
 
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_vertex_shader)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/EXT/geometry_shader4.txt">GL_EXT_geometry_shader4</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_geometry_shader4. */
+  void InitGL_EXT_geometry_shader4 ()
+  {
+    if (tested_CS_GL_EXT_geometry_shader4) return;
+    if (!extstrGL) return;
+    tested_CS_GL_EXT_geometry_shader4 = true;
+    const char* ext = "GL_EXT_geometry_shader4";
+
+    char cfgkey[26 + 23 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_EXT_geometry_shader4 = CheckExtension (extstrGL, ext);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_EXT_geometry_shader4;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_geometry_shader4)
     }
     else
     {

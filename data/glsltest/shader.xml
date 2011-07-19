@@ -19,6 +19,23 @@
           </program>
         </vp>
 
+        <gp>
+          <program>
+            <![CDATA[
+              void main (void)
+              {
+                gl_Position = gl_PositionIn[0];
+                EmitVertex ();
+                gl_Position = gl_PositionIn[1];
+                EmitVertex ();
+                gl_Position = gl_PositionIn[2];
+                EmitVertex ();
+                EndPrimitive ();
+              }
+            ]]>
+          </program>
+        </gp>
+
         <fp>
           <variablemap destination="coeff" type="vector3">
             <![CDATA[1.0,1.0,0.1]]>
