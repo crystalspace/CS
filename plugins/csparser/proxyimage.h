@@ -93,7 +93,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     //// iResource //// 
     virtual const CS::Resource::TypeID GetTypeID () const
     {
-      return CS::Resource::HashID ("image");
+      return CS::Resource::GetTypeID ("image");
     }
   };
 }

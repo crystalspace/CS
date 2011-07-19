@@ -33,18 +33,18 @@ namespace CS
     {
       // Implements the DJB hash algorithm.
       template<size_t N, size_t I = 1>
-      struct HashIDCalc
+      struct TypeIDCalc
       {
         CS_FORCEINLINE_TEMPLATEMETHOD
           static TypeID hash (const char (&s)[N])
         {
-          TypeID typeID = HashIDCalc<N, I+1>::hash (s);
+          TypeID typeID = TypeIDCalc<N, I+1>::hash (s);
           return ((typeID << 5) + typeID) + s[N-I];
         }
       };
 
       template<size_t N>
-      struct HashIDCalc<N, N>
+      struct TypeIDCalc<N, N>
       {
         CS_FORCEINLINE_TEMPLATEMETHOD
           static TypeID hash (const char (&s)[N])
@@ -56,13 +56,13 @@ namespace CS
 
     template<size_t N>
     CS_FORCEINLINE_TEMPLATEMETHOD
-    TypeID HashID (const char (&s)[N])
+    TypeID GetTypeID (const char (&s)[N])
     {
-      return Impl::HashIDCalc<N>::hash (s);
+      return Impl::TypeIDCalc<N>::hash (s);
     }
 
     CS_FORCEINLINE
-    TypeID HashID (const char* s)
+    TypeID GetTypeID (const char* s)
     {
       return csHashCompute (s);
     }

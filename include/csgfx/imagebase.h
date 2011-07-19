@@ -98,7 +98,7 @@ public:
   //// iResource //// 
   virtual const CS::Resource::TypeID GetTypeID () const
   {
-    return CS::Resource::HashID ("image");
+    return CS::Resource::GetTypeID ("image");
   }
 };
 

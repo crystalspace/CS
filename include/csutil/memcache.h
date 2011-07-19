@@ -36,22 +36,25 @@ namespace CS
       // iResourceCache
       virtual void Add (CS::Resource::TypeID type, const char* name, iLoadingResource* resource)
       {
+        Resources& resources = resourcesHash.GetOrCreate (type);
         resources.Put (name, resource);
       }
 
       virtual csRef<iLoadingResource> Get (CS::Resource::TypeID type, const char* name)
       {
+        Resources& resources = resourcesHash.GetOrCreate (type);
         return resources.Get (name, csRef<iLoadingResource> ());
       }
 
       virtual void Release (CS::Resource::TypeID type, const char* name)
       {
+        Resources& resources = resourcesHash.GetOrCreate (type);
         resources.Delete (name);
       }
 
-    private: 
+    private:
       typedef csRedBlackTreeMap<csString, csRef<iLoadingResource> > Resources;
-      Resources resources;
+      csHash<Resources, CS::Resource::TypeID> resourcesHash;
     };
   }
 }

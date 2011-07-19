@@ -221,7 +221,7 @@ void DAMNPanel::OnSearchButton (wxCommandEvent& event)
         std::string pk = root[index]["pk"].asString();
         std::string subName = root[index]["fields"]["subName"].asString();
         //printf("test1 %s\n", pk.c_str());
-        csRef<iLoadingResource> image = damn->Get(CS::Resource::HashID ("image"), (pk+"::preview").c_str());
+        csRef<iLoadingResource> image = damn->Get(CS::Resource::GetTypeID ("image"), (pk+"::preview").c_str());
         searchResults[image] = subName;
         image->AddListener(this);
       }
@@ -241,7 +241,7 @@ void DAMNPanel::OnSearchButton (wxCommandEvent& event)
 void DAMNPanel::OnCancelButton (wxCommandEvent& event)
 {
    printf("success c\n");
-   csRef<iLoadingResource> image = damn->Get(CS::Resource::HashID ("factory"), "782b83441a749df48b085f35655558700d1f1f17::mesh");
+   csRef<iLoadingResource> image = damn->Get(CS::Resource::GetTypeID ("factory"), "782b83441a749df48b085f35655558700d1f1f17::mesh");
 }
 
 

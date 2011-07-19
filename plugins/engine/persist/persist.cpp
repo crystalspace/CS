@@ -59,9 +59,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 
   csPtr<iResource> Persist::Load (iDocumentNode* node)
   {
-    Resource::TypeID typeID = Resource::HashID (node->GetContentsValue ());
+    Resource::TypeID typeID = Resource::GetTypeID (node->GetContentsValue ());
 
-    if (typeID == Resource::HashID ("image"))
+    if (typeID == Resource::GetTypeID ("image"))
       return csPtr<iResource> (LoadImage (node));
 
     return 0;
@@ -69,7 +69,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 
   csPtr<iResource> Persist::Load (Resource::TypeID typeID, iDataBuffer* buf)
   {
-    if (typeID == Resource::HashID ("image"))
+    if (typeID == Resource::GetTypeID ("image"))
       return csPtr<iResource> (LoadImage (buf));
 
     return 0;
@@ -79,7 +79,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
   {
     Resource::TypeID typeID = resource->GetTypeID ();
 
-    if (typeID == Resource::HashID ("image"))
+    if (typeID == Resource::GetTypeID ("image"))
       return SaveImage (resource, node);
 
     return false;
@@ -89,7 +89,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
   {
     Resource::TypeID typeID = resource->GetTypeID ();
 
-    if (typeID == Resource::HashID ("image"))
+    if (typeID == Resource::GetTypeID ("image"))
       return SaveImage (resource);
 
     return 0;

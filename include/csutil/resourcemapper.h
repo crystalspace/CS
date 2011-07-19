@@ -89,7 +89,7 @@ namespace CS
           while (resourceNodes->HasNext ())
           {
             csRef<iDocumentNode> resourceNode = resourceNodes->Next ();
-            Register (plugin, CS::Resource::HashID (resourceNode->GetContentsValue ()));
+            Register (plugin, CS::Resource::GetTypeID (resourceNode->GetContentsValue ()));
           }
         }
 
