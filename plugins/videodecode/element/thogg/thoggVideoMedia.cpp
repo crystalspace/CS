@@ -138,7 +138,6 @@ bool TheoraVideoMedia::Update ()
   cout<<"writing to "<<activeBuffer<<endl;
   canSwap=false;
 
-  
   iTextureHandle* tex = _buffers.Get (activeBuffer);
   uint8* pixels = tex->QueryBlitBuffer (_streamInfo.pic_x,_streamInfo.pic_y,_streamInfo.pic_width,_streamInfo.pic_height,dstSize);
 
@@ -363,23 +362,16 @@ void TheoraVideoMedia::InitializeStream (ogg_stream_state &state, th_info &info,
   _decodersStarted = false;
   _infile = source;
 
-  //create the buffers needed for double buffering
+  // Create the buffers needed for double buffering
+  csRef<iTextureHandle> tex1 = texManager->CreateTexture 
+    (_streamInfo.frame_width, _streamInfo.frame_height, 0, csimg2D, "rgb8",
+     CS_TEXTURE_2D | CS_TEXTURE_NPOTS);
+  _buffers.Push (tex1);
 
-  csRef<iTextureHandle> _buffer1,_buffer2;
-
-  csPtr<iTextureHandle> tex1 = texManager->CreateTexture 
-    (_streamInfo.frame_width, _streamInfo.frame_height, 0, csimg2D,"rgb8",
-    CS_TEXTURE_2D|CS_TEXTURE_NPOTS);
-  _buffer1.AttachNew(tex1);
-
-  _buffers.Push (_buffer1);
-
-  csPtr<iTextureHandle> tex2 = texManager->CreateTexture 
-    (_streamInfo.frame_width, _streamInfo.frame_height,0,csimg2D,"rgb8",
-    CS_TEXTURE_2D|CS_TEXTURE_NPOTS);
-  _buffer2.AttachNew(tex2);
-
-  _buffers.Push (_buffer2);
+  csRef<iTextureHandle> tex2 = texManager->CreateTexture 
+    (_streamInfo.frame_width, _streamInfo.frame_height, 0, csimg2D, "rgb8",
+     CS_TEXTURE_2D | CS_TEXTURE_NPOTS);
+  _buffers.Push (tex2);
 
   activeBuffer = 1;
 

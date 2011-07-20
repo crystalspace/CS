@@ -106,6 +106,8 @@ THREADED_CALLABLE_IMPL(vplPlayer, Update)
     }
   }
   }
+
+  return true;
 }
 
 void vplPlayer::Loop (bool shouldLoop)
