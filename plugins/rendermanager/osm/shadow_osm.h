@@ -627,7 +627,10 @@ namespace CS
           }
           
           const csGraphics3DCaps *caps = g3d->GetCaps();
-          if (!mrt)  
+          
+          if (mrt > 0)  
+            mrt = csMin(caps->MaxRTColorAttachments, mrt);
+          else
             mrt = caps->MaxRTColorAttachments;
 
           csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
