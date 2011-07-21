@@ -4,6 +4,7 @@ SubInclude TOP apps tutorial pathtut ;
 SubInclude TOP apps tutorial phystut ;
 SubInclude TOP apps tutorial pysimp ;
 SubInclude TOP apps tutorial simpcd ;
+SubInclude TOP apps tutorial simpcd2 ;
 SubInclude TOP apps tutorial simple1 ;
 SubInclude TOP apps tutorial simple2 ;
 SubInclude TOP apps tutorial simplept ;

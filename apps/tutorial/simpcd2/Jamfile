@@ -1,0 +1,5 @@
+SubDir TOP apps tutorial simpcd2 ;
+
+Description simpcd2 : "collision detection tutorial" ;
+Application simpcd2 : [ Wildcard *.cpp *.h ] : noinstall ;
+LinkWith simpcd2 : crystalspace ;

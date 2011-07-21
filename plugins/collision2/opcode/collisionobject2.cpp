@@ -23,10 +23,14 @@ void csOpcodeCollisionObject::SetObjectType (CS::Collision2::CollisionObjectType
 void csOpcodeCollisionObject::SetTransform (const csOrthoTransform& trans)
 {
   transform = trans;
+  if (movable)
+    movable->SetFullTransform (transform);
 }
 
 csOrthoTransform csOpcodeCollisionObject::GetTransform ()
 {
+  if (movable)
+    return movable->GetFullTransform ();
   return transform;
 }
 

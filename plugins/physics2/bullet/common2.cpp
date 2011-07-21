@@ -51,12 +51,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
     iMovable* movable = body->GetAttachedMovable ();
     if (movable)
     {
-      // Dont do anything if nothing has changed
-      // @@@ TODO Is comparing that transform efficient and correct?
-      if (movable->GetPosition () == tr.GetOrigin () &&
-        movable->GetTransform ().GetT2O () == tr.GetT2O ())
-        return;
-
       // Update movable
       movable->SetFullTransform (tr);
       movable->UpdateMove ();
@@ -77,12 +71,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
     iMovable* movable = body->GetAttachedMovable ();
     if (movable)
     {
-      // Dont do anything if nothing has changed
-      // @@@ TODO Is comparing that transform efficient and correct?
-      if (movable->GetPosition () == tr.GetOrigin () &&
-        movable->GetTransform ().GetT2O () == tr.GetT2O ())
-        return;
-
       // Update movable
       movable->SetFullTransform (tr);
       movable->UpdateMove ();

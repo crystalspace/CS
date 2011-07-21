@@ -5,7 +5,6 @@
 #include "ivaria/physical2.h"
 #include "ivaria/bullet2.h"
 #include "ivaria/collision2.h"
-#include "ivaria/softanim.h"
 #include "imesh/animesh.h"
 #include "imesh/animnode/ragdoll.h"
 

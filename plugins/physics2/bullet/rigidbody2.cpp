@@ -601,7 +601,7 @@ void csBulletDefaultKinematicCallback::GetBodyTransform
   iMovable* movable = rigBody->GetAttachedMovable ();
   if (movable)
   {
-    transform = movable->GetTransform ();
+    transform = movable->GetFullTransform ();
     return;
   }  
 }

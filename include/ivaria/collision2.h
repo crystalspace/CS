@@ -88,7 +88,7 @@ struct HitBeamResult
   bool hasHit;
 
   /// The collision object that was hit, or \a nullptr if no object was hit.
-  csRef<iCollisionObject> object;
+  iCollisionObject* object;
 
   /// Intersection point in world space.
   csVector3 isect;

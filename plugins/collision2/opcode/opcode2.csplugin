@@ -5,7 +5,7 @@
     <classes>
       <class>
         <name>crystalspace.collision.opcode2</name>
-        <implementation>Opcode2CollisionSystem</implementation>
+        <implementation>csOpcodeCollisionSystem</implementation>
         <description>OPCODE collision system</description>
       </class>
     </classes>

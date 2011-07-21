@@ -94,7 +94,7 @@ void csBulletCollisionObject::SetTransform (const csOrthoTransform& trans)
   else // ghost or actor
   {
     if (movable)
-      movable->SetTransform (BulletToCS (transform * invPricipalAxis, system->getInverseInternalScale ()));
+      movable->SetFullTransform (BulletToCS (transform * invPricipalAxis, system->getInverseInternalScale ()));
     if (btObject)
       btObject->setWorldTransform(transform);
   }
@@ -443,7 +443,7 @@ void csBulletCollisionObject::AddBulletObject ()
     btObject = new btPairCachingGhostObject ();
     btObject->setWorldTransform (transform);
     if (movable)
-      movable->SetTransform (BulletToCS(transform * invPricipalAxis, system->getInverseInternalScale ()));
+      movable->SetFullTransform (BulletToCS(transform * invPricipalAxis, system->getInverseInternalScale ()));
     btObject->setUserPointer (dynamic_cast<CS::Collision2::iCollisionObject*> (this));
     btObject->setCollisionShape (shape);
     sector->broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());

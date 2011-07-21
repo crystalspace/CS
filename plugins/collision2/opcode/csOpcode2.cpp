@@ -288,10 +288,9 @@ CS::Collision2::HitBeamResult csOpcodeCollisionSector::HitBeamObject (csOpcodeCo
   CS::Collision2::HitBeamResult res = HitBeamCollider (collider->model, collider->vertholder, 
     collider->indexholder, object->transform, start, end, depth);
   if (res.hasHit)
-  {
     res.object = object;
-    return res;
-  }
+
+  return res;
 }
 
 CS::Collision2::HitBeamResult csOpcodeCollisionSector::HitBeamTerrain (csOpcodeCollisionObject* terrainObj, 
@@ -312,6 +311,7 @@ CS::Collision2::HitBeamResult csOpcodeCollisionSector::HitBeamTerrain (csOpcodeC
       return result;
     }
   }
+  return result;
 }
 
 static void ray_cb (const CollisionFace& hit, void* user_data)
@@ -351,7 +351,6 @@ CS::Collision2::HitBeamResult csOpcodeCollisionSector::HitBeamCollider (Opcode::
   transform.m[2][2] = u.z;
 
   u = trans.GetO2TTranslation ();
-  u.Set (0, 0, 0);
   transform.m[3][0] = u.x;
   transform.m[3][1] = u.y;
   transform.m[3][2] = u.z;
@@ -569,13 +568,11 @@ bool csOpcodeCollisionSector::CollideDetect (Opcode::Model* modelA,
   transform2.m[2][2] = u.z;
 
   u = transA.GetO2TTranslation ();
-  u.Set (0, 0, 0);
   transform1.m[3][0] = u.x;
   transform1.m[3][1] = u.y;
   transform1.m[3][2] = u.z;
 
   u = transB.GetO2TTranslation ();
-  u.Set (0, 0, 0);
   transform2.m[3][0] = u.x;
   transform2.m[3][1] = u.y;
   transform2.m[3][2] = u.z;
