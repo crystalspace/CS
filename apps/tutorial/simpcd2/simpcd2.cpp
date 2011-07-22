@@ -30,7 +30,7 @@ Simple::Simple ()
 {
   SetApplicationName ("CrystalSpace.SimpleCD2");
 
-  environment = ENVIRONMENT_WALLS;
+  environment = ENVIRONMENT_TERRAIN;
 
   rot1_direction = 1;
   rot2_direction = -1;
@@ -100,13 +100,36 @@ void Simple::Frame ()
   }
   else
   {
-     bool cd = sprite1_obj->Collide (terrainObject);
-     if (cd)
-     {
-       // Restore old transforms and reverse turning directions.
-       sprite1_obj->SetTransform (old_trans1);
-       rot1_direction = -rot1_direction;
-     }
+//     csArray<CS::Collision2::CollisionData> data;
+//     collisionSector->CollisionTest (terrainObject, data);
+//     for (size_t i = 0; i < data.GetSize (); i++)
+//     {
+//       if (data[i].objectB == sprite1_obj)
+//       {
+//         sprite1_obj->SetTransform (old_trans1);
+//         rot1_direction = -rot1_direction;
+//       }
+//       else if (data[i].objectB == sprite2_obj)
+//       {
+//         sprite2_obj->SetTransform (old_trans2);
+//         rot2_direction = -rot2_direction;
+//       }
+//     }
+    bool cd = sprite1_obj->Collide (terrainObject);
+    if (cd)
+    {
+      // Restore old transforms and reverse turning directions.
+      sprite1_obj->SetTransform (old_trans1);
+      rot1_direction = -rot1_direction;
+    }
+
+    cd = sprite2_obj->Collide (terrainObject);
+    if (cd)
+    {
+      // Restore old transforms and reverse turning directions.
+      sprite2_obj->SetTransform (old_trans2);
+      rot2_direction = -rot2_direction;
+    }
   }
 
   iCamera* c = view->GetCamera();
@@ -577,7 +600,7 @@ void Simple::CreateTerrain ()
 
   // Now create the first child.
   sprite1 = engine->CreateMeshWrapper (imeshfact, "Rotater1");
-  csOrthoTransform tc (csZRotMatrix3 (PI/2.), csVector3 (0, -.5, -.5));
+  csOrthoTransform tc (csZRotMatrix3 (0), csVector3 (0, -.5, -.5));
 
   spstate = scfQueryInterface<iSprite3DState> (sprite1->GetMeshObject ());
   spstate->SetAction ("default");
@@ -595,7 +618,7 @@ void Simple::CreateTerrain ()
 
   // Now create the second child.
   sprite2 = engine->CreateMeshWrapper (imeshfact, "Rotater2");
-  tc = csOrthoTransform (csZRotMatrix3 (PI/2.), csVector3 (0, .5, -.5));
+  tc = csOrthoTransform (csZRotMatrix3 (0), csVector3 (0, .5, -.5));
 
   spstate = scfQueryInterface<iSprite3DState> (sprite2->GetMeshObject ());
   spstate->SetAction ("default");
@@ -636,6 +659,7 @@ bool Simple::OnMouseDown (iEvent& event)
       rot2_direction = (rot2_direction == 0.0f? -1.0f : 0.0f);
     }
   }
+  return true;
 }
 
 /*-------------------------------------------------------------------------*

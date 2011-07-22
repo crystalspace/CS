@@ -132,56 +132,58 @@ TerrainCellCollider::TerrainCellCollider (iTerrainCell* cell, csOrthoTransform t
 {
   opcMeshInt.SetCallback (&MeshCallback, this);
 
-  csLockedHeightData gridData = cell->GetHeightData ();
-  int gridWidth = cell->GetGridWidth ();
-  int gridHeight = cell->GetGridHeight ();
+  Opcode::OPCODECREATE OPCC;
 
-  vertholder = new Point [gridWidth * gridHeight];
-  indexholder = new unsigned int[3 * 2 * (gridWidth - 1) * (gridHeight - 1)];
+  unsigned int width = cell->GetGridWidth ();
+  unsigned int height = cell->GetGridHeight ();
+
+  vertholder = new Point [width * height];
+  indexholder = new unsigned int[3 * 2 * (width - 1) * (height - 1)];
 
   model = new Opcode::Model;
 
-  opcMeshInt.SetNbTriangles (2 * (gridWidth-1) * (gridHeight-1));
-  opcMeshInt.SetNbVertices((udword)gridWidth * gridHeight);
-
-  Opcode::OPCODECREATE OPCC;
+  opcMeshInt.SetNbTriangles (2 * (width-1) * (height-1));
+  opcMeshInt.SetNbVertices ((udword)width * height);
 
   // Mesh data
   OPCC.mIMesh = &opcMeshInt;
-  OPCC.mSettings.mRules = Opcode::SPLIT_SPLATTER_POINTS | Opcode::SPLIT_GEOM_CENTER;
+  OPCC.mSettings.mRules = Opcode::SPLIT_SPLATTER_POINTS |
+    Opcode::SPLIT_GEOM_CENTER;
   OPCC.mNoLeaf = true;
   OPCC.mQuantized = true;
   OPCC.mKeepOriginal = false;
   OPCC.mCanRemap = true;
 
-  csVector3 size = cell->GetSize ();
-  float gridCellWidth = size.x / gridWidth;
-  float gridCellHeight = size.z / gridHeight;
+  float offset_x = cell->GetPosition ().x;
+  float offset_y = cell->GetPosition ().y;
 
-  int index = 0;
-  float z = size.z;
-  float x = 0;
-  for (int i = 0; i < gridHeight; i++, z -= gridCellHeight)
+  float scale_x = cell->GetSize ().x / (width - 1);
+  float scale_z = cell->GetSize ().z / (height - 1);
+
+  for (unsigned int y = 0 ; y < height ; y++)
   {
-    for (int j = 0; j < gridWidth; j++, x += gridCellWidth)
+    for (unsigned int x = 0 ; x < width ; x++)
     {
-      //Need to revert left and right?
-      vertholder[index].Set (x , gridData.data[i * gridWidth + j] , z);
-      index++;
+      int index = y*width + x;
+
+      vertholder[index].Set (x * scale_x + offset_x,
+        cell->GetHeight(x, height - y - 1),
+        y * scale_z + offset_y);
     }
   }
 
-  index = 0;
-  for (int i = 0, y = 0; i < gridHeight - 1; i++, y += gridWidth)
+  int i = 0;
+  for (unsigned int y = 0 ; y < height-1 ; y++)
   {
-    for (int j = 0; j < gridWidth - 1; j++)
+    int yr = y * width;
+    for (unsigned int x = 0 ; x < width-1 ; x++)
     {
-      indexholder[index++] = y + j;
-      indexholder[index++] = y + gridWidth + j;
-      indexholder[index++] = y + j + 1;
-      indexholder[index++] = y + j + 1;
-      indexholder[index++] = y + gridWidth + j;
-      indexholder[index++] = y + gridWidth + j + 1;
+      indexholder[i++] = yr + x;
+      indexholder[i++] = yr+width + x;
+      indexholder[i++] = yr + x+1;
+      indexholder[i++] = yr + x+1;
+      indexholder[i++] = yr+width + x;
+      indexholder[i++] = yr+width + x+1;
     }
   }
 
@@ -273,10 +275,8 @@ void csOpcodeColliderTerrain::OnCellUnload (iTerrainCell *cell)
 
 void csOpcodeColliderTerrain::LoadCellToCollider (iTerrainCell* cell)
 {
-  csOrthoTransform cellTransform (terrainTransform);
-  csVector3 cellPosition  (cell->GetPosition ()[0], 0.0f, cell->GetPosition ()[1]);
-  cellTransform.SetOrigin (terrainTransform.GetOrigin ()
-    + terrainTransform.This2OtherRelative (cellPosition));
+  csOrthoTransform cellTransform;
+  cellTransform.Identity ();
 
   //Move to center??
 
