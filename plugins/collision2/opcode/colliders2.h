@@ -115,6 +115,10 @@ public:
 class TerrainCellCollider
 {
   friend class csOpcodeCollisionObject;
+
+  static void MeshCallback (udword triangle_index, 
+    Opcode::VertexPointers& triangle, void* user_data);
+
 public:
   Opcode::MeshInterface opcMeshInt;
   Opcode::Model* model;

@@ -130,6 +130,8 @@ void csOpcodeCollider::MeshCallback (udword triangle_index,
 TerrainCellCollider::TerrainCellCollider (iTerrainCell* cell, csOrthoTransform trans)
 : cell (cell), cellTransform (trans)
 {
+  opcMeshInt.SetCallback (&MeshCallback, this);
+
   csLockedHeightData gridData = cell->GetHeightData ();
   int gridWidth = cell->GetGridWidth ();
   int gridHeight = cell->GetGridHeight ();
@@ -161,7 +163,7 @@ TerrainCellCollider::TerrainCellCollider (iTerrainCell* cell, csOrthoTransform t
   float x = 0;
   for (int i = 0; i < gridHeight; i++, z -= gridCellHeight)
   {
-    for (int j = 0; j < gridWidth; x += gridCellWidth)
+    for (int j = 0; j < gridWidth; j++, x += gridCellWidth)
     {
       //Need to revert left and right?
       vertholder[index].Set (x , gridData.data[i * gridWidth + j] , z);
@@ -193,10 +195,28 @@ TerrainCellCollider::~TerrainCellCollider ()
     delete model;
     model = NULL;
   }
-  delete indexholder;
-  delete vertholder;
+  if (indexholder)
+    delete[] indexholder;
+  indexholder = NULL;
+
+  if (vertholder)
+    delete[] vertholder;
+  vertholder = NULL;
 }
 
+void TerrainCellCollider::MeshCallback (udword triangle_index,
+                                     Opcode::VertexPointers& triangle,
+                                     void* user_data)
+{
+  TerrainCellCollider* collider = (TerrainCellCollider*)user_data;
+
+  udword *tri_array = collider->indexholder;
+  Point *vertholder = collider->vertholder;
+  int index = 3 * triangle_index;
+  triangle.Vertex[0] = &vertholder [tri_array[index]] ;
+  triangle.Vertex[1] = &vertholder [tri_array[index + 1]];
+  triangle.Vertex[2] = &vertholder [tri_array[index + 2]];
+}
 
 csOpcodeColliderTerrain::csOpcodeColliderTerrain (iTerrainSystem* terrain,
                                                   csOpcodeCollisionSystem* sys)

@@ -328,6 +328,8 @@ CS::Collision2::HitBeamResult csOpcodeCollisionSector::HitBeamCollider (Opcode::
                                                                         const csVector3& end,
                                                                         float& depth)
 {
+  ColCache.Model0 = model;
+
   csMatrix3 m;
   m = trans.GetT2O ();
   csVector3 u;

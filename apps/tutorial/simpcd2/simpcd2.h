@@ -80,8 +80,8 @@ private:
   /// The first of the two colliding meshes
   csRef<iMeshWrapper> sprite1;
   
-  /// sprite1's collider
-  csRef<CS::Collision2::iColliderConcaveMesh> sprite1_col;
+  /// sprites' shared collider
+  csRef<CS::Collision2::iColliderConcaveMesh> sprite_col;
 
   /// sprite1's object
   csRef<CS::Collision2::iCollisionObject> sprite1_obj;
@@ -91,9 +91,6 @@ private:
 
   /// The second of the two colliding meshes
   csRef<iMeshWrapper> sprite2;
-
-  /// sprite2's collider
-  csRef<CS::Collision2::iColliderConcaveMesh> sprite2_col;
 
   /// sprite2's object
   csRef<CS::Collision2::iCollisionObject> sprite2_obj;
@@ -107,6 +104,12 @@ private:
 
   // Collider's local transform
   csOrthoTransform localTrans;
+
+  // Environments
+  int environment;
+
+  // The collider of terrain.
+  csRef<CS::Collision2::iCollisionObject> terrainObject;
 
 public:
   bool SetupModules ();
@@ -134,6 +137,8 @@ public:
 
   /// Here we will create our little, simple world.
   void CreateRoom ();
+
+  void CreateTerrain ();
 
   /// Construct our game. This will just set the application ID for now.
   Simple ();

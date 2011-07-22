@@ -17,8 +17,12 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "simpcd2.h"
+#include "imesh/terrain2.h"
 
 CS_IMPLEMENT_APPLICATION
+
+#define ENVIRONMENT_WALLS 1
+#define ENVIRONMENT_TERRAIN 2
 
 //---------------------------------------------------------------------------
 
@@ -26,10 +30,11 @@ Simple::Simple ()
 {
   SetApplicationName ("CrystalSpace.SimpleCD2");
 
+  environment = ENVIRONMENT_WALLS;
+
   rot1_direction = 1;
   rot2_direction = -1;
-  sprite1_col = 0;
-  sprite2_col = 0;
+  sprite_col = 0;
   
   localTrans.Identity ();
 }
@@ -81,14 +86,27 @@ void Simple::Frame ()
   // one returned from GetTransform() since there is no equivalent
   // SetFullTransform().
   //---------
-  bool cd = sprite1_obj->Collide (sprite2_obj);
-  if (cd)
+  if (environment == ENVIRONMENT_WALLS)
   {
-    // Restore old transforms and reverse turning directions.
-    sprite1_obj->SetTransform (old_trans1);
-    sprite2_obj->SetTransform (old_trans2);
-    rot1_direction = -rot1_direction;
-    rot2_direction = -rot2_direction;
+    bool cd = sprite1_obj->Collide (sprite2_obj);
+    if (cd)
+    {
+      // Restore old transforms and reverse turning directions.
+      sprite1_obj->SetTransform (old_trans1);
+      sprite2_obj->SetTransform (old_trans2);
+      rot1_direction = -rot1_direction;
+      rot2_direction = -rot2_direction;
+    }
+  }
+  else
+  {
+     bool cd = sprite1_obj->Collide (terrainObject);
+     if (cd)
+     {
+       // Restore old transforms and reverse turning directions.
+       sprite1_obj->SetTransform (old_trans1);
+       rot1_direction = -rot1_direction;
+     }
   }
 
   iCamera* c = view->GetCamera();
@@ -215,6 +233,7 @@ void Simple::OnExit()
   printer.Invalidate();
 }
 
+
 bool Simple::Application()
 {
   // Open the main system. This will open all the previously loaded plug-ins.
@@ -265,7 +284,10 @@ bool Simple::SetupModules ()
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   // Here we create our world.
-  CreateRoom();
+  if (environment == ENVIRONMENT_WALLS)
+    CreateRoom();
+  else
+    CreateTerrain ();
 
   // Let the engine prepare all lightmaps for use and also free all images 
   // that were loaded for the texture manager.
@@ -422,10 +444,10 @@ void Simple::CreateRoom ()
   spstate->SetAction ("default");
   sprite1->QuerySceneNode ()->SetParent (parent_sprite->QuerySceneNode ());
 
-  sprite1_col = collisionSystem->CreateColliderConcaveMesh (sprite1);
+  sprite_col = collisionSystem->CreateColliderConcaveMesh (sprite1);
 
   sprite1_obj = collisionSystem->CreateCollisionObject ();
-  sprite1_obj->AddCollider (sprite1_col, localTrans);
+  sprite1_obj->AddCollider (sprite_col, localTrans);
   sprite1_obj->SetAttachedMovable (sprite1->GetMovable ());
   // You have to set a world transform to collision object.
   sprite1_obj->SetTransform (tc * parTrans);
@@ -441,15 +463,150 @@ void Simple::CreateRoom ()
   spstate->SetAction ("default");
   sprite2->QuerySceneNode ()->SetParent (parent_sprite->QuerySceneNode ());
 
-  sprite2_col = collisionSystem->CreateColliderConcaveMesh (sprite2);
-
   sprite2_obj = collisionSystem->CreateCollisionObject ();
-  sprite2_obj->AddCollider (sprite2_col, localTrans);
+  sprite2_obj->AddCollider (sprite_col, localTrans);
   sprite2_obj->SetAttachedMovable (sprite2->GetMovable ());
   sprite2_obj->SetTransform (tc * parTrans);
 
   collisionSector->AddCollisionObject (sprite2_obj);
   //sprite2_obj->SetCollisionGroup ("SpriteFiltered");
+}
+
+void Simple::CreateTerrain ()
+{
+  printf ("Loading terrain...\n");
+
+  // Load the level file
+  csRef<iVFS> VFS (csQueryRegistry<iVFS> (GetObjectRegistry ()));
+  VFS->ChDir ("/lev/terraini");
+
+  if (!loader->LoadMapFile ("world"))
+  {
+    ReportError("Error couldn't load terrain level!");
+    return;
+  }
+
+  // We create a new sector called "room".
+  room = engine->FindSector ("room");
+
+  engine->Prepare ();
+
+  // Find the terrain mesh
+  csRef<iMeshWrapper> terrainWrapper = engine->FindMeshObject ("Terrain");
+  if (!terrainWrapper)
+  {
+    ReportError("Error cannot find the terrain mesh!");
+    return;
+  }
+
+  csRef<iTerrainSystem> terrain =
+    scfQueryInterface<iTerrainSystem> (terrainWrapper->GetMeshObject ());
+  if (!terrain)
+  {
+    ReportError("Error cannot find the terrain interface!");
+    return;
+  }
+
+  // Create the dynamic system
+  collisionSector = collisionSystem->CreateCollisionSector ();
+  if (!collisionSector) 
+  {
+    ReportError ("Error creating collision sector!");
+    return;
+  }
+
+  collisionSector->SetSector (room);
+
+  csRef<CS::Collision2::iColliderTerrain> terrainCollider = collisionSystem->CreateColliderTerrain (terrain);
+  terrainObject = collisionSystem->CreateCollisionObject ();
+  terrainObject->AddCollider (terrainCollider, localTrans);
+  terrainObject->RebuildObject ();
+  collisionSector->AddCollisionObject (terrainObject);
+
+  // Now we need light to see something.
+  csRef<iLight> light;
+  iLightList* ll = room->GetLights ();
+
+  light = engine->CreateLight(0, csVector3(-3, 5, 0), 10, csColor(2, 0, 0));
+  ll->Add (light);
+
+  light = engine->CreateLight(0, csVector3(3, 5,  0), 10, csColor(0, 0, 2));
+  ll->Add (light);
+
+  light = engine->CreateLight(0, csVector3(0, 5, -3), 10, csColor(0, 2, 0));
+  ll->Add (light);
+
+  // Load a texture for our sprite.
+  iTextureWrapper* txt = loader->LoadTexture ("spark",
+    "/lib/std/spark.png");
+  if (txt == 0)
+  {
+    ReportError ("Error loading texture!");
+    return;
+  }
+
+  //---------
+  // Load a sprite template from disk.
+  //---------
+  csRef<iMeshFactoryWrapper> imeshfact (loader->LoadMeshObjectFactory (
+    "/lib/std/sprite2"));
+  if (imeshfact == 0)
+  {
+    ReportError ("Error loading mesh object factory!");
+    return;
+  }
+
+  //---------
+  // Here we create a hierarchical mesh object made from three sprites.
+  // There is one 'anchor' (parent_sprite) which has two children
+  // ('sprite1' and 'sprite2'). Later on we will rotate the two children
+  // and also rotate the entire hierarchical mesh.
+  //---------
+  csRef<iSprite3DState> spstate;
+
+  // First create the parent sprite.
+  parent_sprite = engine->CreateMeshWrapper (
+    imeshfact, "Parent", room,
+    csVector3 (0, 2, 3.5));
+  spstate = 
+    scfQueryInterface<iSprite3DState> (parent_sprite->GetMeshObject ());
+  spstate->SetAction ("default");
+  parent_sprite->GetMovable ()->Transform (csZRotMatrix3 (PI/2.));
+  parent_sprite->GetMovable ()->UpdateMove ();
+  csOrthoTransform parTrans = parent_sprite->GetMovable ()->GetFullTransform ();
+
+  // Now create the first child.
+  sprite1 = engine->CreateMeshWrapper (imeshfact, "Rotater1");
+  csOrthoTransform tc (csZRotMatrix3 (PI/2.), csVector3 (0, -.5, -.5));
+
+  spstate = scfQueryInterface<iSprite3DState> (sprite1->GetMeshObject ());
+  spstate->SetAction ("default");
+  sprite1->QuerySceneNode ()->SetParent (parent_sprite->QuerySceneNode ());
+
+  sprite_col = collisionSystem->CreateColliderConcaveMesh (sprite1);
+
+  sprite1_obj = collisionSystem->CreateCollisionObject ();
+  sprite1_obj->AddCollider (sprite_col, localTrans);
+  sprite1_obj->SetAttachedMovable (sprite1->GetMovable ());
+  // You have to set a world transform to collision object.
+  sprite1_obj->SetTransform (tc * parTrans);
+
+  collisionSector->AddCollisionObject (sprite1_obj);
+
+  // Now create the second child.
+  sprite2 = engine->CreateMeshWrapper (imeshfact, "Rotater2");
+  tc = csOrthoTransform (csZRotMatrix3 (PI/2.), csVector3 (0, .5, -.5));
+
+  spstate = scfQueryInterface<iSprite3DState> (sprite2->GetMeshObject ());
+  spstate->SetAction ("default");
+  sprite2->QuerySceneNode ()->SetParent (parent_sprite->QuerySceneNode ());
+
+  sprite2_obj = collisionSystem->CreateCollisionObject ();
+  sprite2_obj->AddCollider (sprite_col, localTrans);
+  sprite2_obj->SetAttachedMovable (sprite2->GetMovable ());
+  sprite2_obj->SetTransform (tc * parTrans);
+
+  collisionSector->AddCollisionObject (sprite2_obj);
 }
 
 bool Simple::OnMouseDown (iEvent& event)
