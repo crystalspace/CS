@@ -205,17 +205,17 @@ namespace CS
               
               csReversibleTransform meshTransform = 
                 mesh.meshWrapper->GetMovable()->GetTransform();
-              csRef<csRenderBufferHolder> buffers = 
-                mesh.renderMesh->buffers;
-              iRenderBuffer* positions = 
-                buffers->GetRenderBuffer (CS_BUFFER_POSITION);
-              csVertexListWalker<float, csVector3> positionWalker (positions);
+//               csRef<csRenderBufferHolder> buffers = 
+//                 mesh.renderMesh->buffers;
+//               iRenderBuffer* positions = 
+//                 buffers->GetRenderBuffer (CS_BUFFER_POSITION);
+//               csVertexListWalker<float, csVector3> positionWalker (positions);
               csVector3 lightPosition = light->GetMovable()->GetPosition();
 
               // only take into account translucent objects
-              if ( mesh.meshWrapper->GetRenderPriority() != 
-                rview->GetEngine()->GetRenderPriority("alpha"))
-                continue;
+//               if ( mesh.meshWrapper->GetRenderPriority() != 
+//                 rview->GetEngine()->GetRenderPriority("alpha"))
+//                 continue;
 
               // add to mesh filter include
 	            superFrust->meshFilter.AddFilterMesh (mesh.meshWrapper);
@@ -240,25 +240,34 @@ namespace CS
                 //vLightPP /= vLightPP.w;
                 meshBboxLightPP.AddBoundingVertexSmart (csVector3 (vLightPP.x,
                   vLightPP.y, vLightPP.z));
-              }
 
-              castingObjects += meshBboxLightPP;
-              receivingObjects += meshBboxLightPP;
-                  
-              // Iterate on all vertices
-              for (size_t i = 0; i < positionWalker.GetSize (); i++)
-              {
                 float distance = (lightPosition - 
-                  meshTransform.This2Other(*positionWalker)).Norm ();
+                  meshBboxWorld.GetCorner (c)).Norm ();
 
                 if (distance < _near)
                   _near = distance;
 
                 if (distance > _far)
                   _far = distance;
-
-                ++positionWalker;
               }
+
+              castingObjects += meshBboxLightPP;
+              receivingObjects += meshBboxLightPP;
+                  
+              // Iterate on all vertices
+//               for (size_t i = 0; i < positionWalker.GetSize (); i++)
+//               {
+//                 float distance = (lightPosition - 
+//                   meshTransform.This2Other(*positionWalker)).Norm ();
+// 
+//                 if (distance < _near)
+//                   _near = distance;
+// 
+//                 if (distance > _far)
+//                   _far = distance;
+// 
+//                 ++positionWalker;
+//               }
             }
           }
         }
@@ -329,7 +338,7 @@ namespace CS
 
           csBox3 castingObjects;
           csBox3 receivingObjects;
-
+  
           ProcessGeometry(lightFrustums.frustums[0], context, light, rview, 
             _near, _far, castingObjects, receivingObjects);
 
@@ -404,7 +413,7 @@ namespace CS
             csRef<iClipper2D> newView;
             newView.AttachNew (new csBoxClipper (clipBox));
             newRenderView->SetClipper (newView);
-            newRenderView->SetMeshFilter(superFrust.meshFilter);
+//             newRenderView->SetMeshFilter(superFrust.meshFilter);
 
             typename RenderTree::ContextNode* shadowMapCtx = 
               renderTree.CreateContext (newRenderView);
@@ -467,7 +476,7 @@ namespace CS
             csRef<iClipper2D> newView;
             newView.AttachNew (new csBoxClipper (clipBox));
             newRenderView->SetClipper (newView);
-            newRenderView->SetMeshFilter(superFrust.meshFilter);
+//             newRenderView->SetMeshFilter(superFrust.meshFilter);
 
             typename RenderTree::ContextNode* shadowMapCtx = 
               renderTree.CreateContext (newRenderView);

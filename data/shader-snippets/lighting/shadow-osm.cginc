@@ -122,7 +122,7 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     float2 position = shadowMapCoordsBiased.xy;
    
     int i;
-    float eps = 0.04;
+    float eps = 0.0;
 
     float compareDepth = (1 - shadowMapCoordsBiased.z) + eps;
     float depth = blurTex2D(lightPropsOM.shadowMap[lightNum], position).x;
@@ -147,14 +147,19 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     
     inLight = lerp(previousMap, nextMap, (float) (((compareDepth - depth) * 4) - previousSplit) 
       / (nextSplit - previousSplit) );
-    //inLight = previousMap;
+    inLight = previousMap;
       
-    inLight = inLight * (i != numSplits - 1) + previousMap * (i == numSplits - 1);
+    //inLight = inLight * (i != numSplits - 1) + previousMap * (i == numSplits - 1);
     inLight = exp(-1.0 * inLight);
-    
     //inLight = ((float)i / (numSplits - 1));
+/*
+    inLight = 1;
+    if (compareDepth > depth && depth != 0)
+      inLight = 0;
+*/
+    //inLight = tex2D(lightPropsOM.shadowMap[lightNum], float3(position, compareDepth)).x;
     
-    inLight = inLight * (depth != 0) + (depth == 0);
+    //inLight = inLight * (depth != 0) + (depth == 0);
     return inLight;
   }
 };

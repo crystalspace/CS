@@ -128,6 +128,7 @@
             i = min(((compareDepth - depth) * 9.36 * numSplits), numSplits - 1);  
 
             int index = i % 4;
+            value += 10 * (value == 1);
             float4 color = value;
             color = color * float4(index < 1, index < 2, index < 3, 1);
             
