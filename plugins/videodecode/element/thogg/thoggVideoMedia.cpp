@@ -57,6 +57,7 @@ bool TheoraVideoMedia::Initialize (iObjectRegistry* r)
     _videobuf_granulepos=-1;
     _videobufTime=0;
     _frameToSkip=-1;
+    cacheSize=1;
   }
   else
   {
@@ -104,6 +105,9 @@ double TheoraVideoMedia::GetPosition () const
 
 bool TheoraVideoMedia::Update ()
 {
+  if (cache.GetSize ()>=cacheSize)
+    return false;
+
   _videobufReady=false;
 
   while (_theora_p && !_videobufReady)
@@ -134,128 +138,19 @@ bool TheoraVideoMedia::Update ()
   if (!_videobufReady)
     return true;
 
-  size_t dstSize;
-  cout<<"writing to "<<activeBuffer<<endl;
-  canSwap=false;
-
-  iTextureHandle* tex = _buffers.Get (activeBuffer);
-  uint8* pixels = tex->QueryBlitBuffer (_streamInfo.pic_x,_streamInfo.pic_y,_streamInfo.pic_width,_streamInfo.pic_height,dstSize);
-
   th_ycbcr_buffer yuv;
   th_decode_ycbcr_out(_decodeControl,yuv);
-  int y_offset=(_streamInfo.pic_x&~1)+yuv[0].stride*(_streamInfo.pic_y&~1);
-
-  // 4:2:0 pixel format
-  if (_streamInfo.pixel_fmt==TH_PF_420)
-  {
-    int uv_offset=(_streamInfo.pic_x/2)+(yuv[1].stride)*(_streamInfo.pic_y/2);
-
-    for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
-      for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
-      {
-        //          int uvOff = uv_offset+x/2;
-        int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
-        int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y/2))[x/2];
-        int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y/2))[x/2];
-
-        int R = (Y + 1.402f*(V-128));
-        int G = (Y - 0.334f*(U-128) - 0.714f*(V-128));
-        int B = (Y + 1.772f*(U-128));
-
-        // Clamping the values here is faster than calling a function
-        if(R<0) R=0;
-        else if(R>255) R=255;
-        if(G<0) G=0;
-        else if(G>255) G=255;
-        if(B<0) B=0;
-        else if(B>255) B=255;
-
-        *pixels++ = (uint8)R;
-        *pixels++ = (uint8)G;
-        *pixels++ = (uint8)B;
-        *pixels++ = 0xff;
-      }
-
-  }
-  // 4:2:2 pixel format
-  else if (_streamInfo.pixel_fmt==TH_PF_422)
-  {
-    int uv_offset=(_streamInfo.pic_x/2)+(yuv[1].stride)*(_streamInfo.pic_y);
-
-    for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
-      for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
-      {
-        //            int uvOff = uv_offset+x/2;
-        int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
-        int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y))[x/2];
-        int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y))[x/2];
-
-        int R = (Y + 1.402f*(V-128));
-        int G = (Y - 0.334f*(U-128) - 0.714f*(V-128));
-        int B = (Y + 1.772f*(U-128));
-
-        // Clamping the values here is faster than calling a function
-        if(R<0) R=0;
-        else if(R>255) R=255;
-        if(G<0) G=0;
-        else if(G>255) G=255;
-        if(B<0) B=0;
-        else if(B>255) B=255;
-
-        *pixels++ = (uint8)R;
-        *pixels++ = (uint8)G;
-        *pixels++ = (uint8)B;
-        *pixels++ = 0xff;
-      }
-
-  }
-  // 4:4:4 pixel format
-  else if (_streamInfo.pixel_fmt==TH_PF_444)
-  {
-    int uv_offset=(_streamInfo.pic_x/2)+(yuv[1].stride)*(_streamInfo.pic_y);
-
-    for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
-      for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
-      {
-        //              int uvOff = uv_offset+x/2;
-        int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
-        int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y))[x];
-        int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y))[x];
-
-        int R = (Y + 1.402f*(V-128));
-        int G = (Y - 0.334f*(U-128) - 0.714f*(V-128));
-        int B = (Y + 1.772f*(U-128));
-
-        // Clamping the values here is faster than calling a function
-        if(R<0) R=0;
-        else if(R>255) R=255;
-        if(G<0) G=0;
-        else if(G>255) G=255;
-        if(B<0) B=0;
-        else if(B>255) B=255;
-
-        *pixels++ = R;
-        *pixels++ = G;
-        *pixels++ = B;
-        *pixels++ = 0xff;
-      }
-
-  }
-  else
-  {
-    csReport(object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
-             "The Theora video stream has an unsupported pixel format.\n");
-    return false;
-  }
-
-  tex->ApplyBlitBuffer (pixels);
-  canSwap=true;
+  cachedData data;
+  memcpy (&data.yuv, &yuv, sizeof(yuv));
+  cache.Push (data);
 
   return false;
 }
 
 long TheoraVideoMedia::SeekPage (long targetFrame,bool return_keyframe, ogg_sync_state *oy,unsigned long fileSize)
 {
+  cache.DeleteAll ();
+
   ogg_stream_reset (&_streamState);
   th_decode_free (_decodeControl);
   _decodeControl=th_decode_alloc(&_streamInfo,_setupInfo);
@@ -328,14 +223,13 @@ long TheoraVideoMedia::SeekPage (long targetFrame,bool return_keyframe, ogg_sync
     cout<<"want to skip to :"<<_frameToSkip<<endl;
     return (long) (granule >> _streamInfo.keyframe_granule_shift);
   }
-
   return -1;
 }
 
 void TheoraVideoMedia::SwapBuffers()
 {
   //override for testing purposes
-    return;
+    //return;
   if (activeBuffer==0)
   {
     _texture = _buffers[activeBuffer];
@@ -378,4 +272,133 @@ void TheoraVideoMedia::InitializeStream (ogg_stream_state &state, th_info &info,
   _texture = _buffers[0];
 
   canSwap=false;
+}
+
+void TheoraVideoMedia::WriteData ()
+{
+  if(cache.GetSize ()!=0)
+  {
+    size_t dstSize;
+    cout<<"writing to "<<activeBuffer<<endl;
+    canSwap=false;
+
+
+    iTextureHandle* tex = _buffers.Get (activeBuffer);
+    uint8* pixels = tex->QueryBlitBuffer (_streamInfo.pic_x,_streamInfo.pic_y,_streamInfo.pic_width,_streamInfo.pic_height,dstSize);
+
+
+    cachedData data = cache.PopTop ();
+    th_ycbcr_buffer yuv;
+
+    memcpy (&yuv, &data.yuv, sizeof (data.yuv));
+
+    int y_offset=(_streamInfo.pic_x&~1)+yuv[0].stride*(_streamInfo.pic_y&~1);
+
+    // 4:2:0 pixel format
+    if (_streamInfo.pixel_fmt==TH_PF_420)
+    {
+      int uv_offset=(_streamInfo.pic_x/2)+(yuv[1].stride)*(_streamInfo.pic_y/2);
+
+      for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
+        for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
+        {
+          //          int uvOff = uv_offset+x/2;
+          int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
+          int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y/2))[x/2];
+          int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y/2))[x/2];
+
+          int R = (Y + 1.402f*(V-128));
+          int G = (Y - 0.334f*(U-128) - 0.714f*(V-128));
+          int B = (Y + 1.772f*(U-128));
+
+          // Clamping the values here is faster than calling a function
+          if(R<0) R=0;
+          else if(R>255) R=255;
+          if(G<0) G=0;
+          else if(G>255) G=255;
+          if(B<0) B=0;
+          else if(B>255) B=255;
+
+          *pixels++ = (uint8)R;
+          *pixels++ = (uint8)G;
+          *pixels++ = (uint8)B;
+          *pixels++ = 0xff;
+        }
+
+    }
+    // 4:2:2 pixel format
+    else if (_streamInfo.pixel_fmt==TH_PF_422)
+    {
+      int uv_offset=(_streamInfo.pic_x/2)+(yuv[1].stride)*(_streamInfo.pic_y);
+
+      for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
+        for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
+        {
+          //            int uvOff = uv_offset+x/2;
+          int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
+          int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y))[x/2];
+          int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y))[x/2];
+
+          int R = (Y + 1.402f*(V-128));
+          int G = (Y - 0.334f*(U-128) - 0.714f*(V-128));
+          int B = (Y + 1.772f*(U-128));
+
+          // Clamping the values here is faster than calling a function
+          if(R<0) R=0;
+          else if(R>255) R=255;
+          if(G<0) G=0;
+          else if(G>255) G=255;
+          if(B<0) B=0;
+          else if(B>255) B=255;
+
+          *pixels++ = (uint8)R;
+          *pixels++ = (uint8)G;
+          *pixels++ = (uint8)B;
+          *pixels++ = 0xff;
+        }
+
+    }
+    // 4:4:4 pixel format
+    else if (_streamInfo.pixel_fmt==TH_PF_444)
+    {
+      int uv_offset=(_streamInfo.pic_x/2)+(yuv[1].stride)*(_streamInfo.pic_y);
+
+      for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
+        for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
+        {
+          //              int uvOff = uv_offset+x/2;
+          int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
+          int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y))[x];
+          int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y))[x];
+
+          int R = (Y + 1.402f*(V-128));
+          int G = (Y - 0.334f*(U-128) - 0.714f*(V-128));
+          int B = (Y + 1.772f*(U-128));
+
+          // Clamping the values here is faster than calling a function
+          if(R<0) R=0;
+          else if(R>255) R=255;
+          if(G<0) G=0;
+          else if(G>255) G=255;
+          if(B<0) B=0;
+          else if(B>255) B=255;
+
+          *pixels++ = R;
+          *pixels++ = G;
+          *pixels++ = B;
+          *pixels++ = 0xff;
+        }
+
+    }
+    else
+    {
+      csReport(object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
+        "The Theora video stream has an unsupported pixel format.\n");
+      return;
+    }
+
+    tex->ApplyBlitBuffer (pixels);
+    canSwap=true;
+
+  }
 }

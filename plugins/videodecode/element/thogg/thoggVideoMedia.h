@@ -32,6 +32,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <iostream>
 using namespace std;
+using namespace CS::Threading;
 
 #define QUALIFIED_PLUGIN_NAME "crystalspace.vpl.element.thogg"
 
@@ -71,6 +72,16 @@ private:
   bool    _videobufReady;
   double  _videobufTime;
 
+
+  struct cachedData
+  {
+    th_ycbcr_buffer yuv;
+  };
+
+  csFIFO<cachedData> cache;
+  size_t cacheSize;
+
+
 public:
 
   // Provide access to the Theora specific members
@@ -101,6 +112,7 @@ public:
   virtual double GetPosition () const;
   virtual void CleanMedia () ;
   virtual bool Update () ;
+  virtual void WriteData () ;
 
   virtual void SwapBuffers() ;
 

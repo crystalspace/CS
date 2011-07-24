@@ -74,6 +74,11 @@ struct iMediaContainer : public virtual iBase
 
   /// Swaps the active buffer for the one that was written to last inside the active iMedia
   virtual void SwapBuffers() = 0;
+
+  /**
+    * Gets data from the prefetch queue and writes it to the active buffer
+    */
+  virtual void WriteData () = 0 ;
 };
 
 /** @} */

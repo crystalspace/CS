@@ -88,6 +88,7 @@ public:
   virtual double GetPosition () const;
   virtual void CleanMedia () ;
   virtual bool Update () ;
+  virtual void WriteData () ;
 
   virtual void SwapBuffers() ;
 

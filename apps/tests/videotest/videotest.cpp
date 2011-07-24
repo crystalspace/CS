@@ -144,7 +144,7 @@ bool VideoTest::Application ()
   mediaPlayer->InitializePlayer (video);
 
   // Specifying -1 as index triggers auto stream activation
-  mediaPlayer->SetActiveStream (-1);
+  mediaPlayer->SetActiveStream (0);
   mediaPlayer->GetTargetTexture (logoTex);
   mediaPlayer->Loop (false);
   mediaPlayer->Play ();
@@ -311,7 +311,7 @@ bool VideoTest::OnPauseButtonClicked (const CEGUI::EventArgs&)
 bool VideoTest::OnStopButtonClicked (const CEGUI::EventArgs&)
 {
   mediaPlayer->Stop ();
-  return true;
+  return false;
 }
 bool VideoTest::OnLoopToggle (const CEGUI::EventArgs& e)
 {

@@ -35,6 +35,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #define QUALIFIED_PLUGIN_NAME "crystalspace.vpl.element.thogg"
 
+using namespace CS::Threading;
+
 /**
   * Container for the different streams inside a video file
   */
@@ -54,6 +56,10 @@ private:
   csRef<TheoraVideoMedia> _activeTheoraStream;
   csRef<TheoraAudioMedia> _activeVorbisStream;
 
+private:
+  Mutex swapMutex;
+  Condition isSeeking;
+
 public:
   ogg_sync_state        _syncState;
   ogg_page              _oggPage;
@@ -63,6 +69,7 @@ public:
 private:
   bool canSwap;
   int hasDataToBuffer;
+  int ok;
 
   //helper for buffering data
   int BufferData (ogg_sync_state *oy);
@@ -90,6 +97,8 @@ public:
   virtual float GetPosition () const;
   virtual float GetLength () const;
   virtual void SwapBuffers() ;
+
+  virtual void WriteData () ;
 
   /// Does a seek on the active media
   void DoSeek ();

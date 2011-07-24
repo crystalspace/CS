@@ -61,6 +61,11 @@ struct iMedia : public virtual iBase
     * Perform frame-specific updates on the stream.
     */
   virtual bool Update () = 0 ;
+
+  /**
+    * Gets data from the prefetch queue and writes it to the active buffer
+    */
+  virtual void WriteData () = 0 ;
   
   /**
     * Swaps the active buffer for the one that was written to last

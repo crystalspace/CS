@@ -48,6 +48,7 @@ private:
 
   bool _playing;
   bool _shouldLoop;
+  bool _shouldStop;
 
 public:
   iObjectRegistry* GetObjectRegistry() const
@@ -75,6 +76,8 @@ public:
   virtual bool IsPlaying () ;
   virtual float GetLength () const;
 
+  void WriteData () ;
+
   void SwapBuffers();
 
   /**
@@ -92,6 +95,7 @@ public:
         virtual ~FrameEventHandler () { }
         virtual bool HandleEvent (iEvent& ev)
         {
+          parent->WriteData ();
           parent->SwapBuffers (); 
 
           return false;

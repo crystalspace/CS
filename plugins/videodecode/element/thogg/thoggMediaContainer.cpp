@@ -79,7 +79,7 @@ void TheoraMediaContainer::SetActiveStream (size_t index)
   }
 
   // Store the activated stream in our references, for fast, full access
-  if ( strcmp(media [activeStreams [index]]->GetType (),"TheoraVideo") == 0)
+  if ( strcmp(media [index]->GetType (),"TheoraVideo") == 0)
   {
     csRef<iVideoMedia> stream = scfQueryInterface<iVideoMedia> ( media [index] ); 
     if (stream.IsValid()) 
@@ -88,7 +88,7 @@ void TheoraMediaContainer::SetActiveStream (size_t index)
     }
   }
 
-  if ( strcmp(media [activeStreams [index]]->GetType (),"TheoraAudio") == 0)
+  if ( strcmp(media [index]->GetType (),"TheoraAudio") == 0)
   {
     csRef<iAudioMedia> stream = scfQueryInterface<iAudioMedia> ( media [index] ); 
     if (stream.IsValid ()) 
@@ -116,13 +116,16 @@ void TheoraMediaContainer::Update ()
   //if a seek is scheduled, do it
   if (timeToSeek!=-1)
   {
+    MutexScopedLock lock (swapMutex);
     DoSeek ();
     timeToSeek=-1;
     endOfFile=false;
+
+    isSeeking.NotifyOne ();
   }
   if (!endOfFile && activeStreams.GetSize () > 0)
   {
-    int ok=0;
+    ok=0;
     for (size_t i=0;i<activeStreams.GetSize ();i++)
     {
       if( media [activeStreams [i]]->Update ())
@@ -302,8 +305,14 @@ float TheoraMediaContainer::GetLength () const
   return 0;
 }
 
-void TheoraMediaContainer::SwapBuffers()
+void TheoraMediaContainer::SwapBuffers ()
 {
+  MutexScopedLock lock (swapMutex);
+
+  // Wait until we have an item
+  while (timeToSeek != -1)
+    isSeeking.Wait (swapMutex);
+
   if(canSwap)
   {
     canSwap=false;
@@ -311,5 +320,15 @@ void TheoraMediaContainer::SwapBuffers()
     {
       media[activeStreams[i]]->SwapBuffers ();
     }
+  }
+}
+void TheoraMediaContainer::WriteData ()
+{
+  if(ok==0)
+  {
+    if (_activeTheoraStream.IsValid ())
+      _activeTheoraStream->WriteData ();
+    if (_activeVorbisStream.IsValid ())
+      _activeVorbisStream->WriteData ();
   }
 }

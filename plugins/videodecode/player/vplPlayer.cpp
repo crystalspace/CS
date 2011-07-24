@@ -56,6 +56,7 @@ void vplPlayer::InitializePlayer (csRef<iMediaContainer> media)
     csEventID events[2] = { Frame, CS_EVENTLIST_END };
     q->RegisterListener (frameEventHandler, events);
   }
+  _shouldStop = false;
 }
 
 void vplPlayer::SetActiveStream (int index) 
@@ -85,26 +86,31 @@ THREADED_CALLABLE_IMPL(vplPlayer, Update)
 {
   while (true)
   {
-
-  if (_playing)
-  {
-    if (_mediaFile.IsValid ())
+    if (_playing)
     {
-      if (_mediaFile->Eof ())
+      if(_shouldStop)
       {
-        if (_shouldLoop) 
-        {
-          Seek (0.0f);
-          _mediaFile->Update ();
-          _playing=true;
-        }
-        else
-          _playing=false;
+        // Stop playing
+        _playing=false;
+        // Seek back to the beginning of the stream
       }
+      if (_mediaFile.IsValid ())
+      {
+        if (_mediaFile->Eof ())
+        {
+          if (_shouldLoop) 
+          {
+            Seek (0.0f);
+            _mediaFile->Update ();
+            _playing=true;
+          }
+          else
+            _playing=false;
+        }
 
-      _mediaFile->Update ();
+        _mediaFile->Update ();
+      }
     }
-  }
   }
 
   return true;
@@ -118,6 +124,12 @@ void vplPlayer::Loop (bool shouldLoop)
 void vplPlayer::Play () 
 {
   _playing=true;
+  if(_shouldStop)
+  {
+    _shouldStop=false;
+    if (_mediaFile.IsValid ())
+      _mediaFile->Seek (0.0f);
+  }
 }
 
 void vplPlayer::Pause() 
@@ -127,10 +139,7 @@ void vplPlayer::Pause()
 
 void vplPlayer::Stop () 
 {
-  // Stop playing
-  _playing=false;
-  // Seek back to the beginning of the stream
-  _mediaFile->Seek (0.0f);
+  _shouldStop = true;
 }
 
 void vplPlayer::Seek (float time)
@@ -160,4 +169,9 @@ float vplPlayer::GetLength () const
 void vplPlayer::SwapBuffers ()
 {
   _mediaFile->SwapBuffers ();
+}
+
+void vplPlayer::WriteData ()
+{
+  _mediaFile->WriteData ();
 }

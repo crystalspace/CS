@@ -187,3 +187,7 @@ void TheoraAudioMedia::InitializeStream (ogg_stream_state &state, vorbis_info &i
 
   _decodersStarted = false;
 }
+
+void TheoraAudioMedia::WriteData ()
+{
+}
