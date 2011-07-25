@@ -49,6 +49,10 @@ private:
   bool _playing;
   bool _shouldLoop;
   bool _shouldStop;
+  bool _shouldUpdate;
+
+
+  csRef<iThreadReturn> ret;
 
 public:
   iObjectRegistry* GetObjectRegistry() const
@@ -59,6 +63,10 @@ public:
 
   // From iComponent.
   virtual bool Initialize (iObjectRegistry*);
+
+  virtual void StartPlayer() ;
+
+  virtual void StopPlayer() ;
 
   virtual void InitializePlayer (csRef<iMediaContainer> media) ;
   virtual void SetActiveStream (int index) ;

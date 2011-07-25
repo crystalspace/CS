@@ -51,9 +51,16 @@ struct iMediaPlayer : public virtual iBase
   /// Makes "Target" point to the internal iTextureHandle of the active stream
   virtual void GetTargetTexture (csRef<iTextureHandle> &target) = 0;
 
-  /// Called continuously to update the player
-  //virtual void Update () = 0;
+  /// Called continuously to update the player. The user shouldn't call this method directly
+  /// To start and stop the player, use StartPlayer() and StopPlayer()
   THREADED_INTERFACE( Update );
+
+  /// Start the update thread for the media player
+  virtual void StartPlayer() = 0;
+
+  /// Stops the update thread for the media player. In order to close the application
+  /// properly, this must be called when shutting down the application.
+  virtual void StopPlayer() = 0;
 
   /// Enable/disable looping
   virtual void Loop (bool shouldLoop) = 0 ;

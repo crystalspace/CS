@@ -29,7 +29,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 using namespace std;
 
-csRef<iThreadReturn> ret;
 VideoTest::VideoTest ()
 : DemoApplication ("CrystalSpace.VideoTest"), inWater (false)
 {
@@ -50,11 +49,7 @@ void VideoTest::Frame ()
 
   //draw the room
   view->Draw();
-
-  if (!ret.IsValid ())
-  {
-    ret = mediaPlayer->Update ();
-  }
+  mediaPlayer->StartPlayer ();
 
 
   if(updateSeeker)
@@ -97,6 +92,11 @@ void VideoTest::Frame ()
     w,
     h,
     0);
+}
+
+void VideoTest::OnExit ()
+{
+  mediaPlayer->StopPlayer ();
 }
 
 bool VideoTest::Application ()
@@ -297,7 +297,11 @@ bool VideoTest::OnExitButtonClicked (const CEGUI::EventArgs&)
 {
   csRef<iEventQueue> q =
     csQueryRegistry<iEventQueue> (GetObjectRegistry());
-  if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
+  if (q.IsValid())
+  {
+    mediaPlayer->StopPlayer ();
+    q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
+  }
   return true;
 }
 bool VideoTest::OnPlayButtonClicked (const CEGUI::EventArgs&)

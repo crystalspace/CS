@@ -57,6 +57,21 @@ void vplPlayer::InitializePlayer (csRef<iMediaContainer> media)
     q->RegisterListener (frameEventHandler, events);
   }
   _shouldStop = false;
+  _shouldUpdate=false;
+}
+
+void vplPlayer::StartPlayer ()
+{
+  if (!ret.IsValid ())
+  {
+    _shouldUpdate = true;
+    ret = Update ();
+  }
+}
+
+void vplPlayer::StopPlayer ()
+{
+  _shouldUpdate = false;
 }
 
 void vplPlayer::SetActiveStream (int index) 
@@ -84,7 +99,7 @@ void vplPlayer::GetTargetTexture (csRef<iTextureHandle> &target)
 //void vplPlayer::Update ()
 THREADED_CALLABLE_IMPL(vplPlayer, Update)
 {
-  while (true)
+  while (_shouldUpdate)
   {
     if (_playing)
     {
