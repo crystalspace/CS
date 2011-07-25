@@ -95,8 +95,11 @@ public:
         virtual ~FrameEventHandler () { }
         virtual bool HandleEvent (iEvent& ev)
         {
-          parent->WriteData ();
-          parent->SwapBuffers (); 
+          if (parent->IsPlaying ())
+          {
+            parent->WriteData ();
+            parent->SwapBuffers (); 
+          }
 
           return false;
         }

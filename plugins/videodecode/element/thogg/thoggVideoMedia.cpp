@@ -149,6 +149,10 @@ bool TheoraVideoMedia::Update ()
 
 long TheoraVideoMedia::SeekPage (long targetFrame,bool return_keyframe, ogg_sync_state *oy,unsigned long fileSize)
 {
+  MutexScopedLock lock (writeMutex);
+  while (isWrite)
+    isWriting.Wait (writeMutex);
+
   cache.DeleteAll ();
 
   ogg_stream_reset (&_streamState);
@@ -221,6 +225,7 @@ long TheoraVideoMedia::SeekPage (long targetFrame,bool return_keyframe, ogg_sync
   {
     _frameToSkip = targetFrame;
     cout<<"want to skip to :"<<_frameToSkip<<endl;
+
     return (long) (granule >> _streamInfo.keyframe_granule_shift);
   }
   return -1;
@@ -276,6 +281,10 @@ void TheoraVideoMedia::InitializeStream (ogg_stream_state &state, th_info &info,
 
 void TheoraVideoMedia::WriteData ()
 {
+  MutexScopedLock lock (writeMutex);
+
+
+  isWrite=true;
   if(cache.GetSize ()!=0)
   {
     size_t dstSize;
@@ -394,6 +403,8 @@ void TheoraVideoMedia::WriteData ()
     {
       csReport(object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
         "The Theora video stream has an unsupported pixel format.\n");
+      isWrite=false;
+      isWriting.NotifyOne ();
       return;
     }
 
@@ -401,4 +412,6 @@ void TheoraVideoMedia::WriteData ()
     canSwap=true;
 
   }
+  isWrite=false;
+  isWriting.NotifyOne ();
 }

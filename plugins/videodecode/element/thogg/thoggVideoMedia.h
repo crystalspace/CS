@@ -82,6 +82,11 @@ private:
   size_t cacheSize;
 
 
+  // Mutexes
+private:
+  bool isWrite;
+  Mutex writeMutex;
+  Condition isWriting;
 public:
 
   // Provide access to the Theora specific members
