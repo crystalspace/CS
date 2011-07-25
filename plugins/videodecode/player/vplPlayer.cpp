@@ -113,7 +113,7 @@ THREADED_CALLABLE_IMPL(vplPlayer, Update)
     }
     // If the media isn't playing, we don't want to slow down the thread a bit
     else
-      Sleep(100);
+      csSleep (100);
   }
 
   return true;
