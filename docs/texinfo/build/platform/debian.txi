@@ -1,0 +1,150 @@
+@c -*-texinfo-*-
+@node Debian, MSVC7, Unix, Platform Instructions
+@subsection Specific instructions for Ubuntu and Debian based systems
+@cindex Debian
+
+This section is intended to explain the step by step procedure to install Crystal Space on Ubuntu or any other Debian based system. 
+
+@menu
+* Debian Libraries:: Library Prerequisites
+* Debian Building:: Building
+@end menu
+
+@node Debian Libraries, Debian Building, Debian, Debian
+@subsubsection Library Prerequisites
+
+@subsubheading Basic libraries
+
+Debian packages are available for these libraries. You can easily install them with these commands:
+
+@example
+ sudo apt-get install libx11-dev nvidia-cg-toolkit nvidia-current-dev zlib1g-dev mesa-common-dev; @* sudo apt-get install libgl1-mesa-dev libfreetype6-dev libxext-dev libxxf86vm-dev libjpeg62-dev; @* sudo apt-get install libmng-dev libopenal-dev libpng12-dev libvorbis-dev libsdl1.2-dev; @* sudo apt-get install libxrender-dev libtool libwxbase2.8-dev libwxgtk2.8-dev @*
+@end example
+
+@subsubheading Other libraries
+
+Some libraries are mandatory for most Crystal Space applications but not available for Debian systems. Therefore, you have to install them manually. @* @*
+
+
+@itemize @bullet
+@item
+@strong{CEGUI}
+
+First, install the PCRE library, which is mandatory for CEGUI.
+
+@example
+sudo apt-get install libpcre3-dev
+@end example
+
+Then download the latest version of CEGUI library at: @uref{http://sourceforge.net/projects/crayzedsgui/files/}
+
+Extract files to a temporary folder and install the library:
+
+@example
+configure
+make
+sudo make install
+@end example
+
+Look in which directory @samp{make install} actually installed the library and check if it is registered in the library path:
+
+@example
+echo $LD_LIBRARY_PATH
+@end example
+
+If not, add a line in the @samp{~/.bashrc} file (knowing that the default location is usually @samp{/usr/local/lib/}):
+
+@example
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.:/usr/local/lib/
+@end example
+@*
+
+@item
+@strong{BULLET}
+
+Download the latest version of the Bullet library at: @uref{http://code.google.com/p/bullet/downloads/}
+
+Extract files to a temporary folder and install the library:
+
+@example
+configure
+make
+sudo make install
+@end example
+
+As you did for CEGUI, check if the installation directory is defined in environment variable @samp{LD_LIBRARY_PATH}; if not, add it in @samp{~/.bashrc}. @* @*
+
+@item
+@strong{ASSIMP}
+
+First, install the Boost libraries, which are needed by Assimp.
+
+@example
+sudo apt-get install libboost-dev
+@end example
+
+Then download the latest version of library from repository in a temporary directory (e.g. @samp{assimp}):
+
+@example
+svn co https://assimp.svn.sourceforge.net/svnroot/assimp/trunk assimp
+@end example
+
+Install the library:
+
+@example
+cmake . -G "Unix Makefiles"
+make
+sudo make install
+@end example
+
+As mentioned before, check if the installation directory is defined in the environment variable @samp{LD_LIBRARY_PATH}; if not, add it in @samp{~/.bashrc}.
+
+@end itemize
+
+@node Debian Building, MSVC7, Debian Libraries, Debian
+@subsubsection Building
+
+@subsubheading Download the latest Crystal Space source 
+
+You can either download the @emph{latest stable version} of Crystal Space or the @emph{current development version}.
+
+@itemize @bullet
+@item
+@strong{Stable version}
+
+The sources of the stable version are available at:
+
+@uref{http://www.crystalspace3d.org/main/Download}
+
+If you want to download a @emph{source package}, simply locate the installation folder and decompress the archive there. @*@*
+If you prefer to download the source files from @emph{Subversion repository}, check out the latest 2.0 release of Crystal Space:
+
+@example
+svn co https://crystal.svn.sourceforge.net/svnroot/crystal/CS/branches/release/V2.0 CS_stable
+@end example
+
+@item
+@strong{Development version}
+
+This unstable version, called the @emph{trunk}, is actively being developed. You can found it here:
+
+@uref{http://www.crystalspace3d.org/main/Download_trunk}
+
+To download the current development version of Crystal Space, check out its Subversion repository:
+
+@example
+svn co https://crystal.svn.sourceforge.net/svnroot/crystal/CS/trunk CS_latest
+@end example
+
+@end itemize
+
+@subsubheading Configure and build the project
+
+Run the configuration script in the CS branch folder and build the entire project:
+
+@example
+configure
+nice jam
+@end example
+
+You can now try running the @samp{walktest} and @samp{avatartest} demonstrations.

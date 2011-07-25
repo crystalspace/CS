@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MSVC7, MinGW, Unix, Platform Instructions
+@node MSVC7, MinGW, Debian, Platform Instructions
 @subsection Microsoft Visual C++ 8 or 9
 @cindex Windows, Building
 @cindex MSVC, Building
