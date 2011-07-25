@@ -6,29 +6,45 @@
 This section is intended to explain the step by step procedure to install Crystal Space on Ubuntu or any other Debian based system. 
 
 @menu
+* Debian 3D Display:: 3D Display Configuration
 * Debian Libraries:: Library Prerequisites
 * Debian Building:: Building
 @end menu
+
+@node Debian 3D Display, Debian Libraries, Debian, Debian
+@subsubsection 3D Display Configuration
+
+@subsubheading Driver installation
+
+Depending on your hardware and your Debian distribution, you may need to install manually the official display drivers of your graphic card. In order to do so, please check the specific documentation available for your configuration.
+
+@subsubheading Deactivate the desktop 3D effects
+
+The 3D effects of your graphical desktop (e.g. the transparency or any other additional display effects you can have on your windows) may unfortunately interfere with any other 3D based applications such as the ones from Crystal Space. You may therefore have to disable these effects in order to avoid problems such as flickering, slow or unresponsive applications.
+
+In Ubuntu Natty 11.4, this is done before login in, once you selected the user you want to log, by selecting the ``Ubuntu Classic (No effects)'' UI option at the bottom of your screen.
 
 @node Debian Libraries, Debian Building, Debian, Debian
 @subsubsection Library Prerequisites
 
 @subsubheading Basic libraries
 
-Debian packages are available for these libraries. You can easily install them with these commands:
+These are most of the basic @ref{External Libraries, external libraries} that are needed for Crystal Space. Since Debian packages are available for those libraries, you can easily install them by copying and pasting at once the following lines in a terminal:
 
 @example
- sudo apt-get install libx11-dev nvidia-cg-toolkit nvidia-current-dev zlib1g-dev mesa-common-dev; @* sudo apt-get install libgl1-mesa-dev libfreetype6-dev libxext-dev libxxf86vm-dev libjpeg62-dev; @* sudo apt-get install libmng-dev libopenal-dev libpng12-dev libvorbis-dev libsdl1.2-dev; @* sudo apt-get install libxrender-dev libtool libwxbase2.8-dev libwxgtk2.8-dev @*
+ sudo apt-get install libx11-dev nvidia-cg-toolkit nvidia-current-dev zlib1g-dev mesa-common-dev; @* sudo apt-get install libgl1-mesa-dev libfreetype6-dev libxext-dev libxxf86vm-dev libjpeg62-dev; @* sudo apt-get install libmng-dev libopenal-dev libpng12-dev libvorbis-dev libsdl1.2-dev; @* sudo apt-get install libxrender-dev libtool libwxbase2.8-dev libwxgtk2.8-dev subversion
 @end example
 
 @subsubheading Other libraries
 
-Some libraries are mandatory for most Crystal Space applications but not available for Debian systems. Therefore, you have to install them manually. @* @*
+Some additional libraries are mandatory for many Crystal Space applications, but without up-to-date Debian packages available. Therefore, you have to install them manually as described in this section. @* @*
 
 
 @itemize @bullet
 @item
 @strong{CEGUI}
+
+The Crazy Eddie's GUI is used in many applications where there is a graphical user interface.
 
 First, install the PCRE library, which is mandatory for CEGUI.
 
@@ -38,33 +54,22 @@ sudo apt-get install libpcre3-dev
 
 Then download the latest version of CEGUI library at: @uref{http://sourceforge.net/projects/crayzedsgui/files/}
 
-Extract files to a temporary folder and install the library:
+Extract the files to a temporary folder and install the library:
 
 @example
 configure
 make
 sudo make install
 @end example
-
-Look in which directory @samp{make install} actually installed the library and check if it is registered in the library path:
-
-@example
-echo $LD_LIBRARY_PATH
-@end example
-
-If not, add a line in the @samp{~/.bashrc} file (knowing that the default location is usually @samp{/usr/local/lib/}):
-
-@example
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.:/usr/local/lib/
-@end example
-@*
 
 @item
 @strong{BULLET}
 
+The Bullet library allows to use advanced physical simulation effects such as soft bodies and ragdolls.
+
 Download the latest version of the Bullet library at: @uref{http://code.google.com/p/bullet/downloads/}
 
-Extract files to a temporary folder and install the library:
+Extract the files to a temporary folder and install the library:
 
 @example
 configure
@@ -72,10 +77,10 @@ make
 sudo make install
 @end example
 
-As you did for CEGUI, check if the installation directory is defined in environment variable @samp{LD_LIBRARY_PATH}; if not, add it in @samp{~/.bashrc}. @* @*
-
 @item
 @strong{ASSIMP}
+
+The Open Asset Import Library can be used to load transparently in Crystal Space assets from a @uref{http://assimp.sourceforge.net/main_features_formats.html, wide list of different 3D file formats}.
 
 First, install the Boost libraries, which are needed by Assimp.
 
@@ -83,10 +88,10 @@ First, install the Boost libraries, which are needed by Assimp.
 sudo apt-get install libboost-dev
 @end example
 
-Then download the latest version of library from repository in a temporary directory (e.g. @samp{assimp}):
+Then download the latest version of the Assimp library from their Subversion repository in a temporary directory (e.g. @samp{assimp_trunk}):
 
 @example
-svn co https://assimp.svn.sourceforge.net/svnroot/assimp/trunk assimp
+svn co https://assimp.svn.sourceforge.net/svnroot/assimp/trunk assimp_trunk
 @end example
 
 Install the library:
@@ -96,8 +101,6 @@ cmake . -G "Unix Makefiles"
 make
 sudo make install
 @end example
-
-As mentioned before, check if the installation directory is defined in the environment variable @samp{LD_LIBRARY_PATH}; if not, add it in @samp{~/.bashrc}.
 
 @end itemize
 
@@ -117,7 +120,7 @@ The sources of the stable version are available at:
 @uref{http://www.crystalspace3d.org/main/Download}
 
 If you want to download a @emph{source package}, simply locate the installation folder and decompress the archive there. @*@*
-If you prefer to download the source files from @emph{Subversion repository}, check out the latest 2.0 release of Crystal Space:
+If you prefer to download the source files from the @emph{Subversion repository}, check out the latest 2.0 release of Crystal Space:
 
 @example
 svn co https://crystal.svn.sourceforge.net/svnroot/crystal/CS/branches/release/V2.0 CS_stable
@@ -138,13 +141,31 @@ svn co https://crystal.svn.sourceforge.net/svnroot/crystal/CS/trunk CS_latest
 
 @end itemize
 
+@subsubheading Update your environment variables
+
+This is not advised to do a @samp{make install} for Crystal Space, since it can interfere with other installations you may have made previously. The dedicated way to deal with that problem is to define the @ref{HOWTO Setting the CRYSTAL environment variable, ``CRYSTAL''} environment variable.
+
+In order to do so, you can open your @samp{~/.bashrc} file and add the following new line at the end of it:
+
+@example
+export CRYSTAL=path_to_your_CS_directory
+@end example
+
+Also, since you haven't installed Crystal Space, your system will most probably have troubles finding the shared library files of Crystal Space. To deal with that, you would need to add an entry in your ``LD_LIBRARY_PATH'' environment variable, so add also the following line to your @samp{~/.bashrc} file:
+
+@example
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:path_to_your_CS_directory
+@end example
+
+The changes you made to your @samp{~/.bashrc} file will only get available for the next terminals you would open. You may therefore prefer to close the terminals you have already opened in order to avoid getting problems with the environment variables not defined.
+
 @subsubheading Configure and build the project
 
-Run the configuration script in the CS branch folder and build the entire project:
+Now everything is finally setup. We can open a new terminal, run the configuration script in the CS branch folder and build the entire project:
 
 @example
 configure
 nice jam
 @end example
 
-You can now try running the @samp{walktest} and @samp{avatartest} demonstrations.
+This is the end of the compilation process of Crystal Space. You can now try running the @samp{walktest} and @samp{avatartest} demonstrations.
