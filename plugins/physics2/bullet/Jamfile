@@ -3,7 +3,9 @@ SubDir TOP plugins physics2 bullet ;
 if $(BULLET.AVAILABLE) = "yes"
 {
   Description bullet2 : "Bullet collision and physics" ;
-  Plugin bullet2 : [ Wildcard *.cpp *.h ] ;
+  Plugin bullet2 :
+    [ Wildcard *.cpp *.h ]
+    [ Wildcard convexdecompose : *.cpp *.h ] ;
   LinkWith bullet2 : crystalspace ;
   ExternalLibs bullet2 : BULLET ;
 }
