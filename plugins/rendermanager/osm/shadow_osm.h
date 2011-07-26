@@ -324,8 +324,12 @@ namespace CS
           LightFrustums& lightFrustums = *lightFrustumsPtr;
 
           uint currentFrame = viewSetup.rview->GetCurrentFrameNumber();
-          if (lightFrustums.setupFrame == currentFrame)
+
+          // fixes a memory leak
+          if (lightFrustums.setupFrame == currentFrame ||
+            lightFrustums.setupFrame != -1)
             return;
+
           lightFrustums.setupFrame = currentFrame;
 
           typename RenderTree::ContextNode& context = meshNode->GetOwner();
@@ -413,7 +417,7 @@ namespace CS
             csRef<iClipper2D> newView;
             newView.AttachNew (new csBoxClipper (clipBox));
             newRenderView->SetClipper (newView);
-//             newRenderView->SetMeshFilter(superFrust.meshFilter);
+            newRenderView->SetMeshFilter(superFrust.meshFilter);
 
             typename RenderTree::ContextNode* shadowMapCtx = 
               renderTree.CreateContext (newRenderView);
@@ -476,7 +480,7 @@ namespace CS
             csRef<iClipper2D> newView;
             newView.AttachNew (new csBoxClipper (clipBox));
             newRenderView->SetClipper (newView);
-//             newRenderView->SetMeshFilter(superFrust.meshFilter);
+            newRenderView->SetMeshFilter(superFrust.meshFilter);
 
             typename RenderTree::ContextNode* shadowMapCtx = 
               renderTree.CreateContext (newRenderView);

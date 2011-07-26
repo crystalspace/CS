@@ -28,6 +28,7 @@ class SelfShadowDemo : public CS::Utility::DemoApplication
 {
  private:
   bool CreateScene ();
+  void LoadKrystal();
 
  public:
   SelfShadowDemo ();
@@ -37,6 +38,7 @@ class SelfShadowDemo : public CS::Utility::DemoApplication
   void Frame ();
   bool OnKeyboard (iEvent &event);
 
+  bool OnInitialize (int argc, char* argv[]);
   //-- csApplicationFramework
   bool Application ();
 };

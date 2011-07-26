@@ -110,6 +110,18 @@ bool SelfShadowDemo::OnKeyboard (iEvent &ev)
   return false;
 }
 
+bool SelfShadowDemo::OnInitialize (int argc, char* argv[])
+{
+  // Default behavior from csDemoApplication
+  if (!DemoApplication::OnInitialize (argc, argv))
+    return false;
+
+  if (!csInitializer::RequestPlugins (GetObjectRegistry (),
+    CS_REQUEST_PLUGIN("crystalspace.mesh.object.furmesh", CS::Mesh::iFurMeshType),
+    CS_REQUEST_END))
+    return ReportError ("Failed to initialize plugins!");
+}
+
 bool SelfShadowDemo::Application ()
 {
   // Default behavior from DemoApplication
@@ -146,12 +158,14 @@ bool SelfShadowDemo::Application ()
 
 bool SelfShadowDemo::CreateScene ()
 {
-  char *world = "world";
+  char *world = "world_grass";
 
   printf ("Loading level...\n");
   vfs->ChDir ("/lev/selfshadow");
   if (!loader->LoadMapFile (world))
     ReportError("Error couldn't load level!");
+
+//   LoadKrystal();
 
   engine->Prepare ();
 
@@ -163,4 +177,133 @@ bool SelfShadowDemo::CreateScene ()
   printf ("Ready!\n");
 
   return true;
+}
+
+void SelfShadowDemo::LoadKrystal()
+{
+  iSector* sector = engine->FindSector("Scene");
+
+  if (!sector)
+    ReportError("Could not find default room!");
+
+  printf ("Loading Krystal...\n");
+
+  // Load animesh factory
+  csLoadResult rc = loader->Load ("/lib/krystal/krystal.xml");
+  if (!rc.success)
+    ReportError ("Can't load Krystal library file!");
+
+  csRef<iMeshFactoryWrapper> meshfact =
+    engine->FindMeshFactory ("krystal");
+  if (!meshfact)
+    ReportError ("Can't find Krystal's mesh factory!");
+
+  csRef<CS::Mesh::iAnimatedMeshFactory> animeshFactory = 
+    scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
+    (meshfact->GetMeshObjectFactory ());
+  if (!animeshFactory)
+    ReportError ("Can't find Krystal's animesh factory!");
+
+  // Create the animated mesh
+  csRef<iMeshWrapper> avatarMesh =
+    engine->CreateMeshWrapper (meshfact, "krystal",
+    room, csVector3 (0.0f));
+
+  csRef<CS::Mesh::iAnimatedMesh> animesh = 
+    scfQueryInterface<CS::Mesh::iAnimatedMesh> (avatarMesh->GetMeshObject ());
+  avatarMesh->GetMovable()->SetSector(sector);
+  avatarMesh->GetMovable()->UpdateMove();
+
+  // Load some fur
+  rc = loader->Load ("/lib/hairtest/krystal_furmesh.xml");
+  if (!rc.success)
+    ReportError ("Can't load krystal furmesh library!");
+
+  csRef<iMeshWrapper> krystalFurmeshObject = 
+    engine->FindMeshObject ("krystal_furmesh_object");
+  if (!krystalFurmeshObject)
+    ReportError ("Can't find fur mesh object!");
+  krystalFurmeshObject->SetRenderPriority(engine->GetRenderPriority("alpha"));
+
+  krystalFurmeshObject->GetMovable()->SetSector(sector);
+  krystalFurmeshObject->GetMovable()->UpdateMove();
+
+  // Load the fur material
+  rc = loader->Load ("/lib/hairtest/fur_material_krystal.xml");
+  if (!rc.success)
+    ReportError ("Can't load Fur library file!");
+
+  // Find the fur mesh plugin
+  csRef<CS::Mesh::iFurMeshType> furMeshType = 
+    csQueryRegistry<CS::Mesh::iFurMeshType> (GetObjectRegistry ());
+  if (!furMeshType)
+    ReportError("Failed to locate CS::Mesh::iFurMeshType plugin!");
+
+  // Load the Marschner shader
+  csRef<iMaterialWrapper> materialWrapper = 
+    engine->FindMaterial ("marschner_material");
+  if (!materialWrapper)
+    ReportError ("Can't find marschner material!");
+
+  // Create the fur properties for the hairs
+  csRef<CS::Mesh::iFurMeshMaterialProperties> hairMeshProperties = 
+    furMeshType->CreateHairMeshMarschnerProperties ("krystal_marschner");
+  hairMeshProperties->SetMaterial(materialWrapper->GetMaterial ());
+  animesh->GetSubMesh (1)->SetMaterial (materialWrapper);
+
+  csRef<CS::Animation::iFurAnimatedMeshControl> animationPhysicsControl = 
+    scfQueryInterface<CS::Animation::iFurAnimatedMeshControl>
+    (furMeshType->CreateFurAnimatedMeshControl ("krystal_hairs_animation"));
+
+  animationPhysicsControl->SetAnimatedMesh (animesh);
+
+  csRef<iMeshObject> imo = krystalFurmeshObject->GetMeshObject();
+
+  // Get reference to the iFurMesh interface
+  csRef<CS::Mesh::iFurMesh> furMesh = scfQueryInterface<CS::Mesh::iFurMesh> (imo);
+
+  csRef<CS::Mesh::iFurMeshState> ifms = 
+    scfQueryInterface<CS::Mesh::iFurMeshState> (furMesh);
+
+  animationPhysicsControl->SetDisplacement (ifms->GetDisplacement ());
+
+  furMesh->SetFurMeshProperties (hairMeshProperties);
+
+  // Shader variables
+  csRef<iShaderVarStringSet> svStrings = 
+    csQueryRegistryTagInterface<iShaderVarStringSet> (
+    object_reg, "crystalspace.shader.variablenameset");
+
+  if (!svStrings) 
+   ReportError ("No SV names string set!\n");
+
+  // remove diffuse, blonde and transparent
+  CS::ShaderVarName objColor (svStrings, "fur color");	
+
+  csVector4 color = csVector4(0.51, 0.34, 0.25, 0.4); 
+  materialWrapper->GetMaterial()->GetVariableAdd(objColor)->SetValue(color);  
+
+  CS::ShaderVarName objTexture (svStrings, "texture map");	
+  materialWrapper->GetMaterial()-> RemoveVariable(objTexture);  
+
+  CS::ShaderVarName diffuseType (svStrings, "diffuse type");	
+  int type; 
+  // use ambient instead
+  materialWrapper->GetMaterial()-> GetVariableAdd(diffuseType)->SetValue(100);  
+
+  furMesh->GetFurMeshProperties()->Invalidate();
+
+  furMesh->SetAnimatedMesh (animesh);
+  furMesh->SetMeshFactory (animeshFactory);
+  furMesh->SetMeshFactorySubMesh (animesh->GetSubMesh (2)->GetFactorySubMesh ());
+  furMesh->GenerateGeometry (view, room);
+
+  furMesh->SetAnimationControl (animationPhysicsControl);
+  furMesh->StartAnimationControl ();
+
+  furMesh->SetGuideLOD (0);
+  furMesh->SetStrandLOD (1);
+  furMesh->SetControlPointsLOD (0.0f);
+
+  furMesh->ResetMesh ();
 }
