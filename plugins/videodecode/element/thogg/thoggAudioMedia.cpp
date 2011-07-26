@@ -191,3 +191,23 @@ void TheoraAudioMedia::InitializeStream (ogg_stream_state &state, vorbis_info &i
 void TheoraAudioMedia::WriteData ()
 {
 }
+
+
+void TheoraAudioMedia::SetCacheSize(size_t size) 
+{
+  cacheSize = size;
+}
+
+
+bool TheoraAudioMedia::HasDataReady()
+{
+  /*if(cache.GetSize ()!=0)
+    return true;*/
+  return false;
+}
+bool TheoraAudioMedia::IsCacheFull()
+{
+  /*if(cache.GetSize ()>=cacheSize)
+    return true;*/
+  return false;
+}

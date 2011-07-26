@@ -415,3 +415,21 @@ void TheoraVideoMedia::WriteData ()
   isWrite=false;
   isWriting.NotifyOne ();
 }
+
+void TheoraVideoMedia::SetCacheSize (size_t size) 
+{
+  cacheSize = size;
+}
+
+bool TheoraVideoMedia::HasDataReady ()
+{
+  if (cache.GetSize ()!=0)
+    return true;
+  return false;
+}
+bool TheoraVideoMedia::IsCacheFull ()
+{
+  if(cache.GetSize ()>=cacheSize)
+    return true;
+  return false;
+}

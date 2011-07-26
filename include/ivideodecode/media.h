@@ -71,6 +71,21 @@ struct iMedia : public virtual iBase
     * Swaps the active buffer for the one that was written to last
     */
   virtual void SwapBuffers() = 0;
+  
+  /**
+    * Set the how many frames will be cached
+    */
+  virtual void SetCacheSize(size_t size) = 0;
+
+  /**
+    * Returns true if there is data ready to be used
+    */
+  virtual bool HasDataReady() = 0;
+
+  /**
+    * Returns true if the cache is full
+    */
+  virtual bool IsCacheFull() = 0;
 };
 
 /**

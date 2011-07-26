@@ -68,7 +68,7 @@ public:
 
   virtual void StopPlayer() ;
 
-  virtual void InitializePlayer (csRef<iMediaContainer> media) ;
+  virtual void InitializePlayer (csRef<iMediaContainer> media, size_t cacheSize = 1) ;
   virtual void SetActiveStream (int index) ;
   virtual void RemoveActiveStream (int index) ;
   virtual void GetTargetTexture (csRef<iTextureHandle> &target) ;

@@ -58,6 +58,9 @@ private:
   FILE              *_infile;
   bool              _decodersStarted;
   bool              _audiobuf_ready;
+
+
+  size_t cacheSize;
   
 public:
   
@@ -89,8 +92,12 @@ public:
   virtual void CleanMedia () ;
   virtual bool Update () ;
   virtual void WriteData () ;
+  virtual void SetCacheSize(size_t size) ;
 
   virtual void SwapBuffers() ;
+
+  virtual bool HasDataReady() ;
+  virtual bool IsCacheFull() ;
 
   inline void SetLength (float length)  { this->length=length; }
   void Seek (float time, ogg_sync_state *oy,ogg_page *op,ogg_stream_state *thState);

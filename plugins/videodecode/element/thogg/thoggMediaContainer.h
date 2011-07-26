@@ -56,6 +56,8 @@ private:
   csRef<TheoraVideoMedia> _activeTheoraStream;
   csRef<TheoraAudioMedia> _activeVorbisStream;
 
+  size_t cacheSize;
+
 private:
   Mutex swapMutex;
   Condition isSeeking;
@@ -99,6 +101,9 @@ public:
   virtual void SwapBuffers() ;
 
   virtual void WriteData () ;
+
+
+  virtual void SetCacheSize(size_t size) ;
 
   /// Does a seek on the active media
   void DoSeek ();

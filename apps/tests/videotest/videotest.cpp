@@ -141,7 +141,7 @@ bool VideoTest::Application ()
   }
 
   mediaPlayer = csQueryRegistry<iMediaPlayer> (object_reg);
-  mediaPlayer->InitializePlayer (video);
+  mediaPlayer->InitializePlayer (video,5);
 
   // Specifying -1 as index triggers auto stream activation
   // We only select the video stream for now, because audio streaming doesn't 
@@ -299,7 +299,6 @@ bool VideoTest::OnExitButtonClicked (const CEGUI::EventArgs&)
     csQueryRegistry<iEventQueue> (GetObjectRegistry());
   if (q.IsValid())
   {
-    mediaPlayer->StopPlayer ();
     q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
   }
   return true;

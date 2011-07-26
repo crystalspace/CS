@@ -79,6 +79,11 @@ struct iMediaContainer : public virtual iBase
     * Gets data from the prefetch queue and writes it to the active buffer
     */
   virtual void WriteData () = 0 ;
+
+  /**
+    * Set the how many frames will be cached
+    */
+  virtual void SetCacheSize(size_t size) = 0;
 };
 
 /** @} */

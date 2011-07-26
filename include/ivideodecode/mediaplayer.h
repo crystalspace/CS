@@ -40,7 +40,9 @@ struct iMediaPlayer : public virtual iBase
   SCF_INTERFACE (iMediaPlayer,0,1,0);
 
   /// Initialize the video player
-  virtual void InitializePlayer (csRef<iMediaContainer> media) = 0;
+  /// cacheSize refers to the number of frames will be cached
+  /// If you don't want to use caching, use 1
+  virtual void InitializePlayer (csRef<iMediaContainer> media, size_t cacheSize = 1) = 0;
 
   /// Activates a stream from inside the iMediaContainer
   virtual void SetActiveStream (int index) = 0;

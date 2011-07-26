@@ -118,8 +118,12 @@ public:
   virtual void CleanMedia () ;
   virtual bool Update () ;
   virtual void WriteData () ;
+  virtual void SetCacheSize(size_t size) ;
 
   virtual void SwapBuffers() ;
+
+  virtual bool HasDataReady() ;
+  virtual bool IsCacheFull() ;
 
   inline void SetFrameCount (unsigned long count)  { frameCount=count; }
   inline void SetLength (float length)  { this->length=length; }

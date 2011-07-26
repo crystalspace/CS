@@ -35,13 +35,21 @@ bool vplPlayer::Initialize (iObjectRegistry* r)
   return true;
 }
 
-void vplPlayer::InitializePlayer (csRef<iMediaContainer> media)
+void vplPlayer::InitializePlayer (csRef<iMediaContainer> media, size_t cacheSize)
 {
   if (!media.IsValid())
+  {
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
               "Media container is not valid!");
+    return;
+  }
   else
     _mediaFile = media;
+
+  if (cacheSize<1)
+    _mediaFile->SetCacheSize (1);
+  else;
+  _mediaFile->SetCacheSize (cacheSize);
 
   CS_INITIALIZE_FRAME_EVENT_SHORTCUTS (object_reg);
   csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));

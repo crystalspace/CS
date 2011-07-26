@@ -70,12 +70,15 @@ void TheoraMediaContainer::SetActiveStream (size_t index)
     {
       found = true;
       activeStreams[i] = index;
+      media[index]->SetCacheSize (cacheSize);
     }
   }
 
   if (!found)
   {
     activeStreams.Push (index);
+
+    media[index]->SetCacheSize (cacheSize);
   }
 
   // Store the activated stream in our references, for fast, full access
@@ -113,6 +116,10 @@ bool TheoraMediaContainer::RemoveActiveStream (size_t index)
 
 void TheoraMediaContainer::Update ()
 {
+  // if processingCache is true, that means we've reached the end
+  // of the file, but there still is data in the caches of the 
+  // active streams which needs processing
+  static bool processingCache=false;
   //if a seek is scheduled, do it
   if (timeToSeek!=-1)
   {
@@ -126,25 +133,51 @@ void TheoraMediaContainer::Update ()
   if (!endOfFile && activeStreams.GetSize () > 0)
   {
     ok=0;
+    size_t cacheFull = 0;
+    size_t dataAvailable = 0;
     for (size_t i=0;i<activeStreams.GetSize ();i++)
     {
-      if( media [activeStreams [i]]->Update ())
+      // First, we want to know if any stream needs more data.
+      // in one stream needs data, ok will be different from 0
+      // If we're at the end of the file, but there's still data 
+      // in the caches, we don't care if a streams needs more data
+      if( media [activeStreams [i]]->Update () && !processingCache)
         ok++;
+      // Next, we want to know if all the active streams have
+      // a full cache. if they do, we won't read more data until 
+      // there's space left in the cache
+      if( media [activeStreams [i]]->IsCacheFull ())
+        cacheFull++;
+      // Next, we want to know if there still is data available
+      // we don't want to stop updating 'til we used every frame
+      if( media [activeStreams [i]]->HasDataReady ())
+        dataAvailable++;
     }
 
     if (ok==0)
     {
       canSwap=true;
     }
+    if(processingCache && dataAvailable==0)
+      ok++;
 
     /* buffer compressed data every loop */
-    if (ok>0)
+    if (ok>0 && cacheFull!=activeStreams.GetSize ())
     {
       hasDataToBuffer=BufferData (&_syncState);
       if (hasDataToBuffer==0)
       {
         printf("Ogg buffering stopped, end of file reached.\n");
-        endOfFile = true;
+        if(dataAvailable==0)
+        {
+          endOfFile = true;
+          processingCache=false;
+        }
+        else
+        {
+          cout<<"Processing the rest of the cache...\n";
+          processingCache=true;
+        }
       }
       while (ogg_sync_pageout(&_syncState,&_oggPage)>0)
       {
@@ -278,7 +311,10 @@ void TheoraMediaContainer::AutoActivateStreams ()
       }
 
       if (!found)
+      {
         SetActiveStream (i);
+        media[i]->SetCacheSize (cacheSize);
+      }
     }
   }
 }
@@ -331,4 +367,9 @@ void TheoraMediaContainer::WriteData ()
     if (_activeVorbisStream.IsValid ())
       _activeVorbisStream->WriteData ();
   }
+}
+
+void TheoraMediaContainer::SetCacheSize(size_t size) 
+{
+  cacheSize = size;
 }
