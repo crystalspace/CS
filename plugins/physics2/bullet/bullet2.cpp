@@ -1412,7 +1412,7 @@ csRef<CS::Physics2::iSoftBody> csBulletSystem::CreateSoftBody (csVector3* vertic
   btScalar* btVertices = new btScalar[vertexCount * 3];
   for (size_t i = 0; i < vertexCount; i++)
   {
-    csVector3& vertex = vertices[i]
+    csVector3 vertex = vertices[i]
     * bodyTransform.GetInverse() * internalScale;
     btVertices[i * 3] = vertex[0];
     btVertices[i * 3 + 1] = vertex[1];

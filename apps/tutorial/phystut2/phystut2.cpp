@@ -537,10 +537,10 @@ bool Simple::OnKeyboard (iEvent &event)
       // Update the display of the dynamics debugger
       //dynamicsDebugger->UpdateDisplay ();
     }
-
+/*
 #ifdef CS_HAVE_BULLET_SERIALIZER
     // Save a .bullet file
-    else if (csKeyEventHelper::GetRawCode (&ev) == 's'
+    else if (csKeyEventHelper::GetRawCode (&event) == 's'
       && kbd->GetKeyState (CSKEY_CTRL))
     {
       const char* filename = "phystut_world.bullet";
@@ -552,7 +552,7 @@ bool Simple::OnKeyboard (iEvent &event)
       return true;
     }
 #endif
-
+*/
     else if (csKeyEventHelper::GetRawCode (&event) == 'i'
       && kbd->GetKeyState (CSKEY_CTRL))
     {
@@ -920,11 +920,12 @@ bool Simple::Application ()
   
   hudManager->GetKeyDescriptions ()->Push ("?: toggle display of collisions");
   hudManager->GetKeyDescriptions ()->Push ("g: toggle gravity");
-  
+/*  
 #ifdef CS_HAVE_BULLET_SERIALIZER
   if (phys_engine_id == BULLET_ID)
     hudManager->GetKeyDescriptions ()->Push ("CTRL-s: save the dynamic world");
 #endif
+*/
   /*
   if (phys_engine_id == BULLET_ID)
     hudManager->GetKeyDescriptions ()->Push ("CTRL-n: next environment");
