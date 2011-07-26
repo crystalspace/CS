@@ -24,7 +24,7 @@ The 3D effects of your graphical desktop (e.g. the transparency or any other add
 
 In Ubuntu Natty 11.4, this is done before login in, once you selected the user you want to log, by selecting the ``Ubuntu Classic (No effects)'' UI option at the bottom of your screen.
 
-@node Debian Libraries, Debian Building, Debian, Debian
+@node Debian Libraries, Debian Building, Debian 3D Display, Debian
 @subsubsection Library Prerequisites
 
 @subsubheading Basic libraries
@@ -104,7 +104,7 @@ sudo make install
 
 @end itemize
 
-@node Debian Building, MSVC7, Debian Libraries, Debian
+@node Debian Building, , Debian Libraries, Debian
 @subsubsection Building
 
 @subsubheading Download the latest Crystal Space source 
