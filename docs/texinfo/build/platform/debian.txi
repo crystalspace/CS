@@ -22,7 +22,7 @@ Depending on your hardware and your Debian distribution, you may need to install
 
 The 3D effects of your graphical desktop (e.g. the transparency or any other additional display effects you can have on your windows) may unfortunately interfere with any other 3D based applications such as the ones from Crystal Space. You may therefore have to disable these effects in order to avoid problems such as flickering, slow or unresponsive applications.
 
-In Ubuntu Natty 11.4, this is done before login in, once you selected the user you want to log, by selecting the ``Ubuntu Classic (No effects)'' UI option at the bottom of your screen.
+In Ubuntu Natty 11.04, this is done before login in, once you selected the user you want to log, by selecting the ``Ubuntu Classic (No effects)'' UI option at the bottom of your screen.
 
 @node Debian Libraries, Debian Building, Debian 3D Display, Debian
 @subsubsection Library Prerequisites
@@ -61,6 +61,7 @@ configure
 make
 sudo make install
 @end example
+@*
 
 @item
 @strong{BULLET}
@@ -76,6 +77,7 @@ configure
 make
 sudo make install
 @end example
+@*
 
 @item
 @strong{ASSIMP}
@@ -88,7 +90,7 @@ First, install the Boost libraries, which are needed by Assimp.
 sudo apt-get install libboost-dev
 @end example
 
-Then download the latest version of the Assimp library from their Subversion repository in a temporary directory (e.g. @samp{assimp_trunk}):
+Then download the latest version of the Assimp library from its Subversion repository in a temporary directory (e.g. @samp{assimp_trunk}):
 
 @example
 svn co https://assimp.svn.sourceforge.net/svnroot/assimp/trunk assimp_trunk
@@ -143,7 +145,7 @@ svn co https://crystal.svn.sourceforge.net/svnroot/crystal/CS/trunk CS_latest
 
 @subsubheading Update your environment variables
 
-This is not advised to do a @samp{make install} for Crystal Space, since it can interfere with other installations you may have made previously. The dedicated way to deal with that problem is to define the @ref{HOWTO Setting the CRYSTAL environment variable, ``CRYSTAL''} environment variable.
+This is not advised to do a @samp{make install} for Crystal Space, since it can interfere with other installations you may have made previously. The dedicated way to deal with that problem is to define the ``@ref{HOWTO Setting the CRYSTAL environment variable, CRYSTAL}'' environment variable.
 
 In order to do so, you can open your @samp{~/.bashrc} file and add the following new line at the end of it:
 
@@ -151,7 +153,7 @@ In order to do so, you can open your @samp{~/.bashrc} file and add the following
 export CRYSTAL=path_to_your_CS_directory
 @end example
 
-Also, since you haven't installed Crystal Space, your system will most probably have troubles finding the shared library files of Crystal Space. To deal with that, you would need to add an entry in your ``LD_LIBRARY_PATH'' environment variable, so add also the following line to your @samp{~/.bashrc} file:
+Also, since you haven't installed Crystal Space, your system will most probably have troubles finding its shared library files. To deal with that, you would need to add an entry in your ``LD_LIBRARY_PATH'' environment variable, so add also the following line to your @samp{~/.bashrc} file:
 
 @example
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:path_to_your_CS_directory
