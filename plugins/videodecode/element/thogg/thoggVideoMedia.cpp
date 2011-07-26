@@ -312,21 +312,25 @@ void TheoraVideoMedia::WriteData ()
         for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
         {
           //          int uvOff = uv_offset+x/2;
-          int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
+          /*int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
           int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y/2))[x/2];
           int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y/2))[x/2];
 
           int R = (Y + 1.402f*(V-128));
           int G = (Y - 0.334f*(U-128) - 0.714f*(V-128));
-          int B = (Y + 1.772f*(U-128));
+          int B = (Y + 1.772f*(U-128));*/
+
+          int Y = (yuv[0].data+y_offset+yuv[0].stride*y)[x] -16;
+          int U = (yuv[1].data+uv_offset+yuv[1].stride*(y/2))[x/2] - 128;
+          int V = (yuv[2].data+uv_offset+yuv[2].stride*(y/2))[x/2] - 128;
+          int R = ((298*Y + 409*V + 128)>>8);
+          int G = ((298*Y - 100*U - 208*V + 128)>>8);
+          int B = ((298*Y + 516*U + 128)>>8);
 
           // Clamping the values here is faster than calling a function
-          if(R<0) R=0;
-          else if(R>255) R=255;
-          if(G<0) G=0;
-          else if(G>255) G=255;
-          if(B<0) B=0;
-          else if(B>255) B=255;
+          if(R<0) R=0; else if(R>255) R=255;
+          if(G<0) G=0; else if(G>255) G=255;
+          if(B<0) B=0; else if(B>255) B=255;
 
           *pixels++ = (uint8)R;
           *pixels++ = (uint8)G;
@@ -344,13 +348,20 @@ void TheoraVideoMedia::WriteData ()
         for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
         {
           //            int uvOff = uv_offset+x/2;
-          int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
+         /* int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
           int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y))[x/2];
           int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y))[x/2];
 
           int R = (Y + 1.402f*(V-128));
           int G = (Y - 0.334f*(U-128) - 0.714f*(V-128));
-          int B = (Y + 1.772f*(U-128));
+          int B = (Y + 1.772f*(U-128));*/
+
+          int Y = (yuv[0].data+y_offset+yuv[0].stride*y)[x] -16;
+          int U = (yuv[1].data+uv_offset+yuv[1].stride*(y))[x/2] - 128;
+          int V = (yuv[2].data+uv_offset+yuv[2].stride*(y))[x/2]; - 128;
+          int R = ((298*Y + 409*V + 128)>>8);
+          int G = ((298*Y - 100*U - 208*V + 128)>>8);
+          int B = ((298*Y + 516*U + 128)>>8);
 
           // Clamping the values here is faster than calling a function
           if(R<0) R=0;
@@ -376,13 +387,20 @@ void TheoraVideoMedia::WriteData ()
         for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
         {
           //              int uvOff = uv_offset+x/2;
-          int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
+         /* int Y = (int)(yuv[0].data+y_offset+yuv[0].stride*y)[x];
           int U = (int)(yuv[1].data+uv_offset+yuv[1].stride*(y))[x];
           int V = (int)(yuv[2].data+uv_offset+yuv[2].stride*(y))[x];
 
           int R = (Y + 1.402f*(V-128));
           int G = (Y - 0.334f*(U-128) - 0.714f*(V-128));
-          int B = (Y + 1.772f*(U-128));
+          int B = (Y + 1.772f*(U-128));*/
+
+          int Y = (yuv[0].data+y_offset+yuv[0].stride*y)[x] -16;
+          int U = (yuv[1].data+uv_offset+yuv[1].stride*(y))[x] - 128;
+          int V = (yuv[2].data+uv_offset+yuv[2].stride*(y))[x]; - 128;
+          int R = ((298*Y + 409*V + 128)>>8);
+          int G = ((298*Y - 100*U - 208*V + 128)>>8);
+          int B = ((298*Y + 516*U + 128)>>8);
 
           // Clamping the values here is faster than calling a function
           if(R<0) R=0;
