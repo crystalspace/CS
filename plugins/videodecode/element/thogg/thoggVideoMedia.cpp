@@ -358,7 +358,7 @@ void TheoraVideoMedia::WriteData ()
 
           int Y = (yuv[0].data+y_offset+yuv[0].stride*y)[x] -16;
           int U = (yuv[1].data+uv_offset+yuv[1].stride*(y))[x/2] - 128;
-          int V = (yuv[2].data+uv_offset+yuv[2].stride*(y))[x/2]; - 128;
+          int V = (yuv[2].data+uv_offset+yuv[2].stride*(y))[x/2] - 128;
           int R = ((298*Y + 409*V + 128)>>8);
           int G = ((298*Y - 100*U - 208*V + 128)>>8);
           int B = ((298*Y + 516*U + 128)>>8);
@@ -397,7 +397,7 @@ void TheoraVideoMedia::WriteData ()
 
           int Y = (yuv[0].data+y_offset+yuv[0].stride*y)[x] -16;
           int U = (yuv[1].data+uv_offset+yuv[1].stride*(y))[x] - 128;
-          int V = (yuv[2].data+uv_offset+yuv[2].stride*(y))[x]; - 128;
+          int V = (yuv[2].data+uv_offset+yuv[2].stride*(y))[x] - 128;
           int R = ((298*Y + 409*V + 128)>>8);
           int G = ((298*Y - 100*U - 208*V + 128)>>8);
           int B = ((298*Y + 516*U + 128)>>8);
