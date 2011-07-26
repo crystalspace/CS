@@ -125,8 +125,9 @@
               return output;  
 */    
             int i;
-            i = min(((compareDepth - depth) * 9.36 * numSplits), numSplits - 1);  
-
+            i = min( ( (compareDepth - depth) / (0.95 - depth) ) * numSplits - 1, 
+              numSplits - 1);
+            
             int index = i % 4;
             value += 10 * (value == 1);
             float4 color = value;

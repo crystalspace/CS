@@ -213,9 +213,9 @@ namespace CS
               csVector3 lightPosition = light->GetMovable()->GetPosition();
 
               // only take into account translucent objects
-//               if ( mesh.meshWrapper->GetRenderPriority() != 
-//                 rview->GetEngine()->GetRenderPriority("alpha"))
-//                 continue;
+              if ( mesh.meshWrapper->GetRenderPriority() != 
+                rview->GetEngine()->GetRenderPriority("alpha"))
+                continue;
 
               // add to mesh filter include
 	            superFrust->meshFilter.AddFilterMesh (mesh.meshWrapper);
