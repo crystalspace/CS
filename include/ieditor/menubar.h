@@ -24,6 +24,7 @@
 
 #include <wx/string.h>
 
+class wxMenu;
 class wxMenuBar;
 class wxMenuItem;
 
@@ -93,6 +94,8 @@ struct iMenu : public virtual iBase
   virtual csPtr<iMenuCheckItem> AppendCheckItem (const char* item) = 0;
   virtual csPtr<iMenuItem> AppendSeparator () = 0;
   virtual csPtr<iMenu> AppendSubMenu (const char* item) = 0;
+  
+  virtual csPtr<iMenuItem> AppendOperator (const char* identifier) = 0;
 };
 
 

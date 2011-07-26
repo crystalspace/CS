@@ -16,11 +16,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __DAMN_DAMNPANEL_H__
-#define __DAMN_DAMNPANEL_H__
+#ifndef __DAMN_DAMNVIEW_H__
+#define __DAMN_DAMNVIEW_H__
 
-#include "ieditor/objectlist.h"
-#include "ieditor/panelmanager.h"
+#include "ieditor/view.h"
 #include "ieditor/actionmanager.h"
 #include "ieditor/editor.h"
 
@@ -41,20 +40,20 @@ using namespace CS::EditorApp;
 
 CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {
-class DAMNPanel : public scfImplementation3<DAMNPanel,iPanel,iComponent, iResourceListener>,
+class DAMNView : public scfImplementation3<DAMNView,CS::EditorApp::iView,iComponent, iResourceListener>,
   public wxPanel
 {
 public:
-  DAMNPanel (iBase* parent);
-  virtual ~DAMNPanel ();
+  DAMNView (iBase* parent);
+  virtual ~DAMNView ();
 
   // iComponent
   virtual bool Initialize (iObjectRegistry* obj_reg);
 
-  // iPanel
+  // iView
   virtual wxWindow* GetWindow ();
   virtual const wxChar* GetCaption () const;
-  virtual PanelDockPosition GetDefaultDockPosition () const;
+  virtual ViewDockPosition GetDefaultDockPosition () const;
   
   // iResourceListener
   virtual void OnLoaded (iLoadingResource* resource);
@@ -71,14 +70,12 @@ private:
   wxScrolledWindow* previewList;
 
   csRef<iEditor> editor;
-  csRef<iPanelManager> panelManager;
+  csRef<iViewManager> viewManager;
   csRef<iActionManager> actionManager;
   
   csRef<iPluginManager> plugmgr;
   csRef<CS::Network::HTTP::iHTTPConnectionFactory> http;
   csRef<iResourceManager> damn;
-
-  csRef<iObjectList> objects;
 
   void OnSize (wxSizeEvent& event);
   

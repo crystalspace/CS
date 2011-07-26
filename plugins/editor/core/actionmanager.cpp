@@ -41,12 +41,11 @@ ActionManager::~ActionManager ()
 
 bool ActionManager::Do (iAction* action)
 {
-  csRef<iAction> undoAction (action->Do ());
-  if (!undoAction.IsValid ())
+  if (!action->Do ())
     return false;
   
   redoStack.Empty ();
-  undoStack.Push (undoAction);
+  undoStack.Push (action);
 
   NotifyListeners (action);
   
@@ -61,9 +60,8 @@ bool ActionManager::Undo ()
   csRef<iAction> action (undoStack.Pop ());
 
   // Store redo action
-  csRef<iAction> redoAction (action->Do ());
-  if (redoAction.IsValid ())
-    redoStack.Push (redoAction);
+  if (action->Undo ())
+    redoStack.Push (action);
 
   NotifyListeners (action);
 
@@ -77,9 +75,8 @@ bool ActionManager::Redo ()
   
   csRef<iAction> action (redoStack.Pop ());
   
-  csRef<iAction> undoAction (action->Do ());
-  if (undoAction.IsValid ())
-    undoStack.Push (undoAction);
+  if (action->Do ())
+    undoStack.Push (action);
 
   NotifyListeners (action);
 

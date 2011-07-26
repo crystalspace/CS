@@ -53,19 +53,7 @@ BEGIN_EVENT_TABLE (MainFrame, wxFrame)
   
   EVT_MENU (ID_Undo, MainFrame::OnUndo)
   EVT_MENU (ID_Redo, MainFrame::OnRedo)
-
-  EVT_MENU (ID_MoveTool, MainFrame::OnMoveTool)
-  EVT_MENU (ID_ScaleTool, MainFrame::OnScaleTool)
-  EVT_MENU (ID_RotateTool, MainFrame::OnRotateTool)
-  
 END_EVENT_TABLE ()
-
-//#include "data/editor/images/trans/move_on.xpm"
-#include "data/editor/images/trans/move_off.xpm"
-//#include "data/editor/images/trans/rot_on.xpm"
-#include "data/editor/images/trans/rot_off.xpm"
-//#include "data/editor/images/trans/scale_on.xpm"
-#include "data/editor/images/trans/scale_off.xpm"
 
 MainFrame::MainFrame (iObjectRegistry* object_reg, Editor* editor,
 		      const wxString& title, const wxPoint& pos, const wxSize& size)
@@ -99,22 +87,6 @@ MainFrame::MainFrame (iObjectRegistry* object_reg, Editor* editor,
   PositionStatusBar ();
   statusBar->Show ();
 
-  wxToolBar* toolBar = CreateToolBar (wxNO_BORDER|wxHORIZONTAL|wxTB_FLAT, ID_ToolBar);
-  toolBar->SetToolBitmapSize (wxSize (21, 21));
-
-  //wxBitmap* moveon = new wxBitmap (move_on_xpm));
-  wxBitmap* moveoff = new wxBitmap (move_off_xpm);
-  wxBitmap* rotoff = new wxBitmap (rot_off_xpm);
-  wxBitmap* scaleoff = new wxBitmap (scale_off_xpm);
-  toolBar->AddCheckTool (ID_MoveTool, wxT ("Move"), *moveoff, *moveoff, wxT ("Move object"));
-  toolBar->AddCheckTool (ID_RotateTool, wxT ("Rotate"), *rotoff, *rotoff, wxT ("Rotate object"));
-  toolBar->AddCheckTool (ID_ScaleTool, wxT ("Scale"), *scaleoff, *scaleoff, wxT ("Scale object"));
-  toolBar->Realize ();
-
-  delete moveoff;
-  delete rotoff;
-  delete scaleoff;
-
   actionManager = csQueryRegistry<iActionManager> (object_reg);
   if (actionManager)
   {
@@ -134,18 +106,6 @@ MainFrame::~MainFrame ()
 
 bool MainFrame::Initialize ()
 {
-/*
-  if (!vfs)
-    vfs = csQueryRegistry<iVFS> (object_reg);
-  vfs->Mount ("/cseditor/", "$@data$/editor$/");
-  vfs->ChDir ("/cseditor/sys/");
-  csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
-  if (!loader)
-    return false;
-  
-  loader->LoadLibraryFile ("arrows.lib");
-  vfs->ChDir ("/");
-*/  
   pump = new Pump(this);
   pump->Start (20);
 
@@ -322,33 +282,9 @@ void MainFrame::CreateHelper(csArray<csSimpleRenderMesh> &helpers, const char* f
   helpers.Push (mesh);
 }
 
-void MainFrame::OnMoveTool (wxCommandEvent& event)
-{
-  if (event.IsChecked ())
-  {
-    editor->SetTransformStatus (iEditor::MOVING);
-    // -1.5 -0.7 14
-    csArray<csSimpleRenderMesh>* helpers = new csArray<csSimpleRenderMesh> ();
-    CreateHelper (*helpers, "ArrowZFact", "blue");
-    CreateHelper (*helpers, "ArrowXFact", "red");
-    CreateHelper (*helpers, "ArrowYFact", "green");
-    editor->SetHelperMeshes (helpers);
-  }
-  else
-  {
-    editor->SetTransformStatus (iEditor::NOTHING);
-    editor->SetHelperMeshes (0);
-  }
-}
-void MainFrame::OnRotateTool (wxCommandEvent& event)
-{
-}
-void MainFrame::OnScaleTool (wxCommandEvent& event)
-{
-}
-
 void MainFrame::UpdateEditMenu ()
 {
+  printf("MainFrame::UpdateEditMenu\n");
   const iAction* undo = actionManager->PeekUndo ();
   const iAction* redo = actionManager->PeekRedo ();
 
@@ -359,11 +295,11 @@ void MainFrame::UpdateEditMenu ()
 
   if (undo)
     menuBar->SetLabel(ID_Undo, wxT("Undo \"")
-        + wxString(undo->GetDescription ()) + wxT("\"\tCtrl+Z"));
+        + wxString(undo->GetDescription (), wxConvUTF8) + wxT("\"\tCtrl+Z"));
   
   if (redo)
     menuBar->SetLabel(ID_Redo, wxT("Redo \"")
-        + wxString(redo->GetDescription ()) + wxT("\"\tCtrl+Y"));
+        + wxString(redo->GetDescription (), wxConvUTF8) + wxT("\"\tCtrl+Y"));
 }
 
 }

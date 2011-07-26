@@ -47,11 +47,7 @@ enum
   ID_Save = wxID_SAVE,
   ID_Undo = wxID_UNDO,
   ID_Redo = wxID_REDO,
-  ID_MoveTool = wxID_HIGHEST + 2000,
-  ID_RotateTool,
-  ID_ScaleTool,
-  ID_ToolBar,
-  ID_ImportLibrary
+  ID_ImportLibrary = wxID_HIGHEST + 2000
 };
 
 class MainFrame : public wxFrame
@@ -77,10 +73,6 @@ public:
 
   void OnUndo (wxCommandEvent& event);
   void OnRedo (wxCommandEvent& event);
-
-  void OnMoveTool (wxCommandEvent& event);
-  void OnRotateTool (wxCommandEvent& event);
-  void OnScaleTool (wxCommandEvent& event);
 
   void UpdateEditMenu ();
 

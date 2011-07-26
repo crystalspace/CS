@@ -29,13 +29,12 @@
 #include "ivideo/wxwin.h"
 
 #include "ieditor/panelmanager.h"
-#include "objectlist.h"
 #include "menubar.h"
-#include "auipanelmanager.h"
-#include "interfacewrappermanager.h"
+#include "settingsmanager.h"
 #include "actionmanager.h"
-#include "editorobject.h"
+#include "operatormanager.h"
 #include "mainframe.h"
+#include "context.h"
 
 #include "editor.h"
 
@@ -45,7 +44,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 SCF_IMPLEMENT_FACTORY (Editor)
 
 Editor::Editor (iBase* parent)
-: scfImplementationType (this, parent), helper_meshes (0), transstatus (NOTHING)
+: scfImplementationType (this, parent), helper_meshes (0)
 {
 }
 
@@ -53,7 +52,7 @@ Editor::~Editor ()
 {
   delete helper_meshes;
 
-  panelManager->Uninitialize ();
+  viewManager->Uninitialize ();
 
   // Remove ourself from object registry
   object_reg->Unregister (this, "iEditor");
@@ -99,6 +98,8 @@ bool Editor::Initialize (iObjectRegistry* reg)
   object_reg = reg;
   object_reg->Register (this, "iEditor");
   
+  context.AttachNew (new Context (object_reg));
+  
   actionManager.AttachNew (new ActionManager (object_reg));
   
   // Create the main frame
@@ -107,11 +108,9 @@ bool Editor::Initialize (iObjectRegistry* reg)
   menuBar.AttachNew (new MenuBar (object_reg, mainFrame->GetMenuBar ()));
   mainFrame->Show ();
   
-  panelManager.AttachNew (new AUIPanelManager (object_reg, mainFrame));
-  interfaceManager.AttachNew (new InterfaceWrapperManager (object_reg));
-
-  selection.AttachNew (new ObjectList ());
-  objects.AttachNew (new ObjectList ());
+  operatorManager.AttachNew (new OperatorManager (object_reg));
+  viewManager.AttachNew (new AUIViewManager (object_reg, mainFrame));
+  settingsManager.AttachNew (new SettingsManager (object_reg, mainFrame));
 
   return true;
 }
@@ -222,7 +221,7 @@ bool Editor::StartApplication ()
   mainCollection = engine->CreateCollection ("Main collection");
 
   mainFrame->Initialize ();
-  panelManager->Initialize ();
+  viewManager->Initialize ();
 
   // Analyze the command line arguments
   csRef<iCommandLineParser> cmdline =
@@ -354,21 +353,6 @@ void Editor::RemoveMapListener (iMapListener* listener)
   mapListeners.Delete (listener);
 }
 
-csPtr<iEditorObject> Editor::CreateEditorObject (iBase* object, wxBitmap* icon)
-{
-  return csPtr<iEditorObject> (new EditorObject (object_reg, object, icon));
-}
-
-iObjectList* Editor::GetSelection ()
-{
-  return selection;
-}
-
-iObjectList* Editor::GetObjects ()
-{
-  return objects;
-}
-
 void Editor::SetHelperMeshes (csArray<csSimpleRenderMesh>* helpers)
 {
   delete helper_meshes;
@@ -377,15 +361,6 @@ void Editor::SetHelperMeshes (csArray<csSimpleRenderMesh>* helpers)
 csArray<csSimpleRenderMesh>* Editor::GetHelperMeshes ()
 {
   return helper_meshes;
-}
-
-void Editor::SetTransformStatus (TransformStatus status)
-{
-  transstatus = status;
-}
-Editor::TransformStatus Editor::GetTransformStatus ()
-{
-  return transstatus;
 }
 
 }

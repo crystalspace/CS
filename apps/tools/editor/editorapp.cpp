@@ -34,6 +34,9 @@
 #include <wx/wx.h>
 #include "csutil/custom_new_enable.h"
 
+#include <wx/popupwin.h>
+#include <wx/srchctrl.h>
+
 CS_IMPLEMENT_APPLICATION
 
 #if defined(CS_PLATFORM_WIN32)
@@ -62,10 +65,71 @@ public:
 
   virtual bool OnInit (void);
   virtual int OnExit (void);
+  virtual int FilterEvent(wxEvent& event);
 };
 
 
 IMPLEMENT_APP(EditorApp)
+
+
+int EditorApp::FilterEvent(wxEvent& event)
+{
+  if (event.GetEventType()==wxEVT_KEY_DOWN && ((wxKeyEvent&)event).GetKeyCode()==WXK_SPACE)
+  {
+    printf("EditorApp::FilterEvent %s\n", (wxGetActiveWindow()?"has":"no"));
+    wxTextCtrl* hastextfocus = dynamic_cast<wxTextCtrl*>(wxGetActiveWindow());
+    if (hastextfocus) return -1;
+    
+    wxPopupTransientWindow* p = new wxPopupTransientWindow( GetTopWindow());
+    wxSearchCtrl* srchCtrl = new wxSearchCtrl(p, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(200, -1), 0);
+    wxScrolledWindow* m_panel = new wxScrolledWindow(p, wxID_ANY);
+    m_panel->SetScrollbars(0, 1, 0, 0);
+    
+    wxBoxSizer* topSizer = new wxBoxSizer(wxVERTICAL);
+
+    wxBoxSizer* sizer = new wxBoxSizer( wxVERTICAL );
+    wxStaticText* text = new wxStaticText( m_panel, wxID_ANY,
+                          wxT("Operator Something\n")
+                          wxT("Operator Something\n")
+                          wxT("Operator Something\n")
+                          wxT("Operator Something\n")
+                          wxT("Operator Something\n")
+                          wxT("Operator Something\n")
+                          wxT("Operator Something\n")
+                          wxT("Operator Something\n")
+                          wxT("Operator Something\n")
+                          wxT("Operator Something\n")
+                          wxT("Operator Something\n")
+                          wxT("And more..."));
+    
+    
+    sizer->Add(text, 0, wxALL, 0);
+    
+    topSizer->Add(srchCtrl, 0, wxTOP|wxEXPAND, 0);
+    topSizer->Add(m_panel, 0, wxALL, 0);
+    
+    m_panel->SetMaxSize(wxSize(200, 250));
+     
+    m_panel->SetSizer(sizer);
+    sizer->SetSizeHints(m_panel);
+    p->SetSizer(topSizer);
+    topSizer->SetSizeHints(p);
+    
+    topSizer->Layout();
+    
+    /*
+    srchCtrl->SetBackgroundColour(wxColour(wxT("#1c1c1c")));
+    srchCtrl->SetForegroundColour(wxColour(wxT("#2b2b2b")));
+    m_panel->SetBackgroundColour(wxColour(wxT("#1c1c1c")));
+    text->SetForegroundColour(*wxWHITE);
+    */
+    p->Position(wxGetMousePosition(), wxSize(0, 0) );
+    p->Popup();
+    return true;
+  }
+
+  return -1;
+}
 
 /*---------------------------------------------------------------------*
  * Main function
@@ -104,12 +168,16 @@ bool EditorApp::OnInit (void)
   if (!editor->StartEngine ()) return false;
 
   // Load the specific plugins for the Crystal Space editor
-  if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.cs3dpanel")) return false;
-  if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.scenebrowserpanel")) return false;
-  if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.assetbrowserpanel")) return false;
-  if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.csobjectmaplistener")) return false;
-  if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.csinterfacewrappers")) return false;
-  if (!editor->LoadPlugin ("crystalspace.editor.plugin.damn.damnpanel")) return false;
+  if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.cs3dview")) return false;
+  //if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.scenebrowserpanel")) return false;
+  //if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.assetbrowserpanel")) return false;
+  //if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.csobjectmaplistener")) return false;
+  //if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.csinterfacewrappers")) return false;
+  if (!editor->LoadPlugin ("crystalspace.editor.plugin.damn.damnview")) return false;
+  
+  if (!editor->LoadPlugin ("cs.editor.operator.test")) return false;
+  if (!editor->LoadPlugin ("cs.editor.operator.select")) return false;
+  if (!editor->LoadPlugin ("cs.editor.operator.move")) return false;
 
   // Start the application
   if (!editor->StartApplication ()) return false;

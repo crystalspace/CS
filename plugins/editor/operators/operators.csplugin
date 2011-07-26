@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!-- cseditordamn.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>cs.editor.operator.test</name>
+        <implementation>TestOperatorFactory</implementation>
+        <description>Test operator</description>
+      </class>
+      
+      <class>
+        <name>cs.editor.operator.select</name>
+        <implementation>SelectOperatorFactory</implementation>
+        <description></description>
+      </class>
+      
+      <class>
+        <name>cs.editor.operator.move</name>
+        <implementation>MoveOperatorFactory</implementation>
+        <description></description>
+      </class>
+      
+    </classes>
+  </scf>
+</plugin>

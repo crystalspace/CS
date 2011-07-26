@@ -31,11 +31,13 @@
 
 namespace CS {
 namespace EditorApp {
+  
+class MenuBar;
 
 class MenuItem : public scfImplementation1<MenuItem,iMenuItem>, public wxEvtHandler
 {
 public:
-  MenuItem (wxMenuBar* menuBar, wxMenu* menu, wxMenuItem* item);
+  MenuItem (MenuBar* menuBar, wxMenu* menu, wxMenuItem* item);
   virtual ~MenuItem ();
   
   virtual wxMenuItem* GetwxMenuItem () const;
@@ -45,7 +47,7 @@ public:
   
 private:
   void OnToggle (wxCommandEvent& event);
-  wxMenuBar* menuBar;
+  MenuBar* menuBar;
   wxMenu* menu;
   wxMenuItem* item;
   
@@ -55,7 +57,7 @@ private:
 class MenuCheckItem : public scfImplementation1<MenuCheckItem,iMenuCheckItem>, public wxEvtHandler
 {
 public:
-  MenuCheckItem (wxMenuBar* menuBar, wxMenu* menu, wxMenuItem* item);
+  MenuCheckItem (MenuBar* menuBar, wxMenu* menu, wxMenuItem* item);
   virtual ~MenuCheckItem ();
   
   virtual bool IsChecked () const;
@@ -69,17 +71,36 @@ public:
   
 private:
   void OnToggle (wxCommandEvent& event);
-  wxMenuBar* menuBar;
+  MenuBar* menuBar;
   wxMenu* menu;
   wxMenuItem* item;
   
   csRefArray<iMenuItemEventListener> listeners;
 };
 
+class MenuOperatorItem : public scfImplementation1<MenuOperatorItem,iMenuItem>, public wxEvtHandler
+{
+public:
+  MenuOperatorItem (MenuBar* menuBar, wxMenu* menu, const char* identifier);
+  virtual ~MenuOperatorItem ();
+  
+  virtual wxMenuItem* GetwxMenuItem () const;
+  
+  virtual void AddListener (iMenuItemEventListener*) {}
+  virtual void RemoveListener (iMenuItemEventListener*) {}
+  
+private:
+  void OnToggle (wxCommandEvent& event);
+  MenuBar* menuBar;
+  wxMenu* menu;
+  wxMenuItem* item;
+  std::string identifier;
+};
+
 class Menu : public scfImplementation1<Menu,iMenu>, public wxEvtHandler
 {
 public:
-  Menu (wxMenuBar* menuBar, wxMenu* menu, const wxString& title);
+  Menu (MenuBar* menuBar, wxMenu* menu, const wxString& title);
   virtual ~Menu ();
   
   virtual wxMenu* GetwxMenu () const;
@@ -88,9 +109,11 @@ public:
   virtual csPtr<iMenuCheckItem> AppendCheckItem (const char* item);
   virtual csPtr<iMenuItem> AppendSeparator ();
   virtual csPtr<iMenu> AppendSubMenu (const char* item);
+  
+  virtual csPtr<iMenuItem> AppendOperator (const char* identifier);
 
 private:
-  wxMenuBar* menuBar;
+  MenuBar* menuBar;
   wxMenu* menu;
   wxString title;
 };
@@ -109,6 +132,7 @@ public:
 private:
   iObjectRegistry* object_reg;
   wxMenuBar* menuBar;
+  friend class MenuOperatorItem;
 };
 
 } // namespace EditorApp

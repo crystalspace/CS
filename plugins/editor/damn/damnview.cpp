@@ -44,7 +44,7 @@
 
 #include <wx/mstream.h>
 
-#include "damnpanel.h"
+#include "damnview.h"
 
 #include "json/json.h"
 
@@ -58,24 +58,24 @@ const int ICONSIZE = 128;
 CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {
   
-SCF_IMPLEMENT_FACTORY (DAMNPanel)
+SCF_IMPLEMENT_FACTORY (DAMNView)
 
-BEGIN_EVENT_TABLE(DAMNPanel, wxPanel)
-  EVT_SIZE(DAMNPanel::OnSize)
+BEGIN_EVENT_TABLE(DAMNView, wxPanel)
+  EVT_SIZE(DAMNView::OnSize)
 END_EVENT_TABLE()
 
 
-DAMNPanel::DAMNPanel (iBase* parent)
+DAMNView::DAMNView (iBase* parent)
  : scfImplementationType (this, parent), sizer(0), srchCtrl(0), previewList(0)
 {
 }
 
-bool DAMNPanel::Initialize (iObjectRegistry* obj_reg)
+bool DAMNView::Initialize (iObjectRegistry* obj_reg)
 {
   object_reg = obj_reg;
   
-  panelManager = csQueryRegistry<iPanelManager> (object_reg);
-  if (!panelManager)
+  viewManager = csQueryRegistry<iViewManager> (object_reg);
+  if (!viewManager)
     return false;
 
   editor = csQueryRegistry<iEditor> (object_reg);
@@ -96,11 +96,11 @@ bool DAMNPanel::Initialize (iObjectRegistry* obj_reg)
   abs->AddAbstraction("image", "format=image/png&sizex=512&sizey=512");
   abs->AddAbstraction("mesh", "format=application/x-crystalspace.library%2Bxml");
 
-  // Create the panel
+  // Create the view
   Create (editor->GetWindow (), -1, wxPoint (0, 0), wxSize (ICONSIZE*2, 250));
 
-  // Add it to the panel manager
-  panelManager->AddPanel (this);
+  // Add it to the view manager
+  viewManager->AddView (this);
   
   wxBoxSizer* box = new wxBoxSizer(wxVERTICAL);
   SetSizer(box);
@@ -108,8 +108,8 @@ bool DAMNPanel::Initialize (iObjectRegistry* obj_reg)
   srchCtrl = new wxSearchCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxSize(250, -1), 0);
   srchCtrl->ShowCancelButton(true);
   
-  this->Connect(srchCtrl->GetId(), wxEVT_COMMAND_SEARCHCTRL_SEARCH_BTN, wxCommandEventHandler(DAMNPanel::OnSearchButton), 0, this);
-  this->Connect(srchCtrl->GetId(), wxEVT_COMMAND_SEARCHCTRL_CANCEL_BTN, wxCommandEventHandler(DAMNPanel::OnCancelButton), 0, this);
+  this->Connect(srchCtrl->GetId(), wxEVT_COMMAND_SEARCHCTRL_SEARCH_BTN, wxCommandEventHandler(DAMNView::OnSearchButton), 0, this);
+  this->Connect(srchCtrl->GetId(), wxEVT_COMMAND_SEARCHCTRL_CANCEL_BTN, wxCommandEventHandler(DAMNView::OnCancelButton), 0, this);
   box->Add(srchCtrl, 0, wxTOP|wxEXPAND, 0);
   
   
@@ -123,26 +123,26 @@ bool DAMNPanel::Initialize (iObjectRegistry* obj_reg)
   return true;
 }
 
-DAMNPanel::~DAMNPanel ()
+DAMNView::~DAMNView ()
 {
 }
 
-wxWindow* DAMNPanel::GetWindow ()
+wxWindow* DAMNView::GetWindow ()
 {
   return this;
 }
 
-const wxChar* DAMNPanel::GetCaption () const
+const wxChar* DAMNView::GetCaption () const
 {
-  return wxT("DAMN Browser");
+  return wxT("DAMN View");
 }
 
-PanelDockPosition DAMNPanel::GetDefaultDockPosition () const
+ViewDockPosition DAMNView::GetDefaultDockPosition () const
 {
   return DockPositionRight;
 }
 
-void DAMNPanel::OnSize (wxSizeEvent& event)
+void DAMNView::OnSize (wxSizeEvent& event)
 {
   // Resize the tree control
   /*if (listCtrl)
@@ -155,7 +155,7 @@ void DAMNPanel::OnSize (wxSizeEvent& event)
   event.Skip();
 }
 
-void DAMNPanel::OnLoaded (iLoadingResource* resource)
+void DAMNView::OnLoaded (iLoadingResource* resource)
 {
   if (resource->Get()) {
     csRef<iImage> image = scfQueryInterface<iImage>(resource->Get());
@@ -175,9 +175,9 @@ void DAMNPanel::OnLoaded (iLoadingResource* resource)
     meter->SetProgressDescription("DAMN: ", "Done.");
 }
 
-void DAMNPanel::OnSearchButton (wxCommandEvent& event)
+void DAMNView::OnSearchButton (wxCommandEvent& event)
 {
-  printf("DAMNPanel::OnSearchButton %s\n", (const char*)srchCtrl->GetValue().mb_str());
+  printf("DAMNView::OnSearchButton %s\n", (const char*)srchCtrl->GetValue().mb_str());
   std::string searchTerm((const char*)srchCtrl->GetValue().mb_str());
   
   if (searchTerm == "") searchTerm = "shield";
@@ -238,7 +238,7 @@ void DAMNPanel::OnSearchButton (wxCommandEvent& event)
 
 }
 
-void DAMNPanel::OnCancelButton (wxCommandEvent& event)
+void DAMNView::OnCancelButton (wxCommandEvent& event)
 {
    printf("success c\n");
    csRef<iLoadingResource> image = damn->Get(CS::Resource::GetTypeID ("factory"), "782b83441a749df48b085f35655558700d1f1f17::mesh");

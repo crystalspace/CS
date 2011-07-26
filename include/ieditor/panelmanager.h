@@ -25,21 +25,12 @@
 #include <wx/string.h>
 
 class wxWindow;
-class wxMenu;
-class wxMenuBar;
 
 namespace CS {
 namespace EditorApp {
+  
+struct iContext;
 
-enum PanelDockPosition
-{
-  DockPositionNone = 0,
-  DockPositionTop = 1,
-  DockPositionRight = 2,
-  DockPositionBottom = 3,
-  DockPositionLeft = 4,
-  DockPositionCenter = 5,
-};
   
 /**
  * A panel is a window in the editor.
@@ -56,8 +47,16 @@ struct iPanel : public virtual iBase
   /// Get the caption that will be shown in the titlebar of this panel.
   virtual const wxChar* GetCaption () const = 0;
 
-  /// Get the default position to dock this panel.
-  virtual PanelDockPosition GetDefaultDockPosition () const = 0;
+  /**
+   * Check whether this panel can be drawn.
+   */
+  //virtual bool Poll (iContext*) = 0;
+  
+  /**
+   * This will be called when the UI needs to be redrawn or the context
+   * changed.
+   */
+  virtual void Draw (iContext*) = 0;
 };
 
 
@@ -78,7 +77,7 @@ struct iPanelManager : public virtual iBase
    * \remarks Only call this when you no longer need the panel,
    *          e.g. when unloading a plugin.
    */
-  virtual void RemovePanel (iPanel* panel) = 0;
+  //virtual void RemovePanel (iPanel* panel) = 0;
 
   /// Set whether or not the given panel should be visible.
   virtual void SetPanelVisible (iPanel* panel, bool visible) = 0;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2007 by Seth Yastrov
+    Copyright (C) 2011 by Jelle Hellemans
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,44 +16,38 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <cssysdef.h>
-#include "csutil/scf.h"
+#ifndef __CSEDITOR_TESTOPERATOR_H__
+#define __CSEDITOR_TESTOPERATOR_H__
 
-#include <csutil/objreg.h>
 
-#include "csinterfacewrappers.h"
+#include <csutil/scf_implementation.h>
+#include <iutil/comp.h>
+
+#include "ieditor/operator.h"
 
 using namespace CS::EditorApp;
 
 CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {
-
-SCF_IMPLEMENT_FACTORY(CSInterfaceWrappers)
-
-CSInterfaceWrappers::CSInterfaceWrappers (iBase* parent)
-  : scfImplementationType (this, parent)
+class TestOperator : public scfImplementation1<TestOperator,iOperator>
 {
-}
+public:
+  TestOperator (iObjectRegistry* obj_reg);
+  virtual ~TestOperator ();
 
-CSInterfaceWrappers::~CSInterfaceWrappers ()
-{
-}
+  // iOperator
+  virtual bool Poll (iContext*);
+  virtual OperatorState Execute (iContext*);
+  virtual OperatorState Invoke (iContext*, iEvent*);
+  virtual OperatorState Modal (iContext*, iEvent*);
 
+private:
+  iObjectRegistry* object_reg;
+};
 
-bool CSInterfaceWrappers::Initialize (iObjectRegistry* obj_reg)
-{
-  object_reg = obj_reg;
-
-  interfaceManager = csQueryRegistry<iInterfaceWrapperManager> (object_reg);
-  if (!interfaceManager)
-    return false;
-
-  interfaceManager->Register (new InterfaceWrapper::ObjectFactory ());
-  interfaceManager->Register (new InterfaceWrapper::SceneNodeFactory ());
-  interfaceManager->Register (new InterfaceWrapper::MeshFactoryWrapperFactory ());
-  
-  return true;
-}
+CS_EDITOR_IMPLEMENT_OPERATOR(TestOperator, "cs.editor.operator.test", "An operator", "This is an operator");
 
 }
 CS_PLUGIN_NAMESPACE_END(CSE)
+
+#endif

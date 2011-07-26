@@ -21,6 +21,8 @@
 
 #include <csutil/objreg.h>
 
+#include "ieditor/operator.h"
+
 
 #include "menubar.h"
 
@@ -31,15 +33,15 @@ namespace CS {
 namespace EditorApp {
 
 
-MenuItem::MenuItem (wxMenuBar* menuBar, wxMenu* menu, wxMenuItem* item)
+MenuItem::MenuItem (MenuBar* menuBar, wxMenu* menu, wxMenuItem* item)
   : scfImplementationType (this), menuBar(menuBar), menu(menu), item(item)
 {
-  menuBar->GetParent()->Connect(item->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MenuItem::OnToggle), 0, this);
+  menuBar->GetwxMenuBar()->GetParent()->Connect(item->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MenuItem::OnToggle), 0, this);
 }
 
 MenuItem::~MenuItem ()
 {
-  menuBar->GetParent()->Disconnect(item->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MenuItem::OnToggle), 0, this); 
+  menuBar->GetwxMenuBar()->GetParent()->Disconnect(item->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MenuItem::OnToggle), 0, this); 
   menu->Remove(item);
   delete item;
 }
@@ -68,15 +70,15 @@ void MenuItem::RemoveListener (iMenuItemEventListener* l)
 //---------------------------------------------------------------
 
 
-MenuCheckItem::MenuCheckItem (wxMenuBar* menuBar, wxMenu* menu, wxMenuItem* item)
+MenuCheckItem::MenuCheckItem (MenuBar* menuBar, wxMenu* menu, wxMenuItem* item)
   : scfImplementationType (this), menuBar(menuBar), menu(menu), item(item)
 {
-  menuBar->GetParent()->Connect(item->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MenuCheckItem::OnToggle), 0, this);
+  menuBar->GetwxMenuBar()->GetParent()->Connect(item->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MenuCheckItem::OnToggle), 0, this);
 }
 
 MenuCheckItem::~MenuCheckItem ()
 {
-  menuBar->GetParent()->Disconnect(item->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MenuCheckItem::OnToggle), 0, this); 
+  menuBar->GetwxMenuBar()->GetParent()->Disconnect(item->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MenuCheckItem::OnToggle), 0, this); 
   menu->Remove(item);
   delete item;
 }
@@ -114,15 +116,47 @@ void MenuCheckItem::RemoveListener (iMenuItemEventListener* l)
 
 //---------------------------------------------------------------
 
-Menu::Menu (wxMenuBar* menuBar, wxMenu* menu, const wxString& title)
+MenuOperatorItem::MenuOperatorItem (MenuBar* menuBar, wxMenu* menu, const char* identifier)
+  : scfImplementationType (this), menuBar(menuBar), menu(menu), item(0), identifier(identifier)
+{
+  csRef<iOperatorManager> operatorManager = csQueryRegistry<iOperatorManager> (menuBar->object_reg);
+  wxString label(operatorManager->GetLabel(identifier), wxConvUTF8);
+  wxString help(operatorManager->GetDescription(identifier), wxConvUTF8);
+  item = menu->Append(wxID_ANY, label, help);
+  
+  menuBar->GetwxMenuBar()->GetParent()->Connect(item->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MenuOperatorItem::OnToggle), 0, this);
+}
+
+MenuOperatorItem::~MenuOperatorItem ()
+{
+  menuBar->GetwxMenuBar()->GetParent()->Disconnect(item->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MenuOperatorItem::OnToggle), 0, this); 
+  menu->Remove(item);
+  delete item;
+}
+
+void MenuOperatorItem::OnToggle (wxCommandEvent& event)
+{
+  csRef<iOperatorManager> operatorManager = csQueryRegistry<iOperatorManager> (menuBar->object_reg);
+  operatorManager->Execute(identifier.c_str());
+}
+
+wxMenuItem* MenuOperatorItem::GetwxMenuItem () const
+{
+  return item;
+}
+
+
+//---------------------------------------------------------------
+
+Menu::Menu (MenuBar* menuBar, wxMenu* menu, const wxString& title)
   : scfImplementationType (this), menuBar(menuBar), menu(menu), title(title)
 {
 }
 
 Menu::~Menu ()
 {
-  int pos = menuBar->FindMenu(title);
-  if (pos != wxNOT_FOUND) menuBar->Remove(pos);
+  int pos = menuBar->GetwxMenuBar()->FindMenu(title);
+  if (pos != wxNOT_FOUND) menuBar->GetwxMenuBar()->Remove(pos);
   delete menu;
 }
 
@@ -175,6 +209,14 @@ csPtr<iMenu> Menu::AppendSubMenu (const char* item)
   return csPtr<iMenu> (ref);
 }
 
+csPtr<iMenuItem> Menu::AppendOperator (const char* identifier)
+{
+  csRef<iMenuItem> ref;
+  ref.AttachNew (new MenuOperatorItem (menuBar, menu, identifier));
+
+  return csPtr<iMenuItem> (ref);
+}
+
 //---------------------------------------------------------------
 
 MenuBar::MenuBar (iObjectRegistry* obj_reg, wxMenuBar* menuBar)
@@ -201,7 +243,7 @@ csPtr<iMenu> MenuBar::Append (const char* item)
   menuBar->Append(menu, str);
 
   csRef<iMenu> ref;
-  ref.AttachNew (new Menu (menuBar, menu, str));
+  ref.AttachNew (new Menu (this, menu, str));
 
   return csPtr<iMenu> (ref);
 }

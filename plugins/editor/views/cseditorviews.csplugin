@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!-- cseditorviews.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.editor.plugin.core.cs3dview</name>
+        <implementation>CS3DView</implementation>
+        <description>CSEditor 3D View</description>
+      </class>
+      <!--
+      <class>
+        <name>crystalspace.editor.plugin.core.scenebrowserpanel</name>
+        <implementation>SceneBrowserPanel</implementation>
+        <description>CSEditor Scene Browser Panel</description>
+      </class>
+      <class>
+        <name>crystalspace.editor.plugin.core.assetbrowserpanel</name>
+        <implementation>AssetBrowserPanel</implementation>
+        <description>CSEditor Asset Browser Panel</description>
+      </class>
+      -->
+    </classes>
+  </scf>
+</plugin>

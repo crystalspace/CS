@@ -19,8 +19,7 @@
 #ifndef __CORE_CS3DPANEL_H__
 #define __CORE_CS3DPANEL_H__
 
-#include "ieditor/objectlist.h"
-#include "ieditor/panelmanager.h"
+#include "ieditor/view.h"
 #include "ieditor/editor.h"
 
 #include "csutil/scf_implementation.h"
@@ -33,46 +32,40 @@
 #include <wx/event.h>
 #include <wx/dnd.h>
 
-#include "dataobject.h"
 
 class wxWindow;
-
-using namespace CS::EditorApp;
 
 CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {
 
-#include "data/editor/images/meshIcon.xpm"
+//#include "data/editor/images/meshIcon.xpm"
 
-class CS3DPanel : public scfImplementation5<CS3DPanel,iPanel,iMapListener,iObjectListListener,iEventHandler,iComponent>
+class CS3DView : public scfImplementation4<CS3DView,CS::EditorApp::iView,CS::EditorApp::iMapListener,iEventHandler,iComponent>
 {
 public:
-  CS3DPanel (iBase* parent);
-  virtual ~CS3DPanel();
+  CS3DView (iBase* parent);
+  virtual ~CS3DView();
 
   // iComponent
   virtual bool Initialize (iObjectRegistry* obj_reg);
 
-  // iPanel
+  // iView
   virtual wxWindow* GetWindow ();
   virtual const wxChar* GetCaption () const;
-  virtual PanelDockPosition GetDefaultDockPosition () const;
+  virtual CS::EditorApp::ViewDockPosition GetDefaultDockPosition () const;
+  
 
   // iMapListener
   virtual void OnMapLoaded (const char* path, const char* filename);
   virtual void OnLibraryLoaded (const char* path, const char* filename, iCollection* collection);
 
-  // iObjectListListener
-  virtual void OnObjectAdded (iObjectList* list, iEditorObject* obj);
-  virtual void OnObjectRemoved (iObjectList* list, iEditorObject* obj);
-  virtual void OnObjectsCleared (iObjectList* list);
-  
+
   /// Called by wxTimer Pump every X seconds
   void PushFrame ();
 
   void OnSize (wxSizeEvent& event);
   
-  void OnDrop (wxCoord x, wxCoord y, iEditorObject* obj);
+  //void OnDrop (wxCoord x, wxCoord y, iEditorObject* obj);
   
 private:
   iObjectRegistry* object_reg;
@@ -82,10 +75,8 @@ private:
   // mouse pos of operation action start
   csVector2 opstartpos, mousepos;
 
-  csRef<iEditor> editor;
-  csRef<iPanelManager> panelManager;
-  
-  csRef<iObjectList> selection, objects;
+  csRef<CS::EditorApp::iEditor> editor;
+  csRef<CS::EditorApp::iViewManager> viewManager;
   
   csRef<iEngine> engine;
   csRef<iGraphics3D> g3d;
@@ -93,7 +84,7 @@ private:
   csRef<iKeyboardDriver> kbd;
   csRef<iCollideSystem> cdsys;
   csRef<iEventQueue> q;
-  csRef<iView> view;
+  csRef< ::iView> view;
   
   /// Our collider used for gravity and CD.
   csColliderActor collider_actor;
@@ -107,40 +98,34 @@ private:
   virtual void ProcessFrame ();
   virtual void FinishFrame ();
   
-  
-  /// Updates the selection bounding box
-  void UpdateSelection ();
-  
 
-  CS_EVENTHANDLER_NAMES("crystalspace.editor.plugin.core.cs3dpanel")
+  CS_EVENTHANDLER_NAMES("crystalspace.editor.plugin.core.cs3dview")
   CS_EVENTHANDLER_NIL_CONSTRAINTS
-
-  CS_DECLARE_EVENT_SHORTCUTS;
   
   class Pump : public wxTimer
   {
   public:
-    Pump (CS3DPanel* p) : panel (p) {}
+    Pump (CS3DView* p) : view (p) {}
     
     virtual void Notify ()
-    { panel->PushFrame (); }
+    { view->PushFrame (); }
   private:
-    CS3DPanel* panel;
+    CS3DView* view;
   };
 
   Pump* pump;
 
-  class Panel : public wxPanel
+  class View : public wxPanel
   {
     public:
-      Panel(CS3DPanel* p, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize)
-      : wxPanel (parent, id, pos, size), panel(p)
+      View(CS3DView* p, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize)
+      : wxPanel (parent, id, pos, size), view(p)
       {}
     
       virtual void OnSize (wxSizeEvent& ev)
-      { panel->OnSize (ev); }
+      { view->OnSize (ev); }
     private:
-      CS3DPanel* panel;
+      CS3DView* view;
       
       DECLARE_EVENT_TABLE()
   };
@@ -149,10 +134,10 @@ private:
   class MyDropTarget : public wxDropTarget
   {
   public:
-    MyDropTarget (CS3DPanel* panel) : panel (panel)
+    MyDropTarget (CS3DView* view) : view (view)
     {
-      data = new EditorDataObject ();
-      SetDataObject (data);
+      //data = new EditorDataObject ();
+      //SetDataObject (data);
     }
     
     // wxDropTarget
@@ -167,9 +152,9 @@ private:
       printf("OnData\n");
       if (!GetData ())
         return wxDragNone;
-      iEditorObject* obj = data->GetEditorObject ();
-      printf ("You dropped a %s\n", obj->GetName ());
-      panel->OnDrop (x, y, obj);
+      //iEditorObject* obj = data->GetEditorObject ();
+      //printf ("You dropped a %s\n", obj->GetName ());
+      //view->OnDrop (x, y, obj);
       
       return def;
     }
@@ -179,8 +164,8 @@ private:
     { return def; }
     
     private:
-      csRef<CS3DPanel> panel;
-      EditorDataObject* data;
+      csRef<CS3DView> view;
+      //EditorDataObject* data;
   };
   
 };

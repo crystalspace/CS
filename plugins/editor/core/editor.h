@@ -20,14 +20,16 @@
 #define __EDITOR_H__
 
 #include "ieditor/editor.h"
-#include "ieditor/interfacewrappermanager.h"
 #include "ieditor/actionmanager.h"
+#include "ieditor/settingsmanager.h"
+#include "ieditor/operator.h"
+#include "ieditor/context.h"
 
 #include "iengine/collection.h"
 #include "iutil/comp.h"
 #include "csutil/refarr.h"
 
-#include "auipanelmanager.h"
+#include "auiviewmanager.h"
 #include "mainframe.h"
 #include "menubar.h"
 
@@ -57,8 +59,8 @@ public:
   inline virtual wxWindow* GetWindow ()
   { return static_cast<wxWindow*> (mainFrame); }
 
-  inline virtual iPanelManager* GetPanelManager () const
-  { return panelManager; }
+  inline virtual iViewManager* GetViewManager () const
+  { return viewManager; }
 
   inline virtual iMenuBar* GetMenuBar () const
   { return menuBar; }
@@ -74,18 +76,9 @@ public:
   virtual void AddMapListener (iMapListener* listener);
 
   virtual void RemoveMapListener (iMapListener* listener);
-
-  virtual csPtr<iEditorObject> CreateEditorObject (iBase* object, wxBitmap* icon);
-  
-  virtual iObjectList* GetSelection ();
-
-  virtual iObjectList* GetObjects ();
-  
+ 
   virtual void SetHelperMeshes (csArray<csSimpleRenderMesh>* helpers);
   virtual csArray<csSimpleRenderMesh>* GetHelperMeshes ();
-
-  virtual void SetTransformStatus (TransformStatus status);
-  virtual TransformStatus GetTransformStatus ();
 
   void FireMapLoaded (const char* path, const char* file);
   void FireLibraryLoaded (const char* path, const char* file);
@@ -96,7 +89,6 @@ private:
   iObjectRegistry* object_reg;
 
   csArray<csSimpleRenderMesh>* helper_meshes;
-  TransformStatus transstatus;
 
   MainFrame* mainFrame;
 
@@ -107,22 +99,16 @@ private:
 
   csRef<iCollection> mainCollection;
 
-  csRef<AUIPanelManager> panelManager;
+  csRef<iContext> context;
+  
+  csRef<AUIViewManager> viewManager;
   csRef<MenuBar> menuBar;
-  csRef<iInterfaceWrapperManager> interfaceManager;
+  csRef<iSettingsManager> settingsManager;
   csRef<iActionManager> actionManager;
-
-  /*
-  csRef<iActionManager> actionManager;
-  csRef<iToolManager> toolManager;
-  csRef<iPluginManager> pluginManager;
-  */
+  
+  csRef<iOperatorManager> operatorManager;
 
   csRefArray<iMapListener> mapListeners;
-
-  csRef<iObjectList> selection;
-  csRef<iObjectList> objects;
-
 };
 
 }

@@ -16,33 +16,24 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IEDITOR_INTERFACEWRAPPERMANAGER_H__
-#define __IEDITOR_INTERFACEWRAPPERMANAGER_H__
+#ifndef __IEDITOR_SETTINGSMANAGER_H__
+#define __IEDITOR_SETTINGSMANAGER_H__
 
 #include <csutil/scf.h>
 #include <csutil/scf_implementation.h>
 
+#include <wx/string.h>
+
+
 namespace CS {
 namespace EditorApp {
 
-struct iInterfaceWrapperFactory;
-  
 /**
- * Manages the interface wrappers.
+ *
  */
-struct iInterfaceWrapperManager : public virtual iBase
+struct iSettingsManager : public virtual iBase
 {
-  SCF_INTERFACE (iInterfaceWrapperManager, 0, 0, 1);
-
-  /**
-   * Register an interface wrapper factory with the interface it wraps.
-   */
-  virtual void Register (iInterfaceWrapperFactory* wrapper) = 0;
-
-  /**
-   * Get the interface wrapper factory associated with the specified interface.
-   */
-  virtual iInterfaceWrapperFactory* GetFactory (scfInterfaceID interface_id) = 0;
+  SCF_INTERFACE (iSettingsManager, 0, 1, 0);
 };
 
 } // namespace EditorApp

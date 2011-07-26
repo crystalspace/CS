@@ -23,7 +23,7 @@
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
 
-#include "ieditor/editorobject.h"
+//#include "ieditor/editorobject.h"
 
 class wxWindow;
 
@@ -36,7 +36,7 @@ namespace CS {
 namespace EditorApp {
 
 struct iObjectList;
-struct iPanelManager;
+struct iViewManager;
 struct iMenuBar;
 
 /// Listens for map actions
@@ -66,7 +66,7 @@ struct iEditor : public virtual iBase
   virtual wxWindow* GetWindow () = 0;
 
   /// Get the panel manager associated with this editor
-  virtual iPanelManager* GetPanelManager () const = 0;
+  virtual iViewManager* GetViewManager () const = 0;
 
   /// Get the panel manager associated with this editor
   virtual iMenuBar* GetMenuBar () const = 0;
@@ -90,41 +90,9 @@ struct iEditor : public virtual iBase
   /// Remove a map listener.
   virtual void RemoveMapListener (iMapListener* listener) = 0;
 
-  /// Create an editor object wrapping the specified object
-  virtual csPtr<iEditorObject> CreateEditorObject (iBase* object, wxBitmap* icon) = 0;
-  
-  /// Get the active selection.
-  virtual iObjectList* GetSelection () = 0;
-
-  /// Get the list of objects registered with the editor.
-  virtual iObjectList* GetObjects () = 0;
-
   // TODO: remove all of that
   virtual void SetHelperMeshes (csArray<csSimpleRenderMesh>* helpers) = 0;
   virtual csArray<csSimpleRenderMesh>* GetHelperMeshes () = 0;
-  
-  enum TransformStatus
-  {
-    NOTHING = 0,
-  
-    MOVING,
-    MOVEX,
-    MOVEY,
-    MOVEZ,
-  
-    ROTATING,
-    ROTATEX,
-    ROTATEY,
-    ROTATEZ,
-  
-    SCALING,
-    SCALEX,
-    SCALEY,
-    SCALEZ
-  };
-
-  virtual void SetTransformStatus (TransformStatus status) = 0;
-  virtual TransformStatus GetTransformStatus () = 0;
 };
 
 } // namespace EditorApp
