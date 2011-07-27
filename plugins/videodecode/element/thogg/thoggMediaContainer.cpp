@@ -170,9 +170,9 @@ void TheoraMediaContainer::Update ()
         dataAvailable++;
     }
     if(_waitToFillCache )
-      if (cacheFull == activeStreams.GetSize ())
+      if (dataAvailable == activeStreams.GetSize ())
       {
-        cout<<"cache full! starting to play video...\n";
+        cout<<"cache has data! starting to play video...\n";
         _waitToFillCache=false;
       }
 
