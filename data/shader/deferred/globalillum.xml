@@ -47,7 +47,7 @@
       <!--<fp plugin="glcg" file="/shader/deferred/globalillum.cgfp" />-->
       <fp plugin="glcg">
         <cgfp>
-          <?Include ssao2.cginc ?>
+          <?Include ssao.cginc ?>
         </cgfp>
       </fp>
 
