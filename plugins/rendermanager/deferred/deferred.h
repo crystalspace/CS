@@ -93,17 +93,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
     //---- iRenderManagerGlobalIllum Interface ----
     virtual void EnableGlobalIllumination (bool enable);
-    virtual void SetSamplingPatternSize (int samplingPatternSize);
-    virtual void SetNumberOfSamples (int numSamples);
-    virtual void SetSampleRadius (float sampleRadius);
-    virtual void SetOcclusionStrength (float occlusionStrength);
-    virtual void SetDepthBias (float depthBias);
-    virtual void SetMaxOccluderDistance (float maxOccluderDistance);
-    virtual void SetLightRotationAngle (float lightRotation);
-    virtual void SetBlurKernelSize (int kernelSize);
-    virtual void SetBlurPositionThreshold (float positionThreshold);
-    virtual void SetBlurNormalThreshold (float normalThreshold);
-    virtual void SetBounceStrength (float bounceStrength);
+    virtual void EnableBlurPass (bool enableBlur);
+    virtual csShaderVariable* GetGlobalIllumVariableAdd(const char *svName);
+    virtual csShaderVariable* GetBlurVariableAdd(const char *svName);
+    virtual csShaderVariable* GetCompositionVariableAdd(const char *svName);
 
   public:
 
@@ -134,6 +127,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     csRef<iShaderManager> shaderManager;
     csRef<iLightManager> lightManager;
     csRef<iStringSet> stringSet;
+    csRef<iShaderVarStringSet> svStringSet;
 
     csRef<iTextureHandle> accumBuffer;
 

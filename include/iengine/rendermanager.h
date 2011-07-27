@@ -121,11 +121,19 @@ struct iRenderManagerVisCull : public virtual iBase
   */
 struct iRenderManagerGlobalIllum : public virtual iBase
 {
-  SCF_INTERFACE(iRenderManagerGlobalIllum, 1, 0, 0);  
+  SCF_INTERFACE(iRenderManagerGlobalIllum, 1, 0, 0);
     
   virtual void EnableGlobalIllumination (bool enable) = 0;
 
-  virtual void SetSamplingPatternSize (int samplingPatternSize) = 0;
+  virtual void EnableBlurPass (bool enableBlur) = 0;
+
+  virtual csShaderVariable* GetGlobalIllumVariableAdd(const char *svName) = 0;
+
+  virtual csShaderVariable* GetBlurVariableAdd(const char *svName) = 0;
+
+  virtual csShaderVariable* GetCompositionVariableAdd(const char *svName) = 0;
+
+  /*virtual void SetSamplingPatternSize (int samplingPatternSize) = 0;
 
   virtual void SetNumberOfSamples (int numberOfSamples) = 0;
 
@@ -145,7 +153,7 @@ struct iRenderManagerGlobalIllum : public virtual iBase
 
   virtual void SetBlurPositionThreshold (float positionThreshold) = 0;
 
-  virtual void SetBlurNormalThreshold (float normalThreshold) = 0;
+  virtual void SetBlurNormalThreshold (float normalThreshold) = 0;*/
 };
 
 #endif // __CS_IENGINE_RENDERMANAGER_H__

@@ -24,17 +24,7 @@
   Seidel, 2009.
 -->
 
-<shader compiler="xmlshader" name="deferred_globalillum">
-  
-  <shadervars>
-    <shadervar name="sample radius" type="float">50.0</shadervar>
-    <shadervar name="sample count" type="int">16</shadervar>
-    <shadervar name="pattern size" type="int">4</shadervar>
-    <shadervar name="depth bias" type="float">1.0</shadervar>
-    <shadervar name="occlusion strength" type="float">4.0</shadervar>
-    <shadervar name="max occluder distance" type="float">50.0</shadervar>
-    <shadervar name="light rotation angle" type="float">30.0</shadervar>
-  </shadervars>
+<shader compiler="xmlshader" name="deferred_globalillum"> 
   
   <technique priority="200">
     <pass>
@@ -55,7 +45,11 @@
       <texture destination="EnvmapTexture" name="tex globalillum envmap" />
       <texture destination="RandNormalsTexture" name="tex random normals" />      
       <!--<fp plugin="glcg" file="/shader/deferred/globalillum.cgfp" />-->
-      <fp plugin="glcg" file="/shader/deferred/ssao2.cgfp" />
+      <fp plugin="glcg">
+        <cgfp>
+          <?Include ssao2.cginc ?>
+        </cgfp>
+      </fp>
 
     </pass>
   </technique>

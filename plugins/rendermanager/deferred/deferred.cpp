@@ -205,6 +205,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   shaderManager = csQueryRegistry<iShaderManager> (objRegistry);
   lightManager = csQueryRegistry<iLightManager> (objRegistry);
   stringSet = csQueryRegistryTagInterface<iStringSet> (objRegistry, "crystalspace.shared.stringset");
+  svStringSet = shaderManager->GetSVNameStringset();
 
   treePersistent.Initialize (shaderManager);
   portalPersistent.Initialize (shaderManager, graphics3D, treePersistent.debugPersist);
@@ -392,16 +393,17 @@ bool RMDeferred::RenderView(iView *view, bool recursePortals)
     ShowGBuffer (renderTree);
 
   //UpdatePostEffectsSV ();
-  iShaderVarStringSet *svStringSet = shaderManager->GetSVNameStringset();
-  csShaderVariable *invViewportSizeSV = shaderManager->GetVariableAdd (svStringSet->Request("inv viewport size"));
-  invViewportSizeSV->SetValue (csVector2 (1.0f / graphics2D->GetWidth(), 1.0f / graphics2D->GetHeight()));
 
-  //iShader *fillGBufferShader = renderLayer.GetDefaultShader (deferredLayer);
-  //csShaderVariable *farPlaneSV = fillGBufferShader->GetVariableAdd (stringSet->Request("far clip distance"));
+  // Add global shader variable with viewport dimensions
+  csShaderVariable *viewportSizeSV = shaderManager->GetVariableAdd (svStringSet->Request("viewport size"));
+  viewportSizeSV->SetValue (csVector4 (graphics2D->GetWidth(), graphics2D->GetHeight(), 
+    1.0f / graphics2D->GetWidth(), 1.0f / graphics2D->GetHeight()));
+    
+  // Add global shader variable with distance from near to far clip plane
   csShaderVariable *farPlaneSV = shaderManager->GetVariableAdd (svStringSet->Request("far clip distance"));
   float farPlaneDistance = rview->GetCamera()->GetFarPlane()->D();
   float nearPlaneDistance = camera->GetNearClipDistance();
-  farPlaneSV->SetValue (farPlaneDistance - nearPlaneDistance);
+  farPlaneSV->SetValue (abs (farPlaneDistance - nearPlaneDistance));
 
   CS::Math::Matrix4 perspectiveFixup;
   postEffects.SetupView (view, perspectiveFixup);
@@ -454,7 +456,7 @@ bool RMDeferred::RenderView(iView *view, bool recursePortals)
     iTextureHandle *finalBuffer = accumBuffer;
 
     if (globalIllum.IsEnabled())
-      finalBuffer = globalIllum.GetLightCompositionBuffer(); //GetGlobalIllumBuffer();
+      finalBuffer = globalIllum.GetLightCompositionBuffer();
 
     DrawFullscreenTexture (finalBuffer, graphics3D);
   }
@@ -643,11 +645,17 @@ bool RMDeferred::DebugCommand(const char *cmd)
   else if (strcmp (cmd, "toggle_visualize_ambient_occlusion") == 0)
   {
     globalIllum.showAmbientOcclusion = !globalIllum.showAmbientOcclusion;
+    if (globalIllum.showAmbientOcclusion)
+      globalIllum.showGlobalIllumination = false;
+
     return true;
   }
   else if (strcmp (cmd, "toggle_visualize_global_illumination") == 0)
   {
     globalIllum.showGlobalIllumination = !globalIllum.showGlobalIllumination;
+    if (globalIllum.showGlobalIllumination)
+      globalIllum.showAmbientOcclusion = false;
+
     return true;
   }
   /*else if (strcmp (cmd, "toggle_visualize_diffusebuffer") == 0)
@@ -707,59 +715,27 @@ void RMDeferred::EnableGlobalIllumination (bool enable)
   }
 }
 
-void RMDeferred::SetSamplingPatternSize (int samplingPatternSize)
+void RMDeferred::EnableBlurPass (bool enableBlur)
 {
-  globalIllum.patternSize = samplingPatternSize;
+  globalIllum.applyBlur = enableBlur;
 }
 
-void RMDeferred::SetNumberOfSamples (int numSamples)
+csShaderVariable* RMDeferred::GetGlobalIllumVariableAdd(const char *svName)
 {
-  globalIllum.sampleCount = numSamples;
+  if (!svName) return nullptr;
+  return globalIllum.globalIllumShader->GetVariableAdd (svStringSet->Request (svName));
 }
 
-void RMDeferred::SetSampleRadius (float sampleRadius)
+csShaderVariable* RMDeferred::GetBlurVariableAdd(const char *svName)
 {
-  globalIllum.sampleRadius = sampleRadius;
+  if (!svName) return nullptr;
+  return shaderManager->GetVariableAdd (svStringSet->Request (svName));
 }
 
-void RMDeferred::SetOcclusionStrength (float occlusionStrength)
+csShaderVariable* RMDeferred::GetCompositionVariableAdd(const char *svName)
 {
-  globalIllum.occlusionStrength = occlusionStrength;
-}
-
-void RMDeferred::SetDepthBias (float depthBias)
-{
-  globalIllum.depthBias = depthBias;
-}
-
-void RMDeferred::SetMaxOccluderDistance (float maxOccluderDistance)
-{
-  globalIllum.maxOccluderDistance = maxOccluderDistance;
-}
-
-void RMDeferred::SetLightRotationAngle (float lightRotation)
-{
-  globalIllum.lightRotationAngle = lightRotation;
-}
-
-void RMDeferred::SetBounceStrength (float bounceStrength)
-{
-  globalIllum.bounceStrength = bounceStrength;
-}
-
-void RMDeferred::SetBlurKernelSize (int kernelSize)
-{
-  globalIllum.blurKernelSize = kernelSize;
-}
-
-void RMDeferred::SetBlurPositionThreshold (float positionThreshold)
-{
-  globalIllum.blurPositionThreshold = positionThreshold;
-}
-
-void RMDeferred::SetBlurNormalThreshold (float normalThreshold)
-{
-  globalIllum.blurNormalThreshold = normalThreshold;
+  if (!svName) return nullptr;
+  return globalIllum.lightCompositionShader->GetVariableAdd (svStringSet->Request (svName));
 }
 
 }

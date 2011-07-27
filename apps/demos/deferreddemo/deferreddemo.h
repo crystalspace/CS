@@ -141,6 +141,8 @@ protected:
   float viewRotX;
   float viewRotY;
 
+  iLight *light;  
+
 protected:
 
   CEGUI::Window *guiRoot;
@@ -149,24 +151,26 @@ protected:
   CEGUI::Checkbox *guiShowGBuffer;
   CEGUI::Checkbox *guiDrawLightVolumes;
   CEGUI::Checkbox *guiDrawLogo;
-
-  /*CEGUI::Slider *guiSampleRadius;
-  CEGUI::Slider *guiMaxOccluderDist;
-  CEGUI::Slider *guiDepthBias;*/
+  CEGUI::Checkbox *guiEnableAO;
+  CEGUI::Checkbox *guiEnableIndirectLight;
+  CEGUI::Checkbox *guiEnableBlur;
+  CEGUI::Checkbox *guiEnableRadiusWide;
+  CEGUI::Checkbox *guiEnableGlobalIllum;
 
   bool showGBuffer;
   bool drawLightVolumes;
   bool showAmbientOcclusion;
   bool showGlobalIllumination;
-  bool enableGlobalIllum;
+  bool enableGlobalIllum;  
 
   float occlusionStrength;
   float sampleRadius;
+  float sampleRadiusWide;
   int sampleCount;
   float maxOccluderDistance;
   int patternSize;
-  float depthBias;
-  float lightRotation;
+  float selfOcclusion;
+  float occAngleBias;
   float bounceStrength;
   int blurKernelSize;
   float blurPositionThreshold;
@@ -174,11 +178,12 @@ protected:
 
   csRef<iEventHandler> occlusionStrengthListener;
   csRef<iEventHandler> sampleRadiusListener;
+  csRef<iEventHandler> sampleRadiusWideListener;
   csRef<iEventHandler> sampleCountListener;
   csRef<iEventHandler> maxOccluderDistListener;
   csRef<iEventHandler> patternSizeListener;
-  csRef<iEventHandler> depthBiasListener;
-  csRef<iEventHandler> lightRotationListener;
+  csRef<iEventHandler> selfOcclusionListener;
+  csRef<iEventHandler> occAngleBiasListener;
   csRef<iEventHandler> bounceStrengthListener;
   csRef<iEventHandler> blurKernelSizeListener;
   csRef<iEventHandler> blurPositionThresholdListener;

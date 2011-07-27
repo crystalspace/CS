@@ -46,7 +46,7 @@
         <cgfp>
           <variablemap variable="projection transform inverse" destination="ProjInv" />
           <variablemap variable="far clip distance" destination="FarClipDistance" />
-          <variablemap variable="inv viewport size" destination="InvViewportSize" />
+          <variablemap variable="viewport size" destination="ViewportSize" />
           <variablemap variable="ssao blur kernelsize" destination="KernelSize" />
           <variablemap variable="ssao blur position threshold" destination="PositionThreshold" />
           <variablemap variable="ssao blur normal threshold" destination="NormalThreshold" />

@@ -1,6 +1,6 @@
 <cgfp>
 
-<variablemap variable="inv viewport size" destination="InvViewportSize" />
+<variablemap variable="viewport size" destination="ViewportSize" />
 <variablemap variable="debug show ambocc" destination="ShowAO" />
 <variablemap variable="debug show globalillum" destination="ShowGlobalIllum" />
 
@@ -22,7 +22,7 @@ float4 main(vertex2fragment IN,
             uniform sampler2D AmbientBuffer,            
             uniform sampler2D DirectRadianceBuffer,
             uniform sampler2D GlobalIllumBuffer,        
-            uniform float2 InvViewportSize, // (1/viewport.width, 1/viewport.height)
+            uniform float4 ViewportSize, // (width, height, 1/width, 1/height)
             uniform int ShowAO,
             uniform int ShowGlobalIllum) : COLOR
 {
@@ -37,7 +37,7 @@ float4 main(vertex2fragment IN,
   //float2 screenXY = IN.ScreenPos.xy / IN.ScreenPos.w;
   float2 texCoord = IN.TexCoord; //screenXY * 0.5f + 0.5f; //IN.TexCoord;   
   
-  /*float4 normalDepthVS = tex2D (NormalBuffer, texCoord);  
+  float4 normalDepthVS = tex2D (NormalBuffer, texCoord);  
   float3 pixelNormalVS = normalDepthVS.rgb * 2.0f - 1.0f;
 	float pixelDepth = normalDepthVS.a;
   
@@ -52,7 +52,7 @@ float4 main(vertex2fragment IN,
   {
     for (int j = -1; j <= 1; j += 2)
     {
-      float2 sampleTexCoord = texCoord + float2 (j * InvViewportSize.x, i * InvViewportSize.y);
+      float2 sampleTexCoord = texCoord + float2 (j * ViewportSize.z, i * ViewportSize.w);
       float4 sampleDepthNormalVS = tex2D (NormalBuffer, sampleTexCoord);
       float3 sampleNormalVS = sampleDepthNormalVS.rgb * 2.0f - 1.0f;
       float sampleDepth = sampleDepthNormalVS.a;
@@ -84,14 +84,14 @@ float4 main(vertex2fragment IN,
   {    
     AO *= 0.25f;
     radiance *= 0.25f;
-  }*/
+  }
   
   float3 directRadiance = tex2D (DirectRadianceBuffer, texCoord).rgb;  
   float3 diffuseColor = tex2D (DiffuseBuffer, texCoord).rgb;  
   float3 ambientColor = tex2D (AmbientBuffer, texCoord).rgb;  
   
-  float4 radiance = tex2D (GlobalIllumBuffer, texCoord);
-  float AO = radiance.a;
+  //float4 radiance = tex2D (GlobalIllumBuffer, texCoord);
+  //float AO = radiance.a;
   
   radiance.rgb = diffuseColor * AO * (ambientColor + radiance.rgb);
   

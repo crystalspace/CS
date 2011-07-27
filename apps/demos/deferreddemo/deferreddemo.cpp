@@ -27,6 +27,8 @@
 const char *DEFAULT_CFG_WORLDDIR = "/lev/castle";
 const char *DEFAULT_CFG_LOGOFILE = "/lib/std/cslogo2.png";
 
+const float LIGHT_ROTATION_SPEED = 2.0f;
+
 //----------------------------------------------------------------------
 DeferredDemo::DeferredDemo()
 :
@@ -177,7 +179,7 @@ bool DeferredDemo::SetupModules()
 
   rmGlobalIllum = scfQueryInterface<iRenderManagerGlobalIllum> (rm);
   if (!rmGlobalIllum)
-    return ReportError ("Failed to query the deferred Render Manager's global illumination interface!");
+    return ReportError ("Failed to query the deferred Render Manager global illumination interface!");
 
   return true;
 }
@@ -192,6 +194,12 @@ bool DeferredDemo::LoadScene()
 
   if (!loader->LoadMapFile (cfgWorldFile))
      return ReportError("Could not load level!");
+
+  /*if (!vfs->ChDir ("/data/frankie"))
+    return ReportError("Could not navigate to directory /data/frankie");
+
+  if (!loader->LoadLibraryFile ("frankie.xml"))
+    return ReportError ("Could not load library frankie.xml");*/
 
   return true;
 }
@@ -242,12 +250,6 @@ bool DeferredDemo::SetupGui(bool reload)
 {
   // Initialize the HUD manager
   hudManager->GetKeyDescriptions ()->Empty ();
-  /*hudManager->GetStateDescriptions ()->Push ("occlusionStrength");
-  hudManager->GetStateDescriptions ()->Push ("sampleRadius");
-  hudManager->GetStateDescriptions ()->Push ("maxOccluderDistance");
-  hudManager->GetStateDescriptions ()->Push ("patternSize");
-  hudManager->GetStateDescriptions ()->Push ("depthBias");
-  hudManager->GetStateDescriptions ()->Push ("lightRotation");*/
 
   configEventNotifier.AttachNew(new CS::Utility::ConfigEventNotifier(GetObjectRegistry()));
 
@@ -255,16 +257,16 @@ bool DeferredDemo::SetupGui(bool reload)
     "DeferredDemo.OcclusionStrength", occlusionStrength));
   sampleRadiusListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
     "DeferredDemo.SampleRadius", sampleRadius));
+  sampleRadiusWideListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
+    "DeferredDemo.SampleRadiusWide", sampleRadiusWide));
   sampleCountListener.AttachNew (new CS::Utility::ConfigListener<int>(GetObjectRegistry(), 
     "DeferredDemo.SampleCount", sampleCount));
   maxOccluderDistListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
-    "DeferredDemo.MaxOccluderDist", maxOccluderDistance));
-  patternSizeListener.AttachNew (new CS::Utility::ConfigListener<int>(GetObjectRegistry(), 
-    "DeferredDemo.PatternSize", patternSize));
-  depthBiasListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
-    "DeferredDemo.DepthBias", depthBias));
-  lightRotationListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
-    "DeferredDemo.LightRotation", lightRotation));
+    "DeferredDemo.MaxOccluderDist", maxOccluderDistance));  
+  selfOcclusionListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
+    "DeferredDemo.SelfOcclusion", selfOcclusion));
+  occAngleBiasListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
+    "DeferredDemo.AngleBias", occAngleBias));
   bounceStrengthListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
     "DeferredDemo.BounceStrength", bounceStrength));
   blurKernelSizeListener.AttachNew (new CS::Utility::ConfigListener<int>(GetObjectRegistry(), 
@@ -305,19 +307,21 @@ bool DeferredDemo::SetupGui(bool reload)
   guiForward          = static_cast<CEGUI::RadioButton*>(winMgr->getWindow ("Forward"));
   guiShowGBuffer      = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("ShowGBuffer"));
   guiDrawLightVolumes = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("DrawLightVolumes"));
-  guiDrawLogo         = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("DrawLogo"));
+  guiDrawLogo         = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("DrawLogo"));  
+  guiEnableAO         = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("EnableAO"));
+  guiEnableBlur       = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("EnableBlur"));
+  guiEnableRadiusWide = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("EnableRadiusWide"));
+  guiEnableGlobalIllum = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("EnableGlobalIllum"));
+  guiEnableIndirectLight = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("EnableIndirectLight"));
 
   /*guiSampleRadius     = static_cast<CEGUI::Slider*>(winMgr->getWindow ("SampleRadius"));
   guiMaxOccluderDist  = static_cast<CEGUI::Slider*>(winMgr->getWindow ("MaxOccluderDist"));
   guiDepthBias        = static_cast<CEGUI::Slider*>(winMgr->getWindow ("DepthBias"));*/
 
   if (!guiRoot || 
-      !guiDeferred || 
-      !guiForward || 
-      !guiShowGBuffer || 
-      !guiDrawLightVolumes || 
-      !guiDrawLogo/* ||
-      !guiSampleRadius || !guiMaxOccluderDist || !guiDepthBias*/)
+      !guiDeferred || !guiForward || !guiEnableGlobalIllum ||
+      !guiShowGBuffer || !guiDrawLightVolumes || !guiDrawLogo ||
+      !guiEnableAO || !guiEnableBlur || !guiEnableIndirectLight || !guiEnableRadiusWide)
   {
     return ReportError("Could not load GUI!");
   }
@@ -330,21 +334,23 @@ bool DeferredDemo::SetupGui(bool reload)
   guiShowGBuffer->setSelected (false);
   guiDrawLightVolumes->setSelected (false);
   guiDrawLogo->setSelected (cfgDrawLogo);
-
-  /*guiSampleRadius->setCurrentValue (5.0f);
-  guiMaxOccluderDist->setCurrentValue (10.0f);
-  guiDepthBias->setCurrentValue (1.0f);*/
-  occlusionStrength = 4.0f;
-  sampleRadius = 5.0f;
-  sampleCount = 16;
-  maxOccluderDistance = 5.0f;
-  patternSize = 4;
-  depthBias = 1.0f;
-  lightRotation = 0.0f;
-  bounceStrength = 1.0f;
-  blurKernelSize = 2;
+  guiEnableAO->setSelected (true);
+  guiEnableBlur->setSelected (true);
+  guiEnableIndirectLight->setSelected (true);
+  guiEnableRadiusWide->setSelected (true);
+  guiEnableGlobalIllum->setSelected (true);
+  
+  occlusionStrength = 0.7f;
+  sampleRadius = 0.1f;
+  sampleRadiusWide = 0.6f;
+  sampleCount = 2;
+  maxOccluderDistance = 0.8f;
+  selfOcclusion = 0.1f;
+  occAngleBias = 0.1f;
+  bounceStrength = 6.0f;
+  blurKernelSize = 3;
   blurPositionThreshold = 0.5f;
-  blurNormalThreshold = 0.5f;
+  blurNormalThreshold = 0.25f;
 
   showGBuffer = false;
   drawLightVolumes = false;
@@ -393,6 +399,10 @@ bool DeferredDemo::SetupScene()
     return ReportError("Graphics3D does not support at least 3 color buffer attachments!");
   else
     ReportInfo("Graphics3D supports %d color buffer attachments.", caps->MaxRTColorAttachments);
+
+  light = engine->FindLight ("Lamp.Lucy.Spot.2");
+  if (!light)
+    return ReportError("Light not found!");
 
   engine->Prepare ();
 
@@ -512,7 +522,6 @@ void DeferredDemo::UpdateCamera()
 void DeferredDemo::UpdateGui()
 {
   guiRoot->setVisible (cfgShowGui);
-
   cfgDrawLogo = guiDrawLogo->isSelected ();
 
   if (showGBuffer != guiShowGBuffer->isSelected ())
@@ -520,40 +529,43 @@ void DeferredDemo::UpdateGui()
     showGBuffer = !showGBuffer;
     rm_debug->DebugCommand ("toggle_visualize_gbuffer");
   }
-
   if (drawLightVolumes != guiDrawLightVolumes->isSelected ())
   {
     drawLightVolumes = !drawLightVolumes;
     rm_debug->DebugCommand ("toggle_visualize_lightvolumes");
   }
-
-  if (showAmbientOcclusion)
-  {
-    rm_debug->DebugCommand ("toggle_visualize_ambient_occlusion");
-  }
-
-  if (showGlobalIllumination)
-  {
-    rm_debug->DebugCommand ("toggle_visualize_global_illumination");
-  }
-
   if (cfgUseDeferredShading != guiDeferred->isSelected ())
   {
      cfgUseDeferredShading = guiDeferred->isSelected ();
-  } 
+  }
+  if (enableGlobalIllum != guiEnableGlobalIllum->isSelected())
+  {
+    enableGlobalIllum = !enableGlobalIllum;
+    rmGlobalIllum->EnableGlobalIllumination (enableGlobalIllum);
+  }
+  // By setting the AO wide radius to 0 it is disabled
+  if (!guiEnableRadiusWide->isSelected())
+  {
+    sampleRadiusWide = 0.0f;
+  }
 
-  rmGlobalIllum->EnableGlobalIllumination (enableGlobalIllum);
-  rmGlobalIllum->SetOcclusionStrength (occlusionStrength);
-  rmGlobalIllum->SetSampleRadius (sampleRadius);
-  rmGlobalIllum->SetNumberOfSamples (sampleCount);
-  rmGlobalIllum->SetMaxOccluderDistance (maxOccluderDistance);
-  rmGlobalIllum->SetSamplingPatternSize (patternSize);
-  rmGlobalIllum->SetDepthBias (depthBias);
-  rmGlobalIllum->SetLightRotationAngle (lightRotation);
-  rmGlobalIllum->SetBounceStrength (bounceStrength);
-  rmGlobalIllum->SetBlurKernelSize (blurKernelSize);
-  rmGlobalIllum->SetBlurPositionThreshold (blurPositionThreshold);
-  rmGlobalIllum->SetBlurNormalThreshold (blurNormalThreshold);
+  rmGlobalIllum->EnableBlurPass (guiEnableBlur->isSelected());
+
+  rmGlobalIllum->GetGlobalIllumVariableAdd ("enable ambient occlusion")->
+      SetValue (guiEnableAO->isSelected() ? 1.0f : 0.0f);
+  rmGlobalIllum->GetGlobalIllumVariableAdd ("enable indirect light")->
+      SetValue (guiEnableIndirectLight->isSelected() ? 1.0f : 0.0f);
+  rmGlobalIllum->GetGlobalIllumVariableAdd ("occlusion strength")->SetValue (occlusionStrength);
+  rmGlobalIllum->GetGlobalIllumVariableAdd ("sample radius")->SetValue (sampleRadius);
+  rmGlobalIllum->GetGlobalIllumVariableAdd ("sample radius wide")->SetValue (sampleRadiusWide);
+  rmGlobalIllum->GetGlobalIllumVariableAdd ("num passes")->SetValue (sampleCount);
+  rmGlobalIllum->GetGlobalIllumVariableAdd ("max occluder distance")->SetValue (maxOccluderDistance);
+  rmGlobalIllum->GetGlobalIllumVariableAdd ("self occlusion")->SetValue (selfOcclusion);
+  rmGlobalIllum->GetGlobalIllumVariableAdd ("occluder angle bias")->SetValue (occAngleBias);
+  rmGlobalIllum->GetGlobalIllumVariableAdd ("bounce strength")->SetValue (bounceStrength);  
+  rmGlobalIllum->GetBlurVariableAdd ("ssao blur kernelsize")->SetValue (blurKernelSize);
+  rmGlobalIllum->GetBlurVariableAdd ("ssao blur position threshold")->SetValue (blurPositionThreshold);
+  rmGlobalIllum->GetBlurVariableAdd ("ssao blur normal threshold")->SetValue (blurNormalThreshold);
 }
 
 //----------------------------------------------------------------------
@@ -713,21 +725,38 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
     {
       showAmbientOcclusion = !showAmbientOcclusion;
       showGlobalIllumination = false;
-      // TODO: use combo box
+      if (showAmbientOcclusion)
+      {
+        rm_debug->DebugCommand ("toggle_visualize_ambient_occlusion");
+      }  
       return true;
     }
     else if (code == 's')
     {
       showGlobalIllumination = !showGlobalIllumination;
       showAmbientOcclusion = false;
-      // TODO: use combo box
+      if (showGlobalIllumination)
+      {
+        rm_debug->DebugCommand ("toggle_visualize_global_illumination");
+      }
       return true;
     }
     else if (code == 'e')
     {
       enableGlobalIllum = !enableGlobalIllum;
-      // TODO: use combo box
+      guiEnableGlobalIllum->setSelected (enableGlobalIllum);
+      rmGlobalIllum->EnableGlobalIllumination (enableGlobalIllum);
       return true;
+    }
+    else if (code == 'k')
+    {      
+      float rot = LIGHT_ROTATION_SPEED * (float)vc->GetElapsedTicks() / 1000.0f;
+      light->GetMovable()->GetTransform().RotateOther (CS_VEC_ROT_LEFT, rot);
+    }
+    else if (code == 'l')
+    {
+      float rot = LIGHT_ROTATION_SPEED * (float)vc->GetElapsedTicks() / 1000.0f;
+      light->GetMovable()->GetTransform().RotateOther (CS_VEC_ROT_RIGHT, rot);
     }
 #ifdef CS_DEBUG
     else if (code == 'r')
