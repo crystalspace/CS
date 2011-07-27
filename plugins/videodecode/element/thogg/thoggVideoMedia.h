@@ -81,6 +81,8 @@ private:
   csFIFO<cachedData> cache;
   size_t cacheSize;
 
+  double _FPS;
+
 
   // Mutexes
 private:
@@ -118,12 +120,15 @@ public:
   virtual void CleanMedia () ;
   virtual bool Update () ;
   virtual void WriteData () ;
+  void WriteData2 () ;
   virtual void SetCacheSize(size_t size) ;
 
   virtual void SwapBuffers() ;
 
   virtual bool HasDataReady() ;
   virtual bool IsCacheFull() ;
+
+  virtual double GetTargetFPS () ;
 
   inline void SetFrameCount (unsigned long count)  { frameCount=count; }
   inline void SetLength (float length)  { this->length=length; }

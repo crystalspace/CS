@@ -53,6 +53,9 @@ bool TheoraVideoMedia::Initialize (iObjectRegistry* r)
       _streamState.serialno,_streamInfo.pic_width,_streamInfo.pic_height, (double)_streamInfo.fps_numerator/_streamInfo.fps_denominator,
       _streamInfo.frame_width, _streamInfo.frame_height, _streamInfo.pic_x, _streamInfo.pic_y);
 
+
+    _FPS = (double)_streamInfo.fps_numerator/_streamInfo.fps_denominator;
+
     _decodersStarted=true;
     _videobuf_granulepos=-1;
     _videobufTime=0;
@@ -125,9 +128,17 @@ bool TheoraVideoMedia::Update ()
         }
         else
         {
-          cout<<_videobufTime<<'-'<<th_granule_frame (_decodeControl,_videobuf_granulepos)<<endl;
+          //cout<<_videobufTime<<'-'<<th_granule_frame (_decodeControl,_videobuf_granulepos)<<endl;
           _videobufReady=true;
           _frameToSkip = -1;
+
+
+          th_ycbcr_buffer yuv;
+          th_decode_ycbcr_out(_decodeControl,yuv);
+          cachedData data;
+          memcpy (&data.yuv, &yuv, sizeof(yuv));
+          cache.Push (data);
+          //cout<<"cache size: "<<cache.GetSize ()<<endl;
         }
       }
     }
@@ -137,12 +148,6 @@ bool TheoraVideoMedia::Update ()
 
   if (!_videobufReady)
     return true;
-
-  th_ycbcr_buffer yuv;
-  th_decode_ycbcr_out(_decodeControl,yuv);
-  cachedData data;
-  memcpy (&data.yuv, &yuv, sizeof(yuv));
-  cache.Push (data);
 
   return false;
 }
@@ -279,6 +284,12 @@ void TheoraVideoMedia::InitializeStream (ogg_stream_state &state, th_info &info,
   canSwap=false;
 }
 
+
+void TheoraVideoMedia::WriteData2 ()
+{
+
+}
+
 void TheoraVideoMedia::WriteData ()
 {
   MutexScopedLock lock (writeMutex);
@@ -288,13 +299,11 @@ void TheoraVideoMedia::WriteData ()
   if(cache.GetSize ()!=0)
   {
     size_t dstSize;
-    cout<<"writing to "<<activeBuffer<<endl;
     canSwap=false;
 
 
     iTextureHandle* tex = _buffers.Get (activeBuffer);
     uint8* pixels = tex->QueryBlitBuffer (_streamInfo.pic_x,_streamInfo.pic_y,_streamInfo.pic_width,_streamInfo.pic_height,dstSize);
-
 
     cachedData data = cache.PopTop ();
     th_ycbcr_buffer yuv;
@@ -450,4 +459,9 @@ bool TheoraVideoMedia::IsCacheFull ()
   if(cache.GetSize ()>=cacheSize)
     return true;
   return false;
+}
+
+double TheoraVideoMedia::GetTargetFPS ()
+{
+  return _FPS;
 }

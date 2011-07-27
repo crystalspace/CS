@@ -104,6 +104,11 @@ struct iVideoMedia : public iMedia
     */
   virtual void GetVideoTarget (csRef<iTextureHandle> &texture) = 0;
 
+  /**
+    * Returns the target FPS the video stream should run at
+    */
+  virtual double GetTargetFPS () = 0;
+
 };
 
 /**

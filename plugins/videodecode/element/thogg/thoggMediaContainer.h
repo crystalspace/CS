@@ -52,11 +52,14 @@ private:
   bool endOfFile;
   unsigned long mSize;
   float timeToSeek;
+  bool    _waitToFillCache;
 
   csRef<TheoraVideoMedia> _activeTheoraStream;
   csRef<TheoraAudioMedia> _activeVorbisStream;
 
   size_t cacheSize;
+
+  csRef<iVirtualClock> clock;
 
 private:
   Mutex swapMutex;
@@ -70,6 +73,7 @@ public:
 
 private:
   bool canSwap;
+  bool canWrite;
   int hasDataToBuffer;
   int ok;
 

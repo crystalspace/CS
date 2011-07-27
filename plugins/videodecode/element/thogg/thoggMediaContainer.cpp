@@ -33,7 +33,11 @@ bool TheoraMediaContainer::Initialize (iObjectRegistry* r)
   object_reg=r;
   endOfFile = false;
   timeToSeek = -1;
+  _waitToFillCache=true;
   _target = NULL;
+  canWrite=false;
+
+  clock = csQueryRegistry<iVirtualClock> (object_reg);
   return 0;
 }
 size_t TheoraMediaContainer::GetMediaCount () const
@@ -120,6 +124,18 @@ void TheoraMediaContainer::Update ()
   // of the file, but there still is data in the caches of the 
   // active streams which needs processing
   static bool processingCache=false;
+
+  static csTicks frameTime = 0;
+  static csTicks lastTime=0;
+
+  if(frameTime==0)
+  if(_activeTheoraStream.IsValid ())
+  {
+    //HACK!: we subtract 3 from the target frame time, because otherwise,
+    //it runs too slow
+    frameTime = 1000/_activeTheoraStream->GetTargetFPS ()-3;
+  }
+
   //if a seek is scheduled, do it
   if (timeToSeek!=-1)
   {
@@ -153,11 +169,23 @@ void TheoraMediaContainer::Update ()
       if( media [activeStreams [i]]->HasDataReady ())
         dataAvailable++;
     }
+    if(_waitToFillCache )
+      if (cacheFull == activeStreams.GetSize ())
+      {
+        cout<<"cache full! starting to play video...\n";
+        _waitToFillCache=false;
+      }
 
-    if (ok==0)
+    /*if (ok==0 && !_waitToFillCache && !canWrite)
+    {
+      //canSwap=true;
+    }*/
+    if (((clock->GetCurrentTicks () - lastTime) >= (frameTime)) && !_waitToFillCache && !canWrite && dataAvailable)
     {
       canSwap=true;
+      lastTime=clock->GetCurrentTicks ();
     }
+
     if(processingCache && dataAvailable==0)
       ok++;
 
@@ -170,6 +198,7 @@ void TheoraMediaContainer::Update ()
         printf("Ogg buffering stopped, end of file reached.\n");
         if(dataAvailable==0)
         {
+          _waitToFillCache=true;
           endOfFile = true;
           processingCache=false;
         }
@@ -352,6 +381,7 @@ void TheoraMediaContainer::SwapBuffers ()
   if(canSwap)
   {
     canSwap=false;
+    canWrite=true;
     for (size_t i =0;i<activeStreams.GetSize ();i++)
     {
       media[activeStreams[i]]->SwapBuffers ();
@@ -360,12 +390,18 @@ void TheoraMediaContainer::SwapBuffers ()
 }
 void TheoraMediaContainer::WriteData ()
 {
-  if(ok==0)
+  if(_waitToFillCache)
+    return;
+  if(!canSwap && canWrite)
   {
-    if (_activeTheoraStream.IsValid ())
-      _activeTheoraStream->WriteData ();
-    if (_activeVorbisStream.IsValid ())
-      _activeVorbisStream->WriteData ();
+    if(ok==0)
+    {
+      canWrite=false;
+      if (_activeTheoraStream.IsValid ())
+        _activeTheoraStream->WriteData ();
+      if (_activeVorbisStream.IsValid ())
+        _activeVorbisStream->WriteData ();
+    }
   }
 }
 
