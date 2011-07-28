@@ -402,9 +402,9 @@ bool DeferredDemo::SetupScene()
 
   light = engine->FindLight ("Lamp.Lucy.Spot.2");
   if (!light)
-    return ReportError("Light not found!");
+    ReportWarning ("Light not found!");
 
-  engine->Prepare ();
+  engine->Prepare ();  
 
   return true;
 }
