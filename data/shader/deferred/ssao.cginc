@@ -3,7 +3,7 @@
 <variablemap variable="viewport size" destination="viewportSize" />
 <variablemap variable="far clip distance" destination="farClipDistance" />
 <variablemap variable="sample radius" destination="sampleRadius" />
-<variablemap variable="sample radius wide" destination="sampleRadiusWide" />
+<variablemap variable="detail sample radius" destination="detailSampleRadius" />
 <variablemap variable="num passes" destination="numPasses" />
 <variablemap variable="self occlusion" destination="selfOcclusion" />
 <variablemap variable="occlusion strength" destination="occlusionStrength" />
@@ -31,7 +31,7 @@ uniform sampler2D RandNormalsTexture;
 uniform float4 viewportSize;  // width, height, 1/width, 1/height
 uniform float farClipDistance;
 uniform float sampleRadius;
-uniform float sampleRadiusWide;
+uniform float detailSampleRadius;
 uniform int numPasses;
 uniform float selfOcclusion;
 uniform float occlusionStrength;
@@ -69,11 +69,11 @@ void GetSamplePositionAndNormal(float2 texCoord, float3 ray, float3 scale, out f
 float ComputeOcclusion(float3 vecToOccluder, float3 normal, float3 sampleNormal)
 {  
   float distance = length (vecToOccluder);
-  float deltaN = (1.0 - dot (normal, sampleNormal)) *
+  float deltaN = (1.0 - max (0.0, dot (normal, sampleNormal))) *
       max (0.0 - selfOcclusion, dot (normal, normalize (vecToOccluder)) - occluderAngleBias);
-  return /*step (0.0, distance) * step (distance, maxOccluderDistance) * */ deltaN * occlusionStrength 
+  return /*step (0.0, distance) * step (distance, maxOccluderDistance) **/  deltaN * occlusionStrength 
       // / (1.0 + distance);
-      * (1.0f - smoothstep (0.0, maxOccluderDistance, distance));
+      * (1.0f - smoothstep (0.01, maxOccluderDistance, distance));
   
   /*float fRangeIsInvalid = saturate((screenPos.z - sampleDepth) / scale.z);			
   // accumulate accessibility, use default value of 0.5 if right computations are not possible
@@ -104,14 +104,7 @@ float4 main(vertex2fragment IN) : COLOR
 		normalize (float3 ( 1,-1,-1)), //* 0.8750f, //0.750f,
 		normalize (float3 ( 1,-1, 1)), //* 0.9375f, //0.875f,
 		normalize (float3 ( 1, 1,-1)) //* 0.9999f //0.999f
-	};
-	/*const float2 samples[4] =
-	{
-		float2 ( 1, 0) * 0.625, 
-    float2 (-1, 0) * 0.750,
-    float2 ( 0, 1) * 0.875, 
-    float2 (0, -1)
-  };*/
+	};	
   
   float2 screenXY = IN.ScreenPos.xy / IN.ScreenPos.w;
   float2 texCoord = screenXY * 0.5 + 0.5;
@@ -124,17 +117,24 @@ float4 main(vertex2fragment IN) : COLOR
   //randomNormal = normalize (randomNormal);
   
   float invDepth = 1.0 / depth;
-  float3 scale = float3 (sampleRadius * invDepth, sampleRadius * invDepth, sampleRadius / farClipDistance);
-  float3 scaleLong = float3 (sampleRadiusWide * invDepth, sampleRadiusWide * invDepth, sampleRadiusWide / farClipDistance);
+  float3 scale[2];
+  scale[0] = float3 (sampleRadius * invDepth, sampleRadius * invDepth, sampleRadius / farClipDistance);
+]]>
+<?if (vars."enable ambient occlusion".float == 1) && (vars."detail sample radius".float != 0) ?>
+  scale[1] = float3 (detailSampleRadius * invDepth, detailSampleRadius * invDepth, detailSampleRadius / farClipDistance);
+<?else?>
+  scale[1] = scale[0];
+<?endif?>
+<![CDATA[
   float AO = 0.0;
   float AOsum = 0.0;
   float3 indirectRadiance = float3(0.0);
-  float n = 0.0;
-  float sampleStep = 0.5 / (8.0 * numPasses);
+  float totalSamples = 8.0 * numPasses;
+  float sampleStep = 0.5 / totalSamples;
   float sampleLength = 0.5;
   //float3 bentNormal = float3(0.0);
   
-  for (n=0; n < numPasses; n++)
+  for (int n=0; n < numPasses; n++)
   {
     float3 randomNormal = tex2D (RandNormalsTexture, texCoord * ((viewportSize.xy / 16) + float2(n))).rgb * 2.0 - 1.0;
     randomNormal = normalize (randomNormal);
@@ -147,7 +147,7 @@ float4 main(vertex2fragment IN) : COLOR
       sampleLength += sampleStep;
       float3 sampleScreenPos, sampleNormal;
       float2 sampleTC;
-      GetSamplePositionAndNormal (texCoord, ray, scale, sampleTC, sampleScreenPos, sampleNormal);
+      GetSamplePositionAndNormal (texCoord, ray, scale[i % 2], sampleTC, sampleScreenPos, sampleNormal);
       float3 vecToOccluder = sampleScreenPos - screenPos;
 ]]>
 <?if vars."enable ambient occlusion".float == 1 ?>
@@ -156,21 +156,15 @@ float4 main(vertex2fragment IN) : COLOR
 <?if vars."enable indirect light".float == 1 ?>
       indirectRadiance += ComputeIndirectRadiance (sampleTC, vecToOccluder, normal, sampleNormal);
 <?endif?>
-<?if (vars."enable ambient occlusion".float == 1) && (vars."sample radius wide".float != 0) ?>
-      GetSamplePositionAndNormal (texCoord, ray, scaleLong, sampleTC, sampleScreenPos, sampleNormal); 
-      vecToOccluder = sampleScreenPos - screenPos;
-      AO += ComputeOcclusion (vecToOccluder, normal, sampleNormal);
-<?endif?>
 <![CDATA[
       //bentNormal += vecToOccluder * AO;
       AOsum += AO;
     }
   }
-  
-  n *= 8.0;
-  AOsum /= n;
+    
+  AOsum /= totalSamples;
   AOsum += selfOcclusion;
-  indirectRadiance /= n;
+  indirectRadiance /= totalSamples;
   
   /*bentNormal = normalize (bentNormal);
   // convert bent normal to spherical coords
@@ -182,7 +176,7 @@ float4 main(vertex2fragment IN) : COLOR
   float3 envRadiance = tex2D (EnvmapTexture, float2 (phi * ONE_OVER_TWOPI, 1.0 - theta * ONE_OVER_PI)).rgb;
   indirectRadiance += envRadiance * max (0.0, dot (bentNormal, normal));*/
   
-  return float4 (indirectRadiance, 1.0 - saturate(AOsum));
+  return float4 (indirectRadiance, 1.0 - saturate (AOsum));
 }
 
 ]]>

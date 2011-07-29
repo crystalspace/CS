@@ -39,7 +39,12 @@
       <texture destination="AmbientBuffer" name="tex gbuffer 2" />
       <texture destination="NormalBuffer" name="tex gbuffer 3" />
       <!--<texture destination="DepthBuffer" name="tex gbuffer depth" />-->            
-      <fp plugin="glcg" file="/shader/deferred/composition.cgfp" />
+      <!--<fp plugin="glcg" file="/shader/deferred/composition.cgfp" />-->
+      <fp plugin="glcg">
+        <cgfp>
+          <?Include composition.cgfp ?>
+        </cgfp>
+      </fp>
 
     </pass>
   </technique>

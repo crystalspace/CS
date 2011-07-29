@@ -715,6 +715,11 @@ void RMDeferred::EnableGlobalIllumination (bool enable)
   }
 }
 
+void RMDeferred::ChangeBufferResolution(const char *bufferResolution)
+{
+  globalIllum.ChangeBufferResolution (bufferResolution);
+}
+
 void RMDeferred::EnableBlurPass (bool enableBlur)
 {
   globalIllum.applyBlur = enableBlur;

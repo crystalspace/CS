@@ -557,7 +557,7 @@ void DeferredDemo::UpdateGui()
       SetValue (guiEnableIndirectLight->isSelected() ? 1.0f : 0.0f);
   rmGlobalIllum->GetGlobalIllumVariableAdd ("occlusion strength")->SetValue (occlusionStrength);
   rmGlobalIllum->GetGlobalIllumVariableAdd ("sample radius")->SetValue (sampleRadius);
-  rmGlobalIllum->GetGlobalIllumVariableAdd ("sample radius wide")->SetValue (sampleRadiusWide);
+  rmGlobalIllum->GetGlobalIllumVariableAdd ("detail sample radius")->SetValue (sampleRadiusWide);
   rmGlobalIllum->GetGlobalIllumVariableAdd ("num passes")->SetValue (sampleCount);
   rmGlobalIllum->GetGlobalIllumVariableAdd ("max occluder distance")->SetValue (maxOccluderDistance);
   rmGlobalIllum->GetGlobalIllumVariableAdd ("self occlusion")->SetValue (selfOcclusion);
@@ -757,6 +757,18 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
     {
       float rot = LIGHT_ROTATION_SPEED * (float)vc->GetElapsedTicks() / 1000.0f;
       light->GetMovable()->GetTransform().RotateOther (CS_VEC_ROT_RIGHT, rot);
+    }
+    else if (code == '1')
+    {
+      rmGlobalIllum->ChangeBufferResolution ("full");
+    }
+    else if (code == '2')
+    {
+      rmGlobalIllum->ChangeBufferResolution ("half");
+    }
+    else if (code == '3')
+    {
+      rmGlobalIllum->ChangeBufferResolution ("quarter");
     }
 #ifdef CS_DEBUG
     else if (code == 'r')

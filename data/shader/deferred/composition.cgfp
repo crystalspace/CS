@@ -1,4 +1,4 @@
-<cgfp>
+<include>
 
 <variablemap variable="viewport size" destination="ViewportSize" />
 <variablemap variable="debug show ambocc" destination="ShowAO" />
@@ -45,8 +45,7 @@ float4 main(vertex2fragment IN,
   float weightedAO = 0.0f;
   float3 radiance = float3(0.0f);
   float3 weightedRadiance = float3(0.0f);
-  float weightSum = 0.0f;
-  int nSample = 0;
+  float weightSum = 0.0f;  
   
   for (int i = -1; i <= 1; i += 2)
   {
@@ -70,7 +69,6 @@ float4 main(vertex2fragment IN,
       
       AO += sampleGI.a;
       radiance += sampleGI.rgb;
-      nSample++;
     }
 	}
   
@@ -81,7 +79,7 @@ float4 main(vertex2fragment IN,
     radiance = weightedRadiance * weightSum;
   }
   else
-  {    
+  {
     AO *= 0.25f;
     radiance *= 0.25f;
   }
@@ -94,15 +92,16 @@ float4 main(vertex2fragment IN,
   //float AO = radiance.a;
   
   radiance.rgb = diffuseColor * AO * (ambientColor + radiance.rgb);
-  
-  if (ShowAO != 0)
+]]>
+<?if vars."debug show ambocc".int != 0 ?>
     return float4 (AO);
-  if (ShowGlobalIllum != 0)
+<?elsif vars."debug show globalillum".int != 0 ?>
     return float4 (radiance.rgb, 1.0f);
-  
-  return float4 (directRadiance + radiance.rgb, 1.0f);
+<?endif?>
+<![CDATA[
+    return float4 (directRadiance + radiance.rgb, 1.0f);
 }
 
 ]]>
 </program>
-</cgfp>
+</include>

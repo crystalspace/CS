@@ -92,8 +92,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     virtual bool DebugCommand(const char *cmd);
 
     //---- iRenderManagerGlobalIllum Interface ----
-    virtual void EnableGlobalIllumination (bool enable);
-    virtual void EnableBlurPass (bool enableBlur);
+    virtual void EnableGlobalIllumination(bool enable);
+    virtual void ChangeBufferResolution(const char *bufferResolution);
+    virtual void EnableBlurPass(bool enableBlur);
     virtual csShaderVariable* GetGlobalIllumVariableAdd(const char *svName);
     virtual csShaderVariable* GetBlurVariableAdd(const char *svName);
     virtual csShaderVariable* GetCompositionVariableAdd(const char *svName);

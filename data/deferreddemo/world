@@ -125,6 +125,7 @@
         <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
     </plugins>
     <library>/lib/frankie/frankie.xml</library>
+    <library>/lib/krystal/krystal.xml</library>
     <meshfact name="Torus01FACT">
         <plugin>meshfact</plugin>
         <params>
@@ -1905,7 +1906,7 @@
         </params>
     </meshfact>
     <sector name="room">
-      <!--ambient blue="0.1" green="0.1" red="0.1" /-->
+        <ambient blue="0.1" green="0.1" red="0.1" />
         <meshobj name="Frankie">
             <plugin>animesh</plugin>
             <params>
@@ -1914,6 +1915,16 @@
             <priority>object</priority>
             <move>
                 <v x="-2" y="-14.2" z="-3" />
+            </move>
+        </meshobj>
+        <meshobj name="Krystal">
+            <plugin>animesh</plugin>
+            <params>
+                <factory>krystal</factory>
+            </params>
+            <priority>object</priority>
+            <move>
+                <v x="-2.5" y="-14.25" z="-3" />
             </move>
         </meshobj>
         <meshobj name="Torus01">

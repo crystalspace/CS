@@ -125,6 +125,8 @@ struct iRenderManagerGlobalIllum : public virtual iBase
     
   virtual void EnableGlobalIllumination (bool enable) = 0;
 
+  virtual void ChangeBufferResolution (const char *bufferResolution) = 0;
+
   virtual void EnableBlurPass (bool enableBlur) = 0;
 
   virtual csShaderVariable* GetGlobalIllumVariableAdd(const char *svName) = 0;
