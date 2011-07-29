@@ -10,9 +10,14 @@
         <vp>
           <program>
             <![CDATA[
+              #version 140
+              #extension GL_EXT_geometry_shader4 : enable
+
+              out vec2 texcoord;
+
               void main (void)
               {
-                gl_TexCoord[0] = gl_MultiTexCoord0;
+                texcoord = gl_MultiTexCoord0.xy;
                 gl_Position = ftransform ();
               }
             ]]>
@@ -22,13 +27,22 @@
         <gp>
           <program>
             <![CDATA[
+              #version 140
+              #extension GL_EXT_geometry_shader4 : enable
+
+              in vec2 texcoord[];
+              out vec2 tc;
+
               void main (void)
               {
                 gl_Position = gl_PositionIn[0];
+                tc = texcoord[0];
                 EmitVertex ();
                 gl_Position = gl_PositionIn[1];
+                tc = texcoord[1];
                 EmitVertex ();
                 gl_Position = gl_PositionIn[2];
+                tc = texcoord[2];
                 EmitVertex ();
                 EndPrimitive ();
               }
@@ -43,12 +57,16 @@
 
           <program>
             <![CDATA[
+              #version 140
+              #extension GL_EXT_geometry_shader4 : enable
+
               uniform vec3 coeff;
               uniform sampler2D texdiff;
+              in vec2 tc;
 
               void main (void)
               {
-                vec4 col = texture2D (texdiff, gl_TexCoord[0].xy);
+                vec4 col = texture2D (texdiff, tc);
                 gl_FragColor = col * vec4 (coeff, 0.0);
               }
             ]]>
