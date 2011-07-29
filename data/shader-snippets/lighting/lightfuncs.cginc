@@ -190,6 +190,8 @@ struct LightPropertiesOpacityMap
   float4x4 opacityMapTF[MAX_LIGHTS];
   // Depth map
   sampler2D shadowMap[MAX_LIGHTS];  
+  // Split function
+  sampler2D splitFunc[MAX_LIGHTS];    
   // OSM
   sampler2D opacityMap[MAX_OSM * MAX_LIGHTS];
   float splitDists[MAX_OSM * MAX_LIGHTS];

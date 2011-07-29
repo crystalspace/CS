@@ -87,6 +87,7 @@ namespace CS
           };
 
           csRef<csShaderVariable> depthSV;
+          csRef<csShaderVariable> splitSV;
           csRef<csShaderVariable> textureSV[rtaNumAttachments];
           csRef<csShaderVariable> shadowMapProjectSV;
           Frustum* frustums;
@@ -167,6 +168,9 @@ namespace CS
 
             superFrustum.depthSV =
               lightVarsHelper.CreateTempSV(viewSetup.persist.depthSVName);
+
+            superFrustum.splitSV =
+              lightVarsHelper.CreateTempSV(viewSetup.persist.splitSVName);
 
             for (int i = 0; i < superFrustum.actualNumParts; i++)
             {
@@ -354,6 +358,9 @@ namespace CS
           persist.osmShader->GetVariableAdd(persist.depthSVName)
             ->SetValue(persist.depth);
 
+          persist.osmShader->GetVariableAdd(persist.splitSVName)
+            ->SetValue(persist.split);
+
           int shadowMapSize = persist.shadowMapRes;
 
           // here should be lightFrustums.frustums.GetSize()
@@ -386,6 +393,7 @@ namespace CS
             }
 
             superFrust.depthSV->SetValue(persist.depth);
+            superFrust.splitSV->SetValue(persist.split);
 
             csRef<CS::RenderManager::RenderView> newRenderView;
             newRenderView = 
@@ -588,7 +596,8 @@ namespace CS
         CS::ShaderVarStringID passColorSVName;
         CS::ShaderVarStringID mrtSVName;
         CS::ShaderVarStringID osmSVName;
-        CS::ShaderVarStringID depthSVName;        
+        CS::ShaderVarStringID depthSVName;
+        CS::ShaderVarStringID splitSVName;
         /// Shader for rendering to OSM
         csRef<iShader> osmShader;
         /// Shader type for rendering to OSM
@@ -600,6 +609,7 @@ namespace CS
 
         csRefArray<iTextureHandle> texs;
         csRef<iTextureHandle> depth;
+        csRef<iTextureHandle> split;
 
         /// Set the prefix for configuration settings
         void SetConfigPrefix (const char* configPrefix)
@@ -628,6 +638,7 @@ namespace CS
           mrtSVName = strings->Request ("mrt");
           osmSVName = strings->Request("light osm");
           depthSVName = strings->Request("light shadow map");
+          splitSVName = strings->Request("split function");
 
           csConfigAccess cfg (objectReg);
           shadowMapRes = 512;
@@ -666,6 +677,13 @@ namespace CS
             texs.Push(tex);
           }
 
+          // Create a default texture
+          split = g3d->GetTextureManager()->CreateTexture(256, 1, csimg2D, 
+            "abgr8", CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_NOFILTER);
+
+          // Set linear split
+          SetLinearSplit();
+
           osmShader->GetVariableAdd(numSplitsSVName)->SetValue(numSplits);
 
           // pass mrt number to shader
@@ -677,6 +695,39 @@ namespace CS
         {
           csTicks time = csGetTicks ();
           lightVarsPersist.UpdateNewFrame();
+        }
+
+      private: 
+        void SetLinearSplit()
+        {
+          CS::StructuredTextureFormat readbackFmt 
+            (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
+          csRef<iDataBuffer> databuf = split->Readback(readbackFmt);
+
+          if (!databuf)
+          {
+            csPrintfErr("Error reading back from texture!\n");
+            return;
+          }
+
+          uint8* data = databuf->GetUint8();
+
+          if (!data)
+          {
+            csPrintfErr("Error converting data buffer!\n");
+            return;
+          }
+
+          for (int i = 0 ; i < 4 * 256 ; i += 4)
+          {
+            data[i] = i / 4;
+            if (i / 4 < 40)
+              data[i] = i;
+            else
+              data[i] = 160 + (i / 4 - 40) * 95.0 / 215.0;
+          }
+
+          split->Blit(0, 0, 256, 1, data);  
         }
       };
 
@@ -720,6 +771,9 @@ namespace CS
 
         lightVarsHelper.MergeAsArrayItem (lightStacks[0],
           superFrust.depthSV, lightNum);
+
+        lightVarsHelper.MergeAsArrayItem (lightStacks[0],
+          superFrust.splitSV, lightNum);
 
         superFrust.numSplitsSV->SetValue(viewSetup.persist.numSplits);
 

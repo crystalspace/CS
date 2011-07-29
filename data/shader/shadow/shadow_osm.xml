@@ -25,6 +25,7 @@
       <mixmode><add/></mixmode>
       <texture name="tex diffuse" destination="TexDiffuse" />
       <texture name="light shadow map" destination="DepthMap" />
+      <texture name="split function" destination="SplitFunc" />      
       <vp plugin="glcg">
         <cgvp>
           <variablemap variable="light shadow map projection" destination="projection" />           
@@ -106,7 +107,8 @@
           };
           fragmentOutput main (vertex2fragment IN,
             uniform sampler2D TexDiffuse,
-            uniform sampler2D DepthMap)
+            uniform sampler2D DepthMap,
+            uniform sampler2D SplitFunc)
           {
             fragmentOutput output;
             float4 surface = tex2D (TexDiffuse, IN.TexCoord);
@@ -120,36 +122,41 @@
             
             float compareDepth = (1 - shadowMapCoordsBiased.z) ;
             float depth = tex2D(DepthMap, position).x;
-/*    
-            if (position.x < 0 || position.y < 0 || position.x > 1 || position.y > 1)
+
+            if (position.x < 0 || position.y < 0 || position.x > 1 || position.y > 1 
+              || compareDepth < depth )
               return output;  
-*/    
+
             int i;
-            i = min( ( (compareDepth - depth) / (0.95 - depth) ) * numSplits - 1, 
+            i = min( ( (compareDepth - depth) / (0.95 - depth) ) * (numSplits - 1), 
               numSplits - 1);
+
+            i = min( tex2D( SplitFunc, float2( min( (compareDepth - depth) / 
+              (0.95 - depth) , 0.99 ) , 0 ) ) * (numSplits - 1), numSplits - 1);              
             
             int index = i % 4;
             value += 10 * (value == 1);
             float4 color = value;
+            float4 one = color;
             color = color * float4(index < 1, index < 2, index < 3, 1);
             
             // write in the correct render target
-            int renderTarget = (i / 4) % mrt;
+            int renderTarget = (i / 4);
             
-            output.Color0 = color * (renderTarget <= 0);
+            output.Color0 = color * (renderTarget == 0);
           ]]>            
         <?if vars."mrt".int &gt; 1?>
           <![CDATA[                      
-            output.Color1 = color * (renderTarget <= 1);
-            output.Color2 = color * (renderTarget <= 2);
-            output.Color3 = color * (renderTarget <= 3);
+            output.Color1 = color * (renderTarget == 1) + one * (renderTarget < 1);
+            output.Color2 = color * (renderTarget == 2) + one * (renderTarget < 2);
+            output.Color3 = color * (renderTarget == 3) + one * (renderTarget < 3);
           ]]>            
         <?if vars."mrt".int &gt; 4?>
           <![CDATA[                      
-            output.Color4 = color * (renderTarget <= 4);
-            output.Color5 = color * (renderTarget <= 5);
-            output.Color6 = color * (renderTarget <= 6);
-            output.Color7 = color * (renderTarget <= 7);
+            output.Color4 = color * (renderTarget == 4) + one * (renderTarget < 4);
+            output.Color5 = color * (renderTarget == 5) + one * (renderTarget < 5);
+            output.Color6 = color * (renderTarget == 6) + one * (renderTarget < 6);
+            output.Color7 = color * (renderTarget == 7) + one * (renderTarget < 7);
             ]]>
         <?endif?>
         <?endif?>

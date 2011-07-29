@@ -32,6 +32,10 @@
 	<texture name="light shadow map[$L$]" destination="lightPropsOM.shadowMap[$L$]"
 		comparemode="rToTexture" comparefunc="lequal" />
       <?Endgenerate?>
+      <?Generate L 0 7?>
+	<texture name="split function[$L$]" destination="lightPropsOM.splitFunc[$L$]"
+		comparemode="rToTexture" comparefunc="lequal" />
+      <?Endgenerate?>      
     </block>
     
     <block location="cg:variablemap">
