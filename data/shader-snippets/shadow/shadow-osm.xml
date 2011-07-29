@@ -29,7 +29,11 @@
 		comparemode="rToTexture" comparefunc="lequal" />
       <?Endgenerate?>
       <?Generate L 0 7?>
-	<texture name="light shadow map[$L$]" destination="lightPropsOM.shadowMap[$L$]"
+	<texture name="light shadow map start[$L$]" destination="lightPropsOM.shadowMapStart[$L$]"
+		comparemode="rToTexture" comparefunc="lequal" />
+      <?Endgenerate?>
+      <?Generate L 0 7?>
+	<texture name="light shadow map end[$L$]" destination="lightPropsOM.shadowMapEnd[$L$]"
 		comparemode="rToTexture" comparefunc="lequal" />
       <?Endgenerate?>
       <?Generate L 0 7?>

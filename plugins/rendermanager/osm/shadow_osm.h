@@ -86,7 +86,8 @@ namespace CS
             csRef<csShaderVariable> splitDistsSV;
           };
 
-          csRef<csShaderVariable> depthSV;
+          csRef<csShaderVariable> depthStartSV;
+          csRef<csShaderVariable> depthEndSV;
           csRef<csShaderVariable> splitSV;
           csRef<csShaderVariable> textureSV[rtaNumAttachments];
           csRef<csShaderVariable> shadowMapProjectSV;
@@ -166,8 +167,11 @@ namespace CS
             superFrustum.numSplitsSV = lightVarsHelper.CreateTempSV (
               viewSetup.persist.numSplitsSVName);
 
-            superFrustum.depthSV =
-              lightVarsHelper.CreateTempSV(viewSetup.persist.depthSVName);
+            superFrustum.depthStartSV =
+              lightVarsHelper.CreateTempSV(viewSetup.persist.depthStartSVName);
+
+            superFrustum.depthEndSV =
+              lightVarsHelper.CreateTempSV(viewSetup.persist.depthEndSVName);
 
             superFrustum.splitSV =
               lightVarsHelper.CreateTempSV(viewSetup.persist.splitSVName);
@@ -276,9 +280,9 @@ namespace CS
           }
         }
 
-        CS::Math::Matrix4 FindProjectionMatrix(CS::RenderManager::RenderView* rview,
+        CS::Math::Matrix4 FindOrthCropMatrix(CS::RenderManager::RenderView* rview,
           iLight* light, const csBox3& castingObjects, 
-          const csBox3& receivingObjects, float _far)
+          const csBox3& receivingObjects)
         {
           csBox3 castersBox = castingObjects;
           csBox3 receiversBox = receivingObjects;
@@ -306,14 +310,7 @@ namespace CS
           CS::Math::Matrix4 Mortho = 
             CS::Math::Projections::Ortho (-1, 1, 1, -1, 1, -1);
 
-          float lightCutoff = light->GetCutoffDistance();
-          float lightNear = SMALL_Z;
-
-          lightProject = CS::Math::Projections::Ortho (lightCutoff, 
-            -lightCutoff, lightCutoff, -lightCutoff, 
-            -_far, -lightNear);
-
-          return Mortho * crop * lightProject;
+          return Mortho * crop;
         }
 
         void AddOSMTarget (typename RenderTree::MeshNode* meshNode,
@@ -350,13 +347,35 @@ namespace CS
           ProcessGeometry(lightFrustums.frustums[0], context, light, rview, 
             _near, _far, castingObjects, receivingObjects);
 
-          CS::Math::Matrix4 matrix = FindProjectionMatrix(rview, light, 
-            castingObjects, receivingObjects, _far);
+          CS::Math::Matrix4 proj = FindOrthCropMatrix(rview, light, 
+            castingObjects, receivingObjects);
 
-          AddShadowMapTarget(meshNode, renderTree, light, viewSetup, matrix);
+          float lightCutoff = light->GetCutoffDistance();
+          float lightNear = SMALL_Z;
 
-          persist.osmShader->GetVariableAdd(persist.depthSVName)
-            ->SetValue(persist.depth);
+          lightProject = CS::Math::Projections::Ortho (lightCutoff, 
+            -lightCutoff, lightCutoff, -lightCutoff, 
+            -lightNear, -_far);
+
+          CS::Math::Matrix4 matrix = proj * lightProject;
+
+          AddShadowMapTarget(meshNode, renderTree, light, 
+            viewSetup, matrix, persist.depthEnd);
+
+          lightProject = CS::Math::Projections::Ortho (lightCutoff, 
+            -lightCutoff, lightCutoff, -lightCutoff, 
+            -_far, -lightNear);
+
+          matrix = proj * lightProject;
+
+          AddShadowMapTarget(meshNode, renderTree, light, 
+            viewSetup, matrix, persist.depthStart);
+
+          persist.osmShader->GetVariableAdd(persist.depthStartSVName)
+            ->SetValue(persist.depthStart);
+
+          persist.osmShader->GetVariableAdd(persist.depthEndSVName)
+            ->SetValue(persist.depthStart);
 
           persist.osmShader->GetVariableAdd(persist.splitSVName)
             ->SetValue(persist.split);
@@ -392,7 +411,8 @@ namespace CS
               superFrust.textureSV[rtaColor0 + attachments]->SetValue (tex);
             }
 
-            superFrust.depthSV->SetValue(persist.depth);
+            superFrust.depthStartSV->SetValue(persist.depthStart);
+            superFrust.depthEndSV->SetValue(persist.depthEnd);
             superFrust.splitSV->SetValue(persist.split);
 
             csRef<CS::RenderManager::RenderView> newRenderView;
@@ -447,7 +467,7 @@ namespace CS
 
         void AddShadowMapTarget (typename RenderTree::MeshNode* meshNode,
           RenderTree& renderTree, iLight* light, ViewSetup& viewSetup, 
-          const CS::Math::Matrix4& matrix)
+          const CS::Math::Matrix4& matrix, iTextureHandle* renderTexture)
         {
           if (light->GetFlags().Check (CS_LIGHT_NOSHADOWS)) return;
 
@@ -493,9 +513,9 @@ namespace CS
             typename RenderTree::ContextNode* shadowMapCtx = 
               renderTree.CreateContext (newRenderView);
 
-            renderTree.AddDebugTexture (persist.depth);
+            renderTree.AddDebugTexture (renderTexture);
             // register SVs
-            shadowMapCtx->renderTargets[rtaColor0].texHandle = persist.depth;
+            shadowMapCtx->renderTargets[rtaColor0].texHandle = renderTexture;
             shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
 
             SingleRenderLayer layerConfig(persist.shadowShaderType, 
@@ -596,7 +616,8 @@ namespace CS
         CS::ShaderVarStringID passColorSVName;
         CS::ShaderVarStringID mrtSVName;
         CS::ShaderVarStringID osmSVName;
-        CS::ShaderVarStringID depthSVName;
+        CS::ShaderVarStringID depthStartSVName;
+        CS::ShaderVarStringID depthEndSVName;
         CS::ShaderVarStringID splitSVName;
         /// Shader for rendering to OSM
         csRef<iShader> osmShader;
@@ -608,7 +629,8 @@ namespace CS
         csStringID shadowShaderType;
 
         csRefArray<iTextureHandle> texs;
-        csRef<iTextureHandle> depth;
+        csRef<iTextureHandle> depthStart;
+        csRef<iTextureHandle> depthEnd;
         csRef<iTextureHandle> split;
 
         /// Set the prefix for configuration settings
@@ -637,7 +659,8 @@ namespace CS
           passColorSVName = strings->Request ("pass color");
           mrtSVName = strings->Request ("mrt");
           osmSVName = strings->Request("light osm");
-          depthSVName = strings->Request("light shadow map");
+          depthStartSVName = strings->Request("light shadow map start");
+          depthEndSVName = strings->Request("light shadow map end");
           splitSVName = strings->Request("split function");
 
           csConfigAccess cfg (objectReg);
@@ -666,7 +689,10 @@ namespace CS
 
           numSplits = 4 * mrt;
 
-          depth = g3d->GetTextureManager()-> CreateTexture(shadowMapRes, 
+          depthStart = g3d->GetTextureManager()-> CreateTexture(shadowMapRes, 
+            shadowMapRes, csimg2D, "abgr32_f", CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
+
+          depthEnd = g3d->GetTextureManager()-> CreateTexture(shadowMapRes, 
             shadowMapRes, csimg2D, "abgr32_f", CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
 
           for (int i = 0 ; i < mrt ; i ++)
@@ -793,7 +819,10 @@ namespace CS
         }
 
         lightVarsHelper.MergeAsArrayItem (lightStacks[0],
-          superFrust.depthSV, lightNum);
+          superFrust.depthStartSV, lightNum);
+
+        lightVarsHelper.MergeAsArrayItem (lightStacks[0],
+          superFrust.depthEndSV, lightNum);
 
         lightVarsHelper.MergeAsArrayItem (lightStacks[0],
           superFrust.splitSV, lightNum);
