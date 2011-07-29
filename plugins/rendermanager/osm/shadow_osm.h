@@ -719,13 +719,36 @@ namespace CS
           }
 
           for (int i = 0 ; i < 4 * 256 ; i += 4)
-          {
             data[i] = i / 4;
+
+          split->Blit(0, 0, 256, 1, data);  
+        }
+
+        void SetLogarithmicSplit()
+        {
+          CS::StructuredTextureFormat readbackFmt 
+            (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
+          csRef<iDataBuffer> databuf = split->Readback(readbackFmt);
+
+          if (!databuf)
+          {
+            csPrintfErr("Error reading back from texture!\n");
+            return;
+          }
+
+          uint8* data = databuf->GetUint8();
+
+          if (!data)
+          {
+            csPrintfErr("Error converting data buffer!\n");
+            return;
+          }
+
+          for (int i = 0 ; i < 4 * 256 ; i += 4)
             if (i / 4 < 40)
               data[i] = i;
             else
               data[i] = 160 + (i / 4 - 40) * 95.0 / 215.0;
-          }
 
           split->Blit(0, 0, 256, 1, data);  
         }

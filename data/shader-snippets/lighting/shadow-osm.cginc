@@ -143,13 +143,14 @@ struct ShadowShadowMapDepth : ShadowShadowMap
 */
     i = -(compareDepth < depth) + i * !(compareDepth < depth);
     
-    previousSplit = (float)i / (numSplits - 1);
-    
     float previousMap, nextMap;
     previousMap = getMapValue(i, position);
     nextMap = getMapValue( min ( i + 1, numSplits - 1 ) , position);   
+
+    i = i * (i != -1);
+    previousSplit = (float)i / (numSplits - 1);
     
-    inLight = lerp(nextMap, previousMap, ( ( (compareDepth - depth) / (0.95 - depth) )  
+    inLight = lerp(previousMap, nextMap, ( ( (compareDepth - depth) / (0.95 - depth) )  
       - previousSplit) * (numSplits - 1) );
     inLight = previousMap;//lerp(previousMap, nextMap, 0.5);
     //inLight = ( ( (compareDepth - depth) / (0.95 - depth) ) - previousSplit) * (numSplits - 1);
