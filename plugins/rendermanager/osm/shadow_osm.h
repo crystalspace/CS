@@ -328,7 +328,7 @@ namespace CS
 
           // fixes a memory leak
           if (lightFrustums.setupFrame == currentFrame ||
-            lightFrustums.setupFrame != -1)
+            lightFrustums.setupFrame != (uint)-1)
             return;
 
           lightFrustums.setupFrame = currentFrame;
@@ -683,9 +683,9 @@ namespace CS
           csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
 
           osmShader = loader->LoadShader ("/shader/shadow/shadow_osm.xml");
-          osmShaderType = strings->Request ("osm");
+          osmShaderType = StringIDValue(strings->Request ("osm"));
           shadowShader = loader->LoadShader ("/shader/shadow/shadow_vsm.xml");
-          shadowShaderType = strings->Request ("shadow");
+          shadowShaderType = StringIDValue(strings->Request ("shadow"));
 
           numSplits = 4 * mrt;
 
@@ -719,7 +719,6 @@ namespace CS
         }
         void UpdateNewFrame ()
         {
-          csTicks time = csGetTicks ();
           lightVarsPersist.UpdateNewFrame();
         }
 

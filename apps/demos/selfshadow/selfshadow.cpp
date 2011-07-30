@@ -120,6 +120,8 @@ bool SelfShadowDemo::OnInitialize (int argc, char* argv[])
     CS_REQUEST_PLUGIN("crystalspace.mesh.object.furmesh", CS::Mesh::iFurMeshType),
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
+
+  return true;
 }
 
 bool SelfShadowDemo::Application ()
@@ -287,7 +289,6 @@ void SelfShadowDemo::LoadKrystal()
   materialWrapper->GetMaterial()-> RemoveVariable(objTexture);  
 
   CS::ShaderVarName diffuseType (svStrings, "diffuse type");	
-  int type; 
   // use ambient instead
   materialWrapper->GetMaterial()-> GetVariableAdd(diffuseType)->SetValue(100);  
 
