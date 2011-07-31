@@ -371,15 +371,6 @@ namespace CS
           AddShadowMapTarget(meshNode, renderTree, light, 
             viewSetup, matrix, persist.depthStart);
 
-          persist.osmShader->GetVariableAdd(persist.depthStartSVName)
-            ->SetValue(persist.depthStart);
-
-          persist.osmShader->GetVariableAdd(persist.depthEndSVName)
-            ->SetValue(persist.depthStart);
-
-          persist.osmShader->GetVariableAdd(persist.splitSVName)
-            ->SetValue(persist.split);
-
           int shadowMapSize = persist.shadowMapRes;
 
           // here should be lightFrustums.frustums.GetSize()
@@ -711,6 +702,9 @@ namespace CS
           SetLinearSplit();
 
           osmShader->GetVariableAdd(numSplitsSVName)->SetValue(numSplits);
+          osmShader->GetVariableAdd(splitSVName)->SetValue(split);
+          osmShader->GetVariableAdd(depthStartSVName)->SetValue(depthStart);
+          osmShader->GetVariableAdd(depthEndSVName)->SetValue(depthEnd);
 
           // pass mrt number to shader
           csShaderVariable* mrtVar = new csShaderVariable(mrtSVName); 

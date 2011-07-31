@@ -141,8 +141,11 @@ struct ShadowShadowMapDepth : ShadowShadowMap
 */      
     i = min( tex2D( lightPropsOM.splitFunc[lightNum], 
       float2( min( (compareDepth - depthStart) / 
-      (1 - depthEnd - depthStart + 0.05) , 0.99 ) , 0 ) ) * (numSplits - 1), 
+      (1 - depthEnd - depthStart) , 0.9999 ) , 0 ) ).x * (numSplits - 1), 
       numSplits - 1);      
+/*      
+    i = min ( ( (compareDepth - depthStart) / (1 - depthEnd - depthStart) ) * 
+      (numSplits - 1), numSplits - 1);      
 /*    
     if (compareDepth < depthStart)
       i = -1;
