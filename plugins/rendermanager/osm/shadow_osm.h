@@ -696,7 +696,7 @@ namespace CS
 
           // Create a default texture
           split = g3d->GetTextureManager()->CreateTexture(256, 1, csimg2D, 
-            "abgr8", CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_NOFILTER);
+            "abgr8", CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP);
 
           // Set linear split
           SetLinearSplit();

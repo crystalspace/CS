@@ -139,8 +139,8 @@
                   (1 - depthEnd - depthStart) , 0.9999 ) , 0 ) ).x * (numSplits - 1), 
                   numSplits - 1);              
 
-            i = min ( ( (compareDepth - depthStart) / (1 - depthEnd - depthStart) ) * 
-              (numSplits - 1), numSplits - 1);
+//            i = min ( ( (compareDepth - depthStart) / (1 - depthEnd - depthStart) ) * 
+//              (numSplits - 1), numSplits - 1);
 
             int index = i % 4;
             value += 10 * (value == 1);
