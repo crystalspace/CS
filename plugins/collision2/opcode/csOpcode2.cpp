@@ -609,8 +609,10 @@ void csOpcodeCollisionSector::GetCollisionData (Opcode::Model* modelA,
   Point* current;
   int i, j;
 
-  csArray<csVector3> pointsA(N_pairs * 3);
-  csArray<csVector3> pointsB(N_pairs * 3);
+  csArray<csVector3> pointsA;
+  pointsA.SetSize (N_pairs * 3);
+  csArray<csVector3> pointsB;
+  pointsB.SetSize (N_pairs * 3);
   csVector3 normal1 (0.0f, 0.0f, 0.0f);
   csVector3 normal2 (0.0f, 0.0f, 0.0f);
   csVector3 temp;
@@ -642,12 +644,12 @@ void csOpcodeCollisionSector::GetCollisionData (Opcode::Model* modelA,
     temp.Normalize ();
     normal2 += temp;
 
-    pointsA[index] = a1;
-    pointsA[index+1] = b1;
-    pointsA[index+2] = c1;
-    pointsB[index++] = a2;
-    pointsB[index++] = b2;
-    pointsB[index++] = c2;
+    pointsA[index].Set (a1);
+    pointsA[index+1].Set (b1);
+    pointsA[index+2].Set (c1);
+    pointsB[index++].Set (a2);
+    pointsB[index++].Set (b2);
+    pointsB[index++].Set (c2);
   }
 
   normal1 /= N_pairs;

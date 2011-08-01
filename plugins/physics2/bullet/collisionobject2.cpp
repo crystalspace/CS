@@ -13,7 +13,8 @@ CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 csBulletCollisionObject::csBulletCollisionObject (csBulletSystem* sys)
 : scfImplementationType (this), system (sys), collCb (NULL), btObject (NULL),
 sector (NULL), compoundShape (NULL), movable (NULL), insideWorld (false), 
-shapeChanged (false), isTerrain (false), type (CS::Collision2::COLLISION_OBJECT_BASE), haveStaticColliders(0)
+objectCopy (NULL), objectOrigin (NULL), shapeChanged (false), isTerrain (false),
+type (CS::Collision2::COLLISION_OBJECT_BASE), haveStaticColliders(0)
 {
   btTransform identity;
   identity.setIdentity ();
@@ -82,8 +83,12 @@ void csBulletCollisionObject::SetTransform (const csOrthoTransform& trans)
       if (btObject)
         dynamic_cast<btRigidBody*>(btObject)->setMotionState (motionState);
 
+      CS::Collision2::CollisionGroupMask mask = -1;
+      if (collGroup.value != 1)
+        mask ^= collGroup.value;
+
       if (insideWorld)
-        sector->bulletWorld->addRigidBody (btRigidBody::upcast (btObject));
+        sector->bulletWorld->addRigidBody (btRigidBody::upcast (btObject), collGroup.value, mask);
     }
     else
     {
@@ -250,13 +255,13 @@ void csBulletCollisionObject::SetCollisionGroup (const char* name)
   {
     btObject->getBroadphaseHandle ()->m_collisionFilterGroup = collGroup.value;
     if (collGroup.value == sector->collGroups[0].value)
-      btObject->getBroadphaseHandle ()->m_collisionFilterGroup = sector->allFilter;
+      btObject->getBroadphaseHandle ()->m_collisionFilterMask = sector->allFilter;
     else
       btObject->getBroadphaseHandle ()->m_collisionFilterMask = sector->allFilter ^ collGroup.value;
   }
 }
 
-bool csBulletCollisionObject::Collide (iCollisionObject* otherObject)
+bool csBulletCollisionObject::Collide (CS::Collision2::iCollisionObject* otherObject)
 {
   //Ghost VS no matter what kind.
   if (type == CS::Collision2::COLLISION_OBJECT_GHOST
@@ -274,7 +279,7 @@ bool csBulletCollisionObject::Collide (iCollisionObject* otherObject)
 
   //no matter what kind VS Ghost, Actor.
   if (otherObject->GetObjectType () != CS::Collision2::COLLISION_OBJECT_BASE 
-    || otherObject->GetObjectType () != CS::Collision2::COLLISION_OBJECT_PHYSICAL)
+    && otherObject->GetObjectType () != CS::Collision2::COLLISION_OBJECT_PHYSICAL)
     return otherObject->Collide (this);
 
   csBulletCollisionObject* otherObj = dynamic_cast<csBulletCollisionObject*> (otherObject);
@@ -329,17 +334,23 @@ CS::Collision2::HitBeamResult csBulletCollisionObject::HitBeam (const csVector3&
 
 size_t csBulletCollisionObject::GetContactObjectsCount ()
 {
+  size_t result = 0;
   if (type == CS::Collision2::COLLISION_OBJECT_BASE 
     || type == CS::Collision2::COLLISION_OBJECT_PHYSICAL)
-    return contactObjects.GetSize ();
+    result = contactObjects.GetSize ();
   else
   {
     btGhostObject* ghost = btGhostObject::upcast (btObject);
     if (ghost)
-      return ghost->getNumOverlappingObjects ();
+      result = ghost->getNumOverlappingObjects ();
     else 
       return 0;
   }
+
+  if (objectCopy)
+    result += objectCopy->GetContactObjectsCount ();
+
+  return result;
 }
 
 CS::Collision2::iCollisionObject* csBulletCollisionObject::GetContactObject (size_t index)
@@ -350,18 +361,39 @@ CS::Collision2::iCollisionObject* csBulletCollisionObject::GetContactObject (siz
     if (index < contactObjects.GetSize () && index >= 0)
       return contactObjects[index];
     else
-      return NULL;
+    {
+      if (objectCopy)
+      {
+        index -= contactObjects.GetSize ();
+        return objectCopy->GetContactObject (index);
+      }
+      else
+        return NULL;
+    }
   }
   else
   {
     btGhostObject* ghost = btGhostObject::upcast (btObject);
     if (ghost)
     {
-      btCollisionObject* obj = ghost->getOverlappingObject (index);
-      if (ghost)
-        return static_cast<CS::Collision2::iCollisionObject*> (obj->getUserPointer ());
-      else 
-        return NULL;
+      if (index < ghost->getNumOverlappingObjects () && index >= 0)
+      {
+        btCollisionObject* obj = ghost->getOverlappingObject (index);
+        if (obj)
+          return static_cast<CS::Collision2::iCollisionObject*> (obj->getUserPointer ());
+        else 
+          return NULL;
+      }
+      else
+      {
+        if (objectCopy)
+        {
+          index -= ghost->getNumOverlappingObjects ();
+          return objectCopy->GetContactObject (index);
+        }
+        else
+          return NULL;
+      }
     }
     else 
       return NULL;
@@ -384,6 +416,11 @@ void csBulletCollisionObject::RemoveBulletObject ()
         sector->bulletWorld->removeRigidBody (btRigidBody::upcast(btObject));
         delete btObject;
         btObject = NULL;
+
+        if (objectCopy)
+          objectCopy->sector->RemoveCollisionObject (objectCopy);
+        if (objectOrigin)
+          objectOrigin->objectCopy = NULL;
       }
     }
     else
@@ -393,6 +430,8 @@ void csBulletCollisionObject::RemoveBulletObject ()
       btObject = NULL;
     }
     insideWorld = false;
+    objectCopy = NULL;
+    objectOrigin = NULL;
   }
 }
 

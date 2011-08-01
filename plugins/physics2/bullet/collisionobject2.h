@@ -40,12 +40,17 @@ protected:
   bool shapeChanged;
   bool isTerrain;
 
+  //csBulletSector* desSector;
+  csBulletCollisionObject* objectOrigin;
+  csBulletCollisionObject* objectCopy;
+
 public:
   csBulletCollisionObject (csBulletSystem* sys);
   virtual ~csBulletCollisionObject ();
 
   virtual iObject* QueryObject (void) { return (iObject*) this; }
-  virtual iCollisionObject* QueryCollisionObject () {return dynamic_cast<iCollisionObject*> (this);}
+  virtual CS::Collision2::iCollisionObject* QueryCollisionObject () {
+    return dynamic_cast<CS::Collision2::iCollisionObject*> (this);}
   virtual CS::Physics2::iPhysicalBody* QueryPhysicalBody () {return NULL;}
 
   virtual void SetObjectType (CS::Collision2::CollisionObjectType type, bool forceRebuild = true);
@@ -72,7 +77,7 @@ public:
   virtual void SetCollisionCallback (CS::Collision2::iCollisionCallback* cb) {collCb = cb;}
   virtual CS::Collision2::iCollisionCallback* GetCollisionCallback () {return collCb;}
 
-  virtual bool Collide (iCollisionObject* otherObject);
+  virtual bool Collide (CS::Collision2::iCollisionObject* otherObject);
   virtual CS::Collision2::HitBeamResult HitBeam (const csVector3& start, const csVector3& end);
 
   virtual size_t GetContactObjectsCount ();
@@ -81,6 +86,11 @@ public:
   btCollisionObject* GetBulletCollisionPointer () {return btObject;}
   virtual void RemoveBulletObject ();
   virtual void AddBulletObject ();
+  void RemoveObjectCopy () {
+    csBulletSector* sec = objectCopy->sector;
+    sec->RemoveCollisionObject (objectCopy);
+    objectCopy = NULL;
+  }
 };
 }
 CS_PLUGIN_NAMESPACE_END (Bullet2)

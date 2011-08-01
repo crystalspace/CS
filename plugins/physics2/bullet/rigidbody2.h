@@ -20,6 +20,7 @@ class csBulletRigidBody : public scfImplementationExt1<
 {
   friend class csBulletSoftBody;
   friend class csBulletJoint;
+  friend class csBulletSector;
 private:
   btRigidBody* btBody;
   //CS::Physics2::PhysicalBodyType bodyType;

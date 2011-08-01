@@ -16,7 +16,7 @@
 
 Simple::Simple()
 : DemoApplication ("CrystalSpace.PhysTut2"),
-isSoftBodyWorld (true), environment (ENVIRONMENT_WALLS), solver (0),
+isSoftBodyWorld (true), environment (ENVIRONMENT_TERRAIN), solver (0),
 do_bullet_debug (false), do_soft_debug (true), allStatic (false), 
 pauseDynamic (false), dynamicSpeed (1.0f), physicalCameraMode (CAMERA_DYNAMIC), 
 dragging (false), softDragging (false), remainingStepDuration (0.0f), debugMode (CS::Physics2::Bullet2::DEBUG_COLLIDERS)

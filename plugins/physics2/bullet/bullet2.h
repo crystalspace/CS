@@ -13,6 +13,8 @@
 #include "iengine/movable.h"
 #include "csutil/csobject.h"
 
+#include "BulletCollision/CollisionDispatch/btGhostObject.h"
+
 struct iSector;
 class btCollisionObject;
 class btCompoundShape;
@@ -23,9 +25,12 @@ class btSequentialImpulseConstraintSolver;
 class btBroadphaseInterface;
 struct btSoftBodyWorldInfo;
 
+//class btGhostObject;
+
 CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
 class csBulletSystem;
+class csBulletSector;
 class csBulletDebugDraw;
 class csBulletRigidBody;
 class csBulletSoftBody;
@@ -33,6 +38,22 @@ class csBulletCollisionObject;
 class csBulletCollisionActor;
 class csBulletCollider;
 class csBulletJoint;
+
+struct CollisionPortal
+{
+  iPortal* portal;
+  csBulletSector*  desSector;
+  btGhostObject* ghostPortal;
+  csRefArray<csBulletCollisionObject> objects;
+  csArray<csOrthoTransform> oldTrans;
+
+  CollisionPortal (iPortal* portal) : portal (portal), desSector (NULL), ghostPortal (NULL) {}
+  ~CollisionPortal () {
+    if (ghostPortal) 
+      delete ghostPortal;
+    }
+  void AddObject (csRef<csBulletCollisionObject> object) {objects.Push (object);}
+};
 
 //Will also implement iPhysicalSector...
 class csBulletSector : public scfImplementationExt3<
@@ -50,11 +71,6 @@ class csBulletSector : public scfImplementationExt3<
   friend class csBulletMotionState;
   friend class csBulletSystem;
 
-  struct CollisionPortal
-  {
-    iPortal* portal;
-    csBulletCollisionObject* ghostPortal1;
-  };
   csRef<iSector> sector;
   csBulletSystem* sys;
   csVector3 gravity;
@@ -105,6 +121,12 @@ class csBulletSector : public scfImplementationExt3<
   int systemFilterCount;
 
   void CheckCollisions();
+
+  void UpdateCollisionPortals ();
+
+  void SetInformationToCopy (csBulletCollisionObject* obj, csBulletCollisionObject* cpy);
+
+  void GetInformationFromCopy (csBulletCollisionObject* obj, csBulletCollisionObject* cpy, float duration);
 
 public:
   csBulletSector (csBulletSystem* sys);
@@ -200,7 +222,7 @@ public:
 
   virtual void DumpProfile (bool resetProfile = true);
 
-  bool BulletCollide(btCollisionObject* objectA,
+  bool BulletCollide (btCollisionObject* objectA,
     btCollisionObject* objectB);
 
   CS::Collision2::HitBeamResult RigidHitBeam(btCollisionObject* object, 
@@ -209,9 +231,9 @@ public:
 
   void UpdateSoftBodies (float timeStep);
 
-  void AddMovableToSector(CS::Collision2::iCollisionObject* obj);
+  void AddMovableToSector (CS::Collision2::iCollisionObject* obj);
 
-  void RemoveMovableFromSector(CS::Collision2::iCollisionObject* obj);
+  void RemoveMovableFromSector (CS::Collision2::iCollisionObject* obj);
 };
 
 class csBulletSystem : public scfImplementation3<
@@ -220,6 +242,7 @@ class csBulletSystem : public scfImplementation3<
 {
   friend class csBulletColliderConvexMesh;
   friend class csBulletColliderConcaveMesh;
+  friend class csBulletSector;
 private:
   iObjectRegistry* object_reg;
   /*csRefArrayObject<CS::Collision2::iCollider> colliders;

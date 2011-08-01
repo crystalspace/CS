@@ -64,13 +64,13 @@ void Simple::Frame ()
   // was a collision.
   //---------
   csZRotMatrix3 rotmat1 (rot1_direction * speed / 2.5);
-  csOrthoTransform old_trans1 = sprite1_obj->GetTransform ();
+  csOrthoTransform old_trans1 = sprite1->GetMovable ()->GetFullTransform ();
   csOrthoTransform newTrans1 = old_trans1;
   newTrans1.RotateOther (rotmat1);
   sprite1_obj->SetTransform (newTrans1);
   
   csZRotMatrix3 rotmat2 (rot2_direction * speed / 1.0);
-  csOrthoTransform old_trans2 = sprite2_obj->GetTransform ();
+  csOrthoTransform old_trans2 = sprite2->GetMovable ()->GetFullTransform ();
   csOrthoTransform newTrans2 = old_trans2;
   newTrans2.RotateOther (rotmat2);
   sprite2_obj->SetTransform (newTrans2);
@@ -100,36 +100,36 @@ void Simple::Frame ()
   }
   else
   {
-//     csArray<CS::Collision2::CollisionData> data;
-//     collisionSector->CollisionTest (terrainObject, data);
-//     for (size_t i = 0; i < data.GetSize (); i++)
+     csArray<CS::Collision2::CollisionData> data;
+     collisionSector->CollisionTest (terrainObject, data);
+     for (size_t i = 0; i < data.GetSize (); i++)
+     {
+       if (data[i].objectB == sprite1_obj || data[i].objectA == sprite1_obj)
+       {
+         sprite1_obj->SetTransform (old_trans1);
+         rot1_direction = -rot1_direction;
+       }
+       else if (data[i].objectB == sprite2_obj || data[i].objectA == sprite2_obj)
+       {
+         sprite2_obj->SetTransform (old_trans2);
+         rot2_direction = -rot2_direction;
+       }
+     }
+//     bool cd = sprite1_obj->Collide (terrainObject);
+//     if (cd)
 //     {
-//       if (data[i].objectB == sprite1_obj)
-//       {
-//         sprite1_obj->SetTransform (old_trans1);
-//         rot1_direction = -rot1_direction;
-//       }
-//       else if (data[i].objectB == sprite2_obj)
-//       {
-//         sprite2_obj->SetTransform (old_trans2);
-//         rot2_direction = -rot2_direction;
-//       }
+//       // Restore old transforms and reverse turning directions.
+//       sprite1_obj->SetTransform (old_trans1);
+//       rot1_direction = -rot1_direction;
 //     }
-    bool cd = sprite1_obj->Collide (terrainObject);
-    if (cd)
-    {
-      // Restore old transforms and reverse turning directions.
-      sprite1_obj->SetTransform (old_trans1);
-      rot1_direction = -rot1_direction;
-    }
-
-    cd = sprite2_obj->Collide (terrainObject);
-    if (cd)
-    {
-      // Restore old transforms and reverse turning directions.
-      sprite2_obj->SetTransform (old_trans2);
-      rot2_direction = -rot2_direction;
-    }
+// 
+//     cd = sprite2_obj->Collide (terrainObject);
+//     if (cd)
+//     {
+//       // Restore old transforms and reverse turning directions.
+//       sprite2_obj->SetTransform (old_trans2);
+//       rot2_direction = -rot2_direction;
+//     }
   }
 
   iCamera* c = view->GetCamera();
@@ -474,6 +474,7 @@ void Simple::CreateRoom ()
   sprite1_obj->SetAttachedMovable (sprite1->GetMovable ());
   // You have to set a world transform to collision object.
   sprite1_obj->SetTransform (tc * parTrans);
+  sprite1_obj->RebuildObject ();
 
   collisionSector->AddCollisionObject (sprite1_obj);
   //sprite1_obj->SetCollisionGroup ("Sprite");
@@ -490,6 +491,7 @@ void Simple::CreateRoom ()
   sprite2_obj->AddCollider (sprite_col, localTrans);
   sprite2_obj->SetAttachedMovable (sprite2->GetMovable ());
   sprite2_obj->SetTransform (tc * parTrans);
+  sprite2_obj->RebuildObject ();
 
   collisionSector->AddCollisionObject (sprite2_obj);
   //sprite2_obj->SetCollisionGroup ("SpriteFiltered");
@@ -613,6 +615,7 @@ void Simple::CreateTerrain ()
   sprite1_obj->SetAttachedMovable (sprite1->GetMovable ());
   // You have to set a world transform to collision object.
   sprite1_obj->SetTransform (tc * parTrans);
+  sprite1_obj->RebuildObject ();
 
   collisionSector->AddCollisionObject (sprite1_obj);
 
@@ -628,6 +631,7 @@ void Simple::CreateTerrain ()
   sprite2_obj->AddCollider (sprite_col, localTrans);
   sprite2_obj->SetAttachedMovable (sprite2->GetMovable ());
   sprite2_obj->SetTransform (tc * parTrans);
+  sprite2_obj->RebuildObject ();
 
   collisionSector->AddCollisionObject (sprite2_obj);
 }

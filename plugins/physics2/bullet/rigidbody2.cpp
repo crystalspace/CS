@@ -125,6 +125,12 @@ void csBulletRigidBody::RemoveBulletObject ()
     btBody = NULL;
     btObject = NULL;
     insideWorld = false;
+    csBulletRigidBody* rb = dynamic_cast<csBulletRigidBody*> (objectCopy);
+    if (objectCopy)
+      rb->sector->RemoveRigidBody (rb);
+    rb = dynamic_cast<csBulletRigidBody*> (objectOrigin);
+    if (objectOrigin)
+      rb->objectCopy = NULL;
   }
 }
 
