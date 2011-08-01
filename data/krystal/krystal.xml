@@ -33,12 +33,12 @@
     </texture>		
   </textures>
   <materials>
-    <material name='krystal_material1'>
+    <material name='krystal_material'>
       <texture>krystal_body_h</texture>
       <shadervar type="texture" name="tex normal">krystal_body_nor</shadervar>
       <shadervar type="texture" name="tex specular">krystal_body_spec</shadervar>
     </material>
-    <material name='krystal_material'>
+    <material name='krystal_material1'>
       <shader type='standard'>sub_surface_scattering_fake</shader>
       <shadervar type="texture" name="mytextcoord">krystal_body_h</shadervar>
     </material>	
