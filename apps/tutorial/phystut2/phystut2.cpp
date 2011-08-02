@@ -1,5 +1,7 @@
 #include "cssysdef.h"
+#include "csgeom/poly3d.h"
 #include "csgeom/sphere.h"
+#include "iengine/portal.h"
 #include "imesh/genmesh.h"
 #include "imesh/terrain2.h"
 #include "cstool/genmeshbuilder.h"
@@ -11,12 +13,13 @@
 #define CAMERA_FREE 3
 #define CAMERA_ACTOR 4
 
-#define ENVIRONMENT_WALLS 1
-#define ENVIRONMENT_TERRAIN 2
+#define ENVIRONMENT_PORTALS 1
+#define ENVIRONMENT_BOX 2
+#define ENVIRONMENT_TERRAIN 3
 
 Simple::Simple()
 : DemoApplication ("CrystalSpace.PhysTut2"),
-isSoftBodyWorld (true), environment (ENVIRONMENT_TERRAIN), solver (0),
+isSoftBodyWorld (true), solver (0),
 do_bullet_debug (false), do_soft_debug (true), allStatic (false), 
 pauseDynamic (false), dynamicSpeed (1.0f), physicalCameraMode (CAMERA_DYNAMIC), 
 dragging (false), softDragging (false), remainingStepDuration (0.0f), debugMode (CS::Physics2::Bullet2::DEBUG_COLLIDERS)
@@ -38,7 +41,11 @@ void Simple::PrintHelp ()
   commandLineHelper.AddCommandLineOption
     ("soft", "Enable the soft bodies", csVariant (true));
   commandLineHelper.AddCommandLineOption
-    ("terrain", "Start with the terrain environment", csVariant ());
+    ("level", csString ().Format ("Define the level to be loaded, can be %s, %s, %s",
+				  CS::Quote::Single ("portals"),
+				  CS::Quote::Single ("box"),
+				  CS::Quote::Single ("terrain")),
+     csVariant ("portals"));
 
   // Printing help
   commandLineHelper.PrintApplicationHelp
@@ -115,7 +122,7 @@ void Simple::Frame ()
   {
     iCamera* c = view->GetCamera();
 
-    float cameraSpeed = environment == ENVIRONMENT_WALLS ? 4 : 30;
+    float cameraSpeed = environment == ENVIRONMENT_TERRAIN ? 30.0f : 4.0f;
     if (kbd->GetKeyState (CSKEY_SHIFT))
     {
       // If the user is holding down shift, the arrow keys will cause
@@ -798,9 +805,31 @@ bool Simple::OnInitialize (int argc, char* argv[])
     return ReportError ("Failed to locate ragdoll manager!");
 
   // Check which environment has to be loaded
-  if (clp->GetBoolOption ("terrain", false))
-    environment = ENVIRONMENT_TERRAIN;
+  csString levelName = clp->GetOption ("level");
+  if (levelName.IsEmpty ())
+    environment = ENVIRONMENT_PORTALS;
 
+  else
+  {
+    if (levelName == "portals")
+      environment = ENVIRONMENT_PORTALS;
+
+    else if (levelName == "box")
+      environment = ENVIRONMENT_BOX;
+
+    else if (levelName == "terrain")
+      environment = ENVIRONMENT_TERRAIN;
+
+    else
+    {
+      csPrintf ("Given level (%s) is not one of {%s, %s, %s}. Falling back to Portals\n",
+		CS::Quote::Single (levelName.GetData ()),
+		CS::Quote::Single ("portals"),
+		CS::Quote::Single ("box"),
+		CS::Quote::Single ("terrain"));
+      environment = ENVIRONMENT_PORTALS;
+    }
+  }
 
   if (!collisionSystem)
     return ReportError ("No bullet system plugin!");
@@ -833,15 +862,25 @@ bool Simple::Application ()
   bulletSector->SetDebugMode (debugMode);
 
   // Create the environment
-  if (environment == ENVIRONMENT_WALLS)
+  switch (environment)
   {
-    CreateWalls (csVector3 (5));
+  case ENVIRONMENT_PORTALS:
+    CreatePortalRoom ();
     view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -3));
-  }
-  else
-  {
-    CreateTerrain ();
+    break;
+    
+  case ENVIRONMENT_BOX:
+    CreateBoxRoom ();
+    view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -3));
+    break;
+    
+  case ENVIRONMENT_TERRAIN:
+    CreateTerrainRoom ();
     view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 30, -3));
+    break;
+
+  default:
+    break;
   }
 
   collisionSector->SetSector (room);
@@ -1105,16 +1144,19 @@ void Simple::GripContactBodies ()
     {
       if (pb->GetBodyType () == CS::Physics2::BODY_RIGID)
       {
+	printf ("touch\n");
         CS::Physics2::iRigidBody* rb = pb->QueryRigidBody ();
         csVector3 velo = pb->GetLinearVelocity ();
         velo = - velo;
-        rb->Disable ();
-        //rb->SetLinearVelocity (csVector3 (0,0,-1.0f));
+        //rb->Disable ();
+        rb->SetLinearVelocity (csVector3 (.0f,.0f,.0f));
+        rb->SetAngularVelocity (csVector3 (.0f,.0f,.0f));
       }
       else
       {
         CS::Physics2::iSoftBody* sb = pb->QuerySoftBody ();
-        sb->SetLinearVelocity (csVector3 (0,0,-1.0f));
+	sb->SetLinearVelocity (csVector3 (.0f,.0f,.0f));
+        //sb->SetLinearVelocity (csVector3 (0,0,-1.0f));
       }
     }
   }
@@ -2086,8 +2128,10 @@ CS::Physics2::iSoftBody* Simple::SpawnSoftBody (bool setVelocity /* = true */)
   return body;
 }
 
-void Simple::CreateWalls (const csVector3& radius)
+void Simple::CreateBoxRoom ()
 {
+  printf ("Loading box level...\n");
+
   // Default behavior from DemoApplication for the creation of the scene
   if (!DemoApplication::CreateRoom ())
     return;
@@ -2109,29 +2153,16 @@ void Simple::CreateWalls (const csVector3& radius)
     CS::Quote::Single ("stone"));
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
+/*
+  // This works too, but doesn't behave well with soft bodies
+  csRef<CS::Collision2::iCollisionObject> co = collisionSystem->CreateCollisionObject ();
+  csRef<CS::Collision2::iCollider> collider = collisionSystem->CreateColliderConcaveMesh (walls);
+  co->AddCollider (collider, localTrans);
+  co->RebuildObject ();
+  collisionSector->AddCollisionObject (co);
+*/
 
   csOrthoTransform t;
-
-#if 0
-  // Enabling this will work, however, mesh<->mesh collision
-  // requires a lot of hand tuning. When this is enabled,
-  // mesh objects created with 'm' will either sink through
-  // the floor, or stick in it.
-
-  // Some hints to make mesh<->mesh work better:
-  //  * Decrease the time step. 1/300th of a second minimum
-  //  * Slow down objects
-  //  * Play with softness, cfm, etc.
-#endif
-
-#if 0
-  // With ODE, mesh <-> plane doesn't work yet, so we will use boxes for each
-  // wall for now
-  for (int i = 0; i < walls_state->GetPolygonCount (); i++)
-  {
-    rb->AttachColliderPlane (walls_state->GetPolygonObjectPlane (i), 10, 0, 0);
-  }
-#endif
 
   csVector3 size (10.0f, 10.0f, 10.0f); // This should be the same size as the mesh.
   t.SetOrigin(csVector3(10.0f,0.0f,0.0f));
@@ -2232,9 +2263,143 @@ void Simple::CreateWalls (const csVector3& radius)
   CS::Lighting::SimpleStaticLighter::ShineLights (room, engine, 4);
 }
 
-void Simple::CreateTerrain ()
+void Simple::CreatePortalRoom ()
 {
-  printf ("Loading terrain...\n");
+  printf ("Loading portal level...\n");
+
+  // Default behavior from DemoApplication for the creation of the scene
+  if (!DemoApplication::CreateRoom ())
+    return;
+
+  // Create the box mesh of the room
+  using namespace CS::Geometry;
+  DensityTextureMapper mapper (0.3f);
+  TesselatedBox box (csVector3 (-5, -5, -5), csVector3 (5, 5, 5));
+  box.SetLevel (3);
+  box.SetMapper (&mapper);
+  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+  walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+    engine, room, "walls", "walls_factory", &box);
+
+  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
+    ReportWarning ("Could not load texture %s",
+    CS::Quote::Single ("stone"));
+  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
+  walls->GetMeshObject ()->SetMaterialWrapper (tm);
+
+  // Create the colliders of the room  
+  csVector3 size (10.0f, 10.0f, 10.0f);
+  csOrthoTransform transform;
+
+  csRef<CS::Collision2::iCollisionObject> co =
+    collisionSystem->CreateCollisionObject ();
+  csRef<CS::Collision2::iColliderBox> collider;
+
+  // Right wall (with a portal inside)
+  collider = collisionSystem->CreateColliderBox (csVector3 (4.0f, 2.0f, 4.0f));
+  transform.SetOrigin (csVector3 (7.0f, -4.0f, -3.0f));
+  co->AddCollider (collider, transform);
+
+  transform.SetOrigin (csVector3 (7.0f, -4.0f, 3.0f));
+  co->AddCollider (collider, transform);
+
+  collider = collisionSystem->CreateColliderBox (csVector3 (4.0f, 8.0f, 10.0f));
+  transform.SetOrigin (csVector3 (7.0f, 1.0f, 0.0f));
+  co->AddCollider (collider, transform);
+
+  // Floor (with a portal inside)
+  collider = collisionSystem->CreateColliderBox (csVector3 (6.0f, 4.0f, 4.0f));
+  transform.SetOrigin (csVector3 (-2.0f, -7.0f, 3.0f));
+  co->AddCollider (collider, transform);
+
+  transform.SetOrigin (csVector3 (2.0f, -7.0f, -3.0f));
+  co->AddCollider (collider, transform);
+
+  collider = collisionSystem->CreateColliderBox (csVector3 (4.0f, 4.0f, 6.0f));
+  transform.SetOrigin (csVector3 (3.0f, -7.0f, 2.0f));
+  co->AddCollider (collider, transform);
+
+  transform.SetOrigin (csVector3 (-3.0f, -7.0f, -2.0f));
+  co->AddCollider (collider, transform);
+
+  // Remaining walls
+  collider = collisionSystem->CreateColliderBox (size);
+  transform.SetOrigin (csVector3 (0.0f, 0.0f, 10.0f));
+  co->AddCollider (collider, transform);
+
+  transform.SetOrigin (csVector3 (0.0f, 0.0f, -10.0f));
+  co->AddCollider (collider, transform);
+
+  transform.SetOrigin (csVector3 (-10.0f, 0.0f, 0.0f));
+  co->AddCollider (collider, transform);
+
+  transform.SetOrigin (csVector3 (0.0f, 10.0f, 0.0f));
+  co->AddCollider (collider, transform);
+
+  co->RebuildObject ();
+  collisionSector->AddCollisionObject (co);
+
+  // Create the portal on the right wall
+  csPoly3D poly;
+  poly.AddVertex (csVector3 (0.0f, -1.0f, 1.0f));
+  poly.AddVertex (csVector3 (0.0f, 1.0f, 1.0f));
+  poly.AddVertex (csVector3 (0.0f, 1.0f, -1.0f));
+  poly.AddVertex (csVector3 (0.0f, -1.0f, -1.0f));
+  iPortal* portal;
+  csRef<iMeshWrapper> portalMesh =
+    engine->CreatePortal ("right_wall", room, csVector3 (4.999f, -4.0f, 0.0f),
+			  room, poly.GetVertices (), (int) poly.GetVertexCount (),
+			  portal);
+  portal->GetFlags ().Set (CS_PORTAL_ZFILL);
+  portal->GetFlags ().Set (CS_PORTAL_CLIPDEST);
+  portal->SetWarp (csOrthoTransform (csYRotMatrix3 (PI * 0.5f) * csZRotMatrix3 (PI * 0.5f),
+				     csVector3 (0.999f, 0.0f, -4.999f)));
+
+  // Create the portal on the floor
+  csPoly3D poly2;
+  poly2.AddVertex (csVector3 (-1.0f, 0.0f, 1.0f));
+  poly2.AddVertex (csVector3 (1.0f, 0.0f, 1.0f));
+  poly2.AddVertex (csVector3 (1.0f, 0.0f, -1.0f));
+  poly2.AddVertex (csVector3 (-1.0f, 0.0f, -1.0f));
+  csRef<iMeshWrapper> portalMesh2 =
+    engine->CreatePortal ("floor", room, csVector3 (0.0f, -4.999f, 0.0f),
+			  room, poly2.GetVertices (), (int) poly2.GetVertexCount (),
+			  portal);
+  portal->GetFlags ().Set (CS_PORTAL_ZFILL);
+  portal->GetFlags ().Set (CS_PORTAL_CLIPDEST);
+  portal->SetWarp (csOrthoTransform (csZRotMatrix3 (-PI * 0.5f) * csYRotMatrix3 (PI * 0.5f),
+				     csVector3 (0.0f, -4.999f, -0.999f)));
+
+  // Set our own lights
+  room->SetDynamicAmbientLight (csColor (0.3, 0.3, 0.3));
+
+  csRef<iLight> light;
+  iLightList* lightList = room->GetLights ();
+  lightList->RemoveAll ();
+
+  light = engine->CreateLight(0, csVector3(10), 9000, csColor (1));
+  lightList->Add (light);
+
+  light = engine->CreateLight (0, csVector3 (3, 0, 0), 8, csColor (1, 0, 0));
+  lightList->Add (light);
+
+  light = engine->CreateLight (0, csVector3 (-3, 0,  0), 8, csColor (0, 0, 1));
+  lightList->Add (light);
+
+  light = engine->CreateLight (0, csVector3 (0, 0, 3), 8, csColor (0, 1, 0));
+  lightList->Add (light);
+
+  light = engine->CreateLight (0, csVector3 (0, -3, 0), 8, csColor (1, 1, 0));
+  lightList->Add (light);
+
+  engine->Prepare ();
+  CS::Lighting::SimpleStaticLighter::ShineLights (room, engine, 4);
+}
+
+void Simple::CreateTerrainRoom ()
+{
+  printf ("Loading terrain level...\n");
 
   // Load the level file
   csRef<iVFS> VFS (csQueryRegistry<iVFS> (GetObjectRegistry ()));

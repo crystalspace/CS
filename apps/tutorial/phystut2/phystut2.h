@@ -106,8 +106,9 @@ private:
   CS::Physics2::iSoftBody* SpawnCloth ();
   CS::Physics2::iSoftBody* SpawnSoftBody (bool setVelocity = true);
 
-  void CreateWalls (const csVector3& radius);
-  void CreateTerrain ();
+  void CreateBoxRoom ();
+  void CreatePortalRoom ();
+  void CreateTerrainRoom ();
 
   void CreateGhostCylinder ();
   void GripContactBodies ();
