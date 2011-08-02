@@ -327,7 +327,10 @@ bool AvatarTest::OnInitialize (int argc, char* argv[])
 
   else
   {
-    if (sceneName == "krystal")
+    if (sceneName == "frankie")
+      avatarSceneType = MODEL_FRANKIE;
+
+    else if (sceneName == "krystal")
       avatarSceneType = MODEL_KRYSTAL;
 
     else if (sceneName == "sintel")
