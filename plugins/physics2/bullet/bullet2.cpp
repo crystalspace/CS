@@ -62,7 +62,7 @@ struct PointContactResult : public btCollisionWorld::ContactResultCallback
 };
 
 csBulletSector::csBulletSector (csBulletSystem* sys)
- :scfImplementationType (this), sys (sys), isSoftWorld (false),
+ :scfImplementationType (this), sys (sys), isSoftWorld (false), hitPortal (NULL),
  sector (NULL), softWorldInfo (NULL), worldTimeStep (1.0f / 60.0f),
  worldMaxSteps (1), linearDampening (0.0f), angularDampening (0.0f), linearDisableThreshold (0.8f),
  angularDisableThreshold (1.0f), timeDisableThreshold (0.0f), debugDraw (NULL), allFilter (-1)
@@ -243,29 +243,6 @@ void csBulletSector::RemovePortal (iPortal* portal)
 
 CS::Collision2::HitBeamResult csBulletSector::HitBeam (const csVector3& start, const csVector3& end)
 {
-  CS::Collision2::HitBeamResult result = HitBeamPortal (start, end);
-
-  if (result.hasHit)
-  {
-    if (result.object->GetObjectType () == CS::Collision2::COLLISION_OBJECT_GHOST)
-    {
-      csBulletCollisionObject* csObj = dynamic_cast<csBulletCollisionObject*> (result.object);
-      //Portals are not included.
-      for (size_t i = 0; i < portals.GetSize (); i++)
-      {
-        if (portals[i].ghostPortal == btGhostObject::upcast(csObj->btObject))
-        {
-          result.hasHit = false;
-          break;
-        }
-      }
-    }
-  }
-  return result;
-}
-
-CS::Collision2::HitBeamResult csBulletSector::HitBeamPortal (const csVector3& start, const csVector3& end)
-{
   btVector3 rayFrom = CSToBullet (start, sys->getInternalScale ());
   btVector3 rayTo = CSToBullet (end, sys->getInternalScale ());
 
@@ -278,6 +255,14 @@ CS::Collision2::HitBeamResult csBulletSector::HitBeamPortal (const csVector3& st
   {
     CS::Collision2::iCollisionObject* collObject = static_cast<CS::Collision2::iCollisionObject*> (
       rayCallback.m_collisionObject->getUserPointer ());
+
+    // It's a portal..
+    if (rayCallback.m_collisionObject->getInternalType () == btCollisionObject::CO_GHOST_OBJECT
+      && rayCallback.m_collisionObject->getUserPointer () == NULL)
+    {
+      collObject = NULL;
+      hitPortal = btGhostObject::upcast (rayCallback.m_collisionObject);
+    }
 
     if (rayCallback.m_collisionObject->getInternalType () == btCollisionObject::CO_SOFT_BODY)
     {
@@ -335,6 +320,49 @@ CS::Collision2::HitBeamResult csBulletSector::HitBeamPortal (const csVector3& st
     } // not softBody
   } //has hit
   return result;
+}
+
+CS::Collision2::HitBeamResult csBulletSector::HitBeamPortal (const csVector3& start, const csVector3& end)
+{
+  hitPortal = NULL;
+
+  CS::Collision2::HitBeamResult result = HitBeam (start, end);
+
+  if (result.hasHit && result.object == NULL && hitPortal)
+  {
+    //Portals are not included.
+    for (size_t i = 0; i < portals.GetSize (); i++)
+    {
+      if (portals[i].ghostPortal == hitPortal)
+      {
+        if (!portals[i].portal->CompleteSector (0))
+        {
+          result.hasHit = false;
+          return result;
+        }
+        else
+        {
+          csOrthoTransform warpWor;
+          csVector3 newStart = start;
+          csVector3 newEnd = end;
+          if (portals[i].portal->GetFlags ().Check (CS_PORTAL_WARP))
+          {
+            portals[i].portal->ObjectToWorld (
+              BulletToCS (hitPortal->getWorldTransform (), sys->getInverseInternalScale ()),
+              warpWor);
+            newStart = warpWor.Other2This (start);
+            newEnd = warpWor.Other2This (end);
+          }
+
+          result = portals[i].desSector->HitBeamPortal (newStart, newEnd);
+          return result;
+        }
+      }
+    }
+    
+  }
+  return result;
+
 }
 
 CS::Collision2::CollisionGroup& csBulletSector::CreateCollisionGroup (const char* name)
@@ -1033,7 +1061,8 @@ void csBulletSector::UpdateCollisionPortals ()
             csOrthoTransform trans;
             if (portals[i].portal->GetFlags ().Check (CS_PORTAL_WARP))
             {
-              trans = portals[i].portal->GetWarp ();
+              csOrthoTransform trans;
+              portals[i].portal->ObjectToWorld (rb->GetTransform (), trans);
               newBody->portalWarp = CSToBullet (trans.GetInverse (), sys->getInternalScale ());
             }
           }
@@ -1063,7 +1092,8 @@ void csBulletSector::UpdateCollisionPortals ()
           csOrthoTransform trans;
           if (portals[i].portal->GetFlags ().Check (CS_PORTAL_WARP))
           {
-            trans = portals[i].portal->GetWarp ();
+            csOrthoTransform trans;
+            portals[i].portal->ObjectToWorld (csBulletObj->GetTransform (), trans);
             newObject->portalWarp = CSToBullet (trans.GetInverse (), sys->getInternalScale ());
           }
         }

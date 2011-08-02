@@ -120,6 +120,8 @@ class csBulletSector : public scfImplementationExt3<
   CS::Collision2::CollisionGroupMask allFilter; 
   int systemFilterCount;
 
+  btGhostObject* hitPortal;
+
   void CheckCollisions();
 
   void UpdateCollisionPortals ();
