@@ -124,7 +124,7 @@ class csBulletSector : public scfImplementationExt3<
 
   void UpdateCollisionPortals ();
 
-  void SetInformationToCopy (csBulletCollisionObject* obj, csBulletCollisionObject* cpy);
+  void SetInformationToCopy (csBulletCollisionObject* obj, csBulletCollisionObject* cpy, iPortal* portal);
 
   void GetInformationFromCopy (csBulletCollisionObject* obj, csBulletCollisionObject* cpy, float duration);
 

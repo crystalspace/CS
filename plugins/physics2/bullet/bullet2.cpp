@@ -1030,6 +1030,12 @@ void csBulletSector::UpdateCollisionPortals ()
 
             rb->objectCopy = newBody;
             newBody->objectOrigin = rb;
+            csOrthoTransform trans;
+            if (portals[i].portal->GetFlags ().Check (CS_PORTAL_WARP))
+            {
+              trans = portals[i].portal->GetWarp ();
+              newBody->portalWarp = CSToBullet (trans.GetInverse (), sys->getInternalScale ());
+            }
           }
           else
           {
@@ -1053,10 +1059,17 @@ void csBulletSector::UpdateCollisionPortals ()
 
           csBulletObj->objectCopy = newObject;
           newObject->objectOrigin = csBulletObj;
+
+          csOrthoTransform trans;
+          if (portals[i].portal->GetFlags ().Check (CS_PORTAL_WARP))
+          {
+            trans = portals[i].portal->GetWarp ();
+            newObject->portalWarp = CSToBullet (trans.GetInverse (), sys->getInternalScale ());
+          }
         }
       }
       // And set the transform and record old transforms.
-      SetInformationToCopy (csBulletObj, newObject);
+      SetInformationToCopy (csBulletObj, newObject, portals[i].portal);
       portals[i].oldTrans.Push (csObj->GetTransform ());
     }
 
@@ -1070,7 +1083,9 @@ void csBulletSector::UpdateCollisionPortals ()
   }
 }
 
-void csBulletSector::SetInformationToCopy (csBulletCollisionObject* obj, csBulletCollisionObject* cpy)
+void csBulletSector::SetInformationToCopy (csBulletCollisionObject* obj, 
+                                           csBulletCollisionObject* cpy, 
+                                           iPortal* portal)
 {
   // TODO warp the transform.
   if (obj->type == CS::Collision2::COLLISION_OBJECT_PHYSICAL)
@@ -1080,6 +1095,10 @@ void csBulletSector::SetInformationToCopy (csBulletCollisionObject* obj, csBulle
     {
       csBulletRigidBody* btCopy = dynamic_cast<csBulletRigidBody*> (cpy->QueryPhysicalBody ()->QueryRigidBody ());
       csBulletRigidBody* rb = dynamic_cast<csBulletRigidBody*> (pb->QueryRigidBody ());
+
+      csOrthoTransform trans = rb->GetTransform ();
+      if (portal->GetFlags ().Check (CS_PORTAL_WARP))
+        portal->ObjectToWorld (rb->GetTransform (), trans);
 
       btCopy->SetTransform (rb->GetTransform ());
 
@@ -1115,10 +1134,12 @@ void csBulletSector::GetInformationFromCopy (csBulletCollisionObject* obj,
       csBulletRigidBody* rb = dynamic_cast<csBulletRigidBody*> (pb->QueryRigidBody ());
       if (rb->GetState () == CS::Physics2::STATE_DYNAMIC)
       {
-        rb->btBody->internalGetDeltaLinearVelocity ()+= btCopy->btBody->internalGetDeltaLinearVelocity ();
-        rb->btBody->internalGetDeltaAngularVelocity ()+= btCopy->btBody->internalGetDeltaAngularVelocity ();
-        rb->btBody->internalGetPushVelocity ()+= btCopy->btBody->internalGetPushVelocity ();
-        rb->btBody->internalGetTurnVelocity ()+= btCopy->btBody->internalGetTurnVelocity ();
+        btQuaternion qua = cpy->portalWarp.getRotation ();
+
+        rb->btBody->internalGetDeltaLinearVelocity ()+= quatRotate (qua, btCopy->btBody->internalGetDeltaLinearVelocity ());
+        rb->btBody->internalGetDeltaAngularVelocity ()+= quatRotate (qua, btCopy->btBody->internalGetDeltaAngularVelocity ());
+        rb->btBody->internalGetPushVelocity ()+= quatRotate (qua, btCopy->btBody->internalGetPushVelocity ());
+        rb->btBody->internalGetTurnVelocity ()+= quatRotate (qua, btCopy->btBody->internalGetTurnVelocity ());
         // I don't know if there are any other parameters exist.
         rb->btBody->internalWritebackVelocity (duration);
       }

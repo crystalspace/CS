@@ -20,6 +20,8 @@
 */
 
 #include "cssysdef.h"
+#include "iengine/scenenode.h"
+#include "iengine/mesh.h"
 
 // Bullet includes.
 #include "btBulletDynamicsCommon.h"
@@ -54,6 +56,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
       // Update movable
       movable->SetFullTransform (tr);
       movable->UpdateMove ();
+
+      if (body->objectCopy)
+        movable->GetSceneNode ()->QueryMesh ()->PlaceMesh ();
     }
   }
 

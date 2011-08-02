@@ -18,6 +18,7 @@ type (CS::Collision2::COLLISION_OBJECT_BASE), haveStaticColliders(0)
 {
   btTransform identity;
   identity.setIdentity ();
+  portalWarp.setIdentity ();
   motionState = new csBulletMotionState (this, identity, identity);
 }
 
