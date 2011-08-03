@@ -59,7 +59,13 @@ private:
   bool              _decodersStarted;
   bool              _audiobuf_ready;
 
+  struct cachedData
+  {
 
+
+  };
+
+  csFIFO<cachedData> cache;
   size_t cacheSize;
   
 public:

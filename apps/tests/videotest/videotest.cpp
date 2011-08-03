@@ -146,7 +146,7 @@ bool VideoTest::Application ()
   // Specifying -1 as index triggers auto stream activation
   // We only select the video stream for now, because audio streaming doesn't 
   // work properly with threading ATM
-  mediaPlayer->SetActiveStream (0);
+  mediaPlayer->SetActiveStream (-1);
   mediaPlayer->GetTargetTexture (logoTex);
   mediaPlayer->Loop (false);
   mediaPlayer->Play ();

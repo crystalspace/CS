@@ -120,7 +120,6 @@ public:
   virtual void CleanMedia () ;
   virtual bool Update () ;
   virtual void WriteData () ;
-  void WriteData2 () ;
   virtual void SetCacheSize(size_t size) ;
 
   virtual void SwapBuffers() ;

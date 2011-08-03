@@ -80,6 +80,9 @@ double TheoraAudioMedia::GetPosition () const
 
 bool TheoraAudioMedia::Update ()
 {
+  if (cache.GetSize ()>=cacheSize)
+    return false;
+    
   _audiobuf_ready=false;
   while (_vorbis_p && !_audiobuf_ready)
   {
@@ -123,6 +126,10 @@ bool TheoraAudioMedia::Update ()
     //cout<<vorbis_granule_time (&vd,ogg_page_granulepos (og))<<endl;
     return 0;
   }
+  cachedData buff;
+
+  cache.Push (buff);
+
   return 1;
 }
 
@@ -190,6 +197,7 @@ void TheoraAudioMedia::InitializeStream (ogg_stream_state &state, vorbis_info &i
 
 void TheoraAudioMedia::WriteData ()
 {
+  cache.PopTop ();
 }
 
 
@@ -201,13 +209,13 @@ void TheoraAudioMedia::SetCacheSize(size_t size)
 
 bool TheoraAudioMedia::HasDataReady()
 {
-  /*if(cache.GetSize ()!=0)
-    return true;*/
+  if(cache.GetSize ()!=0)
+    return true;
   return false;
 }
 bool TheoraAudioMedia::IsCacheFull()
 {
-  /*if(cache.GetSize ()>=cacheSize)
-    return true;*/
+  if(cache.GetSize ()>=cacheSize)
+    return true;
   return false;
 }

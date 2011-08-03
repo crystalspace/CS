@@ -284,12 +284,6 @@ void TheoraVideoMedia::InitializeStream (ogg_stream_state &state, th_info &info,
   canSwap=false;
 }
 
-
-void TheoraVideoMedia::WriteData2 ()
-{
-
-}
-
 void TheoraVideoMedia::WriteData ()
 {
   MutexScopedLock lock (writeMutex);
