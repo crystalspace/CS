@@ -682,7 +682,7 @@ bool Simple::OnMouseDown (iEvent &event)
     // Trace the physical beam
     CS::Collision2::HitBeamResult hitResult =
       collisionSector->HitBeam (startBeam, endBeam);
-    if (!hitResult.hasHit)
+    if (!hitResult.hasHit && hitResult.object)
       return false;
 
     // Check if we hit a rigid body

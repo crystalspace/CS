@@ -131,6 +131,9 @@ void csBulletRigidBody::RemoveBulletObject ()
     rb = dynamic_cast<csBulletRigidBody*> (objectOrigin);
     if (objectOrigin)
       rb->objectCopy = NULL;
+
+    objectCopy = NULL;
+    objectOrigin = NULL;
   }
 }
 

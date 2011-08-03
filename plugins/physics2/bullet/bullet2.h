@@ -50,6 +50,7 @@ struct CollisionPortal
   CollisionPortal (iPortal* portal) : portal (portal), desSector (NULL), ghostPortal (NULL) {}
   ~CollisionPortal () {
     if (ghostPortal) 
+      delete ghostPortal->getCollisionShape ();
       delete ghostPortal;
     }
   void AddObject (csRef<csBulletCollisionObject> object) {objects.Push (object);}
@@ -80,7 +81,7 @@ class csBulletSector : public scfImplementationExt3<
   csWeakRefArray<csBulletSoftBody> anchoredSoftBodies;
   csRef<csBulletCollisionActor> collisionActor;
   csRefArray<csBulletJoint> joints;
-  csArray<CollisionPortal> portals;
+  csArray<CollisionPortal*> portals;
   csBulletDebugDraw* debugDraw;
   btDynamicsWorld* bulletWorld;
   btCollisionDispatcher* dispatcher;
@@ -148,7 +149,7 @@ public:
   virtual void AddPortal(iPortal* portal);
   virtual void RemovePortal(iPortal* portal);
 
-  virtual void SetSector(iSector* sector) {this->sector = sector;}
+  virtual void SetSector(iSector* sector);
   virtual iSector* GetSector(){return sector;}
 
   virtual CS::Collision2::HitBeamResult HitBeam(const csVector3& start, 

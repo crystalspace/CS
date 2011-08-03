@@ -417,11 +417,6 @@ void csBulletCollisionObject::RemoveBulletObject ()
         sector->bulletWorld->removeRigidBody (btRigidBody::upcast(btObject));
         delete btObject;
         btObject = NULL;
-
-        if (objectCopy)
-          objectCopy->sector->RemoveCollisionObject (objectCopy);
-        if (objectOrigin)
-          objectOrigin->objectCopy = NULL;
       }
     }
     else
@@ -431,6 +426,12 @@ void csBulletCollisionObject::RemoveBulletObject ()
       btObject = NULL;
     }
     insideWorld = false;
+
+    if (objectCopy)
+      objectCopy->sector->RemoveCollisionObject (objectCopy);
+    if (objectOrigin)
+      objectOrigin->objectCopy = NULL;
+
     objectCopy = NULL;
     objectOrigin = NULL;
   }
