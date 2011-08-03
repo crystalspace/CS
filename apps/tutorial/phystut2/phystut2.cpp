@@ -2271,6 +2271,9 @@ void Simple::CreatePortalRoom ()
   if (!DemoApplication::CreateRoom ())
     return;
 
+  // Setup the engine sector corresponding to our collision sector
+  collisionSector->SetSector (room);
+
   // Create the box mesh of the room
   using namespace CS::Geometry;
   DensityTextureMapper mapper (0.3f);
@@ -2340,6 +2343,9 @@ void Simple::CreatePortalRoom ()
   co->RebuildObject ();
   collisionSector->AddCollisionObject (co);
 
+  // Debug the identity transform
+  CS::Debug::VisualDebuggerHelper::DebugTransform (GetObjectRegistry (), csOrthoTransform (), true);
+
   // Create the portal on the right wall
   csPoly3D poly;
   poly.AddVertex (csVector3 (0.0f, -1.0f, 1.0f));
@@ -2356,6 +2362,14 @@ void Simple::CreatePortalRoom ()
   portal->SetWarp (csOrthoTransform (csYRotMatrix3 (PI * 0.5f) * csZRotMatrix3 (PI * 0.5f),
 				     csVector3 (0.999f, 0.0f, -4.999f)));
 
+  // Create a collision portal
+  collisionSector->AddPortal (portal);
+
+  // Debug the inverse of the warp transform
+  CS::Debug::VisualDebuggerHelper::DebugTransform
+    (GetObjectRegistry (), (csOrthoTransform (csYRotMatrix3 (PI * 0.5f) * csZRotMatrix3 (PI * 0.5f),
+					      csVector3 (0.999f, 0.0f, -4.999f))).GetInverse(), true);
+
   // Create the portal on the floor
   csPoly3D poly2;
   poly2.AddVertex (csVector3 (-1.0f, 0.0f, 1.0f));
@@ -2370,6 +2384,14 @@ void Simple::CreatePortalRoom ()
   portal->GetFlags ().Set (CS_PORTAL_CLIPDEST);
   portal->SetWarp (csOrthoTransform (csZRotMatrix3 (-PI * 0.5f) * csYRotMatrix3 (PI * 0.5f),
 				     csVector3 (0.0f, -4.999f, -0.999f)));
+
+  // Create a collision portal
+  collisionSector->AddPortal (portal);
+
+  // Debug the inverse of the warp transform
+  CS::Debug::VisualDebuggerHelper::DebugTransform
+    (GetObjectRegistry (), (csOrthoTransform (csZRotMatrix3 (-PI * 0.5f) * csYRotMatrix3 (PI * 0.5f),
+					      csVector3 (0.0f, -4.999f, -0.999f))).GetInverse(), true);
 
   // Set our own lights
   room->SetDynamicAmbientLight (csColor (0.3, 0.3, 0.3));
