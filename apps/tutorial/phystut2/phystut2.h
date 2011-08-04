@@ -49,7 +49,6 @@ private:
   int physicalCameraMode;
   csRef<CS::Physics2::iRigidBody> cameraBody;
   csRef<CS::Collision2::iCollisionActor> cameraActor;
-  float rotX, rotY, rotZ;
 
   // Ragdoll related
   csRef<CS::Animation::iSkeletonRagdollNodeManager> ragdollManager;

@@ -1021,15 +1021,6 @@ void Simple::UpdateCameraMode ()
       physicalSector->RemoveRigidBody (cameraBody);
       cameraBody = 0;
 
-      // Update rotX, rotY, rotZ
-      csQuaternion quaternion;
-      quaternion.SetMatrix
-        (((csReversibleTransform) view->GetCamera ()->GetTransform ()).GetT2O ());
-      csVector3 eulerAngles = quaternion.GetEulerAngles ();
-      rotX = eulerAngles.x;
-      rotY = eulerAngles.y;
-      rotZ = eulerAngles.z;
-
       // Update the display of the dynamics debugger
       //dynamicsDebugger->UpdateDisplay ();
 
