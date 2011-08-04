@@ -901,7 +901,7 @@ iSector *csSector::FollowSegment (
   csVector3 &new_position,
   bool &mirror,
   bool only_portals,
-  iPortal** transversed_portals,
+  iPortal** crossed_portals,
   iMeshWrapper** portal_meshes,
   int firstIndex, int* lastIndex)
 {
@@ -932,22 +932,33 @@ iSector *csSector::FollowSegment (
 
         if (po->GetFlags ().Check (CS_PORTAL_WARP))
         {
-	  csReversibleTransform warp_wor;
-	  po->ObjectToWorld (mesh->GetMovable ()->GetTransform (), warp_wor);
-          po->WarpSpace (warp_wor, t, mirror);
-          new_position = po->Warp (warp_wor, new_position);
-        }
+	  // Change the position to be reached in order to get relative
+          // to the position of the portal
+	  new_position =
+	    mesh->GetMovable ()->GetTransform ().Other2This (new_position);
 
-        if(transversed_portals && portal_meshes && lastIndex && firstIndex <= *lastIndex)
+	  // Compute the warp transform of the portal relatively to the origin of the coordinate system
+	  // TODO: this won't work if the portal has been moved since iPortal::SetWarp was called
+	  csOrthoTransform warpTransform =
+	    po->GetWarp ().GetInverse () * mesh->GetMovable ()->GetTransform ();
+
+	  // Warp the position to be reached
+	  new_position = warpTransform.This2Other (new_position);
+
+	  // Update the transform of the starting position
+	  t *= warpTransform;
+	}
+
+        if (crossed_portals && portal_meshes && lastIndex && firstIndex <= *lastIndex)
         {
-            transversed_portals[firstIndex] = po;
+            crossed_portals[firstIndex] = po;
             portal_meshes[firstIndex] = mesh;
             ++firstIndex;
         }
 
         iSector *dest_sect = po->GetSector ();
         return dest_sect->FollowSegment (t, new_position, mirror, only_portals,
-            transversed_portals, portal_meshes, firstIndex, lastIndex);
+            crossed_portals, portal_meshes, firstIndex, lastIndex);
       }
       else
       {
@@ -960,7 +971,7 @@ iSector *csSector::FollowSegment (
     }
   }
 
-  if(lastIndex)
+  if (lastIndex)
     *lastIndex = --firstIndex;
 
   return (iSector*)this;

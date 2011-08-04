@@ -305,7 +305,7 @@ public:
 
   virtual iSector* FollowSegment (csReversibleTransform& t,
     csVector3& new_position, bool& mirror, bool only_portals = false,
-    iPortal** transversed_portals = 0, iMeshWrapper** portal_meshes = 0,
+    iPortal** crossed_portals = 0, iMeshWrapper** portal_meshes = 0,
     int firstIndex = 0, int* lastIndex = 0);
   /** @} */
 
