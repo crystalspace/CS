@@ -144,24 +144,18 @@ void Simple::Frame ()
       // _camera's_ X axis (more on this in a second) and up and down
       // arrows cause the camera to go forwards and backwards.
       if (kbd->GetKeyState (CSKEY_RIGHT))
-        rotY += speed;
+	c->GetTransform ().RotateThis (csVector3 (0.0f, 1.0f, 0.0f), speed);
       if (kbd->GetKeyState (CSKEY_LEFT))
-        rotY -= speed;
+	c->GetTransform ().RotateThis (csVector3 (0.0f, 1.0f, 0.0f), -speed);
       if (kbd->GetKeyState (CSKEY_PGUP))
-        rotX -=speed;
+	c->GetTransform ().RotateThis (csVector3 (1.0f, 0.0f, 0.0f), -speed);
       if (kbd->GetKeyState (CSKEY_PGDN))
-        rotX += speed;
+	c->GetTransform ().RotateThis (csVector3 (1.0f, 0.0f, 0.0f), speed);
       if (kbd->GetKeyState (CSKEY_UP))
         c->Move (CS_VEC_FORWARD * cameraSpeed * speed);
       if (kbd->GetKeyState (CSKEY_DOWN))
         c->Move (CS_VEC_BACKWARD * cameraSpeed * speed);
     }
-
-    // We now assign a new rotation transformation to the camera.
-    csQuaternion quaternion;
-    quaternion.SetEulerAngles (csVector3 (rotX, rotY, rotZ));
-    csOrthoTransform ot (quaternion.GetConjugate ().GetMatrix (), c->GetTransform().GetOrigin ());
-    c->SetTransform (ot);
   }
 
   if (dragging)
@@ -2237,7 +2231,7 @@ void Simple::CreateBoxRoom ()
   physicalSector->AddRigidBody (rb);
   rb->SetState (CS::Physics2::STATE_STATIC);
 
-  // Set our own lights
+  // Set up some lights
   room->SetDynamicAmbientLight (csColor (0.3, 0.3, 0.3));
 
   csRef<iLight> light;
@@ -2359,16 +2353,16 @@ void Simple::CreatePortalRoom ()
 			  portal);
   portal->GetFlags ().Set (CS_PORTAL_ZFILL);
   portal->GetFlags ().Set (CS_PORTAL_CLIPDEST);
-  portal->SetWarp (csOrthoTransform (csYRotMatrix3 (PI * 0.5f) * csZRotMatrix3 (PI * 0.5f),
-				     csVector3 (0.999f, 0.0f, -4.999f)));
+  portal->SetWarp (csOrthoTransform (csYRotMatrix3 (-PI * 0.5f) * csZRotMatrix3 (PI * 0.5f),
+				     csVector3 (1.0f, 0.0f, 4.999f)));
 
   // Create a collision portal
   collisionSector->AddPortal (portal);
 
   // Debug the inverse of the warp transform
   CS::Debug::VisualDebuggerHelper::DebugTransform
-    (GetObjectRegistry (), (csOrthoTransform (csYRotMatrix3 (PI * 0.5f) * csZRotMatrix3 (PI * 0.5f),
-					      csVector3 (0.999f, 0.0f, -4.999f))).GetInverse(), true);
+    (GetObjectRegistry (), (csOrthoTransform (csYRotMatrix3 (-PI * 0.5f) * csZRotMatrix3 (PI * 0.5f),
+					      csVector3 (1.0f, 0.0f, 4.999f))).GetInverse(), true);
 
   // Create the portal on the floor
   csPoly3D poly2;
@@ -2383,7 +2377,7 @@ void Simple::CreatePortalRoom ()
   portal->GetFlags ().Set (CS_PORTAL_ZFILL);
   portal->GetFlags ().Set (CS_PORTAL_CLIPDEST);
   portal->SetWarp (csOrthoTransform (csZRotMatrix3 (-PI * 0.5f) * csYRotMatrix3 (PI * 0.5f),
-				     csVector3 (0.0f, -4.999f, -0.999f)));
+				     csVector3 (0.0f, -4.999f, -1.0f)));
 
   // Create a collision portal
   collisionSector->AddPortal (portal);
@@ -2391,9 +2385,9 @@ void Simple::CreatePortalRoom ()
   // Debug the inverse of the warp transform
   CS::Debug::VisualDebuggerHelper::DebugTransform
     (GetObjectRegistry (), (csOrthoTransform (csZRotMatrix3 (-PI * 0.5f) * csYRotMatrix3 (PI * 0.5f),
-					      csVector3 (0.0f, -4.999f, -0.999f))).GetInverse(), true);
+					      csVector3 (0.0f, -4.999f, -1.0f))).GetInverse(), true);
 
-  // Set our own lights
+  // Set up some lights
   room->SetDynamicAmbientLight (csColor (0.3, 0.3, 0.3));
 
   csRef<iLight> light;
@@ -2454,8 +2448,9 @@ void Simple::CreateTerrainRoom ()
     return;
   }
 
-  // Create a terrain collider for each cell of the terrain
-  csRef<CS::Collision2::iColliderTerrain> terrainCollider = collisionSystem->CreateColliderTerrain (terrain);
+  // Create a terrain collider
+  csRef<CS::Collision2::iColliderTerrain> terrainCollider =
+    collisionSystem->CreateColliderTerrain (terrain);
   csRef<CS::Collision2::iCollisionObject> co = collisionSystem->CreateCollisionObject ();
   co->AddCollider (terrainCollider, localTrans);
   co->RebuildObject ();
