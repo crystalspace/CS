@@ -456,6 +456,11 @@ struct iSector : public virtual iBase
    * \param firstIndex The starting index where the portals will be stored in the
    * \a crossed_portals and \a portal_meshes lists.
    * \param lastIndex The place where will be stored the index of the last portal crossed
+   *
+   * \warning The \a crossed_portals and \a portal_meshes arrays must be allocated to a
+   * sufficient size
+   * \warning The \a crossed_portals and \a portal_meshes arrays won't be filled with crossed
+   * portals if \a lastIndex is not provided
    */
   virtual iSector* FollowSegment (csReversibleTransform& t,
       csVector3& new_position, bool& mirror, bool only_portals = false,
