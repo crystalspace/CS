@@ -436,17 +436,30 @@ struct iSector : public virtual iBase
    * These should be used as the new camera transformation when you decide to
    * really go to the new position.<p>
    *
-   * This function returns the resulting sector and new_position will be set
+   * This function returns the resulting sector, and \a new_position will be set
    * to the last position that you can go to before hitting a wall.<p>
    *
-   * If only_portals is true then only portals will be checked. This
+   * If \a only_portals is true then only portals will be checked. This
    * means that intersection with normal polygons is not checked. This
    * is a lot faster but it does mean that you need to use another
    * collision detection system to test with walls.
+   *
+   * \param t The transform to the start of the segment
+   * \param new_position The end of the segment, in world coordinates
+   * \param mirror Unused parameter...
+   * \param only_portals Whether the collision has to be checked only with the portals, or also
+   * with all meshes
+   * \param crossed_portals The list where will be stored all portals that are crossed during
+   * the following of this segment
+   * \param portal_meshes The list where will be stored the portal container of all the portals
+   * that are crossed during the following of this segment
+   * \param firstIndex The starting index where the portals will be stored in the
+   * \a crossed_portals and \a portal_meshes lists.
+   * \param lastIndex The place where will be stored the index of the last portal crossed
    */
   virtual iSector* FollowSegment (csReversibleTransform& t,
       csVector3& new_position, bool& mirror, bool only_portals = false,
-      iPortal** transversed_portals = 0, iMeshWrapper** portal_meshes = 0,
+      iPortal** crossed_portals = 0, iMeshWrapper** portal_meshes = 0,
       int firstIndex = 0, int* lastIndex = 0) = 0;
   /** @} */
 
