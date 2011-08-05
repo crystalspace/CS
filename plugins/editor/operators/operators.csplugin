@@ -4,23 +4,17 @@
   <scf>
     <classes>
       <class>
-        <name>cs.editor.operator.test</name>
-        <implementation>TestOperatorFactory</implementation>
-        <description>Test operator</description>
-      </class>
-      
-      <class>
         <name>cs.editor.operator.select</name>
-        <implementation>SelectOperatorFactory</implementation>
-        <description></description>
+        <implementation>SelectOperator</implementation>
+        <label>Select</label>
+        <description>Select something</description>
       </class>
-      
       <class>
         <name>cs.editor.operator.move</name>
-        <implementation>MoveOperatorFactory</implementation>
-        <description></description>
+        <implementation>MoveOperator</implementation>
+        <label>Move an object</label>
+        <description>Move an object operator</description>
       </class>
-      
     </classes>
   </scf>
 </plugin>

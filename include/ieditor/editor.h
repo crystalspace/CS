@@ -38,6 +38,7 @@ namespace EditorApp {
 struct iObjectList;
 struct iViewManager;
 struct iMenuBar;
+struct iSpaceManager;
 
 /// Listens for map actions
 struct iMapListener : public virtual iBase
@@ -66,7 +67,7 @@ struct iEditor : public virtual iBase
   virtual wxWindow* GetWindow () = 0;
 
   /// Get the panel manager associated with this editor
-  virtual iViewManager* GetViewManager () const = 0;
+  virtual iSpaceManager* GetSpaceManager () const = 0;
 
   /// Get the panel manager associated with this editor
   virtual iMenuBar* GetMenuBar () const = 0;

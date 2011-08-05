@@ -21,7 +21,6 @@
 
 #include <csutil/objreg.h>
 
-#include "ieditor/operator.h"
 
 
 #include "menubar.h"
@@ -120,8 +119,9 @@ MenuOperatorItem::MenuOperatorItem (MenuBar* menuBar, wxMenu* menu, const char* 
   : scfImplementationType (this), menuBar(menuBar), menu(menu), item(0), identifier(identifier)
 {
   csRef<iOperatorManager> operatorManager = csQueryRegistry<iOperatorManager> (menuBar->object_reg);
-  wxString label(operatorManager->GetLabel(identifier), wxConvUTF8);
-  wxString help(operatorManager->GetDescription(identifier), wxConvUTF8);
+  op = operatorManager->Create(identifier);
+  wxString label(op->GetLabel(), wxConvUTF8);
+  wxString help(op->GetDescription(), wxConvUTF8);
   item = menu->Append(wxID_ANY, label, help);
   
   menuBar->GetwxMenuBar()->GetParent()->Connect(item->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MenuOperatorItem::OnToggle), 0, this);
@@ -137,7 +137,7 @@ MenuOperatorItem::~MenuOperatorItem ()
 void MenuOperatorItem::OnToggle (wxCommandEvent& event)
 {
   csRef<iOperatorManager> operatorManager = csQueryRegistry<iOperatorManager> (menuBar->object_reg);
-  operatorManager->Execute(identifier.c_str());
+  operatorManager->Execute(op);
 }
 
 wxMenuItem* MenuOperatorItem::GetwxMenuItem () const

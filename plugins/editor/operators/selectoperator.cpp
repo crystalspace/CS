@@ -43,11 +43,26 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {
+  
+SCF_IMPLEMENT_FACTORY (SelectOperator)
 
-SelectOperator::SelectOperator (iObjectRegistry* obj_reg)
- : scfImplementationType (this), object_reg(obj_reg)
+SelectOperator::SelectOperator (iBase* parent)
+ : scfImplementationType (this, parent)
 {
 }
+
+bool SelectOperator::Initialize (iObjectRegistry* obj_reg, const char* identifier, const char* label, const char* desc)
+{
+  this->object_reg = obj_reg;
+  this->identifier = identifier;
+  this->label = label;
+  this->desc = desc;
+  return true;
+}
+
+const char* SelectOperator::GetIdentifier () { return identifier; }
+const char* SelectOperator::GetLabel () { return label; }
+const char* SelectOperator::GetDescription () { return desc; }
 
 SelectOperator::~SelectOperator ()
 {

@@ -38,6 +38,8 @@
 
 #include "editor.h"
 
+#include "window.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {
 
@@ -52,7 +54,7 @@ Editor::~Editor ()
 {
   delete helper_meshes;
 
-  viewManager->Uninitialize ();
+  spaceManager->Uninitialize ();
 
   // Remove ourself from object registry
   object_reg->Unregister (this, "iEditor");
@@ -104,13 +106,13 @@ bool Editor::Initialize (iObjectRegistry* reg)
   
   // Create the main frame
   mainFrame = new MainFrame (object_reg, this, wxT (""), wxDefaultPosition, wxSize (1024, 768));
-
-  menuBar.AttachNew (new MenuBar (object_reg, mainFrame->GetMenuBar ()));
-  mainFrame->Show ();
   
+  menuBar.AttachNew (new MenuBar (object_reg, mainFrame->GetMenuBar ()));
+
   operatorManager.AttachNew (new OperatorManager (object_reg));
-  viewManager.AttachNew (new AUIViewManager (object_reg, mainFrame));
+  spaceManager.AttachNew (new SpaceManager (object_reg, mainFrame));
   settingsManager.AttachNew (new SettingsManager (object_reg, mainFrame));
+  
 
   return true;
 }
@@ -120,8 +122,8 @@ bool Editor::StartEngine ()
   // Request every standard plugin except for OpenGL/WXGL canvas
   if (!csInitializer::RequestPlugins (object_reg,
         CS_REQUEST_VFS,
-	CS_REQUEST_PLUGIN ("crystalspace.graphics2d.wxgl", iGraphics2D),
-	CS_REQUEST_OPENGL3D,
+        CS_REQUEST_PLUGIN ("crystalspace.graphics2d.wxgl", iGraphics2D),
+        CS_REQUEST_OPENGL3D,
         CS_REQUEST_ENGINE,
         CS_REQUEST_FONTSERVER,
         CS_REQUEST_IMAGELOADER,
@@ -193,6 +195,8 @@ bool Editor::StartEngine ()
               "Failed to locate iGraphics3d!");
     return false;
   }
+  
+  mainFrame->Show (true);
 
   csRef<iWxWindow> wxwin = scfQueryInterface<iWxWindow> (g3d->GetDriver2D ());
   if(!wxwin)
@@ -221,7 +225,17 @@ bool Editor::StartApplication ()
   mainCollection = engine->CreateCollection ("Main collection");
 
   mainFrame->Initialize ();
-  viewManager->Initialize ();
+  spaceManager->Initialize ();
+  
+  Window* m_splitter = new Window(object_reg, mainFrame);
+  
+  wxBoxSizer* box = new wxBoxSizer(wxHORIZONTAL);
+  box->Add(m_splitter, 1, wxEXPAND | wxALL, 0);
+  mainFrame->SetSizer(box);
+  box->SetSizeHints(mainFrame);
+  
+  //Reset size.
+  mainFrame->SetSize (wxSize(1024, 768));
 
   // Analyze the command line arguments
   csRef<iCommandLineParser> cmdline =

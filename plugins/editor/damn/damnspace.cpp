@@ -44,7 +44,7 @@
 
 #include <wx/mstream.h>
 
-#include "damnview.h"
+#include "damnspace.h"
 
 #include "json/json.h"
 
@@ -57,34 +57,25 @@ const int ICONSIZE = 128;
 
 CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {
-  
-SCF_IMPLEMENT_FACTORY (DAMNView)
 
-BEGIN_EVENT_TABLE(DAMNView, wxPanel)
-  EVT_SIZE(DAMNView::OnSize)
+BEGIN_EVENT_TABLE(DAMNSpace, wxPanel)
+  EVT_SIZE(DAMNSpace::OnSize)
 END_EVENT_TABLE()
 
+SCF_IMPLEMENT_FACTORY (DAMNSpace)
 
-DAMNView::DAMNView (iBase* parent)
- : scfImplementationType (this, parent), sizer(0), srchCtrl(0), previewList(0)
+DAMNSpace::DAMNSpace (iBase* parent)
+ : scfImplementationType (this, parent), object_reg(0), sizer(0), srchCtrl(0), prespaceList(0)
 {
 }
 
-bool DAMNView::Initialize (iObjectRegistry* obj_reg)
+bool DAMNSpace::Initialize (iObjectRegistry* obj_reg, iSpaceFactory* fact, wxWindow* parent)
 {
   object_reg = obj_reg;
+  factory = fact;
   
-  viewManager = csQueryRegistry<iViewManager> (object_reg);
-  if (!viewManager)
-    return false;
-
   editor = csQueryRegistry<iEditor> (object_reg);
-  if (!editor)
-    return false;
-
   actionManager = csQueryRegistry<iActionManager> (object_reg);
-  if (!actionManager)
-    return false;
   
   using namespace CS::Network::HTTP;  
   plugmgr = csQueryRegistry<iPluginManager> (object_reg);
@@ -92,70 +83,66 @@ bool DAMNView::Initialize (iObjectRegistry* obj_reg)
   damn = csLoadPlugin<iResourceManager> (plugmgr, "crystalspace.resources.managers.damn");
   
   csRef<iFormatAbstractor> abs = scfQueryInterface<iFormatAbstractor>(damn);
-  abs->AddAbstraction("preview", "format=image/png&sizex=128&sizey=128&angley=1.54");
+  abs->AddAbstraction("prespace", "format=image/png&sizex=128&sizey=128&angley=1.54");
   abs->AddAbstraction("image", "format=image/png&sizex=512&sizey=512");
   abs->AddAbstraction("mesh", "format=application/x-crystalspace.library%2Bxml");
 
-  // Create the view
-  Create (editor->GetWindow (), -1, wxPoint (0, 0), wxSize (ICONSIZE*2, 250));
+  // Create the space
+  Create (parent, -1/*, wxPoint (0, 0), wxSize (ICONSIZE*2, 250)*/);
 
-  // Add it to the view manager
-  viewManager->AddView (this);
-  
   wxBoxSizer* box = new wxBoxSizer(wxVERTICAL);
-  SetSizer(box);
- 
-  srchCtrl = new wxSearchCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxSize(250, -1), 0);
+  
+  srchCtrl = new wxSearchCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxSize(-1, -1), 0);
   srchCtrl->ShowCancelButton(true);
   
-  this->Connect(srchCtrl->GetId(), wxEVT_COMMAND_SEARCHCTRL_SEARCH_BTN, wxCommandEventHandler(DAMNView::OnSearchButton), 0, this);
-  this->Connect(srchCtrl->GetId(), wxEVT_COMMAND_SEARCHCTRL_CANCEL_BTN, wxCommandEventHandler(DAMNView::OnCancelButton), 0, this);
+  this->Connect(srchCtrl->GetId(), wxEVT_COMMAND_SEARCHCTRL_SEARCH_BTN, wxCommandEventHandler(DAMNSpace::OnSearchButton), 0, this);
+  this->Connect(srchCtrl->GetId(), wxEVT_COMMAND_SEARCHCTRL_CANCEL_BTN, wxCommandEventHandler(DAMNSpace::OnCancelButton), 0, this);
   box->Add(srchCtrl, 0, wxTOP|wxEXPAND, 0);
   
   
-  previewList = new wxScrolledWindow(this);
-  previewList->SetScrollbars(0, 1, 0, 0);
-  box->Add(previewList, 1, wxALL|wxEXPAND, 0);
+  prespaceList = new wxScrolledWindow(this);
+  prespaceList->SetScrollbars(0, 1, 0, 0);
+  box->Add(prespaceList, 1, wxALL|wxEXPAND, 0);
+  
+  //prespaceList->SetBackgroundColour(*wxRED);
   
   sizer = new wxGridSizer(1, 2, 0, 0);
-  previewList->SetSizer(sizer);
-    
+  prespaceList->SetSizer(sizer);
+  sizer->SetSizeHints(prespaceList);
+  
+  
+  SetSizer(box);
+  box->SetSizeHints(this);
+  
   return true;
 }
 
-DAMNView::~DAMNView ()
+DAMNSpace::~DAMNSpace ()
 {
+  printf("DAMNSpace::~DAMNSpace\n");
 }
 
-wxWindow* DAMNView::GetWindow ()
+wxWindow* DAMNSpace::GetWindow ()
 {
   return this;
 }
 
-const wxChar* DAMNView::GetCaption () const
-{
-  return wxT("DAMN View");
-}
-
-ViewDockPosition DAMNView::GetDefaultDockPosition () const
-{
-  return DockPositionRight;
-}
-
-void DAMNView::OnSize (wxSizeEvent& event)
+void DAMNSpace::OnSize (wxSizeEvent& event)
 {
   // Resize the tree control
   /*if (listCtrl)
     listCtrl->SetSize (event.GetSize());*/
   if (sizer)
   {
-    //TODO: this should really be in the previewList::OnSize
+    //TODO: this should really be in the prespaceList::OnSize
     sizer->SetCols(std::max(1, event.GetSize().GetWidth()/128));
   }
+  //SetSize(event.GetSize());
+  printf("DAMNSpace::OnSize %d - %d\n", event.GetSize().GetWidth(), event.GetSize().GetHeight());
   event.Skip();
 }
 
-void DAMNView::OnLoaded (iLoadingResource* resource)
+void DAMNSpace::OnLoaded (iLoadingResource* resource)
 {
   if (resource->Get()) {
     csRef<iImage> image = scfQueryInterface<iImage>(resource->Get());
@@ -166,18 +153,18 @@ void DAMNView::OnLoaded (iLoadingResource* resource)
       subName =  found->second;
     }
     
-    Preview* preview = new Preview(previewList, image, subName);
-    sizer->Add(preview, 1, wxSHAPED);
-    previewList->FitInside();
+    Preview* prespace = new Preview(prespaceList, image, subName);
+    sizer->Add(prespace, 1, wxSHAPED);
+    prespaceList->FitInside();
   }
   meter->Step();
   if (meter->GetCurrent () == meter->GetTotal ())
     meter->SetProgressDescription("DAMN: ", "Done.");
 }
 
-void DAMNView::OnSearchButton (wxCommandEvent& event)
+void DAMNSpace::OnSearchButton (wxCommandEvent& event)
 {
-  printf("DAMNView::OnSearchButton %s\n", (const char*)srchCtrl->GetValue().mb_str());
+  printf("DAMNSpace::OnSearchButton %s\n", (const char*)srchCtrl->GetValue().mb_str());
   std::string searchTerm((const char*)srchCtrl->GetValue().mb_str());
   
   if (searchTerm == "") searchTerm = "shield";
@@ -221,7 +208,7 @@ void DAMNView::OnSearchButton (wxCommandEvent& event)
         std::string pk = root[index]["pk"].asString();
         std::string subName = root[index]["fields"]["subName"].asString();
         //printf("test1 %s\n", pk.c_str());
-        csRef<iLoadingResource> image = damn->Get(CS::Resource::GetTypeID ("image"), (pk+"::preview").c_str());
+        csRef<iLoadingResource> image = damn->Get(CS::Resource::GetTypeID ("image"), (pk+"::prespace").c_str());
         searchResults[image] = subName;
         image->AddListener(this);
       }
@@ -238,7 +225,7 @@ void DAMNView::OnSearchButton (wxCommandEvent& event)
 
 }
 
-void DAMNView::OnCancelButton (wxCommandEvent& event)
+void DAMNSpace::OnCancelButton (wxCommandEvent& event)
 {
    printf("success c\n");
    csRef<iLoadingResource> image = damn->Get(CS::Resource::GetTypeID ("factory"), "782b83441a749df48b085f35655558700d1f1f17::mesh");
@@ -295,11 +282,11 @@ void Preview::OnClicked (wxCommandEvent& event)
 
 void Preview::OnSize (wxSizeEvent& event)
 {
-/*
-  printf("Preview::OnSize %d - %d\n", event.GetSize().GetWidth(), event.GetSize().GetHeight());
-  bitmapBtn->SetSize (event.GetSize());
-  event.Skip();
-*/
+  /*printf("Preview::OnSize %d - %d\n", event.GetSize().GetWidth(), event.GetSize().GetHeight());
+  SetSize (event.GetSize());
+  Layout();
+  sizer->Layout();
+  event.Skip();*/
 }
 
   // ----------------------------------------------------------------------------

@@ -19,7 +19,7 @@
 #ifndef __CORE_CS3DPANEL_H__
 #define __CORE_CS3DPANEL_H__
 
-#include "ieditor/view.h"
+#include "ieditor/space.h"
 #include "ieditor/editor.h"
 
 #include "csutil/scf_implementation.h"
@@ -28,6 +28,7 @@
 #include "iutil/eventh.h"
 #include "csutil/eventnames.h"
 #include "cstool/collider.h"
+#include <csutil/weakref.h>
 
 #include <wx/event.h>
 #include <wx/dnd.h>
@@ -35,25 +36,24 @@
 
 class wxWindow;
 
+using namespace CS::EditorApp;
+
 CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {
 
-//#include "data/editor/images/meshIcon.xpm"
-
-class CS3DView : public scfImplementation4<CS3DView,CS::EditorApp::iView,CS::EditorApp::iMapListener,iEventHandler,iComponent>
+class CS3DSpace : public scfImplementation1<CS3DSpace,iSpace>
 {
 public:
-  CS3DView (iBase* parent);
-  virtual ~CS3DView();
+  CS3DSpace (iBase* parent);
+  virtual ~CS3DSpace();
 
-  // iComponent
-  virtual bool Initialize (iObjectRegistry* obj_reg);
-
-  // iView
+  // iSpace
+  virtual bool Initialize (iObjectRegistry* obj_reg, iSpaceFactory* fact, wxWindow* parent);
+  virtual iSpaceFactory* GetFactory () const { return factory; }
   virtual wxWindow* GetWindow ();
-  virtual const wxChar* GetCaption () const;
-  virtual CS::EditorApp::ViewDockPosition GetDefaultDockPosition () const;
-  
+  virtual void DisableUpdates (bool val) { disabled = val; }
+  bool disabled;
+
 
   // iMapListener
   virtual void OnMapLoaded (const char* path, const char* filename);
@@ -69,14 +69,14 @@ public:
   
 private:
   iObjectRegistry* object_reg;
+  csRef<iSpaceFactory> factory;
 
   wxWindow* window;
   
   // mouse pos of operation action start
   csVector2 opstartpos, mousepos;
 
-  csRef<CS::EditorApp::iEditor> editor;
-  csRef<CS::EditorApp::iViewManager> viewManager;
+  csRef<iEditor> editor;
   
   csRef<iEngine> engine;
   csRef<iGraphics3D> g3d;
@@ -84,7 +84,8 @@ private:
   csRef<iKeyboardDriver> kbd;
   csRef<iCollideSystem> cdsys;
   csRef<iEventQueue> q;
-  csRef< ::iView> view;
+  csRef<iWxWindow> wxwin;
+  csRef<iView> view;
   
   /// Our collider used for gravity and CD.
   csColliderActor collider_actor;
@@ -99,33 +100,55 @@ private:
   virtual void FinishFrame ();
   
 
-  CS_EVENTHANDLER_NAMES("crystalspace.editor.plugin.core.cs3dview")
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
+  struct EventHandler : public scfImplementation1<EventHandler,iEventHandler>
+  {
+    CS3DSpace* space;
+    EventHandler(CS3DSpace* space) : scfImplementationType (this), space(space) {}
+    virtual bool HandleEvent (iEvent& ev) { return space->HandleEvent(ev); }
+    CS_EVENTHANDLER_NAMES("crystalspace.editor.plugin.core.cs3dspace")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
+  };
+  friend struct EventHandler;
+  csRef<EventHandler> eventHandler;
+  
+  struct MapListener : public scfImplementation1<MapListener,iMapListener>
+  {
+    CS3DSpace* space;
+    MapListener(CS3DSpace* space) : scfImplementationType (this), space(space) {}
+    virtual void OnMapLoaded (const char* path, const char* filename) { space->OnMapLoaded (path, filename);  }
+    virtual void OnLibraryLoaded (const char* path, const char* filename, iCollection* collection) { space->OnLibraryLoaded (path, filename, collection);  }
+    CS_EVENTHANDLER_NAMES("crystalspace.editor.plugin.core.cs3dspace")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
+  };
+  friend struct MapListener;
+  csRef<MapListener> mapListener;
+  
+  
   
   class Pump : public wxTimer
   {
   public:
-    Pump (CS3DView* p) : view (p) {}
+    Pump (CS3DSpace* p) : space (p) {}
     
     virtual void Notify ()
-    { view->PushFrame (); }
+    { space->PushFrame (); }
   private:
-    CS3DView* view;
+    CS3DSpace* space;
   };
 
   Pump* pump;
 
-  class View : public wxPanel
+  class Space : public wxPanel
   {
     public:
-      View(CS3DView* p, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize)
-      : wxPanel (parent, id, pos, size), view(p)
+      Space(CS3DSpace* p, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize)
+      : wxPanel (parent, id, pos, size), space(p)
       {}
     
       virtual void OnSize (wxSizeEvent& ev)
-      { view->OnSize (ev); }
+      { if (space) space->OnSize (ev); }
     private:
-      CS3DView* view;
+      CS3DSpace* space;
       
       DECLARE_EVENT_TABLE()
   };
@@ -134,7 +157,7 @@ private:
   class MyDropTarget : public wxDropTarget
   {
   public:
-    MyDropTarget (CS3DView* view) : view (view)
+    MyDropTarget (CS3DSpace* space) : space (space)
     {
       //data = new EditorDataObject ();
       //SetDataObject (data);
@@ -154,7 +177,7 @@ private:
         return wxDragNone;
       //iEditorObject* obj = data->GetEditorObject ();
       //printf ("You dropped a %s\n", obj->GetName ());
-      //view->OnDrop (x, y, obj);
+      //space->OnDrop (x, y, obj);
       
       return def;
     }
@@ -164,7 +187,7 @@ private:
     { return def; }
     
     private:
-      csRef<CS3DView> view;
+      csWeakRef<CS3DSpace> space;
       //EditorDataObject* data;
   };
   

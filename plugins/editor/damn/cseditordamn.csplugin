@@ -4,9 +4,10 @@
   <scf>
     <classes>
       <class>
-        <name>crystalspace.editor.plugin.damn.damnview</name>
-        <implementation>DAMNView</implementation>
-        <description>DAMN Asset Browsing View</description>
+        <name>crystalspace.editor.plugin.damn.damnspace</name>
+        <implementation>DAMNSpace</implementation>
+        <description>DAMN View</description>
+        <allowMultiple>true</allowMultiple>
       </class>
       
       <class>

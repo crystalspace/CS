@@ -33,10 +33,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 class SelectOperator : public scfImplementation1<SelectOperator,iOperator>
 {
 public:
-  SelectOperator (iObjectRegistry* obj_reg);
+  SelectOperator (iBase* parent);
   virtual ~SelectOperator ();
 
   // iOperator
+  virtual bool Initialize (iObjectRegistry* obj_reg, const char* identifier, const char* label, const char* desc);
+  virtual const char* GetIdentifier ();
+  virtual const char* GetLabel ();
+  virtual const char* GetDescription ();
+  
   virtual bool Poll (iContext*);
   virtual OperatorState Execute (iContext*);
   virtual OperatorState Invoke (iContext*, iEvent*);
@@ -44,9 +49,10 @@ public:
 
 private:
   iObjectRegistry* object_reg;
+  csString identifier;
+  csString label;
+  csString desc;
 };
-
-CS_EDITOR_IMPLEMENT_OPERATOR(SelectOperator, "cs.editor.operator.select", "Select", "Select something");
 
 class SelectObjectAction : public scfImplementation1<SelectObjectAction, iAction>
 {

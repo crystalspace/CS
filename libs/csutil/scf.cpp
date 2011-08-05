@@ -150,6 +150,7 @@ public:
   virtual const char *GetClassDescription (const char *iClassID);
   virtual const char *GetClassDependencies (const char *iClassID);
   virtual csRef<iDocument> GetPluginMetadata (char const *iClassID);
+  virtual csRef<iDocumentNode> GetPluginMetadataNode (char const *iClassID);
   virtual bool UnregisterClass (const char *iClassID);
   virtual void UnloadUnusedModules ();
   virtual void ScanPluginsPath (const char* path, bool recursive = false,
@@ -1241,6 +1242,28 @@ csRef<iDocument> csSCF::GetPluginMetadata (char const *iClassID)
       csGetPluginMetadata (get_library_name(cf->LibraryName), metadata);
   }
   return metadata;
+}
+
+csRef<iDocumentNode> csSCF::GetPluginMetadataNode (char const *iClassID)
+{
+  csRef<iDocument> doc = GetPluginMetadata (iClassID);
+  csRef<iDocumentNode> node;
+  if (doc
+      && (node = doc->GetRoot()) 
+      && (node = node->GetNode("plugin")) 
+      && (node = node->GetNode("scf")) 
+      && (node = node->GetNode("classes")))
+  {
+    csRef<iDocumentNodeIterator > it = node->GetNodes("class");
+    while (it->HasNext()) 
+    {
+      csRef<iDocumentNode> klass = it->Next ();
+      if (klass && (node = klass->GetNode("name")) 
+          && !strcmp(iClassID, node->GetContentsValue ()))
+        return klass;
+    }
+  }
+  return csRef<iDocumentNode>();
 }
 
 bool csSCF::ClassRegistered (const char *iClassID)

@@ -23,6 +23,7 @@
 #include <iutil/plugin.h>
 
 #include <csutil/csevent.h>
+#include <iutil/document.h>
 
 #include "operatormanager.h"
 
@@ -78,35 +79,67 @@ bool OperatorManager::HandleEvent(iEvent& ev)
   return false;
 } 
 
-iOperator* OperatorManager::Execute (const char* identifier)
+csPtr<iOperator> OperatorManager::Create (const char* identifier)
 {
-  printf("OperatorManager::Execute %s\n", identifier);
-  csRef<iOperatorFactory> oper = GetOperator(identifier);
-  if (!oper) return 0;
+  csRef<OperatorMeta> meta = operatorMeta.Get(identifier, csRef<OperatorMeta>());
+  if (!meta)
+  {
+    csRef<iDocumentNode> klass = iSCF::SCF->GetPluginMetadataNode(identifier);
+    if (klass)
+    {
+      meta.AttachNew (new OperatorMeta());
+      csRef<iDocumentNode> label = klass->GetNode("label");
+      if (label) meta->label = label->GetContentsValue ();
+      csRef<iDocumentNode> description = klass->GetNode("description");
+      if (description) meta->description = description->GetContentsValue ();
+      operatorMeta.PutUnique(identifier, meta);
+    }
+  }
+  if (!meta)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.managers.operator", "Failed to load metadata for operator '%s'", identifier);
+    return 0;
+  }
+  csRef<iBase> base = iSCF::SCF->CreateInstance(identifier);
+  if (!base)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.managers.operator", "Failed to instantiate operator '%s'", identifier);
+    return 0;
+  }
+  csRef<iOperator> ref = scfQueryInterface<iOperator> (base);
+  if (!ref)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.managers.operator", "Not of type iOperator: '%s'", identifier);
+    return 0;
+  }
+  ref->Initialize(object_reg, identifier, meta->label, meta->description);
+
+  return csPtr<iOperator> (ref);
+}
+
+iOperator* OperatorManager::Execute (iOperator* op)
+{
+  printf("OperatorManager::Execute %s\n", op->GetIdentifier ());
   csRef<iContext> context = csQueryRegistry<iContext> (object_reg);
-  csRef<iOperator> op = oper->Create();
   if (op->Poll(context))
   {
     if (op->Execute(context) == OperatorRunningModal)
     {
-      printf("OperatorManager::Execute MODAL %s\n", identifier);
+      printf("OperatorManager::Execute MODAL %s\n", op->GetIdentifier ());
       modalOperator = op;
     }
   }
   else
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,"crystalspace.managers.operator", "Poll failed for '%s'", identifier);
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,"crystalspace.managers.operator", "Poll failed for '%s'", op->GetIdentifier ());
   }
   return op;
 }
 
-iOperator* OperatorManager::Invoke (const char* identifier, iEvent* ev)
+iOperator* OperatorManager::Invoke (iOperator* op, iEvent* ev)
 {
-  printf("OperatorManager::Invoke %s\n", identifier);
-  csRef<iOperatorFactory> oper = GetOperator(identifier);
-  if (!oper) return 0;
+  printf("OperatorManager::Invoke %s %s %s\n",  op->GetIdentifier (), op->GetLabel (), op->GetDescription ());
   csRef<iContext> context = csQueryRegistry<iContext> (object_reg);
-  csRef<iOperator> op = oper->Create();
   if (op->Poll(context))
   {
     if (op->Invoke(context, ev) == OperatorRunningModal)
@@ -116,23 +149,9 @@ iOperator* OperatorManager::Invoke (const char* identifier, iEvent* ev)
   }
   else
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,"crystalspace.managers.operator", "Poll failed for '%s'", identifier);
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,"crystalspace.managers.operator", "Poll failed for '%s'", op->GetIdentifier ());
   }
   return op;
-}
-
-const char* OperatorManager::GetLabel (const char* identifier)
-{
-  csRef<iOperatorFactory> oper = GetOperator(identifier);
-  if (!oper) return "??? ???";
-  return oper->GetLabel();
-}
-
-const char* OperatorManager::GetDescription (const char* identifier)
-{
-  csRef<iOperatorFactory> oper = GetOperator(identifier);
-  if (!oper) return "??? ???";
-  return oper->GetDescription();
 }
 
 void OperatorManager::Uninitialize ()
@@ -143,24 +162,6 @@ void OperatorManager::Initialize ()
 {
 }
 
-void OperatorManager::Register(const char* identifier, iOperatorFactory* oper)
-{
-  printf("OperatorManager::Register %s\n", identifier);
-  operatorFactories.PutUnique(identifier, oper);
-}
-
-csRef<iOperatorFactory> OperatorManager::GetOperator (const char* identifier)
-{
-  csRef<iOperatorFactory> oper = operatorFactories.Get(identifier, csRef<iOperatorFactory>());
-  if (!oper)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.editor", "Attempt to fetch operator '%s' failed!",
-        identifier);
-  }
-
-  return oper;
-}
 
 } // namespace EditorApp
 } // namespace CS

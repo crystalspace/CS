@@ -1,12 +1,13 @@
 <?xml version="1.0"?>
-<!-- cseditorviews.csplugin -->
+<!-- cseditorspaces.csplugin -->
 <plugin>
   <scf>
     <classes>
       <class>
-        <name>crystalspace.editor.plugin.core.cs3dview</name>
-        <implementation>CS3DView</implementation>
-        <description>CSEditor 3D View</description>
+        <name>crystalspace.editor.plugin.core.cs3dspace</name>
+        <implementation>CS3DSpace</implementation>
+        <description>3D View</description>
+        <allowMultiple>false</allowMultiple>
       </class>
       <!--
       <class>

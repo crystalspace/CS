@@ -28,6 +28,7 @@
 #include <map>
 
 #include "ieditor/menubar.h"
+#include "ieditor/operator.h"
 
 namespace CS {
 namespace EditorApp {
@@ -95,6 +96,7 @@ private:
   wxMenu* menu;
   wxMenuItem* item;
   std::string identifier;
+  csRef<iOperator> op;
 };
 
 class Menu : public scfImplementation1<Menu,iMenu>, public wxEvtHandler

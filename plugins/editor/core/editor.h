@@ -29,7 +29,7 @@
 #include "iutil/comp.h"
 #include "csutil/refarr.h"
 
-#include "auiviewmanager.h"
+#include "spacemanager.h"
 #include "mainframe.h"
 #include "menubar.h"
 
@@ -59,8 +59,8 @@ public:
   inline virtual wxWindow* GetWindow ()
   { return static_cast<wxWindow*> (mainFrame); }
 
-  inline virtual iViewManager* GetViewManager () const
-  { return viewManager; }
+  inline virtual iSpaceManager* GetSpaceManager () const
+  { return spaceManager; }
 
   inline virtual iMenuBar* GetMenuBar () const
   { return menuBar; }
@@ -101,7 +101,7 @@ private:
 
   csRef<iContext> context;
   
-  csRef<AUIViewManager> viewManager;
+  csRef<SpaceManager> spaceManager;
   csRef<MenuBar> menuBar;
   csRef<iSettingsManager> settingsManager;
   csRef<iActionManager> actionManager;

@@ -30,6 +30,7 @@
 
 // -- Forward declarations
 struct iDocument;
+struct iDocumentNode;
 #if defined(CS_DEBUG) || defined(CS_MEMORY_TRACKER)
   struct iObjectRegistry;
 #endif
@@ -211,7 +212,7 @@ typedef iBase* (*scfFactoryFunc)(iBase*);
  */
 struct iSCF : public virtual iBase
 {
-  SCF_INTERFACE(iSCF, 3,0,0);
+  SCF_INTERFACE(iSCF, 4,0,0);
   /**
    * This is the global instance of iSCF.  On most platforms, this variable is
    * module-global; for instance, the application has an iSCF::SCF variable,
@@ -319,6 +320,13 @@ struct iSCF : public virtual iBase
    * csGetPluginMetadata() (csutil/csshlib.h) to retrieve its meta information.
    */
   virtual csRef<iDocument> GetPluginMetadata (char const *iClassID) = 0;
+  
+  /**
+   * Given a registered class name, returns the meta information associated
+   * with the iClassID rather than the whole plugin module.
+   * (it will return the <class> node for the given iClassID)
+   */
+  virtual csRef<iDocumentNode> GetPluginMetadataNode (char const *iClassID) = 0;
 
   /**
   * Unload all unused shared libraries (also called inside scfCreateInstance).

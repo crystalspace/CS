@@ -44,6 +44,8 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {
+
+SCF_IMPLEMENT_FACTORY (MoveOperator)
   
 bool SoftTransform(iObject* obj, csReversibleTransform transform)
 {
@@ -59,10 +61,23 @@ bool SoftTransform(iObject* obj, csReversibleTransform transform)
   return true; 
 }
 
-MoveOperator::MoveOperator (iObjectRegistry* obj_reg)
- : scfImplementationType (this), object_reg(obj_reg)
+MoveOperator::MoveOperator (iBase* parent)
+ : scfImplementationType (this, parent)
 {
 }
+
+bool MoveOperator::Initialize (iObjectRegistry* obj_reg, const char* identifier, const char* label, const char* desc)
+{
+  this->object_reg = obj_reg;
+  this->identifier = identifier;
+  this->label = label;
+  this->desc = desc;
+  return true;
+}
+
+const char* MoveOperator::GetIdentifier () { return identifier; }
+const char* MoveOperator::GetLabel () { return label; }
+const char* MoveOperator::GetDescription () { return desc; }
 
 MoveOperator::~MoveOperator ()
 {

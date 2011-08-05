@@ -34,10 +34,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 class MoveOperator : public scfImplementation1<MoveOperator,iOperator>
 {
 public:
-  MoveOperator (iObjectRegistry* obj_reg);
+  MoveOperator (iBase* parent);
   virtual ~MoveOperator ();
 
   // iOperator
+  virtual bool Initialize (iObjectRegistry* obj_reg, const char* identifier, const char* label, const char* desc);
+  virtual const char* GetIdentifier ();
+  virtual const char* GetLabel ();
+  virtual const char* GetDescription ();
+  
   virtual bool Poll (iContext*);
   virtual OperatorState Execute (iContext*);
   virtual OperatorState Invoke (iContext*, iEvent*);
@@ -45,13 +50,14 @@ public:
 
 private:
   iObjectRegistry* object_reg;
+  csString identifier;
+  csString label;
+  csString desc;
   csVector3 worldStart;
   
   OperatorState Commit (iContext* ctx, iMeshWrapper* mesh);
   csReversibleTransform GetOperationTransform(csVector3 worldDiff);
 };
-
-CS_EDITOR_IMPLEMENT_OPERATOR(MoveOperator, "cs.editor.operator.move", "Move an object", "Move an object operator");
 
 class MoveObjectAction : public scfImplementation1<MoveObjectAction, iAction>
 {

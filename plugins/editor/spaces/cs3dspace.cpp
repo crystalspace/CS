@@ -44,7 +44,7 @@
 #include "ivideo/natwin.h"
 #include "ivideo/wxwin.h"
 
-#include "cs3dview.h"
+#include "cs3dspace.h"
 
 #include "ieditor/context.h"
 #include "ieditor/operator.h"
@@ -55,58 +55,36 @@
 CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {
 
-SCF_IMPLEMENT_FACTORY (CS3DView);
-
-BEGIN_EVENT_TABLE(CS3DView::View, wxPanel)
-  EVT_SIZE(CS3DView::View::OnSize)
+BEGIN_EVENT_TABLE(CS3DSpace::Space, wxPanel)
+  EVT_SIZE(CS3DSpace::Space::OnSize)
 END_EVENT_TABLE()
 
+SCF_IMPLEMENT_FACTORY (CS3DSpace)
 
-CS3DView::CS3DView (iBase* parent)
- : scfImplementationType (this, parent), initializedColliderActor (false)
-{
+CS3DSpace::CS3DSpace (iBase* parent)
+ : scfImplementationType (this, parent), object_reg(0), initializedColliderActor (false)
+{  
 }
 
-bool CS3DView::Initialize (iObjectRegistry* obj_reg)
+bool CS3DSpace::Initialize (iObjectRegistry* obj_reg, iSpaceFactory* fact, wxWindow* parent)
 {
   object_reg = obj_reg;
+  factory = fact;
   
-  viewManager = csQueryRegistry<CS::EditorApp::iViewManager> (object_reg);
-  if (!viewManager)
-    return false;
-
-  editor = csQueryRegistry<CS::EditorApp::iEditor> (object_reg);
-  if (!editor)
-    return false;
-
+  editor = csQueryRegistry<iEditor> (object_reg);
   engine = csQueryRegistry<iEngine> (object_reg);
-  if (!engine)
-    return false;
-  
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
-  if (!g3d)
-    return false;
-
   vc = csQueryRegistry<iVirtualClock> (object_reg);
-  if (!vc)
-    return false;
-
   cdsys = csQueryRegistry<iCollideSystem> (obj_reg);
-  if (!cdsys)
-    return false;
-
   kbd = csQueryRegistry<iKeyboardDriver> (obj_reg);
-  if (!kbd)
-    return false;
-
   q = csQueryRegistry<iEventQueue> (object_reg);
-  if (!q)
-    return false;
+
+disabled = false;
 
   iGraphics2D* g2d = g3d->GetDriver2D ();
   g2d->AllowResize (true);
 
-  csRef<iWxWindow> wxwin = scfQueryInterface<iWxWindow> (g2d);
+  wxwin = scfQueryInterface<iWxWindow> (g2d);
   if( !wxwin )
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -114,20 +92,20 @@ bool CS3DView::Initialize (iObjectRegistry* obj_reg)
               "Canvas is no iWxWindow plugin!");
     return false;
   }
-  window = new CS3DView::View (this, editor->GetWindow (), -1, wxPoint(0,0), wxSize(200,150));
+
+  window = new CS3DSpace::Space (this, parent, -1, wxPoint(0,0), wxSize(-1,-1));
   wxwin->SetParent (window);
   
-  window->SetDropTarget (new MyDropTarget (this));
-  
-  // Add it to the view manager
-  viewManager->AddView (this);
-  
-  view = csPtr< ::iView> (new csView (engine, g3d));
+  //window->SetDropTarget (new MyDropTarget (this));
+
+  view = csPtr<iView> (new csView (engine, g3d));
   view->SetAutoResize (false);
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   // Let editor know we're interested in map load events
-  editor->AddMapListener (this);
+  //editor->AddMapListener (this);
+  mapListener.AttachNew(new MapListener(this));
+  editor->AddMapListener (mapListener);
   
   //iEventNameRegistry* name_reg = csEventNameRegistry::GetRegistry (object_reg);
   // Register the event handler
@@ -139,8 +117,8 @@ bool CS3DView::Initialize (iObjectRegistry* obj_reg)
     csevInput (object_reg),
     CS_EVENTLIST_END
   };
-  
-  q->RegisterListener (this, events);
+  eventHandler.AttachNew(new EventHandler(this));
+  q->RegisterListener (eventHandler, events);
   
   /* This triggers a timer event every 20 milliseconds, which will yield
   a maximum framerate of 1000/20 = 50 FPS.  Obviously if it takes longer
@@ -158,28 +136,19 @@ bool CS3DView::Initialize (iObjectRegistry* obj_reg)
   return true;
 }
 
-CS3DView::~CS3DView()
+CS3DSpace::~CS3DSpace()
 {
-  q->RemoveListener (this);
+  printf("CS3DSpace::~CS3DSpace\n");
+  q->RemoveListener (eventHandler);
   delete pump;
 }
 
-wxWindow* CS3DView::GetWindow ()
+wxWindow* CS3DSpace::GetWindow ()
 {
   return window;
 }
 
-const wxChar* CS3DView::GetCaption () const
-{
-  return wxT("3D View");
-}
-
-CS::EditorApp::ViewDockPosition CS3DView::GetDefaultDockPosition () const
-{
-  return CS::EditorApp::DockPositionCenter;
-}
-
-bool CS3DView::HandleEvent (iEvent& ev)
+bool CS3DSpace::HandleEvent (iEvent& ev)
 {
   iEventNameRegistry* name_reg = csEventNameRegistry::GetRegistry (object_reg);
   
@@ -187,29 +156,32 @@ bool CS3DView::HandleEvent (iEvent& ev)
   if (ev.Name == csevFrame(name_reg))
   {
     ProcessFrame ();
-    FinishFrame ();
+    if (!disabled) FinishFrame ();
     return false; //Let other handlers have a say too
   }
+  DisableUpdates(false);
   
   bool mouse_down = ev.Name == csevMouseDown (name_reg, 0);
   if (mouse_down && csMouseEventHelper::GetButton (&ev) == 1)
   {
-    printf("CS3DView::HandleEvent mouse_down\n");
-    csRef<CS::EditorApp::iContext> context = csQueryRegistry<CS::EditorApp::iContext> (object_reg);
+    printf("CS3DSpace::HandleEvent mouse_down\n");
+    csRef<iContext> context = csQueryRegistry<iContext> (object_reg);
     context->SetCamera(view->GetCamera ());
-    csRef<CS::EditorApp::iOperatorManager> operatorManager = csQueryRegistry<CS::EditorApp::iOperatorManager> (object_reg);
-    operatorManager->Invoke("cs.editor.operator.select", &ev);
+    csRef<iOperatorManager> operatorManager = csQueryRegistry<iOperatorManager> (object_reg);
+    csRef<iOperator> op = operatorManager->Create("cs.editor.operator.select");
+    operatorManager->Invoke(op, &ev);
     return true;
   }
   if (CS_IS_KEYBOARD_EVENT(object_reg, ev)) 
   {
     if (csKeyEventHelper::GetCookedCode (&ev) == 'G')
     {
-      printf("CS3DView::HandleEvent csKeyEventHelper\n");
-      csRef<CS::EditorApp::iContext> context = csQueryRegistry<CS::EditorApp::iContext> (object_reg);
+      printf("CS3DSpace::HandleEvent csKeyEventHelper\n");
+      csRef<iContext> context = csQueryRegistry<iContext> (object_reg);
       context->SetCamera(view->GetCamera ());
-      csRef<CS::EditorApp::iOperatorManager> operatorManager = csQueryRegistry<CS::EditorApp::iOperatorManager> (object_reg);
-      operatorManager->Invoke("cs.editor.operator.move", &ev);
+      csRef<iOperatorManager> operatorManager = csQueryRegistry<iOperatorManager> (object_reg);
+      csRef<iOperator> op = operatorManager->Create("cs.editor.operator.move");
+      operatorManager->Invoke(op, &ev);
       return true;
     }
   }
@@ -217,7 +189,7 @@ bool CS3DView::HandleEvent (iEvent& ev)
   return false;
 }
 
-void CS3DView::MoveCamera ()
+void CS3DSpace::MoveCamera ()
 {
   if (!initializedColliderActor)
     return;
@@ -267,7 +239,7 @@ void CS3DView::MoveCamera ()
 
 }
 
-void CS3DView::ProcessFrame ()
+void CS3DSpace::ProcessFrame ()
 {
   MoveCamera ();
   
@@ -284,7 +256,7 @@ void CS3DView::ProcessFrame ()
   csTransform tr_w2c = view->GetCamera ()->GetTransform ();
   int fov = g3d->GetDriver2D ()->GetHeight ();
   
-  csRef<CS::EditorApp::iContext> context = csQueryRegistry<CS::EditorApp::iContext> (object_reg);
+  csRef<iContext> context = csQueryRegistry<iContext> (object_reg);
   csWeakRefArray<iObject>::ConstIterator it = context->GetSelectedObjects ().GetIterator ();
   while (it.HasNext ())
   {
@@ -326,20 +298,20 @@ void CS3DView::ProcessFrame ()
   }
 }
 
-void CS3DView::FinishFrame ()
+void CS3DSpace::FinishFrame ()
 {
   g3d->FinishDraw ();
   g3d->Print (0);
 }
 
-void CS3DView::PushFrame ()
+void CS3DSpace::PushFrame ()
 {
   vc->Advance();
   q->Process();
   wxYield();
 }
 
-void CS3DView::OnSize (wxSizeEvent& event)
+void CS3DSpace::OnSize (wxSizeEvent& event)
 {
   if (!g3d.IsValid () || !g3d->GetDriver2D () || !view.IsValid ())
     return;
@@ -357,18 +329,18 @@ void CS3DView::OnSize (wxSizeEvent& event)
   
   wxwin->GetWindow()->SetSize (size);
   
-  // Update the view ratio
+  // Update the space ratio
   view->GetPerspectiveCamera ()->SetFOV ((float) (size.y) / (float) (size.x), 1.0f);
   view->SetRectangle (0, 0, size.x, size.y);
 
   event.Skip();
 }
 /*
-void CS3DView::OnDrop (wxCoord x, wxCoord y, iEditorObject* obj)
+void CS3DSpace::OnDrop (wxCoord x, wxCoord y, iEditorObject* obj)
 {
-  printf ("CS3DView::OnDrop\n");
+  printf ("CS3DSpace::OnDrop\n");
 
-  iCamera* camera = view->GetCamera ();
+  iCamera* camera = space->GetCamera ();
     
   if (camera->GetSector ())
   {
@@ -391,7 +363,7 @@ void CS3DView::OnDrop (wxCoord x, wxCoord y, iEditorObject* obj)
   }
 }
 */
-void CS3DView::OnMapLoaded (const char* path, const char* filename)
+void CS3DSpace::OnMapLoaded (const char* path, const char* filename)
 {
   // If there are no sectors then invalidate the camera
   if (!engine->GetSectors ()->GetCount ())
@@ -426,7 +398,7 @@ void CS3DView::OnMapLoaded (const char* path, const char* filename)
   iGraphics2D* g2d = g3d->GetDriver2D ();
   
   view.Invalidate ();
-  view = csPtr< ::iView> (new csView (engine, g3d));
+  view = csPtr<iView> (new csView (engine, g3d));
   view->SetAutoResize (false);  
   view->GetPerspectiveCamera ()->SetFOV ((float) (g2d->GetHeight ()) / (float) (g2d->GetWidth ()), 1.0f);
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
@@ -453,7 +425,7 @@ void CS3DView::OnMapLoaded (const char* path, const char* filename)
     wxwin->GetWindow ()->SetFocus ();
 }
 
-void CS3DView::OnLibraryLoaded (const char* path, const char* filename, iCollection* collection)
+void CS3DSpace::OnLibraryLoaded (const char* path, const char* filename, iCollection* collection)
 {
 }
 

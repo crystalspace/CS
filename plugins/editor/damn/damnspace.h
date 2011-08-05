@@ -19,7 +19,7 @@
 #ifndef __DAMN_DAMNVIEW_H__
 #define __DAMN_DAMNVIEW_H__
 
-#include "ieditor/view.h"
+#include "ieditor/space.h"
 #include "ieditor/actionmanager.h"
 #include "ieditor/editor.h"
 
@@ -40,20 +40,18 @@ using namespace CS::EditorApp;
 
 CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {
-class DAMNView : public scfImplementation3<DAMNView,CS::EditorApp::iView,iComponent, iResourceListener>,
+class DAMNSpace : public scfImplementation2<DAMNSpace,CS::EditorApp::iSpace, iResourceListener>,
   public wxPanel
 {
 public:
-  DAMNView (iBase* parent);
-  virtual ~DAMNView ();
+  DAMNSpace (iBase* parent);
+  virtual ~DAMNSpace ();
 
-  // iComponent
-  virtual bool Initialize (iObjectRegistry* obj_reg);
-
-  // iView
+  // iSpace
+  virtual bool Initialize (iObjectRegistry* obj_reg, iSpaceFactory* fact, wxWindow* parent);
+  virtual iSpaceFactory* GetFactory () const { return factory; }
   virtual wxWindow* GetWindow ();
-  virtual const wxChar* GetCaption () const;
-  virtual ViewDockPosition GetDefaultDockPosition () const;
+  virtual void DisableUpdates (bool val) { }
   
   // iResourceListener
   virtual void OnLoaded (iLoadingResource* resource);
@@ -64,13 +62,13 @@ public:
 
 private:
   iObjectRegistry* object_reg;
+  csRef<iSpaceFactory> factory;
   
   wxGridSizer* sizer;
   wxSearchCtrl* srchCtrl;
-  wxScrolledWindow* previewList;
+  wxScrolledWindow* prespaceList;
 
   csRef<iEditor> editor;
-  csRef<iViewManager> viewManager;
   csRef<iActionManager> actionManager;
   
   csRef<iPluginManager> plugmgr;

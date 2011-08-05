@@ -32,6 +32,12 @@
 
 namespace CS {
 namespace EditorApp {
+  
+struct OperatorMeta : public CS::Utility::AtomicRefCount
+{
+  csString label;
+  csString description;
+};
 
 class OperatorManager : public scfImplementation2<OperatorManager,iOperatorManager, iEventHandler>
 {
@@ -43,12 +49,10 @@ public:
   virtual void Uninitialize ();
   
   //iOperatorManager
-  virtual iOperator* Execute (const char*);
-  virtual iOperator* Invoke (const char*, iEvent*);
-  virtual void Register(const char*, iOperatorFactory*);
-  virtual const char* GetLabel (const char*);
-  virtual const char* GetDescription (const char*);
-
+  virtual csPtr<iOperator> Create(const char*);
+  virtual iOperator* Execute (iOperator*);
+  virtual iOperator* Invoke (iOperator*, iEvent*);
+  
 private:  
   //iEventHandler
   virtual bool HandleEvent(iEvent& ev);
@@ -64,8 +68,7 @@ private:
 
 private:
   iObjectRegistry* object_reg;
-  csHash<csRef<iOperatorFactory>, csString> operatorFactories;
-  csRef<iOperatorFactory> GetOperator (const char* name);
+  csHash<csRef<OperatorMeta>, csString> operatorMeta;
 };
 
 

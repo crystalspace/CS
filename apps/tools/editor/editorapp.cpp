@@ -27,6 +27,7 @@
 #include "iutil/objreg.h"
 
 #include "ieditor/editor.h"
+#include "ieditor/space.h"
 
 /* Fun fact: should occur after csutil/event.h, otherwise, gcc may report
  * missing csMouseEventHelper symbols. */
@@ -168,17 +169,13 @@ bool EditorApp::OnInit (void)
   if (!editor->StartEngine ()) return false;
 
   // Load the specific plugins for the Crystal Space editor
-  if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.cs3dview")) return false;
-  //if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.scenebrowserpanel")) return false;
-  //if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.assetbrowserpanel")) return false;
-  //if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.csobjectmaplistener")) return false;
-  //if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.csinterfacewrappers")) return false;
-  if (!editor->LoadPlugin ("crystalspace.editor.plugin.damn.damnview")) return false;
+  //if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.cs3dview")) return false;
+  //if (!editor->LoadPlugin ("crystalspace.editor.plugin.damn.damnview")) return false;
   
-  if (!editor->LoadPlugin ("cs.editor.operator.test")) return false;
-  if (!editor->LoadPlugin ("cs.editor.operator.select")) return false;
-  if (!editor->LoadPlugin ("cs.editor.operator.move")) return false;
-
+  csRef<CS::EditorApp::iSpaceManager> spacemgr = csQueryRegistry<CS::EditorApp::iSpaceManager> (object_reg);
+  if (!spacemgr->Register ("crystalspace.editor.plugin.core.cs3dspace")) return false;
+  if (!spacemgr->Register ("crystalspace.editor.plugin.damn.damnspace")) return false;
+  
   // Start the application
   if (!editor->StartApplication ()) return false;
 

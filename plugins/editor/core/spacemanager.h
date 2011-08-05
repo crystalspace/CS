@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 by Jelle Hellemans
+    Copyright (C) 2007 by Seth Yastrov
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,38 +16,38 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSEDITOR_TESTOPERATOR_H__
-#define __CSEDITOR_TESTOPERATOR_H__
+#ifndef __SPACEMANAGER_H__
+#define __SPACEMANAGER_H__
+
+#include <csutil/refarr.h>
+#include <csutil/hash.h>
 
 
-#include <csutil/scf_implementation.h>
-#include <iutil/comp.h>
+#include "ieditor/space.h"
 
-#include "ieditor/operator.h"
 
-using namespace CS::EditorApp;
+namespace CS {
+namespace EditorApp {
 
-CS_PLUGIN_NAMESPACE_BEGIN(CSE)
-{
-class TestOperator : public scfImplementation1<TestOperator,iOperator>
+class SpaceManager : public scfImplementation1<SpaceManager,iSpaceManager>
 {
 public:
-  TestOperator (iObjectRegistry* obj_reg);
-  virtual ~TestOperator ();
-
-  // iOperator
-  virtual bool Poll (iContext*);
-  virtual OperatorState Execute (iContext*);
-  virtual OperatorState Invoke (iContext*, iEvent*);
-  virtual OperatorState Modal (iContext*, iEvent*);
-
+  SpaceManager (iObjectRegistry* obj_reg, wxWindow* parent);
+  virtual ~SpaceManager ();
+  
+  virtual void Initialize ();
+  virtual void Uninitialize ();
+  
+  //iSpaceManager
+  virtual bool Register (const char*);
+  virtual const csHash<csRef<iSpaceFactory>, csString>& GetAll();
+  
 private:
   iObjectRegistry* object_reg;
+  csHash<csRef<iSpaceFactory>, csString> factories;
 };
 
-CS_EDITOR_IMPLEMENT_OPERATOR(TestOperator, "cs.editor.operator.test", "An operator", "This is an operator");
-
-}
-CS_PLUGIN_NAMESPACE_END(CSE)
+} // namespace EditorApp
+} // namespace CS
 
 #endif
