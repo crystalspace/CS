@@ -28,7 +28,6 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/wxwin.h"
 
-#include "ieditor/panelmanager.h"
 #include "menubar.h"
 #include "settingsmanager.h"
 #include "actionmanager.h"

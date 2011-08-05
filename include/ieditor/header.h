@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2007 by Seth Yastrov
+    Copyright (C) 2011 by Jelle Hellemans
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,45 +16,39 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SPACEMANAGER_H__
-#define __SPACEMANAGER_H__
+#ifndef __IEDITOR_HEADER_H__
+#define __IEDITOR_HEADER_H__
 
+#include <csutil/scf.h>
+#include <csutil/scf_implementation.h>
 #include <csutil/refarr.h>
-#include <csutil/hash.h>
 
-
-#include "ieditor/space.h"
-#include "ieditor/context.h"
+class wxWindow;
 
 namespace CS {
 namespace EditorApp {
-
-class SpaceManager : public scfImplementation2<SpaceManager,iSpaceManager,iContextListener>
+  
+struct iContext;
+struct iLayout;
+struct iLayoutExtension;
+  
+/**
+ * 
+ */
+struct iHeader : public virtual iBase
 {
-public:
-  SpaceManager (iObjectRegistry* obj_reg, wxWindow* parent);
-  virtual ~SpaceManager ();
-  
-  virtual void Initialize ();
-  virtual void Uninitialize ();
-  
-  //iSpaceManager
-  virtual bool Register (const char*);
-  virtual bool Register(iHeader*);
-  virtual bool Register(iPanel*);
-  virtual const csHash<csRef<iSpaceFactory>, csString>& GetAll();
-  
-  //iContext
-  virtual void OnChanged (iContext*);
-  
-private:
-  iObjectRegistry* object_reg;
-  csHash<csRef<iSpaceFactory>, csString> factories;
-  
-  csHash<csRef<iHeader>, csString> headers;
+  SCF_INTERFACE (iHeader, 0, 0, 1);
+
+  //iLayout wxwindow is persistent, but content is cleared.
+  //iSpace listens to context changes and redraws.
+  virtual void Draw(iContext*, iLayout*) = 0;
+ 
+  virtual void Prepend(iLayoutExtension*) = 0;
+  virtual void Append(iLayoutExtension*) = 0;
 };
+
+
 
 } // namespace EditorApp
 } // namespace CS
-
 #endif

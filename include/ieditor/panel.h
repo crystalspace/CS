@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IEDITOR_PANELMANAGER_H__
-#define __IEDITOR_PANELMANAGER_H__
+#ifndef __IEDITOR_PANEL_H__
+#define __IEDITOR_PANEL_H__
 
 #include <csutil/scf.h>
 #include <csutil/scf_implementation.h>
@@ -30,6 +30,7 @@ namespace CS {
 namespace EditorApp {
   
 struct iContext;
+struct iLayoutExtension;
 
   
 /**
@@ -44,46 +45,23 @@ struct iPanel : public virtual iBase
   /// Get the underlying wxWindow content area of this panel.
   virtual wxWindow* GetWindow () = 0;
 
-  /// Get the caption that will be shown in the titlebar of this panel.
-  virtual const wxChar* GetCaption () const = 0;
-
   /**
    * Check whether this panel can be drawn.
    */
-  //virtual bool Poll (iContext*) = 0;
+  virtual bool Poll (iContext*) = 0;
   
   /**
    * This will be called when the UI needs to be redrawn or the context
    * changed.
    */
   virtual void Draw (iContext*) = 0;
-};
-
-
-/**
- * Manages a set of panels which make up the visible parts of the editor.
- */
-struct iPanelManager : public virtual iBase
-{
-  SCF_INTERFACE (iPanelManager, 0, 1, 0);
   
-  /**
-   * Add a panel to the panel manager.
-   */
-  virtual void AddPanel (iPanel* panel) = 0;
-
-  /**
-   * Remove a panel from the panel manager.
-   * \remarks Only call this when you no longer need the panel,
-   *          e.g. when unloading a plugin.
-   */
-  //virtual void RemovePanel (iPanel* panel) = 0;
-
-  /// Set whether or not the given panel should be visible.
-  virtual void SetPanelVisible (iPanel* panel, bool visible) = 0;
-
-  // TODO: Maybe a GetIterator() function?
+  virtual void ToggleCollapse() = 0;
+ 
+  virtual void Prepend(iLayoutExtension*) = 0;
+  virtual void Append(iLayoutExtension*) = 0;
 };
+
 
 } // namespace EditorApp
 } // namespace CS

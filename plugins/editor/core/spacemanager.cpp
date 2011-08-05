@@ -34,6 +34,10 @@
 #include <wx/textdlg.h>
 #include <wx/bitmap.h>
 
+#include "ieditor/context.h"
+#include "ieditor/header.h"
+#include "ieditor/layout.h"
+
 
 namespace CS {
 namespace EditorApp {
@@ -95,11 +99,15 @@ SpaceManager::SpaceManager (iObjectRegistry* obj_reg, wxWindow* parent)
   : scfImplementationType (this), object_reg (obj_reg)
 {
   object_reg->Register (this, "iSpaceManager");
+  csRef<iContext> context = csQueryRegistry<iContext> (object_reg);
+  context->AddListener(this);
 }
 
 SpaceManager::~SpaceManager ()
 {
   object_reg->Unregister (this, "iSpaceManager");
+  csRef<iContext> context = csQueryRegistry<iContext> (object_reg);
+  if (context) context->RemoveListener(this);
 }
 
 bool SpaceManager::Register (const char* identifier)
@@ -124,6 +132,31 @@ bool SpaceManager::Register (const char* identifier)
   return false;
 }
 
+bool SpaceManager::Register (iHeader* header)
+{
+  printf("SpaceManager::Register header \n");
+  csRef<iFactory> fact = scfQueryInterface<iFactory> (header);
+  if (fact) 
+  {
+    printf("SpaceManager::Register header %s\n", fact->QueryClassID());
+    csRef<iDocumentNode> klass = iSCF::SCF->GetPluginMetadataNode(fact->QueryClassID());
+    if (klass)
+    {
+      csRef<iDocumentNode> space = klass->GetNode("space");
+      printf("SpaceManager::Register header %s\n", space->GetContentsValue ());
+      headers.PutUnique(space->GetContentsValue (), header);
+      return true;
+    }
+  }
+  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.managers.space", "SpaceManager::Register failed to register header!");
+  return false;
+}
+
+bool SpaceManager::Register (iPanel*)
+{
+  return true;
+}
+
 const csHash<csRef<iSpaceFactory>, csString>& SpaceManager::GetAll ()
 {
   return factories;
@@ -135,6 +168,32 @@ void SpaceManager::Initialize ()
 
 void SpaceManager::Uninitialize ()
 {
+}
+
+void SpaceManager::OnChanged (iContext* context)
+{
+  printf("SpaceManager::OnChanged \n");
+  csHash<csRef<iSpaceFactory>, csString>::ConstGlobalIterator facts = GetAll().GetIterator ();
+  while (facts.HasNext())
+  {
+    iSpaceFactory* n = facts.Next();
+    SpaceFactory* f = static_cast<SpaceFactory*>(n);
+    if (!f) continue;
+    f->spaces.Compact ();
+    csWeakRefArray<iSpace>::Iterator spaces = f->spaces.GetIterator ();
+    while (spaces.HasNext())
+    {
+      iSpace* space = spaces.Next();
+      //if (!space || !space->GetFactory()) continue;
+      const char* id = space->GetFactory()->GetIdentifier();
+      printf("SpaceManager::OnChanged %s\n", id);
+      csRef<iHeader> header = headers.Get(id, csRef<iHeader>());
+      if (header)
+      {
+        header->Draw(context, 0);
+      }
+    }
+  }
 }
 
 } // namespace EditorApp

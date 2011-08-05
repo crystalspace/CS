@@ -172,6 +172,8 @@ bool EditorApp::OnInit (void)
   //if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.cs3dview")) return false;
   //if (!editor->LoadPlugin ("crystalspace.editor.plugin.damn.damnview")) return false;
   
+  if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.cs3dheader")) return false;
+  
   csRef<CS::EditorApp::iSpaceManager> spacemgr = csQueryRegistry<CS::EditorApp::iSpaceManager> (object_reg);
   if (!spacemgr->Register ("crystalspace.editor.plugin.core.cs3dspace")) return false;
   if (!spacemgr->Register ("crystalspace.editor.plugin.damn.damnspace")) return false;

@@ -122,7 +122,7 @@ DAMNSpace::~DAMNSpace ()
   printf("DAMNSpace::~DAMNSpace\n");
 }
 
-wxWindow* DAMNSpace::GetWindow ()
+wxWindow* DAMNSpace::GetWindow (const char*)
 {
   return this;
 }

@@ -143,7 +143,7 @@ CS3DSpace::~CS3DSpace()
   delete pump;
 }
 
-wxWindow* CS3DSpace::GetWindow ()
+wxWindow* CS3DSpace::GetWindow (const char*)
 {
   return window;
 }

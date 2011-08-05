@@ -50,7 +50,7 @@ public:
   // iSpace
   virtual bool Initialize (iObjectRegistry* obj_reg, iSpaceFactory* fact, wxWindow* parent);
   virtual iSpaceFactory* GetFactory () const { return factory; }
-  virtual wxWindow* GetWindow ();
+  virtual wxWindow* GetWindow (const char*);
   virtual void DisableUpdates (bool val) { }
   
   // iResourceListener

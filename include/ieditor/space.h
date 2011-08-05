@@ -34,6 +34,8 @@ namespace EditorApp {
   
 struct iContext;
 struct iSpaceFactory;
+struct iHeader;
+struct iPanel;
   
 /**
  * A space is a window in the editor.
@@ -49,7 +51,7 @@ struct iSpace : public virtual iBase
   virtual iSpaceFactory* GetFactory() const = 0;
 
   /// Get the underlying wxWindow content area of this space.
-  virtual wxWindow* GetWindow () = 0;
+  virtual wxWindow* GetWindow (const char*) = 0;
   
   virtual void DisableUpdates (bool) = 0;
 };
@@ -81,6 +83,10 @@ struct iSpaceManager : public virtual iBase
   SCF_INTERFACE (iSpaceManager, 0, 1, 0);
   
   virtual bool Register(const char*) = 0;
+  
+  virtual bool Register(iHeader*) = 0;
+  
+  virtual bool Register(iPanel*) = 0;
   
   virtual const csHash<csRef<iSpaceFactory>, csString>& GetAll() = 0;
 };

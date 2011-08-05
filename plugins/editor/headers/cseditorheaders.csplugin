@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- cseditorspaces.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.editor.plugin.core.cs3dheader</name>
+        <implementation>CS3DHeader</implementation>
+        <description>3D View Header</description>
+        <space>crystalspace.editor.plugin.core.cs3dspace</space>
+      </class>
+    </classes>
+  </scf>
+</plugin>
