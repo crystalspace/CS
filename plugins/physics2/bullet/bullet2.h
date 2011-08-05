@@ -42,6 +42,7 @@ class csBulletJoint;
 struct CollisionPortal
 {
   iPortal* portal;
+  csOrthoTransform warpTrans;
   csBulletSector*  desSector;
   btGhostObject* ghostPortal;
   csRefArray<csBulletCollisionObject> objects;
@@ -127,7 +128,8 @@ class csBulletSector : public scfImplementationExt3<
 
   void UpdateCollisionPortals ();
 
-  void SetInformationToCopy (csBulletCollisionObject* obj, csBulletCollisionObject* cpy, iPortal* portal);
+  void SetInformationToCopy (csBulletCollisionObject* obj, csBulletCollisionObject* cpy,
+    const csOrthoTransform& warpTrans);
 
   void GetInformationFromCopy (csBulletCollisionObject* obj, csBulletCollisionObject* cpy, float duration);
 
@@ -146,7 +148,7 @@ public:
   virtual size_t GetCollisionObjectCount () {return collisionObjects.GetSize ();}
   virtual CS::Collision2::iCollisionObject* GetCollisionObject (size_t index);
 
-  virtual void AddPortal(iPortal* portal);
+  virtual void AddPortal(iPortal* portal, const csOrthoTransform& meshTrans);
   virtual void RemovePortal(iPortal* portal);
 
   virtual void SetSector(iSector* sector);

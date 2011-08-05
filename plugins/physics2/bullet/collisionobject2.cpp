@@ -14,11 +14,10 @@ csBulletCollisionObject::csBulletCollisionObject (csBulletSystem* sys)
 : scfImplementationType (this), system (sys), collCb (NULL), btObject (NULL),
 sector (NULL), compoundShape (NULL), movable (NULL), insideWorld (false), 
 objectCopy (NULL), objectOrigin (NULL), shapeChanged (false), isTerrain (false),
-type (CS::Collision2::COLLISION_OBJECT_BASE), haveStaticColliders(0)
+type (CS::Collision2::COLLISION_OBJECT_BASE), haveStaticColliders(0), portalWarp (btQuaternion::getIdentity ())
 {
   btTransform identity;
   identity.setIdentity ();
-  portalWarp.setIdentity ();
   motionState = new csBulletMotionState (this, identity, identity);
 }
 
@@ -82,7 +81,10 @@ void csBulletCollisionObject::SetTransform (const csOrthoTransform& trans)
       motionState = new csBulletMotionState (this, transform * principalAxis, principalAxis);
 
       if (btObject)
+      {
         dynamic_cast<btRigidBody*>(btObject)->setMotionState (motionState);
+        dynamic_cast<btRigidBody*>(btObject)->setCenterOfMassTransform (motionState->m_graphicsWorldTrans);
+      }
 
       CS::Collision2::CollisionGroupMask mask = -1;
       if (collGroup.value != 1)
@@ -110,7 +112,7 @@ csOrthoTransform csBulletCollisionObject::GetTransform ()
 {
   float inverseScale = system->getInverseInternalScale ();
 
-  if (type == CS::Collision2::COLLISION_OBJECT_BASE || type == CS::Collision2::COLLISION_OBJECT_PHYSICAL)
+  /*if (type == CS::Collision2::COLLISION_OBJECT_BASE || type == CS::Collision2::COLLISION_OBJECT_PHYSICAL)
   {
     if (!isTerrain)
     {
@@ -124,6 +126,11 @@ csOrthoTransform csBulletCollisionObject::GetTransform ()
       csBulletColliderTerrain* terrainCollider = dynamic_cast<csBulletColliderTerrain*> (colliders[0]);
       return terrainCollider->terrainTransform;      
     }
+  }*/
+  if (isTerrain)
+  {
+    csBulletColliderTerrain* terrainCollider = dynamic_cast<csBulletColliderTerrain*> (colliders[0]);
+    return terrainCollider->terrainTransform;   
   }
   else // ghost or actor
     return BulletToCS (btObject->getWorldTransform(), system->getInverseInternalScale ());

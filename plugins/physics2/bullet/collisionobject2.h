@@ -43,7 +43,7 @@ protected:
   //csBulletSector* desSector;
   csBulletCollisionObject* objectOrigin;
   csBulletCollisionObject* objectCopy;
-  btTransform portalWarp;
+  btQuaternion portalWarp;
 
 public:
   csBulletCollisionObject (csBulletSystem* sys);

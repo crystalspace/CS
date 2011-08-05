@@ -540,7 +540,7 @@ struct iCollisionSector : public virtual iBase
   virtual iCollisionObject* GetCollisionObject (size_t index) = 0;
 
   /// Add a portal into the sector. Collision objects crossing a portal will be switched from iCollisionSector's.
-  virtual void AddPortal (iPortal* portal) = 0;
+  virtual void AddPortal (iPortal* portal, const csOrthoTransform& meshTrans) = 0;
 
   /// Remove the given portal from this sector.
   virtual void RemovePortal (iPortal* portal) = 0;

@@ -621,7 +621,7 @@ bool Simple::OnMouseDown (iEvent &event)
 
     // Trace the physical beam
     CS::Collision2::HitBeamResult hitResult =
-      collisionSector->HitBeam (startBeam, endBeam);
+      collisionSector->HitBeamPortal (startBeam, endBeam);
     if (!hitResult.hasHit)
       return false;
 
@@ -676,7 +676,7 @@ bool Simple::OnMouseDown (iEvent &event)
     // Trace the physical beam
     CS::Collision2::HitBeamResult hitResult =
       collisionSector->HitBeam (startBeam, endBeam);
-    if (!hitResult.hasHit && hitResult.object)
+    if (!hitResult.hasHit || !hitResult.object)
       return false;
 
     // Check if we hit a rigid body
@@ -2348,7 +2348,7 @@ void Simple::CreatePortalRoom ()
 				     csVector3 (1.0f, 0.0f, 4.999f)));
 
   // Create a collision portal
-  collisionSector->AddPortal (portal);
+  collisionSector->AddPortal (portal, portalMesh->GetMovable ()->GetFullTransform ());
 
   // Debug the inverse of the warp transform
   CS::Debug::VisualDebuggerHelper::DebugTransform
@@ -2371,7 +2371,7 @@ void Simple::CreatePortalRoom ()
 				     csVector3 (0.0f, -4.999f, -1.0f)));
 
   // Create a collision portal
-  collisionSector->AddPortal (portal);
+  collisionSector->AddPortal (portal, portalMesh2->GetMovable ()->GetFullTransform ());
 
   // Debug the inverse of the warp transform
   CS::Debug::VisualDebuggerHelper::DebugTransform
