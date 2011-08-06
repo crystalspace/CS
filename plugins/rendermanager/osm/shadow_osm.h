@@ -766,8 +766,8 @@ namespace CS
           data[0] = 0;
           for (int i = 4 ; i < 4 * 256 ; i += 4)
           {
-            data[i] = csMin( ( (log(pow(2.0, 248.0) * (i / 4.0)) / log(2.0) 
-              - 248.0) * 255.0 / 7.0 ) , 255.0);
+            data[i] = (unsigned char)csMin( ( (log(pow(2.0, 248.0) * (i / 4.0)) 
+              / log(2.0) - 248.0) * 255.0 / 7.0 ) , 255.0);
 //             csPrintf("%d ", data[i] );
           }
 
