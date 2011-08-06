@@ -698,8 +698,8 @@ namespace CS
           split = g3d->GetTextureManager()->CreateTexture(256, 1, csimg2D, 
             "abgr8", CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP);
 
-          // Set linear split
-          SetLogarithmicSplit();
+          // Set linear or logarithmic split
+          SetHybridSplit(0.75);
 
           osmShader->GetVariableAdd(numSplitsSVName)->SetValue(numSplits);
           osmShader->GetVariableAdd(splitSVName)->SetValue(split);
@@ -716,34 +716,8 @@ namespace CS
           lightVarsPersist.UpdateNewFrame();
         }
 
-      private: 
-        void SetLinearSplit()
-        {
-          CS::StructuredTextureFormat readbackFmt 
-            (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
-          csRef<iDataBuffer> databuf = split->Readback(readbackFmt);
-
-          if (!databuf)
-          {
-            csPrintfErr("Error reading back from texture!\n");
-            return;
-          }
-
-          uint8* data = databuf->GetUint8();
-
-          if (!data)
-          {
-            csPrintfErr("Error converting data buffer!\n");
-            return;
-          }
-
-          for (int i = 0 ; i < 4 * 256 ; i += 4)
-            data[i] = i / 4;
-
-          split->Blit(0, 0, 256, 1, data);  
-        }
-
-        void SetLogarithmicSplit()
+      private:       
+        void SetHybridSplit(float logValue)
         {
           CS::StructuredTextureFormat readbackFmt 
             (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
@@ -766,8 +740,9 @@ namespace CS
           data[0] = 0;
           for (int i = 4 ; i < 4 * 256 ; i += 4)
           {
-            data[i] = (unsigned char)csMin( ( (log(pow(2.0, 248.0) * (i / 4.0)) 
-              / log(2.0) - 248.0) * 255.0 / 7.0 ) , 255.0);
+            data[i] = (unsigned char)csMin( (1 - logValue) * i / 4 + logValue *
+              ( (log(pow(2.0, 248.0) * (i / 4.0)) / log(2.0) - 248.0) 
+                * 255.0 / 7.0 ) , 255.0);
 //             csPrintf("%d ", data[i] );
           }
 
