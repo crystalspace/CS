@@ -601,6 +601,7 @@ namespace CS
         int mrt;
         int numSplits;
         int shadowMapRes;
+        int splitRes;
         csString configPrefix;
         CS::ShaderVarStringID numSplitsSVName;
         CS::ShaderVarStringID splitDistsSVName;
@@ -679,7 +680,7 @@ namespace CS
           shadowShaderType = StringIDValue(strings->Request ("shadow"));
 
           numSplits = 4 * mrt;
-
+          
           depthStart = g3d->GetTextureManager()-> CreateTexture(shadowMapRes, 
             shadowMapRes, csimg2D, "abgr32_f", CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
 
@@ -694,12 +695,13 @@ namespace CS
             texs.Push(tex);
           }
 
+          splitRes = 512;
           // Create a default texture
-          split = g3d->GetTextureManager()->CreateTexture(256, 1, csimg2D, 
+          split = g3d->GetTextureManager()->CreateTexture(splitRes, 1, csimg2D, 
             "abgr8", CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP);
 
           // Set linear or logarithmic split
-          SetHybridSplit(0.75);
+          SetHybridSplit(0.75, splitRes);
 
           osmShader->GetVariableAdd(numSplitsSVName)->SetValue(numSplits);
           osmShader->GetVariableAdd(splitSVName)->SetValue(split);
@@ -717,7 +719,7 @@ namespace CS
         }
 
       private:       
-        void SetHybridSplit(float logValue)
+        void SetHybridSplit(float logValue, int textureSize)
         {
           CS::StructuredTextureFormat readbackFmt 
             (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
@@ -737,16 +739,21 @@ namespace CS
             return;
           }
 
+          double end = textureSize - 1;
+          double range = (int)(log(end - 1.0)/log(2.0));
+          double start = end - range;
+
+//           csPrintf("%lf %lf %lf\n", start, end, range);
           data[0] = 0;
-          for (int i = 4 ; i < 4 * 256 ; i += 4)
+          for (int i = 4 ; i < 4 * textureSize ; i += 4)
           {
-            data[i] = (unsigned char)csMin( (1 - logValue) * i / 4 + logValue *
-              ( (log(pow(2.0, 248.0) * (i / 4.0)) / log(2.0) - 248.0) 
-                * 255.0 / 7.0 ) , 255.0);
+            data[i] = (unsigned char)(csMin( (1 - logValue) * i / 4 + logValue *
+              ( (log(pow(2.0, start) * (i / 4.0)) / log(2.0) - start) 
+                * end / range ) , end) * 255 / end);
 //             csPrintf("%d ", data[i] );
           }
 
-          split->Blit(0, 0, 256, 1, data);  
+          split->Blit(0, 0, textureSize, 1, data);  
         }
       };
 
