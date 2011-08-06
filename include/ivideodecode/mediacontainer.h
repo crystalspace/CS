@@ -57,6 +57,9 @@ struct iMediaContainer : public virtual iBase
   /// Makes "texture" point to the internal iTextureHandle of the active video stream
   virtual void GetTargetTexture (csRef<iTextureHandle> &target) = 0;
 
+  /// Makes "sound" point to the internal iSndSysStream of the active video stream
+  virtual void GetTargetAudio (csRef<iSndSysStream> &target) = 0;
+
   /// Updates the active streams
   virtual void Update () = 0;
 
@@ -84,6 +87,9 @@ struct iMediaContainer : public virtual iBase
     * Set the how many frames will be cached
     */
   virtual void SetCacheSize(size_t size) = 0;
+
+  // Returns the aspect ratio to use with the image
+  virtual float GetAspectRatio () = 0;
 };
 
 /** @} */

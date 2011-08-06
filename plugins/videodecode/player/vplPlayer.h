@@ -72,6 +72,7 @@ public:
   virtual void SetActiveStream (int index) ;
   virtual void RemoveActiveStream (int index) ;
   virtual void GetTargetTexture (csRef<iTextureHandle> &target) ;
+  virtual void GetTargetAudio (csRef<iSndSysStream> &target) ;
   
   THREADED_CALLABLE_DECL(vplPlayer, Update, csThreadReturn, THREADED, false, false);
   //virtual void Update ();
@@ -83,6 +84,8 @@ public:
   virtual float GetPosition () const;
   virtual bool IsPlaying () ;
   virtual float GetLength () const;
+
+  virtual float GetAspectRatio () ;
 
   void WriteData () ;
 

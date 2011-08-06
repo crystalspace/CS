@@ -353,6 +353,11 @@ void TheoraMediaContainer::GetTargetTexture (csRef<iTextureHandle> &target)
   if(_activeTheoraStream.IsValid ())
     _activeTheoraStream->GetVideoTarget (target);
 }
+void TheoraMediaContainer::GetTargetAudio (csRef<iSndSysStream> &target)
+{
+  if (_activeVorbisStream.IsValid ())
+    _activeVorbisStream->GetAudioTarget (target);
+}
 
 float TheoraMediaContainer::GetPosition () const
 {
@@ -408,4 +413,11 @@ void TheoraMediaContainer::WriteData ()
 void TheoraMediaContainer::SetCacheSize(size_t size) 
 {
   cacheSize = size;
+}
+
+
+float TheoraMediaContainer::GetAspectRatio () 
+{
+  if (_activeTheoraStream.IsValid ())
+    return _activeTheoraStream->GetAspectRatio ();
 }

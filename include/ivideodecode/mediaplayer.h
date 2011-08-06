@@ -53,6 +53,9 @@ struct iMediaPlayer : public virtual iBase
   /// Makes "Target" point to the internal iTextureHandle of the active stream
   virtual void GetTargetTexture (csRef<iTextureHandle> &target) = 0;
 
+  /// Makes "sound" point to the internal iSndSysStream of the active video stream
+  virtual void GetTargetAudio (csRef<iSndSysStream> &target) = 0;
+
   /// Called continuously to update the player. The user shouldn't call this method directly
   /// To start and stop the player, use StartPlayer() and StopPlayer()
   THREADED_INTERFACE( Update );
@@ -87,6 +90,9 @@ struct iMediaPlayer : public virtual iBase
 
   /// Returns if the media is playing or not
   virtual bool IsPlaying () = 0 ;
+
+  /// Returns the aspect ratio to use with the image
+  virtual float GetAspectRatio () = 0;
 };
 
 /** @} */

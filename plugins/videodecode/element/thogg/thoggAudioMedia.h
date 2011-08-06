@@ -31,12 +31,16 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <iostream>
 #include <stdio.h>
+
+
+#include "csplugincommon/sndsys/sndstream.h"
+using namespace CS::SndSys;
 using namespace std;
 
 struct iTextureWrapper; 
 struct csVPLvideoFormat;
 
-
+class SndSysTheoraStream;
 /**
   * Audio stream
   */
@@ -56,6 +60,7 @@ private:
   ogg_page          *_oggPage;
   int               _vorbis_p;
   FILE              *_infile;
+  FILE              *_log;
   bool              _decodersStarted;
   bool              _audiobuf_ready;
 
@@ -93,7 +98,7 @@ public:
   virtual const char* GetType () const;
   virtual unsigned long GetFrameCount () const;
   virtual float GetLength() const;
-  virtual void SetAudioTarget (csRef<iSndSysStream> stream);
+  virtual void GetAudioTarget (csRef<iSndSysStream> stream);
   virtual double GetPosition () const;
   virtual void CleanMedia () ;
   virtual bool Update () ;
@@ -109,6 +114,70 @@ public:
   void Seek (float time, ogg_sync_state *oy,ogg_page *op,ogg_stream_state *thState);
 };
 
+
+class SndSysTheoraStream : public SndSysBasicStream
+{
+public:
+  SndSysTheoraStream (csSndSysSoundFormat *pRenderFormat, int Mode3D);
+  virtual ~SndSysTheoraStream ();
+
+
+  ////
+  // Interface implementation
+  ////
+
+  //------------------------
+  // iSndSysStream
+  //------------------------
+public:
+
+  /// Retrieve the textual description of this stream
+  virtual const char *GetDescription() ;
+
+  /**
+  * Get length of this stream in rendered frames.
+  * May return CS_SNDSYS_STREAM_UNKNOWN_LENGTH if the stream is of unknown 
+  * length. For example, sound data being streamed from a remote host may not 
+  * have a pre-determinable length.
+  */
+  virtual size_t GetFrameCount() ;
+
+  /**
+  * NOT AN APPLICATION CALLABLE FUNCTION!   This function advances the stream
+  * position based on the provided frame count value which is considered as an
+  * elapsed frame count.
+  *
+  * A Sound Element will usually store the last advance frame internally.
+  * When this function is called it will compare the last frame with the
+  * frame presented and retrieve more data from the associated iSndSysData
+  * container as needed.  It will then update its internal last advance
+  * frame value.
+  *  
+  * This function is not necessarily thread safe and must be called ONLY
+  * from the Sound System's main processing thread.
+  */
+  virtual void AdvancePosition(size_t frame_delta) ;
+
+  ////
+  //  Member variables
+  ////
+protected:
+
+  /// Our data related information. A reference to the underlying raw data
+  //   and our position tracking reference are contained here.
+
+  /// Holds our reference to the underlying data element
+
+  /// Numeric identifier of the current stream within the ogg file
+  //
+  //  This is tracked because different streams within the same ogg file
+  //   may have different audio properties that require us to adjust our
+  //   decoding parameters.
+  int m_CurrentOggStream;
+
+  /// Format of the sound data in the current ogg stream
+  vorbis_info *m_pCurrentOggFormatInfo;
+};
 /** @} */
 
 #endif // __CS_THOGGAUDIOMEDIA_H__

@@ -82,6 +82,7 @@ private:
   size_t cacheSize;
 
   double _FPS;
+  float _aspectRatio;
 
 
   // Mutexes
@@ -128,6 +129,8 @@ public:
   virtual bool IsCacheFull() ;
 
   virtual double GetTargetFPS () ;
+
+  virtual float GetAspectRatio () ;
 
   inline void SetFrameCount (unsigned long count)  { frameCount=count; }
   inline void SetLength (float length)  { this->length=length; }

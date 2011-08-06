@@ -53,6 +53,7 @@ bool TheoraVideoMedia::Initialize (iObjectRegistry* r)
       _streamState.serialno,_streamInfo.pic_width,_streamInfo.pic_height, (double)_streamInfo.fps_numerator/_streamInfo.fps_denominator,
       _streamInfo.frame_width, _streamInfo.frame_height, _streamInfo.pic_x, _streamInfo.pic_y);
 
+    _aspectRatio = (float)_streamInfo.aspect_numerator*_streamInfo.pic_width/(_streamInfo.aspect_denominator*_streamInfo.pic_height);
 
     _FPS = (double)_streamInfo.fps_numerator/_streamInfo.fps_denominator;
 
@@ -458,4 +459,9 @@ bool TheoraVideoMedia::IsCacheFull ()
 double TheoraVideoMedia::GetTargetFPS ()
 {
   return _FPS;
+}
+
+float TheoraVideoMedia::GetAspectRatio () 
+{
+  return _aspectRatio;
 }

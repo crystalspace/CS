@@ -94,6 +94,7 @@ public:
     { this->pDescription=pDescription; }
   void AddMedia (csRef<iMedia> media);
   virtual void GetTargetTexture (csRef<iTextureHandle> &target) ;
+  virtual void GetTargetAudio (csRef<iSndSysStream> &target) ;
   virtual void SetActiveStream (size_t index);
   virtual bool RemoveActiveStream (size_t index);
   virtual void Update ();
@@ -108,6 +109,8 @@ public:
 
 
   virtual void SetCacheSize(size_t size) ;
+
+  virtual float GetAspectRatio () ;
 
   /// Does a seek on the active media
   void DoSeek ();

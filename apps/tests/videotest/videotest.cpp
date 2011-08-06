@@ -85,7 +85,7 @@ void VideoTest::Frame ()
   g3d->DrawPixmap (logoTex, 
     10, 
     10,
-    width,
+    width * mediaPlayer->GetAspectRatio (),
     height,
     0,
     0,
@@ -140,6 +140,7 @@ bool VideoTest::Application ()
     printf ("%d streams in media container\n",(int)video->GetMediaCount ());
   }
 
+  csRef<iSndSysStream> audioStream;
   mediaPlayer = csQueryRegistry<iMediaPlayer> (object_reg);
   mediaPlayer->InitializePlayer (video,5);
 

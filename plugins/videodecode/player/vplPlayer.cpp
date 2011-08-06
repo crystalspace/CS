@@ -103,6 +103,10 @@ void vplPlayer::GetTargetTexture (csRef<iTextureHandle> &target)
 {
   _mediaFile->GetTargetTexture (target);
 }
+void vplPlayer::GetTargetAudio (csRef<iSndSysStream> &target)
+{
+  _mediaFile->GetTargetAudio (target);
+}
 
 //void vplPlayer::Update ()
 THREADED_CALLABLE_IMPL(vplPlayer, Update)
@@ -200,4 +204,9 @@ void vplPlayer::SwapBuffers ()
 void vplPlayer::WriteData ()
 {
   _mediaFile->WriteData ();
+}
+
+float vplPlayer::GetAspectRatio () 
+{
+  return _mediaFile->GetAspectRatio ();
 }

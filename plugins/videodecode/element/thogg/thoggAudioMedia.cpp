@@ -28,6 +28,7 @@ void TheoraAudioMedia::CleanMedia ()
   vorbis_comment_clear(&_streamComments);
   vorbis_info_clear(&_streamInfo);
   printf("audio stream is clean\n");
+  fclose(_log);
 }
 
 bool TheoraAudioMedia::Initialize (iObjectRegistry* r)
@@ -42,6 +43,7 @@ bool TheoraAudioMedia::Initialize (iObjectRegistry* r)
     printf("Ogg logical stream %ld is Vorbis %d channel %ld Hz audio.\n",
       _streamState.serialno,_streamInfo.channels,_streamInfo.rate);
     _decodersStarted = true;
+    _log = fopen("sndlog.txt","wb");
   }
   else
   {
@@ -68,7 +70,7 @@ float TheoraAudioMedia::GetLength () const
   return length;
 }
 
-void TheoraAudioMedia::SetAudioTarget (csRef<iSndSysStream> stream)
+void TheoraAudioMedia::GetAudioTarget (csRef<iSndSysStream> stream)
 {
   _stream = stream;
 }
@@ -88,12 +90,18 @@ bool TheoraAudioMedia::Update ()
   {
     float **pcm;
     int ret=vorbis_synthesis_pcmout(&_dspState,&pcm);
+    int count = 0;
+
+    int numSamples = 714 * _streamInfo.channels;
+    int numBytes = numSamples * sizeof(short);
+
+    short *samples = new short[numBytes];
 
     /* if there's pending, decoded audio, grab it */
     if (ret>0)
     {
       int i,j;
-//      int count=0;
+      // int count=0;
       for (i=0;i<ret && i<(256/_streamInfo.channels);i++)
         for (j=0;j<_streamInfo.channels;j++)
         {
@@ -102,10 +110,13 @@ bool TheoraAudioMedia::Update ()
             val=32767;
           if(val<-32768)
             val=-32768;
-          //fwrite(&val,sizeof(val),1,out);
+          samples[count]=val;
+          count++;
+          //fwrite(&val,sizeof(val),1,_log);
         }
         _audiobuf_ready=1;
         vorbis_synthesis_read(&_dspState,i);
+        delete samples;
     }
     else
     {

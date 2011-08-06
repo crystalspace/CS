@@ -201,6 +201,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggSndStream.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggVideoMedia.cpp"
 				>
 			</File>

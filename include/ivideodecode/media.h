@@ -98,6 +98,9 @@ struct iVideoMedia : public iMedia
   /// Get the format of the sound data.
   virtual const csVPLvideoFormat* GetFormat() const = 0;
 
+  // Returns the aspect ratio to use with the image
+  virtual float GetAspectRatio () = 0;
+
 
   /**
     * Makes "texture" point to the internal iTextureHandle of the stream
@@ -119,9 +122,9 @@ struct iAudioMedia : public iMedia
   SCF_INTERFACE(iAudioMedia,0,1,0);
 
   /**
-    * Set the audio stream target
+    * Get the audio stream target
     */
-  virtual void SetAudioTarget (csRef<iSndSysStream> stream) = 0;
+  virtual void GetAudioTarget (csRef<iSndSysStream> stream) = 0;
 };
 
 
