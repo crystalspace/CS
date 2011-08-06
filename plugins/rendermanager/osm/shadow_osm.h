@@ -699,7 +699,7 @@ namespace CS
             "abgr8", CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP);
 
           // Set linear split
-          SetLinearSplit();
+          SetLogarithmicSplit();
 
           osmShader->GetVariableAdd(numSplitsSVName)->SetValue(numSplits);
           osmShader->GetVariableAdd(splitSVName)->SetValue(split);
@@ -763,11 +763,13 @@ namespace CS
             return;
           }
 
-          for (int i = 0 ; i < 4 * 256 ; i += 4)
-            if (i / 4 < 40)
-              data[i] = i;
-            else
-              data[i] = 160 + (i / 4 - 40) * 95.0 / 215.0;
+          data[0] = 0;
+          for (int i = 4 ; i < 4 * 256 ; i += 4)
+          {
+            data[i] = csMin( ( (log(pow(2.0, 248.0) * (i / 4.0)) / log(2.0) 
+              - 248.0) * 255.0 / 7.0 ) , 255.0);
+//             csPrintf("%d ", data[i] );
+          }
 
           split->Blit(0, 0, 256, 1, data);  
         }
