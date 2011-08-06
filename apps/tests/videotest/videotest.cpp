@@ -129,7 +129,7 @@ bool VideoTest::Application ()
 
   //Get the path of the video we want to load
   csRef<iDataBuffer> path;
-  path = vfs->GetRealPath ("vid420.ogg");
+  path = vfs->GetRealPath ("vid422.ogg");
 
   // Get the loader and load the video
   csRef<iMediaLoader> vlpLoader = csQueryRegistry<iMediaLoader> (object_reg);
@@ -145,15 +145,11 @@ bool VideoTest::Application ()
   mediaPlayer->InitializePlayer (video,5);
 
   // Specifying -1 as index triggers auto stream activation
-  // We only select the video stream for now, because audio streaming doesn't 
-  // work properly with threading ATM
   mediaPlayer->SetActiveStream (-1);
   mediaPlayer->GetTargetTexture (logoTex);
   mediaPlayer->Loop (false);
   mediaPlayer->Play ();
 
-  // For some reason, CEGUI stopped working properly after I merged the trunk
-  // Not using it for now
   InitializeCEGUI ();
 
   updateSeeker=true;
