@@ -420,4 +420,5 @@ float TheoraMediaContainer::GetAspectRatio ()
 {
   if (_activeTheoraStream.IsValid ())
     return _activeTheoraStream->GetAspectRatio ();
+  return 1;
 }
