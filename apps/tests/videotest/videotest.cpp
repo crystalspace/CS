@@ -110,6 +110,7 @@ bool VideoTest::Application ()
     CS_REQUEST_PLUGIN ("crystalspace.vpl.loader", iMediaLoader),
     CS_REQUEST_PLUGIN ("crystalspace.vpl.player", iMediaPlayer),
     CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
+    CS_REQUEST_PLUGIN("crystalspace.sndsys.renderer.software", iSndSysRenderer),
     CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -124,12 +125,17 @@ bool VideoTest::Application ()
   cegui = csQueryRegistry<iCEGUI> (GetObjectRegistry());
   if (!cegui) return ReportError("Failed to locate CEGUI plugin");
 
+  sndrenderer = csQueryRegistry<iSndSysRenderer> (GetObjectRegistry());
+  if (!sndrenderer) return ReportError("Failed to locate sound renderer!");
+
+  sndrenderer->GetListener ()->SetPosition (csVector3 (0, 0, 0));
+
   // Set the working directory
   vfs->ChDir ("/videodecode/");
 
   //Get the path of the video we want to load
   csRef<iDataBuffer> path;
-  path = vfs->GetRealPath ("vid422.ogg");
+  path = vfs->GetRealPath ("vid420.ogg");
 
   // Get the loader and load the video
   csRef<iMediaLoader> vlpLoader = csQueryRegistry<iMediaLoader> (object_reg);
@@ -147,8 +153,26 @@ bool VideoTest::Application ()
   // Specifying -1 as index triggers auto stream activation
   mediaPlayer->SetActiveStream (-1);
   mediaPlayer->GetTargetTexture (logoTex);
+  mediaPlayer->GetTargetAudio (audioStream);
+
+  if (audioStream.IsValid ())
+  {
+    sndsource = sndrenderer->CreateSource (audioStream);
+    if (!sndsource)
+      ReportError ("Can't create source");
+  }
+  else
+    ReportError ("Audio stream cannot be played");
+
   mediaPlayer->Loop (false);
   mediaPlayer->Play ();
+
+  if(sndsource.IsValid () )
+  {
+    sndsource->SetVolume (1.0f);
+    audioStream->SetLoopState (CS_SNDSYS_STREAM_DONTLOOP);
+    audioStream->Unpause ();
+  }
 
   InitializeCEGUI ();
 

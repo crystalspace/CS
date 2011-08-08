@@ -54,6 +54,7 @@ bool TheoraVideoMedia::Initialize (iObjectRegistry* r)
       _streamInfo.frame_width, _streamInfo.frame_height, _streamInfo.pic_x, _streamInfo.pic_y);
 
     _aspectRatio = (float)_streamInfo.aspect_numerator/(float)_streamInfo.aspect_denominator;
+    cout<<_aspectRatio<<endl;
 
     _FPS = (double)_streamInfo.fps_numerator/_streamInfo.fps_denominator;
 
@@ -327,6 +328,7 @@ void TheoraVideoMedia::WriteData ()
           int Y = (yuv[0].data+y_offset+yuv[0].stride*y)[x] -16;
           int U = (yuv[1].data+uv_offset+yuv[1].stride*(y/2))[x/2] - 128;
           int V = (yuv[2].data+uv_offset+yuv[2].stride*(y/2))[x/2] - 128;
+
           int R = ((298*Y + 409*V + 128)>>8);
           int G = ((298*Y - 100*U - 208*V + 128)>>8);
           int B = ((298*Y + 516*U + 128)>>8);

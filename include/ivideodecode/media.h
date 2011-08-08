@@ -124,7 +124,7 @@ struct iAudioMedia : public iMedia
   /**
     * Get the audio stream target
     */
-  virtual void GetAudioTarget (csRef<iSndSysStream> stream) = 0;
+  virtual void GetAudioTarget (csRef<iSndSysStream> &stream) = 0;
 };
 
 

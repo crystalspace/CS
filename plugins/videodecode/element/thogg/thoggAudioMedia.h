@@ -26,6 +26,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <iutil/comp.h>
 #include <ivideodecode/media.h>
 #include <csutil/scf_implementation.h>
+#include "thoggSndStreamData.h"
 
 #include <vorbis/codec.h>
 
@@ -33,7 +34,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdio.h>
 
 
-#include "csplugincommon/sndsys/sndstream.h"
+//#include "csplugincommon/sndsys/sndstream.h"
 using namespace CS::SndSys;
 using namespace std;
 
@@ -46,9 +47,15 @@ class SndSysTheoraStream;
   */
 class TheoraAudioMedia : public scfImplementation2 < TheoraAudioMedia, iAudioMedia, scfFakeInterface<iMedia> >
 {
+public:
+
+  struct cachedData
+  {
+
+
+  };
 private:
   iObjectRegistry*      object_reg;
-  csRef<iSndSysStream>	_stream;
   float                 length;
 
   ogg_stream_state  _streamState;
@@ -64,14 +71,12 @@ private:
   bool              _decodersStarted;
   bool              _audiobuf_ready;
 
-  struct cachedData
-  {
-
-
-  };
 
   csFIFO<cachedData> cache;
   size_t cacheSize;
+
+  // The stream used to play audio
+  csRef<iSndSysStream> _outputStream;
   
 public:
   
@@ -98,7 +103,7 @@ public:
   virtual const char* GetType () const;
   virtual unsigned long GetFrameCount () const;
   virtual float GetLength() const;
-  virtual void GetAudioTarget (csRef<iSndSysStream> stream);
+  virtual void GetAudioTarget (csRef<iSndSysStream> &stream);
   virtual double GetPosition () const;
   virtual void CleanMedia () ;
   virtual bool Update () ;
@@ -113,71 +118,5 @@ public:
   inline void SetLength (float length)  { this->length=length; }
   void Seek (float time, ogg_sync_state *oy,ogg_page *op,ogg_stream_state *thState);
 };
-
-
-class SndSysTheoraStream : public SndSysBasicStream
-{
-public:
-  SndSysTheoraStream (csSndSysSoundFormat *pRenderFormat, int Mode3D);
-  virtual ~SndSysTheoraStream ();
-
-
-  ////
-  // Interface implementation
-  ////
-
-  //------------------------
-  // iSndSysStream
-  //------------------------
-public:
-
-  /// Retrieve the textual description of this stream
-  virtual const char *GetDescription() ;
-
-  /**
-  * Get length of this stream in rendered frames.
-  * May return CS_SNDSYS_STREAM_UNKNOWN_LENGTH if the stream is of unknown 
-  * length. For example, sound data being streamed from a remote host may not 
-  * have a pre-determinable length.
-  */
-  virtual size_t GetFrameCount() ;
-
-  /**
-  * NOT AN APPLICATION CALLABLE FUNCTION!   This function advances the stream
-  * position based on the provided frame count value which is considered as an
-  * elapsed frame count.
-  *
-  * A Sound Element will usually store the last advance frame internally.
-  * When this function is called it will compare the last frame with the
-  * frame presented and retrieve more data from the associated iSndSysData
-  * container as needed.  It will then update its internal last advance
-  * frame value.
-  *  
-  * This function is not necessarily thread safe and must be called ONLY
-  * from the Sound System's main processing thread.
-  */
-  virtual void AdvancePosition(size_t frame_delta) ;
-
-  ////
-  //  Member variables
-  ////
-protected:
-
-  /// Our data related information. A reference to the underlying raw data
-  //   and our position tracking reference are contained here.
-
-  /// Holds our reference to the underlying data element
-
-  /// Numeric identifier of the current stream within the ogg file
-  //
-  //  This is tracked because different streams within the same ogg file
-  //   may have different audio properties that require us to adjust our
-  //   decoding parameters.
-  int m_CurrentOggStream;
-
-  /// Format of the sound data in the current ogg stream
-  vorbis_info *m_pCurrentOggFormatInfo;
-};
-/** @} */
 
 #endif // __CS_THOGGAUDIOMEDIA_H__

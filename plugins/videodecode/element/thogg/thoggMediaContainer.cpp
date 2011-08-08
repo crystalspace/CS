@@ -377,14 +377,24 @@ float TheoraMediaContainer::GetLength () const
 
 void TheoraMediaContainer::SwapBuffers ()
 {
+  static csTicks time =0;
+  static csTicks total=0;
+
+  csTicks timeTaken = csGetTicks ()-time;
+  //cout<<total<<endl;
+  total+=timeTaken;
   MutexScopedLock lock (swapMutex);
 
   // Wait until we have an item
   while (timeToSeek != -1)
     isSeeking.Wait (swapMutex);
 
+  time = csGetTicks ();
+
   if(canSwap)
   {
+    //cout<<"swap: "<<total<<endl;
+    total = 0;
     canSwap=false;
     canWrite=true;
     for (size_t i =0;i<activeStreams.GetSize ();i++)

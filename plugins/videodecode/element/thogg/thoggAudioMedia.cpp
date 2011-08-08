@@ -43,6 +43,37 @@ bool TheoraAudioMedia::Initialize (iObjectRegistry* r)
     printf("Ogg logical stream %ld is Vorbis %d channel %ld Hz audio.\n",
       _streamState.serialno,_streamInfo.channels,_streamInfo.rate);
     _decodersStarted = true;
+
+    csSndSysSoundFormat format;
+    format.Bits = _streamInfo.bitrate_nominal;
+    format.Channels = _streamInfo.channels;
+    format.Freq = _streamInfo.rate;
+
+    if (!csInitializer::RequestPlugins (object_reg,
+      CS_REQUEST_VFS,
+      CS_REQUEST_PLUGIN("crystalspace.sndsys.renderer.software", iSndSysRenderer),
+      CS_REQUEST_END))
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+        "crystalspace.application.vidplaydemo",
+        "Can't initialize plugins!");
+      return false;
+    }
+
+    csRef<iSndSysRenderer> sndrenderer = csQueryRegistry<iSndSysRenderer> (object_reg);
+    if (!sndrenderer) cout<<"Failed to locate sound renderer!\n";
+
+    csRef<SndSysTheoraSoundData> data;
+    data.AttachNew(new SndSysTheoraSoundData (this,NULL));
+    _outputStream =  sndrenderer->CreateStream (data,CS_SND3D_DISABLE);
+
+    /*csRef<SndSysBasicStream> media = scfQueryInterface<SndSysBasicStream> (stream ); 
+    if (media.IsValid()) 
+    { 
+      _outputStream = static_cast<SndSysTheoraStream*> ( (SndSysBasicStream*)media);
+    }*/
+    //_outputStream.AttachNew ( new SndSysTheoraStream (&format,CS_SND3D_DISABLE));
+
     _log = fopen("sndlog.txt","wb");
   }
   else
@@ -70,9 +101,9 @@ float TheoraAudioMedia::GetLength () const
   return length;
 }
 
-void TheoraAudioMedia::GetAudioTarget (csRef<iSndSysStream> stream)
+void TheoraAudioMedia::GetAudioTarget (csRef<iSndSysStream> &stream)
 {
-  _stream = stream;
+  stream = _outputStream;
 }
 
 double TheoraAudioMedia::GetPosition () const
@@ -92,6 +123,7 @@ bool TheoraAudioMedia::Update ()
     int ret=vorbis_synthesis_pcmout(&_dspState,&pcm);
     int count = 0;
 
+    /// ToDo: change 714 to the frame count of the video
     int numSamples = 714 * _streamInfo.channels;
     int numBytes = numSamples * sizeof(short);
 
@@ -102,7 +134,7 @@ bool TheoraAudioMedia::Update ()
     {
       int i,j;
       // int count=0;
-      for (i=0;i<ret && i<(256/_streamInfo.channels);i++)
+      for (i=0;i<ret && i<(2048/_streamInfo.channels);i++)
         for (j=0;j<_streamInfo.channels;j++)
         {
           int val=(int)(pcm[j][i]*32767.f);
