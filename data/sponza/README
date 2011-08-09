@@ -1,0 +1,13 @@
+This world was created in Blender and exported to the Crystalspace world format using 'Blender2Crystal'.  It contains many public use models created by and used in the computer graphics research community.  Most of these are provided by Stanford University and can be found at the following web site:
+
+http://graphics.stanford.edu/data/3Dscanrep/
+
+The room itself is the Sponza Atrium in Italy and was modeled by hand by Marko Dabrovic who retains copyrights on the geometry and texture/bump maps.  The original model is available here:
+
+http://hdri.cgtechniques.com/~sponza/files/
+
+It was assembled, converted and lit for use in CrystalSpace by Seth Berrier as part of his Google Summer of Code project in 2009.  It is an ideal space for computing global lighting and testing the changes made to lighter2 for this project.
+
+Modified by Santiago Sánchez as part of his Google Summer of Code project in 2011: added some textures from the Crytek's Sponza model, available here:
+
+http://www.crytek.com/cryengine/cryengine3/downloads
