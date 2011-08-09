@@ -67,8 +67,11 @@ protected:
   /// Draws the logo if possible.
   void DrawLogo();
 
+  /// Takes a screenshot.
+  bool TakeScreenShot();
+
   /// Updates the cameras position and rotation.
-  void UpdateCamera();
+  void UpdateCamera(float deltaTime);
 
   /// Loads modules needed by the application.
   bool SetupModules();
@@ -87,6 +90,21 @@ protected:
 
   /// Updates the GUI.
   void UpdateGui();
+
+  /// Sets up the dynamics system
+  bool SetupDynamicsSystem(iPluginManager *pluginManager);
+
+  /// Creates the colliders for the dynamics system
+  void CreateColliders();
+
+  void CreateMeshColliders(const char *baseMeshName, int numMeshes);
+  void CreateMeshBBoxCollider(const char *meshName);
+
+  /// Updates the dynamics system
+  void UpdateDynamics(float deltaTime);
+
+  /// Spawns a sphere
+  void SpawnSphere(bool attachLight = false);
 
   /// Handles an event not being Handled by csBaseEventHandler.
   virtual bool OnUnhandledEvent(iEvent &event);
@@ -127,6 +145,21 @@ protected:
   csRef<CS::Utility::iHUDManager> hudManager;
   csRef<iConfigListener> configEventNotifier;
 
+  csRef<iDynamics> dynamics;
+  csRef<iDynamicSystem> dynamicSystem;
+  csRef<CS::Physics::Bullet::iDynamicSystem> bulletDynamicSystem;
+  csRef<CS::Debug::iDynamicsDebuggerManager> dynamicsDebuggerManager;
+  csRef<CS::Debug::iDynamicSystemDebugger> dynamicsDebugger;
+
+  csRef<iSector> room;
+
+  csRef<iMeshFactoryWrapper> ballFact[6];
+  csColor ballColors[3];
+
+  csRef<iLight> light;
+
+  csRef<iShaderVarStringSet> svStringSet;
+
   CS::NumberedFilenameHelper screenshotHelper;
   csString screenshotFormat;
 
@@ -139,9 +172,7 @@ protected:
   csRef<iView> view;
 
   float viewRotX;
-  float viewRotY;
-
-  iLight *light;  
+  float viewRotY;   
 
 protected:
 
@@ -154,21 +185,24 @@ protected:
   CEGUI::Checkbox *guiEnableAO;
   CEGUI::Checkbox *guiEnableIndirectLight;
   CEGUI::Checkbox *guiEnableBlur;
-  CEGUI::Checkbox *guiEnableRadiusWide;
+  CEGUI::Checkbox *guiEnableDetailSamples;
   CEGUI::Checkbox *guiEnableGlobalIllum;
 
   bool showGBuffer;
   bool drawLightVolumes;
   bool showAmbientOcclusion;
   bool showGlobalIllumination;
-  bool enableGlobalIllum;  
+  bool enableGlobalIllum;
 
+  bool isBulletEnabled;
+  bool doBulletDebug;
+
+  // Variables for the global illumination effects
   float occlusionStrength;
   float sampleRadius;
-  float sampleRadiusWide;
-  int sampleCount;
-  float maxOccluderDistance;
-  int patternSize;
+  float detailSampleRadius;
+  int aoPasses;
+  float maxOccluderDistance;  
   float selfOcclusion;
   float occAngleBias;
   float bounceStrength;
@@ -178,8 +212,8 @@ protected:
 
   csRef<iEventHandler> occlusionStrengthListener;
   csRef<iEventHandler> sampleRadiusListener;
-  csRef<iEventHandler> sampleRadiusWideListener;
-  csRef<iEventHandler> sampleCountListener;
+  csRef<iEventHandler> detailSampleRadiusListener;
+  csRef<iEventHandler> aoPassesListener;
   csRef<iEventHandler> maxOccluderDistListener;
   csRef<iEventHandler> patternSizeListener;
   csRef<iEventHandler> selfOcclusionListener;
@@ -206,7 +240,6 @@ protected:
 private:
 
   bool shouldShutdown;
-
 };
 
-#endif // __DEFERREDDEMO_H__
+#endif //__DEFERREDDEMO_H__

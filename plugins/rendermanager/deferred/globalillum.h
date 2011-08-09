@@ -32,39 +32,22 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 {
-
   /**
-   * Generates a halton number
-   */
-  inline float halton(const int base, int index) 
-  {
-	  float x = 0.0f;
-	  float f = 1.0f / base;
-
-	  while(index) 
-    {
-		  x += f * (float) (index % base);
-		  index /= base;
-		  f *= 1.0f / base;
-	  }
-	  return x;
-  }
-
-  /**
-   * Renderer for screen-space global illumination techniques such as SSAO and SSDO.
+   * Renderer for screen-space global illumination techniques.
    */
   class csGlobalIllumRenderer
   {
   public:
 
-    csGlobalIllumRenderer() : graphics3D (nullptr), globalIllumBuffer (nullptr), compositionBuffer (nullptr),
+    csGlobalIllumRenderer() : graphics3D (nullptr), globalIllumBuffer (nullptr),
       intermediateBuffer (nullptr), gbuffer (nullptr), enabled (true), isInitialized (false) 
     {         
     }
     
     ~csGlobalIllumRenderer() 
     {
-      CS_ASSERT (!isGlobalIllumBufferAttached && !isCompositionBufferAttached & !isIntermediateBufferAttached);
+      CS_ASSERT (!isGlobalIllumBufferAttached && !isIntermediateBufferAttached
+                 && !isDepthNormalBufferAttached);
     }
     
     bool Initialize(iGraphics3D *g3D, iObjectRegistry *objRegistry, GBuffer *gbuffer, 
@@ -80,9 +63,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       }
 
       graphics3D = g3D;
-      isGlobalIllumBufferAttached = false;
-      isCompositionBufferAttached = false;
+      isGlobalIllumBufferAttached  = false;
       isIntermediateBufferAttached = false;
+      isDepthNormalBufferAttached  = false;
       
       objectRegistry = objRegistry;
       csConfigAccess cfg (objRegistry);
@@ -100,9 +83,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       // Initialize buffers
       globalIllumBufferFormat = cfg->GetStr ("RenderManager.Deferred.GlobalIllum.GlobalIllumBufferFormat",
         "rgba16_f");
-      compositionBufferFormat = cfg->GetStr ("RenderManager.Deferred.GlobalIllum.CompositionBufferFormat", 
-        "rgb16_f");
-
+      
       csString bufferRes (cfg->GetStr ("RenderManager.Deferred.GlobalIllum.BufferResolution", "half"));
       if (bufferRes.CompareNoCase ("full"))
         bufferDownscaleFactor = 1.0f;
@@ -159,11 +140,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         return false;
       }
 
+      downsampleShader = loader->LoadShader ("/shader/deferred/downsample.xml");
+      if (!downsampleShader)
+      {
+        csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING, reporterMessageID, 
+          "Could not load deferred_downsample shader");
+        enabled = false;
+        return false;
+      }
+
       LoadRandomNormalsTexture (loader, graphics3D, cfg);
       LoadIrradianceEnvironmentMap (loader, graphics3D);
       //GenerateSampleDirections (graphics3D);
       
-      SetupShaderVars(cfg);           
+      SetupShaderVars(cfg);
 
       CreateFullscreenQuad();
 
@@ -175,7 +165,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     void UpdateShaderVars()
     {
       if (!enabled)
-        return;     
+        return;
 
       lightCompositionShader->GetVariableAdd (
         svStringSet->Request ("debug show ambocc"))->SetValue ((int)showAmbientOcclusion);
@@ -183,12 +173,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         svStringSet->Request ("debug show globalillum"))->SetValue ((int)showGlobalIllumination);
     }
 
-    void RenderGlobalIllum(int contextDrawFlags)
+    void RenderGlobalIllum(iTextureHandle *accumBuffer)
     {
-      if (!enabled)
+      if (!enabled || !accumBuffer)
         return;
 
-      // Draw (directional) ambient occlusion + indirect light
+      // Downsample buffer with normals and depth
+      /*AttachDepthNormalBuffer();
+      {
+        graphics3D->SetZMode (CS_ZBUF_MESH);        
+
+        DrawFullscreenQuad (downsampleShader);
+      }
+      DetachDepthNormalBuffer();*/
+
+      // Render ambient occlusion + indirect light
       AttachGlobalIllumBuffer();
       {
         graphics3D->SetZMode (CS_ZBUF_MESH);        
@@ -210,20 +209,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 	          
         AttachGlobalIllumBuffer();
         {
-          graphics3D->SetZMode (CS_ZBUF_MESH);        
+          graphics3D->SetZMode (CS_ZBUF_MESH);
 
 		      DrawFullscreenQuad (verticalBlurShader);
         }
         DetachGlobalIllumBuffer();
       }
       
-      AttachCompositionBuffer();      
+      // Upsample and combine with direct light
+      AttachBuffer (accumBuffer);
       {
         graphics3D->SetZMode (CS_ZBUF_MESH);
         
         DrawFullscreenQuad (lightCompositionShader);
       }
-      DetachCompositionBuffer();
+      graphics3D->UnsetRenderTargets();
     }
 
     void ChangeBufferResolution(const char *bufferResolution)
@@ -247,7 +247,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         return;
       }
 
-      if (resolutionFactor != bufferDownscaleFactor)
+      if (! (fabs (resolutionFactor - bufferDownscaleFactor) < EPSILON))
       {
         bufferDownscaleFactor = resolutionFactor;
 
@@ -319,33 +319,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       }      
     }
 
-    bool AttachCompositionBuffer(bool useGBufferDepth = false)
+    bool AttachDepthNormalBuffer()
     {
-      if (!enabled || isCompositionBufferAttached)
+      if (!enabled || isDepthNormalBufferAttached)
         return false;
 
-      if (!graphics3D->SetRenderTarget (compositionBuffer, false, 0, rtaColor0))
-          return false;
-
-      if (useGBufferDepth && gbuffer->HasDepthBuffer())
-      {
-        if (!graphics3D->SetRenderTarget (gbuffer->GetDepthBuffer(), false, 0, rtaDepth))
-          return false;
-      }
+      if (!graphics3D->SetRenderTarget (depthNormalBuffer, false, 0, rtaColor0))
+          return false;      
 
       if (!graphics3D->ValidateRenderTargets())
         return false;
 
-      isCompositionBufferAttached = true;
+      isDepthNormalBufferAttached = true;
       return true;
     }
 
-    void DetachCompositionBuffer()
+    void DetachDepthNormalBuffer()
     {
-      if (enabled && isCompositionBufferAttached)
+      if (enabled && isDepthNormalBufferAttached)
       {
         graphics3D->UnsetRenderTargets();
-        isCompositionBufferAttached = false;
+        isDepthNormalBufferAttached = false;
       }      
     }
 
@@ -357,11 +351,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     iTextureHandle *GetIntermediateBuffer()
     {
       return intermediateBuffer;
-    }
-
-    iTextureHandle *GetLightCompositionBuffer()
-    {
-      return compositionBuffer;
     }
 
     bool IsInitialized()
@@ -415,15 +404,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         }
       }      
 
-      if (!compositionBuffer)
+      if (!depthNormalBuffer)
       {
-        compositionBuffer = graphics3D->GetTextureManager()->CreateTexture (g2D->GetWidth(), g2D->GetHeight(), 
-          csimg2D, compositionBufferFormat, flags, &errString);
+        depthNormalBuffer = graphics3D->GetTextureManager()->CreateTexture (
+          g2D->GetWidth() * 0.5f/*bufferDownscaleFactor*/, g2D->GetHeight() * 0.5f/*bufferDownscaleFactor*/,
+          csimg2D, gbuffer->GetColorBufferFormat(), flags, &errString);
 
-        if (!compositionBuffer)
+        if (!depthNormalBuffer)
         {
           csReport (objectRegistry, CS_REPORTER_SEVERITY_ERROR, reporterMessageID, 
-            "Could not create composition buffer! %s", errString.GetCsString().GetDataSafe());        
+            "Could not create depth and normals buffer! %s", errString.GetCsString().GetDataSafe());        
           return false;
         }
       }
@@ -462,23 +452,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
           return false;
         }
         DetachIntermediateBuffer();
-
-        if (!AttachCompositionBuffer())
-        {
-          csReport(objectRegistry, CS_REPORTER_SEVERITY_ERROR, reporterMessageID, 
-              "Failed to attach composition buffer to the device!");
-          return false;
-        }
-
-        if (!graphics3D->ValidateRenderTargets())
-        {
-          DetachCompositionBuffer();
-          csReport(objectRegistry, CS_REPORTER_SEVERITY_ERROR, reporterMessageID, 
-              "Composition buffer format is not supported by the device!");
-          return false;
-        }
-        DetachCompositionBuffer();
       }
+
+      return true;
+    }
+
+    bool AttachBuffer(iTextureHandle *buffer)
+    {
+      if (!graphics3D->SetRenderTarget (buffer, false, 0, rtaColor0))
+          return false;
+
+      if (!graphics3D->ValidateRenderTargets())
+        return false;
 
       return true;
     }
@@ -502,8 +487,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     }
 
     void SetupShaderVars(csConfigAccess &cfg)
-    { 
-      // Add variables to shaders
+    {       
       globalIllumBufferSV = shaderManager->GetVariableAdd (
           svStringSet->Request ("tex global illumination"));
       globalIllumBufferSV->SetValue (globalIllumBuffer);
@@ -511,10 +495,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       intermediateBufferSV = verticalBlurShader->GetVariableAdd (
           svStringSet->Request ("tex horizontal blur"));
       intermediateBufferSV->SetValue (intermediateBuffer);
-      
-      //compositionBufferSV = lightCompositionShader->GetVariableAdd (
-      //    svStringSet->Request ("tex light composition"));
-      //compositionBufferSV->SetValue (compositionBuffer);
+
+      depthNormalBufferSV = shaderManager->GetVariableAdd (
+          svStringSet->Request ("tex downsampled normal depth"));
+      depthNormalBufferSV->SetValue (depthNormalBuffer);
       
       csRef<csShaderVariable> shaderVar = globalIllumShader->GetVariableAdd (
           svStringSet->Request ("tex random normals"));      
@@ -522,12 +506,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       
       shaderVar = globalIllumShader->GetVariableAdd (
           svStringSet->Request ("tex globalillum envmap"));
-      shaderVar->SetValue (irradianceEnvironmentMap);
-
-      /*shaderVar = globalIllumShader->GetVariableAdd (
-          svStringSet->Request ("pattern size"));
-      int patternSize = cfg->GetInt ("RenderManager.Deferred.GlobalIllum.SSDO.SamplingPatternSize", 4);
-      shaderVar->SetValue (patternSize);*/
+      shaderVar->SetValue (irradianceEnvironmentMap);      
 
       shaderVar = globalIllumShader->GetVariableAdd (
           svStringSet->Request ("num passes"));
@@ -611,8 +590,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     }
 
     void CreateFullscreenQuad()
-    {
-      // Builds the quad.
+    {      
       float w = graphics3D->GetDriver2D ()->GetWidth ();
       float h = graphics3D->GetDriver2D ()->GetHeight ();
 
@@ -639,6 +617,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
       const char *randomNormalsFilePath = cfg->GetStr (
         "RenderManager.Deferred.GlobalIllum.SSDO.RandomNormalsFilePath", "/data/random_normals64.png");
+        //"/data/InterleavedSphereJittered4x4.png");
 
       randomNormalsTexture = loader->LoadTexture (randomNormalsFilePath, flags, 
         graphics3D->GetTextureManager(), &image);
@@ -647,95 +626,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         csReport (objectRegistry, CS_REPORTER_SEVERITY_WARNING, reporterMessageID, 
           "Could not load random_normals.png texture!");
       }
-
-      // save tex to file (remove, just for debug!)
-      csRef<iImageIO> imageIO = csQueryRegistry<iImageIO> (objectRegistry); 
-      csRef<iDataBuffer> data = imageIO->Save (image, "image/png");
-      if (!data)
-      {
-        csReport (objectRegistry, CS_REPORTER_SEVERITY_WARNING, reporterMessageID, 
-          "Could not export random_normals image to format png!");
-      }
-
-      csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectRegistry);
-      vfs->ChDir ("/data");
-      if (!vfs->WriteFile ("random_normals_debug", data->GetData(), data->GetSize()))
-      {
-        csReport(objectRegistry, CS_REPORTER_SEVERITY_WARNING, reporterMessageID, 
-          "Could not save random normals texture!");
-      }
     }
-
-    /**
-      * Generates random positions inside a unit hemisphere based on halton numbers
-      */
-    /*void GenerateSampleDirections(iGraphics3D *graphics3D)
-    {
-	    int patternSizeSquared = patternSize * patternSize;
-
-	    srand(0);
-
-	    int haltonIndex = 0;
-	    float* seedPixels = new float[3 * maxSamples * patternSizeSquared];
-	
-	    for(int i = 0; i < patternSizeSquared; i++) 
-      {
-		    for(int j = 0; j < maxSamples; j++)
-        {
-			    csVector3 sample;
-			    do {
-				    sample = csVector3(2.0f * halton(2, haltonIndex) - 1.0f,
-							                  2.0f * halton(3, haltonIndex) - 1.0f, 
-							                  halton(5, haltonIndex));
-				    haltonIndex++;
-				      
-			    } while(sample.Norm() > 1.0);
-
-			    seedPixels[(i * maxSamples + j) * 3 + 0] = sample.x;
-			    seedPixels[(i * maxSamples + j) * 3 + 1] = sample.y;
-			    seedPixels[(i * maxSamples + j) * 3 + 2] = sample.z;
-		    }
-	    }
-                
-      csRef<iImage> seedImage;
-      seedImage.AttachNew (new csImageMemory (maxSamples, patternSizeSquared, seedPixels, 
-        CS_IMGFMT_TRUECOLOR, (const csRGBpixel *)0));
-
-      int flags = CS_TEXTURE_2D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_NPOTS;
-      scfString failReason;        
-      
-      sampleDirectionsTexture = graphics3D->GetTextureManager()->RegisterTexture (seedImage,
-        flags, &failReason);
-      //sampleDirectionsTexture = graphics3D->GetTextureManager()->CreateTexture (maxSampleCount, 
-      //  patternSizeSquared, csimg2D, "rgb16_f", flags, &failReason);
-
-      if (!sampleDirectionsTexture)
-      {
-        csReport(objectRegistry, CS_REPORTER_SEVERITY_ERROR, reporterMessageID, 
-          "Could not register sample directions texture: %s!", failReason.GetCsString().GetDataSafe());        
-      }
-
-      //sampleDirectionsTexture->Blit (0, 0, maxSampleCount, patternSizeSquared, (unsigned char*)seedPixels);
-
-      csRef<iImageIO> imageIO = csQueryRegistry<iImageIO> (objectRegistry);
-      csRef<iDataBuffer> data = imageIO->Save (seedImage, "image/png");
-
-      if (!data)
-      {
-        csReport (objectRegistry, CS_REPORTER_SEVERITY_WARNING, reporterMessageID, 
-          "Could not export ssdo_sampledirs image to format png");
-      }
-
-      csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectRegistry);
-      vfs->ChDir ("/data");
-      if (!vfs->WriteFile ("ssdo_sampledirs", data->GetData(), data->GetSize()))
-      {
-        csReport(objectRegistry, CS_REPORTER_SEVERITY_WARNING, reporterMessageID, 
-          "Could not save ssdo sample dirs!");
-      }   
-          
-      delete seedPixels;
-    }*/
 
     void LoadIrradianceEnvironmentMap(iLoader *loader, iGraphics3D *graphics3D)
     {
@@ -749,130 +640,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         csReport (objectRegistry, CS_REPORTER_SEVERITY_WARNING, reporterMessageID, 
           "Could not load blurred_grace.tga texture!");
       }
-
-      // save tex to file (remove, just for debug!)
-      csRef<iImageIO> imageIO = csQueryRegistry<iImageIO> (objectRegistry); 
-      csRef<iDataBuffer> data = imageIO->Save (image, "image/bmp");
-      if (!data)
-      {
-        csReport (objectRegistry, CS_REPORTER_SEVERITY_WARNING, reporterMessageID, 
-          "Could not export blurred_grace image to format bmp!");
-      }
-
-      csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectRegistry);
-      vfs->ChDir ("/data");
-      if (!vfs->WriteFile ("blurred_grace_debug", data->GetData(), data->GetSize()))
-      {
-        csReport(objectRegistry, CS_REPORTER_SEVERITY_WARNING, reporterMessageID, 
-          "Could not save blurred_grace texture!");
-      }
-    }
-
-    /**
-      * Load hdr image in PFM format.
-      */
-    bool LoadImagePFM(const char* filename, iGraphics3D *graphics3D)
-    { 
-      // init some variables 
-      const int MAX_LINE = 1024;
-      char imageformat[ MAX_LINE ];
-      float f[1]; 
-	 
-      // open the file handle
-      FILE* infile = fopen( filename, "rb" ); 
- 
-      if ( infile == NULL ) { 
-        printf("Error loading %s !\n", filename); 
-        return false; 
-      } 
- 
-      int envMapWidth, envMapHeight;
-      // read the header
-      fscanf( infile," %s %d %d ", &imageformat, &envMapWidth, &envMapHeight ); 
-	 
-      // set member variables 
-      // assert( width > 0 && height > 0 ); 
-      printf("Image format %s Width %d Height %d\n", imageformat, envMapWidth, envMapHeight);
-   
-      float* const envMapPixels = new float[envMapWidth * envMapHeight * 3];
-
-      // go ahead with the data 
-      fscanf( infile,"%f", &f[0] ); 
-      fgetc( infile );
- 
-      float red, green, blue; 
-     
-      float *p = envMapPixels; 
-      //float LMax = 0.f;
-      // read the values and store them 
-      for ( int j = 0; j < envMapHeight ; j++ ) 
-      { 
-		    for ( int i = 0; i < envMapWidth ; i++ ) 
-        {     
-			    fread( f, 4, 1, infile ); 
-			    red = f[0]; 
-		     
-			    fread( f, 4, 1, infile ); 
-			    green = f[0]; 
-		     
-			    fread( f, 4, 1, infile ); 
-			    blue = f[0]; 
-		     
-			    *p++ = red; 
-			    *p++ = green; 
-			    *p++ = blue; 
-	 
-			    /*float L = (red + green + blue) / 3.0;
-			    if (L > LMax)
-			      LMax = L; */
-		    } 
-      }
-
-      fclose (infile);
-      p = NULL;
-                    
-      csRef<iImage> image;
-      image.AttachNew (new csImageMemory (envMapWidth, envMapHeight, envMapPixels, 
-        CS_IMGFMT_TRUECOLOR, (const csRGBpixel *)0));
-
-      int flags = CS_TEXTURE_2D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_NPOTS;
-      scfString failReason;        
-        
-      irradianceEnvironmentMap = graphics3D->GetTextureManager()->RegisterTexture (image, 
-        flags, &failReason);
-      /*irradianceEnvironmentMap = graphics3D->GetTextureManager()->CreateTexture (envMapWidth,
-        envMapHeight, csimg2D, "rgb16_f", flags, &failReason);*/
-
-      if (!irradianceEnvironmentMap)
-      {
-        csReport(objectRegistry, CS_REPORTER_SEVERITY_ERROR, reporterMessageID, 
-          "Could not register irradiance environment map: %s!", failReason.GetCsString().GetDataSafe());
-        return false;
-      }
-
-      //irradianceEnvironmentMap->Blit (0, 0, envMapWidth, envMapHeight, (unsigned char*)envMapPixels);
-
-      csRef<iImageIO> imageIO = csQueryRegistry<iImageIO> (objectRegistry);
-      csRef<iDataBuffer> data = imageIO->Save (image, "image/png");
-      if (!data)
-      {
-        csReport (objectRegistry, CS_REPORTER_SEVERITY_WARNING, reporterMessageID, 
-          "Could not export ssdo_envmap image to format png");	         
-      }
-
-      csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectRegistry);
-      vfs->ChDir ("/data");
-      if (!vfs->WriteFile ("ssdo_envmap", data->GetData(), data->GetSize()))
-      {
-        csReport(objectRegistry, CS_REPORTER_SEVERITY_WARNING, reporterMessageID, 
-          "Could not save ssdo envmap!");
-      }
-          
-      printf("Loading Envmap finished\n");
-      //float revGamma = 1.0 / 2.2;
-      delete envMapPixels;
-
-	    return true;
     }
 
     void DrawFullscreenQuad(iShader *shader)
@@ -894,20 +661,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     }
 
   public:
-    /*int patternSize;
-    int maxSamples;
-    int sampleCount;
-    float sampleRadius;
-    float depthBias;
-    float occlusionStrength;
-    float maxOccluderDistance;
-    float lightRotationAngle;
-    float bounceStrength;
-
-    int blurKernelSize;
-    float blurPositionThreshold;
-    float blurNormalThreshold;*/
-
     bool showAmbientOcclusion;
     bool showGlobalIllumination;
     bool applyBlur;
@@ -916,13 +669,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     csRef<iShader> horizontalBlurShader;    
     csRef<iShader> verticalBlurShader;
     csRef<iShader> lightCompositionShader;
+    csRef<iShader> downsampleShader;
 
   private:
     csSimpleRenderMesh quadMesh;
     csVector3 quadVerts[4];
 
     bool enabled;
-    bool isInitialized;    
+    bool isInitialized;
 
     GBuffer *gbuffer;
     
@@ -935,37 +689,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     csRef<iTextureHandle> intermediateBuffer;
     bool isIntermediateBufferAttached;
 
-    csRef<iTextureHandle> compositionBuffer;
-    bool isCompositionBufferAttached;
-    const char *compositionBufferFormat;
+    csRef<iTextureHandle> depthNormalBuffer;
+    bool isDepthNormalBufferAttached;
 
     csRef<iTextureHandle> randomNormalsTexture;
     csRef<iTextureHandle> sampleDirectionsTexture;
-    csRef<iTextureHandle> irradianceEnvironmentMap;
-    //iTextureHandle *directLightBuffer;
+    csRef<iTextureHandle> irradianceEnvironmentMap;    
     
     csRef<csShaderVariable> globalIllumBufferSV;
     csRef<csShaderVariable> intermediateBufferSV;
-    csRef<csShaderVariable> compositionBufferSV;
-    /*csRef<csShaderVariable> randomNormalsTextureSV;
-    csRef<csShaderVariable> sampleDirectionsTextureSV;
-    csRef<csShaderVariable> irradianceEnvironmentMapSV;
-
-    csRef<csShaderVariable> patternSizeSV;
-    csRef<csShaderVariable> sampleCountSV;
-    csRef<csShaderVariable> sampleRadiusSV;
-    csRef<csShaderVariable> depthBiasSV;
-    csRef<csShaderVariable> occlusionStrengthSV;
-    csRef<csShaderVariable> maxOccluderDistanceSV;
-    csRef<csShaderVariable> lightRotationAngleSV;
-    csRef<csShaderVariable> bounceStrengthSV;
-    
-    csRef<csShaderVariable> blurKernelSizeSV;
-    csRef<csShaderVariable> blurPositionThresholdSV;
-    csRef<csShaderVariable> blurNormalThresholdSV;
-
-    csRef<csShaderVariable> showAmbientOcclusionSV;
-    csRef<csShaderVariable> showGlobalIlluminationSV;*/
+    csRef<csShaderVariable> depthNormalBufferSV;
 
     iGraphics3D *graphics3D;
     csRef<iShaderManager> shaderManager;

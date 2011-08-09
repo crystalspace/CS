@@ -155,6 +155,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
             "Failed to detach GBuffer!");
       }
 
+      colorBufferFormat.Insert (0, colorFmt);
+
       return true;
     }
 
@@ -256,6 +258,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       return false;
     }
 
+    const char* GetColorBufferFormat() const
+    {
+      return colorBufferFormat.GetDataSafe();
+    }
+
   private:
 
     csRefArray<iTextureHandle> colorBuffers;
@@ -268,6 +275,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     iGraphics3D *graphics3D;
 
     bool isAttached;
+    csString colorBufferFormat;
   };
 
 }

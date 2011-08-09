@@ -115,6 +115,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
                          iStringSet *stringSet,
                          GBuffer &gbuffer,
                          csGlobalIllumRenderer &globalIllum,
+                         iTextureHandle *directLightBuffer,
                          DeferredLightRenderer::PersistentData &lightRenderPersistent,
                          int deferredLayer,
                          int zonlyLayer,
@@ -126,6 +127,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     stringSet(stringSet),
     gbuffer(gbuffer),
     globalIllum(globalIllum),
+    directLightBuffer(directLightBuffer),
     lightRenderPersistent(lightRenderPersistent),
     deferredLayer(deferredLayer),
     zonlyLayer(zonlyLayer),
@@ -211,8 +213,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       }
       gbuffer.Detach ();
 
-      // Fills the accumulation buffer
-      AttachAccumBuffer (context, false);
+      // Draw the direct light
+      if (!globalIllum.IsEnabled())
+        AttachAccumBuffer (context, false);
+      else
+        AttachDirectLightBuffer (context);
       {
         graphics3D->SetZMode (CS_ZBUF_MESH);
 
@@ -231,27 +236,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
           typename RenderTree::ContextNode *context = contextStack[i];
 
           ForEachLight (*context, lightRender);
-        }
-
-        if (!globalIllum.IsEnabled())
-          graphics3D->FinishDraw ();
+        }        
       }
-      DetachAccumBuffer ();
+      graphics3D->UnsetRenderTargets();
 
-      globalIllum.RenderGlobalIllum (context->drawFlags);
+      int subTex;
+      globalIllum.RenderGlobalIllum (GetAccumBuffer (context, subTex));
 
       // Draws the forward shaded objects.
-      if (!globalIllum.IsEnabled())
-        AttachAccumBuffer (context, true);
-      else
-        globalIllum.AttachCompositionBuffer (true);
-
+      AttachAccumBuffer (context, true);
       {
-        graphics3D->SetZMode (CS_ZBUF_MESH);        
-
-        /*int drawFlags = CSDRAW_3DGRAPHICS | context->drawFlags;
-        drawFlags |= CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
-        graphics3D->BeginDraw (drawFlags);*/
+        graphics3D->SetZMode (CS_ZBUF_MESH);
 
         ForwardMeshTreeRenderer<RenderTree> render (graphics3D, shaderMgr, deferredLayer);
         LightVolumeRenderer lightVolumeRender (lightRender, true, 0.2f);
@@ -269,22 +264,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
         graphics3D->FinishDraw ();
       }
-      if (!globalIllum.IsEnabled())
-        DetachAccumBuffer ();
-      else
-        globalIllum.DetachCompositionBuffer();
+      DetachAccumBuffer ();
 
       contextStack.Empty ();
     }
 
     /// Updates shader variables.
     void UpdateShaderVars(typename RenderTree::ContextNode *context)
-    {      
-      ShaderVarStringID accumBufferSVName (shaderMgr->GetSVNameStringset()->Request ("tex direct radiance"));
-      csShaderVariable *accumBufferSV = shaderMgr->GetVariableAdd (accumBufferSVName);
-
+    {
       int subtex;
-      accumBufferSV->SetValue (GetAccumBuffer (context, subtex));
+      iTextureHandle *directLightBuffer = GetDirectLightBuffer (context, subtex);
+
+      if (directLightBuffer)
+      {
+        ShaderVarStringID directLightBufferSVName (shaderMgr->GetSVNameStringset()->Request ("tex direct radiance"));
+        csShaderVariable *directLightBufferSV = shaderMgr->GetVariableAdd (directLightBufferSVName);
+
+        directLightBufferSV->SetValue (directLightBuffer);
+      }
 
       globalIllum.UpdateShaderVars();
     }
@@ -342,6 +339,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       graphics3D->UnsetRenderTargets ();
     }
 
+    /**
+     * Attaches the direct light buffer from the given context
+     */
+    bool AttachDirectLightBuffer(typename RenderTree::ContextNode *context)
+    {
+      int subTex;
+      iTextureHandle *buf = GetDirectLightBuffer (context, subTex);
+      if (!buf) 
+        return false;
+
+      if (!graphics3D->SetRenderTarget (buf, false, subTex, rtaColor0))
+        return false;
+
+      if (!graphics3D->ValidateRenderTargets ())
+        return false;
+
+      return true;
+    }
+
      /**
       * Returns the contexts accumulation buffer or NULL if no such buffer exists.
       */
@@ -374,6 +390,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     }
 
     /**
+      * Returns the contexts direct light buffer or NULL if no such buffer exists.
+      */
+    iTextureHandle *GetDirectLightBuffer(typename RenderTree::ContextNode *context, int &subTex)
+    {
+      //subTex = context->renderTargets[rtaColor1].subtexture;
+      //return context->renderTargets[rtaColor1].texHandle;
+      return directLightBuffer;
+    }
+
+    /**
+     * Returns true if the given context has a valid direct light buffer.
+     */
+    bool HasDirectLightBuffer(typename RenderTree::ContextNode *context)
+    {
+      int subTex;
+      iTextureHandle *buf = GetDirectLightBuffer (context, subTex);
+      return buf != (iTextureHandle*) nullptr;
+    }
+
+    /**
      * Returns true if the given context has the same render view as the 
      * last context.
      */
@@ -400,6 +436,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
     GBuffer &gbuffer;
     csGlobalIllumRenderer &globalIllum;
+    iTextureHandle *directLightBuffer;
     DeferredLightRenderer::PersistentData &lightRenderPersistent;
 
     csArray<typename RenderTree::ContextNode*> contextStack;

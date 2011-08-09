@@ -27,7 +27,7 @@
 const char *DEFAULT_CFG_WORLDDIR = "/lev/castle";
 const char *DEFAULT_CFG_LOGOFILE = "/lib/std/cslogo2.png";
 
-const float LIGHT_ROTATION_SPEED = 2.0f;
+const char* ballMaterialNames[4] = { "red", "green", "blue", "yellow" };
 
 //----------------------------------------------------------------------
 DeferredDemo::DeferredDemo()
@@ -63,6 +63,7 @@ bool DeferredDemo::OnInitialize(int argc, char *argv[])
       CS_REQUEST_REPORTER,
       CS_REQUEST_REPORTERLISTENER,
       CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
+      CS_REQUEST_PLUGIN ("crystalspace.dynamics.debug", CS::Debug::iDynamicsDebuggerManager),
       CS_REQUEST_END))
   {
     return ReportError("Failed to initialize plugins!");
@@ -77,7 +78,7 @@ bool DeferredDemo::OnInitialize(int argc, char *argv[])
     csevFrame (GetObjectRegistry()),
     csevKeyboardEvent (GetObjectRegistry()),
     csevCommandLineHelp (GetObjectRegistry()),
-
+    csevMouseEvent (GetObjectRegistry()),
     CS_EVENTLIST_END
   };
 
@@ -141,11 +142,24 @@ bool DeferredDemo::SetupModules()
   if (!loader) 
     return ReportError("Failed to locate Loader!");
 
+  csRef<iShaderManager> shaderManager = csQueryRegistry<iShaderManager> (GetObjectRegistry());
+  if (!shaderManager)
+    return ReportError("Failed to locate shader manager!");
+
+  svStringSet = shaderManager->GetSVNameStringset();
+
   cegui = csQueryRegistry<iCEGUI> (GetObjectRegistry());
   if (!loader) 
     return ReportError("Failed to locate CEGUI!");
 
+  dynamicsDebuggerManager = csQueryRegistry<CS::Debug::iDynamicsDebuggerManager> (GetObjectRegistry());
+  if (!dynamicsDebuggerManager)
+    return ReportError ("Failed to locate Dynamic's Debugger Manager!");
+  
   csRef<iPluginManager> pluginManager = csQueryRegistry<iPluginManager> (GetObjectRegistry ());
+  if (!pluginManager)
+    return ReportError ("Failed to locate Plugin Manager!");
+
   hudManager = csLoadPlugin<CS::Utility::iHUDManager>(pluginManager, "crystalspace.utilities.texthud");
   if (!hudManager)
     return ReportError ("Failed to locate HUD manager!");
@@ -181,6 +195,40 @@ bool DeferredDemo::SetupModules()
   if (!rmGlobalIllum)
     return ReportError ("Failed to query the deferred Render Manager global illumination interface!");
 
+  SetupDynamicsSystem (pluginManager);
+
+  return true;
+}
+
+bool DeferredDemo::SetupDynamicsSystem(iPluginManager *pluginManager)
+{
+  // Setup physics subsystem
+  dynamics = csLoadPlugin<iDynamics> (pluginManager, "crystalspace.dynamics.bullet");
+  if (!dynamics)
+    return ReportError ("Failed to load iDynamics plugin!");
+
+  dynamicSystem = dynamics->CreateSystem ();
+  if (!dynamicSystem) 
+    return ReportError ("Failed to create dynamic system!");
+
+  // Set some linear and angular dampening in order to have a reduction of
+  // the movements of the objects
+  dynamicSystem->SetLinearDampener(0.1f);
+  dynamicSystem->SetRollingDampener(0.1f);
+
+  bulletDynamicSystem = scfQueryInterface<CS::Physics::Bullet::iDynamicSystem> (dynamicSystem);
+
+  // Scale up the whole world for a better behavior of the dynamic simulation.
+  bulletDynamicSystem->SetInternalScale (10.0f);
+    
+  dynamicsDebugger = dynamicsDebuggerManager->CreateDebugger();
+  dynamicsDebugger->SetDynamicSystem (dynamicSystem);
+
+  // Don't display static colliders as the z-fighting with the original mesh is very ugly
+  dynamicsDebugger->SetStaticBodyMaterial (nullptr);
+
+  isBulletEnabled = true;
+  doBulletDebug = false;
   return true;
 }
 
@@ -194,12 +242,6 @@ bool DeferredDemo::LoadScene()
 
   if (!loader->LoadMapFile (cfgWorldFile))
      return ReportError("Could not load level!");
-
-  /*if (!vfs->ChDir ("/data/frankie"))
-    return ReportError("Could not navigate to directory /data/frankie");
-
-  if (!loader->LoadLibraryFile ("frankie.xml"))
-    return ReportError ("Could not load library frankie.xml");*/
 
   return true;
 }
@@ -249,7 +291,7 @@ bool DeferredDemo::LoadSettings()
 bool DeferredDemo::SetupGui(bool reload)
 {
   // Initialize the HUD manager
-  hudManager->GetKeyDescriptions ()->Empty ();
+  hudManager->GetKeyDescriptions()->Empty ();
 
   configEventNotifier.AttachNew(new CS::Utility::ConfigEventNotifier(GetObjectRegistry()));
 
@@ -257,10 +299,10 @@ bool DeferredDemo::SetupGui(bool reload)
     "DeferredDemo.OcclusionStrength", occlusionStrength));
   sampleRadiusListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
     "DeferredDemo.SampleRadius", sampleRadius));
-  sampleRadiusWideListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
-    "DeferredDemo.SampleRadiusWide", sampleRadiusWide));
-  sampleCountListener.AttachNew (new CS::Utility::ConfigListener<int>(GetObjectRegistry(), 
-    "DeferredDemo.SampleCount", sampleCount));
+  detailSampleRadiusListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
+    "DeferredDemo.DetailSampleRadius", detailSampleRadius));
+  aoPassesListener.AttachNew (new CS::Utility::ConfigListener<int>(GetObjectRegistry(), 
+    "DeferredDemo.NumPasses", aoPasses));
   maxOccluderDistListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
     "DeferredDemo.MaxOccluderDist", maxOccluderDistance));  
   selfOcclusionListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
@@ -310,18 +352,16 @@ bool DeferredDemo::SetupGui(bool reload)
   guiDrawLogo         = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("DrawLogo"));  
   guiEnableAO         = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("EnableAO"));
   guiEnableBlur       = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("EnableBlur"));
-  guiEnableRadiusWide = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("EnableRadiusWide"));
-  guiEnableGlobalIllum = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("EnableGlobalIllum"));
+  guiEnableDetailSamples = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("EnableDetailSamples"));
+  guiEnableGlobalIllum   = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("EnableGlobalIllum"));
   guiEnableIndirectLight = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("EnableIndirectLight"));
-
-  /*guiSampleRadius     = static_cast<CEGUI::Slider*>(winMgr->getWindow ("SampleRadius"));
-  guiMaxOccluderDist  = static_cast<CEGUI::Slider*>(winMgr->getWindow ("MaxOccluderDist"));
-  guiDepthBias        = static_cast<CEGUI::Slider*>(winMgr->getWindow ("DepthBias"));*/
+  //CEGUI::Combobox *guiCombo = static_cast<CEGUI::Combobox*>(winMgr->getWindow ("RenderBuffer"));  
+  //guiCombo->addItem (new CEGUI::ListboxTextItem ("Ambient Occlusion"));
 
   if (!guiRoot || 
       !guiDeferred || !guiForward || !guiEnableGlobalIllum ||
       !guiShowGBuffer || !guiDrawLightVolumes || !guiDrawLogo ||
-      !guiEnableAO || !guiEnableBlur || !guiEnableIndirectLight || !guiEnableRadiusWide)
+      !guiEnableAO || !guiEnableBlur || !guiEnableIndirectLight || !guiEnableDetailSamples)
   {
     return ReportError("Could not load GUI!");
   }
@@ -337,20 +377,20 @@ bool DeferredDemo::SetupGui(bool reload)
   guiEnableAO->setSelected (true);
   guiEnableBlur->setSelected (true);
   guiEnableIndirectLight->setSelected (true);
-  guiEnableRadiusWide->setSelected (true);
+  guiEnableDetailSamples->setSelected (true);
   guiEnableGlobalIllum->setSelected (true);
   
-  occlusionStrength = 0.7f;
-  sampleRadius = 0.1f;
-  sampleRadiusWide = 0.6f;
-  sampleCount = 2;
-  maxOccluderDistance = 0.8f;
-  selfOcclusion = 0.1f;
-  occAngleBias = 0.1f;
-  bounceStrength = 6.0f;
+  occlusionStrength = 1.4f;
+  sampleRadius = 0.25f;
+  detailSampleRadius = 0.05f;
+  aoPasses = 2;
+  maxOccluderDistance = 2.0f;
+  selfOcclusion = 0.0f;
+  occAngleBias = 0.0f;
+  bounceStrength = 6.5f;
   blurKernelSize = 3;
   blurPositionThreshold = 0.5f;
-  blurNormalThreshold = 0.25f;
+  blurNormalThreshold = 0.2f;
 
   showGBuffer = false;
   drawLightVolumes = false;
@@ -364,8 +404,7 @@ bool DeferredDemo::SetupGui(bool reload)
 //----------------------------------------------------------------------
 bool DeferredDemo::SetupScene()
 {
-  // Setup camera
-  csRef<iSector> room;
+  // Setup camera  
   csVector3 pos (0, 0, 0);
   if (engine->GetCameraPositions ()->GetCount () > 0)
   {
@@ -398,15 +437,154 @@ bool DeferredDemo::SetupScene()
   if (caps->MaxRTColorAttachments < 3)
     return ReportError("Graphics3D does not support at least 3 color buffer attachments!");
   else
-    ReportInfo("Graphics3D supports %d color buffer attachments.", caps->MaxRTColorAttachments);
+    ReportInfo("Graphics3D supports %d color buffer attachments.", caps->MaxRTColorAttachments);  
+  
+  // Create 5 ball factories with different sizes
+  for (int i=0; i < 6; i++)
+  {
+    ballFact[i] = engine->CreateMeshFactory ("crystalspace.mesh.object.genmesh", 
+      csString ("ballFact") + csString ((char)('0' + i)));
+    if (!ballFact[i])
+      ReportError ("Failed to create mesh object factory!");
 
-  light = engine->FindLight ("Lamp.Lucy.Spot.2");
-  if (!light)
-    ReportWarning ("Light not found!");
+    csRef<iGeneralFactoryState> factoryState = 
+      scfQueryInterface<iGeneralFactoryState> (ballFact[i]->GetMeshObjectFactory());
 
-  engine->Prepare ();  
+    float r = i * 0.1f + 0.3f;
+    if (i == 5) r = 0.1f;
+    csVector3 radius (r, r, r);
+    csEllipsoid ellips (csVector3 (0.0f), radius);
+    factoryState->GenerateSphere (ellips, 16);
+  }
+  
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
+  vfs->ChDir ("/lib/std");
+  csRef<iMaterialWrapper> matR = engine->CreateMaterial (ballMaterialNames[0], 
+      engine->CreateTexture ("red", "red.jpg", nullptr, CS_TEXTURE_2D));  
+  csRef<iMaterialWrapper> matG = engine->CreateMaterial (ballMaterialNames[1], 
+      engine->CreateTexture ("green", "green.jpg", nullptr, CS_TEXTURE_2D));  
+  csRef<iMaterialWrapper> matB = engine->CreateMaterial (ballMaterialNames[2], 
+      engine->CreateTexture ("blue", "blue.jpg", nullptr, CS_TEXTURE_2D));
+  csRef<iMaterialWrapper> matY = engine->CreateMaterial (ballMaterialNames[3], 
+      engine->CreateTexture ("yellow", "yellow.jpg", nullptr, CS_TEXTURE_2D));
+
+  CreateColliders();
+    
+  dynamicsDebugger->SetDebugSector (room);
+
+  engine->Prepare ();
 
   return true;
+}
+
+//----------------------------------------------------------------------
+void DeferredDemo::CreateColliders()
+{
+  ReportInfo ("Creating colliders...");
+
+  /*csPlane3 mainFloor (csVector3 (0.0f, 1.0f, 0.0f), 0.55f);
+  dynamicSystem->AttachColliderPlane (mainFloor, 200.0f, 0.0f);
+  
+  csOrthoTransform t;
+  // Walls
+  csVector3 wallsSize (46.0f, 22.0f, 1.0f);
+
+  t.SetOrigin(csVector3(0.0f, 10.0f, 9.9f));
+  dynamicSystem->AttachColliderBox (wallsSize, t, 100.0f, 0.0f);
+
+  t.SetOrigin(csVector3(0.0f, 10.0f, -9.8f));
+  dynamicSystem->AttachColliderBox (wallsSize, t, 100.0f, 0.0f);
+
+  wallsSize.Set (1.0f, 22.0f, 20.0f);
+
+  t.SetOrigin(csVector3(22.0f, 10.0f, 0.0f));
+  dynamicSystem->AttachColliderBox (wallsSize, t, 100.0f, 0.0f);
+
+  t.SetOrigin(csVector3(-21.1f, 10.0f, 0.0f));
+  dynamicSystem->AttachColliderBox (wallsSize, t, 100.0f, 0.0f);
+
+  // Second level floor
+  wallsSize.Set (46.0f, 0.25f, 6.0f);
+
+  t.SetOrigin(csVector3(0.0f, 6.2f, 7.0f));
+  dynamicSystem->AttachColliderBox (wallsSize, t, 200.0f, 0.0f);
+
+  t.SetOrigin(csVector3(0.0f, 6.2f, -7.0f));
+  dynamicSystem->AttachColliderBox (wallsSize, t, 200.0f, 0.0f);
+
+  // Third level floor
+  t.SetOrigin(csVector3(0.0f, 13.25f, 7.0f));
+  dynamicSystem->AttachColliderBox (wallsSize, t, 200.0f, 0.0f);
+
+  t.SetOrigin(csVector3(0.0f, 13.25f, -7.0f));
+  dynamicSystem->AttachColliderBox (wallsSize, t, 200.0f, 0.0f);
+
+  // Second level floor
+  wallsSize.Set (7.0f, 0.25f, 20.0f);
+
+  t.SetOrigin(csVector3(18.5f, 6.8f, 0.0f));
+  dynamicSystem->AttachColliderBox (wallsSize, t, 200.0f, 0.0f);
+
+  t.SetOrigin(csVector3(-17.5f, 6.8f, 0.0f));
+  dynamicSystem->AttachColliderBox (wallsSize, t, 200.0f, 0.0f);
+
+  // Third level floor
+  t.SetOrigin(csVector3(18.5f, 13.85f, 0.0f));
+  dynamicSystem->AttachColliderBox (wallsSize, t, 200.0f, 0.0f);
+
+  t.SetOrigin(csVector3(-17.5f, 13.85f, 0.0f));
+  dynamicSystem->AttachColliderBox (wallsSize, t, 200.0f, 0.0f);*/
+
+  /*CreateMeshBBoxCollider ("lucy");
+  CreateMeshBBoxCollider ("happy_vrip");
+  CreateMeshBBoxCollider ("xyzrgb_dragon");
+  CreateMeshBBoxCollider ("bunny_Mesh");
+  CreateMeshBBoxCollider ("dragon_vrip");
+  //CreateMeshBBoxCollider ("krystal");
+
+  CreateMeshColliders ("Cube.00", 6);
+  CreateMeshColliders ("pillar", 5);
+  CreateMeshColliders ("arcs", 8);
+  CreateMeshColliders ("object", 11);
+  CreateMeshColliders ("walls", 3);
+  CreateMeshColliders ("floors", 1);
+  CreateMeshColliders ("ceiling", 1);*/
+
+  for (int i=0; i < engine->GetMeshes()->GetCount(); i++)
+  {
+    iMeshWrapper *mesh = engine->GetMeshes()->Get(i);
+    csReversibleTransform &fullTransform = mesh->GetMovable()->GetFullTransform();
+    csOrthoTransform t (fullTransform.GetO2T(), fullTransform.GetOrigin());    
+    dynamicSystem->AttachColliderMesh (mesh, t, 10.0f, 0.0f); 
+  }
+}
+
+//----------------------------------------------------------------------
+void DeferredDemo::CreateMeshBBoxCollider(const char *meshName)
+{
+  csOrthoTransform t;
+  iMeshWrapper *mesh = engine->FindMeshObject (meshName); 
+  if (mesh)
+  {
+    t.SetOrigin (mesh->GetWorldBoundingBox().GetCenter());
+    dynamicSystem->AttachColliderBox (mesh->GetWorldBoundingBox().GetSize(), t, 10.0f, 0.0f);
+  }
+}
+
+//----------------------------------------------------------------------
+void DeferredDemo::CreateMeshColliders(const char *baseMeshName, int numMeshes)
+{
+  for (int i=0; i < numMeshes; i++)
+  {
+    csOrthoTransform t;
+    csString meshName = csString (baseMeshName) + csString ((char)('0' + i));
+    iMeshWrapper *mesh = engine->FindMeshObject (meshName);
+    if (mesh)
+    {
+      t.SetOrigin (mesh->GetMovable()->GetFullPosition());
+      dynamicSystem->AttachColliderMesh (mesh, t, 10.0f, 0.0f);
+    }
+  }
 }
 
 //----------------------------------------------------------------------
@@ -475,40 +653,38 @@ void DeferredDemo::RunDemo()
 }
 
 //----------------------------------------------------------------------
-void DeferredDemo::UpdateCamera()
+void DeferredDemo::UpdateCamera(float deltaTime)
 {
   const float MOVE_SPEED = 5.0f;
-  const float ROTATE_SPEED = 2.0f;
-
-  float dt = (float)(vc->GetElapsedTicks () / 1000.0f);
+  const float ROTATE_SPEED = 2.0f;  
 
   // Handles camera movement.
   iCamera *c = view->GetCamera ();
   if (kbd->GetKeyState (CSKEY_SHIFT))
   {
     if (kbd->GetKeyState (CSKEY_RIGHT))
-      c->Move (CS_VEC_RIGHT * MOVE_SPEED * dt);
+      c->Move (CS_VEC_RIGHT * MOVE_SPEED * deltaTime);
     if (kbd->GetKeyState (CSKEY_LEFT))
-      c->Move (CS_VEC_LEFT * MOVE_SPEED * dt);
+      c->Move (CS_VEC_LEFT * MOVE_SPEED * deltaTime);
     if (kbd->GetKeyState (CSKEY_UP))
-      c->Move (CS_VEC_UP * MOVE_SPEED * dt);
+      c->Move (CS_VEC_UP * MOVE_SPEED * deltaTime);
     if (kbd->GetKeyState (CSKEY_DOWN))
-      c->Move (CS_VEC_DOWN * MOVE_SPEED * dt);
+      c->Move (CS_VEC_DOWN * MOVE_SPEED * deltaTime);
   }
   else
   {
     if (kbd->GetKeyState (CSKEY_RIGHT))
-      viewRotY += ROTATE_SPEED * dt;
+      viewRotY += ROTATE_SPEED * deltaTime;
     if (kbd->GetKeyState (CSKEY_LEFT))
-      viewRotY -= ROTATE_SPEED * dt;
+      viewRotY -= ROTATE_SPEED * deltaTime;
     if (kbd->GetKeyState (CSKEY_PGUP))
-      viewRotX += ROTATE_SPEED * dt;
+      viewRotX += ROTATE_SPEED * deltaTime;
     if (kbd->GetKeyState (CSKEY_PGDN))
-      viewRotX -= ROTATE_SPEED * dt;
+      viewRotX -= ROTATE_SPEED * deltaTime;
     if (kbd->GetKeyState (CSKEY_UP))
-      c->Move (CS_VEC_FORWARD * MOVE_SPEED * dt);
+      c->Move (CS_VEC_FORWARD * MOVE_SPEED * deltaTime);
     if (kbd->GetKeyState (CSKEY_DOWN))
-      c->Move (CS_VEC_BACKWARD * MOVE_SPEED * dt);
+      c->Move (CS_VEC_BACKWARD * MOVE_SPEED * deltaTime);
   }
 
   csMatrix3 Rx = csXRotMatrix3 (viewRotX);
@@ -516,6 +692,15 @@ void DeferredDemo::UpdateCamera()
   csOrthoTransform V (Rx * Ry, c->GetTransform ().GetOrigin ());
 
   c->SetTransform (V);
+}
+
+//----------------------------------------------------------------------
+void DeferredDemo::UpdateDynamics(float deltaTime)
+{
+  dynamicsDebugger->SetDebugSector (view->GetCamera()->GetSector());
+
+  if (isBulletEnabled)
+    dynamics->Step (deltaTime);
 }
 
 //----------------------------------------------------------------------
@@ -544,9 +729,9 @@ void DeferredDemo::UpdateGui()
     rmGlobalIllum->EnableGlobalIllumination (enableGlobalIllum);
   }
   // By setting the AO wide radius to 0 it is disabled
-  if (!guiEnableRadiusWide->isSelected())
+  if (!guiEnableDetailSamples->isSelected())
   {
-    sampleRadiusWide = 0.0f;
+    detailSampleRadius = 0.0f;
   }
 
   rmGlobalIllum->EnableBlurPass (guiEnableBlur->isSelected());
@@ -557,8 +742,8 @@ void DeferredDemo::UpdateGui()
       SetValue (guiEnableIndirectLight->isSelected() ? 1.0f : 0.0f);
   rmGlobalIllum->GetGlobalIllumVariableAdd ("occlusion strength")->SetValue (occlusionStrength);
   rmGlobalIllum->GetGlobalIllumVariableAdd ("sample radius")->SetValue (sampleRadius);
-  rmGlobalIllum->GetGlobalIllumVariableAdd ("detail sample radius")->SetValue (sampleRadiusWide);
-  rmGlobalIllum->GetGlobalIllumVariableAdd ("num passes")->SetValue (sampleCount);
+  rmGlobalIllum->GetGlobalIllumVariableAdd ("detail sample radius")->SetValue (detailSampleRadius);
+  rmGlobalIllum->GetGlobalIllumVariableAdd ("num passes")->SetValue (aoPasses);
   rmGlobalIllum->GetGlobalIllumVariableAdd ("max occluder distance")->SetValue (maxOccluderDistance);
   rmGlobalIllum->GetGlobalIllumVariableAdd ("self occlusion")->SetValue (selfOcclusion);
   rmGlobalIllum->GetGlobalIllumVariableAdd ("occluder angle bias")->SetValue (occAngleBias);
@@ -566,6 +751,11 @@ void DeferredDemo::UpdateGui()
   rmGlobalIllum->GetBlurVariableAdd ("ssao blur kernelsize")->SetValue (blurKernelSize);
   rmGlobalIllum->GetBlurVariableAdd ("ssao blur position threshold")->SetValue (blurPositionThreshold);
   rmGlobalIllum->GetBlurVariableAdd ("ssao blur normal threshold")->SetValue (blurNormalThreshold);
+
+  char *msg = new char[50];
+  cs_snprintf (msg, 50, "%s: %d", "Number of lights", room->GetLights()->GetCount());
+  hudManager->GetStateDescriptions()->Empty();
+  hudManager->GetStateDescriptions()->Push (msg);
 }
 
 //----------------------------------------------------------------------
@@ -598,7 +788,7 @@ void DeferredDemo::DrawLogo()
   const int margin = (int)screenW * marginFraction;
 
   // Width of the logo, as a fraction of screen width
-  const float widthFraction = 0.3f;
+  const float widthFraction = 0.2f;
   const int width = (int)screenW * widthFraction;
   const int height = width * h / w;
 
@@ -618,7 +808,10 @@ void DeferredDemo::DrawLogo()
 //----------------------------------------------------------------------
 void DeferredDemo::Frame ()
 {
-  UpdateCamera ();
+  float dt = (float)(vc->GetElapsedTicks () / 1000.0f);
+
+  UpdateCamera (dt);
+  UpdateDynamics (dt);
   UpdateGui ();
 
   if (cfgUseDeferredShading)
@@ -627,6 +820,9 @@ void DeferredDemo::Frame ()
     engine->SetRenderManager (rm_default);
 
   view->Draw ();
+
+  if (doBulletDebug)
+    bulletDynamicSystem->DebugDraw (view);
 
   cegui->Render ();
 
@@ -669,39 +865,16 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
     }        
     else if (code == CSKEY_F12) // Screenshot key
     {      
-      csRef<iImage> screenshot = graphics2D->ScreenShot ();
-
-      // Convert the screenshot to the target image format
-      csRef<iImageIO> imageIO = csQueryRegistry<iImageIO> (GetObjectRegistry ());
-      if (!screenshot || !imageIO)
-	      return false;
-
-      csRef<iDataBuffer> data =
-	      imageIO->Save (screenshot, csString().Format ("image/%s", screenshotFormat.GetData()));
-
-      if (!data)
-      {
-	      ReportError ("Could not export screenshot image to format %s!",
-		      CS::Quote::Single (screenshotFormat.GetData ()));
-	      return false;
-      }
-
-      // Save the file
-      csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
-      if (!vfs) return false;
-
-      csString filename = screenshotHelper.FindNextFilename (vfs);
-      if (data && vfs->WriteFile (filename, data->GetData (), data->GetSize()))
-      {
-	      csRef<iDataBuffer> path = vfs->GetRealPath (filename.GetData ());
-	      ReportInfo ("Screenshot saved to %s...", CS::Quote::Single (path->GetData()));
-      }
-
-      return true;
+      return TakeScreenShot();
     }
     else if (code == CSKEY_F9)
     {
       hudManager->SetEnabled (!hudManager->GetEnabled());
+      return true;
+    }
+    else if (code == CSKEY_F2)
+    {
+      graphics2D->SetFullScreen (!graphics2D->GetFullScreen());
       return true;
     }
     else if (code == 'f')
@@ -748,15 +921,14 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
       rmGlobalIllum->EnableGlobalIllumination (enableGlobalIllum);
       return true;
     }
-    else if (code == 'k')
-    {      
-      float rot = LIGHT_ROTATION_SPEED * (float)vc->GetElapsedTicks() / 1000.0f;
-      light->GetMovable()->GetTransform().RotateOther (CS_VEC_ROT_LEFT, rot);
-    }
-    else if (code == 'l')
+    else if (code == 'n')
     {
-      float rot = LIGHT_ROTATION_SPEED * (float)vc->GetElapsedTicks() / 1000.0f;
-      light->GetMovable()->GetTransform().RotateOther (CS_VEC_ROT_RIGHT, rot);
+      isBulletEnabled = !isBulletEnabled;
+    }
+    else if (code == 'b')
+    {
+      doBulletDebug = !doBulletDebug;
+      return true;
     }
     else if (code == '1')
     {
@@ -770,6 +942,15 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
     {
       rmGlobalIllum->ChangeBufferResolution ("quarter");
     }
+    else if (code == CSKEY_SPACE)
+    {
+      if (kbd->GetKeyState (CSKEY_CTRL))
+        SpawnSphere(true);
+      else
+        SpawnSphere();
+      
+      return true;
+    } 
 #ifdef CS_DEBUG
     else if (code == 'r')
     {
@@ -783,8 +964,78 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
 }
 
 //----------------------------------------------------------------------
+bool DeferredDemo::TakeScreenShot()
+{
+  csRef<iImage> screenshot = graphics2D->ScreenShot();
+
+  // Convert the screenshot to the target image format
+  csRef<iImageIO> imageIO = csQueryRegistry<iImageIO> (GetObjectRegistry ());
+  if (!screenshot || !imageIO)
+	  return false;
+
+  csRef<iDataBuffer> data =
+	  imageIO->Save (screenshot, csString().Format ("image/%s", screenshotFormat.GetData()));
+
+  if (!data)
+  {
+	  ReportError ("Could not export screenshot image to format %s!",
+		  CS::Quote::Single (screenshotFormat.GetData ()));
+	  return false;
+  }
+
+  // Save the file
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
+  if (!vfs) return false;
+
+  csString filename = screenshotHelper.FindNextFilename (vfs);
+  if (data && vfs->WriteFile (filename, data->GetData (), data->GetSize()))
+  {
+	  csRef<iDataBuffer> path = vfs->GetRealPath (filename.GetData ());
+	  ReportInfo ("Screenshot saved to %s...", CS::Quote::Single (path->GetData()));
+  }
+
+  return true;
+}
+
+//----------------------------------------------------------------------
+void DeferredDemo::SpawnSphere(bool attachLight)
+{  
+  const csOrthoTransform& cameraTransform = view->GetCamera()->GetTransform();  
+  int ballIndex = rand() % 5;    
+  csRef<iRigidBody> body = dynamicSystem->CreateBody();
+  float radius = ballIndex * 0.1f + 0.3f;
+  iSector *currentSector = view->GetCamera()->GetSector();
+
+  if (attachLight)
+  {
+    light = engine->CreateLight ("light", body->GetPosition(), 8.0f, csColor (0.5f, 0.5f, 0.5f), 
+        CS_LIGHT_DYNAMICTYPE_DYNAMIC);
+    //light->SetType (CS_LIGHT_SPOTLIGHT);
+    //light->SetSpotLightFalloff (25.0f, 30.0f);
+    currentSector->GetLights()->Add (light);
+    body->AttachLight (light);
+    radius = 0.15f;
+    ballIndex = 5;
+  }
+
+  csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (ballFact[ballIndex], "ball", currentSector));
+  iMaterialWrapper* mat = engine->GetMaterialList()->FindByName (ballMaterialNames[rand() % 4]);    
+  mesh->GetMeshObject()->SetMaterialWrapper (mat);
+
+  body->SetProperties (0.01f, csVector3 (0.0f), csMatrix3());
+  body->SetPosition (cameraTransform.GetOrigin() + cameraTransform.GetT2O() * csVector3 (0, 0, 1));
+  body->AttachMesh (mesh);    
+  body->AttachColliderSphere (radius, csVector3(0.0f), 1, 1, 0.01f);    
+  body->SetLinearVelocity (cameraTransform.GetT2O() * csVector3 (0, 0, 7));
+  body->SetAngularVelocity (cameraTransform.GetT2O() * csVector3 (7, 0, 0));  
+    
+  dynamicsDebugger->UpdateDisplay();
+}
+
+//----------------------------------------------------------------------
 bool DeferredDemo::OnQuit (iEvent &event)
 {
   shouldShutdown = true;
   return true;
 }
+

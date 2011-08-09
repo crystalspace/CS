@@ -14,7 +14,6 @@
 <variablemap variable="enable indirect light" destination="enableIndirectLight" />
 
 <program>
-<?Include /shader/deferred/light_common.cginc?>
 <![CDATA[
 
 uniform float4x4 Projection : state.matrix.projection;
@@ -81,7 +80,7 @@ float ComputeOcclusion(float3 vecToOccluder, float3 normal, float3 sampleNormal)
       occlusionStrength * step (fRangeIsInvalid, maxOccluderDistance);*/
 }
 
-float3 ComputeIndirectRadiance(float2 sampleTC, float3 vecToOccluder, float3 normal, float3 sampleNormal)
+float3 ComputeIndirectRadiance(float2 sampleTC, float3 vecToOccluder, float3 normal, float3 sampleNormal, float ao)
 {
   float occluderDist = max (1.0, length (vecToOccluder));
   vecToOccluder = normalize (vecToOccluder);  
@@ -96,26 +95,24 @@ float4 main(vertex2fragment IN) : COLOR
 {
   const float3 samples[8] =
 	{
-		normalize (float3 ( 1, 1, 1)), //* 0.5625f, //0.125f,
-		normalize (float3 (-1,-1,-1)), //* 0.6250f, //0.250f,
-		normalize (float3 (-1,-1, 1)), //* 0.6875f, //0.375f,
-		normalize (float3 (-1, 1,-1)), //* 0.7500f, //0.500f,
-		normalize (float3 (-1, 1 ,1)), //* 0.8125f, //0.625f,
-		normalize (float3 ( 1,-1,-1)), //* 0.8750f, //0.750f,
-		normalize (float3 ( 1,-1, 1)), //* 0.9375f, //0.875f,
-		normalize (float3 ( 1, 1,-1)) //* 0.9999f //0.999f
+		normalize (float3 ( 1, 1, 1)), 
+		normalize (float3 (-1,-1,-1)), 
+		normalize (float3 (-1,-1, 1)), 
+		normalize (float3 (-1, 1,-1)), 
+		normalize (float3 (-1, 1 ,1)), 
+		normalize (float3 ( 1,-1,-1)), 
+		normalize (float3 ( 1,-1, 1)), 
+		normalize (float3 ( 1, 1,-1)) 
 	};	
   
   float2 screenXY = IN.ScreenPos.xy / IN.ScreenPos.w;
   float2 texCoord = screenXY * 0.5 + 0.5;
   
-  float4 normalDepth = tex2D (NormalBuffer, texCoord);
+  float4 normalDepth = tex2D (NormalBuffer, texCoord); //return normalDepth;
   float depth = normalDepth.a * farClipDistance;
   float3 screenPos = float3 (screenXY.x, -screenXY.y, depth);
   float3 normal = normalDepth.rgb * 2.0 - 1.0;
-  //float3 randomNormal = tex2D (RandNormalsTexture, texCoord * viewportSize.xy / 16).rgb * 2.0 - 1.0;
-  //randomNormal = normalize (randomNormal);
-  
+    
   float invDepth = 1.0 / depth;
   float3 scale[2];
   scale[0] = float3 (sampleRadius * invDepth, sampleRadius * invDepth, sampleRadius / farClipDistance);
@@ -136,7 +133,7 @@ float4 main(vertex2fragment IN) : COLOR
   
   for (int n=0; n < numPasses; n++)
   {
-    float3 randomNormal = tex2D (RandNormalsTexture, texCoord * ((viewportSize.xy / 16) + float2(n))).rgb * 2.0 - 1.0;
+    float3 randomNormal = tex2D (RandNormalsTexture, texCoord * ((viewportSize.xy / 64) + float2(n))).rgb * 2.0 - 1.0;
     randomNormal = normalize (randomNormal);
     for (int i=0; i < 8; i++)
     {
@@ -154,7 +151,7 @@ float4 main(vertex2fragment IN) : COLOR
       AO = ComputeOcclusion (vecToOccluder, normal, sampleNormal);
 <?endif?>
 <?if vars."enable indirect light".float == 1 ?>
-      indirectRadiance += ComputeIndirectRadiance (sampleTC, vecToOccluder, normal, sampleNormal);
+      indirectRadiance += ComputeIndirectRadiance (sampleTC, vecToOccluder, normal, sampleNormal, AO);
 <?endif?>
 <![CDATA[
       //bentNormal += vecToOccluder * AO;

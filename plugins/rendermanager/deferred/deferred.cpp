@@ -195,11 +195,11 @@ portalPersistent(CS::RenderManager::TextureCache::tcacheExactSizeMatch)
 //----------------------------------------------------------------------
 bool RMDeferred::Initialize(iObjectRegistry *registry)
 {
-  const char *messageID = "crystalspace.rendermanager.deferred";
+  messageID = "crystalspace.rendermanager.deferred";
 
   objRegistry = registry;
 
-  csRef<iGraphics3D> graphics3D = csQueryRegistry<iGraphics3D> (objRegistry);
+  graphics3D = csQueryRegistry<iGraphics3D> (objRegistry);
   iGraphics2D *graphics2D = graphics3D->GetDriver2D ();
    
   shaderManager = csQueryRegistry<iShaderManager> (objRegistry);
@@ -287,7 +287,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
 
   // Creates the accumulation buffer.
   int flags = CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP | CS_TEXTURE_NPOTS;
-  const char *accumFmt = cfg->GetStr ("RenderManager.Deferred.AccumBufferFormat", "rgb16_f");
+  accumFmt = cfg->GetStr ("RenderManager.Deferred.AccumBufferFormat", "rgb16_f");
 
   scfString errStr;
   accumBuffer = graphics3D->GetTextureManager ()->CreateTexture (graphics2D->GetWidth (),
@@ -316,15 +316,12 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   desc.height = graphics2D->GetHeight ();
   desc.colorBufferFormat = gbufferFmt;
 
-  if (!gbuffer.Initialize (desc, 
-                           graphics3D, 
-                           shaderManager->GetSVNameStringset (), 
-                           objRegistry))
+  if (!gbuffer.Initialize (desc, graphics3D, shaderManager->GetSVNameStringset(), objRegistry))
   {
     return false;
   }
 
-  if (!globalIllum.Initialize (graphics3D, objRegistry, &gbuffer))
+  if (!globalIllum.Initialize (graphics3D, objRegistry, &gbuffer) || !CreateDirectLightBuffer())
   {
     csReport (objRegistry, CS_REPORTER_SEVERITY_NOTIFY, messageID,
           "Dynamic global illumination is disabled");
@@ -345,6 +342,25 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
 
   RMViscullCommon::Initialize (objRegistry, "RenderManager.Deferred");
   
+  return true;
+}
+
+//----------------------------------------------------------------------
+bool RMDeferred::CreateDirectLightBuffer()
+{
+  scfString errStr;
+  iGraphics2D *graphics2D = graphics3D->GetDriver2D();
+  int flags = CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP | CS_TEXTURE_NPOTS;
+  directLightBuffer = graphics3D->GetTextureManager()->CreateTexture (graphics2D->GetWidth(),
+      graphics2D->GetHeight(), csimg2D, accumFmt, flags, &errStr);
+
+  if (!directLightBuffer)
+  {
+    csReport (objRegistry, CS_REPORTER_SEVERITY_ERROR, messageID, 
+      "Could not create direct light buffer: %s!", errStr.GetCsString ().GetDataSafe ());
+    return false;
+  }
+
   return true;
 }
 
@@ -403,7 +419,7 @@ bool RMDeferred::RenderView(iView *view, bool recursePortals)
   csShaderVariable *farPlaneSV = shaderManager->GetVariableAdd (svStringSet->Request("far clip distance"));
   float farPlaneDistance = rview->GetCamera()->GetFarPlane()->D();
   float nearPlaneDistance = camera->GetNearClipDistance();
-  farPlaneSV->SetValue (abs (farPlaneDistance - nearPlaneDistance));
+  farPlaneSV->SetValue (fabs (farPlaneDistance - nearPlaneDistance));
 
   CS::Math::Matrix4 perspectiveFixup;
   postEffects.SetupView (view, perspectiveFixup);
@@ -424,6 +440,12 @@ bool RMDeferred::RenderView(iView *view, bool recursePortals)
     {
       startContext->renderTargets[rtaColor0].texHandle = accumBuffer;
       startContext->renderTargets[rtaColor0].subtexture = 0;
+
+      /*if (directLightBuffer)
+      {
+        startContext->renderTargets[rtaColor1].texHandle = directLightBuffer;
+        startContext->renderTargets[rtaColor1].subtexture = 0;
+      }*/
     }
 
     contextSetup (*startContext, portalData, recursePortals);
@@ -436,6 +458,7 @@ bool RMDeferred::RenderView(iView *view, bool recursePortals)
                                                  stringSet,
                                                  gbuffer,
                                                  globalIllum,
+                                                 directLightBuffer,
                                                  lightRenderPersistent,
                                                  deferredLayer,
                                                  zonlyLayer,
@@ -453,12 +476,7 @@ bool RMDeferred::RenderView(iView *view, bool recursePortals)
   else
   {  
     // Output the final result to the backbuffer.
-    iTextureHandle *finalBuffer = accumBuffer;
-
-    if (globalIllum.IsEnabled())
-      finalBuffer = globalIllum.GetLightCompositionBuffer();
-
-    DrawFullscreenTexture (finalBuffer, graphics3D);
+    DrawFullscreenTexture (accumBuffer, graphics3D);
   }
 
   DebugFrameRender (rview, renderTree);
@@ -707,6 +725,9 @@ void RMDeferred::EnableGlobalIllumination (bool enable)
   
     csRef<iGraphics3D> graphics3D = csQueryRegistry<iGraphics3D> (objRegistry);
     globalIllum.Initialize (graphics3D, objRegistry, &gbuffer, false);
+
+    if (!directLightBuffer)
+      CreateDirectLightBuffer();    
   }
   else
   {

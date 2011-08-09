@@ -116,7 +116,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
     void ShowGBuffer(RenderTreeType &tree);
 
+    bool CreateDirectLightBuffer();
+
     iObjectRegistry *objRegistry;
+
+    csRef<iGraphics3D> graphics3D;
 
     RenderTreeType::PersistentData treePersistent;
     PortalSetupType::PersistentData portalPersistent;
@@ -130,7 +134,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     csRef<iStringSet> stringSet;
     csRef<iShaderVarStringSet> svStringSet;
 
+    const char *accumFmt;
     csRef<iTextureHandle> accumBuffer;
+    csRef<iTextureHandle> directLightBuffer;
 
     GBuffer gbuffer;
     csGlobalIllumRenderer globalIllum;
@@ -146,6 +152,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     bool showGBuffer;
     bool drawLightVolumes;
     csDebugBuffer debugBuffer;
+
+    const char *messageID;
   };
 }
 CS_PLUGIN_NAMESPACE_END(RMDeferred)

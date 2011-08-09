@@ -40,6 +40,7 @@
       <texture destination="DiffuseBuffer" name="tex gbuffer 0" />
       <texture destination="AmbientBuffer" name="tex gbuffer 2" />
       <texture destination="NormalBuffer" name="tex gbuffer 3" />
+      <!--texture destination="NormalBuffer" name="tex downsampled normal depth" /-->
       <texture destination="DepthBuffer" name="tex gbuffer depth" />
       <texture destination="SeedTexture" name="tex sample directions" />
       <texture destination="EnvmapTexture" name="tex globalillum envmap" />

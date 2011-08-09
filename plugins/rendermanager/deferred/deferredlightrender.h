@@ -181,7 +181,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     const float r = light->GetCutoffDistance ();
     const csVector3 c = light->GetMovable ()->GetFullPosition ();
 
-    return (p - c).SquaredNorm () <= (r * r);
+    return (p - c).SquaredNorm () <= ((r * r) + SMALL_EPSILON);
   }
 
   /**
@@ -200,7 +200,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     csVector3 u = p - pos;
 
     float dot_ud = u * d;
-    if (dot_ud <= 0.0f || dot_ud >= range)
+    if (dot_ud <= SMALL_EPSILON || dot_ud >= (range - SMALL_EPSILON))
       return false;
 
     float cang = dot_ud / u.Norm ();

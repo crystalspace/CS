@@ -26,18 +26,18 @@ float4 main(vertex2fragment IN,
             uniform int ShowAO,
             uniform int ShowGlobalIllum) : COLOR
 {
-	float4 bilinearWeights[4] =
+	/*float4 bilinearWeights[4] =
   {
     float4( 9/16, 3/16, 3/16, 1/16 ), 
     float4( 3/16, 9/16, 1/16, 3/16 ), 
     float4( 3/16, 1/16, 9/16, 3/16 ), 
     float4( 1/16, 3/16, 3/16, 9/16 ) 
-  };
+  };*/
   
   //float2 screenXY = IN.ScreenPos.xy / IN.ScreenPos.w;
   float2 texCoord = IN.TexCoord; //screenXY * 0.5f + 0.5f; //IN.TexCoord;   
   
-  float4 normalDepthVS = tex2D (NormalBuffer, texCoord);  
+  /*float4 normalDepthVS = tex2D (NormalBuffer, texCoord);  
   float3 pixelNormalVS = normalDepthVS.rgb * 2.0f - 1.0f;
 	float pixelDepth = normalDepthVS.a;
   
@@ -82,14 +82,14 @@ float4 main(vertex2fragment IN,
   {
     AO *= 0.25f;
     radiance *= 0.25f;
-  }
+  }*/
   
   float3 directRadiance = tex2D (DirectRadianceBuffer, texCoord).rgb;  
   float3 diffuseColor = tex2D (DiffuseBuffer, texCoord).rgb;  
   float3 ambientColor = tex2D (AmbientBuffer, texCoord).rgb;  
   
-  //float4 radiance = tex2D (GlobalIllumBuffer, texCoord);
-  //float AO = radiance.a;
+  float4 radiance = tex2D (GlobalIllumBuffer, texCoord);
+  float AO = radiance.a;
   
   radiance.rgb = diffuseColor * AO * (ambientColor + radiance.rgb);
 ]]>

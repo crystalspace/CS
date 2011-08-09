@@ -1,11 +1,9 @@
 <include>
 <![CDATA[
 
-//uniform float4x4 ProjInv; //: state.matrix.inverse.projection;
 uniform sampler2D NormalBuffer;
 uniform sampler2D DiffuseBuffer;
 uniform sampler2D AmbientBuffer;            
-//uniform sampler2D DepthBuffer;
 uniform sampler2D DirectRadianceBuffer;
 uniform sampler2D GlobalIllumBuffer;
 uniform float FarClipDistance;
@@ -19,11 +17,11 @@ uniform int ShowAO;
 uniform int ShowGlobalIllum;
 
 const float TWO_PI = 6.28318f;
-//const float EPSILON = 0.01f;
+const float EPSILON = 0.01f;
 float weightedAO = 0.0f;
 float AO = 0.0f;
-float3 weightedRadiance = float3(0.0f);
-float3 radiance = float3(0.0f);
+float4 weightedRadiance = float4(0.0f);
+float4 radiance = float4(0.0f);
 
 float GaussianCoeff(float sampleDist, float sqrSigma)
 {  
@@ -38,33 +36,31 @@ float WeightSample(float sampleDist, float2 sampleTexCoord,
   float3 sampleNormalVS = sampleDepthNormalVS.rgb * 2.0f - 1.0f;
   float sampleDepth = sampleDepthNormalVS.a;
       
-  float deltaZ = /*abs*/ (sampleDepth - pixelDepth);
+  float deltaZ = abs (sampleDepth - pixelDepth);
   float dotN = dot (pixelNormalVS, sampleNormalVS);       
   float4 sampleGI = tex2D (GlobalIllumBuffer, sampleTexCoord);
   
   float totalWeight = 0.0f;
   if (deltaZ < PositionThreshold && dotN > 1.0f - NormalThreshold)
   {
-    totalWeight = GaussianCoeff (sampleDist, sqrGaussianSigma); //* pow (dotN, /*32.0f*/NormalThreshold) / 
-        //(/*EPSILON*/PositionThreshold + deltaZ);
+    totalWeight = GaussianCoeff (sampleDist, sqrGaussianSigma) * pow (dotN, 32.0f) / 
+        (EPSILON + deltaZ);
     //totalWeight = exp (-i * i * NormalThreshold - deltaZ * deltaZ * PositionThreshold * 1024.0f);
     
-    weightedAO += sampleGI.a * totalWeight;
-    weightedRadiance += sampleGI.rgb * totalWeight;    
+    //weightedAO += sampleGI.a * totalWeight;
+    weightedRadiance += sampleGI * totalWeight;    
   }
   
-  AO += sampleGI.a;
-  radiance += sampleGI.rgb;
+  //AO += sampleGI.a;
+  radiance += sampleGI;
   return totalWeight;
 }
 
 float4 main(in float2 texCoord : TEXCOORD0) : COLOR
-{
-  //return tex2D (GlobalIllumBuffer, texCoord);
-  //float2 texCoord = (ScreenPos.xy / ScreenPos.w) * 0.5f + 0.5f;  
+{  
   float4 normalDepthVS = tex2D (NormalBuffer, texCoord);
   float3 pixelNormalVS = normalDepthVS.rgb * 2.0f - 1.0f;
-  float pixelDepth = normalDepthVS.a;  
+  float pixelDepth = normalDepthVS.a;
   
   float weightSum = 0.0f;
   float sqrGaussianSigma = KernelSize * 0.3333f;
@@ -83,18 +79,20 @@ float4 main(in float2 texCoord : TEXCOORD0) : COLOR
   
   if (weightSum > 0.0f)
   {
-    weightSum = 1.0f / weightSum;
-    AO = weightedAO * weightSum;
-    radiance = weightedRadiance * weightSum;
+    //weightSum = 1.0f / weightSum;
+    //AO = weightedAO * weightSum;
+    radiance = weightedRadiance / weightSum;
   }
   else
   {
-    weightSum = 1.0f / (2.0f * KernelSize + 1.0f);
-    AO *= weightSum;
-    radiance *= weightSum;
+    //weightSum = 1.0f / (2.0f * KernelSize + 1.0f);
+    //AO *= weightSum;
+    //radiance *= weightSum;
+    radiance /= 2.0f * KernelSize + 1.0f;
   }
-
-  return float4 (radiance, AO);
+  
+  return radiance;
+  //return float4 (radiance, AO);
 }
 
 ]]>
