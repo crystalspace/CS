@@ -86,6 +86,25 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     return color;
   }
   
+  // PCF - Percentage Close Filtering
+  float getVisibility(sampler2D tex, float2 position, float compareDepth)
+  {
+    float vis = 0;
+    //bias = 0.01;
+    vis += compareDepth > tex2D(tex, position + float2(0, bias));
+    vis += compareDepth > tex2D(tex, position + float2(0, -bias));
+    vis += compareDepth > tex2D(tex, position + float2(bias, bias));
+    vis += compareDepth > tex2D(tex, position + float2(bias, -bias));
+    vis += compareDepth > tex2D(tex, position + float2(-bias, bias));
+    vis += compareDepth > tex2D(tex, position + float2(-bias, -bias));
+    vis += compareDepth > tex2D(tex, position + float2(0, 0));
+    vis += compareDepth > tex2D(tex, position + float2(bias, 0));
+    vis += compareDepth > tex2D(tex, position + float2(-bias, 0));    
+    vis /= 9.0;
+    
+    return vis;
+  }
+  
   float getMapValue(int i, float2 position)
   {
     // already checked when depthStart = 0
@@ -122,9 +141,9 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     float2 position = shadowMapCoordsBiased.xy;
    
     int i;
-    float eps = 0.0;
+    float eps = 0.0001;
 
-    float compareDepth = (1 - shadowMapCoordsBiased.z) + eps;
+    float compareDepth = (1 - shadowMapCoordsBiased.z) - eps;
     float depthStart = tex2D(lightPropsOM.shadowMapStart[lightNum], position).x;
     float depthEnd = tex2D(lightPropsOM.shadowMapEnd[lightNum], position).x;    
 /*    
@@ -150,10 +169,11 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     if (compareDepth < depthStart)
       i = -1;
 */
-    i = -(compareDepth < depthStart) + i * !(compareDepth < depthStart);
+//    i = -(compareDepth < depthStart) + i * (compareDepth < depthStart);
     
     float previousMap, nextMap;
-    previousMap = getMapValue(i, position);
+    previousMap = getMapValue(i, position) * 
+      getVisibility( lightPropsOM.shadowMapStart[lightNum] , position, compareDepth );
 //    nextMap = getMapValue( min ( i + 1, numSplits - 1 ) , position);   
 
     i = i * (i != -1);
@@ -171,8 +191,10 @@ struct ShadowShadowMapDepth : ShadowShadowMap
 /*
     inLight = 1;
 //    if (compareDepth > depthStart && depthStart != 0)
-    if (compareDepth > depthStart && compareDepth < (1 - depthEnd + 0.05))
-      inLight = 1 - (compareDepth - depthStart) / (1 - depthEnd - depthStart + 0.05);
+    if (compareDepth > depthStart )//&& compareDepth < (1 - depthEnd + 0.05))
+      inLight = 0;//1 - (compareDepth - depthStart) / (1 - depthEnd - depthStart + 0.05);
+
+    inLight =  1 - getVisibility( lightPropsOM.shadowMapStart[lightNum] , position, compareDepth ); 
 */
     //inLight = tex2D(lightPropsOM.shadowMapStart[lightNum], float3(position, compareDepth)).x;
     
