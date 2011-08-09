@@ -891,7 +891,8 @@ bool csGLGraphics3D::Open ()
   ext->InitGL_AMD_seamless_cubemap_per_texture ();
   ext->InitGL_ARB_half_float_vertex ();
   ext->InitGL_ARB_instanced_arrays ();
-  
+  ext->InitGL_ARB_tessellation_shader (); // glPatchParameteri()
+
   /* Some of the exts checked for above affect the state cache,
      so let it grab the state again */
   statecache->currentContext->InitCache();
@@ -2079,17 +2080,21 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 
   GLenum primitivetype = GL_TRIANGLES;
   int primNum_divider = 1, primNum_sub = 0;
+  int primVertices = 1;
   switch (mymesh->meshtype)
   {
     case CS_MESHTYPE_QUADS:
+      primVertices = 4;
       primNum_divider = 2;
       primitivetype = GL_QUADS;
       break;
     case CS_MESHTYPE_TRIANGLESTRIP:
+      // primVertices = ?;
       primNum_sub = 2;
       primitivetype = GL_TRIANGLE_STRIP;
       break;
     case CS_MESHTYPE_TRIANGLEFAN:
+      // primVertices = ?;
       primNum_sub = 2;
       primitivetype = GL_TRIANGLE_FAN;
       break;
@@ -2106,15 +2111,18 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       break;
     }
     case CS_MESHTYPE_LINES:
+      primVertices = 2;
       primNum_divider = 2;
       primitivetype = GL_LINES;
       break;
     case CS_MESHTYPE_LINESTRIP:
+      // primVertices = ?;
       primNum_sub = 1;
       primitivetype = GL_LINE_STRIP;
       break;
     case CS_MESHTYPE_TRIANGLES:
     default:
+      primVertices = 3;
       primNum_divider = 3;
       primitivetype = GL_TRIANGLES;
       break;
@@ -2125,6 +2133,20 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       statecache->Enable_GL_POINT_SPRITE_ARB();
     else
       statecache->Disable_GL_POINT_SPRITE_ARB();
+  }
+
+  if (mymesh->use_patches)
+  {
+    csGLGraphics3D::ext->glPatchParameteri (GL_PATCH_VERTICES_ARB,
+      primVertices);
+    // FIXME: the idea is that if this mesh is renderer another time without
+    // any tessellation shader activated, it wont fail, but it wont work
+    // if the mesh is drawn twice after a csShaderProgram::SetupState() call.
+    // to be short, this assumes that for each SetupState() there is a single
+    // draw call per mesh
+    ((csCoreRenderMesh*)mymesh)->use_patches = false;
+    // update primitive type
+    primitivetype = GL_PATCHES_ARB;
   }
 
   // Based on the kind of clipping we need we set or clip mask.
@@ -4280,9 +4302,11 @@ void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
 
   GLenum primitivetype = GL_TRIANGLES;
   int primNum_divider = 1, primNum_sub = 0;
+  int primVertices = 1;
   switch (mymesh->meshtype)
   {
     case CS_MESHTYPE_QUADS:
+      primVertices = 4;
       primNum_divider = 2;
       primitivetype = GL_QUADS;
       break;
@@ -4307,6 +4331,7 @@ void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
       break;
     }
     case CS_MESHTYPE_LINES:
+      primVertices = 2;
       primNum_divider = 2;
       primitivetype = GL_LINES;
       break;
@@ -4316,6 +4341,7 @@ void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
       break;
     case CS_MESHTYPE_TRIANGLES:
     default:
+      primVertices = 3;
       primNum_divider = 3;
       primitivetype = GL_TRIANGLES;
       break;
@@ -4326,6 +4352,20 @@ void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
       statecache->Enable_GL_POINT_SPRITE_ARB();
     else
       statecache->Disable_GL_POINT_SPRITE_ARB();
+  }
+
+  if (mymesh->use_patches)
+  {
+    csGLGraphics3D::ext->glPatchParameteri (GL_PATCH_VERTICES_ARB,
+      primVertices);
+    // FIXME: the idea is that if this mesh is renderer another time without
+    // any tessellation shader activated, it wont fail, but it wont work
+    // if the mesh is drawn twice after a csShaderProgram::SetupState() call.
+    // to be short, this assumes that for each SetupState() there is a single
+    // draw call per mesh
+    ((csCoreRenderMesh*)mymesh)->use_patches = false;
+    // update primitive type
+    primitivetype = GL_PATCHES_ARB;
   }
 
   // Based on the kind of clipping we need we set or clip mask.

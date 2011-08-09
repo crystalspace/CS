@@ -96,11 +96,13 @@ void csGLShader_GLSL::Open()
     ext->InitGL_ARB_shader_objects ();
     ext->InitGL_ARB_shading_language_100 ();
     ext->InitGL_EXT_geometry_shader4 ();
+    ext->InitGL_ARB_tessellation_shader ();
     if (ext->CS_GL_ARB_vertex_shader &&
         ext->CS_GL_ARB_fragment_shader &&
         ext->CS_GL_ARB_shader_objects &&
         ext->CS_GL_ARB_shading_language_100 &&
-        ext->CS_GL_EXT_geometry_shader4)
+        ext->CS_GL_EXT_geometry_shader4 &&
+        ext->CS_GL_ARB_tessellation_shader)
       enable = true;
   } else return;
 

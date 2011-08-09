@@ -29,6 +29,7 @@
 #include "iutil/document.h"
 #include "iutil/string.h"
 #include "ivaria/reporter.h"
+#include "ivideo/rendermesh.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 
@@ -51,13 +52,21 @@ void csShaderGLSLProgram::Deactivate()
   shaderPlug->ext->glUseProgramObjectARB (0);
 }
 
-void csShaderGLSLProgram::SetupState (const CS::Graphics::RenderMesh* /*mesh*/, 
+void csShaderGLSLProgram::SetupState (const CS::Graphics::RenderMesh* mesh, 
                                       CS::Graphics::RenderMeshModes& /*modes*/,
                                       const csShaderVariableStack& stack)
 {
   size_t i;
   const csGLExtensionManager* ext = shaderPlug->ext;
   csRef<csShaderVariable> var;
+
+  if (useTessellation)
+  {
+    // setup primitive type as GL_PATCHES, also check out how many
+    // vertices should be assigned for each patch
+    // TODO: cast hax
+    ((CS::Graphics::RenderMesh*)mesh)->use_patches = true;
+  }
 
   // set variables
   for (i = 0; i < variablemap.GetSize (); ++i)
@@ -188,6 +197,22 @@ bool csShaderGLSLProgram::Load (iShaderDestinationResolver*,
       return false;
   }
 
+  program = node->GetNode ("ep");
+  if (program)
+  {
+    epSource = LoadSource (program);
+    if (!epSource)
+      return false;
+  }
+
+  program = node->GetNode ("cp");
+  if (program)
+  {
+    cpSource = LoadSource (program);
+    if (!cpSource)
+      return false;
+  }
+
   return true;
 }
 
@@ -234,6 +259,18 @@ csPtr<csShaderGLSLShader> csShaderGLSLProgram::CreateGP () const
   return csPtr<csShaderGLSLShader> (
     new csShaderGLSLShader (shaderPlug, "geometry", GL_GEOMETRY_SHADER_EXT));
 }
+csPtr<csShaderGLSLShader> csShaderGLSLProgram::CreateEP () const
+{
+  return csPtr<csShaderGLSLShader> (
+    new csShaderGLSLShader (shaderPlug, "tessellation evaluation",
+                            GL_TESS_EVALUATION_SHADER_ARB));
+}
+csPtr<csShaderGLSLShader> csShaderGLSLProgram::CreateCP () const
+{
+  return csPtr<csShaderGLSLShader> (
+    new csShaderGLSLShader (shaderPlug, "tessellation control",
+                            GL_TESS_CONTROL_SHADER_ARB));
+}
 
 bool csShaderGLSLProgram::Compile (iHierarchicalCache*, csRef<iString>* tag)
 {
@@ -245,7 +282,6 @@ bool csShaderGLSLProgram::Compile (iHierarchicalCache*, csRef<iString>* tag)
   if (!ext)
     return false;
 
-  // glCreateProgram() does not seem to be available
   program_id = ext->glCreateProgramObjectARB ();
 
   if (vpSource)
@@ -280,6 +316,30 @@ bool csShaderGLSLProgram::Compile (iHierarchicalCache*, csRef<iString>* tag)
       return false;
 
     ext->glAttachObjectARB (program_id, gp->GetID ());
+  }
+  if (epSource)
+  {
+    if (!ext->CS_GL_ARB_tessellation_shader)
+      return false;
+
+    ep = CreateEP ();
+    if (!ep->Compile (epSource->GetData ()))
+      return false;
+
+    ext->glAttachObjectARB (program_id, ep->GetID ());
+    useTessellation = true;
+  }
+  if (cpSource)
+  {
+    if (!ext->CS_GL_ARB_tessellation_shader)
+      return false;
+
+    cp = CreateCP ();
+    if (!cp->Compile (cpSource->GetData ()))
+      return false;
+
+    ext->glAttachObjectARB (program_id, cp->GetID ());
+    useTessellation = true;
   }
 
   ext->glLinkProgramARB (program_id);

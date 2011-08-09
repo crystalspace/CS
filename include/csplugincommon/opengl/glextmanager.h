@@ -10590,6 +10590,148 @@ typedef GLint (csAPIENTRY* csGLGETATTRIBLOCATIONARB) (GLhandleARB programObj, co
 /**\name GL_EXT_geometry_shader4 functions
  * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/EXT/geometry_shader4.txt">http://www.opengl.org/registry/specs/EXT/geometry_shader4.txt</a>.
  * @{ */
+typedef GLvoid (csAPIENTRY* csGLPROGRAMPARAMETERIEXT) (GLuint program, GLenum pname, GLint value);
+
+/** @} */
+/**\name GL_ARB_tessellation_shader constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/tessellation_shader.txt">http://www.opengl.org/registry/specs/ARB/tessellation_shader.txt</a>.
+ * @{ */
+#ifndef GL_PATCHES_ARB
+#define GL_PATCHES_ARB                                                  0xE
+#endif
+
+#ifndef GL_PATCH_VERTICES_ARB
+#define GL_PATCH_VERTICES_ARB                                        0x8E72
+#endif
+
+#ifndef GL_PATCH_DEFAULT_INNER_LEVEL_ARB
+#define GL_PATCH_DEFAULT_INNER_LEVEL_ARB                             0x8E73
+#endif
+
+#ifndef GL_PATCH_DEFAULT_OUTER_LEVEL_ARB
+#define GL_PATCH_DEFAULT_OUTER_LEVEL_ARB                             0x8E74
+#endif
+
+#ifndef GL_TESS_CONTROL_OUTPUT_VERTICES_ARB
+#define GL_TESS_CONTROL_OUTPUT_VERTICES_ARB                          0x8E75
+#endif
+
+#ifndef GL_TESS_GEN_MODE_ARB
+#define GL_TESS_GEN_MODE_ARB                                         0x8E76
+#endif
+
+#ifndef GL_TESS_GEN_SPACING_ARB
+#define GL_TESS_GEN_SPACING_ARB                                      0x8E77
+#endif
+
+#ifndef GL_TESS_GEN_VERTEX_ORDER_ARB
+#define GL_TESS_GEN_VERTEX_ORDER_ARB                                 0x8E78
+#endif
+
+#ifndef GL_TESS_GEN_POINT_MODE_ARB
+#define GL_TESS_GEN_POINT_MODE_ARB                                   0x8E79
+#endif
+
+#ifndef GL_ISOLINES_ARB
+#define GL_ISOLINES_ARB                                              0x8E7A
+#endif
+
+#ifndef GL_FRACTIONAL_ODD_ARB
+#define GL_FRACTIONAL_ODD_ARB                                        0x8E7B
+#endif
+
+#ifndef GL_FRACTIONAL_EVEN_ARB
+#define GL_FRACTIONAL_EVEN_ARB                                       0x8E7C
+#endif
+
+#ifndef GL_MAX_PATCH_VERTICES_ARB
+#define GL_MAX_PATCH_VERTICES_ARB                                    0x8E7D
+#endif
+
+#ifndef GL_MAX_TESS_GEN_LEVEL_ARB
+#define GL_MAX_TESS_GEN_LEVEL_ARB                                    0x8E7E
+#endif
+
+#ifndef GL_MAX_TESS_CONTROL_UNIFORM_COMPONENTS_ARB
+#define GL_MAX_TESS_CONTROL_UNIFORM_COMPONENTS_ARB                   0x8E7F
+#endif
+
+#ifndef GL_MAX_TESS_EVALUATION_UNIFORM_COMPONENTS_ARB
+#define GL_MAX_TESS_EVALUATION_UNIFORM_COMPONENTS_ARB                0x8E80
+#endif
+
+#ifndef GL_MAX_TESS_CONTROL_TEXTURE_IMAGE_UNITS_ARB
+#define GL_MAX_TESS_CONTROL_TEXTURE_IMAGE_UNITS_ARB                  0x8E81
+#endif
+
+#ifndef GL_MAX_TESS_EVALUATION_TEXTURE_IMAGE_UNITS_ARB
+#define GL_MAX_TESS_EVALUATION_TEXTURE_IMAGE_UNITS_ARB               0x8E82
+#endif
+
+#ifndef GL_MAX_TESS_CONTROL_OUTPUT_COMPONENTS_ARB
+#define GL_MAX_TESS_CONTROL_OUTPUT_COMPONENTS_ARB                    0x8E83
+#endif
+
+#ifndef GL_MAX_TESS_PATCH_COMPONENTS_ARB
+#define GL_MAX_TESS_PATCH_COMPONENTS_ARB                             0x8E84
+#endif
+
+#ifndef GL_MAX_TESS_CONTROL_TOTAL_OUTPUT_COMPONENTS_ARB
+#define GL_MAX_TESS_CONTROL_TOTAL_OUTPUT_COMPONENTS_ARB              0x8E85
+#endif
+
+#ifndef GL_MAX_TESS_EVALUATION_OUTPUT_COMPONENTS_ARB
+#define GL_MAX_TESS_EVALUATION_OUTPUT_COMPONENTS_ARB                 0x8E86
+#endif
+
+#ifndef GL_MAX_TESS_CONTROL_UNIFORM_BLOCKS_ARB
+#define GL_MAX_TESS_CONTROL_UNIFORM_BLOCKS_ARB                       0x8E89
+#endif
+
+#ifndef GL_MAX_TESS_EVALUATION_UNIFORM_BLOCKS_ARB
+#define GL_MAX_TESS_EVALUATION_UNIFORM_BLOCKS_ARB                    0x8E8A
+#endif
+
+#ifndef GL_MAX_TESS_CONTROL_INPUT_COMPONENTS_ARB
+#define GL_MAX_TESS_CONTROL_INPUT_COMPONENTS_ARB                     0x886C
+#endif
+
+#ifndef GL_MAX_TESS_EVALUATION_INPUT_COMPONENTS_ARB
+#define GL_MAX_TESS_EVALUATION_INPUT_COMPONENTS_ARB                  0x886D
+#endif
+
+#ifndef GL_MAX_COMBINED_TESS_CONTROL_UNIFORM_COMPONENTS_ARB
+#define GL_MAX_COMBINED_TESS_CONTROL_UNIFORM_COMPONENTS_ARB          0x8E1E
+#endif
+
+#ifndef GL_MAX_COMBINED_TESS_EVALUATION_UNIFORM_COMPONENTS_ARB
+#define GL_MAX_COMBINED_TESS_EVALUATION_UNIFORM_COMPONENTS_ARB       0x8E1F
+#endif
+
+#ifndef GL_UNIFORM_BLOCK_REFERENCED_BY_TESS_CONTROL_SHADER_ARB
+#define GL_UNIFORM_BLOCK_REFERENCED_BY_TESS_CONTROL_SHADER_ARB       0x84F0
+#endif
+
+#ifndef GL_UNIFORM_BLOCK_REFERENCED_BY_TESS_EVALUATION_SHADER_ARB
+#define GL_UNIFORM_BLOCK_REFERENCED_BY_TESS_EVALUATION_SHADER_ARB    0x84F1
+#endif
+
+#ifndef GL_TESS_EVALUATION_SHADER_ARB
+#define GL_TESS_EVALUATION_SHADER_ARB                                0x8E87
+#endif
+
+#ifndef GL_TESS_CONTROL_SHADER_ARB
+#define GL_TESS_CONTROL_SHADER_ARB                                   0x8E88
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_tessellation_shader functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/tessellation_shader.txt">http://www.opengl.org/registry/specs/ARB/tessellation_shader.txt</a>.
+ * @{ */
+typedef GLvoid (csAPIENTRY* csGLPATCHPARAMETERI) (GLenum pname, GLint value);
+typedef GLvoid (csAPIENTRY* csGLPATCHPARAMETERFV) (GLenum pname, const GLfloat* values);
 
 /** @} */
 /**\name GL_ARB_pixel_buffer_object constants
@@ -17340,6 +17482,26 @@ public:
   /**\name GL_EXT_geometry_shader4 functions
    * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/EXT/geometry_shader4.txt">http://www.opengl.org/registry/specs/EXT/geometry_shader4.txt</a>.
    * @{ */
+  #ifndef GLPROGRAMPARAMETERIEXT_DECL
+  #define GLPROGRAMPARAMETERIEXT_DECL
+  csGLPROGRAMPARAMETERIEXT glProgramParameteriEXT;
+  #endif
+
+
+  /** @} */
+  /**\name GL_ARB_tessellation_shader functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/tessellation_shader.txt">http://www.opengl.org/registry/specs/ARB/tessellation_shader.txt</a>.
+   * @{ */
+  #ifndef GLPATCHPARAMETERI_DECL
+  #define GLPATCHPARAMETERI_DECL
+  csGLPATCHPARAMETERI glPatchParameteri;
+  #endif
+
+  #ifndef GLPATCHPARAMETERFV_DECL
+  #define GLPATCHPARAMETERFV_DECL
+  csGLPATCHPARAMETERFV glPatchParameterfv;
+  #endif
+
 
   /** @} */
   /**\name GL_ARB_pixel_buffer_object functions
@@ -18215,6 +18377,9 @@ public:
   /** Whether the <a href="http://www.opengl.org/registry/specs/EXT/geometry_shader4.txt">GL_EXT_geometry_shader4</a> extension was found. 
    * Set by csGLExtensionManager::InitGL_EXT_geometry_shader4(). */
   bool CS_GL_EXT_geometry_shader4;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/tessellation_shader.txt">GL_ARB_tessellation_shader</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_tessellation_shader(). */
+  bool CS_GL_ARB_tessellation_shader;
   /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/pixel_buffer_object.txt">GL_ARB_pixel_buffer_object</a> extension was found. 
    * Set by csGLExtensionManager::InitGL_ARB_pixel_buffer_object(). */
   bool CS_GL_ARB_pixel_buffer_object;
@@ -18472,6 +18637,7 @@ protected:
   bool tested_CS_GL_ARB_fragment_shader;
   bool tested_CS_GL_ARB_vertex_shader;
   bool tested_CS_GL_EXT_geometry_shader4;
+  bool tested_CS_GL_ARB_tessellation_shader;
   bool tested_CS_GL_ARB_pixel_buffer_object;
   bool tested_CS_GL_ARB_texture_rectangle;
   bool tested_CS_GL_EXT_framebuffer_object;
@@ -24535,7 +24701,12 @@ public:
     if (!extstrGL) return;
     tested_CS_GL_EXT_geometry_shader4 = true;
     const char* ext = "GL_EXT_geometry_shader4";
-
+    InitGL_ARB_shader_objects();
+    if (!CS_GL_ARB_shader_objects)
+    {
+      Report (msgDependencyNotFound, "GL", CS::Quote::Single (ext), CS::Quote::Single ("GL_ARB_shader_objects"));
+      return;
+    }
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
@@ -24547,8 +24718,45 @@ public:
     allclear = true;
     if (init)	// Don't check the functions if ext isn't reported anyway
     {
+      EXTMGR_FUNC_INIT(glProgramParameteriEXT, GLPROGRAMPARAMETERIEXT);
 
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_geometry_shader4)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", CS::Quote::Single (ext));
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/tessellation_shader.txt">GL_ARB_tessellation_shader</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_tessellation_shader. */
+  void InitGL_ARB_tessellation_shader ()
+  {
+    if (tested_CS_GL_ARB_tessellation_shader) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_tessellation_shader = true;
+    const char* ext = "GL_ARB_tessellation_shader";
+    InitGL_ARB_shader_objects();
+    if (!CS_GL_ARB_shader_objects)
+    {
+      Report (msgDependencyNotFound, "GL", CS::Quote::Single (ext), CS::Quote::Single ("GL_ARB_shader_objects"));
+      return;
+    }
+    char cfgkey[26 + 26 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_tessellation_shader = CheckExtension (extstrGL, ext);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_tessellation_shader;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+      EXTMGR_FUNC_INIT(glPatchParameteri, GLPATCHPARAMETERI);
+      EXTMGR_FUNC_INIT(glPatchParameterfv, GLPATCHPARAMETERFV);
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_tessellation_shader)
     }
     else
     {

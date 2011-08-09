@@ -10,7 +10,7 @@
         <vp>
           <program>
             <![CDATA[
-              #version 140
+              #version 410
               #extension GL_EXT_geometry_shader4 : enable
 
               out vec2 texcoord;
@@ -18,17 +18,92 @@
               void main (void)
               {
                 texcoord = gl_MultiTexCoord0.xy;
-                gl_Position = ftransform ();
+                gl_Position = gl_Vertex;
               }
             ]]>
           </program>
         </vp>
 
+        <cp>
+          <program>
+            <![CDATA[
+              #version 410
+              #extension GL_EXT_geometry_shader4 : enable
+              #extension GL_EXT_gpu_shader4 : enable
+
+              layout (vertices = 3) out;
+
+              in vec2 texcoord[];
+              out vec2 tc[];
+
+              void main (void)
+              {
+                const float inner = 4;
+                const float outer = 4;
+                #define ID gl_InvocationID
+
+                // in modern GL, attributes other than the position must be
+                // specified explicitly
+                tc[ID] = texcoord[ID];
+                // vertex position is built-in
+                gl_out[ID].gl_Position = gl_in[ID].gl_Position;
+
+                if (ID == 0) {
+                  gl_TessLevelInner[0] = inner;
+                  gl_TessLevelInner[1] = inner;
+                  gl_TessLevelOuter[0] = outer;
+                  gl_TessLevelOuter[1] = outer;
+                  gl_TessLevelOuter[2] = outer;
+                  gl_TessLevelOuter[3] = outer;
+                }
+              }
+            ]]>
+          </program>
+        </cp>
+
+        <ep>
+          <program>
+            <![CDATA[
+              #version 410
+              #extension GL_EXT_geometry_shader4 : enable
+              #extension GL_EXT_gpu_shader4 : enable
+
+              layout(triangles, equal_spacing, cw) in;
+
+              in vec2 tc[];
+              out vec2 texcoord;
+
+              void main (void)
+              {
+                vec2 t0 = gl_TessCoord.x * tc[0];
+                vec2 t1 = gl_TessCoord.y * tc[1];
+                vec2 t2 = gl_TessCoord.z * tc[2];
+                texcoord = t0 + t1 + t2;
+
+                vec4 p0 = gl_TessCoord.x * gl_in[0].gl_Position;
+                vec4 p1 = gl_TessCoord.y * gl_in[1].gl_Position;
+                vec4 p2 = gl_TessCoord.z * gl_in[2].gl_Position;
+                // doing projection after tessellation avoids
+                // screen-space interpolation of the vertices
+                gl_Position = gl_ModelViewProjectionMatrix * (p0 + p1 + p2);
+              }
+            ]]>
+          </program>
+        </ep>
+
         <gp>
           <program>
             <![CDATA[
-              #version 140
+              #version 410
               #extension GL_EXT_geometry_shader4 : enable
+
+              // let's make the tessellation visible :)
+#define LINES 1
+#if LINES
+              layout (line_strip, max_vertices = 4) out;
+#else
+              layout (triangle_strip, max_vertices = 3) out;
+#endif
 
               in vec2 texcoord[];
               out vec2 tc;
@@ -44,6 +119,11 @@
                 gl_Position = gl_PositionIn[2];
                 tc = texcoord[2];
                 EmitVertex ();
+#if LINES
+                gl_Position = gl_PositionIn[0];
+                tc = texcoord[0];
+                EmitVertex ();
+#endif
                 EndPrimitive ();
               }
             ]]>
@@ -57,7 +137,7 @@
 
           <program>
             <![CDATA[
-              #version 140
+              #version 410
               #extension GL_EXT_geometry_shader4 : enable
 
               uniform vec3 coeff;

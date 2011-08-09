@@ -40,22 +40,29 @@ private:
   GLuint program_id;
 
   bool validProgram;                // what for
+  bool useTessellation;
 
   csArray<csString> tuBindings;
 
   csRef<iDataBuffer> vpSource;
   csRef<iDataBuffer> fpSource;
   csRef<iDataBuffer> gpSource;
+  csRef<iDataBuffer> epSource;
+  csRef<iDataBuffer> cpSource;
 
   csRef<csShaderGLSLShader> vp;
   csRef<csShaderGLSLShader> fp;
   csRef<csShaderGLSLShader> gp;
+  csRef<csShaderGLSLShader> ep;
+  csRef<csShaderGLSLShader> cp;
 
   csRef<iDataBuffer> LoadSource (iDocumentNode* node);
 
   csPtr<csShaderGLSLShader> CreateVP () const;
   csPtr<csShaderGLSLShader> CreateFP () const;
   csPtr<csShaderGLSLShader> CreateGP () const;
+  csPtr<csShaderGLSLShader> CreateEP () const;
+  csPtr<csShaderGLSLShader> CreateCP () const;
 
   void SetupVmap ();
 
@@ -67,6 +74,7 @@ public:
   {
     program_id = 0;
     validProgram = true;
+    useTessellation = false;
     this->shaderPlug = shaderPlug;
   }
   virtual ~csShaderGLSLProgram ()
