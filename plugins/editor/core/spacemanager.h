@@ -43,15 +43,20 @@ public:
   virtual bool Register(iHeader*);
   virtual bool Register(iPanel*);
   virtual const csHash<csRef<iSpaceFactory>, csString>& GetAll();
+  virtual void ReDraw (iSpace* space);
   
   //iContext
   virtual void OnChanged (iContext*);
-  
+
+private:
+  void ReDraw (iContext* context, iSpace* space);
+    
 private:
   iObjectRegistry* object_reg;
   csHash<csRef<iSpaceFactory>, csString> factories;
   
   csHash<csRef<iHeader>, csString> headers;
+  csHash<csRef<iPanel>, csString> panels;
 };
 
 } // namespace EditorApp

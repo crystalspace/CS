@@ -20,7 +20,6 @@
 #define __MAINFRAME_H__
 
 #include "ieditor/editor.h"
-#include "ieditor/menubar.h"
 #include "ieditor/actionmanager.h"
 
 #include "iutil/vfs.h"

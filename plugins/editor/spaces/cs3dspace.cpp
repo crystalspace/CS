@@ -143,7 +143,7 @@ CS3DSpace::~CS3DSpace()
   delete pump;
 }
 
-wxWindow* CS3DSpace::GetWindow (const char*)
+wxWindow* CS3DSpace::GetWindow ()
 {
   return window;
 }
@@ -405,6 +405,9 @@ void CS3DSpace::OnMapLoaded (const char* path, const char* filename)
 
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (pos);
+  
+  csRef<iContext> context = csQueryRegistry<iContext> (object_reg);
+  context->SetCamera(view->GetCamera ());
 
   // Initialize collision objects for all loaded objects.
   csColliderHelper::InitializeCollisionWrappers (cdsys, engine);

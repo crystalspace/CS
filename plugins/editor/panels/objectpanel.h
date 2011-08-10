@@ -16,40 +16,37 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IEDITOR_LAYOUT_H__
-#define __IEDITOR_LAYOUT_H__
+#ifndef __CSEDITOR_OBJECT_PANEL_H__
+#define __CSEDITOR_OBJECT_PANEL_H__
 
-#include <csutil/scf.h>
-#include <csutil/scf_implementation.h>
+#include "csutil/scf_implementation.h"
+#include "iutil/comp.h"
 
+#include "ieditor/panel.h"
 
-namespace CS {
-namespace EditorApp {
-  
-struct iOperator;
-struct iMenu;
-struct iProperty;
-struct iResource;
-  
-/**
- * 
- */
-struct iLayout : public virtual iBase
+using namespace CS::EditorApp;
+
+CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {
-  SCF_INTERFACE (iLayout, 0, 0, 1);
+class ObjectPanel : public scfImplementation2<ObjectPanel,iPanel,iComponent>
+{
+public:
+  ObjectPanel (iBase* parent);
+  virtual ~ObjectPanel ();
 
-  virtual iOperator* AppendOperator(const char* id, const char* label, const char* icon) = 0;
-  virtual iMenu* AppendMenu(const char* id, const char* label) = 0;
-  virtual iProperty* AppendProperty(iResource*, const char* id) = 0;
-  virtual void AppendLabel(const char* label) = 0;
-  virtual void AppendSeperator() = 0;
-
-  virtual iLayout* Row() = 0;
-  virtual iLayout* Column() = 0;
+  // iComponent
+  virtual bool Initialize (iObjectRegistry* obj_reg);
+  
+  // iPanel
+  virtual bool Poll (iContext*);
+  virtual void Draw(iContext*, iLayout*);
+  virtual void Prepend(iLayoutExtension*);
+  virtual void Append(iLayoutExtension*);
+  
+private:
+  iObjectRegistry* object_reg;
 };
+}
+CS_PLUGIN_NAMESPACE_END(CSE)
 
-
-
-} // namespace EditorApp
-} // namespace CS
 #endif

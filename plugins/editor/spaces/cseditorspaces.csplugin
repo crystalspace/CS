@@ -9,6 +9,12 @@
         <description>3D View</description>
         <allowMultiple>false</allowMultiple>
       </class>
+      <class>
+        <name>crystalspace.editor.plugin.core.propertiesspace</name>
+        <implementation>PropertiesSpace</implementation>
+        <description>Properties</description>
+        <allowMultiple>true</allowMultiple>
+      </class>
       <!--
       <class>
         <name>crystalspace.editor.plugin.core.scenebrowserpanel</name>

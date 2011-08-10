@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!-- cseditorspaces.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.editor.plugin.core.objectpanel</name>
+        <implementation>ObjectPanel</implementation>
+        <description>Object Panel</description>
+        <space>crystalspace.editor.plugin.core.propertiesspace</space>
+      </class>
+      
+      <class>
+        <name>crystalspace.editor.plugin.core.camerapanel</name>
+        <implementation>CameraPanel</implementation>
+        <description>Camera Panel</description>
+        <space>crystalspace.editor.plugin.core.propertiesspace</space>
+      </class>
+      
+    </classes>
+  </scf>
+</plugin>

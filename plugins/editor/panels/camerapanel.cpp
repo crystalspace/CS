@@ -20,26 +20,30 @@
 #include "csutil/scf.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
+#include <iengine/camera.h>
+#include <iengine/sector.h>
+#include <iutil/object.h>
 
 #include "ieditor/space.h"
 #include "ieditor/layout.h"
+#include "ieditor/context.h"
 
-#include "cs3dheader.h"
+#include "camerapanel.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {
   
-SCF_IMPLEMENT_FACTORY (CS3DHeader)
+SCF_IMPLEMENT_FACTORY (CameraPanel)
 
-CS3DHeader::CS3DHeader (iBase* parent) : scfImplementationType (this, parent)
+CameraPanel::CameraPanel (iBase* parent) : scfImplementationType (this, parent)
 {
 }
 
-CS3DHeader::~CS3DHeader ()
+CameraPanel::~CameraPanel ()
 {
 }
 
-bool CS3DHeader::Initialize (iObjectRegistry* obj_reg)
+bool CameraPanel::Initialize (iObjectRegistry* obj_reg)
 {
   object_reg = obj_reg;
   
@@ -47,19 +51,32 @@ bool CS3DHeader::Initialize (iObjectRegistry* obj_reg)
   return mgr->Register(this);
 }
 
-void CS3DHeader::Draw(iContext*, iLayout* layout)
+bool CameraPanel::Poll(iContext* ctx)
 {
-  printf("CS3DHeader::Draw\n");
-  layout->AppendMenu("crystalspace.editor.plugin.core.cs3dmenu", "View");
-  layout->AppendSeperator();
-  layout->AppendOperator("cs.editor.operator.select", "Select", "");
+  return ctx && ctx->GetCamera();
 }
 
-void CS3DHeader::Prepend(iLayoutExtension*)
+void CameraPanel::Draw(iContext* ctx, iLayout* layout)
+{
+  printf("CameraPanel::Draw\n");
+  
+  csString ori;
+  const csVector3 & origin = ctx->GetCamera()->GetTransform().GetOrigin();
+  ori.Format("Origin: X:%f Y:%f Z:%f", origin[0], origin[1], origin[2]);
+  layout->AppendLabel(ori.GetData());
+  if (ctx->GetCamera()->GetSector())
+  {
+    csString sect;
+    sect.Format("Sector: %s", ctx->GetCamera()->GetSector()->QueryObject()->GetName());
+    layout->AppendLabel(sect.GetData());
+  }
+}
+
+void CameraPanel::Prepend(iLayoutExtension*)
 {
 }
 
-void CS3DHeader::Append(iLayoutExtension*)
+void CameraPanel::Append(iLayoutExtension*)
 {
 }
 

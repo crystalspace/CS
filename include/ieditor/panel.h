@@ -41,10 +41,7 @@ struct iLayoutExtension;
 struct iPanel : public virtual iBase
 {
   SCF_INTERFACE (iPanel, 0, 0, 1);
-
-  /// Get the underlying wxWindow content area of this panel.
-  virtual wxWindow* GetWindow () = 0;
-
+  
   /**
    * Check whether this panel can be drawn.
    */
@@ -54,9 +51,7 @@ struct iPanel : public virtual iBase
    * This will be called when the UI needs to be redrawn or the context
    * changed.
    */
-  virtual void Draw (iContext*) = 0;
-  
-  virtual void ToggleCollapse() = 0;
+  virtual void Draw (iContext*, iLayout*) = 0;
  
   virtual void Prepend(iLayoutExtension*) = 0;
   virtual void Append(iLayoutExtension*) = 0;

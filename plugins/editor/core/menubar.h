@@ -27,7 +27,7 @@
 
 #include <map>
 
-#include "ieditor/menubar.h"
+#include "ieditor/menu.h"
 #include "ieditor/operator.h"
 
 namespace CS {
@@ -55,51 +55,7 @@ private:
   csRefArray<iMenuItemEventListener> listeners;
 };
 
-class MenuCheckItem : public scfImplementation1<MenuCheckItem,iMenuCheckItem>, public wxEvtHandler
-{
-public:
-  MenuCheckItem (MenuBar* menuBar, wxMenu* menu, wxMenuItem* item);
-  virtual ~MenuCheckItem ();
-  
-  virtual bool IsChecked () const;
-  
-  virtual void Check (bool v);
-  
-  virtual wxMenuItem* GetwxMenuItem () const;
-  
-  virtual void AddListener (iMenuItemEventListener*);
-  virtual void RemoveListener (iMenuItemEventListener*);
-  
-private:
-  void OnToggle (wxCommandEvent& event);
-  MenuBar* menuBar;
-  wxMenu* menu;
-  wxMenuItem* item;
-  
-  csRefArray<iMenuItemEventListener> listeners;
-};
-
-class MenuOperatorItem : public scfImplementation1<MenuOperatorItem,iMenuItem>, public wxEvtHandler
-{
-public:
-  MenuOperatorItem (MenuBar* menuBar, wxMenu* menu, const char* identifier);
-  virtual ~MenuOperatorItem ();
-  
-  virtual wxMenuItem* GetwxMenuItem () const;
-  
-  virtual void AddListener (iMenuItemEventListener*) {}
-  virtual void RemoveListener (iMenuItemEventListener*) {}
-  
-private:
-  void OnToggle (wxCommandEvent& event);
-  MenuBar* menuBar;
-  wxMenu* menu;
-  wxMenuItem* item;
-  std::string identifier;
-  csRef<iOperator> op;
-};
-
-class Menu : public scfImplementation1<Menu,iMenu>, public wxEvtHandler
+class Menu : public scfImplementation1<Menu,iMenu2>, public wxEvtHandler
 {
 public:
   Menu (MenuBar* menuBar, wxMenu* menu, const wxString& title);
@@ -108,11 +64,8 @@ public:
   virtual wxMenu* GetwxMenu () const;
   
   virtual csPtr<iMenuItem> AppendItem (const char* item);
-  virtual csPtr<iMenuCheckItem> AppendCheckItem (const char* item);
   virtual csPtr<iMenuItem> AppendSeparator ();
-  virtual csPtr<iMenu> AppendSubMenu (const char* item);
-  
-  virtual csPtr<iMenuItem> AppendOperator (const char* identifier);
+  virtual csPtr<iMenu2> AppendSubMenu (const char* item);
 
 private:
   MenuBar* menuBar;
@@ -129,7 +82,7 @@ public:
   
   virtual wxMenuBar* GetwxMenuBar () const;
   
-  virtual csPtr<iMenu> Append (const char* item);
+  virtual csPtr<iMenu2> Append (const char* item);
 
 private:
   iObjectRegistry* object_reg;

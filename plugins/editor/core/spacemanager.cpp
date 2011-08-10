@@ -24,9 +24,11 @@
 #include <csutil/weakrefarr.h>
 #include <ivaria/reporter.h>
 
+
 #include "spacemanager.h"
 
-#include "mainframe.h"
+#include "window.h"
+#include "layouts.h"
 
 #include <wx/colordlg.h>
 #include <wx/msgdlg.h>
@@ -34,9 +36,15 @@
 #include <wx/textdlg.h>
 #include <wx/bitmap.h>
 
+
+
 #include "ieditor/context.h"
 #include "ieditor/header.h"
 #include "ieditor/layout.h"
+#include "ieditor/operator.h"
+#include "ieditor/menu.h"
+#include "ieditor/panel.h"
+
 
 
 namespace CS {
@@ -93,7 +101,7 @@ size_t SpaceFactory::GetCount ()
   return spaces.GetSize();
 }
 
-
+//----------------------------------------------------------------------
 
 SpaceManager::SpaceManager (iObjectRegistry* obj_reg, wxWindow* parent)
   : scfImplementationType (this), object_reg (obj_reg)
@@ -152,9 +160,24 @@ bool SpaceManager::Register (iHeader* header)
   return false;
 }
 
-bool SpaceManager::Register (iPanel*)
+bool SpaceManager::Register (iPanel* panel)
 {
-  return true;
+  printf("SpaceManager::Register panel \n");
+  csRef<iFactory> fact = scfQueryInterface<iFactory> (panel);
+  if (fact) 
+  {
+    printf("SpaceManager::Register panel %s\n", fact->QueryClassID());
+    csRef<iDocumentNode> klass = iSCF::SCF->GetPluginMetadataNode(fact->QueryClassID());
+    if (klass)
+    {
+      csRef<iDocumentNode> space = klass->GetNode("space");
+      printf("SpaceManager::Register panel %s\n", space->GetContentsValue ());
+      panels.Put(space->GetContentsValue (), panel);
+      return true;
+    }
+  }
+  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.managers.space", "SpaceManager::Register failed to register panel!");
+  return false;
 }
 
 const csHash<csRef<iSpaceFactory>, csString>& SpaceManager::GetAll ()
@@ -168,6 +191,69 @@ void SpaceManager::Initialize ()
 
 void SpaceManager::Uninitialize ()
 {
+}
+
+void SpaceManager::ReDraw (iSpace* space)
+{
+  csRef<iContext> context = csQueryRegistry<iContext> (object_reg);
+  ReDraw(context, space);
+}
+
+void SpaceManager::ReDraw (iContext* context, iSpace* space)
+{
+  if (!space || !space->GetFactory()) return;
+  const char* id = space->GetFactory()->GetIdentifier();
+  printf("SpaceManager::ReDraw %s\n", id);
+  //Draw header
+  csRef<iHeader> header = headers.Get(id, csRef<iHeader>());
+  if (header)
+  {
+    wxWindow* win = space->GetWindow();
+    if (win && win->GetParent())
+    {
+      ViewControl* ctrl = static_cast<ViewControl*>(win->GetParent());
+      if (ctrl)
+      {
+        printf("SpaceManager::ReDraw CTRL %s\n", id);
+        csRef<iLayout> layout;
+        layout.AttachNew(new HeaderLayout(object_reg, ctrl->GetRegion()));
+        ctrl->SetLayout(layout);
+        header->Draw(context, layout);
+      }
+    }
+  }
+  
+  //Draw panels
+  wxWindow* win = space->GetWindow();
+  if (win->GetSizer())
+  {
+    win->GetSizer()->Clear(true);
+  }
+  if (win)
+  {
+    wxSizer* sz = new wxBoxSizer(wxVERTICAL);
+    csHash<csRef<iPanel>, csString>::Iterator panelsit =	panels.GetIterator(id);
+    while (panelsit.HasNext())
+    {
+      iPanel* panel = panelsit.Next();
+      if (panel && panel->Poll(context))
+      {
+        printf("SpaceManager::ReDraw PANEL %s\n", id);
+        csRef<iLayout> layout;
+        
+        csRef<iFactory> fact = scfQueryInterface<iFactory> (panel);
+        
+        CollapsiblePane* collpane = new CollapsiblePane(object_reg, win, fact->QueryDescription());
+        sz->Add(collpane, 0, wxGROW|wxALL, 10);
+        
+        layout.AttachNew(new PanelLayout(object_reg, collpane->GetPane()));
+        collpane->SetLayout(layout);
+        panel->Draw(context, layout);
+      }
+    }
+    win->SetSizer(sz, true);
+    sz->SetSizeHints(win);
+  }
 }
 
 void SpaceManager::OnChanged (iContext* context)
@@ -184,14 +270,7 @@ void SpaceManager::OnChanged (iContext* context)
     while (spaces.HasNext())
     {
       iSpace* space = spaces.Next();
-      //if (!space || !space->GetFactory()) continue;
-      const char* id = space->GetFactory()->GetIdentifier();
-      printf("SpaceManager::OnChanged %s\n", id);
-      csRef<iHeader> header = headers.Get(id, csRef<iHeader>());
-      if (header)
-      {
-        header->Draw(context, 0);
-      }
+      ReDraw(context, space);
     }
   }
 }

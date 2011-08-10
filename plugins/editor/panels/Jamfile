@@ -1,0 +1,11 @@
+SubDir TOP plugins editor panels ;
+
+
+if $(WX.AVAILABLE) = "yes"
+{
+  Description cseditorpanelss : "CSEditor panels" ;
+
+  Plugin cseditorpanels : [ Wildcard *.cpp *.h ] ;
+  LinkWith cseditorpanels : crystalspace ;
+  ExternalLibs cseditorpanels : WX ;
+}

@@ -16,45 +16,60 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <cssysdef.h>
+#include "cssysdef.h"
 #include "csutil/scf.h"
 
-#include <wx/event.h>
 
-#include "statusbar.h"
+#include "propertiesspace.h"
+
+#include "ieditor/context.h"
+#include "ieditor/operator.h"
+
+#include <wx/wx.h>
+
 
 CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {
 
-BEGIN_EVENT_TABLE(StatusBar, wxStatusBar)
-  EVT_SIZE(StatusBar::OnSize)
+BEGIN_EVENT_TABLE(PropertiesSpace::Space, wxPanel)
+  EVT_SIZE(PropertiesSpace::Space::OnSize)
 END_EVENT_TABLE()
 
-StatusBar::StatusBar (wxWindow* parent)
-  : wxStatusBar (parent)
-{
-  static const int widths[Field_Max] = {-1, 150, 30};
+SCF_IMPLEMENT_FACTORY (PropertiesSpace)
 
-  SetFieldsCount(Field_Max);
-  SetStatusWidths(Field_Max, widths);
-
-  gauge = new wxGauge(this, wxID_ANY, 100);
-  gauge->SetValue(0);
+PropertiesSpace::PropertiesSpace (iBase* parent)
+ : scfImplementationType (this, parent), object_reg(0)
+{  
 }
 
-StatusBar::~StatusBar ()
+bool PropertiesSpace::Initialize (iObjectRegistry* obj_reg, iSpaceFactory* fact, wxWindow* parent)
 {
+  object_reg = obj_reg;
+  factory = fact;
+
+  window = new PropertiesSpace::Space (this, parent, -1, wxPoint(0,0), wxSize(-1,-1));
+  //window->SetBackgroundColour(*wxRED);
+  
+  return true;
 }
 
-void StatusBar::OnSize (wxSizeEvent& event)
+PropertiesSpace::~PropertiesSpace()
 {
-  wxRect gaugeRect;
-  GetFieldRect(Field_Gauge, gaugeRect);
+  window->Destroy();
+}
 
-  gauge->SetSize(gaugeRect);
-  Layout();
+wxWindow* PropertiesSpace::GetWindow ()
+{
+  return window;
+}
+
+void PropertiesSpace::OnSize (wxSizeEvent& event)
+{
+  //window->SetSize (event.GetSize());
+  window->Layout();
   event.Skip();
 }
 
 }
 CS_PLUGIN_NAMESPACE_END(CSE)
+

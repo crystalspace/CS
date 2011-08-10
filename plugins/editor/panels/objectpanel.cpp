@@ -24,22 +24,22 @@
 #include "ieditor/space.h"
 #include "ieditor/layout.h"
 
-#include "cs3dheader.h"
+#include "objectpanel.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {
   
-SCF_IMPLEMENT_FACTORY (CS3DHeader)
+SCF_IMPLEMENT_FACTORY (ObjectPanel)
 
-CS3DHeader::CS3DHeader (iBase* parent) : scfImplementationType (this, parent)
+ObjectPanel::ObjectPanel (iBase* parent) : scfImplementationType (this, parent)
 {
 }
 
-CS3DHeader::~CS3DHeader ()
+ObjectPanel::~ObjectPanel ()
 {
 }
 
-bool CS3DHeader::Initialize (iObjectRegistry* obj_reg)
+bool ObjectPanel::Initialize (iObjectRegistry* obj_reg)
 {
   object_reg = obj_reg;
   
@@ -47,19 +47,23 @@ bool CS3DHeader::Initialize (iObjectRegistry* obj_reg)
   return mgr->Register(this);
 }
 
-void CS3DHeader::Draw(iContext*, iLayout* layout)
+bool ObjectPanel::Poll(iContext*)
 {
-  printf("CS3DHeader::Draw\n");
-  layout->AppendMenu("crystalspace.editor.plugin.core.cs3dmenu", "View");
-  layout->AppendSeperator();
+  return true;
+}
+
+void ObjectPanel::Draw(iContext*, iLayout* layout)
+{
+  printf("ObjectPanel::Draw\n");
+  layout->AppendLabel("object");
   layout->AppendOperator("cs.editor.operator.select", "Select", "");
 }
 
-void CS3DHeader::Prepend(iLayoutExtension*)
+void ObjectPanel::Prepend(iLayoutExtension*)
 {
 }
 
-void CS3DHeader::Append(iLayoutExtension*)
+void ObjectPanel::Append(iLayoutExtension*)
 {
 }
 

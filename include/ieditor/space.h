@@ -29,6 +29,8 @@
 class wxWindow;
 class wxBitmap;
 
+struct iObjectRegistry;
+
 namespace CS {
 namespace EditorApp {
   
@@ -51,7 +53,7 @@ struct iSpace : public virtual iBase
   virtual iSpaceFactory* GetFactory() const = 0;
 
   /// Get the underlying wxWindow content area of this space.
-  virtual wxWindow* GetWindow (const char*) = 0;
+  virtual wxWindow* GetWindow () = 0;
   
   virtual void DisableUpdates (bool) = 0;
 };
@@ -89,6 +91,8 @@ struct iSpaceManager : public virtual iBase
   virtual bool Register(iPanel*) = 0;
   
   virtual const csHash<csRef<iSpaceFactory>, csString>& GetAll() = 0;
+  
+  virtual void ReDraw (iSpace* space) = 0;
 };
 
 

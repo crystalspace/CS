@@ -1,0 +1,11 @@
+SubDir TOP plugins editor menus ;
+
+
+if $(WX.AVAILABLE) = "yes"
+{
+  Description cseditormenus : "CSEditor menus" ;
+
+  Plugin cseditormenus : [ Wildcard *.cpp *.h ] ;
+  LinkWith cseditormenus : crystalspace ;
+  ExternalLibs cseditormenus : WX ;
+}

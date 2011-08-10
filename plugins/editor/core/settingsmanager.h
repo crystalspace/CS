@@ -32,7 +32,7 @@
 
 #include "ieditor/settingsmanager.h"
 
-#include "ieditor/menubar.h"
+#include "ieditor/menu.h"
 
 struct wxStaticText;
 
@@ -54,7 +54,7 @@ public:
 private:
   iObjectRegistry* object_reg;
   wxWindow* parent;
-  csRef<iMenu> settingsMenu;
+  csRef<iMenu2> settingsMenu;
   csRef<iMenuItem> preferences;
 
 private:  

@@ -174,8 +174,12 @@ bool EditorApp::OnInit (void)
   
   if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.cs3dheader")) return false;
   
+  if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.objectpanel")) return false;
+  if (!editor->LoadPlugin ("crystalspace.editor.plugin.core.camerapanel")) return false;
+  
   csRef<CS::EditorApp::iSpaceManager> spacemgr = csQueryRegistry<CS::EditorApp::iSpaceManager> (object_reg);
   if (!spacemgr->Register ("crystalspace.editor.plugin.core.cs3dspace")) return false;
+  if (!spacemgr->Register ("crystalspace.editor.plugin.core.propertiesspace")) return false;
   if (!spacemgr->Register ("crystalspace.editor.plugin.damn.damnspace")) return false;
   
   // Start the application

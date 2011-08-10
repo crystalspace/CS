@@ -58,8 +58,8 @@ const int ICONSIZE = 128;
 CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {
 
-BEGIN_EVENT_TABLE(DAMNSpace, wxPanel)
-  EVT_SIZE(DAMNSpace::OnSize)
+BEGIN_EVENT_TABLE(DAMNSpace::Space, wxPanel)
+  EVT_SIZE(DAMNSpace::Space::OnSize)
 END_EVENT_TABLE()
 
 SCF_IMPLEMENT_FACTORY (DAMNSpace)
@@ -88,19 +88,20 @@ bool DAMNSpace::Initialize (iObjectRegistry* obj_reg, iSpaceFactory* fact, wxWin
   abs->AddAbstraction("mesh", "format=application/x-crystalspace.library%2Bxml");
 
   // Create the space
-  Create (parent, -1/*, wxPoint (0, 0), wxSize (ICONSIZE*2, 250)*/);
+  //Create (parent, -1/*, wxPoint (0, 0), wxSize (ICONSIZE*2, 250)*/);
+  window = new DAMNSpace::Space (this, parent, -1);
 
   wxBoxSizer* box = new wxBoxSizer(wxVERTICAL);
   
-  srchCtrl = new wxSearchCtrl(this, -1, wxEmptyString, wxDefaultPosition, wxSize(-1, -1), 0);
+  srchCtrl = new wxSearchCtrl(window, -1, wxEmptyString, wxDefaultPosition, wxSize(-1, -1), 0);
   srchCtrl->ShowCancelButton(true);
   
-  this->Connect(srchCtrl->GetId(), wxEVT_COMMAND_SEARCHCTRL_SEARCH_BTN, wxCommandEventHandler(DAMNSpace::OnSearchButton), 0, this);
-  this->Connect(srchCtrl->GetId(), wxEVT_COMMAND_SEARCHCTRL_CANCEL_BTN, wxCommandEventHandler(DAMNSpace::OnCancelButton), 0, this);
+  window->Connect(srchCtrl->GetId(), wxEVT_COMMAND_SEARCHCTRL_SEARCH_BTN, wxCommandEventHandler(DAMNSpace::OnSearchButton), 0, this);
+  window->Connect(srchCtrl->GetId(), wxEVT_COMMAND_SEARCHCTRL_CANCEL_BTN, wxCommandEventHandler(DAMNSpace::OnCancelButton), 0, this);
   box->Add(srchCtrl, 0, wxTOP|wxEXPAND, 0);
   
   
-  prespaceList = new wxScrolledWindow(this);
+  prespaceList = new wxScrolledWindow(window);
   prespaceList->SetScrollbars(0, 1, 0, 0);
   box->Add(prespaceList, 1, wxALL|wxEXPAND, 0);
   
@@ -111,8 +112,8 @@ bool DAMNSpace::Initialize (iObjectRegistry* obj_reg, iSpaceFactory* fact, wxWin
   sizer->SetSizeHints(prespaceList);
   
   
-  SetSizer(box);
-  box->SetSizeHints(this);
+  window->SetSizer(box);
+  box->SetSizeHints(window);
   
   return true;
 }
@@ -120,11 +121,12 @@ bool DAMNSpace::Initialize (iObjectRegistry* obj_reg, iSpaceFactory* fact, wxWin
 DAMNSpace::~DAMNSpace ()
 {
   printf("DAMNSpace::~DAMNSpace\n");
+  window->Destroy();
 }
 
-wxWindow* DAMNSpace::GetWindow (const char*)
+wxWindow* DAMNSpace::GetWindow ()
 {
-  return this;
+  return window;
 }
 
 void DAMNSpace::OnSize (wxSizeEvent& event)

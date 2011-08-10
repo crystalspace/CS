@@ -29,6 +29,8 @@
 #include <wx/button.h>
 #include <wx/menu.h>
 
+#include "ieditor/layout.h"
+
 namespace CS {
 namespace EditorApp {
 
@@ -47,6 +49,7 @@ public:
 private:
   void OnDClick(wxSplitterEvent& event);
   void OnUnsplitEvent(wxSplitterEvent& event);
+  void OnSize (wxSizeEvent& ev);
   DECLARE_EVENT_TABLE()
   
 private:
@@ -59,13 +62,20 @@ class ViewControl : public wxPanel
 public:
   ViewControl (iObjectRegistry* obj_reg, wxWindow* parent);
   virtual ~ViewControl ();
+  wxWindow* GetRegion() { return toolbar; }
+  void SetLayout(iLayout* l) { layout = l; }
 private:
   void OnClicked (wxCommandEvent& event);
+  
+  void OnSize (wxSizeEvent& ev);
+  DECLARE_EVENT_TABLE()
 private:
   iObjectRegistry* object_reg;
   csRef<iSpace> space;
   friend class BitmapComboBox;
   wxBoxSizer* box;
+  wxWindow* toolbar;
+  csRef<iLayout> layout;
 };
 
 class BitmapComboBox : public wxBitmapComboBox
@@ -79,22 +89,6 @@ private:
   iObjectRegistry* object_reg;
   ViewControl* control;
 };
-
-
-class MenuEntry : public wxButton
-{
-public:
-  MenuEntry (iObjectRegistry* obj_reg, wxWindow* parent, const wxString& label);
-  virtual ~MenuEntry ();
-
-private:
-  void OnClicked (wxCommandEvent& event);
-  DECLARE_EVENT_TABLE()
-  
-private:
-  iObjectRegistry* object_reg;
-};
-
 
 } // namespace EditorApp
 } // namespace CS

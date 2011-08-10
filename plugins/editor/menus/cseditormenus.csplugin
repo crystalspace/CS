@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- cseditorspaces.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.editor.plugin.core.cs3dmenu</name>
+        <implementation>CS3DMenu</implementation>
+        <description>3D View menu</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

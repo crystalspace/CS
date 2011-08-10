@@ -41,7 +41,7 @@ using namespace CS::EditorApp;
 CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {
 class DAMNSpace : public scfImplementation2<DAMNSpace,CS::EditorApp::iSpace, iResourceListener>,
-  public wxPanel
+  public wxEvtHandler
 {
 public:
   DAMNSpace (iBase* parent);
@@ -50,7 +50,7 @@ public:
   // iSpace
   virtual bool Initialize (iObjectRegistry* obj_reg, iSpaceFactory* fact, wxWindow* parent);
   virtual iSpaceFactory* GetFactory () const { return factory; }
-  virtual wxWindow* GetWindow (const char*);
+  virtual wxWindow* GetWindow ();
   virtual void DisableUpdates (bool val) { }
   
   // iResourceListener
@@ -80,7 +80,21 @@ private:
   void OnSearchButton (wxCommandEvent& event);
   void OnCancelButton (wxCommandEvent& event);
   
-  DECLARE_EVENT_TABLE()
+  class Space : public wxPanel
+  {
+    public:
+      Space(DAMNSpace* p, wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize)
+      : wxPanel (parent, id, pos, size), space(p)
+      {}
+    
+      virtual void OnSize (wxSizeEvent& ev)
+      { if (space) space->OnSize (ev); }
+    private:
+      DAMNSpace* space;
+      
+      DECLARE_EVENT_TABLE()
+  };
+  wxWindow* window;
 };
 
 class Preview : public wxPanel

@@ -31,12 +31,16 @@
 #include "wx/dcmemory.h"
 #include "wx/artprov.h"
 
+
+#include <ieditor/editor.h>
+
 namespace CS {
 namespace EditorApp {
   
 BEGIN_EVENT_TABLE(Window, wxSplitterWindow)
   EVT_SPLITTER_DCLICK(wxID_ANY, Window::OnDClick)
   EVT_SPLITTER_UNSPLIT(wxID_ANY, Window::OnUnsplitEvent)
+  EVT_SIZE(Window::OnSize)
 END_EVENT_TABLE()
 
 Window::Window (iObjectRegistry* obj_reg, wxWindow* parent, bool hor)
@@ -95,32 +99,51 @@ void Window::OnUnsplitEvent(wxSplitterEvent& event)
   if (w) w->Destroy();
 }
 
+void Window::OnSize (wxSizeEvent& event)
+{
+  //SetSize (event.GetSize());
+  Layout();
+  event.Skip();
+}
+
 // ----------------------------------------------------------------------------
 
 #include "data/editor/images/sceneIcon.xpm"
+
+BEGIN_EVENT_TABLE(ViewControl, wxPanel)
+  EVT_SIZE(ViewControl::OnSize)
+END_EVENT_TABLE()
 
 ViewControl::ViewControl (iObjectRegistry* obj_reg, wxWindow* parent)
   : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize), object_reg (obj_reg)
 {
   box = new wxBoxSizer(wxVERTICAL);
   
-  wxPanel* menuBar = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, 20));
+  wxPanel* menuBar = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(-1, -1));
   {
     wxBoxSizer* bar = new wxBoxSizer(wxHORIZONTAL);
     {
-      wxAuiToolBar* tb1 = new wxAuiToolBar(menuBar, wxID_ANY);
+      wxToolBar* tb1 = new wxToolBar(menuBar, wxID_ANY);
       
       BitmapComboBox* m_combobox = new BitmapComboBox(obj_reg, tb1, this);
       
-      if (space) box->Add(space->GetWindow(""), 1, wxEXPAND);   
-      
-      static MenuEntry* entry1 = new MenuEntry(obj_reg, tb1, wxT("View")); 
-      tb1->AddControl(entry1);    
-      
-      MenuEntry* entry2 = new MenuEntry(obj_reg, tb1, wxT("Test")); 
-      tb1->AddControl(entry2);            
+      if (space) box->Add(space->GetWindow(), 1, wxEXPAND | wxALL, 0);              
       
       tb1->AddControl(m_combobox);
+      
+      tb1->Realize();
+      bar->Add(tb1, 0, /*wxEXPAND |*/ wxALIGN_LEFT, 0);
+    }
+    {
+      toolbar = new wxPanel(menuBar, wxID_ANY);
+      bar->Add(toolbar, 1, wxEXPAND | wxALL, 0);
+    }
+    {
+      wxToolBar* tb1 = new wxToolBar(menuBar, wxID_ANY);
+      tb1->AddTool(1, wxT("Split"), wxArtProvider::GetBitmap(wxART_MISSING_IMAGE));
+      tb1->Connect(1, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ViewControl::OnClicked), 0, this);
+      tb1->AddTool(2, wxT("Duplicate"), wxArtProvider::GetBitmap(wxART_MISSING_IMAGE));
+      tb1->Connect(2, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ViewControl::OnClicked), 0, this);
       /*tb1->AddTool(1, wxT("Test"), wxArtProvider::GetBitmap(wxART_ERROR));
       tb1->AddSeparator();
       tb1->AddTool(2, wxT("Test"), wxArtProvider::GetBitmap(wxART_QUESTION));
@@ -128,16 +151,7 @@ ViewControl::ViewControl (iObjectRegistry* obj_reg, wxWindow* parent)
       tb1->AddTool(4, wxT("Test"), wxArtProvider::GetBitmap(wxART_WARNING));
       tb1->AddTool(5, wxT("Test"), wxArtProvider::GetBitmap(wxART_MISSING_IMAGE));*/
       tb1->Realize();
-      bar->Add(tb1, 1, wxEXPAND | wxALL, 0);
-    }
-    {
-      wxAuiToolBar* tb1 = new wxAuiToolBar(menuBar, wxID_ANY);
-      tb1->AddTool(1, wxT("Split"), wxArtProvider::GetBitmap(wxART_MISSING_IMAGE));
-      tb1->Connect(1, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ViewControl::OnClicked), 0, this);
-      tb1->AddTool(2, wxT("Duplicate"), wxArtProvider::GetBitmap(wxART_MISSING_IMAGE));
-      tb1->Connect(2, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ViewControl::OnClicked), 0, this);
-      tb1->Realize();
-      bar->Add(tb1, 0, wxEXPAND | wxALIGN_RIGHT, 0);
+      bar->Add(tb1, 0, /*wxEXPAND |*/ wxALIGN_RIGHT, 0);
     }
     menuBar->SetSizer(bar);
   }
@@ -168,10 +182,17 @@ void ViewControl::OnClicked (wxCommandEvent& event)
   }
 }
 
+void ViewControl::OnSize (wxSizeEvent& event)
+{
+  //SetSize (event.GetSize());
+  Layout();
+  event.Skip();
+}
+
 // ----------------------------------------------------------------------------
 
 BitmapComboBox::BitmapComboBox (iObjectRegistry* obj_reg, wxWindow* parent, ViewControl* ctrl)
-  : wxBitmapComboBox(parent, wxID_ANY, wxEmptyString,wxDefaultPosition, wxSize(45, 20),0, NULL, wxCB_READONLY),
+  : wxBitmapComboBox(parent, wxID_ANY, wxEmptyString,wxDefaultPosition, wxSize(50, 20),0, NULL, wxCB_READONLY),
   object_reg(obj_reg), control(ctrl)
 {
   csRef<iSpaceManager> mgr = csQueryRegistry<iSpaceManager> (object_reg);
@@ -217,11 +238,16 @@ void BitmapComboBox::OnSelected (wxCommandEvent& event)
       if (f->AllowMultiple() || f->GetCount() == 0)
       {
         printf("BitmapComboBox::BitmapComboBox Creating %s\n", f->GetLabel());
-        control->box->Remove(control->space->GetWindow(""));
+        control->layout.Invalidate();
+        control->box->Remove(control->space->GetWindow());
         control->space = f->Create(control);
-        control->box->Insert(0, control->space->GetWindow(""), 1, wxEXPAND);
-        control->box->Layout();
+        control->box->Insert(0, control->space->GetWindow(), 1, wxEXPAND, 0);
         SetSelection(i-1);
+        mgr->ReDraw(control->space);
+        //control->SetBackgroundColour(*wxBLUE); //TODO: why isnt  control->space->GetWindow() expanding??
+        //HACK
+        csRef<CS::EditorApp::iEditor> editor = csQueryRegistry<CS::EditorApp::iEditor>(object_reg);
+        editor->GetWindow()->GetSizer ()->Layout();
       }
       else
       {
@@ -234,32 +260,6 @@ void BitmapComboBox::OnSelected (wxCommandEvent& event)
 
 // ----------------------------------------------------------------------------
 
-BEGIN_EVENT_TABLE(MenuEntry, wxButton)
-  EVT_BUTTON(wxID_ANY, MenuEntry::OnClicked)
-END_EVENT_TABLE()
-
-MenuEntry::MenuEntry (iObjectRegistry* obj_reg, wxWindow* parent, const wxString& label)
-  : wxButton(parent, wxID_ANY, label, wxDefaultPosition, wxDefaultSize, wxNO_BORDER | wxBU_EXACTFIT), 
-  object_reg (obj_reg)
-{
-}
-
-MenuEntry::~MenuEntry ()
-{
-}
-
-void MenuEntry::OnClicked (wxCommandEvent& event)
-{
-  printf("MenuEntry::OnClicked %d\n", event.GetId());
-  
-  wxMenu* editMenu = new wxMenu ();
-  editMenu->Append (wxID_ANY, wxT("&Undo\tCtrl+Z"));
-  editMenu->Append (wxID_ANY, wxT("&Redo\tCtrl+Y"));
-  
-  PopupMenu(editMenu);
-}
-
-// ----------------------------------------------------------------------------
 
 } // namespace EditorApp
 } // namespace CS

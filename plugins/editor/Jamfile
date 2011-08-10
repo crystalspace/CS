@@ -6,3 +6,5 @@ SubInclude TOP plugins editor damn ;
 SubInclude TOP plugins editor operators ;
 SubInclude TOP plugins editor spaces ;
 SubInclude TOP plugins editor headers ;
+SubInclude TOP plugins editor menus ;
+SubInclude TOP plugins editor panels ;
