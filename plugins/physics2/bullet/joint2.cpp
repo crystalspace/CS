@@ -85,8 +85,19 @@ void csBulletJoint::Attach (iPhysicalBody* body1, iPhysicalBody* body2, bool for
       if (body2->GetBodyType () == CS::Physics2::BODY_RIGID)
       {
         isSoft = false;
-        bodies[0] = body1;
-        bodies[1] = body2;
+        bool static1 = (body1->QueryRigidBody ()->GetState () == CS::Physics2::STATE_STATIC);
+
+        if (static1)
+        {
+          bodies[0] = body1;
+          bodies[1] = body2;
+        }
+        else
+        {
+          bodies[0] = body2;
+          bodies[1] = body1;
+        }
+
       }
       else
       {
@@ -490,6 +501,7 @@ bool csBulletJoint::RebuildJoint ()
       rigidJoint = dofJoint;
     } 
     rigidJoint->setBreakingImpulseThreshold (threshold * sys->getInternalScale ());
+    rigidJoint->setDbgDrawSize(sys->getInternalScale ());
     sector->bulletWorld->addConstraint (rigidJoint, true);
     insideWorld = true;
   }

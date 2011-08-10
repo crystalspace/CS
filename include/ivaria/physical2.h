@@ -668,6 +668,9 @@ struct iPhysicalSystem : public virtual iBase
   virtual csRef<iJoint> CreateRigidHingeJoint (const csVector3 position,
     float minAngle, float maxAngle, int axis) = 0;
 
+  virtual csRef<iJoint> CreateRigidConeTwistJoint (const csOrthoTransform trans,
+    float swingSpan1,float swingSpan2,float twistSpan) = 0;
+
   /// Create a linear joint for soft body.
   virtual csRef<iJoint> CreateSoftLinearJoint (const csVector3 position) = 0;
 

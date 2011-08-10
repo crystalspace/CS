@@ -1561,7 +1561,7 @@ CS::Physics2::iRigidBody* Simple::SpawnCompound (bool setVelocity /* = true */)
 
 CS::Physics2::iJoint* Simple::SpawnJointed ()
 {
-#define P2P
+#define CONETWIST
 
 #ifdef P2P
   // Create and position two rigid bodies
@@ -1569,8 +1569,6 @@ CS::Physics2::iJoint* Simple::SpawnJointed ()
   CS::Physics2::iRigidBody* rb1 = SpawnBox (false);
   csOrthoTransform trans = rb1->GetTransform ();
   trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () * csVector3 (0.5f, 0.5f, 0.0f));
-  rb1->SetLinearVelocity (csVector3 (0.0f));
-  rb1->SetAngularVelocity (csVector3 (0.0f));
   rb1->SetTransform (trans);
   csVector3 jointPosition = trans.This2Other(csVector3(-0.2f, 0.4f, 0.2f));
 
@@ -1580,6 +1578,27 @@ CS::Physics2::iJoint* Simple::SpawnJointed ()
   rb2->SetTransform (trans);
   rb2->SetState (CS::Physics2::STATE_STATIC);
   csRef<CS::Physics2::iJoint> joint = physicalSystem->CreateRigidP2PJoint (jointPosition);
+  joint->Attach (rb2, rb1);
+#endif
+
+#ifdef CONETWIST
+  // Create and position two rigid bodies
+  // Already added to sector.
+  CS::Physics2::iRigidBody* rb1 = SpawnBox (false);
+  csOrthoTransform trans = rb1->GetTransform ();
+  trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () * csVector3 (0.0f, 1.0f, 0.0f));
+  rb1->SetTransform (trans);
+  csVector3 jointPosition = trans.This2Other(csVector3(-0.2f, 0.4f, 0.2f));
+
+  CS::Physics2::iRigidBody* rb2 = SpawnBox (false);
+  trans = rb2->GetTransform ();
+  csOrthoTransform jointTrans = trans;
+  jointTrans.SetO2T (csZRotMatrix3 (PI / 2.0f));
+  trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () * csVector3 (0.0f, -1.0f, 0.0f));
+  rb2->SetTransform (trans);
+  rb2->SetState (CS::Physics2::STATE_STATIC);
+  csRef<CS::Physics2::iJoint> joint = physicalSystem->CreateRigidConeTwistJoint (jointTrans,
+    PI * 0.15f, PI * 0.25f, PI * 0.8f);
   joint->Attach (rb1, rb2);
 #endif
 

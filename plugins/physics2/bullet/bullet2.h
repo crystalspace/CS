@@ -306,6 +306,8 @@ public:
     float minDist, float maxDist, float minAngle, float maxAngle, int axis);
   virtual csRef<CS::Physics2::iJoint> CreateRigidHingeJoint (const csVector3 position,
     float minAngle, float maxAngle, int axis);
+  virtual csRef<CS::Physics2::iJoint> CreateRigidConeTwistJoint (const csOrthoTransform trans,
+    float swingSpan1,float swingSpan2,float twistSpan);
   virtual csRef<CS::Physics2::iJoint> CreateSoftLinearJoint (const csVector3 position);
   virtual csRef<CS::Physics2::iJoint> CreateSoftAngularJoint (int axis);
   virtual csRef<CS::Physics2::iJoint> CreateRigidPivotJoint (CS::Physics2::iRigidBody* body, const csVector3 position);

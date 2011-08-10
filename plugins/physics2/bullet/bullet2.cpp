@@ -1652,6 +1652,28 @@ csRef<CS::Physics2::iJoint> csBulletSystem::CreateRigidHingeJoint (const csVecto
   return joint;
 }
 
+csRef<CS::Physics2::iJoint> csBulletSystem::CreateRigidConeTwistJoint (const csOrthoTransform trans, 
+                                                                       float swingSpan1,float swingSpan2,
+                                                                       float twistSpan) 
+{
+  csRef<csBulletJoint> joint;
+  joint.AttachNew (new csBulletJoint (this));
+  joint->SetTransConstraints (true, true, true);
+  joint->SetRotConstraints (true, true, true);
+
+  csVector3 minDistant (0.0f, 0.0f, 0.0f);
+  csVector3 maxDistant (0.0f, 0.0f, 0.0f);
+  joint->SetMaximumDistance (minDistant);
+  joint->SetMinimumDistance (maxDistant);
+  minDistant.Set (-twistSpan, -swingSpan2, -swingSpan1);  
+  maxDistant.Set (twistSpan, swingSpan2, swingSpan1); 
+  joint->SetMinimumAngle (minDistant);
+  joint->SetMaximumAngle (maxDistant);
+  joint->SetTransform (trans);
+  joint->SetType (RIGID_CONETWIST_JOINT);
+  return joint;
+}
+
 csRef<CS::Physics2::iJoint> csBulletSystem::CreateSoftLinearJoint (const csVector3 position)
 {
   csRef<csBulletJoint> joint;
