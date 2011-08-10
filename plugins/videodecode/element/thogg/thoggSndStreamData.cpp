@@ -14,6 +14,7 @@ SndSysBasicData(pParent)
 {
   m_SoundFormat.Bits = 16;
   m_SoundFormat.Channels = 2;
+  m_SoundFormat.Freq = 44100;
 }
 
 SndSysTheoraSoundData::~SndSysTheoraSoundData ()

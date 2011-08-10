@@ -19,6 +19,7 @@ SndSysTheoraStream::SndSysTheoraStream (csSndSysSoundFormat *pRenderFormat,
                                             int Mode3D) :
   SndSysBasicStream(pRenderFormat, Mode3D)
 {
+  this->pRenderFormat = pRenderFormat;
   // Allocate an advance buffer
   m_pCyclicBuffer = new SoundCyclicBuffer (
     (m_RenderFormat.Bits/8 * m_RenderFormat.Channels) * 
@@ -43,19 +44,23 @@ size_t SndSysTheoraStream::GetFrameCount()
 
 void SndSysTheoraStream::AdvancePosition(size_t frame_delta) 
 {
-  /*cout<<m_PreparedDataBufferSize<<endl;
-  char * m_pWavCurrentPointer = new char[256];
-  int available_bytes = 256;
-  for(int i=0;i<256;i++)
+  size_t needed_bytes=0;
+
+  if (m_NewPosition != InvalidPosition)
   {
-    m_pWavCurrentPointer[i]=100;
+    // Signal a full cyclic buffer flush
+    needed_bytes=m_pCyclicBuffer->GetLength();
+
+    // Flush the prepared samples too
+    m_PreparedDataBufferUsage=0;
+    m_PreparedDataBufferStart=0;
+
+    m_NewPosition = InvalidPosition;
+    m_bPlaybackReadComplete=false;
   }
-  memcpy(m_pPreparedDataBuffer,m_pWavCurrentPointer,available_bytes);*/
 
   if (m_bPaused || m_bPlaybackReadComplete || frame_delta==0)
     return;
-
-  size_t needed_bytes=0;
 
   // Figure out how many bytes we need to fill for this advancement
   if (needed_bytes==0)
@@ -75,7 +80,52 @@ void SndSysTheoraStream::AdvancePosition(size_t frame_delta)
 
   while (needed_bytes > 0)
   {
+    if ((m_NewOutputFrequency != m_OutputFrequency))
+    {
+      int needed_buffer,source_sample_size;
+
+      m_OutputFrequency=m_NewOutputFrequency;
+
+
+      // Create the pcm sample converter if it's not yet created
+      if (m_pPCMConverter == 0)
+        m_pPCMConverter = new PCMSampleConverter (
+        pRenderFormat->Channels, m_RenderFormat.Bits,
+        pRenderFormat->Freq);
+
+      // Calculate the size of one source sample
+      source_sample_size=pRenderFormat->Channels * m_RenderFormat.Bits;
+
+      // Calculate the needed buffer size for this conversion
+      needed_buffer = (m_pPCMConverter->GetRequiredOutputBufferMultiple (
+        m_RenderFormat.Channels,m_RenderFormat.Bits,m_OutputFrequency) * 
+        (OGG_DECODE_BUFFER_SIZE + source_sample_size))/1024;
+      cout<<needed_buffer<<endl;
+
+      if (m_PreparedDataBufferSize < needed_buffer)
+      {
+        delete[] m_pPreparedDataBuffer;
+        m_pPreparedDataBuffer = new char[needed_buffer];
+        m_PreparedDataBufferSize=needed_buffer;
+      }
+    }
+
+    if ((m_RenderFormat.Freq == m_OutputFrequency) &&
+      (m_RenderFormat.Channels == m_RenderFormat.Channels))
+    {
+      /*CS_ASSERT(bytes_read <= m_PreparedDataBufferSize);
+      memcpy(m_pPreparedDataBuffer,ogg_decode_buffer,bytes_read);
+      m_PreparedDataBufferUsage=bytes_read;*/
+    }
+    else
+    {
+     /* m_PreparedDataBufferUsage = m_pPCMConverter->ConvertBuffer (ogg_decode_buffer,
+        bytes_read, m_pPreparedDataBuffer, m_RenderFormat.Channels,
+        m_RenderFormat.Bits,m_OutputFrequency);*/
+    }
+
+    if (m_PreparedDataBufferUsage > 0)
+      needed_bytes -= CopyBufferBytes (needed_bytes);
     break;
   }
-  //cout<<needed_bytes<<endl ;
 }
