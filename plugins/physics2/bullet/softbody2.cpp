@@ -297,7 +297,7 @@ void csBulletSoftBody::RemoveAnchor (size_t vertexIndex)
     }
 }
 
-float csBulletSoftBody::GetRidigity ()
+float csBulletSoftBody::GetRigidity ()
 {
   CS_ASSERT (btBody);
   return this->btBody->m_materials[0]->m_kLST;

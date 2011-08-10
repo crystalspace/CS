@@ -366,6 +366,9 @@ struct iCollisionObject : public virtual iBase
 {
   SCF_INTERFACE (CS::Collision2::iCollisionObject, 1, 0, 0);
 
+  /// Return the underlying object
+  virtual iObject *QueryObject (void) = 0;
+
   virtual iCollisionObject* QueryCollisionObject () = 0;
 
   virtual CS::Physics2::iPhysicalBody* QueryPhysicalBody () = 0;
@@ -518,6 +521,9 @@ struct iCollisionSector : public virtual iBase
 {
   SCF_INTERFACE (CS::Collision2::iCollisionSector, 1, 0, 0);
 
+  /// Return the underlying object
+  virtual iObject *QueryObject (void) = 0;
+
   /// Set the global gravity.
   virtual void SetGravity (const csVector3& v) = 0;
 
@@ -538,6 +544,9 @@ struct iCollisionSector : public virtual iBase
 
   /// Get the collision object by index.
   virtual iCollisionObject* GetCollisionObject (size_t index) = 0;
+
+  /// Find a collision object within a sector.
+  virtual iCollisionObject* FindCollisionObject (const char* name) = 0;
 
   /// Add a portal into the sector. Collision objects crossing a portal will be switched from iCollisionSector's.
   virtual void AddPortal (iPortal* portal, const csOrthoTransform& meshTrans) = 0;
@@ -670,6 +679,9 @@ struct iCollisionSystem : public virtual iBase
   
   /// Create a collision sector.
   virtual csRef<iCollisionSector> CreateCollisionSector () = 0;
+
+  /// Find a collision sector by name.
+  virtual iCollisionSector* FindCollisionSector (const char* name) = 0; 
 
   /**
   * Decompose a concave mesh in convex parts. Each convex part will be added to

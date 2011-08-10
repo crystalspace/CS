@@ -133,7 +133,10 @@ csOrthoTransform csBulletCollisionObject::GetTransform ()
     return terrainCollider->terrainTransform;   
   }
   else // ghost or actor
-    return BulletToCS (btObject->getWorldTransform(), system->getInverseInternalScale ());
+    if (btObject)
+      return BulletToCS (btObject->getWorldTransform(), system->getInverseInternalScale ());
+    else
+      return csOrthoTransform(csMatrix3 (), csVector3 (0.0f,0.0f,0.0f));
 }
 
 void csBulletCollisionObject::AddCollider (CS::Collision2::iCollider* collider,

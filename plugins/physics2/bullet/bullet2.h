@@ -147,6 +147,7 @@ public:
 
   virtual size_t GetCollisionObjectCount () {return collisionObjects.GetSize ();}
   virtual CS::Collision2::iCollisionObject* GetCollisionObject (size_t index);
+  virtual CS::Collision2::iCollisionObject* FindCollisionObject (const char* name);
 
   virtual void AddPortal(iPortal* portal, const csOrthoTransform& meshTrans);
   virtual void RemovePortal(iPortal* portal);
@@ -198,12 +199,14 @@ public:
 
   virtual size_t GetRigidBodyCount () {return rigidBodies.GetSize ();}
   virtual CS::Physics2::iRigidBody* GetRigidBody (size_t index);
+  virtual CS::Physics2::iRigidBody* FindRigidBody (const char* name);
 
   virtual void AddSoftBody (CS::Physics2::iSoftBody* body);
   virtual void RemoveSoftBody (CS::Physics2::iSoftBody* body);
 
   virtual size_t GetSoftBodyCount () {return softBodies.GetSize ();}
   virtual CS::Physics2::iSoftBody* GetSoftBody (size_t index);
+  virtual CS::Physics2::iSoftBody* FindSoftBody (const char* name);
 
   virtual void RemoveJoint (CS::Physics2::iJoint* joint);
 
@@ -289,6 +292,7 @@ public:
   virtual csRef<CS::Collision2::iCollisionObject> CreateCollisionObject ();
   virtual csRef<CS::Collision2::iCollisionActor> CreateCollisionActor ();
   virtual csRef<CS::Collision2::iCollisionSector> CreateCollisionSector ();
+  virtual CS::Collision2::iCollisionSector* FindCollisionSector (const char* name);
 
   virtual void DecomposeConcaveMesh (CS::Collision2::iCollisionObject* object,
     iMeshWrapper* mesh, bool simplify = false); 

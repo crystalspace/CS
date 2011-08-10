@@ -207,6 +207,11 @@ CS::Collision2::iCollisionObject* csBulletSector::GetCollisionObject (size_t ind
     return NULL;
 }
 
+CS::Collision2::iCollisionObject* csBulletSector::FindCollisionObject (const char* name)
+{
+  return collisionObjects.FindByName (name);
+}
+
 void csBulletSector::AddPortal (iPortal* portal, const csOrthoTransform& meshTrans)
 {
   CollisionPortal* newPortal = new CollisionPortal(portal);
@@ -260,22 +265,23 @@ void csBulletSector::RemovePortal (iPortal* portal)
 void csBulletSector::SetSector (iSector* sector)
 {
    this->sector = sector;
-   //const csSet<csPtrKey<iMeshWrapper> >& portal_meshes = 
-   //  sector->GetPortalMeshes ();
-   //csSet<csPtrKey<iMeshWrapper> >::GlobalIterator it = 
-   //  portal_meshes.GetIterator ();
 
-   //while (it.HasNext ())
-   //{
-   //  iMeshWrapper* portalMesh = it.Next ();
-   //  iPortalContainer* portalContainer = portalMesh->GetPortalContainer ();
-   //  int i; 
-   //  for (i = 0; i < portalContainer->GetPortalCount (); i++)
-   //  {
-   //    iPortal* portal = portalContainer->GetPortal (i);
-   //    AddPortal (portal);
-   //  }
-   //}
+   const csSet<csPtrKey<iMeshWrapper> >& portal_meshes = 
+     sector->GetPortalMeshes ();
+   csSet<csPtrKey<iMeshWrapper> >::GlobalIterator it = 
+     portal_meshes.GetIterator ();
+
+   while (it.HasNext ())
+   {
+     iMeshWrapper* portalMesh = it.Next ();
+     iPortalContainer* portalContainer = portalMesh->GetPortalContainer ();
+     int i; 
+     for (i = 0; i < portalContainer->GetPortalCount (); i++)
+     {
+       iPortal* portal = portalContainer->GetPortal (i);
+       AddPortal (portal, portalMesh->GetMovable ()->GetFullTransform ());
+     }
+   }
 }
 
 CS::Collision2::HitBeamResult csBulletSector::HitBeam (const csVector3& start, const csVector3& end)
@@ -740,9 +746,14 @@ void csBulletSector::RemoveRigidBody (CS::Physics2::iRigidBody* body)
   rigidBodies.Delete (btBody);
 }
 
-iRigidBody* csBulletSector::GetRigidBody (size_t index)
+CS::Physics2::iRigidBody* csBulletSector::GetRigidBody (size_t index)
 {
   return rigidBodies[index]->QueryRigidBody ();
+}
+
+CS::Physics2::iRigidBody* csBulletSector::FindRigidBody (const char* name)
+{
+  return rigidBodies.FindByName (name);
 }
 
 void csBulletSector::AddSoftBody (CS::Physics2::iSoftBody* body)
@@ -784,6 +795,11 @@ void csBulletSector::RemoveSoftBody (CS::Physics2::iSoftBody* body)
 CS::Physics2::iSoftBody* csBulletSector::GetSoftBody (size_t index)
 {
   return softBodies[index]->QuerySoftBody ();
+}
+
+CS::Physics2::iSoftBody* csBulletSector::FindSoftBody (const char* name)
+{
+  return softBodies.FindByName (name);
 }
 
 void csBulletSector::RemoveJoint (CS::Physics2::iJoint* joint)
@@ -1410,6 +1426,11 @@ csRef<CS::Collision2::iCollisionSector> csBulletSystem::CreateCollisionSector ()
 
   collSectors.Push (collSector);
   return collSector;
+}
+
+CS::Collision2::iCollisionSector* csBulletSystem::FindCollisionSector (const char* name)
+{
+  return this->collSectors.FindByName (name);
 }
 
 void csBulletSystem::DecomposeConcaveMesh (CS::Collision2::iCollisionObject* object, iMeshWrapper* mesh, bool simplify)

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- physldr2.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.physics.loader2</name>
+        <implementation>csPhysicsLoader2</implementation>
+        <description>Crystal Space physics loader</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

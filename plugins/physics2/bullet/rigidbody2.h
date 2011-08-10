@@ -41,6 +41,7 @@ public:
   csBulletRigidBody (csBulletSystem* phySys);
   virtual ~csBulletRigidBody ();
 
+  virtual iObject* QueryObject (void) { return (iObject*) this; }
   //iCollisionObject
   virtual iCollisionObject* QueryCollisionObject () {return dynamic_cast<csBulletCollisionObject*> (this);}
   virtual iPhysicalBody* QueryPhysicalBody () {return this;}

@@ -40,6 +40,7 @@ public:
   csBulletSoftBody (csBulletSystem* phySys, btSoftBody* body);
   virtual ~csBulletSoftBody ();
 
+  virtual iObject* QueryObject (void) { return (iObject*) this; }
   //iCollisionObject
   virtual iCollisionObject* QueryCollisionObject () {return dynamic_cast<csBulletCollisionObject*> (this);}  
   virtual iPhysicalBody* QueryPhysicalBody () {return this;}
@@ -123,7 +124,7 @@ public:
     csVector3& position);
   virtual void RemoveAnchor (size_t vertexIndex);
 
-  virtual float GetRidigity ();
+  virtual float GetRigidity ();
   virtual void SetRigidity (float rigidity);
 
   virtual void SetLinearVelocity (const csVector3& vel);

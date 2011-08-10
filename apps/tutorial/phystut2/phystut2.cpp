@@ -2256,9 +2256,6 @@ void Simple::CreatePortalRoom ()
   if (!DemoApplication::CreateRoom ())
     return;
 
-  // Setup the engine sector corresponding to our collision sector
-  collisionSector->SetSector (room);
-
   // Create the box mesh of the room
   using namespace CS::Geometry;
   DensityTextureMapper mapper (0.3f);
@@ -2348,7 +2345,7 @@ void Simple::CreatePortalRoom ()
 				     csVector3 (1.0f, 0.0f, 4.999f)));
 
   // Create a collision portal
-  collisionSector->AddPortal (portal, portalMesh->GetMovable ()->GetFullTransform ());
+  //collisionSector->AddPortal (portal, portalMesh->GetMovable ()->GetFullTransform ());
 
   // Debug the inverse of the warp transform
   CS::Debug::VisualDebuggerHelper::DebugTransform
@@ -2371,7 +2368,7 @@ void Simple::CreatePortalRoom ()
 				     csVector3 (0.0f, -4.999f, -1.0f)));
 
   // Create a collision portal
-  collisionSector->AddPortal (portal, portalMesh2->GetMovable ()->GetFullTransform ());
+  //collisionSector->AddPortal (portal, portalMesh2->GetMovable ()->GetFullTransform ());
 
   // Debug the inverse of the warp transform
   CS::Debug::VisualDebuggerHelper::DebugTransform

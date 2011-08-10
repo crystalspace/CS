@@ -330,7 +330,7 @@ struct iSoftBody : public virtual iPhysicalBody
   virtual void SetRigidity (float rigidity) = 0;
 
   /// Get the rigidity of this body.
-  virtual float GetRidigity () = 0;
+  virtual float GetRigidity () = 0;
 
   /// Set the linear velocity (movement).
   virtual void SetLinearVelocity (const csVector3& vel) = 0;
@@ -823,6 +823,9 @@ struct iPhysicalSector : public virtual iBase
   /// Get the rigid body by index.
   virtual iRigidBody* GetRigidBody (size_t index) = 0;
 
+  /// Find the rigid body in this sector.
+  virtual iRigidBody* FindRigidBody (const char* name) = 0;
+
   /**
   * Add a soft body into the sector.
   * The soft body has to be initialized.
@@ -837,6 +840,9 @@ struct iPhysicalSector : public virtual iBase
 
   /// Get the soft body by index.
   virtual iSoftBody* GetSoftBody (size_t index) = 0;
+
+  /// Find  the soft body in this setor.
+  virtual iSoftBody* FindSoftBody (const char* name) = 0;
 
   /// Remove a joint by pointer.
   virtual void RemoveJoint (iJoint* joint) = 0;

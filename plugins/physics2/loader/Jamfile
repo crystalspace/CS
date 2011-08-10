@@ -1,0 +1,12 @@
+SubDir TOP plugins physics2 loader ;
+
+if $(BULLET.AVAILABLE) = "yes"
+{
+Description physldr2 : "Physics2 Loader plugin" ;
+
+Plugin physldr2
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith physldr2 : crystalspace ;
+
+}
