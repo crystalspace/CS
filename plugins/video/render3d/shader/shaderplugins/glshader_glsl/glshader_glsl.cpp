@@ -116,14 +116,14 @@ bool csGLShader_GLSL::Initialize(iObjectRegistry* reg)
 {
   object_reg = reg;
 
-  csRef<iGraphics3D> r = csQueryRegistry<iGraphics3D> (object_reg);
+  graph = csQueryRegistry<iGraphics3D> (object_reg);
 
-  csRef<iFactory> f = scfQueryInterfaceSafe<iFactory> (r);
+  csRef<iFactory> f = scfQueryInterfaceSafe<iFactory> (graph);
   if (f == 0 || strcmp ("crystalspace.graphics3d.opengl", 
       f->QueryClassID ()) != 0)
     return false;
 
-  r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
+  graph->GetDriver2D()->PerformExtension ("getextmanager", &ext);
   return true;
 }
 

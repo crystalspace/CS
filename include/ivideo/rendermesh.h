@@ -278,7 +278,7 @@ namespace Graphics
     const char* db_mesh_name;
 
     CoreRenderMesh () : db_mesh_name ("<unknown>"), clip_portal (0), 
-      clip_plane (0), clip_z_plane (0), do_mirror (false), use_patches (false),
+      clip_plane (0), clip_z_plane (0), do_mirror (false),
       multiRanges (0), rangesNum (0), indexstart (0), indexend (0)
     {
     }
@@ -315,8 +315,6 @@ namespace Graphics
 
     /// Mesh type
     csRenderMeshType meshtype;
-    /// Whether to use tessellation patches
-    bool use_patches;
     /**
     * Index ranges to render. If ranges are specified they have precedence
     * over \a indexstart and \a indexend.

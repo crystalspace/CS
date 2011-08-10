@@ -89,7 +89,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) :
   glProfiling (false), explicitProjection (false), needMatrixUpdate (true),
   multisampleEnabled (false),
   imageUnits (0), activeVertexAttribs (0), wantToSwap (false),
-  delayClearFlags (0), currentAttachments (0)
+  delayClearFlags (0), currentAttachments (0), use_patches (false)
 {
   verbose = false;
   frustum_valid = false;
@@ -2135,16 +2135,10 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       statecache->Disable_GL_POINT_SPRITE_ARB();
   }
 
-  if (mymesh->use_patches)
+  if (use_patches)
   {
     csGLGraphics3D::ext->glPatchParameteri (GL_PATCH_VERTICES_ARB,
       primVertices);
-    // FIXME: the idea is that if this mesh is renderer another time without
-    // any tessellation shader activated, it wont fail, but it wont work
-    // if the mesh is drawn twice after a csShaderProgram::SetupState() call.
-    // to be short, this assumes that for each SetupState() there is a single
-    // draw call per mesh
-    ((csCoreRenderMesh*)mymesh)->use_patches = false;
     // update primitive type
     primitivetype = GL_PATCHES_ARB;
   }
@@ -4354,16 +4348,10 @@ void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
       statecache->Disable_GL_POINT_SPRITE_ARB();
   }
 
-  if (mymesh->use_patches)
+  if (use_patches)
   {
     csGLGraphics3D::ext->glPatchParameteri (GL_PATCH_VERTICES_ARB,
       primVertices);
-    // FIXME: the idea is that if this mesh is renderer another time without
-    // any tessellation shader activated, it wont fail, but it wont work
-    // if the mesh is drawn twice after a csShaderProgram::SetupState() call.
-    // to be short, this assumes that for each SetupState() there is a single
-    // draw call per mesh
-    ((csCoreRenderMesh*)mymesh)->use_patches = false;
     // update primitive type
     primitivetype = GL_PATCHES_ARB;
   }

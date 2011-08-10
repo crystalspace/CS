@@ -52,8 +52,8 @@ void csShaderGLSLProgram::Deactivate()
   shaderPlug->ext->glUseProgramObjectARB (0);
 }
 
-void csShaderGLSLProgram::SetupState (const CS::Graphics::RenderMesh* mesh, 
-                                      CS::Graphics::RenderMeshModes& /*modes*/,
+void csShaderGLSLProgram::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
+                                      CS::Graphics::RenderMeshModes& modes,
                                       const csShaderVariableStack& stack)
 {
   size_t i;
@@ -61,12 +61,7 @@ void csShaderGLSLProgram::SetupState (const CS::Graphics::RenderMesh* mesh,
   csRef<csShaderVariable> var;
 
   if (useTessellation)
-  {
-    // setup primitive type as GL_PATCHES, also check out how many
-    // vertices should be assigned for each patch
-    // TODO: cast hax
-    ((CS::Graphics::RenderMesh*)mesh)->use_patches = true;
-  }
+    shaderPlug->graph->EnableTessellation ();
 
   // set variables
   for (i = 0; i < variablemap.GetSize (); ++i)
@@ -150,6 +145,8 @@ void csShaderGLSLProgram::SetupState (const CS::Graphics::RenderMesh* mesh,
 
 void csShaderGLSLProgram::ResetState ()
 {
+  if (useTessellation)
+    shaderPlug->graph->DisableTessellation ();
 }
 
 csRef<iDataBuffer> csShaderGLSLProgram::LoadSource (iDocumentNode* node)

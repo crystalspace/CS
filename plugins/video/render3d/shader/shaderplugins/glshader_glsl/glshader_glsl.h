@@ -37,6 +37,7 @@ private:
 public:
   csGLExtensionManager* ext;
   iObjectRegistry* object_reg;
+  csRef<iGraphics3D> graph;
 
   CS_LEAKGUARD_DECLARE (csGLShader_GLSL);
 
