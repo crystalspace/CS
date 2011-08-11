@@ -553,7 +553,7 @@ void DeferredDemo::CreateColliders()
   for (int i=0; i < engine->GetMeshes()->GetCount(); i++)
   {
     iMeshWrapper *mesh = engine->GetMeshes()->Get(i);
-    csReversibleTransform &fullTransform = mesh->GetMovable()->GetFullTransform();
+    const csReversibleTransform &fullTransform = mesh->GetMovable()->GetFullTransform();
     csOrthoTransform t (fullTransform.GetO2T(), fullTransform.GetOrigin());    
     dynamicSystem->AttachColliderMesh (mesh, t, 10.0f, 0.0f); 
   }

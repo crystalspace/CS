@@ -419,7 +419,7 @@ bool RMDeferred::RenderView(iView *view, bool recursePortals)
   csShaderVariable *farPlaneSV = shaderManager->GetVariableAdd (svStringSet->Request("far clip distance"));
   float farPlaneDistance = rview->GetCamera()->GetFarPlane()->D();
   float nearPlaneDistance = camera->GetNearClipDistance();
-  farPlaneSV->SetValue (fabs (farPlaneDistance - nearPlaneDistance));
+  farPlaneSV->SetValue ((float) fabs (farPlaneDistance - nearPlaneDistance));
 
   CS::Math::Matrix4 perspectiveFixup;
   postEffects.SetupView (view, perspectiveFixup);
