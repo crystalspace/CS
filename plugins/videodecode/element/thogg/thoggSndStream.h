@@ -85,7 +85,7 @@ public:
   //  Member variables
   ////
 protected:
-  csSndSysSoundFormat *pRenderFormat;
+  csSndSysSoundFormat pRenderFormat;
 };
 /** @} */
 

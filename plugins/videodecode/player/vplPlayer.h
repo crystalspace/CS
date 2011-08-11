@@ -108,8 +108,8 @@ public:
         {
           if (parent->IsPlaying ())
           {
-            parent->WriteData ();
             parent->SwapBuffers (); 
+            parent->WriteData ();
           }
 
           return false;

@@ -352,11 +352,13 @@ void TheoraMediaContainer::GetTargetTexture (csRef<iTextureHandle> &target)
 {
   if(_activeTheoraStream.IsValid ())
     _activeTheoraStream->GetVideoTarget (target);
+  else target=NULL;
 }
 void TheoraMediaContainer::GetTargetAudio (csRef<iSndSysStream> &target)
 {
   if (_activeVorbisStream.IsValid ())
     _activeVorbisStream->GetAudioTarget (target);
+  else target=NULL;
 }
 
 float TheoraMediaContainer::GetPosition () const

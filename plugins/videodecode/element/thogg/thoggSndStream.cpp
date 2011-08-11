@@ -19,7 +19,8 @@ SndSysTheoraStream::SndSysTheoraStream (csSndSysSoundFormat *pRenderFormat,
                                             int Mode3D) :
   SndSysBasicStream(pRenderFormat, Mode3D)
 {
-  this->pRenderFormat = pRenderFormat;
+  memcpy(&this->pRenderFormat,pRenderFormat,sizeof(csSndSysSoundFormat));
+ // this->pRenderFormat = pRenderFormat;
   // Allocate an advance buffer
   m_pCyclicBuffer = new SoundCyclicBuffer (
     (m_RenderFormat.Bits/8 * m_RenderFormat.Channels) * 
@@ -90,17 +91,17 @@ void SndSysTheoraStream::AdvancePosition(size_t frame_delta)
       // Create the pcm sample converter if it's not yet created
       if (m_pPCMConverter == 0)
         m_pPCMConverter = new PCMSampleConverter (
-        pRenderFormat->Channels, m_RenderFormat.Bits,
-        pRenderFormat->Freq);
+        pRenderFormat.Channels, m_RenderFormat.Bits,
+        pRenderFormat.Freq);
 
       // Calculate the size of one source sample
-      source_sample_size=pRenderFormat->Channels * m_RenderFormat.Bits;
+      source_sample_size=pRenderFormat.Channels * m_RenderFormat.Bits;
 
       // Calculate the needed buffer size for this conversion
       needed_buffer = (m_pPCMConverter->GetRequiredOutputBufferMultiple (
         m_RenderFormat.Channels,m_RenderFormat.Bits,m_OutputFrequency) * 
         (OGG_DECODE_BUFFER_SIZE + source_sample_size))/1024;
-      cout<<needed_buffer<<endl;
+      cout<<"buffer size: "<<needed_buffer<<endl;
 
       if (m_PreparedDataBufferSize < needed_buffer)
       {

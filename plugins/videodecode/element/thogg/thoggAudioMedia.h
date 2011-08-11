@@ -51,8 +51,8 @@ public:
 
   struct cachedData
   {
-
-
+    int count;
+    short* data;
   };
 private:
   iObjectRegistry*      object_reg;

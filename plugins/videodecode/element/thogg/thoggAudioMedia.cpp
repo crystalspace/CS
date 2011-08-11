@@ -67,6 +67,7 @@ bool TheoraAudioMedia::Initialize (iObjectRegistry* r)
     data.AttachNew(new SndSysTheoraSoundData (this,NULL));
     _outputStream =  sndrenderer->CreateStream (data,CS_SND3D_DISABLE);
 
+
     /*csRef<SndSysBasicStream> media = scfQueryInterface<SndSysBasicStream> (stream ); 
     if (media.IsValid()) 
     { 
@@ -117,6 +118,8 @@ bool TheoraAudioMedia::Update ()
     return false;
     
   _audiobuf_ready=false;
+
+
   while (_vorbis_p && !_audiobuf_ready)
   {
     float **pcm;
@@ -148,7 +151,15 @@ bool TheoraAudioMedia::Update ()
         }
         _audiobuf_ready=1;
         vorbis_synthesis_read(&_dspState,i);
-        delete samples;
+
+        cachedData dataOut;
+
+        dataOut.count=count;
+        dataOut.data=samples;
+
+        cache.Push (dataOut);
+
+        samples=NULL;
     }
     else
     {
@@ -169,9 +180,6 @@ bool TheoraAudioMedia::Update ()
     //cout<<vorbis_granule_time (&vd,ogg_page_granulepos (og))<<endl;
     return 0;
   }
-  cachedData buff;
-
-  cache.Push (buff);
 
   return 1;
 }
@@ -240,7 +248,11 @@ void TheoraAudioMedia::InitializeStream (ogg_stream_state &state, vorbis_info &i
 
 void TheoraAudioMedia::WriteData ()
 {
-  cache.PopTop ();
+  if(cache.GetSize ()!=0)
+  {
+    cachedData data = cache.PopTop ();
+    delete data.data;
+  }
 }
 
 

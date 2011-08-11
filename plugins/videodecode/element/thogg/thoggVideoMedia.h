@@ -84,6 +84,12 @@ private:
   double _FPS;
   float _aspectRatio;
 
+  // Stuff for conversion on the other thread
+
+  uint8* rgbBuff;
+  int conversionState;
+  void Convert ();
+  cachedData currentData;
 
   // Mutexes
 private:
