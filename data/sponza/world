@@ -25,7 +25,7 @@
     </texture> -->
     
     <texture name='KAMEN.JPG'>
-      <file>textures/kamen.jpg</file>
+      <file>textures/KAMEN.JPG</file>
     </texture>
 
     <texture name='sponza_bricks_d'>
