@@ -28,6 +28,10 @@ const char *DEFAULT_CFG_WORLDDIR = "/lev/castle";
 const char *DEFAULT_CFG_LOGOFILE = "/lib/std/cslogo2.png";
 
 const char* ballMaterialNames[4] = { "red", "green", "blue", "yellow" };
+const csColor ballMaterialColors[4] = { csColor (1.0f, 0.0f, 0.0f),
+					csColor (0.0f, 1.0f, 0.0f),
+					csColor (0.0f, 0.0f, 1.0f),
+					csColor (1.0f, 1.0f, 0.0f) };
 
 //----------------------------------------------------------------------
 DeferredDemo::DeferredDemo()
@@ -459,14 +463,14 @@ bool DeferredDemo::SetupScene()
   
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
   vfs->ChDir ("/lib/std");
-  csRef<iMaterialWrapper> matR = engine->CreateMaterial (ballMaterialNames[0], 
-      engine->CreateTexture ("red", "red.jpg", nullptr, CS_TEXTURE_2D));  
-  csRef<iMaterialWrapper> matG = engine->CreateMaterial (ballMaterialNames[1], 
-      engine->CreateTexture ("green", "green.jpg", nullptr, CS_TEXTURE_2D));  
-  csRef<iMaterialWrapper> matB = engine->CreateMaterial (ballMaterialNames[2], 
-      engine->CreateTexture ("blue", "blue.jpg", nullptr, CS_TEXTURE_2D));
-  csRef<iMaterialWrapper> matY = engine->CreateMaterial (ballMaterialNames[3], 
-      engine->CreateTexture ("yellow", "yellow.jpg", nullptr, CS_TEXTURE_2D));
+  csRef<iMaterialWrapper> matR = CS::Material::MaterialBuilder::CreateColorMaterial
+    (GetObjectRegistry (), ballMaterialNames[0], ballMaterialColors[0]);
+  csRef<iMaterialWrapper> matG = CS::Material::MaterialBuilder::CreateColorMaterial
+    (GetObjectRegistry (), ballMaterialNames[1], ballMaterialColors[1]);
+  csRef<iMaterialWrapper> matB = CS::Material::MaterialBuilder::CreateColorMaterial
+    (GetObjectRegistry (), ballMaterialNames[2], ballMaterialColors[2]);
+  csRef<iMaterialWrapper> matY = CS::Material::MaterialBuilder::CreateColorMaterial
+    (GetObjectRegistry (), ballMaterialNames[3], ballMaterialColors[3]);
 
   CreateColliders();
     
@@ -1006,9 +1010,11 @@ void DeferredDemo::SpawnSphere(bool attachLight)
   float radius = ballIndex * 0.1f + 0.3f;
   iSector *currentSector = view->GetCamera()->GetSector();
 
+  int materialIndex = rand() % 4;
+
   if (attachLight)
   {
-    light = engine->CreateLight ("light", body->GetPosition(), 8.0f, csColor (0.5f, 0.5f, 0.5f), 
+    light = engine->CreateLight ("light", body->GetPosition(), 8.0f, ballMaterialColors[materialIndex], 
         CS_LIGHT_DYNAMICTYPE_DYNAMIC);
     //light->SetType (CS_LIGHT_SPOTLIGHT);
     //light->SetSpotLightFalloff (25.0f, 30.0f);
@@ -1019,7 +1025,7 @@ void DeferredDemo::SpawnSphere(bool attachLight)
   }
 
   csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (ballFact[ballIndex], "ball", currentSector));
-  iMaterialWrapper* mat = engine->GetMaterialList()->FindByName (ballMaterialNames[rand() % 4]);    
+  iMaterialWrapper* mat = engine->GetMaterialList()->FindByName (ballMaterialNames[materialIndex]);    
   mesh->GetMeshObject()->SetMaterialWrapper (mat);
 
   body->SetProperties (0.01f, csVector3 (0.0f), csMatrix3());
