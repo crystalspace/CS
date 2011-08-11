@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  (C) 2011 by Santiago Sanchez
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<!--
+  Based on the paper "Approximating Dynamic Global Illumination in 
+  Image Space" by Tobias Ritschel, Thorsten Grosch and Hans-Peter 
+  Seidel, 2009.
+-->
+
+<shader compiler="xmlshader" name="deferred_downsample">
+    
+  <technique priority="200">
+    <pass>
+      <!-- no blending -->
+      <mixmode>
+        <blendop src="one" dst="zero" />
+        <alphatest>disable</alphatest>
+      </mixmode>	
+      
+      <vp plugin="glcg" file="/shader/deferred/globalillum.cgvp" /> 
+      
+      <texture destination="NormalDepthBuffer" name="tex gbuffer 3" />      
+      <fp plugin="glcg">
+        <cgfp>          
+          <variablemap variable="viewport size" destination="ViewportSize" />          
+          <variablemap variable="downsample depth threshold" destination="DepthThreshold" />             
+          <program>
+            <?Include downsample.cginc ?>
+          </program>
+        </cgfp>
+      </fp>
+    </pass>
+  </technique>
+
+</shader>
