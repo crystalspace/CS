@@ -847,6 +847,8 @@ struct iPhysicalSector : public virtual iBase
   /// Find  the soft body in this setor.
   virtual iSoftBody* FindSoftBody (const char* name) = 0;
 
+  virtual void AddJoint (iJoint* joint) = 0;
+
   /// Remove a joint by pointer.
   virtual void RemoveJoint (iJoint* joint) = 0;
 

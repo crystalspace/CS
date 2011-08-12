@@ -27,6 +27,7 @@ class csBulletJoint : public scfImplementation1<
   csBulletJoint, CS::Physics2::iJoint>
 {
   friend class csBulletSystem;
+  friend class csBulletSector;
 private:
   csBulletSystem* sys;
   csBulletSector* sector;
@@ -66,6 +67,7 @@ private:
   bool isSoft;
   bool isSpring;
   bool positionSet;
+  bool transformSet;
   bool equilPointSet;
   bool insideWorld;
 
@@ -74,7 +76,6 @@ public:
   virtual ~csBulletJoint ();
 
   void SetType (csJointType type) {this->type = type;}
-  void RemoveBulletJoint ();
 
   virtual void Attach (iPhysicalBody* body1, iPhysicalBody* body2,
     bool forceUpdate = true);
@@ -154,6 +155,9 @@ public:
 
   virtual void SetBreakingImpulseThreshold (float threshold, bool forceUpdate = false);
   virtual float GetBreakingImpulseThreshold () {return threshold;}
+
+  void AddBulletJoint ();
+  void RemoveBulletJoint ();
 };
 }
 CS_PLUGIN_NAMESPACE_END (Bullet2)

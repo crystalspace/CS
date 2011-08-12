@@ -692,6 +692,7 @@ bool Simple::OnMouseDown (iEvent &event)
 
         // Create a p2p joint at the point clicked
         dragJoint = physicalSystem->CreateRigidPivotJoint (bulletBody, hitResult.isect);
+        physicalSector->AddJoint (dragJoint);
 
         dragging = true;
         dragDistance = (hitResult.isect - startBeam).Norm ();
@@ -801,7 +802,7 @@ bool Simple::OnInitialize (int argc, char* argv[])
   // Check which environment has to be loaded
   csString levelName = clp->GetOption ("level");
   if (levelName.IsEmpty ())
-    environment = ENVIRONMENT_PORTALS;
+    environment = ENVIRONMENT_BOX;
 
   else
   {
@@ -1665,11 +1666,11 @@ CS::Physics2::iJoint* Simple::SpawnJointed ()
 #ifdef SOFT_LINEAR
   csRef<CS::Physics2::iSoftBody> sb1 = SpawnSoftBody (false);
   csRef<CS::Physics2::Bullet2::iSoftBody> bulletSoftBody = scfQueryInterface<CS::Physics2::Bullet2::iSoftBody> (sb1);
-  //bulletSoftBody->ResetCollisionFlag ();
-  //// The soft body need to use cluster collision.
-  //bulletSoftBody->SetClusterCollisionRS (true);
-  //bulletSoftBody->SetClusterCollisionSS (true);
-  //bulletSoftBody->GenerateCluster (32);
+  bulletSoftBody->ResetCollisionFlag ();
+  // The soft body need to use cluster collision.
+  bulletSoftBody->SetClusterCollisionRS (true);
+  bulletSoftBody->SetClusterCollisionSS (true);
+  bulletSoftBody->GenerateCluster (32);
   
   //CS::Physics2::iRigidBody* rb2 = SpawnBox (false);
   //csOrthoTransform trans = rb2->GetTransform ();
@@ -1685,10 +1686,10 @@ CS::Physics2::iJoint* Simple::SpawnJointed ()
   trans.SetOrigin (csVector3 (0.0f,1.0f,-0.5f));
   rb2->SetTransform (trans);
   bulletSoftBody = scfQueryInterface<CS::Physics2::Bullet2::iSoftBody> (rb2);
-  //bulletSoftBody->ResetCollisionFlag ();
-  //bulletSoftBody->SetClusterCollisionRS (true);
-  //bulletSoftBody->SetClusterCollisionSS (true);
-  //bulletSoftBody->GenerateCluster (32);
+  bulletSoftBody->ResetCollisionFlag ();
+  bulletSoftBody->SetClusterCollisionRS (true);
+  bulletSoftBody->SetClusterCollisionSS (true);
+  bulletSoftBody->GenerateCluster (32);
 
   //Use local position when it's soft joint.
   csRef<CS::Physics2::iJoint> joint = 
@@ -1715,6 +1716,7 @@ CS::Physics2::iJoint* Simple::SpawnJointed ()
   joint->Attach (sb1, rb2);
 #endif
 
+  physicalSector->AddJoint (joint);
   return joint;
 }
 
@@ -1789,36 +1791,40 @@ void Simple::SpawnChain ()
   csRef<CS::Physics2::iJoint> joint;
 
   joint = physicalSystem->CreateJoint ();
-  jointTransform.Identity ();
+  jointTransform.SetO2T (csZRotMatrix3 (PI * .5f));
   jointTransform.SetOrigin (initPos - csVector3 (0.0f, 0.6f, 0.0f));
   joint->SetTransform (jointTransform);
   joint->Attach (rb1, rb2, false);
   ConstraintJoint (joint);
   joint->RebuildJoint ();
+  physicalSector->AddJoint (joint);
 
   joint = physicalSystem->CreateJoint ();
-  jointTransform.Identity ();
+  jointTransform.SetO2T (csZRotMatrix3 (PI * .5f));
   jointTransform.SetOrigin (initPos - csVector3 (0.0f, 0.6f, 0.0f) - offset);
   joint->SetTransform (jointTransform);
   joint->Attach (rb2, rb3, false);
   ConstraintJoint (joint);
   joint->RebuildJoint ();
+  physicalSector->AddJoint (joint);
 
   joint = physicalSystem->CreateJoint ();
-  jointTransform.Identity ();
+  jointTransform.SetO2T (csZRotMatrix3 (PI * .5f));
   jointTransform.SetOrigin (initPos - csVector3 (0.0f, 0.6f, 0.0f) - 2.0f * offset);
   joint->SetTransform (jointTransform);
   joint->Attach (rb3, rb4, false);
   ConstraintJoint (joint);
   joint->RebuildJoint ();
+  physicalSector->AddJoint (joint);
 
   joint = physicalSystem->CreateJoint ();
-  jointTransform.Identity ();
+  jointTransform.SetO2T (csZRotMatrix3 (PI * .5f));
   jointTransform.SetOrigin (initPos - csVector3 (0.0f, 0.6f, 0.0f) - 3.0f * offset);
   joint->SetTransform (jointTransform);
   joint->Attach (rb4, rb5, false);
   ConstraintJoint (joint);
   joint->RebuildJoint ();
+  physicalSector->AddJoint (joint);
 
   // Update the display of the dynamics debugger
   //dynamicsDebugger->UpdateDisplay ();

@@ -208,6 +208,7 @@ public:
   virtual CS::Physics2::iSoftBody* GetSoftBody (size_t index);
   virtual CS::Physics2::iSoftBody* FindSoftBody (const char* name);
 
+  virtual void AddJoint (CS::Physics2::iJoint* joint);
   virtual void RemoveJoint (CS::Physics2::iJoint* joint);
 
   virtual void SetSoftBodyEnabled (bool enabled);

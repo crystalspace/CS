@@ -58,7 +58,8 @@ public:
   virtual void RebuildObject ();
 
   // btSoftBody don't use collision shape.
-  virtual void AddCollider (CS::Collision2::iCollider* collider, const csOrthoTransform& relaTrans) {}
+  virtual void AddCollider (CS::Collision2::iCollider* collider, const csOrthoTransform& relaTrans
+    = csOrthoTransform (csMatrix3 (), csVector3 (0))) {}
   virtual void RemoveCollider (CS::Collision2::iCollider* collider) {}
   virtual void RemoveCollider (size_t index) {}
 

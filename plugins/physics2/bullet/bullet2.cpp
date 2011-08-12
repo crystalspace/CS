@@ -802,6 +802,15 @@ CS::Physics2::iSoftBody* csBulletSector::FindSoftBody (const char* name)
   return softBodies.FindByName (name);
 }
 
+void csBulletSector::AddJoint (CS::Physics2::iJoint* joint)
+{
+  csBulletJoint* btJoint = dynamic_cast<csBulletJoint*> (joint);
+  CS_ASSERT(btJoint);
+  btJoint->sector = this;
+  btJoint->AddBulletJoint ();
+  joints.Push (btJoint);
+}
+
 void csBulletSector::RemoveJoint (CS::Physics2::iJoint* joint)
 {
   csBulletJoint* btJoint = dynamic_cast<csBulletJoint*> (joint);

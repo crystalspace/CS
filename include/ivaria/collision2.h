@@ -395,7 +395,8 @@ struct iCollisionObject : public virtual iBase
   virtual csOrthoTransform GetTransform () = 0;
 
   /// Add a collider to this collision body.
-  virtual void AddCollider (iCollider* collider, const csOrthoTransform& relaTrans) = 0;
+  virtual void AddCollider (iCollider* collider, const csOrthoTransform& relaTrans
+    = csOrthoTransform (csMatrix3 (), csVector3 (0))) = 0;
 
   /// Remove the given collider from this collision object.
   virtual void RemoveCollider (iCollider* collider) = 0;
