@@ -88,7 +88,12 @@ CS::Collision2::iCollisionObject* csOpcodeCollisionSector::GetCollisionObject (s
     return NULL;
 }
 
-void csOpcodeCollisionSector::AddPortal (iPortal* portal)
+CS::Collision2::iCollisionObject* csOpcodeCollisionSector::FindCollisionObject (const char* name)
+{
+  return collisionObjects.FindByName (name);
+}
+
+void csOpcodeCollisionSector::AddPortal (iPortal* portal, const csOrthoTransform& meshTrans)
 {
 //TODO
 }
@@ -796,6 +801,11 @@ csRef<CS::Collision2::iCollisionSector> csOpcodeCollisionSystem::CreateCollision
 
   collSectors.Push (collSector);
   return collSector;
+}
+
+CS::Collision2::iCollisionSector* csOpcodeCollisionSystem::FindCollisionSector (const char* name)
+{
+  return this->collSectors.FindByName (name);
 }
 
 void csOpcodeCollisionSystem::DecomposeConcaveMesh (CS::Collision2::iCollisionObject* object,

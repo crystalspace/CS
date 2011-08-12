@@ -37,7 +37,7 @@ class RagdollNodeManager;
 
 struct ChainData
 {
-  csRef<CS::Animation::iBodyChain2> chain;
+  csRef<CS::Animation::iBodyChain> chain;
   CS::Animation::RagdollState state;
 };
 
@@ -53,13 +53,13 @@ public:
   RagdollNodeFactory (RagdollNodeManager* manager, const char *name);
 
   //-- CS::Animation::iSkeletonRagdollNodeFactory
-  virtual void SetBodySkeleton (CS::Animation::iBodySkeleton2* skeleton);
-  virtual CS::Animation::iBodySkeleton2* GetBodySkeleton () const;
+  virtual void SetBodySkeleton (CS::Animation::iBodySkeleton* skeleton);
+  virtual CS::Animation::iBodySkeleton* GetBodySkeleton () const;
 
-  virtual void AddBodyChain (CS::Animation::iBodyChain2* chain,
+  virtual void AddBodyChain (CS::Animation::iBodyChain* chain,
 		       CS::Animation::RagdollState state
 		       = CS::Animation::STATE_INACTIVE);
-  virtual void RemoveBodyChain (CS::Animation::iBodyChain2* chain);
+  virtual void RemoveBodyChain (CS::Animation::iBodyChain* chain);
 
   inline virtual void SetChildNode (CS::Animation::iSkeletonAnimNodeFactory* factory)
   { CS::Animation::SkeletonAnimNodeFactorySingle::SetChildNode (factory); }
@@ -71,7 +71,7 @@ public:
     CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton);
 protected:
   RagdollNodeManager* manager;
-  csRef<CS::Animation::iBodySkeleton2> bodySkeleton;
+  csRef<CS::Animation::iBodySkeleton> bodySkeleton;
   csArray<ChainData> chains;
   CS::Animation::BoneID ragdollRoot;
 
@@ -95,8 +95,8 @@ public:
   virtual CS::Physics2::iPhysicalSystem* GetPhysicalSystem () const;
   virtual void SetPhysicalSector (CS::Physics2::iPhysicalSector* sector);
   virtual CS::Physics2::iPhysicalSector* GetPhysicalSector () const;
-  virtual void SetBodyChainState (CS::Animation::iBodyChain2* chain, CS::Animation::RagdollState state);
-  virtual CS::Animation::RagdollState GetBodyChainState (CS::Animation::iBodyChain2* chain) const;
+  virtual void SetBodyChainState (CS::Animation::iBodyChain* chain, CS::Animation::RagdollState state);
+  virtual CS::Animation::RagdollState GetBodyChainState (CS::Animation::iBodyChain* chain) const;
 
   virtual CS::Physics2::iRigidBody* GetBoneRigidBody (CS::Animation::BoneID bone);
   virtual CS::Physics2::iJoint* GetBoneJoint (const CS::Animation::BoneID bone);
@@ -106,7 +106,7 @@ public:
 
   virtual CS::Animation::BoneID GetRigidBodyBone (CS::Physics2::iRigidBody* body) const;
 
-  virtual void ResetChainTransform (CS::Animation::iBodyChain2* chain);
+  virtual void ResetChainTransform (CS::Animation::iBodyChain* chain);
 
   //-- CS::Animation::iSkeletonAnimNode
   virtual void Play ();
@@ -125,16 +125,16 @@ private:
 
   struct ResetChainData
   {
-    csRef<CS::Animation::iBodyChain2> chain;
+    csRef<CS::Animation::iBodyChain> chain;
     int frameCount;
   };
 
-  void CreateBoneData (CS::Animation::iBodyChainNode2* chainNode,
+  void CreateBoneData (CS::Animation::iBodyChainNode* chainNode,
 		 CS::Animation::RagdollState state);
-  void SetChainNodeState (CS::Animation::iBodyChainNode2* chainNode,
+  void SetChainNodeState (CS::Animation::iBodyChainNode* chainNode,
 		    CS::Animation::RagdollState state);
   void UpdateBoneState (BoneData* boneData);
-  void ResetChainNodeTransform (CS::Animation::iBodyChainNode2* chainNode);
+  void ResetChainNodeTransform (CS::Animation::iBodyChainNode* chainNode);
 
 private:
   csWeakRef<iSceneNode> sceneNode;

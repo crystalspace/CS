@@ -1,6 +1,0 @@
-SubDir TOP plugins mesh animesh body2 ;
-
-Description bodymesh2 : "Physical description of an animated mesh object plugin" ;
-Plugin bodymesh2 : [ Wildcard *.cpp *.h ] ;
-LinkWith bodymesh2 : crystalspace ;
-CompileGroups bodymesh2 : meshes ;

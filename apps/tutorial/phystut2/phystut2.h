@@ -6,7 +6,7 @@
 #include "ivaria/bullet2.h"
 #include "ivaria/collision2.h"
 #include "imesh/animesh.h"
-#include "imesh/animnode/ragdoll.h"
+#include "imesh/animnode/ragdoll2.h"
 
 class Simple : public CS::Utility::DemoApplication
 {
@@ -51,7 +51,7 @@ private:
   csRef<CS::Collision2::iCollisionActor> cameraActor;
 
   // Ragdoll related
-  csRef<CS::Animation::iSkeletonRagdollNodeManager> ragdollManager;
+  csRef<CS::Animation::iSkeletonRagdollNodeManager2> ragdollManager;
   CS::Animation::StateID ragdollState;
   csRef<iMeshWrapper> ragdollMesh;
 

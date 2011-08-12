@@ -794,15 +794,15 @@ bool Simple::OnInitialize (int argc, char* argv[])
   }
 
   // Load the ragdoll plugin
-  ragdollManager = csLoadPlugin<CS::Animation::iSkeletonRagdollNodeManager>
-    (plugmgr, "crystalspace.mesh.animesh.animnode.ragdoll");
+  ragdollManager = csLoadPlugin<CS::Animation::iSkeletonRagdollNodeManager2>
+    (plugmgr, "crystalspace.mesh.animesh.animnode.ragdoll2");
   if (!ragdollManager)
     return ReportError ("Failed to locate ragdoll manager!");
 
   // Check which environment has to be loaded
   csString levelName = clp->GetOption ("level");
   if (levelName.IsEmpty ())
-    environment = ENVIRONMENT_BOX;
+    environment = ENVIRONMENT_PORTALS;
 
   else
   {
@@ -1877,7 +1877,7 @@ void Simple::LoadRagdoll ()
   chain->AddSubChain (animeshFactory->GetSkeletonFactory ()->FindBone ("Tail_8"));
 
   // Create ragdoll animation node factory
-  csRef<CS::Animation::iSkeletonRagdollNodeFactory> ragdollFactory =
+  csRef<CS::Animation::iSkeletonRagdollNodeFactory2> ragdollFactory =
     ragdollManager->CreateAnimNodeFactory ("frankie_ragdoll");
   ragdollFactory->SetBodySkeleton (bodySkeleton);
   ragdollFactory->AddBodyChain (chain, CS::Animation::STATE_DYNAMIC);
@@ -1892,54 +1892,52 @@ void Simple::SpawnRagdoll ()
   //TODO----------------------------------------------------------------
   // I haven't implement animated mesh yet.
   // Load frankie's factory if not yet done
-  //csRef<iMeshFactoryWrapper> meshfact =
-  //  engine->FindMeshFactory ("franky_frankie");
-  //if (!meshfact)
-  //{
-  //  LoadRagdoll ();
-  //  meshfact = engine->FindMeshFactory ("franky_frankie");
-  //}
+  csRef<iMeshFactoryWrapper> meshfact =
+    engine->FindMeshFactory ("franky_frankie");
+  if (!meshfact)
+  {
+    LoadRagdoll ();
+    meshfact = engine->FindMeshFactory ("franky_frankie");
+  }
 
-  //if (!meshfact)
-  //  return;
+  if (!meshfact)
+    return;
 
-  //// Create animesh
-  //ragdollMesh = engine->CreateMeshWrapper (meshfact, "Frankie",
-  //  room, csVector3 (0, -4, 0));
-  //csRef<CS::Mesh::iAnimatedMesh> animesh =
-  //  scfQueryInterface<CS::Mesh::iAnimatedMesh> (ragdollMesh->GetMeshObject ());
+  // Create animesh
+  ragdollMesh = engine->CreateMeshWrapper (meshfact, "Frankie",
+    room, csVector3 (0, -4, 0));
+  csRef<CS::Mesh::iAnimatedMesh> animesh =
+    scfQueryInterface<CS::Mesh::iAnimatedMesh> (ragdollMesh->GetMeshObject ());
 
-  //// Close the eyes of Frankie as he is dead
-  //csRef<CS::Mesh::iAnimatedMeshFactory> animeshFactory =
-  //  scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
-  //  (meshfact->GetMeshObjectFactory ());
+  // Close the eyes of Frankie as he is dead
+  csRef<CS::Mesh::iAnimatedMeshFactory> animeshFactory =
+    scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
+    (meshfact->GetMeshObjectFactory ());
 
-  //animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyelids_closed"), 0.7f);
+  animesh->SetMorphTargetWeight (animeshFactory->FindMorphTarget ("eyelids_closed"), 0.7f);
 
-  //// Set the initial position of the body
-  //const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
-  //ragdollMesh->QuerySceneNode ()->GetMovable ()->SetPosition (
-  //  tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1));
+  // Set the initial position of the body
+  const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+  ragdollMesh->QuerySceneNode ()->GetMovable ()->SetPosition (
+    tc.GetOrigin () + tc.GetT2O () * csVector3 (0, 0, 1));
 
-  //// Start the ragdoll animation node so that the rigid bodies of the bones are created
-  //CS::Animation::iSkeletonAnimNode* root = animesh->GetSkeleton ()->GetAnimationPacket ()->
-  //  GetAnimationRoot ();
-  //csRef<CS::Animation::iSkeletonRagdollNode> ragdoll =
-  //  scfQueryInterfaceSafe<CS::Animation::iSkeletonRagdollNode> (root);
-  //ragdoll->SetDynamicSystem (dynamicSystem);
-  //ragdoll->Play ();
+  // Start the ragdoll animation node so that the rigid bodies of the bones are created
+  CS::Animation::iSkeletonAnimNode* root = animesh->GetSkeleton ()->GetAnimationPacket ()->
+    GetAnimationRoot ();
+  csRef<CS::Animation::iSkeletonRagdollNode2> ragdoll =
+    scfQueryInterfaceSafe<CS::Animation::iSkeletonRagdollNode2> (root);
+  ragdoll->SetPhysicalSystem (physicalSystem);
+  ragdoll->SetPhysicalSector (physicalSector);
+  ragdoll->Play ();
 
-  //// Fling the body.
-  //for (uint i = 0; i < ragdoll->GetBoneCount (CS::Animation::STATE_DYNAMIC); i++)
-  //{
-  //  CS::Animation::BoneID boneID = ragdoll->GetBone (CS::Animation::STATE_DYNAMIC, i);
-  //  iRigidBody* rb = ragdoll->GetBoneRigidBody (boneID);
-  //  rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
-  //  rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 5, 0));
-  //}
-
-  //// Update the display of the dynamics debugger
-  //dynamicsDebugger->UpdateDisplay ();
+  // Fling the body.
+  for (uint i = 0; i < ragdoll->GetBoneCount (CS::Animation::STATE_DYNAMIC); i++)
+  {
+    CS::Animation::BoneID boneID = ragdoll->GetBone (CS::Animation::STATE_DYNAMIC, i);
+    CS::Physics2::iRigidBody* rb = ragdoll->GetBoneRigidBody (boneID);
+    rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+    rb->SetAngularVelocity (tc.GetT2O () * csVector3 (5, 5, 0));
+  }
 }
 
 void Simple::SpawnRope ()

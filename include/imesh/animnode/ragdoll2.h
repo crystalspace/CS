@@ -27,7 +27,8 @@
 
 #include "csutil/scf_interface.h"
 
-#include "imesh/bodymesh2.h"
+#include "ivaria/physical2.h"
+#include "imesh/bodymesh.h"
 
 /**\addtogroup meshplugins
  * @{ */
@@ -101,24 +102,24 @@ struct iSkeletonRagdollNodeFactory2 : public virtual iSkeletonAnimNodeFactory
   /**
    * Set the physical description of the skeleton.
    */
-  virtual void SetBodySkeleton (CS::Animation::iBodySkeleton2* skeleton) = 0;
+  virtual void SetBodySkeleton (CS::Animation::iBodySkeleton* skeleton) = 0;
 
   /**
    * Get the physical description of the skeleton.
    */
-  virtual CS::Animation::iBodySkeleton2* GetBodySkeleton () const = 0;
+  virtual CS::Animation::iBodySkeleton* GetBodySkeleton () const = 0;
 
   /**
    * Add a new body chain to the ragdoll animation node. The dynamic state
    * of each body chain can be set separately.
    * \param state The initial state of the body chain.
    */
-  virtual void AddBodyChain (iBodyChain2* chain, RagdollState state = STATE_INACTIVE) = 0;
+  virtual void AddBodyChain (iBodyChain* chain, RagdollState state = STATE_INACTIVE) = 0;
 
   /**
    * Remove the chain from the ragdoll animation node.
    */
-  virtual void RemoveBodyChain (iBodyChain2* chain) = 0;
+  virtual void RemoveBodyChain (iBodyChain* chain) = 0;
 
   /**
    * Set the child animation node of this node. The ragdoll animation node will
@@ -174,12 +175,12 @@ struct iSkeletonRagdollNode2 : public virtual iSkeletonAnimNode
   /**
    * Set the body chain in the given physical state.
    */
-  virtual void SetBodyChainState (iBodyChain2* chain, RagdollState state) = 0;
+  virtual void SetBodyChainState (iBodyChain* chain, RagdollState state) = 0;
 
   /**
    * Get the physical state of the given body chain.
    */
-  virtual RagdollState GetBodyChainState (iBodyChain2* chain) const = 0;
+  virtual RagdollState GetBodyChainState (iBodyChain* chain) const = 0;
 
   /**
    * Get the rigid body of the given bone.
@@ -211,7 +212,7 @@ struct iSkeletonRagdollNode2 : public virtual iSkeletonAnimNode
    * handle such a radical teleportation might lead to an unstable and unwanted
    * behavior.
    */
-  virtual void ResetChainTransform (iBodyChain2* chain) = 0;
+  virtual void ResetChainTransform (iBodyChain* chain) = 0;
 
   /**
    * Get the bone associated with the given rigid body, or

@@ -80,8 +80,9 @@ public:
 
   virtual size_t GetCollisionObjectCount () {return collisionObjects.GetSize ();}
   virtual CS::Collision2::iCollisionObject* GetCollisionObject (size_t index);
+  virtual CS::Collision2::iCollisionObject* FindCollisionObject (const char* name);
 
-  virtual void AddPortal(iPortal* portal);
+  virtual void AddPortal(iPortal* portal, const csOrthoTransform& meshTrans);
   virtual void RemovePortal(iPortal* portal);
 
   virtual void SetSector(iSector* sector) {this->sector = sector;}
@@ -173,6 +174,7 @@ public:
   virtual csRef<CS::Collision2::iCollisionObject> CreateCollisionObject ();
   virtual csRef<CS::Collision2::iCollisionActor> CreateCollisionActor ();
   virtual csRef<CS::Collision2::iCollisionSector> CreateCollisionSector ();
+  virtual CS::Collision2::iCollisionSector* FindCollisionSector (const char* name);
 
   virtual void DecomposeConcaveMesh (CS::Collision2::iCollisionObject* object,
     iMeshWrapper* mesh, bool simplify = false); 

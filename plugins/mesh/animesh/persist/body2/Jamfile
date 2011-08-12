@@ -1,7 +1,0 @@
-SubDir TOP plugins mesh animesh persist body2 ;
-
-Description bodymeshldr2 : "Body mesh loader" ;
-Plugin bodymeshldr2 : [ Wildcard *.cpp *.h ] ;
-Includes bodymeshldr2.h : $(SUBDIR)/bodymeshldr2.tok ;
-LinkWith bodymeshldr2 : crystalspace ;
-CompileGroups bodymeshldr2 : meshes ;

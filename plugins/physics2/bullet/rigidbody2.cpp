@@ -254,7 +254,7 @@ bool csBulletRigidBody::IsEnabled ()
 
 void csBulletRigidBody::SetMass (float mass)
 {
-  if (mass < EPSILON)
+  if (mass > SMALL_EPSILON)
     totalMass = mass;
 }
 
@@ -263,7 +263,7 @@ float csBulletRigidBody::GetMass ()
   if (physicalState != CS::Physics2::STATE_DYNAMIC)
     return 0.0f;
 
-  if (totalMass > EPSILON)
+  if (totalMass > SMALL_EPSILON)
     return totalMass;
 
   return density * this->GetVolume ();
