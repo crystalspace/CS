@@ -202,8 +202,8 @@ public:
   void DrawMeshBasic(const CS::Graphics::CoreRenderMesh* mymesh,
     const CS::Graphics::RenderMeshModes& modes) {}
 
-  void EnableTessellation () {}
-  void DisableTessellation () {}
+  void SetTessellation (bool flag) {}
+  bool GetTessellation () {}
 
 
 private:

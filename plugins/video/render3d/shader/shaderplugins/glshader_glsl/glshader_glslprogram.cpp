@@ -61,7 +61,7 @@ void csShaderGLSLProgram::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
   csRef<csShaderVariable> var;
 
   if (useTessellation)
-    shaderPlug->graph->EnableTessellation ();
+    shaderPlug->graph->SetTessellation (true);
 
   // set variables
   for (i = 0; i < variablemap.GetSize (); ++i)
@@ -146,7 +146,7 @@ void csShaderGLSLProgram::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
 void csShaderGLSLProgram::ResetState ()
 {
   if (useTessellation)
-    shaderPlug->graph->DisableTessellation ();
+    shaderPlug->graph->SetTessellation (false);
 }
 
 csRef<iDataBuffer> csShaderGLSLProgram::LoadSource (iDocumentNode* node)

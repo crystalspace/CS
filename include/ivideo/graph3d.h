@@ -1247,10 +1247,10 @@ struct iGraphics3D : public virtual iBase
   /// Get state of edge drawing
   virtual bool GetEdgeDrawing () = 0;
 
-  /// Enable tessellation rendering mode
-  virtual void EnableTessellation () = 0;
-  /// Disable tessellation rendering mode
-  virtual void DisableTessellation () = 0;
+  /// Enable/disable tessellation rendering mode
+  virtual void SetTessellation (bool flag) = 0;
+  /// Get tessellation state
+  virtual bool GetTessellation () = 0;
 };
 
 /** @} */

@@ -789,8 +789,8 @@ public:
   virtual void DrawMeshBasic(const CS::Graphics::CoreRenderMesh* mymesh,
 							const CS::Graphics::RenderMeshModes& modes);
 
-  virtual void EnableTessellation () { use_patches = true; }
-  virtual void DisableTessellation () { use_patches = false; }
+  virtual void SetTessellation (bool flag) { use_patches = flag; }
+  virtual bool GetTessellation () { return use_patches; }
 
   //=========================================================================
 
