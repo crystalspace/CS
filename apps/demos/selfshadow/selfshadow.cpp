@@ -282,7 +282,7 @@ void SelfShadowDemo::LoadKrystal()
   // remove diffuse, blonde and transparent
   CS::ShaderVarName objColor (svStrings, "fur color");	
 
-  csVector4 color = csVector4(0.51, 0.34, 0.25, 0.4); 
+  csVector4 color = csVector4(0.51f, 0.34f, 0.25f, 0.4f); 
   materialWrapper->GetMaterial()->GetVariableAdd(objColor)->SetValue(color);  
 
   CS::ShaderVarName objTexture (svStrings, "texture map");	
