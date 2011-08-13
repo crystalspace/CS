@@ -2080,7 +2080,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 
   GLenum primitivetype = GL_TRIANGLES;
   int primNum_divider = 1, primNum_sub = 0;
-  int primVertices = 1;
+  int primVertices = -1;
   switch (mymesh->meshtype)
   {
     case CS_MESHTYPE_QUADS:
@@ -2089,16 +2089,15 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       primitivetype = GL_QUADS;
       break;
     case CS_MESHTYPE_TRIANGLESTRIP:
-      // primVertices = ?;
       primNum_sub = 2;
       primitivetype = GL_TRIANGLE_STRIP;
       break;
     case CS_MESHTYPE_TRIANGLEFAN:
-      // primVertices = ?;
       primNum_sub = 2;
       primitivetype = GL_TRIANGLE_FAN;
       break;
     case CS_MESHTYPE_POINTS:
+      primVertices = 1;
       primitivetype = GL_POINTS;
       break;
     case CS_MESHTYPE_POINT_SPRITES:
@@ -2107,6 +2106,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       {
         break;
       }
+      primVertices = 1;
       primitivetype = GL_POINTS;
       break;
     }
@@ -2116,7 +2116,6 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       primitivetype = GL_LINES;
       break;
     case CS_MESHTYPE_LINESTRIP:
-      // primVertices = ?;
       primNum_sub = 1;
       primitivetype = GL_LINE_STRIP;
       break;
@@ -2135,7 +2134,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       statecache->Disable_GL_POINT_SPRITE_ARB();
   }
 
-  if (use_patches)
+  if (use_patches && primVertices > 0)
   {
     csGLGraphics3D::ext->glPatchParameteri (GL_PATCH_VERTICES_ARB,
       primVertices);
@@ -4296,7 +4295,7 @@ void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
 
   GLenum primitivetype = GL_TRIANGLES;
   int primNum_divider = 1, primNum_sub = 0;
-  int primVertices = 1;
+  int primVertices = -1;
   switch (mymesh->meshtype)
   {
     case CS_MESHTYPE_QUADS:
@@ -4313,6 +4312,7 @@ void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
       primitivetype = GL_TRIANGLE_FAN;
       break;
     case CS_MESHTYPE_POINTS:
+      primVertices = 1;
       primitivetype = GL_POINTS;
       break;
     case CS_MESHTYPE_POINT_SPRITES:
@@ -4321,6 +4321,7 @@ void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
       {
         break;
       }
+      primVertices = 1;
       primitivetype = GL_POINTS;
       break;
     }
@@ -4348,7 +4349,7 @@ void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
       statecache->Disable_GL_POINT_SPRITE_ARB();
   }
 
-  if (use_patches)
+  if (use_patches && primVertices > 0)
   {
     csGLGraphics3D::ext->glPatchParameteri (GL_PATCH_VERTICES_ARB,
       primVertices);
