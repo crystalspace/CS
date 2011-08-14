@@ -221,9 +221,9 @@ namespace CS
               csVector3 lightPosition = light->GetMovable()->GetPosition();
 
               // only take into account translucent objects
-              if ( mesh.meshWrapper->GetRenderPriority() != 
-                rview->GetEngine()->GetRenderPriority("alpha"))
-                continue;
+//               if ( mesh.meshWrapper->GetRenderPriority() != 
+//                 rview->GetEngine()->GetRenderPriority("alpha"))
+//                 continue;
 
               // add to mesh filter include
 	            superFrust->meshFilter.AddFilterMesh (mesh.meshWrapper);
@@ -455,6 +455,24 @@ namespace CS
             contextFunction (*shadowMapCtx);            
           }
         }
+
+//         void ChooseSplitFunction(const PersistentData& persist)
+//         {
+//           csRef<iDataBuffer> databuf;
+//           uint8* data;
+//           CS::StructuredTextureFormat readbackFmt 
+//             (CS::TextureFormatStrings::ConvertStructured ("abgr32_f"));
+// 
+//           databuf = persist.depthStart->Readback(readbackFmt);
+//           data = databuf->GetUint8();
+// 
+//           for (int i = 0 ; i < persist.shadowMapRes ; i ++)
+//             for (int j = 0 ; j < persist.shadowMapRes ; j ++)
+//               for (int k = 0 ; k < 4 ; k ++)
+//                 if (data[i + j * persist.shadowMapRes + k] != 0 && 
+//                   data[i + j * persist.shadowMapRes + k] != 255)
+//                   csPrintf("%u ", data[i + j * persist.shadowMapRes + k]);
+//         }
 
         void AddShadowMapTarget (typename RenderTree::MeshNode* meshNode,
           RenderTree& renderTree, iLight* light, ViewSetup& viewSetup, 
