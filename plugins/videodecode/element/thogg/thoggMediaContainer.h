@@ -59,7 +59,7 @@ private:
 
   size_t cacheSize;
 
-  csRef<iVirtualClock> clock;
+  csTicks timeSinceStart;
 
 private:
   Mutex swapMutex;
@@ -111,6 +111,8 @@ public:
   virtual void SetCacheSize(size_t size) ;
 
   virtual float GetAspectRatio () ;
+
+  virtual void DropFrame ();
 
   /// Does a seek on the active media
   void DoSeek ();

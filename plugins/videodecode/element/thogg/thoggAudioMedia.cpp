@@ -183,6 +183,13 @@ bool TheoraAudioMedia::Update ()
 
   return 1;
 }
+void TheoraAudioMedia::DropFrame ()
+{
+  if(cache.GetSize ()!=0)
+  {
+    cache.PopTop ();
+  }
+}
 
 void TheoraAudioMedia::Seek(float time, ogg_sync_state *oy,ogg_page *op,ogg_stream_state *thState)
 {

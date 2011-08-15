@@ -92,6 +92,8 @@ void VideoTest::Frame ()
     w,
     h,
     0);
+
+  csSleep (1);
 }
 
 void VideoTest::OnExit ()
@@ -148,21 +150,21 @@ bool VideoTest::Application ()
 
   csRef<iSndSysStream> audioStream;
   mediaPlayer = csQueryRegistry<iMediaPlayer> (object_reg);
-  mediaPlayer->InitializePlayer (video,5);
+  mediaPlayer->InitializePlayer (video,15);
 
   // Specifying -1 as index triggers auto stream activation
   mediaPlayer->SetActiveStream (0);
   mediaPlayer->GetTargetTexture (logoTex);
-  mediaPlayer->GetTargetAudio (audioStream);
+  //mediaPlayer->GetTargetAudio (audioStream);
 
-  if (audioStream.IsValid ())
+  /*if (audioStream.IsValid ())
   {
     sndsource = sndrenderer->CreateSource (audioStream);
     if (!sndsource)
       ReportError ("Can't create source");
   }
   else
-    ReportError ("Audio stream cannot be played");
+    ReportError ("Audio stream cannot be played");*/
 
   mediaPlayer->Loop (false);
   mediaPlayer->Play ();

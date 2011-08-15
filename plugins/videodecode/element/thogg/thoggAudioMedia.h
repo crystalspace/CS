@@ -115,6 +115,8 @@ public:
   virtual bool HasDataReady() ;
   virtual bool IsCacheFull() ;
 
+  virtual void DropFrame () ;
+
   inline void SetLength (float length)  { this->length=length; }
   void Seek (float time, ogg_sync_state *oy,ogg_page *op,ogg_stream_state *thState);
 };

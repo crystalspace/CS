@@ -37,7 +37,7 @@ bool TheoraMediaContainer::Initialize (iObjectRegistry* r)
   _target = NULL;
   canWrite=false;
 
-  clock = csQueryRegistry<iVirtualClock> (object_reg);
+  timeSinceStart = 0;
   return 0;
 }
 size_t TheoraMediaContainer::GetMediaCount () const
@@ -118,15 +118,23 @@ bool TheoraMediaContainer::RemoveActiveStream (size_t index)
   return activeStreams.Delete (index);
 }
 
+void TheoraMediaContainer::DropFrame ()
+{
+  for (uint i=0;i<activeStreams.GetSize ();i++)
+  {
+    media [activeStreams [i]]->DropFrame ();
+  }
+}
 void TheoraMediaContainer::Update ()
 {
+  timeSinceStart+=csGetTicks ();
   // if processingCache is true, that means we've reached the end
   // of the file, but there still is data in the caches of the 
   // active streams which needs processing
   static bool processingCache=false;
 
   static csTicks frameTime = 0;
-  static csTicks lastTime=0;
+  static csTicks lastTime=csGetTicks ();
 
   if(frameTime==0)
   if(_activeTheoraStream.IsValid ())
@@ -180,10 +188,26 @@ void TheoraMediaContainer::Update ()
     {
       //canSwap=true;
     }*/
-    if (((clock->GetCurrentTicks () - lastTime) >= (frameTime)) && !_waitToFillCache && !canWrite && dataAvailable)
+    if(!_waitToFillCache && !canWrite && dataAvailable)
     {
-      canSwap=true;
-      lastTime=clock->GetCurrentTicks ();
+      if( ((csGetTicks () - lastTime) >= (frameTime+40)))
+      {
+        cout<<"dropped a frame\n";
+        DropFrame ();
+        lastTime=csGetTicks ();
+      }
+      else
+      if( (csGetTicks () - lastTime) < (frameTime))
+      {
+        /*canSwap=true;
+        lastTime=csGetTicks ();*/
+      }
+      else
+      if( (csGetTicks () - lastTime) >= (frameTime))
+      {
+        canSwap=true;
+        lastTime=csGetTicks ();
+      }
     }
 
     if(processingCache && dataAvailable==0)
@@ -265,8 +289,8 @@ void TheoraMediaContainer::QueuePage (ogg_page *page)
 
 int TheoraMediaContainer::BufferData (ogg_sync_state *oy)
 {
-  char *buffer=ogg_sync_buffer (oy,4096);
-  int bytes=fread (buffer,1,4096,infile);
+  char *buffer=ogg_sync_buffer (oy,1024);
+  int bytes=fread (buffer,1,1024,infile);
   ogg_sync_wrote (oy,bytes);
   return (bytes);
 }
@@ -320,6 +344,7 @@ void TheoraMediaContainer::DoSeek ()
   
   if(_activeVorbisStream.IsValid ())
     _activeVorbisStream->Seek (time,&_syncState,&_oggPage, _activeTheoraStream->StreamState());
+  timeSinceStart=0;
 }
 
 void TheoraMediaContainer::AutoActivateStreams ()

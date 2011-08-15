@@ -86,6 +86,11 @@ struct iMedia : public virtual iBase
     * Returns true if the cache is full
     */
   virtual bool IsCacheFull() = 0;
+
+  /**
+    * Triggers a frame drop
+    **/
+  virtual void DropFrame () = 0;
 };
 
 /**

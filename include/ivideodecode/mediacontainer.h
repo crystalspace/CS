@@ -90,6 +90,9 @@ struct iMediaContainer : public virtual iBase
 
   // Returns the aspect ratio to use with the image
   virtual float GetAspectRatio () = 0;
+
+  ///triggers a frame drop
+  virtual void DropFrame () = 0;
 };
 
 /** @} */

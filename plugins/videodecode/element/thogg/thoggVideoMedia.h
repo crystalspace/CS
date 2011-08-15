@@ -89,7 +89,15 @@ private:
   uint8* rgbBuff;
   int conversionState;
   void Convert ();
+
   cachedData currentData;
+
+  // Look-up tables for conversion
+  int Ylut[256],
+      GUlut[256],
+      GVlut[256],
+      RVlut[256],
+      BUlut[256];
 
   // Mutexes
 private:
@@ -137,6 +145,7 @@ public:
   virtual double GetTargetFPS () ;
 
   virtual float GetAspectRatio () ;
+  virtual void DropFrame () ;
 
   inline void SetFrameCount (unsigned long count)  { frameCount=count; }
   inline void SetLength (float length)  { this->length=length; }
