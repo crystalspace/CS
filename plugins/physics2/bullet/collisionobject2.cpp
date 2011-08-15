@@ -265,10 +265,7 @@ void csBulletCollisionObject::SetCollisionGroup (const char* name)
   if (btObject && insideWorld)
   {
     btObject->getBroadphaseHandle ()->m_collisionFilterGroup = collGroup.value;
-    if (collGroup.value == sector->collGroups[0].value)
-      btObject->getBroadphaseHandle ()->m_collisionFilterMask = sector->allFilter;
-    else
-      btObject->getBroadphaseHandle ()->m_collisionFilterMask = sector->allFilter ^ collGroup.value;
+    btObject->getBroadphaseHandle ()->m_collisionFilterMask = collGroup.group;
   }
 }
 
@@ -482,7 +479,7 @@ void csBulletCollisionObject::AddBulletObject ()
         shape, localInertia);
       btObject = new btRigidBody (infos);
       btObject->setUserPointer (dynamic_cast<iCollisionObject*> (this));
-      sector->bulletWorld->addRigidBody (btRigidBody::upcast(btObject), collGroup.value, sector->allFilter ^ collGroup.value);
+      sector->bulletWorld->addRigidBody (btRigidBody::upcast(btObject), collGroup.value, collGroup.group);
     }
     else
       dynamic_cast<csBulletColliderTerrain*> (colliders[0])->AddRigidBodies (sector, this);
@@ -498,7 +495,7 @@ void csBulletCollisionObject::AddBulletObject ()
     btObject->setUserPointer (dynamic_cast<CS::Collision2::iCollisionObject*> (this));
     btObject->setCollisionShape (shape);
     sector->broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
-    sector->bulletWorld->addCollisionObject (btObject, collGroup.value, sector->allFilter ^ collGroup.value);
+    sector->bulletWorld->addCollisionObject (btObject, collGroup.value, collGroup.group);
   }
   insideWorld = true;
 }

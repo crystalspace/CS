@@ -211,10 +211,7 @@ void csBulletRigidBody::AddBulletObject ()
 
   SetState (physicalState);
 
-  bool isDefault = (collGroup.value == sector->collGroups[0].value);
-  CS::Collision2::CollisionGroupMask collisionFilterMask = isDefault? sector->allFilter : sector->allFilter ^ collGroup.value;
-
-  sector->bulletWorld->addRigidBody (btBody, collGroup.value, collisionFilterMask);
+  sector->bulletWorld->addRigidBody (btBody, collGroup.value, collGroup.group);
   btBody->setUserPointer (dynamic_cast<CS::Collision2::iCollisionObject*> (
     dynamic_cast<csBulletCollisionObject*>(this)));
 

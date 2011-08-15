@@ -43,10 +43,12 @@ csOpcodeCollisionSector::csOpcodeCollisionSector (csOpcodeCollisionSystem* sys)
 {
   CS::Collision2::CollisionGroup defaultGroup ("Default");
   defaultGroup.value = 1;
+  defaultGroup.group = allFilter;
   collGroups.Push (defaultGroup);
 
   CS::Collision2::CollisionGroup staticGroup ("Static");
   staticGroup.value = 2;
+  staticGroup.group = allFilter ^ 2;
   collGroups.Push (staticGroup);
   systemFilterCount = 2;
 }
@@ -67,7 +69,6 @@ void csOpcodeCollisionSector::AddCollisionObject (CS::Collision2::iCollisionObje
   collisionObjects.Push (obj);
   obj->sector = this;
   obj->collGroup = collGroups[0]; 
-  obj->mask = allFilter;
 
   AddMovableToSector (object);
 }
@@ -106,29 +107,6 @@ void csOpcodeCollisionSector::RemovePortal (iPortal* portal)
 CS::Collision2::HitBeamResult csOpcodeCollisionSector::HitBeam(const csVector3& start, 
                                                                 const csVector3& end)
 {
-  CS::Collision2::HitBeamResult result = HitBeamPortal (start, end);
-
-  if (result.hasHit)
-  {
-    if (result.object->GetObjectType () == CS::Collision2::COLLISION_OBJECT_GHOST)
-    {
-      //Portals are not included.
-      for (size_t i = 0; i < portals.GetSize (); i++)
-      {
-        if (portals[i].ghostPortal1 == result.object)
-        {
-          result.hasHit = false;
-          break;
-        }
-      }
-    }
-  }
-  return result;
-}
-
-CS::Collision2::HitBeamResult csOpcodeCollisionSector::HitBeamPortal(const csVector3& start, 
-                                                                      const csVector3& end)
-{
   CS::Collision2::HitBeamResult result;
   //Maybe at first do an AABB-ray collide. (Does Opcode support AABB-ray collide?)
   float depth = FLT_MAX;
@@ -149,6 +127,15 @@ CS::Collision2::HitBeamResult csOpcodeCollisionSector::HitBeamPortal(const csVec
   return result;
 }
 
+CS::Collision2::HitBeamResult csOpcodeCollisionSector::HitBeamPortal(const csVector3& start, 
+                                                                      const csVector3& end)
+{
+  CS::Collision2::HitBeamResult result = HitBeam (start, end);
+
+  //TODO
+  return result;
+}
+
 CS::Collision2::CollisionGroup& csOpcodeCollisionSector::CreateCollisionGroup (const char* name)
 {
   size_t groupCount = collGroups.GetSize ();
@@ -157,6 +144,7 @@ CS::Collision2::CollisionGroup& csOpcodeCollisionSector::CreateCollisionGroup (c
 
   CS::Collision2::CollisionGroup newGroup(name);
   newGroup.value = 1 << groupCount;
+  newGroup.group = allFilter ^ newGroup.value;
   collGroups.Push (newGroup);
   return collGroups[groupCount];
 }
@@ -176,7 +164,7 @@ void csOpcodeCollisionSector::SetGroupCollision (const char* name1, const char* 
   int index2 = collGroups.FindKey (CollisionGroupVector::KeyCmp (name2));
   if (index1 == csArrayItemNotFound || index2 == csArrayItemNotFound)
     return;
-  if (collide)
+  if (!collide)
   {
     if (index1 >= systemFilterCount)
       collGroups[index1].value &= ~(1 << index2);
@@ -200,9 +188,9 @@ bool csOpcodeCollisionSector::GetGroupCollision (const char* name1, const char* 
     return false;
   if ((collGroups[index1].value & (1 << index2)) != 0 
     || (collGroups[index2].value & (1 << index1)) != 0)
-    return false;
-  else
     return true;
+  else
+    return false;
 }
 
 bool csOpcodeCollisionSector::CollisionTest (CS::Collision2::iCollisionObject* object, csArray<CS::Collision2::CollisionData>& collisions)
@@ -213,8 +201,8 @@ bool csOpcodeCollisionSector::CollisionTest (CS::Collision2::iCollisionObject* o
   {
     if (collisionObjects[i]->QueryCollisionObject () != object)
     {
-      bool collides = (obj->collGroup.value & collisionObjects[i]->mask) != 0;
-      collides = collides && (collisionObjects[i]->collGroup.value & obj->mask);
+      bool collides = (obj->collGroup.value & collisionObjects[i]->collGroup.group) != 0;
+      collides = collides && (collisionObjects[i]->collGroup.value & obj->collGroup.group);
 
       if(!collides)
         continue;

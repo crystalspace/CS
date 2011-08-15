@@ -24,7 +24,6 @@ private:
   csRef<CS::Collision2::iCollisionCallback> collCb;
   csRefArray<csOpcodeCollisionObject> contactObjects;
   csOrthoTransform transform;
-  CS::Collision2::CollisionGroupMask mask;
 
   bool insideWorld;
   bool isTerrain;

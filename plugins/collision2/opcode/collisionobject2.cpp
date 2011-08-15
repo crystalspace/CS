@@ -80,14 +80,13 @@ void csOpcodeCollisionObject::SetCollisionGroup (const char* name)
 
   CS::Collision2::CollisionGroup& group = sector->FindCollisionGroup (name);
   this->collGroup = group;
-  this->mask = sector->allFilter ^ group.value;
 }
 
 bool csOpcodeCollisionObject::Collide (CS::Collision2::iCollisionObject* otherObject)
 {
   csOpcodeCollisionObject* obj = dynamic_cast<csOpcodeCollisionObject*> (otherObject);
-  bool collides = (obj->collGroup.value & mask) != 0;
-  collides = collides && (collGroup.value & obj->mask);
+  bool collides = (obj->collGroup.value & collGroup.group) != 0;
+  collides = collides && (collGroup.value & obj->collGroup.group);
 
   if(!collides)
     return false;

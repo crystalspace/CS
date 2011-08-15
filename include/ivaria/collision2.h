@@ -61,6 +61,7 @@ struct CollisionGroup
 {
   csString name;
   CollisionGroupMask value;
+  CollisionGroupMask group;
 
   CollisionGroup () {}
 

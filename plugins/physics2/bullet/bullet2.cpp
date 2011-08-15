@@ -87,35 +87,38 @@ csBulletSector::csBulletSector (csBulletSystem* sys)
 
   CS::Collision2::CollisionGroup defaultGroup ("Default");
   defaultGroup.value = 1;
+  defaultGroup.group = allFilter;
   collGroups.Push (defaultGroup);
 
   CS::Collision2::CollisionGroup staticGroup ("Static");
   staticGroup.value = 2;
+  staticGroup.group = allFilter ^ 2;
   collGroups.Push (staticGroup);
 
   CS::Collision2::CollisionGroup kinematicGroup ("Kinematic");
   kinematicGroup.value = 4;
+  kinematicGroup.group = allFilter ^ 4;
   collGroups.Push (kinematicGroup);
 
-  CS::Collision2::CollisionGroup debrisGroup ("Debris");
-  debrisGroup.value = 8;
-  collGroups.Push (debrisGroup);
+  CS::Collision2::CollisionGroup portalGroup ("Portal");
+  portalGroup.value = 8;
+  portalGroup.group = allFilter ^ 8;
+  collGroups.Push (portalGroup);
 
-  CS::Collision2::CollisionGroup sensorGroup ("Sensor");
-  sensorGroup.value = 16;
-  collGroups.Push (sensorGroup);
+  CS::Collision2::CollisionGroup copyGroup ("PortalCopy");
+  copyGroup.value = 16;
+  copyGroup.group = allFilter ^ 16;
+  collGroups.Push (copyGroup);
 
   CS::Collision2::CollisionGroup characterGroup ("Character");
   characterGroup.value = 32;
+  characterGroup.group = allFilter ^ 32;
   collGroups.Push (characterGroup);
 
-  CS::Collision2::CollisionGroup portalGroup ("Portal");
-  portalGroup.value = 64;
-  collGroups.Push (portalGroup);
-
   SetGroupCollision ("Portal", "Static", false);
+  SetGroupCollision ("Portal", "PortalCopy", false);
 
-  systemFilterCount = 7;
+  systemFilterCount = 6;
 }
 
 csBulletSector::~csBulletSector ()
@@ -225,16 +228,21 @@ void csBulletSector::AddPortal (iPortal* portal, const csOrthoTransform& meshTra
   for (size_t i = 0; i < portal->GetVertexIndicesCount (); i++)
     box.AddBoundingVertex (vert[portal->GetVertexIndices ()[i]]);
 
+  float maxEdge = MAX (box.GetSize ().x, box.GetSize ().y);
+  maxEdge = MAX (maxEdge, box.GetSize ().z);
+  box.AddBoundingVertex (vert[0] + portal->GetObjectPlane ().GetNormal () * maxEdge *0.1f);
+
   newPortal->ghostPortal->setWorldTransform (CSToBullet (meshTrans, sys->getInternalScale ()));
 
   btCollisionShape* shape = new btBoxShape (CSToBullet (box.GetSize () * 0.5f, sys->getInternalScale ()));
+
 
   newPortal->ghostPortal->setCollisionShape (shape);
 
   newPortal->ghostPortal->setCollisionFlags (newPortal->ghostPortal->getCollisionFlags() 
     | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 
-  bulletWorld->addCollisionObject (newPortal->ghostPortal, collGroups[6].value, allFilter ^ collGroups[6].value);
+  bulletWorld->addCollisionObject (newPortal->ghostPortal, collGroups[3].value, collGroups[3].group);
 
   for (size_t i = 0; i < sys->collSectors.GetSize (); i++)
     if (sys->collSectors[i]->GetSector () == desSector)
@@ -290,6 +298,8 @@ CS::Collision2::HitBeamResult csBulletSector::HitBeam (const csVector3& start, c
   btVector3 rayTo = CSToBullet (end, sys->getInternalScale ());
 
   btCollisionWorld::ClosestRayResultCallback rayCallback (rayFrom, rayTo);
+  rayCallback.m_collisionFilterMask = allFilter ^ 16;
+  rayCallback.m_collisionFilterGroup = 1;
   bulletWorld->rayTest (rayFrom, rayTo, rayCallback);
 
   CS::Collision2::HitBeamResult result;
@@ -415,6 +425,7 @@ CS::Collision2::CollisionGroup& csBulletSector::CreateCollisionGroup (const char
 
   CS::Collision2::CollisionGroup newGroup(name);
   newGroup.value = 1 << groupCount;
+  newGroup.group = allFilter ^ newGroup.value;
   collGroups.Push (newGroup);
   return collGroups[groupCount];
 }
@@ -436,19 +447,19 @@ void csBulletSector::SetGroupCollision (const char* name1,
   int index2 = collGroups.FindKey (CollisionGroupVector::KeyCmp (name2));
   if (index1 == csArrayItemNotFound || index2 == csArrayItemNotFound)
     return;
-  if (collide)
+  if (!collide)
   {
     if (index1 >= systemFilterCount)
-      collGroups[index1].value &= ~(1 << index2);
+      collGroups[index1].group &= ~(1 << index2);
     if (index2 >= systemFilterCount)
-      collGroups[index2].value &= ~(1 << index1);
+      collGroups[index2].group &= ~(1 << index1);
   }
   else
   {
     if (index1 >= systemFilterCount)
-      collGroups[index1].value |= 1 << index2;
+      collGroups[index1].group |= 1 << index2;
     if (index2 >= systemFilterCount)
-      collGroups[index2].value |= 1 << index1;
+      collGroups[index2].group |= 1 << index1;
   }
 }
 
@@ -459,11 +470,11 @@ bool csBulletSector::GetGroupCollision (const char* name1,
   int index2 = collGroups.FindKey (CollisionGroupVector::KeyCmp (name2));
   if (index1 == csArrayItemNotFound || index2 == csArrayItemNotFound)
     return false;
-  if ((collGroups[index1].value & (1 << index2)) != 0 
-    || (collGroups[index2].value & (1 << index1)) != 0)
-    return false;
-  else
+  if ((collGroups[index1].group & (1 << index2)) != 0 
+    || (collGroups[index2].group & (1 << index1)) != 0)
     return true;
+  else
+    return false;
 }
 
 bool csBulletSector::CollisionTest (CS::Collision2::iCollisionObject* object, 
@@ -532,10 +543,6 @@ bool csBulletSector::CollisionTest (CS::Collision2::iCollisionObject* object,
       }
     }
   }
-
-  // Check the copy of this object in another sector.
-  if (collObject->objectCopy)
-    collObject->objectCopy->sector->CollisionTest (collObject->objectCopy, collisions);
 
   if (length != collisions.GetSize ())
     return true;

@@ -545,7 +545,7 @@ void csBulletColliderTerrain::AddRigidBodies (csBulletSector* sector, csBulletCo
     if (cell->GetLoadState () != iTerrainCell::Loaded)
       continue;
     bodies[i]->setUserPointer (dynamic_cast<CS::Collision2::iCollisionObject*> (body));
-    sector->bulletWorld->addRigidBody (bodies[i], body->collGroup.value, sector->allFilter ^ body->collGroup.value);
+    sector->bulletWorld->addRigidBody (bodies[i], body->collGroup.value, body->collGroup.group);
   }
 }
 }
