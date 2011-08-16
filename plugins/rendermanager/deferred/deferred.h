@@ -28,6 +28,7 @@
 #include "csplugincommon/rendermanager/renderlayers.h"
 #include "csplugincommon/rendermanager/posteffectssupport.h"
 #include "csplugincommon/rendermanager/viscullcommon.h"
+#include "csplugincommon/rendermanager/hdrexposure.h"
 
 #include "iutil/comp.h"
 #include "csutil/scf_implementation.h"
@@ -61,12 +62,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
   public:
 
     enum csDebugBuffer {
-      DiffuseBuffer,
-      NormalBuffer,
-      AmbientBuffer,
-      DepthBuffer,
-      SpecularBuffer,
-      ColorBuffer
+      CS_DEPTH_BUFFER,
+      CS_DIFFUSE_BUFFER,
+      CS_NORMAL_BUFFER,
+      CS_AMBIENT_BUFFER,
+      CS_SPECULAR_BUFFER,
+      CS_VERTEX_NORMALS_BUFFER,
+      CS_LINEAR_DEPTH_BUFFER,
+      CS_AMBOCC_BUFFER,
+      CS_INDLIGHT_BUFFER
     };
 
     /// Constructor.
@@ -95,6 +99,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     virtual void EnableGlobalIllumination(bool enable);
     virtual void ChangeBufferResolution(const char *bufferResolution);
     virtual void EnableBlurPass(bool enableBlur);
+    virtual void ChangeNormalsAndDepthResolution (const char *resolution);
     virtual csShaderVariable* GetGlobalIllumVariableAdd(const char *svName);
     virtual csShaderVariable* GetBlurVariableAdd(const char *svName);
     virtual csShaderVariable* GetCompositionVariableAdd(const char *svName);
@@ -105,9 +110,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     void AddDeferredLayer(CS::RenderManager::MultipleRenderLayer &layers, int &addedLayer);
     void AddZOnlyLayer(CS::RenderManager::MultipleRenderLayer &layers, int &addedLayer);
 
-    void AddPostEffectLayer();
-    void SetPostEffectShaderOption();
-    //void UpdatePostEffectsSV();    
+    void LoadDebugLayer();
+    void UpdateDebugBufferSV();
 
     int LocateDeferredLayer(const CS::RenderManager::MultipleRenderLayer &layers);
     int LocateZOnlyLayer(const CS::RenderManager::MultipleRenderLayer &layers);
@@ -141,17 +145,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     GBuffer gbuffer;
     csGlobalIllumRenderer globalIllum;
 
+    CS::RenderManager::HDRHelper hdr;
+    CS::RenderManager::HDR::Exposure::Configurable hdrExposure;
+    bool isHDREnabled;
+    bool doHDRExposure;
+
     int deferredLayer;
     int zonlyLayer;
     int maxPortalRecurse;
 
-    //csRef<csShaderVariable> postEffectOptionSV;
-    //PostEffectManager::Layer *postEffectLayer;
-    csStringID idPostEffectOptionSV;
-
+    bool hasPostEffects;
     bool showGBuffer;
     bool drawLightVolumes;
+    
+    bool isDebugActive;
     csDebugBuffer debugBuffer;
+    csRef<iShader> debugShader;
+    CS::RenderManager::PostEffectManager::Layer *debugLayer;
 
     const char *messageID;
   };

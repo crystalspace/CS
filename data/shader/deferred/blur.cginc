@@ -18,6 +18,25 @@ uniform int ShowGlobalIllum;
 
 const float TWO_PI = 6.28318f;
 const float EPSILON = 0.01f;
+]]>
+// Cg profiles for older hardware don't support data-dependent loops
+<? if vars."ssao blur kernelsize".int <= 1 ?>
+const int KERNEL_SIZE = 1;
+<? elsif vars."ssao blur kernelsize".int == 2 ?>
+const int KERNEL_SIZE = 2;
+<? elsif vars."ssao blur kernelsize".int == 3 ?>
+const int KERNEL_SIZE = 3;
+<? elsif vars."ssao blur kernelsize".int == 4 ?>
+const int KERNEL_SIZE = 4;
+<? elsif vars."ssao blur kernelsize".int == 5 ?>
+const int KERNEL_SIZE = 5;
+<? elsif vars."ssao blur kernelsize".int == 6 ?>
+const int KERNEL_SIZE = 6;
+<? else ?>
+const int KERNEL_SIZE = 7;
+<? endif ?>
+
+<![CDATA[
 float weightedAO = 0.0f;
 float AO = 0.0f;
 float4 weightedRadiance = float4(0.0f);
@@ -63,13 +82,13 @@ float4 main(in float2 texCoord : TEXCOORD0) : COLOR
   float pixelDepth = normalDepthVS.a;
   
   float weightSum = 0.0f;
-  float sqrGaussianSigma = KernelSize * 0.3333f;
+  float sqrGaussianSigma = KERNEL_SIZE * 0.3333f;
   sqrGaussianSigma *= sqrGaussianSigma;
   ViewportSize.zw *= 3.0f * Direction; // strided blur
   
   weightSum += WeightSample (0, texCoord, pixelDepth, pixelNormalVS, sqrGaussianSigma); 
   
-	for (int i=1; i <= KernelSize; i++)
+	for (int i=1; i <= KERNEL_SIZE; i++)
 	{
     float2 tcOffset = float2 (i * ViewportSize.z, i * ViewportSize.w);
 	      
@@ -85,10 +104,10 @@ float4 main(in float2 texCoord : TEXCOORD0) : COLOR
   }
   else
   {
-    //weightSum = 1.0f / (2.0f * KernelSize + 1.0f);
+    //weightSum = 1.0f / (2.0f * KERNEL_SIZE + 1.0f);
     //AO *= weightSum;
     //radiance *= weightSum;
-    radiance /= 2.0f * KernelSize + 1.0f;
+    radiance /= 2.0f * KERNEL_SIZE + 1.0f;
   }
   
   return radiance;

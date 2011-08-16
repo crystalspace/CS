@@ -48,6 +48,8 @@ shouldShutdown(false)
   
   cfgDrawLogo = true;
   cfgUseDeferredShading = true;
+
+  downsampleNormalsDepth = false;
 }
 
 //----------------------------------------------------------------------
@@ -106,7 +108,6 @@ bool DeferredDemo::OnInitialize(int argc, char *argv[])
   csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (GetObjectRegistry());
   cfg->AddDomain ("/config/deferreddemo.cfg", vfs, iConfigManager::ConfigPriorityPlugin);
 
-  csRef<iBugPlug> bugPlug = csQueryRegistry<iBugPlug> (GetObjectRegistry());  
 
   return true;
 }
@@ -200,6 +201,10 @@ bool DeferredDemo::SetupModules()
     return ReportError ("Failed to query the deferred Render Manager global illumination interface!");
 
   SetupDynamicsSystem (pluginManager);
+
+  globalIllumResolution = cfg->GetStr ("RenderManager.Deferred.GlobalIllum.BufferResolution", "full");
+  depthNormalsResolution = cfg->GetStr ("RenderManager.Deferred.GlobalIllum.DepthAndNormalsResolution",
+    "full");
 
   return true;
 }
@@ -295,7 +300,17 @@ bool DeferredDemo::LoadSettings()
 bool DeferredDemo::SetupGui(bool reload)
 {
   // Initialize the HUD manager
-  hudManager->GetKeyDescriptions()->Empty ();
+  hudManager->GetKeyDescriptions()->Empty();
+  hudManager->GetKeyDescriptions()->Push ("z: Change SSGI resolution");
+  hudManager->GetKeyDescriptions()->Push ("x: Change depth/normals resolution");
+  hudManager->GetKeyDescriptions()->Push ("Space: Throw ball");
+  hudManager->GetKeyDescriptions()->Push ("Ctrl+Space: Throw ball w/light");
+  hudManager->GetKeyDescriptions()->Push ("n: Pause/Resume physics simulation");
+  hudManager->GetKeyDescriptions()->Push ("g: Show/Hide GUI");
+  hudManager->GetKeyDescriptions()->Push ("F9: Show/Hide HUD");
+  hudManager->GetKeyDescriptions()->Push ("F12: Screenshot");  
+  hudManager->GetKeyDescriptions()->Push ("1-9: Visualize deferred buffers");
+  hudManager->GetKeyDescriptions()->Push ("0: Visualize final rendered image");
 
   configEventNotifier.AttachNew(new CS::Utility::ConfigEventNotifier(GetObjectRegistry()));
 
@@ -431,7 +446,7 @@ bool DeferredDemo::SetupScene()
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (pos);
   
-  csPlane3 *farPlane = new csPlane3 (0, 0, -1, 1000);
+  csPlane3 *farPlane = new csPlane3 (0, 0, -1, 100);
   view->GetCamera()->SetFarPlane (farPlane);
   view->GetPerspectiveCamera()->SetNearClipDistance (0.2f);
   delete farPlane;
@@ -454,7 +469,7 @@ bool DeferredDemo::SetupScene()
     csRef<iGeneralFactoryState> factoryState = 
       scfQueryInterface<iGeneralFactoryState> (ballFact[i]->GetMeshObjectFactory());
 
-    float r = i * 0.1f + 0.3f;
+    float r = i * 0.1f + 0.4f;
     if (i == 5) r = 0.1f;
     csVector3 radius (r, r, r);
     csEllipsoid ellips (csVector3 (0.0f), radius);
@@ -660,7 +675,7 @@ void DeferredDemo::RunDemo()
 void DeferredDemo::UpdateCamera(float deltaTime)
 {
   const float MOVE_SPEED = 5.0f;
-  const float ROTATE_SPEED = 2.0f;  
+  const float ROTATE_SPEED = 2.0f;
 
   // Handles camera movement.
   iCamera *c = view->GetCamera ();
@@ -756,9 +771,17 @@ void DeferredDemo::UpdateGui()
   rmGlobalIllum->GetBlurVariableAdd ("ssao blur position threshold")->SetValue (blurPositionThreshold);
   rmGlobalIllum->GetBlurVariableAdd ("ssao blur normal threshold")->SetValue (blurNormalThreshold);
 
-  char *msg = new char[50];
-  cs_snprintf (msg, 50, "%s: %d", "Number of lights", room->GetLights()->GetCount());
   hudManager->GetStateDescriptions()->Empty();
+  csString msg ("Number of lights: ");
+  msg.Append (room->GetLights()->GetCount());  
+  hudManager->GetStateDescriptions()->Push (msg);
+
+  msg = csString ("SSGI resolution: ");
+  msg.Append (globalIllumResolution);
+  hudManager->GetStateDescriptions()->Push (msg);
+
+  msg = csString ("Depth/Normals resolution: ");
+  msg.Append (depthNormalsResolution);
   hudManager->GetStateDescriptions()->Push (msg);
 }
 
@@ -898,24 +921,64 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
       cfgShowGui = !cfgShowGui;
       return true;
     }
-    else if (code == 'a')
+    else if (code == '8')
     {
-      showAmbientOcclusion = !showAmbientOcclusion;
-      showGlobalIllumination = false;
-      if (showAmbientOcclusion)
+      //showAmbientOcclusion = !showAmbientOcclusion;
+      //showGlobalIllumination = false;
+      //if (showAmbientOcclusion)
       {
         rm_debug->DebugCommand ("toggle_visualize_ambient_occlusion");
-      }  
+      }
       return true;
     }
-    else if (code == 's')
+    else if (code == '9')
     {
-      showGlobalIllumination = !showGlobalIllumination;
-      showAmbientOcclusion = false;
-      if (showGlobalIllumination)
+      //showGlobalIllumination = !showGlobalIllumination;
+      //showAmbientOcclusion = false;
+      //if (showGlobalIllumination)
       {
-        rm_debug->DebugCommand ("toggle_visualize_global_illumination");
+        rm_debug->DebugCommand ("toggle_visualize_color_bleeding");
       }
+      return true;
+    }
+    else if (code == '0')
+    {
+      rm_debug->DebugCommand ("toggle_visualize_backbuffer");
+      return true;
+    } 
+    else if (code == '1')
+    {
+      rm_debug->DebugCommand ("toggle_visualize_diffusebuffer");
+      return true;
+    }
+    else if (code == '2')
+    {
+      rm_debug->DebugCommand ("toggle_visualize_normalbuffer");
+      return true;
+    }
+    else if (code == '3')
+    {
+      rm_debug->DebugCommand ("toggle_visualize_ambientbuffer");
+      return true;
+    } 
+    else if (code == '4')
+    {
+      rm_debug->DebugCommand ("toggle_visualize_depthbuffer");
+      return true;
+    }
+    else if (code == '5')
+    {
+      rm_debug->DebugCommand ("toggle_visualize_specularbuffer");
+      return true;
+    }
+    else if (code == '6')
+    {
+      rm_debug->DebugCommand ("toggle_visualize_vertexnormalsbuffer");
+      return true;
+    }
+    else if (code == '7')
+    {
+      rm_debug->DebugCommand ("toggle_visualize_lineardepthbuffer");
       return true;
     }
     else if (code == 'e')
@@ -929,23 +992,35 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
     {
       isBulletEnabled = !isBulletEnabled;
     }
-    else if (code == 'b')
+    else if (code == 'p')
     {
       doBulletDebug = !doBulletDebug;
       return true;
     }
-    else if (code == '1')
+    else if (code == 'z')
     {
-      rmGlobalIllum->ChangeBufferResolution ("full");
+      if (globalIllumResolution.CompareNoCase ("full"))
+        globalIllumResolution = "half";
+      else if (globalIllumResolution.CompareNoCase ("half"))
+        globalIllumResolution = "quarter";
+      else if (globalIllumResolution.CompareNoCase ("quarter"))
+        globalIllumResolution = "full";
+
+      rmGlobalIllum->ChangeBufferResolution (globalIllumResolution.GetDataSafe());
+      return true;
     }
-    else if (code == '2')
+    else if (code == 'x')
     {
-      rmGlobalIllum->ChangeBufferResolution ("half");
-    }
-    else if (code == '3')
-    {
-      rmGlobalIllum->ChangeBufferResolution ("quarter");
-    }
+      if (depthNormalsResolution.CompareNoCase ("full"))
+        depthNormalsResolution = "half";
+      else if (depthNormalsResolution.CompareNoCase ("half"))
+        depthNormalsResolution = "quarter";
+      else if (depthNormalsResolution.CompareNoCase ("quarter"))
+        depthNormalsResolution = "full";
+
+      rmGlobalIllum->ChangeNormalsAndDepthResolution (depthNormalsResolution.GetDataSafe());
+      return true;
+    }    
     else if (code == CSKEY_SPACE)
     {
       if (kbd->GetKeyState (CSKEY_CTRL))
@@ -1007,7 +1082,7 @@ void DeferredDemo::SpawnSphere(bool attachLight)
   const csOrthoTransform& cameraTransform = view->GetCamera()->GetTransform();  
   int ballIndex = rand() % 5;    
   csRef<iRigidBody> body = dynamicSystem->CreateBody();
-  float radius = ballIndex * 0.1f + 0.3f;
+  float radius = ballIndex * 0.1f + 0.4f;
   iSector *currentSector = view->GetCamera()->GetSector();
 
   int materialIndex = rand() % 4;
@@ -1030,7 +1105,6 @@ void DeferredDemo::SpawnSphere(bool attachLight)
 
   body->SetProperties (0.01f, csVector3 (0.0f), csMatrix3());
   body->SetPosition (cameraTransform.GetOrigin() + cameraTransform.GetT2O() * csVector3 (0, 0, 1));
-  body->AttachMesh (mesh);    
   body->AttachColliderSphere (radius, csVector3(0.0f), 1, 1, 0.01f);    
   body->SetLinearVelocity (cameraTransform.GetT2O() * csVector3 (0, 0, 7));
   body->SetAngularVelocity (cameraTransform.GetT2O() * csVector3 (7, 0, 0));  

@@ -39,8 +39,8 @@
       <vp plugin="glcg" file="/shader/deferred/globalillum.cgvp" />      
       
       <texture destination="GlobalIllumBuffer" name="tex global illumination" />
-      <texture destination="NormalBuffer" name="tex gbuffer 3" />
-      <texture destination="DepthBuffer" name="tex gbuffer depth" />
+      <!--texture destination="NormalBuffer" name="tex gbuffer 3" /-->
+      <texture destination="NormalBuffer" name="tex normals depth" />
       <!--<fp plugin="glcg" file="/shader/deferred/horizontal_blur.cgfp" />-->
       <fp plugin="glcg">
         <cgfp>

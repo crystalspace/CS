@@ -355,7 +355,7 @@
         </matrix>
       </move>
     </meshobj>-->
-    <meshobj name='happy_vrip'>
+    <!--<meshobj name='happy_vrip'>
       <plugin>genmesh</plugin>
       <params>
         <factory>happy_vrip</factory>
@@ -428,7 +428,7 @@
           <roty>-0.7443</roty>
         </matrix>
       </move>
-    </meshobj>
+    </meshobj>-->
     <meshobj name='lucy'>
       <plugin>genmesh</plugin>
       <params>
@@ -453,7 +453,7 @@
         <v y='0.8338' x='-18.538' z='7.0152'/>
       </move>
     </meshobj>-->
-    <meshobj name='Cube.005'>
+    <!--<meshobj name='Cube.005'>
       <plugin>genmesh</plugin>
       <params>
         <factory>Cube.005</factory>
@@ -474,7 +474,7 @@
       <move>
         <v y='0.8338' x='-18.538' z='-7.0837'/>
       </move>
-    </meshobj>
+    </meshobj>-->
     <meshobj name='Cube.000'>
       <plugin>genmesh</plugin>
       <params>
@@ -856,7 +856,7 @@
         <v y='0.4604' x='0.4737' z='0.0504'/>
       </move>
     </meshobj>
-    <meshobj name="krystal">
+    <!--<meshobj name="krystal">
       <plugin>animesh</plugin>
       <params>
         <factory>krystal</factory>
@@ -868,7 +868,7 @@
           <roty>3.14159</roty>
         </matrix>
       </move>
-    </meshobj>
+    </meshobj>-->
     
     <light name='Lamp.Down0'>
       <center y='3.5' x='11.8' z='3.5'/>
@@ -922,12 +922,12 @@
     </light>    
     <light name='Lamp.Down10'>
       <center y='3.8' x='-15' z='0'/>
-      <color blue='0.4' green='0.35' red='0.35'/>
+      <color blue='0.6' green='0.6' red='0.6'/>
       <radius>5</radius>      
     </light>    
     <light name='Lamp.Down11'>
       <center y='3.8' x='16' z='0'/>
-      <color blue='0.35' green='0.35' red='0.4'/>
+      <color blue='0.6' green='0.6' red='0.6'/>
       <radius>5</radius>    
     </light>
     
@@ -1044,7 +1044,7 @@
     <light name='Lamp.Lucy.Spot.2'>
       <center y='12' x='3' z='0'/>
       <color blue='0.8' green='0.8' red='0.8'/>
-      <radius>15</radius>
+      <radius>18</radius>
       <spotlightfalloff outer='25' inner='20'/>
       <move>
         <matrix>
@@ -1060,14 +1060,13 @@
 
   <sequences>
   
-    <sequence name="rotateSpotLight">
+    <!--<sequence name="rotateSpotLight">
 	    <rotatelight light="Lamp.Lucy.Spot.2" duration="2000" relative="true">
-	      <roty>1</roty>
-	      <!--v x="1" y="-13" z="-4" /-->
+	      <roty>1</roty>	      
 	    </rotatelight>
       <delay time="1000" />
 	    <enable trigger="rotateSpotLight" />
-    </sequence>    
+    </sequence>-->
     <sequence name="rotateLights">
 	    <rotatelight light="Lamp.Down0" duration="500">
 	      <roty>1</roty>
@@ -1117,10 +1116,10 @@
   
   <triggers>
   
-    <trigger name="rotateSpotLight">
+    <!--<trigger name="rotateSpotLight">
       <sectorvis sector="Scene" />
       <fire delay="0" sequence="rotateSpotLight" />
-    </trigger>
+    </trigger>-->
     <trigger name="rotateLights">
       <sectorvis sector="Scene" />
       <fire delay="0" sequence="rotateLights" />

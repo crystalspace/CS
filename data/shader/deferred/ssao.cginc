@@ -45,11 +45,23 @@ const float TWO_PI         = 6.283185f;
 const float ONE_OVER_PI    = 0.318310f;
 const float ONE_OVER_TWOPI = 0.159155f;
 
+]]>
+// Cg profiles for older hardware don't support data-dependent loops
+<? if vars."num passes".int <= 1 ?>
+const int NUM_PASSES  = 1;
+<? elsif vars."num passes".int == 2 ?>
+const int NUM_PASSES  = 2;
+<? elsif vars."num passes".int == 3 ?>
+const int NUM_PASSES  = 3;
+<? else ?>
+const int NUM_PASSES  = 4;
+<? endif ?>
+<![CDATA[
+
 struct vertex2fragment 
 {
   float2 TexCoord : TEXCOORD0;
   float4 ScreenPos : TEXCOORD1;
-  float4 ViewPos : TEXCOORD2;
 };
 
 void GetSamplePositionAndNormal(float2 texCoord, float3 ray, float3 scale, out float2 sampleTC,
@@ -70,25 +82,19 @@ float ComputeOcclusion(float3 vecToOccluder, float3 normal, float3 sampleNormal)
   float distance = length (vecToOccluder);
   float deltaN = (1.0 - max (0.0, dot (normal, sampleNormal))) *
       max (0.0 - selfOcclusion, dot (normal, normalize (vecToOccluder)) - occluderAngleBias);
-  return /*step (0.0, distance) * step (distance, maxOccluderDistance) **/  deltaN * occlusionStrength 
-      // / (1.0 + distance);
-      * (1.0f - smoothstep (0.01, maxOccluderDistance, distance));
-  
-  /*float fRangeIsInvalid = saturate((screenPos.z - sampleDepth) / scale.z);			
-  // accumulate accessibility, use default value of 0.5 if right computations are not possible
-  return lerp (sampleDepth > (screenPos.z + ray.z), 0.1, fRangeIsInvalid) * deltaN * 
-      occlusionStrength * step (fRangeIsInvalid, maxOccluderDistance);*/
+  return deltaN * (1.0 - smoothstep (0.01, maxOccluderDistance, distance));
+       // step (0.01, distance) * step (distance, maxOccluderDistance) / (1.0 + distance * distance);      
 }
 
 float3 ComputeIndirectRadiance(float2 sampleTC, float3 vecToOccluder, float3 normal, float3 sampleNormal, float ao)
 {
-  float occluderDist = max (1.0, length (vecToOccluder));
+  /*float occluderDist = max (1.0, length (vecToOccluder));
   vecToOccluder = normalize (vecToOccluder);  
   float cosRi = max (0.0, dot (normal, vecToOccluder));
   float cosSi = max (0.0, dot (sampleNormal, -vecToOccluder));
-  float occluderGeometricTerm = cosSi * cosRi / (occluderDist * occluderDist);
+  float occluderGeometricTerm = cosSi * cosRi / (occluderDist * occluderDist);*/
   float3 occluderRadiance = tex2D (DirectRadianceBuffer, sampleTC).rgb;
-  return indirectLightStrength * occluderRadiance * occluderGeometricTerm;
+  return indirectLightStrength * occluderRadiance * ao; //* occluderGeometricTerm;
 }
 
 float4 main(vertex2fragment IN) : COLOR
@@ -126,20 +132,21 @@ float4 main(vertex2fragment IN) : COLOR
   float AO = 0.0;
   float AOsum = 0.0;
   float3 indirectRadiance = float3(0.0);
-  float totalSamples = 8.0 * numPasses;
+  float totalSamples = 8.0 * NUM_PASSES;
   float sampleStep = 0.5 / totalSamples;
   float sampleLength = 0.5;
   //float3 bentNormal = float3(0.0);
   
-  for (int n=0; n < numPasses; n++)
-  {
-    float3 randomNormal = tex2D (RandNormalsTexture, texCoord * ((viewportSize.xy / 64) + float2(n))).rgb * 2.0 - 1.0;
+  float3 randomNormal = tex2D (RandNormalsTexture, texCoord * ((viewportSize.xy / 64) /*+ float2(n)*/)).rgb * 2.0 - 1.0;
     randomNormal = normalize (randomNormal);
+  
+  for (int n=0; n < NUM_PASSES; n++)
+  {    
     for (int i=0; i < 8; i++)
-    {
+    {      
       float3 ray = reflect (samples[i] * sampleLength, randomNormal);
-      if (dot (ray, normal) < 0.0)
-        ray = -ray;
+      //if (dot (ray, normal) < 0.0)
+      //  ray = -ray;
       
       sampleLength += sampleStep;
       float3 sampleScreenPos, sampleNormal;
@@ -147,22 +154,27 @@ float4 main(vertex2fragment IN) : COLOR
       GetSamplePositionAndNormal (texCoord, ray, scale[i % 2], sampleTC, sampleScreenPos, sampleNormal);
       float3 vecToOccluder = sampleScreenPos - screenPos;
 ]]>
-<?if vars."enable ambient occlusion".float == 1 ?>
-      AO = ComputeOcclusion (vecToOccluder, normal, sampleNormal);
+<?if vars."enable ambient occlusion".float == 1 || vars."enable indirect light".float == 1 ?>
+      AO = ComputeOcclusion (vecToOccluder, normal, sampleNormal);      
 <?endif?>
 <?if vars."enable indirect light".float == 1 ?>
       indirectRadiance += ComputeIndirectRadiance (sampleTC, vecToOccluder, normal, sampleNormal, AO);
 <?endif?>
-<![CDATA[
+<?if vars."enable ambient occlusion".float == 1 ?>
+      AOsum += occlusionStrength * AO;
+<?endif?>
+
       //bentNormal += vecToOccluder * AO;
-      AOsum += AO;
     }
   }
-    
+<?if vars."enable ambient occlusion".float == 1 ?>
   AOsum /= totalSamples;
   AOsum += selfOcclusion;
-  indirectRadiance /= totalSamples;
-  
+<?endif?>
+<?if vars."enable indirect light".float == 1 ?>
+  indirectRadiance /= 2.0 * totalSamples;
+<?endif?>
+<![CDATA[
   /*bentNormal = normalize (bentNormal);
   // convert bent normal to spherical coords
   float theta = acos (bentNormal.y);

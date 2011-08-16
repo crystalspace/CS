@@ -84,7 +84,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       globalIllumBufferFormat = cfg->GetStr ("RenderManager.Deferred.GlobalIllum.GlobalIllumBufferFormat",
         "rgba16_f");
       
-      csString bufferRes (cfg->GetStr ("RenderManager.Deferred.GlobalIllum.BufferResolution", "half"));
+      csString bufferRes (cfg->GetStr ("RenderManager.Deferred.GlobalIllum.BufferResolution", "full"));
       if (bufferRes.CompareNoCase ("full"))
         bufferDownscaleFactor = 1.0f;
       else if (bufferRes.CompareNoCase ("half"))
@@ -92,13 +92,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       else if (bufferRes.CompareNoCase ("quarter"))
         bufferDownscaleFactor = 0.25f;
       else
-        bufferDownscaleFactor = 0.5f;
+        bufferDownscaleFactor = 0.5f;      
 
-      if (!InitRenderBuffers())
+      applyBlur = cfg->GetBool ("RenderManager.Deferred.GlobalIllum.ApplyBlur", true);
+      
+      depthNormalsResolution = cfg->GetStr ("RenderManager.Deferred.GlobalIllum.DepthAndNormalsResolution",
+        "full");
+      if (depthNormalsResolution.CompareNoCase ("full"))
+        depthNormalsBufferScale = 1.0f;
+      else if (depthNormalsResolution.CompareNoCase ("half"))
+        depthNormalsBufferScale = 0.5f;
+      else if (depthNormalsResolution.CompareNoCase ("quarter"))
+        depthNormalsBufferScale = 0.25f;
+      else
+        depthNormalsBufferScale = 1.0f;
+
+      if (!InitRenderTargets())
       {
         enabled = false;
         return false;
-      }     
+      }
       
       csRef<iLoader> loader = csQueryRegistry<iLoader> (objRegistry);
       shaderManager = csQueryRegistry<iShaderManager> (objRegistry);
@@ -151,18 +164,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
       LoadRandomNormalsTexture (loader, graphics3D, cfg);
       LoadIrradianceEnvironmentMap (loader, graphics3D);
-      //GenerateSampleDirections (graphics3D);
-      
-      SetupShaderVars(cfg);
+      //GenerateSampleDirections (graphics3D);     
 
-      CreateFullscreenQuad();
+      CreateFullscreenQuad();      
+
+      SetupShaderVars (cfg);
 
       isInitialized = true;
-      applyBlur = true;
       return true;
     }    
 
-    void UpdateShaderVars()
+    /*void UpdateShaderVars()
     {
       if (!enabled)
         return;
@@ -171,21 +183,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         svStringSet->Request ("debug show ambocc"))->SetValue ((int)showAmbientOcclusion);
       lightCompositionShader->GetVariableAdd (
         svStringSet->Request ("debug show globalillum"))->SetValue ((int)showGlobalIllumination);
-    }
+
+      if (downsampleDepthNormals)
+        depthNormalBufferSV->SetValue (depthNormalBuffer); 
+      else
+        depthNormalBufferSV->SetValue (gbuffer->GetColorBuffer(3));
+    }*/
 
     void RenderGlobalIllum(iTextureHandle *accumBuffer)
     {
       if (!enabled || !accumBuffer)
         return;
 
-      // Downsample buffer with normals and depth
-      /*AttachDepthNormalBuffer();
+      if (depthNormalsBufferScale < 1.0f)
       {
-        graphics3D->SetZMode (CS_ZBUF_MESH);        
+        // Downsample buffer with normals and depth
+        AttachDepthNormalBuffer();
+        {
+          graphics3D->SetZMode (CS_ZBUF_MESH);
 
-        DrawFullscreenQuad (downsampleShader);
+          DrawFullscreenQuad (downsampleShader);
+        }
+        DetachDepthNormalBuffer();
       }
-      DetachDepthNormalBuffer();*/
 
       // Render ambient occlusion + indirect light
       AttachGlobalIllumBuffer();
@@ -252,12 +272,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         bufferDownscaleFactor = resolutionFactor;
 
         DestroyIntermediateBuffers();
-        InitRenderBuffers();
+        InitRenderTargets();
 
         globalIllumBufferSV->SetValue (globalIllumBuffer);
         intermediateBufferSV->SetValue (intermediateBuffer);
       }
-    }
+    }    
 
     bool AttachGlobalIllumBuffer(bool useGBufferDepth = false)
     {
@@ -366,11 +386,127 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     void SetEnabled(bool value)
     {
       this->enabled = value;
+    }
+
+    bool GetShowAmbientOcclusion()
+    {
+      return showAmbientOcclusion;
+    }
+
+    void SetShowAmbientOcclusion(bool showAO)
+    {
+      if (showAmbientOcclusion == showAO)
+        return;      
+
+      showAmbientOcclusion = showAO;
+
+      lightCompositionShader->GetVariableAdd (
+        svStringSet->Request ("debug show ambocc"))->SetValue ((int)showAmbientOcclusion);
+    }
+
+    bool GetShowColorBleeding()
+    {
+      return showGlobalIllumination;
+    }
+
+    void SetShowColorBleeding(bool showCB)
+    {
+      if (showGlobalIllumination == showCB)
+        return;
+
+      showGlobalIllumination = showCB;
+
+      lightCompositionShader->GetVariableAdd (
+        svStringSet->Request ("debug show globalillum"))->SetValue ((int)showGlobalIllumination);
+    }
+
+    bool GetApplyBlur()
+    {
+      return applyBlur;
+    }
+
+    void SetApplyBlur(bool applyBlur)
+    {
+      this->applyBlur = applyBlur;
+    }
+
+    const char* GetNormalsAndDepthResolution()
+    {
+      return depthNormalsResolution;
+    }
+
+    void SetNormalsAndDepthResolution (const char *resolution)
+    {
+      if (csString (resolution).CompareNoCase (depthNormalsResolution))
+        return;
+
+      depthNormalsResolution = csString (resolution);
+
+      if (depthNormalsResolution.CompareNoCase ("full"))
+      {
+        // Use full resolution depth and normals from gbuffer
+        DetachDepthNormalBuffer();
+        depthNormalBufferSV->SetValue (gbuffer->GetColorBuffer(3));
+        depthNormalsBufferScale = 1.0f;
+        depthNormalBuffer = nullptr;
+        return;
+      }
+
+      iGraphics2D *g2D = graphics3D->GetDriver2D();
+
+      depthNormalsBufferScale = 0.5f;
+      if (depthNormalsResolution.CompareNoCase ("quarter"))
+        depthNormalsBufferScale = 0.25f;
+
+      bool changeRes = !depthNormalBuffer;
+      if (!changeRes)
+      {
+        // Check if depthNormalBuffer resolution is not already the desired
+        int bufwidth = 0, bufheight = 0;
+        depthNormalBuffer->GetRendererDimensions (bufwidth, bufheight);
+
+        changeRes = !(fabs (depthNormalsBufferScale * g2D->GetWidth() - (float)bufwidth) < EPSILON) ||
+                    !(fabs (depthNormalsBufferScale * g2D->GetHeight() - (float)bufheight) < EPSILON);
+      }
+
+      if (changeRes)
+      {
+        const int flags = CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP | CS_TEXTURE_NPOTS;
+        scfString errString;
+        depthNormalBuffer = graphics3D->GetTextureManager()->CreateTexture (
+          g2D->GetWidth() * depthNormalsBufferScale, g2D->GetHeight() * depthNormalsBufferScale,
+          csimg2D, gbuffer->GetColorBufferFormat(), flags, &errString);
+
+        if (!depthNormalBuffer)
+        {
+          csReport (objectRegistry, CS_REPORTER_SEVERITY_WARNING, reporterMessageID, 
+            "Could not create depth and normals buffer! %s", errString.GetCsString().GetDataSafe());
+          // Can't use downsampled buffer -> use full resolution depth and normals from gbuffer
+          DetachDepthNormalBuffer();
+          depthNormalBufferSV->SetValue (gbuffer->GetColorBuffer(3));
+          depthNormalsResolution = csString ("full");
+          depthNormalsBufferScale = 1.0f;
+          return;
+        }
+      }
+
+      // Use downsampled depth and normals
+      depthNormalBufferSV->SetValue (depthNormalBuffer);      
+    }
+
+    iShader* GetGlobalIllumShader()
+    {
+      return globalIllumShader;
+    }    
+
+    iShader* GetLightCompositionShader()
+    {
+      return lightCompositionShader;
     }    
 
   private:
 
-    bool InitRenderBuffers()
+    bool InitRenderTargets()
     {
       const int flags = CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP | CS_TEXTURE_NPOTS;
       scfString errString;
@@ -404,10 +540,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         }
       }      
 
-      if (!depthNormalBuffer)
+      if (depthNormalsBufferScale < 1.0f && !depthNormalBuffer)
       {
         depthNormalBuffer = graphics3D->GetTextureManager()->CreateTexture (
-          g2D->GetWidth() * 0.5f/*bufferDownscaleFactor*/, g2D->GetHeight() * 0.5f/*bufferDownscaleFactor*/,
+          g2D->GetWidth() * depthNormalsBufferScale, g2D->GetHeight() * depthNormalsBufferScale,
           csimg2D, gbuffer->GetColorBufferFormat(), flags, &errString);
 
         if (!depthNormalBuffer)
@@ -497,8 +633,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       intermediateBufferSV->SetValue (intermediateBuffer);
 
       depthNormalBufferSV = shaderManager->GetVariableAdd (
-          svStringSet->Request ("tex downsampled normal depth"));
-      depthNormalBufferSV->SetValue (depthNormalBuffer);
+          svStringSet->Request ("tex normals depth"));
+      if (depthNormalsBufferScale < 1.0f)
+        depthNormalBufferSV->SetValue (depthNormalBuffer); 
+      else
+        depthNormalBufferSV->SetValue (gbuffer->GetColorBuffer(3));
       
       csRef<csShaderVariable> shaderVar = globalIllumShader->GetVariableAdd (
           svStringSet->Request ("tex random normals"));      
@@ -658,20 +797,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       // Restores old transforms.
       graphics3D->SetWorldToCamera (oldView);
       graphics3D->SetProjectionMatrix (oldProj);
-    }
+    }    
 
-  public:
+  private:
     bool showAmbientOcclusion;
     bool showGlobalIllumination;
     bool applyBlur;
-  
+
+    csString depthNormalsResolution;
+    float depthNormalsBufferScale;
+
     csRef<iShader> globalIllumShader;
-    csRef<iShader> horizontalBlurShader;    
+    csRef<iShader> horizontalBlurShader;  
     csRef<iShader> verticalBlurShader;
     csRef<iShader> lightCompositionShader;
     csRef<iShader> downsampleShader;
 
-  private:
     csSimpleRenderMesh quadMesh;
     csVector3 quadVerts[4];
 

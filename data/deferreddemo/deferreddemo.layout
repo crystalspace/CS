@@ -6,8 +6,8 @@
     <Property Name="MousePassThroughEnabled" Value="True" />
 
     <Window Type='ice/Listbox' Name='Frame'>
-      <Property Name='UnifiedSize' Value='{{0.0,260.0},{0.0,560.0}}'/>
-      <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,10.0}}'/>      
+      <Property Name='UnifiedSize' Value='{{0.0,260.0},{0.0,505.0}}'/>
+      <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,10.0}}'/>
       
       <Window Type='ice/Listbox' Name='RMFrame'>
         <Property Name='UnifiedSize' Value='{{0.0,250.0},{0.0,115.0}}'/>
@@ -56,9 +56,9 @@
         </Window>        
       </Window>
       
-      <Window Type='ice/Listbox' Name='GIFrame'>
-        <Property Name='UnifiedSize' Value='{{0.0,250.0},{0.0,85.0}}'/>
-        <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,125.0}}'/>               
+      <Window Type='ice/Listbox' Name='GIFrame'>        
+        <Property Name='UnifiedSize' Value='{{0.0,250.0},{0.0,30.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,125.0}}'/>
         
         <Window Type='ice/Checkbox' Name='EnableGlobalIllum'>
           <Property Name='UnifiedSize' Value='{{1.0,0.0},{0.0,20}}'/>
@@ -66,17 +66,14 @@
           <Property Name='Text' Value='Global Illumination'/>          
         </Window>
         
-        <Window Type="ice/SettingComboBox" Name="RenderBuffer" >
+        <!--<Window Type="ice/SettingComboBox" Name="RenderBuffer" >
           <Property Name="UnifiedSize" Value="{{1.0,-20.0},{0.0,30.0}}"/>
           <Property Name="UnifiedPosition" Value="{{0.0,10.0},{0.0,30.0}}"/>          
           
           <Property Name="Text" Value="Render Target"/>
           <Property Name="ConfigTypes" Value="string"/>
           <Property Name="ConfigNames" Value="DeferredDemo.RenderTarget"/>
-          <Property Name="Values" Value="Final Composition:Final Composition;
-                                         Ambient Occlusion:Ambient Occlusion;
-                                         Ambient + Indirect Light:Indirect Light;
-                                         Direct Light:Direct Light" />
+          <Property Name="Values" Value="Final Composition:Final Composition;Ambient Occlusion:Ambient Occlusion;Ambient + Indirect Light:Indirect Light;Direct Light:Direct Light" />
         </Window>
         
         <Window Type="ice/SettingComboBox" Name="GlobalIllumRes" >
@@ -87,12 +84,12 @@
           <Property Name="ConfigTypes" Value="string"/>
           <Property Name="ConfigNames" Value="DeferredDemo.GlobalIllumRes"/>
           <Property Name="Values" Value="Full:full;Half:half;Quarter:quarter" />
-        </Window>
+        </Window>-->
       </Window>
     
       <Window Type='ice/Listbox' Name='SSAOFrame'>
         <Property Name='UnifiedSize' Value='{{0.0,250.0},{0.0,190.0}}'/>
-        <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,215.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,160.0}}'/>
         
         <Window Type='ice/Checkbox' Name='EnableAO'>
           <Property Name='UnifiedSize' Value='{{1.0,0.0},{0.0,20}}'/>
@@ -193,7 +190,7 @@
       
       <Window Type='ice/Listbox' Name='IndLightFrame'>
         <Property Name='UnifiedSize' Value='{{0.0,250.0},{0.0,50.0}}'/>
-        <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,410.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,355.0}}'/>
         
         <Window Type='ice/Checkbox' Name='EnableIndirectLight'>
           <Property Name='UnifiedSize' Value='{{1.0,0.0},{0.0,20}}'/>
@@ -216,7 +213,7 @@
       
       <Window Type='ice/Listbox' Name='BlurFrame'>
         <Property Name='UnifiedSize' Value='{{0.0,250.0},{0.0,90.0}}'/>
-        <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,465.0}}'/>
+        <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,410.0}}'/>
                 
         <Window Type='ice/Checkbox' Name='EnableBlur'>
           <Property Name='UnifiedSize' Value='{{1.0,0.0},{0.0,20}}'/>
@@ -232,7 +229,7 @@
           <Property Name='ConfigTypes' Value='int'/>
           <Property Name='ConfigNames' Value='DeferredDemo.KernelSize'/>
           <Property Name='MinimumValue' Value='1'/>
-          <Property Name='MaximumValue' Value='15'/>
+          <Property Name='MaximumValue' Value='7'/>
           <Property Name='ClickStepSize' Value='1'/>
         </Window>
         

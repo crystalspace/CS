@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--
-  Copyright (C) 2007 by Frank Richter
-	    (C) 2007 by Jorrit Tyberghein
-        (C) 2011 by Santiago Sanchez
+  Copyright (C) 2011 by Santiago Sanchez
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -39,13 +37,11 @@
       <texture destination="DirectRadianceBuffer" name="tex direct radiance" />
       <texture destination="DiffuseBuffer" name="tex gbuffer 0" />
       <texture destination="AmbientBuffer" name="tex gbuffer 2" />
-      <texture destination="NormalBuffer" name="tex gbuffer 3" />
-      <!--texture destination="NormalBuffer" name="tex downsampled normal depth" /-->
-      <texture destination="DepthBuffer" name="tex gbuffer depth" />
+      <!--texture destination="NormalBuffer" name="tex gbuffer 3" /-->
+      <texture destination="NormalBuffer" name="tex normals depth" />
       <texture destination="SeedTexture" name="tex sample directions" />
       <texture destination="EnvmapTexture" name="tex globalillum envmap" />
       <texture destination="RandNormalsTexture" name="tex random normals" />      
-      <!--<fp plugin="glcg" file="/shader/deferred/globalillum.cgfp" />-->
       <fp plugin="glcg">
         <cgfp>
           <?Include ssao.cginc ?>

@@ -193,6 +193,10 @@ protected:
   bool showAmbientOcclusion;
   bool showGlobalIllumination;
   bool enableGlobalIllum;
+  bool downsampleNormalsDepth;
+
+  csString globalIllumResolution;
+  csString depthNormalsResolution;
 
   bool isBulletEnabled;
   bool doBulletDebug;

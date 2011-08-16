@@ -184,10 +184,10 @@ private:
 };
 
 //----------------------------------------------------------------------
-RMDeferred::RMDeferred(iBase *parent) 
-  : 
-scfImplementationType(this, parent),
-portalPersistent(CS::RenderManager::TextureCache::tcacheExactSizeMatch)
+RMDeferred::RMDeferred(iBase *parent) : 
+  scfImplementationType (this, parent),
+  portalPersistent (CS::RenderManager::TextureCache::tcacheExactSizeMatch),
+  doHDRExposure (false), isHDREnabled (false), hasPostEffects (false)
 {
   SetTreePersistent (treePersistent);
 }
@@ -213,7 +213,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   lightRenderPersistent.Initialize (registry);
   
   PostEffectsSupport::Initialize (registry, "RenderManager.Deferred");
-  //AddPostEffectLayer();
+  LoadDebugLayer();
 
   // Initialize the extra data in the persistent tree data.
   RenderTreeType::TreeTraitsType::Initialize (treePersistent, registry);
@@ -223,8 +223,8 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   maxPortalRecurse = cfg->GetInt ("RenderManager.Deferred.MaxPortalRecurse", 30);
   showGBuffer = false;
   drawLightVolumes = false;
-  debugBuffer = ColorBuffer;
-  idPostEffectOptionSV = csInvalidStringID;
+  isDebugActive = false;
+  debugBuffer = CS_DEPTH_BUFFER;
 
   bool layersValid = false;
   const char *layersFile = cfg->GetStr ("RenderManager.Deferred.Layers", nullptr);
@@ -341,6 +341,18 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   portalPersistent.texCache.SetFlags (flags);
 
   RMViscullCommon::Initialize (objRegistry, "RenderManager.Deferred");
+
+  HDRSettings hdrSettings (cfg, "RenderManager.Deferred");
+  isHDREnabled = hdrSettings.IsEnabled();
+  if (hdrSettings.IsEnabled())
+  {
+    doHDRExposure = true;
+    
+    hdr.Setup (objRegistry, hdrSettings.GetQuality(), hdrSettings.GetColorRange());   
+    postEffects.SetChainedOutput (hdr.GetHDRPostEffects());
+  
+    hdrExposure.Initialize (objRegistry, hdr, hdrSettings);
+  }
   
   return true;
 }
@@ -408,8 +420,6 @@ bool RMDeferred::RenderView(iView *view, bool recursePortals)
   if (showGBuffer)
     ShowGBuffer (renderTree);
 
-  //UpdatePostEffectsSV ();
-
   // Add global shader variable with viewport dimensions
   csShaderVariable *viewportSizeSV = shaderManager->GetVariableAdd (svStringSet->Request("viewport size"));
   viewportSizeSV->SetValue (csVector4 (graphics2D->GetWidth(), graphics2D->GetHeight(), 
@@ -424,7 +434,7 @@ bool RMDeferred::RenderView(iView *view, bool recursePortals)
   CS::Math::Matrix4 perspectiveFixup;
   postEffects.SetupView (view, perspectiveFixup);
 
-  bool hasPostEffects = (postEffects.GetScreenTarget () != (iTextureHandle*)nullptr);
+  hasPostEffects = (postEffects.GetScreenTarget () != (iTextureHandle*)nullptr);
 
   // Setup the main context
   {
@@ -440,12 +450,6 @@ bool RMDeferred::RenderView(iView *view, bool recursePortals)
     {
       startContext->renderTargets[rtaColor0].texHandle = accumBuffer;
       startContext->renderTargets[rtaColor0].subtexture = 0;
-
-      /*if (directLightBuffer)
-      {
-        startContext->renderTargets[rtaColor1].texHandle = directLightBuffer;
-        startContext->renderTargets[rtaColor1].subtexture = 0;
-      }*/
     }
 
     contextSetup (*startContext, portalData, recursePortals);
@@ -468,10 +472,11 @@ bool RMDeferred::RenderView(iView *view, bool recursePortals)
   }
 
   if (hasPostEffects)
-  {    
-    //UpdatePostEffectsSV ();
-    SetPostEffectShaderOption ();
+  {
     postEffects.DrawPostEffects (renderTree);
+
+    if (doHDRExposure)
+      hdrExposure.ApplyExposure (renderTree, view);
   }
   else
   {  
@@ -495,56 +500,42 @@ bool RMDeferred::PrecacheView(iView *view)
   return RenderView (view, false);
 
   postEffects.ClearIntermediates ();
+  hdr.GetHDRPostEffects().ClearIntermediates();
 }
 
 //----------------------------------------------------------------------
-void RMDeferred::AddPostEffectLayer()
+void RMDeferred::LoadDebugLayer()
 {
   const char *messageID = "crystalspace.rendermanager.deferred";
 
   csRef<iLoader> loader = csQueryRegistry<iLoader> (objRegistry);
-  if (!loader->LoadShader("shader/postproc/fx.xml"))
+  if (!loader->LoadShader("shader/deferred/debug.xml"))
   {
     csReport (objRegistry, CS_REPORTER_SEVERITY_WARNING,
-      messageID, "Could not load post effect shader");
+      messageID, "Could not load debug shader");
   }
-  iShader *postEffectShader = shaderManager->GetShader ("fx");
-  
-  postEffects.AddLayer (postEffectShader);
+
+  debugShader = shaderManager->GetShader ("deferred_debug");  
 }
 
 //----------------------------------------------------------------------
-void RMDeferred::SetPostEffectShaderOption()
+void RMDeferred::UpdateDebugBufferSV()
 {
-  if (idPostEffectOptionSV == csInvalidStringID) 
+  if (!isDebugActive)
   {
-    iShaderVarStringSet *svStringSet = shaderManager->GetSVNameStringset ();
-    idPostEffectOptionSV = svStringSet->Request ("option");
+    debugLayer = postEffects.AddLayer (debugShader);
+    isDebugActive = true;
+    doHDRExposure = false;
   }
-    
-  csShaderVariable *postEffectOptionSV = postEffects.GetLastLayer()->GetSVContext()->
-      GetVariableAdd (idPostEffectOptionSV);
 
-  postEffectOptionSV->SetValue((int)debugBuffer);
+  csShaderVariable *debugBufferSV = postEffects.GetLastLayer()->GetSVContext()->
+      GetVariableAdd (svStringSet->Request ("debug buffer"));
+  debugBufferSV->SetValue ((float)debugBuffer);
+
+  /*csShaderVariable *screenYFlippedSV = postEffects.GetLastLayer()->GetSVContext()->
+      GetVariableAdd (svStringSet->Request ("flip vertical texcoord"));
+  screenYFlippedSV->SetValue (hasPostEffects ? 1.0f : 0.0f);*/
 }
-
-//----------------------------------------------------------------------
-/*void RMDeferred::UpdatePostEffectsSV()
-{
-  iShaderVarStringSet *svStringSet = shaderManager->GetSVNameStringset ();
-  
-	postEffectOptionSV.AttachNew (new csShaderVariable (svStringSet->Request ("option")));
-	postEffectOptionSV->SetValue ((int)debugBuffer);
-  postEffects.GetLastLayer()->GetSVContext()->AddVariable (postEffectOptionSV);  
-  
-  /*postEffectOptionSV->SetValue ((int)debugBuffer);
-
-  csShaderVariableStack svStack;
-  postEffects.GetLayerRenderSVs (postEffects.GetLastLayer(), svStack);
-  
-  iShader *postEffectShader = shaderManager->GetShader ("effect");
-  postEffectShader->PushVariables (svStack);*/
-//}
 
 //----------------------------------------------------------------------
 void RMDeferred::AddDeferredLayer(CS::RenderManager::MultipleRenderLayer &layers, int &addedLayer)
@@ -662,50 +653,93 @@ bool RMDeferred::DebugCommand(const char *cmd)
   }
   else if (strcmp (cmd, "toggle_visualize_ambient_occlusion") == 0)
   {
-    globalIllum.showAmbientOcclusion = !globalIllum.showAmbientOcclusion;
-    if (globalIllum.showAmbientOcclusion)
-      globalIllum.showGlobalIllumination = false;
+    if (debugBuffer != CS_AMBOCC_BUFFER)
+    {
+      debugBuffer = CS_AMBOCC_BUFFER;
+      UpdateDebugBufferSV();
+    }
+    return true;
+  }
+  else if (strcmp (cmd, "toggle_visualize_color_bleeding") == 0)
+  {
+    if (debugBuffer != CS_INDLIGHT_BUFFER)
+    {
+      debugBuffer = CS_INDLIGHT_BUFFER;
+      UpdateDebugBufferSV();
+    }
 
     return true;
   }
-  else if (strcmp (cmd, "toggle_visualize_global_illumination") == 0)
+  else if (strcmp (cmd, "toggle_visualize_diffusebuffer") == 0)
   {
-    globalIllum.showGlobalIllumination = !globalIllum.showGlobalIllumination;
-    if (globalIllum.showGlobalIllumination)
-      globalIllum.showAmbientOcclusion = false;
-
-    return true;
-  }
-  /*else if (strcmp (cmd, "toggle_visualize_diffusebuffer") == 0)
-  {
-    debugBuffer = DiffuseBuffer;
+    if (debugBuffer != CS_DIFFUSE_BUFFER)
+    {
+      debugBuffer = CS_DIFFUSE_BUFFER;
+      UpdateDebugBufferSV();
+    }
     return true;
   }
   else if (strcmp (cmd, "toggle_visualize_normalbuffer") == 0)
   {
-    debugBuffer = NormalBuffer;
+    if (debugBuffer != CS_NORMAL_BUFFER)
+    {
+      debugBuffer = CS_NORMAL_BUFFER;
+      UpdateDebugBufferSV();
+    }
     return true;
   }
   else if (strcmp (cmd, "toggle_visualize_ambientbuffer") == 0)
   {
-    debugBuffer = AmbientBuffer;
+    if (debugBuffer != CS_AMBIENT_BUFFER)
+    {
+      debugBuffer = CS_AMBIENT_BUFFER;
+      UpdateDebugBufferSV();
+    }
     return true;
   }
   else if (strcmp (cmd, "toggle_visualize_depthbuffer") == 0)
   {
-    debugBuffer = DepthBuffer;
+    if (debugBuffer != CS_DEPTH_BUFFER)
+    {
+      debugBuffer = CS_DEPTH_BUFFER;
+      UpdateDebugBufferSV();
+    }
     return true;
   }
   else if (strcmp (cmd, "toggle_visualize_specularbuffer") == 0)
   {
-    debugBuffer = SpecularBuffer;
+    if (debugBuffer != CS_SPECULAR_BUFFER)
+    {
+      debugBuffer = CS_SPECULAR_BUFFER;
+      UpdateDebugBufferSV();
+    }
     return true;
   }
-  else if (strcmp (cmd, "toggle_visualize_colorbuffer") == 0)
+  else if (strcmp (cmd, "toggle_visualize_backbuffer") == 0)
   {
-    debugBuffer = ColorBuffer;
+    postEffects.RemoveLayer (debugLayer);
+    isDebugActive = false;
+    doHDRExposure = isHDREnabled;
     return true;
-  }*/
+  }
+  else if (strcmp (cmd, "toggle_visualize_vertexnormalsbuffer") == 0)
+  {
+    if (debugBuffer != CS_VERTEX_NORMALS_BUFFER)
+    {
+      debugBuffer = CS_VERTEX_NORMALS_BUFFER;
+      UpdateDebugBufferSV();
+    }
+    return true;
+  }
+  else if (strcmp (cmd, "toggle_visualize_lineardepthbuffer") == 0)
+  {
+    if (debugBuffer != CS_LINEAR_DEPTH_BUFFER)
+    {
+      debugBuffer = CS_LINEAR_DEPTH_BUFFER;
+      UpdateDebugBufferSV();
+    }
+    return true;
+  }
 
   return false;
 }
@@ -743,13 +777,22 @@ void RMDeferred::ChangeBufferResolution(const char *bufferResolution)
 
 void RMDeferred::EnableBlurPass (bool enableBlur)
 {
-  globalIllum.applyBlur = enableBlur;
+  globalIllum.SetApplyBlur (enableBlur);
+}
+
+void RMDeferred::ChangeNormalsAndDepthResolution (const char *resolution)
+{
+  globalIllum.SetNormalsAndDepthResolution (resolution);
 }
 
 csShaderVariable* RMDeferred::GetGlobalIllumVariableAdd(const char *svName)
 {
-  if (!svName) return nullptr;
-  return globalIllum.globalIllumShader->GetVariableAdd (svStringSet->Request (svName));
+  if (!svName) 
+    return nullptr;
+  if (!globalIllum.GetGlobalIllumShader())
+    return nullptr;
+
+  return globalIllum.GetGlobalIllumShader()->GetVariableAdd (svStringSet->Request (svName));  
 }
 
 csShaderVariable* RMDeferred::GetBlurVariableAdd(const char *svName)
@@ -760,8 +803,12 @@ csShaderVariable* RMDeferred::GetBlurVariableAdd(const char *svName)
 
 csShaderVariable* RMDeferred::GetCompositionVariableAdd(const char *svName)
 {
-  if (!svName) return nullptr;
-  return globalIllum.lightCompositionShader->GetVariableAdd (svStringSet->Request (svName));
+  if (!svName) 
+    return nullptr;
+  if (!globalIllum.GetLightCompositionShader())
+    return nullptr;
+
+  return globalIllum.GetLightCompositionShader()->GetVariableAdd (svStringSet->Request (svName));
 }
 
 }

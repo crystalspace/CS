@@ -283,7 +283,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         directLightBufferSV->SetValue (directLightBuffer);
       }
 
-      globalIllum.UpdateShaderVars();
+      //globalIllum.UpdateShaderVars();
     }
 
     /**
