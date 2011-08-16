@@ -24,7 +24,7 @@
 #include <CEGUILogger.h>
 #include "csutil/custom_new_enable.h"
 
-const char *DEFAULT_CFG_WORLDDIR = "/lev/castle";
+const char *DEFAULT_CFG_WORLDDIR = "/data/sponza";  // "/lev/castle";
 const char *DEFAULT_CFG_LOGOFILE = "/lib/std/cslogo2.png";
 
 const char* ballMaterialNames[4] = { "red", "green", "blue", "yellow" };
@@ -1088,8 +1088,8 @@ void DeferredDemo::SpawnSphere(bool attachLight)
   int materialIndex = rand() % 4;
 
   if (attachLight)
-  {
-    light = engine->CreateLight ("light", body->GetPosition(), 8.0f, ballMaterialColors[materialIndex], 
+  {    
+    light = engine->CreateLight ("light", body->GetPosition(), 5.0f, ballMaterialColors[materialIndex], 
         CS_LIGHT_DYNAMICTYPE_DYNAMIC);
     //light->SetType (CS_LIGHT_SPOTLIGHT);
     //light->SetSpotLightFalloff (25.0f, 30.0f);
@@ -1104,7 +1104,7 @@ void DeferredDemo::SpawnSphere(bool attachLight)
   mesh->GetMeshObject()->SetMaterialWrapper (mat);
 
   body->AttachMesh (mesh);
-  body->SetProperties (0.01f, csVector3 (0.0f), csMatrix3());
+  body->SetProperties (0.1f, csVector3 (0.0f), csMatrix3());
   body->SetPosition (cameraTransform.GetOrigin() + cameraTransform.GetT2O() * csVector3 (0, 0, 1));
   body->AttachColliderSphere (radius, csVector3(0.0f), 1, 1, 0.01f);    
   body->SetLinearVelocity (cameraTransform.GetT2O() * csVector3 (0, 0, 7));
