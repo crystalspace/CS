@@ -1103,6 +1103,7 @@ void DeferredDemo::SpawnSphere(bool attachLight)
   iMaterialWrapper* mat = engine->GetMaterialList()->FindByName (ballMaterialNames[materialIndex]);    
   mesh->GetMeshObject()->SetMaterialWrapper (mat);
 
+  body->AttachMesh (mesh);
   body->SetProperties (0.01f, csVector3 (0.0f), csMatrix3());
   body->SetPosition (cameraTransform.GetOrigin() + cameraTransform.GetT2O() * csVector3 (0, 0, 1));
   body->AttachColliderSphere (radius, csVector3(0.0f), 1, 1, 0.01f);    
