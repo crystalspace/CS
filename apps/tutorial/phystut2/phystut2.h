@@ -52,8 +52,6 @@ private:
 
   // Ragdoll related
   csRef<CS::Animation::iSkeletonRagdollNodeManager2> ragdollManager;
-  CS::Animation::StateID ragdollState;
-  csRef<iMeshWrapper> ragdollMesh;
 
   // Dragging related
   bool dragging;
@@ -99,8 +97,10 @@ private:
   CS::Physics2::iJoint* SpawnJointed ();
   CS::Physics2::iRigidBody* SpawnFilterBody (bool setVelocity = true);
   void SpawnChain ();
-  void LoadRagdoll ();
-  void SpawnRagdoll ();
+  void LoadFrankieRagdoll ();
+  void LoadKrystalRagdoll ();
+  void SpawnFrankieRagdoll ();
+  void SpawnKrystalRagdoll ();
   void SpawnRope ();
   CS::Physics2::iSoftBody* SpawnCloth ();
   CS::Physics2::iSoftBody* SpawnSoftBody (bool setVelocity = true);
