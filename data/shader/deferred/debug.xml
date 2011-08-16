@@ -1,0 +1,93 @@
+<shader compiler="xmlshader" name="deferred_debug">
+  <technique priority="200">
+    <pass>
+      <vp plugin="glcg">
+        <cgvp>        
+        <program>
+        <![CDATA[
+        struct app2vertex 
+        {
+          float3 Position : POSITION;
+        };
+
+        struct vertex2fragment 
+        { 
+          float4 Position : POSITION;
+          float2 TexCoord : TEXCOORD0;
+        };
+
+        vertex2fragment main(app2vertex IN, uniform float4x4 ModelViewProj : state.matrix.mvp)
+        {
+          vertex2fragment OUT;
+          float4 pos = mul (ModelViewProj, float4 (IN.Position, 1.0f));
+          OUT.Position = pos;
+          OUT.TexCoord = (pos.xy / pos.w) * 0.5f + 0.5f;
+          return OUT;
+        }
+        ]]>
+        </program>
+        </cgvp>
+      </vp>
+      <texture destination="DiffuseTexture" name="tex gbuffer 0" />
+      <texture destination="NormalTexture" name="tex gbuffer 1" />
+      <texture destination="AmbientTexture" name="tex gbuffer 2" />
+      <texture destination="VertexNormalsTexture" name="tex gbuffer 3" />
+      <texture destination="DepthTexture" name="tex gbuffer depth" />
+      <texture destination="GlobalIllumTexture" name="tex global illumination" />
+      <fp plugin="glcg">
+        <cgfp>
+        <variablemap variable="debug buffer" destination="bufferNumber" />
+        <variablemap variable="flip vertical texcoord" destination="flipVerticalTexCoord" />
+        <program>
+        <![CDATA[
+
+        float4 main(in float2 texCoord : TEXCOORD0,
+              uniform sampler2D DiffuseTexture,
+              uniform sampler2D NormalTexture,
+              uniform sampler2D VertexNormalsTexture,
+              uniform sampler2D AmbientTexture,
+              uniform sampler2D DepthTexture,
+              uniform sampler2D GlobalIllumTexture,
+              uniform float bufferNumber,
+              uniform float flipVerticalTexCoord) : COLOR
+        {       
+          texCoord.y = -texCoord.y + 1.0f; //flip vertically
+          float4 result = float4 (1.0f);
+        ]]>
+        <? if vars."debug buffer".float == 0 ?>
+          result.rgb = tex2D(DepthTexture, texCoord).rgb; //post-projection depth
+        <? elsif vars."debug buffer".float == 1 ?>
+          result.rgb = tex2D(DiffuseTexture, texCoord).rgb; //diffuse
+        <? elsif vars."debug buffer".float == 2 ?>
+          result.rgb = tex2D(NormalTexture, texCoord).rgb; //"normal/height map" normals
+        <? elsif vars."debug buffer".float == 3 ?>
+          result.rgb = tex2D(AmbientTexture, texCoord).rgb; //ambient
+        <? elsif vars."debug buffer".float == 4 ?>
+          float4 diffuse = tex2D(DiffuseTexture, texCoord);
+          float4 normal = tex2D(NormalTexture, texCoord);
+          float4 ambient = tex2D(AmbientTexture, texCoord);
+          result.rgb = float3 (diffuse.a, normal.a, ambient.a); //specular
+        <? elsif vars."debug buffer".float == 5 ?>
+          result.rgb = tex2D(VertexNormalsTexture, texCoord).rgb; //interpolated vertex normals
+        <? elsif vars."debug buffer".float == 6 ?>
+          float4 temp = tex2D(VertexNormalsTexture, texCoord); //linear depth
+          result.rgb = float3 (temp.a);
+        <? elsif vars."debug buffer".float == 7 ?>
+          float4 ao = tex2D(GlobalIllumTexture, texCoord); //ambient occlusion
+          result.rgb = float3 (ao.a);
+        <? elsif vars."debug buffer".float == 8 ?>
+          result.rgb = tex2D(GlobalIllumTexture, texCoord).rgb; //color bleeding          
+        <? else ?>
+          result.rgb = tex2D(DiffuseTexture, texCoord).rgb;
+        <? endif ?>
+        <![CDATA[  
+          return result;
+        }
+
+        ]]>
+        </program>
+        </cgfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>
