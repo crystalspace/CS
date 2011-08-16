@@ -262,7 +262,7 @@
     <clearscreen>yes</clearscreen>
     <clearzbuf>yes</clearzbuf>
   </settings>
-  <library>factories/Cube.011</library>
+  <!--library>factories/Cube.011</library>
   <library>factories/Armadillo.001</library>
   <library>factories/xyzrgb_statuette</library>
   <library>factories/happy_vrip</library>
@@ -270,11 +270,11 @@
   <library>factories/dragon_vrip</library>
   <library>factories/Cube.010</library>
   <library>factories/Cube.009</library>
-  <library>factories/bunny_Mesh</library>
+  <library>factories/bunny_Mesh</library-->
   <library>factories/lucy</library>
-  <library>factories/Cube.006</library>
+  <!--library>factories/Cube.006</library>
   <library>factories/Cube.005</library>
-  <library>factories/Cube.003</library>
+  <library>factories/Cube.003</library-->
   <library>factories/Cube</library>
   <library>factories/pillar rou_sp_01_stup</library>
   <library>factories/object27_sp_00_luk_ma</library>
@@ -313,7 +313,7 @@
   <library>factories/ceiling_sp_00_svod_sp</library>
   <library>factories/object32_sp_svod_kapi</library>
   <library>factories/arcs 03_sp_00_luk_mal</library>
-  <library>/lib/krystal/krystal.xml</library>
+  <!--library>/lib/krystal/krystal.xml</library-->
   
   <sector name='Scene'>
     <cullerp plugin='crystalspace.culling.frustvis'/>
