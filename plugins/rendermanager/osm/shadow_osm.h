@@ -454,25 +454,123 @@ namespace CS
               persist.shaderManager, viewSetup);
             contextFunction (*shadowMapCtx);            
           }
+
+          ChooseSplitFunction(persist);
         }
 
-//         void ChooseSplitFunction(const PersistentData& persist)
-//         {
-//           csRef<iDataBuffer> databuf;
-//           uint8* data;
-//           CS::StructuredTextureFormat readbackFmt 
-//             (CS::TextureFormatStrings::ConvertStructured ("abgr32_f"));
+        void ChooseSplitFunction(PersistentData& persist)
+        {
+          if (persist.splitRatio >= 0.05 && persist.splitRatio <= 1.05)
+          {
+            csRef<iDataBuffer> databuf;
+            uint8** data = new uint8*[persist.mrt];
+            CS::StructuredTextureFormat readbackFmt 
+              (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
+
+            // get data from MRTs
+            for (int i = 0 ; i < persist.mrt ; i ++)
+            {
+              databuf = persist.texs[i]->Readback(readbackFmt);
+              data[i] = databuf->GetUint8();
+            }
+
+            // compute difference between different layers
+            int *diff = new int[4 * persist.mrt];
+            for (int i = 0 ; i < 4 * persist.mrt ; i ++ )
+              diff[i] = 0 ;
+
+            for (int layer = 0 ; layer < persist.mrt ; layer ++)
+              for (int i = 0 ; i < persist.shadowMapRes ; i ++)
+                for (int j = 0 ; j < persist.shadowMapRes ; j ++)
+                  for (int k = 0 ; k < 4 ; k ++)
+                    if (4 * layer + k < 4 * persist.mrt - 1)
+                      diff[4 * layer + k] += 
+                      abs(data[layer][4 * (i + j * persist.shadowMapRes) + k] - 
+                      data[layer + (k + 1) / 4]
+                        [4 * (i + j * persist.shadowMapRes) + (k + 1) % 4]);
+
+            for (int i = 0 ; i < 4 * persist.mrt ; i ++ )
+              csPrintf("%d ", diff[i]);          
+            csPrintf("\n");
+
+            // compute mean
+            double mean = 0;
+            for (int i = 0 ; i < 4 * persist.mrt - 1 ; i ++ )
+              mean += diff[i];
+
+            mean /= (4 * persist.mrt - 1);
+
+            // compute variance
+            double variance = 0;
+            for (int i = 0 ; i < 4 * persist.mrt - 1 ; i ++ )
+              variance += pow((diff[i] - mean), 2);
+
+            csPrintf("split_ratio %lf mean %lf variance %lf\n", persist.splitRatio, mean, variance);
+
+//             for (int i = 0 ; i < persist.shadowMapRes ; i ++)
+//               for (int j = 0 ; j < persist.shadowMapRes ; j ++)
+//                 if (data[0][4 * (i + j * persist.shadowMapRes) + 0] == 176 && 
+//                   data[0][4 * (i + j * persist.shadowMapRes) + 1] == 255 && 
+//                   data[0][4 * (i + j * persist.shadowMapRes) + 2] == 255)
+//                     csPrintf("Exists %d %d\n", i, j);
 // 
-//           databuf = persist.depthStart->Readback(readbackFmt);
-//           data = databuf->GetUint8();
+//             if(!data[3])
+//             {
+//               csPrintfErr ("Bad data buffer!\n");
+//               return;
+//             }
 // 
-//           for (int i = 0 ; i < persist.shadowMapRes ; i ++)
-//             for (int j = 0 ; j < persist.shadowMapRes ; j ++)
-//               for (int k = 0 ; k < 4 ; k ++)
-//                 if (data[i + j * persist.shadowMapRes + k] != 0 && 
-//                   data[i + j * persist.shadowMapRes + k] != 255)
-//                   csPrintf("%u ", data[i + j * persist.shadowMapRes + k]);
-//         }
+//             csRef<iImage> image;
+//             image.AttachNew(new csImageMemory (persist.shadowMapRes, persist.shadowMapRes, 
+//               data[3], false, CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
+// 
+//             if(!image.IsValid())
+//             {
+//               csPrintfErr ("Error creating image\n");
+//               return;
+//             }
+// 
+//             csPrintf ("Saving %zu KB of data.\n", 
+//               csImageTools::ComputeDataSize (image) / 1024);
+// 
+//             csRef<iDataBuffer> db = persist.imageio->
+//               Save (image, "image/png", "progressive");
+// 
+//             if (db)
+//             {
+//               if (!persist.VFS->
+//                 WriteFile ("render_tex.png", (const char*)db->GetData (), db->GetSize ()))
+//               {
+//                 csPrintfErr ("Failed to write file %s!", CS::Quote::Single ("render_tex.png"));
+//                 return;
+//               }
+//             }
+//             else
+//             {
+//               csPrintfErr ("Failed to save png image for basemap!");
+//               return;
+//             }	
+
+            if (mean > persist.bestSplitRatioMean)
+            {
+              persist.bestSplitRatioMean = mean;
+              persist.bestSplitRatio = persist.splitRatio;
+            }
+
+            if (persist.splitRatio < 0.95)
+              persist.SetHybridSplit(persist.splitRatio + 0.1);
+            else
+            {
+              persist.SetHybridSplit(persist.bestSplitRatio);
+              csPrintf("Best Split is: %lf\n", persist.bestSplitRatio);
+            }
+
+            delete[] data;
+            delete[] diff;
+          }
+
+          persist.splitRatio += 0.1;
+        }
 
         void AddShadowMapTarget (typename RenderTree::MeshNode* meshNode,
           RenderTree& renderTree, iLight* light, ViewSetup& viewSetup, 
@@ -643,6 +741,13 @@ namespace CS
         csRef<iTextureHandle> depthEnd;
         csRef<iTextureHandle> split;
 
+        csRef<iImageIO> imageio;
+        csRef<iVFS> VFS;
+
+        double splitRatio;
+        double bestSplitRatio;
+        double bestSplitRatioMean;
+
         /// Set the prefix for configuration settings
         void SetConfigPrefix (const char* configPrefix)
         {
@@ -656,6 +761,8 @@ namespace CS
             csQueryRegistry<iShaderManager> (objectReg);
           csRef<iGraphics3D> g3d =
             csQueryRegistry<iGraphics3D> (objectReg);
+          imageio = csQueryRegistry<iImageIO> (objectReg);
+          VFS = csQueryRegistry<iVFS> (objectReg);
 
           this->shaderManager = shaderManager;
           this->g3d = g3d;
@@ -718,8 +825,11 @@ namespace CS
           split = g3d->GetTextureManager()->CreateTexture(splitRes, 1, csimg2D, 
             "abgr8", CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP);
 
+          splitRatio = -1;
+          bestSplitRatio = 0;
+          bestSplitRatioMean = -1;
           // Set linear or logarithmic split
-          SetHybridSplit(0.75, splitRes);
+          SetHybridSplit(bestSplitRatio);
 
           osmShader->GetVariableAdd(numSplitsSVName)->SetValue(numSplits);
           osmShader->GetVariableAdd(splitSVName)->SetValue(split);
@@ -736,9 +846,9 @@ namespace CS
           lightVarsPersist.UpdateNewFrame();
         }
 
-      private:       
-        void SetHybridSplit(float logValue, int textureSize)
+        void SetHybridSplit(float logValue)
         {
+          const int &textureSize = splitRes;
           CS::StructuredTextureFormat readbackFmt 
             (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
           csRef<iDataBuffer> databuf = split->Readback(readbackFmt);
