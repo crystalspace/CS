@@ -503,9 +503,13 @@ namespace CS
             // compute variance
             double variance = 0;
             for (int i = 0 ; i < 4 * persist.mrt - 1 ; i ++ )
-              variance += pow((diff[i] - mean), 2);
+              variance += abs(diff[i] - mean);
 
-            csPrintf("split_ratio %lf mean %lf variance %lf\n", persist.splitRatio, mean, variance);
+            double alpha = 1, beta = 1000000;
+            double func = alpha * mean + beta / variance;
+
+            csPrintf("split_ratio %lf mean %lf variance %lf func %lf\n", 
+              persist.splitRatio, mean, variance, func);
 
 //             for (int i = 0 ; i < persist.shadowMapRes ; i ++)
 //               for (int j = 0 ; j < persist.shadowMapRes ; j ++)
@@ -551,9 +555,9 @@ namespace CS
 //               return;
 //             }	
 
-            if (mean > persist.bestSplitRatioMean)
+            if (func > persist.bestSplitRatioMean)
             {
-              persist.bestSplitRatioMean = mean;
+              persist.bestSplitRatioMean = func;
               persist.bestSplitRatio = persist.splitRatio;
             }
 
