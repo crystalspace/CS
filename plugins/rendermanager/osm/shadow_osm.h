@@ -78,6 +78,7 @@ namespace CS
         {
           int actualNumParts;
           csRef<csShaderVariable> numSplitsSV;
+          csRef<csShaderVariable> shadowMapResSV;
 	        CS::Utility::MeshFilter meshFilter;
 
           struct Frustum
@@ -175,6 +176,9 @@ namespace CS
 
             superFrustum.numSplitsSV = lightVarsHelper.CreateTempSV (
               viewSetup.persist.numSplitsSVName);
+
+            superFrustum.shadowMapResSV = lightVarsHelper.CreateTempSV (
+              viewSetup.persist.shadowMapResSVName);
 
             superFrustum.depthStartSV =
               lightVarsHelper.CreateTempSV(viewSetup.persist.depthStartSVName);
@@ -737,6 +741,7 @@ namespace CS
         int splitRes;
         csString configPrefix;
         CS::ShaderVarStringID numSplitsSVName;
+        CS::ShaderVarStringID shadowMapResSVName;
         CS::ShaderVarStringID splitDistsSVName;
         CS::ShaderVarStringID passColorSVName;
         CS::ShaderVarStringID mrtSVName;
@@ -800,6 +805,7 @@ namespace CS
           svNames.SetStrings (strings);
 
           numSplitsSVName = strings->Request ("light numSplits");
+          shadowMapResSVName = strings->Request ("light shadow map size");
           splitDistsSVName = strings->Request ("light splitDists");
           passColorSVName = strings->Request ("pass color");
           mrtSVName = strings->Request ("mrt");
@@ -961,12 +967,16 @@ namespace CS
           superFrust.splitSV, lightNum);
 
         superFrust.numSplitsSV->SetValue(viewSetup.persist.numSplits);
+        superFrust.shadowMapResSV->SetValue(viewSetup.persist.shadowMapRes);
 
         lightVarsHelper.MergeAsArrayItem (lightStacks[0],
           superFrust.shadowMapProjectSV, lightNum);
 
         lightVarsHelper.MergeAsArrayItem (lightStacks[0],
           superFrust.numSplitsSV, lightNum);
+
+        lightVarsHelper.MergeAsArrayItem (lightStacks[0],
+          superFrust.shadowMapResSV, lightNum);
 
         // here might be number of lights
         return 1;

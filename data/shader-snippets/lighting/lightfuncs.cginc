@@ -192,6 +192,8 @@ struct LightPropertiesOpacityMap
   sampler2D shadowMapStart[MAX_LIGHTS];  
   // Depth map end
   sampler2D shadowMapEnd[MAX_LIGHTS];  
+  // Depth map size
+  float size[MAX_LIGHTS];
   // Split function
   sampler2D splitFunc[MAX_LIGHTS];    
   // OSM

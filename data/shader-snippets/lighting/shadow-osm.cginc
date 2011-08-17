@@ -132,7 +132,7 @@ struct ShadowShadowMapDepth : ShadowShadowMap
   
   half GetVisibility()
   { 
-    bias = 1.0 / 512.0;
+    bias = 1.0 / lightPropsOM.size[lightNum];
     half inLight;
     int numSplits = lightPropsOM.opacityMapNumSplits[lightNum];
     float previousSplit, nextSplit;

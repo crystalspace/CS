@@ -57,6 +57,8 @@
 		 destination="lightPropsOM.opacityMapNumSplits" />		 
     <variablemap variable="light splitDists" 
 		 destination="lightPropsOM.splitDists" />		      
+    <variablemap variable="light shadow map size" 
+		 destination="lightPropsOM.size" />		      
   <?Endtemplate?>  
   
   <?SEndIf?>
