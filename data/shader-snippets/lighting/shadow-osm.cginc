@@ -198,7 +198,7 @@ struct ShadowShadowMapDepth : ShadowShadowMap
 */
     //inLight = tex2D(lightPropsOM.shadowMapStart[lightNum], float3(position, compareDepth)).x;
     
-    inLight = inLight * (depthStart != 0) + (depthStart == 0);
+    //inLight = inLight * (depthStart != 0) + (depthStart == 0);
     return inLight;
   }
 };
