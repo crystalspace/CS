@@ -284,10 +284,22 @@ struct WrapShadowParams<RMOSM::ShadowType>
   {
     if (strcmp (cmd, "reset") == 0)
     {
-      uint flag = treePersistent.debugPersist.QueryDebugFlag("draw.osm.choose.split");
+      uint flag = 
+        treePersistent.debugPersist.QueryDebugFlag("draw.osm.choose.split");
       treePersistent.debugPersist.EnableDebugFlag(flag,true);
       return true;
     }
+    else if (strcmp (cmd, "show") == 0)
+    {
+      uint flag = 
+        treePersistent.debugPersist.QueryDebugFlag("draw.osm.render.textures");
+      if (treePersistent.debugPersist.IsDebugFlagEnabled(flag))
+        treePersistent.debugPersist.EnableDebugFlag(flag,false);
+      else
+        treePersistent.debugPersist.EnableDebugFlag(flag,true);
+      return true;
+    }
+
     return false;
   }
 

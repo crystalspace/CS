@@ -452,7 +452,9 @@ namespace CS
 
             for (int t = 0; t < persist.mrt; t++)
             {
-              renderTree.AddDebugTexture (persist.texs[t]);
+              if(persist.dbgPersist->
+                IsDebugFlagEnabled(persist.dbgShowRenderTextures))
+                  renderTree.AddDebugTexture (persist.texs[t]);
               // register SVs
               shadowMapCtx->renderTargets[rtaColor0 + t].texHandle = 
                 persist.texs[t];
@@ -632,8 +634,10 @@ namespace CS
 
             typename RenderTree::ContextNode* shadowMapCtx = 
               renderTree.CreateContext (newRenderView);
-
-            renderTree.AddDebugTexture (renderTexture);
+            
+            if(persist.dbgPersist->
+              IsDebugFlagEnabled(persist.dbgShowRenderTextures))
+                renderTree.AddDebugTexture (renderTexture);
             // register SVs
             shadowMapCtx->renderTargets[rtaColor0].texHandle = renderTexture;
             shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
@@ -762,6 +766,7 @@ namespace CS
         double bestSplitRatioMean;
 
         uint dbgChooseSplit;
+        uint dbgShowRenderTextures;
         RenderTreeBase::DebugPersistent *dbgPersist;
 
         /// Set the prefix for configuration settings
@@ -783,6 +788,9 @@ namespace CS
           this->dbgPersist = &dbgPersist;
           dbgChooseSplit = 
             dbgPersist.RegisterDebugFlag ("draw.osm.choose.split");
+          dbgShowRenderTextures =
+            dbgPersist.RegisterDebugFlag ("draw.osm.render.textures");
+          dbgPersist.EnableDebugFlag(dbgShowRenderTextures, true);
 
           this->shaderManager = shaderManager;
           this->g3d = g3d;

@@ -86,6 +86,11 @@ bool SelfShadowDemo::OnKeyboard (iEvent &ev)
       rm_dbg->DebugCommand("reset");
       return true;
     }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 't')
+    {
+      rm_dbg->DebugCommand("show");
+      return true;
+    }
 
     light->GetMovable()->Transform(rotateMatrix);
 
