@@ -40,12 +40,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMOSM)
     CS::RenderManager::RenderTreeLightingTraits> RenderTreeType;
 
   class RMOSM : public scfImplementation4<RMOSM, 
-    iRenderManager, 
-    scfFakeInterface<iRenderManagerVisCull>,
-    iComponent,
-    scfFakeInterface<iDebugHelper> >,
-    public CS::RenderManager::RMDebugCommon<RenderTreeType>,
-    public CS::RenderManager::RMViscullCommon
+                                          iRenderManager, 
+                                          scfFakeInterface<iRenderManagerVisCull>,
+                                          iComponent,
+                                          scfFakeInterface<iDebugHelper> >,
+                public CS::RenderManager::RMDebugCommon<RenderTreeType>,
+                public CS::RenderManager::RMViscullCommon
   {
   public:
     RMOSM (iBase* parent);
@@ -66,6 +66,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMOSM)
       CS::RenderManager::MultipleRenderLayer, LightSetupType> ContextSetupType;
     typedef CS::RenderManager::StandardPortalSetup<RenderTreeType, 
       ContextSetupType> PortalSetupType;
+
+    //---- iDebugHelper Interface ----
+    virtual bool DebugCommand(const char *cmd);
 
   public:
     iObjectRegistry* objectReg;

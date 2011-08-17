@@ -113,6 +113,15 @@ namespace CS
           if (light->GetFlags().Check (CS_LIGHT_NOSHADOWS)) return;
 
           ViewSetup& viewSetup = shadows.viewSetup;
+
+          PersistentData& persist = viewSetup.persist;
+          if( persist.dbgPersist->IsDebugFlagEnabled(persist.dbgChooseSplit) )
+          {
+            persist.splitRatio = -0.1;
+            persist.SetHybridSplit(0);
+            persist.dbgPersist->EnableDebugFlag(persist.dbgChooseSplit,false);
+          }
+
           uint currentFrame = viewSetup.rview->GetCurrentFrameNumber();
           if (lastSetupFrame != currentFrame)
           {
@@ -752,6 +761,9 @@ namespace CS
         double bestSplitRatio;
         double bestSplitRatioMean;
 
+        uint dbgChooseSplit;
+        RenderTreeBase::DebugPersistent *dbgPersist;
+
         /// Set the prefix for configuration settings
         void SetConfigPrefix (const char* configPrefix)
         {
@@ -767,6 +779,10 @@ namespace CS
             csQueryRegistry<iGraphics3D> (objectReg);
           imageio = csQueryRegistry<iImageIO> (objectReg);
           VFS = csQueryRegistry<iVFS> (objectReg);
+
+          this->dbgPersist = &dbgPersist;
+          dbgChooseSplit = 
+            dbgPersist.RegisterDebugFlag ("draw.osm.choose.split");
 
           this->shaderManager = shaderManager;
           this->g3d = g3d;

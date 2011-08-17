@@ -32,6 +32,7 @@ class SelfShadowDemo : public CS::Utility::DemoApplication
 
  public:
   SelfShadowDemo ();
+  csRef<iDebugHelper> rm_dbg;
 
   //-- CS::Utility::DemoApplication
   void PrintHelp ();

@@ -278,5 +278,18 @@ struct WrapShadowParams<RMOSM::ShadowType>
     return true;
   }
 
+
+  //----------------------------------------------------------------------
+  bool RMOSM::DebugCommand(const char *cmd)
+  {
+    if (strcmp (cmd, "reset") == 0)
+    {
+      uint flag = treePersistent.debugPersist.QueryDebugFlag("draw.osm.choose.split");
+      treePersistent.debugPersist.EnableDebugFlag(flag,true);
+      return true;
+    }
+    return false;
+  }
+
 }
 CS_PLUGIN_NAMESPACE_END(RMOSM)

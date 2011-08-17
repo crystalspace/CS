@@ -89,6 +89,10 @@ bool SelfShadowDemo::OnKeyboard (iEvent &ev)
     {
       moveFactor = speed;
     }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'r')
+    {
+      rm_dbg->DebugCommand("reset");
+    }
 
     light->GetMovable()->Transform(rotateMatrix);
 
@@ -143,6 +147,8 @@ bool SelfShadowDemo::Application ()
     "crystalspace.rendermanager.osm");
   if (!rm)
     return ReportError("Failed to load OSM Render Manager!");
+
+  rm_dbg = scfQueryInterface<iDebugHelper>(rm);
 
   cfg->RemoveDomain ("/config/engine.cfg");
 
