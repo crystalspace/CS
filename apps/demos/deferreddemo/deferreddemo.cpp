@@ -68,7 +68,7 @@ void DeferredDemo::PrintHelp ()
   commandLineHelper.AddCommandLineOption
     ("world", "Use given world file", csVariant ("world"));
   commandLineHelper.AddCommandLineOption
-    ("worlddir", "Use given VFS path", csVariant ("/lev/sponza"));
+    ("worlddir", "Use given VFS path", csVariant ("/data/sponza"));
 
   // Printing help
   commandLineHelper.PrintApplicationHelp
@@ -427,75 +427,7 @@ bool DeferredDemo::SetupScene()
 //----------------------------------------------------------------------
 void DeferredDemo::CreateColliders()
 {
-  ReportInfo ("Creating colliders...");
-
-  /*csPlane3 mainFloor (csVector3 (0.0f, 1.0f, 0.0f), 0.55f);
-  dynamicSystem->AttachColliderPlane (mainFloor, 200.0f, 0.0f);
-  
-  csOrthoTransform t;
-  // Walls
-  csVector3 wallsSize (46.0f, 22.0f, 1.0f);
-
-  t.SetOrigin(csVector3(0.0f, 10.0f, 9.9f));
-  dynamicSystem->AttachColliderBox (wallsSize, t, 100.0f, 0.0f);
-
-  t.SetOrigin(csVector3(0.0f, 10.0f, -9.8f));
-  dynamicSystem->AttachColliderBox (wallsSize, t, 100.0f, 0.0f);
-
-  wallsSize.Set (1.0f, 22.0f, 20.0f);
-
-  t.SetOrigin(csVector3(22.0f, 10.0f, 0.0f));
-  dynamicSystem->AttachColliderBox (wallsSize, t, 100.0f, 0.0f);
-
-  t.SetOrigin(csVector3(-21.1f, 10.0f, 0.0f));
-  dynamicSystem->AttachColliderBox (wallsSize, t, 100.0f, 0.0f);
-
-  // Second level floor
-  wallsSize.Set (46.0f, 0.25f, 6.0f);
-
-  t.SetOrigin(csVector3(0.0f, 6.2f, 7.0f));
-  dynamicSystem->AttachColliderBox (wallsSize, t, 200.0f, 0.0f);
-
-  t.SetOrigin(csVector3(0.0f, 6.2f, -7.0f));
-  dynamicSystem->AttachColliderBox (wallsSize, t, 200.0f, 0.0f);
-
-  // Third level floor
-  t.SetOrigin(csVector3(0.0f, 13.25f, 7.0f));
-  dynamicSystem->AttachColliderBox (wallsSize, t, 200.0f, 0.0f);
-
-  t.SetOrigin(csVector3(0.0f, 13.25f, -7.0f));
-  dynamicSystem->AttachColliderBox (wallsSize, t, 200.0f, 0.0f);
-
-  // Second level floor
-  wallsSize.Set (7.0f, 0.25f, 20.0f);
-
-  t.SetOrigin(csVector3(18.5f, 6.8f, 0.0f));
-  dynamicSystem->AttachColliderBox (wallsSize, t, 200.0f, 0.0f);
-
-  t.SetOrigin(csVector3(-17.5f, 6.8f, 0.0f));
-  dynamicSystem->AttachColliderBox (wallsSize, t, 200.0f, 0.0f);
-
-  // Third level floor
-  t.SetOrigin(csVector3(18.5f, 13.85f, 0.0f));
-  dynamicSystem->AttachColliderBox (wallsSize, t, 200.0f, 0.0f);
-
-  t.SetOrigin(csVector3(-17.5f, 13.85f, 0.0f));
-  dynamicSystem->AttachColliderBox (wallsSize, t, 200.0f, 0.0f);*/
-
-  /*CreateMeshBBoxCollider ("lucy");
-  CreateMeshBBoxCollider ("happy_vrip");
-  CreateMeshBBoxCollider ("xyzrgb_dragon");
-  CreateMeshBBoxCollider ("bunny_Mesh");
-  CreateMeshBBoxCollider ("dragon_vrip");
-  //CreateMeshBBoxCollider ("krystal");
-
-  CreateMeshColliders ("Cube.00", 6);
-  CreateMeshColliders ("pillar", 5);
-  CreateMeshColliders ("arcs", 8);
-  CreateMeshColliders ("object", 11);
-  CreateMeshColliders ("walls", 3);
-  CreateMeshColliders ("floors", 1);
-  CreateMeshColliders ("ceiling", 1);*/
+  ReportInfo ("Creating colliders...");  
 
   for (int i=0; i < engine->GetMeshes()->GetCount(); i++)
   {
@@ -503,34 +435,6 @@ void DeferredDemo::CreateColliders()
     const csReversibleTransform &fullTransform = mesh->GetMovable()->GetFullTransform();
     csOrthoTransform t (fullTransform.GetO2T(), fullTransform.GetOrigin());    
     dynamicSystem->AttachColliderMesh (mesh, t, 10.0f, 0.0f); 
-  }
-}
-
-//----------------------------------------------------------------------
-void DeferredDemo::CreateMeshBBoxCollider(const char *meshName)
-{
-  csOrthoTransform t;
-  iMeshWrapper *mesh = engine->FindMeshObject (meshName); 
-  if (mesh)
-  {
-    t.SetOrigin (mesh->GetWorldBoundingBox().GetCenter());
-    dynamicSystem->AttachColliderBox (mesh->GetWorldBoundingBox().GetSize(), t, 10.0f, 0.0f);
-  }
-}
-
-//----------------------------------------------------------------------
-void DeferredDemo::CreateMeshColliders(const char *baseMeshName, int numMeshes)
-{
-  for (int i=0; i < numMeshes; i++)
-  {
-    csOrthoTransform t;
-    csString meshName = csString (baseMeshName) + csString ((char)('0' + i));
-    iMeshWrapper *mesh = engine->FindMeshObject (meshName);
-    if (mesh)
-    {
-      t.SetOrigin (mesh->GetMovable()->GetFullPosition());
-      dynamicSystem->AttachColliderMesh (mesh, t, 10.0f, 0.0f);
-    }
   }
 }
 
@@ -651,10 +555,11 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
 	hudManager->GetKeyDescriptions()->Push ("z: Change SSGI resolution");
 	hudManager->GetKeyDescriptions()->Push ("x: Change depth/normals resolution");
 	hudManager->GetKeyDescriptions()->Push ("Space: Throw ball");
-	hudManager->GetKeyDescriptions()->Push ("Ctrl+Space: Throw ball w/light");
+	hudManager->GetKeyDescriptions()->Push ("Alt+Space: Throw ball w/light");
 	hudManager->GetKeyDescriptions()->Push ("n: Pause/Resume physics simulation");
 	hudManager->GetKeyDescriptions()->Push ("g: Show/Hide GUI");
-	hudManager->GetKeyDescriptions()->Push ("F8: Show/Hide HUD");
+  hudManager->GetKeyDescriptions()->Push ("F8: Show/Hide Key Descriptions");
+	hudManager->GetKeyDescriptions()->Push ("F9: Show/Hide HUD");
 	hudManager->GetKeyDescriptions()->Push ("F12: Screenshot");  
 	hudManager->GetKeyDescriptions()->Push ("1-9: Visualize deferred buffers");
 	hudManager->GetKeyDescriptions()->Push ("0: Visualize final rendered image");
@@ -789,7 +694,7 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
     }    
     else if (code == CSKEY_SPACE)
     {
-      if (kbd->GetKeyState (CSKEY_CTRL))
+      if (kbd->GetKeyState (CSKEY_ALT))
         SpawnSphere(true);
       else
         SpawnSphere();

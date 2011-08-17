@@ -76,10 +76,7 @@ protected:
   bool SetupDynamicsSystem ();
 
   /// Creates the colliders for the dynamics system
-  void CreateColliders ();
-
-  void CreateMeshColliders (const char *baseMeshName, int numMeshes);
-  void CreateMeshBBoxCollider (const char *meshName);
+  void CreateColliders ();  
 
   /// Updates the dynamics system
   void UpdateDynamics (float deltaTime);
