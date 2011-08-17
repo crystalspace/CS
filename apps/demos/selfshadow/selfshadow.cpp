@@ -61,37 +61,30 @@ bool SelfShadowDemo::OnKeyboard (iEvent &ev)
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
   if (eventtype == csKeyEventTypeDown)
   {
-    if (csKeyEventHelper::GetCookedCode (&ev) == 'a')
+    if (csKeyEventHelper::GetCookedCode (&ev) == 'w')
     {
       rotateMatrix = csMatrix3(1, 0, 0, 0, cos(rotateFactor), -sin(rotateFactor), 
         0, sin(rotateFactor), cos(rotateFactor));
     }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'q')
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 's')
     {
       rotateMatrix = csMatrix3(1, 0, 0, 0, cos(rotateFactor), sin(rotateFactor), 
         0, -sin(rotateFactor), cos(rotateFactor));
     }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'd')
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'a')
     {
       rotateMatrix = csMatrix3(cos(rotateFactor), -sin(rotateFactor), 0,
         sin(rotateFactor), cos(rotateFactor), 0, 0, 0, 1);
     }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'e')
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'd')
     {
       rotateMatrix = csMatrix3(cos(rotateFactor), sin(rotateFactor), 0,
         -sin(rotateFactor), cos(rotateFactor), 0, 0, 0, 1);
     }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 's')
-    {
-      moveFactor = -speed;
-    }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'w')
-    {
-      moveFactor = speed;
-    }
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'r')
     {
       rm_dbg->DebugCommand("reset");
+      return true;
     }
 
     light->GetMovable()->Transform(rotateMatrix);
@@ -133,6 +126,11 @@ bool SelfShadowDemo::Application ()
   // Default behavior from DemoApplication
   if (!DemoApplication::Application ())
     return false;
+
+  hudManager->GetKeyDescriptions()->Push ("w a s d keys: rotate light");
+  hudManager->GetKeyDescriptions()->Push ("r: recompute splitting function");
+  hudManager->GetKeyDescriptions()->Push ("t: show render textures");
+  hudManager->GetKeyDescriptions()->Push ("c: change scene");
 
   /* NOTE: Config settings for render managers are stored in 'engine.cfg' 
    * and are needed when loading a render manager. Normally these settings 
