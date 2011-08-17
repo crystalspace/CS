@@ -91,6 +91,13 @@ bool SelfShadowDemo::OnKeyboard (iEvent &ev)
       rm_dbg->DebugCommand("show");
       return true;
     }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'c')
+    {
+      sceneNumber = ( sceneNumber + 1 ) % numberOfScenes;
+      CreateScene();
+      rm_dbg->DebugCommand("reset");
+      return true;
+    }
 
     light->GetMovable()->Transform(rotateMatrix);
 
@@ -142,7 +149,6 @@ bool SelfShadowDemo::Application ()
    * are added by the engine when it loads a render manager. However, since
    * we are loading the shadow_pssm render manager manually we must also manually
    * add the proper config file. */
-  csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
   csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (GetObjectRegistry());
   cfg->AddDomain ("/config/engine.cfg", vfs, iConfigManager::ConfigPriorityPlugin);
 
@@ -152,6 +158,7 @@ bool SelfShadowDemo::Application ()
     return ReportError("Failed to load OSM Render Manager!");
 
   rm_dbg = scfQueryInterface<iDebugHelper>(rm);
+  sceneNumber = 1;
 
   cfg->RemoveDomain ("/config/engine.cfg");
 
@@ -169,11 +176,17 @@ bool SelfShadowDemo::Application ()
 
 bool SelfShadowDemo::CreateScene ()
 {
-  char *world = "world_tree";
+  if (sceneNumber < 0 || sceneNumber >= numberOfScenes)
+  {
+    ReportError("Invalid scene number!");
+    return false;
+  }
+  char *worlds[] = {"world", "world_tree", "world_grass", 
+    "world_grass_small", "world_grass_big"};
 
   printf ("Loading level...\n");
   vfs->ChDir ("/lev/selfshadow");
-  if (!loader->LoadMapFile (world))
+  if (!loader->LoadMapFile (worlds[sceneNumber]))
     ReportError("Error couldn't load level!");
 
 //   LoadKrystal();
