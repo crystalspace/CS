@@ -19,139 +19,86 @@
 #ifndef __DEFERREDDEMO_H__
 #define __DEFERREDDEMO_H__
 
-#include "crystalspace.h"
-
+#include "cstool/demoapplication.h"
+#include "iengine/rendermanager.h"
+#include "iutil/cfgnotifier.h"
+#include "iutil/dbghelp.h"
+#include "ivaria/bullet.h"
+#include "ivaria/dynamics.h"
+#include "ivaria/dynamicsdebug.h"
 #include "ivaria/icegui.h"
-
-struct iEngine;
-struct iObjectRegistry;
-struct iGraphics3D;
-struct iGraphics2D;
 
 /**
  * The main class that runs the deferred shading demo application.
  */
-class DeferredDemo : public csApplicationFramework, csBaseEventHandler
+class DeferredDemo : public CS::Utility::DemoApplication
 {
 public:
 
   /// Constructor.
-  DeferredDemo();
+  DeferredDemo ();
 
   /// Destructor.
-  ~DeferredDemo();
+  ~DeferredDemo ();
 
-  /// Initialize the deferred shading demo application.
-  virtual bool OnInitialize(int argc, char *argv[]);
+  //-- CS::Utility::DemoApplication
+  void PrintHelp ();
+  void Frame ();
+  const char* GetApplicationConfigFile ()
+  { return "/config/deferreddemo.cfg"; }
 
-  /// Main entry point to the application.
-  virtual bool Application();
-
-  /// Returns true if the application should shutdown after the current frame.
-  bool ShouldShutdown() const { return shouldShutdown; }
-
-  /// Prints help text for the demo app.
-  void Help();
+  //-- csApplicationFramework
+  bool OnInitialize (int argc, char *argv[]);
+  bool Application  ();
+  bool OnKeyboard (iEvent &event);
 
 protected:
-
-  /// The deferred shading demos run method.
-  void RunDemo();
 
   /// Loads settings for the demo.
-  bool LoadSettings();
-
-  /// Loads the logo.
-  bool LoadLogo();
-
-  /// Draws the logo if possible.
-  void DrawLogo();
-
-  /// Takes a screenshot.
-  bool TakeScreenShot();
-
-  /// Updates the cameras position and rotation.
-  void UpdateCamera(float deltaTime);
+  bool LoadSettings ();
 
   /// Loads modules needed by the application.
-  bool SetupModules();
+  bool SetupModules ();
 
   /// Loads the demo scene.
-  bool LoadScene();
-
-  /// Loads application data.
-  bool LoadAppData();
+  bool LoadScene ();
 
   /// Setup the demo scene.
-  bool SetupScene();
+  bool SetupScene ();
 
   /// Sets up the demo GUI.
-  bool SetupGui(bool reload = false);
+  bool SetupGui (bool reload = false);
 
   /// Updates the GUI.
-  void UpdateGui();
+  void UpdateGui ();
 
   /// Sets up the dynamics system
-  bool SetupDynamicsSystem(iPluginManager *pluginManager);
+  bool SetupDynamicsSystem ();
 
   /// Creates the colliders for the dynamics system
-  void CreateColliders();
+  void CreateColliders ();
 
-  void CreateMeshColliders(const char *baseMeshName, int numMeshes);
-  void CreateMeshBBoxCollider(const char *meshName);
+  void CreateMeshColliders (const char *baseMeshName, int numMeshes);
+  void CreateMeshBBoxCollider (const char *meshName);
 
   /// Updates the dynamics system
-  void UpdateDynamics(float deltaTime);
+  void UpdateDynamics (float deltaTime);
 
   /// Spawns a sphere
-  void SpawnSphere(bool attachLight = false);
-
-  /// Handles an event not being Handled by csBaseEventHandler.
-  virtual bool OnUnhandledEvent(iEvent &event);
-
-  /// Handles a keyboard event.
-  virtual bool OnKeyboard(iEvent &event);
-
-  /// Handles a quit event.
-  virtual bool OnQuit(iEvent &event);
-
-  /// Handles the Frame event.
-  virtual void Frame();
+  void SpawnSphere (bool attachLight = false);
 
 protected:
-
-  csRef<iEventQueue> eventQueue;
-
-  csRef<iEngine> engine;
-
-  csRef<iGraphics2D> graphics2D;
-  csRef<iGraphics3D> graphics3D;
 
   csRef<iRenderManager> rm;
   csRef<iRenderManager> rm_default;
   csRef<iDebugHelper> rm_debug;
   csRef<iRenderManagerGlobalIllum> rmGlobalIllum;
 
-  csRef<iLoader> loader;
-
-  csRef<iKeyboardDriver> kbd;
-  csRef<iMouseDriver> md;
-
-  csRef<iVirtualClock> vc;
-
-  csRef<FramePrinter> printer;
-
-  csRef<iCEGUI> cegui;
-  csRef<CS::Utility::iHUDManager> hudManager;
-  csRef<iConfigListener> configEventNotifier;
-
   csRef<iDynamics> dynamics;
   csRef<iDynamicSystem> dynamicSystem;
   csRef<CS::Physics::Bullet::iDynamicSystem> bulletDynamicSystem;
   csRef<CS::Debug::iDynamicsDebuggerManager> dynamicsDebuggerManager;
   csRef<CS::Debug::iDynamicSystemDebugger> dynamicsDebugger;
-
-  csRef<iSector> room;
 
   csRef<iMeshFactoryWrapper> ballFact[6];
   csColor ballColors[3];
@@ -169,12 +116,7 @@ protected:
 
 protected:
 
-  csRef<iView> view;
-
-  float viewRotX;
-  float viewRotY;   
-
-protected:
+  csRef<iCEGUI> cegui;
 
   CEGUI::Window *guiRoot;
   CEGUI::RadioButton *guiDeferred;
@@ -214,6 +156,7 @@ protected:
   float blurPositionThreshold;
   float blurNormalThreshold;
 
+  csRef<iConfigListener> configEventNotifier;
   csRef<iEventHandler> occlusionStrengthListener;
   csRef<iEventHandler> sampleRadiusListener;
   csRef<iEventHandler> detailSampleRadiusListener;
@@ -237,6 +180,7 @@ protected:
   bool cfgUseDeferredShading;
 
   bool cfgShowGui;
+  bool cfgShowHUD;
 
   // The logo texture.
   csRef<iTextureHandle> logoTex;

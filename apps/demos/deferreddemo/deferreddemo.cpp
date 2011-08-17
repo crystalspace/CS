@@ -15,8 +15,14 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+#include "cssysdef.h"
 
+#include "csgeom/plane3.h"
+#include "csgeom/sphere.h"
+#include "cstool/materialbuilder.h"
+#include "csutil/cfgnotifier.h"
 #include "deferreddemo.h"
+#include "iengine/campos.h"
 
 #include "csutil/custom_new_disable.h"
 #include <CEGUI.h>
@@ -25,7 +31,6 @@
 #include "csutil/custom_new_enable.h"
 
 const char *DEFAULT_CFG_WORLDDIR = "/data/sponza";  // "/lev/castle";
-const char *DEFAULT_CFG_LOGOFILE = "/lib/std/cslogo2.png";
 
 const char* ballMaterialNames[4] = { "red", "green", "blue", "yellow" };
 const csColor ballMaterialColors[4] = { csColor (1.0f, 0.0f, 0.0f),
@@ -34,22 +39,19 @@ const csColor ballMaterialColors[4] = { csColor (1.0f, 0.0f, 0.0f),
 					csColor (1.0f, 1.0f, 0.0f) };
 
 //----------------------------------------------------------------------
-DeferredDemo::DeferredDemo()
-:
-viewRotX(0.0f),
-viewRotY(0.0f),
-shouldShutdown(false)
-{
-  SetApplicationName ("CrystalSpace.DeferredDemo");
 
+DeferredDemo::DeferredDemo()
+  : DemoApplication ("CrystalSpace.DeferredDemo")
+{
   // Sets default cfg values.
   cfgWorldDir = DEFAULT_CFG_WORLDDIR;
   cfgWorldFile = "world";
   
-  cfgDrawLogo = true;
   cfgUseDeferredShading = true;
 
   downsampleNormalsDepth = false;
+
+  cfgShowHUD = false;
 }
 
 //----------------------------------------------------------------------
@@ -57,17 +59,26 @@ DeferredDemo::~DeferredDemo()
 {}
 
 //----------------------------------------------------------------------
+void DeferredDemo::PrintHelp ()
+{
+  csCommandLineHelper commandLineHelper;
+
+  commandLineHelper.AddCommandLineOption
+    ("forward", "Use forward rendering on startup", csVariant ());
+  commandLineHelper.AddCommandLineOption
+    ("world", "Use given world file", csVariant ("world"));
+  commandLineHelper.AddCommandLineOption
+    ("worlddir", "Use given VFS path", csVariant ("/lev/sponza"));
+
+  // Printing help
+  commandLineHelper.PrintApplicationHelp
+    (GetObjectRegistry (), "deferreddemo", "deferreddemo", "Crystal Space's deferred renderer demo.");
+}
+
+//----------------------------------------------------------------------
 bool DeferredDemo::OnInitialize(int argc, char *argv[])
 {
   if (!csInitializer::RequestPlugins (GetObjectRegistry(),
-      CS_REQUEST_VFS,
-      CS_REQUEST_OPENGL3D,
-      CS_REQUEST_ENGINE,
-      CS_REQUEST_FONTSERVER,
-      CS_REQUEST_IMAGELOADER,
-      CS_REQUEST_LEVELLOADER,
-      CS_REQUEST_REPORTER,
-      CS_REQUEST_REPORTERLISTENER,
       CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
       CS_REQUEST_PLUGIN ("crystalspace.dynamics.debug", CS::Debug::iDynamicsDebuggerManager),
       CS_REQUEST_END))
@@ -75,78 +86,36 @@ bool DeferredDemo::OnInitialize(int argc, char *argv[])
     return ReportError("Failed to initialize plugins!");
   }
 
-  csBaseEventHandler::Initialize (GetObjectRegistry());
-  csEventID events[] = 
-  {
-    /* List of events to listen to. */
-
-    csevQuit (GetObjectRegistry()),
-    csevFrame (GetObjectRegistry()),
-    csevKeyboardEvent (GetObjectRegistry()),
-    csevCommandLineHelp (GetObjectRegistry()),
-    csevMouseEvent (GetObjectRegistry()),
-    CS_EVENTLIST_END
-  };
-
-  if (!RegisterQueue (GetObjectRegistry(), events))
-  {
-    return ReportError("Failed to set up event handler!");
-  }
-
-  // Setup default values.
-  viewRotX = 0.0f;
-  viewRotY = 0.0f;
-
-  shouldShutdown = false;
-  
-  // Setup chached event names.
-  quitEventID = csevQuit (GetObjectRegistry());
-  cmdLineHelpEventID = csevCommandLineHelp (GetObjectRegistry());
-
-  // Load deferred demo config file.
-  csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
-  csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (GetObjectRegistry());
-  cfg->AddDomain ("/config/deferreddemo.cfg", vfs, iConfigManager::ConfigPriorityPlugin);
-
+  // Default behavior from DemoApplication
+  if (!DemoApplication::OnInitialize (argc, argv))
+    return false;
 
   return true;
 }
 
 //----------------------------------------------------------------------
+bool DeferredDemo::Application()
+{
+  // Default behavior from DemoApplication
+  if (!DemoApplication::Application ())
+    return false;
+
+  if (!(SetupModules() && 
+	LoadSettings() && 
+	LoadScene() &&
+	SetupGui() &&
+	SetupScene()))
+    return false;
+
+   // Run the application
+   Run();
+
+   return true;
+}
+
+//----------------------------------------------------------------------
 bool DeferredDemo::SetupModules()
 {
-  eventQueue = csQueryRegistry<iEventQueue> (GetObjectRegistry());
-  if (!eventQueue) 
-    return ReportError("Failed to locate Event Queue!");
-
-  graphics2D = csQueryRegistry<iGraphics2D> (GetObjectRegistry());
-  if (!graphics2D) 
-    return ReportError("Failed to locate 2D renderer!");
-
-  graphics3D = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
-  if (!graphics3D) 
-    return ReportError("Failed to locate 3D renderer!");
-
-  engine = csQueryRegistry<iEngine> (GetObjectRegistry());
-  if (!engine) 
-    return ReportError("Failed to locate 3D engine!");
-
-  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry());
-  if (!vc) 
-    return ReportError("Failed to locate Virtual Clock!");
-
-  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry());
-  if (!kbd) 
-    return ReportError("Failed to locate Keyboard Driver!");
-
-  md = csQueryRegistry<iMouseDriver> (GetObjectRegistry());
-  if (!md) 
-    return ReportError("Failed to locate Mouse Driver!");
-
-  loader = csQueryRegistry<iLoader> (GetObjectRegistry());
-  if (!loader) 
-    return ReportError("Failed to locate Loader!");
-
   csRef<iShaderManager> shaderManager = csQueryRegistry<iShaderManager> (GetObjectRegistry());
   if (!shaderManager)
     return ReportError("Failed to locate shader manager!");
@@ -161,27 +130,12 @@ bool DeferredDemo::SetupModules()
   if (!dynamicsDebuggerManager)
     return ReportError ("Failed to locate Dynamic's Debugger Manager!");
   
-  csRef<iPluginManager> pluginManager = csQueryRegistry<iPluginManager> (GetObjectRegistry ());
-  if (!pluginManager)
-    return ReportError ("Failed to locate Plugin Manager!");
-
-  hudManager = csLoadPlugin<CS::Utility::iHUDManager>(pluginManager, "crystalspace.utilities.texthud");
-  if (!hudManager)
-    return ReportError ("Failed to locate HUD manager!");
-
-  // Load the screenshot configuration
-  csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (GetObjectRegistry());
-  screenshotFormat = cfg->GetStr ("Deferreddemo.Settings.Screenshot.ImageFormat", "jpg");
-  csString screenshotMask = cfg->GetStr ("Deferreddemo.Settings.Screenshot.FilenameFormat",
-					    "/tmp/CS_DeferredDemo_0000");
-  screenshotHelper.SetMask (screenshotMask + "." + screenshotFormat);
-
   /* NOTE: Config settings for render managers are stored in 'engine.cfg' 
    * and are needed when loading a render manager. Normally these settings 
    * are added by the engine when it loads a render manager. However, since
    * we are loading the deferred render manager manually we must also manually
    * add the proper config file. */
-  csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());  
+  csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (GetObjectRegistry());
   cfg->AddDomain ("/config/engine.cfg", vfs, iConfigManager::ConfigPriorityPlugin);
 
   rm = csLoadPlugin<iRenderManager> (GetObjectRegistry(), "crystalspace.rendermanager.deferred");
@@ -200,17 +154,19 @@ bool DeferredDemo::SetupModules()
   if (!rmGlobalIllum)
     return ReportError ("Failed to query the deferred Render Manager global illumination interface!");
 
-  SetupDynamicsSystem (pluginManager);
-
-  globalIllumResolution = cfg->GetStr ("RenderManager.Deferred.GlobalIllum.BufferResolution", "full");
-  depthNormalsResolution = cfg->GetStr ("RenderManager.Deferred.GlobalIllum.DepthAndNormalsResolution",
+  globalIllumResolution = config->GetStr ("RenderManager.Deferred.GlobalIllum.BufferResolution", "full");
+  depthNormalsResolution = config->GetStr ("RenderManager.Deferred.GlobalIllum.DepthAndNormalsResolution",
     "full");
+
+  SetupDynamicsSystem ();
 
   return true;
 }
 
-bool DeferredDemo::SetupDynamicsSystem(iPluginManager *pluginManager)
+bool DeferredDemo::SetupDynamicsSystem()
 {
+  csRef<iPluginManager> pluginManager = csQueryRegistry<iPluginManager> (GetObjectRegistry ());
+
   // Setup physics subsystem
   dynamics = csLoadPlugin<iDynamics> (pluginManager, "crystalspace.dynamics.bullet");
   if (!dynamics)
@@ -238,13 +194,13 @@ bool DeferredDemo::SetupDynamicsSystem(iPluginManager *pluginManager)
 
   isBulletEnabled = true;
   doBulletDebug = false;
+
   return true;
 }
 
 //----------------------------------------------------------------------
 bool DeferredDemo::LoadScene()
 {
-  csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
   if (!vfs->ChDir (cfgWorldDir))
     return ReportError("Could not navigate to level directory %s!",
 		       CS::Quote::Single (cfgWorldDir.GetDataSafe ()));
@@ -256,42 +212,32 @@ bool DeferredDemo::LoadScene()
 }
 
 //----------------------------------------------------------------------
-bool DeferredDemo::LoadAppData()
-{
-  LoadLogo ();
-
-  return true;
-}
-
-//----------------------------------------------------------------------
 bool DeferredDemo::LoadSettings()
 {
   const char *val = NULL;
 
-  csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (GetObjectRegistry());
   csRef<iCommandLineParser> cmdline = csQueryRegistry<iCommandLineParser> (GetObjectRegistry());
 
   val = cmdline->GetOption ("worlddir");
   if (val)
     cfgWorldDir = val;
   else
-    cfgWorldDir = cfg->GetStr ("Deferreddemo.Settings.WorldDirectory", DEFAULT_CFG_WORLDDIR);
+    cfgWorldDir = config->GetStr ("Deferreddemo.Settings.WorldDirectory", DEFAULT_CFG_WORLDDIR);
 
-  cfgWorldFile = cfg->GetStr ("Deferreddemo.Settings.WorldFile", "world");
-  cfgLogoFile = cfg->GetStr ("Deferreddemo.Settings.LogoFile", DEFAULT_CFG_LOGOFILE);
+  cfgWorldFile = config->GetStr ("Deferreddemo.Settings.WorldFile", "world");
 
 
   if (cmdline->GetOption ("nologo"))
     cfgDrawLogo = false;
   else
-    cfgDrawLogo = cfg->GetBool ("Deferreddemo.Settings.DrawLogo", true);
+    cfgDrawLogo = config->GetBool ("Deferreddemo.Settings.DrawLogo", true);
 
   if (cmdline->GetOption ("forward"))
     cfgUseDeferredShading = false;
   else
-    cfgUseDeferredShading = !cfg->GetBool ("Deferreddemo.Settings.UseForward", false);
+    cfgUseDeferredShading = !config->GetBool ("Deferreddemo.Settings.UseForward", false);
 
-  cfgShowGui = cfg->GetBool ("Deferreddemo.Settings.ShowGui", true);
+  cfgShowGui = config->GetBool ("Deferreddemo.Settings.ShowGui", true);
 
   return true;
 }
@@ -301,16 +247,6 @@ bool DeferredDemo::SetupGui(bool reload)
 {
   // Initialize the HUD manager
   hudManager->GetKeyDescriptions()->Empty();
-  hudManager->GetKeyDescriptions()->Push ("z: Change SSGI resolution");
-  hudManager->GetKeyDescriptions()->Push ("x: Change depth/normals resolution");
-  hudManager->GetKeyDescriptions()->Push ("Space: Throw ball");
-  hudManager->GetKeyDescriptions()->Push ("Ctrl+Space: Throw ball w/light");
-  hudManager->GetKeyDescriptions()->Push ("n: Pause/Resume physics simulation");
-  hudManager->GetKeyDescriptions()->Push ("g: Show/Hide GUI");
-  hudManager->GetKeyDescriptions()->Push ("F9: Show/Hide HUD");
-  hudManager->GetKeyDescriptions()->Push ("F12: Screenshot");  
-  hudManager->GetKeyDescriptions()->Push ("1-9: Visualize deferred buffers");
-  hudManager->GetKeyDescriptions()->Push ("0: Visualize final rendered image");
 
   configEventNotifier.AttachNew(new CS::Utility::ConfigEventNotifier(GetObjectRegistry()));
 
@@ -336,8 +272,6 @@ bool DeferredDemo::SetupGui(bool reload)
     "DeferredDemo.PositionThreshold", blurPositionThreshold));
   blurNormalThresholdListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
     "DeferredDemo.NormalThreshold", blurNormalThreshold));
-
-  csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
 
   if (!reload)
   {
@@ -423,36 +357,29 @@ bool DeferredDemo::SetupGui(bool reload)
 //----------------------------------------------------------------------
 bool DeferredDemo::SetupScene()
 {
-  // Setup camera  
-  csVector3 pos (0, 0, 0);
-  if (engine->GetCameraPositions ()->GetCount () > 0)
-  {
-    iCameraPosition* campos = engine->GetCameraPositions ()->Get (0);
-    room = engine->GetSectors ()->FindByName (campos->GetSector ());
-    pos = campos->GetPosition ();
-  }
-  else
-  {
-    // There are no valid starting point for the camera so we just start at the origin.
-    room = engine->GetSectors ()->FindByName ("room");
-    pos = csVector3 (0, 0, 0);
-  }
+  // Find a strating sector
+  iCameraPositionList* positions = engine->GetCameraPositions ();
+  if (positions->GetCount ())
+    room = engine->FindSector (positions->Get (0)->GetSector ());
+
+  else room = engine->GetSectors ()->Get (0);
 
   if (!room)
-    return ReportError("Can't find a valid starting position!");
+    return ReportError ("Could not find a valid starting sector");
 
-  view.AttachNew ( new csView (engine, graphics3D) );
-  view->SetRectangle (0, 0, graphics2D->GetWidth (), graphics2D->GetHeight ());
+  // Setup the camera
   view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (pos);
-  
+  cameraManager->SetCamera (view->GetCamera ());
+  cameraManager->SetCameraMode (CS::Utility::CAMERA_MOVE_FREE);
+
+  // TODO: explain this
   csPlane3 *farPlane = new csPlane3 (0, 0, -1, 100);
   view->GetCamera()->SetFarPlane (farPlane);
   view->GetPerspectiveCamera()->SetNearClipDistance (0.2f);
   delete farPlane;
 
   // Checks for support of at least 4 color buffer attachment points.
-  const csGraphics3DCaps *caps = graphics3D->GetCaps();
+  const csGraphics3DCaps *caps = g3d->GetCaps();
   if (caps->MaxRTColorAttachments < 3)
     return ReportError("Graphics3D does not support at least 3 color buffer attachments!");
   else
@@ -476,7 +403,6 @@ bool DeferredDemo::SetupScene()
     factoryState->GenerateSphere (ellips, 16);
   }
   
-  csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
   vfs->ChDir ("/lib/std");
   csRef<iMaterialWrapper> matR = CS::Material::MaterialBuilder::CreateColorMaterial
     (GetObjectRegistry (), ballMaterialNames[0], ballMaterialColors[0]);
@@ -491,7 +417,9 @@ bool DeferredDemo::SetupScene()
     
   dynamicsDebugger->SetDebugSector (room);
 
+  printf ("Precaching data...\n");
   engine->Prepare ();
+  printf ("Ready!\n");
 
   return true;
 }
@@ -607,113 +535,6 @@ void DeferredDemo::CreateMeshColliders(const char *baseMeshName, int numMeshes)
 }
 
 //----------------------------------------------------------------------
-void DeferredDemo::Help()
-{
-  csRef<iConfigManager> cfg (csQueryRegistry<iConfigManager> (object_reg));
-
-  csPrintf ("Options for DeferredDemo:\n");
-  csPrintf ("  -nologo            do not draw logo.\n");
-  csPrintf ("  -forward           use forward rendering on startup.\n");
-  csPrintf ("  -world=<file>      use given world file instead of %s\n",
-	    CS::Quote::Single ("world"));
-  csPrintf ("  -worlddir=<path>   load map from VFS <path> (default %s)\n", 
-    CS::Quote::Single (cfg->GetStr ("Walktest.Settings.WorldFile",
-				    DEFAULT_CFG_WORLDDIR)));
-}
-
-//----------------------------------------------------------------------
-bool DeferredDemo::Application()
-{
-  if (!OpenApplication (GetObjectRegistry()))
-  {
-    return ReportError("Error opening system!");
-  }
-
-  // Check for commandline help.
-  if (csCommandLineHelper::CheckHelp (GetObjectRegistry()))
-  {
-    csCommandLineHelper::Help (GetObjectRegistry());
-    return true;
-  }
-
-  if (SetupModules() && 
-      LoadSettings() && 
-      LoadAppData() &&
-      LoadScene() &&
-      SetupGui() &&
-      SetupScene())
-  {
-    RunDemo();
-  }
-
-  return true;
-}
-
-//----------------------------------------------------------------------
-void DeferredDemo::RunDemo()
-{
-  // Fetch the minimal elapsed ticks per second.
-  csConfigAccess cfgacc (GetObjectRegistry(), "/config/system.cfg");
-  csTicks min_elapsed = (csTicks)cfgacc->GetInt ("System.MinimumElapsedTicks", 0);
-
-  while (!ShouldShutdown())
-  {
-    vc->Advance ();
-
-    csTicks previous = csGetTicks ();
-
-    eventQueue->Process ();
-
-    // Limit fps.
-    csTicks elapsed = csGetTicks () - previous;
-    if (elapsed < min_elapsed)
-      csSleep (min_elapsed - elapsed);
-  }
-}
-
-//----------------------------------------------------------------------
-void DeferredDemo::UpdateCamera(float deltaTime)
-{
-  const float MOVE_SPEED = 5.0f;
-  const float ROTATE_SPEED = 2.0f;
-
-  // Handles camera movement.
-  iCamera *c = view->GetCamera ();
-  if (kbd->GetKeyState (CSKEY_SHIFT))
-  {
-    if (kbd->GetKeyState (CSKEY_RIGHT))
-      c->Move (CS_VEC_RIGHT * MOVE_SPEED * deltaTime);
-    if (kbd->GetKeyState (CSKEY_LEFT))
-      c->Move (CS_VEC_LEFT * MOVE_SPEED * deltaTime);
-    if (kbd->GetKeyState (CSKEY_UP))
-      c->Move (CS_VEC_UP * MOVE_SPEED * deltaTime);
-    if (kbd->GetKeyState (CSKEY_DOWN))
-      c->Move (CS_VEC_DOWN * MOVE_SPEED * deltaTime);
-  }
-  else
-  {
-    if (kbd->GetKeyState (CSKEY_RIGHT))
-      viewRotY += ROTATE_SPEED * deltaTime;
-    if (kbd->GetKeyState (CSKEY_LEFT))
-      viewRotY -= ROTATE_SPEED * deltaTime;
-    if (kbd->GetKeyState (CSKEY_PGUP))
-      viewRotX += ROTATE_SPEED * deltaTime;
-    if (kbd->GetKeyState (CSKEY_PGDN))
-      viewRotX -= ROTATE_SPEED * deltaTime;
-    if (kbd->GetKeyState (CSKEY_UP))
-      c->Move (CS_VEC_FORWARD * MOVE_SPEED * deltaTime);
-    if (kbd->GetKeyState (CSKEY_DOWN))
-      c->Move (CS_VEC_BACKWARD * MOVE_SPEED * deltaTime);
-  }
-
-  csMatrix3 Rx = csXRotMatrix3 (viewRotX);
-  csMatrix3 Ry = csYRotMatrix3 (viewRotY);
-  csOrthoTransform V (Rx * Ry, c->GetTransform ().GetOrigin ());
-
-  c->SetTransform (V);
-}
-
-//----------------------------------------------------------------------
 void DeferredDemo::UpdateDynamics(float deltaTime)
 {
   dynamicsDebugger->SetDebugSector (view->GetCamera()->GetSector());
@@ -747,6 +568,7 @@ void DeferredDemo::UpdateGui()
     enableGlobalIllum = !enableGlobalIllum;
     rmGlobalIllum->EnableGlobalIllumination (enableGlobalIllum);
   }
+
   // By setting the AO wide radius to 0 it is disabled
   if (!guiEnableDetailSamples->isSelected())
   {
@@ -786,58 +608,10 @@ void DeferredDemo::UpdateGui()
 }
 
 //----------------------------------------------------------------------
-bool DeferredDemo::LoadLogo()
-{
-  logoTex = loader->LoadTexture (cfgLogoFile.GetDataSafe (), CS_TEXTURE_2D, NULL);
-
-  if (!logoTex.IsValid ())
-  {
-    return ReportError("Could not load logo %s!",
-		       CS::Quote::Single (cfgLogoFile.GetDataSafe ()));
-  }
-
-  return true;
-}
-
-//----------------------------------------------------------------------
-void DeferredDemo::DrawLogo()
-{
-  if (!cfgDrawLogo || !logoTex.IsValid ())
-    return;
-
-  int w, h;
-  logoTex->GetRendererDimensions (w, h);
-
-  int screenW = graphics2D->GetWidth ();
-
-  // Margin to the edge of the screen, as a fraction of screen width
-  const float marginFraction = 0.01f;
-  const int margin = (int)screenW * marginFraction;
-
-  // Width of the logo, as a fraction of screen width
-  const float widthFraction = 0.2f;
-  const int width = (int)screenW * widthFraction;
-  const int height = width * h / w;
-
-  graphics3D->BeginDraw (CSDRAW_2DGRAPHICS);
-  graphics3D->DrawPixmap (logoTex, 
-                          screenW - width - margin, 
-                          margin,
-                          width,
-                          height,
-                          0,
-                          0,
-                          w,
-                          h,
-                          0);
-}
-
-//----------------------------------------------------------------------
 void DeferredDemo::Frame ()
 {
   float dt = (float)(vc->GetElapsedTicks () / 1000.0f);
 
-  UpdateCamera (dt);
   UpdateDynamics (dt);
   UpdateGui ();
 
@@ -846,62 +620,54 @@ void DeferredDemo::Frame ()
   else
     engine->SetRenderManager (rm_default);
 
-  view->Draw ();
+  // Default behavior from DemoApplication
+  DemoApplication::Frame ();
 
   if (doBulletDebug)
     bulletDynamicSystem->DebugDraw (view);
 
   cegui->Render ();
 
-  DrawLogo ();
-
-  graphics3D->FinishDraw ();
-  graphics3D->Print (NULL);
-}
-
-//----------------------------------------------------------------------
-bool DeferredDemo::OnUnhandledEvent (iEvent &event)
-{
-  if (event.Name == quitEventID)
-  {
-    return OnQuit (event);
-  }
-  else if (event.Name == cmdLineHelpEventID)
-  {
-    Help ();
-    return true;
-  }
-
-  return false;
+  // TODO: enable/disable logo
 }
 
 //----------------------------------------------------------------------
 bool DeferredDemo::OnKeyboard(iEvent &event)
 {
+  // Default behavior from DemoApplication
+  DemoApplication::OnKeyboard (event);
+
   csKeyEventType eventtype = csKeyEventHelper::GetEventType (&event);
   if (eventtype == csKeyEventTypeDown)
   {
     utf32_char code = csKeyEventHelper::GetCookedCode(&event);
-    if (code == CSKEY_ESC)
+    if (code == CSKEY_F8)
     {
-      if (eventQueue.IsValid ()) 
+      cfgShowHUD = !cfgShowHUD;
+
+      if (cfgShowHUD)
       {
-        eventQueue->GetEventOutlet ()->Broadcast( csevQuit(GetObjectRegistry()) );
-        return true;
+	hudManager->GetKeyDescriptions()->Empty();
+	hudManager->GetKeyDescriptions()->Push ("z: Change SSGI resolution");
+	hudManager->GetKeyDescriptions()->Push ("x: Change depth/normals resolution");
+	hudManager->GetKeyDescriptions()->Push ("Space: Throw ball");
+	hudManager->GetKeyDescriptions()->Push ("Ctrl+Space: Throw ball w/light");
+	hudManager->GetKeyDescriptions()->Push ("n: Pause/Resume physics simulation");
+	hudManager->GetKeyDescriptions()->Push ("g: Show/Hide GUI");
+	hudManager->GetKeyDescriptions()->Push ("F8: Show/Hide HUD");
+	hudManager->GetKeyDescriptions()->Push ("F12: Screenshot");  
+	hudManager->GetKeyDescriptions()->Push ("1-9: Visualize deferred buffers");
+	hudManager->GetKeyDescriptions()->Push ("0: Visualize final rendered image");
       }
-    }        
-    else if (code == CSKEY_F12) // Screenshot key
-    {      
-      return TakeScreenShot();
-    }
-    else if (code == CSKEY_F9)
-    {
-      hudManager->SetEnabled (!hudManager->GetEnabled());
+
+      else
+	hudManager->GetKeyDescriptions()->Empty();
+
       return true;
     }
     else if (code == CSKEY_F2)
     {
-      graphics2D->SetFullScreen (!graphics2D->GetFullScreen());
+      g2d->SetFullScreen (!g2d->GetFullScreen());
       return true;
     }
     else if (code == 'f')
@@ -1043,40 +809,6 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
 }
 
 //----------------------------------------------------------------------
-bool DeferredDemo::TakeScreenShot()
-{
-  csRef<iImage> screenshot = graphics2D->ScreenShot();
-
-  // Convert the screenshot to the target image format
-  csRef<iImageIO> imageIO = csQueryRegistry<iImageIO> (GetObjectRegistry ());
-  if (!screenshot || !imageIO)
-	  return false;
-
-  csRef<iDataBuffer> data =
-	  imageIO->Save (screenshot, csString().Format ("image/%s", screenshotFormat.GetData()));
-
-  if (!data)
-  {
-	  ReportError ("Could not export screenshot image to format %s!",
-		  CS::Quote::Single (screenshotFormat.GetData ()));
-	  return false;
-  }
-
-  // Save the file
-  csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
-  if (!vfs) return false;
-
-  csString filename = screenshotHelper.FindNextFilename (vfs);
-  if (data && vfs->WriteFile (filename, data->GetData (), data->GetSize()))
-  {
-	  csRef<iDataBuffer> path = vfs->GetRealPath (filename.GetData ());
-	  ReportInfo ("Screenshot saved to %s...", CS::Quote::Single (path->GetData()));
-  }
-
-  return true;
-}
-
-//----------------------------------------------------------------------
 void DeferredDemo::SpawnSphere(bool attachLight)
 {  
   const csOrthoTransform& cameraTransform = view->GetCamera()->GetTransform();  
@@ -1113,10 +845,11 @@ void DeferredDemo::SpawnSphere(bool attachLight)
   dynamicsDebugger->UpdateDisplay();
 }
 
-//----------------------------------------------------------------------
-bool DeferredDemo::OnQuit (iEvent &event)
-{
-  shouldShutdown = true;
-  return true;
-}
+//---------------------------------------------------------------------------
 
+CS_IMPLEMENT_APPLICATION
+
+int main (int argc, char* argv[])
+{
+  return DeferredDemo ().Main (argc, argv);
+}
