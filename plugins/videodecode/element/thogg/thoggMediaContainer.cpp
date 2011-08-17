@@ -190,22 +190,16 @@ void TheoraMediaContainer::Update ()
     }*/
     if(!_waitToFillCache && !canWrite && dataAvailable)
     {
-      if( ((csGetTicks () - lastTime) >= (frameTime+40)))
+      if( (csGetTicks () - lastTime) >= (frameTime) && ((csGetTicks () - lastTime) < (frameTime+100)))
       {
-        cout<<"dropped a frame\n";
-        DropFrame ();
+        canSwap=true;
         lastTime=csGetTicks ();
       }
       else
-      if( (csGetTicks () - lastTime) < (frameTime))
+      if( ((csGetTicks () - lastTime) >= (frameTime+100)))
       {
-        /*canSwap=true;
-        lastTime=csGetTicks ();*/
-      }
-      else
-      if( (csGetTicks () - lastTime) >= (frameTime))
-      {
-        canSwap=true;
+        cout<<"dropped a frame\n";
+        DropFrame ();
         lastTime=csGetTicks ();
       }
     }

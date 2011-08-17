@@ -93,7 +93,7 @@ void VideoTest::Frame ()
     h,
     0);
 
-  csSleep (1);
+  csSleep (5);
 }
 
 void VideoTest::OnExit ()
@@ -113,6 +113,8 @@ bool VideoTest::Application ()
     CS_REQUEST_PLUGIN ("crystalspace.vpl.player", iMediaPlayer),
     CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
     CS_REQUEST_PLUGIN("crystalspace.sndsys.renderer.software", iSndSysRenderer),
+    CS_REQUEST_PLUGIN("crystalspace.documentsystem.multiplexer", iDocumentSystem),
+    CS_REQUEST_PLUGIN_TAG("crystalspace.documentsystem.tinyxml", iDocumentSystem, "iDocumentSystem.1"),
     CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -135,13 +137,9 @@ bool VideoTest::Application ()
   // Set the working directory
   vfs->ChDir ("/videodecode/");
 
-  //Get the path of the video we want to load
-  csRef<iDataBuffer> path;
-  path = vfs->GetRealPath ("vid420.ogg");
-
   // Get the loader and load the video
   csRef<iMediaLoader> vlpLoader = csQueryRegistry<iMediaLoader> (object_reg);
-  csRef<iMediaContainer> video = vlpLoader->LoadMedia(path->GetData ());
+  csRef<iMediaContainer> video = vlpLoader->LoadMedia("vid420.xml");
 
   if (video.IsValid ())
   {
@@ -150,7 +148,7 @@ bool VideoTest::Application ()
 
   csRef<iSndSysStream> audioStream;
   mediaPlayer = csQueryRegistry<iMediaPlayer> (object_reg);
-  mediaPlayer->InitializePlayer (video,15);
+  mediaPlayer->InitializePlayer (video,5);
 
   // Specifying -1 as index triggers auto stream activation
   mediaPlayer->SetActiveStream (0);

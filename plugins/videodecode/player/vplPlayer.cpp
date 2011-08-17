@@ -113,6 +113,7 @@ THREADED_CALLABLE_IMPL(vplPlayer, Update)
 {
   while (_shouldUpdate)
   {
+    csTicks start=csGetTicks ();
     if (_playing)
     {
       if(_shouldStop)
@@ -137,10 +138,13 @@ THREADED_CALLABLE_IMPL(vplPlayer, Update)
 
         _mediaFile->Update ();
       }
+
+      csSleep (5);
     }
-    // If the media isn't playing, we don't want to slow down the thread a bit
+    // If the media isn't playing, we don't want to use up the thread
     else
       csSleep (100);
+    //cout<<"frame time "<<csGetTicks ()-start<<endl;
   }
 
   return true;

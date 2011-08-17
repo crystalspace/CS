@@ -429,8 +429,83 @@ csRef<iMediaContainer> thoggLoader::LoadMedia (const char * pFileName, const cha
 {
   csReport(object_reg, CS_REPORTER_SEVERITY_DEBUG, QUALIFIED_PLUGIN_NAME,
     "Loading Theora video '%s'.\n", pFileName);
+  
+  csRef<iDocumentAttribute> videoName;
+  /// Parse XML
 
-  infile = fopen(pFileName,"rb");
+  /// Read the xml file and create the document
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+  csRef<iDocumentSystem> docSys = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
+  csRef<iDocument> xmlDoc = docSys->CreateDocument ();
+  csRef<iDataBuffer> xmlData = vfs->ReadFile (pFileName);
+
+  /// Start parsing
+  if (xmlDoc->Parse (xmlData) == 0)
+  {
+    /// Get the root
+    csRef<iDocumentNode> node = xmlDoc->GetRoot ();
+
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+
+    /// Iterate through the nodes
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+
+      /// The <media> tag
+      if ( strcmp (child->GetValue (),"media")==0)
+      {
+        if ( strcmp (child->GetAttributeValue ("type"),"video") ==0)
+        {
+          cout<<"video file detected!\n";
+        }
+        else
+        {
+          cout<<"not video file!\n";
+          break;
+        }
+      }
+
+      csRef<iDocumentNodeIterator> it2 = child->GetNodes ();
+      while (it2->HasNext ())
+      {
+        csRef<iDocumentNode> child2 = it2->Next ();
+        cout<<"node: "<<child2->GetValue ()<<endl;
+
+        /// Get the video stream path
+        if (strcmp(child2->GetValue (),"videoStream")==0)
+        {
+          cout<<"video file path: "<<child2->GetAttributeValue ("path")<<endl;
+          /// Save the video path
+          videoName = child2->GetAttribute ("path");
+        }
+        /// Get all the languages
+        if (strcmp(child2->GetValue (),"audioStream")==0)
+        {
+          csRef<iDocumentNodeIterator> it3 = child2->GetNodes ();
+
+          /// Read the name and path for each language
+          while (it3->HasNext ())
+          {
+            csRef<iDocumentNode> child3 = it3->Next ();
+            if (strcmp(child3->GetValue (),"language")==0)
+            {
+              cout<<"lang name: "<<child3->GetAttributeValue ("name")<<
+                " lang path: "<<child3->GetAttributeValue ("path")<<endl;
+            }
+          }
+        }
+      }
+    }
+
+    cout<<"done parsing xml\n";
+  }
+  else
+    cout<<"fail"<<endl;
+  //return NULL;
+
+  csRef<iDataBuffer> vidPath = vfs->GetRealPath (videoName->GetValue ());
+  infile = fopen (vidPath->GetData (),"rb");
 
   /// checking if the file exists
   if (infile==NULL)

@@ -107,13 +107,13 @@ double TheoraVideoMedia::GetPosition () const
 
 bool TheoraVideoMedia::Update ()
 {
-  csSleep (1);
   Convert ();
   if (cache.GetSize ()>=cacheSize)
     return false;
 
   _videobufReady=false;
 
+  csTicks start = csGetTicks ();
   while (_theora_p && !_videobufReady)
   {
     if (ogg_stream_packetout(&_streamState,&_oggPacket)>0)
@@ -146,6 +146,8 @@ bool TheoraVideoMedia::Update ()
     else
       break;
   }
+
+  //cout<<"read time "<<csGetTicks ()-start<<endl;
 
   if (!_videobufReady)
     return true;
@@ -231,7 +233,7 @@ long TheoraVideoMedia::SeekPage (long targetFrame,bool return_keyframe, ogg_sync
   if (return_keyframe)
   {
     _frameToSkip = targetFrame;
-    cout<<"want to skip to :"<<_frameToSkip<<endl;
+    //cout<<"want to skip to :"<<_frameToSkip<<endl;
 
     return (long) (granule >> _streamInfo.keyframe_granule_shift);
   }
@@ -422,7 +424,7 @@ void TheoraVideoMedia::Convert ()
 
     conversionState = 2;
 
-    cout<<"conv time = "<<csGetTicks ()-start<<endl;
+    //cout<<"conv time = "<<csGetTicks ()-start<<endl;
   }
 }
 void TheoraVideoMedia::SwapBuffers()
@@ -444,10 +446,14 @@ void TheoraVideoMedia::SwapBuffers()
       activeBuffer = 1;
       canSwap=false;
 
+      csTicks start = csGetTicks ();
+
       size_t dstSize;
       iTextureHandle* tex = _buffers.Get (activeBuffer);
       rgbBuff = tex->QueryBlitBuffer (_streamInfo.pic_x,_streamInfo.pic_y,_streamInfo.pic_width,_streamInfo.pic_height,dstSize);
       conversionState = 0;
+
+      //cout<<"query blit buffer time "<<csGetTicks ()-start<<endl;
     }
     else
     {
@@ -455,10 +461,12 @@ void TheoraVideoMedia::SwapBuffers()
       activeBuffer = 0;
       canSwap=false;
 
+      csTicks start = csGetTicks ();
       size_t dstSize;
       iTextureHandle* tex = _buffers.Get (activeBuffer);
       rgbBuff = tex->QueryBlitBuffer (_streamInfo.pic_x,_streamInfo.pic_y,_streamInfo.pic_width,_streamInfo.pic_height,dstSize);
       conversionState = 0;
+      //cout<<"query blit buffer time "<<csGetTicks ()-start<<endl;
     }
   }
 }
@@ -475,8 +483,10 @@ void TheoraVideoMedia::WriteData ()
   {
     if (conversionState==2)
     {
+      csTicks start = csGetTicks ();
       iTextureHandle* tex = _buffers.Get (activeBuffer);
       tex->ApplyBlitBuffer (rgbBuff);
+      //cout<<"apply blit buffer time "<<csGetTicks ()-start<<endl;
 
       conversionState = 3;
       canSwap=true;
