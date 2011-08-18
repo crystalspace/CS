@@ -84,6 +84,7 @@ public:
   virtual float GetPosition () const;
   virtual bool IsPlaying () ;
   virtual float GetLength () const;
+  virtual void SelectLanguage (const char* identifier);
 
   virtual float GetAspectRatio () ;
 

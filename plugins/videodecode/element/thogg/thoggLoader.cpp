@@ -428,7 +428,7 @@ bool thoggLoader::Initialize (iObjectRegistry* r)
 csRef<iMediaContainer> thoggLoader::LoadMedia (const char * pFileName, const char *pDescription, const char* pMediaType)
 {
   csReport(object_reg, CS_REPORTER_SEVERITY_DEBUG, QUALIFIED_PLUGIN_NAME,
-    "Loading Theora video '%s'.\n", pFileName);
+    "Loading Theora video from '%s'.\n", pFileName);
   
   csRef<iDocumentAttribute> videoName;
   /// Parse XML
@@ -439,6 +439,7 @@ csRef<iMediaContainer> thoggLoader::LoadMedia (const char * pFileName, const cha
   csRef<iDocument> xmlDoc = docSys->CreateDocument ();
   csRef<iDataBuffer> xmlData = vfs->ReadFile (pFileName);
 
+  csArray<Language> langs;
   /// Start parsing
   if (xmlDoc->Parse (xmlData) == 0)
   {
@@ -455,14 +456,12 @@ csRef<iMediaContainer> thoggLoader::LoadMedia (const char * pFileName, const cha
       /// The <media> tag
       if ( strcmp (child->GetValue (),"media")==0)
       {
-        if ( strcmp (child->GetAttributeValue ("type"),"video") ==0)
+        /// If the media isn't a video, we don't care
+        if ( strcmp (child->GetAttributeValue ("type"),"video") !=0)
         {
-          cout<<"video file detected!\n";
-        }
-        else
-        {
-          cout<<"not video file!\n";
-          break;
+          csReport(object_reg, CS_REPORTER_SEVERITY_ERROR, QUALIFIED_PLUGIN_NAME,
+            "Media file '%s' does not contain video.\n", pFileName);
+          return 0;
         }
       }
 
@@ -470,7 +469,6 @@ csRef<iMediaContainer> thoggLoader::LoadMedia (const char * pFileName, const cha
       while (it2->HasNext ())
       {
         csRef<iDocumentNode> child2 = it2->Next ();
-        cout<<"node: "<<child2->GetValue ()<<endl;
 
         /// Get the video stream path
         if (strcmp(child2->GetValue (),"videoStream")==0)
@@ -490,19 +488,31 @@ csRef<iMediaContainer> thoggLoader::LoadMedia (const char * pFileName, const cha
             csRef<iDocumentNode> child3 = it3->Next ();
             if (strcmp(child3->GetValue (),"language")==0)
             {
-              cout<<"lang name: "<<child3->GetAttributeValue ("name")<<
-                " lang path: "<<child3->GetAttributeValue ("path")<<endl;
+               //we want to store all the language streams
+               Language buff;
+
+               //store the name
+               buff.name = new char[strlen (child3->GetAttributeValue ("name"))];
+               strcpy (buff.name,child3->GetAttributeValue ("name"));
+
+               //and the path
+               buff.path = new char[strlen (child3->GetAttributeValue ("path"))];
+               strcpy (buff.path,child3->GetAttributeValue ("path"));
+
+               langs.Push (buff);
             }
           }
         }
       }
     }
-
-    cout<<"done parsing xml\n";
   }
   else
-    cout<<"fail"<<endl;
-  //return NULL;
+  {
+    csReport(object_reg, CS_REPORTER_SEVERITY_ERROR, QUALIFIED_PLUGIN_NAME,
+      "Failed to parse '%s'.\n", pFileName);
+    return 0;
+  }
+
 
   csRef<iDataBuffer> vidPath = vfs->GetRealPath (videoName->GetValue ());
   infile = fopen (vidPath->GetData (),"rb");
@@ -520,6 +530,7 @@ csRef<iMediaContainer> thoggLoader::LoadMedia (const char * pFileName, const cha
     csRef<TheoraMediaContainer> container;
     container.AttachNew (new TheoraMediaContainer ( (iBase*)this));
     container->Initialize (object_reg);
+    container->SetLanguages (langs);
 
     bool res=false;
     res = StartParsing(container);

@@ -93,6 +93,9 @@ struct iMediaPlayer : public virtual iBase
 
   /// Returns the aspect ratio to use with the image
   virtual float GetAspectRatio () = 0;
+
+  /// Select a language from the available ones
+  virtual void SelectLanguage (const char* identifier) = 0;
 };
 
 /** @} */

@@ -44,6 +44,10 @@ size_t TheoraMediaContainer::GetMediaCount () const
 {
   return media.GetSize ();
 }
+void TheoraMediaContainer::SetLanguages (csArray<Language> languages)
+{
+  this->languages = languages;
+}
 
 csRef<iMedia> TheoraMediaContainer::GetMedia (size_t index)
 {
@@ -375,8 +379,8 @@ void TheoraMediaContainer::GetTargetTexture (csRef<iTextureHandle> &target)
 }
 void TheoraMediaContainer::GetTargetAudio (csRef<iSndSysStream> &target)
 {
-  if (_activeVorbisStream.IsValid ())
-    _activeVorbisStream->GetAudioTarget (target);
+  if (sndstream.IsValid ())
+    target = sndstream;
   else target=NULL;
 }
 
@@ -452,4 +456,41 @@ float TheoraMediaContainer::GetAspectRatio ()
   if (_activeTheoraStream.IsValid ())
     return _activeTheoraStream->GetAspectRatio ();
   return 1;
+}
+
+void TheoraMediaContainer::SelectLanguage (const char* identifier)
+{
+  for (size_t i =0;i<languages.GetSize ();i++)
+  {
+    if (strcmp (languages[i].name,identifier) ==0)
+    {
+      csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+      csRef<iSndSysLoader> sndloader = csQueryRegistry<iSndSysLoader> (object_reg);
+      csRef<iSndSysRenderer> sndrenderer = csQueryRegistry<iSndSysRenderer> (object_reg);
+
+      csRef<iDataBuffer> soundbuf = vfs->ReadFile (languages[i].path);
+      if (!soundbuf)
+      {
+        csReport(object_reg, CS_REPORTER_SEVERITY_ERROR, QUALIFIED_PLUGIN_NAME,
+          "Can't load file %s!\n", languages[i].path);
+        return;
+      }
+
+      csRef<iSndSysData> snddata = sndloader->LoadSound (soundbuf);
+      if (!snddata)
+      {
+        csReport(object_reg, CS_REPORTER_SEVERITY_ERROR, QUALIFIED_PLUGIN_NAME,
+          "Can't load sound %s!\n", languages[i].path);
+        return;
+      }
+
+      sndstream = sndrenderer->CreateStream (snddata,CS_SND3D_DISABLE );
+      if (!sndstream)
+      {
+        csReport(object_reg, CS_REPORTER_SEVERITY_ERROR, QUALIFIED_PLUGIN_NAME,
+          "Can't create stream for %s!\n", languages[i].path);
+        return;
+      }
+    }
+  }
 }

@@ -47,6 +47,7 @@ struct iObjectRegistry;
 class thoggLoader : public scfImplementation2<thoggLoader,iMediaLoader,iComponent>
 {
 private:
+
   iObjectRegistry* object_reg;
 
   csRef<iTextureManager> texManager;

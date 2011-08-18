@@ -50,6 +50,7 @@ void VideoTest::Frame ()
   //draw the room
   view->Draw();
   mediaPlayer->StartPlayer ();
+  audioStream->Unpause ();
 
 
   if(updateSeeker)
@@ -115,6 +116,8 @@ bool VideoTest::Application ()
     CS_REQUEST_PLUGIN("crystalspace.sndsys.renderer.software", iSndSysRenderer),
     CS_REQUEST_PLUGIN("crystalspace.documentsystem.multiplexer", iDocumentSystem),
     CS_REQUEST_PLUGIN_TAG("crystalspace.documentsystem.tinyxml", iDocumentSystem, "iDocumentSystem.1"),
+    CS_REQUEST_PLUGIN("crystalspace.sndsys.element.loader", iSndSysLoader),
+    CS_REQUEST_PLUGIN("crystalspace.sndsys.renderer.software", iSndSysRenderer),
     CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -146,32 +149,29 @@ bool VideoTest::Application ()
     printf ("%d streams in media container\n",(int)video->GetMediaCount ());
   }
 
-  csRef<iSndSysStream> audioStream;
   mediaPlayer = csQueryRegistry<iMediaPlayer> (object_reg);
   mediaPlayer->InitializePlayer (video,5);
 
   // Specifying -1 as index triggers auto stream activation
   mediaPlayer->SetActiveStream (0);
   mediaPlayer->GetTargetTexture (logoTex);
-  //mediaPlayer->GetTargetAudio (audioStream);
 
-  /*if (audioStream.IsValid ())
-  {
-    sndsource = sndrenderer->CreateSource (audioStream);
-    if (!sndsource)
-      ReportError ("Can't create source");
-  }
-  else
-    ReportError ("Audio stream cannot be played");*/
+  mediaPlayer->SelectLanguage ("enUS");
+  mediaPlayer->GetTargetAudio (audioStream);
 
   mediaPlayer->Loop (false);
   mediaPlayer->Play ();
 
-  if(sndsource.IsValid () )
+  if ( audioStream.IsValid ())
   {
-    sndsource->SetVolume (1.0f);
-    audioStream->SetLoopState (CS_SNDSYS_STREAM_DONTLOOP);
-    audioStream->Unpause ();
+    sndsource = sndrenderer->CreateSource (audioStream);
+
+    if (sndsource.IsValid () )
+    {
+      sndsource->SetVolume (1.0f);
+      audioStream->SetLoopState (CS_SNDSYS_STREAM_LOOP);
+      //audioStream->Unpause ();
+    }
   }
 
   InitializeCEGUI ();

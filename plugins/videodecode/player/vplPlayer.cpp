@@ -108,6 +108,12 @@ void vplPlayer::GetTargetAudio (csRef<iSndSysStream> &target)
   _mediaFile->GetTargetAudio (target);
 }
 
+void vplPlayer::SelectLanguage (const char* identifier)
+{
+  if (_mediaFile.IsValid ())
+    _mediaFile->SelectLanguage (identifier);
+}
+
 //void vplPlayer::Update ()
 THREADED_CALLABLE_IMPL(vplPlayer, Update)
 {

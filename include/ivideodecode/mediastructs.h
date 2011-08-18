@@ -49,6 +49,15 @@ struct csVPLvideoFormat
   int target_bitrate;
 };
 
+/// Used to store languages available for a media file
+struct Language
+{
+  /// The name of the language
+  char* name;
+  /// The path of the audio file
+  char* path;
+};
+
 /** @} */
 
 #endif // __CS_VPL_COMMON_STRUCTS_H__

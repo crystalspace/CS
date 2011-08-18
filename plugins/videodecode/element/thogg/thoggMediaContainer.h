@@ -61,6 +61,13 @@ private:
 
   csTicks timeSinceStart;
 
+  /// audio languages
+  
+  csArray<Language> languages;
+
+  /// audio stream
+  csRef<iSndSysStream> sndstream;
+
 private:
   Mutex swapMutex;
   Condition isSeeking;
@@ -114,9 +121,12 @@ public:
 
   virtual void DropFrame ();
 
+  virtual void SelectLanguage (const char* identifier);
+
   /// Does a seek on the active media
   void DoSeek ();
   void QueuePage (ogg_page *page);
+  void SetLanguages (csArray<Language> languages);
   inline void ClearMedia()  { media.Empty (); }
   inline unsigned long GetFileSize () const { return mSize; }
   inline void SetFileSize (unsigned long size)  { mSize=size; }

@@ -56,6 +56,9 @@ private:
   /// The sound source.
   csRef<iSndSysSource> sndsource;
 
+  /// The audio stream.
+  csRef<iSndSysStream> audioStream;
+
   // We need this to make the seeking slider work properly
   bool updateSeeker;
 
