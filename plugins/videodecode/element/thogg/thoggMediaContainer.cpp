@@ -220,6 +220,7 @@ void TheoraMediaContainer::Update ()
         printf("Ogg buffering stopped, end of file reached.\n");
         if(dataAvailable==0)
         {
+          sndstream->Pause ();
           _waitToFillCache=true;
           endOfFile = true;
           processingCache=false;
@@ -340,8 +341,14 @@ void TheoraMediaContainer::DoSeek ()
 
   float time= ((float) targetFrame/_activeTheoraStream->GetFrameCount ()) *_activeTheoraStream->GetLength ();
   
-  if(_activeVorbisStream.IsValid ())
-    _activeVorbisStream->Seek (time,&_syncState,&_oggPage, _activeTheoraStream->StreamState());
+  /*if(_activeVorbisStream.IsValid ())
+    _activeVorbisStream->Seek (time,&_syncState,&_oggPage, _activeTheoraStream->StreamState());*/
+
+  if(sndstream.IsValid ())
+  {
+    if (targetFrame>sndstream->GetFrameCount ())
+      sndstream->SetPosition (sndstream->GetFrameCount ());
+  }
   timeSinceStart=0;
 }
 
@@ -398,6 +405,31 @@ float TheoraMediaContainer::GetLength () const
     return _activeTheoraStream->GetLength ();
 
   return 0;
+}
+
+void TheoraMediaContainer::OnPause ()
+{
+  if (sndstream.IsValid ())
+  {
+    sndstream->Pause ();
+  }
+}
+
+void TheoraMediaContainer::OnPlay ()
+{
+  if (sndstream.IsValid ())
+  {
+    sndstream->Unpause ();
+  }
+}
+
+void TheoraMediaContainer::OnStop ()
+{
+  if (sndstream.IsValid ())
+  {
+    sndstream->Pause ();
+    sndstream->SetPosition (0);
+  }
 }
 
 void TheoraMediaContainer::SwapBuffers ()

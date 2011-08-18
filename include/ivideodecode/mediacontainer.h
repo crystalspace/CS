@@ -96,6 +96,15 @@ struct iMediaContainer : public virtual iBase
 
   // Select a language from the available ones
   virtual void SelectLanguage (const char* identifier) = 0;
+
+  // Do stuff when the video is paused, if necessary
+  virtual void OnPause () = 0;
+
+  // Do stuff when the video is played, if necessary
+  virtual void OnPlay () = 0;
+
+  // Do stuff when the video is stopped, if necessary
+  virtual void OnStop () = 0;
 };
 
 /** @} */

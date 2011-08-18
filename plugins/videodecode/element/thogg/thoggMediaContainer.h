@@ -123,6 +123,12 @@ public:
 
   virtual void SelectLanguage (const char* identifier);
 
+  virtual void OnPause ();
+
+  virtual void OnPlay ();
+
+  virtual void OnStop ();
+
   /// Does a seek on the active media
   void DoSeek ();
   void QueuePage (ogg_page *page);

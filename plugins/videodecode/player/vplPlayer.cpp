@@ -164,22 +164,37 @@ void vplPlayer::Loop (bool shouldLoop)
 void vplPlayer::Play () 
 {
   _playing=true;
+  if (_mediaFile.IsValid ())
+  {
+    _mediaFile->OnPlay ();
+  }
   if(_shouldStop)
   {
     _shouldStop=false;
     if (_mediaFile.IsValid ())
+    {
       _mediaFile->Seek (0.0f);
+      _mediaFile->OnPlay ();
+    }
   }
 }
 
 void vplPlayer::Pause() 
 {
   _playing=false;
+  if (_mediaFile.IsValid ())
+  {
+    _mediaFile->OnPause ();
+  }
 }
 
 void vplPlayer::Stop () 
 {
   _shouldStop = true;
+  if (_mediaFile.IsValid ())
+  {
+    _mediaFile->OnStop ();
+  }
 }
 
 void vplPlayer::Seek (float time)

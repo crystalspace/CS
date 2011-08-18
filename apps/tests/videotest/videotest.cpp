@@ -50,7 +50,7 @@ void VideoTest::Frame ()
   //draw the room
   view->Draw();
   mediaPlayer->StartPlayer ();
-  audioStream->Unpause ();
+  //audioStream->Unpause ();
 
 
   if(updateSeeker)
@@ -160,7 +160,6 @@ bool VideoTest::Application ()
   mediaPlayer->GetTargetAudio (audioStream);
 
   mediaPlayer->Loop (false);
-  mediaPlayer->Play ();
 
   if ( audioStream.IsValid ())
   {
@@ -173,6 +172,8 @@ bool VideoTest::Application ()
       //audioStream->Unpause ();
     }
   }
+
+  mediaPlayer->Play ();
 
   InitializeCEGUI ();
 
