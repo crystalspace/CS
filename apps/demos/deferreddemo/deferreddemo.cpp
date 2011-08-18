@@ -441,8 +441,6 @@ void DeferredDemo::CreateColliders()
 //----------------------------------------------------------------------
 void DeferredDemo::UpdateDynamics(float deltaTime)
 {
-  dynamicsDebugger->SetDebugSector (view->GetCamera()->GetSector());
-
   if (isBulletEnabled)
     dynamics->Step (deltaTime);
 }
@@ -710,6 +708,37 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
 #endif
   }
 
+  return false;
+}
+
+//----------------------------------------------------------------------
+bool DeferredDemo::OnMouseDown (iEvent &event)
+{
+  // We start here a mouse interaction with the camera, therefore
+  // we must take precedence in the mouse events over the CeGUI
+  // window. In order to do that, we re-register to the event
+  // queue, but with a different priority.
+  if (mouseMove) return false;
+  mouseMove = true;
+
+  // Re-register to the event queue
+  csBaseEventHandler::UnregisterQueue ();
+  RegisterQueue (GetObjectRegistry (), csevAllEvents (GetObjectRegistry ()));
+
+  return false;
+}
+
+//----------------------------------------------------------------------
+bool DeferredDemo::OnMouseUp (iEvent &event)
+{
+  // We finish here a mouse interaction with the camera, therefore
+  // the CeGUI window should again take precedence in the mouse events.
+  if (!mouseMove) return false;
+  mouseMove = false;
+
+  // Re-register to the event queue
+  csBaseEventHandler::UnregisterQueue ();
+  RegisterQueue (GetObjectRegistry (), csevAllEvents (GetObjectRegistry ()));
   return false;
 }
 
