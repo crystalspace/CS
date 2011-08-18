@@ -71,7 +71,9 @@ struct ShadowShadowMapDepth : ShadowShadowMap
   
   float4 blurTex2D(sampler2D tex, float2 position)
   {
+/*
     float4 color = 0;
+
     color += tex2D(tex, position + float2(0, bias));
     color += tex2D(tex, position + float2(0, -bias));
     color += tex2D(tex, position + float2(bias, bias));
@@ -80,15 +82,41 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     color += tex2D(tex, position + float2(-bias, -bias));
     color += tex2D(tex, position + float2(0, 0));
     color += tex2D(tex, position + float2(bias, 0));
-    color += tex2D(tex, position + float2(-bias, 0));    
+    color += tex2D(tex, position + float2(-bias, 0));    	
     color /= 9;
     
     return color;
+*/
+
+    float4 sum = 0;
+/*
+    float2 offset;
+    offset = (float)(frac(position.xy * 0.5) > 0.25);  // mod
+    offset.y += offset.x;  // y ^= x in floating point
+
+    if (offset.y > 1.1)
+      offset.y = 0;
+      
+    sum = (tex2D(tex, position + bias * (offset + float2(-1.5, 0.5))) +
+           tex2D(tex, position + bias * (offset + float2(0.5, 0.5))) +
+           tex2D(tex, position + bias * (offset + float2(-1.5, -1.5))) +
+           tex2D(tex, position + bias * (offset + float2(0.5, -1.5)))) * 0.25;
+*/
+    float x, y;
+
+    for (y = -1.5; y <= 1.5; y += 1)
+      for (x = -1.5; x <= 1.5; x += 1)
+        sum += tex2D(tex, position + float2(bias * x, bias * y));
+      
+    sum /= 16.0; 
+
+    return sum;
   }
   
   // PCF - Percentage Close Filtering
   float getVisibility(sampler2D tex, float2 position, float compareDepth)
   {
+/*  
     float vis = 0;
     //bias = 0.01;
     vis += compareDepth > tex2D(tex, position + float2(0, bias));
@@ -103,6 +131,17 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     vis /= 9.0;
     
     return vis;
+*/    
+    float4 sum = 0;
+    float x, y;
+
+    for (y = -1.5; y <= 1.5; y += 1)
+      for (x = -1.5; x <= 1.5; x += 1)
+        sum += compareDepth > tex2D(tex, position + float2(bias * x, bias * y));
+      
+    sum /= 16.0; 
+
+    return sum;    
   }
   
   float getMapValue(int i, float2 position)
