@@ -226,7 +226,6 @@ bool DeferredDemo::LoadSettings()
 
   cfgWorldFile = config->GetStr ("Deferreddemo.Settings.WorldFile", "world");
 
-
   if (cmdline->GetOption ("nologo"))
     cfgDrawLogo = false;
   else
@@ -302,7 +301,6 @@ bool DeferredDemo::SetupGui(bool reload)
   guiForward          = static_cast<CEGUI::RadioButton*>(winMgr->getWindow ("Forward"));
   guiShowGBuffer      = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("ShowGBuffer"));
   guiDrawLightVolumes = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("DrawLightVolumes"));
-  guiDrawLogo         = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("DrawLogo"));  
   guiEnableAO         = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("EnableAO"));
   guiEnableBlur       = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("EnableBlur"));
   guiEnableDetailSamples = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("EnableDetailSamples"));
@@ -313,7 +311,7 @@ bool DeferredDemo::SetupGui(bool reload)
 
   if (!guiRoot || 
       !guiDeferred || !guiForward || !guiEnableGlobalIllum ||
-      !guiShowGBuffer || !guiDrawLightVolumes || !guiDrawLogo ||
+      !guiShowGBuffer || !guiDrawLightVolumes ||
       !guiEnableAO || !guiEnableBlur || !guiEnableIndirectLight || !guiEnableDetailSamples)
   {
     return ReportError("Could not load GUI!");
@@ -326,7 +324,6 @@ bool DeferredDemo::SetupGui(bool reload)
 
   guiShowGBuffer->setSelected (false);
   guiDrawLightVolumes->setSelected (false);
-  guiDrawLogo->setSelected (cfgDrawLogo);
   guiEnableAO->setSelected (true);
   guiEnableBlur->setSelected (true);
   guiEnableIndirectLight->setSelected (true);
@@ -449,7 +446,6 @@ void DeferredDemo::UpdateDynamics(float deltaTime)
 void DeferredDemo::UpdateGui()
 {
   guiRoot->setVisible (cfgShowGui);
-  cfgDrawLogo = guiDrawLogo->isSelected ();
 
   if (showGBuffer != guiShowGBuffer->isSelected ())
   {
@@ -689,14 +685,15 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
 
       rmGlobalIllum->ChangeNormalsAndDepthResolution (depthNormalsResolution.GetDataSafe());
       return true;
-    }    
-    else if (code == CSKEY_SPACE)
+    }
+    else if (code == 'l')
     {
-      if (kbd->GetKeyState (CSKEY_ALT))
-        SpawnSphere(true);
-      else
-        SpawnSphere();
-      
+      SpawnSphere (true);      
+      return true;
+    } 
+    else if (code == CSKEY_SPACE)
+    {      
+      SpawnSphere();
       return true;
     } 
 #ifdef CS_DEBUG
