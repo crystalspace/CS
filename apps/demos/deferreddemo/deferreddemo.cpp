@@ -258,7 +258,7 @@ bool DeferredDemo::SetupGui(bool reload)
   aoPassesListener.AttachNew (new CS::Utility::ConfigListener<int>(GetObjectRegistry(), 
     "DeferredDemo.NumPasses", aoPasses));
   maxOccluderDistListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
-    "DeferredDemo.MaxOccluderDist", maxOccluderDistance));  
+    "DeferredDemo.MaxOccluderDist", maxOccluderDistance));
   selfOcclusionListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
     "DeferredDemo.SelfOcclusion", selfOcclusion));
   occAngleBiasListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
@@ -306,41 +306,30 @@ bool DeferredDemo::SetupGui(bool reload)
   guiEnableDetailSamples = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("EnableDetailSamples"));
   guiEnableGlobalIllum   = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("EnableGlobalIllum"));
   guiEnableIndirectLight = static_cast<CEGUI::Checkbox*>(winMgr->getWindow ("EnableIndirectLight"));
-  //CEGUI::Combobox *guiCombo = static_cast<CEGUI::Combobox*>(winMgr->getWindow ("RenderBuffer"));  
-  //guiCombo->addItem (new CEGUI::ListboxTextItem ("Ambient Occlusion"));
+  CEGUI::PushButton *guiResetButton = static_cast<CEGUI::PushButton*>(winMgr->getWindow ("ResetButton"));
+  
 
   if (!guiRoot || 
       !guiDeferred || !guiForward || !guiEnableGlobalIllum ||
-      !guiShowGBuffer || !guiDrawLightVolumes ||
+      !guiShowGBuffer || !guiDrawLightVolumes || !guiResetButton ||
       !guiEnableAO || !guiEnableBlur || !guiEnableIndirectLight || !guiEnableDetailSamples)
   {
     return ReportError("Could not load GUI!");
   }
+
+  guiResetButton->subscribeEvent (CEGUI::PushButton::EventClicked, 
+    CEGUI::Event::Subscriber (&DeferredDemo::OnResetButtonClicked, this));
+
+  //if (!SetupHelpPane (winMgr))
+  //  ReportWarning ("Could not setup GUI help pane!");
 
   if (cfgUseDeferredShading)
     guiDeferred->setSelected (true);
   else
     guiForward->setSelected (true);
 
-  guiShowGBuffer->setSelected (false);
-  guiDrawLightVolumes->setSelected (false);
-  guiEnableAO->setSelected (true);
-  guiEnableBlur->setSelected (true);
-  guiEnableIndirectLight->setSelected (true);
-  guiEnableDetailSamples->setSelected (true);
-  guiEnableGlobalIllum->setSelected (true);
-  
-  occlusionStrength = 1.4f;
-  sampleRadius = 0.25f;
-  detailSampleRadius = 0.05f;
-  aoPasses = 2;
-  maxOccluderDistance = 2.0f;
-  selfOcclusion = 0.0f;
-  occAngleBias = 0.0f;
-  bounceStrength = 6.5f;
-  blurKernelSize = 3;
-  blurPositionThreshold = 0.5f;
-  blurNormalThreshold = 0.2f;
+  //TODO: should read values from config file?
+  ResetGUIValues();
 
   showGBuffer = false;
   drawLightVolumes = false;
@@ -348,6 +337,99 @@ bool DeferredDemo::SetupGui(bool reload)
   showGlobalIllumination = false;
   enableGlobalIllum = true;
 
+  guiShowGBuffer->setSelected (showGBuffer);
+  guiDrawLightVolumes->setSelected (drawLightVolumes);
+  guiEnableGlobalIllum->setSelected (enableGlobalIllum);
+  guiEnableAO->setSelected (true);
+  guiEnableBlur->setSelected (true);
+  guiEnableIndirectLight->setSelected (true);
+  guiEnableDetailSamples->setSelected (true);
+
+  return true;
+}
+
+//----------------------------------------------------------------------
+void DeferredDemo::ResetGUIValues()
+{  
+  occlusionStrength = 1.7f;
+  sampleRadius = 0.30f;
+  detailSampleRadius = 0.05f;
+  aoPasses = 2;
+  maxOccluderDistance = 1.6f;
+  selfOcclusion = 0.1f;
+  occAngleBias = 0.0f;
+  bounceStrength = 2.0f;
+  blurKernelSize = 3;
+  blurPositionThreshold = 0.5f;
+  blurNormalThreshold = 0.2f;
+
+  CEGUI::WindowManager *winMgr = cegui->GetWindowManagerPtr();
+  static_cast<CEGUI::Slider*>(winMgr->getWindow ("OcclusionStrength__auto_slider__"))->
+    setCurrentValue (occlusionStrength);
+  static_cast<CEGUI::Slider*>(winMgr->getWindow ("SampleRadius__auto_slider__"))->
+    setCurrentValue (sampleRadius);
+  static_cast<CEGUI::Slider*>(winMgr->getWindow ("DetailSampleRadius__auto_slider__"))->
+    setCurrentValue (detailSampleRadius);
+  static_cast<CEGUI::Slider*>(winMgr->getWindow ("NumPasses__auto_slider__"))->
+    setCurrentValue ((float)aoPasses);
+  static_cast<CEGUI::Slider*>(winMgr->getWindow ("MaxOccluderDist__auto_slider__"))->
+    setCurrentValue (maxOccluderDistance);
+  static_cast<CEGUI::Slider*>(winMgr->getWindow ("SelfOcclusion__auto_slider__"))->
+    setCurrentValue (selfOcclusion);
+  static_cast<CEGUI::Slider*>(winMgr->getWindow ("AngleBias__auto_slider__"))->
+    setCurrentValue (occAngleBias);
+  static_cast<CEGUI::Slider*>(winMgr->getWindow ("BounceStrength__auto_slider__"))->
+    setCurrentValue (bounceStrength);
+  static_cast<CEGUI::Slider*>(winMgr->getWindow ("KernelSize__auto_slider__"))->
+    setCurrentValue ((float)blurKernelSize);
+  static_cast<CEGUI::Slider*>(winMgr->getWindow ("PositionThreshold__auto_slider__"))->
+    setCurrentValue (blurPositionThreshold);
+  static_cast<CEGUI::Slider*>(winMgr->getWindow ("NormalThreshold__auto_slider__"))->
+    setCurrentValue (blurNormalThreshold);
+}
+
+//----------------------------------------------------------------------
+bool DeferredDemo::OnResetButtonClicked(const CEGUI::EventArgs &e)
+{
+  ResetGUIValues();
+  return true;
+}
+
+//----------------------------------------------------------------------
+bool DeferredDemo::SetupHelpPane(CEGUI::WindowManager *winMgr)
+{
+  CEGUI::Window *guiHelpFrame = winMgr->getWindow ("HelpFrame");
+  CEGUI::Window *guiHelpTxt = winMgr->getWindow ("HelpTxt");
+  if (!guiHelpTxt || !guiHelpFrame)
+    return false;
+
+  const int keyDescriptionsCount = 10;
+  const char *keyDescriptions[keyDescriptionsCount] = 
+  {
+    "z: Change SSGI resolution",
+	  "x: Change depth/normals resolution",
+	  "Space: Throw ball",
+	  "l: Throw ball w/light",
+	  "n: Pause/Resume physics simulation",
+	  "g: Show/Hide GUI",
+	  "F9: Show/Hide HUD",
+	  "F12: Screenshot",
+	  "1-9: Visualize deferred buffers",
+	  "0: Visualize final rendered image"
+  };
+
+  for (int i=0; i < keyDescriptionsCount; i++)
+  {
+    CEGUI::Window *helpText = guiHelpTxt->clone (CEGUI::String (csString ("HelpTxt").Append(i).GetData()));
+    helpText->setProperty ("Text", keyDescriptions[i]);
+    helpText->setProperty ("HorzFormatting", "Left");
+
+    float yOffset = helpText->getPosition().d_y.d_offset;
+    helpText->setPosition (CEGUI::UVector2 (CEGUI::UDim (0.0f, 5.0f), CEGUI::UDim (0.0f, yOffset + i * 25.0f)));
+
+    guiHelpFrame->addChildWindow (helpText);
+  }
+  
   return true;
 }
 

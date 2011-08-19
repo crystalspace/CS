@@ -69,8 +69,17 @@ protected:
   /// Setup the demo scene.
   bool SetupScene ();
 
-  /// Sets up the demo GUI.
+  /// Setup the demo GUI.
   bool SetupGui (bool reload = false);
+
+  /// Setup the help pane
+  bool SetupHelpPane (CEGUI::WindowManager *winMgr);
+
+  /// Reset GUI to default values
+  void ResetGUIValues();
+
+  /// Handler for reset button Clicked event
+  bool OnResetButtonClicked(const CEGUI::EventArgs &e);
 
   /// Updates the GUI.
   void UpdateGui ();
