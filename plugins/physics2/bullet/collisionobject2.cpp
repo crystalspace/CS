@@ -112,7 +112,7 @@ csOrthoTransform csBulletCollisionObject::GetTransform ()
 {
   float inverseScale = system->getInverseInternalScale ();
 
-  /*if (type == CS::Collision2::COLLISION_OBJECT_BASE || type == CS::Collision2::COLLISION_OBJECT_PHYSICAL)
+  if (type == CS::Collision2::COLLISION_OBJECT_BASE || type == CS::Collision2::COLLISION_OBJECT_PHYSICAL)
   {
     if (!isTerrain)
     {
@@ -126,7 +126,8 @@ csOrthoTransform csBulletCollisionObject::GetTransform ()
       csBulletColliderTerrain* terrainCollider = dynamic_cast<csBulletColliderTerrain*> (colliders[0]);
       return terrainCollider->terrainTransform;      
     }
-  }*/
+  }
+
   if (isTerrain)
   {
     csBulletColliderTerrain* terrainCollider = dynamic_cast<csBulletColliderTerrain*> (colliders[0]);

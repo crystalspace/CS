@@ -1262,17 +1262,11 @@ void csBulletSector::GetInformationFromCopy (csBulletCollisionObject* obj,
       {
         btQuaternion qua = cpy->portalWarp;
 
-        rb->btBody->internalGetDeltaLinearVelocity () = quatRotate (qua, btCopy->btBody->internalGetDeltaLinearVelocity ())
-          - rb->btBody->internalGetDeltaLinearVelocity ();
-        rb->btBody->internalGetDeltaAngularVelocity () = quatRotate (qua, btCopy->btBody->internalGetDeltaAngularVelocity ())
-          - rb->btBody->internalGetDeltaAngularVelocity ();
-        rb->btBody->internalGetPushVelocity ()= quatRotate (qua, btCopy->btBody->internalGetPushVelocity ())
-          - rb->btBody->internalGetPushVelocity ();
-        rb->btBody->internalGetTurnVelocity ()= quatRotate (qua, btCopy->btBody->internalGetTurnVelocity ())
-          - rb->btBody->internalGetTurnVelocity ();
-        // I don't know if there are any other parameters exist.
-        rb->btBody->internalWritebackVelocity (duration);
-        rb->btBody->getMotionState ()->setWorldTransform (rb->btBody->getWorldTransform ());
+        rb->btBody->internalGetDeltaLinearVelocity () = quatRotate (qua, btCopy->btBody->internalGetDeltaLinearVelocity ());
+	rb->btBody->internalGetDeltaAngularVelocity () = quatRotate (qua, btCopy->btBody->internalGetDeltaAngularVelocity ());
+	rb->btBody->internalGetPushVelocity ()= quatRotate (qua, btCopy->btBody->internalGetPushVelocity ());
+	rb->btBody->internalGetTurnVelocity ()= quatRotate (qua, btCopy->btBody->internalGetTurnVelocity ());
+	rb->btBody->internalWritebackVelocity ();
       }
       else if (rb->GetState () == CS::Physics2::STATE_KINEMATIC)
       {
