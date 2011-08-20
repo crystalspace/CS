@@ -353,6 +353,7 @@ void TheoraMediaContainer::DoSeek ()
     // Ortherwise, seek to the required position
     else
       sndstream->SetPosition (timeToSeek*sndstream->GetRenderedFormat ()->Freq);
+    sndstream->Unpause ();
   }
   timeSinceStart=0;
 }
@@ -528,6 +529,7 @@ void TheoraMediaContainer::SelectLanguage (const char* identifier)
           "Can't create stream for %s!\n", languages[i].path);
         return;
       }
+      sndstream->SetLoopState (CS_SNDSYS_STREAM_DONTLOOP);
 
       /// store the audio stream length
       audioStreamLength = sndstream->GetFrameCount ()/sndstream->GetRenderedFormat ()->Freq;

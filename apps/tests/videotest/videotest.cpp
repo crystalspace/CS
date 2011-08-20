@@ -45,12 +45,9 @@ void VideoTest::PrintHelp ()
 
 void VideoTest::Frame ()
 {
-//  iCamera* camera = view->GetCamera ();
-
   //draw the room
   view->Draw();
   mediaPlayer->StartPlayer ();
-  //audioStream->Unpause ();
 
 
   if(updateSeeker)
@@ -170,8 +167,6 @@ bool VideoTest::Application ()
     if (sndsource.IsValid () )
     {
       sndsource->SetVolume (1.0f);
-      audioStream->SetLoopState (CS_SNDSYS_STREAM_LOOP);
-      //audioStream->Unpause ();
     }
   }
 
