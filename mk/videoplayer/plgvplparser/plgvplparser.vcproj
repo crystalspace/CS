@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="plgvplthogg"
-	ProjectGUID="{06FED960-25A3-43D2-8E66-F0A119AB9BA2}"
-	RootNamespace="plgvplthogg"
+	Name="plgvplparser"
+	ProjectGUID="{E7377DA9-5852-4C0A-873D-F1B7A0F6E37C}"
+	RootNamespace="plgvplparser"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\..\..\out\debug9\build\plgvplthogg\"
-			IntermediateDirectory="..\..\..\out\debug9\build\plgvplthogg\"
+			OutputDirectory="..\..\..\out\debug9\build\plgvplparser\"
+			IntermediateDirectory="..\..\..\out\debug9\build\plgvplparser\"
 			ConfigurationType="2"
 			CharacterSet="1"
 			>
@@ -47,10 +47,10 @@
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile="..\..\..\out\debug9\build\plgvplthogg\plgvplthogg.pch"
-				AssemblerListingLocation="..\..\..\out\debug9\build\plgvplthogg\"
-				ObjectFile="..\..\..\out\debug9\build\plgvplthogg\"
-				ProgramDataBaseFileName="..\..\..\out\debug9\build\plgvplthogg\Win32\vplthogg.pdb"
+				PrecompiledHeaderFile="..\..\..\out\debug9\build\plgvplthogg\plgvplparser.pch"
+				AssemblerListingLocation="..\..\..\out\debug9\build\plgvplparser\"
+				ObjectFile="..\..\..\out\debug9\build\plgvplparser\"
+				ProgramDataBaseFileName="..\..\..\out\debug9\build\plgvplparser\Win32\vplparser.pdb"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -68,14 +68,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="delayimp.lib zlib.lib libcrystalspace_d.lib"
-				OutputFile="..\..\..\vplthogg.dll"
+				OutputFile="..\..\..\vplparser.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\winlibs\x86\lib;..\..\..\win32libs\lib"
 				IgnoreDefaultLibraryNames="LIBC,LIBCD,LIBCMT,LIBCMTD,MSVCRT"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="..\..\..\out\debug9\build\plgvplthogg\Win32\vplthogg.pdb"
+				ProgramDatabaseFile="..\..\..\out\debug9\build\plgvplparser\Win32\vplparser.pdb"
 				SubSystem="2"
-				ImportLibrary="..\..\..\out\debug9\build\plgvplthogg\Win32\plgvplthogg.lib"
+				ImportLibrary="..\..\..\out\debug9\build\plgvplparser\Win32\plgvplparser.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -98,14 +98,14 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="md ..\..\..\out\debug9\bin 2&gt; nul&#x0D;&#x0A;copy /y &quot;$(TargetPath)&quot; ..\..\..\out\debug9\bin\&#x0D;&#x0A;"
+				CommandLine="md ..\..\..\out\debug9\bin 2&gt; nul&#x0D;&#x0A;copy /y &quot;$(TargetPath)&quot; ..\..\..\out\debug9\bin\"
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -128,7 +128,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;PLGVPLTHOGG_EXPORTS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -177,10 +177,6 @@
 		</Configuration>
 	</Configurations>
 	<References>
-		<ProjectReference
-			ReferencedProjectIdentifier="{E7377DA9-5852-4C0A-873D-F1B7A0F6E37C}"
-			RelativePathToProject="..\plgvplparser\plgvplparser.vcproj"
-		/>
 	</References>
 	<Files>
 		<Filter
@@ -193,27 +189,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggAudioMedia.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggLoader.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggMediaContainer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggSndStream.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggSndStreamData.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggVideoMedia.cpp"
+				RelativePath="..\..\..\plugins\videodecode\persist\standard\vplParser.cpp"
 				>
 			</File>
 		</Filter>
@@ -223,27 +199,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggAudioMedia.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggLoader.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggMediaContainer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggSndStream.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggSndStreamData.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggVideoMedia.h"
+				RelativePath="..\..\..\plugins\videodecode\persist\standard\vplParser.h"
 				>
 			</File>
 		</Filter>
@@ -253,7 +209,7 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\plgvplthogg.rc"
+				RelativePath=".\plgvplparser.rc"
 				>
 			</File>
 		</Filter>
@@ -261,7 +217,7 @@
 			Name="Other files"
 			>
 			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thogg.csplugin"
+				RelativePath="..\..\..\plugins\videodecode\persist\standard\parser.csplugin"
 				>
 			</File>
 		</Filter>

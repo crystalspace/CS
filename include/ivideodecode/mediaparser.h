@@ -16,8 +16,8 @@ License along with this library; if not, write to the Free
 Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_MEDIALOADER_H__
-#define __CS_MEDIALOADER_H__
+#ifndef __CS_MEDIAPARSER_H__
+#define __CS_MEDIAPARSER_H__
 
 /**\file
   * Video Player: loader 
@@ -25,26 +25,28 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "csutil/scf.h"
 #include "csutil/ref.h"
+#include "mediastructs.h"
 #include <iutil/document.h>
 
-struct iMediaContainer;
-
 /**
-  * The video loader is used to initialize the decoder
+  * The media parser is used to read 
   */
-struct iMediaLoader : public virtual iBase
+struct iMadiaParser : public virtual iBase
 {
-  SCF_INTERFACE (iMediaLoader,0,1,0);
+  SCF_INTERFACE (iMadiaParser,0,1,0);
 
-  /// Create an iMediaContainer from raw input data.
-  //
-  //  Optional pDescription may point to a brief description that will follow this data
-  //   through any streams or sources created from it, and may be useful for display or
-  //   diagnostic purposes.
-  //
-  //  Optional pMediaType may suggest the media type to be loaded, to reduce the guess work.
-  //   Originally intended to be an enum, but res suggested a string of characters
-  virtual csRef<iMediaContainer> LoadMedia (const char * pFileName, const char *pDescription=0, const char* pMediaType = "AutoDetect") = 0;
+  // Parse an iDocumentNode into useable data for the iMediaLoader
+  virtual bool Parse (iDocumentNode* doc) = 0;
+
+  // Return the path for the media file that needs to be loaded
+  virtual const char* GetMediaPath () = 0;
+
+  // Return the type of the media that needs to be loaded
+  virtual const char* GetMediaType () = 0;
+
+  // Return a list of available language streams
+  virtual csArray<Language> GetLanguages () = 0;
 };
+/** @} */
 
-#endif // __CS_MEDIALOADER_H__
+#endif // __CS_MEDIAPARSER_H__

@@ -348,11 +348,11 @@ void TheoraMediaContainer::DoSeek ()
   {
     // We want to know if we seek past the end of the audio stream.
     // If we do seek past the end, seek to the end of the stream.
-    if (timeToSeek > (sndstream->GetFrameCount ()/sndstream->GetRenderedFormat ()->Freq))
+    if (timeToSeek > audioStreamLength)
       sndstream->SetPosition (sndstream->GetFrameCount ());
     // Ortherwise, seek to the required position
     else
-      sndstream->SetPosition (timeToSeek*sndstream->GetRenderedFormat ()->Freq/*sndstream->GetFrameCount ()*/);
+      sndstream->SetPosition (timeToSeek*sndstream->GetRenderedFormat ()->Freq);
   }
   timeSinceStart=0;
 }
@@ -529,7 +529,8 @@ void TheoraMediaContainer::SelectLanguage (const char* identifier)
         return;
       }
 
-      cout<<sndstream->GetFrameCount ()/sndstream->GetRenderedFormat ()->Freq<<endl;
+      /// store the audio stream length
+      audioStreamLength = sndstream->GetFrameCount ()/sndstream->GetRenderedFormat ()->Freq;
     }
   }
 }

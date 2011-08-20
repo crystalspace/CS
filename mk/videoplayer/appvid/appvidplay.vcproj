@@ -267,6 +267,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\include\ivideodecode\mediaparser.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\include\ivideodecode\mediaplayer.h"
 				>
 			</File>

@@ -1,0 +1,13 @@
+<?xml version=""1.0""?>",
+<!-- sndsyswav.csplugin -->",
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.vpl.parser</name>
+        <implementation>vplParser</implementation>
+        <description>Generic Media Parser</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

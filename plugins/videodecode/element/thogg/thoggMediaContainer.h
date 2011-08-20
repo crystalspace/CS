@@ -68,6 +68,9 @@ private:
   /// audio stream
   csRef<iSndSysStream> sndstream;
 
+  /// audio stream length in seconds
+  size_t audioStreamLength;
+
 private:
   Mutex swapMutex;
   Condition isSeeking;
