@@ -247,7 +247,7 @@ void BitmapComboBox::OnSelected (wxCommandEvent& event)
         //control->SetBackgroundColour(*wxBLUE); //TODO: why isnt  control->space->GetWindow() expanding??
         //HACK
         csRef<CS::EditorApp::iEditor> editor = csQueryRegistry<CS::EditorApp::iEditor>(object_reg);
-        editor->GetWindow()->GetSizer ()->Layout();
+        editor->GetWindow()->Layout();
       }
       else
       {

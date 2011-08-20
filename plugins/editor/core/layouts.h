@@ -133,6 +133,7 @@ public:
   void SetLayout(iLayout* l) { layout = l; }
 private:
  void OnSize (wxSizeEvent& ev);
+ void OnChanged (wxCollapsiblePaneEvent& ev);
   DECLARE_EVENT_TABLE()
 private:
   iObjectRegistry* object_reg;

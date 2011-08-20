@@ -108,7 +108,8 @@ HeaderLayout::HeaderLayout(iObjectRegistry* obj_reg, wxWindow* parent)
 
 HeaderLayout::~HeaderLayout()
 {
-  tb->Destroy();
+  //tb->Destroy();
+  box->Clear(true);
 }
 
 iOperator* HeaderLayout::AppendOperator(const char* id, const char* label, const char* icon) 
@@ -245,6 +246,7 @@ wxWindow* PanelLayout::GetWindow()
 
 BEGIN_EVENT_TABLE(CollapsiblePane, wxCollapsiblePane)
   EVT_SIZE(CollapsiblePane::OnSize)
+  EVT_COLLAPSIBLEPANE_CHANGED(wxID_ANY, CollapsiblePane::OnChanged)
 END_EVENT_TABLE()
 
 CollapsiblePane::CollapsiblePane (iObjectRegistry* obj_reg, wxWindow* parent, const char* label)
@@ -263,6 +265,13 @@ void CollapsiblePane::OnSize (wxSizeEvent& event)
   printf("CollapsiblePane::OnSize %d - %d\n", event.GetSize().GetWidth(), event.GetSize().GetHeight());
   //SetSize (event.GetSize());
   Layout();
+  event.Skip();
+}
+
+void CollapsiblePane::OnChanged (wxCollapsiblePaneEvent& event)
+{
+  printf("CollapsiblePane::OnChanged\n");
+  GetParent()->Layout();
   event.Skip();
 }
 

@@ -215,44 +215,49 @@ void SpaceManager::ReDraw (iContext* context, iSpace* space)
       if (ctrl)
       {
         printf("SpaceManager::ReDraw CTRL %s\n", id);
+        ctrl->SetLayout(0);
         csRef<iLayout> layout;
         layout.AttachNew(new HeaderLayout(object_reg, ctrl->GetRegion()));
         ctrl->SetLayout(layout);
         header->Draw(context, layout);
+        ctrl->GetRegion()->GetParent()->Layout();
       }
     }
   }
   
   //Draw panels
   wxWindow* win = space->GetWindow();
-  if (win->GetSizer())
-  {
-    win->GetSizer()->Clear(true);
-  }
   if (win)
   {
-    wxSizer* sz = new wxBoxSizer(wxVERTICAL);
     csHash<csRef<iPanel>, csString>::Iterator panelsit =	panels.GetIterator(id);
-    while (panelsit.HasNext())
+    bool hasPanels = panelsit.HasNext();
+    if (hasPanels)
     {
-      iPanel* panel = panelsit.Next();
-      if (panel && panel->Poll(context))
+      wxSizer* sz = new wxBoxSizer(wxVERTICAL);
+      if (win->GetSizer())
+        win->GetSizer()->Clear(true);
+      
+      while (panelsit.HasNext())
       {
-        printf("SpaceManager::ReDraw PANEL %s\n", id);
-        csRef<iLayout> layout;
-        
-        csRef<iFactory> fact = scfQueryInterface<iFactory> (panel);
-        
-        CollapsiblePane* collpane = new CollapsiblePane(object_reg, win, fact->QueryDescription());
-        sz->Add(collpane, 0, wxGROW|wxALL, 10);
-        
-        layout.AttachNew(new PanelLayout(object_reg, collpane->GetPane()));
-        collpane->SetLayout(layout);
-        panel->Draw(context, layout);
+        iPanel* panel = panelsit.Next();
+        if (panel && panel->Poll(context))
+        {
+          printf("SpaceManager::ReDraw PANEL %s\n", id);
+          csRef<iLayout> layout;
+          
+          csRef<iFactory> fact = scfQueryInterface<iFactory> (panel);
+          
+          CollapsiblePane* collpane = new CollapsiblePane(object_reg, win, fact->QueryDescription());
+          sz->Add(collpane, 0, wxGROW|wxALL, 10);
+          
+          layout.AttachNew(new PanelLayout(object_reg, collpane->GetPane()));
+          collpane->SetLayout(layout);
+          panel->Draw(context, layout);
+        }
       }
+      win->SetSizer(sz, true);
+      sz->SetSizeHints(win);
     }
-    win->SetSizer(sz, true);
-    sz->SetSizeHints(win);
   }
 }
 
