@@ -19,11 +19,6 @@ object_reg(0)
 
 thoggLoader::~thoggLoader ()
 {
-  /// Clear theora/vorbis components we no longer need
-  vorbis_comment_clear(&vc);
-  vorbis_info_clear(&vi);
-  th_comment_clear(&tc);
-  th_info_clear(&ti);
 }
 
 int thoggLoader::BufferData (ogg_sync_state *oy)
@@ -187,6 +182,9 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
             buff->Theora_p()++;
             if (buff->Theora_p()==3)
             {
+
+              th_comment_clear(&tc);
+              th_info_clear(&ti);
               times++;
               break;
             }
@@ -217,6 +215,9 @@ bool thoggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
             buff->Vorbis_p ()++;
             if (buff->Vorbis_p ()==3)
             {
+
+              vorbis_comment_clear(&vc);
+              vorbis_info_clear(&vi);
               times++;
               break;
             }
@@ -418,52 +419,24 @@ bool thoggLoader::Initialize (iObjectRegistry* r)
   object_reg = r;
   infile = NULL;
 
-  _g3d=csQueryRegistry<iGraphics3D> (object_reg);
-
-  texManager = _g3d->GetTextureManager ();
 
   return true;
 }
 
-csRef<iMediaContainer> thoggLoader::LoadMedia (const char * pFileName, const char *pDescription, const char* pMediaType)
+csRef<iMediaContainer> thoggLoader::LoadMedia (const char * pFileName, const char *pDescription/*, const char* pMediaType*/)
 {
+  _g3d=csQueryRegistry<iGraphics3D> (object_reg);
+
+  texManager = _g3d->GetTextureManager ();
+
   csReport(object_reg, CS_REPORTER_SEVERITY_DEBUG, QUALIFIED_PLUGIN_NAME,
     "Loading Theora video from '%s'.\n", pFileName);
 
   /// Get an iMediaParser from the object registry
-  csRef<iMediaParser> parser = csQueryRegistry<iMediaParser> (object_reg);
 
-  /// Parse XML
-
-  /// Read the xml file and create the document
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
-  csRef<iDocumentSystem> docSys = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
-  csRef<iDocument> xmlDoc = docSys->CreateDocument ();
-  csRef<iDataBuffer> xmlData = vfs->ReadFile (pFileName);
-
-  /// Start parsing
-  if (xmlDoc->Parse (xmlData) == 0)
-  {
-    /// Get the root
-    csRef<iDocumentNode> node = xmlDoc->GetRoot ();
-
-    /// Tell the parser to parse the xml file
-    parser->Parse (node);
-  }
-  else
-  {
-    csReport(object_reg, CS_REPORTER_SEVERITY_ERROR, QUALIFIED_PLUGIN_NAME,
-      "Failed to parse '%s'.\n", pFileName);
-    return NULL;
-  }
-
-
-  /// Check if the media is a theora video
-  if (strcmp (parser->GetMediaType ().GetData (),"theoraVideo")!=0)
-    return NULL;
-
-  /// If it is, get the path for the video
-  csRef<iDataBuffer> vidPath = vfs->GetRealPath (parser->GetMediaPath ().GetData ());
+  /// Get the path for the video
+  csRef<iDataBuffer> vidPath = vfs->GetRealPath (path.GetData ());
   infile = fopen (vidPath->GetData (),"rb");
 
   /// checking if the file exists
@@ -479,7 +452,7 @@ csRef<iMediaContainer> thoggLoader::LoadMedia (const char * pFileName, const cha
     csRef<TheoraMediaContainer> container;
     container.AttachNew (new TheoraMediaContainer ( (iBase*)this));
     container->Initialize (object_reg);
-    container->SetLanguages (parser->GetLanguages ());
+    container->SetLanguages (languages);
 
     bool res=false;
     res = StartParsing(container);
@@ -492,3 +465,8 @@ csRef<iMediaContainer> thoggLoader::LoadMedia (const char * pFileName, const cha
   }
 }
 
+void thoggLoader::Create (csString path,csArray<Language> languages)
+{
+  this->path = path;
+  this->languages = languages;
+}

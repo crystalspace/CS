@@ -19,6 +19,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __VPLLOADER_H__
 #define __VPLLOADER_H__
 
+#define QUALIFIED_PLUGIN_NAME "crystalspace.vpl.loader"
+
 #include <iutil/comp.h>
 #include <ivideodecode/medialoader.h>
 #include <ivideodecode/mediacontainer.h>
@@ -45,7 +47,9 @@ public:
   // From iComponent.
   virtual bool Initialize (iObjectRegistry*);
 
-  virtual csRef<iMediaContainer> LoadMedia (const char * pFileName, const char *pDescription=0, const char* pMediaType = "AutoDetect");
+  virtual csRef<iMediaContainer> LoadMedia (const char * pFileName, const char *pDescription=0/*, const char* pMediaType = "AutoDetect"*/);
+
+  virtual void Create (csString path,csArray<Language> languages) {}
 };
 
 #endif // __VPLLOADER_H__

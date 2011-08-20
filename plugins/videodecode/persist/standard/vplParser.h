@@ -25,8 +25,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/strhash.h"
 
 #include <iutil/comp.h>
-#include <ivideodecode/mediaparser.h>
 #include <csutil/scf_implementation.h>
+#include <ivideodecode/mediastructs.h>
+#include <ivideodecode/medialoader.h>
 
 struct iReporter;
 struct iPluginManager;
@@ -37,7 +38,7 @@ struct iObjectRegistry;
   * This is the implementation for our API and
   * also the implementation of the plugin.
   */
-class vplParser : public scfImplementation2<vplParser,iMediaParser,iComponent>
+class vplParser : public scfImplementation2<vplParser,iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -60,13 +61,11 @@ public:
   // From iComponent.
   virtual bool Initialize (iObjectRegistry*);
 
-  virtual bool Parse (iDocumentNode* doc) ;
+  virtual bool IsThreadSafe() { return true; }
 
-  virtual csString GetMediaPath () ;
-
-  virtual csString GetMediaType () ;
-
-  virtual csArray<Language> GetLanguages () ;
+  /// Parse a given node and return a new object for it.
+  virtual csPtr<iBase> Parse (iDocumentNode* node,
+    iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 };
 
 #endif // __VPLPARSER_H__

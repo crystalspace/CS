@@ -23,7 +23,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <ivideodecode/medialoader.h>
 #include <ivideodecode/mediacontainer.h>
 #include <ivideodecode/media.h>
-#include <ivideodecode/mediaparser.h>
+//#include <ivideodecode/mediaparser.h>
 #include <csutil/scf_implementation.h>
 #include "thoggMediaContainer.h"
 #include <csutil/nobjvec.h>
@@ -70,6 +70,9 @@ private:
   FILE *infile;
   csRef<iGraphics3D> _g3d;
 
+  csString path;
+  csArray<Language> languages;
+
 private:
 
   /* Helper; just grab some more compressed bitstream and sync it for
@@ -88,7 +91,9 @@ public:
   virtual bool Initialize (iObjectRegistry*);
 
 
-  virtual csRef<iMediaContainer> LoadMedia (const char * pFileName, const char *pDescription=0, const char* pMediaType = "AutoDetect");
+  virtual csRef<iMediaContainer> LoadMedia (const char * pFileName, const char *pDescription=0/*, const char* pMediaType = "AutoDetect"*/);
+
+  virtual void Create (csString path,csArray<Language> languages) ;
 };
 
 #endif // __THOGGLOADER_H__

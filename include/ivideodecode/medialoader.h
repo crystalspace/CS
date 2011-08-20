@@ -26,6 +26,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/scf.h"
 #include "csutil/ref.h"
 #include <iutil/document.h>
+#include <ivideodecode/mediastructs.h>
 
 struct iMediaContainer;
 
@@ -44,7 +45,10 @@ struct iMediaLoader : public virtual iBase
   //
   //  Optional pMediaType may suggest the media type to be loaded, to reduce the guess work.
   //   Originally intended to be an enum, but res suggested a string of characters
-  virtual csRef<iMediaContainer> LoadMedia (const char * pFileName, const char *pDescription=0, const char* pMediaType = "AutoDetect") = 0;
+  virtual csRef<iMediaContainer> LoadMedia (const char * pFileName, const char *pDescription=0/*, const char* pMediaType = "AutoDetect"*/) = 0;
+
+  /// Used to initialize a loader. Should never be called directly
+  virtual void Create (csString path,csArray<Language> languages) = 0;
 };
 
 #endif // __CS_MEDIALOADER_H__

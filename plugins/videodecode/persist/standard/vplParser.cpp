@@ -48,9 +48,9 @@ bool vplParser::Initialize (iObjectRegistry* r)
   InitTokenTable (xmltokens);
   return true;
 }
-bool vplParser::Parse (iDocumentNode* doc) 
+csPtr<iBase> vplParser::Parse (iDocumentNode* node, iStreamSource*, iLoaderContext* ldr_context, iBase* context)
 {
-  csRef<iDocumentNodeIterator> it = doc->GetNodes ();
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
 
   while (it->HasNext ())
   {
@@ -60,14 +60,20 @@ bool vplParser::Parse (iDocumentNode* doc)
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-      case XMLTOKEN_MEDIA:
+    case XMLTOKEN_MEDIA:
+      {
+        if (strcmp (child->GetAttributeValue ("type"),"theoraVideo")==0)
         {
+
+          csRef<iPluginManager> mgr=csQueryRegistry<iPluginManager> (object_reg);
+          csRef<iMediaLoader> m_pThOggLoader=csLoadPlugin<iMediaLoader> (mgr,
+            "crystalspace.vpl.element.thogg");
           // Get the type of the media
           mediaType = csString(child->GetAttributeValue ("type"));
 
           // Iterate through the rest of the nodes in the media file
           csRef<iDocumentNodeIterator> it2 = child->GetNodes ();
-          
+
           while (it2->HasNext ())
           {
             csRef<iDocumentNode> child2 = it2->Next ();
@@ -76,62 +82,51 @@ bool vplParser::Parse (iDocumentNode* doc)
             csStringID id2 = xmltokens.Request (value2);
             switch (id2)
             {
-              case XMLTOKEN_VIDEOSTREAM:
-                {
-                  // Get the path for the media file
-                  mediaPath = csString(child2->GetAttributeValue ("path"));
-                }
-              case XMLTOKEN_AUDIOSTREAM:
-                {
-                  // Get the info about the different audio streams available
-                  csRef<iDocumentNodeIterator> it3 = child2->GetNodes ();
+            case XMLTOKEN_VIDEOSTREAM:
+              {
+                // Get the path for the media file
+                mediaPath = csString(child2->GetAttributeValue ("path"));
+              }
+            case XMLTOKEN_AUDIOSTREAM:
+              {
+                // Get the info about the different audio streams available
+                csRef<iDocumentNodeIterator> it3 = child2->GetNodes ();
 
-                  while (it3->HasNext ())
+                while (it3->HasNext ())
+                {
+                  csRef<iDocumentNode> child3 = it3->Next ();
+                  if (child3->GetType () != CS_NODE_ELEMENT) continue;
+                  const char* value3 = child3->GetValue ();
+                  csStringID id3 = xmltokens.Request (value3);
+                  switch (id3)
                   {
-                    csRef<iDocumentNode> child3 = it3->Next ();
-                    if (child3->GetType () != CS_NODE_ELEMENT) continue;
-                    const char* value3 = child3->GetValue ();
-                    csStringID id3 = xmltokens.Request (value3);
-                    switch (id3)
+                  case XMLTOKEN_LANGUAGE:
                     {
-                      case XMLTOKEN_LANGUAGE:
-                        {
-                          // Store the info about the language
-                          //we want to store all the language streams
-                          Language buff;
+                      // Store the info about the language
+                      //we want to store all the language streams
+                      Language buff;
 
-                          //store the name
-                          buff.name = new char[strlen (child3->GetAttributeValue ("name"))];
-                          strcpy (buff.name,child3->GetAttributeValue ("name"));
+                      //store the name
+                      buff.name = new char[strlen (child3->GetAttributeValue ("name"))];
+                      strcpy (buff.name,child3->GetAttributeValue ("name"));
 
-                          //and the path
-                          buff.path = new char[strlen (child3->GetAttributeValue ("path"))];
-                          strcpy (buff.path,child3->GetAttributeValue ("path"));
+                      //and the path
+                      buff.path = new char[strlen (child3->GetAttributeValue ("path"))];
+                      strcpy (buff.path,child3->GetAttributeValue ("path"));
 
-                          languages.Push (buff);
-                        }
+                      languages.Push (buff);
                     }
                   }
                 }
+              }
             }
           }
+          m_pThOggLoader->Create (mediaPath,languages);
+
+          return csPtr<iBase>(m_pThOggLoader);
         }
+      }
     }
   }
-  return true;
-}
-
-csString vplParser::GetMediaPath ()
-{
-  return mediaPath;
-}
-
-csString vplParser::GetMediaType ()
-{
-  return mediaType;
-}
-
-csArray<Language> vplParser::GetLanguages ()
-{
-  return languages;
+  return 0;
 }
