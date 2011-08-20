@@ -19,20 +19,39 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __VPLPARSER_H__
 #define __VPLPARSER_H__
 
+#include "imap/reader.h"
+#include "imap/writer.h"
+#include "iutil/eventh.h"
+#include "csutil/strhash.h"
+
 #include <iutil/comp.h>
 #include <ivideodecode/mediaparser.h>
 #include <csutil/scf_implementation.h>
 
+struct iReporter;
+struct iPluginManager;
+struct iSyntaxService;
 struct iObjectRegistry;
 
 /**
   * This is the implementation for our API and
   * also the implementation of the plugin.
   */
-class vplParser : public scfImplementation2<vplParser,iMadiaParser,iComponent>
+class vplParser : public scfImplementation2<vplParser,iMediaParser,iComponent>
 {
 private:
   iObjectRegistry* object_reg;
+  csRef<iReporter> reporter;
+  csRef<iSyntaxService> synldr;
+
+  csString          mediaPath;
+  csString          mediaType;
+  csArray<Language> languages;
+
+  csStringHash xmltokens;
+#define CS_TOKEN_ITEM_FILE "plugins/videodecode/persist/standard/vplParser.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE 
 
 public:
   vplParser (iBase* parent);
@@ -43,9 +62,9 @@ public:
 
   virtual bool Parse (iDocumentNode* doc) ;
 
-  virtual const char* GetMediaPath () ;
+  virtual csString GetMediaPath () ;
 
-  virtual const char* GetMediaType () ;
+  virtual csString GetMediaType () ;
 
   virtual csArray<Language> GetLanguages () ;
 };

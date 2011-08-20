@@ -31,18 +31,18 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 /**
   * The media parser is used to read 
   */
-struct iMadiaParser : public virtual iBase
+struct iMediaParser : public virtual iBase
 {
-  SCF_INTERFACE (iMadiaParser,0,1,0);
+  SCF_INTERFACE (iMediaParser,0,1,0);
 
   // Parse an iDocumentNode into useable data for the iMediaLoader
   virtual bool Parse (iDocumentNode* doc) = 0;
 
   // Return the path for the media file that needs to be loaded
-  virtual const char* GetMediaPath () = 0;
+  virtual csString GetMediaPath () = 0;
 
   // Return the type of the media that needs to be loaded
-  virtual const char* GetMediaType () = 0;
+  virtual csString GetMediaType () = 0;
 
   // Return a list of available language streams
   virtual csArray<Language> GetLanguages () = 0;

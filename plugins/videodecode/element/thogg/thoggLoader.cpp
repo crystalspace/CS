@@ -429,8 +429,10 @@ csRef<iMediaContainer> thoggLoader::LoadMedia (const char * pFileName, const cha
 {
   csReport(object_reg, CS_REPORTER_SEVERITY_DEBUG, QUALIFIED_PLUGIN_NAME,
     "Loading Theora video from '%s'.\n", pFileName);
-  
-  csRef<iDocumentAttribute> videoName;
+
+  /// Get an iMediaParser from the object registry
+  csRef<iMediaParser> parser = csQueryRegistry<iMediaParser> (object_reg);
+
   /// Parse XML
 
   /// Read the xml file and create the document
@@ -439,82 +441,29 @@ csRef<iMediaContainer> thoggLoader::LoadMedia (const char * pFileName, const cha
   csRef<iDocument> xmlDoc = docSys->CreateDocument ();
   csRef<iDataBuffer> xmlData = vfs->ReadFile (pFileName);
 
-  csArray<Language> langs;
   /// Start parsing
   if (xmlDoc->Parse (xmlData) == 0)
   {
     /// Get the root
     csRef<iDocumentNode> node = xmlDoc->GetRoot ();
 
-    csRef<iDocumentNodeIterator> it = node->GetNodes ();
-
-    /// Iterate through the nodes
-    while (it->HasNext ())
-    {
-      csRef<iDocumentNode> child = it->Next ();
-
-      /// The <media> tag
-      if ( strcmp (child->GetValue (),"media")==0)
-      {
-        /// If the media isn't a video, we don't care
-        if ( strcmp (child->GetAttributeValue ("type"),"video") !=0)
-        {
-          csReport(object_reg, CS_REPORTER_SEVERITY_ERROR, QUALIFIED_PLUGIN_NAME,
-            "Media file '%s' does not contain video.\n", pFileName);
-          return 0;
-        }
-      }
-
-      csRef<iDocumentNodeIterator> it2 = child->GetNodes ();
-      while (it2->HasNext ())
-      {
-        csRef<iDocumentNode> child2 = it2->Next ();
-
-        /// Get the video stream path
-        if (strcmp(child2->GetValue (),"videoStream")==0)
-        {
-          cout<<"video file path: "<<child2->GetAttributeValue ("path")<<endl;
-          /// Save the video path
-          videoName = child2->GetAttribute ("path");
-        }
-        /// Get all the languages
-        if (strcmp(child2->GetValue (),"audioStream")==0)
-        {
-          csRef<iDocumentNodeIterator> it3 = child2->GetNodes ();
-
-          /// Read the name and path for each language
-          while (it3->HasNext ())
-          {
-            csRef<iDocumentNode> child3 = it3->Next ();
-            if (strcmp(child3->GetValue (),"language")==0)
-            {
-               //we want to store all the language streams
-               Language buff;
-
-               //store the name
-               buff.name = new char[strlen (child3->GetAttributeValue ("name"))];
-               strcpy (buff.name,child3->GetAttributeValue ("name"));
-
-               //and the path
-               buff.path = new char[strlen (child3->GetAttributeValue ("path"))];
-               strcpy (buff.path,child3->GetAttributeValue ("path"));
-
-               langs.Push (buff);
-            }
-          }
-        }
-      }
-    }
+    /// Tell the parser to parse the xml file
+    parser->Parse (node);
   }
   else
   {
     csReport(object_reg, CS_REPORTER_SEVERITY_ERROR, QUALIFIED_PLUGIN_NAME,
       "Failed to parse '%s'.\n", pFileName);
-    return 0;
+    return NULL;
   }
 
 
-  csRef<iDataBuffer> vidPath = vfs->GetRealPath (videoName->GetValue ());
+  /// Check if the media is a theora video
+  if (strcmp (parser->GetMediaType ().GetData (),"theoraVideo")!=0)
+    return NULL;
+
+  /// If it is, get the path for the video
+  csRef<iDataBuffer> vidPath = vfs->GetRealPath (parser->GetMediaPath ().GetData ());
   infile = fopen (vidPath->GetData (),"rb");
 
   /// checking if the file exists
@@ -530,7 +479,7 @@ csRef<iMediaContainer> thoggLoader::LoadMedia (const char * pFileName, const cha
     csRef<TheoraMediaContainer> container;
     container.AttachNew (new TheoraMediaContainer ( (iBase*)this));
     container->Initialize (object_reg);
-    container->SetLanguages (langs);
+    container->SetLanguages (parser->GetLanguages ());
 
     bool res=false;
     res = StartParsing(container);

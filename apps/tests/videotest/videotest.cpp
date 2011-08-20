@@ -112,6 +112,7 @@ bool VideoTest::Application ()
     CS_REQUEST_VFS,
     CS_REQUEST_PLUGIN ("crystalspace.vpl.loader", iMediaLoader),
     CS_REQUEST_PLUGIN ("crystalspace.vpl.player", iMediaPlayer),
+    CS_REQUEST_PLUGIN("crystalspace.vpl.parser",iMediaParser),
     CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
     CS_REQUEST_PLUGIN("crystalspace.sndsys.renderer.software", iSndSysRenderer),
     CS_REQUEST_PLUGIN("crystalspace.documentsystem.multiplexer", iDocumentSystem),
@@ -125,6 +126,7 @@ bool VideoTest::Application ()
       "Can't initialize plugins!");
     return false;
   }
+
 
   vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
   if (!vfs) return ReportError("Failed to locate VFS!");

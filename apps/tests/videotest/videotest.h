@@ -29,6 +29,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <ivideodecode/media.h>
 #include <ivideodecode/mediacontainer.h>
 #include <ivideodecode/mediaplayer.h>
+#include <ivideodecode/mediaparser.h>
 
 struct iEngine;
 struct iObjectRegistry;
