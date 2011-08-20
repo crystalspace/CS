@@ -19,7 +19,6 @@ struct vertex2fragment
   float3 ViewNormal   : TEXCOORD3;
   float3 ViewTangent  : TEXCOORD4;
   float3 ViewBiNormal : TEXCOORD5;
-  //float3 WorldNormal  : TEXCOORD6;
 };
 
 struct fragmentOutput
@@ -159,12 +158,9 @@ fragmentOutput main(vertex2fragment IN,
   normal = (normalize (normal) + 1) * 0.5;
   float3 interpVertexNormal = (normalize (IN.ViewNormal) + 1) * 0.5;  
   
-  //FarClipDistance = 29.8f;
   float linearDepth = IN.ViewPosition.z / FarClipDistance;
-  //float linearDepth = length (IN.ViewPosition);
 
   fragmentOutput output;
-
   output.Color0 = float4 (diffuse, specular.r);
   output.Color1 = float4 (normal, specular.g);
   output.Color2 = float4 (ambient, specular.b);

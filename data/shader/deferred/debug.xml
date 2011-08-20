@@ -37,7 +37,6 @@
       <fp plugin="glcg">
         <cgfp>
         <variablemap variable="debug buffer" destination="bufferNumber" />
-        <variablemap variable="flip vertical texcoord" destination="flipVerticalTexCoord" />
         <program>
         <![CDATA[
 
@@ -48,10 +47,9 @@
               uniform sampler2D AmbientTexture,
               uniform sampler2D DepthTexture,
               uniform sampler2D GlobalIllumTexture,
-              uniform float bufferNumber,
-              uniform float flipVerticalTexCoord) : COLOR
-        {       
-          texCoord.y = -texCoord.y + 1.0f; //flip vertically
+              uniform float bufferNumber) : COLOR
+        {
+          //texCoord.y = -texCoord.y + 1.0f; //flip vertically
           float4 result = float4 (1.0f);
         ]]>
         <? if vars."debug buffer".float == 0 ?>

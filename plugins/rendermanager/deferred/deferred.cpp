@@ -213,7 +213,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
   lightRenderPersistent.Initialize (registry);
   
   PostEffectsSupport::Initialize (registry, "RenderManager.Deferred");
-  LoadDebugLayer();
+  LoadDebugShader();
 
   // Initialize the extra data in the persistent tree data.
   RenderTreeType::TreeTraitsType::Initialize (treePersistent, registry);
@@ -352,7 +352,7 @@ bool RMDeferred::Initialize(iObjectRegistry *registry)
     postEffects.SetChainedOutput (hdr.GetHDRPostEffects());
   
     hdrExposure.Initialize (objRegistry, hdr, hdrSettings);
-  }
+  }  
   
   return true;
 }
@@ -471,17 +471,25 @@ bool RMDeferred::RenderView(iView *view, bool recursePortals)
     ForEachContextReverse (renderTree, render);
   }
 
-  if (hasPostEffects)
+  if (isDebugActive)
   {
-    postEffects.DrawPostEffects (renderTree);
-
-    if (doHDRExposure)
-      hdrExposure.ApplyExposure (renderTree, view);
+    DrawDebugBuffer();
+    DrawFullscreenTexture (accumBuffer, graphics3D);
   }
   else
-  {  
-    // Output the final result to the backbuffer.
-    DrawFullscreenTexture (accumBuffer, graphics3D);
+  {
+    if (hasPostEffects)
+    {
+      postEffects.DrawPostEffects (renderTree);
+
+      if (doHDRExposure)
+        hdrExposure.ApplyExposure (renderTree, view);
+    }
+    else
+    {  
+      // Output the final result to the backbuffer.
+      DrawFullscreenTexture (accumBuffer, graphics3D);
+    }
   }
 
   DebugFrameRender (rview, renderTree);
@@ -504,7 +512,7 @@ bool RMDeferred::PrecacheView(iView *view)
 }
 
 //----------------------------------------------------------------------
-void RMDeferred::LoadDebugLayer()
+void RMDeferred::LoadDebugShader()
 {
   const char *messageID = "crystalspace.rendermanager.deferred";
 
@@ -523,18 +531,12 @@ void RMDeferred::UpdateDebugBufferSV()
 {
   if (!isDebugActive)
   {
-    debugLayer = postEffects.AddLayer (debugShader);
     isDebugActive = true;
     doHDRExposure = false;
   }
 
-  csShaderVariable *debugBufferSV = postEffects.GetLastLayer()->GetSVContext()->
-      GetVariableAdd (svStringSet->Request ("debug buffer"));
-  debugBufferSV->SetValue ((float)debugBuffer);
-
-  /*csShaderVariable *screenYFlippedSV = postEffects.GetLastLayer()->GetSVContext()->
-      GetVariableAdd (svStringSet->Request ("flip vertical texcoord"));
-  screenYFlippedSV->SetValue (hasPostEffects ? 1.0f : 0.0f);*/
+  csShaderVariable *debugBufferSV = debugShader->GetVariableAdd (svStringSet->Request ("debug buffer"));
+  debugBufferSV->SetValue ((float)debugBuffer);  
 }
 
 //----------------------------------------------------------------------
@@ -639,6 +641,51 @@ void RMDeferred::ShowGBuffer(RenderTreeType &tree)
 }
 
 //----------------------------------------------------------------------
+void RMDeferred::DrawDebugBuffer()
+{
+  float w = graphics3D->GetDriver2D ()->GetWidth ();
+  float h = graphics3D->GetDriver2D ()->GetHeight ();
+
+  csVector3 quadVerts[4]; 
+  quadVerts[0] = csVector3 (0.0f, 0.0f, 0.0f);
+  quadVerts[1] = csVector3 (0.0f,    h, 0.0f);
+  quadVerts[2] = csVector3 (   w,    h, 0.0f);
+  quadVerts[3] = csVector3 (   w, 0.0f, 0.0f);
+
+  csSimpleRenderMesh quadMesh;
+  uint mixModeNoBlending = CS_MIXMODE_BLEND(ONE, ZERO) | CS_MIXMODE_ALPHATEST_DISABLE;  
+  quadMesh.meshtype = CS_MESHTYPE_TRIANGLEFAN;
+  quadMesh.vertices = quadVerts;
+  quadMesh.vertexCount = 4;
+  quadMesh.z_buf_mode = CS_ZBUF_NONE;
+  quadMesh.mixmode = mixModeNoBlending;
+  quadMesh.alphaType.autoAlphaMode = false;
+  quadMesh.alphaType.alphaType = csAlphaMode::alphaNone;
+  quadMesh.shader = debugShader;
+
+  // Switches to using orthographic projection. 
+  csReversibleTransform oldView = graphics3D->GetWorldToCamera ();
+  CS::Math::Matrix4 oldProj = graphics3D->GetProjectionMatrix ();
+
+  graphics3D->SetRenderTarget (accumBuffer);
+  graphics3D->SetZMode (CS_ZBUF_NONE);
+  graphics3D->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER);
+
+  graphics3D->SetWorldToCamera (csReversibleTransform ());
+  graphics3D->SetProjectionMatrix (CreateOrthoProj (graphics3D));      
+  
+  graphics3D->DrawSimpleMesh (quadMesh);
+
+  // Restores old transforms.
+  graphics3D->SetWorldToCamera (oldView);
+  graphics3D->SetProjectionMatrix (oldProj);
+
+  graphics3D->FinishDraw();
+  graphics3D->UnsetRenderTargets();
+}
+
+
+//----------------------------------------------------------------------
 bool RMDeferred::DebugCommand(const char *cmd)
 {
   if (strcmp (cmd, "toggle_visualize_gbuffer") == 0)
@@ -653,7 +700,7 @@ bool RMDeferred::DebugCommand(const char *cmd)
   }
   else if (strcmp (cmd, "toggle_visualize_ambient_occlusion") == 0)
   {
-    if (debugBuffer != CS_AMBOCC_BUFFER)
+    if (debugBuffer != CS_AMBOCC_BUFFER && globalIllum.IsEnabled())
     {
       debugBuffer = CS_AMBOCC_BUFFER;
       UpdateDebugBufferSV();
@@ -662,7 +709,7 @@ bool RMDeferred::DebugCommand(const char *cmd)
   }
   else if (strcmp (cmd, "toggle_visualize_color_bleeding") == 0)
   {
-    if (debugBuffer != CS_INDLIGHT_BUFFER)
+    if (debugBuffer != CS_INDLIGHT_BUFFER && globalIllum.IsEnabled())
     {
       debugBuffer = CS_INDLIGHT_BUFFER;
       UpdateDebugBufferSV();
@@ -717,9 +764,9 @@ bool RMDeferred::DebugCommand(const char *cmd)
   }
   else if (strcmp (cmd, "toggle_visualize_backbuffer") == 0)
   {
-    postEffects.RemoveLayer (debugLayer);
     isDebugActive = false;
     doHDRExposure = isHDREnabled;
+    debugBuffer = CS_NODEBUG_BUFFER;
     return true;
   }
   else if (strcmp (cmd, "toggle_visualize_vertexnormalsbuffer") == 0)

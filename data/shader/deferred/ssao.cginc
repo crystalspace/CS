@@ -114,7 +114,9 @@ float4 main(vertex2fragment IN) : COLOR
   float2 screenXY = IN.ScreenPos.xy / IN.ScreenPos.w;
   float2 texCoord = screenXY * 0.5 + 0.5;
   
-  float4 normalDepth = tex2D (NormalBuffer, texCoord); //return normalDepth;
+  float4 normalDepth = tex2D (NormalBuffer, texCoord); 
+  //return float4 (1.0);
+  //return float4 (normalDepth.rgb, 1.0);
   float depth = normalDepth.a * farClipDistance;
   float3 screenPos = float3 (screenXY.x, -screenXY.y, depth);
   float3 normal = normalDepth.rgb * 2.0 - 1.0;
@@ -185,6 +187,7 @@ float4 main(vertex2fragment IN) : COLOR
   float3 envRadiance = tex2D (EnvmapTexture, float2 (phi * ONE_OVER_TWOPI, 1.0 - theta * ONE_OVER_PI)).rgb;
   indirectRadiance += envRadiance * max (0.0, dot (bentNormal, normal));*/
   
+  //return float4 (1.0 - saturate (AOsum));
   return float4 (indirectRadiance, 1.0 - saturate (AOsum));
 }
 

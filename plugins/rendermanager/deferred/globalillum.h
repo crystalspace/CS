@@ -163,10 +163,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       }
 
       LoadRandomNormalsTexture (loader, graphics3D, cfg);
-      LoadIrradianceEnvironmentMap (loader, graphics3D);
-      //GenerateSampleDirections (graphics3D);     
+      //LoadIrradianceEnvironmentMap (loader, graphics3D);    
 
-      CreateFullscreenQuad();      
+      CreateFullscreenQuad ();
 
       SetupShaderVars (cfg);
 
@@ -726,28 +725,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       shaderVar = lightCompositionShader->GetVariableAdd (
           svStringSet->Request ("debug show globalillum"));
       shaderVar->SetValue ((int)showGlobalIllumination);
-    }
-
-    void CreateFullscreenQuad()
-    {      
-      float w = graphics3D->GetDriver2D ()->GetWidth ();
-      float h = graphics3D->GetDriver2D ()->GetHeight ();
-
-      quadVerts[0] = csVector3 (0.0f, 0.0f, 0.0f);
-      quadVerts[1] = csVector3 (0.0f,    h, 0.0f);
-      quadVerts[2] = csVector3 (   w,    h, 0.0f);
-      quadVerts[3] = csVector3 (   w, 0.0f, 0.0f);
-
-      uint mixModeNoBlending = CS_MIXMODE_BLEND(ONE, ZERO) | CS_MIXMODE_ALPHATEST_DISABLE;
-
-      quadMesh.meshtype = CS_MESHTYPE_TRIANGLEFAN;
-      quadMesh.vertices = quadVerts;
-      quadMesh.vertexCount = 4;
-      quadMesh.z_buf_mode = CS_ZBUF_NONE;
-      quadMesh.mixmode = mixModeNoBlending;
-      quadMesh.alphaType.autoAlphaMode = false;
-      quadMesh.alphaType.alphaType = csAlphaMode::alphaNone;
-    }
+    }    
 
     void LoadRandomNormalsTexture(iLoader *loader, iGraphics3D *graphics3D, csConfigAccess &cfg)
     {
@@ -781,6 +759,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       }
     }
 
+    void CreateFullscreenQuad()
+    {
+      float w = graphics3D->GetDriver2D ()->GetWidth ();
+      float h = graphics3D->GetDriver2D ()->GetHeight ();
+
+      quadVerts[0] = csVector3 (0.0f, 0.0f, 0.0f);
+      quadVerts[1] = csVector3 (0.0f,    h, 0.0f);
+      quadVerts[2] = csVector3 (   w,    h, 0.0f);
+      quadVerts[3] = csVector3 (   w, 0.0f, 0.0f);
+
+      uint mixModeNoBlending = CS_MIXMODE_BLEND(ONE, ZERO) | CS_MIXMODE_ALPHATEST_DISABLE;
+
+      quadMesh.meshtype = CS_MESHTYPE_TRIANGLEFAN;
+      quadMesh.vertices = quadVerts;
+      quadMesh.vertexCount = 4;
+      quadMesh.z_buf_mode = CS_ZBUF_NONE;
+      quadMesh.mixmode = mixModeNoBlending;
+      quadMesh.alphaType.autoAlphaMode = false;
+      quadMesh.alphaType.alphaType = csAlphaMode::alphaNone;
+    }
+
     void DrawFullscreenQuad(iShader *shader)
     {
       // Switches to using orthographic projection. 
@@ -790,14 +789,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       graphics3D->SetWorldToCamera (csReversibleTransform ());
       graphics3D->SetProjectionMatrix (CreateOrthoProj (graphics3D));
       
-      quadMesh.shader = shader;  
-      
+      quadMesh.shader = shader;      
       graphics3D->DrawSimpleMesh (quadMesh, 0);
 
       // Restores old transforms.
       graphics3D->SetWorldToCamera (oldView);
       graphics3D->SetProjectionMatrix (oldProj);
-    }    
+    }
 
   private:
     bool showAmbientOcclusion;

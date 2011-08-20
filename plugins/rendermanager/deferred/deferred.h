@@ -70,7 +70,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       CS_VERTEX_NORMALS_BUFFER,
       CS_LINEAR_DEPTH_BUFFER,
       CS_AMBOCC_BUFFER,
-      CS_INDLIGHT_BUFFER
+      CS_INDLIGHT_BUFFER,
+      CS_NODEBUG_BUFFER
     };
 
     /// Constructor.
@@ -110,8 +111,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     void AddDeferredLayer(CS::RenderManager::MultipleRenderLayer &layers, int &addedLayer);
     void AddZOnlyLayer(CS::RenderManager::MultipleRenderLayer &layers, int &addedLayer);
 
-    void LoadDebugLayer();
+    void LoadDebugShader();
     void UpdateDebugBufferSV();
+    void DrawDebugBuffer();
 
     int LocateDeferredLayer(const CS::RenderManager::MultipleRenderLayer &layers);
     int LocateZOnlyLayer(const CS::RenderManager::MultipleRenderLayer &layers);
@@ -120,7 +122,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
     void ShowGBuffer(RenderTreeType &tree);
 
-    bool CreateDirectLightBuffer();
+    bool CreateDirectLightBuffer();    
 
     iObjectRegistry *objRegistry;
 
@@ -161,7 +163,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     bool isDebugActive;
     csDebugBuffer debugBuffer;
     csRef<iShader> debugShader;
-    CS::RenderManager::PostEffectManager::Layer *debugLayer;
 
     const char *messageID;
   };

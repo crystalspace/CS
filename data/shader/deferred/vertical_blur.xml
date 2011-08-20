@@ -34,11 +34,11 @@
       
       <vp plugin="glcg" file="/shader/deferred/globalillum.cgvp" />
       
-      <texture destination="DirectRadianceBuffer" name="tex direct radiance" />
+      <!--texture destination="DirectRadianceBuffer" name="tex direct radiance" /-->
       <texture destination="GlobalIllumBuffer" name="tex horizontal blur" />
       <!--<texture destination="GlobalIllumBuffer" name="tex global illumination" />-->
-      <texture destination="DiffuseBuffer" name="tex gbuffer 0" />
-      <texture destination="AmbientBuffer" name="tex gbuffer 2" />
+      <!--texture destination="DiffuseBuffer" name="tex gbuffer 0" /-->
+      <!--texture destination="AmbientBuffer" name="tex gbuffer 2" /-->
       <!--texture destination="NormalBuffer" name="tex gbuffer 3" /-->
       <texture destination="NormalBuffer" name="tex normals depth" />
       <!--<fp plugin="glcg" file="/shader/deferred/vertical_blur.cgfp" />-->
