@@ -41,7 +41,7 @@ const csColor ballMaterialColors[4] = { csColor (1.0f, 0.0f, 0.0f),
 //----------------------------------------------------------------------
 
 DeferredDemo::DeferredDemo()
-  : DemoApplication ("CrystalSpace.DeferredDemo")
+  : DemoApplication ("CrystalSpace.DeferredDemo"), mouseMove (false)
 {
   // Sets default cfg values.
   cfgWorldDir = DEFAULT_CFG_WORLDDIR;
