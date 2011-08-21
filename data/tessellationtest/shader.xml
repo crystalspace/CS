@@ -44,8 +44,8 @@
 
               void main (void)
               {
-                const float inner = 4;
-                const float outer = 4;
+                const float inner = 16;
+                const float outer = 16;
 
                 #define ID gl_InvocationID
 
@@ -103,10 +103,9 @@
 
 #define PI 3.14159
 
-              float smoothheight (float h)
+              float smoothheight (float x)
               {
-                float x = (2.0 / PI) * h;
-                return (sin (x) + 1.0) / 2.0;
+                return sin (x * PI / 2.0);
               }
 
               void main (void)
@@ -145,13 +144,10 @@
                 // displacement mapping
                 if (displace)
                 {
-                  float displacement = 0.1;
+                  float displacement = 0.05;
                   float height = texture (texheight, texc).x;
-                  height -= 0.5;
-#if 0
-//                  height = clamp (height, 0.0, 1.0);
-                  height = smoothheight (height);
-#endif
+                  height -= 0.3;
+                  height = smoothheight (min (height * 2.0, 1.0));
                   displacement *= height;
                   pos += vec4 (normal * displacement, 0.0);
                 }
@@ -203,7 +199,7 @@
 #if LINES
                 gl_Position = gl_PositionIn[0];
                 tc = texcoord[0];
-                nor = n[0];
+//                nor = n[0];
                 EmitVertex ();
 #endif
                 EndPrimitive ();
