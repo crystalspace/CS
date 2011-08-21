@@ -1,0 +1,5 @@
+SubDir TOP apps tests tessellationtest ;
+
+Description tessellationtest : "tessellation shader test" ;
+Application tessellationtest : [ Wildcard *.cpp *.h ] : noinstall ;
+LinkWith tessellationtest : crystalspace ;

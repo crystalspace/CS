@@ -21,6 +21,7 @@ SubInclude TOP apps tests simdtest ;
 SubInclude TOP apps tests smoketest ;
 SubInclude TOP apps tests sndtest ;
 SubInclude TOP apps tests threadtest ;
+SubInclude TOP apps tests tessellationtest ;
 SubInclude TOP apps tests transparentwindow ;
 SubInclude TOP apps tests tri3dtest ;
 SubInclude TOP apps tests wxtest ;
