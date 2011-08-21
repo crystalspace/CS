@@ -223,7 +223,7 @@ bool csShaderGLSLProgram::Load (iShaderDestinationResolver*, const char* program
 
 void csShaderGLSLProgram::SetupVmap ()
 {
-  size_t i;
+  int i;
   const csGLExtensionManager* ext = shaderPlug->ext;
   csRef<csShaderVariable> var;
 
@@ -237,6 +237,7 @@ void csShaderGLSLProgram::SetupVmap ()
     {
       // the uniform variable doesnt exist!
       variablemap.DeleteIndex (i);
+      i--;
     }
   }
 }
