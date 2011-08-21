@@ -42,7 +42,7 @@ struct csVPLvideoFormat;
 /**
   * Video stream
   */
-class TheoraVideoMedia : public scfImplementation2< TheoraVideoMedia, iVideoMedia, scfFakeInterface<iMedia> >
+class csTheoraVideoMedia : public scfImplementation2< csTheoraVideoMedia, iVideoMedia, scfFakeInterface<iMedia> >
 {
 private:
   iObjectRegistry* object_reg;
@@ -108,39 +108,39 @@ public:
 
   // Provide access to the Theora specific members
   // Inline because it's faster, although a bit slow
-  inline ogg_stream_state* StreamState()     { return &_streamState; }
-  inline th_info*          StreamInfo()      { return &_streamInfo; }
-  inline th_comment*       StreamComments()  { return &_streamComments; }
-  inline th_dec_ctx *      DecodeControl()   { return _decodeControl; }
-  inline th_setup_info**   SetupInfo()       { return &_setupInfo; }
-  inline int&              Theora_p()        { return _theora_p; }
+  inline ogg_stream_state* StreamState ()     { return &_streamState; }
+  inline th_info*          StreamInfo ()      { return &_streamInfo; }
+  inline th_comment*       StreamComments ()  { return &_streamComments; }
+  inline th_dec_ctx *      DecodeControl ()   { return _decodeControl; }
+  inline th_setup_info**   SetupInfo ()       { return &_setupInfo; }
+  inline int&              Theora_p ()        { return _theora_p; }
 
   // An easy way to initialize the stream
   void InitializeStream (ogg_stream_state &state, th_info &info, th_comment &comments, th_setup_info *setupInfo,
     FILE *source, csRef<iTextureManager> texManager);
 
 public:
-  TheoraVideoMedia (iBase* parent);
-  virtual ~TheoraVideoMedia ();
+  csTheoraVideoMedia (iBase* parent);
+  virtual ~csTheoraVideoMedia ();
 
   // From iComponent.
   virtual bool Initialize (iObjectRegistry*);
 
   virtual const char* GetType () const;
-  virtual const csVPLvideoFormat* GetFormat() const;
-  virtual unsigned long GetFrameCount() const;
-  virtual float GetLength() const;
+  virtual const csVPLvideoFormat* GetFormat () const;
+  virtual unsigned long GetFrameCount () const;
+  virtual float GetLength () const;
   virtual void GetVideoTarget (csRef<iTextureHandle> &texture);
   virtual double GetPosition () const;
   virtual void CleanMedia () ;
   virtual bool Update () ;
   virtual void WriteData () ;
-  virtual void SetCacheSize(size_t size) ;
+  virtual void SetCacheSize (size_t size) ;
 
-  virtual void SwapBuffers() ;
+  virtual void SwapBuffers () ;
 
-  virtual bool HasDataReady() ;
-  virtual bool IsCacheFull() ;
+  virtual bool HasDataReady () ;
+  virtual bool IsCacheFull () ;
 
   virtual double GetTargetFPS () ;
 
@@ -149,7 +149,7 @@ public:
 
   inline void SetFrameCount (unsigned long count)  { frameCount=count; }
   inline void SetLength (float length)  { this->length=length; }
-  long SeekPage(long targetFrame,bool return_keyframe, ogg_sync_state *oy,unsigned  long fileSize);
+  long SeekPage (long targetFrame,bool return_keyframe, ogg_sync_state *oy,unsigned  long fileSize);
 };
 
 

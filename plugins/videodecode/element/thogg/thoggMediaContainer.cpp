@@ -8,7 +8,7 @@ SCF_IMPLEMENT_FACTORY (TheoraMediaContainer)
 
 TheoraMediaContainer::TheoraMediaContainer (iBase* parent) :
 scfImplementationType (this, parent),
-object_reg(0)
+object_reg (0)
 {
   hasDataToBuffer=1;
 }
@@ -93,9 +93,9 @@ void TheoraMediaContainer::SetActiveStream (size_t index)
   if ( strcmp(media [index]->GetType (),"TheoraVideo") == 0)
   {
     csRef<iVideoMedia> stream = scfQueryInterface<iVideoMedia> ( media [index] ); 
-    if (stream.IsValid()) 
+    if (stream.IsValid ()) 
     { 
-      _activeTheoraStream = static_cast<TheoraVideoMedia*> ( (iVideoMedia*)stream);
+      _activeTheoraStream = static_cast<csTheoraVideoMedia*> ( (iVideoMedia*)stream);
     }
   }
 
@@ -104,18 +104,18 @@ void TheoraMediaContainer::SetActiveStream (size_t index)
     csRef<iAudioMedia> stream = scfQueryInterface<iAudioMedia> ( media [index] ); 
     if (stream.IsValid ()) 
     { 
-      _activeVorbisStream = static_cast<TheoraAudioMedia*>((iAudioMedia*)stream);
+      _activeVorbisStream = static_cast<csTheoraAudioMedia*> ((iAudioMedia*)stream);
     }
   }
 }
 
 bool TheoraMediaContainer::RemoveActiveStream (size_t index)
 {
-  if ( strcmp(media [activeStreams [index]]->GetType (),"TheoraVideo") == 0)
+  if ( strcmp (media [activeStreams [index]]->GetType (),"TheoraVideo") == 0)
   {
     _activeTheoraStream = NULL;
   }
-  if ( strcmp(media [activeStreams [index]]->GetType (),"TheoraAudio") == 0)
+  if ( strcmp (media [activeStreams [index]]->GetType (),"TheoraAudio") == 0)
   {
     _activeVorbisStream = NULL;
   }
@@ -140,8 +140,8 @@ void TheoraMediaContainer::Update ()
   static csTicks frameTime = 0;
   static csTicks lastTime=csGetTicks ();
 
-  if(frameTime==0)
-  if(_activeTheoraStream.IsValid ())
+  if (frameTime==0)
+  if (_activeTheoraStream.IsValid ())
   {
     //HACK!: we subtract 3 from the target frame time, because otherwise,
     //it runs too slow
@@ -169,19 +169,19 @@ void TheoraMediaContainer::Update ()
       // in one stream needs data, ok will be different from 0
       // If we're at the end of the file, but there's still data 
       // in the caches, we don't care if a streams needs more data
-      if( media [activeStreams [i]]->Update () && !processingCache)
+      if ( media [activeStreams [i]]->Update () && !processingCache)
         ok++;
       // Next, we want to know if all the active streams have
       // a full cache. if they do, we won't read more data until 
       // there's space left in the cache
-      if( media [activeStreams [i]]->IsCacheFull ())
+      if ( media [activeStreams [i]]->IsCacheFull ())
         cacheFull++;
       // Next, we want to know if there still is data available
       // we don't want to stop updating 'til we used every frame
-      if( media [activeStreams [i]]->HasDataReady ())
+      if ( media [activeStreams [i]]->HasDataReady ())
         dataAvailable++;
     }
-    if(_waitToFillCache )
+    if (_waitToFillCache )
       if (dataAvailable == activeStreams.GetSize ())
       {
         cout<<"cache has data! starting to play video...\n";
@@ -192,15 +192,15 @@ void TheoraMediaContainer::Update ()
     {
       //canSwap=true;
     }*/
-    if(!_waitToFillCache && !canWrite && dataAvailable)
+    if (!_waitToFillCache && !canWrite && dataAvailable)
     {
-      if( (csGetTicks () - lastTime) >= (frameTime) && ((csGetTicks () - lastTime) < (frameTime+100)))
+      if ( (csGetTicks () - lastTime) >= (frameTime) && ( (csGetTicks () - lastTime) < (frameTime+100)))
       {
         canSwap=true;
         lastTime=csGetTicks ();
       }
       else
-      if( ((csGetTicks () - lastTime) >= (frameTime+100)))
+      if ( ( (csGetTicks () - lastTime) >= (frameTime+100)))
       {
         cout<<"dropped a frame\n";
         DropFrame ();
@@ -217,10 +217,13 @@ void TheoraMediaContainer::Update ()
       hasDataToBuffer=BufferData (&_syncState);
       if (hasDataToBuffer==0)
       {
-        printf("Ogg buffering stopped, end of file reached.\n");
-        if(dataAvailable==0)
+        printf ("Ogg buffering stopped, end of file reached.\n");
+        if (dataAvailable==0)
         {
-          sndstream->Pause ();
+          if (sndstream.IsValid ())
+          {
+            sndstream->Pause ();
+          }
           _waitToFillCache=true;
           endOfFile = true;
           processingCache=false;
@@ -231,7 +234,7 @@ void TheoraMediaContainer::Update ()
           processingCache=true;
         }
       }
-      while (ogg_sync_pageout(&_syncState,&_oggPage)>0)
+      while (ogg_sync_pageout (&_syncState,&_oggPage)>0)
       {
         QueuePage (&_oggPage);
       }
@@ -246,16 +249,16 @@ void TheoraMediaContainer::QueuePage (ogg_page *page)
   // queue the page to every stream
   if (activeStreams.GetSize () == 0)
   {
-    for (uint i=0;i<media.GetSize();i++)
+    for (uint i=0;i<media.GetSize ();i++)
     {
-      if (strcmp (media[i]->GetType(),"TheoraVideo")==0)
+      if (strcmp (media[i]->GetType (),"TheoraVideo")==0)
       {
         csRef<iVideoMedia> media = scfQueryInterface<iVideoMedia> (this->GetMedia (i) ); 
-        if (media.IsValid()) 
+        if (media.IsValid ()) 
         { 
-          csRef<TheoraVideoMedia> buff = static_cast<TheoraVideoMedia*> ( (iVideoMedia*)media);
+          csRef<csTheoraVideoMedia> buff = static_cast<csTheoraVideoMedia*> ( (iVideoMedia*)media);
 
-          ogg_stream_pagein ( buff->StreamState() ,page);
+          ogg_stream_pagein (buff->StreamState () ,page);
         }
       }
       else if (strcmp (media[i]->GetType (),"TheoraAudio")==0)
@@ -263,7 +266,7 @@ void TheoraMediaContainer::QueuePage (ogg_page *page)
         csRef<iAudioMedia> media = scfQueryInterface<iAudioMedia> (this->GetMedia (i) ); 
         if (media.IsValid ()) 
         { 
-          csRef<TheoraAudioMedia> buff = static_cast<TheoraAudioMedia*>((iAudioMedia*)media);
+          csRef<csTheoraAudioMedia> buff = static_cast<csTheoraAudioMedia*> ( (iAudioMedia*)media);
 
           ogg_stream_pagein ( buff->StreamState () ,page);
         }
@@ -274,14 +277,14 @@ void TheoraMediaContainer::QueuePage (ogg_page *page)
   // Otherwise, queue the page only to the active streams
   else
   {
-    if(_activeTheoraStream.IsValid ())
+    if (_activeTheoraStream.IsValid ())
     {
-      ogg_stream_pagein ( _activeTheoraStream->StreamState () ,page);
+      ogg_stream_pagein (_activeTheoraStream->StreamState () ,page);
     }
 
-    if(_activeVorbisStream.IsValid ())
+    if (_activeVorbisStream.IsValid ())
     {
-      ogg_stream_pagein ( _activeVorbisStream->StreamState () ,page);
+      ogg_stream_pagein (_activeVorbisStream->StreamState () ,page);
     }
   }
 }
@@ -319,14 +322,14 @@ void TheoraMediaContainer::DoSeek ()
 
   if (!_activeTheoraStream.IsValid ())
   {
-    csReport(object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
+    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
       "There isn't an active video stream in the media container. Seeking not available.\n");
     return;
   }
 
   // If a video stream is present, seek
   long frame;
-  unsigned long targetFrame=(unsigned long) (_activeTheoraStream->GetFrameCount () * 
+  unsigned long targetFrame= (unsigned long) (_activeTheoraStream->GetFrameCount () * 
     timeToSeek / _activeTheoraStream->GetLength ());
 
   //check if we're seeking outside the video
@@ -339,12 +342,12 @@ void TheoraMediaContainer::DoSeek ()
   if (frame != -1)
     _activeTheoraStream->SeekPage (std::max ( (long)0,frame),false,&_syncState,mSize);
 
-  float time= ((float) targetFrame/_activeTheoraStream->GetFrameCount ()) *_activeTheoraStream->GetLength ();
+  float time= ( (float) targetFrame/_activeTheoraStream->GetFrameCount ()) *_activeTheoraStream->GetLength ();
   
   /*if(_activeVorbisStream.IsValid ())
     _activeVorbisStream->Seek (time,&_syncState,&_oggPage, _activeTheoraStream->StreamState());*/
 
-  if(sndstream.IsValid ())
+  if (sndstream.IsValid ())
   {
     // We want to know if we seek past the end of the audio stream.
     // If we do seek past the end, seek to the end of the stream.
@@ -386,7 +389,7 @@ void TheoraMediaContainer::AutoActivateStreams ()
 
 void TheoraMediaContainer::GetTargetTexture (csRef<iTextureHandle> &target) 
 {
-  if(_activeTheoraStream.IsValid ())
+  if (_activeTheoraStream.IsValid ())
     _activeTheoraStream->GetVideoTarget (target);
   else target=NULL;
 }
@@ -454,7 +457,7 @@ void TheoraMediaContainer::SwapBuffers ()
 
   time = csGetTicks ();
 
-  if(canSwap)
+  if (canSwap)
   {
     //cout<<"swap: "<<total<<endl;
     total = 0;
@@ -468,11 +471,11 @@ void TheoraMediaContainer::SwapBuffers ()
 }
 void TheoraMediaContainer::WriteData ()
 {
-  if(_waitToFillCache)
+  if (_waitToFillCache)
     return;
-  if(!canSwap && canWrite)
+  if (!canSwap && canWrite)
   {
-    if(ok==0)
+    if (ok==0)
     {
       canWrite=false;
       if (_activeTheoraStream.IsValid ())
@@ -483,7 +486,7 @@ void TheoraMediaContainer::WriteData ()
   }
 }
 
-void TheoraMediaContainer::SetCacheSize(size_t size) 
+void TheoraMediaContainer::SetCacheSize (size_t size) 
 {
   cacheSize = size;
 }
@@ -509,7 +512,7 @@ void TheoraMediaContainer::SelectLanguage (const char* identifier)
       csRef<iDataBuffer> soundbuf = vfs->ReadFile (languages[i].path);
       if (!soundbuf)
       {
-        csReport(object_reg, CS_REPORTER_SEVERITY_ERROR, QUALIFIED_PLUGIN_NAME,
+        csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, QUALIFIED_PLUGIN_NAME,
           "Can't load file %s!\n", languages[i].path);
         return;
       }
@@ -517,7 +520,7 @@ void TheoraMediaContainer::SelectLanguage (const char* identifier)
       csRef<iSndSysData> snddata = sndloader->LoadSound (soundbuf);
       if (!snddata)
       {
-        csReport(object_reg, CS_REPORTER_SEVERITY_ERROR, QUALIFIED_PLUGIN_NAME,
+        csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, QUALIFIED_PLUGIN_NAME,
           "Can't load sound %s!\n", languages[i].path);
         return;
       }
@@ -525,7 +528,7 @@ void TheoraMediaContainer::SelectLanguage (const char* identifier)
       sndstream = sndrenderer->CreateStream (snddata,CS_SND3D_DISABLE );
       if (!sndstream)
       {
-        csReport(object_reg, CS_REPORTER_SEVERITY_ERROR, QUALIFIED_PLUGIN_NAME,
+        csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, QUALIFIED_PLUGIN_NAME,
           "Can't create stream for %s!\n", languages[i].path);
         return;
       }

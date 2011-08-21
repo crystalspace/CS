@@ -24,21 +24,21 @@
 
 using namespace std;
 
-SCF_IMPLEMENT_FACTORY (vplParser)
+SCF_IMPLEMENT_FACTORY (csVplParser)
 
-vplParser::vplParser (iBase* parent) :
+csVplParser::csVplParser (iBase* parent) :
 scfImplementationType (this, parent),
-object_reg(0)
+object_reg (0)
 {
 }
 
-vplParser::~vplParser ()
+csVplParser::~csVplParser ()
 {
 }
 
-bool vplParser::Initialize (iObjectRegistry* r)
+bool csVplParser::Initialize (iObjectRegistry* r)
 {
-  vplParser::object_reg = r;
+  csVplParser::object_reg = r;
   reporter = csQueryRegistry<iReporter> (object_reg);
   synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
@@ -48,7 +48,7 @@ bool vplParser::Initialize (iObjectRegistry* r)
   InitTokenTable (xmltokens);
   return true;
 }
-csPtr<iBase> vplParser::Parse (iDocumentNode* node, iStreamSource*, iLoaderContext* ldr_context, iBase* context)
+csPtr<iBase> csVplParser::Parse (iDocumentNode* node, iStreamSource*, iLoaderContext* ldr_context, iBase* context)
 {
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
 
@@ -69,7 +69,7 @@ csPtr<iBase> vplParser::Parse (iDocumentNode* node, iStreamSource*, iLoaderConte
           csRef<iMediaLoader> m_pThOggLoader=csLoadPlugin<iMediaLoader> (mgr,
             "crystalspace.vpl.element.thogg");
           // Get the type of the media
-          mediaType = csString(child->GetAttributeValue ("type"));
+          mediaType = csString (child->GetAttributeValue ("type"));
 
           // Iterate through the rest of the nodes in the media file
           csRef<iDocumentNodeIterator> it2 = child->GetNodes ();
@@ -85,7 +85,7 @@ csPtr<iBase> vplParser::Parse (iDocumentNode* node, iStreamSource*, iLoaderConte
             case XMLTOKEN_VIDEOSTREAM:
               {
                 // Get the path for the media file
-                mediaPath = csString(child2->GetAttributeValue ("path"));
+                mediaPath = csString (child2->GetAttributeValue ("path"));
               }
             case XMLTOKEN_AUDIOSTREAM:
               {
@@ -123,7 +123,7 @@ csPtr<iBase> vplParser::Parse (iDocumentNode* node, iStreamSource*, iLoaderConte
           }
           m_pThOggLoader->Create (mediaPath,languages);
 
-          return csPtr<iBase>(m_pThOggLoader);
+          return csPtr<iBase> (m_pThOggLoader);
         }
       }
     }

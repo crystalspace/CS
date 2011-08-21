@@ -38,7 +38,7 @@ struct iObjectRegistry;
   * This is the implementation for our API and
   * also the implementation of the plugin.
   */
-class vplParser : public scfImplementation2<vplParser,iLoaderPlugin, iComponent>
+class csVplParser : public scfImplementation2<csVplParser,iLoaderPlugin, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -55,13 +55,13 @@ private:
 #undef CS_TOKEN_ITEM_FILE 
 
 public:
-  vplParser (iBase* parent);
-  virtual ~vplParser ();
+  csVplParser (iBase* parent);
+  virtual ~csVplParser ();
 
   // From iComponent.
   virtual bool Initialize (iObjectRegistry*);
 
-  virtual bool IsThreadSafe() { return true; }
+  virtual bool IsThreadSafe () { return true; }
 
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,

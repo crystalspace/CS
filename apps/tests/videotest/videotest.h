@@ -87,7 +87,7 @@ public:
   void PrintHelp ();
   void Frame ();
 
-  const char* GetApplicationConfigFile()
+  const char* GetApplicationConfigFile ()
   { return "/config/csisland.cfg"; }
 
   //-- csApplicationFramework

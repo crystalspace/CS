@@ -36,16 +36,16 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 struct iObjectRegistry;
 
 #ifdef WIN32
-  #pragma comment(lib,"libtheora_static.lib")
-  #pragma comment(lib,"ogg.lib")
-  #pragma comment(lib,"vorbis.lib")
+  #pragma comment (lib,"libtheora_static.lib")
+  #pragma comment (lib,"ogg.lib")
+  #pragma comment (lib,"vorbis.lib")
 #endif
 
 /**
   * This is the implementation for our API and
   * also the implementation of the plugin.
   */
-class thoggLoader : public scfImplementation2<thoggLoader,iMediaLoader,iComponent>
+class csThOggLoader : public scfImplementation2<csThOggLoader,iMediaLoader,iComponent>
 {
 private:
 
@@ -77,15 +77,15 @@ private:
 
   /* Helper; just grab some more compressed bitstream and sync it for
   page extraction */
-  int BufferData(ogg_sync_state *oy);
+  int BufferData (ogg_sync_state *oy);
 
   bool StartParsing (csRef<TheoraMediaContainer> container);
   bool ParseHeaders (csRef<TheoraMediaContainer> container);
   void ComputeStreamLength (csRef<TheoraMediaContainer> container);
 
 public:
-  thoggLoader (iBase* parent);
-  virtual ~thoggLoader ();
+  csThOggLoader (iBase* parent);
+  virtual ~csThOggLoader ();
 
   // From iComponent.
   virtual bool Initialize (iObjectRegistry*);

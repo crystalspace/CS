@@ -58,14 +58,14 @@ struct iMediaPlayer : public virtual iBase
 
   /// Called continuously to update the player. The user shouldn't call this method directly
   /// To start and stop the player, use StartPlayer() and StopPlayer()
-  THREADED_INTERFACE( Update );
+  THREADED_INTERFACE ( Update );
 
   /// Start the update thread for the media player
-  virtual void StartPlayer() = 0;
+  virtual void StartPlayer () = 0;
 
   /// Stops the update thread for the media player. In order to close the application
   /// properly, this must be called when shutting down the application.
-  virtual void StopPlayer() = 0;
+  virtual void StopPlayer () = 0;
 
   /// Enable/disable looping
   virtual void Loop (bool shouldLoop) = 0 ;
@@ -74,7 +74,7 @@ struct iMediaPlayer : public virtual iBase
   virtual void Play () = 0 ;
 
   /// Pauses the media
-  virtual void Pause() = 0 ;
+  virtual void Pause () = 0 ;
 
   /// Stops the media and seeks to the beginning
   virtual void Stop () = 0 ;

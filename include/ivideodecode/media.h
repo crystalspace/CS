@@ -45,7 +45,7 @@ struct iMedia : public virtual iBase
   /**
     * Return the length in seconds
     */
-  virtual float GetLength() const = 0;
+  virtual float GetLength () const = 0;
 
   /**
     * Gets the position of the stream
@@ -70,22 +70,22 @@ struct iMedia : public virtual iBase
   /**
     * Swaps the active buffer for the one that was written to last
     */
-  virtual void SwapBuffers() = 0;
+  virtual void SwapBuffers () = 0;
   
   /**
     * Set the how many frames will be cached
     */
-  virtual void SetCacheSize(size_t size) = 0;
+  virtual void SetCacheSize (size_t size) = 0;
 
   /**
     * Returns true if there is data ready to be used
     */
-  virtual bool HasDataReady() = 0;
+  virtual bool HasDataReady () = 0;
 
   /**
     * Returns true if the cache is full
     */
-  virtual bool IsCacheFull() = 0;
+  virtual bool IsCacheFull () = 0;
 
   /**
     * Triggers a frame drop
@@ -98,10 +98,10 @@ struct iMedia : public virtual iBase
   */
 struct iVideoMedia : public iMedia
 {
-  SCF_INTERFACE(iVideoMedia,0,1,0);
+  SCF_INTERFACE (iVideoMedia,0,1,0);
 
   /// Get the format of the sound data.
-  virtual const csVPLvideoFormat* GetFormat() const = 0;
+  virtual const csVPLvideoFormat* GetFormat () const = 0;
 
   // Returns the aspect ratio to use with the image
   virtual float GetAspectRatio () = 0;
@@ -124,7 +124,7 @@ struct iVideoMedia : public iMedia
   */
 struct iAudioMedia : public iMedia
 {
-  SCF_INTERFACE(iAudioMedia,0,1,0);
+  SCF_INTERFACE (iAudioMedia,0,1,0);
 
   /**
     * Get the audio stream target

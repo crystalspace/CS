@@ -26,5 +26,5 @@ CS_IMPLEMENT_APPLICATION
   */
 int main(int argc, char *argv[])
 {
-  return csApplicationRunner<VideoTest>::Run(argc, argv);
+  return csApplicationRunner<VideoTest>::Run (argc, argv);
 }

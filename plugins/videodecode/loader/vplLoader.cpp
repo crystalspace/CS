@@ -6,19 +6,19 @@
 
 using namespace std;
 
-SCF_IMPLEMENT_FACTORY (vplLoader)
+SCF_IMPLEMENT_FACTORY (csVplLoader)
 
-vplLoader::vplLoader (iBase* parent) :
+csVplLoader::csVplLoader (iBase* parent) :
 scfImplementationType (this, parent),
-object_reg(0)
+object_reg (0)
 {
 }
 
-vplLoader::~vplLoader ()
+csVplLoader::~csVplLoader ()
 {
 }
 
-bool vplLoader::Initialize (iObjectRegistry* r)
+bool csVplLoader::Initialize (iObjectRegistry* r)
 {
   object_reg = r;
 
@@ -29,7 +29,7 @@ bool vplLoader::Initialize (iObjectRegistry* r)
   return true;
 }
 
-csRef<iMediaContainer> vplLoader::LoadMedia (const char * pFileName, const char *pDescription/*, const char* pMediaType*/)
+csRef<iMediaContainer> csVplLoader::LoadMedia (const char * pFileName, const char *pDescription/*, const char* pMediaType*/)
 {
   csRef<iLoaderPlugin> parser = csQueryRegistry<iLoaderPlugin> (object_reg);
 
@@ -55,7 +55,7 @@ csRef<iMediaContainer> vplLoader::LoadMedia (const char * pFileName, const char 
   }
   else
   {
-    csReport(object_reg, CS_REPORTER_SEVERITY_ERROR, QUALIFIED_PLUGIN_NAME,
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, QUALIFIED_PLUGIN_NAME,
       "Failed to parse '%s'.\n", pFileName);
     return NULL;
   }

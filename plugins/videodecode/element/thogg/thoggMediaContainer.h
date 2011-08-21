@@ -54,8 +54,8 @@ private:
   float timeToSeek;
   bool    _waitToFillCache;
 
-  csRef<TheoraVideoMedia> _activeTheoraStream;
-  csRef<TheoraAudioMedia> _activeVorbisStream;
+  csRef<csTheoraVideoMedia> _activeTheoraStream;
+  csRef<csTheoraAudioMedia> _activeVorbisStream;
 
   size_t cacheSize;
 
@@ -113,7 +113,7 @@ public:
   virtual void AutoActivateStreams () ;
   virtual float GetPosition () const;
   virtual float GetLength () const;
-  virtual void SwapBuffers() ;
+  virtual void SwapBuffers () ;
 
   virtual void WriteData () ;
 
@@ -136,7 +136,7 @@ public:
   void DoSeek ();
   void QueuePage (ogg_page *page);
   void SetLanguages (csArray<Language> languages);
-  inline void ClearMedia()  { media.Empty (); }
+  inline void ClearMedia ()  { media.Empty (); }
   inline unsigned long GetFileSize () const { return mSize; }
   inline void SetFileSize (unsigned long size)  { mSize=size; }
 };

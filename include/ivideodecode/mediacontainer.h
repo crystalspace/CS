@@ -76,7 +76,7 @@ struct iMediaContainer : public virtual iBase
   virtual float GetLength () const = 0 ;
 
   /// Swaps the active buffer for the one that was written to last inside the active iMedia
-  virtual void SwapBuffers() = 0;
+  virtual void SwapBuffers () = 0;
 
   /**
     * Gets data from the prefetch queue and writes it to the active buffer
@@ -86,7 +86,7 @@ struct iMediaContainer : public virtual iBase
   /**
     * Set the how many frames will be cached
     */
-  virtual void SetCacheSize(size_t size) = 0;
+  virtual void SetCacheSize (size_t size) = 0;
 
   // Returns the aspect ratio to use with the image
   virtual float GetAspectRatio () = 0;

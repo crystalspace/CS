@@ -26,7 +26,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <iutil/comp.h>
 #include <ivideodecode/media.h>
 #include <csutil/scf_implementation.h>
-#include "thoggSndStreamData.h"
 
 #include <vorbis/codec.h>
 
@@ -45,7 +44,7 @@ class SndSysTheoraStream;
 /**
   * Audio stream
   */
-class TheoraAudioMedia : public scfImplementation2 < TheoraAudioMedia, iAudioMedia, scfFakeInterface<iMedia> >
+class csTheoraAudioMedia : public scfImplementation2 < csTheoraAudioMedia, iAudioMedia, scfFakeInterface<iMedia> >
 {
 public:
 
@@ -82,38 +81,38 @@ public:
   
   // Provide access to the Vorbis specific members
   // Inline because it's faster, although a bit slow
-  inline ogg_stream_state*   StreamState()    { return &_streamState; }
-  inline vorbis_info*        StreamInfo()     { return &_streamInfo; }
-  inline vorbis_dsp_state*   DspState()       { return &_dspState; }
-  inline vorbis_block*       VorbisBlock()    { return &_vorbisBlock; }
-  inline vorbis_comment*     StreamComments() { return &_streamComments; }
-  inline int&                Vorbis_p()       { return _vorbis_p; }
+  inline ogg_stream_state*   StreamState ()    { return &_streamState; }
+  inline vorbis_info*        StreamInfo ()     { return &_streamInfo; }
+  inline vorbis_dsp_state*   DspState ()       { return &_dspState; }
+  inline vorbis_block*       VorbisBlock ()    { return &_vorbisBlock; }
+  inline vorbis_comment*     StreamComments () { return &_streamComments; }
+  inline int&                Vorbis_p ()       { return _vorbis_p; }
 
   // An easy way to initialize the stream
   void InitializeStream (ogg_stream_state &state, vorbis_info &info, vorbis_comment &comments, 
     FILE *source);
 
 public:
-  TheoraAudioMedia (iBase* parent);
-  virtual ~TheoraAudioMedia ();
+  csTheoraAudioMedia (iBase* parent);
+  virtual ~csTheoraAudioMedia ();
 
   // From iComponent.
   virtual bool Initialize (iObjectRegistry*);
 
   virtual const char* GetType () const;
   virtual unsigned long GetFrameCount () const;
-  virtual float GetLength() const;
+  virtual float GetLength () const;
   virtual void GetAudioTarget (csRef<iSndSysStream> &stream);
   virtual double GetPosition () const;
   virtual void CleanMedia () ;
   virtual bool Update () ;
   virtual void WriteData () ;
-  virtual void SetCacheSize(size_t size) ;
+  virtual void SetCacheSize (size_t size) ;
 
-  virtual void SwapBuffers() ;
+  virtual void SwapBuffers () ;
 
-  virtual bool HasDataReady() ;
-  virtual bool IsCacheFull() ;
+  virtual bool HasDataReady () ;
+  virtual bool IsCacheFull () ;
 
   virtual void DropFrame () ;
 

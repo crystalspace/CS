@@ -7,15 +7,15 @@
 using namespace std;
 
 
-SCF_IMPLEMENT_FACTORY (vplPlayer)
+SCF_IMPLEMENT_FACTORY (csVplPlayer)
 
-vplPlayer::vplPlayer (iBase* parent) :
+csVplPlayer::csVplPlayer (iBase* parent) :
 scfImplementationType (this, parent),
-object_reg(0)
+object_reg (0)
 {
 }
 
-vplPlayer::~vplPlayer ()
+csVplPlayer::~csVplPlayer ()
 {
   // Unregister the Frame event listener
   if (frameEventHandler)
@@ -26,7 +26,7 @@ vplPlayer::~vplPlayer ()
   }
 }
 
-bool vplPlayer::Initialize (iObjectRegistry* r)
+bool csVplPlayer::Initialize (iObjectRegistry* r)
 {
   object_reg = r;
 
@@ -35,9 +35,9 @@ bool vplPlayer::Initialize (iObjectRegistry* r)
   return true;
 }
 
-void vplPlayer::InitializePlayer (csRef<iMediaContainer> media, size_t cacheSize)
+void csVplPlayer::InitializePlayer (csRef<iMediaContainer> media, size_t cacheSize)
 {
-  if (!media.IsValid())
+  if (!media.IsValid ())
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
               "Media container is not valid!");
@@ -68,7 +68,7 @@ void vplPlayer::InitializePlayer (csRef<iMediaContainer> media, size_t cacheSize
   _shouldUpdate=false;
 }
 
-void vplPlayer::StartPlayer ()
+void csVplPlayer::StartPlayer ()
 {
   if (!ret.IsValid ())
   {
@@ -77,12 +77,12 @@ void vplPlayer::StartPlayer ()
   }
 }
 
-void vplPlayer::StopPlayer ()
+void csVplPlayer::StopPlayer ()
 {
   _shouldUpdate = false;
 }
 
-void vplPlayer::SetActiveStream (int index) 
+void csVplPlayer::SetActiveStream (int index) 
 {
   if (_mediaFile.IsValid ())
   {
@@ -93,36 +93,36 @@ void vplPlayer::SetActiveStream (int index)
   }
 }
 
-void vplPlayer::RemoveActiveStream (int index) 
+void csVplPlayer::RemoveActiveStream (int index) 
 {
   if (_mediaFile.IsValid ())
     _mediaFile->RemoveActiveStream (index);
 }
 
-void vplPlayer::GetTargetTexture (csRef<iTextureHandle> &target) 
+void csVplPlayer::GetTargetTexture (csRef<iTextureHandle> &target) 
 {
   _mediaFile->GetTargetTexture (target);
 }
-void vplPlayer::GetTargetAudio (csRef<iSndSysStream> &target)
+void csVplPlayer::GetTargetAudio (csRef<iSndSysStream> &target)
 {
   _mediaFile->GetTargetAudio (target);
 }
 
-void vplPlayer::SelectLanguage (const char* identifier)
+void csVplPlayer::SelectLanguage (const char* identifier)
 {
   if (_mediaFile.IsValid ())
     _mediaFile->SelectLanguage (identifier);
 }
 
 //void vplPlayer::Update ()
-THREADED_CALLABLE_IMPL(vplPlayer, Update)
+THREADED_CALLABLE_IMPL(csVplPlayer, Update)
 {
   while (_shouldUpdate)
   {
     csTicks start=csGetTicks ();
     if (_playing)
     {
-      if(_shouldStop)
+      if (_shouldStop)
       {
         // Stop playing
         _playing=false;
@@ -145,7 +145,7 @@ THREADED_CALLABLE_IMPL(vplPlayer, Update)
         _mediaFile->Update ();
       }
 
-      csSleep (5);
+      //csSleep (5);
     }
     // If the media isn't playing, we don't want to use up the thread
     else
@@ -156,19 +156,19 @@ THREADED_CALLABLE_IMPL(vplPlayer, Update)
   return true;
 }
 
-void vplPlayer::Loop (bool shouldLoop)
+void csVplPlayer::Loop (bool shouldLoop)
 {
   _shouldLoop = shouldLoop;
 }
 
-void vplPlayer::Play () 
+void csVplPlayer::Play () 
 {
   _playing=true;
   if (_mediaFile.IsValid ())
   {
     _mediaFile->OnPlay ();
   }
-  if(_shouldStop)
+  if (_shouldStop)
   {
     _shouldStop=false;
     if (_mediaFile.IsValid ())
@@ -179,7 +179,7 @@ void vplPlayer::Play ()
   }
 }
 
-void vplPlayer::Pause() 
+void csVplPlayer::Pause () 
 {
   _playing=false;
   if (_mediaFile.IsValid ())
@@ -188,7 +188,7 @@ void vplPlayer::Pause()
   }
 }
 
-void vplPlayer::Stop () 
+void csVplPlayer::Stop () 
 {
   _shouldStop = true;
   if (_mediaFile.IsValid ())
@@ -197,7 +197,7 @@ void vplPlayer::Stop ()
   }
 }
 
-void vplPlayer::Seek (float time)
+void csVplPlayer::Seek (float time)
 {
   if (_mediaFile.IsValid ())
   {
@@ -206,32 +206,32 @@ void vplPlayer::Seek (float time)
   }
 }
 
-float vplPlayer::GetPosition () const
+float csVplPlayer::GetPosition () const
 {
   return _mediaFile->GetPosition ();
 }
 
-bool vplPlayer::IsPlaying () 
+bool csVplPlayer::IsPlaying () 
 {
   return _playing;
 }
 
-float vplPlayer::GetLength () const
+float csVplPlayer::GetLength () const
 {
   return _mediaFile->GetLength ();
 }
 
-void vplPlayer::SwapBuffers ()
+void csVplPlayer::SwapBuffers ()
 {
   _mediaFile->SwapBuffers ();
 }
 
-void vplPlayer::WriteData ()
+void csVplPlayer::WriteData ()
 {
   _mediaFile->WriteData ();
 }
 
-float vplPlayer::GetAspectRatio () 
+float csVplPlayer::GetAspectRatio () 
 {
   return _mediaFile->GetAspectRatio ();
 }

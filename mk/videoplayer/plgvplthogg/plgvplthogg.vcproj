@@ -205,14 +205,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggSndStream.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggSndStreamData.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggVideoMedia.cpp"
 				>
 			</File>
@@ -232,14 +224,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggMediaContainer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggSndStream.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggSndStreamData.h"
 				>
 			</File>
 			<File

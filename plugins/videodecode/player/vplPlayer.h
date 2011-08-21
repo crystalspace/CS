@@ -38,8 +38,8 @@ struct iObjectRegistry;
   * This is the implementation for our API and
   * also the implementation of the plugin.
   */
-class vplPlayer :  public ThreadedCallable<vplPlayer>,
-  public scfImplementation2<vplPlayer,iMediaPlayer,iComponent>
+class csVplPlayer :  public ThreadedCallable<csVplPlayer>,
+  public scfImplementation2<csVplPlayer,iMediaPlayer,iComponent>
 {
 private:
   iObjectRegistry* object_reg;
@@ -55,18 +55,18 @@ private:
   csRef<iThreadReturn> ret;
 
 public:
-  iObjectRegistry* GetObjectRegistry() const
+  iObjectRegistry* GetObjectRegistry () const
   { return object_reg; }
 
-  vplPlayer (iBase* parent);
-  virtual ~vplPlayer ();
+  csVplPlayer (iBase* parent);
+  virtual ~csVplPlayer ();
 
   // From iComponent.
   virtual bool Initialize (iObjectRegistry*);
 
-  virtual void StartPlayer() ;
+  virtual void StartPlayer () ;
 
-  virtual void StopPlayer() ;
+  virtual void StopPlayer () ;
 
   virtual void InitializePlayer (csRef<iMediaContainer> media, size_t cacheSize = 1) ;
   virtual void SetActiveStream (int index) ;
@@ -74,11 +74,11 @@ public:
   virtual void GetTargetTexture (csRef<iTextureHandle> &target) ;
   virtual void GetTargetAudio (csRef<iSndSysStream> &target) ;
   
-  THREADED_CALLABLE_DECL(vplPlayer, Update, csThreadReturn, THREADED, false, false);
+  THREADED_CALLABLE_DECL (csVplPlayer, Update, csThreadReturn, THREADED, false, false);
   //virtual void Update ();
   virtual void Loop (bool shouldLoop) ;
   virtual void Play () ;
-  virtual void Pause() ;
+  virtual void Pause () ;
   virtual void Stop () ;
   virtual void Seek (float time) ;
   virtual float GetPosition () const;
@@ -100,9 +100,9 @@ public:
     iEventHandler>
   {
   private:
-    vplPlayer* parent;
+    csVplPlayer* parent;
   public:
-    FrameEventHandler (vplPlayer* parent) :
+    FrameEventHandler (csVplPlayer* parent) :
         scfImplementationType (this), parent (parent) { }
         virtual ~FrameEventHandler () { }
         virtual bool HandleEvent (iEvent& ev)
@@ -111,12 +111,11 @@ public:
           {
             parent->WriteData ();
             parent->SwapBuffers (); 
-            parent->WriteData ();
           }
 
           return false;
         }
-        CS_EVENTHANDLER_PHASE_FRAME("crystalspace.videodecode.frame")
+        CS_EVENTHANDLER_PHASE_FRAME ("crystalspace.videodecode.frame")
   };
   csRef<FrameEventHandler> frameEventHandler;
 
