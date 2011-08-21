@@ -45,7 +45,7 @@ FILEFLAGS 0x0
   "    <classes>",
   "      <class>",
   "        <name>crystalspace.vpl.loader</name>",
-  "        <implementation>vplLoader</implementation>",
+  "        <implementation>csVplLoader</implementation>",
   "        <description>Generic Media Loader</description>",
   "      </class>",
   "    </classes>",

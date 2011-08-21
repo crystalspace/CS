@@ -45,7 +45,7 @@ FILEFLAGS 0x0
   "    <classes>",
   "      <class>",
   "        <name>crystalspace.vpl.player</name>",
-  "        <implementation>vplPlayer</implementation>",
+  "        <implementation>csVplPlayer</implementation>",
   "        <description>Generic Media Player</description>",
   "      </class>",
   "    </classes>",

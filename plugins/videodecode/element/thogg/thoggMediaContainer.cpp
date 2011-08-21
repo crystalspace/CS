@@ -332,7 +332,7 @@ void TheoraMediaContainer::DoSeek ()
   unsigned long targetFrame= (unsigned long) (_activeTheoraStream->GetFrameCount () * 
     timeToSeek / _activeTheoraStream->GetLength ());
 
-  //check if we're seeking outside the video
+  // check if we're seeking outside the video
   if (targetFrame>_activeTheoraStream->GetFrameCount ())
   {
     targetFrame = _activeTheoraStream->GetFrameCount ();
@@ -343,9 +343,22 @@ void TheoraMediaContainer::DoSeek ()
     _activeTheoraStream->SeekPage (std::max ( (long)0,frame),false,&_syncState,mSize);
 
   float time= ( (float) targetFrame/_activeTheoraStream->GetFrameCount ()) *_activeTheoraStream->GetLength ();
-  
-  /*if(_activeVorbisStream.IsValid ())
-    _activeVorbisStream->Seek (time,&_syncState,&_oggPage, _activeTheoraStream->StreamState());*/
+
+
+  // skip to the frame we need
+  while (_activeTheoraStream->Update ()!=0)
+  {
+    hasDataToBuffer=BufferData (&_syncState);
+    if (hasDataToBuffer==0)
+    {
+      _waitToFillCache=true;
+      endOfFile = true;
+    }
+    while (ogg_sync_pageout (&_syncState,&_oggPage)>0)
+    {
+      QueuePage (&_oggPage);
+    }
+  }
 
   if (sndstream.IsValid ())
   {
@@ -356,7 +369,6 @@ void TheoraMediaContainer::DoSeek ()
     // Ortherwise, seek to the required position
     else
       sndstream->SetPosition (timeToSeek*sndstream->GetRenderedFormat ()->Freq);
-    sndstream->Unpause ();
   }
   timeSinceStart=0;
 }

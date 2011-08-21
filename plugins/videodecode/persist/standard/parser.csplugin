@@ -5,7 +5,7 @@
     <classes>
       <class>
         <name>crystalspace.vpl.parser</name>
-        <implementation>vplParser</implementation>
+        <implementation>csVplParser</implementation>
         <description>Generic Media Parser</description>
       </class>
     </classes>

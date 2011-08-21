@@ -5,7 +5,7 @@
     <classes>
       <class>
         <name>crystalspace.vpl.element.thogg</name>
-        <implementation>thoggLoader</implementation>
+        <implementation>csThOggLoader</implementation>
         <description>Theora OGG Video Player Element</description>
       </class>
     </classes>
