@@ -108,6 +108,11 @@ bool TessellationTest::OnKeyboard(iEvent& ev)
 
 bool TessellationTest::OnInitialize(int /*argc*/, char* /*argv*/ [])
 {
+  if (!SetupConfigManager (object_reg, "data/tessellationtest/tess.cfg"))
+  {
+    ReportError ("Failed to initialize config!\n");
+    return false;
+  }
   // RequestPlugins() will load all plugins we specify. In addition
   // it will also check if there are plugins that need to be loaded
   // from the config system (both the application config and CS or
