@@ -132,7 +132,7 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     
     return vis;
 */    
-    float4 sum = 0;
+    float sum = 0;
     float x, y;
 
     for (y = -1.5; y <= 1.5; y += 1)
