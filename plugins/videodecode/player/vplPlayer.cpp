@@ -66,6 +66,7 @@ void csVplPlayer::InitializePlayer (csRef<iMediaContainer> media, size_t cacheSi
   }
   _shouldStop = false;
   _shouldUpdate=false;
+  _shouldPlay=false;
 }
 
 void csVplPlayer::StartPlayer ()
@@ -119,6 +120,11 @@ THREADED_CALLABLE_IMPL(csVplPlayer, Update)
 {
   while (_shouldUpdate)
   {
+    if (_shouldPlay)
+    {
+      Play ();
+      _shouldPlay=false;
+    }
     csTicks start=csGetTicks ();
     if (_playing)
     {
@@ -163,6 +169,12 @@ void csVplPlayer::Loop (bool shouldLoop)
 
 void csVplPlayer::Play () 
 {
+  if (!ret.IsValid ())
+  {
+    _shouldPlay=true;
+    return;
+  }
+
   _playing=true;
   if (_mediaFile.IsValid ())
   {

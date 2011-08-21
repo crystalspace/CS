@@ -50,6 +50,7 @@ private:
   bool _shouldLoop;
   bool _shouldStop;
   bool _shouldUpdate;
+  bool _shouldPlay;
 
 
   csRef<iThreadReturn> ret;

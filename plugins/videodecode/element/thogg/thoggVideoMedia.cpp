@@ -107,7 +107,6 @@ bool csTheoraVideoMedia::Update ()
 
   _videobufReady=false;
 
-  csTicks start = csGetTicks ();
   while (_theora_p && !_videobufReady)
   {
     if (ogg_stream_packetout (&_streamState,&_oggPacket)>0)
@@ -118,12 +117,11 @@ bool csTheoraVideoMedia::Update ()
 
         if (th_granule_frame (_decodeControl,_videobuf_granulepos)<_frameToSkip)
         {
-          _videobufReady=false;
+          //_videobufReady=false;
           return false;
         }
         else
         {
-          //cout<<_videobufTime<<'-'<<th_granule_frame (_decodeControl,_videobuf_granulepos)<<endl;
           _videobufReady=true;
           _frameToSkip = -1;
 
@@ -133,7 +131,6 @@ bool csTheoraVideoMedia::Update ()
           cachedData data;
           memcpy (&data.yuv, &yuv, sizeof (yuv));
           cache.Push (data);
-          //cout<<"cache size: "<<cache.GetSize ()<<endl;
         }
       }
     }
@@ -141,7 +138,6 @@ bool csTheoraVideoMedia::Update ()
       break;
   }
 
-  //cout<<"read time "<<csGetTicks ()-start<<endl;
 
   if (!_videobufReady)
     return true;
