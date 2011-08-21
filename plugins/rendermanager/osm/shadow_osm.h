@@ -118,7 +118,9 @@ namespace CS
           PersistentData& persist = viewSetup.persist;
           if( persist.dbgPersist->IsDebugFlagEnabled(persist.dbgChooseSplit) )
           {
-            persist.splitRatio = -0.1;
+            persist.splitRatio = -1;
+            persist.bestSplitRatioMean = -1;
+            persist.bestSplitRatioCorrelation = FLT_MAX;
             persist.SetHybridSplit(0);
             persist.dbgPersist->EnableDebugFlag(persist.dbgChooseSplit,false);
           }
@@ -475,7 +477,7 @@ namespace CS
 
         void ChooseSplitFunction(PersistentData& persist)
         {
-          if (persist.splitRatio >= 0.05 && persist.splitRatio <= 1.05)
+          if (persist.splitRatio >= -0.05 && persist.splitRatio <= 1.05)
           {
             csRef<iDataBuffer> databuf;
             uint8** data = new uint8*[persist.mrt];
@@ -525,6 +527,74 @@ namespace CS
 
             csPrintf("split_ratio %lf mean %lf variance %lf func %lf\n", 
               persist.splitRatio, mean, variance, func);
+
+            double *means = new double[4 * persist.mrt];
+            double *variances = new double[4 * persist.mrt];
+            double *correlations = new double[4 * persist.mrt];
+
+            // compute correlation coefficient:
+
+            // compute mean
+            for (int i = 0 ; i < 4 * persist.mrt ; i ++)
+              means[i] = 0;
+
+            for (int layer = 0 ; layer < persist.mrt ; layer ++)
+              for (int i = 0 ; i < persist.shadowMapRes ; i ++)
+                for (int j = 0 ; j < persist.shadowMapRes ; j ++)
+                  for (int k = 0 ; k < 4 ; k ++)
+                  {
+                    means[4 * layer + k] +=
+                      data[layer][4 * (i + j * persist.shadowMapRes) + k];
+                  }
+
+            for (int i = 0 ; i < 4 * persist.mrt ; i ++)
+              means[i] /= (persist.shadowMapRes * persist.shadowMapRes);
+
+            // compute variance
+            for (int i = 0 ; i < 4 * persist.mrt ; i ++)
+              variances[i] = 0;
+
+            for (int layer = 0 ; layer < persist.mrt ; layer ++)
+              for (int i = 0 ; i < persist.shadowMapRes ; i ++)
+                for (int j = 0 ; j < persist.shadowMapRes ; j ++)
+                  for (int k = 0 ; k < 4 ; k ++)
+                  {
+                    variances[4 * layer + k] += pow(
+                      data[layer][4 * (i + j * persist.shadowMapRes) + k] - 
+                      means[4 * layer + k], 2);
+                  }
+
+            // compute correlation
+            for (int i = 0 ; i < 4 * persist.mrt ; i ++)
+              correlations[i] = 0;
+
+            for (int layer = 0 ; layer < persist.mrt ; layer ++)
+              for (int i = 0 ; i < persist.shadowMapRes ; i ++)
+                for (int j = 0 ; j < persist.shadowMapRes ; j ++)
+                  for (int k = 0 ; k < 4 ; k ++)
+                    if (4 * layer + k < 4 * persist.mrt - 1)
+                      correlations[4 * layer + k] += 
+                        (data[layer][4 * (i + j * persist.shadowMapRes) + k] - 
+                          means[4 * layer + k]) * 
+                        (data[layer + (k + 1) / 4]
+                          [4 * (i + j * persist.shadowMapRes) + (k + 1) % 4] -
+                          means[4 * layer + k + 1]);
+
+            for (int i = 0 ; i < 4 * persist.mrt - 1 ; i ++)
+              correlations[i] /= sqrt(variances[i] * variances[i + 1]);
+
+            double sum = 0;
+            for (int i = 0 ; i < 4 * persist.mrt ; i ++)
+              sum += correlations[i];
+
+            csPrintf("Correlation coefficient: ");
+//             for (int i = 0 ; i < 4 * persist.mrt ; i ++)
+//               csPrintf("%lf ", correlations[i]);
+            csPrintf("%lf \n", sum);
+
+            delete [] means;
+            delete [] variances;
+            delete [] correlations;
 
 //             for (int i = 0 ; i < persist.shadowMapRes ; i ++)
 //               for (int j = 0 ; j < persist.shadowMapRes ; j ++)
@@ -576,12 +646,19 @@ namespace CS
               persist.bestSplitRatio = persist.splitRatio;
             }
 
+            if (sum < persist.bestSplitRatioCorrelation)
+            {
+              persist.bestSplitRatioCorrelation = sum;
+              persist.bestSplitRatio2 = persist.splitRatio;
+            }
+
             if (persist.splitRatio < 0.95)
               persist.SetHybridSplit(persist.splitRatio + 0.1);
             else
             {
               persist.SetHybridSplit(persist.bestSplitRatio);
-              csPrintf("Best Split is: %lf\n", persist.bestSplitRatio);
+              csPrintf("Best Split is: %lf and %lf\n", 
+                persist.bestSplitRatio, persist.bestSplitRatio2);
             }
 
             delete[] data;
@@ -769,6 +846,8 @@ namespace CS
         double splitRatio;
         double bestSplitRatio;
         double bestSplitRatioMean;
+        double bestSplitRatioCorrelation;
+        double bestSplitRatio2;
 
         uint dbgChooseSplit;
         uint dbgShowRenderTextures;
@@ -862,6 +941,8 @@ namespace CS
           splitRatio = -1;
           bestSplitRatio = 0;
           bestSplitRatioMean = -1;
+          bestSplitRatioCorrelation = FLT_MAX;
+          bestSplitRatio2 = 0;
           // Set linear or logarithmic split
           SetHybridSplit(bestSplitRatio);
 
