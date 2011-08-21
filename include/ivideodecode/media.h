@@ -22,6 +22,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 /**\file
   * Video Player: media stream 
   */
+/**
+ * \addtogroup videoplay
+ * @{ */
 
 #include "csutil/scf.h"
 #include "csutil/ref.h"
@@ -100,10 +103,9 @@ struct iVideoMedia : public iMedia
 {
   SCF_INTERFACE (iVideoMedia,0,1,0);
 
-  /// Get the format of the sound data.
-  virtual const csVPLvideoFormat* GetFormat () const = 0;
-
-  // Returns the aspect ratio to use with the image
+  /**
+    * Returns the aspect ratio to use with the image
+    */
   virtual float GetAspectRatio () = 0;
 
 

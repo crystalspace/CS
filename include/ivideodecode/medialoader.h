@@ -22,6 +22,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 /**\file
   * Video Player: loader 
   */
+/**
+ * \addtogroup videoplay
+ * @{ */
 
 #include "csutil/scf.h"
 #include "csutil/ref.h"
@@ -37,17 +40,21 @@ struct iMediaLoader : public virtual iBase
 {
   SCF_INTERFACE (iMediaLoader,0,1,0);
 
-  /// Create an iMediaContainer from raw input data.
-  //
-  //  Optional pDescription may point to a brief description that will follow this data
-  //   through any streams or sources created from it, and may be useful for display or
-  //   diagnostic purposes.
-  //
-  //  Optional pMediaType may suggest the media type to be loaded, to reduce the guess work.
-  //   Originally intended to be an enum, but res suggested a string of characters
-  virtual csRef<iMediaContainer> LoadMedia (const char * pFileName, const char *pDescription=0/*, const char* pMediaType = "AutoDetect"*/) = 0;
+  /**
+    * Create an iMediaContainer from raw input data.
+    *
+    * Optional pDescription may point to a brief description that will follow this data
+    *   through any streams or sources created from it, and may be useful for display or
+    *   diagnostic purposes.
+    *
+    *  Optional pMediaType may suggest the media type to be loaded, to reduce the guess work.
+    *   Originally intended to be an enum, but res suggested a string of characters
+    */
+  virtual csRef<iMediaContainer> LoadMedia (const char * pFileName, const char *pDescription=0) = 0;
 
-  /// Used to initialize a loader. Should never be called directly
+  /**
+    * Used to initialize a loader. Should never be called directly
+    */
   virtual void Create (csString path,csArray<Language> languages) = 0;
 };
 

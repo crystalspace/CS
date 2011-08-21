@@ -78,12 +78,6 @@ const char* csTheoraVideoMedia::GetType () const
   return "TheoraVideo";
 }
 
-const csVPLvideoFormat *csTheoraVideoMedia::GetFormat() const
-{
-  // TO DO
-  return 0;
-}
-
 unsigned long csTheoraVideoMedia::GetFrameCount() const
 {
   return frameCount;

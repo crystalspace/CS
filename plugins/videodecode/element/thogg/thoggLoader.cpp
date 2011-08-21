@@ -132,7 +132,7 @@ bool csThOggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
 
   }
 
-  /// if there isn't a Theora video stream in the file, we don't care anymore
+  // if there isn't a Theora video stream in the file, we don't care anymore
   if (!foundVideo)
   {
     //clear the sync state
@@ -146,7 +146,7 @@ bool csThOggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
   }
 
 
-  /// Next, parse secondary headers.
+  // Next, parse secondary headers.
   size_t times=0;
   while (times!=container->GetMediaCount ())
   {
@@ -277,7 +277,7 @@ bool csThOggLoader::ParseHeaders (csRef<TheoraMediaContainer> container)
     }
   }
 
-  /// Next, parse secondary headers.
+  // Next, parse secondary headers.
   times=0;
   while (times!=container->GetMediaCount ())
   {
@@ -431,14 +431,14 @@ csRef<iMediaContainer> csThOggLoader::LoadMedia (const char * pFileName, const c
   csReport (object_reg, CS_REPORTER_SEVERITY_DEBUG, QUALIFIED_PLUGIN_NAME,
     "Loading Theora video from '%s'.\n", pFileName);
 
-  /// Get an iMediaParser from the object registry
+  // Get an iMediaParser from the object registry
 
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
-  /// Get the path for the video
+  // Get the path for the video
   csRef<iDataBuffer> vidPath = vfs->GetRealPath (path.GetData ());
   infile = fopen (vidPath->GetData (),"rb");
 
-  /// checking if the file exists
+  // checking if the file exists
   if (infile==NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,

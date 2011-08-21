@@ -123,7 +123,7 @@ bool csTheoraAudioMedia::Update ()
     int ret=vorbis_synthesis_pcmout (&_dspState,&pcm);
     int count = 0;
 
-    /// ToDo: change 714 to the frame count of the video
+    // ToDo: change 714 to the frame count of the video
     int numSamples = 714 * _streamInfo.channels;
     int numBytes = numSamples * sizeof (short);
 

@@ -20,41 +20,31 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __CS_VPL_COMMON_STRUCTS_H__
 
 /**\file
- * Video Player: types
+ * Video Player: structs
  */
+
+/**
+ * \addtogroup videoplay
+ * @{ */
 
 #include "csutil/scf.h"
 
 /**\addtogroup vpl
  * @{ */
 
-struct csVPLvideoFormat
-{
-  /// frame width and height
-  uint32 fWidth, 
-         fHeight;
-  /// colorspace for the video stream
-  int colorspace;
-  /// the pixel format of the video stream
-  int pixelfmt;
-
-  /// picture offset
-  uint32 picOffsetX,
-         picOffsetY;
-
-  /// the FPS of the video stream
-  float FPS;
-
-  /// the target bitrate of the video stream 
-  int target_bitrate;
-};
-
-/// Used to store languages available for a media file
+/**
+  * Used to store languages available for a media file
+  */
 struct Language
 {
-  /// The name of the language
+  /**
+    * The name of the language
+    */
   char* name;
-  /// The path of the audio file
+
+  /**
+    * The path of the audio file
+    */
   char* path;
 };
 

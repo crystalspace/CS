@@ -534,7 +534,7 @@ void TheoraMediaContainer::SelectLanguage (const char* identifier)
       }
       sndstream->SetLoopState (CS_SNDSYS_STREAM_DONTLOOP);
 
-      /// store the audio stream length
+      // store the audio stream length
       audioStreamLength = sndstream->GetFrameCount ()/sndstream->GetRenderedFormat ()->Freq;
     }
   }

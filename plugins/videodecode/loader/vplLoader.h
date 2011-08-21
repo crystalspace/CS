@@ -37,7 +37,7 @@ class csVplLoader : public scfImplementation2<csVplLoader,iMediaLoader,iComponen
 private:
   iObjectRegistry* object_reg;
 
-  /// Theora video loader interface
+  // Theora video loader interface
   csRef<iMediaLoader> m_pThOggLoader;
 
 public:

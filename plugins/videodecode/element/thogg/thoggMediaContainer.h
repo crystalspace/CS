@@ -61,14 +61,14 @@ private:
 
   csTicks timeSinceStart;
 
-  /// audio languages
+  // audio languages
   
   csArray<Language> languages;
 
-  /// audio stream
+  // audio stream
   csRef<iSndSysStream> sndstream;
 
-  /// audio stream length in seconds
+  // audio stream length in seconds
   size_t audioStreamLength;
 
 private:
@@ -132,7 +132,7 @@ public:
 
   virtual void OnStop ();
 
-  /// Does a seek on the active media
+  // Does a seek on the active media
   void DoSeek ();
   void QueuePage (ogg_page *page);
   void SetLanguages (csArray<Language> languages);

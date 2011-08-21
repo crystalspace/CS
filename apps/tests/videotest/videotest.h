@@ -50,13 +50,13 @@ private:
   csRef<iVFS> vfs;
   csRef<iCEGUI> cegui;
 
-  /// The sound renderer.
+  // The sound renderer.
   csRef<iSndSysRenderer> sndrenderer;
 
-  /// The sound source.
+  // The sound source.
   csRef<iSndSysSource> sndsource;
 
-  /// The audio stream.
+  // The audio stream.
   csRef<iSndSysStream> audioStream;
 
   // We need this to make the seeking slider work properly

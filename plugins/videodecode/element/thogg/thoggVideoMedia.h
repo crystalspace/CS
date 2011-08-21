@@ -127,7 +127,6 @@ public:
   virtual bool Initialize (iObjectRegistry*);
 
   virtual const char* GetType () const;
-  virtual const csVPLvideoFormat* GetFormat () const;
   virtual unsigned long GetFrameCount () const;
   virtual float GetLength () const;
   virtual void GetVideoTarget (csRef<iTextureHandle> &texture);
