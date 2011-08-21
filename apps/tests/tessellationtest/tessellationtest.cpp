@@ -93,6 +93,14 @@ bool TessellationTest::OnKeyboard(iEvent& ev)
     case '-':
       camDist += 0.1;
       break;
+    case 'p':
+      phong = !phong;
+      svPhong->SetValue ((int)phong);
+      break;
+    case 'd':
+      displace = !displace;
+      svDisplace->SetValue ((int)displace);
+      break;
     }
   }
   return false;
@@ -184,6 +192,10 @@ bool TessellationTest::SetupModules ()
   strings = csQueryRegistryTagInterface<iStringSet> 
       (GetObjectRegistry(), "crystalspace.shared.stringset");
   if (!strings) return ReportError("Failed to locate string set!");
+
+  shstrings = csQueryRegistryTagInterface<iShaderVarStringSet> 
+      (GetObjectRegistry(), "crystalspace.shader.variablenameset");
+  if (!shstrings) return ReportError("Failed to locate variable name set!");
   
   // We need a View to the virtual world.
   view.AttachNew(new csView (engine, g3d));
@@ -207,6 +219,9 @@ bool TessellationTest::SetupModules ()
   // Now we need to position the camera in our world.
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, 0));
+
+  // Setup default state
+  phong = displace = true;
 
   // We use some other "helper" event handlers to handle 
   // pushing our work into the 3D engine and rendering it
@@ -246,7 +261,13 @@ void TessellationTest::CreateTeapot ()
   {
     const char *shaderFile = "data/tessellationtest/shader.xml";
     iShader* shader = loader->LoadShader (shaderFile);
-  
+
+    // Booleans parameters: enable/disable phong smoothing/displacement mapping
+    svPhong = shader->GetVariableAdd (shstrings->Request ("phong"));
+    svPhong->SetValue ((int)phong);
+    svDisplace = shader->GetVariableAdd (shstrings->Request("displace"));
+    svDisplace->SetValue ((int)displace);
+
     // Change shader of teapot material
     tm->GetMaterial ()->SetShader (strings->Request ("base"), shader);
     tm->GetMaterial ()->SetShader (strings->Request ("diffuse"), shader);

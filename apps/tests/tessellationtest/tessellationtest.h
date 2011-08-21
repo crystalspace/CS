@@ -44,6 +44,7 @@ class TessellationTest : public csApplicationFramework, public csBaseEventHandle
 
   /// Shared string set, needed to get csStringIDs for strings
   csRef<iStringSet> strings;
+  csRef<iShaderVarStringSet> shstrings;
 
   /// The render manager, cares about selecting lights+meshes to render
   csRef<iRenderManager> rm;
@@ -57,6 +58,10 @@ class TessellationTest : public csApplicationFramework, public csBaseEventHandle
   /// Event handlers to draw and print the 3D canvas on each frame
   csRef<FrameBegin3DDraw> drawer;
   csRef<FramePrinter> printer;
+
+  /// Shader variables to customize the render
+  csShaderVariable *svPhong, *svDisplace;
+  bool phong, displace;
 
  public:
   bool SetupModules ();
