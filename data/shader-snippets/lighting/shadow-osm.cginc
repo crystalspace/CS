@@ -189,7 +189,7 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     if (position.x < 0 || position.y < 0 || position.x > 1 || position.y > 1)
       depthStart = 0;    
 */
-    depthStart *= !(position.x < 0 || position.y < 0 || position.x > 1 || position.y > 1);
+    //depthStart *= !(position.x < 0 || position.y < 0 || position.x > 1 || position.y > 1);
 /*
     i = min( ( (compareDepth - depthStart) / (0.95 - depthStart) ) * (numSplits - 1), numSplits - 1);
 

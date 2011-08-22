@@ -938,13 +938,13 @@ namespace CS
           split = g3d->GetTextureManager()->CreateTexture(splitRes, 1, csimg2D, 
             "abgr8", CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP);
 
-          splitRatio = -1;
+          splitRatio = 2;
           bestSplitRatio = 0;
           bestSplitRatioMean = -1;
           bestSplitRatioCorrelation = FLT_MAX;
           bestSplitRatio2 = 0;
           // Set linear or logarithmic split
-          SetHybridSplit(bestSplitRatio);
+          SetHybridSplit(1);
 
           osmShader->GetVariableAdd(numSplitsSVName)->SetValue(numSplits);
           osmShader->GetVariableAdd(splitSVName)->SetValue(split);

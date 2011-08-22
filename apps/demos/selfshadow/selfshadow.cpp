@@ -95,7 +95,7 @@ bool SelfShadowDemo::OnKeyboard (iEvent &ev)
     {
       sceneNumber = ( sceneNumber + 1 ) % numberOfScenes;
       CreateScene();
-      rm_dbg->DebugCommand("reset");
+//       rm_dbg->DebugCommand("reset");
       return true;
     }
 
