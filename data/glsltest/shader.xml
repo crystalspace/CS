@@ -159,7 +159,7 @@
 
               void main (void)
               {
-                vec4 col = texture2D (texdiff, tc);
+                vec4 col = texture (texdiff, tc);
                 gl_FragColor = col * vec4 (coeff, 0.0);
               }
             ]]>
