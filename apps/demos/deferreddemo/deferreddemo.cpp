@@ -48,9 +48,7 @@ DeferredDemo::DeferredDemo()
   cfgWorldFile = "world";
   
   cfgUseDeferredShading = true;
-
   downsampleNormalsDepth = false;
-
   cfgShowHUD = false;
 }
 
@@ -261,8 +259,6 @@ bool DeferredDemo::SetupGui(bool reload)
     "DeferredDemo.MaxOccluderDist", maxOccluderDistance));
   selfOcclusionListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
     "DeferredDemo.SelfOcclusion", selfOcclusion));
-  occAngleBiasListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
-    "DeferredDemo.AngleBias", occAngleBias));
   bounceStrengthListener.AttachNew (new CS::Utility::ConfigListener<float>(GetObjectRegistry(), 
     "DeferredDemo.BounceStrength", bounceStrength));
   blurKernelSizeListener.AttachNew (new CS::Utility::ConfigListener<int>(GetObjectRegistry(), 
@@ -357,7 +353,6 @@ void DeferredDemo::ResetGUIValues()
   aoPasses = 2;
   maxOccluderDistance = 1.6f;
   selfOcclusion = 0.1f;
-  occAngleBias = 0.0f;
   bounceStrength = 2.0f;
   blurKernelSize = 3;
   blurPositionThreshold = 0.5f;
@@ -376,8 +371,6 @@ void DeferredDemo::ResetGUIValues()
     setCurrentValue (maxOccluderDistance);
   static_cast<CEGUI::Slider*>(winMgr->getWindow ("SelfOcclusion__auto_slider__"))->
     setCurrentValue (selfOcclusion);
-  static_cast<CEGUI::Slider*>(winMgr->getWindow ("AngleBias__auto_slider__"))->
-    setCurrentValue (occAngleBias);
   static_cast<CEGUI::Slider*>(winMgr->getWindow ("BounceStrength__auto_slider__"))->
     setCurrentValue (bounceStrength);
   static_cast<CEGUI::Slider*>(winMgr->getWindow ("KernelSize__auto_slider__"))->
@@ -425,7 +418,8 @@ bool DeferredDemo::SetupHelpPane(CEGUI::WindowManager *winMgr)
     helpText->setProperty ("HorzFormatting", "Left");
 
     float yOffset = helpText->getPosition().d_y.d_offset;
-    helpText->setPosition (CEGUI::UVector2 (CEGUI::UDim (0.0f, 5.0f), CEGUI::UDim (0.0f, yOffset + i * 25.0f)));
+    helpText->setPosition (CEGUI::UVector2 (CEGUI::UDim (0.0f, 5.0f), 
+      CEGUI::UDim (0.0f, yOffset + i * 25.0f)));
 
     guiHelpFrame->addChildWindow (helpText);
   }
@@ -436,7 +430,7 @@ bool DeferredDemo::SetupHelpPane(CEGUI::WindowManager *winMgr)
 //----------------------------------------------------------------------
 bool DeferredDemo::SetupScene()
 {
-  // Find a strating sector
+  // Find a starting sector
   iCameraPositionList* positions = engine->GetCameraPositions ();
   if (positions->GetCount ())
     room = engine->FindSector (positions->Get (0)->GetSector ());
@@ -451,7 +445,7 @@ bool DeferredDemo::SetupScene()
   cameraManager->SetCamera (view->GetCamera ());
   cameraManager->SetCameraMode (CS::Utility::CAMERA_MOVE_FREE);
 
-  // TODO: explain this
+  // Set near and far clip planes
   csPlane3 *farPlane = new csPlane3 (0, 0, -1, 100);
   view->GetCamera()->SetFarPlane (farPlane);
   view->GetPerspectiveCamera()->SetNearClipDistance (0.2f);
@@ -494,6 +488,7 @@ bool DeferredDemo::SetupScene()
 
   CreateColliders();
     
+  //TODO: should this be updated with current sector?
   dynamicsDebugger->SetDebugSector (room);
 
   printf ("Precaching data...\n");
@@ -506,7 +501,7 @@ bool DeferredDemo::SetupScene()
 //----------------------------------------------------------------------
 void DeferredDemo::CreateColliders()
 {
-  ReportInfo ("Creating colliders...");  
+  ReportInfo ("Creating colliders...");
 
   for (int i=0; i < engine->GetMeshes()->GetCount(); i++)
   {
@@ -567,15 +562,15 @@ void DeferredDemo::UpdateGui()
   rmGlobalIllum->GetGlobalIllumVariableAdd ("num passes")->SetValue (aoPasses);
   rmGlobalIllum->GetGlobalIllumVariableAdd ("max occluder distance")->SetValue (maxOccluderDistance);
   rmGlobalIllum->GetGlobalIllumVariableAdd ("self occlusion")->SetValue (selfOcclusion);
-  rmGlobalIllum->GetGlobalIllumVariableAdd ("occluder angle bias")->SetValue (occAngleBias);
   rmGlobalIllum->GetGlobalIllumVariableAdd ("bounce strength")->SetValue (bounceStrength);  
   rmGlobalIllum->GetBlurVariableAdd ("ssao blur kernelsize")->SetValue (blurKernelSize);
   rmGlobalIllum->GetBlurVariableAdd ("ssao blur position threshold")->SetValue (blurPositionThreshold);
   rmGlobalIllum->GetBlurVariableAdd ("ssao blur normal threshold")->SetValue (blurNormalThreshold);
 
   hudManager->GetStateDescriptions()->Empty();
-  csString msg ("Number of lights: ");
-  msg.Append (room->GetLights()->GetCount());  
+  iSector *currentSector = view->GetCamera()->GetSector();
+  csString msg ("Lights in current sector: ");
+  msg.Append (currentSector->GetLights()->GetCount());  
   hudManager->GetStateDescriptions()->Push (msg);
 
   msg = csString ("SSGI resolution: ");
@@ -621,32 +616,7 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
   if (eventtype == csKeyEventTypeDown)
   {
     utf32_char code = csKeyEventHelper::GetCookedCode(&event);
-    if (code == CSKEY_F8)
-    {
-      cfgShowHUD = !cfgShowHUD;
-
-      if (cfgShowHUD)
-      {
-	hudManager->GetKeyDescriptions()->Empty();
-	hudManager->GetKeyDescriptions()->Push ("z: Change SSGI resolution");
-	hudManager->GetKeyDescriptions()->Push ("x: Change depth/normals resolution");
-	hudManager->GetKeyDescriptions()->Push ("Space: Throw ball");
-	hudManager->GetKeyDescriptions()->Push ("Alt+Space: Throw ball w/light");
-	hudManager->GetKeyDescriptions()->Push ("n: Pause/Resume physics simulation");
-	hudManager->GetKeyDescriptions()->Push ("g: Show/Hide GUI");
-  hudManager->GetKeyDescriptions()->Push ("F8: Show/Hide Key Descriptions");
-	hudManager->GetKeyDescriptions()->Push ("F9: Show/Hide HUD");
-	hudManager->GetKeyDescriptions()->Push ("F12: Screenshot");  
-	hudManager->GetKeyDescriptions()->Push ("1-9: Visualize deferred buffers");
-	hudManager->GetKeyDescriptions()->Push ("0: Visualize final rendered image");
-      }
-
-      else
-	hudManager->GetKeyDescriptions()->Empty();
-
-      return true;
-    }
-    else if (code == CSKEY_F2)
+    if (code == CSKEY_F2)
     {
       g2d->SetFullScreen (!g2d->GetFullScreen());
       return true;
@@ -777,7 +747,7 @@ bool DeferredDemo::OnKeyboard(iEvent &event)
     {      
       SpawnSphere();
       return true;
-    } 
+    }    
 #ifdef CS_DEBUG
     else if (code == 'r')
     {
@@ -834,8 +804,8 @@ void DeferredDemo::SpawnSphere(bool attachLight)
 
   if (attachLight)
   {    
-    light = engine->CreateLight ("light", body->GetPosition(), 5.0f, ballMaterialColors[materialIndex], 
-        CS_LIGHT_DYNAMICTYPE_DYNAMIC);
+    csRef<iLight> light = engine->CreateLight ("light", body->GetPosition(), 5.0f, 
+        ballMaterialColors[materialIndex], CS_LIGHT_DYNAMICTYPE_DYNAMIC);
     //light->SetType (CS_LIGHT_SPOTLIGHT);
     //light->SetSpotLightFalloff (25.0f, 30.0f);
     currentSector->GetLights()->Add (light);
@@ -843,9 +813,9 @@ void DeferredDemo::SpawnSphere(bool attachLight)
     radius = 0.15f;
     ballIndex = 5;
   }
-
+  
   csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (ballFact[ballIndex], "ball", currentSector));
-  iMaterialWrapper* mat = engine->GetMaterialList()->FindByName (ballMaterialNames[materialIndex]);    
+  iMaterialWrapper* mat = engine->GetMaterialList()->FindByName (ballMaterialNames[materialIndex]);
   mesh->GetMeshObject()->SetMaterialWrapper (mat);
 
   body->AttachMesh (mesh);

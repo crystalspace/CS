@@ -112,8 +112,6 @@ protected:
   csRef<iMeshFactoryWrapper> ballFact[6];
   csColor ballColors[3];
 
-  csRef<iLight> light;
-
   csRef<iShaderVarStringSet> svStringSet;
 
 protected:
@@ -152,7 +150,6 @@ protected:
   int aoPasses;
   float maxOccluderDistance;  
   float selfOcclusion;
-  float occAngleBias;
   float bounceStrength;
   int blurKernelSize;
   float blurPositionThreshold;
@@ -166,7 +163,6 @@ protected:
   csRef<iEventHandler> maxOccluderDistListener;
   csRef<iEventHandler> patternSizeListener;
   csRef<iEventHandler> selfOcclusionListener;
-  csRef<iEventHandler> occAngleBiasListener;
   csRef<iEventHandler> bounceStrengthListener;
   csRef<iEventHandler> blurKernelSizeListener;
   csRef<iEventHandler> blurPositionThresholdListener;
