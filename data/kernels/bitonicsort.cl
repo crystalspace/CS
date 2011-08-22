@@ -1,24 +1,40 @@
 /*
-  Copyright (C) 2011 by Matthieu Kraus
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2 of the License, or (at your option) any later version.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Library General Public License for more details.
-
-  You should have received a copy of the GNU Library General Public
-  License along with this library; if not, write to the Free
-  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    Crystal Space Entity Layer
+    Copyright (C) 2011 by Matthieu Kraus
+  
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+  
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+  
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-// type specific data
-#define element_t float
-#define compare(a,b) (a > b)
+// default type
+#ifndef element_t
+#  define element_t float
+#endif
+
+// default compare and exchange
+#ifndef CMPXCHG
+#  define CMPXCHG(a,b)\
+    const element_t left = a;\
+    const element_t right = b;\
+\
+    if(inc == (left > right))\
+    {\
+      b = left;\
+      a = right;\
+    }
+#endif
+
 
 // check whether async_strided_copy is available
 #ifdef CL_VERSION_1_1
@@ -100,14 +116,7 @@ void bitonicSortBatch(__global element_t* gArray,
   {
     GetIds(passDist,lId);
 
-    const element_t left = lArray[leftId];
-    const element_t right = lArray[rightId];
-
-    if(inc == compare(left,right))
-    {
-      lArray[rightId] = left;
-      lArray[leftId] = right;
-    }
+    CMPXCHG(lArray[leftId],lArray[rightId])
 
     barrier(CLK_LOCAL_MEM_FENCE);
   }
@@ -136,12 +145,5 @@ void bitonicSort(__global element_t* array,
 
   GetIds(dist,id);
 
-  const element_t leftElement = array[leftId];
-  const element_t rightElement = array[rightId];
-
-  if(inc == compare(leftElement,rightElement))
-  {
-    array[rightId] = leftElement;
-    array[leftId]  = rightElement;
-  }
+  CMPXCHG(array[leftId],array[rightId])
 }
