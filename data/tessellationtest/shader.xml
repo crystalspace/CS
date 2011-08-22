@@ -76,6 +76,13 @@
         </cp>
 
         <ep>
+          <variablemap variable="object2world transform"
+                       destination="mat_object" />
+          <variablemap variable="world2camera transform"
+                       destination="mat_camera" />
+          <variablemap variable="projection transform"
+                       destination="mat_projection" />
+
           <variablemap variable="phong" destination="phong" type="int" />
           <variablemap variable="displace" destination="displace" type="int" />
 
@@ -86,6 +93,10 @@
               #extension GL_EXT_gpu_shader4 : enable
 
               layout(triangles, equal_spacing, ccw) in;
+
+              uniform mat4 mat_object;
+              uniform mat4 mat_camera;
+              uniform mat4 mat_projection;
 
               uniform sampler2D texheight;
               uniform bool phong;
@@ -163,7 +174,8 @@
 
                 // doing projection after tessellation avoids
                 // screen-space interpolation of the vertex attributes
-                gl_Position = gl_ModelViewProjectionMatrix * pos;
+                mat4 mat_final = mat_projection * mat_camera * mat_object;
+                gl_Position = mat_final * pos;
               }
             ]]>
           </program>

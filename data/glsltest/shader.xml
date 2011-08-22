@@ -65,6 +65,13 @@
         </cp>
 
         <ep>
+          <variablemap variable="object2world transform"
+                       destination="mat_object" />
+          <variablemap variable="world2camera transform"
+                       destination="mat_camera" />
+          <variablemap variable="projection transform"
+                       destination="mat_projection" />
+
           <program>
             <![CDATA[
               #version 410
@@ -72,6 +79,10 @@
               #extension GL_EXT_gpu_shader4 : enable
 
               layout(triangles, equal_spacing, cw) in;
+
+              uniform mat4 mat_object;
+              uniform mat4 mat_camera;
+              uniform mat4 mat_projection;
 
               in vec2 tc[];
               out vec2 texcoord;
@@ -86,9 +97,12 @@
                 vec4 p0 = gl_TessCoord.x * gl_in[0].gl_Position;
                 vec4 p1 = gl_TessCoord.y * gl_in[1].gl_Position;
                 vec4 p2 = gl_TessCoord.z * gl_in[2].gl_Position;
+                vec4 pos = p0 + p1 + p2;
+
                 // doing projection after tessellation avoids
                 // screen-space interpolation of the vertices
-                gl_Position = gl_ModelViewProjectionMatrix * (p0 + p1 + p2);
+                mat4 mat_final = mat_projection * mat_camera * mat_object;
+                gl_Position = mat_final * pos;
               }
             ]]>
           </program>
