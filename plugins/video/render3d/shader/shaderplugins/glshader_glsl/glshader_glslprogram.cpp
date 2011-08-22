@@ -113,13 +113,25 @@ void csShaderGLSLProgram::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
           ext->glUniform4fARB (mapping.userVal, v[0], v[1], v[2], v[3]);
       }
       break;    
-    case csShaderVariable::MATRIX:
+    case csShaderVariable::MATRIX3X3:
       {
         csMatrix3 m;
         if (var->GetValue (m))
         {
+          // NOTE: sending a 4x4 matrix isn't actually required
           float matrix[16];
           makeGLMatrix (m, matrix);
+          ext->glUniformMatrix4fvARB (mapping.userVal, 1, GL_FALSE, matrix);
+        }
+      }
+      break;
+    case csShaderVariable::MATRIX4X4:
+      {
+        CS::Math::Matrix4 m;
+        if (var->GetValue (m))
+        {
+          float matrix[16];
+          CS::PluginCommon::MakeGLMatrix4x4 (m, matrix);
           ext->glUniformMatrix4fvARB (mapping.userVal, 1, GL_FALSE, matrix);
         }
       }
