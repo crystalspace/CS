@@ -2,19 +2,12 @@
 <![CDATA[
 
 uniform sampler2D NormalBuffer;
-uniform sampler2D DiffuseBuffer;
-uniform sampler2D AmbientBuffer;            
-uniform sampler2D DirectRadianceBuffer;
 uniform sampler2D GlobalIllumBuffer;
-uniform float FarClipDistance;
 uniform float4 ViewportSize; // (width, height, 1/width, 1/height)
 uniform int KernelSize;
 uniform float2 Direction; // X:(1,0) - Y:(0,1)
-uniform float Combine;
 uniform float PositionThreshold;
 uniform float NormalThreshold;
-uniform int ShowAO;
-uniform int ShowGlobalIllum;
 
 const float TWO_PI = 6.28318f;
 const float EPSILON = 0.01f;
@@ -37,8 +30,6 @@ const int KERNEL_SIZE = 7;
 <? endif ?>
 
 <![CDATA[
-float weightedAO = 0.0f;
-float AO = 0.0f;
 float4 weightedRadiance = float4(0.0f);
 float4 radiance = float4(0.0f);
 
@@ -64,13 +55,10 @@ float WeightSample(float sampleDist, float2 sampleTexCoord,
   {
     totalWeight = GaussianCoeff (sampleDist, sqrGaussianSigma) * pow (dotN, 32.0f) / 
         (EPSILON + deltaZ);
-    //totalWeight = exp (-i * i * NormalThreshold - deltaZ * deltaZ * PositionThreshold * 1024.0f);
     
-    //weightedAO += sampleGI.a * totalWeight;
     weightedRadiance += sampleGI * totalWeight;    
   }
   
-  //AO += sampleGI.a;
   radiance += sampleGI;
   return totalWeight;
 }
@@ -84,7 +72,7 @@ float4 main(in float2 texCoord : TEXCOORD0) : COLOR
   float weightSum = 0.0f;
   float sqrGaussianSigma = KERNEL_SIZE * 0.3333f;
   sqrGaussianSigma *= sqrGaussianSigma;
-  ViewportSize.zw *= 3.0f * Direction; // strided blur
+  ViewportSize.zw *= 3.0f * Direction; // strided blur (should make this a uniform)
   
   weightSum += WeightSample (0, texCoord, pixelDepth, pixelNormalVS, sqrGaussianSigma); 
   
@@ -98,20 +86,14 @@ float4 main(in float2 texCoord : TEXCOORD0) : COLOR
   
   if (weightSum > 0.0f)
   {
-    //weightSum = 1.0f / weightSum;
-    //AO = weightedAO * weightSum;
     radiance = weightedRadiance / weightSum;
   }
   else
   {
-    //weightSum = 1.0f / (2.0f * KERNEL_SIZE + 1.0f);
-    //AO *= weightSum;
-    //radiance *= weightSum;
     radiance /= 2.0f * KERNEL_SIZE + 1.0f;
   }
   
   return radiance;
-  //return float4 (radiance, AO);
 }
 
 ]]>

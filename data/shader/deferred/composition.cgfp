@@ -1,9 +1,4 @@
 <include>
-
-<variablemap variable="viewport size" destination="ViewportSize" />
-<variablemap variable="debug show ambocc" destination="ShowAO" />
-<variablemap variable="debug show globalillum" destination="ShowGlobalIllum" />
-
 <program>
 
 <![CDATA[
@@ -20,14 +15,11 @@ float4 main(vertex2fragment IN,
             uniform sampler2D DiffuseBuffer,
             uniform sampler2D AmbientBuffer,            
             uniform sampler2D DirectRadianceBuffer,
-            uniform sampler2D GlobalIllumBuffer,        
-            uniform float4 ViewportSize, // (width, height, 1/width, 1/height)
-            uniform int ShowAO,
-            uniform int ShowGlobalIllum) : COLOR
+            uniform sampler2D GlobalIllumBuffer) : COLOR
 {	
   float2 texCoord = IN.TexCoord;
   
-  float3 directRadiance = tex2D (DirectRadianceBuffer, texCoord).rgb; //return float4(directRadiance, 1.0);
+  float3 directRadiance = tex2D (DirectRadianceBuffer, texCoord).rgb;
   float3 diffuseColor = tex2D (DiffuseBuffer, texCoord).rgb;  
   float3 ambientColor = tex2D (AmbientBuffer, texCoord).rgb;  
   
@@ -45,6 +37,7 @@ float4 main(vertex2fragment IN,
     return float4 (directRadiance + (diffuseColor * ambientColor * AO) + radiance.rgb, 1.0f);
     
     // AO affects ambient and direct light
+    // TODO: include shadervar to choose whether AO also affects direct light or not
     //return float4 ((directRadiance + diffuseColor * ambientColor) * AO + radiance.rgb, 1.0f);
 }
 

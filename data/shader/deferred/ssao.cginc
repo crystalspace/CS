@@ -9,7 +9,6 @@
 <variablemap variable="occlusion strength" destination="occlusionStrength" />
 <variablemap variable="max occluder distance" destination="maxOccluderDistance" />
 <variablemap variable="bounce strength" destination="indirectLightStrength" />
-<variablemap variable="occluder angle bias" destination="occluderAngleBias" />
 <variablemap variable="enable ambient occlusion" destination="enableAO" />
 <variablemap variable="enable indirect light" destination="enableIndirectLight" />
 
@@ -24,7 +23,6 @@ uniform sampler2D NormalBuffer;
 uniform sampler2D AmbientBuffer;
 uniform sampler2D DepthBuffer;
 uniform sampler2D DirectRadianceBuffer;
-uniform sampler2D SeedTexture;
 uniform sampler2D EnvmapTexture;
 uniform sampler2D RandNormalsTexture;
 uniform float4 viewportSize;  // width, height, 1/width, 1/height
@@ -36,14 +34,9 @@ uniform float selfOcclusion;
 uniform float occlusionStrength;
 uniform float maxOccluderDistance;
 uniform float indirectLightStrength;
-uniform float occluderAngleBias;
 uniform float enableAO;
 uniform float enableIndirectLight;
 uniform float enableGlobalAO;
-
-const float TWO_PI         = 6.283185f;
-const float ONE_OVER_PI    = 0.318310f;
-const float ONE_OVER_TWOPI = 0.159155f;
 
 ]]>
 // Cg profiles for older hardware don't support data-dependent loops
@@ -81,9 +74,8 @@ float ComputeOcclusion(float3 vecToOccluder, float3 normal, float3 sampleNormal)
 {  
   float distance = length (vecToOccluder);
   float deltaN = (1.0 - max (0.0, dot (normal, sampleNormal))) *
-      max (0.0 - selfOcclusion, dot (normal, normalize (vecToOccluder)) - occluderAngleBias);
-  return deltaN * (1.0 - smoothstep (0.01, maxOccluderDistance, distance));
-       // step (0.01, distance) * step (distance, maxOccluderDistance) / (1.0 + distance * distance);      
+      max (0.0 - selfOcclusion, dot (normal, normalize (vecToOccluder)));
+  return deltaN * (1.0 - smoothstep (0.01, maxOccluderDistance, distance));      
 }
 
 float3 ComputeIndirectRadiance(float2 sampleTC, float3 vecToOccluder, float3 normal, float3 sampleNormal, float ao)
@@ -94,7 +86,7 @@ float3 ComputeIndirectRadiance(float2 sampleTC, float3 vecToOccluder, float3 nor
   float cosSi = max (0.0, dot (sampleNormal, -vecToOccluder));
   float occluderGeometricTerm = cosSi * cosRi / (occluderDist * occluderDist);*/
   float3 occluderRadiance = tex2D (DirectRadianceBuffer, sampleTC).rgb;
-  return indirectLightStrength * occluderRadiance * ao; //* occluderGeometricTerm;
+  return indirectLightStrength * occluderRadiance * ao;
 }
 
 float4 main(vertex2fragment IN) : COLOR
@@ -115,8 +107,6 @@ float4 main(vertex2fragment IN) : COLOR
   float2 texCoord = screenXY * 0.5 + 0.5;
   
   float4 normalDepth = tex2D (NormalBuffer, texCoord); 
-  //return float4 (1.0);
-  //return float4 (normalDepth.rgb, 1.0);
   float depth = normalDepth.a * farClipDistance;
   float3 screenPos = float3 (screenXY.x, -screenXY.y, depth);
   float3 normal = normalDepth.rgb * 2.0 - 1.0;
@@ -137,9 +127,8 @@ float4 main(vertex2fragment IN) : COLOR
   float totalSamples = 8.0 * NUM_PASSES;
   float sampleStep = 0.5 / totalSamples;
   float sampleLength = 0.5;
-  //float3 bentNormal = float3(0.0);
   
-  float3 randomNormal = tex2D (RandNormalsTexture, texCoord * ((viewportSize.xy / 64) /*+ float2(n)*/)).rgb * 2.0 - 1.0;
+  float3 randomNormal = tex2D (RandNormalsTexture, texCoord * ((viewportSize.xy / 64))).rgb * 2.0 - 1.0;
     randomNormal = normalize (randomNormal);
   
   for (int n=0; n < NUM_PASSES; n++)
@@ -165,8 +154,6 @@ float4 main(vertex2fragment IN) : COLOR
 <?if vars."enable ambient occlusion".float == 1 ?>
       AOsum += occlusionStrength * AO;
 <?endif?>
-
-      //bentNormal += vecToOccluder * AO;
     }
   }
 <?if vars."enable ambient occlusion".float == 1 ?>
@@ -177,17 +164,7 @@ float4 main(vertex2fragment IN) : COLOR
   indirectRadiance /= 2.0 * totalSamples;
 <?endif?>
 <![CDATA[
-  /*bentNormal = normalize (bentNormal);
-  // convert bent normal to spherical coords
-  float theta = acos (bentNormal.y);
-  float phi = atan2 (bentNormal.z, bentNormal.x);
-  //phi += lightRotationAngle;
-  if (phi < 0) phi += TWO_PI; //TODO: replace if for step function?
-  if (phi > TWO_PI) phi -= TWO_PI;
-  float3 envRadiance = tex2D (EnvmapTexture, float2 (phi * ONE_OVER_TWOPI, 1.0 - theta * ONE_OVER_PI)).rgb;
-  indirectRadiance += envRadiance * max (0.0, dot (bentNormal, normal));*/
   
-  //return float4 (1.0 - saturate (AOsum));
   return float4 (indirectRadiance, 1.0 - saturate (AOsum));
 }
 

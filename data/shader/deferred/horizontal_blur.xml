@@ -16,11 +16,6 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
-<!--
-  Based on the paper "Approximating Dynamic Global Illumination in 
-  Image Space" by Tobias Ritschel, Thorsten Grosch and Hans-Peter 
-  Seidel, 2009.
--->
 
 <shader compiler="xmlshader" name="deferred_horizontal_blur">
   
@@ -39,13 +34,9 @@
       <vp plugin="glcg" file="/shader/deferred/globalillum.cgvp" />      
       
       <texture destination="GlobalIllumBuffer" name="tex global illumination" />
-      <!--texture destination="NormalBuffer" name="tex gbuffer 3" /-->
       <texture destination="NormalBuffer" name="tex normals depth" />
-      <!--<fp plugin="glcg" file="/shader/deferred/horizontal_blur.cgfp" />-->
       <fp plugin="glcg">
         <cgfp>
-          <variablemap variable="projection transform inverse" destination="ProjInv" />
-          <variablemap variable="far clip distance" destination="FarClipDistance" />
           <variablemap variable="viewport size" destination="ViewportSize" />
           <variablemap variable="ssao blur kernelsize" destination="KernelSize" />
           <variablemap variable="ssao blur position threshold" destination="PositionThreshold" />
