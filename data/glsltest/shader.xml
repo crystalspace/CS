@@ -109,6 +109,7 @@
           <program>
             <![CDATA[
               #version 410
+              #extension GL_EXT_geometry_shader4 : enable
 
               // let's make the tessellation visible :)
 #define LINES 1
