@@ -3,18 +3,18 @@
   <Window Type="DefaultWindow" Name="root">
     <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
     <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
-    <Property Name="MousePassThroughEnabled" Value="True" />
+    <Property Name="MousePassThroughEnabled" Value="True" />    
 
     <Window Type="ice/TabControl" Name="TabControl">
       <Property Name="TabHeight" Value="{0,25}" />
       <Property Name="TabPanePosition" Value="Top" />
-      <Property Name='UnifiedSize' Value='{{0.0,260.0},{0.0,550.0}}'/>
-      <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,5.0}}'/>
+      <Property Name='UnifiedSize' Value='{{0.0,260.0},{0.0,505.0}}'/>
+      <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,5.0}}'/>      
       
       <Window Type='DefaultWindow' Name='OptionsPane'>
         <Property Name="Text" Value="Options" />
         <Property Name="Visible" Value="True" />
-        <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+        <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />        
 
         <Window Type='ice/Listbox' Name='RMFrame'>
           <Property Name='UnifiedSize' Value='{{0.0,250.0},{0.0,95.0}}'/>
@@ -75,7 +75,7 @@
         </Window>
 
         <Window Type='ice/Listbox' Name='SSAOFrame'>
-          <Property Name='UnifiedSize' Value='{{0.0,250.0},{0.0,190.0}}'/>
+          <Property Name='UnifiedSize' Value='{{0.0,250.0},{0.0,170.0}}'/>
           <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,160.0}}'/>
 
           <Window Type='ice/Checkbox' Name='EnableAO'>
@@ -160,24 +160,12 @@
             <Property Name='MinimumValue' Value='0.0'/>
             <Property Name='MaximumValue' Value='1.0'/>
             <Property Name='ClickStepSize' Value='0.01'/>
-          </Window>
-
-          <Window Type="ice/SettingSlider" Name="AngleBias">
-            <Property Name='UnifiedSize' Value='{{0.70,60.0},{0.0,30}}'/>
-            <Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,165.0}}'/>
-
-            <Property Name='Text' Value='Occ.Ang.Bias'/>
-            <Property Name='ConfigTypes' Value='float'/>
-            <Property Name='ConfigNames' Value='DeferredDemo.AngleBias'/>
-            <Property Name='MinimumValue' Value='0.0'/>
-            <Property Name='MaximumValue' Value='1.0'/>
-            <Property Name='ClickStepSize' Value='0.01'/>
-          </Window>
+          </Window>          
         </Window>
 
         <Window Type='ice/Listbox' Name='IndLightFrame'>
           <Property Name='UnifiedSize' Value='{{0.0,250.0},{0.0,50.0}}'/>
-          <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,355.0}}'/>
+          <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,335.0}}'/>
 
           <Window Type='ice/Checkbox' Name='EnableIndirectLight'>
             <Property Name='UnifiedSize' Value='{{1.0,0.0},{0.0,20}}'/>
@@ -200,7 +188,7 @@
 
         <Window Type='ice/Listbox' Name='BlurFrame'>
           <Property Name='UnifiedSize' Value='{{0.0,250.0},{0.0,90.0}}'/>
-          <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,410.0}}'/>
+          <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,390.0}}'/>
 
           <Window Type='ice/Checkbox' Name='EnableBlur'>
             <Property Name='UnifiedSize' Value='{{1.0,0.0},{0.0,20}}'/>
@@ -251,7 +239,7 @@
         <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
 
         <Window Type='ice/Listbox' Name='HelpFrame'>
-          <Property Name='UnifiedSize' Value='{{0.0,250.0},{0.0,495.0}}'/>
+          <Property Name='UnifiedSize' Value='{{0.0,250.0},{0.0,475.0}}'/>
           <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,5.0}}'/>
           
           <Window Type='ice/StaticText' Name='HelpTxt'>
