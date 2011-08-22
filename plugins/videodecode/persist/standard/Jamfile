@@ -1,6 +1,6 @@
 SubDir TOP plugins videodecode persist standard ;
 
-Description vplParser : "video parser" ;
-Plugin vplParser : [ Wildcard *.cpp *.h ] ;
+Description parser : "media parser" ;
+Plugin parser : [ Wildcard *.cpp *.h ] ;
 Includes vplParser.h : $(SUBDIR)/vplParser.tok ;
-LinkWith vplParser : crystalspace ;
+LinkWith parser : crystalspace ;

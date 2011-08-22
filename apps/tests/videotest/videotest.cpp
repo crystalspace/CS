@@ -134,7 +134,9 @@ bool VideoTest::Application ()
   sndrenderer = csQueryRegistry<iSndSysRenderer> (GetObjectRegistry ());
   if (!sndrenderer) return ReportError ("Failed to locate sound renderer!");
 
-  sndrenderer->GetListener ()->SetPosition (csVector3 (0, 0, 0));
+  csRef<iSndSysListener> listener = sndrenderer->GetListener ();
+  if (!listener) return ReportError("Failed to locate sound listener!"); 
+  listener->SetPosition (csVector3 (0, 0, 0));
 
   // Set the working directory
   vfs->ChDir ("/videodecode/");

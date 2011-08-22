@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- vplParser.csplugin -->"
+<!-- parser.csplugin -->
 <plugin>
   <scf>
     <classes>

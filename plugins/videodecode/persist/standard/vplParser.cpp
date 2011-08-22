@@ -48,6 +48,8 @@ bool csVplParser::Initialize (iObjectRegistry* r)
   return true;
 }
 
+static const char* msgidFactory = "crystalspace.vplparser";
+
 csPtr<iBase> csVplParser::Parse (iDocumentNode* node, iStreamSource*, iLoaderContext* ldr_context, iBase* context)
 {
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -62,7 +64,15 @@ csPtr<iBase> csVplParser::Parse (iDocumentNode* node, iStreamSource*, iLoaderCon
     {
     case XMLTOKEN_MEDIA:
       {
-        if (strcmp (child->GetAttributeValue ("type"),"theoraVideo")==0)
+        const char* type = child->GetAttributeValue ("type");
+        if (type == 0)
+        {
+          synldr->ReportError (msgidFactory, child, 
+                               "No type defined while loading video");
+          return 0;
+        }
+
+        if (strcmp (type,"theoraVideo")==0)
         {
 
           csRef<iPluginManager> mgr=csQueryRegistry<iPluginManager> (object_reg);
@@ -85,7 +95,15 @@ csPtr<iBase> csVplParser::Parse (iDocumentNode* node, iStreamSource*, iLoaderCon
             case XMLTOKEN_VIDEOSTREAM:
               {
                 // Get the path for the media file
-                mediaPath = csString (child2->GetAttributeValue ("path"));
+                const char* vidPath = child2->GetAttributeValue ("path");
+                if (vidPath == 0)
+                {
+                  synldr->ReportError (msgidFactory, child2, 
+                                       "No path defined while loading videostream");
+                  return 0;
+                }
+
+                mediaPath = csString (vidPath);
               }
             case XMLTOKEN_AUDIOSTREAM:
               {
@@ -107,12 +125,28 @@ csPtr<iBase> csVplParser::Parse (iDocumentNode* node, iStreamSource*, iLoaderCon
                       Language buff;
 
                       //store the name
-                      buff.name = new char[strlen (child3->GetAttributeValue ("name"))];
-                      strcpy (buff.name,child3->GetAttributeValue ("name"));
+                      const char* name = child3->GetAttributeValue ("name");
+                      if (name == 0)
+                      {
+                        synldr->ReportError (msgidFactory, child3, 
+                                             "No language name defined while loading audiostream");
+                        return 0;
+                      }
+
+                      buff.name = new char[strlen (name)];
+                      strcpy (buff.name,name);
 
                       //and the path
-                      buff.path = new char[strlen (child3->GetAttributeValue ("path"))];
-                      strcpy (buff.path,child3->GetAttributeValue ("path"));
+                      const char* langPath = child3->GetAttributeValue ("path");
+                      if (langPath == 0)
+                      {
+                        synldr->ReportError (msgidFactory, child3, 
+                                             "No language path defined while loading audiostream");
+                        return 0;
+                      }
+
+                      buff.path = new char[strlen (langPath)];
+                      strcpy (buff.path,langPath);
 
                       languages.Push (buff);
                     }
