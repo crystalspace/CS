@@ -33,7 +33,7 @@
 CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 {
   /**
-   * Renderer for screen-space global illumination techniques.
+   * Implements screen-space global illumination techniques.
    */
   class csGlobalIllumRenderer
   {
@@ -41,7 +41,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
     csGlobalIllumRenderer() : graphics3D (nullptr), globalIllumBuffer (nullptr),
       intermediateBuffer (nullptr), gbuffer (nullptr), enabled (true), isInitialized (false) 
-    {         
+    {
     }
     
     ~csGlobalIllumRenderer() 
@@ -81,7 +81,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       this->gbuffer = gbuffer;
 
       // Initialize buffers
-      globalIllumBufferFormat = cfg->GetStr ("RenderManager.Deferred.GlobalIllum.GlobalIllumBufferFormat",
+      globalIllumBufferFormat = cfg->GetStr ("RenderManager.Deferred.GlobalIllum.BufferFormat",
         "rgba16_f");
       
       csString bufferRes (cfg->GetStr ("RenderManager.Deferred.GlobalIllum.BufferResolution", "full"));
@@ -162,8 +162,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         return false;
       }
 
-      LoadRandomNormalsTexture (loader, graphics3D, cfg);
-      //LoadIrradianceEnvironmentMap (loader, graphics3D);    
+      LoadRandomNormalsTexture (loader, graphics3D, cfg);          
 
       CreateFullscreenQuad ();
 
@@ -171,23 +170,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 
       isInitialized = true;
       return true;
-    }    
-
-    /*void UpdateShaderVars()
-    {
-      if (!enabled)
-        return;
-
-      lightCompositionShader->GetVariableAdd (
-        svStringSet->Request ("debug show ambocc"))->SetValue ((int)showAmbientOcclusion);
-      lightCompositionShader->GetVariableAdd (
-        svStringSet->Request ("debug show globalillum"))->SetValue ((int)showGlobalIllumination);
-
-      if (downsampleDepthNormals)
-        depthNormalBufferSV->SetValue (depthNormalBuffer); 
-      else
-        depthNormalBufferSV->SetValue (gbuffer->GetColorBuffer(3));
-    }*/
+    }
 
     void RenderGlobalIllum(iTextureHandle *accumBuffer)
     {
@@ -640,80 +623,70 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       
       csRef<csShaderVariable> shaderVar = globalIllumShader->GetVariableAdd (
           svStringSet->Request ("tex random normals"));      
-      shaderVar->SetValue (randomNormalsTexture);
-      
-      shaderVar = globalIllumShader->GetVariableAdd (
-          svStringSet->Request ("tex globalillum envmap"));
-      shaderVar->SetValue (irradianceEnvironmentMap);      
+      shaderVar->SetValue (randomNormalsTexture);      
 
       shaderVar = globalIllumShader->GetVariableAdd (
           svStringSet->Request ("num passes"));
-      int sampleCount = cfg->GetInt ("RenderManager.Deferred.GlobalIllum.SSDO.NumPasses", 2);
+      int sampleCount = cfg->GetInt ("RenderManager.Deferred.GlobalIllum.NumPasses", 2);
       shaderVar->SetValue (sampleCount);
 
       shaderVar = globalIllumShader->GetVariableAdd (
           svStringSet->Request ("sample radius"));
-      float sampleRadius = cfg->GetFloat ("RenderManager.Deferred.GlobalIllum.SSDO.SampleRadius", 0.1f);
+      float sampleRadius = cfg->GetFloat ("RenderManager.Deferred.GlobalIllum.SampleRadius", 0.1f);
       shaderVar->SetValue (sampleRadius);
 
       shaderVar = globalIllumShader->GetVariableAdd (
           svStringSet->Request ("detail sample radius"));
-      float sampleRadiusFar = cfg->GetFloat ("RenderManager.Deferred.GlobalIllum.SSDO.SampleRadiusFar", 0.6f);
+      float sampleRadiusFar = cfg->GetFloat ("RenderManager.Deferred.GlobalIllum.DetailSampleRadius", 0.6f);
       shaderVar->SetValue (sampleRadiusFar);
 
       shaderVar = globalIllumShader->GetVariableAdd (
           svStringSet->Request ("self occlusion"));
-      float depthBias = cfg->GetFloat ("RenderManager.Deferred.GlobalIllum.SSDO.SelfOcclusion", 0.0f);
+      float depthBias = cfg->GetFloat ("RenderManager.Deferred.GlobalIllum.SelfOcclusion", 0.0f);
       shaderVar->SetValue (depthBias);
 
       shaderVar = globalIllumShader->GetVariableAdd (
           svStringSet->Request ("occlusion strength"));
-      float occlusionStrength = cfg->GetFloat ("RenderManager.Deferred.GlobalIllum.SSDO.OcclusionStrength",
+      float occlusionStrength = cfg->GetFloat ("RenderManager.Deferred.GlobalIllum.OcclusionStrength",
         0.7f);
       shaderVar->SetValue (occlusionStrength);
 
       shaderVar = globalIllumShader->GetVariableAdd (
           svStringSet->Request ("max occluder distance"));
-      float maxOccluderDistance = cfg->GetFloat ("RenderManager.Deferred.GlobalIllum.SSDO.MaxOccluderDistance",
+      float maxOccluderDistance = cfg->GetFloat ("RenderManager.Deferred.GlobalIllum.MaxOccluderDistance",
         0.8f);
-      shaderVar->SetValue (maxOccluderDistance);
-
-      shaderVar = globalIllumShader->GetVariableAdd (
-          svStringSet->Request ("occluder angle bias"));
-      float lightRotationAngle = cfg->GetFloat ("RenderManager.Deferred.GlobalIllum.SSDO.OccluderAngleBias",
-        0.0f);
-      shaderVar->SetValue (lightRotationAngle);
+      shaderVar->SetValue (maxOccluderDistance);      
 
       shaderVar = globalIllumShader->GetVariableAdd (
           svStringSet->Request ("bounce strength"));
-      float bounceStrength = cfg->GetFloat ("RenderManager.Deferred.GlobalIllum.SSDO.BounceStrength", 6.0f);
+      float bounceStrength = cfg->GetFloat ("RenderManager.Deferred.GlobalIllum.LightBounceStrength", 6.0f);
       shaderVar->SetValue (bounceStrength);
 
       shaderVar = globalIllumShader->GetVariableAdd (
           svStringSet->Request ("enable ambient occlusion"));
-      float enableAO = cfg->GetFloat ("RenderManager.Deferred.GlobalIllum.SSDO.EnableAO", 1.0f);
-      shaderVar->SetValue (enableAO);
+      bool enableAO = cfg->GetBool ("RenderManager.Deferred.GlobalIllum.AmbientOcclusion.Enable", true);
+      shaderVar->SetValue ((float)enableAO);
 
       shaderVar = globalIllumShader->GetVariableAdd (
           svStringSet->Request ("enable indirect light"));
-      float enableIL = cfg->GetFloat ("RenderManager.Deferred.GlobalIllum.SSDO.EnableIndirectLight", 1.0f);
-      shaderVar->SetValue (enableIL);
+      bool enableIL = cfg->GetFloat ("RenderManager.Deferred.GlobalIllum.IndirectLight.Enable", true);
+      shaderVar->SetValue ((float)enableIL);
 
       shaderVar = shaderManager->GetVariableAdd (
           svStringSet->Request ("ssao blur kernelsize"));
-      int blurKernelSize = cfg->GetInt ("RenderManager.Deferred.GlobalIllum.SSDO.BlurKernelSize", 3);
+      int blurKernelSize = cfg->GetInt ("RenderManager.Deferred.GlobalIllum.Blur.KernelSize", 3);
       shaderVar->SetValue (blurKernelSize);
 
       shaderVar = shaderManager->GetVariableAdd (
           svStringSet->Request ("ssao blur position threshold"));
       float blurPositionThreshold = cfg->GetFloat (
-        "RenderManager.Deferred.GlobalIllum.SSDO.BlurPositionThreshold", 0.5f);
+        "RenderManager.Deferred.GlobalIllum.Blur.PositionThreshold", 0.5f);
       shaderVar->SetValue (blurPositionThreshold);
 
       shaderVar = shaderManager->GetVariableAdd (
           svStringSet->Request ("ssao blur normal threshold"));
       float blurNormalThreshold = cfg->GetFloat (
-        "RenderManager.Deferred.GlobalIllum.SSDO.BlurNormalThreshold", 0.1f);
+        "RenderManager.Deferred.GlobalIllum.Blur.NormalThreshold", 0.1f);
       shaderVar->SetValue (blurNormalThreshold);
 
       showAmbientOcclusion = false;
@@ -733,7 +706,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       int flags = CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS;
 
       const char *randomNormalsFilePath = cfg->GetStr (
-        "RenderManager.Deferred.GlobalIllum.SSDO.RandomNormalsFilePath", "/data/random_normals64.png");
+        "RenderManager.Deferred.GlobalIllum.RandomNormalsFilePath", "/data/random_normals64.png");
         //"/data/InterleavedSphereJittered4x4.png");
 
       randomNormalsTexture = loader->LoadTexture (randomNormalsFilePath, flags, 
@@ -741,23 +714,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       if (!randomNormalsTexture)
       {
         csReport (objectRegistry, CS_REPORTER_SEVERITY_WARNING, reporterMessageID, 
-          "Could not load random_normals.png texture!");
+          "Could not load random normals texture!");
       }
-    }
-
-    void LoadIrradianceEnvironmentMap(iLoader *loader, iGraphics3D *graphics3D)
-    {
-      csRef<iImage> image;
-      int flags = CS_TEXTURE_2D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS;
-
-      irradianceEnvironmentMap = loader->LoadTexture ("/data/blurred_grace.tga", flags, 
-        graphics3D->GetTextureManager(), &image);
-      if (!irradianceEnvironmentMap)
-      {
-        csReport (objectRegistry, CS_REPORTER_SEVERITY_WARNING, reporterMessageID, 
-          "Could not load blurred_grace.tga texture!");
-      }
-    }
+    }    
 
     void CreateFullscreenQuad()
     {
@@ -832,8 +791,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     bool isDepthNormalBufferAttached;
 
     csRef<iTextureHandle> randomNormalsTexture;
-    csRef<iTextureHandle> sampleDirectionsTexture;
-    csRef<iTextureHandle> irradianceEnvironmentMap;    
     
     csRef<csShaderVariable> globalIllumBufferSV;
     csRef<csShaderVariable> intermediateBufferSV;
