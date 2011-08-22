@@ -42,12 +42,12 @@ bool csVplParser::Initialize (iObjectRegistry* r)
   reporter = csQueryRegistry<iReporter> (object_reg);
   synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
-  mediaPath = mediaType = NULL;
   languages.DeleteAll ();
 
   InitTokenTable (xmltokens);
   return true;
 }
+
 csPtr<iBase> csVplParser::Parse (iDocumentNode* node, iStreamSource*, iLoaderContext* ldr_context, iBase* context)
 {
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -118,9 +118,11 @@ csPtr<iBase> csVplParser::Parse (iDocumentNode* node, iStreamSource*, iLoaderCon
                     }
                   }
                 }
+
               }
             }
           }
+
           m_pThOggLoader->Create (mediaPath,languages);
 
           return csPtr<iBase> (m_pThOggLoader);
@@ -128,5 +130,6 @@ csPtr<iBase> csVplParser::Parse (iDocumentNode* node, iStreamSource*, iLoaderCon
       }
     }
   }
+
   return 0;
 }
