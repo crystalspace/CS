@@ -98,7 +98,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="md ..\..\..\out\debug9\bin 2&gt; nul&#x0D;&#x0A;copy /y &quot;$(TargetPath)&quot; ..\..\..\out\debug9\bin\"
+				CommandLine="md ..\..\..\out\debug9\bin 2&gt; nul&#x0D;&#x0A;copy /y &quot;$(TargetPath)&quot; ..\..\..\out\debug9\bin\&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -217,7 +217,7 @@
 			Name="Other files"
 			>
 			<File
-				RelativePath="..\..\..\plugins\videodecode\persist\standard\parser.csplugin"
+				RelativePath="..\..\..\plugins\videodecode\persist\standard\vplParser.csplugin"
 				>
 			</File>
 		</Filter>
