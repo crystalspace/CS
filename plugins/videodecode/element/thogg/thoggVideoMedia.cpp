@@ -101,7 +101,7 @@ double csTheoraVideoMedia::GetPosition () const
 
 bool csTheoraVideoMedia::Update ()
 {
-  Convert ();
+  //Convert ();
   if (cache.GetSize ()>=cacheSize)
     return false;
 
@@ -128,8 +128,11 @@ bool csTheoraVideoMedia::Update ()
 
           th_ycbcr_buffer yuv;
           th_decode_ycbcr_out (_decodeControl,yuv);
+          //currentData.yuv = &yuv;
+          memcpy (&currentData.yuv, &yuv, sizeof (yuv));
+          Convert ();
           cachedData data;
-          memcpy (&data.yuv, &yuv, sizeof (yuv));
+          data.pixels = currentData.pixels;
           cache.Push (data);
         }
       }
@@ -261,7 +264,6 @@ void csTheoraVideoMedia::InitializeStream (ogg_stream_state &state, th_info &inf
   iTextureHandle* tex = _buffers.Get (activeBuffer);
   rgbBuff = tex->QueryBlitBuffer (_streamInfo.pic_x,_streamInfo.pic_y,_streamInfo.pic_width,_streamInfo.pic_height,dstSize);
 
-  conversionState=0;
 
   // Initialize the LUTs
   {
@@ -286,177 +288,150 @@ void csTheoraVideoMedia::DropFrame ()
 {
   if (cache.GetSize ()!=0)
   {
-    cache.PopTop ();
+    cachedData dat = cache.PopTop ();
+    delete dat.pixels;
   }
 }
 
 void csTheoraVideoMedia::Convert ()
 {
-  /*if (conversionState)
-    return;*/
-  if (conversionState == 0 && cache.GetSize ()!=0)
+
+  int y_offset= (_streamInfo.pic_x&~1)+currentData.yuv[0].stride* (_streamInfo.pic_y&~1);
+
+  uint8* pixels = rgbBuff; 
+
+  int Y,U,V,R,G,B;
+  // 4:2:0 pixel format
+  if (_streamInfo.pixel_fmt==TH_PF_420)
   {
-    currentData = cache.PopTop ();
-    if (rgbBuff==NULL)
-    {
-      conversionState = -1;
-      cout<<"RGB buffer is invalid! skipping conversion...\n";
-      return; 
-    }
-    //cout<<"converting "<<csGetTicks ()<<endl;
-    csTicks start = csGetTicks ();
+    int uv_offset= (_streamInfo.pic_x/2)+ (currentData.yuv[1].stride)* (_streamInfo.pic_y/2);
+    uint8 * test = new uint8[_streamInfo.pic_width*_streamInfo.pic_height*4];
+    int k=0;
+    for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
+      for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
+      {
+        Y = (currentData.yuv[0].data+y_offset+currentData.yuv[0].stride* ( (y)))[x] ;//-16;
+        U = (currentData.yuv[1].data+uv_offset+currentData.yuv[1].stride* (y/2))[x/2] ;//- 128;
+        V = (currentData.yuv[2].data+uv_offset+currentData.yuv[2].stride* (y/2))[x/2] ;//- 128;
 
-    //th_ycbcr_buffer yuv;
+        /* int R = ((298*Y + 409*V + 128)>>8);
+        int G = ((298*Y - 100*U - 208*V + 128)>>8);
+        int B = ((298*Y + 516*U + 128)>>8);*/
+        R = (Ylut[Y] + RVlut[V])>>8;
+        G = (Ylut[Y] - GUlut[U] - GVlut[V])>>8;
+        B = (Ylut[Y] + BUlut[U])>>8;
 
-    //memcpy (&yuv, &currentData.yuv, sizeof (currentData.yuv));
+        // Clamping the values here is faster than calling a function
+        if (R<0) R=0; else if (R>255) R=255;
+        if (G<0) G=0; else if (G>255) G=255;
+        if (B<0) B=0; else if (B>255) B=255;
 
-    int y_offset= (_streamInfo.pic_x&~1)+currentData.yuv[0].stride* (_streamInfo.pic_y&~1);
+        test[k] = (uint8)R;
+        k++;
+        test[k] = (uint8)G;
+        k++;
+        test[k] = (uint8)B;
+        k++;
+        test[k] = 0xff;
+        k++;
+      }
 
-    uint8* pixels = rgbBuff; 
+      currentData.pixels = test;
 
-    int Y,U,V,R,G,B;
-    // 4:2:0 pixel format
-    if (_streamInfo.pixel_fmt==TH_PF_420)
-    {
-      int uv_offset= (_streamInfo.pic_x/2)+ (currentData.yuv[1].stride)* (_streamInfo.pic_y/2);
+  }
+  // 4:2:2 pixel format
+  else if (_streamInfo.pixel_fmt==TH_PF_422)
+  {
+    int uv_offset= (_streamInfo.pic_x/2)+ (currentData.yuv[1].stride)* (_streamInfo.pic_y);
+    uint8 * test = new uint8[_streamInfo.pic_width*_streamInfo.pic_height*4];
+    int k=0;
+    for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
+      for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
+      {
+        Y = (currentData.yuv[0].data+y_offset+currentData.yuv[0].stride*y)[x] ;//-16;
+        U = (currentData.yuv[1].data+uv_offset+currentData.yuv[1].stride* (y))[x/2] ;//- 128;
+        V = (currentData.yuv[2].data+uv_offset+currentData.yuv[2].stride* (y))[x/2] ;//- 128;
 
-      for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
-        for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
-        {
-          Y = (currentData.yuv[0].data+y_offset+currentData.yuv[0].stride* ( (y)))[x] ;//-16;
-          U = (currentData.yuv[1].data+uv_offset+currentData.yuv[1].stride* (y/2))[x/2] ;//- 128;
-          V = (currentData.yuv[2].data+uv_offset+currentData.yuv[2].stride* (y/2))[x/2] ;//- 128;
+        R = (Ylut[Y] + RVlut[V])>>8;
+        G = (Ylut[Y] - GUlut[U] - GVlut[V])>>8;
+        B = (Ylut[Y] + BUlut[U])>>8;
 
-         /* int R = ((298*Y + 409*V + 128)>>8);
-          int G = ((298*Y - 100*U - 208*V + 128)>>8);
-          int B = ((298*Y + 516*U + 128)>>8);*/
-          R = (Ylut[Y] + RVlut[V])>>8;
-          G = (Ylut[Y] - GUlut[U] - GVlut[V])>>8;
-          B = (Ylut[Y] + BUlut[U])>>8;
+        // Clamping the values here is faster than calling a function
+        if (R<0) R=0; else if (R>255) R=255;
+        if (G<0) G=0; else if (G>255) G=255;
+        if (B<0) B=0; else if (B>255) B=255;
 
-          // Clamping the values here is faster than calling a function
-          if (R<0) R=0; else if (R>255) R=255;
-          if (G<0) G=0; else if (G>255) G=255;
-          if (B<0) B=0; else if (B>255) B=255;
+        test[k] = (uint8)R;
+        k++;
+        test[k] = (uint8)G;
+        k++;
+        test[k] = (uint8)B;
+        k++;
+        test[k] = 0xff;
+        k++;
+      }
+      currentData.pixels = test;
 
-          *pixels++ = (uint8)R;
-          *pixels++ = (uint8)G;
-          *pixels++ = (uint8)B;
-          *pixels++ = 0xff;
-        }
+  }
+  // 4:4:4 pixel format
+  else if (_streamInfo.pixel_fmt==TH_PF_444)
+  {
+    int uv_offset= (_streamInfo.pic_x/2)+ (currentData.yuv[1].stride)* (_streamInfo.pic_y);
 
-    }
-    // 4:2:2 pixel format
-    else if (_streamInfo.pixel_fmt==TH_PF_422)
-    {
-      int uv_offset= (_streamInfo.pic_x/2)+ (currentData.yuv[1].stride)* (_streamInfo.pic_y);
+    uint8 * test = new uint8[_streamInfo.pic_width*_streamInfo.pic_height*4];
+    int k=0;
+    for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
+      for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
+      {
+        Y = (currentData.yuv[0].data+y_offset+currentData.yuv[0].stride*y)[x];// -16;
+        U = (currentData.yuv[1].data+uv_offset+currentData.yuv[1].stride* (y))[x] ;//- 128;
+        V = (currentData.yuv[2].data+uv_offset+currentData.yuv[2].stride* (y))[x] ;//- 128;
 
-      for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
-        for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
-        {
-          Y = (currentData.yuv[0].data+y_offset+currentData.yuv[0].stride*y)[x] ;//-16;
-          U = (currentData.yuv[1].data+uv_offset+currentData.yuv[1].stride* (y))[x/2] ;//- 128;
-          V = (currentData.yuv[2].data+uv_offset+currentData.yuv[2].stride* (y))[x/2] ;//- 128;
+        R = (Ylut[Y] + RVlut[V])>>8;
+        G = (Ylut[Y] - GUlut[U] - GVlut[V])>>8;
+        B = (Ylut[Y] + BUlut[U])>>8;
 
-          R = (Ylut[Y] + RVlut[V])>>8;
-          G = (Ylut[Y] - GUlut[U] - GVlut[V])>>8;
-          B = (Ylut[Y] + BUlut[U])>>8;
+        // Clamping the values here is faster than calling a function
+        if (R<0) R=0; else if (R>255) R=255;
+        if (G<0) G=0; else if (G>255) G=255;
+        if (B<0) B=0; else if (B>255) B=255;
 
-          // Clamping the values here is faster than calling a function
-          if (R<0) R=0; else if (R>255) R=255;
-          if (G<0) G=0; else if (G>255) G=255;
-          if (B<0) B=0; else if (B>255) B=255;
+        test[k] = (uint8)R;
+        k++;
+        test[k] = (uint8)G;
+        k++;
+        test[k] = (uint8)B;
+        k++;
+        test[k] = 0xff;
+        k++;
+      }
+      currentData.pixels = test;
 
-          *pixels++ = (uint8)R;
-          *pixels++ = (uint8)G;
-          *pixels++ = (uint8)B;
-          *pixels++ = 0xff;
-        }
-
-    }
-    // 4:4:4 pixel format
-    else if (_streamInfo.pixel_fmt==TH_PF_444)
-    {
-      int uv_offset= (_streamInfo.pic_x/2)+ (currentData.yuv[1].stride)* (_streamInfo.pic_y);
-
-      for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
-        for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
-        {
-          Y = (currentData.yuv[0].data+y_offset+currentData.yuv[0].stride*y)[x];// -16;
-          U = (currentData.yuv[1].data+uv_offset+currentData.yuv[1].stride* (y))[x] ;//- 128;
-          V = (currentData.yuv[2].data+uv_offset+currentData.yuv[2].stride* (y))[x] ;//- 128;
-
-          R = (Ylut[Y] + RVlut[V])>>8;
-          G = (Ylut[Y] - GUlut[U] - GVlut[V])>>8;
-          B = (Ylut[Y] + BUlut[U])>>8;
-
-          // Clamping the values here is faster than calling a function
-          if (R<0) R=0; else if (R>255) R=255;
-          if (G<0) G=0; else if (G>255) G=255;
-          if (B<0) B=0; else if (B>255) B=255;
-
-          *pixels++ = R;
-          *pixels++ = G;
-          *pixels++ = B;
-          *pixels++ = 0xff;
-        }
-
-    }
-    else
-    {
-      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
-        "The Theora video stream has an unsupported pixel format.\n");
-      conversionState = 0;
-      //isWrite=false;
-      isWriting.NotifyOne ();
-      return;
-    }
-
-    conversionState = 2;
-
-    //cout<<"conv time = "<<csGetTicks ()-start<<endl;
+  }
+  else
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
+      "The Theora video stream has an unsupported pixel format.\n");
+    isWrite=false;
+    isWriting.NotifyOne ();
+    return;
   }
 }
 void csTheoraVideoMedia::SwapBuffers ()
 {
-  //override for testing purposes
-  //return;
-  if (conversionState == -1)
-  {
-    size_t dstSize;
-    iTextureHandle* tex = _buffers.Get (activeBuffer);
-    rgbBuff = tex->QueryBlitBuffer (_streamInfo.pic_x,_streamInfo.pic_y,_streamInfo.pic_width,_streamInfo.pic_height,dstSize);
-    conversionState = 0;
-  }
-  if (conversionState == 3)
+  if(canSwap)
   {
     if (activeBuffer==0)
     {
       _texture = _buffers[activeBuffer];
       activeBuffer = 1;
       canSwap=false;
-
-      csTicks start = csGetTicks ();
-
-      size_t dstSize;
-      iTextureHandle* tex = _buffers.Get (activeBuffer);
-      rgbBuff = tex->QueryBlitBuffer (_streamInfo.pic_x,_streamInfo.pic_y,_streamInfo.pic_width,_streamInfo.pic_height,dstSize);
-      conversionState = 0;
-
-      //cout<<"query blit buffer time "<<csGetTicks ()-start<<endl;
     }
     else
     {
       _texture = _buffers[activeBuffer];
       activeBuffer = 0;
       canSwap=false;
-
-      csTicks start = csGetTicks ();
-      size_t dstSize;
-      iTextureHandle* tex = _buffers.Get (activeBuffer);
-      rgbBuff = tex->QueryBlitBuffer (_streamInfo.pic_x,_streamInfo.pic_y,_streamInfo.pic_width,_streamInfo.pic_height,dstSize);
-      conversionState = 0;
-      //cout<<"query blit buffer time "<<csGetTicks ()-start<<endl;
     }
   }
 }
@@ -464,40 +439,26 @@ void csTheoraVideoMedia::SwapBuffers ()
 
 void csTheoraVideoMedia::WriteData ()
 {
-  if (conversionState==1)
-    return;
-
-
   isWrite=true;
-  //if (conversionState!=0)
+  if(!canSwap && cache.GetSize ()!=0)
   {
-    if (conversionState==2)
     {
-      csTicks start = csGetTicks ();
-      iTextureHandle* tex = _buffers.Get (activeBuffer);
-      tex->ApplyBlitBuffer (rgbBuff);
-      //cout<<"apply blit buffer time "<<csGetTicks ()-start<<endl;
+      MutexScopedLock lock (writeMutex);
 
-      conversionState = 3;
+      cachedData dat = cache.PopTop ();
+      size_t dstSize;
+      iTextureHandle* tex = _buffers.Get (activeBuffer);
+      rgbBuff = tex->QueryBlitBuffer (_streamInfo.pic_x,_streamInfo.pic_y,_streamInfo.pic_width,_streamInfo.pic_height,dstSize);
+
+      memcpy(rgbBuff,dat.pixels,_streamInfo.pic_width*_streamInfo.pic_height*4);
+      delete dat.pixels;
+
+      tex->ApplyBlitBuffer (rgbBuff);
+
       canSwap=true;
       isWrite=false;
-     // isWriting.NotifyOne ();
+      isWriting.NotifyOne ();
     }
-    /*if(cache.GetSize ()!=0)
-    {
-      if (conversionState==0)
-      {
-        MutexScopedLock lock (writeMutex);
-        canSwap=false;
-        size_t dstSize;
-
-        iTextureHandle* tex = _buffers.Get (activeBuffer);
-        rgbBuff = tex->QueryBlitBuffer (_streamInfo.pic_x,_streamInfo.pic_y,_streamInfo.pic_width,_streamInfo.pic_height,dstSize);
-        currentData = cache.PopTop ();
-
-        conversionState = 1;
-      }
-    }*/
   }
   isWrite=false;
 }

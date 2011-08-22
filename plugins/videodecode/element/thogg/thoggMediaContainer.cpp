@@ -145,7 +145,7 @@ void TheoraMediaContainer::Update ()
   {
     //HACK!: we subtract 3 from the target frame time, because otherwise,
     //it runs too slow
-    frameTime = 1000/_activeTheoraStream->GetTargetFPS ()-3;
+    frameTime = 1000/_activeTheoraStream->GetTargetFPS ();//-3;
   }
 
   //if a seek is scheduled, do it

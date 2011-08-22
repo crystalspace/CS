@@ -76,6 +76,7 @@ private:
   struct cachedData
   {
     th_ycbcr_buffer yuv;
+    uint8* pixels;
   };
 
   csFIFO<cachedData> cache;
@@ -87,8 +88,8 @@ private:
   // Stuff for conversion on the other thread
 
   uint8* rgbBuff;
-  int conversionState;
   void Convert ();
+  
 
   cachedData currentData;
 
