@@ -3,7 +3,8 @@
   <technique priority="200">
     <pass>
 
-      <buffer source="texture coordinate" destination="gl_MultiTexCoord0"/>
+      <buffer source="position" destination="in_position" />
+      <buffer source="texture coordinate" destination="in_texcoord"/>
       <texture name="tex diffuse" destination="texdiff"/>
 
       <shader plugin="glsl">
@@ -13,12 +14,14 @@
               #version 410
               #extension GL_EXT_geometry_shader4 : enable
 
+              in vec3 in_position;
+              in vec2 in_texcoord;
               out vec2 texcoord;
 
               void main (void)
               {
-                texcoord = gl_MultiTexCoord0.xy;
-                gl_Position = gl_Vertex;
+                texcoord = in_texcoord;
+                gl_Position = vec4 (in_position, 1.0);
               }
             ]]>
           </program>

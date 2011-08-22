@@ -3,8 +3,10 @@
   <technique priority="200">
     <pass>
 
-      <buffer source="texture coordinate" destination="gl_MultiTexCoord0"/>
-      <buffer source="normal" destination="gl_Normal"/>
+      <buffer source="position" destination="in_position" />
+      <buffer source="texture coordinate" destination="in_texcoord"/>
+      <buffer source="normal" destination="in_normal"/>
+
       <texture name="tex diffuse" destination="texdiff"/>
       <texture name="tex height" destination="texheight"/>
 
@@ -15,14 +17,18 @@
               #version 410
               #extension GL_EXT_geometry_shader4 : enable
 
+              in vec3 in_position;
+              in vec2 in_texcoord;
+              in vec3 in_normal;
+
               out vec2 texcoord;
               out vec3 normal;
 
               void main (void)
               {
-                texcoord = gl_MultiTexCoord0.xy * 0.5;
-                normal = normalize (gl_Normal);
-                gl_Position = gl_Vertex;
+                texcoord = in_texcoord * 0.5;
+                normal = normalize (in_normal);
+                gl_Position = vec4 (in_position, 1.0);
               }
             ]]>
           </program>
