@@ -1,0 +1,3 @@
+SubDir TOP plugins videodecode persist ;
+
+SubInclude TOP plugins videodecode persist standard ;

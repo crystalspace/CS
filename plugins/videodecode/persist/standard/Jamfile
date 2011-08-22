@@ -1,0 +1,5 @@
+SubDir TOP plugins videodecode persist standard ;
+
+Description standard : "video parser" ;
+Plugin standard : [ Wildcard *.cpp *.h ] ;
+LinkWith standard : crystalspace ;
