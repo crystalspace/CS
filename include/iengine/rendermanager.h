@@ -137,27 +137,6 @@ struct iRenderManagerGlobalIllum : public virtual iBase
 
   virtual csShaderVariable* GetCompositionVariableAdd(const char *svName) = 0;
 
-  /*virtual void SetSamplingPatternSize (int samplingPatternSize) = 0;
-
-  virtual void SetNumberOfSamples (int numberOfSamples) = 0;
-
-  virtual void SetSampleRadius (float sampleRadius) = 0;
-
-  virtual void SetOcclusionStrength (float occlusionStrength) = 0;
-
-  virtual void SetDepthBias (float depthBias) = 0;
-
-  virtual void SetMaxOccluderDistance (float maxOccluderDistance) = 0;
-
-  virtual void SetLightRotationAngle (float lightRotation) = 0;
-
-  virtual void SetBounceStrength (float bounceStrength) = 0;
-
-  virtual void SetBlurKernelSize (int kernelSize) = 0;
-
-  virtual void SetBlurPositionThreshold (float positionThreshold) = 0;
-
-  virtual void SetBlurNormalThreshold (float normalThreshold) = 0;*/
 };
 
 #endif // __CS_IENGINE_RENDERMANAGER_H__
