@@ -41,6 +41,12 @@
         <texture name="sponza_floor_s">
             <file>textures/sponza_floor_a_spec.dds</file>
         </texture>
+        <texture name="sponza_floor_h">
+            <file>textures/sponza_floor_a_heig.dds</file>
+        </texture>
+        <texture name="sponza_floor_n">
+            <file>textures/sponza_floor_a_norm.dds</file>
+        </texture>
         <!--<texture name="PROZOR1.JPG">
             <file>textures/PROZOR1.JPG</file>
         </texture>-->
@@ -99,6 +105,9 @@
         <texture name="door_s">
             <file>textures/sponza_door_spec.dds</file>
         </texture>
+        <texture name="door_n">
+            <file>textures/sponza_door_norm.dds</file>
+        </texture>
         <texture name="door2_d">
             <file>textures/sponza_door2.dds</file>
         </texture>
@@ -133,6 +142,8 @@
         </material>
         <material name="sp_00_pod">
             <texture>sponza_floor_d</texture>
+            <shadervar type="texture" name="tex normal">sponza_floor_n</shadervar>
+            <shadervar type="texture" name="tex height">sponza_floor_h</shadervar>
             <shadervar type="texture" name="tex specular">sponza_floor_s</shadervar>
         </material>
         <material name="sp_svod_kapitel">
@@ -168,6 +179,7 @@
         <material name="sp_00_vrata_krug">
             <!--<texture>vrata_krug.JPG</texture>-->
             <texture>door_d</texture>
+            <shadervar type='texture' name='tex normal'>door_n</shadervar>
             <shadervar type='texture' name='tex specular'>door_s</shadervar>
         </material>
         <material name="sp_01_stup_baza">
