@@ -1,1144 +1,1471 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <world>
-  <plugins>
-    <plugin name='genmesh'>crystalspace.mesh.loader.genmesh</plugin>
-    <plugin name='genmeshfact'>crystalspace.mesh.loader.factory.genmesh</plugin>
-    <plugin name="animesh">crystalspace.mesh.loader.animesh</plugin>
-    <plugin name="animeshfact">crystalspace.mesh.loader.factory.animesh</plugin>
-  </plugins>
-  <shaders/>
-  <textures>
-    <texture name='SP_LUK.JPG'>
-      <file>textures/SP_LUK.JPG</file>
-    </texture>
-<!--    <texture name='BUMPSP_LUK.JPG'>
+    <plugins>
+        <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
+        <plugin name="genmeshfact">crystalspace.mesh.loader.factory.genmesh</plugin>
+        <plugin name="animesh">crystalspace.mesh.loader.animesh</plugin>
+        <plugin name="animeshfact">crystalspace.mesh.loader.factory.animesh</plugin>
+    </plugins>
+    <shaders />
+    <textures>
+        <texture name="SP_LUK.JPG">
+            <file>textures/SP_LUK.JPG</file>
+        </texture>
+        <!--    <texture name='BUMPSP_LUK.JPG'>
       <file>textures/BUMPSP_LUK.JPG</file>
       <class>normalmap</class>
     </texture> -->
-
-    <texture name='RELJEF.JPG'>
-      <file>textures/RELJEF.JPG</file>
-    </texture>
-<!--    <texture name='BUMPRELJEF.JPG'>
+        <texture name="RELJEF.JPG">
+          <file>textures/RELJEF.JPG</file>
+        </texture>
+        <!--    <texture name='BUMPRELJEF.JPG'>
       <file>textures/BUMPRELJEF.JPG</file>
       <class>normalmap</class>
     </texture> -->
-    
-    <texture name='KAMEN.JPG'>
-      <file>textures/KAMEN.JPG</file>
-    </texture>
+        <texture name="KAMEN.JPG">
+            <file>textures/KAMEN.JPG</file>
+        </texture>
+        <texture name="sponza_bricks_d">
+            <file>textures/spnza_bricks_a_diff.dds</file>
+        </texture>
+        <texture name="sponza_bricks_n">
+            <file>textures/spnza_bricks_a_ddn.dds</file>
+            <class>normalmap</class>
+        </texture>
+        <texture name="sponza_bricks_s">
+            <file>textures/spnza_bricks_a_spec.dds</file>
+        </texture>
+        <texture name="sponza_floor_d">
+            <file>textures/sponza_floor_a_diff.dds</file>
+        </texture>
+        <texture name="sponza_floor_s">
+            <file>textures/sponza_floor_a_spec.dds</file>
+        </texture>
+        <!--<texture name="PROZOR1.JPG">
+            <file>textures/PROZOR1.JPG</file>
+        </texture>-->
+        <!--<texture name='BUMPPROZOR1.JPG'>
+          <file>textures/BUMPPROZOR1.JPG</file>
+          <class>normalmap</class>
+        </texture> -->
+        <texture name="KAMEN-stup.JPG">
+            <file>textures/KAMEN-stup.JPG</file>
+        </texture>
+        <texture name="sp_00_stup_kapitel.JPG">
+            <file>textures/sp_00_stup_kapitel.JPG</file>
+        </texture>
+        <texture name="SP_01_STUB.JPG">
+            <file>textures/SP_01_STUB.JPG</file>
+        </texture>
+        <texture name="SP_01_STUB_kapitel.JPG">
+            <file>textures/SP_01_STUB_kapitel.JPG</file>
+        </texture>
+        <texture name="sp_01_stup.JPG">
+            <file>textures/sp_01_stup.JPG</file>
+        </texture>
+        <texture name="SP_01_STUP_baza.JPG">
+            <file>textures/SP_01_STUP_baza.JPG</file>
+        </texture>
+        <texture name="SP_01_STUP_kapitel.JPG">
+            <file>textures/SP_01_STUP_kapitel.JPG</file>
+        </texture>
+        <!--<texture name="vrata_kocka.JPG">
+            <file>textures/vrata_kocka.JPG</file>
+        </texture>-->
+        <!--<texture name="vrata_krug.JPG">
+            <file>textures/vrata_krug.JPG</file>
+        </texture>-->
+        <texture name="sp_00_svod">
+            <file>textures/TanColor.png</file>
+        </texture>
+        <texture name="ceiling_d">
+            <file>textures/sponza_ceiling_a_diff.dds</file>
+        </texture>
+        <texture name="ceiling_s">
+            <file>textures/sponza_ceiling_a_spec.dds</file>
+        </texture>
+        <texture name="box_d">
+            <file>textures/box.jpg</file>
+        </texture>
+        <texture name="box_n">
+            <file>textures/boxn.jpg</file>
+        </texture>
+        <texture name="box_h">
+            <file>textures/boxh.jpg</file>
+        </texture>
+        <texture name="door_d">
+            <file>textures/sponza_door.dds</file>
+        </texture>
+        <texture name="door_s">
+            <file>textures/sponza_door_spec.dds</file>
+        </texture>
+        <texture name="door2_d">
+            <file>textures/sponza_door2.dds</file>
+        </texture>
+        <texture name="door2_s">
+            <file>textures/sponza_door2_spec.dds</file>
+        </texture>
+        <texture name="window_d">
+            <file>textures/sponza_window.dds</file>
+        </texture>
+        <texture name="window_s">
+            <file>textures/sponza_window_spec.dds</file>
+        </texture>
+        <texture name="GreyColor">
+            <file>textures/GreyColor.png</file>
+            <!--<color red="0.35" green="0.35" blue="0.7" />-->
+        </texture>
+        <texture name="RedColor">
+            <color red="0.85" green="0.1" blue="0.1" />
+        </texture>
+    </textures>
+    <materials>
+        <material name="sp_01_stup">
+            <texture>sp_01_stup.JPG</texture>
+        </material>
+        <material name="sp_00_luk_mal1">
+            <texture>SP_01_STUB_kapitel.JPG</texture>
+            <!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
+        </material>
+        <material name="sp_02_reljef">
+            <texture>RELJEF.JPG</texture>
+            <!--      <shadervar type='texture' name='tex normal'>BUMPRELJEF.JPG</shadervar> -->
+        </material>
+        <material name="sp_00_pod">
+            <texture>sponza_floor_d</texture>
+            <shadervar type="texture" name="tex specular">sponza_floor_s</shadervar>
+        </material>
+        <material name="sp_svod_kapitel">
+            <texture>sp_00_stup_kapitel.JPG</texture>
+        </material>
+        <material name="sp_vijenac">
+            <texture>sp_00_stup_kapitel.JPG</texture>
+        </material>
+        <material name="sp_00_stup">
+            <texture>KAMEN-stup.JPG</texture>
+        </material>
+        <material name="sp_01_luk_a">
+            <texture>SP_LUK.JPG</texture>
+            <!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
+        </material>
+        <material name="sp_01_stub_baza_">
+            <texture>SP_01_STUP_baza.JPG</texture>
+        </material>
+        <material name="sp_00_svod">
+            <texture>sp_00_svod</texture>
+            <shadervar type="texture" name="tex specular">ceiling_s</shadervar>
+        </material>
+        <material name="sp_01_svod">
+            <texture>ceiling_d</texture>
+            <shadervar type="texture" name="tex specular">ceiling_s</shadervar>
+        </material>
+        <material name="sp_00_prozor">
+            <!--<texture>PROZOR1.JPG</texture>-->
+            <texture>window_d</texture>
+            <!--      <shadervar type='texture' name='tex normal'>BUMPPROZOR1.JPG</shadervar> -->
+            <shadervar type='texture' name='tex specular'>window_s</shadervar>
+        </material>
+        <material name="sp_00_vrata_krug">
+            <!--<texture>vrata_krug.JPG</texture>-->
+            <texture>door_d</texture>
+            <shadervar type='texture' name='tex specular'>door_s</shadervar>
+        </material>
+        <material name="sp_01_stup_baza">
+            <texture>SP_01_STUP_baza.JPG</texture>
+        </material>
+        <material name="sp_01_luk_a3">
+            <texture>SP_LUK.JPG</texture>
+            <!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
+        </material>
+        <material name="sp_01_stub_baza">
+            <texture>SP_01_STUP_baza.JPG</texture>
+        </material>
+        <material name="sp_01_luk_a6">
+            <texture>SP_LUK.JPG</texture>
+            <!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
+        </material>
+        <material name="sp_00_vrata_kock">
+            <!--<texture>vrata_kocka.JPG</texture>-->
+            <texture>door2_d</texture>
+            <shadervar type='texture' name='tex specular'>door2_s</shadervar>
+        </material>
+        <material name="sp_01_stub">
+            <texture>SP_01_STUB.JPG</texture>
+        </material>
+        <material name="sp_01_stub_kut">
+            <texture>SP_01_STUB.JPG</texture>
+        </material>
+        <material name="sp_00_luk_mal3">
+            <texture>SP_01_STUP_kapitel.JPG</texture>
+            <!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
+        </material>
+        <material name="sp_00_zid">
+            <texture>sponza_bricks_d</texture>
+            <shadervar type="texture" name="tex normal">sponza_bricks_n</shadervar>
+            <shadervar type="texture" name="tex specular">sponza_bricks_s</shadervar>
+        </material>
+        <material name="sp_00_luk_mali4">
+            <texture>SP_LUK.JPG</texture>
+            <!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
+        </material>
+        <material name="sp_zid_vani">
+            <texture>KAMEN.JPG</texture>
+            <!--      <shadervar type='texture' name='tex normal'>BUMPKAMEN.JPG</shadervar> -->
+        </material>
+        <material name="sp_01_luk_a5">
+            <texture>SP_LUK.JPG</texture>
+            <!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
+        </material>
+        <material name="sp_00_luk_mali3">
+            <texture>SP_LUK.JPG</texture>
+            <!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
+        </material>
+        <material name="sp_01_luk_a2">
+            <texture>SP_LUK.JPG</texture>
+            <!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
+        </material>
+        <material name="sp_01_luk_a4">
+            <texture>SP_LUK.JPG</texture>
+            <!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
+        </material>
+        <material name="sp_00_luk_mal2">
+            <texture>SP_01_STUB_kapitel.JPG</texture>
+            <!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
+        </material>
+        <material name="sp_00_luk_mali">
+            <texture>SP_LUK.JPG</texture>
+            <!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
+        </material>
+        <material name="sp_00_prozor2">
+            <!--<texture>PROZOR1.JPG</texture>-->
+            <texture>window_d</texture>
+            <!--      <shadervar type='texture' name='tex normal'>BUMPPROZOR1.JPG</shadervar> -->
+            <shadervar type='texture' name='tex specular'>window_s</shadervar>
+        </material>
+        <material name="sp_00_luk_mali2">
+            <texture>SP_LUK.JPG</texture>
+            <!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
+        </material>
+        <material name="stone">
+            <texture>box_d</texture>
+            <shadervar type="texture" name="tex normal">box_n</shadervar>
+            <shadervar type="texture" name="tex height">box_h</shadervar>
+        </material>
+        <material name="no">
+            <texture>GreyColor</texture>
+        </material>
+        <material name="red">
+            <texture>RedColor</texture>
+        </material>
+    </materials>
+    <sounds />
+    <settings>
+      <!--<clearscreen>yes</clearscreen>
+      <clearzbuf>yes</clearzbuf>-->
+    </settings>
+    <!--library>factories/Cube.011</library>
+    <library>factories/Armadillo.001</library>
+    <library>factories/xyzrgb_statuette</library>
+    <library>factories/happy_vrip</library>
+    <library>factories/xyzrgb_dragon</library>-->
+    <library>factories/dragon_vrip</library>
+    <!--<library>factories/Cube.010</library>
+    <library>factories/Cube.009</library>
+    <library>factories/bunny_Mesh</library-->
+    <library>factories/lucy</library>
+    <!--library>factories/Cube.006</library>
+    <library>factories/Cube.005</library>
+    <library>factories/Cube.003</library-->
+    <library>factories/Cube</library>
+    <library>factories/pillar rou_sp_01_stup</library>
+    <library>factories/object27_sp_00_luk_ma</library>
+    <library>factories/relief_sp_02_reljef_s</library>
+    <library>factories/floors_sp_00_pod_sp_0</library>
+    <library>factories/object6_sp_svod_kapit</library>
+    <library>factories/object23_sp_vijenac_s</library>
+    <library>factories/puillar fl_sp_00_stup</library>
+    <library>factories/arcs small_sp_01_luk_</library>
+    <library>factories/object31_sp_01_stub_b</library>
+    <library>factories/object21_sp_00_svod_s</library>
+    <library>factories/object5_sp_svod_kapit</library>
+    <library>factories/walls_sp_00_prozor_sp</library>
+    <library>factories/doors_sp_00_vrata_kru</library>
+    <library>factories/object3_sp_01_stup_ba</library>
+    <library>factories/parapet_sp_01_luk_a3_</library>
+    <library>factories/holes_sp_01_stup_sp_0</library>
+    <library>factories/object28_sp_01_stub_b</library>
+    <library>factories/arcs 02_sp_01_luk_a6_</library>
+    <library>factories/doors_sp_00_vrata_koc</library>
+    <library>factories/pillar qua_sp_01_stub</library>
+    <library>factories/pillar cor_sp_01_stub</library>
+    <library>factories/object4_sp_00_luk_mal</library>
+    <library>factories/walls_sp_00_vrata_kru</library>
+    <library>factories/walls_sp_00_zid_sp_00</library>
+    <library>factories/pillar flo_sp_00_stup</library>
+    <library>factories/arcs 04_sp_00_luk_mal</library>
+    <library>factories/outside01_sp_zid_vani</library>
+    <library>factories/arcs 01_sp_01_luk_a5_</library>
+    <library>factories/arcs floo0_sp_00_luk_</library>
+    <library>factories/arcs long_sp_01_luk_a</library>
+    <library>factories/round hole_sp_01_luk_</library>
+    <library>factories/object19_sp_00_luk_ma</library>
+    <library>factories/arcs floor_sp_00_luk_</library>
+    <library>factories/windows_sp_00_prozor2</library>
+    <library>factories/ceiling_sp_00_svod_sp</library>
+    <library>factories/object32_sp_svod_kapi</library>
+    <library>factories/arcs 03_sp_00_luk_mal</library>
+    <!--library>/lib/krystal/krystal.xml</library-->
+    <sector name="Scene">
+      <cullerp plugin="crystalspace.culling.frustvis" />
+      <ambient red="0.1" green="0.1" blue="0.1" />
+      <!--<meshobj name='Cube.004'>
+        <plugin>genmesh</plugin>
+        <params>
+          <factory>Cube.011</factory>
+          <material>red</material>
+        </params>
+        <zuse/>
+        <move>
+          <v y='0.8338' x='19.9837' z='-7.0837'/>
+        </move>
+      </meshobj>
+      <meshobj name='Armadillo.001'>
+        <plugin>genmesh</plugin>
+        <params>
+          <factory>Armadillo.001</factory>
+        </params>
+        <zuse/>
+        <move>
+          <v y='2.1324' x='19.83' z='-6.9571'/>
+          <matrix>
+            <roty>0.7854</roty>
+          </matrix>
+        </move>
+      </meshobj>-->
+          <!--<meshobj name='xyzrgb_statuette'>
+        <plugin>genmesh</plugin>
+        <params>
+          <factory>xyzrgb_statuette</factory>
+        </params>
+        <zuse/>
+        <move>
+          <v y='2.7244' x='-18.4496' z='7.1128'/>
+          <matrix>
+            <roty>2.9172</roty>
+          </matrix>
+        </move>
+      </meshobj>-->
+          <!--<meshobj name='happy_vrip'>
+        <plugin>genmesh</plugin>
+        <params>
+          <factory>happy_vrip</factory>
+        </params>
+        <zuse/>
+        <move>
+          <v y='0.0656' x='-18.5142' z='-6.878'/>
+          <matrix>
+            <roty>2.3562</roty>
+          </matrix>
+        </move>
+      </meshobj>
+      <meshobj name='xyzrgb_dragon'>
+        <plugin>genmesh</plugin>
+        <params>
+          <factory>xyzrgb_dragon</factory>
+        </params>
+        <zuse/>
+        <move>
+          <v y='1.802' x='0.761' z='6.4136'/>
+          <matrix>
+            <roty>-1.3387</roty>
+          </matrix>
+        </move>
+      </meshobj>-->
+      <meshobj name='dragon_vrip'>
+        <plugin>genmesh</plugin>
+        <params>
+          <factory>dragon_vrip</factory>
+        </params>
+        <zuse/>
+        <move>
+          <v y='-0.4' x='18.0' z='0'/>        
+        </move>
+      </meshobj>
+          <!--<meshobj name='Cube.002'>
+        <plugin>genmesh</plugin>
+        <params>
+          <factory>Cube.010</factory>
+          <material>no</material>
+        </params>
+        <zuse/>
+        <move>
+          <v y='0.8338' x='0.7228' z='6.5144'/>
+        </move>
+      </meshobj>
+      <meshobj name='Cube.001'>
+        <plugin>genmesh</plugin>
+        <params>
+          <factory>Cube.009</factory>
+          <material>no</material>
+        </params>
+        <zuse/>
+        <move>
+          <v y='0.8338' x='0.7228' z='-6.583'/>
+        </move>
+      </meshobj>
+      <meshobj name='bunny_Mesh'>
+        <plugin>genmesh</plugin>
+        <params>
+          <factory>bunny_Mesh</factory>
+        </params>
+        <zuse/>
+        <move>
+          <v y='3.1446' x='20.1478' z='7.0963'/>
+          <matrix>
+            <roty>-0.7443</roty>
+          </matrix>
+        </move>
+      </meshobj>-->
+      <meshobj name='lucy'>
+        <plugin>genmesh</plugin>
+        <params>
+          <factory>lucy</factory>        
+        </params>
+        <zuse/>
+        <move>
+          <v y='2.8252' x='1.0265' z='2.0064'/>
+          <matrix>
+            <roty>1.5708</roty>
+          </matrix>
+        </move>
+      </meshobj>
+          <!--<meshobj name='Cube.006'>
+        <plugin>genmesh</plugin>
+        <params>
+          <factory>Cube.006</factory>
+          <material>red</material>
+        </params>
+        <zuse/>
+        <move>
+          <v y='0.8338' x='-18.538' z='7.0152'/>
+        </move>
+      </meshobj>-->
+          <!--<meshobj name='Cube.005'>
+        <plugin>genmesh</plugin>
+        <params>
+          <factory>Cube.005</factory>
+          <material>no</material>
+        </params>
+        <zuse/>
+        <move>
+          <v y='1.4612' x='19.9837' z='7.0152'/>
+        </move>
+      </meshobj>
+      <meshobj name='Cube.003'>
+        <plugin>genmesh</plugin>
+        <params>
+          <factory>Cube.003</factory>
+          <material>no</material>
+        </params>
+        <zuse/>
+        <move>
+          <v y='0.8338' x='-18.538' z='-7.0837'/>
+        </move>
+      </meshobj>-->
+      <meshobj name="Cube.000">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>Cube</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>no</material>
+              <mixmode>
+                  <copy />
+              </mixmode>              
+          </params>
+          <zuse />
+          <move>
+              <v y="0.8338" x="0.7228" z="-0.0343" />
+          </move>          
+      </meshobj>
+      <meshobj name="pillar0">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>pillar rou_sp_01_stup</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_01_stup</material>
+              <mixmode>
+                  <copy />
+              </mixmode>              
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>          
+      </meshobj>
+      <meshobj name="object0">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>object27_sp_00_luk_ma</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_00_luk_mal1</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="relief_sp_02_reljef_s">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>relief_sp_02_reljef_s</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_02_reljef</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="floors0">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>floors_sp_00_pod_sp_0</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_00_pod</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="object1">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>object6_sp_svod_kapit</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_svod_kapitel</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="object2">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>object23_sp_vijenac_s</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_vijenac</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="pillar1">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>puillar fl_sp_00_stup</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_00_stup</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="arcs0">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>arcs small_sp_01_luk_</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_01_luk_a</material>              
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="object3">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>object31_sp_01_stub_b</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_01_stub_baza_</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="object4">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>object21_sp_00_svod_s</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_00_svod</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="object5">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>object5_sp_svod_kapit</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_svod_kapitel</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="walls0">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>walls_sp_00_prozor_sp</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_00_prozor</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="doors_sp_00_vrata_kru">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>doors_sp_00_vrata_kru</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_00_vrata_krug</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="object6">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>object3_sp_01_stup_ba</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_01_stup_baza</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="parapet_sp_01_luk_a3_">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>parapet_sp_01_luk_a3_</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_01_luk_a3</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="holes_sp_01_stup_sp_0">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>holes_sp_01_stup_sp_0</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_01_stup</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="object7">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>object28_sp_01_stub_b</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_01_stub_baza</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="arcs1">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>arcs 02_sp_01_luk_a6_</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_01_luk_a6</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="doors_sp_00_vrata_koc">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>doors_sp_00_vrata_koc</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_00_vrata_kock</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="pillar2">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>pillar qua_sp_01_stub</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_01_stub</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="pillar3">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>pillar cor_sp_01_stub</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_01_stub_kut</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="object8">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>object4_sp_00_luk_mal</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_00_luk_mal3</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="walls1">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>walls_sp_00_vrata_kru</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_00_vrata_krug</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="walls2">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>walls_sp_00_zid_sp_00</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_00_zid</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="pillar4">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>pillar flo_sp_00_stup</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_00_stup</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="arcs2">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>arcs 04_sp_00_luk_mal</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_00_luk_mali4</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="outside01_sp_zid_vani">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>outside01_sp_zid_vani</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <!--<material>sp_zid_vani</material>-->
+              <material>stone</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="arcs3">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>arcs 01_sp_01_luk_a5_</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_01_luk_a5</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="arcs4">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>arcs floo0_sp_00_luk_</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_00_luk_mali3</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="arcs5">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>arcs long_sp_01_luk_a</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_01_luk_a2</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="round hole_sp_01_luk_">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>round hole_sp_01_luk_</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_01_luk_a4</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="object9">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>object19_sp_00_luk_ma</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_00_luk_mal2</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="arcs6">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>arcs floor_sp_00_luk_</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_00_luk_mali</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="windows_sp_00_prozor2">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>windows_sp_00_prozor2</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_00_prozor2</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="ceiling0">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>ceiling_sp_00_svod_sp</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_00_svod</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="object10">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>object32_sp_svod_kapi</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_svod_kapitel</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <meshobj name="arcs7">
+          <plugin>genmesh</plugin>
+          <params>
+              <factory>arcs 03_sp_00_luk_mal</factory>
+              <color red="0" green="0" blue="0" />
+              <manualcolors />
+              <material>sp_00_luk_mali2</material>
+              <mixmode>
+                  <copy />
+              </mixmode>
+          </params>
+          <zuse />
+          <move>
+              <v y="0.4604" x="0.4737" z="0.0504" />
+          </move>
+      </meshobj>
+      <!--<meshobj name="krystal">
+        <plugin>animesh</plugin>
+        <params>
+          <factory>krystal</factory>
+        </params>
+        <priority>object</priority>
+        <move>
+          <v x="-3.5" y="6.7" z="-6" />
+          <matrix>
+            <roty>3.14159</roty>
+          </matrix>
+        </move>
+      </meshobj>-->
+      <light name="Lamp.Down0">
+          <center y="3.5" x="11.8" z="3.5" />
+          <color blue="1" green="0.5" red="0.2" />
+          <radius>3.5</radius>
+      </light>
+      <light name="Lamp.Down1">
+          <center y="3.5" x="6.2" z="3.5" />
+          <color blue="0.5" green="1" red="0.2" />
+          <radius>3.5</radius>
+      </light>
+      <light name="Lamp.Down2">
+          <center y="3.5" x="0.5" z="3.5" />
+          <color blue="0.2" green="1" red="0.5" />
+          <radius>3.5</radius>
+      </light>
+      <light name="Lamp.Down3">
+          <center y="3.5" x="-5.5" z="3.5" />
+          <color blue="0.2" green="0.5" red="1" />
+          <radius>3.5</radius>
+      </light>
+      <light name="Lamp.Down4">
+          <center y="3.5" x="-11" z="3.5" />
+          <color blue="1" green="0.1" red="0.1" />
+          <radius>3.5</radius>
+      </light>
+      <light name="Lamp.Down5">
+          <center y="3.5" x="11.8" z="-3.5" />
+          <color blue="0.1" green="1" red="0.1" />
+          <radius>3.5</radius>
+      </light>
+      <light name="Lamp.Down6">
+          <center y="3.5" x="6.2" z="-3.5" />
+          <color blue="0.1" green="0.1" red="1" />
+          <radius>3.5</radius>
+      </light>
+      <light name="Lamp.Down7">
+          <center y="3.5" x="0.5" z="-3.5" />
+          <color blue="1" green="1" red="0.1" />
+          <radius>3.5</radius>
+      </light>
+      <light name="Lamp.Down8">
+          <center y="3.5" x="-5.5" z="-3.5" />
+          <color blue="1" green="0.1" red="1" />
+          <radius>3.5</radius>
+      </light>
+      <light name="Lamp.Down9">
+          <center y="3.5" x="-11" z="-3.5" />
+          <color blue="0.1" green="1" red="1" />
+          <radius>3.5</radius>
+      </light>
+      <light name="Lamp.Down10">
+          <center y="3.8" x="-15" z="0" />
+          <color blue="0.8" green="0.8" red="0.8" />
+          <radius>5</radius>
+      </light>
+      <light name="Lamp.Mid0">
+          <center y="12.5" x="11.8" z="2.0" />
+          <color blue="0.95" green="1" red="1" />
+          <radius>2.75</radius>
+      </light>
+      <light name="Lamp.Mid1">
+          <center y="12.5" x="6.2" z="2.0" />
+          <color blue="0.95" green="1" red="1" />
+          <radius>2.75</radius>
+      </light>
+      <light name="Lamp.Mid2">
+          <center y="12.5" x="0.5" z="2.0" />
+          <color blue="0.95" green="1" red="1" />
+          <radius>2.75</radius>
+      </light>
+      <light name="Lamp.Mid3">
+          <center y="12.5" x="-5.5" z="2.0" />
+          <color blue="0.95" green="1" red="1" />
+          <radius>2.75</radius>
+      </light>
+      <light name="Lamp.Mid4">
+          <center y="12.5" x="-11" z="2.0" />
+          <color blue="0.95" green="1" red="1" />
+          <radius>2.75</radius>
+      </light>
+      <light name="Lamp.Mid5">
+          <center y="12.5" x="11.8" z="-2.0" />
+          <color blue="0.95" green="1" red="1" />
+          <radius>2.75</radius>
+      </light>
+      <light name="Lamp.Mid6">
+          <center y="12.5" x="6.2" z="-2.0" />
+          <color blue="0.95" green="1" red="1" />
+          <radius>2.75</radius>
+      </light>
+      <light name="Lamp.Mid7">
+          <center y="12.5" x="0.5" z="-2.0" />
+          <color blue="0.95" green="1" red="1" />
+          <radius>2.75</radius>
+      </light>
+      <light name="Lamp.Mid8">
+          <center y="12.5" x="-5.5" z="-2.0" />
+          <color blue="0.95" green="1" red="1" />
+          <radius>2.75</radius>
+      </light>
+      <light name="Lamp.Mid9">
+          <center y="12.5" x="-11" z="-2.0" />
+          <color blue="0.95" green="1" red="1" />
+          <radius>2.75</radius>
+      </light>
+      <light name="Lamp.Mid10">
+          <center y="12.5" x="-13" z="0" />
+          <color blue="1" green="1" red="1" />
+          <radius>3</radius>
+      </light>
+      <light name="Lamp.Mid11">
+          <center y="12.5" x="13" z="0" />
+          <color blue="1" green="1" red="1" />
+          <radius>3</radius>
+      </light>
+      <light name="Lamp.Up0">
+          <center y="18.5" x="11.8" z="1.5" />
+          <color blue="0.95" green="1" red="1" />
+          <radius>2.75</radius>
+      </light>
+      <light name="Lamp.Up1">
+          <center y="18.5" x="6.2" z="1.5" />
+          <color blue="0.95" green="1" red="1" />
+          <radius>2.75</radius>
+      </light>
+      <light name="Lamp.Up2">
+          <center y="18.5" x="0.5" z="1.5" />
+          <color blue="0.95" green="1" red="1" />
+          <radius>2.75</radius>
+      </light>
+      <light name="Lamp.Up3">
+          <center y="18.5" x="-5.5" z="1.5" />
+          <color blue="0.95" green="1" red="1" />
+          <radius>2.75</radius>
+      </light>
+      <light name="Lamp.Up4">
+          <center y="18.5" x="-11" z="1.5" />
+          <color blue="0.95" green="1" red="1" />
+          <radius>2.75</radius>
+      </light>
+      <light name="Lamp.Up5">
+          <center y="18.5" x="11.8" z="-1.5" />
+          <color blue="0.95" green="1" red="1" />
+          <radius>2.75</radius>
+      </light>
+      <light name="Lamp.Up6">
+          <center y="18.5" x="6.2" z="-1.5" />
+          <color blue="0.95" green="1" red="1" />
+          <radius>2.75</radius>
+      </light>
+      <light name="Lamp.Up7">
+          <center y="18.5" x="0.5" z="-1.5" />
+          <color blue="0.95" green="1" red="1" />
+          <radius>2.75</radius>
+      </light>
+      <light name="Lamp.Up8">
+          <center y="18.5" x="-5.5" z="-1.5" />
+          <color blue="0.95" green="1" red="1" />
+          <radius>2.75</radius>
+      </light>
+      <light name="Lamp.Up9">
+          <center y="18.5" x="-11" z="-1.5" />
+          <color blue="0.95" green="1" red="1" />
+          <radius>2.75</radius>
+      </light>
+      <light name="Lamp.Up10">
+          <center y="18.5" x="-13" z="0" />
+          <color blue="1" green="1" red="1" />
+          <radius>3</radius>
+      </light>
+      <light name="Lamp.Up11">
+          <center y="18.5" x="13" z="0" />
+          <color blue="1" green="1" red="1" />
+          <radius>3</radius>
+      </light>
+      <!--<light name='Lamp.Fill2'>
+        <center y='7.2024' x='-10.8536' z='0.1885'/>
+        <color blue='0.520427465439' green='0.520427465439' red='0.520427465439'/>
+        <radius>5</radius>
+      </light>
+      <light name='Lamp.Armadillo.Spot'>
+        <center y='6.0731' x='16.7304' z='-5.2251'/>
+        <color blue='0.5' green='0.5' red='0.5'/>
+        <radius>20.0</radius>
+        <spotlightfalloff outer='30.0' inner='27.610137389'/>
+        <move>
+          <matrix>
+            <lookat>
+              <to y='-0.1453' x='0.1551' z='-0.0821'/>
+            </lookat>
+          </matrix>
+        </move>
+        <type>spot</type>
+      </light>
 
-    <texture name='sponza_bricks_d'>
-      <file>textures/spnza_bricks_a_diff.dds</file>
-    </texture>
-    <texture name='sponza_bricks_n'>
-      <file>textures/spnza_bricks_a_ddn.dds</file>
-      <class>normalmap</class>
-    </texture>
-    <texture name='sponza_bricks_s'>
-      <file>textures/spnza_bricks_a_spec.dds</file>
-    </texture>
-    
-    <texture name='sponza_floor_d'>
-      <file>textures/sponza_floor_a_diff.dds</file>
-    </texture>
-    <texture name='sponza_floor_s'>
-      <file>textures/sponza_floor_a_spec.dds</file>
-    </texture>
+      <light name='Lamp.Bunny.Spot'>
+        <center y='5.9437' x='16.7886' z='5.3393'/>
+        <color blue='0.5' green='0.5' red='0.5'/>
+        <radius>20.0</radius>
+        <spotlightfalloff outer='30.0' inner='27.610137389'/>
+        <move>
+          <matrix>
+            <lookat>
+              <to y='-0.1501' x='0.1542' z='0.0747'/>
+            </lookat>
+          </matrix>
+        </move>
+        <type>spot</type>
+      </light>
 
-    <texture name='PROZOR1.JPG'>
-      <file>textures/PROZOR1.JPG</file>
-    </texture>
-<!--    <texture name='BUMPPROZOR1.JPG'>
-      <file>textures/BUMPPROZOR1.JPG</file>
-      <class>normalmap</class>
-    </texture> -->
+      <light name='Lamp.Dragon.Spot'>
+        <center y='6.4308' x='0.4863' z='-6.7137'/>
+        <color blue='0.5' green='0.5' red='0.5'/>
+        <radius>20.0</radius>
+        <spotlightfalloff outer='33.9979896545' inner='32.4651422737'/>
+        <move>
+          <matrix>
+            <lookat>
+              <to y='-0.3193' x='0' z='0'/>
+            </lookat>
+          </matrix>
+        </move>
+        <type>spot</type>
+      </light>
 
-    <texture name='KAMEN-stup.JPG'>
-      <file>textures/KAMEN-stup.JPG</file>
-    </texture>
+      <light name='Lamp.AsianDragon.Spot'>
+        <center y='6.4308' x='0.4445' z='6.7589'/>
+        <color blue='0.5' green='0.5' red='0.5'/>
+        <radius>20.0</radius>
+        <spotlightfalloff outer='33.9979896545' inner='32.4651422737'/>
+        <move>
+          <matrix>
+            <lookat>
+              <to y='-0.3193' x='0' z='0'/>
+            </lookat>
+          </matrix>
+        </move>
+        <type>spot</type>
+      </light>
 
-    <texture name='sp_00_stup_kapitel.JPG'>
-      <file>textures/sp_00_stup_kapitel.JPG</file>
-    </texture>
+      <light name='Lamp.ThaiStatue.Spot'>
+        <center y='6.0731' x='-15.8678' z='5.3443'/>
+        <color blue='0.5' green='0.5' red='0.5'/>
+        <radius>20.0</radius>
+        <spotlightfalloff outer='30.0' inner='27.610137389'/>
+        <move>
+          <matrix>
+            <lookat>
+              <to y='-0.1537' x='-0.1446' z='0.0858'/>
+            </lookat>
+          </matrix>
+        </move>
+        <type>spot</type>
+      </light>
 
-    <texture name='SP_01_STUB.JPG'>
-      <file>textures/SP_01_STUB.JPG</file>
-    </texture>
+      <light name='Lamp.Buddha.Spot'>
+        <center y='6.0731' x='-15.8678' z='-5.2251'/>
+        <color blue='0.5' green='0.5' red='0.5'/>
+        <radius>20.0</radius>
+        <spotlightfalloff outer='30.0' inner='27.610137389'/>
+        <move>
+          <matrix>
+            <lookat>
+              <to y='-0.1206' x='-0.1533' z='-0.1177'/>
+            </lookat>
+          </matrix>
+        </move>
+        <type>spot</type>
+      </light>
 
-    <texture name='SP_01_STUB_kapitel.JPG'>
-      <file>textures/SP_01_STUB_kapitel.JPG</file>
-    </texture>
-
-    <texture name='sp_01_stup.JPG'>
-      <file>textures/sp_01_stup.JPG</file>      
-    </texture>
-
-    <texture name='SP_01_STUP_baza.JPG'>
-      <file>textures/SP_01_STUP_baza.JPG</file>
-    </texture>
-
-    <texture name='SP_01_STUP_kapitel.JPG'>
-      <file>textures/SP_01_STUP_kapitel.JPG</file>
-    </texture>
-
-    <texture name='vrata_kocka.JPG'>
-      <file>textures/vrata_kocka.JPG</file>
-    </texture>
-
-    <texture name='vrata_krug.JPG'>
-      <file>textures/vrata_krug.JPG</file>
-    </texture>
-
-    <texture name='sp_00_svod'>
-      <file>textures/TanColor.png</file>
-<!--	<color red='0.9411764705882353' green='0.8666666666666667' blue='0.7372549019607844' /> -->
-    </texture>
-    
-    <texture name='ceiling_d'>
-      <file>textures/sponza_ceiling_a_diff.dds</file>
-    </texture>
-    
-    <texture name='ceiling_s'>
-      <file>textures/sponza_ceiling_a_spec.dds</file>
-    </texture>
-    
-    <texture name='box_d'>
-      <file>textures/box.jpg</file>
-    </texture>
-    
-    <texture name='box_n'>
-      <file>textures/boxn.jpg</file>
-    </texture>
-    
-    <texture name='box_h'>
-      <file>textures/boxh.jpg</file>
-    </texture>
-
-    <texture name='GreyColor'>
-      <!--<file>textures/GreyColor.png</file>-->
-      <color red="0.5" green="0.6" blue="0.7" />
-    </texture>
-    
-    <texture name="RedColor">
-      <color red="0.5" green="0" blue="0" />
-    </texture>
-
-  </textures>
-
-  <materials>
-    <material name='sp_01_stup'>
-      <texture>sp_01_stup.JPG</texture>
-    </material>
-    <material name='sp_00_luk_mal1'>
-      <texture>SP_01_STUB_kapitel.JPG</texture>
-<!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
-    </material>
-    <material name='sp_02_reljef'>
-      <texture>RELJEF.JPG</texture>
-<!--      <shadervar type='texture' name='tex normal'>BUMPRELJEF.JPG</shadervar> -->
-    </material>
-    <material name='sp_00_pod'>
-      <texture>sponza_floor_d</texture>
-      <shadervar type='texture' name='tex specular'>sponza_floor_s</shadervar>
-    </material>
-    <material name='sp_svod_kapitel'>
-      <texture>sp_00_stup_kapitel.JPG</texture>
-    </material>
-    <material name='sp_vijenac'>
-      <texture>sp_00_stup_kapitel.JPG</texture>
-    </material>
-    <material name='sp_00_stup'>
-      <texture>KAMEN-stup.JPG</texture>
-    </material>
-    <material name='sp_01_luk_a'>
-      <texture>SP_LUK.JPG</texture>
-<!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
-    </material>
-    <material name='sp_01_stub_baza_'>
-      <texture>SP_01_STUP_baza.JPG</texture>
-    </material>
-    <material name='sp_00_svod'>
-      <texture>sp_00_svod</texture>
-      <shadervar type='texture' name='tex specular'>ceiling_s</shadervar>
-    </material>
-    <material name='sp_01_svod'>
-      <texture>ceiling_d</texture>
-      <shadervar type='texture' name='tex specular'>ceiling_s</shadervar>
-    </material>
-    <material name='sp_00_prozor'>
-      <texture>PROZOR1.JPG</texture>
-<!--      <shadervar type='texture' name='tex normal'>BUMPPROZOR1.JPG</shadervar> -->
-    </material>
-    <material name='sp_00_vrata_krug'>
-      <texture>vrata_krug.JPG</texture>
-    </material>
-    <material name='sp_01_stup_baza'>
-      <texture>SP_01_STUP_baza.JPG</texture>
-    </material>
-    <material name='sp_01_luk_a3'>
-      <texture>SP_LUK.JPG</texture>
-<!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
-    </material>
-    <material name='sp_01_stub_baza'>
-      <texture>SP_01_STUP_baza.JPG</texture>
-    </material>
-    <material name='sp_01_luk_a6'>
-      <texture>SP_LUK.JPG</texture>
-<!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
-    </material>
-    <material name='sp_00_vrata_kock'>
-      <texture>vrata_kocka.JPG</texture>
-    </material>
-    <material name='sp_01_stub'>
-      <texture>SP_01_STUB.JPG</texture>
-    </material>
-    <material name='sp_01_stub_kut'>
-      <texture>SP_01_STUB.JPG</texture>
-    </material>
-    <material name='sp_00_luk_mal3'>
-      <texture>SP_01_STUP_kapitel.JPG</texture>
-<!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
-    </material>
-    <material name='sp_00_zid'>
-      <texture>sponza_bricks_d</texture>
-      <shadervar type='texture' name='tex normal'>sponza_bricks_n</shadervar>
-      <shadervar type='texture' name='tex specular'>sponza_bricks_s</shadervar>
-    </material>
-    <material name='sp_00_luk_mali4'>
-      <texture>SP_LUK.JPG</texture>
-<!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
-    </material>
-    <material name='sp_zid_vani'>
-      <texture>KAMEN.JPG</texture>
-<!--      <shadervar type='texture' name='tex normal'>BUMPKAMEN.JPG</shadervar> -->
-    </material>
-    <material name='sp_01_luk_a5'>
-      <texture>SP_LUK.JPG</texture>
-<!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
-    </material>
-    <material name='sp_00_luk_mali3'>
-      <texture>SP_LUK.JPG</texture>
-<!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
-    </material>
-    <material name='sp_01_luk_a2'>
-      <texture>SP_LUK.JPG</texture>
-<!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
-    </material>
-    <material name='sp_01_luk_a4'>
-      <texture>SP_LUK.JPG</texture>
-<!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
-    </material>
-    <material name='sp_00_luk_mal2'>
-      <texture>SP_01_STUB_kapitel.JPG</texture>
-<!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
-    </material>
-    <material name='sp_00_luk_mali'>
-      <texture>SP_LUK.JPG</texture>
-<!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
-    </material>
-    <material name='sp_00_prozor2'>
-      <texture>PROZOR1.JPG</texture>
-<!--      <shadervar type='texture' name='tex normal'>BUMPPROZOR1.JPG</shadervar> -->
-    </material>
-    <material name='sp_00_luk_mali2'>
-      <texture>SP_LUK.JPG</texture>
-<!--      <shadervar type='texture' name='tex normal'>BUMPSP_LUK.JPG</shadervar> -->
-    </material>
-    <material name='box'>
-      <texture>box_d</texture>
-      <shadervar type='texture' name='tex normal'>box_n</shadervar>
-      <shadervar type='texture' name='tex height'>box_h</shadervar>
-    </material>
-    <material name='no'>
-      <texture>GreyColor</texture>
-    </material>
-    <material name='red'>
-      <texture>RedColor</texture>
-    </material>
-  </materials>
-  <sounds/>
-  <settings>
-    <clearscreen>yes</clearscreen>
-    <clearzbuf>yes</clearzbuf>
-  </settings>
-  <!--library>factories/Cube.011</library>
-  <library>factories/Armadillo.001</library>
-  <library>factories/xyzrgb_statuette</library>
-  <library>factories/happy_vrip</library>
-  <library>factories/xyzrgb_dragon</library>
-  <library>factories/dragon_vrip</library>
-  <library>factories/Cube.010</library>
-  <library>factories/Cube.009</library>
-  <library>factories/bunny_Mesh</library-->
-  <library>factories/lucy</library>
-  <!--library>factories/Cube.006</library>
-  <library>factories/Cube.005</library>
-  <library>factories/Cube.003</library-->
-  <library>factories/Cube</library>
-  <library>factories/pillar rou_sp_01_stup</library>
-  <library>factories/object27_sp_00_luk_ma</library>
-  <library>factories/relief_sp_02_reljef_s</library>
-  <library>factories/floors_sp_00_pod_sp_0</library>
-  <library>factories/object6_sp_svod_kapit</library>
-  <library>factories/object23_sp_vijenac_s</library>
-  <library>factories/puillar fl_sp_00_stup</library>
-  <library>factories/arcs small_sp_01_luk_</library>
-  <library>factories/object31_sp_01_stub_b</library>
-  <library>factories/object21_sp_00_svod_s</library>
-  <library>factories/object5_sp_svod_kapit</library>
-  <library>factories/walls_sp_00_prozor_sp</library>
-  <library>factories/doors_sp_00_vrata_kru</library>
-  <library>factories/object3_sp_01_stup_ba</library>
-  <library>factories/parapet_sp_01_luk_a3_</library>
-  <library>factories/holes_sp_01_stup_sp_0</library>
-  <library>factories/object28_sp_01_stub_b</library>
-  <library>factories/arcs 02_sp_01_luk_a6_</library>
-  <library>factories/doors_sp_00_vrata_koc</library>
-  <library>factories/pillar qua_sp_01_stub</library>
-  <library>factories/pillar cor_sp_01_stub</library>
-  <library>factories/object4_sp_00_luk_mal</library>
-  <library>factories/walls_sp_00_vrata_kru</library>
-  <library>factories/walls_sp_00_zid_sp_00</library>
-  <library>factories/pillar flo_sp_00_stup</library>
-  <library>factories/arcs 04_sp_00_luk_mal</library>
-  <library>factories/outside01_sp_zid_vani</library>
-  <library>factories/arcs 01_sp_01_luk_a5_</library>
-  <library>factories/arcs floo0_sp_00_luk_</library>
-  <library>factories/arcs long_sp_01_luk_a</library>
-  <library>factories/round hole_sp_01_luk_</library>
-  <library>factories/object19_sp_00_luk_ma</library>
-  <library>factories/arcs floor_sp_00_luk_</library>
-  <library>factories/windows_sp_00_prozor2</library>
-  <library>factories/ceiling_sp_00_svod_sp</library>
-  <library>factories/object32_sp_svod_kapi</library>
-  <library>factories/arcs 03_sp_00_luk_mal</library>
-  <!--library>/lib/krystal/krystal.xml</library-->
-  
-  <sector name='Scene'>
-    <cullerp plugin='crystalspace.culling.frustvis'/>
-    <ambient red="0.1" green="0.1" blue="0.1" />
-    <!--<meshobj name='Cube.004'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>Cube.011</factory>
-        <material>red</material>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.8338' x='19.9837' z='-7.0837'/>
-      </move>
-    </meshobj>
-    <meshobj name='Armadillo.001'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>Armadillo.001</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='2.1324' x='19.83' z='-6.9571'/>
-        <matrix>
-          <roty>0.7854</roty>
-        </matrix>
-      </move>
-    </meshobj>-->
-    <!--<meshobj name='xyzrgb_statuette'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>xyzrgb_statuette</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='2.7244' x='-18.4496' z='7.1128'/>
-        <matrix>
-          <roty>2.9172</roty>
-        </matrix>
-      </move>
-    </meshobj>-->
-    <!--<meshobj name='happy_vrip'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>happy_vrip</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.0656' x='-18.5142' z='-6.878'/>
-        <matrix>
-          <roty>2.3562</roty>
-        </matrix>
-      </move>
-    </meshobj>
-    <meshobj name='xyzrgb_dragon'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>xyzrgb_dragon</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='1.802' x='0.761' z='6.4136'/>
-        <matrix>
-          <roty>-1.3387</roty>
-        </matrix>
-      </move>
-    </meshobj>
-    <meshobj name='dragon_vrip'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>dragon_vrip</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.1199' x='0.6589' z='-6.5428'/>
-        <matrix>
-          <roty>-1.5708</roty>
-        </matrix>
-      </move>
-    </meshobj>
-    <meshobj name='Cube.002'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>Cube.010</factory>
-        <material>no</material>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.8338' x='0.7228' z='6.5144'/>
-      </move>
-    </meshobj>
-    <meshobj name='Cube.001'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>Cube.009</factory>
-        <material>no</material>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.8338' x='0.7228' z='-6.583'/>
-      </move>
-    </meshobj>
-    <meshobj name='bunny_Mesh'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>bunny_Mesh</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='3.1446' x='20.1478' z='7.0963'/>
-        <matrix>
-          <roty>-0.7443</roty>
-        </matrix>
-      </move>
-    </meshobj>-->
-    <meshobj name='lucy'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>lucy</factory>        
-      </params>
-      <zuse/>
-      <move>
-        <v y='2.8252' x='1.0265' z='2.0064'/>
-        <matrix>
-          <roty>1.5708</roty>
-        </matrix>
-      </move>
-    </meshobj>
-    <!--<meshobj name='Cube.006'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>Cube.006</factory>
-        <material>red</material>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.8338' x='-18.538' z='7.0152'/>
-      </move>
-    </meshobj>-->
-    <!--<meshobj name='Cube.005'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>Cube.005</factory>
-        <material>no</material>
-      </params>
-      <zuse/>
-      <move>
-        <v y='1.4612' x='19.9837' z='7.0152'/>
-      </move>
-    </meshobj>
-    <meshobj name='Cube.003'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>Cube.003</factory>
-        <material>no</material>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.8338' x='-18.538' z='-7.0837'/>
-      </move>
-    </meshobj>-->
-    <meshobj name='Cube.000'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>Cube</factory>
-        <material>no</material>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.8338' x='0.7228' z='-0.0343'/>
-      </move>
-    </meshobj>
-    <meshobj name='pillar0'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>pillar rou_sp_01_stup</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='object0'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>object27_sp_00_luk_ma</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='relief_sp_02_reljef_s'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>relief_sp_02_reljef_s</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='floors0'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>floors_sp_00_pod_sp_0</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='object1'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>object6_sp_svod_kapit</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='object2'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>object23_sp_vijenac_s</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='pillar1'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>puillar fl_sp_00_stup</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='arcs0'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>arcs small_sp_01_luk_</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='object3'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>object31_sp_01_stub_b</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='object4'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>object21_sp_00_svod_s</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='object5'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>object5_sp_svod_kapit</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='walls0'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>walls_sp_00_prozor_sp</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='doors_sp_00_vrata_kru'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>doors_sp_00_vrata_kru</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='object6'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>object3_sp_01_stup_ba</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='parapet_sp_01_luk_a3_'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>parapet_sp_01_luk_a3_</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='holes_sp_01_stup_sp_0'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>holes_sp_01_stup_sp_0</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='object7'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>object28_sp_01_stub_b</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='arcs1'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>arcs 02_sp_01_luk_a6_</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='doors_sp_00_vrata_koc'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>doors_sp_00_vrata_koc</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='pillar2'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>pillar qua_sp_01_stub</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='pillar3'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>pillar cor_sp_01_stub</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='object8'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>object4_sp_00_luk_mal</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='walls1'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>walls_sp_00_vrata_kru</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='walls2'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>walls_sp_00_zid_sp_00</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='pillar4'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>pillar flo_sp_00_stup</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='arcs2'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>arcs 04_sp_00_luk_mal</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='outside01_sp_zid_vani'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>outside01_sp_zid_vani</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='arcs3'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>arcs 01_sp_01_luk_a5_</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='arcs4'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>arcs floo0_sp_00_luk_</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='arcs5'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>arcs long_sp_01_luk_a</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='round hole_sp_01_luk_'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>round hole_sp_01_luk_</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='object9'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>object19_sp_00_luk_ma</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='arcs6'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>arcs floor_sp_00_luk_</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='windows_sp_00_prozor2'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>windows_sp_00_prozor2</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='ceiling0'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>ceiling_sp_00_svod_sp</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='object10'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>object32_sp_svod_kapi</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <meshobj name='arcs7'>
-      <plugin>genmesh</plugin>
-      <params>
-        <factory>arcs 03_sp_00_luk_mal</factory>
-      </params>
-      <zuse/>
-      <move>
-        <v y='0.4604' x='0.4737' z='0.0504'/>
-      </move>
-    </meshobj>
-    <!--<meshobj name="krystal">
-      <plugin>animesh</plugin>
-      <params>
-        <factory>krystal</factory>
-      </params>
-      <priority>object</priority>
-      <move>
-        <v x="-3.5" y="6.7" z="-6" />
-        <matrix>
-          <roty>3.14159</roty>
-        </matrix>
-      </move>
-    </meshobj>-->
-    
-    <light name='Lamp.Down0'>
-      <center y='3.5' x='11.8' z='3.5'/>
-      <color blue='0.5' green='0.25' red='0.1'/>
-      <radius>3.5</radius>      
-    </light>
-    <light name='Lamp.Down1'>
-      <center y='3.5' x='6.2' z='3.5'/>
-      <color blue='0.25' green='0.5' red='0.1'/>
-      <radius>3.5</radius>      
-    </light>    
-    <light name='Lamp.Down2'>
-      <center y='3.5' x='0.5' z='3.5'/>
-      <color blue='0.1' green='0.5' red='0.25'/>
-      <radius>3.5</radius>      
-    </light>    
-    <light name='Lamp.Down3'>
-      <center y='3.5' x='-5.5' z='3.5'/>
-      <color blue='0.1' green='0.25' red='0.5'/>
-      <radius>3.5</radius>      
-    </light>    
-    <light name='Lamp.Down4'>
-      <center y='3.5' x='-11' z='3.5'/>
-      <color blue='0.5' green='0.05' red='0.05'/>
-      <radius>3.5</radius>      
-    </light>    
-    <light name='Lamp.Down5'>
-      <center y='3.5' x='11.8' z='-3.5'/>
-      <color blue='0.05' green='0.5' red='0.05'/>
-      <radius>3.5</radius>      
-    </light>
-    <light name='Lamp.Down6'>
-      <center y='3.5' x='6.2' z='-3.5'/>
-      <color blue='0.05' green='0.05' red='0.5'/>
-      <radius>3.5</radius>      
-    </light>    
-    <light name='Lamp.Down7'>
-      <center y='3.5' x='0.5' z='-3.5'/>
-      <color blue='0.5' green='0.5' red='0.05'/>
-      <radius>3.5</radius>      
-    </light>    
-    <light name='Lamp.Down8'>
-      <center y='3.5' x='-5.5' z='-3.5'/>
-      <color blue='0.5' green='0.05' red='0.5'/>
-      <radius>3.5</radius>      
-    </light>    
-    <light name='Lamp.Down9'>
-      <center y='3.5' x='-11' z='-3.5'/>
-      <color blue='0.05' green='0.5' red='0.5'/>
-      <radius>3.5</radius>      
-    </light>    
-    <light name='Lamp.Down10'>
-      <center y='3.8' x='-15' z='0'/>
-      <color blue='0.6' green='0.6' red='0.6'/>
-      <radius>5</radius>      
-    </light>    
-    <light name='Lamp.Down11'>
-      <center y='3.8' x='16' z='0'/>
-      <color blue='0.6' green='0.6' red='0.6'/>
-      <radius>5</radius>    
-    </light>
-    
-    <!--<light name='Lamp.Fill2'>
-      <center y='7.2024' x='-10.8536' z='0.1885'/>
-      <color blue='0.520427465439' green='0.520427465439' red='0.520427465439'/>
-      <radius>5</radius>
-    </light>-->
-    <!--<light name='Lamp.Armadillo.Spot'>
-      <center y='6.0731' x='16.7304' z='-5.2251'/>
-      <color blue='0.5' green='0.5' red='0.5'/>
-      <radius>20.0</radius>
-      <spotlightfalloff outer='30.0' inner='27.610137389'/>
-      <move>
-        <matrix>
-          <lookat>
-            <to y='-0.1453' x='0.1551' z='-0.0821'/>
-          </lookat>
-        </matrix>
-      </move>
-      <type>spot</type>
-    </light>
-
-    <light name='Lamp.Bunny.Spot'>
-      <center y='5.9437' x='16.7886' z='5.3393'/>
-      <color blue='0.5' green='0.5' red='0.5'/>
-      <radius>20.0</radius>
-      <spotlightfalloff outer='30.0' inner='27.610137389'/>
-      <move>
-        <matrix>
-          <lookat>
-            <to y='-0.1501' x='0.1542' z='0.0747'/>
-          </lookat>
-        </matrix>
-      </move>
-      <type>spot</type>
-    </light>
-
-    <light name='Lamp.Dragon.Spot'>
-      <center y='6.4308' x='0.4863' z='-6.7137'/>
-      <color blue='0.5' green='0.5' red='0.5'/>
-      <radius>20.0</radius>
-      <spotlightfalloff outer='33.9979896545' inner='32.4651422737'/>
-      <move>
-        <matrix>
-          <lookat>
-            <to y='-0.3193' x='0' z='0'/>
-          </lookat>
-        </matrix>
-      </move>
-      <type>spot</type>
-    </light>
-
-    <light name='Lamp.AsianDragon.Spot'>
-      <center y='6.4308' x='0.4445' z='6.7589'/>
-      <color blue='0.5' green='0.5' red='0.5'/>
-      <radius>20.0</radius>
-      <spotlightfalloff outer='33.9979896545' inner='32.4651422737'/>
-      <move>
-        <matrix>
-          <lookat>
-            <to y='-0.3193' x='0' z='0'/>
-          </lookat>
-        </matrix>
-      </move>
-      <type>spot</type>
-    </light>
-
-    <light name='Lamp.ThaiStatue.Spot'>
-      <center y='6.0731' x='-15.8678' z='5.3443'/>
-      <color blue='0.5' green='0.5' red='0.5'/>
-      <radius>20.0</radius>
-      <spotlightfalloff outer='30.0' inner='27.610137389'/>
-      <move>
-        <matrix>
-          <lookat>
-            <to y='-0.1537' x='-0.1446' z='0.0858'/>
-          </lookat>
-        </matrix>
-      </move>
-      <type>spot</type>
-    </light>
-
-    <light name='Lamp.Buddha.Spot'>
-      <center y='6.0731' x='-15.8678' z='-5.2251'/>
-      <color blue='0.5' green='0.5' red='0.5'/>
-      <radius>20.0</radius>
-      <spotlightfalloff outer='30.0' inner='27.610137389'/>
-      <move>
-        <matrix>
-          <lookat>
-            <to y='-0.1206' x='-0.1533' z='-0.1177'/>
-          </lookat>
-        </matrix>
-      </move>
-      <type>spot</type>
-    </light>
-
-    <light name='Lamp.Lucy.Spot.1'>
-      <center y='12.5978' x='3.2357' z='-3.0497'/>
-      <color blue='0.5' green='0.05' red='0.05'/>
-      <radius>20.0</radius>
-      <spotlightfalloff outer='22.5' inner='20.7237219091'/>
-      <move>
-        <matrix>
-          <lookat>
-            <to y='-0.312' x='-0.094' z='0.1182'/>
-          </lookat>
-        </matrix>
-      </move>
-      <type>spot</type>
-    </light>-->
-
-    <light name='Lamp.Lucy.Spot.2'>
-      <center y='12' x='3' z='0'/>
-      <color blue='0.8' green='0.8' red='0.8'/>
-      <radius>18</radius>
-      <spotlightfalloff outer='25' inner='20'/>
-      <move>
-        <matrix>
-          <lookat>
-            <to y='-0.3103' x='-0.0935' z='-0.1229'/>
-          </lookat>
-        </matrix>
-      </move>
-      <type>spot</type>
-    </light>
-
-  </sector>
-
-  <sequences>
-  
-    <!--<sequence name="rotateSpotLight">
-	    <rotatelight light="Lamp.Lucy.Spot.2" duration="2000" relative="true">
-	      <roty>1</roty>	      
-	    </rotatelight>
-      <delay time="1000" />
-	    <enable trigger="rotateSpotLight" />
-    </sequence>-->
-    <sequence name="rotateLights">
-	    <rotatelight light="Lamp.Down0" duration="500">
-	      <roty>1</roty>
-	      <v x="9" y="3.5" z="3.5" />
-	    </rotatelight>      
-      <rotatelight light="Lamp.Down1" duration="800">
-	      <roty>1</roty>
-	      <v x="3.5" y="3.5" z="3.5" />
-	    </rotatelight>
-      <rotatelight light="Lamp.Down2" duration="1000">
-	      <roty>1</roty>
-	      <v x="3.5" y="3.5" z="3.5" />
-	    </rotatelight>
-      <rotatelight light="Lamp.Down3" duration="800">
-	      <roty>1</roty>
-	      <v x="-2" y="3.5" z="3.5" />
-	    </rotatelight>
-      <rotatelight light="Lamp.Down4" duration="500">
-	      <roty>1</roty>
-	      <v x="-7.6" y="3.5" z="3.5" />
-	    </rotatelight>
-      
-      <rotatelight light="Lamp.Down5" duration="700">
-	      <roty>1</roty>
-	      <v x="9" y="3.5" z="-3.5" />
-	    </rotatelight>      
-      <rotatelight light="Lamp.Down6" duration="400">
-	      <roty>1</roty>
-	      <v x="3.5" y="3.5" z="-3.5" />
-	    </rotatelight>
-      <rotatelight light="Lamp.Down7" duration="300">
-	      <roty>1</roty>
-	      <v x="3.5" y="3.5" z="-3.5" />
-	    </rotatelight>
-      <rotatelight light="Lamp.Down8" duration="400">
-	      <roty>1</roty>
-	      <v x="-2" y="3.5" z="-3.5" />
-	    </rotatelight>
-      <rotatelight light="Lamp.Down9" duration="700">
-	      <roty>1</roty>
-	      <v x="-7.6" y="3.5" z="-3.5" />
-	    </rotatelight>
-	    <enable trigger="rotateLights" />
-    </sequence>
-    
-  </sequences>
-  
-  <triggers>
-  
-    <!--<trigger name="rotateSpotLight">
-      <sectorvis sector="Scene" />
-      <fire delay="0" sequence="rotateSpotLight" />
-    </trigger>-->
-    <trigger name="rotateLights">
-      <sectorvis sector="Scene" />
-      <fire delay="0" sequence="rotateLights" />
-    </trigger>
-    
-  </triggers>
-  
-  <start name='MainFloor'>
-    <sector>Scene</sector>
-    <position y='2.5189' x='10.7476' z='0.1849'/>
-    <up y='1' x='0' z='0'/>
-    <forward y='0' x='0' z='-1'/>
-  </start>
-  
-  <start name='Balcany'>
-    <sector>Scene</sector>
-    <position y='10.3657' x='-18.3375' z='-1.512'/>
-    <up y='1' x='0' z='0'/>
-    <forward y='0' x='1' z='0'/>
-  </start> 
-
+      <light name='Lamp.Lucy.Spot.1'>
+        <center y='12.5978' x='3.2357' z='-3.0497'/>
+        <color blue='0.5' green='0.05' red='0.05'/>
+        <radius>20.0</radius>
+        <spotlightfalloff outer='22.5' inner='20.7237219091'/>
+        <move>
+          <matrix>
+            <lookat>
+              <to y='-0.312' x='-0.094' z='0.1182'/>
+            </lookat>
+          </matrix>
+        </move>
+        <type>spot</type>
+      </light>-->
+      <light name="Lamp.Lucy.Spot.2">
+          <center y="12" x="3" z="0" />
+          <color blue="0.8" green="0.8" red="0.8" />
+          <radius>18</radius>
+          <spotlightfalloff outer="25" inner="20" />
+          <move>
+              <matrix>
+                  <lookat>
+                      <to y="-1" x="0" z="0" />
+                  </lookat>
+              </matrix>
+          </move>
+          <type>spot</type>
+      </light>
+    </sector>
+    <sequences>
+        <sequence name="rotateSpotLight">
+            <rotatelight light="Lamp.Lucy.Spot.2" duration="5000" relative="true">
+                <roty>1</roty>
+            </rotatelight>
+            <delay time="1000" />
+            <enable trigger="rotateSpotLight" />
+        </sequence>
+        <sequence name="rotateLights">
+            <rotatelight light="Lamp.Down0" duration="500">
+                <roty>1</roty>
+                <v x="9" y="3.5" z="3.5" />
+            </rotatelight>
+            <rotatelight light="Lamp.Down1" duration="800">
+                <roty>1</roty>
+                <v x="3.5" y="3.5" z="3.5" />
+            </rotatelight>
+            <rotatelight light="Lamp.Down2" duration="1000">
+                <roty>1</roty>
+                <v x="3.5" y="3.5" z="3.5" />
+            </rotatelight>
+            <rotatelight light="Lamp.Down3" duration="800">
+                <roty>1</roty>
+                <v x="-2" y="3.5" z="3.5" />
+            </rotatelight>
+            <rotatelight light="Lamp.Down4" duration="500">
+                <roty>1</roty>
+                <v x="-7.6" y="3.5" z="3.5" />
+            </rotatelight>
+            <rotatelight light="Lamp.Down5" duration="700">
+                <roty>1</roty>
+                <v x="9" y="3.5" z="-3.5" />
+            </rotatelight>
+            <rotatelight light="Lamp.Down6" duration="400">
+                <roty>1</roty>
+                <v x="3.5" y="3.5" z="-3.5" />
+            </rotatelight>
+            <rotatelight light="Lamp.Down7" duration="300">
+                <roty>1</roty>
+                <v x="3.5" y="3.5" z="-3.5" />
+            </rotatelight>
+            <rotatelight light="Lamp.Down8" duration="400">
+                <roty>1</roty>
+                <v x="-2" y="3.5" z="-3.5" />
+            </rotatelight>
+            <rotatelight light="Lamp.Down9" duration="700">
+                <roty>1</roty>
+                <v x="-7.6" y="3.5" z="-3.5" />
+            </rotatelight>
+            <enable trigger="rotateLights" />
+        </sequence>
+    </sequences>
+    <triggers>
+        <trigger name="rotateSpotLight">
+            <sectorvis sector="Scene" />
+            <fire delay="0" sequence="rotateSpotLight" />
+        </trigger>
+        <trigger name="rotateLights">
+            <sectorvis sector="Scene" />
+            <fire delay="0" sequence="rotateLights" />
+        </trigger>
+    </triggers>
+    <start name="MainFloor">
+        <sector>Scene</sector>
+        <position y="2.5189" x="10.7476" z="0.1849" />
+        <up y="1" x="0" z="0" />
+        <forward y="0" x="0" z="-1" />
+    </start>
+    <start name="Balcany">
+        <sector>Scene</sector>
+        <position y="10.3657" x="-18.3375" z="-1.512" />
+        <up y="1" x="0" z="0" />
+        <forward y="0" x="1" z="0" />
+    </start>
 </world>
+
