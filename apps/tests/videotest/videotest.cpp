@@ -132,11 +132,14 @@ bool VideoTest::Application ()
   if (!cegui) return ReportError ("Failed to locate CEGUI plugin");
 
   sndrenderer = csQueryRegistry<iSndSysRenderer> (GetObjectRegistry ());
-  if (!sndrenderer) return ReportError ("Failed to locate sound renderer!");
+  if (!sndrenderer) ReportWarning ("Failed to locate sound renderer!");
 
-  csRef<iSndSysListener> listener = sndrenderer->GetListener ();
-  if (!listener) return ReportError("Failed to locate sound listener!"); 
-  listener->SetPosition (csVector3 (0, 0, 0));
+  else
+  {
+    csRef<iSndSysListener> listener = sndrenderer->GetListener ();
+    if (!listener) ReportWarning ("Failed to locate sound listener!"); 
+    else listener->SetPosition (csVector3 (0, 0, 0));
+  }
 
   // Set the working directory
   vfs->ChDir ("/videodecode/");
@@ -162,7 +165,7 @@ bool VideoTest::Application ()
 
   mediaPlayer->Loop (false);
 
-  if ( audioStream.IsValid ())
+  if (audioStream.IsValid () && sndrenderer)
   {
     sndsource = sndrenderer->CreateSource (audioStream);
 
