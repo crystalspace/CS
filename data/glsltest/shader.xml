@@ -12,7 +12,6 @@
           <program>
             <![CDATA[
               #version 410
-              #extension GL_EXT_geometry_shader4 : enable
 
               in vec3 in_position;
               in vec2 in_texcoord;
@@ -31,7 +30,6 @@
           <program>
             <![CDATA[
               #version 410
-              #extension GL_EXT_geometry_shader4 : enable
               #extension GL_EXT_gpu_shader4 : enable
 
               layout (vertices = 3) out;
@@ -75,7 +73,6 @@
           <program>
             <![CDATA[
               #version 410
-              #extension GL_EXT_geometry_shader4 : enable
               #extension GL_EXT_gpu_shader4 : enable
 
               layout(triangles, equal_spacing, cw) in;
@@ -112,7 +109,6 @@
           <program>
             <![CDATA[
               #version 410
-              #extension GL_EXT_geometry_shader4 : enable
 
               // let's make the tessellation visible :)
 #define LINES 1
@@ -155,7 +151,6 @@
           <program>
             <![CDATA[
               #version 410
-              #extension GL_EXT_geometry_shader4 : enable
 
               uniform vec3 coeff;
               uniform sampler2D texdiff;
