@@ -115,7 +115,7 @@ bool VideoTest::Application ()
     CS_REQUEST_PLUGIN ("crystalspace.documentsystem.multiplexer", iDocumentSystem),
     CS_REQUEST_PLUGIN_TAG ("crystalspace.documentsystem.tinyxml", iDocumentSystem, "iDocumentSystem.1"),
     CS_REQUEST_PLUGIN ("crystalspace.sndsys.element.loader", iSndSysLoader),
-    CS_REQUEST_PLUGIN ("crystalspace.sndsys.renderer.software", iSndSysRenderer),
+    CS_REQUEST_PLUGIN ("crystalspace.sndsys.renderer.openal", iSndSysRenderer),
     CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,

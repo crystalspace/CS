@@ -217,7 +217,7 @@
 			Name="Other files"
 			>
 			<File
-				RelativePath="..\..\..\plugins\videodecode\persist\standard\vplParser.csplugin"
+				RelativePath="..\..\..\plugins\videodecode\persist\standard\parser.csplugin"
 				>
 			</File>
 		</Filter>
