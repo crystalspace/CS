@@ -47,13 +47,15 @@ struct iMediaLoader : public virtual iBase
     *   through any streams or sources created from it, and may be useful for display or
     *   diagnostic purposes.
     *
-    *  Optional pMediaType may suggest the media type to be loaded, to reduce the guess work.
-    *   Originally intended to be an enum, but res suggested a string of characters
+    * \param[in] pFileName The path to the file that needs to be loaded
+    * \param[in] pDescription A description for the resulting media stream (Optional)
     */
   virtual csRef<iMediaContainer> LoadMedia (const char * pFileName, const char *pDescription=0) = 0;
 
   /**
     * Used to initialize a loader. Should never be called directly
+    * \param[in] path Path to the media file
+    * \param[in] languages List of available languages
     */
   virtual void Create (csString path,csArray<Language> languages) = 0;
 };

@@ -160,7 +160,7 @@ void TheoraMediaContainer::Update ()
   }
   if (!endOfFile && activeStreams.GetSize () > 0)
   {
-    ok=0;
+    updateState=0;
     size_t cacheFull = 0;
     size_t dataAvailable = 0;
     for (size_t i=0;i<activeStreams.GetSize ();i++)
@@ -170,7 +170,7 @@ void TheoraMediaContainer::Update ()
       // If we're at the end of the file, but there's still data 
       // in the caches, we don't care if a streams needs more data
       if ( media [activeStreams [i]]->Update () && !processingCache)
-        ok++;
+        updateState++;
       // Next, we want to know if all the active streams have
       // a full cache. if they do, we won't read more data until 
       // there's space left in the cache
@@ -209,10 +209,10 @@ void TheoraMediaContainer::Update ()
     }
 
     if(processingCache && dataAvailable==0)
-      ok++;
+      updateState++;
 
     /* buffer compressed data every loop */
-    if (ok>0 && cacheFull!=activeStreams.GetSize ())
+    if (updateState>0 && cacheFull!=activeStreams.GetSize ())
     {
       hasDataToBuffer=BufferData (&_syncState);
       if (hasDataToBuffer==0)
@@ -487,7 +487,7 @@ void TheoraMediaContainer::WriteData ()
     return;
   if (!canSwap && canWrite)
   {
-    if (ok==0)
+    if (updateState==0)
     {
       canWrite=false;
       if (_activeTheoraStream.IsValid ())

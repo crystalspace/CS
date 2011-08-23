@@ -45,55 +45,57 @@ struct iMediaContainer : public virtual iBase
   virtual size_t GetMediaCount () const = 0;
 
   /**
-    * Gets the iMedia object at an index
+    * Get the iMedia object at an index
+    * \param[in] index Object index
     */
   virtual csRef<iMedia> GetMedia (size_t index) = 0;
 
   /**
-    * Gets the description of the media container
+    * Get the description of the media container
     */
   virtual const char* GetDescription () const = 0;
 
   /**
-    * 
-    */
-  /**
-    * Sets an active stream. In case there's already a stream of that type, it's replaced
+    * Activate a stream. In case there's already a stream of that type, it's replaced
+    * \param[in] index Object index
     */
   virtual void SetActiveStream (size_t index) = 0;
 
   /**
     * Removes an active stream.
+    * \param[in] index Object index
     */
   virtual bool RemoveActiveStream (size_t index) = 0;
 
   /**
-    * Automatically picks the first stream of every kind from inside the container
+    * Automatically pick the first stream of every kind from inside the container
     */
   virtual void AutoActivateStreams () = 0;
 
   /**
-    * Makes "texture" point to the internal iTextureHandle of the active media stream
+    * Get a reference to the internal texture buffer
+    * \param[out] texture Target texture
     */
   virtual void GetTargetTexture (csRef<iTextureHandle> &target) = 0;
 
   /**
-    * Makes "sound" point to the internal iSndSysStream of the active media stream
+    *  Get a reference to the internal audio stream
+    * \param[out] target Target audio stream
     */
   virtual void GetTargetAudio (csRef<iSndSysStream> &target) = 0;
 
   /**
-    * Updates the active streams
+    * Update the active streams
     */
   virtual void Update () = 0;
 
   /**
-    * Checks if end of file has been reached
+    * Check if end of file has been reached
     */
   virtual bool Eof () const = 0;
 
   /**
-    * Triggers a seek for the active iMedia streams, resolved at the next update
+    * Trigger a seek for the active iMedia streams, resolved at the next update
     */
   virtual void Seek (float time) = 0 ;
 
@@ -118,37 +120,38 @@ struct iMediaContainer : public virtual iBase
   virtual void WriteData () = 0 ;
 
   /**
-    * Set the how many frames will be cached
+    * Set how many frames will be cached
     */
   virtual void SetCacheSize (size_t size) = 0;
 
   /**
-    * Returns the aspect ratio to use with the image
+    * Get the aspect ratio associated to the active video stream
     */
   virtual float GetAspectRatio () = 0;
 
   /**
-    * Triggers a frame drop
+    * Trigger a frame drop
     */
   virtual void DropFrame () = 0;
 
   /**
     * Select a language from the available ones
+    * \param[in] identifier A string identifier for the target language
     */
   virtual void SelectLanguage (const char* identifier) = 0;
 
   /**
-    * Do stuff when the video is paused, if necessary
+    * Callback for the "Pause" command
     */
   virtual void OnPause () = 0;
 
   /**
-    * Do stuff when the video is played, if necessary
+    * Callback for the "Play" commandy
     */
   virtual void OnPlay () = 0;
 
   /**
-    * Do stuff when the video is stopped, if necessary
+    * Callback for the "Stop" command
     */
   virtual void OnStop () = 0;
 };

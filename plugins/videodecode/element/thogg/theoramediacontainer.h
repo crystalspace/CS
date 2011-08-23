@@ -85,7 +85,7 @@ private:
   bool canSwap;
   bool canWrite;
   int hasDataToBuffer;
-  int ok;
+  int updateState;
 
   //helper for buffering data
   int BufferData (ogg_sync_state *oy);

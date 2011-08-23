@@ -45,27 +45,31 @@ struct iMediaPlayer : public virtual iBase
 
   /**
     * Initialize the video player
-    * cacheSize refers to the number of frames will be cached
-    * If you don't want to use caching, use 1
+    * \param[in] media The media container to be used by the player
+    * \param[in] cacheSize The number of frames to cache.If caching is not needed, use 1
     */
   virtual void InitializePlayer (csRef<iMediaContainer> media, size_t cacheSize = 1) = 0;
   /**
-    * Activates a stream from inside the iMediaContainer
+    * Activate a stream from the media container
+    * \param[in] index Object index
     */
   virtual void SetActiveStream (int index) = 0;
 
   /**
-    * Deactivates a stream from inside the iMediaContainer
+   * Deactivate a stream from the media container
+    * \param[in] index Object index
     */
   virtual void RemoveActiveStream (int index) = 0;
 
   /**
-    * Makes "Target" point to the internal iTextureHandle of the active stream
+    * Get a reference to the internal texture buffer
+    * \param[out] target Target texture
     */
   virtual void GetTargetTexture (csRef<iTextureHandle> &target) = 0;
 
   /**
-    * Makes "sound" point to the internal iSndSysStream of the active video stream
+    *  Get a reference to the internal audio stream
+    * \param[out] target Target audio stream
     */
   virtual void GetTargetAudio (csRef<iSndSysStream> &target) = 0;
 
@@ -76,13 +80,14 @@ struct iMediaPlayer : public virtual iBase
   THREADED_INTERFACE ( Update );
 
   /**
-    * Start the update thread for the media player
+   * Start the update thread for the media player In order to close the player
+    * properly, this must be called when starting the player.
     */
   virtual void StartPlayer () = 0;
 
   /**
-    * Stops the update thread for the media player. In order to close the application
-    * properly, this must be called when shutting down the application.
+    * Stop the update thread for the media player. In order to close the player
+    * properly, this must be called when shutting down the player.
     */
   virtual void StopPlayer () = 0;
 
@@ -92,42 +97,42 @@ struct iMediaPlayer : public virtual iBase
   virtual void Loop (bool shouldLoop) = 0 ;
 
   /**
-    * Starts playing the media
+    * Start playing the media
     */
   virtual void Play () = 0 ;
 
   /**
-    * Pauses the media
+    * Pause the media
     */
   virtual void Pause () = 0 ;
 
   /**
-    * Stops the media and seeks to the beginning
+    * Stop the media and seek to the beginning
     */
   virtual void Stop () = 0 ;
 
   /**
-    * Seeks the media
+    * Seek the media
     */
   virtual void Seek (float time) = 0 ;
 
   /**
-    * Get the position of the media
+    * Get the position of the media in seconds
     */
   virtual float GetPosition () const = 0 ;
 
   /**
-    * Get the length of the media
+    * Get the length of the media in seconds
     */
   virtual float GetLength () const = 0 ;
 
   /**
-    * Returns if the media is playing or not
+    * Check if the media is playing or not
     */
   virtual bool IsPlaying () = 0 ;
 
   /**
-    * Returns the aspect ratio to use with the image
+    * Get the aspect ratio of the active video stream
     */  
   virtual float GetAspectRatio () = 0;
 

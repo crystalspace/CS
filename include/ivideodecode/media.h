@@ -76,7 +76,8 @@ struct iMedia : public virtual iBase
   virtual void SwapBuffers () = 0;
   
   /**
-    * Set the how many frames will be cached
+    * Set the number of frames to be cached 
+    * \param[in] size Number of frames
     */
   virtual void SetCacheSize (size_t size) = 0;
 
@@ -110,7 +111,8 @@ struct iVideoMedia : public iMedia
 
 
   /**
-    * Makes "texture" point to the internal iTextureHandle of the stream
+    * Get a reference to the internal texture buffer
+    * \param[out] texture Target texture
     */
   virtual void GetVideoTarget (csRef<iTextureHandle> &texture) = 0;
 
@@ -129,7 +131,8 @@ struct iAudioMedia : public iMedia
   SCF_INTERFACE (iAudioMedia,0,1,0);
 
   /**
-    * Get the audio stream target
+    *  Get a reference to the internal audio stream
+    * \param[out] stream Target audio stream
     */
   virtual void GetAudioTarget (csRef<iSndSysStream> &stream) = 0;
 };

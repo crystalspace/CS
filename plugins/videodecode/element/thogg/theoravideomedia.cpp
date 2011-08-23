@@ -305,7 +305,7 @@ void csTheoraVideoMedia::Convert ()
   if (_streamInfo.pixel_fmt==TH_PF_420)
   {
     int uv_offset= (_streamInfo.pic_x/2)+ (currentData.yuv[1].stride)* (_streamInfo.pic_y/2);
-    uint8 * test = new uint8[_streamInfo.pic_width*_streamInfo.pic_height*4];
+    uint8 * outputBuffer = new uint8[_streamInfo.pic_width*_streamInfo.pic_height*4];
     int k=0;
     for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
       for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
@@ -326,24 +326,24 @@ void csTheoraVideoMedia::Convert ()
         if (G<0) G=0; else if (G>255) G=255;
         if (B<0) B=0; else if (B>255) B=255;
 
-        test[k] = (uint8)R;
+        outputBuffer[k] = (uint8)R;
         k++;
-        test[k] = (uint8)G;
+        outputBuffer[k] = (uint8)G;
         k++;
-        test[k] = (uint8)B;
+        outputBuffer[k] = (uint8)B;
         k++;
-        test[k] = 0xff;
+        outputBuffer[k] = 0xff;
         k++;
       }
 
-      currentData.pixels = test;
+      currentData.pixels = outputBuffer;
 
   }
   // 4:2:2 pixel format
   else if (_streamInfo.pixel_fmt==TH_PF_422)
   {
     int uv_offset= (_streamInfo.pic_x/2)+ (currentData.yuv[1].stride)* (_streamInfo.pic_y);
-    uint8 * test = new uint8[_streamInfo.pic_width*_streamInfo.pic_height*4];
+    uint8 * outputBuffer = new uint8[_streamInfo.pic_width*_streamInfo.pic_height*4];
     int k=0;
     for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
       for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
@@ -361,16 +361,16 @@ void csTheoraVideoMedia::Convert ()
         if (G<0) G=0; else if (G>255) G=255;
         if (B<0) B=0; else if (B>255) B=255;
 
-        test[k] = (uint8)R;
+        outputBuffer[k] = (uint8)R;
         k++;
-        test[k] = (uint8)G;
+        outputBuffer[k] = (uint8)G;
         k++;
-        test[k] = (uint8)B;
+        outputBuffer[k] = (uint8)B;
         k++;
-        test[k] = 0xff;
+        outputBuffer[k] = 0xff;
         k++;
       }
-      currentData.pixels = test;
+      currentData.pixels = outputBuffer;
 
   }
   // 4:4:4 pixel format
@@ -378,7 +378,7 @@ void csTheoraVideoMedia::Convert ()
   {
     int uv_offset= (_streamInfo.pic_x/2)+ (currentData.yuv[1].stride)* (_streamInfo.pic_y);
 
-    uint8 * test = new uint8[_streamInfo.pic_width*_streamInfo.pic_height*4];
+    uint8 * outputBuffer = new uint8[_streamInfo.pic_width*_streamInfo.pic_height*4];
     int k=0;
     for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
       for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
@@ -396,16 +396,16 @@ void csTheoraVideoMedia::Convert ()
         if (G<0) G=0; else if (G>255) G=255;
         if (B<0) B=0; else if (B>255) B=255;
 
-        test[k] = (uint8)R;
+        outputBuffer[k] = (uint8)R;
         k++;
-        test[k] = (uint8)G;
+        outputBuffer[k] = (uint8)G;
         k++;
-        test[k] = (uint8)B;
+        outputBuffer[k] = (uint8)B;
         k++;
-        test[k] = 0xff;
+        outputBuffer[k] = 0xff;
         k++;
       }
-      currentData.pixels = test;
+      currentData.pixels = outputBuffer;
 
   }
   else
