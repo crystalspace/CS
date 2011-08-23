@@ -101,20 +101,14 @@ void VideoTest::OnExit ()
 
 bool VideoTest::Application ()
 {
-  // Default behavior from DemoApplication
-  if (!DemoApplication::Application ())
-    return false;
-
   if (!csInitializer::RequestPlugins (object_reg,
     CS_REQUEST_VFS,
     CS_REQUEST_PLUGIN ("crystalspace.vpl.loader", iMediaLoader),
     CS_REQUEST_PLUGIN ("crystalspace.vpl.player", iMediaPlayer),
     CS_REQUEST_PLUGIN ("crystalspace.vpl.parser",iLoaderPlugin),
     CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
-    CS_REQUEST_PLUGIN ("crystalspace.sndsys.renderer.software", iSndSysRenderer),
     CS_REQUEST_PLUGIN ("crystalspace.documentsystem.multiplexer", iDocumentSystem),
     CS_REQUEST_PLUGIN_TAG ("crystalspace.documentsystem.tinyxml", iDocumentSystem, "iDocumentSystem.1"),
-    CS_REQUEST_PLUGIN ("crystalspace.sndsys.element.loader", iSndSysLoader),
     CS_REQUEST_PLUGIN ("crystalspace.sndsys.renderer.openal", iSndSysRenderer),
     CS_REQUEST_END))
   {
@@ -124,6 +118,9 @@ bool VideoTest::Application ()
     return false;
   }
 
+  // Default behavior from DemoApplication
+  if (!DemoApplication::Application ())
+    return false;
 
   vfs = csQueryRegistry<iVFS> (GetObjectRegistry ());
   if (!vfs) return ReportError ("Failed to locate VFS!");
@@ -184,8 +181,6 @@ bool VideoTest::Application ()
   // Create the scene
   if (!CreateScene ())
     return false;
-
-
 
   // Run the application
   Run ();
