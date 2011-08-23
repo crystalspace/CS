@@ -8,7 +8,7 @@ SCF_IMPLEMENT_FACTORY (csTheoraAudioMedia)
 
 csTheoraAudioMedia::csTheoraAudioMedia (iBase* parent) :
 scfImplementationType (this, parent),
-object_reg (0)
+_object_reg (0)
 {
 }
 
@@ -27,21 +27,19 @@ void csTheoraAudioMedia::CleanMedia ()
   }
   vorbis_comment_clear (&_streamComments);
   vorbis_info_clear (&_streamInfo);
-  printf ("audio stream is clean\n");
   fclose (_log);
 }
 
 bool csTheoraAudioMedia::Initialize (iObjectRegistry* r)
 {
-  object_reg = r;
+  _object_reg = r;
 
   // initialize the decoders
   if (_vorbis_p)
   {
     vorbis_synthesis_init (&_dspState,&_streamInfo);
     vorbis_block_init (&_dspState,&_vorbisBlock);
-    printf ("Ogg logical stream %ld is Vorbis %d channel %ld Hz audio.\n",
-      _streamState.serialno,_streamInfo.channels,_streamInfo.rate);
+
     _decodersStarted = true;
 
     csSndSysSoundFormat format;
@@ -49,28 +47,21 @@ bool csTheoraAudioMedia::Initialize (iObjectRegistry* r)
     format.Channels = _streamInfo.channels;
     format.Freq = _streamInfo.rate;
 
-    if (!csInitializer::RequestPlugins (object_reg,
+    if (!csInitializer::RequestPlugins (_object_reg,
       CS_REQUEST_VFS,
       CS_REQUEST_PLUGIN ("crystalspace.sndsys.renderer.software", iSndSysRenderer),
       CS_REQUEST_END))
     {
-      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      csReport (_object_reg, CS_REPORTER_SEVERITY_ERROR,
         "crystalspace.application.vidplaydemo",
         "Can't initialize plugins!");
       return false;
     }
 
-    csRef<iSndSysRenderer> sndrenderer = csQueryRegistry<iSndSysRenderer> (object_reg);
-    if (!sndrenderer) cout<<"Failed to locate sound renderer!\n";
-
-    
-
-    /*csRef<SndSysBasicStream> media = scfQueryInterface<SndSysBasicStream> (stream ); 
-    if (media.IsValid()) 
-    { 
-      _outputStream = static_cast<SndSysTheoraStream*> ( (SndSysBasicStream*)media);
-    }*/
-    //_outputStream.AttachNew ( new SndSysTheoraStream (&format,CS_SND3D_DISABLE));
+    csRef<iSndSysRenderer> sndrenderer = csQueryRegistry<iSndSysRenderer> (_object_reg);
+    if (!sndrenderer) csReport (_object_reg, CS_REPORTER_SEVERITY_ERROR,
+                                "crystalspace.application.vidplaydemo",
+                                "Failed to locate sound renderer!");
 
     _log = fopen ("sndlog.txt","wb");
   }
@@ -96,7 +87,7 @@ unsigned long csTheoraAudioMedia::GetFrameCount () const
 
 float csTheoraAudioMedia::GetLength () const
 {
-  return length;
+  return _length;
 }
 
 void csTheoraAudioMedia::GetAudioTarget (csRef<iSndSysStream> &stream)
@@ -111,7 +102,7 @@ double csTheoraAudioMedia::GetPosition () const
 
 bool csTheoraAudioMedia::Update ()
 {
-  if (cache.GetSize ()>=cacheSize)
+  if (_cache.GetSize ()>=_cacheSize)
     return false;
     
   _audiobuf_ready=false;
@@ -154,7 +145,7 @@ bool csTheoraAudioMedia::Update ()
         dataOut.count=count;
         dataOut.data=samples;
 
-        cache.Push (dataOut);
+        _cache.Push (dataOut);
 
         samples=NULL;
     }
@@ -174,7 +165,6 @@ bool csTheoraAudioMedia::Update ()
 
   if (_audiobuf_ready)
   {
-    //cout<<vorbis_granule_time (&vd,ogg_page_granulepos (og))<<endl;
     return 0;
   }
 
@@ -182,9 +172,9 @@ bool csTheoraAudioMedia::Update ()
 }
 void csTheoraAudioMedia::DropFrame ()
 {
-  if (cache.GetSize ()!=0)
+  if (_cache.GetSize ()!=0)
   {
-    cache.PopTop ();
+    _cache.PopTop ();
   }
 }
 
@@ -252,9 +242,9 @@ void csTheoraAudioMedia::InitializeStream (ogg_stream_state &state, vorbis_info 
 
 void csTheoraAudioMedia::WriteData ()
 {
-  if (cache.GetSize ()!=0)
+  if (_cache.GetSize ()!=0)
   {
-    cachedData data = cache.PopTop ();
+    cachedData data = _cache.PopTop ();
     delete data.data;
   }
 }
@@ -262,19 +252,19 @@ void csTheoraAudioMedia::WriteData ()
 
 void csTheoraAudioMedia::SetCacheSize (size_t size) 
 {
-  cacheSize = size;
+  _cacheSize = size;
 }
 
 
 bool csTheoraAudioMedia::HasDataReady ()
 {
-  if (cache.GetSize ()!=0)
+  if (_cache.GetSize ()!=0)
     return true;
   return false;
 }
 bool csTheoraAudioMedia::IsCacheFull ()
 {
-  if (cache.GetSize ()>=cacheSize)
+  if (_cache.GetSize ()>=_cacheSize)
     return true;
   return false;
 }

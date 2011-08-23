@@ -41,13 +41,13 @@ struct iObjectRegistry;
 class csVplParser : public scfImplementation2<csVplParser,iLoaderPlugin, iComponent>
 {
 private:
-  iObjectRegistry* object_reg;
-  csRef<iReporter> reporter;
-  csRef<iSyntaxService> synldr;
+  iObjectRegistry*      _object_reg;
+  csRef<iReporter>      _reporter;
+  csRef<iSyntaxService> _synldr;
 
-  csString          mediaPath;
-  csString          mediaType;
-  csArray<Language> languages;
+  csString              _mediaPath;
+  csString              _mediaType;
+  csArray<Language>     _languages;
 
   csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE "plugins/videodecode/persist/standard/vplParser.tok"

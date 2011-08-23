@@ -35,10 +35,7 @@ struct iObjectRegistry;
 class csVplLoader : public scfImplementation2<csVplLoader,iMediaLoader,iComponent>
 {
 private:
-  iObjectRegistry* object_reg;
-
-  // Theora video loader interface
-  csRef<iMediaLoader> m_pThOggLoader;
+  iObjectRegistry*  _object_reg;
 
 public:
   csVplLoader (iBase* parent);
@@ -47,7 +44,7 @@ public:
   // From iComponent.
   virtual bool Initialize (iObjectRegistry*);
 
-  virtual csRef<iMediaContainer> LoadMedia (const char * pFileName, const char *pDescription=0/*, const char* pMediaType = "AutoDetect"*/);
+  virtual csRef<iMediaContainer> LoadMedia (const char * pFileName, const char *pDescription=0);
 
   virtual void Create (csString path,csArray<Language> languages) {}
 };

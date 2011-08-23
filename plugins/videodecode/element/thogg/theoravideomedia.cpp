@@ -9,7 +9,7 @@ SCF_IMPLEMENT_FACTORY (csTheoraVideoMedia)
 
 csTheoraVideoMedia::csTheoraVideoMedia (iBase* parent) :
 scfImplementationType (this, parent),
-object_reg (0)
+_object_reg (0)
 {
 }
 
@@ -29,12 +29,11 @@ void csTheoraVideoMedia::CleanMedia ()
   th_comment_clear (&_streamComments);
   th_info_clear (&_streamInfo);
   th_setup_free (_setupInfo);
-  printf ("video stream is clean\n");
 }
 
 bool csTheoraVideoMedia::Initialize (iObjectRegistry* r)
 {
-  object_reg = r;
+  _object_reg = r;
 
   // initialize the decoders
   if (_theora_p)
@@ -45,13 +44,8 @@ bool csTheoraVideoMedia::Initialize (iObjectRegistry* r)
     _decodeControl=th_decode_alloc (&_streamInfo,_setupInfo);
 
     //Initialize the decoders and print the info on the stream
-    printf ("Ogg logical stream %ld is Theora %dx%d %.02f fps video\n"
-      "  Frame content is %dx%d with offset (%d,%d).\n",
-      _streamState.serialno,_streamInfo.pic_width,_streamInfo.pic_height, (double)_streamInfo.fps_numerator/_streamInfo.fps_denominator,
-      _streamInfo.frame_width, _streamInfo.frame_height, _streamInfo.pic_x, _streamInfo.pic_y);
 
     _aspectRatio = (float)_streamInfo.aspect_numerator/ (float)_streamInfo.aspect_denominator;
-    cout<<_aspectRatio<<endl;
 
     _FPS = (double)_streamInfo.fps_numerator/_streamInfo.fps_denominator;
 
@@ -59,7 +53,7 @@ bool csTheoraVideoMedia::Initialize (iObjectRegistry* r)
     _videobuf_granulepos=-1;
     _videobufTime=0;
     _frameToSkip=-1;
-    cacheSize=1;
+    _cacheSize=1;
   }
   else
   {
@@ -80,12 +74,12 @@ const char* csTheoraVideoMedia::GetType () const
 
 unsigned long csTheoraVideoMedia::GetFrameCount() const
 {
-  return frameCount;
+  return _frameCount;
 }
 
 float csTheoraVideoMedia::GetLength () const
 {
-  return length;
+  return _length;
 }
 
 void csTheoraVideoMedia::GetVideoTarget (csRef<iTextureHandle> &texture)
@@ -102,7 +96,7 @@ double csTheoraVideoMedia::GetPosition () const
 bool csTheoraVideoMedia::Update ()
 {
   //Convert ();
-  if (cache.GetSize ()>=cacheSize)
+  if (_cache.GetSize ()>=_cacheSize)
     return false;
 
   _videobufReady=false;
@@ -129,11 +123,11 @@ bool csTheoraVideoMedia::Update ()
           th_ycbcr_buffer yuv;
           th_decode_ycbcr_out (_decodeControl,yuv);
           //currentData.yuv = &yuv;
-          memcpy (&currentData.yuv, &yuv, sizeof (yuv));
+          memcpy (&_currentData.yuv, &yuv, sizeof (yuv));
           Convert ();
           cachedData data;
-          data.pixels = currentData.pixels;
-          cache.Push (data);
+          data.pixels = _currentData.pixels;
+          _cache.Push (data);
         }
       }
     }
@@ -150,12 +144,12 @@ bool csTheoraVideoMedia::Update ()
 
 long csTheoraVideoMedia::SeekPage (long targetFrame,bool return_keyframe, ogg_sync_state *oy,unsigned long fileSize)
 {
-  MutexScopedLock lock (writeMutex);
-  while (isWrite)
-    isWriting.Wait (writeMutex);
-  rgbBuff = NULL;
+  MutexScopedLock lock (_writeMutex);
+  while (_isWrite)
+    _isWriting.Wait (_writeMutex);
+  _rgbBuff = NULL;
 
-  cache.DeleteAll ();
+  _cache.DeleteAll ();
 
   ogg_stream_reset (&_streamState);
   th_decode_free (_decodeControl);
@@ -226,7 +220,6 @@ long csTheoraVideoMedia::SeekPage (long targetFrame,bool return_keyframe, ogg_sy
   if (return_keyframe)
   {
     _frameToSkip = targetFrame;
-    //cout<<"want to skip to :"<<_frameToSkip<<endl;
 
     return (long) (granule >> _streamInfo.keyframe_granule_shift);
   }
@@ -256,13 +249,9 @@ void csTheoraVideoMedia::InitializeStream (ogg_stream_state &state, th_info &inf
      CS_TEXTURE_2D | CS_TEXTURE_NPOTS);
   _buffers.Push (tex2);
 
-  activeBuffer = 1;
+  _activeBuffer = 1;
 
   _texture = _buffers[0];
-
-  size_t dstSize;
-  iTextureHandle* tex = _buffers.Get (activeBuffer);
-  rgbBuff = tex->QueryBlitBuffer (_streamInfo.pic_x,_streamInfo.pic_y,_streamInfo.pic_width,_streamInfo.pic_height,dstSize);
 
 
   // Initialize the LUTs
@@ -281,14 +270,14 @@ void csTheoraVideoMedia::InitializeStream (ogg_stream_state &state, th_info &inf
     }
   }
 
-  canSwap=false;
+  _canSwap=false;
 }
 
 void csTheoraVideoMedia::DropFrame ()
 {
-  if (cache.GetSize ()!=0)
+  if (_cache.GetSize ()!=0)
   {
-    cachedData dat = cache.PopTop ();
+    cachedData dat = _cache.PopTop ();
     delete dat.pixels;
   }
 }
@@ -296,23 +285,23 @@ void csTheoraVideoMedia::DropFrame ()
 void csTheoraVideoMedia::Convert ()
 {
 
-  int y_offset= (_streamInfo.pic_x&~1)+currentData.yuv[0].stride* (_streamInfo.pic_y&~1);
+  int y_offset= (_streamInfo.pic_x&~1)+_currentData.yuv[0].stride* (_streamInfo.pic_y&~1);
 
-  uint8* pixels = rgbBuff; 
+  uint8* pixels = _rgbBuff; 
 
   int Y,U,V,R,G,B;
   // 4:2:0 pixel format
   if (_streamInfo.pixel_fmt==TH_PF_420)
   {
-    int uv_offset= (_streamInfo.pic_x/2)+ (currentData.yuv[1].stride)* (_streamInfo.pic_y/2);
+    int uv_offset= (_streamInfo.pic_x/2)+ (_currentData.yuv[1].stride)* (_streamInfo.pic_y/2);
     uint8 * outputBuffer = new uint8[_streamInfo.pic_width*_streamInfo.pic_height*4];
     int k=0;
     for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
       for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
       {
-        Y = (currentData.yuv[0].data+y_offset+currentData.yuv[0].stride* ( (y)))[x] ;//-16;
-        U = (currentData.yuv[1].data+uv_offset+currentData.yuv[1].stride* (y/2))[x/2] ;//- 128;
-        V = (currentData.yuv[2].data+uv_offset+currentData.yuv[2].stride* (y/2))[x/2] ;//- 128;
+        Y = (_currentData.yuv[0].data+y_offset+_currentData.yuv[0].stride* ( (y)))[x] ;//-16;
+        U = (_currentData.yuv[1].data+uv_offset+_currentData.yuv[1].stride* (y/2))[x/2] ;//- 128;
+        V = (_currentData.yuv[2].data+uv_offset+_currentData.yuv[2].stride* (y/2))[x/2] ;//- 128;
 
         /* int R = ((298*Y + 409*V + 128)>>8);
         int G = ((298*Y - 100*U - 208*V + 128)>>8);
@@ -336,21 +325,21 @@ void csTheoraVideoMedia::Convert ()
         k++;
       }
 
-      currentData.pixels = outputBuffer;
+      _currentData.pixels = outputBuffer;
 
   }
   // 4:2:2 pixel format
   else if (_streamInfo.pixel_fmt==TH_PF_422)
   {
-    int uv_offset= (_streamInfo.pic_x/2)+ (currentData.yuv[1].stride)* (_streamInfo.pic_y);
+    int uv_offset= (_streamInfo.pic_x/2)+ (_currentData.yuv[1].stride)* (_streamInfo.pic_y);
     uint8 * outputBuffer = new uint8[_streamInfo.pic_width*_streamInfo.pic_height*4];
     int k=0;
     for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
       for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
       {
-        Y = (currentData.yuv[0].data+y_offset+currentData.yuv[0].stride*y)[x] ;//-16;
-        U = (currentData.yuv[1].data+uv_offset+currentData.yuv[1].stride* (y))[x/2] ;//- 128;
-        V = (currentData.yuv[2].data+uv_offset+currentData.yuv[2].stride* (y))[x/2] ;//- 128;
+        Y = (_currentData.yuv[0].data+y_offset+_currentData.yuv[0].stride*y)[x] ;//-16;
+        U = (_currentData.yuv[1].data+uv_offset+_currentData.yuv[1].stride* (y))[x/2] ;//- 128;
+        V = (_currentData.yuv[2].data+uv_offset+_currentData.yuv[2].stride* (y))[x/2] ;//- 128;
 
         R = (Ylut[Y] + RVlut[V])>>8;
         G = (Ylut[Y] - GUlut[U] - GVlut[V])>>8;
@@ -370,22 +359,22 @@ void csTheoraVideoMedia::Convert ()
         outputBuffer[k] = 0xff;
         k++;
       }
-      currentData.pixels = outputBuffer;
+      _currentData.pixels = outputBuffer;
 
   }
   // 4:4:4 pixel format
   else if (_streamInfo.pixel_fmt==TH_PF_444)
   {
-    int uv_offset= (_streamInfo.pic_x/2)+ (currentData.yuv[1].stride)* (_streamInfo.pic_y);
+    int uv_offset= (_streamInfo.pic_x/2)+ (_currentData.yuv[1].stride)* (_streamInfo.pic_y);
 
     uint8 * outputBuffer = new uint8[_streamInfo.pic_width*_streamInfo.pic_height*4];
     int k=0;
     for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
       for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
       {
-        Y = (currentData.yuv[0].data+y_offset+currentData.yuv[0].stride*y)[x];// -16;
-        U = (currentData.yuv[1].data+uv_offset+currentData.yuv[1].stride* (y))[x] ;//- 128;
-        V = (currentData.yuv[2].data+uv_offset+currentData.yuv[2].stride* (y))[x] ;//- 128;
+        Y = (_currentData.yuv[0].data+y_offset+_currentData.yuv[0].stride*y)[x];// -16;
+        U = (_currentData.yuv[1].data+uv_offset+_currentData.yuv[1].stride* (y))[x] ;//- 128;
+        V = (_currentData.yuv[2].data+uv_offset+_currentData.yuv[2].stride* (y))[x] ;//- 128;
 
         R = (Ylut[Y] + RVlut[V])>>8;
         G = (Ylut[Y] - GUlut[U] - GVlut[V])>>8;
@@ -405,33 +394,33 @@ void csTheoraVideoMedia::Convert ()
         outputBuffer[k] = 0xff;
         k++;
       }
-      currentData.pixels = outputBuffer;
+      _currentData.pixels = outputBuffer;
 
   }
   else
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
+    csReport (_object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
       "The Theora video stream has an unsupported pixel format.\n");
-    isWrite=false;
-    isWriting.NotifyOne ();
+    _isWrite=false;
+    _isWriting.NotifyOne ();
     return;
   }
 }
 void csTheoraVideoMedia::SwapBuffers ()
 {
-  if(canSwap)
+  if(_canSwap)
   {
-    if (activeBuffer==0)
+    if (_activeBuffer==0)
     {
-      _texture = _buffers[activeBuffer];
-      activeBuffer = 1;
-      canSwap=false;
+      _texture = _buffers[_activeBuffer];
+      _activeBuffer = 1;
+      _canSwap=false;
     }
     else
     {
-      _texture = _buffers[activeBuffer];
-      activeBuffer = 0;
-      canSwap=false;
+      _texture = _buffers[_activeBuffer];
+      _activeBuffer = 0;
+      _canSwap=false;
     }
   }
 }
@@ -439,44 +428,44 @@ void csTheoraVideoMedia::SwapBuffers ()
 
 void csTheoraVideoMedia::WriteData ()
 {
-  isWrite=true;
-  if(!canSwap && cache.GetSize ()!=0)
+  _isWrite=true;
+  if(!_canSwap && _cache.GetSize ()!=0)
   {
     {
-      MutexScopedLock lock (writeMutex);
+      MutexScopedLock lock (_writeMutex);
 
-      cachedData dat = cache.PopTop ();
+      cachedData dat = _cache.PopTop ();
       size_t dstSize;
-      iTextureHandle* tex = _buffers.Get (activeBuffer);
-      rgbBuff = tex->QueryBlitBuffer (_streamInfo.pic_x,_streamInfo.pic_y,_streamInfo.pic_width,_streamInfo.pic_height,dstSize);
+      iTextureHandle* tex = _buffers.Get (_activeBuffer);
+      _rgbBuff = tex->QueryBlitBuffer (_streamInfo.pic_x,_streamInfo.pic_y,_streamInfo.pic_width,_streamInfo.pic_height,dstSize);
 
-      memcpy(rgbBuff,dat.pixels,_streamInfo.pic_width*_streamInfo.pic_height*4);
+      memcpy(_rgbBuff,dat.pixels,_streamInfo.pic_width*_streamInfo.pic_height*4);
       delete dat.pixels;
 
-      tex->ApplyBlitBuffer (rgbBuff);
+      tex->ApplyBlitBuffer (_rgbBuff);
 
-      canSwap=true;
-      isWrite=false;
-      isWriting.NotifyOne ();
+      _canSwap=true;
+      _isWrite=false;
+      _isWriting.NotifyOne ();
     }
   }
-  isWrite=false;
+  _isWrite=false;
 }
 
 void csTheoraVideoMedia::SetCacheSize (size_t size) 
 {
-  cacheSize = size;
+  _cacheSize = size;
 }
 
 bool csTheoraVideoMedia::HasDataReady ()
 {
-  if (cache.GetSize ()!=0)
+  if (_cache.GetSize ()!=0)
     return true;
   return false;
 }
 bool csTheoraVideoMedia::IsCacheFull ()
 {
-  if (cache.GetSize ()>=cacheSize)
+  if (_cache.GetSize ()>=_cacheSize)
     return true;
   return false;
 }

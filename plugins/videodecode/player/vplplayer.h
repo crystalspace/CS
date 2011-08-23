@@ -42,22 +42,22 @@ class csVplPlayer :  public ThreadedCallable<csVplPlayer>,
   public scfImplementation2<csVplPlayer,iMediaPlayer,iComponent>
 {
 private:
-  iObjectRegistry* object_reg;
+  iObjectRegistry*        _object_reg;
 
-  csRef<iMediaContainer> _mediaFile;
+  csRef<iMediaContainer>  _mediaFile;
 
-  bool _playing;
-  bool _shouldLoop;
-  bool _shouldStop;
-  bool _shouldUpdate;
-  bool _shouldPlay;
+  bool                    _playing;
+  bool                    _shouldLoop;
+  bool                    _shouldStop;
+  bool                    _shouldUpdate;
+  bool                    _shouldPlay;
 
 
-  csRef<iThreadReturn> ret;
+  csRef<iThreadReturn>    _threadInfo;
 
 public:
   iObjectRegistry* GetObjectRegistry () const
-  { return object_reg; }
+  { return _object_reg; }
 
   csVplPlayer (iBase* parent);
   virtual ~csVplPlayer ();
@@ -76,7 +76,6 @@ public:
   virtual void GetTargetAudio (csRef<iSndSysStream> &target) ;
   
   THREADED_CALLABLE_DECL (csVplPlayer, Update, csThreadReturn, THREADED, false, false);
-  //virtual void Update ();
   virtual void Loop (bool shouldLoop) ;
   virtual void Play () ;
   virtual void Pause () ;
@@ -94,7 +93,8 @@ public:
   void SwapBuffers();
 
   /**
-   * Embedded iEventHandler interface that handles keyboard events
+   * Embedded iEventHandler interface that handles the Frame event
+   * in order to write data and swap buffers
    */
   class FrameEventHandler : 
     public scfImplementation1<FrameEventHandler, 

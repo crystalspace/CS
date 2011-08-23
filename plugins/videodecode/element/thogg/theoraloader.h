@@ -49,13 +49,13 @@ class csThOggLoader : public scfImplementation2<csThOggLoader,iMediaLoader,iComp
 {
 private:
 
-  iObjectRegistry* object_reg;
+  iObjectRegistry* _object_reg;
 
-  csRef<iTextureManager> texManager;
+  csRef<iTextureManager> _texManager;
 
   //ogg stuff
-  ogg_sync_state   oy;
-  ogg_page         og;
+  ogg_sync_state   _oy;
+  ogg_page         _og;
 
   //theora stuff
   th_info      ti;
@@ -63,15 +63,15 @@ private:
   //------------------
 
   //vorbis stuff
-  vorbis_info      vi;
-  vorbis_comment   vc;
+  vorbis_info      _vi;
+  vorbis_comment   _vc;
   //------------------
 
-  FILE *infile;
-  csRef<iGraphics3D> _g3d;
+  FILE *              _infile;
+  csRef<iGraphics3D>  _g3d;
 
-  csString path;
-  csArray<Language> languages;
+  csString            _path;
+  csArray<Language>   _languages;
 
 private:
 
@@ -91,7 +91,7 @@ public:
   virtual bool Initialize (iObjectRegistry*);
 
 
-  virtual csRef<iMediaContainer> LoadMedia (const char * pFileName, const char *pDescription=0/*, const char* pMediaType = "AutoDetect"*/);
+  virtual csRef<iMediaContainer> LoadMedia (const char * pFileName, const char *pDescription=0);
 
   virtual void Create (csString path,csArray<Language> languages) ;
 };

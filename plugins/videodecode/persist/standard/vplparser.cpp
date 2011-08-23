@@ -28,7 +28,7 @@ SCF_IMPLEMENT_FACTORY (csVplParser)
 
 csVplParser::csVplParser (iBase* parent) :
 scfImplementationType (this, parent),
-object_reg (0)
+_object_reg (0)
 {
 }
 
@@ -38,12 +38,14 @@ csVplParser::~csVplParser ()
 
 bool csVplParser::Initialize (iObjectRegistry* r)
 {
-  csVplParser::object_reg = r;
-  reporter = csQueryRegistry<iReporter> (object_reg);
-  synldr = csQueryRegistry<iSyntaxService> (object_reg);
+  csVplParser::_object_reg = r;
+  _reporter = csQueryRegistry<iReporter> (_object_reg);
+  _synldr = csQueryRegistry<iSyntaxService> (_object_reg);
 
-  languages.DeleteAll ();
+  // Clear the internal language table
+  _languages.DeleteAll ();
 
+  // Initialize the xml tokens
   InitTokenTable (xmltokens);
   return true;
 }
@@ -67,7 +69,7 @@ csPtr<iBase> csVplParser::Parse (iDocumentNode* node, iStreamSource*, iLoaderCon
         const char* type = child->GetAttributeValue ("type");
         if (type == 0)
         {
-          synldr->ReportError (msgidFactory, child, 
+          _synldr->ReportError (msgidFactory, child, 
                                "No type defined while loading video");
           return 0;
         }
@@ -75,11 +77,11 @@ csPtr<iBase> csVplParser::Parse (iDocumentNode* node, iStreamSource*, iLoaderCon
         if (strcmp (type,"theoraVideo")==0)
         {
 
-          csRef<iPluginManager> mgr=csQueryRegistry<iPluginManager> (object_reg);
+          csRef<iPluginManager> mgr=csQueryRegistry<iPluginManager> (_object_reg);
           csRef<iMediaLoader> m_pThOggLoader=csLoadPlugin<iMediaLoader> (mgr,
             "crystalspace.vpl.element.thogg");
           // Get the type of the media
-          mediaType = csString (child->GetAttributeValue ("type"));
+          _mediaType = csString (child->GetAttributeValue ("type"));
 
           // Iterate through the rest of the nodes in the media file
           csRef<iDocumentNodeIterator> it2 = child->GetNodes ();
@@ -98,12 +100,12 @@ csPtr<iBase> csVplParser::Parse (iDocumentNode* node, iStreamSource*, iLoaderCon
                 const char* vidPath = child2->GetAttributeValue ("path");
                 if (vidPath == 0)
                 {
-                  synldr->ReportError (msgidFactory, child2, 
+                  _synldr->ReportError (msgidFactory, child2, 
                                        "No path defined while loading videostream");
                   return 0;
                 }
 
-                mediaPath = csString (vidPath);
+                _mediaPath = csString (vidPath);
               }
             case XMLTOKEN_AUDIOSTREAM:
               {
@@ -128,7 +130,7 @@ csPtr<iBase> csVplParser::Parse (iDocumentNode* node, iStreamSource*, iLoaderCon
                       const char* name = child3->GetAttributeValue ("name");
                       if (name == 0)
                       {
-                        synldr->ReportError (msgidFactory, child3, 
+                        _synldr->ReportError (msgidFactory, child3, 
                                              "No language name defined while loading audiostream");
                         return 0;
                       }
@@ -140,7 +142,7 @@ csPtr<iBase> csVplParser::Parse (iDocumentNode* node, iStreamSource*, iLoaderCon
                       const char* langPath = child3->GetAttributeValue ("path");
                       if (langPath == 0)
                       {
-                        synldr->ReportError (msgidFactory, child3, 
+                        _synldr->ReportError (msgidFactory, child3, 
                                              "No language path defined while loading audiostream");
                         return 0;
                       }
@@ -148,7 +150,7 @@ csPtr<iBase> csVplParser::Parse (iDocumentNode* node, iStreamSource*, iLoaderCon
                       buff.path = new char[strlen (langPath)];
                       strcpy (buff.path,langPath);
 
-                      languages.Push (buff);
+                      _languages.Push (buff);
                     }
                   }
                 }
@@ -157,7 +159,7 @@ csPtr<iBase> csVplParser::Parse (iDocumentNode* node, iStreamSource*, iLoaderCon
             }
           }
 
-          m_pThOggLoader->Create (mediaPath,languages);
+          m_pThOggLoader->Create (_mediaPath,_languages);
 
           return csPtr<iBase> (m_pThOggLoader);
         }

@@ -45,47 +45,45 @@ class TheoraMediaContainer : public scfImplementation2<TheoraMediaContainer,
   iComponent>
 {
 private:
-  iObjectRegistry* object_reg;
-  csRefArray<iMedia> media;
-  csArray<size_t> activeStreams;
-  const char* pDescription;
-  bool endOfFile;
-  unsigned long mSize;
-  float timeToSeek;
-  bool    _waitToFillCache;
+  iObjectRegistry*    _object_reg;
+  csRefArray<iMedia>  _media;
+  csArray<size_t>     _activeStreams;
+  const char*         _pDescription;
+  bool                _endOfFile;
+  unsigned long       _fileSize;
+  float               _timeToSeekTo;
+  bool                _waitToFillCache;
 
   csRef<csTheoraVideoMedia> _activeTheoraStream;
   csRef<csTheoraAudioMedia> _activeVorbisStream;
 
-  size_t cacheSize;
-
-  csTicks timeSinceStart;
+  size_t  _cacheSize;
 
   // audio languages
   
-  csArray<Language> languages;
+  csArray<Language> _languages;
 
   // audio stream
-  csRef<iSndSysStream> sndstream;
+  csRef<iSndSysStream> _sndstream;
 
   // audio stream length in seconds
-  size_t audioStreamLength;
+  size_t _audioStreamLength;
 
 private:
-  Mutex swapMutex;
-  Condition isSeeking;
+  Mutex     _swapMutex;
+  Condition _isSeeking;
 
 public:
-  ogg_sync_state        _syncState;
-  ogg_page              _oggPage;
-  FILE                  *infile;
-  csRef<iTextureHandle> _target;
+  ogg_sync_state          _syncState;
+  ogg_page                _oggPage;
+  FILE*                   _infile;
+  csRef<iTextureHandle>   _target;
 
 private:
-  bool canSwap;
-  bool canWrite;
-  int hasDataToBuffer;
-  int updateState;
+  bool  _canSwap;
+  bool  _canWrite;
+  int   _hasDataToBuffer;
+  int   _updateState;
 
   //helper for buffering data
   int BufferData (ogg_sync_state *oy);
@@ -101,7 +99,8 @@ public:
   virtual csRef<iMedia> GetMedia (size_t index);
   virtual const char* GetDescription () const;
   inline virtual void SetDescription (const char* pDescription)
-    { this->pDescription=pDescription; }
+    { this->_pDescription=pDescription; }
+
   void AddMedia (csRef<iMedia> media);
   virtual void GetTargetTexture (csRef<iTextureHandle> &target) ;
   virtual void GetTargetAudio (csRef<iSndSysStream> &target) ;
@@ -132,13 +131,21 @@ public:
 
   virtual void OnStop ();
 
-  // Does a seek on the active media
+  // Execute a seek on the active media
   void DoSeek ();
+
+  // Queue a page to the appropriate stream
   void QueuePage (ogg_page *page);
   void SetLanguages (csArray<Language> languages);
-  inline void ClearMedia ()  { media.Empty (); }
-  inline unsigned long GetFileSize () const { return mSize; }
-  inline void SetFileSize (unsigned long size)  { mSize=size; }
+
+  inline void ClearMedia ()  
+  { _media.Empty (); }
+
+  inline unsigned long GetFileSize () const 
+  { return _fileSize; }
+
+  inline void SetFileSize (unsigned long size)  
+  { _fileSize=size; }
 };
 
 /** @} */

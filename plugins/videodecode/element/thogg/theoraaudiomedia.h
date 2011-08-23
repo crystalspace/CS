@@ -54,8 +54,8 @@ public:
     short* data;
   };
 private:
-  iObjectRegistry*      object_reg;
-  float                 length;
+  iObjectRegistry*      _object_reg;
+  float                 _length;
 
   ogg_stream_state  _streamState;
   vorbis_info       _streamInfo;
@@ -71,8 +71,8 @@ private:
   bool              _audiobuf_ready;
 
 
-  csFIFO<cachedData> cache;
-  size_t cacheSize;
+  csFIFO<cachedData>  _cache;
+  size_t              _cacheSize;
 
   // The stream used to play audio
   csRef<iSndSysStream> _outputStream;
@@ -116,7 +116,7 @@ public:
 
   virtual void DropFrame () ;
 
-  inline void SetLength (float length)  { this->length=length; }
+  inline void SetLength (float length)  { this->_length=length; }
   void Seek (float time, ogg_sync_state *oy,ogg_page *op,ogg_stream_state *thState);
 };
 

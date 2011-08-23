@@ -11,7 +11,7 @@ SCF_IMPLEMENT_FACTORY (csVplPlayer)
 
 csVplPlayer::csVplPlayer (iBase* parent) :
 scfImplementationType (this, parent),
-object_reg (0)
+_object_reg (0)
 {
 }
 
@@ -20,7 +20,7 @@ csVplPlayer::~csVplPlayer ()
   // Unregister the Frame event listener
   if (frameEventHandler)
   {
-    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (_object_reg));
     if (q)
       q->RemoveListener (frameEventHandler);
   }
@@ -28,7 +28,7 @@ csVplPlayer::~csVplPlayer ()
 
 bool csVplPlayer::Initialize (iObjectRegistry* r)
 {
-  object_reg = r;
+  _object_reg = r;
 
   _mediaFile=NULL;
   _playing = false;
@@ -39,7 +39,7 @@ void csVplPlayer::InitializePlayer (csRef<iMediaContainer> media, size_t cacheSi
 {
   if (!media.IsValid ())
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
+    csReport (_object_reg, CS_REPORTER_SEVERITY_WARNING, QUALIFIED_PLUGIN_NAME,
               "Media container is not valid!");
     return;
   }
@@ -51,8 +51,8 @@ void csVplPlayer::InitializePlayer (csRef<iMediaContainer> media, size_t cacheSi
   else;
   _mediaFile->SetCacheSize (cacheSize);
 
-  CS_INITIALIZE_FRAME_EVENT_SHORTCUTS (object_reg);
-  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
+  CS_INITIALIZE_FRAME_EVENT_SHORTCUTS (_object_reg);
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (_object_reg));
 
   // Register the Frame event listener
   if (!frameEventHandler)
@@ -71,10 +71,10 @@ void csVplPlayer::InitializePlayer (csRef<iMediaContainer> media, size_t cacheSi
 
 void csVplPlayer::StartPlayer ()
 {
-  if (!ret.IsValid ())
+  if (!_threadInfo.IsValid ())
   {
     _shouldUpdate = true;
-    ret = Update ();
+    _threadInfo = Update ();
   }
 }
 
@@ -151,12 +151,10 @@ THREADED_CALLABLE_IMPL(csVplPlayer, Update)
         _mediaFile->Update ();
       }
 
-      //csSleep (5);
     }
     // If the media isn't playing, we don't want to use up the thread
     else
       csSleep (100);
-    //cout<<"frame time "<<csGetTicks ()-start<<endl;
   }
 
   return true;
@@ -169,7 +167,7 @@ void csVplPlayer::Loop (bool shouldLoop)
 
 void csVplPlayer::Play () 
 {
-  if (!ret.IsValid ())
+  if (!_threadInfo.IsValid ())
   {
     _shouldPlay=true;
     return;

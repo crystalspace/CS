@@ -10,7 +10,7 @@ SCF_IMPLEMENT_FACTORY (csVplLoader)
 
 csVplLoader::csVplLoader (iBase* parent) :
 scfImplementationType (this, parent),
-object_reg (0)
+_object_reg (0)
 {
 }
 
@@ -20,23 +20,20 @@ csVplLoader::~csVplLoader ()
 
 bool csVplLoader::Initialize (iObjectRegistry* r)
 {
-  object_reg = r;
-
-  csRef<iPluginManager> mgr=csQueryRegistry<iPluginManager> (object_reg);
-  m_pThOggLoader=csLoadPlugin<iMediaLoader> (mgr,
-    "crystalspace.vpl.element.thogg");
+  _object_reg = r;
 
   return true;
 }
 
-csRef<iMediaContainer> csVplLoader::LoadMedia (const char * pFileName, const char *pDescription/*, const char* pMediaType*/)
+csRef<iMediaContainer> csVplLoader::LoadMedia (const char * pFileName, const char *pDescription)
 {
-  csRef<iLoaderPlugin> parser = csQueryRegistry<iLoaderPlugin> (object_reg);
+  // Get the generic media xml parser
+  csRef<iLoaderPlugin> parser = csQueryRegistry<iLoaderPlugin> (_object_reg);
 
   // Parse XML
 
   // Read the xml file and create the document
-  csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (_object_reg);
   csRef<iDocumentSystem> docSys = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   csRef<iDocument> xmlDoc = docSys->CreateDocument ();
   csRef<iDataBuffer> xmlData = vfs->ReadFile (pFileName);
@@ -55,7 +52,7 @@ csRef<iMediaContainer> csVplLoader::LoadMedia (const char * pFileName, const cha
   }
   else
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, QUALIFIED_PLUGIN_NAME,
+    csReport (_object_reg, CS_REPORTER_SEVERITY_ERROR, QUALIFIED_PLUGIN_NAME,
       "Failed to parse '%s'.\n", pFileName);
     return NULL;
   }

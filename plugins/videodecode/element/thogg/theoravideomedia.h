@@ -45,18 +45,18 @@ struct csVPLvideoFormat;
 class csTheoraVideoMedia : public scfImplementation2< csTheoraVideoMedia, iVideoMedia, scfFakeInterface<iMedia> >
 {
 private:
-  iObjectRegistry* object_reg;
-  float            length;
-  unsigned long    frameCount;
+  iObjectRegistry* _object_reg;
+  float            _length;
+  unsigned long    _frameCount;
 
   ogg_int64_t      _videobuf_granulepos;
   ogg_int64_t      _frameToSkip;
 
-  csRef<iTextureHandle> _texture;
-  csRefArray<iTextureHandle> _buffers;
+  csRef<iTextureHandle>       _texture;
+  csRefArray<iTextureHandle>  _buffers;
 
-  int activeBuffer;
-  bool canSwap;
+  int                         _activeBuffer;
+  bool                        _canSwap;
 
   // Theora-related stuff
   ogg_stream_state  _streamState;
@@ -66,7 +66,7 @@ private:
   ogg_packet        _oggPacket;
   th_setup_info    *_setupInfo;
   int               _theora_p;
-  FILE              *_infile;
+  FILE             *_infile;
 
   bool    _decodersStarted;
   bool    _videobufReady;
@@ -79,19 +79,19 @@ private:
     uint8* pixels;
   };
 
-  csFIFO<cachedData> cache;
-  size_t cacheSize;
+  csFIFO<cachedData>  _cache;
+  size_t              _cacheSize;
 
-  double _FPS;
-  float _aspectRatio;
+  double              _FPS;
+  float               _aspectRatio;
 
   // Stuff for conversion on the other thread
 
-  uint8* rgbBuff;
-  void Convert ();
+  uint8*  _rgbBuff;
+  void    Convert ();
   
 
-  cachedData currentData;
+  cachedData _currentData;
 
   // Look-up tables for conversion
   int Ylut[256],
@@ -102,9 +102,9 @@ private:
 
   // Mutexes
 private:
-  bool isWrite;
-  Mutex writeMutex;
-  Condition isWriting;
+  bool        _isWrite;
+  Mutex       _writeMutex;
+  Condition   _isWriting;
 public:
 
   // Provide access to the Theora specific members
@@ -147,8 +147,8 @@ public:
   virtual float GetAspectRatio () ;
   virtual void DropFrame () ;
 
-  inline void SetFrameCount (unsigned long count)  { frameCount=count; }
-  inline void SetLength (float length)  { this->length=length; }
+  inline void SetFrameCount (unsigned long count)  { _frameCount=count; }
+  inline void SetLength (float length)  { this->_length=length; }
   long SeekPage (long targetFrame,bool return_keyframe, ogg_sync_state *oy,unsigned  long fileSize);
 };
 
