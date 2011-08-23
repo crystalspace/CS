@@ -1,3 +1,21 @@
+/*
+  Copyright (C) 2011 by Liu Lu
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #ifndef __CS_OPCODE_COLLIDER_H__
 #define __CS_OPCODE_COLLIDER_H__
 
@@ -37,80 +55,6 @@ public:
   virtual float GetMargin () const {return 0;}
   virtual float GetVolume () const {return volume;}
 };
-
-/*
-class csOpcodeColliderBox: public scfImplementation2<
-  csOpcodeColliderBox, csOpcodeCollider, iColliderBox>
-{
-  IceMaths::AABB shape;
-  csVector3 boxSize;
-
-public:
-  csOpcodeColliderBox (const csVector3& boxSize);
-  virtual ~csOpcodeColliderBox();
-  virtual ColliderType GetGeometryType() const {return COLLIDER_BOX;}
-  virtual csVector3 GetBoxGeometry() {return boxSize};
-};
-
-class csOPCODEColliderSphere: public scfImplementation2<
-  csOPCODEColliderSphere, csOpcodeCollider, iColliderSphere>
-{
-  IceMaths::Sphere shape;
-  float radius;
-
-public:
-  csOPCODEColliderSphere(float radius);
-  virtual ~csOPCODEColliderSphere();
-  virtual ColliderType GetGeometryType() const {return COLLIDER_SPHERE;}
-  virtual float GetSphereGeometry() {return radius;}
-};
-
-class csOpcodeColliderPlane:
-  public scfImplementation2<csOpcodeColliderPlane,
-  csOpcodeCollider, CS::Collision2::iColliderPlane>
-{
-  IceMaths::Plane opcodePlane;
-  csPlane3 plane;
-
-public:
-  csBulletColliderPlane (const csPlane3& plane, csBulletSystem* sys);
-  virtual ~csBulletColliderPlane ();
-  virtual CS::Collision2::ColliderType GetGeometryType () const
-  {return CS::Collision2::COLLIDER_PLANE;}
-  virtual csPlane3 GetPlaneGeometry () {return plane;}
-};
-
-
-class csOPCODEColliderCapsule:
-  public scfImplementation1<csOPCODEColliderCapsule, iColliderCapsule>
-{
-  IceMaths::LSS shape;
-  float radius;
-  float length;
-
-public:
-  csOPCODEColliderCapsule (float length, float radius);
-  virtual ~csOPCODEColliderCapsule();
-  virtual ColliderType GetGeometryType() const {return COLLIDER_CAPSULE;}
-  virtual void SetMargin(float margin) {}
-  virtual bool GetCapsuleGeometry(float& length, float& radius);
-};
-
-class csOPCODEColliderConcaveMesh:
-  public scfImplementation1<csOPCODEColliderConcaveMesh, iColliderConcaveMesh>
-{
-  iMeshWrapper* meshFactory;
-  Opcode::MeshInterface opcMeshInt;
-  Opcode::OPCODECREATE OPCC;
-  size_t* indexHolder;
-  csDirtyAccessArray<Point> vertices;
-public:
-  csOPCODEColliderConcaveMesh(iMeshWrapper* mesh);
-  virtual ~csOPCODEColliderConcaveMesh ();
-  virtual ColliderType GetGeometryType () const {return COLLIDER_CONCAVE_MESH;}
-  virtual iMeshFactoryWrapper* GetMeshFactory () {return meshFactory;}
-};*/
-
 
 class TerrainCellCollider
 {

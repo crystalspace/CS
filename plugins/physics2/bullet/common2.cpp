@@ -1,8 +1,5 @@
 /*
-  Copyright (C) 2010 Christian Van Brussel, Communications and Remote
-      Sensing Laboratory of the School of Engineering at the 
-      Universite catholique de Louvain, Belgium
-      http://www.tele.ucl.ac.be
+  Copyright (C) 2011 by Liu Lu
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -30,7 +27,7 @@
 #include "bullet2.h"
 #include "common2.h"
 #include "collisionobject2.h"
-//#include "rigidbodies.h"
+#include "rigidbody2.h"
 
 struct btSoftBodyWorldInfo;
 CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
@@ -77,12 +74,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
       movable->SetFullTransform (tr);
       movable->UpdateMove ();
     }
-    /*if (body->mesh)
-      body->moveCb->Execute (body->mesh, tr);
-    if (body->light)
-      body->moveCb->Execute (body->light, tr);
-    if (body->camera)
-      body->moveCb->Execute (body->camera, tr);*/
   }
 
 //------------------------ csBulletKinematicMotionState ----------------------
@@ -97,12 +88,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
 
   void csBulletKinematicMotionState::getWorldTransform (btTransform& trans) const
   {
-    /*if (!body->kinematicCb)
-      return;*/
+    csBulletRigidBody* rb = dynamic_cast<csBulletRigidBody*> (body);
+    if (!rb || !rb->kinematicCb)
+      return;
 
     // get the body transform from the callback
     csOrthoTransform transform;
-    //body->kinematicCb->GetBodyTransform (body, transform);
+    rb->kinematicCb->GetBodyTransform (rb, transform);
     trans = CSToBullet (principalAxis * transform, body->system->getInternalScale ());
   }
 

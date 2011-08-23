@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 by Jorrit Tyberghein
+Copyright (C) 2011 by Liu Lu
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -138,6 +138,7 @@ public:
   /// Here we will create our little, simple world.
   void CreateRoom ();
 
+  /// Here we will create a terrain world.
   void CreateTerrain ();
 
   /// Construct our game. This will just set the application ID for now.

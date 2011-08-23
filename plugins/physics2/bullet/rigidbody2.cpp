@@ -1,3 +1,21 @@
+/*
+  Copyright (C) 2011 by Liu Lu
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #include "cssysdef.h"
 #include "btBulletDynamicsCommon.h"
 #include "btBulletCollisionCommon.h"
@@ -19,54 +37,6 @@ csBulletRigidBody::~csBulletRigidBody ()
 {
   RemoveBulletObject ();
 }
-
-//Lulu: Seems like not neccessary..
-//void csBulletRigidBody::RebuildObject ()
-//{
-//  //TODO
-//  size_t colliderCount = colliders.GetSize ();
-//  if (colliderCount == 0)
-//  {  
-//    csFPrintf  (stderr, "csBulletCollisionObject: Haven't add any collider to the object.\nRebuild failed.\n");
-//    return;
-//  }
-//
-//  if(compoundShape)
-//    delete compoundShape;
-//
-//  if(colliderCount >= 2)
-//  {  
-//    compoundShape = new btCompoundShape();
-//    for (size_t i = 0; i < colliderCount; i++)
-//    {
-//      btTransform relaTrans = CSToBullet (relaTransforms[i], system->getInternalScale ());
-//      compoundShape->addChildShape (relaTrans, colliders[i]->shape);
-//    }
-//    //Shift children shape?
-//  }
-//
-//  bool wasInWorld = false;
-//  if (insideWorld)
-//  {
-//    wasInWorld = true;
-//    RemoveBulletObject ();
-//  }
-//
-//  btCollisionShape* shape;
-//  if (compoundShape == NULL)
-//  {
-//    //only one collider.
-//    shape = colliders[0]->shape;
-//  }
-//  else if (compoundChanged)
-//  {
-//    //use compound shape.
-//    shape = compoundShape;
-//  }
-//
-//  if (wasInWorld)
-//    AddBulletObject ();
-//}
 
 void csBulletRigidBody::AddCollider (CS::Collision2::iCollider* collider, 
                                      const csOrthoTransform& relaTrans)
@@ -118,6 +88,9 @@ void csBulletRigidBody::RemoveBulletObject ()
 {
   if (insideWorld)
   {
+    for (size_t i = 0; i < joints.GetSize (); i++)
+      sector->RemoveJoint (joints[i]);
+
     linearVelocity = GetLinearVelocity ();
     angularVelocity = GetAngularVelocity ();
     sector->bulletWorld->removeRigidBody (btBody);
@@ -211,10 +184,10 @@ void csBulletRigidBody::AddBulletObject ()
 
   SetState (physicalState);
 
-  sector->bulletWorld->addRigidBody (btBody, collGroup.value, collGroup.group);
+  sector->bulletWorld->addRigidBody (btBody, collGroup.value, collGroup.mask);
   btBody->setUserPointer (dynamic_cast<CS::Collision2::iCollisionObject*> (
     dynamic_cast<csBulletCollisionObject*>(this)));
-
+ 
   insideWorld = true;
 }
 
@@ -341,7 +314,7 @@ bool csBulletRigidBody::SetState (CS::Physics2::RigidBodyState state)
       sector->bulletWorld->removeRigidBody (btBody);
 
     btVector3 linearVelo = CSToBullet (linearVelocity, system->getInternalScale ());
-    btVector3 angularVelo = CSToBullet (angularVelocity, system->getInternalScale ());
+    btVector3 angularVelo = btVector3 (angularVelocity.x, angularVelocity.y, angularVelocity.z);
 
     if (previousState == CS::Physics2::STATE_KINEMATIC && insideWorld)
     {
@@ -387,6 +360,15 @@ bool csBulletRigidBody::SetState (CS::Physics2::RigidBodyState state)
     {
       if (!kinematicCb)
         kinematicCb.AttachNew (new csBulletDefaultKinematicCallback ());
+
+      // create new motion state
+      btTransform principalAxis = motionState->inversePrincipalAxis.inverse ();
+      btTransform trans;
+      motionState->getWorldTransform (trans);
+      delete motionState;
+      motionState = new csBulletKinematicMotionState
+        (this, trans, principalAxis);
+      btBody->setMotionState (motionState);
 
       // set body kinematic
 

@@ -1,3 +1,21 @@
+/*
+  Copyright (C) 2011 by Liu Lu
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #ifndef __CS_OPCODE_COLLISION_H__
 #define __CS_OPCODE_COLLISION_H__
 
@@ -23,11 +41,7 @@ class csOpcodeCollisionSector : public scfImplementationExt1<
   friend class csOpcodeCollisionObject;
   Opcode::AABBTreeCollider TreeCollider;
   Opcode::RayCollider RayCol;
-  Opcode::LSSCollider LSSCol;
-  Opcode::OBBCollider OBBCol;
   Opcode::BVTCache ColCache;
-  Opcode::LSSCache LSSCache;
-  Opcode::OBBCache OBBCache;
 
   struct CollisionPortal
   {
@@ -62,8 +76,6 @@ class csOpcodeCollisionSector : public scfImplementationExt1<
   csArray<CollisionPortal> portals;
   csArray<int> collision_faces;
   CS::Collision2::CollisionData curCollisionData;
-  //actor?
-  //TODO portal, collision group
 
 public:
   csOpcodeCollisionSector (csOpcodeCollisionSystem* sys);
@@ -71,7 +83,7 @@ public:
 
   virtual iObject* QueryObject () {return (iObject*) this;}
   
-    //iCollisionSector
+  //iCollisionSector
   virtual void SetGravity (const csVector3& v);
   virtual csVector3 GetGravity () const {return gravity;}
 

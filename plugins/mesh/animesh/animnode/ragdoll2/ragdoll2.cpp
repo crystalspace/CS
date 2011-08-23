@@ -1,8 +1,5 @@
 /*
-  Copyright (C) 2009-10 Christian Van Brussel, Communications and Remote
-      Sensing Laboratory of the School of Engineering at the 
-      Universite catholique de Louvain, Belgium
-      http://www.tele.ucl.ac.be
+  Copyright (C) 2011 by Liu Lu
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -11,7 +8,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
   Library General Public License for more details.
 
   You should have received a copy of the GNU Library General Public
@@ -406,12 +403,12 @@ void RagdollNode::Stop ()
   isPlaying = false;
 
   // update state of all bones
-  //for (csHash<BoneData, CS::Animation::BoneID>::GlobalIterator it = bones.GetIterator ();
-  //      it.HasNext(); )
-  //{
-  //  BoneData& bone = it.Next ();
-  //  UpdateBoneState (&bone);
-  //}
+  for (csHash<BoneData, CS::Animation::BoneID>::GlobalIterator it = bones.GetIterator ();
+        it.HasNext(); )
+  {
+    BoneData& bone = it.Next ();
+    UpdateBoneState (&bone);
+  }
 
   // stop child node
   if (childNode)
@@ -522,17 +519,8 @@ void RagdollNode::UpdateBoneState (BoneData* boneData)
   // check if this node has been stopped or if the bone is inactive
   if (!isPlaying || boneData->state == CS::Animation::STATE_INACTIVE)
   {
-    if (boneData->joint)
-    {
-      physicalSector->RemoveJoint (boneData->joint);
-      boneData->joint = 0;
-    }
-
     if (boneData->rigidBody)
-    {
-      physicalSector->RemoveRigidBody (boneData->rigidBody);
-      boneData->rigidBody = 0;
-    }
+      boneData->rigidBody->Disable ();
 
     return;
   }

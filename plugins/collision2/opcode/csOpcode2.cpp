@@ -1,3 +1,21 @@
+/*
+  Copyright (C) 2011 by Liu Lu
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #include "cssysdef.h"
 #include "csqsqrt.h"
 #include "ivaria/softanim.h"
@@ -43,12 +61,12 @@ csOpcodeCollisionSector::csOpcodeCollisionSector (csOpcodeCollisionSystem* sys)
 {
   CS::Collision2::CollisionGroup defaultGroup ("Default");
   defaultGroup.value = 1;
-  defaultGroup.group = allFilter;
+  defaultGroup.mask = allFilter;
   collGroups.Push (defaultGroup);
 
   CS::Collision2::CollisionGroup staticGroup ("Static");
   staticGroup.value = 2;
-  staticGroup.group = allFilter ^ 2;
+  staticGroup.mask = allFilter ^ 2;
   collGroups.Push (staticGroup);
   systemFilterCount = 2;
 }
@@ -144,7 +162,7 @@ CS::Collision2::CollisionGroup& csOpcodeCollisionSector::CreateCollisionGroup (c
 
   CS::Collision2::CollisionGroup newGroup(name);
   newGroup.value = 1 << groupCount;
-  newGroup.group = allFilter ^ newGroup.value;
+  newGroup.mask = allFilter ^ newGroup.value;
   collGroups.Push (newGroup);
   return collGroups[groupCount];
 }
@@ -201,8 +219,8 @@ bool csOpcodeCollisionSector::CollisionTest (CS::Collision2::iCollisionObject* o
   {
     if (collisionObjects[i]->QueryCollisionObject () != object)
     {
-      bool collides = (obj->collGroup.value & collisionObjects[i]->collGroup.group) != 0;
-      collides = collides && (collisionObjects[i]->collGroup.value & obj->collGroup.group);
+      bool collides = (obj->collGroup.value & collisionObjects[i]->collGroup.mask) != 0;
+      collides = collides && (collisionObjects[i]->collGroup.value & obj->collGroup.mask);
 
       if(!collides)
         continue;

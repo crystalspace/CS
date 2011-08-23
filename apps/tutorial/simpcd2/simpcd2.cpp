@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 by Jorrit Tyberghein
+Copyright (C) 2011 by Liu Lu
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -30,7 +30,7 @@ Simple::Simple ()
 {
   SetApplicationName ("CrystalSpace.SimpleCD2");
 
-  environment = ENVIRONMENT_TERRAIN;
+  environment = ENVIRONMENT_WALLS;
 
   rot1_direction = 1;
   rot2_direction = -1;
@@ -100,6 +100,11 @@ void Simple::Frame ()
   }
   else
   {
+    //---------
+    // Check for collision between the sprite and the terrain.
+    // If there is a collision we undo our transforms of the sprite and
+    // reverse rotation direction for it.
+    //---------
      csArray<CS::Collision2::CollisionData> data;
      collisionSector->CollisionTest (terrainObject, data);
      for (size_t i = 0; i < data.GetSize (); i++)
@@ -115,6 +120,7 @@ void Simple::Frame ()
          rot2_direction = -rot2_direction;
        }
      }
+     // This also works.
 //     bool cd = sprite1_obj->Collide (terrainObject);
 //     if (cd)
 //     {
@@ -377,6 +383,7 @@ void Simple::CreateRoom ()
     return;
   }
 
+  // Bind the sector to the collision sector.
   collisionSector->SetSector (room);
 
   // Creating the walls for our room.
@@ -467,16 +474,21 @@ void Simple::CreateRoom ()
   spstate->SetAction ("default");
   sprite1->QuerySceneNode ()->SetParent (parent_sprite->QuerySceneNode ());
 
+  // Create a collider.
   sprite_col = collisionSystem->CreateColliderConcaveMesh (sprite1);
 
+  // Create a collision object. Set the collider and the movable.
   sprite1_obj = collisionSystem->CreateCollisionObject ();
   sprite1_obj->AddCollider (sprite_col, localTrans);
   sprite1_obj->SetAttachedMovable (sprite1->GetMovable ());
   // You have to set a world transform to collision object.
   sprite1_obj->SetTransform (tc * parTrans);
+  // The object must rebuild before it's added to a sector.
   sprite1_obj->RebuildObject ();
 
+  // Add the object to the sector.
   collisionSector->AddCollisionObject (sprite1_obj);
+  // Give it a collision group.
   //sprite1_obj->SetCollisionGroup ("Sprite");
 
   // Now create the second child.
@@ -524,6 +536,7 @@ void Simple::CreateTerrain ()
     return;
   }
 
+  // Get the terrain system.
   csRef<iTerrainSystem> terrain =
     scfQueryInterface<iTerrainSystem> (terrainWrapper->GetMeshObject ());
   if (!terrain)
@@ -532,7 +545,7 @@ void Simple::CreateTerrain ()
     return;
   }
 
-  // Create the dynamic system
+  // Create the collision sector.
   collisionSector = collisionSystem->CreateCollisionSector ();
   if (!collisionSector) 
   {
@@ -540,12 +553,18 @@ void Simple::CreateTerrain ()
     return;
   }
 
+  // Bind the sector to the collision sector.
   collisionSector->SetSector (room);
 
+  // Create a terrain collider.
   csRef<CS::Collision2::iColliderTerrain> terrainCollider = collisionSystem->CreateColliderTerrain (terrain);
+
+  // Create a collision object. Set the collider.
   terrainObject = collisionSystem->CreateCollisionObject ();
   terrainObject->AddCollider (terrainCollider, localTrans);
   terrainObject->RebuildObject ();
+
+  // Add the object to the sector.
   collisionSector->AddCollisionObject (terrainObject);
 
   // Now we need light to see something.
@@ -608,15 +627,19 @@ void Simple::CreateTerrain ()
   spstate->SetAction ("default");
   sprite1->QuerySceneNode ()->SetParent (parent_sprite->QuerySceneNode ());
 
+  // Create a collider.
   sprite_col = collisionSystem->CreateColliderConcaveMesh (sprite1);
 
+  // Create a collision object. Set the collider and the movable.
   sprite1_obj = collisionSystem->CreateCollisionObject ();
   sprite1_obj->AddCollider (sprite_col, localTrans);
   sprite1_obj->SetAttachedMovable (sprite1->GetMovable ());
+
   // You have to set a world transform to collision object.
   sprite1_obj->SetTransform (tc * parTrans);
   sprite1_obj->RebuildObject ();
 
+  // Add the object to the sector.
   collisionSector->AddCollisionObject (sprite1_obj);
 
   // Now create the second child.
@@ -654,6 +677,7 @@ bool Simple::OnMouseDown (iEvent& event)
     if (!hitResult.hasHit)
       return false;
 
+    // Stop the object.
     if (hitResult.object == sprite1_obj)
     {
       rot1_direction = (rot1_direction == 0.0f? 1.0f : 0.0f);

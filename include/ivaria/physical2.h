@@ -1,5 +1,27 @@
+/*
+    Copyright (C) 2011 by Liu Lu
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #ifndef __IVARIA_PHYSIH__
 #define __IVARIA_PHYSIH__
+
+/**\file
+ * Physics interfaces
+ */
 
 #include "csutil/scf.h"
 #include "csutil/scf_interface.h"
@@ -42,12 +64,18 @@ struct iSoftBody;
 struct iKinematicCallback;
 struct iPhysicalSystem;
 
+/**
+ * The type of a physical body.
+ */
 enum PhysicalBodyType
 {
   BODY_RIGID = 0,
   BODY_SOFT
 };
 
+/**
+ * The type of a rigid body state.
+ */
 enum RigidBodyState
 {
   STATE_STATIC = 0,
@@ -56,17 +84,26 @@ enum RigidBodyState
 };
 
 /**
-* A base interface of physical bodies. 
-* iRigidBody and iSoftBody will be derived from this one.
-*/
+ * A base interface of physical bodies. 
+ * iRigidBody and iSoftBody will be derived from this one.
+ */
 struct iPhysicalBody : public virtual CS::Collision2::iCollisionObject
 {
   SCF_INTERFACE (CS::Physics2::iPhysicalBody, 1, 0, 0);
 
+  /// Get the body type of this physical body.
   virtual PhysicalBodyType GetBodyType () const = 0;
 
+  /**
+   * Query the iRigidBody interface of this body. It returns NULL if the
+   * interface is not valid, ie GetType() is not CS::Physics2::BODY_RIGID.
+   */
   virtual iRigidBody* QueryRigidBody () = 0;
 
+  /**
+   * Query the iSoftBody interface of this body. It returns NULL if the
+   * interface is not valid, ie GetType() is not CS::Physics2::BODY_SOFT.
+   */
   virtual iSoftBody* QuerySoftBody () = 0;
 
   /// Disable this collision object.
@@ -78,22 +115,24 @@ struct iPhysicalBody : public virtual CS::Collision2::iCollisionObject
   /// Check if the collision object is enabled.
   virtual bool IsEnabled () = 0;
 
-  // move "virtual iRigidBody::RigidBodyState GetState() = 0;" here and implement it for soft bodies by switching to rigid bodies when static/dynamic?
-  //Lulu: If soft body can switch to rigid body, what about the parameters? Dose user have to call functions to set the parameters of rigid body? 
-  //      If iPhysicalSystem create a new rigidbody, it's based on the softbody's current shape or original shape? 
-  //      And the collision system will create a collision shape for the mesh? How to decide which type of collider is appropriate?
-
   /// Set the total mass of this body.
   virtual void SetMass (float mass) = 0;
 
   /// Get the mass of this body.
   virtual float GetMass () = 0;
 
-  /// Set the mass of this body.
-  /*virtual void SetMass (float mass) = 0;*/
-
+  /// Get the density of the body.
   virtual float GetDensity () const = 0;
 
+  /**
+   * Set the density of this collider. If the mass of the body was not defined
+   * then it will be computed from this. But iSoftBody must use SetMass instead. 
+   * 
+   * You should be really careful when using densities because most of the
+   * game physics libraries do not work well when objects with large mass
+   * differences interact. It is safer to artificially keep the mass of moving
+   * objects in a safe range (from 1 to 100 kilogram for example).
+   */
   virtual void SetDensity (float density) = 0;
 
   /// Return the volume of this body.
@@ -106,32 +145,33 @@ struct iPhysicalBody : public virtual CS::Collision2::iCollisionObject
   virtual csVector3 GetLinearVelocity (size_t index = 0) const = 0;
 
   /**
-  * Set the friction of this body.
-  * [0,1] for soft body.
-  */
+   * Set the friction of this body.
+   * [0,1] for soft body.
+   */
   virtual void SetFriction (float friction) = 0;
 
-  /// Get the friction of this rigid body.
+  /// Get the friction of this body.
   virtual float GetFriction () = 0;
 };
 
 /**
-* This is the interface for a rigid body.
-* It keeps all properties for the body.
-* It can also be attached to a movable or a bone,
-* to automatically update it.
-*
-* Main creators of instances implementing this interface:
-* - iPhysicalSystem::CreateRigidBody()
-* 
-* Main ways to get pointers to this interface:
-* - iPhysicalSystem::GetRigidBody()
-* 
-* Main users of this interface:
-* - iPhysicalSystem
-*
-* \sa iSoftBody
-*/
+ * This is the interface for a rigid body.
+ * It keeps all properties for the body.
+ * It can also be attached to a movable or a bone,
+ * to automatically update it.
+ *
+ * Main creators of instances implementing this interface:
+ * - iPhysicalSystem::CreateRigidBody()
+ * 
+ *  Main ways to get pointers to this interface:
+ * - iPhysicalSector::GetRigidBody()
+ * - iPhysicalSector::FindRigidBody()
+ * 
+ * Main users of this interface:
+ * - iPhysicalSector
+ *
+ * \sa CS::Physics2::iSoftBody CS::Physics2::Bullet2::iSoftBody
+ */
 struct iRigidBody : public virtual iPhysicalBody
 {
   SCF_INTERFACE (CS::Physics2::iRigidBody, 1, 0, 0);
@@ -141,7 +181,6 @@ struct iRigidBody : public virtual iPhysicalBody
   
   /// Set the current state of the body.
   virtual bool SetState (RigidBodyState state) = 0;
-
 
   /// Set the elasticity of this rigid body.
   virtual void SetElasticity (float elasticity) = 0;
@@ -168,30 +207,30 @@ struct iRigidBody : public virtual iPhysicalBody
   virtual void AddRelTorque (const csVector3& torque) = 0;
 
   /**
-  * Add a force (world space) at a specific position (world space)
-  * (active for one timestep)
-  */
+   * Add a force (world space) at a specific position (world space)
+   * (active for one timestep)
+   */
   virtual void AddForceAtPos (const csVector3& force,
       const csVector3& pos) = 0;
 
   /**
-  * Add a force (world space) at a specific position (local space)
-  * (active for one timestep)
-  */
+   * Add a force (world space) at a specific position (local space)
+   * (active for one timestep)
+   */
   virtual void AddForceAtRelPos (const csVector3& force,
       const csVector3& pos) = 0;
 
   /**
-  * Add a force (local space) at a specific position (world space)
-  * (active for one timestep)
-  */
+   * Add a force (local space) at a specific position (world space)
+   * (active for one timestep)
+   */
   virtual void AddRelForceAtPos (const csVector3& force,
       const csVector3& pos) = 0;
 
   /**
-  * Add a force (local space) at a specific position (local space)
-  * (active for one timestep)
-  */
+   * Add a force (local space) at a specific position (local space)
+   * (active for one timestep)
+   */
   virtual void AddRelForceAtRelPos (const csVector3& force,
       const csVector3& pos) = 0;
 
@@ -202,37 +241,37 @@ struct iRigidBody : public virtual iPhysicalBody
   virtual csVector3 GetTorque () const = 0;
 
   /**
-  * Set the callback to be used to update the transform of the kinematic body.
-  * If no callback are provided then the dynamic system will use a default one.
-  */
+   * Set the callback to be used to update the transform of the kinematic body.
+   * If no callback are provided then the dynamic system will use a default one.
+   */
   virtual void SetKinematicCallback (iKinematicCallback* cb) = 0;
 
   /// Get the callback used to update the transform of the kinematic body.
   virtual iKinematicCallback* GetKinematicCallback () = 0;
 
   /**
-  * Set the linear dampener for this rigid body. The dampening correspond to
-  * how much the movements of the objects will be reduced. It is a value
-  * between 0 and 1, giving the ratio of speed that will be reduced
-  * in one second. 0 means that the movement will not be reduced, while
-  * 1 means that the object will not move.
-  * The default value is 0.
-  * \sa iDynamicSystem::SetLinearDampener()
-  */
+   * Set the linear dampener for this rigid body. The dampening correspond to
+   * how much the movements of the objects will be reduced. It is a value
+   * between 0 and 1, giving the ratio of speed that will be reduced
+   * in one second. 0 means that the movement will not be reduced, while
+   * 1 means that the object will not move.
+   * The default value is 0.
+   * \sa iDynamicSystem::SetLinearDampener()
+   */
   virtual void SetLinearDampener (float d) = 0;
 
   /// Get the linear dampener for this rigid body.
   virtual float GetLinearDampener () = 0;
 
   /**
-  * Set the angular dampener for this rigid body. The dampening correspond to
-  * how much the movements of the objects will be reduced. It is a value
-  * between 0 and 1, giving the ratio of speed that will be reduced
-  * in one second. 0 means that the movement will not be reduced, while
-  * 1 means that the object will not move.
-  * The default value is 0.
-  * \sa iDynamicSystem::SetRollingDampener()
-  */
+   * Set the angular dampener for this rigid body. The dampening correspond to
+   * how much the movements of the objects will be reduced. It is a value
+   * between 0 and 1, giving the ratio of speed that will be reduced
+   * in one second. 0 means that the movement will not be reduced, while
+   * 1 means that the object will not move.
+   * The default value is 0.
+   * \sa iDynamicSystem::SetRollingDampener()
+   */
   virtual void SetRollingDampener (float d) = 0;
 
   /// Get the angular dampener for this rigid body.
@@ -241,7 +280,7 @@ struct iRigidBody : public virtual iPhysicalBody
 
 /**
  * This class can be implemented in order to update the position of an anchor of a
- * CS::Physics2::Bullet::iSoftBody. This can be used to try to control manually the
+ * CS::Physics2::iSoftBody. This can be used to try to control manually the
  * position of a vertex of a soft body.
  *
  * \warning This feature uses a hack around the physical simulation of soft bodies
@@ -259,16 +298,27 @@ struct iAnchorAnimationControl : public virtual iBase
 };
 
 /**
-* A soft body is a physical body that can be deformed by the physical
-* simulation. It can be used to simulate eg ropes, clothes or any soft
-* volumetric object.
-*
-* A soft body does not have a positional transform by itself, but the
-* position of every vertex of the body can be queried through GetVertexPosition().
-*
-* A soft body can neither be static or kinematic, it is always dynamic.
-* \sa iRigidBody 
-*/
+ * A soft body is a physical body that can be deformed by the physical
+ * simulation. It can be used to simulate eg ropes, clothes or any soft
+ * volumetric object.
+ *
+ * A soft body does not have a positional transform by itself, but the
+ * position of every vertex of the body can be queried through GetVertexPosition().
+ *
+ * A soft body can neither be static or kinematic, it is always dynamic.
+ *
+ * Main creators of instances implementing this interface:
+ * - iPhysicalSystem::CreateSoftBody()
+ * 
+ * Main ways to get pointers to this interface: 
+ * - iPhysicalSector::GetSoftBody()
+ * - iPhysicalSector::FindSoftBody()
+ * 
+ * Main users of this interface:
+ * - iPhysicalSector
+ *
+ * \sa CS::Physics2::iRigidBody CS::Physics2::Bullet2::iSoftBody
+ */
 struct iSoftBody : public virtual iPhysicalBody
 {
   SCF_INTERFACE (CS::Physics2::iSoftBody, 1, 0, 0);
@@ -289,44 +339,44 @@ struct iSoftBody : public virtual iPhysicalBody
   virtual void AnchorVertex (size_t vertexIndex) = 0;
 
   /**
-  * Anchor the given vertex to the given rigid body. The relative position of the
-  * vertex and the body will remain constant.
-  */
+   * Anchor the given vertex to the given rigid body. The relative position of the
+   * vertex and the body will remain constant.
+   */
   virtual void AnchorVertex (size_t vertexIndex,
       iRigidBody* body) = 0;
 
   /**
-  * Anchor the given vertex to the given controller. The relative position of the
-  * vertex and the controller will remain constant.
-  */
+   * Anchor the given vertex to the given controller. The relative position of the
+   * vertex and the controller will remain constant.
+   */
   virtual void AnchorVertex (size_t vertexIndex,
       iAnchorAnimationControl* controller) = 0;
 
   /**
-  * Update the position of the anchor of the given vertex relatively to the anchored
-  * rigid body. This can be used to have a finer control of the anchor position
-  * relatively to the rigid body.
-  *
-  * This would work only if you called AnchorVertex(size_t,iRigidBody*) before.
-  * The position to be provided is in world coordinates.
-  *
-  * \warning The stability of the simulation can be lost if you move the position too far
-  * from the previous position.
-  * \sa CS::Animation::iSoftBodyAnimationControl::CreateAnimatedMeshAnchor()
-  */
+   * Update the position of the anchor of the given vertex relatively to the anchored
+   * rigid body. This can be used to have a finer control of the anchor position
+   * relatively to the rigid body.
+   *
+   * This would work only if you called AnchorVertex(size_t,iRigidBody*) before.
+   * The position to be provided is in world coordinates.
+   *
+   * \warning The stability of the simulation can be lost if you move the position too far
+   * from the previous position.
+   * \sa CS::Animation::iSoftBodyAnimationControl::CreateAnimatedMeshAnchor()
+   */
   virtual void UpdateAnchor (size_t vertexIndex,
       csVector3& position) = 0;
 
   /**
-  * Remove the given anchor. This won't work if you anchored the vertex to a rigid body, due
-  * to a limitation in the Bullet library.
-  */
+   * Remove the given anchor. This won't work if you anchored the vertex to a rigid body, due
+   * to a limitation in the Bullet library.
+   */
   virtual void RemoveAnchor (size_t vertexIndex) = 0;
 
   /**
-  * Set the rigidity of this body. The value should be in the 0 to 1 range, with
-  * 0 meaning soft and 1 meaning rigid.
-  */
+   * Set the rigidity of this body. The value should be in the 0 to 1 range, with
+   * 0 meaning soft and 1 meaning rigid.
+   */
   virtual void SetRigidity (float rigidity) = 0;
 
   /// Get the rigidity of this body.
@@ -340,8 +390,8 @@ struct iSoftBody : public virtual iPhysicalBody
       size_t vertexIndex) = 0;
 
   /**
-  * Set the wind velocity of the whole body.
-  */
+   * Set the wind velocity of the whole body.
+   */
   virtual void SetWindVelocity (const csVector3& velocity) = 0;
 
   /// Get the wind velocity of the whole body.
@@ -358,12 +408,6 @@ virtual const csVector3 GetWindVelocity () const = 0;
 
   /// Return the normal vector in world coordinates for the given vertex.
   virtual csVector3 GetVertexNormal (size_t index) const = 0;
-
-  /**
-  * Currently Blender set this to 0 when creating a soft body.
-  * Used to create a btTriangleMesh for soft body.
-  */
-  //virtual void SetWelding(float welding) = 0;
 };
 
 /**
@@ -431,25 +475,25 @@ struct SoftBodyHelper
 };
 
 /**
-* A joint that can constrain the relative motion between two iRigidBody.
-* For instance if all motion in along the local X axis is constrained
-* then the bodies will stay motionless relative to each other
-* along an x axis rotated and positioned by the joint's transform.
-*
-* Main creators of instances implementing this interface:
-* - iPhysicalSystem::CreateJoint()
-* 
-* Main users of this interface:
-* - iPhysicalSystem
-*/
+ * A joint that can constrain the relative motion between two iPhysicalBody.
+ * For instance if all motion in along the local X axis is constrained
+ * then the bodies will stay motionless relative to each other
+ * along an x axis rotated and positioned by the joint's transform.
+ *
+ * Main creators of instances implementing this interface:
+ * - iPhysicalSystem::CreateJoint()
+ * 
+ * Main users of this interface:
+ * - iPhysicalSector
+ */
 struct iJoint : public virtual iBase
 {
   SCF_INTERFACE (CS::Physics2::iJoint, 1, 0, 0);
 
   /**
-  * Set the rigid bodies that will be affected by this joint. Set force_update to true if 
-  * you want to apply the changes right away.
-  */
+   * Set the rigid bodies that will be affected by this joint. Set force_update to true if 
+   * you want to apply the changes right away.
+   */
   virtual void Attach (iPhysicalBody* body1, iPhysicalBody* body2,
       bool forceUpdate = true) = 0;
 
@@ -457,10 +501,9 @@ struct iJoint : public virtual iBase
   virtual iPhysicalBody* GetAttachedBody (int index) = 0;
 
   /**
-  * Set the world transformation of the joint.
-  *
-  * Set force_update to true if you want to apply the changes right away.
-  */
+   * Set the world transformation of the joint.
+   * Set force_update to true if you want to apply the changes right away.
+   */
   virtual void SetTransform (const csOrthoTransform& trans,
       bool forceUpdate = false) = 0;
 
@@ -475,13 +518,13 @@ struct iJoint : public virtual iBase
   virtual csVector3 GetPosition () const = 0;
 
   /**
-  * Set the translation constraints on the 3 axes. If true is
-  * passed for an axis then the Joint will constrain all motion along
-  * that axis (ie no motion will be allowed). If false is passed in then all motion along that
-  * axis is free, but bounded by the minimum and maximum distance
-  * if set. Set force_update to true if you want to apply the changes 
-  * right away.
-  */
+   * Set the translation constraints on the 3 axes. If true is
+   * passed for an axis then the Joint will constrain all motion along
+   * that axis (ie no motion will be allowed). If false is passed in then all motion along that
+   * axis is free, but bounded by the minimum and maximum distance
+   * if set. Set force_update to true if you want to apply the changes 
+   * right away.
+   */
   virtual void SetTransConstraints (bool X, 
       bool Y, bool Z, 
       bool forceUpdate = false) = 0;
@@ -496,9 +539,9 @@ struct iJoint : public virtual iBase
   virtual bool IsZTransConstrained () = 0;
 
   /**
-  * Set the minimum allowed distance between the two bodies. Set force_update to true if 
-  * you want to apply the changes right away.
-  */
+   * Set the minimum allowed distance between the two bodies. Set force_update to true if 
+   * you want to apply the changes right away.
+   */
   virtual void SetMinimumDistance (const csVector3& dist,
       bool forceUpdate = false) = 0;
 
@@ -506,9 +549,9 @@ struct iJoint : public virtual iBase
   virtual csVector3 GetMinimumDistance () const = 0;
 
   /**
-  * Set the maximum allowed distance between the two bodies. Set force_update to true if 
-  * you want to apply the changes right away.
-  */
+   * Set the maximum allowed distance between the two bodies. Set force_update to true if 
+   * you want to apply the changes right away.
+   */
   virtual void SetMaximumDistance (const csVector3& dist,
       bool forceUpdate = false) = 0;
 
@@ -516,13 +559,13 @@ struct iJoint : public virtual iBase
   virtual csVector3 GetMaximumDistance () const = 0;
 
   /**
-  * Set the rotational constraints on the 3 axes. If true is
-  * passed for an axis then the Joint will constrain all rotation around
-  * that axis (ie no motion will be allowed). If false is passed in then all rotation around that
-  * axis is free, but bounded by the minimum and maximum angle
-  * if set. Set force_update to true if you want to apply the changes 
-  * right away.
-  */
+   * Set the rotational constraints on the 3 axes. If true is
+   * passed for an axis then the Joint will constrain all rotation around
+   * that axis (ie no motion will be allowed). If false is passed in then all rotation around that
+   * axis is free, but bounded by the minimum and maximum angle
+   * if set. Set force_update to true if you want to apply the changes 
+   * right away.
+   */
   virtual void SetRotConstraints (bool X, 
       bool Y, bool Z, 
       bool forceUpdate = false) = 0;
@@ -537,9 +580,9 @@ struct iJoint : public virtual iBase
   virtual bool IsZRotConstrained () = 0;
 
   /**
-  * Set the minimum allowed angle between the two bodies, in radian. Set force_update to true if 
-  * you want to apply the changes right away.
-  */
+   * Set the minimum allowed angle between the two bodies, in radian. Set force_update to true if 
+   * you want to apply the changes right away.
+   */
   virtual void SetMinimumAngle (const csVector3& angle,
       bool forceUpdate = false) = 0;
 
@@ -547,9 +590,9 @@ struct iJoint : public virtual iBase
   virtual csVector3 GetMinimumAngle () const = 0;
 
   /**
-  * Set the maximum allowed angle between the two bodies (in radian). Set force_update to true if 
-  * you want to apply the changes right away.
-  */
+   * Set the maximum allowed angle between the two bodies (in radian). Set force_update to true if 
+   * you want to apply the changes right away.
+   */
   virtual void SetMaximumAngle (const csVector3& angle,
       bool forceUpdate = false) = 0;
 
@@ -557,10 +600,10 @@ struct iJoint : public virtual iBase
   virtual csVector3 GetMaximumAngle () const = 0;
 
   /** 
-  * Set the restitution of the joint's stop point (this is the 
-  * elasticity of the joint when say throwing open a door how 
-  * much it will bounce the door back closed when it hits).
-  */
+   * Set the restitution of the joint's stop point (this is the 
+   * elasticity of the joint when say throwing open a door how 
+   * much it will bounce the door back closed when it hits).
+   */
   virtual void SetBounce (const csVector3& bounce,
       bool forceUpdate = false) = 0;
 
@@ -568,9 +611,9 @@ struct iJoint : public virtual iBase
   virtual csVector3 GetBounce () const = 0;
 
   /**
-  * Apply a motor velocity to joint (for instance on wheels). Set force_update to true if 
-  * you want to apply the changes right away.
-  */
+   * Apply a motor velocity to joint (for instance on wheels). Set force_update to true if 
+   * you want to apply the changes right away.
+   */
   virtual void SetDesiredVelocity (const csVector3& velo,
       bool forceUpdate = false) = 0;
 
@@ -578,9 +621,9 @@ struct iJoint : public virtual iBase
   virtual csVector3 GetDesiredVelocity () const = 0;
 
   /**
-  * Set the maximum force that can be applied by the joint motor to reach the desired velocity.
-  * Set force_update to true if  you want to apply the changes right away.
-  */
+   * Set the maximum force that can be applied by the joint motor to reach the desired velocity.
+   * Set force_update to true if  you want to apply the changes right away.
+   */
   virtual void SetMaxForce (const csVector3& force,
       bool forceUpdate = false) = 0;
 
@@ -588,31 +631,36 @@ struct iJoint : public virtual iBase
   virtual csVector3 GetMaxForce () const = 0;
 
   /**
-  * Rebuild the joint using the current setup. Return true if the rebuilding operation was successful
-  * (otherwise the joint won't be active).
-  */
+   * Rebuild the joint using the current setup. Return true if the rebuilding operation was successful
+   * (otherwise the joint won't be active).
+   */
   virtual bool RebuildJoint () = 0;
 
   /// Set this joint to a spring joint.
   virtual void SetSpring(bool isSpring, bool forceUpdate = false) = 0;
 
-  /// Set the stiffness of the spring.
+  /// Set the linear stiffness of the spring.
   virtual void SetLinearStiffness (csVector3 stiff, bool forceUpdate = false) = 0;
 
+  /// Get the linear stiffness of the spring.
   virtual csVector3 GetLinearStiffness () const = 0;
 
+  /// Set the angular stiffness of the spring.
   virtual void SetAngularStiffness (csVector3 stiff, bool forceUpdate = false) = 0;
 
+  /// Get the angular stiffness of the spring.
   virtual csVector3 GetAngularStiffness () const = 0;
 
-  /// Set the damping of the spring.
+  /// Set the linear damping of the spring.
   virtual void SetLinearDamping (csVector3 damp, bool forceUpdate = false) = 0;
 
+  /// Get the linear damping of the spring.
   virtual csVector3 GetLinearDamping () const = 0;
 
-  /// Set the damping of the spring.
+  /// Set the angular damping of the spring.
   virtual void SetAngularDamping (csVector3 damp, bool forceUpdate = false) = 0;
 
+  /// Get the angular damping of the spring.
   virtual csVector3 GetAngularDamping () const = 0;
   
   /// Set the value to an equilibrium point for translation.
@@ -621,8 +669,10 @@ struct iJoint : public virtual iBase
   /// Set the value to an equilibrium point for rotation.
   virtual void SetAngularEquilibriumPoint (csVector3 point, bool forceUpdate = false) = 0;
 
+  /// Set the threshold of a breaking impulse.
   virtual void SetBreakingImpulseThreshold (float threshold, bool forceUpdate = false) = 0;
 
+  /// Get the threshold of a breaking impulse.
   virtual float GetBreakingImpulseThreshold () = 0;
 };
 
@@ -644,109 +694,183 @@ struct iKinematicCallback : public virtual iBase
 				 csOrthoTransform& transform) const = 0;
 };
 
+/**
+ * This is the interface for the actual plugin.
+ * It is responsible for creating iPhysicalSector.
+ *
+ * Main creators of instances implementing this interface:
+ * - Bullet plugin (crystalspace.physics.bullet2)
+ * 
+ * Main ways to get pointers to this interface:
+ * - csQueryRegistry()
+ * 
+ * Main users of this interface:
+ * - Dynamics loader plugin (crystalspace.dynamics.loader)
+ *
+ * \sa CS::Collision2::iCollisionSystem
+ */
 struct iPhysicalSystem : public virtual iBase
 {
   SCF_INTERFACE (CS::Physics2::iPhysicalSystem, 1, 0, 0);
 
   /**
-  * Create a rigid body, if there's an iCollisionObject pointer, 
-  * Need to call iCollisionObject::RebuildObject.
-  */
+   * Create a rigid body, if there's an iCollisionObject pointer, 
+   * Need to call iCollisionObject::RebuildObject.
+   */
   virtual csRef<iRigidBody> CreateRigidBody () = 0;
 
   /// Create a general 6DOF joint.
   virtual csRef<iJoint> CreateJoint () = 0;
 
-  /// Create a P2P joint for rigid bodies.
+  /*
+   * Create a P2P joint for rigid bodies by setting the position in 
+   * world space.
+   */
   virtual csRef<iJoint> CreateRigidP2PJoint (const csVector3 position) = 0;
 
-  /// Create a slide joint for rigid bodies.
+  /* 
+   * Create a slide joint for rigid bodies.
+   * \param trans The transform of the joint in world space.
+   * \param minDist The min distance the body can move along the axis.
+   * \param maxDist The max distance the body can move along the axis.
+   * \param minAngle The min angle the body can rotate around the axis.
+   * \param maxAngle The max angle the body can rotate around the axis.
+   * \param axis The slide axis, can only be 0, 1, 2.
+   */
   virtual csRef<iJoint> CreateRigidSlideJoint (const csOrthoTransform trans,
     float minDist, float maxDist, float minAngle, float maxAngle, int axis) = 0;
 
-  /// Create a hinge joint for rigid bodies.
+  /* 
+   * Create a hinge joint for rigid bodies.
+   * \param position The position of the joint in world space.
+   * \param minAngle The min angle the body can rotate around the axis.
+   * \param maxAngle The max angle the body can rotate around the axis.
+   * \param axis The axis of the hinge, can only be 0, 1, 2.
+   */
   virtual csRef<iJoint> CreateRigidHingeJoint (const csVector3 position,
     float minAngle, float maxAngle, int axis) = 0;
 
+  /* 
+   * Create a cone twist joint for rigid bodies.
+   * \param trans The transform of the joint in world space.
+   * \param swingSpan1 The swing span the body can rotate around the local Z axis of joint.
+   * \param swingSpan2 The swing span the body can rotate around the local Y axis of joint.
+   * \param twistSpan The twist span the body can rotate around the local X axis of joint.
+   */
   virtual csRef<iJoint> CreateRigidConeTwistJoint (const csOrthoTransform trans,
     float swingSpan1,float swingSpan2,float twistSpan) = 0;
 
-  /// Create a linear joint for soft body.
+  /* 
+   * Create a linear joint for soft body by setting the position in 
+   * world space.
+   */
   virtual csRef<iJoint> CreateSoftLinearJoint (const csVector3 position) = 0;
 
-  /// Create a angular joint for soft body.
+  /* 
+   * Create a angular joint for soft body by setting the rotation axis.
+   * The axis can only be 0, 1, 2.
+   */
   virtual csRef<iJoint> CreateSoftAngularJoint (int axis) = 0;
 
+  /*
+   * Create a pivot joint to attach to a rigid body to a position in world space
+   * in order to manipulate it.
+   */
   virtual csRef<iJoint> CreateRigidPivotJoint (iRigidBody* body, const csVector3 position) = 0;
   
   /**
-  * Create a soft body rope.
-  * \param start Start position of the rope.
-  * \param end End position of the rope.
-  * \param segmentCount Number of segments in the rope.
-  * \remark You must call SetSoftBodyWorld() prior to this.
-  */
+   * Create a soft body rope.
+   * \param start Start position of the rope.
+   * \param end End position of the rope.
+   * \param segmentCount Number of segments in the rope.
+   * \remark You must call SetSoftBodyWorld() prior to this.
+   */
   virtual csRef<iSoftBody> CreateRope (csVector3 start,
       csVector3 end, size_t segmentCount) = 0;
 
   /**
-  * Create a soft body rope with explicit positions of the vertices.
-  * \param vertices The array of positions to use for the vertices.
-  * \param vertexCount The amount of vertices for the rope.
-  * \remark You must call SetSoftBodyWorld() prior to this.
-  */
+   * Create a soft body rope with explicit positions of the vertices.
+   * \param vertices The array of positions to use for the vertices.
+   * \param vertexCount The amount of vertices for the rope.
+   * \remark You must call SetSoftBodyWorld() prior to this.
+   */
   virtual csRef<iSoftBody> CreateRope (csVector3* vertices, size_t vertexCount) = 0;
 
   /**
-  * Create a soft body cloth.
-  * \param corner1 The position of the top left corner.
-  * \param corner2 The position of the top right corner.
-  * \param corner3 The position of the bottom left corner.
-  * \param corner4 The position of the bottom right corner.
-  * \param segmentCount1 Number of horizontal segments in the cloth.
-  * \param segmentCount2 Number of vertical segments in the cloth.
-  * \param withDiagonals Whether there must be diagonal segments in the cloth
-  * or not. Diagonal segments will make the cloth more rigid.
-  * \remark You must call SetSoftBodyWorld() prior to this.
-  */
+   * Create a soft body cloth.
+   * \param corner1 The position of the top left corner.
+   * \param corner2 The position of the top right corner.
+   * \param corner3 The position of the bottom left corner.
+   * \param corner4 The position of the bottom right corner.
+   * \param segmentCount1 Number of horizontal segments in the cloth.
+   * \param segmentCount2 Number of vertical segments in the cloth.
+   * \param withDiagonals Whether there must be diagonal segments in the cloth
+   * or not. Diagonal segments will make the cloth more rigid.
+   * \remark You must call SetSoftBodyWorld() prior to this.
+   */
   virtual csRef<iSoftBody> CreateCloth (csVector3 corner1, csVector3 corner2,
       csVector3 corner3, csVector3 corner4,
       size_t segmentCount1, size_t segmentCount2,
       bool withDiagonals = false) = 0;
 
   /**
-  * Create a volumetric soft body from a genmesh.
-  * \param genmeshFactory The genmesh factory to use.
-  * \param if there's an iCollisionObject pointer, attach the iCollisionObject to it.
-  * \remark You must call SetSoftBodyWorld() prior to this.
-  */
+   * Create a volumetric soft body from a genmesh.
+   * \param genmeshFactory The genmesh factory to use.
+   * \param bodyTransform the transform of this body.
+   * \remark You must call SetSoftBodyWorld() prior to this.
+   */
   virtual csRef<iSoftBody> CreateSoftBody (iGeneralFactoryState* genmeshFactory, 
     const csOrthoTransform& bodyTransform) = 0;
 
   /**
-  * Create a custom volumetric soft body.
-  * \param vertices The vertices of the soft body. The position is absolute.
-  * \param vertexCount The count of vertices of the soft body.
-  * \param triangles The faces of the soft body.
-  * \param triangleCount The count of faces of the soft body.
-  \param if there's an iCollisionObject pointer, attach the iCollisionObject to it.
-  * \remark You must call SetSoftBodyWorld() prior to this.
-  */
+   * Create a custom volumetric soft body.
+   * \param vertices The vertices of the soft body. The position is absolute.
+   * \param vertexCount The count of vertices of the soft body.
+   * \param triangles The faces of the soft body.
+   * \param triangleCount The count of faces of the soft body.
+   * \param bodyTransform the transform of the soft body.
+   * \param if there's an iCollisionObject pointer, attach the iCollisionObject to it.
+   * \remark You must call SetSoftBodyWorld() prior to this.
+   */
   virtual csRef<iSoftBody> CreateSoftBody (csVector3* vertices,
       size_t vertexCount, csTriangle* triangles,
       size_t triangleCount, const csOrthoTransform& bodyTransform) = 0;
 };
 
+/**
+ * This is the interface for the physical sector.
+ * It manage all physical bodies.
+ * 
+ * Main ways to get pointers to this interface:
+ * - scfQueryInterface<CS::Physics2::iPhysicalSector>() from a CS::Collision2::iCollisionSector
+ *
+ * \sa CS::Collision2::iCollisionSector CS::Physics2::Bullet2::iPhysicalSector
+ */
 struct iPhysicalSector : public virtual iBase
 {
   SCF_INTERFACE (CS::Physics2::iPhysicalSector, 1, 0, 0);
 
   /**
-  * Set the simulation speed. A value of 0 means that the simulation is not made
-  * automatically (but it can still be made manually through Step())
-  */
+   * Set the simulation speed. A value of 0 means that the simulation is not made
+   * automatically (but it can still be made manually through Step())
+   */
   virtual void SetSimulationSpeed (float speed) = 0;
 
+  /**
+   * Set the parameters of the constraint solver. Use this if you want to find a
+   * compromise between accuracy of the simulation and performance cost.
+   * \param timeStep The internal, constant, time step of the simulation, in seconds.
+   * A smaller value gives better accuracy. Default value is 1/60 s (ie 0.0166 s).
+   * \param maxSteps Maximum number of steps that Bullet is allowed to take each
+   * time you call iPhysicalSector::Step(). If you pass a very small time step as
+   * the first parameter, then you must increase the number of maxSteps to
+   * compensate for this, otherwise your simulation is 'losing' time. Default value
+   * is 1. If you pass maxSteps=0 to the function, then it will assume a variable
+   * tick rate. Don't do it.
+   * \param iterations Number of iterations of the constraint solver. A reasonable
+   * range of iterations is from 4 (low quality, good performance) to 20 (good
+   * quality, less but still reasonable performance). Default value is 10. 
+   */
   virtual void SetStepParameters (float timeStep, size_t maxSteps,
     size_t iterations) = 0;  
 
@@ -754,67 +878,54 @@ struct iPhysicalSector : public virtual iBase
   virtual void Step (float duration) = 0;
 
   /**
-  * Set the global linear dampener. The dampening correspond to how
-  * much the movements of the objects will be reduced. It is a value
-  * between 0 and 1, giving the ratio of speed that will be reduced
-  * in one second. 0 means that the movement will not be reduced, while
-  * 1 means that the object will not move.
-  * The default value is 0.
-  * \sa CS::Physics2::Bullet::iRigidBody::SetLinearDampener()
-  */
+   * Set the global linear dampener. The dampening correspond to how
+   * much the movements of the objects will be reduced. It is a value
+   * between 0 and 1, giving the ratio of speed that will be reduced
+   * in one second. 0 means that the movement will not be reduced, while
+   * 1 means that the object will not move.
+   * The default value is 0.
+   * \sa CS::Physics2::iRigidBody::SetLinearDampener()
+   */
   virtual void SetLinearDampener (float d) = 0;
 
   /**
-  * Get the global linear dampener setting.
-  */
+   * Get the global linear dampener setting.
+   */
   virtual float GetLinearDampener () const = 0;
 
   /**
-  * Set the global angular dampener. The dampening correspond to how
-  * much the movements of the objects will be reduced. It is a value
-  * between 0 and 1, giving the ratio of speed that will be reduced
-  * in one second. 0 means that the movement will not be reduced, while
-  * 1 means that the object will not move.
-  * The default value is 0.
-  * \sa CS::Physics2::Bullet::iRigidBody::SetRollingDampener()
-  */
+   * Set the global angular dampener. The dampening correspond to how
+   * much the movements of the objects will be reduced. It is a value
+   * between 0 and 1, giving the ratio of speed that will be reduced
+   * in one second. 0 means that the movement will not be reduced, while
+   * 1 means that the object will not move.
+   * The default value is 0.
+   * \sa CS::Physics2::iRigidBody::SetRollingDampener()
+   */
   virtual void SetRollingDampener (float d) = 0;
 
   /// Get the global rolling dampener setting.
   virtual float GetRollingDampener () const = 0;
-
-  /**
-  * Turn on/off AutoDisable functionality.
-  * AutoDisable will stop moving objects if they are stable in order
-  * to save processing time. By default this is enabled.
-  */
-  // always enabled?
-  //virtual void EnableAutoDisable(bool enable) = 0;
- 
-  /**
-  * Return whether the AutoDisable is on or off.
-  */
-  //virtual bool AutoDisableEnabled() = 0;
   
   /**
-  * Set the parameters for AutoDisable.
-  * \param linear Maximum linear movement to disable a body. Default value is 0.8.
-  * \param angular Maximum angular movement to disable a body. Default value is 1.0.
-  * \param steps Minimum number of steps the body meets linear and angular
-  * requirements before it is disabled. Default value is 0.
-  * \param time Minimum time the body needs to meet linear and angular
-  * movement requirements before it is disabled. Default value is 0.0.
-  * \remark With the Bullet plugin, the 'steps' parameter is ignored.
-  * \remark With the Bullet plugin, calling this method will not affect bodies already
-  * created.
-  */
+   * Set the parameters for AutoDisable.
+   * \param linear Maximum linear movement to disable a body. Default value is 0.8.
+   * \param angular Maximum angular movement to disable a body. Default value is 1.0.
+   * \param steps Minimum number of steps the body meets linear and angular
+   * requirements before it is disabled. Default value is 0.
+   * \param time Minimum time the body needs to meet linear and angular
+   * movement requirements before it is disabled. Default value is 0.0.
+   * \remark With the Bullet plugin, the 'steps' parameter is ignored.
+   * \remark With the Bullet plugin, calling this method will not affect bodies already
+   * created.
+   */
   virtual void SetAutoDisableParams (float linear, float angular,
       float time) = 0;
 
   /**
-  * Add a rigid body into the sector.
-  * The rigid body has to be initialized.
-  */
+   * Add a rigid body into the sector.
+   * The rigid body has to be initialized.
+   */
   virtual void AddRigidBody (iRigidBody* body) = 0;
 
   /// Remove a rigid body by pointer.
@@ -830,9 +941,9 @@ struct iPhysicalSector : public virtual iBase
   virtual iRigidBody* FindRigidBody (const char* name) = 0;
 
   /**
-  * Add a soft body into the sector.
-  * The soft body has to be initialized.
-  */
+   * Add a soft body into the sector.
+   * The soft body has to be initialized.
+   */
   virtual void AddSoftBody (iSoftBody* body) = 0;
 
   /// Remove a soft body by pointer.
@@ -847,21 +958,22 @@ struct iPhysicalSector : public virtual iBase
   /// Find  the soft body in this setor.
   virtual iSoftBody* FindSoftBody (const char* name) = 0;
 
+  /// Add a joint to the sector. The joint must have attached two physical bodies.
   virtual void AddJoint (iJoint* joint) = 0;
 
   /// Remove a joint by pointer.
   virtual void RemoveJoint (iJoint* joint) = 0;
 
   /**
-  * Set whether this dynamic world can handle soft bodies or not.
-  * \warning You have to call this method before adding any objects in the
-  * dynamic world.
-  */
+   * Set whether this dynamic world can handle soft bodies or not.
+   * \warning You have to call this method before adding any objects in the
+   * dynamic world.
+   */
   virtual void SetSoftBodyEnabled (bool enabled) = 0; 
 
   /**
-  * Return whether this dynamic world can handle soft bodies or not.
-  */
+   * Return whether this dynamic world can handle soft bodies or not.
+   */
   virtual bool GetSoftBodyEnabled () = 0;
 };
 

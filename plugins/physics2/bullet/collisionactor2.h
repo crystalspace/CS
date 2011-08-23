@@ -1,3 +1,21 @@
+/*
+  Copyright (C) 2011 by Liu Lu
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #ifndef __CS_BULLET_COLLISIONACTOR_H__
 #define __CS_BULLET_COLLISIONACTOR_H__
 
@@ -13,6 +31,13 @@ class csBulletCollisionActor : public scfImplementationExt1<
   CS::Collision2::iCollisionActor>
 {
 private:
+  btVector3 currentPosition;
+  btVector3 targetPosition;
+  btVector3 upVector;
+  btVector3 frontVector;
+
+  csWeakRef<iCamera> camera;
+
   float verticalVelocity;
   float verticalOffset;
   float fallSpeed;
@@ -30,13 +55,6 @@ private:
   bool wasOnGround;
   bool wasJumping;
   bool useGhostSweep;
-
-  csWeakRef<iCamera> camera;
-
-  btVector3 currentPosition;
-  btVector3 targetPosition;
-  btVector3 upVector;
-  btVector3 frontVector;
 
   bool RecoverFromPenetration ();
   btVector3 StepUp ();

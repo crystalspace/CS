@@ -1,3 +1,21 @@
+/*
+  Copyright (C) 2011 by Liu Lu
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #ifndef __CS_BULLET_COLLIDERS_H__
 #define __CS_BULLET_COLLIDERS_H__
 
@@ -21,16 +39,11 @@ class btGImpactMeshShape;
 class btTriangleMesh;
 struct csLockedHeightData;
 struct iTerrainSystem;
-
-//using namespace CS::Collision;
 struct iTriangleMesh;
 
-//using namespace CS::Collision2;
 
 CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
 {
-
-//using CS::Collision2::ColliderType;
 
 class csBulletSector;
 class csBulletSystem;
@@ -44,11 +57,11 @@ class csBulletCollider: public virtual CS::Collision2::iCollider
   friend class csBulletCollisionActor;
   friend class csBulletRigidBody;
 protected:
-  btCollisionShape* shape;
   csVector3 scale;
+  btCollisionShape* shape;
+  csBulletSystem* collSystem;
   float margin;
   float volume;
-  csBulletSystem* collSystem;
 
 public:
   csBulletCollider ();
@@ -72,6 +85,7 @@ public:
   virtual ~csBulletColliderBox ();
   virtual CS::Collision2::ColliderType GetGeometryType () const
   {return CS::Collision2::COLLIDER_BOX;}
+
   virtual csVector3 GetBoxGeometry () {return boxSize;}
 };
 
@@ -87,6 +101,7 @@ public:
   virtual CS::Collision2::ColliderType GetGeometryType () const
   {return CS::Collision2::COLLIDER_SPHERE;}
   virtual void SetMargin (float margin);
+
   virtual float GetSphereGeometry () {return radius;}
 };
 
@@ -94,7 +109,6 @@ class csBulletColliderCylinder:
   public scfImplementation2<csBulletColliderCylinder,
   csBulletCollider, CS::Collision2::iColliderCylinder>
 {
-  //why Z?
   float radius;
   float length;
 
@@ -103,6 +117,7 @@ public:
   virtual ~csBulletColliderCylinder ();
   virtual CS::Collision2::ColliderType GetGeometryType () const
   {return CS::Collision2::COLLIDER_CYLINDER;}
+
   virtual void GetCylinderGeometry (float& length, float& radius);
 };
 
@@ -118,6 +133,7 @@ public:
   virtual ~csBulletColliderCapsule ();
   virtual CS::Collision2::ColliderType GetGeometryType () const
   {return CS::Collision2::COLLIDER_CAPSULE;}
+
   virtual void GetCapsuleGeometry (float& length, float& radius);
 };
 
@@ -133,6 +149,7 @@ public:
   virtual ~csBulletColliderCone ();
   virtual CS::Collision2::ColliderType GetGeometryType () const
   {return CS::Collision2::COLLIDER_CONE;}
+
   virtual void GetConeGeometry (float& length, float& radius);
 };
 
@@ -147,8 +164,9 @@ public:
   virtual ~csBulletColliderPlane ();
   virtual CS::Collision2::ColliderType GetGeometryType () const
   {return CS::Collision2::COLLIDER_PLANE;}
-  virtual csPlane3 GetPlaneGeometry () {return plane;}
   virtual void SetLocalScale (const csVector3& scale) {}
+
+  virtual csPlane3 GetPlaneGeometry () {return plane;}
 };
 
 class csBulletColliderConvexMesh:
@@ -169,6 +187,7 @@ public:
   virtual ~csBulletColliderConvexMesh ();
   virtual CS::Collision2::ColliderType GetGeometryType () const
  {return CS::Collision2::COLLIDER_CONVEX_MESH;}
+
   virtual iMeshWrapper* GetMesh () {return mesh;}
 };
 
@@ -185,6 +204,7 @@ public:
   virtual ~csBulletColliderConcaveMesh ();
   virtual CS::Collision2::ColliderType GetGeometryType () const
  {return CS::Collision2::COLLIDER_CONCAVE_MESH;}
+
   virtual iMeshWrapper* GetMesh () {return mesh;}
 };
 
@@ -199,16 +219,16 @@ public:
   virtual ~csBulletColliderConcaveMeshScaled();
   virtual CS::Collision2::ColliderType GetGeometryType () const
   {return CS::Collision2::COLLIDER_CONCAVE_MESH_SCALED;}
+
   virtual CS::Collision2::iColliderConcaveMesh* GetCollider () 
   {return dynamic_cast<CS::Collision2::iColliderConcaveMesh*>(originalCollider);}
 };
 
-//TODO: modify the terrain collider.
 class HeightMapCollider : public btHeightfieldTerrainShape
 {
 public:
-  iTerrainCell* cell;
   btVector3 localScale;
+  iTerrainCell* cell;
   float* heightData;
 
   HeightMapCollider (float* gridData,
@@ -231,11 +251,11 @@ class csBulletColliderTerrain:
   
   csArray<HeightMapCollider*> colliders;
   csArray<btRigidBody*> bodies;
+  csOrthoTransform terrainTransform;
   csBulletSector* collSector;
   csBulletSystem* collSystem;
   csBulletCollisionObject* collBody;
   iTerrainSystem* terrainSystem;
-  csOrthoTransform terrainTransform;
   float minimumHeight;
   float maximumHeight;
   bool unload;
@@ -247,12 +267,12 @@ public:
     csBulletSystem* sys);
   virtual ~csBulletColliderTerrain ();
   virtual CS::Collision2::ColliderType GetGeometryType () const {return CS::Collision2::COLLIDER_TERRAIN;}
-  virtual iTerrainSystem* GetTerrain () const {return terrainSystem;}
-  //Lulu: Will set scale/margin to all the height map collider.
-
   virtual void SetLocalScale (const csVector3& scale);
   virtual void SetMargin (float margin);
 
+  virtual iTerrainSystem* GetTerrain () const {return terrainSystem;}
+
+  //-- iTerrainCellLoadCallback
   virtual void OnCellLoad (iTerrainCell *cell);
   virtual void OnCellPreLoad (iTerrainCell *cell);
   virtual void OnCellUnload (iTerrainCell *cell);

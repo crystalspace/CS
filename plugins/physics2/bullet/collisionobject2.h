@@ -19,31 +19,34 @@ class csBulletCollisionObject: public scfImplementationExt1<
   friend class csBulletKinematicMotionState;
   friend class csBulletJoint;
   friend class csBulletColliderTerrain;
+  friend class csBulletCollisionActor;
 
 protected:
-  csBulletSector* sector;
-  csBulletSystem* system;
   csRefArray<csBulletCollider> colliders;
   csRefArray<csBulletCollisionObject> contactObjects;
   csArray<csOrthoTransform> relaTransforms;
+  csArray<CS::Physics2::iJoint*> joints;
+  CS::Collision2::CollisionGroup collGroup;
   csWeakRef<iMovable> movable;
-  btCollisionObject* btObject;
+  csRef<CS::Collision2::iCollisionCallback> collCb;
+  CS::Collision2::CollisionObjectType type;
+
   btTransform transform;
   btTransform invPricipalAxis;
+  btQuaternion portalWarp;
+
+  csBulletSector* sector;
+  csBulletSystem* system;
+  btCollisionObject* btObject;
   csBulletMotionState* motionState;
-  csRef<CS::Collision2::iCollisionCallback> collCb;
   btCompoundShape* compoundShape;
-  CS::Collision2::CollisionObjectType type;
-  CS::Collision2::CollisionGroup collGroup;
-  int haveStaticColliders;
+  csBulletCollisionObject* objectOrigin;
+  csBulletCollisionObject* objectCopy;
+
+  short haveStaticColliders;
   bool insideWorld;
   bool shapeChanged;
   bool isTerrain;
-
-  //csBulletSector* desSector;
-  csBulletCollisionObject* objectOrigin;
-  csBulletCollisionObject* objectCopy;
-  btQuaternion portalWarp;
 
 public:
   csBulletCollisionObject (csBulletSystem* sys);

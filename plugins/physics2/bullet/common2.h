@@ -1,8 +1,5 @@
 /*
-  Copyright (C) 2010 Christian Van Brussel, Communications and Remote
-      Sensing Laboratory of the School of Engineering at the 
-      Universite catholique de Louvain, Belgium
-      http://www.tele.ucl.ac.be
+  Copyright (C) 2011 by Liu Lu
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -19,8 +16,8 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_BULLET_COMMON_H__
-#define __CS_BULLET_COMMON_H__
+#ifndef __CS_BULLET_COMMON2_H__
+#define __CS_BULLET_COMMON2_H__
 
 #include "bullet2.h"
 #include "csgeom/matrix3.h"
@@ -257,4 +254,4 @@ public:
 }
 CS_PLUGIN_NAMESPACE_END(Bullet2)
 
-#endif //__CS_BULLET_COMMON_H__
+#endif //__CS_BULLET_COMMON2_H__

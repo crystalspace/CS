@@ -1,3 +1,21 @@
+/*
+  Copyright (C) 2011 by Liu Lu
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #include "cssysdef.h"
 #include "collisionactor2.h"
 #include "btBulletDynamicsCommon.h"
@@ -86,7 +104,7 @@ touchingContact (false), speed (0), useGhostSweep (true), recoveringFactor (0.2f
   SetMaxSlope (btRadians (45.0f));
   fallSpeed = 55.0f * system->getInternalScale ();
   jumpSpeed = 9.8f * system->getInternalScale ();
-  stepHeight = 0.5f * system->getInternalScale ();
+  stepHeight = 0.05f * system->getInternalScale ();
 }
 
 csBulletCollisionActor::~csBulletCollisionActor ()
@@ -149,16 +167,14 @@ void csBulletCollisionActor::SetCamera (iCamera* camera)
 {
   SetTransform (camera->GetTransform ());
   this->camera = camera; 
+  csVector3 upVec = GetTransform ().GetUp ();
+  upVector.setValue (upVec.x, upVec.y, upVec.z);
 }
 
 void csBulletCollisionActor::UpdateAction (float delta)
 {
-  csVector3 upVec = GetTransform ().GetUp ();
-  upVector.setValue (upVec.x, upVec.y, upVec.z);
-  
   csVector3 frVec = GetTransform ().GetFront ();
   frontVector.setValue (frVec.x, frVec.y, frVec.z);
-
   PreStep ();
   PlayerStep (delta);
   speed = 0;
@@ -220,62 +236,50 @@ bool csBulletCollisionActor::RecoverFromPenetration ()
 {
   bool penetration = false;
 
-  btPairCachingGhostObject* ghost = dynamic_cast<btPairCachingGhostObject*> (btObject);
-  sector->bulletWorld->getDispatcher()->dispatchAllCollisionPairs( 
-    ghost->getOverlappingPairCache(),
-    sector->bulletWorld->getDispatchInfo(),
-    sector->bulletWorld->getDispatcher() );
+  csOrthoTransform curTrans = GetTransform ();
+  csVector3 curPosi = curTrans.GetOrigin ();
 
-  currentPosition = btObject->getWorldTransform().getOrigin();
+  csArray<CS::Collision2::CollisionData> data;
+  sector->CollisionTest (this->QueryCollisionObject (), data);
 
-  for( int i = 0; i < ghost->getOverlappingPairCache()->getNumOverlappingPairs(); i++ )
+  for (size_t i = 0; i < data.GetSize (); i++)
   {
-    btManifoldArray manifoldArray;
-
-    btBroadphasePair* collisionPair = &ghost->getOverlappingPairCache()->getOverlappingPairArray()[i];
-
-    if( collisionPair->m_algorithm )
-      collisionPair->m_algorithm->getAllContactManifolds(manifoldArray);
-
-    for( int j = 0; j < manifoldArray.size(); j++ )
+    if (data[i].penetration < 0.0)
     {
-      btPersistentManifold* manifold = manifoldArray[j];
-
-      btScalar directionSign = manifold->getBody0() == ghost ? btScalar( -1.0 ) : btScalar( 1.0 );
-
-      for( int p = 0; p < manifold->getNumContacts(); p++ )
+      float directionSign;
+      if (data[i].objectA == this->QueryCollisionObject ())
       {
-        const btManifoldPoint &pt = manifold->getContactPoint( p );
-
-        btScalar dist = pt.getDistance();
-
-        if( dist < 0.0 )
-        {
-          // NOTE : btScalar affects the stairs but the parkinson...
-          // 0.0 , the capsule can break the walls...
-          currentPosition += pt.m_normalWorldOnB * directionSign * dist * recoveringFactor;          
-
-          penetration = true;
-        }
+        directionSign = -1.0f;
+        csBulletCollisionObject* obj = dynamic_cast<csBulletCollisionObject*> (data[i].objectB);
+        if (!obj || obj->btObject->getCollisionFlags () & btCollisionObject::CF_NO_CONTACT_RESPONSE)
+          continue;
       }
+      else
+      {
+        directionSign = 1.0f;
+        csBulletCollisionObject* obj = dynamic_cast<csBulletCollisionObject*> (data[i].objectA);
+        if (!obj || obj->btObject->getCollisionFlags () & btCollisionObject::CF_NO_CONTACT_RESPONSE)
+          continue;
+      }
+      curPosi += data[i].normalWorldOnB * directionSign * data[i].penetration * recoveringFactor;
+      penetration = true;
     }
   }
 
-  btTransform trans = ghost->getWorldTransform();
-  trans.setOrigin( currentPosition );
+  curTrans.SetOrigin( curPosi );
 
-  SetTransform (BulletToCS (trans, system->getInverseInternalScale ()));
+  SetTransform (curTrans);
 
   return penetration;
 }
 
 btVector3 csBulletCollisionActor::StepUp ()
 {
-//TODO
   targetPosition = currentPosition + upVector * (stepHeight + 
     verticalOffset > EPSILON ? verticalOffset : 0.0f);
 
   btCollisionShape* collisionShape = colliders[0]->shape;
+
   // Add this to add collider. Ghost object can only have convex shape.
   btAssert (collisionShape->isConvex ());
   btConvexShape* convexShape = dynamic_cast<btConvexShape*> (collisionShape);
@@ -290,7 +294,7 @@ btVector3 csBulletCollisionActor::StepUp ()
 
   KinematicClosestNotMeConvexResultCallback callback( btGhostObject::upcast (btObject), -upVector, maxSlopeCosine );
   callback.m_collisionFilterGroup = btObject->getBroadphaseHandle()->m_collisionFilterGroup;
-  callback.m_collisionFilterMask = btObject->getBroadphaseHandle()->m_collisionFilterMask;
+  callback.m_collisionFilterMask = btObject->getBroadphaseHandle()->m_collisionFilterMask ^ 8;
 
   if( useGhostSweep )
     btGhostObject::upcast (btObject)->convexSweepTest( convexShape, start, 
@@ -364,8 +368,6 @@ btVector3 slideOnCollision( const btVector3& fromPosition, const btVector3& toPo
 
 btVector3 csBulletCollisionActor::StepForwardAndStrafe (float dt)
 {
-  //TODO
-
   targetPosition = currentPosition + frontVector * speed * dt;
 
   btCollisionShape* collisionShape = colliders[0]->shape;
@@ -389,7 +391,7 @@ btVector3 csBulletCollisionActor::StepForwardAndStrafe (float dt)
 
     KinematicClosestNotMeConvexResultCallback callback( btGhostObject::upcast (btObject), sweepDirNegative, 0.0f);
     callback.m_collisionFilterGroup = btObject->getBroadphaseHandle()->m_collisionFilterGroup;
-    callback.m_collisionFilterMask = btObject->getBroadphaseHandle()->m_collisionFilterMask;
+    callback.m_collisionFilterMask = btObject->getBroadphaseHandle()->m_collisionFilterMask ^ 8;
 
     if( useGhostSweep )
       btGhostObject::upcast (btObject)->convexSweepTest( convexShape, start, end, callback, sector->bulletWorld->getDispatchInfo().m_allowedCcdPenetration );
@@ -438,7 +440,7 @@ btVector3 csBulletCollisionActor::StepDown (float dt)
 
   KinematicClosestNotMeConvexResultCallback callback( btGhostObject::upcast (btObject), upVector, maxSlopeCosine );
   callback.m_collisionFilterGroup = btObject->getBroadphaseHandle()->m_collisionFilterGroup;
-  callback.m_collisionFilterMask = btObject->getBroadphaseHandle()->m_collisionFilterMask;
+  callback.m_collisionFilterMask = btObject->getBroadphaseHandle()->m_collisionFilterMask ^ 8;
 
   if( useGhostSweep )
     btGhostObject::upcast (btObject)->convexSweepTest( convexShape, start, 

@@ -12,8 +12,8 @@ CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 
 csBulletCollisionObject::csBulletCollisionObject (csBulletSystem* sys)
 : scfImplementationType (this), system (sys), collCb (NULL), btObject (NULL),
-sector (NULL), compoundShape (NULL), movable (NULL), insideWorld (false), 
-objectCopy (NULL), objectOrigin (NULL), shapeChanged (false), isTerrain (false),
+sector (NULL), compoundShape (NULL), movable (NULL), insideWorld (false), transform (btTransform::getIdentity ()),
+objectCopy (NULL), objectOrigin (NULL), shapeChanged (false), isTerrain (false), 
 type (CS::Collision2::COLLISION_OBJECT_BASE), haveStaticColliders(0), portalWarp (btQuaternion::getIdentity ())
 {
   btTransform identity;
@@ -127,7 +127,6 @@ csOrthoTransform csBulletCollisionObject::GetTransform ()
       return terrainCollider->terrainTransform;      
     }
   }
-
   if (isTerrain)
   {
     csBulletColliderTerrain* terrainCollider = dynamic_cast<csBulletColliderTerrain*> (colliders[0]);
@@ -137,7 +136,7 @@ csOrthoTransform csBulletCollisionObject::GetTransform ()
     if (btObject)
       return BulletToCS (btObject->getWorldTransform(), system->getInverseInternalScale ());
     else
-      return csOrthoTransform(csMatrix3 (), csVector3 (0.0f,0.0f,0.0f));
+      return BulletToCS (transform, system->getInverseInternalScale ());
 }
 
 void csBulletCollisionObject::AddCollider (CS::Collision2::iCollider* collider,
@@ -266,7 +265,7 @@ void csBulletCollisionObject::SetCollisionGroup (const char* name)
   if (btObject && insideWorld)
   {
     btObject->getBroadphaseHandle ()->m_collisionFilterGroup = collGroup.value;
-    btObject->getBroadphaseHandle ()->m_collisionFilterMask = collGroup.group;
+    btObject->getBroadphaseHandle ()->m_collisionFilterMask = collGroup.mask;
   }
 }
 
@@ -480,7 +479,8 @@ void csBulletCollisionObject::AddBulletObject ()
         shape, localInertia);
       btObject = new btRigidBody (infos);
       btObject->setUserPointer (dynamic_cast<iCollisionObject*> (this));
-      sector->bulletWorld->addRigidBody (btRigidBody::upcast(btObject), collGroup.value, collGroup.group);
+      sector->bulletWorld->addRigidBody (btRigidBody::upcast(btObject), collGroup.value, collGroup.mask);
+
     }
     else
       dynamic_cast<csBulletColliderTerrain*> (colliders[0])->AddRigidBodies (sector, this);
@@ -496,7 +496,7 @@ void csBulletCollisionObject::AddBulletObject ()
     btObject->setUserPointer (dynamic_cast<CS::Collision2::iCollisionObject*> (this));
     btObject->setCollisionShape (shape);
     sector->broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
-    sector->bulletWorld->addCollisionObject (btObject, collGroup.value, collGroup.group);
+    sector->bulletWorld->addCollisionObject (btObject, collGroup.value, collGroup.mask);
   }
   insideWorld = true;
 }

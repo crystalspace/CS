@@ -1,5 +1,27 @@
+/*
+    Copyright (C) 2011 by Liu Lu
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #ifndef __IVARIA_PHYSICS_BULLET_H__
 #define __IVARIA_PHYSICS_BULLET_H__
+
+/**\file
+ * Bullet physics interfaces
+ */
 
 #include "csutil/scf_interface.h"
 #include "iutil/objreg.h"
@@ -16,6 +38,9 @@ namespace Physics2
 namespace Bullet2
 {
 
+/**
+ * The type of debug mode.
+ */
 enum DebugMode
 {
   DEBUG_NOTHING = 0,     /*!< Nothing will be displayed. */
@@ -24,14 +49,19 @@ enum DebugMode
   DEBUG_JOINTS = 4,      /*!< Display the joint positions and limits. */
 };
 
+/**
+ * The Bullet implementation of iSoftBody also implements this
+ * interface.
+ * \sa CS::Physics2::iRigidBody CS::Physics2::iSoftBody
+ */
 struct iSoftBody : public virtual iBase
 {
   SCF_INTERFACE (CS::Physics2::Bullet2::iSoftBody, 1, 0, 0);
 
   /**
-  * Draw the debug informations of this soft body. This has to be called
-  * at each frame, and will add 2D lines on top of the rendered scene.
-  */
+   * Draw the debug informations of this soft body. This has to be called
+   * at each frame, and will add 2D lines on top of the rendered scene.
+   */
   virtual void DebugDraw (iView* rView) = 0;
 
   /// Set linear stiffness coefficient [0,1].
@@ -124,54 +154,64 @@ struct iSoftBody : public virtual iBase
   /// Set true if use pose matching.
   virtual void SetShapeMatching (bool match) = 0;
 
+  /// Set true if use bending constraint.
   virtual void SetBendingConstraint (bool bending) = 0;
 
+  /// Generate cluster for the soft body.
   virtual void GenerateCluster (int iter) = 0;
-
-  /**
-  * Configure the soft body with parameters set above.
-  * If bending constraint is used set it with true.
-  */
-  //Lulu: use RebuildObject () instead?
-  //virtual void ConfigureSoftBody(bool bending) = 0;
 };
 
+/**
+ * The Bullet implementation of iPhysicalSector also implements this
+ * interface.
+ * \sa CS::Physics2::iPhysicalSector
+ */
 struct iPhysicalSector : public virtual iBase
 {
   SCF_INTERFACE (CS::Physics2::Bullet2::iPhysicalSector, 1, 0, 0);
 
-  //virtual void SetGimpactEnabled (bool enabled) = 0; 
-
-  //virtual bool GetGimpactEnabled () = 0; 
-
   /**
-  * Save the current state of the dynamic world in a file.
-  * \return True if the operation succeeds, false otherwise.
-  */
+   * Save the current state of the dynamic world in a file.
+   * \return True if the operation succeeds, false otherwise.
+   */
   virtual bool SaveWorld (const char* filename) = 0;
 
   /**
-  * Draw the debug informations of the dynamic system. This has to be called
-  * at each frame, and will add 2D lines on top of the rendered scene. The
-  * objects to be displayed are defined by SetDebugMode().
-  */
+   * Draw the debug informations of the dynamic system. This has to be called
+   * at each frame, and will add 2D lines on top of the rendered scene. The
+   * objects to be displayed are defined by SetDebugMode().
+   */
   virtual void DebugDraw (iView* rview) = 0;
 
   /**
-  * Set the mode to be used when displaying debug informations. The default value
-  * is 'CS::Physics2::Bullet2::DEBUG_COLLIDERS | CS::Physics2::Bullet2::DEBUG_JOINTS'.
-  * \remark Don't forget to call DebugDraw() at each frame to effectively display
-  * the debug informations.
-  */
+   * Set the mode to be used when displaying debug informations. The default value
+   * is 'CS::Physics2::Bullet2::DEBUG_COLLIDERS | CS::Physics2::Bullet2::DEBUG_JOINTS'.
+   * \remark Don't forget to call DebugDraw() at each frame to effectively display
+   * the debug informations.
+   */
   virtual void SetDebugMode (DebugMode mode) = 0;
 
   /// Get the current mode used when displaying debug informations.
   virtual DebugMode GetDebugMode () = 0;  
 
+  /**
+   * Start the profiling of the simulation. This would add an overhead to the
+   * computations, but allows to display meaningful information on the behavior
+   * of the simulation.
+   */ 
   virtual void StartProfile () = 0;
 
+  /**
+   * Stop the profiling of the simulation. This would add an overhead to the
+   */
   virtual void StopProfile () = 0;
 
+  /**
+   * Dump the profile information on the standard output. StartProfile() must
+   * have been called before.
+   * \param resetProfile Whether or not the profile data must be reset after
+   * the dumping.
+   */
   virtual void DumpProfile (bool resetProfile = true) = 0;
 };
 }

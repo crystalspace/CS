@@ -1,3 +1,22 @@
+/*
+  Copyright (C) 2011 by Liu Lu
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+
 #include "cssysdef.h"
 
 #include "csgeom/sphere.h"
@@ -6,6 +25,7 @@
 #include "igeom/trimesh.h"
 #include "imesh/objmodel.h"
 
+// Bullet includes.
 #include "btBulletDynamicsCommon.h"
 #include "btBulletCollisionCommon.h"
 #include "BulletCollision/Gimpact/btGImpactShape.h"
@@ -155,6 +175,7 @@ csBulletColliderCylinder::csBulletColliderCylinder (float length, float radius, 
   : scfImplementationType (this), length (length), radius (radius)
 {
   collSystem = sys;
+  // Lulu: why Z?
   shape = new btCylinderShapeZ (btVector3 (radius * collSystem->getInternalScale (),
     radius * collSystem->getInternalScale (),
     length * collSystem->getInternalScale () * 0.5f));
@@ -366,6 +387,7 @@ HeightMapCollider::HeightMapCollider ( float* gridData,
                                    gridData, 1.0f, minHeight, maxHeight,
                                    1, PHY_FLOAT, false), heightData (gridData)
 {
+  // Apply the local scaling on the shape
   localScale.setValue (gridSize[0] * internalScale / (gridWidth - 1),
     internalScale,
     gridSize[2] * internalScale/ (gridHeight - 1));
@@ -475,12 +497,14 @@ void csBulletColliderTerrain::LoadCellToCollider (iTerrainCell *cell)
 {
   float minHeight,maxHeight;
   csLockedHeightData gridData = cell->GetHeightData ();
+  // Check if the min/max have to be computed
   bool needExtremum =  (minimumHeight == 0.0f && maximumHeight == 0.0f);
   if  (needExtremum)
     minHeight = maxHeight = gridData.data[0];
   int gridWidth = cell->GetGridWidth ();
   int gridHeight = cell->GetGridHeight ();
 
+  // Initialize the terrain height data
   float* heightData = new float[gridHeight*gridWidth];
   for (int i=0;i<gridHeight;i++)
     for (int j=0;j<gridWidth;j++)
@@ -494,12 +518,13 @@ void csBulletColliderTerrain::LoadCellToCollider (iTerrainCell *cell)
         maxHeight = MAX (maxHeight, height);
       }
     }
-  
+
   csOrthoTransform cellTransform (terrainTransform);
   csVector3 cellPosition  (cell->GetPosition ()[0], 0.0f, cell->GetPosition ()[1]);
   cellTransform.SetOrigin (terrainTransform.GetOrigin ()
     + terrainTransform.This2OtherRelative (cellPosition));
 
+  // Create the terrain shape
   HeightMapCollider* colliderData = new HeightMapCollider (
     heightData, gridWidth, gridHeight,
     cell->GetSize (), minHeight, maxHeight,
@@ -512,9 +537,11 @@ void csBulletColliderTerrain::LoadCellToCollider (iTerrainCell *cell)
     (maxHeight - minHeight) * 0.5f + minHeight,
     cell->GetSize ()[2] * 0.5f);
 
+  // Set the origin to the middle of the heightfield
   cellTransform.SetOrigin (cellTransform.GetOrigin () + cellTransform.This2OtherRelative (offset));
   btTransform tr = CSToBullet (cellTransform, collSystem->getInternalScale ());
 
+  // Create the rigid body and add it to the world
   btRigidBody* body = new btRigidBody (0, 0, colliderData, btVector3 (0, 0, 0));
   body->setWorldTransform (tr);
 
@@ -545,7 +572,7 @@ void csBulletColliderTerrain::AddRigidBodies (csBulletSector* sector, csBulletCo
     if (cell->GetLoadState () != iTerrainCell::Loaded)
       continue;
     bodies[i]->setUserPointer (dynamic_cast<CS::Collision2::iCollisionObject*> (body));
-    sector->bulletWorld->addRigidBody (bodies[i], body->collGroup.value, body->collGroup.group);
+    sector->bulletWorld->addRigidBody (bodies[i], body->collGroup.value, body->collGroup.mask);
   }
 }
 }

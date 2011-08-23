@@ -1,3 +1,21 @@
+/*
+  Copyright (C) 2011 by Liu Lu
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #ifndef __CS_BULLET_PHYSICS_H__
 #define __CS_BULLET_PHYSICS_H__
 
@@ -41,12 +59,12 @@ class csBulletJoint;
 
 struct CollisionPortal
 {
-  iPortal* portal;
   csOrthoTransform warpTrans;
-  csBulletSector*  desSector;
-  btGhostObject* ghostPortal;
   csRefArray<csBulletCollisionObject> objects;
   csArray<csOrthoTransform> oldTrans;
+  iPortal* portal;
+  csBulletSector*  desSector;
+  btGhostObject* ghostPortal;
 
   CollisionPortal (iPortal* portal) : portal (portal), desSector (NULL), ghostPortal (NULL) {}
   ~CollisionPortal () {
@@ -73,35 +91,6 @@ class csBulletSector : public scfImplementationExt3<
   friend class csBulletMotionState;
   friend class csBulletSystem;
 
-  csRef<iSector> sector;
-  csBulletSystem* sys;
-  csVector3 gravity;
-  csRefArrayObject<csBulletCollisionObject> collisionObjects;
-  csRefArrayObject<csBulletRigidBody> rigidBodies;
-  csRefArrayObject<csBulletSoftBody> softBodies;
-  csWeakRefArray<csBulletSoftBody> anchoredSoftBodies;
-  csRef<csBulletCollisionActor> collisionActor;
-  csRefArray<csBulletJoint> joints;
-  csArray<CollisionPortal*> portals;
-  csBulletDebugDraw* debugDraw;
-  btDynamicsWorld* bulletWorld;
-  btCollisionDispatcher* dispatcher;
-  btDefaultCollisionConfiguration* configuration;
-  btSequentialImpulseConstraintSolver* solver;
-  btBroadphaseInterface* broadphase;
-  btSoftBodyWorldInfo* softWorldInfo;
-
-  bool isSoftWorld;
-
-  float worldTimeStep;
-  size_t worldMaxSteps;
-  float linearDampening;
-  float angularDampening;
-
-  float linearDisableThreshold;
-  float angularDisableThreshold;
-  float timeDisableThreshold;
-
   class CollisionGroupVector : public csArray<CS::Collision2::CollisionGroup>
   {
   public:
@@ -119,19 +108,45 @@ class csBulletSector : public scfImplementationExt3<
   };
 
   CollisionGroupVector collGroups;
-  CS::Collision2::CollisionGroupMask allFilter; 
+  csRefArray<csBulletJoint> joints;
+  csArray<CollisionPortal*> portals;
+  csRefArrayObject<csBulletCollisionObject> collisionObjects;
+  csRefArrayObject<csBulletRigidBody> rigidBodies;
+  csRefArrayObject<csBulletSoftBody> softBodies;
+  csWeakRefArray<csBulletSoftBody> anchoredSoftBodies;
+  csRef<csBulletCollisionActor> collisionActor;
+  csRef<iSector> sector;
+
+  csVector3 gravity;
+  btGhostObject* hitPortal;
+  csBulletSystem* sys;
+  csBulletDebugDraw* debugDraw;
+  btDynamicsWorld* bulletWorld;
+  btCollisionDispatcher* dispatcher;
+  btDefaultCollisionConfiguration* configuration;
+  btSequentialImpulseConstraintSolver* solver;
+  btBroadphaseInterface* broadphase;
+  btSoftBodyWorldInfo* softWorldInfo;
+
   int systemFilterCount;
 
-  btGhostObject* hitPortal;
+  float linearDampening;
+  float angularDampening;
+
+  float linearDisableThreshold;
+  float angularDisableThreshold;
+  float timeDisableThreshold;
+  float worldTimeStep;
+  size_t worldMaxSteps;
+
+  CS::Collision2::CollisionGroupMask allFilter; 
+  bool isSoftWorld;
 
   void CheckCollisions();
-
   void UpdateCollisionPortals ();
-
   void SetInformationToCopy (csBulletCollisionObject* obj, csBulletCollisionObject* cpy,
     const csOrthoTransform& warpTrans);
-
-  void GetInformationFromCopy (csBulletCollisionObject* obj, csBulletCollisionObject* cpy, float duration);
+  void GetInformationFromCopy (csBulletCollisionObject* obj, csBulletCollisionObject* cpy);
 
 public:
   csBulletSector (csBulletSystem* sys);

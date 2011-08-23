@@ -1,3 +1,21 @@
+/*
+  Copyright (C) 2011 by Liu Lu
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #include "cssysdef.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/transfrm.h"
@@ -19,7 +37,7 @@
 CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
 csBulletSoftBody::csBulletSoftBody (csBulletSystem* phySys, btSoftBody* body)
-  :scfImplementationType (this, phySys), btBody (body), setTrans (false),
+  :scfImplementationType (this, phySys), btBody (body),
   friction (5.0f), density (0.1f)
 {
   btObject = body;
@@ -35,12 +53,10 @@ csBulletSoftBody::~csBulletSoftBody ()
 
 void csBulletSoftBody::SetTransform (const csOrthoTransform& trans)
 {
-  if (!setTrans)
-  {
-    transform = CSToBullet (trans, system->getInternalScale ());
-    btBody->transform (transform);
-    setTrans = true;
-  }
+  btTransform btTrans = CSToBullet (trans, system->getInternalScale ());
+  btTransform t = transform.inverse () * btTrans;
+  transform = btTrans;
+  btBody->transform (t);
 }
 
 csOrthoTransform csBulletSoftBody::GetTransform ()
@@ -102,6 +118,8 @@ void csBulletSoftBody::RemoveBulletObject ()
 {
   if (insideWorld)
   {
+    for (size_t i = 0; i < joints.GetSize (); i++)
+      sector->RemoveJoint (joints[i]);
     btSoftRigidDynamicsWorld* softWorld =
       static_cast<btSoftRigidDynamicsWorld*> (sector->bulletWorld);
     softWorld->removeSoftBody (btBody);
@@ -117,7 +135,7 @@ void csBulletSoftBody::AddBulletObject ()
     btSoftRigidDynamicsWorld* softWorld =
       static_cast<btSoftRigidDynamicsWorld*> (sector->bulletWorld);
 
-    softWorld->addSoftBody (btBody, collGroup.value, collGroup.group);
+    softWorld->addSoftBody (btBody, collGroup.value, collGroup.mask);
     btBody->setUserPointer (static_cast<CS::Collision2::iCollisionObject*> (
       dynamic_cast<iPhysicalBody*>(this)));
     insideWorld = true;

@@ -1,3 +1,21 @@
+/*
+  Copyright (C) 2011 by Liu Lu
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #ifndef __CS_BULLET_SOFTBODY_H__
 #define __CS_BULLET_SOFTBODY_H__
 
@@ -9,8 +27,6 @@ class btSoftBody;
 
 CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
-//using CS::Physics2::iRigidBody;
-using CS::Physics2::iPhysicalBody;
 
 class csBulletSoftBody : public scfImplementationExt2<csBulletSoftBody, 
   csBulletCollisionObject, CS::Physics2::iSoftBody,
@@ -18,13 +34,9 @@ class csBulletSoftBody : public scfImplementationExt2<csBulletSoftBody,
 {
   friend class csBulletRigidBody;
   friend class csBulletJoint;
+  friend class csBulletSector;
 private:
-  //CS::Physics2::Bullet::BodyType bodyType;
-  float friction;
-  float density;
-  float totalMass;
-  bool setTrans;
-  btSoftBody* btBody;   //Don't know if I should add this to rigidbody too.
+
   struct AnimatedAnchor
   {
     AnimatedAnchor (size_t vertexIndex, CS::Physics2::iAnchorAnimationControl* controller)
@@ -34,7 +46,12 @@ private:
     csRef<CS::Physics2::iAnchorAnimationControl> controller;
     btVector3 position;
   };
+
   csArray<AnimatedAnchor> animatedAnchors;
+  float friction;
+  float density;
+  float totalMass;
+  btSoftBody* btBody;  
 
 public:
   csBulletSoftBody (csBulletSystem* phySys, btSoftBody* body);
@@ -42,8 +59,8 @@ public:
 
   virtual iObject* QueryObject (void) { return (iObject*) this; }
   //iCollisionObject
-  virtual iCollisionObject* QueryCollisionObject () {return dynamic_cast<csBulletCollisionObject*> (this);}  
-  virtual iPhysicalBody* QueryPhysicalBody () {return this;}
+  virtual CS::Collision2::iCollisionObject* QueryCollisionObject () {return dynamic_cast<csBulletCollisionObject*> (this);}  
+  virtual CS::Physics2::iPhysicalBody* QueryPhysicalBody () {return this;}
 
   virtual void SetObjectType (CS::Collision2::CollisionObjectType type, bool forceRebuild = true) {}
   virtual CS::Collision2::CollisionObjectType GetObjectType ()

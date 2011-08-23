@@ -1,3 +1,21 @@
+/*
+  Copyright (C) 2011 by Liu Lu
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #ifndef __CS_BULLET_JOINT_H__
 #define __CS_BULLET_JOINT_H__
 
@@ -9,7 +27,12 @@ class btGeneric6DofConstraint;
 
 CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
-using CS::Physics2::iPhysicalBody;
+#define JOINT_SOFT 1
+#define JOINT_SPRING 2
+#define JOINT_POSITION 4
+#define JOINT_TRANSFORM 8
+#define JOINT_EQUIL_POINT 16
+#define JOINT_INSIDE_WORLD 32
 
 enum csJointType
 {
@@ -29,31 +52,7 @@ class csBulletJoint : public scfImplementation1<
   friend class csBulletSystem;
   friend class csBulletSector;
 private:
-  csBulletSystem* sys;
-  csBulletSector* sector;
-  csJointType type;
-  btTypedConstraint* rigidJoint;
-  btSoftBody::Joint* softJoint;
-  iPhysicalBody* bodies[2];
-  btTransform frA, frB;
-  bool transConstraintX;
-  bool transConstraintY;
-  bool transConstraintZ;
-  btVector3 minDist;
-  btVector3 maxDist;
-
-  bool rotConstraintX;
-  bool rotConstraintY;
-  bool rotConstraintZ;
-  csVector3 minAngle;
-  csVector3 maxAngle;
-
-  csVector3 bounce;
-  csVector3 desiredVelocity;
-  btVector3 maxforce;
-
-  int axis;
-  float threshold;
+  csOrthoTransform transform;
   csVector3 linearStiff;
   csVector3 angularStiff;
   csVector3 linearDamp;
@@ -61,15 +60,34 @@ private:
   csVector3 linearEquilPoint;
   csVector3 angularEquilPoint;
 
-  csOrthoTransform transform;
   csVector3 position;
+  csVector3 minAngle;
+  csVector3 maxAngle;
 
-  bool isSoft;
-  bool isSpring;
-  bool positionSet;
-  bool transformSet;
-  bool equilPointSet;
-  bool insideWorld;
+  csVector3 bounce;
+  csVector3 desiredVelocity;
+  btVector3 maxforce;
+  btTransform frA, frB;
+  btVector3 minDist;
+  btVector3 maxDist;
+  csJointType type;
+  csBulletSystem* sys;
+  csBulletSector* sector;
+  btTypedConstraint* rigidJoint;
+  btSoftBody::Joint* softJoint;
+  iPhysicalBody* bodies[2];
+  float threshold;
+  int axis;
+
+  bool transConstraintX;
+  bool transConstraintY;
+  bool transConstraintZ;
+
+  bool rotConstraintX;
+  bool rotConstraintY;
+  bool rotConstraintZ;
+
+  char jointFlag;
 
 public:
   csBulletJoint (csBulletSystem* system);
@@ -77,10 +95,10 @@ public:
 
   void SetType (csJointType type) {this->type = type;}
 
-  virtual void Attach (iPhysicalBody* body1, iPhysicalBody* body2,
+  virtual void Attach (CS::Physics2::iPhysicalBody* body1, CS::Physics2::iPhysicalBody* body2,
     bool forceUpdate = true);
 
-  virtual iPhysicalBody* GetAttachedBody (int index)
+  virtual CS::Physics2::iPhysicalBody* GetAttachedBody (int index)
   {
     CS_ASSERT (index >= 0 && index <= 1);
     return bodies[index];

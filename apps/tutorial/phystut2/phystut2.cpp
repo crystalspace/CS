@@ -182,7 +182,7 @@ void Simple::Frame ()
     view->GetCamera ()->GetTransform ().SetOrigin
     (cameraBody->GetTransform ().GetOrigin ());
   if (physicalCameraMode == CAMERA_ACTOR)
-    cameraActor->UpdateAction (speed);
+    cameraActor->UpdateAction (speed / dynamicSpeed);
 
   // Update the demo's state information
   hudManager->GetStateDescriptions ()->Empty ();
@@ -509,6 +509,11 @@ bool Simple::OnKeyboard (iEvent &event)
             //room->GetMeshes ()->Remove (clipboardMovable->GetSceneNode ()->QueryMesh ());
           }
         }
+        else
+        {
+          CS::Physics2::iSoftBody* softBody = clipboardBody->QuerySoftBody ();
+          physicalSector->RemoveSoftBody (softBody);
+        }
 
         // Update the display of the dynamics debugger
         //dynamicsDebugger->UpdateDisplay ();
@@ -531,11 +536,18 @@ bool Simple::OnKeyboard (iEvent &event)
       newPosition.Normalize ();
       csOrthoTransform newTransform = camera->GetTransform ();
       newTransform.SetOrigin (newTransform.GetOrigin () + newPosition * 1.5f);
-      clipboardBody->SetTransform (newTransform);
 
       // Put back the body from the clipboard to the simulation
       if (clipboardBody->GetBodyType () == CS::Physics2::BODY_RIGID)
+      {
+        clipboardBody->SetTransform (newTransform);
         physicalSector->AddRigidBody (clipboardBody->QueryRigidBody ());
+      }
+      else
+      {
+        CS::Physics2::iSoftBody* softBody = clipboardBody->QuerySoftBody ();
+        physicalSector->AddSoftBody (softBody);
+      }
 
       clipboardBody = 0;
       clipboardMovable = 0;
@@ -1568,7 +1580,7 @@ CS::Physics2::iRigidBody* Simple::SpawnCompound (bool setVelocity /* = true */)
 
 CS::Physics2::iJoint* Simple::SpawnJointed ()
 {
-#define CONETWIST
+#define SOFT_ANGULAR
 
 #ifdef P2P
   // Create and position two rigid bodies
@@ -1688,8 +1700,8 @@ CS::Physics2::iJoint* Simple::SpawnJointed ()
   //Or you can attach it with a softbody.
   CS::Physics2::iSoftBody* rb2 = SpawnSoftBody (false);
   // SetTransform can only be called once in iSoftBody. And this is a local transform.
-  csOrthoTransform trans;
-  trans.SetOrigin (csVector3 (0.0f,1.0f,-0.5f));
+  csOrthoTransform trans = rb2->GetTransform ();
+  trans.SetOrigin (trans.GetOrigin () + csVector3 (0.0f,1.0f,-0.5f));
   rb2->SetTransform (trans);
   bulletSoftBody = scfQueryInterface<CS::Physics2::Bullet2::iSoftBody> (rb2);
   bulletSoftBody->ResetCollisionFlag ();
