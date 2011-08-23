@@ -1,5 +1,5 @@
 #include <cssysdef.h>
-#include "thoggMediaContainer.h"
+#include "theoramediacontainer.h"
 #include <iutil/objreg.h>
 #include <iutil/plugin.h>
 

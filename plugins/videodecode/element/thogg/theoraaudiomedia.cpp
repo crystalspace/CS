@@ -1,5 +1,5 @@
 #include <cssysdef.h>
-#include "thoggAudioMedia.h"
+#include "theoraaudiomedia.h"
 #include <iutil/objreg.h>
 #include <iutil/plugin.h>
 

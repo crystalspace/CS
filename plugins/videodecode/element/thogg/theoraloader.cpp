@@ -1,5 +1,5 @@
 #include <cssysdef.h>
-#include "thoggLoader.h"
+#include "theoraloader.h"
 #include <iutil/objreg.h>
 #include <iutil/plugin.h>
 #include <iostream>

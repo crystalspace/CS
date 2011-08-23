@@ -189,7 +189,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\plugins\videodecode\persist\standard\vplParser.cpp"
+				RelativePath="..\..\..\plugins\videodecode\persist\standard\vplparser.cpp"
 				>
 			</File>
 		</Filter>
@@ -199,7 +199,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\plugins\videodecode\persist\standard\vplParser.h"
+				RelativePath="..\..\..\plugins\videodecode\persist\standard\vplparser.h"
 				>
 			</File>
 		</Filter>

@@ -30,8 +30,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <csutil/array.h>
 
 #include "vorbis/codec.h"
-#include "thoggVideoMedia.h"
-#include "thoggAudioMedia.h"
+#include "theoravideomedia.h"
+#include "theoraaudiomedia.h"
 
 #define QUALIFIED_PLUGIN_NAME "crystalspace.vpl.element.thogg"
 

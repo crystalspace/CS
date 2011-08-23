@@ -193,19 +193,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggAudioMedia.cpp"
+				RelativePath="..\..\..\plugins\videodecode\element\thogg\theoraaudiomedia.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggLoader.cpp"
+				RelativePath="..\..\..\plugins\videodecode\element\thogg\theoraloader.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggMediaContainer.cpp"
+				RelativePath="..\..\..\plugins\videodecode\element\thogg\theoramediacontainer.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggVideoMedia.cpp"
+				RelativePath="..\..\..\plugins\videodecode\element\thogg\theoravideomedia.cpp"
 				>
 			</File>
 		</Filter>
@@ -215,19 +215,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggAudioMedia.h"
+				RelativePath="..\..\..\plugins\videodecode\element\thogg\theoraaudiomedia.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggLoader.h"
+				RelativePath="..\..\..\plugins\videodecode\element\thogg\theoraloader.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggMediaContainer.h"
+				RelativePath="..\..\..\plugins\videodecode\element\thogg\theoramediacontainer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\plugins\videodecode\element\thogg\thoggVideoMedia.h"
+				RelativePath="..\..\..\plugins\videodecode\element\thogg\theoravideomedia.h"
 				>
 			</File>
 		</Filter>
