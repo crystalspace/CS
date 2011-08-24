@@ -43,13 +43,13 @@ void csVplPlayer::InitializePlayer (csRef<iMediaContainer> media, size_t cacheSi
               "Media container is not valid!");
     return;
   }
-  else
-    _mediaFile = media;
+
+  _mediaFile = media;
 
   if (cacheSize<1)
     _mediaFile->SetCacheSize (1);
-  else;
-  _mediaFile->SetCacheSize (cacheSize);
+  else
+    _mediaFile->SetCacheSize (cacheSize);
 
   CS_INITIALIZE_FRAME_EVENT_SHORTCUTS (_object_reg);
   csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (_object_reg));
@@ -130,7 +130,6 @@ THREADED_CALLABLE_IMPL(csVplPlayer, Update)
       {
         // Stop playing
         _playing=false;
-        // Seek back to the beginning of the stream
       }
       if (_mediaFile.IsValid ())
       {
@@ -138,6 +137,7 @@ THREADED_CALLABLE_IMPL(csVplPlayer, Update)
         {
           if (_shouldLoop) 
           {
+            // Seek back to the beginning of the stream
             Seek (0.0f);
             _mediaFile->Update ();
             _playing=true;
@@ -172,6 +172,7 @@ void csVplPlayer::Play ()
   }
 
   _playing=true;
+
   if (_mediaFile.IsValid ())
   {
     _mediaFile->OnPlay ();
