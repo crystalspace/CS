@@ -115,7 +115,6 @@ void csVplPlayer::SelectLanguage (const char* identifier)
     _mediaFile->SelectLanguage (identifier);
 }
 
-//void vplPlayer::Update ()
 THREADED_CALLABLE_IMPL(csVplPlayer, Update)
 {
   while (_shouldUpdate)
@@ -125,7 +124,6 @@ THREADED_CALLABLE_IMPL(csVplPlayer, Update)
       Play ();
       _shouldPlay=false;
     }
-//    csTicks start=csGetTicks ();
     if (_playing)
     {
       if (_shouldStop)

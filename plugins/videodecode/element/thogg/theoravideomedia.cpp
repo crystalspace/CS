@@ -287,8 +287,6 @@ void csTheoraVideoMedia::Convert ()
 
   int y_offset= (_streamInfo.pic_x&~1)+_currentData.yuv[0].stride* (_streamInfo.pic_y&~1);
 
-//  uint8* pixels = _rgbBuff; 
-
   int Y,U,V,R,G,B;
   // 4:2:0 pixel format
   if (_streamInfo.pixel_fmt==TH_PF_420)
@@ -303,9 +301,6 @@ void csTheoraVideoMedia::Convert ()
         U = (_currentData.yuv[1].data+uv_offset+_currentData.yuv[1].stride* (y/2))[x/2] ;//- 128;
         V = (_currentData.yuv[2].data+uv_offset+_currentData.yuv[2].stride* (y/2))[x/2] ;//- 128;
 
-        /* int R = ((298*Y + 409*V + 128)>>8);
-        int G = ((298*Y - 100*U - 208*V + 128)>>8);
-        int B = ((298*Y + 516*U + 128)>>8);*/
         R = (Ylut[Y] + RVlut[V])>>8;
         G = (Ylut[Y] - GUlut[U] - GVlut[V])>>8;
         B = (Ylut[Y] + BUlut[U])>>8;

@@ -185,10 +185,6 @@ void TheoraMediaContainer::Update ()
         _waitToFillCache=false;
       }
 
-    /*if (ok==0 && !_waitToFillCache && !canWrite)
-    {
-      //canSwap=true;
-    }*/
     if (!_waitToFillCache && !_canWrite && dataAvailable)
     {
       if ( (csGetTicks () - lastTime) >= (frameTime) && ( (csGetTicks () - lastTime) < (frameTime+100)))
@@ -336,7 +332,8 @@ void TheoraMediaContainer::DoSeek ()
   if (frame != -1)
     _activeTheoraStream->SeekPage (std::max ( (long)0,frame),false,&_syncState,_fileSize);
 
-//  float time= ( (float) targetFrame/_activeTheoraStream->GetFrameCount ()) *_activeTheoraStream->GetLength ();
+  // In case audio from video file is implemented later on, seek to this time
+  //float time= ( (float) targetFrame/_activeTheoraStream->GetFrameCount ()) *_activeTheoraStream->GetLength ();
 
 
   // skip to the frame we need
