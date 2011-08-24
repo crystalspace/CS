@@ -57,7 +57,7 @@ public:
   // iPanel
   virtual wxWindow* GetWindow ();
   virtual const wxChar* GetCaption () const;
-  virtual int GetDefaultDockPosition () const;
+  virtual PanelDockPosition GetDefaultDockPosition () const;
 
 private:
   iObjectRegistry* object_reg;

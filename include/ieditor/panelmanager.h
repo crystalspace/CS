@@ -25,6 +25,8 @@
 #include <wx/string.h>
 
 class wxWindow;
+class wxMenu;
+class wxMenuBar;
 
 namespace CS {
 namespace EditorApp {
@@ -48,14 +50,14 @@ struct iPanel : public virtual iBase
 {
   SCF_INTERFACE (iPanel, 0, 0, 1);
 
-  /// Get the wxWindow for the content area of the panel.
+  /// Get the underlying wxWindow content area of this panel.
   virtual wxWindow* GetWindow () = 0;
 
-  /// Get the caption that will be shown in the titlebar of the panel.
+  /// Get the caption that will be shown in the titlebar of this panel.
   virtual const wxChar* GetCaption () const = 0;
 
-  /// Get the default position to dock the panel.
-  virtual int GetDefaultDockPosition () const = 0;
+  /// Get the default position to dock this panel.
+  virtual PanelDockPosition GetDefaultDockPosition () const = 0;
 };
 
 
@@ -64,16 +66,7 @@ struct iPanel : public virtual iBase
  */
 struct iPanelManager : public virtual iBase
 {
-  SCF_INTERFACE (iPanelManager, 0, 0, 1);
-  
-  /// Call when the managed window is being destroyed.
-  virtual void Uninitialize () = 0;
-  
-  /// Get the window currently being managed by the panel manager.
-  virtual wxWindow* GetManagedWindow () = 0;
-  
-  /// Set the window to be managed by the panel manager.
-  virtual void SetManagedWindow (wxWindow* managedWindow) = 0;
+  SCF_INTERFACE (iPanelManager, 0, 1, 0);
   
   /**
    * Add a panel to the panel manager.
@@ -87,7 +80,7 @@ struct iPanelManager : public virtual iBase
    */
   virtual void RemovePanel (iPanel* panel) = 0;
 
-  /// Set whether or not the panel should be visible.
+  /// Set whether or not the given panel should be visible.
   virtual void SetPanelVisible (iPanel* panel, bool visible) = 0;
 
   // TODO: Maybe a GetIterator() function?

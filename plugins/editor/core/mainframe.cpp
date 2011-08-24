@@ -42,23 +42,9 @@
 
 #include "ieditor/action.h"
 
-namespace CS {
-namespace EditorApp {
-
-enum
+CS_PLUGIN_NAMESPACE_BEGIN(CSE)
 {
-  ID_Quit = wxID_EXIT,
-  ID_Open = wxID_OPEN,
-  ID_Save = wxID_SAVE,
-  ID_Undo = wxID_UNDO,
-  ID_Redo = wxID_REDO,
-  ID_MoveTool = wxID_HIGHEST + 2000,
-  ID_RotateTool,
-  ID_ScaleTool,
-  ID_ToolBar,
-  ID_ImportLibrary,
-};
-  
+
 BEGIN_EVENT_TABLE (MainFrame, wxFrame)
   EVT_MENU (ID_Open, MainFrame::OnOpen)
   EVT_MENU (ID_Save, MainFrame::OnSave)
@@ -71,6 +57,7 @@ BEGIN_EVENT_TABLE (MainFrame, wxFrame)
   EVT_MENU (ID_MoveTool, MainFrame::OnMoveTool)
   EVT_MENU (ID_ScaleTool, MainFrame::OnScaleTool)
   EVT_MENU (ID_RotateTool, MainFrame::OnRotateTool)
+  
 END_EVENT_TABLE ()
 
 //#include "data/editor/images/trans/move_on.xpm"
@@ -80,8 +67,10 @@ END_EVENT_TABLE ()
 //#include "data/editor/images/trans/scale_on.xpm"
 #include "data/editor/images/trans/scale_off.xpm"
 
-MainFrame::MainFrame (const wxString& title, const wxPoint& pos, const wxSize& size)
-: wxFrame (NULL, -1, title, pos, size), loadingResource (nullptr)
+MainFrame::MainFrame (iObjectRegistry* object_reg, Editor* editor,
+		      const wxString& title, const wxPoint& pos, const wxSize& size)
+: wxFrame (NULL, -1, title, pos, size), object_reg (object_reg), editor (editor),
+  loadingResource (nullptr), pump (nullptr)
 {
   wxMenu* fileMenu = new wxMenu ();
 
@@ -100,6 +89,7 @@ MainFrame::MainFrame (const wxString& title, const wxPoint& pos, const wxSize& s
   menuBar->Append (editMenu, wxT("&Edit"));
 
   SetMenuBar (menuBar);
+  menuBar->Reparent (this);
 
   statusBar = new StatusBar (this);
   SetStatusBar (statusBar);
@@ -124,6 +114,15 @@ MainFrame::MainFrame (const wxString& title, const wxPoint& pos, const wxSize& s
   delete moveoff;
   delete rotoff;
   delete scaleoff;
+
+  actionManager = csQueryRegistry<iActionManager> (object_reg);
+  if (actionManager)
+  {
+    actionListener.AttachNew (new MainFrame::ActionListener (this));
+    actionManager->AddListener (actionListener);
+
+    UpdateEditMenu ();
+  }
 }
 
 MainFrame::~MainFrame ()
@@ -131,47 +130,22 @@ MainFrame::~MainFrame ()
   delete statusBar;
   delete pump;
   delete loadingResource;
-  
-  panelManager->Uninitialize ();
 }
 
-bool MainFrame::Initialize (iObjectRegistry* obj_reg, Editor* editor)
+bool MainFrame::Initialize ()
 {
-  object_reg = obj_reg;
-
-  this->editor = editor;
-  
-  panelManager = csQueryRegistry<iPanelManager> (object_reg);
-  if (!panelManager)
-    return false;
-  
-  panelManager->SetManagedWindow (this);
-
-  actionManager = csQueryRegistry<iActionManager> (object_reg);
-  if (!actionManager)
-    return false;
-
-  actionListener.AttachNew (new MainFrame::ActionListener (this));
-  actionManager->AddListener (actionListener);
-
-  UpdateEditMenu ();
-
-  return true;
-}
-
-bool MainFrame::SecondInitialize (iObjectRegistry* obj_reg)
-{
+/*
   if (!vfs)
     vfs = csQueryRegistry<iVFS> (object_reg);
   vfs->Mount ("/cseditor/", "$@data$/editor$/");
   vfs->ChDir ("/cseditor/sys/");
-  csRef<iLoader> loader = csQueryRegistry<iLoader> (obj_reg);
+  csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
   if (!loader)
     return false;
   
   loader->LoadLibraryFile ("arrows.lib");
   vfs->ChDir ("/");
-  
+*/  
   pump = new Pump(this);
   pump->Start (20);
 
@@ -378,7 +352,7 @@ void MainFrame::UpdateEditMenu ()
   const iAction* undo = actionManager->PeekUndo ();
   const iAction* redo = actionManager->PeekRedo ();
 
-  wxMenuBar* menuBar = GetMenuBar();
+  wxMenuBar* menuBar = GetMenuBar ();
   
   menuBar->Enable(ID_Undo, undo != 0);
   menuBar->Enable(ID_Redo, redo != 0);
@@ -392,5 +366,5 @@ void MainFrame::UpdateEditMenu ()
         + wxString(redo->GetDescription ()) + wxT("\"\tCtrl+Y"));
 }
 
-} // namespace EditorApp
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(CSE)

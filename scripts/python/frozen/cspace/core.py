@@ -1133,6 +1133,9 @@ class iVirtualClock(iBase):
     def Resume(*args): return _core.iVirtualClock_Resume(*args)
     def GetElapsedTicks(*args): return _core.iVirtualClock_GetElapsedTicks(*args)
     def GetCurrentTicks(*args): return _core.iVirtualClock_GetCurrentTicks(*args)
+    def GetElapsedMicroTicks(*args): return _core.iVirtualClock_GetElapsedMicroTicks(*args)
+    def GetElapsedSeconds(*args): return _core.iVirtualClock_GetElapsedSeconds(*args)
+    def GetCurrentMicroTicks(*args): return _core.iVirtualClock_GetCurrentMicroTicks(*args)
     scfGetVersion = staticmethod(_core.iVirtualClock_scfGetVersion)
     __swig_destroy__ = _core.delete_iVirtualClock
     __del__ = lambda self : None;

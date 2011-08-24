@@ -26,11 +26,11 @@
 #include "iutil/stringarray.h"
 #include "ivaria/collider.h"
 #include "ivideo/graph2d.h"
-
-#include <wx/textctrl.h>
+#include "ivideo/wxwin.h"
 
 #include "ieditor/panelmanager.h"
 #include "objectlist.h"
+#include "menubar.h"
 #include "auipanelmanager.h"
 #include "interfacewrappermanager.h"
 #include "actionmanager.h"
@@ -39,54 +39,24 @@
 
 #include "editor.h"
 
-namespace CS {
-namespace EditorApp {
+CS_PLUGIN_NAMESPACE_BEGIN(CSE)
+{
 
-Editor::Editor ()
-  : scfImplementationType (this), helper_meshes (0), transstatus (NOTHING)
+SCF_IMPLEMENT_FACTORY (Editor)
+
+Editor::Editor (iBase* parent)
+: scfImplementationType (this, parent), helper_meshes (0), transstatus (NOTHING)
 {
 }
 
 Editor::~Editor ()
 {
   delete helper_meshes;
+
+  panelManager->Uninitialize ();
+
   // Remove ourself from object registry
   object_reg->Unregister (this, "iEditor");
-}
-
-bool Editor::Initialize (iObjectRegistry* reg)
-{
-  object_reg = reg;
-
-  // Check for commandline help.
-  if (csCommandLineHelper::CheckHelp (object_reg))
-  {
-    Help ();
-    return true;
-  }
-
-  selection.AttachNew (new ObjectList ());
-  objects.AttachNew (new ObjectList ());
-
-  object_reg->Register (this, "iEditor");
-  
-  panelManager.AttachNew (new AUIPanelManager (object_reg));
-  interfaceManager.AttachNew (new InterfaceWrapperManager (object_reg));
-  actionManager.AttachNew (new ActionManager (object_reg));
-  
-  // Create the main frame
-  mainFrame = new MainFrame (wxT ("Crystal Space Editor"), wxDefaultPosition, wxSize (1024, 768));
-  mainFrame->Initialize (object_reg, this);
-
-  mainFrame->Show ();
-  
-  // Initialize CS and load plugins
-  if (!InitCS ())
-    return false;
-
-  mainFrame->SecondInitialize (object_reg);
-
-  return true;
 }
 
 void Editor::Help ()
@@ -117,13 +87,42 @@ void Editor::Help ()
      " files in it.");
 }
 
-bool Editor::InitCS ()
+bool Editor::Initialize (iObjectRegistry* reg)
+{
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (reg))
+  {
+    Help ();
+    return true;
+  }
+
+  object_reg = reg;
+  object_reg->Register (this, "iEditor");
+  
+  actionManager.AttachNew (new ActionManager (object_reg));
+  
+  // Create the main frame
+  mainFrame = new MainFrame (object_reg, this, wxT (""), wxDefaultPosition, wxSize (1024, 768));
+
+  menuBar.AttachNew (new MenuBar (object_reg, mainFrame->GetMenuBar ()));
+  mainFrame->Show ();
+  
+  panelManager.AttachNew (new AUIPanelManager (object_reg, mainFrame));
+  interfaceManager.AttachNew (new InterfaceWrapperManager (object_reg));
+
+  selection.AttachNew (new ObjectList ());
+  objects.AttachNew (new ObjectList ());
+
+  return true;
+}
+
+bool Editor::StartEngine ()
 {
   // Request every standard plugin except for OpenGL/WXGL canvas
   if (!csInitializer::RequestPlugins (object_reg,
         CS_REQUEST_VFS,
 	CS_REQUEST_PLUGIN ("crystalspace.graphics2d.wxgl", iGraphics2D),
-        CS_REQUEST_OPENGL3D,
+	CS_REQUEST_OPENGL3D,
         CS_REQUEST_ENGINE,
         CS_REQUEST_FONTSERVER,
         CS_REQUEST_IMAGELOADER,
@@ -137,6 +136,15 @@ bool Editor::InitCS ()
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
               "crystalspace.application.editor",
               "Can't initialize plugins!");
+    return false;
+  }
+
+  vfs = csQueryRegistry<iVFS> (object_reg);
+  if (!vfs)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+              "crystalspace.application.editor",
+              "Failed to locate iVFS plugin!");
     return false;
   }
 
@@ -159,27 +167,6 @@ bool Editor::InitCS ()
               "Failed to initialize iSaver plugin!");
     return false;
   }
-
-  // Load plugins
-  LoadPlugins ();
-  
-  // Open the main system. This will open all the previously loaded plug-ins.
-  if (!csInitializer::OpenApplication (object_reg))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-              "crystalspace.application.editor",
-              "Error opening system!");
-    return false;
-  }
-
-  vfs = csQueryRegistry<iVFS> (object_reg);
-  if (!vfs)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-              "crystalspace.application.editor",
-              "Failed to locate iVFS plugin!");
-    return false;
-  }
   
   loader = csQueryRegistry<iThreadedLoader> (object_reg);
   if (!loader)
@@ -199,7 +186,43 @@ bool Editor::InitCS ()
     return false;
   }
 
+  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
+  if (!g3d)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+              "crystalspace.application.editor",
+              "Failed to locate iGraphics3d!");
+    return false;
+  }
+
+  csRef<iWxWindow> wxwin = scfQueryInterface<iWxWindow> (g3d->GetDriver2D ());
+  if(!wxwin)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+              "crystalspace.application.editor",
+              "The drawing canvas is not a iWxWindow plugin!");
+    return false;
+  }
+  wxwin->SetParent (mainFrame);
+
+  return true;
+}
+
+bool Editor::StartApplication ()
+{
+  // Open the main system. This will open all the previously loaded plug-ins.
+  if (!csInitializer::OpenApplication (object_reg))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+              "crystalspace.application.editor",
+              "Error opening system!");
+    return false;
+  }
+
   mainCollection = engine->CreateCollection ("Main collection");
+
+  mainFrame->Initialize ();
+  panelManager->Initialize ();
 
   // Analyze the command line arguments
   csRef<iCommandLineParser> cmdline =
@@ -212,8 +235,8 @@ bool Editor::InitCS ()
   const char* realPath = cmdline->GetOption ("R");
   if (realPath)
   {
-    vfs->Mount ("/tmp/viewmesh", realPath);
-    //vfs->ChDir ("/tmp/viewmesh");
+    vfs->Mount ("/tmp/cseditor", realPath);
+    //vfs->ChDir ("/tmp/cseditor");
   }
 
   csString filename = cmdline->GetName (0);
@@ -237,29 +260,26 @@ bool Editor::InitCS ()
   return true;
 }
 
-void Editor::LoadPlugins ()
+bool Editor::LoadPlugin (const char* name)
 {
-  // TODO: Add additional plugin directories to scan, through settings system?
-  csRef<iStringArray> pluginClasses =
-    iSCF::SCF->QueryClassList ("crystalspace.editor.plugin.");
-  if (pluginClasses.IsValid())
-  {
-    csRef<iPluginManager> plugmgr =
-      csQueryRegistry<iPluginManager> (object_reg);
-    for (size_t i = 0; i < pluginClasses->GetSize (); i++)
-    {
-      const char* className = pluginClasses->Get (i);
-      csRef<iComponent> c (plugmgr->LoadPluginInstance (className,
-        iPluginManager::lpiInitialize | iPluginManager::lpiReportErrors
-          | iPluginManager::lpiLoadDependencies));
-      csRef<iBase> b = scfQueryInterface<iBase> (c);
+  csRef<iPluginManager> plugmgr =
+    csQueryRegistry<iPluginManager> (object_reg);
 
-      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-        "crystalspace.application.editor", "Attempt to load plugin '%s' %s",
-        className, b ? "successful" : "failed");
-      if (b) b->DecRef ();
-    }
-  };
+  csRef<iComponent> c (plugmgr->LoadPluginInstance (name,
+        iPluginManager::lpiInitialize | iPluginManager::lpiReportErrors
+        | iPluginManager::lpiLoadDependencies));
+  csRef<iBase> b = scfQueryInterface<iBase> (c);
+
+  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	    "crystalspace.application.editor", "Attempt to load plugin '%s' %s",
+	    name, b ? "successful" : "failed");
+  if (b)
+  {
+    b->DecRef ();
+    return true;
+  }
+
+  return false;
 }
 
 csPtr<iProgressMeter> Editor::GetProgressMeter ()
@@ -368,5 +388,5 @@ Editor::TransformStatus Editor::GetTransformStatus ()
   return transstatus;
 }
 
-} // namespace EditorApp
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(CSE)

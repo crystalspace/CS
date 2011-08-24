@@ -1,8 +1,8 @@
 /*
-  Copyright (C) 2010 Christian Van Brussel, Communications and Remote
-      Sensing Laboratory of the School of Engineering at the 
-      Universite catholique de Louvain, Belgium
-      http://www.tele.ucl.ac.be
+  Copyright (C) 2010 Christian Van Brussel, Institute of Information
+      and Communication Technologies, Electronics and Applied Mathematics
+      at Universite catholique de Louvain, Belgium
+      http://www.uclouvain.be/en-icteam.html
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -63,6 +63,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     inline virtual iSkeletonAnimNodeFactory* GetChildNode () const
     { return CS::Animation::SkeletonAnimNodeFactorySingle::GetChildNode (); }
 
+    inline virtual void SetRandomColor (bool random)
+    { boneRandomColor = random; }
+    inline virtual bool GetRandomColor () const
+    { return boneRandomColor; }
+
     //-- CS::Animation::SkeletonAnimNodeFactorySingle
     csPtr<CS::Animation::SkeletonAnimNodeSingleBase> ActualCreateInstance (
       CS::Animation::iSkeletonAnimPacket* packet, CS::Animation::iSkeleton* skeleton);
@@ -73,6 +78,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(DebugNode)
     bool boneMaskUsed;
     csBitArray boneMask;
     bool leafBonesDisplayed;
+    bool boneRandomColor;
 
     friend class DebugNode;
   };

@@ -124,24 +124,18 @@ void Simple::Frame ()
       // _camera's_ X axis (more on this in a second) and up and down
       // arrows cause the camera to go forwards and backwards.
       if (kbd->GetKeyState (CSKEY_RIGHT))
-	rotY += speed;
+	c->GetTransform ().RotateThis (csVector3 (0.0f, 1.0f, 0.0f), speed);
       if (kbd->GetKeyState (CSKEY_LEFT))
-	rotY -= speed;
+	c->GetTransform ().RotateThis (csVector3 (0.0f, 1.0f, 0.0f), -speed);
       if (kbd->GetKeyState (CSKEY_PGUP))
-	rotX -=speed;
+	c->GetTransform ().RotateThis (csVector3 (1.0f, 0.0f, 0.0f), -speed);
       if (kbd->GetKeyState (CSKEY_PGDN))
-	rotX += speed;
+	c->GetTransform ().RotateThis (csVector3 (1.0f, 0.0f, 0.0f), speed);
       if (kbd->GetKeyState (CSKEY_UP))
 	c->Move (CS_VEC_FORWARD * cameraSpeed * speed);
       if (kbd->GetKeyState (CSKEY_DOWN))
 	c->Move (CS_VEC_BACKWARD * cameraSpeed * speed);
     }
-
-    // We now assign a new rotation transformation to the camera.
-    csQuaternion quaternion;
-    quaternion.SetEulerAngles (csVector3 (rotX, rotY, rotZ));
-    csOrthoTransform ot (quaternion.GetConjugate ().GetMatrix (), c->GetTransform().GetOrigin ());
-    c->SetTransform (ot);
   }
 
   if (dragging)
@@ -1045,15 +1039,6 @@ void Simple::UpdateCameraMode ()
       {
 	dynamicSystem->RemoveBody (cameraBody);
 	cameraBody = 0;
-
-	// Update rotX, rotY, rotZ
-	csQuaternion quaternion;
-	quaternion.SetMatrix
-	  (((csReversibleTransform) view->GetCamera ()->GetTransform ()).GetT2O ());
-	csVector3 eulerAngles = quaternion.GetEulerAngles ();
-	rotX = eulerAngles.x;
-	rotY = eulerAngles.y;
-	rotZ = eulerAngles.z;
 
 	// Update the display of the dynamics debugger
 	dynamicsDebugger->UpdateDisplay ();

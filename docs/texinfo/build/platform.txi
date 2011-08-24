@@ -15,6 +15,7 @@ find a reference to it from within the instructions in this section.
 
 @menu
 * Unix::
+* Debian:: Specific instructions for Ubuntu and Debian based systems
 * MSVC7:: Microsoft Visual C++ 8 or 9
 * MinGW:: Windows using MinGW
 * Cygwin:: Windows using Cygwin
@@ -22,5 +23,6 @@ find a reference to it from within the instructions in this section.
 @end menu
 
 @importss{build,platform,unix.txi}
+@importss{build,platform,debian.txi}
 @importsss{build,platform,win32,win32.txi}
 @importss{build,platform,macosx.txi}

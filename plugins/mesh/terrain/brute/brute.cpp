@@ -32,7 +32,7 @@
 #include "csgfx/shadervarcontext.h"
 #include "cstool/rviewclipper.h"
 #include "csutil/csendian.h"
-#include "csutil/csmd5.h"
+#include "csutil/md5.h"
 #include "csutil/memfile.h"
 #include "csutil/util.h"
 #include "csutil/csstring.h"
@@ -1492,7 +1492,8 @@ char* csTerrainObject::GenerateCacheName ()
         strlen (sect->QueryObject ()->GetName ()));
   }
 
-  csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
+  CS::Utility::Checksum::MD5::Digest digest =
+    CS::Utility::Checksum::MD5::Encode (mf.GetData (), mf.GetSize ());
   csString hex(digest.HexString());
   return hex.Detach();
 }

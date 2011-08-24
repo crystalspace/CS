@@ -22,9 +22,14 @@
 #ifndef __FUR_INTERF_H__
 #define __FUR_INTERF_H__
 
-#include <csutil/scf.h>
+#include "csutil/scf.h"
+#include "ivideo/rendermesh.h"
 
-#include "crystalspace.h"
+class csVector3;
+struct iRigidBody;
+struct iSector;
+struct iTextureWrapper;
+struct iView;
 
 namespace CS {
 namespace Physics {
@@ -39,7 +44,15 @@ struct iDynamicSystem;
  * Fur mesh interface files
  */
 
-namespace CS {
+namespace CS
+{
+  namespace Mesh
+  {
+    struct iAnimatedMesh;
+    struct iAnimatedMeshFactory;
+    struct iAnimatedMeshSubMeshFactory;
+  } // namespace Mesh
+  
 namespace Animation {
 
 /**

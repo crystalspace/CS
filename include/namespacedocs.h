@@ -35,6 +35,12 @@ namespace CS
   {}
 
   /**
+   * Checksums and message digests
+   */
+  namespace Checksum
+  {}
+
+  /**
    * Container classes
    */
   namespace Container

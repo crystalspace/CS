@@ -20106,11 +20106,11 @@ fail:
 
 SWIGINTERN PyObject *_wrap_csGetMicroTicks(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  int64 result;
+  csMicroTicks result;
   
   if(!PyArg_UnpackTuple(args,(char *)"csGetMicroTicks",0,0)) SWIG_fail;
   result = csGetMicroTicks();
-  resultobj = SWIG_NewPointerObj((new int64(static_cast< const int64& >(result))), SWIGTYPE_p_int64_t, SWIG_POINTER_OWN |  0 );
+  resultobj = SWIG_NewPointerObj((new csMicroTicks(static_cast< const csMicroTicks& >(result))), SWIGTYPE_p_int64_t, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -28176,6 +28176,72 @@ SWIGINTERN PyObject *_wrap_iVirtualClock_GetCurrentTicks(PyObject *SWIGUNUSEDPAR
   arg1 = reinterpret_cast< iVirtualClock * >(argp1);
   result = (csTicks)((iVirtualClock const *)arg1)->GetCurrentTicks();
   resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iVirtualClock_GetElapsedMicroTicks(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iVirtualClock *arg1 = (iVirtualClock *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  csMicroTicks result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iVirtualClock_GetElapsedMicroTicks",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iVirtualClock, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iVirtualClock_GetElapsedMicroTicks" "', argument " "1"" of type '" "iVirtualClock const *""'"); 
+  }
+  arg1 = reinterpret_cast< iVirtualClock * >(argp1);
+  result = ((iVirtualClock const *)arg1)->GetElapsedMicroTicks();
+  resultobj = SWIG_NewPointerObj((new csMicroTicks(static_cast< const csMicroTicks& >(result))), SWIGTYPE_p_int64_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iVirtualClock_GetElapsedSeconds(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iVirtualClock *arg1 = (iVirtualClock *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  float result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iVirtualClock_GetElapsedSeconds",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iVirtualClock, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iVirtualClock_GetElapsedSeconds" "', argument " "1"" of type '" "iVirtualClock *""'"); 
+  }
+  arg1 = reinterpret_cast< iVirtualClock * >(argp1);
+  result = (float)(arg1)->GetElapsedSeconds();
+  resultobj = SWIG_From_float(static_cast< float >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iVirtualClock_GetCurrentMicroTicks(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iVirtualClock *arg1 = (iVirtualClock *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  csMicroTicks result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iVirtualClock_GetCurrentMicroTicks",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iVirtualClock, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iVirtualClock_GetCurrentMicroTicks" "', argument " "1"" of type '" "iVirtualClock const *""'"); 
+  }
+  arg1 = reinterpret_cast< iVirtualClock * >(argp1);
+  result = ((iVirtualClock const *)arg1)->GetCurrentMicroTicks();
+  resultobj = SWIG_NewPointerObj((new csMicroTicks(static_cast< const csMicroTicks& >(result))), SWIGTYPE_p_int64_t, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -60829,6 +60895,9 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iVirtualClock_Resume", _wrap_iVirtualClock_Resume, METH_VARARGS, NULL},
 	 { (char *)"iVirtualClock_GetElapsedTicks", _wrap_iVirtualClock_GetElapsedTicks, METH_VARARGS, NULL},
 	 { (char *)"iVirtualClock_GetCurrentTicks", _wrap_iVirtualClock_GetCurrentTicks, METH_VARARGS, NULL},
+	 { (char *)"iVirtualClock_GetElapsedMicroTicks", _wrap_iVirtualClock_GetElapsedMicroTicks, METH_VARARGS, NULL},
+	 { (char *)"iVirtualClock_GetElapsedSeconds", _wrap_iVirtualClock_GetElapsedSeconds, METH_VARARGS, NULL},
+	 { (char *)"iVirtualClock_GetCurrentMicroTicks", _wrap_iVirtualClock_GetCurrentMicroTicks, METH_VARARGS, NULL},
 	 { (char *)"iVirtualClock_scfGetVersion", _wrap_iVirtualClock_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iVirtualClock", _wrap_delete_iVirtualClock, METH_VARARGS, NULL},
 	 { (char *)"iVirtualClock_swigregister", iVirtualClock_swigregister, METH_VARARGS, NULL},
@@ -62248,7 +62317,7 @@ static swig_type_info _swigt__p_iVerbosityManager = {"_p_iVerbosityManager", "iV
 static swig_type_info _swigt__p_iVirtualClock = {"_p_iVirtualClock", "iVirtualClock *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int = {"_p_int", "int *|int32 *|scfInterfaceVersion *|int32_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int16_t = {"_p_int16_t", "int16 *|int16_t *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_int64_t = {"_p_int64_t", "int64_t *|int64 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_int64_t = {"_p_int64_t", "int64_t *|int64 *|csMicroTicks *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int8_t = {"_p_int8_t", "int8 *|int8_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_intptr_t = {"_p_intptr_t", "intptr_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_long_long = {"_p_long_long", "longlong *|long long *", 0, 0, (void*)0, 0};

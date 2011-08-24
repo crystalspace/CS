@@ -79,10 +79,11 @@ AC_DEFUN([CS_CHECK_COMMON_TOOLS_RELAYTOOL],
 	    [enable_relaytool=yes])
     AS_IF([test "$enable_relaytool" != "no"],
 	[CS_PATH_TOOL([RELAYTOOL], [relaytool], [], [$1])
-	CS_CHECK_PROGS([BASH], [bash])
-	AS_IF([test -n "$BASH"],
-	    [CS_EMIT_BUILD_PROPERTY([CMD.RELAYTOOL],
-	        [$BASH $RELAYTOOL], [atomic], [], [$2])])])])
+	AS_IF([test -n "$RELAYTOOL"],
+	    [CS_CHECK_PROGS([BASH], [bash])
+	    AS_IF([test -n "$BASH"],
+		[CS_EMIT_BUILD_PROPERTY([CMD.RELAYTOOL],
+		    [$BASH $RELAYTOOL], [atomic], [], [$2])])])])])
 
 
 #------------------------------------------------------------------------------

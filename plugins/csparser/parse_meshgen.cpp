@@ -94,6 +94,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           meshgen->SetSampleBox (b);
         }
         break;
+      case XMLTOKEN_DEFAULTDENSITY:
+        meshgen->SetDefaultDensityFactor (child->GetContentsValueAsFloat ());
+	break;
       case XMLTOKEN_DENSITYFACTORMAP:
 	{
 	  if (!LoadMeshGenDensityFactorMap (child, meshgen))
@@ -256,6 +259,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       case XMLTOKEN_WINDSPEED:
         geom->SetWindSpeed(child->GetContentsValueAsFloat ());
         break;
+      case XMLTOKEN_MINDRAWDIST:
+        geom->SetMinimumDrawDistance(child->GetContentsValueAsFloat ());
+        break;
+      case XMLTOKEN_MINOPAQUEDIST:
+        geom->SetMinimumOpaqueDistance(child->GetContentsValueAsFloat ());
+        break;
+      case XMLTOKEN_MAXOPAQUEDIST:
+        geom->SetMaximumOpaqueDistance(child->GetContentsValueAsFloat ());
+        break;
       default:
         SyntaxService->ReportBadToken (child);
         return false;
@@ -300,6 +312,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 	  if (!image)
 	    // LoadImageTC reported error
 	    return false;
+	}
+	break;
+      case XMLTOKEN_SCALE:
+	{
+	  float w = child->GetAttributeValueAsFloat ("w");
+	  float h = child->GetAttributeValueAsFloat ("h");
+	  if (w <= 0.0f || h <= 0.0f)
+	  {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.meshgen",
+              child, "Bad values for 'w' and 'h' in 'scale'. Should be > 0!");
+	    return false;
+	  }
+	  float ox = child->GetAttributeValueAsFloat ("offsetx");
+	  float oy = child->GetAttributeValueAsFloat ("offsety");
+	  world2map.Set (CS::Math::Matrix4 ());
+	  world2map.m11 = 1.0f / w;
+	  world2map.m23 = -1.0f / h;
+	  world2map.m14 = 0.5 - world2map.m11 + ox;
+	  world2map.m24 = 0.5 + world2map.m11 + oy;
+	  world2map_given = true;
 	}
 	break;
       case XMLTOKEN_WORLD2IMAGE:

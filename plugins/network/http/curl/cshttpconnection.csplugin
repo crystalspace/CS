@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- cshttpaccess.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.network.factory.http</name>
+        <implementation>HTTPConnectionFactory</implementation>
+        <description>CS HTTP Connection Plugin</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

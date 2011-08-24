@@ -51,6 +51,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
     /// Create a new factory
     virtual csPtr<iMeshObjectFactory> NewFactory ();
+
+  public:
+    iObjectRegistry* object_reg;
   };
 
 
@@ -284,9 +287,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     }
     /** @} */
 
-  private:
+  public:
     ParticlesMeshObjectType* objectType;
 
+  private:
     //-- Needed only for iMeshObjectFactory
     csFlags flags;
     iMeshFactoryWrapper* factoryWrapper;
@@ -637,8 +641,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     
   private:
     friend class ParticlesMeshFactory;
+
+  public:
     ParticlesMeshFactory* factory;
 
+  private:
     iVertexSetup* vertexSetup; //Helper object
 
     // For delayed advance.

@@ -33,6 +33,7 @@
 #include "csutil/csendian.h"
 #include "csutil/documenthelper.h"
 #include "csutil/stringarray.h"
+#include "csutil/stringquote.h"
 
 #include "shader.h"
 #include "shadertech.h"
@@ -46,7 +47,7 @@ CS_LEAKGUARD_IMPLEMENT (csXMLShaderTech);
 /* Magic value for tech + pass cache files.
  * The most significant byte serves as a "version", increase when the
  * cache file format changes. */
-static const uint32 cacheFileMagic = 0x09747863;
+static const uint32 cacheFileMagic = 0x0a747863;
 
 //---------------------------------------------------------------------------
 
@@ -638,6 +639,36 @@ bool csXMLShaderTech::ParseModes (ShaderPass* pass,
     }
   }
 
+  csRef<iDocumentNode> nodeAlphaTestOptions = node->GetNode ("alphatestoptions");
+  if (nodeAlphaTestOptions != 0)
+  {
+    csRef<iDocumentAttribute> funcAttr = nodeAlphaTestOptions->GetAttribute ("func");
+    if (funcAttr)
+    {
+      const char* func = funcAttr->GetValue();
+      if ((strcasecmp (func, "greater") == 0) || (strcasecmp (func, "gt") == 0))
+	pass->alphaTestOpt.func = CS::Graphics::atfGreater;
+      else if ((strcasecmp (func, "greater_equal") == 0) || (strcasecmp (func, "ge") == 0))
+	pass->alphaTestOpt.func = CS::Graphics::atfGreaterEqual;
+      else if ((strcasecmp (func, "lower") == 0) || (strcasecmp (func, "lt") == 0))
+	pass->alphaTestOpt.func = CS::Graphics::atfLower;
+      else if ((strcasecmp (func, "lower_equal") == 0) || (strcasecmp (func, "le") == 0))
+	pass->alphaTestOpt.func = CS::Graphics::atfLowerEqual;
+      else
+      {
+	parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+	  nodeAlphaTestOptions,
+	  "Shader %s, pass %d: unknown alpha test function %s",
+	  CS::Quote::Single (parent->GetName ()),
+	  GetPassNumber (pass),
+	  CS::Quote::Double (func));
+      }
+    }
+    csRef<iDocumentAttribute> threshAttr = nodeAlphaTestOptions->GetAttribute ("threshold");
+    if (threshAttr)
+      pass->alphaTestOpt.threshold = threshAttr->GetValueAsFloat();
+  }
+
   csRef<iDocumentNode> nodeZmode = node->GetNode ("zmode");
   if (nodeZmode != 0)
   {
@@ -963,6 +994,18 @@ bool csXMLShaderTech::WritePass (ShaderPass* pass,
     if (cacheFile->Write ((char*)&diskAlpha, sizeof (diskAlpha))
 	!= sizeof (diskAlpha)) return false;
   }
+  
+  {
+    uint32 diskATOFunc = csLittleEndian::UInt32 (pass->alphaTestOpt.func);
+    if (cacheFile->Write ((char*)&diskATOFunc, sizeof (diskATOFunc))
+	!= sizeof (diskATOFunc)) return false;
+  }
+  {
+    uint32 diskATOThresh = csLittleEndian::UInt32 (csIEEEfloat::FromNative (pass->alphaTestOpt.threshold));
+    if (cacheFile->Write ((char*)&diskATOThresh, sizeof (diskATOThresh))
+	!= sizeof (diskATOThresh)) return false;
+  }
+  
   {
     uint32 diskZ = csLittleEndian::UInt32 (pass->zMode);
     if (cacheFile->Write ((char*)&diskZ, sizeof (diskZ))
@@ -1197,6 +1240,22 @@ bool csXMLShaderTech::ReadPass (ShaderPass* pass,
     pass->alphaMode.alphaType =
       (csAlphaMode::AlphaType)csLittleEndian::UInt32 (diskAlpha);
   }
+  
+  {
+    uint32 diskATOFunc;
+    if (cacheFile->Read ((char*)&diskATOFunc, sizeof (diskATOFunc))
+	!= sizeof (diskATOFunc)) return false;
+    pass->alphaTestOpt.func =
+      (CS::Graphics::AlphaTestFunction)csLittleEndian::UInt32 (diskATOFunc);
+  }
+  {
+    uint32 diskATOThresh;
+    if (cacheFile->Read ((char*)&diskATOThresh, sizeof (diskATOThresh))
+	!= sizeof (diskATOThresh)) return false;
+    pass->alphaTestOpt.threshold =
+      csIEEEfloat::ToNative (csLittleEndian::UInt32 (diskATOThresh));
+  }
+  
   {
     uint32 diskZ;
     if (cacheFile->Read ((char*)&diskZ, sizeof (diskZ))
@@ -2015,6 +2074,8 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   modes.alphaToCoverage = thispass->alphaToCoverage;
   if ((thispass->atcMixMode & CS_MIXMODE_TYPE_MASK) != CS_FX_MESH)
     modes.atcMixmode = thispass->atcMixMode;
+  
+  modes.alphaTest = thispass->alphaTestOpt;
 
   modes.cullMode = thispass->cullMode;
   

@@ -21,6 +21,7 @@
 
 #include "ieditor/editor.h"
 #include "ieditor/panelmanager.h"
+#include "ieditor/menubar.h"
 #include "ieditor/actionmanager.h"
 
 #include "iutil/vfs.h"
@@ -31,20 +32,36 @@
 #include <wx/statusbr.h>
 #include <wx/timer.h>
 
-namespace CS {
-namespace EditorApp {
+using namespace CS::EditorApp;
+
+CS_PLUGIN_NAMESPACE_BEGIN(CSE)
+{
 
 class Editor;
 class StatusBar;
 
+enum
+{
+  ID_Quit = wxID_EXIT,
+  ID_Open = wxID_OPEN,
+  ID_Save = wxID_SAVE,
+  ID_Undo = wxID_UNDO,
+  ID_Redo = wxID_REDO,
+  ID_MoveTool = wxID_HIGHEST + 2000,
+  ID_RotateTool,
+  ID_ScaleTool,
+  ID_ToolBar,
+  ID_ImportLibrary
+};
+
 class MainFrame : public wxFrame
 {
 public:
-  MainFrame (const wxString& title, const wxPoint& pos, const wxSize& size);
+  MainFrame (iObjectRegistry* object_reg, Editor* editor,
+	     const wxString& title, const wxPoint& pos, const wxSize& size);
   virtual ~MainFrame ();
 
-  bool Initialize (iObjectRegistry* obj_reg, Editor* editor);
-  bool SecondInitialize (iObjectRegistry* obj_reg);
+  bool Initialize ();
 
   csPtr<iProgressMeter> GetProgressMeter ();
 
@@ -74,9 +91,7 @@ private:
 
   Editor* editor;
   csRef<iVFS> vfs;
-  csRef<iPanelManager> panelManager;
   csRef<iActionManager> actionManager;
-
   csRef<iActionListener> actionListener;
 
   StatusBar* statusBar;
@@ -123,7 +138,7 @@ private:
   DECLARE_EVENT_TABLE()
 };
 
-} // namespace EditorApp
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(CSE)
 
 #endif

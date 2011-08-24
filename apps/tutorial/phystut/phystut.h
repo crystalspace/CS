@@ -65,7 +65,6 @@ private:
   // Camera related
   int physicalCameraMode;
   csRef<iRigidBody> cameraBody;
-  float rotX, rotY, rotZ;
 
   // Ragdoll related
   csRef<CS::Animation::iSkeletonRagdollNodeManager> ragdollManager;

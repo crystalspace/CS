@@ -13,7 +13,7 @@
 
   You should have received a copy of the GNU Library General Public
   License along with this library; if not, write to the Free
-  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.3
 */
 
 #ifndef __CS_ANIMESH_H__
@@ -42,6 +42,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   class FactorySubmesh;
   class FactorySocket;
+
+  struct Subset
+  {
+    csArray<size_t> vertices;      // the vertices belonging to this subset
+    size_t vertexCount;            // the number of vertices belonging to this subset
+      
+    Subset ()
+    : vertexCount (0)
+    {}
+  };
+
 
   class AnimeshObjectType : 
     public scfImplementation2<AnimeshObjectType, 
@@ -118,6 +129,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     virtual CS::Mesh::iAnimatedMeshSocketFactory* GetSocket (size_t index) const;
     virtual uint FindSocket (const char* name) const;
 
+    virtual void SetBoneBoundingBox (CS::Animation::BoneID bone, const csBox3& box); 
+    virtual const csBox3& GetBoneBoundingBox (CS::Animation::BoneID bone) const; 
+
+    virtual size_t AddSubset ();
+    virtual void AddSubsetVertex (const size_t subset, const size_t vertexIndex);
+    virtual size_t GetSubsetVertex (const size_t subset, const size_t vertexIndex) const;
+    virtual size_t GetSubsetVertexCount (const size_t subset) const;
+    virtual size_t GetSubsetCount () const;
+    virtual void ClearSubsets ();
+
     //-- iMeshObjectFactory
     virtual csFlags& GetFlags ();
 
@@ -148,8 +169,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     }
 
     void ComputeTangents ();
-  
+
   private: 
+    void ComputeObjectBoundingBox ();
+
+    void ComputeSubsets ();
+    void RebuildMorphTargets ();
 
     // required but stupid stuff..
     AnimeshObjectType* objectType;
@@ -176,11 +201,39 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     // Submeshes
     csRefArray<FactorySubmesh> submeshes;
 
-    csRefArray<MorphTarget> morphTargets;
+    csRefArray<MorphTarget> morphTargets;         // Morph targets without optimization
+    csRefArray<MorphTarget> subsetMorphTargets;   // Optimized morph targets (e.i. without null offsets)
     csHash<uint, csString> morphTargetNames;
 
     // Sockets
     csRefArray<FactorySocket> sockets;
+
+    // Bounding boxes
+    struct Bone
+    {
+      csBox3 bbox;    // the bb associated with a bone
+      bool userBbox;  // the bb is defined by user
+
+      Bone () 
+        : userBbox (false)
+      {}
+    };
+
+    csArray<Bone> bones;  // list of bounding boxes linked to the mesh bones
+
+    // Subsets
+    csArray<Subset> subsets; 
+    bool userSubsets;
+
+    struct SubsetTargets
+    {
+      csArray<uint> morphTargets;   // the indices of the morph targets influencing this subset
+      uint morphTargetCount;        // the number of morph targets influencing this subset
+
+      SubsetTargets ()
+      : morphTargetCount (0)
+      {}
+    };
 
     friend class AnimeshObject;
   };
@@ -313,6 +366,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     virtual CS::Mesh::iAnimatedMeshFactory* GetAnimatedMeshFactory () const;
     virtual iRenderBufferAccessor* GetRenderBufferAccessor () const;
 
+    virtual void SetBoneBoundingBox (CS::Animation::BoneID bone, const csBox3& box); 
+    virtual const csBox3& GetBoneBoundingBox (CS::Animation::BoneID bone) const; 
+
     //-- iMeshObject
     virtual iMeshObjectFactory* GetFactory () const;
 
@@ -358,6 +414,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     virtual void BuildDecal(const csVector3* pos, float decalRadius,
       iDecalBuilder* decalBuilder);
 
+    virtual void UnsetObjectBoundingBox ();
+
     //-- iObjectModel
     virtual const csBox3& GetObjectBoundingBox ();
     virtual void SetObjectBoundingBox (const csBox3& bbox);
@@ -375,7 +433,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 			      csRenderBuffer& normals);
 
   private:
-    //
     void SetupSubmeshes ();
     void SetupSockets ();
     void UpdateLocalBoneTransforms ();
@@ -393,6 +450,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     void MorphVertices ();
 
     void PreskinLF ();
+
+    void ComputeObjectBoundingBox ();
 
     class RenderBufferAccessor :
       public scfImplementation1<RenderBufferAccessor, 
@@ -495,8 +554,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     csRef<CS::Animation::iSkeleton> skeleton;
     unsigned int skeletonVersion;
-    csTicks lastTick;
-    bool initialized;
+    bool animationInitialized;
 
     // Hold the bone transforms
     csRef<csShaderVariable> boneTransformArray;
@@ -507,6 +565,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     csRefArray<Submesh> submeshes;
     csRefArray<Socket> sockets;
+
+    // Array of user defined bounding boxes, indexed by a BoneID
+    // (memory is allocated only if a bounding box is associated with BoneID)
+    csHash<csBox3, CS::Animation::BoneID> boundingBoxes;
+
+    // The object bounding box
+    csBox3 boundingBox;
+    // The object bounding box is defined by user
+    bool userObjectBB;
 
     // Holder for skinned vertex buffers
     csRef<RenderBufferAccessor> bufferAccessor;
@@ -528,7 +595,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     bool skinVertexLF, skinNormalLF, skinTangentBinormalLF;
 
     // LOD on the animation
-    float accumulatedTime;
+    csTicks lastUpdate;
     char accumulatedFrames;
   };
 

@@ -211,6 +211,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
   //----------------------------------------------------------------------------//
   bool Renderer::Initialize (iScript* script)
   {
+    // Load the configuration file
+    csString logFile = "/tmp/CEGUI.log";
+    csRef<iVFS> vfs = csQueryRegistry<iVFS> (obj_reg);
+    if (vfs)
+    {
+      csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (obj_reg);
+      cfg->AddDomain ("/config/cegui.cfg", vfs, iConfigManager::ConfigPriorityPlugin);
+      logFile = cfg->GetStr ("CEGUI.LogFile", logFile);
+    }
+
+    // Find the 3D renderer
     g3d = csQueryRegistry<iGraphics3D> (obj_reg);
 
     if (!g3d) {
@@ -241,11 +252,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(cegui)
     if (script)
     {
       scriptModule = new CEGUIScriptModule (script, obj_reg);
-      CEGUI::System::create (*this, rp, 0, ic, scriptModule);  
+      CEGUI::System::create (*this, rp, 0, ic, scriptModule, "", logFile.GetData ());
     }
     else
     {
-      CEGUI::System::create (*this, rp, 0, ic);
+      CEGUI::System::create (*this, rp, 0, ic, nullptr, "", logFile.GetData ());
     }
 
     settingsSliderFact.obj_reg = obj_reg;

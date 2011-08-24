@@ -9,8 +9,6 @@
     <WidgetLook name="crystal/Icon">
       <PropertyLinkDefinition name="Image" widget="__auto_image__" targetProperty="Image" />
       <Child type="ice/StaticImage" nameSuffix="__auto_image__">
-        <Property name="FrameEnabled" value="False" />
-        <Property name="BackgroundEnabled" value="False" />
         <Area>
           <Dim type="LeftEdge" >
             <AbsoluteDim value="66">
@@ -70,17 +68,21 @@
             </UnifiedDim>
           </Dim>
         </Area>
-      </Child>
-      <Child type="ice/StaticImage" nameSuffix="__auto_frame__">
         <Property name="FrameEnabled" value="False" />
         <Property name="BackgroundEnabled" value="False" />
-        <Property name="Image" value="set:crystal image:frame" />
+        <Property name="MousePassThroughEnabled" value="True" />
+      </Child>
+      <Child type="ice/StaticImage" nameSuffix="__auto_frame__">
         <Area>
           <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
           <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
           <Dim type="Width" ><UnifiedDim scale="1" offset="0" type="Width" /></Dim>
           <Dim type="Height" ><UnifiedDim scale="1" offset="0" type="Height" /></Dim>
         </Area>
+        <Property name="FrameEnabled" value="False" />
+        <Property name="BackgroundEnabled" value="False" />
+        <Property name="Image" value="set:crystal image:frame" />
+        <Property name="MousePassThroughEnabled" value="True" />
       </Child>
       <ImagerySection name="normal">
       </ImagerySection>

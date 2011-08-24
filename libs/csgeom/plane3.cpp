@@ -140,10 +140,14 @@ bool csPlane3::ClipPolygon (
   csgeom_csPlane3_Vis *vis = GetStatic_csgeom_csPlane3_Vis ();
 
   if (!reversed) Invert ();
-  if ((size_t)num_verts > verts->GetSize ())
+
+  // Check if the static output array is large enought to hold
+  // the cliped polygon. If only one point is outside
+  // the total size will increase by one.
+  if ((size_t)num_verts >= verts->GetSize ())
   {
-    verts->SetSize (num_verts);
-    vis->SetSize (num_verts);
+    verts->SetSize (num_verts+1);
+    vis->SetSize (num_verts+1);
   }
 
   for (i = 0; i < num_vertices; i++)

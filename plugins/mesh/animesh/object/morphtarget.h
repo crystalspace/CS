@@ -39,13 +39,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csWeakRef<AnimeshObjectFactory> parent;
     csRef<iRenderBuffer> offsets;
     csString name;
+    csArray<size_t> subsetList;
+
   public:
     MorphTarget (AnimeshObjectFactory* parent, const char* name);
 
     bool SetVertexOffsets (iRenderBuffer* renderBuffer);
     iRenderBuffer* GetVertexOffsets () { return offsets; }
-    void Invalidate () { }
+    void Invalidate ();
     const char* GetName() const { return name; }
+    void AddSubset (const size_t subset);
+    size_t GetSubset (const size_t index) const;
+    size_t GetSubsetCount () const;
   };
 }
 CS_PLUGIN_NAMESPACE_END(Animesh)

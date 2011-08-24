@@ -30,6 +30,17 @@ csSpline::csSpline (int d, int p) :
   precalculation_valid = false;
 }
 
+void csSpline::Setup (int d, int p)
+{
+  dimensions = d;
+  num_points = p;
+  delete[] time_points;
+  delete[] points;
+  time_points = new float[p];
+  points = new float[d * p];
+  precalculation_valid = false;
+}
+
 csSpline::~csSpline ()
 {
   delete[] time_points;
@@ -155,7 +166,13 @@ csCubicSpline::csCubicSpline (int d, int p) :
   csSpline(d, p)
 {
   derivative_points = new float[d * p];
-  precalculation_valid = false;
+}
+
+void csCubicSpline::Setup (int d, int p)
+{
+  csSpline::Setup (d, p);
+  delete[] derivative_points;
+  derivative_points = new float[d * p];
 }
 
 csCubicSpline::~csCubicSpline ()

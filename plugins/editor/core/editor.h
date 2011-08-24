@@ -20,30 +20,48 @@
 #define __EDITOR_H__
 
 #include "ieditor/editor.h"
-#include "ieditor/panelmanager.h"
 #include "ieditor/interfacewrappermanager.h"
 #include "ieditor/actionmanager.h"
 
 #include "iengine/collection.h"
+#include "iutil/comp.h"
 #include "csutil/refarr.h"
+
+#include "auipanelmanager.h"
+#include "mainframe.h"
+#include "menubar.h"
 
 struct iObjectRegistry;
 struct iSaver;
 struct iVFS;
 struct csSimpleRenderMesh;
 
-namespace CS {
-namespace EditorApp {
+using namespace CS::EditorApp;
 
-class MainFrame;
+CS_PLUGIN_NAMESPACE_BEGIN(CSE)
+{
 
-class Editor : public scfImplementation1<Editor,iEditor>
+class Editor : public scfImplementation2<Editor, iEditor, iComponent>
 {
 public:
-  Editor ();
+  Editor (iBase* parent);
   virtual ~Editor ();
   
+  // iComponent
   virtual bool Initialize (iObjectRegistry* reg);
+
+  virtual bool StartEngine ();
+  virtual bool StartApplication ();
+  virtual bool LoadPlugin (const char* name);
+
+  inline virtual wxWindow* GetWindow ()
+  { return static_cast<wxWindow*> (mainFrame); }
+
+  inline virtual iPanelManager* GetPanelManager () const
+  { return panelManager; }
+
+  inline virtual iMenuBar* GetMenuBar () const
+  { return menuBar; }
 
   virtual csPtr<iProgressMeter> GetProgressMeter ();
 
@@ -74,8 +92,6 @@ public:
 
 private:
   void Help ();
-  bool InitCS ();
-  void LoadPlugins ();
 
   iObjectRegistry* object_reg;
 
@@ -91,7 +107,8 @@ private:
 
   csRef<iCollection> mainCollection;
 
-  csRef<iPanelManager> panelManager;
+  csRef<AUIPanelManager> panelManager;
+  csRef<MenuBar> menuBar;
   csRef<iInterfaceWrapperManager> interfaceManager;
   csRef<iActionManager> actionManager;
 
@@ -108,7 +125,7 @@ private:
 
 };
 
-} // namespace EditorApp
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(CSE)
 
 #endif

@@ -155,11 +155,11 @@
       <connection from="glow" to="sectorfog" />
       <connection from="sectorfog" to="hdrscale" />
       
-      <parameter id="texRefract" type="shadervar" weavertype="tex2d">tex framebuffer color</parameter>
+      <parameter id="texRefract" type="shadervar" weavertype="tex2d">tex plane refract</parameter>
       <connection from="texRefract" to="refraction" />
-      <parameter id="texRefractDepth" type="shadervar" weavertype="tex2d">tex framebuffer depth</parameter>
+      <parameter id="texRefractDepth" type="shadervar" weavertype="tex2d">tex plane refract depth</parameter>
       <connection from="texRefractDepth" to="refraction" />
-      <parameter id="texRefractXform" type="shadervar" weavertype="translateScale2">framebuffer coord xform</parameter>
+      <parameter id="texRefractXform" type="shadervar" weavertype="translateScale2">refraction coord xform</parameter>
       <connection from="texRefractXform" to="refraction" />
       
       <!-- Use the depth of the refraction to limit perturbation for the reflection as well -->

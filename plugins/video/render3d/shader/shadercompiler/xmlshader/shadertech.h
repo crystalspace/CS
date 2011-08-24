@@ -105,6 +105,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       bool alphaToCoverage;
       uint atcMixMode;
       csAlphaMode alphaMode;
+      CS::Graphics::AlphaTestOptions alphaTestOpt;
       csZBufMode zMode;
       bool overrideZmode;
       CS::Graphics::MeshCullMode cullMode;

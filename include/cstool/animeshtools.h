@@ -1,8 +1,8 @@
 /*
-  Copyright (C) 2011 Christian Van Brussel, Communications and Remote
-      Sensing Laboratory of the School of Engineering at the 
-      Universite catholique de Louvain, Belgium
-      http://www.tele.ucl.ac.be
+  Copyright (C) 2011 Christian Van Brussel, Institute of Information
+      and Communication Technologies, Electronics and Applied Mathematics
+      at Universite catholique de Louvain, Belgium
+      http://www.uclouvain.be/en-icteam.html
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -104,7 +104,9 @@ class CS_CRYSTALSPACE_EXPORT AnimatedMeshTools
   /**
    * Create a new morph target in an animesh by importing the vertices from
    * another animesh.
-   *
+   * \warning You must still call iAnimatedMeshFactory::Invalidate() on
+   * \a baseMesh after the call to this method (eg after the creation of all
+   * morph targets).
    * \param object_reg The object registry
    * \param baseMesh The base animesh where the morph target will be imported.
    * \param morphMesh The animesh to import into the other as a new morph target.

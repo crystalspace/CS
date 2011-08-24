@@ -611,7 +611,7 @@ const char* TiXmlElement::Print( PrintState& print, int depth ) const
   int d;
   for ( d=0; d<depth; d++ )
   {
-    err = StrPuts ( print, "    " );
+    err = StrPuts ( print, "  " );
     if (err != 0) return err;
   }
 
@@ -664,7 +664,7 @@ const char* TiXmlElement::Print( PrintState& print, int depth ) const
     if (err != 0) return err;
     for( d=0; d<depth; ++d )
     {
-      err = StrPuts ( print, "    " );
+      err = StrPuts ( print, "  " );
       if (err != 0) return err;
     }
     err = StrPrintf ( print, "</%s>", value );
@@ -911,7 +911,7 @@ const char* TiXmlComment::Print( PrintState& print, int depth ) const
   const char* err;
   for ( int i=0; i<depth; i++ )
   {
-    err = StrPuts ( print, "    ");
+    err = StrPuts ( print, "  ");
     if (err != 0) return err;
   }
   return StrPrintf ( print, "<!--%s-->", value );
@@ -1043,7 +1043,7 @@ const char* TiXmlUnknown::Print( PrintState& print, int depth ) const
   const char* err;
   for ( int i=0; i<depth; i++ )
   {
-    err = StrPuts ( print, "    " );
+    err = StrPuts ( print, "  " );
     if (err != 0) return err;
   }
   return StrPrintf ( print, "<%s>", value.c_str() );

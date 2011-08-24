@@ -227,9 +227,28 @@ public:
      */
     delimIgnoreDifferent
   };
+
+  /**
+   * Initialize object to hold initially \c limit elements, and increase
+   * storage by \c threshold each time the upper bound is exceeded.
+   * Additionally load in this array the splitted string provided.
+   * \param str The string to split and place in this array.
+   * \param delimiters The delimiters to use to split the string.
+   * \param delimMode The way to split this array
+   */
+  StringArray (const char* str, const char* delimiters, 
+               ConsecutiveDelimiterMode delimMode = delimSplitEach,
+               size_t limit = 0, const CapacityHandler& ch = CapacityHandler())
+  	: superclass(limit, ch)
+  {
+    SplitString(str, delimiters, delimMode);
+  }
+  
   /**
    * Add a number of strings to this array by splitting \a str at characters
-   * from \a delimiters.
+   * from \a delimiters. It will start from the first char and won't ignore
+   * delimiters before the first word (in other words even with delimIgnore
+   * you'll get at least an empty string if the string starts with delimiters).
    */
   size_t SplitString (const char* str, const char* delimiters, 
     ConsecutiveDelimiterMode delimMode = delimSplitEach)
@@ -287,8 +306,16 @@ class csStringArray :
 {
 public:
   csStringArray (size_t limit = 0, size_t threshold = 0)
-  	: CS::Utility::StringArray<CS::Memory::AllocatorMalloc, 
-  	                           csArrayCapacityDefault> (limit, threshold)
+    : CS::Utility::StringArray<CS::Memory::AllocatorMalloc, 
+                               csArrayCapacityDefault> (limit, threshold)
+  {
+  }
+  csStringArray (const char* str, const char* delimiters, 
+               ConsecutiveDelimiterMode delimMode = delimSplitEach,
+               size_t limit = 0, size_t threshold = 0)
+    : CS::Utility::StringArray<CS::Memory::AllocatorMalloc, 
+                               csArrayCapacityDefault> (str, delimiters, 
+                               delimMode, limit, threshold)
   {
   }
 };

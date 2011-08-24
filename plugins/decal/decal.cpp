@@ -284,8 +284,8 @@ void csDecal::AddStaticPoly (const csPoly3D & p, csArray<size_t>* indices)
   bool doFaceOffset = false;
   float faceHighDot = 0.0f;
   float invHighLowFaceDist = 0.0f;
-  csVector3 faceBottomOffset;
-  csVector3 faceCenter;
+  csVector3 faceBottomOffset(0.0f);
+  csVector3 faceCenter(0.0f);
   if (decalTemplate->HasClipping () && !animationControlData.animationControl)
   {
     if (fabs (polyNormThresholdValue) 

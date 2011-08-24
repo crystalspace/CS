@@ -533,16 +533,16 @@ float csColliderHelper::TraceBeam (iCollideSystem* cdsys, iSector* sector,
           obj_isect, 0, &polygon_idx))
       {
         if (!movable->IsFullTransformIdentity ())
-    obj_isect = trans.This2Other (obj_isect);
-  float squared_dist = csSquaredDist::PointPoint (obj_isect, start);
-  if (squared_dist < best_squared_dist)
-  {
-    have_hit = true;
-    best_squared_dist = squared_dist;
-    closest_isect = obj_isect;
-    last_portal_index = polygon_idx;
-    best_mesh = mesh;
-  }
+    	  obj_isect = trans.This2Other (obj_isect);
+	float squared_dist = csSquaredDist::PointPoint (obj_isect, start);
+  	if (squared_dist < best_squared_dist)
+  	{
+    	  have_hit = true;
+    	  best_squared_dist = squared_dist;
+    	  closest_isect = obj_isect;
+    	  last_portal_index = polygon_idx;
+    	  best_mesh = mesh;
+  	}
       }
     }
   }

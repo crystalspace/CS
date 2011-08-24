@@ -24,7 +24,7 @@
 #include "csgeom/trimesh.h"
 #include "csgfx/imagememory.h"
 #include "csutil/csendian.h"
-#include "csutil/csmd5.h"
+#include "csutil/md5.h"
 #include "csutil/memfile.h"
 
 #include "engine.h"
@@ -147,7 +147,8 @@ const char* csLight::GenerateUniqueID ()
   l = csLittleEndian::Convert ((int32)csQint ((attenuationConstants.z * 1000)+.5));
   mf.Write ((char*)&l, 4);
 
-  csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
+  CS::Utility::Checksum::MD5::Digest digest =
+    CS::Utility::Checksum::MD5::Encode (mf.GetData (), mf.GetSize ());
 
   delete[] light_id;
   light_id = new char[sizeof(digest.data)];
