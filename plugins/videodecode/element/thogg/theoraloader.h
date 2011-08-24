@@ -35,11 +35,11 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 struct iObjectRegistry;
 
-#ifdef WIN32
+/*#ifdef WIN32
   #pragma comment (lib,"libtheora_static.lib")
   #pragma comment (lib,"ogg.lib")
   #pragma comment (lib,"vorbis.lib")
-#endif
+#endif*/
 
 /**
   * This is the implementation for our API and

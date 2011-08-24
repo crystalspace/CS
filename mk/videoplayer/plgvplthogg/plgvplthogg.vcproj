@@ -67,7 +67,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="delayimp.lib zlib.lib libcrystalspace_d.lib"
+				AdditionalDependencies="delayimp.lib zlib.lib libcrystalspace_d.lib libtheora_static.lib ogg.lib vorbis.lib"
 				OutputFile="..\..\..\vplthogg.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\winlibs\x86\lib;..\..\..\win32libs\lib"
