@@ -336,7 +336,7 @@ void TheoraMediaContainer::DoSeek ()
   if (frame != -1)
     _activeTheoraStream->SeekPage (std::max ( (long)0,frame),false,&_syncState,_fileSize);
 
-  float time= ( (float) targetFrame/_activeTheoraStream->GetFrameCount ()) *_activeTheoraStream->GetLength ();
+//  float time= ( (float) targetFrame/_activeTheoraStream->GetFrameCount ()) *_activeTheoraStream->GetLength ();
 
 
   // skip to the frame we need

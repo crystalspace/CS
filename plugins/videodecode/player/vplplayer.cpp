@@ -1,5 +1,5 @@
 #include <cssysdef.h>
-#include "vplPlayer.h"
+#include "vplplayer.h"
 #include <iutil/objreg.h>
 #include <iutil/plugin.h>
 #include <iostream>
@@ -125,7 +125,7 @@ THREADED_CALLABLE_IMPL(csVplPlayer, Update)
       Play ();
       _shouldPlay=false;
     }
-    csTicks start=csGetTicks ();
+//    csTicks start=csGetTicks ();
     if (_playing)
     {
       if (_shouldStop)

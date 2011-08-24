@@ -50,7 +50,7 @@ private:
   csArray<Language>     _languages;
 
   csStringHash xmltokens;
-#define CS_TOKEN_ITEM_FILE "plugins/videodecode/persist/standard/vplParser.tok"
+#define CS_TOKEN_ITEM_FILE "plugins/videodecode/persist/standard/vplparser.tok"
 #include "cstool/tokenlist.h"
 #undef CS_TOKEN_ITEM_FILE 
 

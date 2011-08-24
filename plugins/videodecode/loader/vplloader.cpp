@@ -1,5 +1,5 @@
 #include <cssysdef.h>
-#include "vplLoader.h"
+#include "vplloader.h"
 #include <iutil/objreg.h>
 #include <iutil/plugin.h>
 #include <iostream>

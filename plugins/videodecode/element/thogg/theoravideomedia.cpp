@@ -287,7 +287,7 @@ void csTheoraVideoMedia::Convert ()
 
   int y_offset= (_streamInfo.pic_x&~1)+_currentData.yuv[0].stride* (_streamInfo.pic_y&~1);
 
-  uint8* pixels = _rgbBuff; 
+//  uint8* pixels = _rgbBuff; 
 
   int Y,U,V,R,G,B;
   // 4:2:0 pixel format

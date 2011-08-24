@@ -17,7 +17,7 @@
 #include "ivaria/reporter.h"
 
 #include <cssysdef.h>
-#include "vplParser.h"
+#include "vplparser.h"
 #include <iutil/objreg.h>
 #include <iutil/plugin.h>
 #include <iostream>
