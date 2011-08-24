@@ -90,8 +90,6 @@ void VideoTest::Frame ()
     w,
     h,
     0);
-
-  //csSleep (5);
 }
 
 void VideoTest::OnExit ()

@@ -207,7 +207,6 @@ long csTheoraVideoMedia::SeekPage (long targetFrame,bool return_keyframe, ogg_sy
   }
 
   ogg_stream_pagein (&_streamState,&og);
-  //granule=frame << mInfo->TheoraInfo.keyframe_granule_shift;
   th_decode_ctl (_decodeControl,TH_DECCTL_SET_GRANPOS,&granule,sizeof (granule));
 
   //make sure we skip to the keyframe we need

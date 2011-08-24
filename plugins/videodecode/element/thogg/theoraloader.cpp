@@ -328,7 +328,6 @@ void csThOggLoader::ComputeStreamLength (csRef<TheoraMediaContainer> container)
         float mDuration=0;
         unsigned long mNumFrames=0;
         ogg_sync_reset (&_oy);
-        //fseek(infile,currentPos,SEEK_SET);
 
         for (int i=1;i<=10;i++)
         {
@@ -397,7 +396,6 @@ void csThOggLoader::ComputeStreamLength (csRef<TheoraMediaContainer> container)
             if (granule >= 0)
             {
               mDuration= (float) vorbis_granule_time (buff->DspState (),granule);
-              // mNumFrames=(unsigned long) th_granule_frame(&buff->vd,granule)+1;
             }
           }
 

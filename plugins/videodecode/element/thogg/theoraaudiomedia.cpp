@@ -135,7 +135,6 @@ bool csTheoraAudioMedia::Update ()
             val=-32768;
           samples[count]=val;
           count++;
-          //fwrite(&val,sizeof(val),1,_log);
         }
         _audiobuf_ready=1;
         vorbis_synthesis_read (&_dspState,i);
@@ -182,8 +181,6 @@ void csTheoraAudioMedia::Seek (float time, ogg_sync_state *oy,ogg_page *op,ogg_s
 {
   ogg_stream_reset (&_streamState);
   vorbis_synthesis_restart (&_dspState);
-
-  //memset(op, 0, sizeof(ogg_page));
 
   // let's decode some pages and seek to the appropriate PCM sample
   ogg_int64_t granule=0;
