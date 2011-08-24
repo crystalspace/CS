@@ -128,6 +128,7 @@ void TheoraMediaContainer::DropFrame ()
     _media [_activeStreams [i]]->DropFrame ();
   }
 }
+
 void TheoraMediaContainer::Update ()
 {
   // if processingCache is true, that means we've reached the end
@@ -138,15 +139,12 @@ void TheoraMediaContainer::Update ()
   static csTicks frameTime = 0;
   static csTicks lastTime=csGetTicks ();
 
-  if (frameTime==0)
-  if (_activeTheoraStream.IsValid ())
+  if (frameTime==0 && _activeTheoraStream.IsValid ())
   {
-    //HACK!: we subtract 3 from the target frame time, because otherwise,
-    //it runs too slow
-    frameTime = 1000/_activeTheoraStream->GetTargetFPS ();//-3;
+    frameTime = 1000/_activeTheoraStream->GetTargetFPS ();
   }
 
-  //if a seek is scheduled, do it
+  // if a seek is scheduled, do it
   if (_timeToSeekTo!=-1)
   {
     MutexScopedLock lock (_swapMutex);
@@ -179,11 +177,11 @@ void TheoraMediaContainer::Update ()
       if ( _media [_activeStreams [i]]->HasDataReady ())
         dataAvailable++;
     }
-    if (_waitToFillCache )
-      if (dataAvailable == _activeStreams.GetSize ())
-      {
-        _waitToFillCache=false;
-      }
+
+    if (_waitToFillCache && dataAvailable == _activeStreams.GetSize ())
+    {
+      _waitToFillCache=false;
+    }
 
     if (!_waitToFillCache && !_canWrite && dataAvailable)
     {
@@ -192,15 +190,14 @@ void TheoraMediaContainer::Update ()
         _canSwap=true;
         lastTime=csGetTicks ();
       }
-      else
-      if ( ( (csGetTicks () - lastTime) >= (frameTime+100)))
+      else if ((csGetTicks () - lastTime) >= (frameTime+100))
       {
         DropFrame ();
         lastTime=csGetTicks ();
       }
     }
 
-    if(processingCache && dataAvailable==0)
+    if (processingCache && dataAvailable==0)
       _updateState++;
 
     /* buffer compressed data every loop */
@@ -490,7 +487,6 @@ void TheoraMediaContainer::SetCacheSize (size_t size)
 {
   _cacheSize = size;
 }
-
 
 float TheoraMediaContainer::GetAspectRatio () 
 {
