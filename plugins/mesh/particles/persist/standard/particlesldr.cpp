@@ -766,7 +766,36 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
         }
       }
 
-      
+    }
+    else if (!strcasecmp (effectorType, "light"))
+    {
+      csRef<iParticleBuiltinEffectorLight> lightEffector = 
+        factory->CreateLight ();
+      effector = lightEffector;
+
+      csRef<iDocumentNodeIterator> it = node->GetNodes ();
+      while (it->HasNext ())
+      {
+        csRef<iDocumentNode> child = it->Next ();
+
+        if (child->GetType () != CS_NODE_ELEMENT) 
+          continue;
+
+        const char* value = child->GetValue ();
+        csStringID id = xmltokens.Request (value);
+        switch(id)
+        {
+        case XMLTOKEN_CUTOFFDISTANCE:
+          {
+	    float distance = child->GetContentsValueAsFloat ();
+	    lightEffector->SetInitialCutoffDistance (distance);
+	  }
+          break;
+        default:
+          synldr->ReportBadToken (child);
+          return 0;
+        }
+      }
     }
     else
     {
