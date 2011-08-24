@@ -23,7 +23,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <ivideodecode/medialoader.h>
 #include <ivideodecode/mediacontainer.h>
 #include <ivideodecode/media.h>
-//#include <ivideodecode/mediaparser.h>
 #include <csutil/scf_implementation.h>
 #include "theoramediacontainer.h"
 #include <csutil/nobjvec.h>
