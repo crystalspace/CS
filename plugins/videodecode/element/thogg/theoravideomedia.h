@@ -72,11 +72,7 @@ private:
   bool    _videobufReady;
   double  _videobufTime;
 
-
-  struct cachedData
-  {
-    uint8* pixels;
-  };
+  typedef uint8* cachedData;
 
   csFIFO<cachedData>  _cache;
   size_t              _cacheSize;
@@ -89,9 +85,8 @@ private:
   uint8*  _rgbBuff;
   void    Convert ();
   
-
   th_ycbcr_buffer _currentYUVBuffer;
-  uint8 *         _currentPixels;
+  uint8*          _currentPixels;
 
   // Look-up tables for conversion
   int Ylut[256],
