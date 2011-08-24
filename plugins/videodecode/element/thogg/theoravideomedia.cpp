@@ -119,11 +119,7 @@ bool csTheoraVideoMedia::Update ()
           _videobufReady=true;
           _frameToSkip = -1;
 
-
-          th_ycbcr_buffer yuv;
-          th_decode_ycbcr_out (_decodeControl,yuv);
-          //currentData.yuv = &yuv;
-          memcpy (&_currentData.yuv, &yuv, sizeof (yuv));
+          th_decode_ycbcr_out (_decodeControl,_currentData.yuv);
           Convert ();
           cachedData data;
           data.pixels = _currentData.pixels;
