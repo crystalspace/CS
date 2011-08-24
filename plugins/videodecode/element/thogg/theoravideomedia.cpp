@@ -95,7 +95,6 @@ double csTheoraVideoMedia::GetPosition () const
 
 bool csTheoraVideoMedia::Update ()
 {
-  //Convert ();
   if (_cache.GetSize ()>=_cacheSize)
     return false;
 
@@ -111,7 +110,6 @@ bool csTheoraVideoMedia::Update ()
 
         if (th_granule_frame (_decodeControl,_videobuf_granulepos)<_frameToSkip)
         {
-          //_videobufReady=false;
           return false;
         }
         else
@@ -119,10 +117,10 @@ bool csTheoraVideoMedia::Update ()
           _videobufReady=true;
           _frameToSkip = -1;
 
-          th_decode_ycbcr_out (_decodeControl,_currentData.yuv);
+          th_decode_ycbcr_out (_decodeControl,_currentYUVBuffer);
           Convert ();
           cachedData data;
-          data.pixels = _currentData.pixels;
+          data.pixels = _currentPixels;
           _cache.Push (data);
         }
       }
@@ -281,21 +279,21 @@ void csTheoraVideoMedia::DropFrame ()
 void csTheoraVideoMedia::Convert ()
 {
 
-  int y_offset= (_streamInfo.pic_x&~1)+_currentData.yuv[0].stride* (_streamInfo.pic_y&~1);
+  int y_offset= (_streamInfo.pic_x&~1)+_currentYUVBuffer[0].stride* (_streamInfo.pic_y&~1);
 
   int Y,U,V,R,G,B;
   // 4:2:0 pixel format
   if (_streamInfo.pixel_fmt==TH_PF_420)
   {
-    int uv_offset= (_streamInfo.pic_x/2)+ (_currentData.yuv[1].stride)* (_streamInfo.pic_y/2);
+    int uv_offset= (_streamInfo.pic_x/2)+ (_currentYUVBuffer[1].stride)* (_streamInfo.pic_y/2);
     uint8 * outputBuffer = new uint8[_streamInfo.pic_width*_streamInfo.pic_height*4];
     int k=0;
     for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
       for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
       {
-        Y = (_currentData.yuv[0].data+y_offset+_currentData.yuv[0].stride* ( (y)))[x] ;//-16;
-        U = (_currentData.yuv[1].data+uv_offset+_currentData.yuv[1].stride* (y/2))[x/2] ;//- 128;
-        V = (_currentData.yuv[2].data+uv_offset+_currentData.yuv[2].stride* (y/2))[x/2] ;//- 128;
+        Y = (_currentYUVBuffer[0].data+y_offset+_currentYUVBuffer[0].stride* ( (y)))[x] ;//-16;
+        U = (_currentYUVBuffer[1].data+uv_offset+_currentYUVBuffer[1].stride* (y/2))[x/2] ;//- 128;
+        V = (_currentYUVBuffer[2].data+uv_offset+_currentYUVBuffer[2].stride* (y/2))[x/2] ;//- 128;
 
         R = (Ylut[Y] + RVlut[V])>>8;
         G = (Ylut[Y] - GUlut[U] - GVlut[V])>>8;
@@ -316,21 +314,21 @@ void csTheoraVideoMedia::Convert ()
         k++;
       }
 
-      _currentData.pixels = outputBuffer;
+      _currentPixels = outputBuffer;
 
   }
   // 4:2:2 pixel format
   else if (_streamInfo.pixel_fmt==TH_PF_422)
   {
-    int uv_offset= (_streamInfo.pic_x/2)+ (_currentData.yuv[1].stride)* (_streamInfo.pic_y);
+    int uv_offset= (_streamInfo.pic_x/2)+ (_currentYUVBuffer[1].stride)* (_streamInfo.pic_y);
     uint8 * outputBuffer = new uint8[_streamInfo.pic_width*_streamInfo.pic_height*4];
     int k=0;
     for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
       for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
       {
-        Y = (_currentData.yuv[0].data+y_offset+_currentData.yuv[0].stride*y)[x] ;//-16;
-        U = (_currentData.yuv[1].data+uv_offset+_currentData.yuv[1].stride* (y))[x/2] ;//- 128;
-        V = (_currentData.yuv[2].data+uv_offset+_currentData.yuv[2].stride* (y))[x/2] ;//- 128;
+        Y = (_currentYUVBuffer[0].data+y_offset+_currentYUVBuffer[0].stride*y)[x] ;//-16;
+        U = (_currentYUVBuffer[1].data+uv_offset+_currentYUVBuffer[1].stride* (y))[x/2] ;//- 128;
+        V = (_currentYUVBuffer[2].data+uv_offset+_currentYUVBuffer[2].stride* (y))[x/2] ;//- 128;
 
         R = (Ylut[Y] + RVlut[V])>>8;
         G = (Ylut[Y] - GUlut[U] - GVlut[V])>>8;
@@ -350,22 +348,22 @@ void csTheoraVideoMedia::Convert ()
         outputBuffer[k] = 0xff;
         k++;
       }
-      _currentData.pixels = outputBuffer;
+      _currentPixels = outputBuffer;
 
   }
   // 4:4:4 pixel format
   else if (_streamInfo.pixel_fmt==TH_PF_444)
   {
-    int uv_offset= (_streamInfo.pic_x/2)+ (_currentData.yuv[1].stride)* (_streamInfo.pic_y);
+    int uv_offset= (_streamInfo.pic_x/2)+ (_currentYUVBuffer[1].stride)* (_streamInfo.pic_y);
 
     uint8 * outputBuffer = new uint8[_streamInfo.pic_width*_streamInfo.pic_height*4];
     int k=0;
     for (ogg_uint32_t y = 0 ; y < _streamInfo.frame_height ; y++)
       for (ogg_uint32_t x = 0 ; x < _streamInfo.frame_width ; x++)
       {
-        Y = (_currentData.yuv[0].data+y_offset+_currentData.yuv[0].stride*y)[x];// -16;
-        U = (_currentData.yuv[1].data+uv_offset+_currentData.yuv[1].stride* (y))[x] ;//- 128;
-        V = (_currentData.yuv[2].data+uv_offset+_currentData.yuv[2].stride* (y))[x] ;//- 128;
+        Y = (_currentYUVBuffer[0].data+y_offset+_currentYUVBuffer[0].stride*y)[x];// -16;
+        U = (_currentYUVBuffer[1].data+uv_offset+_currentYUVBuffer[1].stride* (y))[x] ;//- 128;
+        V = (_currentYUVBuffer[2].data+uv_offset+_currentYUVBuffer[2].stride* (y))[x] ;//- 128;
 
         R = (Ylut[Y] + RVlut[V])>>8;
         G = (Ylut[Y] - GUlut[U] - GVlut[V])>>8;
@@ -385,7 +383,7 @@ void csTheoraVideoMedia::Convert ()
         outputBuffer[k] = 0xff;
         k++;
       }
-      _currentData.pixels = outputBuffer;
+      _currentPixels = outputBuffer;
 
   }
   else

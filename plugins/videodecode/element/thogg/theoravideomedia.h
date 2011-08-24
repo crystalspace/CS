@@ -75,7 +75,6 @@ private:
 
   struct cachedData
   {
-    th_ycbcr_buffer yuv;
     uint8* pixels;
   };
 
@@ -91,7 +90,8 @@ private:
   void    Convert ();
   
 
-  cachedData _currentData;
+  th_ycbcr_buffer _currentYUVBuffer;
+  uint8 *         _currentPixels;
 
   // Look-up tables for conversion
   int Ylut[256],
