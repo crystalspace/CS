@@ -53,7 +53,7 @@ struct iMediaLoader : public virtual iBase
   virtual csRef<iMediaContainer> LoadMedia (const char * pFileName, const char *pDescription=0) = 0;
 
   /**
-    * Used to initialize a loader. Should never be called directly
+    * Initialize a loader. Should never be called directly.
     * \param[in] path Path to the media file
     * \param[in] languages List of available languages
     */

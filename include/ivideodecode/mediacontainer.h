@@ -40,118 +40,118 @@ struct iMediaContainer : public virtual iBase
   SCF_INTERFACE (iMediaContainer,0,1,0);
 
   /**
-    * Returns the number of iMedia objects inside the iMediaContainer
+    * Return the number of iMedia objects inside the iMediaContainer.
     */
   virtual size_t GetMediaCount () const = 0;
 
   /**
-    * Get the iMedia object at an index
-    * \param[in] index Object index
+    * Get an iMedia object specified by an index.
+    * \param[in] index Index of a media stream
     */
   virtual csRef<iMedia> GetMedia (size_t index) = 0;
 
   /**
-    * Get the description of the media container
+    * Get the description of the media container.
     */
   virtual const char* GetDescription () const = 0;
 
   /**
-    * Activate a stream. In case there's already a stream of that type, it's replaced
-    * \param[in] index Object index
+    * Activate a stream. In case there's already an activated stream of that type, it is replaced.
+    * \param[in] index Index of a media stream
     */
   virtual void SetActiveStream (size_t index) = 0;
 
   /**
-    * Removes an active stream.
-    * \param[in] index Object index
+    * Remove an active stream.
+    * \param[in] index Index of a media stream
     */
   virtual bool RemoveActiveStream (size_t index) = 0;
 
   /**
-    * Automatically pick the first stream of every kind from inside the container
+    * Automatically activate the first stream of every kind from inside the container.
     */
   virtual void AutoActivateStreams () = 0;
 
   /**
-    * Get a reference to the internal texture buffer
+    * Get a reference to the internal texture buffer.
     * \param[out] texture Target texture
     */
   virtual void GetTargetTexture (csRef<iTextureHandle> &target) = 0;
 
   /**
-    *  Get a reference to the internal audio stream
+    *  Get a reference to the internal audio stream.
     * \param[out] target Target audio stream
     */
   virtual void GetTargetAudio (csRef<iSndSysStream> &target) = 0;
 
   /**
-    * Update the active streams
+    * Update the active streams.
     */
   virtual void Update () = 0;
 
   /**
-    * Check if end of file has been reached
+    * Check if end of file has been reached.
     */
   virtual bool Eof () const = 0;
 
   /**
-    * Trigger a seek for the active iMedia streams, resolved at the next update
+    * Trigger a seek for the active iMedia streams, resolved at the next update.
     */
-  virtual void Seek (float time) = 0 ;
+  virtual void Seek (float time) = 0;
 
   /**
-    * Get the position of the media
+    * Get the position of the media in seconds.
     */
-  virtual float GetPosition () const = 0 ;
+  virtual float GetPosition () const = 0;
 
   /**
-    * Get the length of the media
+    * Get the length of the media in seconds.
     */
-  virtual float GetLength () const = 0 ;
+  virtual float GetLength () const = 0;
 
   /**
-    * Swaps the active buffer for the one that was written to last inside the active iMedia
+    * Swap the active buffer for the last one that was written to inside the active iMedia.
     */
   virtual void SwapBuffers () = 0;
 
   /**
-    * Gets data from the prefetch queue and writes it to the active buffer
+    * Get data from the prefetching queue and write it to the active buffer.
     */
   virtual void WriteData () = 0 ;
 
   /**
-    * Set how many frames will be cached
+    * Set the number of frames to be cached.
     */
   virtual void SetCacheSize (size_t size) = 0;
 
   /**
-    * Get the aspect ratio associated to the active video stream
+    * Get the aspect ratio associated to the active video stream.
     */
   virtual float GetAspectRatio () = 0;
 
   /**
-    * Trigger a frame drop
+    * Trigger a frame drop.
     */
   virtual void DropFrame () = 0;
 
   /**
-    * Select a language from the available ones
-    * \param[in] identifier A string identifier for the target language
+    * Select a language from the available ones.
+    * \param[in] identifier An identifier for the target language
     */
   virtual void SelectLanguage (const char* identifier) = 0;
 
   /**
-    * Callback for the "Pause" command
+    * Callback for the "Pause" command.
     */
   virtual void OnPause () = 0;
 
   /**
-    * Callback for the "Play" commandy
+    * Callback for the "Play" command.
     */
   virtual void OnPlay () = 0;
 
   /**
-    * Callback for the "Stop" command
+    * Callback for the "Stop" command.
     */
   virtual void OnStop () = 0;
 };

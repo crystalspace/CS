@@ -44,100 +44,101 @@ struct iMediaPlayer : public virtual iBase
   SCF_INTERFACE (iMediaPlayer,0,1,0);
 
   /**
-    * Initialize the video player
+    * Initialize the video player.
     * \param[in] media The media container to be used by the player
-    * \param[in] cacheSize The number of frames to cache.If caching is not needed, use 1
+    * \param[in] cacheSize The number of frames to cache. If caching is not needed, use 1.
     */
   virtual void InitializePlayer (csRef<iMediaContainer> media, size_t cacheSize = 1) = 0;
+
   /**
-    * Activate a stream from the media container
-    * \param[in] index Object index
+    * Activate a stream from the media container.
+    * \param[in] index Index of a media stream
     */
   virtual void SetActiveStream (int index) = 0;
 
   /**
-   * Deactivate a stream from the media container
-    * \param[in] index Object index
+   * Deactivate a stream from the media container.
+    * \param[in] index Index of a media stream
     */
   virtual void RemoveActiveStream (int index) = 0;
 
   /**
-    * Get a reference to the internal texture buffer
+    * Get a reference to the internal texture buffer.
     * \param[out] target Target texture
     */
   virtual void GetTargetTexture (csRef<iTextureHandle> &target) = 0;
 
   /**
-    *  Get a reference to the internal audio stream
+    *  Get a reference to the internal audio stream.
     * \param[out] target Target audio stream
     */
   virtual void GetTargetAudio (csRef<iSndSysStream> &target) = 0;
 
   /**
-    * Called continuously to update the player. The user shouldn't call this method directly
+    * Called continuously to update the player. The user shouldn't call this method directly.
     * To start and stop the player, use StartPlayer() and StopPlayer()
     */
   THREADED_INTERFACE ( Update );
 
   /**
-   * Start the update thread for the media player In order to close the player
-    * properly, this must be called when starting the player.
+    * Start the Update thread for the media player. In order to close the player
+    * properly, this method must be called when starting the player.
     */
   virtual void StartPlayer () = 0;
 
   /**
-    * Stop the update thread for the media player. In order to close the player
-    * properly, this must be called when shutting down the player.
+    * Stop the Update thread for the media player. In order to close the player
+    * properly, this method must be called when shutting down the player.
     */
   virtual void StopPlayer () = 0;
 
   /**
-    * Enable/disable looping
+    * Enable/disable looping.
     */
-  virtual void Loop (bool shouldLoop) = 0 ;
+  virtual void Loop (bool shouldLoop) = 0;
 
   /**
-    * Start playing the media
+    * Start playing the media.
     */
-  virtual void Play () = 0 ;
+  virtual void Play () = 0;
 
   /**
-    * Pause the media
+    * Pause the media.
     */
-  virtual void Pause () = 0 ;
+  virtual void Pause () = 0;
 
   /**
-    * Stop the media and seek to the beginning
+    * Stop the media and seek to the beginning.
     */
-  virtual void Stop () = 0 ;
+  virtual void Stop () = 0;
 
   /**
-    * Seek the media
+    * Seek the media to a specified time.
     */
-  virtual void Seek (float time) = 0 ;
+  virtual void Seek (float time) = 0;
 
   /**
-    * Get the position of the media in seconds
+    * Get the position of the media in seconds.
     */
-  virtual float GetPosition () const = 0 ;
+  virtual float GetPosition () const = 0;
 
   /**
-    * Get the length of the media in seconds
+    * Get the length of the media in seconds.
     */
-  virtual float GetLength () const = 0 ;
+  virtual float GetLength () const = 0;
 
   /**
-    * Check if the media is playing or not
+    * Check if the media is playing or not.
     */
-  virtual bool IsPlaying () = 0 ;
+  virtual bool IsPlaying () = 0;
 
   /**
-    * Get the aspect ratio of the active video stream
+    * Get the aspect ratio of the active video stream.
     */  
   virtual float GetAspectRatio () = 0;
 
   /**
-    * Select a language from the available ones
+    * Select a language from the available ones.
     */
   virtual void SelectLanguage (const char* identifier) = 0;
 };

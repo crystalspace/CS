@@ -38,6 +38,9 @@ struct iMedia : public virtual iBase
 {
   SCF_INTERFACE (iMedia,0,1,0);
 
+  /**
+    * Get the media type of this stream.
+    */
   virtual const char* GetType () const = 0;
 
   /**
@@ -46,17 +49,17 @@ struct iMedia : public virtual iBase
   virtual unsigned long GetFrameCount() const = 0;
 
   /**
-    * Return the length in seconds
+    * Return the length in seconds.
     */
   virtual float GetLength () const = 0;
 
   /**
-    * Gets the position of the stream
+    * Get the position of the stream in seconds.
     */
   virtual double GetPosition () const = 0 ;
 
   /**
-    * Clears all the decoders of the stream. Done when destroying the object by the container
+    * Clear all the decoders of the stream. Done when destroying the object by the container.
     */
   virtual void CleanMedia () = 0 ;
 
@@ -66,34 +69,34 @@ struct iMedia : public virtual iBase
   virtual bool Update () = 0 ;
 
   /**
-    * Gets data from the prefetch queue and writes it to the active buffer
+    * Get data from the prefetch queue and write it to the active buffer.
     */
   virtual void WriteData () = 0 ;
   
   /**
-    * Swaps the active buffer for the one that was written to last
+    * Swap the active buffer for the last one that was written to.
     */
   virtual void SwapBuffers () = 0;
   
   /**
-    * Set the number of frames to be cached 
+    * Set the number of frames to be cached.
     * \param[in] size Number of frames
     */
   virtual void SetCacheSize (size_t size) = 0;
 
   /**
-    * Returns true if there is data ready to be used
+    * Return true if there is data ready to be used
     */
   virtual bool HasDataReady () = 0;
 
   /**
-    * Returns true if the cache is full
+    * Return true if the cache is full.
     */
   virtual bool IsCacheFull () = 0;
 
   /**
-    * Triggers a frame drop
-    **/
+    * Trigger a frame drop.
+    */
   virtual void DropFrame () = 0;
 };
 
@@ -105,19 +108,19 @@ struct iVideoMedia : public iMedia
   SCF_INTERFACE (iVideoMedia,0,1,0);
 
   /**
-    * Returns the aspect ratio to use with the image
+    * Return the aspect ratio to use with the image.
     */
   virtual float GetAspectRatio () = 0;
 
 
   /**
-    * Get a reference to the internal texture buffer
+    * Get a reference to the internal texture buffer.
     * \param[out] texture Target texture
     */
   virtual void GetVideoTarget (csRef<iTextureHandle> &texture) = 0;
 
   /**
-    * Returns the target FPS the video stream should run at
+    * Return the target FPS of the video stream.
     */
   virtual double GetTargetFPS () = 0;
 
@@ -131,7 +134,7 @@ struct iAudioMedia : public iMedia
   SCF_INTERFACE (iAudioMedia,0,1,0);
 
   /**
-    *  Get a reference to the internal audio stream
+    *  Get a reference to the internal audio stream.
     * \param[out] stream Target audio stream
     */
   virtual void GetAudioTarget (csRef<iSndSysStream> &stream) = 0;
