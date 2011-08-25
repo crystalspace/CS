@@ -506,9 +506,9 @@ namespace CS
                       data[layer + (k + 1) / 4]
                         [4 * (i + j * persist.shadowMapRes) + (k + 1) % 4]);
 
-            for (int i = 0 ; i < 4 * persist.mrt ; i ++ )
-              csPrintf("%d ", diff[i]);          
-            csPrintf("\n");
+//             for (int i = 0 ; i < 4 * persist.mrt ; i ++ )
+//               csPrintf("%d ", diff[i]);          
+//             csPrintf("\n");
 
             // compute mean
             double mean = 0;
@@ -528,72 +528,58 @@ namespace CS
             csPrintf("split_ratio %lf mean %lf variance %lf func %lf\n", 
               persist.splitRatio, mean, variance, func);
 
+            // compute correlation coefficient:
             double *means = new double[4 * persist.mrt];
-            double *variances = new double[4 * persist.mrt];
+            double *squareSum = new double[4 * persist.mrt];
+            double *xy = new double[4 * persist.mrt];
             double *correlations = new double[4 * persist.mrt];
 
-            // compute correlation coefficient:
-
-            // compute mean
             for (int i = 0 ; i < 4 * persist.mrt ; i ++)
+            {
               means[i] = 0;
+              squareSum[i] = 0;
+              xy[i] = 0;
+            }
 
             for (int layer = 0 ; layer < persist.mrt ; layer ++)
               for (int i = 0 ; i < persist.shadowMapRes ; i ++)
                 for (int j = 0 ; j < persist.shadowMapRes ; j ++)
                   for (int k = 0 ; k < 4 ; k ++)
                   {
-                    means[4 * layer + k] +=
-                      data[layer][4 * (i + j * persist.shadowMapRes) + k];
-                  }
+                    uint8 x = data[layer][4 * (i + j * persist.shadowMapRes) + k];
+                    
+                    means[4 * layer + k] += x;
+                    squareSum[4 * layer + k] += (x * x);
 
-            for (int i = 0 ; i < 4 * persist.mrt ; i ++)
-              means[i] /= (persist.shadowMapRes * persist.shadowMapRes);
-
-            // compute variance
-            for (int i = 0 ; i < 4 * persist.mrt ; i ++)
-              variances[i] = 0;
-
-            for (int layer = 0 ; layer < persist.mrt ; layer ++)
-              for (int i = 0 ; i < persist.shadowMapRes ; i ++)
-                for (int j = 0 ; j < persist.shadowMapRes ; j ++)
-                  for (int k = 0 ; k < 4 ; k ++)
-                  {
-                    variances[4 * layer + k] += pow(
-                      data[layer][4 * (i + j * persist.shadowMapRes) + k] - 
-                      means[4 * layer + k], 2);
-                  }
-
-            // compute correlation
-            for (int i = 0 ; i < 4 * persist.mrt ; i ++)
-              correlations[i] = 0;
-
-            for (int layer = 0 ; layer < persist.mrt ; layer ++)
-              for (int i = 0 ; i < persist.shadowMapRes ; i ++)
-                for (int j = 0 ; j < persist.shadowMapRes ; j ++)
-                  for (int k = 0 ; k < 4 ; k ++)
                     if (4 * layer + k < 4 * persist.mrt - 1)
-                      correlations[4 * layer + k] += 
-                        (data[layer][4 * (i + j * persist.shadowMapRes) + k] - 
-                          means[4 * layer + k]) * 
-                        (data[layer + (k + 1) / 4]
-                          [4 * (i + j * persist.shadowMapRes) + (k + 1) % 4] -
-                          means[4 * layer + k + 1]);
+                    {
+                      uint8 y = data[layer + (k + 1) / 4]
+                        [4 * (i + j * persist.shadowMapRes) + (k + 1) % 4];
+                      xy[4 * layer + k] += (x * y);
+                    }
+                  }
+
+            int n = persist.shadowMapRes * persist.shadowMapRes;
+            for (int i = 0 ; i < 4 * persist.mrt ; i ++)
+              means[i] /= n;
 
             for (int i = 0 ; i < 4 * persist.mrt - 1 ; i ++)
-              correlations[i] /= sqrt(variances[i] * variances[i + 1]);
+            {
+              correlations[i] = (xy[i] - means[i] * means[i + 1] * n) /
+                sqrt( (squareSum[i] - means[i] * means[i] * n) * 
+                (squareSum[i + 1] - means[i + 1] * means[i + 1] * n));
+            }
 
             double sum = 0;
-            for (int i = 0 ; i < 4 * persist.mrt ; i ++)
+            for (int i = 0 ; i < 4 * persist.mrt - 1 ; i ++)
               sum += correlations[i];
 
             csPrintf("Correlation coefficient: ");
-//             for (int i = 0 ; i < 4 * persist.mrt ; i ++)
-//               csPrintf("%lf ", correlations[i]);
             csPrintf("%lf \n", sum);
 
             delete [] means;
-            delete [] variances;
+            delete [] squareSum;
+            delete [] xy;
             delete [] correlations;
 
 //             for (int i = 0 ; i < persist.shadowMapRes ; i ++)
