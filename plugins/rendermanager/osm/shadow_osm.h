@@ -119,7 +119,6 @@ namespace CS
           if( persist.dbgPersist->IsDebugFlagEnabled(persist.dbgChooseSplit) )
           {
             persist.splitRatio = -1;
-            persist.bestSplitRatioMean = -1;
             persist.bestSplitRatioCorrelation = FLT_MAX;
             persist.SetHybridSplit(0);
             persist.dbgPersist->EnableDebugFlag(persist.dbgChooseSplit,false);
@@ -491,42 +490,7 @@ namespace CS
               data[i] = databuf->GetUint8();
             }
 
-            // compute difference between different layers
-            int *diff = new int[4 * persist.mrt];
-            for (int i = 0 ; i < 4 * persist.mrt ; i ++ )
-              diff[i] = 0 ;
-
-            for (int layer = 0 ; layer < persist.mrt ; layer ++)
-              for (int i = 0 ; i < persist.shadowMapRes ; i ++)
-                for (int j = 0 ; j < persist.shadowMapRes ; j ++)
-                  for (int k = 0 ; k < 4 ; k ++)
-                    if (4 * layer + k < 4 * persist.mrt - 1)
-                      diff[4 * layer + k] += 
-                      abs(data[layer][4 * (i + j * persist.shadowMapRes) + k] - 
-                      data[layer + (k + 1) / 4]
-                        [4 * (i + j * persist.shadowMapRes) + (k + 1) % 4]);
-
-//             for (int i = 0 ; i < 4 * persist.mrt ; i ++ )
-//               csPrintf("%d ", diff[i]);          
-//             csPrintf("\n");
-
-            // compute mean
-            double mean = 0;
-            for (int i = 0 ; i < 4 * persist.mrt - 1 ; i ++ )
-              mean += diff[i];
-
-            mean /= (4 * persist.mrt - 1);
-
-            // compute variance
-            double variance = 0;
-            for (int i = 0 ; i < 4 * persist.mrt - 1 ; i ++ )
-              variance += abs(diff[i] - mean);
-
-            double alpha = 1, beta = 1000000;
-            double func = alpha * mean + beta / variance;
-
-            csPrintf("split_ratio %lf mean %lf variance %lf func %lf\n", 
-              persist.splitRatio, mean, variance, func);
+            csPrintf("split_ratio %lf \n", persist.splitRatio);
 
             // compute correlation coefficient:
             double *means = new double[4 * persist.mrt];
@@ -577,65 +541,10 @@ namespace CS
             csPrintf("Correlation coefficient: ");
             csPrintf("%lf \n", sum);
 
-            delete [] means;
-            delete [] squareSum;
-            delete [] xy;
-            delete [] correlations;
-
-//             for (int i = 0 ; i < persist.shadowMapRes ; i ++)
-//               for (int j = 0 ; j < persist.shadowMapRes ; j ++)
-//                 if (data[0][4 * (i + j * persist.shadowMapRes) + 0] == 176 && 
-//                   data[0][4 * (i + j * persist.shadowMapRes) + 1] == 255 && 
-//                   data[0][4 * (i + j * persist.shadowMapRes) + 2] == 255)
-//                     csPrintf("Exists %d %d\n", i, j);
-// 
-//             if(!data[3])
-//             {
-//               csPrintfErr ("Bad data buffer!\n");
-//               return;
-//             }
-// 
-//             csRef<iImage> image;
-//             image.AttachNew(new csImageMemory (persist.shadowMapRes, persist.shadowMapRes, 
-//               data[3], false, CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
-// 
-//             if(!image.IsValid())
-//             {
-//               csPrintfErr ("Error creating image\n");
-//               return;
-//             }
-// 
-//             csPrintf ("Saving %zu KB of data.\n", 
-//               csImageTools::ComputeDataSize (image) / 1024);
-// 
-//             csRef<iDataBuffer> db = persist.imageio->
-//               Save (image, "image/png", "progressive");
-// 
-//             if (db)
-//             {
-//               if (!persist.VFS->
-//                 WriteFile ("render_tex.png", (const char*)db->GetData (), db->GetSize ()))
-//               {
-//                 csPrintfErr ("Failed to write file %s!", CS::Quote::Single ("render_tex.png"));
-//                 return;
-//               }
-//             }
-//             else
-//             {
-//               csPrintfErr ("Failed to save png image for basemap!");
-//               return;
-//             }	
-
-            if (func > persist.bestSplitRatioMean)
-            {
-              persist.bestSplitRatioMean = func;
-              persist.bestSplitRatio = persist.splitRatio;
-            }
-
             if (sum < persist.bestSplitRatioCorrelation)
             {
               persist.bestSplitRatioCorrelation = sum;
-              persist.bestSplitRatio2 = persist.splitRatio;
+              persist.bestSplitRatio = persist.splitRatio;
             }
 
             if (persist.splitRatio < 0.95)
@@ -643,12 +552,14 @@ namespace CS
             else
             {
               persist.SetHybridSplit(persist.bestSplitRatio);
-              csPrintf("Best Split is: %lf and %lf\n", 
-                persist.bestSplitRatio, persist.bestSplitRatio2);
+              csPrintf("Best Split is: %lf\n", persist.bestSplitRatio);
             }
 
-            delete[] data;
-            delete[] diff;
+            delete [] means;
+            delete [] squareSum;
+            delete [] xy;
+            delete [] correlations;
+            delete [] data;
           }
 
           persist.splitRatio += 0.1;
@@ -831,9 +742,7 @@ namespace CS
 
         double splitRatio;
         double bestSplitRatio;
-        double bestSplitRatioMean;
         double bestSplitRatioCorrelation;
-        double bestSplitRatio2;
 
         uint dbgChooseSplit;
         uint dbgShowRenderTextures;
@@ -926,9 +835,7 @@ namespace CS
 
           splitRatio = 2;
           bestSplitRatio = 0;
-          bestSplitRatioMean = -1;
           bestSplitRatioCorrelation = FLT_MAX;
-          bestSplitRatio2 = 0;
           // Set linear or logarithmic split
           SetHybridSplit(1);
 
