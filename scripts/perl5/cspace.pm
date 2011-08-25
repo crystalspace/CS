@@ -18585,6 +18585,39 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iParticleBuiltinEffectorLight ##############
+
+package cspace::iParticleBuiltinEffectorLight;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iParticleEffector cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetInitialCutoffDistance = *cspacec::iParticleBuiltinEffectorLight_SetInitialCutoffDistance;
+*GetInitialCutoffDistance = *cspacec::iParticleBuiltinEffectorLight_GetInitialCutoffDistance;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iParticleBuiltinEffectorLight($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iParticleBuiltinEffectorFactory ##############
 
 package cspace::iParticleBuiltinEffectorFactory;
@@ -18596,6 +18629,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *CreateLinColor = *cspacec::iParticleBuiltinEffectorFactory_CreateLinColor;
 *CreateVelocityField = *cspacec::iParticleBuiltinEffectorFactory_CreateVelocityField;
 *CreateLinear = *cspacec::iParticleBuiltinEffectorFactory_CreateLinear;
+*CreateLight = *cspacec::iParticleBuiltinEffectorFactory_CreateLight;
 *scfGetVersion = *cspacec::iParticleBuiltinEffectorFactory_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

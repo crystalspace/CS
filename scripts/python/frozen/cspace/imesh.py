@@ -2153,6 +2153,17 @@ iParticleBuiltinEffectorLinear_swigregister = _imesh.iParticleBuiltinEffectorLin
 iParticleBuiltinEffectorLinear_swigregister(iParticleBuiltinEffectorLinear)
 iParticleBuiltinEffectorLinear_scfGetVersion = _imesh.iParticleBuiltinEffectorLinear_scfGetVersion
 
+class iParticleBuiltinEffectorLight(iParticleEffector):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetInitialCutoffDistance(*args): return _imesh.iParticleBuiltinEffectorLight_SetInitialCutoffDistance(*args)
+    def GetInitialCutoffDistance(*args): return _imesh.iParticleBuiltinEffectorLight_GetInitialCutoffDistance(*args)
+    __swig_destroy__ = _imesh.delete_iParticleBuiltinEffectorLight
+    __del__ = lambda self : None;
+iParticleBuiltinEffectorLight_swigregister = _imesh.iParticleBuiltinEffectorLight_swigregister
+iParticleBuiltinEffectorLight_swigregister(iParticleBuiltinEffectorLight)
+
 class iParticleBuiltinEffectorFactory(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
@@ -2161,6 +2172,7 @@ class iParticleBuiltinEffectorFactory(core.iBase):
     def CreateLinColor(*args): return _imesh.iParticleBuiltinEffectorFactory_CreateLinColor(*args)
     def CreateVelocityField(*args): return _imesh.iParticleBuiltinEffectorFactory_CreateVelocityField(*args)
     def CreateLinear(*args): return _imesh.iParticleBuiltinEffectorFactory_CreateLinear(*args)
+    def CreateLight(*args): return _imesh.iParticleBuiltinEffectorFactory_CreateLight(*args)
     scfGetVersion = staticmethod(_imesh.iParticleBuiltinEffectorFactory_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iParticleBuiltinEffectorFactory
     __del__ = lambda self : None;
