@@ -83,19 +83,24 @@ bool SelfShadowDemo::OnKeyboard (iEvent &ev)
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'r')
     {
-      rm_dbg->DebugCommand("reset");
+      rm_dbg->DebugCommand("reset_split_ratio");
       return true;
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == 't')
     {
-      rm_dbg->DebugCommand("show");
+      rm_dbg->DebugCommand("show_render_textures");
       return true;
     }
-    else if (csKeyEventHelper::GetCookedCode (&ev) == 'c')
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'n')
     {
       sceneNumber = ( sceneNumber + 1 ) % numberOfScenes;
       CreateScene();
-//       rm_dbg->DebugCommand("reset");
+      return true;
+    }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'p')
+    {
+      sceneNumber = ( sceneNumber - 1 ) % numberOfScenes;
+      CreateScene();
       return true;
     }
 
@@ -142,7 +147,8 @@ bool SelfShadowDemo::Application ()
   hudManager->GetKeyDescriptions()->Push ("w a s d keys: rotate light");
   hudManager->GetKeyDescriptions()->Push ("r: recompute splitting function");
   hudManager->GetKeyDescriptions()->Push ("t: show render textures");
-  hudManager->GetKeyDescriptions()->Push ("c: change scene");
+  hudManager->GetKeyDescriptions()->Push ("n: next scene");
+  hudManager->GetKeyDescriptions()->Push ("p: previous scene");
 
   /* NOTE: Config settings for render managers are stored in 'engine.cfg' 
    * and are needed when loading a render manager. Normally these settings 
@@ -158,7 +164,7 @@ bool SelfShadowDemo::Application ()
     return ReportError("Failed to load OSM Render Manager!");
 
   rm_dbg = scfQueryInterface<iDebugHelper>(rm);
-  sceneNumber = 1;
+  sceneNumber = 2;
 
   cfg->RemoveDomain ("/config/engine.cfg");
 
@@ -181,22 +187,32 @@ bool SelfShadowDemo::CreateScene ()
     ReportError("Invalid scene number!");
     return false;
   }
-  char *worlds[] = {"world", "world_tree", "world_grass", 
-    "world_grass_small", "world_grass_big"};
+  char *worlds[] = {"world_krystal", "world", "world_tree", 
+    "world_grass", "world_grass_small", "world_grass_big"};
 
   printf ("Loading level...\n");
   vfs->ChDir ("/lev/selfshadow");
   if (!loader->LoadMapFile (worlds[sceneNumber]))
     ReportError("Error couldn't load level!");
 
-//   LoadKrystal();
-
+  if (sceneNumber == 0)
+  {
+    LoadKrystal();
+    rm_dbg->DebugCommand("hide_opaque_objects");
+  }
+  else
+    rm_dbg->DebugCommand("show_opaque_objects");
+  
   engine->Prepare ();
 
   // Setup the camera
   cameraManager->SetCamera(view->GetCamera());
   cameraManager->SetCameraMode (CS::Utility::CAMERA_ROTATE);
   cameraManager->SetMotionSpeed (10.0f);
+  if (sceneNumber == 0)
+    cameraManager->SetCameraTarget(csVector3(0,1.5f,0));
+  else
+    cameraManager->SetCameraTarget(csVector3(0));
 
   printf ("Ready!\n");
 
@@ -265,7 +281,7 @@ void SelfShadowDemo::LoadKrystal()
 
   // Load the Marschner shader
   csRef<iMaterialWrapper> materialWrapper = 
-    engine->FindMaterial ("marschner_material");
+    engine->FindMaterial ("hair_trans");
   if (!materialWrapper)
     ReportError ("Can't find marschner material!");
 
@@ -273,7 +289,7 @@ void SelfShadowDemo::LoadKrystal()
   csRef<CS::Mesh::iFurMeshMaterialProperties> hairMeshProperties = 
     furMeshType->CreateHairMeshMarschnerProperties ("krystal_marschner");
   hairMeshProperties->SetMaterial(materialWrapper->GetMaterial ());
-  animesh->GetSubMesh (1)->SetMaterial (materialWrapper);
+//   animesh->GetSubMesh (1)->SetMaterial (materialWrapper);
 
   csRef<CS::Animation::iFurAnimatedMeshControl> animationPhysicsControl = 
     scfQueryInterface<CS::Animation::iFurAnimatedMeshControl>
@@ -300,21 +316,6 @@ void SelfShadowDemo::LoadKrystal()
 
   if (!svStrings) 
    ReportError ("No SV names string set!\n");
-
-  // remove diffuse, blonde and transparent
-  CS::ShaderVarName objColor (svStrings, "fur color");	
-
-  csVector4 color = csVector4(0.51f, 0.34f, 0.25f, 0.4f); 
-  materialWrapper->GetMaterial()->GetVariableAdd(objColor)->SetValue(color);  
-
-  CS::ShaderVarName objTexture (svStrings, "texture map");	
-  materialWrapper->GetMaterial()-> RemoveVariable(objTexture);  
-
-  CS::ShaderVarName diffuseType (svStrings, "diffuse type");	
-  // use ambient instead
-  materialWrapper->GetMaterial()-> GetVariableAdd(diffuseType)->SetValue(100);  
-
-  furMesh->GetFurMeshProperties()->Invalidate();
 
   furMesh->SetAnimatedMesh (animesh);
   furMesh->SetMeshFactory (animeshFactory);

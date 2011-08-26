@@ -27,7 +27,7 @@
 class SelfShadowDemo : public CS::Utility::DemoApplication
 {
  private:
-  static const int numberOfScenes = 5;
+  static const int numberOfScenes = 6;
   bool CreateScene ();
   void LoadKrystal();
   int sceneNumber;

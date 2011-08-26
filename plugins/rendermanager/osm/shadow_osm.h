@@ -209,7 +209,7 @@ namespace CS
         void ProcessGeometry(SuperFrustum* superFrust, 
           typename RenderTree::ContextNode& context, iLight* light, 
           CS::RenderManager::RenderView* rview, float& _near, float& _far, 
-          csBox3& castingObjects, csBox3& receivingObjects)
+          csBox3& castingObjects, csBox3& receivingObjects, bool showOpaqueObjects)
         {
           typename RenderTree::ContextNode::TreeType::MeshNodeTreeIteratorType 
             it = context.meshNodes.GetIterator ();
@@ -235,9 +235,10 @@ namespace CS
               csVector3 lightPosition = light->GetMovable()->GetPosition();
 
               // only take into account translucent objects
-//               if ( mesh.meshWrapper->GetRenderPriority() != 
-//                 rview->GetEngine()->GetRenderPriority("alpha"))
-//                 continue;
+              if (!showOpaqueObjects &&
+                mesh.meshWrapper->GetRenderPriority() != 
+                rview->GetEngine()->GetRenderPriority("alpha"))
+                  continue;
 
               // add to mesh filter include
 	            superFrust->meshFilter.AddFilterMesh (mesh.meshWrapper);
@@ -359,7 +360,8 @@ namespace CS
           csBox3 receivingObjects;
   
           ProcessGeometry(lightFrustums.frustums[0], context, light, rview, 
-            _near, _far, castingObjects, receivingObjects);
+            _near, _far, castingObjects, receivingObjects, 
+            persist.dbgPersist->IsDebugFlagEnabled(persist.dbgShowOpaqueObjects));
 
           CS::Math::Matrix4 proj = FindOrthCropMatrix(rview, light, 
             castingObjects, receivingObjects);
@@ -746,6 +748,7 @@ namespace CS
 
         uint dbgChooseSplit;
         uint dbgShowRenderTextures;
+        uint dbgShowOpaqueObjects;
         RenderTreeBase::DebugPersistent *dbgPersist;
 
         /// Set the prefix for configuration settings
@@ -770,6 +773,9 @@ namespace CS
           dbgShowRenderTextures =
             dbgPersist.RegisterDebugFlag ("draw.osm.render.textures");
           dbgPersist.EnableDebugFlag(dbgShowRenderTextures, true);
+          dbgShowOpaqueObjects =
+            dbgPersist.RegisterDebugFlag ("draw.osm.opaque.objects");
+          dbgPersist.EnableDebugFlag(dbgShowOpaqueObjects, true);
 
           this->shaderManager = shaderManager;
           this->g3d = g3d;

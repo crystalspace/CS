@@ -282,14 +282,14 @@ struct WrapShadowParams<RMOSM::ShadowType>
   //----------------------------------------------------------------------
   bool RMOSM::DebugCommand(const char *cmd)
   {
-    if (strcmp (cmd, "reset") == 0)
+    if (strcmp (cmd, "reset_split_ratio") == 0)
     {
       uint flag = 
         treePersistent.debugPersist.QueryDebugFlag("draw.osm.choose.split");
       treePersistent.debugPersist.EnableDebugFlag(flag,true);
       return true;
     }
-    else if (strcmp (cmd, "show") == 0)
+    else if (strcmp (cmd, "show_render_textures") == 0)
     {
       uint flag = 
         treePersistent.debugPersist.QueryDebugFlag("draw.osm.render.textures");
@@ -297,6 +297,20 @@ struct WrapShadowParams<RMOSM::ShadowType>
         treePersistent.debugPersist.EnableDebugFlag(flag,false);
       else
         treePersistent.debugPersist.EnableDebugFlag(flag,true);
+      return true;
+    }
+    else if (strcmp (cmd, "show_opaque_objects") == 0)
+    {
+      uint flag = 
+        treePersistent.debugPersist.QueryDebugFlag("draw.osm.opaque.objects");
+      treePersistent.debugPersist.EnableDebugFlag(flag,true);
+      return true;
+    }
+    else if (strcmp (cmd, "hide_opaque_objects") == 0)
+    {
+      uint flag = 
+        treePersistent.debugPersist.QueryDebugFlag("draw.osm.opaque.objects");
+      treePersistent.debugPersist.EnableDebugFlag(flag,false);
       return true;
     }
 
