@@ -104,7 +104,7 @@ touchingContact (false), speed (0), useGhostSweep (true), recoveringFactor (0.2f
   SetMaxSlope (btRadians (45.0f));
   fallSpeed = 55.0f * system->getInternalScale ();
   jumpSpeed = 9.8f * system->getInternalScale ();
-  stepHeight = 0.05f * system->getInternalScale ();
+  stepHeight = 0.1f * system->getInternalScale ();
 }
 
 csBulletCollisionActor::~csBulletCollisionActor ()
@@ -154,6 +154,8 @@ void csBulletCollisionActor::SetRotation (const csMatrix3& rot)
   csOrthoTransform trans = GetTransform ();
   trans.SetT2O (rot);
   SetTransform (trans);
+  if (camera)
+    camera->SetTransform (trans);
 }
 
 void csBulletCollisionActor::Rotate (const csVector3& v, float angle)
@@ -161,19 +163,21 @@ void csBulletCollisionActor::Rotate (const csVector3& v, float angle)
   csOrthoTransform trans = GetTransform ();
   trans.RotateThis (v, angle);
   SetTransform (trans);
+  if (camera)
+    camera->GetTransform ().RotateThis (v, angle);
 }
 
 void csBulletCollisionActor::SetCamera (iCamera* camera)
 {
   SetTransform (camera->GetTransform ());
   this->camera = camera; 
-  csVector3 upVec = GetTransform ().GetUp ();
+  csVector3 upVec = camera->GetTransform ().GetUp ();
   upVector.setValue (upVec.x, upVec.y, upVec.z);
 }
 
 void csBulletCollisionActor::UpdateAction (float delta)
 {
-  csVector3 frVec = GetTransform ().GetFront ();
+  csVector3 frVec = camera->GetTransform ().GetFront ();
   frontVector.setValue (frVec.x, frVec.y, frVec.z);
   PreStep ();
   PlayerStep (delta);
@@ -214,7 +218,7 @@ void csBulletCollisionActor::PlayerStep (float delta)
   currentPosition = StepDown (delta);
 
   xform.SetOrigin (BulletToCS (currentPosition, system->getInverseInternalScale ()));
-  SetTransform (xform);
+  csBulletCollisionObject::SetTransform (xform);
 }
 
 void csBulletCollisionActor::Jump ()

@@ -62,10 +62,8 @@ void csBulletCollisionObject::SetTransform (const csOrthoTransform& trans)
 {
 
   //Lulu: I don't understand why remove the body from the world then set MotionState,
-  //      then add it back to the world. I didn't add this part to my code.
-  //      So this code may be incorrect. I have to mark this.
+  //      then add it back to the world. 
 
-  //TODO: Think about this and RebuildObject...
   transform = CSToBullet (trans, system->getInternalScale ());
 
   if (type == CS::Collision2::COLLISION_OBJECT_BASE || type == CS::Collision2::COLLISION_OBJECT_PHYSICAL)
@@ -86,12 +84,8 @@ void csBulletCollisionObject::SetTransform (const csOrthoTransform& trans)
         dynamic_cast<btRigidBody*>(btObject)->setCenterOfMassTransform (motionState->m_graphicsWorldTrans);
       }
 
-      CS::Collision2::CollisionGroupMask mask = -1;
-      if (collGroup.value != 1)
-        mask ^= collGroup.value;
-
       if (insideWorld)
-        sector->bulletWorld->addRigidBody (btRigidBody::upcast (btObject), collGroup.value, mask);
+        sector->bulletWorld->addRigidBody (btRigidBody::upcast (btObject), collGroup.value, collGroup.mask);
     }
     else
     {
@@ -271,25 +265,7 @@ void csBulletCollisionObject::SetCollisionGroup (const char* name)
 
 bool csBulletCollisionObject::Collide (CS::Collision2::iCollisionObject* otherObject)
 {
-  //Ghost VS no matter what kind.
-  if (type == CS::Collision2::COLLISION_OBJECT_GHOST
-    || type == CS::Collision2::COLLISION_OBJECT_ACTOR)
-  {
-    btGhostObject* ghost = btGhostObject::upcast (btObject);
-    btAlignedObjectArray<btCollisionObject*>& overObjects = ghost->getOverlappingPairs ();
-    for (int i = 0; i < overObjects.size (); i++)
-    {
-      if (overObjects[i]->getUserPointer () == dynamic_cast<void*> (otherObject))
-        return true;
-    }
-    return false;
-  }
-
-  //no matter what kind VS Ghost, Actor.
-  if (otherObject->GetObjectType () != CS::Collision2::COLLISION_OBJECT_BASE 
-    && otherObject->GetObjectType () != CS::Collision2::COLLISION_OBJECT_PHYSICAL)
-    return otherObject->Collide (this);
-
+  csArray<CS::Collision2::CollisionData> data;
   csBulletCollisionObject* otherObj = dynamic_cast<csBulletCollisionObject*> (otherObject);
   if (isTerrain)
   {
@@ -303,8 +279,14 @@ bool csBulletCollisionObject::Collide (CS::Collision2::iCollisionObject* otherOb
     for (size_t i = 0; i < terrainColl->bodies.GetSize (); i++)
     {
       btRigidBody* body = terrainColl->GetBulletObject (i);
-      return sector->BulletCollide (body, otherBtObject);
+      if (sector->BulletCollide (body, otherBtObject, data))
+      {
+        if (otherObj->collCb)
+          otherObj->collCb->OnCollision (otherObj, this, data);
+        return true;
+      }
     }
+    return false;
   }
   else
   {
@@ -314,7 +296,12 @@ bool csBulletCollisionObject::Collide (CS::Collision2::iCollisionObject* otherOb
 
     //Object/Body VS object.
     btCollisionObject* otherBtObject = dynamic_cast<csBulletCollisionObject*> (otherObject)->GetBulletCollisionPointer ();
-    return sector->BulletCollide (btObject, otherBtObject);
+    bool result = sector->BulletCollide (btObject, otherBtObject, data);
+    if (result)
+      if (collCb)
+        collCb->OnCollision (this, otherObj, data);
+
+    return result;
   }
   return false;
 }
@@ -408,7 +395,7 @@ CS::Collision2::iCollisionObject* csBulletCollisionObject::GetContactObject (siz
   }
 }
 
-void csBulletCollisionObject::RemoveBulletObject ()
+bool csBulletCollisionObject::RemoveBulletObject ()
 {
   if (insideWorld)
   {
@@ -441,10 +428,12 @@ void csBulletCollisionObject::RemoveBulletObject ()
 
     objectCopy = NULL;
     objectOrigin = NULL;
+    return true;
   }
+  return false;
 }
 
-void csBulletCollisionObject::AddBulletObject ()
+bool csBulletCollisionObject::AddBulletObject ()
 {
   //Add to world in this function...
   if (insideWorld)
@@ -499,6 +488,7 @@ void csBulletCollisionObject::AddBulletObject ()
     sector->bulletWorld->addCollisionObject (btObject, collGroup.value, collGroup.mask);
   }
   insideWorld = true;
+  return true;
 }
 }
 CS_PLUGIN_NAMESPACE_END (Bullet2)

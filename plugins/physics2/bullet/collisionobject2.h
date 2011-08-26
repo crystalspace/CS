@@ -89,8 +89,8 @@ public:
   virtual CS::Collision2::iCollisionObject* GetContactObject (size_t index);
 
   btCollisionObject* GetBulletCollisionPointer () {return btObject;}
-  virtual void RemoveBulletObject ();
-  virtual void AddBulletObject ();
+  virtual bool RemoveBulletObject ();
+  virtual bool AddBulletObject ();
   void RemoveObjectCopy () {
     csBulletSector* sec = objectCopy->sector;
     sec->RemoveCollisionObject (objectCopy);

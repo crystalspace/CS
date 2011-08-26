@@ -84,7 +84,7 @@ csBulletSector::csBulletSector (csBulletSystem* sys)
  :scfImplementationType (this), sys (sys), isSoftWorld (false), hitPortal (NULL),
  sector (NULL), softWorldInfo (NULL), worldTimeStep (1.0f / 60.0f),
  worldMaxSteps (1), linearDampening (0.0f), angularDampening (0.0f), linearDisableThreshold (0.8f),
- angularDisableThreshold (1.0f), timeDisableThreshold (0.0f), debugDraw (NULL), allFilter (-1)
+ angularDisableThreshold (1.0f), timeDisableThreshold (0.0f), debugDraw (NULL)
 {
   configuration = new btDefaultCollisionConfiguration ();
   dispatcher = new btCollisionDispatcher (configuration);
@@ -102,6 +102,8 @@ csBulletSector::csBulletSector (csBulletSystem* sys)
   broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
 
   SetGravity (csVector3 (0.0f, -9.81f, 0.0f));
+
+  CS::Collision2::CollisionGroupMask allFilter = -1;
 
   CS::Collision2::CollisionGroup defaultGroup ("Default");
   defaultGroup.value = 1;
@@ -148,8 +150,8 @@ csBulletSector::~csBulletSector ()
   }
 
   joints.DeleteAll ();
-  rigidBodies.DeleteAll ();
   softBodies.DeleteAll ();
+  rigidBodies.DeleteAll ();
   collisionObjects.DeleteAll ();
   portals.DeleteAll ();
   collisionActor = NULL;
@@ -212,11 +214,13 @@ void csBulletSector::RemoveCollisionObject (CS::Collision2::iCollisionObject* ob
   }
   else
   {
-    collObject->RemoveBulletObject ();
-    collObject->insideWorld = false;
+    bool removed = collObject->RemoveBulletObject ();
 
-    RemoveMovableFromSector (object);
-    collisionObjects.Delete (collObject);
+    if (removed)
+    {
+      RemoveMovableFromSector (object);
+      collisionObjects.Delete (collObject);
+    }
   }
 }
 
@@ -315,7 +319,7 @@ CS::Collision2::HitBeamResult csBulletSector::HitBeam (const csVector3& start, c
   btVector3 rayTo = CSToBullet (end, sys->getInternalScale ());
 
   btCollisionWorld::ClosestRayResultCallback rayCallback (rayFrom, rayTo);
-  rayCallback.m_collisionFilterMask = allFilter ^ 16;
+  rayCallback.m_collisionFilterMask = collGroups[4].mask;
   rayCallback.m_collisionFilterGroup = 1;
   bulletWorld->rayTest (rayFrom, rayTo, rayCallback);
 
@@ -442,7 +446,7 @@ CS::Collision2::CollisionGroup& csBulletSector::CreateCollisionGroup (const char
 
   CS::Collision2::CollisionGroup newGroup(name);
   newGroup.value = 1 << groupCount;
-  newGroup.mask = allFilter ^ newGroup.value;
+  newGroup.mask = ~newGroup.value;
   collGroups.Push (newGroup);
   return collGroups[groupCount];
 }
@@ -623,11 +627,10 @@ CS::Collision2::iCollisionActor* csBulletSector::GetCollisionActor ()
 }
 
 bool csBulletSector::BulletCollide (btCollisionObject* objectA,
-                                    btCollisionObject* objectB)
+                                    btCollisionObject* objectB,
+                                    csArray<CS::Collision2::CollisionData>& data)
 {
   //contactPairTest
-  //Does user need the collision data?
-  csArray<CS::Collision2::CollisionData> data;
   PointContactResult result(sys, data);
   bulletWorld->contactPairTest (objectA, objectB, result);
   if (data.IsEmpty ())
@@ -788,7 +791,11 @@ void csBulletSector::AddRigidBody (CS::Physics2::iRigidBody* body)
 
   btBody->sector = this;
   btBody->collGroup = collGroups[0]; // Default Group.
+  btBody->linearDampening = linearDampening;
+  btBody->angularDampening = angularDampening;
   btBody->AddBulletObject ();
+  btBody->btBody->setSleepingThresholds (linearDisableThreshold, angularDisableThreshold);
+  btBody->btBody->setDeactivationTime (timeDisableThreshold);
 
   AddMovableToSector (body);
 }
@@ -798,10 +805,12 @@ void csBulletSector::RemoveRigidBody (CS::Physics2::iRigidBody* body)
   csBulletRigidBody* btBody = dynamic_cast<csBulletRigidBody*> (body);
   CS_ASSERT (btBody);
 
-  btBody->RemoveBulletObject ();
-  RemoveMovableFromSector (body);
-
-  rigidBodies.Delete (btBody);
+  bool removed = btBody->RemoveBulletObject ();
+  if (removed)
+  {
+    RemoveMovableFromSector (body);
+    rigidBodies.Delete (btBody);
+  }
 }
 
 CS::Physics2::iRigidBody* csBulletSector::GetRigidBody (size_t index)
@@ -844,10 +853,12 @@ void csBulletSector::RemoveSoftBody (CS::Physics2::iSoftBody* body)
   csBulletSoftBody* btBody = dynamic_cast<csBulletSoftBody*> (body);
   CS_ASSERT (btBody);
 
-  btBody->RemoveBulletObject ();
-  softBodies.Delete (btBody);
-
-  RemoveMovableFromSector (body);
+  bool removed = btBody->RemoveBulletObject ();
+  if (removed)
+  {
+    softBodies.Delete (btBody);
+    RemoveMovableFromSector (body);
+  }
 }
 
 CS::Physics2::iSoftBody* csBulletSector::GetSoftBody (size_t index)
@@ -1141,6 +1152,8 @@ void csBulletSector::UpdateCollisionPortals ()
           //use AABB
           btVector3 aabbMin, aabbMax;
           csBulletSoftBody* sb = dynamic_cast<csBulletSoftBody*> (pb);
+          if (sb->anchorCount != 0)
+            continue;
           if (sb->joints.GetSize () != 0)
           {
             sb->SetLinearVelocity (csVector3 (0.0f));
@@ -1171,6 +1184,8 @@ void csBulletSector::UpdateCollisionPortals ()
         {
           //Check if this is a joint chain.
           csBulletRigidBody* firstBody = dynamic_cast<csBulletRigidBody*> (pb->QueryRigidBody ());
+          if (firstBody->anchorCount != 0)
+            continue;
           if (firstBody->joints.GetSize () != 0)
           {
             btVector3 aabbMin, aabbMax;

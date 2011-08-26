@@ -139,7 +139,6 @@ class csBulletSector : public scfImplementationExt3<
   float worldTimeStep;
   size_t worldMaxSteps;
 
-  CS::Collision2::CollisionGroupMask allFilter; 
   bool isSoftWorld;
 
   void CheckCollisions();
@@ -247,7 +246,8 @@ public:
   virtual void DumpProfile (bool resetProfile = true);
 
   bool BulletCollide (btCollisionObject* objectA,
-    btCollisionObject* objectB);
+    btCollisionObject* objectB,
+    csArray<CS::Collision2::CollisionData>& data);
 
   CS::Collision2::HitBeamResult RigidHitBeam(btCollisionObject* object, 
 			     const csVector3& start,

@@ -37,7 +37,7 @@
 CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
 csBulletSoftBody::csBulletSoftBody (csBulletSystem* phySys, btSoftBody* body)
-  :scfImplementationType (this, phySys), btBody (body),
+  :scfImplementationType (this, phySys), btBody (body), anchorCount (0),
   friction (5.0f), density (0.1f)
 {
   btObject = body;
@@ -114,7 +114,7 @@ CS::Collision2::HitBeamResult csBulletSoftBody::HitBeam (const csVector3& start,
   return result;
 }
 
-void csBulletSoftBody::RemoveBulletObject ()
+bool csBulletSoftBody::RemoveBulletObject ()
 {
   if (insideWorld)
   {
@@ -124,10 +124,23 @@ void csBulletSoftBody::RemoveBulletObject ()
       static_cast<btSoftRigidDynamicsWorld*> (sector->bulletWorld);
     softWorld->removeSoftBody (btBody);
     insideWorld = false;
+    anchorCount = 0;
+    animatedAnchors.DeleteAll ();
+    sector->anchoredSoftBodies.Delete (this);
+    for (int i = 0; i < btBody->m_anchors.size (); i++)
+    {
+      btRigidBody* btRB = btBody->m_anchors[i].m_body;
+      CS::Collision2::iCollisionObject* collObject = static_cast<CS::Collision2::iCollisionObject*> (
+        btRB->getUserPointer ());
+      csBulletRigidBody* rb = dynamic_cast<csBulletRigidBody*> (collObject);
+      rb->anchorCount -- ;
+    }
+    return true;
   }
+  return false;
 }
 
-void csBulletSoftBody::AddBulletObject ()
+bool csBulletSoftBody::AddBulletObject ()
 {
   if (!insideWorld)
   {
@@ -140,6 +153,7 @@ void csBulletSoftBody::AddBulletObject ()
       dynamic_cast<iPhysicalBody*>(this)));
     insideWorld = true;
   }
+  return true;
 }
 
 bool csBulletSoftBody::Disable ()
@@ -243,6 +257,7 @@ void csBulletSoftBody::AnchorVertex (size_t vertexIndex)
 {
   CS_ASSERT(vertexIndex < (size_t) btBody->m_nodes.size ());
   btBody->setMass (vertexIndex, 0.0f);
+  anchorCount ++;
 }
 
 void csBulletSoftBody::AnchorVertex (size_t vertexIndex, iRigidBody* body)
@@ -252,6 +267,8 @@ void csBulletSoftBody::AnchorVertex (size_t vertexIndex, iRigidBody* body)
     && vertexIndex < (size_t) this->btBody->m_nodes.size ()
     && rigidBody->btBody);
   this->btBody->appendAnchor (vertexIndex, rigidBody->btBody);
+  anchorCount ++;
+  rigidBody->anchorCount ++;
 }
 
 void csBulletSoftBody::AnchorVertex (size_t vertexIndex,
@@ -260,6 +277,7 @@ void csBulletSoftBody::AnchorVertex (size_t vertexIndex,
   AnimatedAnchor anchor (vertexIndex, controller);
   animatedAnchors.Push (anchor);
   (sector->anchoredSoftBodies).Push (this);
+  anchorCount ++;
 }
 
 void csBulletSoftBody::UpdateAnchor (size_t vertexIndex, csVector3& position)
@@ -285,6 +303,7 @@ void csBulletSoftBody::RemoveAnchor (size_t vertexIndex)
   if (btBody->getMass (vertexIndex) < SMALL_EPSILON)
   {
     btBody->setMass (vertexIndex, btBody->getTotalMass () / btBody->m_nodes.size ());
+    anchorCount --;
     return;
   }
 
@@ -297,6 +316,7 @@ void csBulletSoftBody::RemoveAnchor (size_t vertexIndex)
     {
       animatedAnchors.DeleteIndex (index);
       (sector->anchoredSoftBodies).Delete (this);
+      anchorCount --;
       return;
     }
   }

@@ -81,7 +81,9 @@ public:
   virtual void SetTransform (const csOrthoTransform& trans) 
   {
     csBulletCollisionObject::SetTransform (trans);
-    if (camera) camera->SetTransform (trans);
+
+    if (camera)
+      camera->GetTransform ().SetOrigin (GetTransform ().GetOrigin ());
   }
   virtual csOrthoTransform GetTransform () {return csBulletCollisionObject::GetTransform ();}
 
@@ -109,8 +111,8 @@ public:
   virtual CS::Collision2::iCollisionObject* GetContactObject (size_t index) {
     return csBulletCollisionObject::GetContactObject (index);}
 
-  virtual void RemoveBulletObject () {csBulletCollisionObject::RemoveBulletObject ();}
-  virtual void AddBulletObject () {csBulletCollisionObject::AddBulletObject ();}
+  virtual bool RemoveBulletObject () {return csBulletCollisionObject::RemoveBulletObject ();}
+  virtual bool AddBulletObject () {return csBulletCollisionObject::AddBulletObject ();}
 
   //iCollisionActor
   virtual bool IsOnGround ();

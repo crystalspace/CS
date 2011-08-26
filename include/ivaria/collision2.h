@@ -96,7 +96,6 @@ struct CollisionGroup
 
   /// The value of the group.
   CollisionGroupMask value;
-  CollisionGroupMask group;
 
   /// The mask of the group.
   CollisionGroupMask mask;
@@ -177,11 +176,10 @@ struct iCollisionCallback: public virtual iBase
    * A collision occurred.
    * \param thisbody The body that received a collision.
    * \param otherbody The body that collided with \a thisBody.
-   * \param collisions The list of collisions between the two bodies. 
-   * \param timesteps Since how many simulation time steps this collision occured. 
+   * \param collisions The list of collisions between the two bodies.  
    */
   virtual void OnCollision (iCollisionObject *thisbody, iCollisionObject *otherbody, 
-      const csArray<CollisionData>& collisions, size_t timesteps) = 0; 
+      const csArray<CollisionData>& collisions) = 0; 
 };
 
 /**

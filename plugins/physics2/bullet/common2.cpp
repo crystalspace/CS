@@ -94,8 +94,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
 
     // get the body transform from the callback
     csOrthoTransform transform;
-    rb->kinematicCb->GetBodyTransform (rb, transform);
-    trans = CSToBullet (principalAxis * transform, body->system->getInternalScale ());
+    if (rb->movable)
+    {
+      rb->kinematicCb->GetBodyTransform (rb, transform);
+      trans = CSToBullet (principalAxis * transform, body->system->getInternalScale ());
+    }
+    else
+      btDefaultMotionState::getWorldTransform (trans);
   }
 
 }

@@ -26,7 +26,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
 csBulletRigidBody::csBulletRigidBody (csBulletSystem* phySys)
 : scfImplementationType (this, phySys), btBody (NULL), density (0.2f), totalMass (0.0f),
-physicalState (CS::Physics2::STATE_DYNAMIC), softness (0.01f), 
+physicalState (CS::Physics2::STATE_DYNAMIC), softness (0.01f), anchorCount (0),
 friction (5.0f), elasticity (0.2f), linearVelocity (0.0f, 0.0f, 0.0f),
 angularVelocity (0.0f, 0.0f, 0.0f), linearDampening (0.0f), angularDampening (0.0f)
 {
@@ -84,10 +84,16 @@ void csBulletRigidBody::RemoveCollider (size_t index)
   relaTransforms.DeleteIndex (index);
 }
 
-void csBulletRigidBody::RemoveBulletObject ()
+bool csBulletRigidBody::RemoveBulletObject ()
 {
   if (insideWorld)
   {
+    if (anchorCount > 0)
+    {
+      csFPrintf (stderr, "csBulletRigidBody: Please remove the soft body attached with this body first.\n");
+      return false;
+    }
+
     for (size_t i = 0; i < joints.GetSize (); i++)
       sector->RemoveJoint (joints[i]);
 
@@ -107,10 +113,12 @@ void csBulletRigidBody::RemoveBulletObject ()
 
     objectCopy = NULL;
     objectOrigin = NULL;
+    return true;
   }
+  return false;
 }
 
-void csBulletRigidBody::AddBulletObject ()
+bool csBulletRigidBody::AddBulletObject ()
 {
   if (insideWorld)
     RemoveBulletObject ();
@@ -189,6 +197,7 @@ void csBulletRigidBody::AddBulletObject ()
     dynamic_cast<csBulletCollisionObject*>(this)));
  
   insideWorld = true;
+  return true;
 }
 
 bool csBulletRigidBody::Disable ()
@@ -591,7 +600,7 @@ void csBulletDefaultKinematicCallback::GetBodyTransform
   {
     transform = movable->GetFullTransform ();
     return;
-  }  
+  }
 }
 }
 CS_PLUGIN_NAMESPACE_END (Bullet2)

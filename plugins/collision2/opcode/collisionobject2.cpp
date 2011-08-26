@@ -114,9 +114,24 @@ bool csOpcodeCollisionObject::Collide (CS::Collision2::iCollisionObject* otherOb
   if (obj->isTerrain && isTerrain)
     return false;
   else if (obj->isTerrain || isTerrain)
-    return sector->CollideTerrain (this, obj, collisions, false);
+  {
+    bool contact = sector->CollideTerrain (this, obj, collisions);
+    if (contact)
+      if (collCb)
+        if (obj->isTerrain)
+          collCb->OnCollision (this,obj,collisions);
+        else
+          collCb->OnCollision (obj,this,collisions);
+    return contact;
+  }
   else
-    return sector->CollideObject (this, obj, collisions, false);
+  {
+    bool contact = sector->CollideObject (this, obj, collisions);
+    if (contact)
+      if (collCb)
+        collCb->OnCollision (this, obj, collisions);
+    return contact;
+  }
 }
 
 CS::Collision2::HitBeamResult csOpcodeCollisionObject::HitBeam (const csVector3& start, const csVector3& end)

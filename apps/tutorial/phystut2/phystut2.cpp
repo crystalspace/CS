@@ -90,15 +90,10 @@ void Simple::Frame ()
     {
       csOrthoTransform trans = view->GetCamera()->GetTransform();
       if (kbd->GetKeyState (CSKEY_UP))
-      {
         trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () * csVector3 (0, 0, 5) * speed);
-        cameraBody->SetTransform (trans);
-      }
       if (kbd->GetKeyState (CSKEY_DOWN))
-      {
         trans.SetOrigin (trans.GetOrigin () + trans.GetT2O () * csVector3 (0, 0, -5) * speed);
-        cameraBody->SetTransform (trans);
-      }
+      cameraBody->SetTransform (trans);
     }
   }
   else if (physicalCameraMode == CAMERA_ACTOR)
@@ -178,9 +173,15 @@ void Simple::Frame ()
 
   GripContactBodies ();
 
-  if (physicalCameraMode == CAMERA_DYNAMIC || physicalCameraMode == CAMERA_KINEMATIC)
+  if (physicalCameraMode == CAMERA_DYNAMIC)
+  {
     view->GetCamera ()->GetTransform ().SetOrigin
     (cameraBody->GetTransform ().GetOrigin ());
+  }
+  else if (physicalCameraMode == CAMERA_KINEMATIC)
+  {
+    view->GetCamera ()->SetTransform (cameraBody->GetTransform ());
+  }
   if (physicalCameraMode == CAMERA_ACTOR)
     cameraActor->UpdateAction (speed / dynamicSpeed);
 
@@ -505,8 +506,11 @@ bool Simple::OnKeyboard (iEvent &event)
           CS::Physics2::iRigidBody* rigidBody = clipboardBody->QueryRigidBody ();
           if (rigidBody->GetState () == CS::Physics2::STATE_DYNAMIC)
           {
+            int count = physicalSector->GetRigidBodyCount ();
             physicalSector->RemoveRigidBody (clipboardBody->QueryRigidBody ());
             //room->GetMeshes ()->Remove (clipboardMovable->GetSceneNode ()->QueryMesh ());
+            if (physicalSector->GetRigidBodyCount () == count)
+              clipboardBody.Invalidate ();
           }
         }
         else
@@ -1068,7 +1072,8 @@ void Simple::UpdateCameraMode ()
       collisionSector->RemoveCollisionActor ();
       // Create a body
       cameraBody = physicalSystem->CreateRigidBody ();
-      cameraBody->SetTransform (view->GetCamera ()->GetTransform ());
+      const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+      cameraBody->SetTransform (tc);
 
       csRef<CS::Collision2::iColliderSphere> sphere = collisionSystem->CreateColliderSphere (0.8f);
       csOrthoTransform localTrans;
@@ -1078,13 +1083,15 @@ void Simple::UpdateCameraMode ()
       cameraBody->SetFriction (10.0f);
       cameraBody->RebuildObject ();
 
+      // Attach the camera to the body so as to benefit of the default
+      // kinematic callback
+      // But iCamera don't support GetMovable() currently. You should update the camera by yourself.
+      //cameraBody->SetAttachedMovable (view->GetCamera ()->QuerySceneNode ()->GetMovable ());
+
       // Make it kinematic
       cameraBody->SetState (CS::Physics2::STATE_KINEMATIC);
 
       physicalSector->AddRigidBody (cameraBody);
-      // Attach the camera to the body so as to benefit of the default
-      // kinematic callback
-      cameraBody->SetAttachedMovable (view->GetCamera ()->QuerySceneNode ()->GetMovable ());
 
       break;
     }

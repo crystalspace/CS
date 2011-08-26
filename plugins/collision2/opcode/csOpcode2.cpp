@@ -439,8 +439,7 @@ CS::Collision2::HitBeamResult csOpcodeCollisionSector::HitBeamCollider (Opcode::
 
 bool csOpcodeCollisionSector::CollideObject (csOpcodeCollisionObject* objA,
                                              csOpcodeCollisionObject* objB, 
-                                             csArray<CS::Collision2::CollisionData>& collisions,
-                                             bool recordData /* = true */)
+                                             csArray<CS::Collision2::CollisionData>& collisions)
 {
   CS::Collision2::iCollider* col = objA->collider;
   csOpcodeCollider* colliderA = dynamic_cast<csOpcodeCollider*> (col);
@@ -449,16 +448,15 @@ bool csOpcodeCollisionSector::CollideObject (csOpcodeCollisionObject* objA,
   if (CollideDetect (colliderA->model, colliderB->model, 
     objA->transform, objB->transform))
   {
-    if (recordData)
-    {
-      GetCollisionData (colliderA->model, colliderB->model, 
-        colliderA->vertholder, colliderB->vertholder,
-        colliderA->indexholder, colliderB->indexholder,
-        objA->transform, objB->transform);
-      curCollisionData.objectA = objA;
-      curCollisionData.objectB = objB;
-      collisions.Push (curCollisionData);
-    }
+    
+    GetCollisionData (colliderA->model, colliderB->model, 
+      colliderA->vertholder, colliderB->vertholder,
+      colliderA->indexholder, colliderB->indexholder,
+      objA->transform, objB->transform);
+    curCollisionData.objectA = objA;
+    curCollisionData.objectB = objB;
+    collisions.Push (curCollisionData);
+    
     return true;
   }
   return false;
@@ -466,8 +464,7 @@ bool csOpcodeCollisionSector::CollideObject (csOpcodeCollisionObject* objA,
 
 bool csOpcodeCollisionSector::CollideTerrain (csOpcodeCollisionObject* objA, 
                                               csOpcodeCollisionObject* objB,
-                                              csArray<CS::Collision2::CollisionData>& collisions, 
-                                              bool recordData /* = true */)
+                                              csArray<CS::Collision2::CollisionData>& collisions)
 {
   CS::Collision2::iCollider* colA = objA->collider;
   CS::Collision2::iCollider* colB = objB->collider;
@@ -494,16 +491,15 @@ bool csOpcodeCollisionSector::CollideTerrain (csOpcodeCollisionObject* objA,
       terrainColl->GetColliderTransform (i), objB->transform);
       if (isCollide)
       { 
-        if (recordData)
-        {
-          GetCollisionData (terrainColl->GetColliderModel (i), objColl->model,
-            terrainColl->GetVertexHolder (i), objColl->vertholder,
-            terrainColl->GetIndexHolder (i), objColl->indexholder,
-            terrainColl->GetColliderTransform (i), objB->transform);
-          curCollisionData.objectA = objA;
-          curCollisionData.objectB = objB;
-          collisions.Push (curCollisionData);
-        }
+        
+        GetCollisionData (terrainColl->GetColliderModel (i), objColl->model,
+          terrainColl->GetVertexHolder (i), objColl->vertholder,
+          terrainColl->GetIndexHolder (i), objColl->indexholder,
+          terrainColl->GetColliderTransform (i), objB->transform);
+        curCollisionData.objectA = objA;
+        curCollisionData.objectB = objB;
+        collisions.Push (curCollisionData);
+        
         return true;
       }
     }
@@ -513,16 +509,15 @@ bool csOpcodeCollisionSector::CollideTerrain (csOpcodeCollisionObject* objA,
       objA->transform, terrainColl->GetColliderTransform (i));
       if (isCollide)
       { 
-        if (recordData)
-        {
-          GetCollisionData (objColl->model, terrainColl->GetColliderModel (i),
-          objColl->vertholder, terrainColl->GetVertexHolder (i),
-          objColl->indexholder, terrainColl->GetIndexHolder (i),
-          objA->transform, terrainColl->GetColliderTransform (i));
-          curCollisionData.objectA = objA;
-          curCollisionData.objectB = objB;
-          collisions.Push (curCollisionData);
-        }
+        
+        GetCollisionData (objColl->model, terrainColl->GetColliderModel (i),
+        objColl->vertholder, terrainColl->GetVertexHolder (i),
+        objColl->indexholder, terrainColl->GetIndexHolder (i),
+        objA->transform, terrainColl->GetColliderTransform (i));
+        curCollisionData.objectA = objA;
+        curCollisionData.objectB = objB;
+        collisions.Push (curCollisionData);
+        
         return true;
       }
     }

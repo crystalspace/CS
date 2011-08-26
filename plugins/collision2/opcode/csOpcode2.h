@@ -143,10 +143,10 @@ public:
     const csOrthoTransform& transA, const csOrthoTransform& transB);
 
   bool CollideObject (csOpcodeCollisionObject* objA, csOpcodeCollisionObject* objB, 
-    csArray<CS::Collision2::CollisionData>& collisions, bool recordData = true);
+    csArray<CS::Collision2::CollisionData>& collisions);
 
   bool CollideTerrain (csOpcodeCollisionObject* objA, csOpcodeCollisionObject* objB, 
-    csArray<CS::Collision2::CollisionData>& collisions, bool recordData = true);
+    csArray<CS::Collision2::CollisionData>& collisions);
 };
 
 class csOpcodeCollisionSystem : public scfImplementation2<

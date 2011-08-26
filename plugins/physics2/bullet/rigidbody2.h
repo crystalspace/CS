@@ -53,6 +53,7 @@ private:
   float softness;
   float elasticity;
   float totalMass;
+  short anchorCount;
 
 public:
   csBulletRigidBody (csBulletSystem* phySys);
@@ -97,8 +98,8 @@ public:
     return csBulletCollisionObject::GetContactObject (index);}
 
   btRigidBody* GetBulletRigidPointer () {return btBody;}
-  virtual void RemoveBulletObject ();
-  virtual void AddBulletObject ();
+  virtual bool RemoveBulletObject ();
+  virtual bool AddBulletObject ();
 
   //iPhysicalBody
 
