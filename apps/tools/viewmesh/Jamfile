@@ -91,6 +91,7 @@ if $(CEGUI.AVAILABLE) = "yes"
     stdpt
     stdrep
     terrainldr
+    texthud
     vproc_std
     xmlread
     xmlshader
