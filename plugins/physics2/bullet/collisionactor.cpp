@@ -154,8 +154,6 @@ void csBulletCollisionActor::SetRotation (const csMatrix3& rot)
   csOrthoTransform trans = GetTransform ();
   trans.SetT2O (rot);
   SetTransform (trans);
-  if (camera)
-    camera->SetTransform (trans);
 }
 
 void csBulletCollisionActor::Rotate (const csVector3& v, float angle)
@@ -163,8 +161,6 @@ void csBulletCollisionActor::Rotate (const csVector3& v, float angle)
   csOrthoTransform trans = GetTransform ();
   trans.RotateThis (v, angle);
   SetTransform (trans);
-  if (camera)
-    camera->GetTransform ().RotateThis (v, angle);
 }
 
 void csBulletCollisionActor::SetCamera (iCamera* camera)

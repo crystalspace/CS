@@ -81,9 +81,8 @@ public:
   virtual void SetTransform (const csOrthoTransform& trans) 
   {
     csBulletCollisionObject::SetTransform (trans);
-
     if (camera)
-      camera->GetTransform ().SetOrigin (GetTransform ().GetOrigin ());
+      camera->SetTransform (trans);
   }
   virtual csOrthoTransform GetTransform () {return csBulletCollisionObject::GetTransform ();}
 
