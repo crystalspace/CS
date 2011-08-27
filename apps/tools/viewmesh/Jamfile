@@ -37,6 +37,7 @@ if $(CEGUI.AVAILABLE) = "yes"
     bindoc
     bruteblock
     bugplug
+    cameramanager
     csbmpimg
     cscegui
     csddsimg
