@@ -41,13 +41,13 @@ uniform float enableGlobalAO;
 ]]>
 // Cg profiles for older hardware don't support data-dependent loops
 <? if vars."num passes".int <= 1 ?>
-const int NUM_PASSES  = 1;
+#define NUM_PASSES  1
 <? elsif vars."num passes".int == 2 ?>
-const int NUM_PASSES  = 2;
+#define NUM_PASSES  2
 <? elsif vars."num passes".int == 3 ?>
-const int NUM_PASSES  = 3;
+#define NUM_PASSES  3
 <? else ?>
-const int NUM_PASSES  = 4;
+#define NUM_PASSES  4
 <? endif ?>
 <![CDATA[
 

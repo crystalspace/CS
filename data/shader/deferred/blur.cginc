@@ -14,19 +14,19 @@ const float EPSILON = 0.01f;
 ]]>
 // Cg profiles for older hardware don't support data-dependent loops
 <? if vars."ssao blur kernelsize".int <= 1 ?>
-const int KERNEL_SIZE = 1;
+#define KERNEL_SIZE  1
 <? elsif vars."ssao blur kernelsize".int == 2 ?>
-const int KERNEL_SIZE = 2;
+#define KERNEL_SIZE  2
 <? elsif vars."ssao blur kernelsize".int == 3 ?>
-const int KERNEL_SIZE = 3;
+#define KERNEL_SIZE  3
 <? elsif vars."ssao blur kernelsize".int == 4 ?>
-const int KERNEL_SIZE = 4;
+#define KERNEL_SIZE  4
 <? elsif vars."ssao blur kernelsize".int == 5 ?>
-const int KERNEL_SIZE = 5;
+#define KERNEL_SIZE  5
 <? elsif vars."ssao blur kernelsize".int == 6 ?>
-const int KERNEL_SIZE = 6;
+#define KERNEL_SIZE  6
 <? else ?>
-const int KERNEL_SIZE = 7;
+#define KERNEL_SIZE  7
 <? endif ?>
 
 <![CDATA[
