@@ -70,6 +70,9 @@ public:
   virtual void SetAttachedMovable (iMovable* movable) {csBulletCollisionObject::SetAttachedMovable (movable);}
   virtual iMovable* GetAttachedMovable () {return csBulletCollisionObject::GetAttachedMovable ();}
 
+  virtual void SetAttachedCamera (iCamera* camera) {csBulletCollisionObject::SetAttachedCamera (camera);}
+  virtual iCamera* GetAttachedCamera () {return csBulletCollisionObject::GetAttachedCamera ();}
+
   virtual void SetTransform (const csOrthoTransform& trans) {csBulletCollisionObject::SetTransform (trans);}
   virtual csOrthoTransform GetTransform () {return csBulletCollisionObject::GetTransform ();}
 

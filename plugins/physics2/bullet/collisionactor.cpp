@@ -96,7 +96,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (Bullet2)
 {
 
 csBulletCollisionActor::csBulletCollisionActor (csBulletSystem* sys)
-: scfImplementationType (this, sys), camera (NULL), wasOnGround (true),
+: scfImplementationType (this, sys), wasOnGround (true),
 wasJumping (false), verticalVelocity (0), maxJumpHeight (0),
 touchingContact (false), speed (0), useGhostSweep (true), recoveringFactor (0.2f)
 {

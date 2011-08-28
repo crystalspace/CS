@@ -54,6 +54,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
       movable->SetFullTransform (tr);
       movable->UpdateMove ();
     }
+    iCamera* camera = body->GetAttachedCamera ();
+    if (camera)
+    {
+      csOrthoTransform& cameraTrans = camera->GetTransform ();
+      if (cameraTrans.GetOrigin () == tr.GetOrigin () &&
+        cameraTrans.GetT2O () == tr.GetT2O ())
+        return;
+
+      // Update camera position
+      cameraTrans.SetOrigin (tr.GetOrigin ());
+      cameraTrans.SetT2O (tr.GetT2O ());
+    }
   }
 
   void csBulletMotionState::setWorldTransform (const btTransform& trans)
@@ -73,6 +85,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
       // Update movable
       movable->SetFullTransform (tr);
       movable->UpdateMove ();
+    }
+    iCamera* camera = body->GetAttachedCamera ();
+    if (camera)
+    {
+      csOrthoTransform& cameraTrans = camera->GetTransform ();
+      if (cameraTrans.GetOrigin () == tr.GetOrigin () &&
+        cameraTrans.GetT2O () == tr.GetT2O ())
+        return;
+
+      // Update camera position
+      cameraTrans.SetOrigin (tr.GetOrigin ());
+      cameraTrans.SetT2O (tr.GetT2O ());
     }
   }
 
@@ -94,13 +118,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Bullet2)
 
     // get the body transform from the callback
     csOrthoTransform transform;
-    if (rb->movable)
-    {
-      rb->kinematicCb->GetBodyTransform (rb, transform);
-      trans = CSToBullet (principalAxis * transform, body->system->getInternalScale ());
-    }
-    else
-      btDefaultMotionState::getWorldTransform (trans);
+    
+    rb->kinematicCb->GetBodyTransform (rb, transform);
+    trans = CSToBullet (principalAxis * transform, body->system->getInternalScale ());
+    
   }
 
 }

@@ -43,12 +43,16 @@ void csOpcodeCollisionObject::SetTransform (const csOrthoTransform& trans)
   transform = trans;
   if (movable)
     movable->SetFullTransform (transform);
+  if (camera)
+    camera->SetTransform (transform);
 }
 
 csOrthoTransform csOpcodeCollisionObject::GetTransform ()
 {
   if (movable)
     return movable->GetFullTransform ();
+  if (camera)
+    return camera->GetTransform ();
   return transform;
 }
 

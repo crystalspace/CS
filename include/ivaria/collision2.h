@@ -446,6 +446,15 @@ struct iCollisionObject : public virtual iBase
 
   /// Get the movable attached to this collision object.
   virtual iMovable* GetAttachedMovable () = 0;
+
+  /**
+   * Set the camera attached to this collision object. Its position will be updated
+   * automatically when this object is moved.
+   */
+  virtual void SetAttachedCamera (iCamera* camera) = 0;
+
+  /// Get the camera attached to this collision object.
+  virtual iCamera* GetAttachedCamera () = 0;
   
   /// Set the transform.
   virtual void SetTransform (const csOrthoTransform& trans) = 0;

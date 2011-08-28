@@ -36,8 +36,6 @@ private:
   btVector3 upVector;
   btVector3 frontVector;
 
-  csWeakRef<iCamera> camera;
-
   float verticalVelocity;
   float verticalOffset;
   float fallSpeed;
@@ -78,11 +76,12 @@ public:
   virtual void SetAttachedMovable (iMovable* movable) {csBulletCollisionObject::SetAttachedMovable (movable);}
   virtual iMovable* GetAttachedMovable () {return csBulletCollisionObject::GetAttachedMovable ();}
 
+  virtual void SetAttachedCamera (iCamera* camera) {csBulletCollisionObject::SetAttachedCamera (camera);}
+  virtual iCamera* GetAttachedCamera () {return csBulletCollisionObject::GetAttachedCamera ();}
+
   virtual void SetTransform (const csOrthoTransform& trans) 
   {
     csBulletCollisionObject::SetTransform (trans);
-    if (camera)
-      camera->SetTransform (trans);
   }
   virtual csOrthoTransform GetTransform () {return csBulletCollisionObject::GetTransform ();}
 

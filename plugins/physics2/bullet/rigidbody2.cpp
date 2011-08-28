@@ -601,6 +601,12 @@ void csBulletDefaultKinematicCallback::GetBodyTransform
     transform = movable->GetFullTransform ();
     return;
   }
+  iCamera* camera = rigBody->GetAttachedCamera ();
+  if (camera)
+  {
+    transform = camera->GetTransform ();
+    return;
+  }
 }
 }
 CS_PLUGIN_NAMESPACE_END (Bullet2)

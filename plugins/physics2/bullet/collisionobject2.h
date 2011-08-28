@@ -28,6 +28,7 @@ protected:
   csArray<CS::Physics2::iJoint*> joints;
   CS::Collision2::CollisionGroup collGroup;
   csWeakRef<iMovable> movable;
+  csWeakRef<iCamera> camera;
   csRef<CS::Collision2::iCollisionCallback> collCb;
   CS::Collision2::CollisionObjectType type;
 
@@ -62,6 +63,9 @@ public:
 
   virtual void SetAttachedMovable (iMovable* movable){this->movable = movable;}
   virtual iMovable* GetAttachedMovable (){return movable;}
+
+  virtual void SetAttachedCamera (iCamera* camera){this->camera = camera;}
+  virtual iCamera* GetAttachedCamera (){return camera;}
 
   virtual void SetTransform (const csOrthoTransform& trans);
   virtual csOrthoTransform GetTransform ();

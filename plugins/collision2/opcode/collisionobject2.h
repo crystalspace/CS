@@ -19,6 +19,7 @@
 #ifndef __CS_OPCODE_COLLISIONOBJECT_H__
 #define __CS_OPCODE_COLLISIONOBJECT_H__
 
+#include "iengine/camera.h"
 #include "csOpcode2.h"
 #include "colliders2.h"
 
@@ -36,6 +37,7 @@ private:
   csOpcodeCollisionSystem* system;
   csOpcodeCollisionSector* sector;
   csWeakRef<iMovable> movable;
+  csWeakRef<iCamera> camera;
   csRef<CS::Collision2::iCollider> collider;
   CS::Collision2::CollisionObjectType type;
   CS::Collision2::CollisionGroup collGroup;
@@ -59,6 +61,9 @@ public:
 
   virtual void SetAttachedMovable (iMovable* movable){this->movable = movable;}
   virtual iMovable* GetAttachedMovable (){return movable;}
+
+  virtual void SetAttachedCamera (iCamera* camera){this->camera = camera;}
+  virtual iCamera* GetAttachedCamera (){return camera;}
 
   virtual void SetTransform (const csOrthoTransform& trans);
   virtual csOrthoTransform GetTransform ();

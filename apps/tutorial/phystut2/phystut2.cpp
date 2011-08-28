@@ -173,14 +173,10 @@ void Simple::Frame ()
 
   GripContactBodies ();
 
-  if (physicalCameraMode == CAMERA_DYNAMIC)
+  if (physicalCameraMode == CAMERA_DYNAMIC/* || physicalCameraMode == CAMERA_KINEMATIC*/)
   {
     view->GetCamera ()->GetTransform ().SetOrigin
     (cameraBody->GetTransform ().GetOrigin ());
-  }
-  else if (physicalCameraMode == CAMERA_KINEMATIC)
-  {
-    view->GetCamera ()->SetTransform (cameraBody->GetTransform ());
   }
   if (physicalCameraMode == CAMERA_ACTOR)
     cameraActor->UpdateAction (speed / dynamicSpeed);
@@ -1016,7 +1012,7 @@ void Simple::UpdateCameraMode ()
         // Remove the attached camera (in this mode we want to control
         // the orientation of the camera, so we update the camera
         // position by ourselves)
-        cameraBody->SetAttachedMovable (0);
+        cameraBody->SetAttachedCamera (0);
       }
 
       // Create a new rigid body
@@ -1085,8 +1081,7 @@ void Simple::UpdateCameraMode ()
 
       // Attach the camera to the body so as to benefit of the default
       // kinematic callback
-      // But iCamera don't support GetMovable() currently. You should update the camera by yourself.
-      //cameraBody->SetAttachedMovable (view->GetCamera ()->QuerySceneNode ()->GetMovable ());
+      cameraBody->SetAttachedCamera (view->GetCamera ());
 
       // Make it kinematic
       cameraBody->SetState (CS::Physics2::STATE_KINEMATIC);
