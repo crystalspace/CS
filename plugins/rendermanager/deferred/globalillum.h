@@ -33,14 +33,14 @@
 CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
 {
   /**
-   * Implements screen-space global illumination techniques.
+   * Implements the SSDO screen-space global illumination technique
    */
   class csGlobalIllumRenderer
   {
   public:
 
-    csGlobalIllumRenderer() : graphics3D (nullptr), globalIllumBuffer (nullptr),
-      intermediateBuffer (nullptr), gbuffer (nullptr), enabled (true), isInitialized (false) 
+  csGlobalIllumRenderer()
+    : isInitialized (false), enabled (true)
     {
     }
     
@@ -63,6 +63,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
       }
 
       graphics3D = g3D;
+
+      showAmbientOcclusion = false;
+      showGlobalIllumination = false;
+      applyBlur = true;
+
       isGlobalIllumBufferAttached  = false;
       isIntermediateBufferAttached = false;
       isDepthNormalBufferAttached  = false;
@@ -249,7 +254,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
         return;
       }
 
-      if (! (fabs (resolutionFactor - bufferDownscaleFactor) < EPSILON))
+      if (fabs (resolutionFactor - bufferDownscaleFactor) > EPSILON)
       {
         bufferDownscaleFactor = resolutionFactor;
 
@@ -757,12 +762,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     }
 
   private:
+    iGraphics3D *graphics3D;
+    csRef<iShaderManager> shaderManager;
+    iObjectRegistry *objectRegistry;
+    csRef<iShaderVarStringSet> svStringSet;
+
+    const char *reporterMessageID;
+
+    bool isInitialized;
+    bool enabled;
     bool showAmbientOcclusion;
     bool showGlobalIllumination;
     bool applyBlur;
 
-    csString depthNormalsResolution;
-    float depthNormalsBufferScale;
+    GBuffer *gbuffer;
 
     csRef<iShader> globalIllumShader;
     csRef<iShader> horizontalBlurShader;  
@@ -773,10 +786,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     csSimpleRenderMesh quadMesh;
     csVector3 quadVerts[4];
 
-    bool enabled;
-    bool isInitialized;
-
-    GBuffer *gbuffer;
+    csString depthNormalsResolution;
+    float depthNormalsBufferScale;
     
     float bufferDownscaleFactor;
 
@@ -795,13 +806,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMDeferred)
     csRef<csShaderVariable> globalIllumBufferSV;
     csRef<csShaderVariable> intermediateBufferSV;
     csRef<csShaderVariable> depthNormalBufferSV;
-
-    iGraphics3D *graphics3D;
-    csRef<iShaderManager> shaderManager;
-    iObjectRegistry *objectRegistry;
-    csRef<iShaderVarStringSet> svStringSet;
-
-    const char *reporterMessageID;
   };
 }
 CS_PLUGIN_NAMESPACE_END(RMDeferred)

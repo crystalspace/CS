@@ -187,7 +187,7 @@ private:
 RMDeferred::RMDeferred(iBase *parent) : 
   scfImplementationType (this, parent),
   portalPersistent (CS::RenderManager::TextureCache::tcacheExactSizeMatch),
-  doHDRExposure (false), isHDREnabled (false), hasPostEffects (false)
+  isHDREnabled (false), doHDRExposure (false), hasPostEffects (false)
 {
   SetTreePersistent (treePersistent);
 }
