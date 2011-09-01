@@ -40,6 +40,30 @@ void SelfShadowDemo::PrintHelp ()
 
 void SelfShadowDemo::Frame ()
 {
+  csTicks elapsed_time = vc->GetElapsedTicks ();
+  float speed = (elapsed_time / 1000.0) * (0.03 * 20);
+  float rotateFactor = speed;
+
+  if (rotateGrass)
+  {
+    csRef<iMeshFactoryWrapper> meshfact =
+      engine->FindMeshFactory ("GrassFact");
+
+    if (!meshfact)
+      meshfact = engine->FindMeshFactory ("GrassFactSmall");
+    if (!meshfact)
+      meshfact = engine->FindMeshFactory ("GrassFactBig");
+
+    // only if there is grass in the current scene
+    if (meshfact)
+    {
+      meshfact->HardTransform(csReversibleTransform(
+        csMatrix3(cos(rotateFactor), 0, sin(rotateFactor),
+        0, 1, 0, -sin(rotateFactor), 0, cos(rotateFactor)), 
+        csVector3(0) ));
+    }
+  }
+
   // Default behavior from DemoApplication
   DemoApplication::Frame ();
 }
@@ -103,6 +127,11 @@ bool SelfShadowDemo::OnKeyboard (iEvent &ev)
       CreateScene();
       return true;
     }
+    else if (csKeyEventHelper::GetCookedCode (&ev) == 'g')
+    {
+      rotateGrass = !rotateGrass;
+      return true;
+    }
 
     light->GetMovable()->Transform(rotateMatrix);
 
@@ -147,6 +176,7 @@ bool SelfShadowDemo::Application ()
   hudManager->GetKeyDescriptions()->Push ("w a s d keys: rotate light");
   hudManager->GetKeyDescriptions()->Push ("r: recompute splitting function");
   hudManager->GetKeyDescriptions()->Push ("t: show render textures");
+  hudManager->GetKeyDescriptions()->Push ("g: dynamic grass");
   hudManager->GetKeyDescriptions()->Push ("n: next scene");
   hudManager->GetKeyDescriptions()->Push ("p: previous scene");
 
@@ -165,6 +195,7 @@ bool SelfShadowDemo::Application ()
 
   rm_dbg = scfQueryInterface<iDebugHelper>(rm);
   sceneNumber = 2;
+  rotateGrass = false;
 
   cfg->RemoveDomain ("/config/engine.cfg");
 

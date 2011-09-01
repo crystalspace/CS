@@ -31,6 +31,7 @@ class SelfShadowDemo : public CS::Utility::DemoApplication
   bool CreateScene ();
   void LoadKrystal();
   int sceneNumber;
+  bool rotateGrass;
 
  public:
   SelfShadowDemo ();
