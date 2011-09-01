@@ -123,7 +123,9 @@ bool SelfShadowDemo::OnKeyboard (iEvent &ev)
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'p')
     {
-      sceneNumber = ( sceneNumber - 1 ) % numberOfScenes;
+      sceneNumber = ( sceneNumber - 1 );
+      if (sceneNumber < 0)
+        sceneNumber += numberOfScenes;
       CreateScene();
       return true;
     }
