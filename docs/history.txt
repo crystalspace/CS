@@ -1,9 +1,9 @@
 Crystal Space detailed change log.
 http://www.crystalspace3d.org/
 
-This used to be the history entries for Crystal Space. To lessen the maintence
-burden this have now been fully migrated into subversion. There are a number of
-ways to access recent log information
+This used to be the history entries for Crystal Space. To lessen the
+maintenance burden this has now been fully migrated into subversion. There
+are a number of ways to access recent log information:
 
 1. svn log
 	Tips: Use svn log --limit 10 to get the 10 latest changes or 
