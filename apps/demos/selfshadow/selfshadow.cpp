@@ -46,21 +46,16 @@ void SelfShadowDemo::Frame ()
 
   if (rotateGrass)
   {
-    csRef<iMeshFactoryWrapper> meshfact =
-      engine->FindMeshFactory ("GrassFact");
+    csRef<iMeshWrapper> objectfact =
+      engine->FindMeshObject ("Hair");
 
-    if (!meshfact)
-      meshfact = engine->FindMeshFactory ("GrassFactSmall");
-    if (!meshfact)
-      meshfact = engine->FindMeshFactory ("GrassFactBig");
-
-    // only if there is grass in the current scene
-    if (meshfact)
+    if (objectfact)
     {
-      meshfact->HardTransform(csReversibleTransform(
+      objectfact->GetMovable()->SetTransform(
+        objectfact->GetMovable()->GetTransform() *
         csMatrix3(cos(rotateFactor), 0, sin(rotateFactor),
-        0, 1, 0, -sin(rotateFactor), 0, cos(rotateFactor)), 
-        csVector3(0) ));
+        0, 1, 0, -sin(rotateFactor), 0, cos(rotateFactor)) );
+      objectfact->GetMovable()->UpdateMove();
     }
   }
 
@@ -196,7 +191,7 @@ bool SelfShadowDemo::Application ()
     return ReportError("Failed to load OSM Render Manager!");
 
   rm_dbg = scfQueryInterface<iDebugHelper>(rm);
-  sceneNumber = 2;
+  sceneNumber = 5;
   rotateGrass = false;
 
   cfg->RemoveDomain ("/config/engine.cfg");
