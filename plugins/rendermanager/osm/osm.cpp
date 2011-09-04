@@ -118,7 +118,8 @@ struct WrapShadowParams<RMOSM::ShadowType>
       // Sort the mesh lists  
       {
         StandardMeshSorter<RenderTreeType> mySorter (rview->GetEngine ());
-        mySorter.SetupCameraLocation (rview->GetCamera ()->GetTransform ().GetOrigin ());
+        mySorter.SetupCameraLocation 
+          (rview->GetCamera ()->GetTransform ().GetOrigin ());
         ForEachMeshNode (context, mySorter);
       }
 
@@ -198,13 +199,15 @@ struct WrapShadowParams<RMOSM::ShadowType>
     // Pre-setup culling graph
     RenderTreeType renderTree (treePersistent);
 
-    RenderTreeType::ContextNode* startContext = renderTree.CreateContext (rview);
+    RenderTreeType::ContextNode* startContext = 
+      renderTree.CreateContext (rview);
     startContext->drawFlags |= (CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER);
 
     // Setup the main context
     {
       ContextSetupType contextSetup (this, renderLayer);
-      ContextSetupType::PortalSetupType::ContextSetupData portalData (startContext);
+      ContextSetupType::PortalSetupType::ContextSetupData 
+        portalData (startContext);
 
       contextSetup (*startContext, portalData, recursePortals);
     }
@@ -250,8 +253,8 @@ struct WrapShadowParams<RMOSM::ShadowType>
     const char* layersFile = cfg->GetStr ("RenderManager.OSM.Layers", 0);
     if (layersFile)
     {
-      layersValid = CS::RenderManager::AddLayersFromFile (objectReg, layersFile,
-        renderLayer);
+      layersValid = CS::RenderManager::AddLayersFromFile (objectReg, 
+        layersFile, renderLayer);
       if (!layersValid) renderLayer.Clear();
     }
 
@@ -280,8 +283,10 @@ struct WrapShadowParams<RMOSM::ShadowType>
 
 
   //----------------------------------------------------------------------
+  // Adding communication between the application and the render manager
   bool RMOSM::DebugCommand(const char *cmd)
   {
+    // Recompute the splitting ratio 
     if (strcmp (cmd, "reset_split_ratio") == 0)
     {
       uint flag = 
@@ -289,6 +294,7 @@ struct WrapShadowParams<RMOSM::ShadowType>
       treePersistent.debugPersist.EnableDebugFlag(flag,true);
       return true;
     }
+    // Show / Hide render textures
     else if (strcmp (cmd, "show_render_textures") == 0)
     {
       uint flag = 
@@ -299,6 +305,7 @@ struct WrapShadowParams<RMOSM::ShadowType>
         treePersistent.debugPersist.EnableDebugFlag(flag,true);
       return true;
     }
+    // Add opaque object to the render textures 
     else if (strcmp (cmd, "show_opaque_objects") == 0)
     {
       uint flag = 
@@ -306,6 +313,7 @@ struct WrapShadowParams<RMOSM::ShadowType>
       treePersistent.debugPersist.EnableDebugFlag(flag,true);
       return true;
     }
+    // Remove opaque object from the render textures  
     else if (strcmp (cmd, "hide_opaque_objects") == 0)
     {
       uint flag = 

@@ -21,6 +21,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_SHADOW_OSM_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_SHADOW_OSM_H__
 
+/**\file
+ * OSM shadow handler
+ */
+
 #include "ivideo/shader/shader.h"
 
 #include "csutil/cfgacc.h"
@@ -43,12 +47,47 @@ namespace CS
 {
   namespace RenderManager
   {
+    /**
+     * OSM shadow handler.
+     * Usage: in the \c ShadowHandler argument of the LightSetup class.
+     * In addition, on initialization the SetConfigPrefix() method of the shadow
+     * handler persistent data (accessible through the light setup persistent
+     * data) must be called, before the light setup persistent data is
+     * initialized:
+     * \code
+     * // First, set prefix for configuration settings
+     * lightPersistent.shadowPersist.SetConfigPrefix ("RenderManager.ShadowPSSM");
+     * // Then, light setup (and shadow handler) persistent data is initialized
+     * lightPersistent.Initialize (objectReg, treePersistent.debugPersist);
+     * \endcode
+     */
     template<typename RenderTree, typename LayerConfigType>
     class ShadowOSM
     {
     public:
       struct PersistentData;
 
+      /**
+       * Shadow per-view specific data.
+       * An instance of this class needs to be created when rendering a view and
+       * passed the light setup.
+       * Example:
+       * \code
+       * // ... basic setup ...
+       *
+       * // Setup shadow handler per-view data
+       * ShadowType::ViewSetup shadowViewSetup (
+       *   rednerManager->lightPersistent.shadowPersist, renderView);
+       *
+       * // ... perform various tasks ...
+       *
+       * // Setup lighting for meshes
+       * LightSetupType lightSetup (
+       *  renderManager->lightPersistent, renderManager->lightManager,
+       *  context.svArrays, layerConfig, shadowViewSetup);
+       * \endcode
+       * \sa LightSetup
+       */
       class ViewSetup
       {
       public:
@@ -57,9 +96,9 @@ namespace CS
 
         SingleRenderLayer depthRenderLayer;
 
-        ViewSetup (PersistentData& persist, CS::RenderManager::RenderView* rview)
-          : persist (persist), rview (rview),
-          depthRenderLayer (persist.osmShaderType, 
+        ViewSetup (PersistentData& persist, 
+          CS::RenderManager::RenderView* rview) : persist (persist), 
+          rview (rview), depthRenderLayer (persist.osmShaderType, 
           persist.osmShader) { }
 
         ~ViewSetup() { }
@@ -74,27 +113,19 @@ namespace CS
 
         CachedLightData() : lastSetupFrame (~0) {}
         // Transform light space to post-project light space
-        struct SuperFrustum : public CS::Utility::FastRefCount<SuperFrustum>
+        struct SuperFrustum : 
+          public CS::Utility::FastRefCount<SuperFrustum>
         {
           int actualNumParts;
           csRef<csShaderVariable> numSplitsSV;
           csRef<csShaderVariable> shadowMapResSV;
 	        CS::Utility::MeshFilter meshFilter;
 
-          struct Frustum
-          {
-            float splitDists;
-            csRef<csShaderVariable> splitDistsSV;
-          };
-
           csRef<csShaderVariable> depthStartSV;
           csRef<csShaderVariable> depthEndSV;
           csRef<csShaderVariable> splitSV;
           csRef<csShaderVariable> textureSV[rtaNumAttachments];
           csRef<csShaderVariable> shadowMapProjectSV;
-          Frustum* frustums;
-
-          ~SuperFrustum() { delete[] frustums; }
         };
         typedef csRefArray<SuperFrustum> LightFrustumsArray;
         struct LightFrustums
@@ -111,11 +142,13 @@ namespace CS
 
         void SetupFrame (RenderTree& tree, ShadowOSM& shadows, iLight* light)
         {
+          // No shadows return
           if (light->GetFlags().Check (CS_LIGHT_NOSHADOWS)) return;
 
           ViewSetup& viewSetup = shadows.viewSetup;
 
           PersistentData& persist = viewSetup.persist;
+          // Recompute splitting ratio
           if( persist.dbgPersist->IsDebugFlagEnabled(persist.dbgChooseSplit) )
           {
             persist.splitRatio = -1;
@@ -125,6 +158,7 @@ namespace CS
           }
 
           uint currentFrame = viewSetup.rview->GetCurrentFrameNumber();
+          // Avoid two updates on the same frame
           if (lastSetupFrame != currentFrame)
           {
             lightFrustumsHash.DeleteAll();
@@ -136,11 +170,13 @@ namespace CS
             lightFrustumsHash.GetOrCreate (
             camera, LightFrustums());
 
+          // Light updates only once
           if (lightFrustumsSettings.frustumsSetupFrame != currentFrame)
           {
             float lightNear = SMALL_Z;
             float lightCutoff = light->GetCutoffDistance();
 
+            //Find light projection
             CS::Math::Matrix4 lightProject = CS::Math::Projections::Ortho (
               lightCutoff, -lightCutoff, lightCutoff, -lightCutoff,
               -lightCutoff, -lightNear);
@@ -158,10 +194,10 @@ namespace CS
             SuperFrustum& superFrustum = *(lightFrustums[lightFrustums.Push (
               newFrust)]);
 
-	          superFrustum.meshFilter.SetFilterMode (CS::Utility::MESH_FILTER_INCLUDE);
+            // Configure current light frustum
+	          superFrustum.meshFilter.SetFilterMode 
+              (CS::Utility::MESH_FILTER_INCLUDE);
             superFrustum.actualNumParts = viewSetup.persist.numSplits;
-            superFrustum.frustums =
-              new typename SuperFrustum::Frustum[superFrustum.actualNumParts];
 
             superFrustum.shadowMapProjectSV = lightVarsHelper.CreateTempSV (
               viewSetup.persist.svNames.GetLightSVId (
@@ -192,11 +228,6 @@ namespace CS
 
             for (int i = 0; i < superFrustum.actualNumParts; i++)
             {
-              typename SuperFrustum::Frustum& lightFrustum =
-                superFrustum.frustums[i];
-              lightFrustum.splitDistsSV = lightVarsHelper.CreateTempSV(
-                viewSetup.persist.splitDistsSVName);
-
               if (i % 4 == 3)
                 superFrustum.textureSV[rtaColor0 + i / 4] =
                   lightVarsHelper.CreateTempSV (viewSetup.persist.osmSVName);
@@ -206,20 +237,24 @@ namespace CS
           }
         }
 
+        // Compute objects limits 
         void ProcessGeometry(SuperFrustum* superFrust, 
           typename RenderTree::ContextNode& context, iLight* light, 
           CS::RenderManager::RenderView* rview, float& _near, float& _far, 
-          csBox3& castingObjects, csBox3& receivingObjects, bool showOpaqueObjects)
+          csBox3& castingObjects, csBox3& receivingObjects, 
+          bool showOpaqueObjects)
         {
           typename RenderTree::ContextNode::TreeType::MeshNodeTreeIteratorType 
             it = context.meshNodes.GetIterator ();
 
+          // Iterate through all meshes
           while (it.HasNext ())
           {
-            typename RenderTree::ContextNode::TreeType::MeshNode *node = it.Next();
-            CS_ASSERT_MSG("Null node encountered, should not be possible", node);
+            typename RenderTree::ContextNode::TreeType::MeshNode *node = 
+              it.Next();
+            CS_ASSERT_MSG
+              ("Null node encountered, should not be possible", node);
 
-            // setup split dists
             for (size_t i = 0 ; i < node->meshes.GetSize(); i ++)
             {
               typename RenderTree::ContextNode::TreeType::MeshNode::SingleMesh 
@@ -227,20 +262,15 @@ namespace CS
               
               csReversibleTransform meshTransform = 
                 mesh.meshWrapper->GetMovable()->GetTransform();
-//               csRef<csRenderBufferHolder> buffers = 
-//                 mesh.renderMesh->buffers;
-//               iRenderBuffer* positions = 
-//                 buffers->GetRenderBuffer (CS_BUFFER_POSITION);
-//               csVertexListWalker<float, csVector3> positionWalker (positions);
               csVector3 lightPosition = light->GetMovable()->GetPosition();
 
-              // only take into account translucent objects
+              // Add / Remove opaque objects from the crop matrix
               if (!showOpaqueObjects &&
                 mesh.meshWrapper->GetRenderPriority() != 
                 rview->GetEngine()->GetRenderPriority("alpha"))
                   continue;
 
-              // add to mesh filter include
+              // Add to mesh filter
 	            superFrust->meshFilter.AddFilterMesh (mesh.meshWrapper);
 
               csReversibleTransform world2light = 
@@ -276,26 +306,13 @@ namespace CS
 
               castingObjects += meshBboxLightPP;
               receivingObjects += meshBboxLightPP;
-                  
-              // Iterate on all vertices
-//               for (size_t i = 0; i < positionWalker.GetSize (); i++)
-//               {
-//                 float distance = (lightPosition - 
-//                   meshTransform.This2Other(*positionWalker)).Norm ();
-// 
-//                 if (distance < _near)
-//                   _near = distance;
-// 
-//                 if (distance > _far)
-//                   _far = distance;
-// 
-//                 ++positionWalker;
-//               }
             }
           }
         }
 
-        CS::Math::Matrix4 FindOrthCropMatrix(CS::RenderManager::RenderView* rview,
+        // Compute crop matrix
+        CS::Math::Matrix4 FindOrthCropMatrix
+          (CS::RenderManager::RenderView* rview,
           iLight* light, const csBox3& castingObjects, 
           const csBox3& receivingObjects)
         {
@@ -328,6 +345,7 @@ namespace CS
           return Mortho * crop;
         }
 
+        // Render pass for computing opacity maps
         void AddOSMTarget (typename RenderTree::MeshNode* meshNode,
           RenderTree& renderTree, iLight* light, ViewSetup& viewSetup)
         {
@@ -341,7 +359,7 @@ namespace CS
 
           uint currentFrame = viewSetup.rview->GetCurrentFrameNumber();
 
-          // fixes a memory leak
+          // Fixes a memory leak
           if (lightFrustums.setupFrame == currentFrame ||
             lightFrustums.setupFrame != (uint)-1)
             return;
@@ -359,22 +377,27 @@ namespace CS
           csBox3 castingObjects;
           csBox3 receivingObjects;
   
+          // Find object limits
           ProcessGeometry(lightFrustums.frustums[0], context, light, rview, 
             _near, _far, castingObjects, receivingObjects, 
-            persist.dbgPersist->IsDebugFlagEnabled(persist.dbgShowOpaqueObjects));
+            persist.dbgPersist->
+              IsDebugFlagEnabled(persist.dbgShowOpaqueObjects));
 
+          // Then compute crop matrix
           CS::Math::Matrix4 proj = FindOrthCropMatrix(rview, light, 
             castingObjects, receivingObjects);
 
           float lightCutoff = light->GetCutoffDistance();
           float lightNear = SMALL_Z;
 
+          // And finally compute projection matrix
           lightProject = CS::Math::Projections::Ortho (lightCutoff, 
             -lightCutoff, lightCutoff, -lightCutoff, 
             -lightNear, -_far);
 
           CS::Math::Matrix4 matrix = proj * lightProject;
 
+          // Get end depth map
           AddShadowMapTarget(meshNode, renderTree, light, 
             viewSetup, matrix, persist.depthEnd);
 
@@ -384,36 +407,19 @@ namespace CS
 
           matrix = proj * lightProject;
 
+          // Get start depth map
           AddShadowMapTarget(meshNode, renderTree, light, 
             viewSetup, matrix, persist.depthStart);
 
           int shadowMapSize = persist.shadowMapRes;
 
-          // here should be lightFrustums.frustums.GetSize()
-//           csPrintf("%d\n", lightFrustums.frustums.GetSize());
+          // @@@ FIXME: Here should be lightFrustums.frustums.GetSize()
           for (size_t l = 0; l < 1; l++)
           {
             const SuperFrustum& superFrust = *(lightFrustums.frustums[l]);            
 
             for (int attachments = 0 ; attachments < persist.mrt ; attachments ++)
             {
-              for (int channels = 0 ; channels < 4 ; channels ++)
-              {
-                int frustNum = 4 * attachments + channels;
-                typename SuperFrustum::Frustum& lightFrust = 
-                  superFrust.frustums[frustNum];
-                lightFrust.splitDists = _near + (_far - _near) * 
-                  ((float)frustNum / (superFrust.actualNumParts - 1));
-
-                lightFrust.splitDistsSV->SetValue(lightFrust.splitDists);
-
-                // fill in split dists for osm
-                csRef<csShaderVariable> passColorSV = persist.osmShader->
-                  GetVariableAdd(persist.passColorSVName);
-
-                passColorSV->SetArrayElement(frustNum, lightFrust.splitDistsSV);
-              }
-
               iTextureHandle *tex= persist.texs[attachments];
               superFrust.textureSV[rtaColor0 + attachments]->SetValue (tex);
             }
@@ -428,7 +434,7 @@ namespace CS
             newRenderView->SetEngine (rview->GetEngine ());
             newRenderView->SetThisSector (rview->GetThisSector ());
 
-            // we only need one shadow map project sv per light
+            // We only need one shadow map project SV per light
             for (int i = 0; i < 4; i++)
             {
               csShaderVariable* item = 
@@ -436,9 +442,10 @@ namespace CS
               item->SetValue (matrix.Row (i));
             }
 
-            // pass the matrix to the shader that generates OSMs
+            // Pass the matrix to the shader that generates OSMs as well
             persist.osmShader->AddVariable(superFrust.shadowMapProjectSV);
 
+            // Create render target
             csRef<iCustomMatrixCamera> shadowViewCam =
               newRenderView->GetEngine()->CreateCustomMatrixCamera();
             newRenderView->SetCamera (shadowViewCam->GetCamera());
@@ -462,7 +469,7 @@ namespace CS
               if(persist.dbgPersist->
                 IsDebugFlagEnabled(persist.dbgShowRenderTextures))
                   renderTree.AddDebugTexture (persist.texs[t]);
-              // register SVs
+              // Register SVs
               shadowMapCtx->renderTargets[rtaColor0 + t].texHandle = 
                 persist.texs[t];
               shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
@@ -476,6 +483,7 @@ namespace CS
           ChooseSplitFunction(persist);
         }
 
+        // Recompute the splitting function, when necessarily 
         void ChooseSplitFunction(PersistentData& persist)
         {
           if (persist.splitRatio >= -0.05 && persist.splitRatio <= 1.05)
@@ -485,7 +493,7 @@ namespace CS
             CS::StructuredTextureFormat readbackFmt 
               (CS::TextureFormatStrings::ConvertStructured ("abgr8"));
 
-            // get data from MRTs
+            // Get data from MRTs
             for (int i = 0 ; i < persist.mrt ; i ++)
             {
               databuf = persist.texs[i]->Readback(readbackFmt);
@@ -494,7 +502,7 @@ namespace CS
 
             csPrintf("split_ratio %lf \n", persist.splitRatio);
 
-            // compute correlation coefficient:
+            // Compute correlation coefficient:
             double *means = new double[4 * persist.mrt];
             double *squareSum = new double[4 * persist.mrt];
             double *xy = new double[4 * persist.mrt];
@@ -507,12 +515,14 @@ namespace CS
               xy[i] = 0;
             }
 
+            // Use only one for to speed things up
             for (int layer = 0 ; layer < persist.mrt ; layer ++)
               for (int i = 0 ; i < persist.shadowMapRes ; i ++)
                 for (int j = 0 ; j < persist.shadowMapRes ; j ++)
                   for (int k = 0 ; k < 4 ; k ++)
                   {
-                    uint8 x = data[layer][4 * (i + j * persist.shadowMapRes) + k];
+                    uint8 x = 
+                      data[layer][4 * (i + j * persist.shadowMapRes) + k];
                     
                     means[4 * layer + k] += x;
                     squareSum[4 * layer + k] += (x * x);
@@ -529,6 +539,7 @@ namespace CS
             for (int i = 0 ; i < 4 * persist.mrt ; i ++)
               means[i] /= n;
 
+            // Correlations between consecutive images
             for (int i = 0 ; i < 4 * persist.mrt - 1 ; i ++)
             {
               correlations[i] = (xy[i] - means[i] * means[i + 1] * n) /
@@ -536,6 +547,7 @@ namespace CS
                 (squareSum[i + 1] - means[i + 1] * means[i + 1] * n));
             }
 
+            // The sum of correlation coefficients
             double sum = 0;
             for (int i = 0 ; i < 4 * persist.mrt - 1 ; i ++)
               sum += correlations[i];
@@ -543,6 +555,7 @@ namespace CS
             csPrintf("Correlation coefficient: ");
             csPrintf("%lf \n", sum);
 
+            // Choose the smallest sum, i.e. the biggest difference
             if (sum < persist.bestSplitRatioCorrelation)
             {
               persist.bestSplitRatioCorrelation = sum;
@@ -567,6 +580,7 @@ namespace CS
           persist.splitRatio += 0.1;
         }
 
+        // Render pass to get a depth / shadow map
         void AddShadowMapTarget (typename RenderTree::MeshNode* meshNode,
           RenderTree& renderTree, iLight* light, ViewSetup& viewSetup, 
           const CS::Math::Matrix4& matrix, iTextureHandle* renderTexture)
@@ -585,8 +599,7 @@ namespace CS
           PersistentData& persist = viewSetup.persist;
           int shadowMapSize = persist.shadowMapRes;
 
-          // here should be lightFrustums.frustums.GetSize()
-//           csPrintf("%d\n", lightFrustums.frustums.GetSize());
+          // @@@ FIXME: here should be lightFrustums.frustums.GetSize()
           for (size_t l = 0; l < 1; l++)
           {
             const SuperFrustum& superFrust = *(lightFrustums.frustums[l]);            
@@ -605,6 +618,7 @@ namespace CS
             shadowViewCam->GetCamera()->SetTransform 
               (light->GetMovable()->GetTransform());
 
+            // Create new render pass
             newRenderView->SetViewDimensions (shadowMapSize, shadowMapSize);
             csBox2 clipBox (0, 0, shadowMapSize, shadowMapSize);
             csRef<iClipper2D> newView;
@@ -618,7 +632,7 @@ namespace CS
             if(persist.dbgPersist->
               IsDebugFlagEnabled(persist.dbgShowRenderTextures))
                 renderTree.AddDebugTexture (renderTexture);
-            // register SVs
+            // Register SVs
             shadowMapCtx->renderTargets[rtaColor0].texHandle = renderTexture;
             shadowMapCtx->drawFlags = CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER;
 
@@ -660,7 +674,7 @@ namespace CS
           iVisibilityCuller* culler = sector->GetVisibilityCuller ();
           Viscull<RenderTree> (context, rview, culler);
 
-          // Sort the mesh lists  
+          // Sort the mesh lists - not needed for OSM
           {
 //             StandardMeshSorter<RenderTree> mySorter (rview->GetEngine ());
 //             mySorter.SetupCameraLocation 
@@ -709,7 +723,6 @@ namespace CS
         csLightShaderVarCache svNames;
         LightingVariablesHelper::PersistentData lightVarsPersist;
         iShaderManager* shaderManager;
-        iGraphics3D* g3d;
 
         int mrt;
         int numSplits;
@@ -718,29 +731,24 @@ namespace CS
         csString configPrefix;
         CS::ShaderVarStringID numSplitsSVName;
         CS::ShaderVarStringID shadowMapResSVName;
-        CS::ShaderVarStringID splitDistsSVName;
-        CS::ShaderVarStringID passColorSVName;
         CS::ShaderVarStringID mrtSVName;
         CS::ShaderVarStringID osmSVName;
         CS::ShaderVarStringID depthStartSVName;
         CS::ShaderVarStringID depthEndSVName;
         CS::ShaderVarStringID splitSVName;
-        /// Shader for rendering to OSM
+        // Shader for rendering to OSM
         csRef<iShader> osmShader;
-        /// Shader type for rendering to OSM
+        // Shader type for rendering to OSM
         csStringID osmShaderType;
-        /// Shader for rendering to shadow map
+        // Shader for rendering to shadow map
         csRef<iShader> shadowShader;
-        /// Shader type for rendering to shadow map
+        // Shader type for rendering to shadow map
         csStringID shadowShaderType;
 
         csRefArray<iTextureHandle> texs;
         csRef<iTextureHandle> depthStart;
         csRef<iTextureHandle> depthEnd;
         csRef<iTextureHandle> split;
-
-        csRef<iImageIO> imageio;
-        csRef<iVFS> VFS;
 
         double splitRatio;
         double bestSplitRatio;
@@ -764,9 +772,8 @@ namespace CS
             csQueryRegistry<iShaderManager> (objectReg);
           csRef<iGraphics3D> g3d =
             csQueryRegistry<iGraphics3D> (objectReg);
-          imageio = csQueryRegistry<iImageIO> (objectReg);
-          VFS = csQueryRegistry<iVFS> (objectReg);
 
+          // Communication between the render manager and application level
           this->dbgPersist = &dbgPersist;
           dbgChooseSplit = 
             dbgPersist.RegisterDebugFlag ("draw.osm.choose.split");
@@ -778,22 +785,21 @@ namespace CS
           dbgPersist.EnableDebugFlag(dbgShowOpaqueObjects, true);
 
           this->shaderManager = shaderManager;
-          this->g3d = g3d;
           mrt = 0;
 
           iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
           svNames.SetStrings (strings);
 
+          // Set up SV names
           numSplitsSVName = strings->Request ("light numSplits");
           shadowMapResSVName = strings->Request ("light shadow map size");
-          splitDistsSVName = strings->Request ("light splitDists");
-          passColorSVName = strings->Request ("pass color");
           mrtSVName = strings->Request ("mrt");
           osmSVName = strings->Request("light osm");
           depthStartSVName = strings->Request("light shadow map start");
           depthEndSVName = strings->Request("light shadow map end");
           splitSVName = strings->Request("split function");
 
+          // Read settings from file (engine.cfg)
           csConfigAccess cfg (objectReg);
           shadowMapRes = 512;
           if (!configPrefix.IsEmpty())
@@ -804,15 +810,15 @@ namespace CS
               "%s.ShadowMapResolution", configPrefix.GetData()), 512);
           }
           
+          // Get the number of supported MRTs
           const csGraphics3DCaps *caps = g3d->GetCaps();
-          
           if (mrt > 0)  
             mrt = csMin(caps->MaxRTColorAttachments, mrt);
           else
             mrt = caps->MaxRTColorAttachments;
 
+          // Load shaders
           csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
-
           osmShader = loader->LoadShader ("/shader/shadow/shadow_osm.xml");
           osmShaderType = StringIDValue(strings->Request ("osm"));
           shadowShader = loader->LoadShader ("/shader/shadow/shadow_vsm.xml");
@@ -820,6 +826,7 @@ namespace CS
 
           numSplits = 4 * mrt;
           
+          // Create textures
           depthStart = g3d->GetTextureManager()-> CreateTexture(shadowMapRes, 
             shadowMapRes, csimg2D, "abgr32_f", CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
 
@@ -836,7 +843,7 @@ namespace CS
 
           splitRes = 512;
           // Create a default texture
-          split = g3d->GetTextureManager()->CreateTexture(splitRes, 1, csimg2D, 
+          split = g3d->GetTextureManager()->CreateTexture(splitRes, 1, csimg2D,
             "abgr8", CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP);
 
           splitRatio = 2;
@@ -850,7 +857,7 @@ namespace CS
           osmShader->GetVariableAdd(depthStartSVName)->SetValue(depthStart);
           osmShader->GetVariableAdd(depthEndSVName)->SetValue(depthEnd);
 
-          // pass mrt number to shader
+          // Pass mrt number to shader, doesn't change w/ time
           csShaderVariable* mrtVar = new csShaderVariable(mrtSVName); 
           mrtVar->SetValue(mrt);
           shaderManager->AddVariable(mrtVar);
@@ -860,6 +867,7 @@ namespace CS
           lightVarsPersist.UpdateNewFrame();
         }
 
+        // Set the ratio between linear and logarithmic split
         void SetHybridSplit(float logValue)
         {
           const int &textureSize = splitRes;
@@ -885,14 +893,13 @@ namespace CS
           double range = (int)(log(end - 1.0)/log(2.0));
           double start = end - range;
 
-//           csPrintf("%lf %lf %lf\n", start, end, range);
+          // Write to texture
           data[0] = 0;
           for (int i = 4 ; i < 4 * textureSize ; i += 4)
           {
             data[i] = (unsigned char)(csMin( (1 - logValue) * i / 4 + logValue *
               ( (log(pow(2.0, start) * (i / 4.0)) / log(2.0) - start) 
                 * end / range ) , end) * 255 / end);
-//             csPrintf("%d ", data[i] );
           }
 
           split->Blit(0, 0, textureSize, 1, data);  
@@ -924,17 +931,13 @@ namespace CS
         typename CachedLightData::SuperFrustum& superFrust =
           *(lightFrustums[subLightNum]);
 
+        // Create shader variables arrays on stack
         for (int f = 0; f < superFrust.actualNumParts; f++)
         {
-          typename CachedLightData::SuperFrustum::Frustum& lightFrustum =
-            superFrust.frustums[f];
-          
+
           if (f % 4 == 3)    
             lightVarsHelper.MergeAsArrayItem (lightStacks[0], 
               superFrust.textureSV[rtaColor0 + f / 4], 8 * lightNum + f / 4);
-
-          lightVarsHelper.MergeAsArrayItem(lightStacks[0],
-            lightFrustum.splitDistsSV, 8 * lightNum + f);
         }
 
         lightVarsHelper.MergeAsArrayItem (lightStacks[0],
@@ -958,18 +961,14 @@ namespace CS
         lightVarsHelper.MergeAsArrayItem (lightStacks[0],
           superFrust.shadowMapResSV, lightNum);
 
-        // here might be number of lights
+        // @@@ FIXME: here might be number of lights
         return 1;
       }
 
       static bool NeedFinalHandleLight() { return true; }
       void FinalHandleLight (iLight* light, CachedLightData& lightData)
       {    
-//         lightData.AddShadowMapTarget (meshNode, persist, renderTree, light, 
-//           viewSetup);
-
         lightData.AddOSMTarget (meshNode, renderTree, light, viewSetup);
-
         lightData.ClearFrameData();
       }
 
