@@ -44,8 +44,10 @@ void SelfShadowDemo::Frame ()
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
   float rotateFactor = speed;
 
+  // Translucent objects become dynamic by being rotated
   if (rotateGrass)
   {
+    // Search for mesh named 'Hair'
     csRef<iMeshWrapper> objectfact =
       engine->FindMeshObject ("Hair");
 
@@ -71,6 +73,7 @@ bool SelfShadowDemo::OnKeyboard (iEvent &ev)
   csTicks elapsed_time = vc->GetElapsedTicks ();
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
 
+  // Only moves the first light
   csRef<iLight> light = engine->GetSectors()->Get(0)->GetLights()->Get(0);
 
   float moveFactor = 0;
@@ -82,40 +85,44 @@ bool SelfShadowDemo::OnKeyboard (iEvent &ev)
   {
     if (csKeyEventHelper::GetCookedCode (&ev) == 'w')
     {
-      rotateMatrix = csMatrix3(1, 0, 0, 0, cos(rotateFactor), -sin(rotateFactor), 
-        0, sin(rotateFactor), cos(rotateFactor));
+      rotateMatrix = csMatrix3(1, 0, 0, 0, cos(rotateFactor), 
+        -sin(rotateFactor), 0, sin(rotateFactor), cos(rotateFactor));
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == 's')
     {
-      rotateMatrix = csMatrix3(1, 0, 0, 0, cos(rotateFactor), sin(rotateFactor), 
-        0, -sin(rotateFactor), cos(rotateFactor));
+      rotateMatrix = csMatrix3(1, 0, 0, 0, cos(rotateFactor), 
+        sin(rotateFactor), 0, -sin(rotateFactor), cos(rotateFactor));
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'a')
     {
-      rotateMatrix = csMatrix3(cos(rotateFactor), -sin(rotateFactor), 0,
-        sin(rotateFactor), cos(rotateFactor), 0, 0, 0, 1);
+      rotateMatrix = csMatrix3(cos(rotateFactor), -sin(rotateFactor), 
+        0, sin(rotateFactor), cos(rotateFactor), 0, 0, 0, 1);
     }
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'd')
     {
-      rotateMatrix = csMatrix3(cos(rotateFactor), sin(rotateFactor), 0,
-        -sin(rotateFactor), cos(rotateFactor), 0, 0, 0, 1);
+      rotateMatrix = csMatrix3(cos(rotateFactor), sin(rotateFactor), 
+        0, -sin(rotateFactor), cos(rotateFactor), 0, 0, 0, 1);
     }
+    // Recomputed the split ratio
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'r')
     {
       rm_dbg->DebugCommand("reset_split_ratio");
       return true;
     }
+    // Switch between showing the render textures
     else if (csKeyEventHelper::GetCookedCode (&ev) == 't')
     {
       rm_dbg->DebugCommand("show_render_textures");
       return true;
     }
+    // Load next scene
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'n')
     {
       sceneNumber = ( sceneNumber + 1 ) % numberOfScenes;
       CreateScene();
       return true;
     }
+    // Load previous scene
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'p')
     {
       sceneNumber = ( sceneNumber - 1 );
@@ -124,12 +131,14 @@ bool SelfShadowDemo::OnKeyboard (iEvent &ev)
       CreateScene();
       return true;
     }
+    // Start dynamic scene
     else if (csKeyEventHelper::GetCookedCode (&ev) == 'g')
     {
       rotateGrass = !rotateGrass;
       return true;
     }
 
+    // Rotate light
     light->GetMovable()->Transform(rotateMatrix);
 
     csVector3 oldDirection = light->GetMovable()->GetPosition();
@@ -156,8 +165,10 @@ bool SelfShadowDemo::OnInitialize (int argc, char* argv[])
   if (!DemoApplication::OnInitialize (argc, argv))
     return false;
 
+  // Load furmesh for krystal scene
   if (!csInitializer::RequestPlugins (GetObjectRegistry (),
-    CS_REQUEST_PLUGIN("crystalspace.mesh.object.furmesh", CS::Mesh::iFurMeshType),
+    CS_REQUEST_PLUGIN("crystalspace.mesh.object.furmesh", 
+      CS::Mesh::iFurMeshType), 
     CS_REQUEST_END))
     return ReportError ("Failed to initialize plugins!");
 
@@ -170,6 +181,7 @@ bool SelfShadowDemo::Application ()
   if (!DemoApplication::Application ())
     return false;
 
+  // Add keys descriptions
   hudManager->GetKeyDescriptions()->Push ("w a s d keys: rotate light");
   hudManager->GetKeyDescriptions()->Push ("r: recompute splitting function");
   hudManager->GetKeyDescriptions()->Push ("t: show render textures");
@@ -182,14 +194,17 @@ bool SelfShadowDemo::Application ()
    * are added by the engine when it loads a render manager. However, since
    * we are loading the shadow_pssm render manager manually we must also manually
    * add the proper config file. */
-  csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (GetObjectRegistry());
-  cfg->AddDomain ("/config/engine.cfg", vfs, iConfigManager::ConfigPriorityPlugin);
+  csRef<iConfigManager> cfg = 
+    csQueryRegistry<iConfigManager> (GetObjectRegistry());
+  cfg->AddDomain 
+    ("/config/engine.cfg", vfs, iConfigManager::ConfigPriorityPlugin);
 
-  csRef<iRenderManager> rm = csLoadPlugin<iRenderManager> (GetObjectRegistry(), 
-    "crystalspace.rendermanager.osm");
+  csRef<iRenderManager> rm = csLoadPlugin<iRenderManager> 
+    (GetObjectRegistry(), "crystalspace.rendermanager.osm");
   if (!rm)
     return ReportError("Failed to load OSM Render Manager!");
 
+  // Load debuger for changing various settings
   rm_dbg = scfQueryInterface<iDebugHelper>(rm);
   sceneNumber = 5;
   rotateGrass = false;
@@ -210,19 +225,23 @@ bool SelfShadowDemo::Application ()
 
 bool SelfShadowDemo::CreateScene ()
 {
+  // Invalid scene number
   if (sceneNumber < 0 || sceneNumber >= numberOfScenes)
   {
     ReportError("Invalid scene number!");
     return false;
   }
+  // Available scenes
   char *worlds[] = {"world_krystal", "world", "world_tree", 
     "world_grass", "world_grass_small", "world_grass_big"};
 
+  // Load scene
   printf ("Loading level...\n");
   vfs->ChDir ("/lev/selfshadow");
   if (!loader->LoadMapFile (worlds[sceneNumber]))
     ReportError("Error couldn't load level!");
 
+  // Load krystal
   if (sceneNumber == 0)
   {
     LoadKrystal();
@@ -328,7 +347,8 @@ void SelfShadowDemo::LoadKrystal()
   csRef<iMeshObject> imo = krystalFurmeshObject->GetMeshObject();
 
   // Get reference to the iFurMesh interface
-  csRef<CS::Mesh::iFurMesh> furMesh = scfQueryInterface<CS::Mesh::iFurMesh> (imo);
+  csRef<CS::Mesh::iFurMesh> furMesh = 
+    scfQueryInterface<CS::Mesh::iFurMesh> (imo);
 
   csRef<CS::Mesh::iFurMeshState> ifms = 
     scfQueryInterface<CS::Mesh::iFurMeshState> (furMesh);
@@ -347,7 +367,8 @@ void SelfShadowDemo::LoadKrystal()
 
   furMesh->SetAnimatedMesh (animesh);
   furMesh->SetMeshFactory (animeshFactory);
-  furMesh->SetMeshFactorySubMesh (animesh->GetSubMesh (2)->GetFactorySubMesh ());
+  furMesh->SetMeshFactorySubMesh 
+    (animesh->GetSubMesh (2)->GetFactorySubMesh ());
   furMesh->GenerateGeometry (view, room);
 
   furMesh->SetAnimationControl (animationPhysicsControl);

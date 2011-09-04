@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <!--
   Copyright (C) 2011 by Alexandru Voicu
-      (C) 2007-2008 by Frank Richter
-	    (C) 2007 by Jorrit Tyberghein
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -72,14 +70,10 @@
       </vp>
       <fp plugin="glcg">
         <cgfp>
-        <variablemap variable="pass color" destination="passColor" />
         <variablemap variable="light numSplits" destination="numSplits" />        
-        <variablemap variable="mrt" destination="mrt" />        
         <program>
           <![CDATA[
-          float passColor[64];
           int numSplits;
-          int mrt;
           struct vertex2fragment {
             float4 Hposition : POSITION;
             float2 TexCoord : TEXCOORD0;
@@ -122,34 +116,21 @@
               + float3(0.5);
             float2 position = shadowMapCoordsBiased.xy;
             
-            float compareDepth = (1 - shadowMapCoordsBiased.z) ;
+            float eps = 0.0001;            
+            float compareDepth = (1 - shadowMapCoordsBiased.z) - eps;
             float depthStart = tex2D(DepthStartMap, position).x;
             float depthEnd = tex2D(DepthEndMap, position).x;
 
-            int i;
-/*            
-            i = min( ( (compareDepth - depthStart) / (0.95 - depthStart) ) * (numSplits - 1), 
-              numSplits - 1);
-
-            i = min( tex2D( SplitFunc, float2( min( (compareDepth - depthStart) / 
-              (0.95 - depthStart) , 0.99 ) , 0 ) ) * (numSplits - 1), numSplits - 1);              
-*/            
+            int i;      
             i = min( tex2D( SplitFunc, 
                   float2( min( (compareDepth - depthStart) / 
                   (1 - depthEnd - depthStart) , 0.9999 ) , 0 ) ).x * (numSplits - 1), 
                   numSplits - 1);              
 
-//            i = min ( ( (compareDepth - depthStart) / (1 - depthEnd - depthStart) ) * 
-//              (numSplits - 1), numSplits - 1);
-
             int index = i % 4;
             value += 2 * (value == 1);
             float4 color = value;
-/*
-            if (position.x < 0 || position.y < 0 || position.x > 1 || position.y > 1 
-              || compareDepth < depthStart || compareDepth > (1 - depthEnd) )
-              color = 0;  
-*/
+
             float4 one = color;
             color = color * float4(index < 1, index < 2, index < 3, 1);
             

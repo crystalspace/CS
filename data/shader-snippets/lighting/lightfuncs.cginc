@@ -184,6 +184,7 @@ struct LightPropertiesShadowMap
 };
 LightPropertiesShadowMap lightPropsSM;
 
+// Added properties for opacity shadow maps
 struct LightPropertiesOpacityMap
 {
   // Transformation from light to shadow map space
@@ -198,7 +199,6 @@ struct LightPropertiesOpacityMap
   sampler2D splitFunc[MAX_LIGHTS];    
   // OSM
   sampler2D opacityMap[MAX_OSM * MAX_LIGHTS];
-  float splitDists[MAX_OSM * MAX_LIGHTS];
   int opacityMapNumSplits[MAX_LIGHTS];
 };
 LightPropertiesOpacityMap lightPropsOM;
