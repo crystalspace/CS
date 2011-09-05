@@ -194,7 +194,7 @@ public:
   /**
    * Subtract two sets and return the result in a new set.
    */
-  inline friend void Subtract (const csSet& s1, const csSet& s2)
+  inline friend csSet Subtract (const csSet& s1, const csSet& s2)
   {
     csSet subtraction;
     GlobalIterator it = s1.GetIterator ();
