@@ -70,7 +70,7 @@ private:
 #undef CS_TOKEN_ITEM_FILE
 
   csWeakRef<iGraphics3D> g3d;
-  csGLShader_FIXED* shaderPlug;
+  csRef<csGLShader_FIXED> shaderPlug;
   csGLExtensionManager* ext;
 
   enum GlLightParam

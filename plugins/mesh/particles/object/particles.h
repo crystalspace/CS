@@ -288,7 +288,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     /** @} */
 
   public:
-    ParticlesMeshObjectType* objectType;
+    csRef<ParticlesMeshObjectType> objectType;
 
   private:
     //-- Needed only for iMeshObjectFactory

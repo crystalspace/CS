@@ -177,7 +177,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     void RebuildMorphTargets ();
 
     // required but stupid stuff..
-    AnimeshObjectType* objectType;
+    csRef<AnimeshObjectType> objectType;
     iMeshFactoryWrapper* logParent;
     csRef<iMaterialWrapper> material;
     csFlags factoryFlags;
