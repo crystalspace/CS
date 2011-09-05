@@ -998,7 +998,11 @@ iBase *csSCF::CreateInstance (const char *iClassID)
  
   } /* endif */
 
+  /* Aggressively unload modules in debug mode, as this can trigger crashes
+   * when a plugin is released too early. */
+#ifdef CS_DEBUG
   UnloadUnusedModules ();
+#endif
 
   return object;
 }
