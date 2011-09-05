@@ -133,7 +133,15 @@ void csPluginManager::Clear ()
 
   // Free all plugins.
   for (size_t i = Plugins.GetSize () ; i > 0 ; i--)
-    UnloadPluginInstance (Plugins.Get(i - 1).Plugin);
+  {
+    csRef<iComponent> plugin (Plugins.Get(i - 1).Plugin);
+    if (!plugin)
+    {
+      Plugins.DeleteIndexFast (i);
+      continue;
+    }
+    UnloadPluginInstance (plugin);
+  }
 }
 
 void csPluginManager::QueryOptions (iComponent *obj)
@@ -279,6 +287,9 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
       // The plugin wasn't in our plugin list yet. Add it here.
       index = Plugins.Push (csPlugin (p, classID));
     }
+    else if (!Plugins[index].Plugin)
+      // Plugin has been unloaded, store in previous slot
+      Plugins[index].Plugin = p;
 
     if (flags & lpiLoadDependencies)
     {
@@ -406,6 +417,7 @@ csPtr<iPluginIterator> csPluginManager::GetPluginInstances ()
   size_t i;
   for (i = 0 ; i < Plugins.GetSize () ; i++)
   {
+    if (!Plugins[i].Plugin) continue;
     it->pointers.Push (Plugins[i].Plugin);
   }
   return csPtr<iPluginIterator> (it);
@@ -497,6 +509,7 @@ csPtr<iComponent> csPluginManager::QueryPluginInstance (const char *iInterface, 
   for (size_t i = 0; i < Plugins.GetSize (); i++)
   {
     iComponent* ret = Plugins[i].Plugin;
+    if (!ret) continue;
     if (ret->QueryInterface (ifID, iVersion))
       // QI does an implicit IncRef()
       return ret;
@@ -525,7 +538,7 @@ csPtr<iComponent> csPluginManager::QueryPluginInstance (const char* classID,
     if (pl)
     {
       iComponent* p = pl->Plugin;
-      if (p->QueryInterface(ifID, iVersion))
+      if (p && p->QueryInterface(ifID, iVersion))
         // QI does an implicit IncRef()
 	return p;
     }
