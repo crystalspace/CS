@@ -53,6 +53,9 @@ package cspace;
 *scfRegisterStaticClass = *cspacec::scfRegisterStaticClass;
 *scfRegisterStaticClasses = *cspacec::scfRegisterStaticClasses;
 *scfRegisterStaticFactoryFunc = *cspacec::scfRegisterStaticFactoryFunc;
+*Union = *cspacec::Union;
+*Intersect = *cspacec::Intersect;
+*Subtract = *cspacec::Subtract;
 *csDefaultRunLoop = *cspacec::csDefaultRunLoop;
 *csPlatformStartup = *cspacec::csPlatformStartup;
 *csPlatformShutdown = *cspacec::csPlatformShutdown;
@@ -1410,6 +1413,8 @@ sub new {
 *DeleteAll = *cspacec::csStringIDSet_DeleteAll;
 *Empty = *cspacec::csStringIDSet_Empty;
 *Delete = *cspacec::csStringIDSet_Delete;
+*Union = *cspacec::csStringIDSet_Union;
+*Subtract = *cspacec::csStringIDSet_Subtract;
 *GetSize = *cspacec::csStringIDSet_GetSize;
 *IsEmpty = *cspacec::csStringIDSet_IsEmpty;
 sub DESTROY {

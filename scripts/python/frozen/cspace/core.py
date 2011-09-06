@@ -680,6 +680,8 @@ class csStringIDSet(object):
     def DeleteAll(*args): return _core.csStringIDSet_DeleteAll(*args)
     def Empty(*args): return _core.csStringIDSet_Empty(*args)
     def Delete(*args): return _core.csStringIDSet_Delete(*args)
+    def Union(*args): return _core.csStringIDSet_Union(*args)
+    def Subtract(*args): return _core.csStringIDSet_Subtract(*args)
     def GetSize(*args): return _core.csStringIDSet_GetSize(*args)
     def IsEmpty(*args): return _core.csStringIDSet_IsEmpty(*args)
     def __len__(*args): return _core.csStringIDSet___len__(*args)
@@ -690,6 +692,9 @@ class csStringIDSet(object):
     __del__ = lambda self : None;
 csStringIDSet_swigregister = _core.csStringIDSet_swigregister
 csStringIDSet_swigregister(csStringIDSet)
+Union = _core.Union
+Intersect = _core.Intersect
+Subtract = _core.Subtract
 
 class csRefCount(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')

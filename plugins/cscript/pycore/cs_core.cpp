@@ -19358,6 +19358,279 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csStringIDSet_Union(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csSet< csStringID > *arg1 = (csSet< csStringID > *) 0 ;
+  csSet< csStringID > *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csStringIDSet_Union",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csStringIDSet_Union" "', argument " "1"" of type '" "csSet< csStringID > *""'"); 
+  }
+  arg1 = reinterpret_cast< csSet< csStringID > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csStringIDSet_Union" "', argument " "2"" of type '" "csSet< csStringID > const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csStringIDSet_Union" "', argument " "2"" of type '" "csSet< csStringID > const &""'"); 
+  }
+  arg2 = reinterpret_cast< csSet< csStringID > * >(argp2);
+  (arg1)->Union((csSet< csStringID > const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Union__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csSet< csStringID > *arg1 = 0 ;
+  csSet< csStringID > *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  csSet< csStringID > result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"Union",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Union" "', argument " "1"" of type '" "csSet< csStringID > const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Union" "', argument " "1"" of type '" "csSet< csStringID > const &""'"); 
+  }
+  arg1 = reinterpret_cast< csSet< csStringID > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Union" "', argument " "2"" of type '" "csSet< csStringID > const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Union" "', argument " "2"" of type '" "csSet< csStringID > const &""'"); 
+  }
+  arg2 = reinterpret_cast< csSet< csStringID > * >(argp2);
+  result = Union((csSet< CS::StringID< CS::StringSetTag::General > > const &)*arg1,(csSet< CS::StringID< CS::StringSetTag::General > > const &)*arg2);
+  resultobj = SWIG_NewPointerObj((new csSet< csStringID >(static_cast< const csSet< csStringID >& >(result))), SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Union(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[3];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 2); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_Union__SWIG_1(self, args);
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'Union'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    Union()\n"
+    "    Union(csSet< csStringID > const &,csSet< csStringID > const &)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Intersect__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csSet< csStringID > *arg1 = 0 ;
+  csSet< csStringID > *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  csSet< csStringID > result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"Intersect",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Intersect" "', argument " "1"" of type '" "csSet< csStringID > const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Intersect" "', argument " "1"" of type '" "csSet< csStringID > const &""'"); 
+  }
+  arg1 = reinterpret_cast< csSet< csStringID > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Intersect" "', argument " "2"" of type '" "csSet< csStringID > const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Intersect" "', argument " "2"" of type '" "csSet< csStringID > const &""'"); 
+  }
+  arg2 = reinterpret_cast< csSet< csStringID > * >(argp2);
+  result = Intersect((csSet< CS::StringID< CS::StringSetTag::General > > const &)*arg1,(csSet< CS::StringID< CS::StringSetTag::General > > const &)*arg2);
+  resultobj = SWIG_NewPointerObj((new csSet< csStringID >(static_cast< const csSet< csStringID >& >(result))), SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Intersect(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[3];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 2); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_Intersect__SWIG_1(self, args);
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'Intersect'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    Intersect()\n"
+    "    Intersect(csSet< csStringID > const &,csSet< csStringID > const &)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csStringIDSet_Subtract(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csSet< csStringID > *arg1 = (csSet< csStringID > *) 0 ;
+  csSet< csStringID > *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csStringIDSet_Subtract",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csStringIDSet_Subtract" "', argument " "1"" of type '" "csSet< csStringID > *""'"); 
+  }
+  arg1 = reinterpret_cast< csSet< csStringID > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csStringIDSet_Subtract" "', argument " "2"" of type '" "csSet< csStringID > const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csStringIDSet_Subtract" "', argument " "2"" of type '" "csSet< csStringID > const &""'"); 
+  }
+  arg2 = reinterpret_cast< csSet< csStringID > * >(argp2);
+  (arg1)->Subtract((csSet< csStringID > const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Subtract__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csSet< csStringID > *arg1 = 0 ;
+  csSet< csStringID > *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  csSet< csStringID > result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"Subtract",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Subtract" "', argument " "1"" of type '" "csSet< csStringID > const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Subtract" "', argument " "1"" of type '" "csSet< csStringID > const &""'"); 
+  }
+  arg1 = reinterpret_cast< csSet< csStringID > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Subtract" "', argument " "2"" of type '" "csSet< csStringID > const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Subtract" "', argument " "2"" of type '" "csSet< csStringID > const &""'"); 
+  }
+  arg2 = reinterpret_cast< csSet< csStringID > * >(argp2);
+  result = Subtract((csSet< CS::StringID< CS::StringSetTag::General > > const &)*arg1,(csSet< CS::StringID< CS::StringSetTag::General > > const &)*arg2);
+  resultobj = SWIG_NewPointerObj((new csSet< csStringID >(static_cast< const csSet< csStringID >& >(result))), SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Subtract(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[3];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 2); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_Subtract__SWIG_1(self, args);
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'Subtract'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    Subtract()\n"
+    "    Subtract(csSet< csStringID > const &,csSet< csStringID > const &)\n");
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csStringIDSet_GetSize(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csSet< csStringID > *arg1 = (csSet< csStringID > *) 0 ;
@@ -60651,6 +60924,11 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csStringIDSet_DeleteAll", _wrap_csStringIDSet_DeleteAll, METH_VARARGS, NULL},
 	 { (char *)"csStringIDSet_Empty", _wrap_csStringIDSet_Empty, METH_VARARGS, NULL},
 	 { (char *)"csStringIDSet_Delete", _wrap_csStringIDSet_Delete, METH_VARARGS, NULL},
+	 { (char *)"csStringIDSet_Union", _wrap_csStringIDSet_Union, METH_VARARGS, NULL},
+	 { (char *)"Union", _wrap_Union, METH_VARARGS, NULL},
+	 { (char *)"Intersect", _wrap_Intersect, METH_VARARGS, NULL},
+	 { (char *)"csStringIDSet_Subtract", _wrap_csStringIDSet_Subtract, METH_VARARGS, NULL},
+	 { (char *)"Subtract", _wrap_Subtract, METH_VARARGS, NULL},
 	 { (char *)"csStringIDSet_GetSize", _wrap_csStringIDSet_GetSize, METH_VARARGS, NULL},
 	 { (char *)"csStringIDSet_IsEmpty", _wrap_csStringIDSet_IsEmpty, METH_VARARGS, NULL},
 	 { (char *)"csStringIDSet___len__", _wrap_csStringIDSet___len__, METH_VARARGS, NULL},
