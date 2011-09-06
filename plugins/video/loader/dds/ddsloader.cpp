@@ -20,7 +20,11 @@
 #include "cssysdef.h"
 #include "csutil/csendian.h"
 #include "csgfx/imagemanipulate.h"
+
+#include "igraphic/dxtcompress.h"
+#include "iutil/plugin.h"
 #include "ivaria/reporter.h"
+
 #include "dds.h"
 #include "ddsloader.h"
 #include "ddsutil.h"
@@ -54,6 +58,15 @@ bool csDDSImageIO::Initialize (iObjectRegistry* objreg)
 {
   object_reg = objreg;
   return true;
+}
+
+CS::Graphics::iDXTDecompressor* csDDSImageIO::GetDXTDecompressor ()
+{
+  if (!dxt_decompress)
+    dxt_decompress = csQueryRegistryOrLoad<CS::Graphics::iDXTDecompressor> (object_reg,
+                                                                            CS_DXTDECOMPRESSOR_DEFAULT);
+
+  return dxt_decompress;
 }
 
 const csImageIOFileFormatDescriptions& csDDSImageIO::GetDescription ()
@@ -254,7 +267,7 @@ csPtr<iImage> csDDSImageIO::Load (iDataBuffer* buf, int format)
     imgBuf.AttachNew (new csParasiticDataBuffer (buf, imgOffset, dataSize));
     imgOffset += dataSize;
     csRef<csDDSImageFile> Image;
-    Image.AttachNew (new csDDSImageFile (object_reg, format, imgBuf,
+    Image.AttachNew (new csDDSImageFile (this, format, imgBuf,
       dataType, head.pixelformat));
     Image->SetDimensions (head.width, head.height, Depth);
     if (!mainImage.IsValid())
@@ -279,7 +292,7 @@ csPtr<iImage> csDDSImageIO::Load (iDataBuffer* buf, int format)
 	dataSize = DataSize (dataType, bpp, w, h, d);
 	imgBuf.AttachNew (new csParasiticDataBuffer (buf, imgOffset, dataSize));
 	imgOffset += dataSize;
-	mip.AttachNew (new csDDSImageFile (object_reg, format, imgBuf,
+	mip.AttachNew (new csDDSImageFile (this, format, imgBuf,
 	  dataType, head.pixelformat));
 	mip->SetDimensions (w, h, d);
 	if (volMap) mip->imageType = csimg3D;
@@ -308,13 +321,13 @@ csPtr<iDataBuffer> csDDSImageIO::Save (iImage* image, const char* mime,
 
 //---------------------------------------------------------------------------
 
-csDDSImageFile::csDDSImageFile (iObjectRegistry* object_reg, int format, 
-				iDataBuffer* sourceData, 
-				csDDSRawDataType rawType, 
-				const dds::PixelFormat& pixelFmt)
-  : csImageMemory (format), mipmaps(0), imageType (csimg2D)
+csDDSImageFile::csDDSImageFile (csDDSImageIO* iio,
+                                int format,
+                                iDataBuffer* sourceData, 
+                                csDDSRawDataType rawType, 
+                                const dds::PixelFormat& pixelFmt)
+  : csImageMemory (format), mipmaps(0), iio (iio), imageType (csimg2D)
 {
-  csDDSImageFile::object_reg = object_reg;
   rawInfo = new RawInfo;
   rawInfo->rawData = sourceData;
   rawInfo->rawType = rawType;
@@ -324,6 +337,95 @@ csDDSImageFile::csDDSImageFile (iObjectRegistry* object_reg, int format,
 csDDSImageFile::~csDDSImageFile ()
 {
   delete rawInfo;
+}
+
+namespace
+{
+  template<typename OutputType>
+  struct OddDimensionsDecompressor
+  {
+    typedef const void* (CS::Graphics::iDXTDecompressor::*DecompressorFunction) (const void* inBlockPtr,
+                                                                                 size_t blockDistance,
+                                                                                 size_t numBlocks,
+                                                                                 OutputType* outDataPtr,
+                                                                                 const CS::Graphics::UncompressedDXTDataLayout& outDataLayout);
+
+    static void Decompress (const uint8* source, size_t sourceBlockDist,
+                            void* dest_, size_t destPixelDistance, int width, int height,
+                            CS::Graphics::iDXTDecompressor* decompressor, DecompressorFunction func)
+    {
+      uint8* dest (reinterpret_cast<uint8*> (dest_));
+      CS::Graphics::UncompressedDXTDataLayout layout;
+      layout.bytesToNextPixel = destPixelDistance;
+      layout.bytesToNextRow = width * destPixelDistance;
+      layout.bytesToNextBlock = 4*destPixelDistance;
+      layout.blocksPerRow = (width+3) / 4;
+
+      int fullBlocksX = width / 4;
+      int fullBlocksY = height / 4;
+      const void* nextBlock;
+      if ((width % 4) == 0)
+      {
+        nextBlock = (decompressor->*func) (source, sourceBlockDist, fullBlocksX * fullBlocksY,
+                                           reinterpret_cast<OutputType*> (dest), layout);
+        dest += fullBlocksY * 4 * width * destPixelDistance;
+      }
+      else
+      {
+        nextBlock = source;
+        /* Width is not divisible by 4, need to decompress each row of blocks
+         * separately and copy only the leftmost pixels of the right block */
+        for (int blockY = 0; blockY < fullBlocksY; blockY++)
+        {
+          nextBlock = (decompressor->*func) (nextBlock, sourceBlockDist, fullBlocksX,
+                                             reinterpret_cast<OutputType*> (dest), layout);
+          // Handle 'incomplete' rightmost block
+          OutputType block[4 * 4];
+          nextBlock = (decompressor->*func) (nextBlock, sourceBlockDist, 1,
+                                             block, CS::Graphics::UncompressedDXTDataLayout ());
+          int numCols = width - fullBlocksX*4;
+          uint8* destBlockStart = dest + fullBlocksX * 4 * destPixelDistance;
+          for (int y = 0; y < 4; y++)
+          {
+            uint8* destPixel (destBlockStart + y * width * destPixelDistance);
+            for (int x = 0; x < numCols; x++)
+            {
+              *(reinterpret_cast<OutputType*> (destPixel)) = block[y*4 + x];
+              destPixel += destPixelDistance;
+            }
+          }
+          dest += 4 * width * destPixelDistance;
+        }
+      }
+      if ((fullBlocksY * 4) != height)
+      {
+        /* Height is not divisible by 4, need to decompress each block in the last row
+         * separately and copy only the top pixels */
+        int remainingRows = height % 4;
+        uint8* firstRow = dest;
+        // Handle incomplete lower blocks
+        OutputType block[4 * 4];
+        int blocksX ((width+3) / 4);
+        for (int x = 0; x < blocksX; x++)
+        {
+          nextBlock = (decompressor->*func) (nextBlock, sourceBlockDist, 1,
+                                             block, CS::Graphics::UncompressedDXTDataLayout ());
+          int numCols = csMin (width - x*4, 4);
+
+          for (int y = 0; y < remainingRows; y++)
+          {
+            uint8* destPixel (firstRow + y * width * destPixelDistance);
+            for (int x = 0; x < numCols; x++)
+            {
+              *(reinterpret_cast<OutputType*> (destPixel)) = block[y*4 + x];
+              destPixel += destPixelDistance;
+            }
+          }
+          firstRow += 4 * destPixelDistance;
+        }
+      }
+    }
+  };
 }
 
 void csDDSImageFile::MakeImageData ()
@@ -337,35 +439,40 @@ void csDDSImageFile::MakeImageData ()
     {
       case csrawDXT1:
       case csrawDXT1Alpha:
-	{
-	  dds::Loader::DecompressDXT1 (buf, source, Width, Height, 1,
-	    dataSize);
-	  break;
-	}
+      {
+        OddDimensionsDecompressor<csRGBpixel>::Decompress (
+          source, 8, buf, sizeof (csRGBpixel), Width, Height,
+          iio->GetDXTDecompressor(), &CS::Graphics::iDXTDecompressor::DecompressDXT1RGBA);
+        break;
+      }
       case csrawDXT2:
-	{
-	  dds::Loader::DecompressDXT2 (buf, source, Width, Height, 1,
-	    dataSize);
-	  break;
-	}
       case csrawDXT3:
-	{
-	  dds::Loader::DecompressDXT3 (buf, source, Width, Height, 1,
-	    dataSize);
-	  break;
-	}
+      {
+        OddDimensionsDecompressor<csRGBpixel>::Decompress (
+          source + 8, 16, buf, sizeof (csRGBpixel), Width, Height,
+          iio->GetDXTDecompressor(), &CS::Graphics::iDXTDecompressor::DecompressDXT1RGB);
+        OddDimensionsDecompressor<uint8>::Decompress (
+          source, 16, &(buf->alpha), sizeof (csRGBpixel), Width, Height,
+          iio->GetDXTDecompressor(), &CS::Graphics::iDXTDecompressor::DecompressDXT3Alpha);
+
+        if (rawInfo->rawType == csrawDXT2)
+          dds::Loader::CorrectPremult (buf, Width * Height);
+        break;
+      }
       case csrawDXT4:
-	{
-	  dds::Loader::DecompressDXT4 (buf, source, Width, Height, 1,
-	    dataSize);
-	  break;
-	}
       case csrawDXT5:
-	{
-	  dds::Loader::DecompressDXT5 (buf, source, Width, Height, 1,
-	    dataSize);
-	  break;
-	}
+      {
+        OddDimensionsDecompressor<csRGBpixel>::Decompress (
+          source + 8, 16, buf, sizeof (csRGBpixel), Width, Height,
+          iio->GetDXTDecompressor(), &CS::Graphics::iDXTDecompressor::DecompressDXT1RGB);
+        OddDimensionsDecompressor<uint8>::Decompress (
+          source, 16, &(buf->alpha), sizeof (csRGBpixel), Width, Height,
+          iio->GetDXTDecompressor(), &CS::Graphics::iDXTDecompressor::DecompressDXTUNormToUI8);
+
+        if (rawInfo->rawType == csrawDXT4)
+          dds::Loader::CorrectPremult (buf, Width * Height);
+        break;
+      }
       case csrawLum8:
 	{
 	  dds::Loader::DecompressLum (buf, source, Width, Height, Depth, 
@@ -483,7 +590,7 @@ void csDDSImageFile::Report (int severity, const char* msg, ...)
 {
   va_list argv;
   va_start (argv, msg);
-  csReportV (object_reg, severity, "crystalspace.graphic.image.io.dds", msg, 
+  csReportV (iio->GetObjectReg(), severity, "crystalspace.graphic.image.io.dds", msg,
     argv);
   va_end (argv);
 }

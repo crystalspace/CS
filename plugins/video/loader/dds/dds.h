@@ -150,23 +150,13 @@ public:
   static bool ProbeDXT1C (const uint8* source, int w, int h, int depth, 
     size_t size);
 
-  static void DecompressDXT1 (csRGBpixel* buffer, const uint8* source, 
-    int w, int h, int depth, size_t size);
-  static void DecompressDXT2 (csRGBpixel* buffer, const uint8* source, 
-    int w, int h, int depth, size_t size);
-  static void DecompressDXT3 (csRGBpixel* buffer, const uint8* source, 
-    int w, int h, int depth, size_t size);
-  static void DecompressDXT4 (csRGBpixel* buffer, const uint8* source, 
-    int w, int h, int depth, size_t size);
-  static void DecompressDXT5 (csRGBpixel* buffer, const uint8* source, 
-    int w, int h, int depth, size_t size);
   static void DecompressRGB (csRGBpixel* buffer, const uint8* source, 
     int w, int h, int depth, size_t size, const PixelFormat& pf);
   static void DecompressRGBA (csRGBpixel* buffer, const uint8* source, 
     int w, int h, int depth, size_t size, const PixelFormat& pf);
   static void DecompressLum (csRGBpixel* buffer, const uint8* source, 
     int w, int h, int depth, size_t size, const PixelFormat& pf);
-private:
+
   static void CorrectPremult (csRGBpixel* buffer, size_t pixnum);
 };
 

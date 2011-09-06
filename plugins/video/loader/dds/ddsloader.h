@@ -31,6 +31,14 @@
 
 struct iObjectRegistry;
 
+namespace CS
+{
+  namespace Graphics
+  {
+    struct iDXTDecompressor;
+  }
+}
+
 CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
 {
 
@@ -74,9 +82,12 @@ public:
   
   virtual bool Initialize (iObjectRegistry* objreg);
 
+  iObjectRegistry* GetObjectReg () const { return object_reg; }
+  CS::Graphics::iDXTDecompressor* GetDXTDecompressor ();
 private:
   csImageIOFileFormatDescriptions formats;
   iObjectRegistry* object_reg;
+  csRef<CS::Graphics::iDXTDecompressor> dxt_decompress;
 
   csDDSRawDataType IdentifyPixelFormat (const dds::PixelFormat& pf, 
     uint32 dxgiFormat, bool isDX10, uint& bpp);
@@ -102,7 +113,7 @@ public:
   virtual csRef<iDataBuffer> GetRawData() const;
   virtual csImageType GetImageType() const { return imageType; }
 private:
-  csDDSImageFile (iObjectRegistry* object_reg, 
+  csDDSImageFile (csDDSImageIO* iio,
     int format, iDataBuffer* sourceData, csDDSRawDataType rawType, 
     const dds::PixelFormat& pixelFmt);
 
@@ -117,8 +128,7 @@ private:
 
   csRefArray<iImage> mipmaps;
   csRefArray<iImage> subImages;
-  iObjectRegistry* object_reg;
-  csDDSImageIO* iio;
+  csRef<csDDSImageIO> iio;
   csImageType imageType;
 
   void Report (int severity, const char* msg, ...);
