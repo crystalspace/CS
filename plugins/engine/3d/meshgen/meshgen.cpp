@@ -1218,9 +1218,7 @@ void csMeshGenerator::AddDensityFactorMap (const char* factorMapID,
 void csMeshGenerator::UpdateDensityFactorMap (const char* factorMapID, iImage* mapImage)
 {
   DensityFactorMap* factorMap = densityFactorMaps.Get (factorMapID, 0);
-printf ("1:factorMapID=%s\n", factorMapID);fflush (stdout);
   if (factorMap == 0) return;
-printf ("2:factorMapID=%s\n", factorMapID);fflush (stdout);
   factorMap->SetImage (mapImage);
 }
 
