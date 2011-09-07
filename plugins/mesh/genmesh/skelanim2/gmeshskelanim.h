@@ -249,7 +249,7 @@ private:
 
   csString error_buf;
   iMeshObjectFactory *mesh_fact;
-  iSkeletonGraveyard *the_graveyard;
+  csRef<iSkeletonGraveyard> the_graveyard;
 
   bool use_parent;
 public:

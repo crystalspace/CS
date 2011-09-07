@@ -34,7 +34,7 @@ class csShaderGLAVP :
   public scfImplementationExt0<csShaderGLAVP, csShaderProgram>
 {
 private:
-  csGLShader_ARB* shaderPlug;
+  csRef<csGLShader_ARB> shaderPlug;
 
   GLuint program_num;
 
