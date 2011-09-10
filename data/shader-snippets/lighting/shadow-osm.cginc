@@ -69,11 +69,17 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     float4 sum = 0;
     float x, y;
 
-    for (y = -1.5; y <= 1.5; y += 1)
-      for (x = -1.5; x <= 1.5; x += 1)
-        sum += tex2D(tex, position + float2(bias * x, bias * y));
+    sum += tex2D(tex, position + float2(-bias, -bias));
+    sum += tex2D(tex, position + float2(-bias, 0));
+    sum += tex2D(tex, position + float2(-bias, bias));
+    sum += tex2D(tex, position + float2(0, -bias));
+    sum += tex2D(tex, position + float2(0, 0));
+    sum += tex2D(tex, position + float2(0, bias));
+    sum += tex2D(tex, position + float2(bias, -bias));
+    sum += tex2D(tex, position + float2(bias, 0));
+    sum += tex2D(tex, position + float2(bias, bias));
       
-    sum /= 16.0; 
+    sum /= 9.0; 
 
     return sum;
   }
@@ -83,12 +89,18 @@ struct ShadowShadowMapDepth : ShadowShadowMap
   {   
     float sum = 0;
     float x, y;
-
-    for (y = -1.5; y <= 1.5; y += 1)
-      for (x = -1.5; x <= 1.5; x += 1)
-        sum += compareDepth > tex2D(tex, position + float2(bias * x, bias * y));
-      
-    sum /= 16.0; 
+     
+    sum += compareDepth > tex2D(tex, position + float2(-bias, -bias));
+    sum += compareDepth > tex2D(tex, position + float2(-bias, 0));
+    sum += compareDepth > tex2D(tex, position + float2(-bias, bias));
+    sum += compareDepth > tex2D(tex, position + float2(0, -bias));
+    sum += compareDepth > tex2D(tex, position + float2(0, 0));
+    sum += compareDepth > tex2D(tex, position + float2(0, bias));
+    sum += compareDepth > tex2D(tex, position + float2(bias, -bias));
+    sum += compareDepth > tex2D(tex, position + float2(bias, 0));
+    sum += compareDepth > tex2D(tex, position + float2(bias, bias));
+    
+    sum /= 9.0; 
 
     return sum;    
   }
