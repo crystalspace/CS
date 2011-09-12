@@ -1,0 +1,123 @@
+@c -*-texinfo-*-
+@node About Volumetric, Using Volumetric, Volumetric Shadows
+@subsubsection About Volumetric Shadows
+@cindex aboutvolume
+
+More information about the methods implemented and tested for the volumetric 
+shadows render manager can be found at this blog: 
+@uref{http://volumetricshadows.wordpress.com/}.
+Although initially the volumetric render manager was to be implemented using 
+Opacity Shadow Maps, that’s where the name @code{osm_rm} comes from, this 
+algorithm has severe drawbacks so other methods, like Deep Opacity Maps and 
+Bounding Opacity Maps were tested as well. The following sections briefly 
+describe the algorithm, advantages and disadvantages of all tested methods.
+
+@subheading Opacity Shadow Maps
+
+@subsubheading Algorithm
+
+This method is based on T.Y. Kim and U. Neumann’s paper 
+@uref{http://volumetricshadows.files.wordpress.com/2011/06/opacity-shadow-maps.pdf, 
+Opacity Shadow Maps} from 2001. The algorithm consists of slicing the geometry 
+with planes perpendicular with the light’s direction and rendering them to 
+texture, as shown in @emph{Figure 1}. Instead of storing information about the 
+geometry’s depth, like a shadow map, these textures contain information about 
+density by accumulating the alpha values of the geometry encountered so far, 
+yielding the opacity function shown in the bottom of @emph{Figure 1}.
+
+@center @picturesss{usingcs,engine,volumetric,OSM}
+@center @emph{Figure 1} Computing the opacity function.
+
+@subsubheading Advantages 
+
+The main two advantages of this method are that it is both easy to implement, 
+especially starting from a shadow map render manager and fast to compute, it 
+only implies rendering the scene to texture multiple times without any further 
+computations.  
+
+@subsubheading Disadvantages
+
+The drawback of this algorithm is that it requires a substantial number of 
+opacity maps in order to produce artifact free renderings. For instance in 
+@emph{Figure 2.a} the scene is rendered using only 16 maps and the artifacts are 
+clearly visible, while in @emph{Figure 2.b} using 64 maps, the artifacts become 
+smaller and less visible.
+
+@center @picturesss{usingcs,engine,volumetric,osm_16_64}
+@center @emph{Figure 2} Difference in rendering for Opacity Shadow Maps with 16 maps (a) and 64 maps (b).
+
+@subheading Deep Opacity Maps
+
+@subsubheading Algorithm
+
+@uref{http://volumetricshadows.files.wordpress.com/2011/07/deepopacitymaps.pdf, 
+Deep Opacity Maps} were introduced in 2008 by C. Yuksel and J. Keyser and remove 
+the artifacts from Opacity Shadow Maps by aligning the maps with the initial 
+shape of the object as seen from the light’s perspective. This is done by first 
+computing a depth map and afterwards distributing the opacity maps based on that 
+information (@emph{Figure 3}).
+
+@center @picturesss{usingcs,engine,volumetric,dom}
+@center @emph{Figure 3} Difference in distributing the opacity maps in Opacity Shadow Maps (a) and Deep Opacity Maps (b).
+
+@subsubheading Advantages 
+
+The advantage of this method is that it manages to use only a few layers to 
+generate renderings without visible layering artifacts as in the case of Opacity
+Shadow Maps. Moreover, it represents a compromise between performance and 
+visuals, achieving renderings without any significant artifacts while having good
+frame rates as well.
+
+@subsubheading Disadvantages
+
+Although the layering artifacts are removed, when a very small number of layers 
+is used, @emph{Figure 4.a} has only 4 maps, artifacts at the end of the object 
+may appear. This can be solved by either increasing the number of maps, 
+@emph{Figure 4.b} with 16 maps, or by better distributing the 4 maps as can be 
+seen in the following section. 
+
+@center @picturesss{usingcs,engine,volumetric,dom_4_16}
+@center @emph{Figure 4} Difference in rendering for Deep Opacity Maps with 4 maps (a) and 16 maps (b).
+
+@subheading Bounding Opacity Maps
+
+@subsubheading Algorithm
+
+The volumetric shadow render manager uses a novel approach for distributing the 
+maps as described in 
+@uref{http://volumetricshadows.wordpress.com/2011/08/04/bounding-opacity-maps/,
+Bounding Opacity Maps}. This method consists of computing two depth maps from 
+the light’s perspective storing information about both the initial and the final
+object shape (@emph{Figure 5}). Furthermore the maps are distributed according 
+to the objects’ density using a distribution that varies from logarithmic to 
+linear. 
+
+@center @picturesss{usingcs,engine,volumetric,bom}
+@center @emph{Figure 5} A translucent full sphere as seen in real-life (a), the distribution of layers when using Deep Opacity Maps (b) and Bounding Opacity Maps (c).
+
+@subsubheading Advantages 
+
+Because this method tends to follow the distribution of light from the 
+real-world (@emph{Figure 5.a}), by computing two depth maps and by distributing
+the maps according to the objects’ density, realistic renderings are obtained 
+with just a few layers.  
+
+@subsubheading Disadvantages
+
+The main drawback of this algorithm is that it requires more computations, 
+mainly because it needs to find out two depth maps. Furthermore, the maps are 
+distributed according to the overall density in the scene and not individually 
+per object and the maps’ distribution can’t be recomputed in real-time because 
+it is currently done on the CPU.
+
+@subheading Performance
+
+A plot showing the variance between the performance, measured in FPS 
+(frames-per-second) and the number of maps / layers used, for the three 
+algorithms presented in this section is shown in @emph{Figure 6}. When looking 
+at these results it is important to take into account that even though Bounding 
+Opacity Maps have the worst performance they also require only a few layers to 
+produce realistic renderings.
+
+@center @picturesss{usingcs,engine,volumetric,FPS}
+@center @emph{Figure 6} The variance between the number of layers and the FPS for Opacity Shadow Maps (red), Deep Opacity Maps (green) and Bounding Opacity Maps (blue).

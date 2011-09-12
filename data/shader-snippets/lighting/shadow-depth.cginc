@@ -79,7 +79,7 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     shadowMapCoordsProj.xyz /= shadowMapCoordsProj.w;
     
     // FWIW, this should prolly be made some kind of setting.
-    bias = 0.0000001;
+    bias = 0.0001;
     //bias *= 1 + (gradient*gradient*256);
   }
   

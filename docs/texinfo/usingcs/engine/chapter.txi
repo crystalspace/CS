@@ -19,6 +19,7 @@ Everything about the 3D Engine. The core of Crystal Space.
 * Progressive Level of Detail::
 * Decals::
 * Deferred Shading::
+* Volumetric Shadows::
 @end menu
 
 @importss{usingcs,engine,worldcmp.txi}
@@ -34,4 +35,4 @@ Everything about the 3D Engine. The core of Crystal Space.
 @importss{usingcs,engine,proglod.txi}
 @importss{usingcs,engine,decals.txi}
 @importsss{usingcs,engine,deferred,chapter.txi}
-
+@importsss{usingcs,engine,volumetric,chapter.txi}

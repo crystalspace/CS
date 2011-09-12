@@ -28,8 +28,8 @@
       float depthInv = 1-depth;
       output = float4 (depthInv, depth*depth, 0, surface.a);*/
       
-      float depth = positionProj.z*-0.5 - 0.5;
-      output = float4 (depth, depth*depth, 0, surface.a);
+      float depth = positionProj.z*-0.5 + 0.5;
+      output = float4 (depth, depth*depth, 0, 1);
     </block>
     
     <output name="output" type="rgba" />

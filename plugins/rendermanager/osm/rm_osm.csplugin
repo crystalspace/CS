@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- rm_osm.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.rendermanager.osm</name>
+        <implementation>RMOSM</implementation>
+        <description>Rendermanager (osm)</description>
+        <requires>
+          <class>crystalspace.engine.</class>
+          <class>crystalspace.graphics3d.</class>         
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

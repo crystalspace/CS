@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+  Copyright (C) 2011 by Alexandru Voicu
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<shader compiler="xmlshader" name="shadow_osm">
+  <technique priority="200">
+    <pass>
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      <mixmode><add/></mixmode>
+      <texture name="tex diffuse" destination="TexDiffuse" />
+      <texture name="light shadow map start" destination="DepthStartMap" />
+      <texture name="light shadow map end" destination="DepthEndMap" />
+      <texture name="split function" destination="SplitFunc" />      
+      <vp plugin="glcg">
+        <cgvp>
+          <variablemap variable="light shadow map projection" destination="projection" />           
+          <program>
+          <![CDATA[
+          float4x4 projection;
+          
+          struct app2vertex {
+            float4 Position : POSITION;
+            float2 TexCoord : TEXCOORD0;
+          };
+          struct vertex2fragment {
+            float4 Hposition : POSITION;
+            float2 TexCoord : TEXCOORD0;
+            float4 shadowMapCoordsProj : TEXCOORD1;
+          };          
+          
+          vertex2fragment main (app2vertex IN,
+            uniform float4x4 ModelView : state.matrix.modelview,
+            uniform float4x4 ModelViewProj : state.matrix.mvp)
+          {
+            vertex2fragment OUT;
+            OUT.Hposition = mul (ModelViewProj, IN.Position);
+            float4 position_camera = mul (ModelView, IN.Position);
+            OUT.TexCoord = IN.TexCoord;
+            
+            // compute the projection for the depthStart map
+            float4x4 flipY;
+            flipY[0] = float4 (1, 0, 0, 0);
+            flipY[1] = float4 (0, -1, 0, 0);
+            flipY[2] = float4 (0, 0, 1, 0);
+            flipY[3] = float4 (0, 0, 0, 1);
+            float4x4 proj = mul (flipY, projection);
+            float4 shadowMapCoords = mul (proj, position_camera);            
+            OUT.shadowMapCoordsProj = shadowMapCoords;
+            OUT.shadowMapCoordsProj.xyz /= OUT.shadowMapCoordsProj.w;             
+            
+            return OUT;
+          }
+          ]]>
+          </program>
+        </cgvp>
+      </vp>
+      <fp plugin="glcg">
+        <cgfp>
+        <variablemap variable="light numSplits" destination="numSplits" />        
+        <program>
+          <![CDATA[
+          int numSplits;
+          struct vertex2fragment {
+            float4 Hposition : POSITION;
+            float2 TexCoord : TEXCOORD0;
+            float4 shadowMapCoordsProj : TEXCOORD1;
+          };  
+          struct fragmentOutput
+          {
+            float4 Color0 : COLOR0;
+          ]]>            
+        <?if vars."mrt".int &gt; 1?>
+          <![CDATA[          
+            float4 Color1 : COLOR1;
+            float4 Color2 : COLOR2;
+            float4 Color3 : COLOR3;
+          ]]>            
+        <?if vars."mrt".int &gt; 4?>
+          <![CDATA[          
+            float4 Color4 : COLOR4;
+            float4 Color5 : COLOR5;
+            float4 Color6 : COLOR6;
+            float4 Color7 : COLOR7;
+          ]]>
+        <?endif?>
+        <?endif?>
+          <![CDATA[               
+          };
+          fragmentOutput main (vertex2fragment IN,
+            uniform sampler2D TexDiffuse,
+            uniform sampler2D DepthStartMap,
+            uniform sampler2D DepthEndMap,            
+            uniform sampler2D SplitFunc)
+          {
+            fragmentOutput output;
+            float4 surface = tex2D (TexDiffuse, IN.TexCoord);
+            
+            float value = surface.a;
+
+            // compute the projection for the depthStart map              
+            float3 shadowMapCoordsBiased = (float3(0.5)*IN.shadowMapCoordsProj.xyz) 
+              + float3(0.5);
+            float2 position = shadowMapCoordsBiased.xy;
+            
+            float eps = 0.0001;            
+            float compareDepth = (1 - shadowMapCoordsBiased.z) - eps;
+            float depthStart = tex2D(DepthStartMap, position).x;
+            float depthEnd = tex2D(DepthEndMap, position).x;
+
+            int i;      
+            i = min( tex2D( SplitFunc, 
+                  float2( min( (compareDepth - depthStart) / 
+                  (1 - depthEnd - depthStart) , 0.9999 ) , 0 ) ).x * (numSplits - 1), 
+                  numSplits - 1);              
+
+            int index = i % 4;
+            value += 2 * (value == 1);
+            float4 color = value;
+
+            float4 one = color;
+            color = color * float4(index < 1, index < 2, index < 3, 1);
+            
+            // write in the correct render target
+            int renderTarget = (i / 4);
+            
+            output.Color0 = color * (renderTarget == 0);
+          ]]>            
+        <?if vars."mrt".int &gt; 1?>
+          <![CDATA[                      
+            output.Color1 = color * (renderTarget == 1) + one * (renderTarget < 1);
+            output.Color2 = color * (renderTarget == 2) + one * (renderTarget < 2);
+            output.Color3 = color * (renderTarget == 3) + one * (renderTarget < 3);
+          ]]>            
+        <?if vars."mrt".int &gt; 4?>
+          <![CDATA[                      
+            output.Color4 = color * (renderTarget == 4) + one * (renderTarget < 4);
+            output.Color5 = color * (renderTarget == 5) + one * (renderTarget < 5);
+            output.Color6 = color * (renderTarget == 6) + one * (renderTarget < 6);
+            output.Color7 = color * (renderTarget == 7) + one * (renderTarget < 7);
+            ]]>
+        <?endif?>
+        <?endif?>
+          <![CDATA[     
+            return output;
+          }
+          ]]>
+          </program>
+        </cgfp>
+      </fp>      
+    </pass>
+  </technique>
+  
+</shader>

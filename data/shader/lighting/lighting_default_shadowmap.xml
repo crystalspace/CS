@@ -24,7 +24,7 @@
   <alias name="shadow" file="/shader-snippets/shadow/shadow-depth.xml" />
   <alias name="surface" file="/shader-snippets/surface/surface-modulate.xml" />
   
-  <?if vars."light shadow map" && ((vars."light count".int &gt; 1) || (vars."light shadow map[0]".texture)) ?>
+  <?if vars."light shadow map" && ((vars."light count".int &gt; 1) || (vars."light shadow map[0].texture")) ?>
   <technique priority="500" minlights="5">
     <tag>per_pixel_lighting</tag>
     <!-- 1 pass, 6 lights -->

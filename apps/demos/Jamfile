@@ -3,5 +3,6 @@ SubDir TOP apps demos ;
 SubInclude TOP apps demos bias ;
 SubInclude TOP apps demos deferreddemo ;
 SubInclude TOP apps demos island ;
+SubInclude TOP apps demos selfshadow ;
 SubInclude TOP apps demos waterdemo ;
 SubInclude TOP apps demos waterdemo2 ;

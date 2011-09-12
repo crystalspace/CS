@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<world>
+  <plugins>
+    <plugin name='genmesh'>crystalspace.mesh.loader.genmesh</plugin>
+    <plugin name='genmeshfact'>crystalspace.mesh.loader.factory.genmesh</plugin>
+  </plugins>
+  <shaders/>
+  <textures>
+    <texture name="white">
+      <file>textures/white.jpg</file>
+    </texture>
+    <texture name="green_trans">
+      <file>textures/green_trans.png</file>
+    </texture>	
+  </textures>
+  <materials>
+    <material name="white">
+      <texture>white</texture>
+    </material>
+    <material name="green_trans">
+      <texture>green_trans</texture>
+    </material>		
+  </materials>
+  <sounds/>
+  <library>factories/GrassFactSmall</library>
+  <library>factories/PlaneFact</library>
+  <triggers/>
+  <sector name='Scene'>
+    <cullerp plugin='crystalspace.culling.frustvis'/>
+    <meshobj name='Hair'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>GrassFactSmall</factory>
+      </params>
+      <move>
+        <v y='1.3273'/>
+        <matrix>
+          <rotz>3.1416</rotz>
+        </matrix>
+      </move>
+    </meshobj>
+    <meshobj name='Plane'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>PlaneFact</factory>
+      </params>
+      <move>
+        <v y='0.0533' x='0.0075' z='-0.0058'/>
+      </move>
+    </meshobj>
+    <light name='Lamp'>
+      <center y='14.75' x='0' z='0'/>
+      <color blue='1.0' green='1.0' red='1.0'/>
+      <radius>100</radius>
+      <type>directional</type>
+      <move>
+        <matrix>
+          <roty>0</roty>
+          <rotz>0</rotz>
+          <rotx>-1.57</rotx>
+        </matrix>
+      </move>	  
+    </light>	  
+  </sector>
+  <sequences/>
+  <start name='Camera'>
+    <sector>Scene</sector>
+    <position y='6' x='0' z='-13'/>
+  </start>  
+</world>

@@ -50,5 +50,17 @@
 		 destination="lightPropsSM.shadowMapUnscale" />
   <?Endtemplate?>
   
+<!--  
+  Copying properties for opacity shadow maps
+-->
+  <?Template Lighting_OpacityMap_Variablemaps?> 
+    <variablemap variable="light shadow map projection" 
+		 destination="lightPropsOM.opacityMapTF" />
+    <variablemap variable="light numSplits" 
+		 destination="lightPropsOM.opacityMapNumSplits" />		       
+    <variablemap variable="light shadow map size" 
+		 destination="lightPropsOM.size" />		      
+  <?Endtemplate?>  
+  
   <?SEndIf?>
 </include>

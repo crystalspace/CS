@@ -1,0 +1,10 @@
+SubDir TOP plugins rendermanager osm ;
+
+Description rm_osm : "Rendermanager (osm)" ;
+
+Plugin rm_osm : 
+  [ Wildcard *.cpp *.h ]
+  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) $(DOTDOT) include csplugincommon rendermanager ] : *.h ]
+;
+CompileGroups rm_osm : rendermanagers ;
+LinkWith rm_osm : crystalspace ;
