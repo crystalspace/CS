@@ -1,0 +1,22 @@
+@c -*-texinfo-*-
+@node Volumetric Shadows, Decals, Engine
+@subsection Volumetric Shadows
+@cindex volumetric
+
+@noindent
+@emph{Written by Alexandru Voicu,
+@email{voicualexandruteodor@@gmail.com}.}
+
+The documentation for the volumetric shadows render manager is split into two 
+parts. In the first part the methods implemented and tested are briefly 
+presented stating the benefits and drawbacks of each of them. The second part 
+describes how to use this Crystal Space plugin and possible ways of improving 
+it.
+
+@menu
+* About Volumetric:: About Volumetric Shadows
+* Using Volumetric:: Using the Volumetric Shadows Render Manager
+@end menu 
+
+@importsss{usingcs,engine,volumetric,aboutvolume.txi}
+@importsss{usingcs,engine,volumetric,usingvolume.txi}

@@ -1,0 +1,159 @@
+@c -*-texinfo-*-
+@node Using Volumetric, About Volumetric , Volumetric Shadows
+@subsubsection Using the Volumetric Shadows Render Manager
+@cindex usingvolume
+
+@subsubheading Considerations when using Volumetric Shadows
+
+Although the volumetric shadows render manger can cope with opaque objects as 
+well, it is important to take into account the following, before choosing to 
+use this render manager for your current scene: 
+
+@itemize @bullet
+@item Because this render manager uses 3 render passes before rendering the 
+final scene it’s slower than the Parallel Split Shadow Maps render manager, 
+which only uses 1 such initial render pass. That is why the volumetric shadow
+render manager should only be used when translucent objects are present in the 
+scene and their shadowing effect needs to be more accurate than the one produced 
+by the Parallel Split Shadow Maps method.
+
+@item At the moment only foliage (grass or trees) and hair are supported by this
+render manager. Volumetric transparent objects, like clouds and smoke, are not 
+yet supported because there is no Volumetric Render Manager in Crystal Space. 
+This Volumetric Render Manager would be responsible for rendering clouds and 
+smoke and the volumetric shadows render manager would be called afterward, 
+without needing any major modifications from the current version. 
+
+@item The only type of mesh currently supported is @code{‘genmesh’}. Although 
+this is the most generic type of mesh used in Crystal Space, support for 
+materials from other types of meshes has to be added as well.
+
+@item	At the moment only one light is supported. Support for multiple lights 
+could be added by using a 3D texture, because every light generates a maximum of
+up to 10 textures.
+@end itemize
+
+@subsubheading The three render passes
+
+@itemize @bullet
+
+@item	The first render pass gives depth information about the closest geometry 
+while rendering from the light’s perspective. This is done by using a standard 
+shadow mapping technique on a RGBA texture with 32-bit float channels.
+
+@item The second render pass also gives depth information, but about the 
+furthest geometry from the light’s position. This is achieved by swapping the 
+@code{farplane} and the @code{nearplane} values while computing the viewing 
+frustum and then applying the standard shadow mapping technique.  
+
+@item The third render pass uses MRTs (multiple render targets) in order to 
+produce between 1 and 8 textures. Each of these textures contains 4 opacity maps
+by storing them on each 32-bit channel available. The opacity maps store the 
+objects’ density at different locations using additive alpha blending.
+
+@end itemize
+
+@subsubheading Selecting the Volumetric Shadows Render Manager
+
+The simplest method to select the volumetric shadows render manager is to use 
+the following configuration option:
+@example
+Engine.RenderManager.Default = crystalspace.rendermanager.osm
+@end example
+
+Alternately, the volumetric shadows render manager can also be loaded manually 
+as follows:
+@example
+csRef<iRenderManager> rm = csLoadPlugin<iRenderManager> (objectRegistry,
+  "crystalspace.rendermanager.osm");
+@end example
+
+@emph{Note}: When loading the volumetric shadows render manager manually the
+'CS/data/config/engine.cfg' configuration file will not, by default, be present
+in the configuration manager. This file specifies configuration options used by
+the volumetric shadows render manager. Be sure to define these configurations 
+option prior to loading the volumetric shadows render manager. This ca be done
+by:
+
+@example
+csRef<iConfigManager> cfg = 
+  csQueryRegistry<iConfigManager> (GetObjectRegistry());
+cfg->AddDomain 
+  ("/config/engine.cfg", vfs, iConfigManager::ConfigPriorityPlugin);
+@end example
+
+After being loaded, the engine must be instructed to use the volumetric shadows 
+render manager as follows:
+
+@example
+engine->SetRenderManager (rm);
+@end example
+
+@subsubheading Configuration options
+
+The configuration options available for the volumetric shadow render manager via
+the 'CS/data/config/engine.cfg' file are:
+
+@table @code
+@item RenderManager.OSM.ShadowMapResolution
+Choosing the texture resolution (defaults to @code{512}). This value is 
+used for both the opacity maps and the shadow maps needed by the 3 render 
+passes.
+
+@item RenderManager.OSM.ForceTextureNumber
+Choosing the desired number of textures for opacity maps, with values from 
+1 to 8 (defaults to @code{2}). The number of textures actually used could be 
+smaller than the desired one, because it is chosen as the minimum of the number 
+of available MRTs (multiple render targets) on the current GPU and the desired 
+number of textures. A bigger value for this variable produces better renderings, 
+but at a higher computational cost, so a compromise between performance and 
+visuals has to be done for the current scene by choosing a value for this 
+variable.
+
+@item RenderManager.OSM.Layers
+Setting the default Render Layers file. This should always be equal to @code{‘/data/renderlayers/lighting_default_osm.xml’}.
+
+@end table
+
+@subsubheading Recomputing the splitting ratio 
+
+The volumetric shadow render manager uses the Bounding Opacity Maps algorithm 
+(@pxref{About Volumetric}) in order to achieve accurate volumetric shadows at 
+real-time performance. The advantage of this method is that it distributes the 
+opacity maps so that they follow the light’s distribution from the real-world. 
+In order to do this it uses a hybrid split function that sets a ratio
+between logarithmic and linear splitting. Determining the splitting ratio 
+represents the current bottleneck of this render manager, because it involves 
+using the CPU to do image processing on textures readback from the GPU. 
+Fortunately the splitting ratio only needs to be recomputed when the objects’ 
+density changes or new objects are brought into the light’s perspective. 
+For more information regarding how to recompute the splitting ratio see the 
+next section.
+
+@subsubheading Debug Commands
+
+The volumetric shadows render manager implements the @code{iDebugHelper} 
+interface and responds to the following debug commands:
+
+@table @code
+@item reset_split_ratio
+Begins recomputing the splitting ratio. This causes the application to have only
+interactive and not real-time performance and should be called only when 
+necessarily. Refer to the above section for more information. 
+
+@item show_render_textures
+Toggles a display of the textures generated by the 3 render passes at the bottom
+of the screen. The first two textures correspond to the depth textures, the one
+that gives information about the furthest geometry is first and the one that 
+gives information about the closest points comes second. The rest of the 
+textures are opacity textures in a number depending on the available MRTs and 
+the desired number of textures. 
+
+@item show_opaque_objects
+Makes the volumetric shadow render manager work with opaque objects as well.
+
+@item hide_opaque_objects
+Makes the volumetric shadow render manager work only with translucent objects,
+which have the @code{alpha} rendering priority in Crystal Space.
+
+@end table
