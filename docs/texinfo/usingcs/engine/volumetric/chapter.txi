@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Volumetric Shadows, Decals, Engine
+@node Volumetric Shadows, , Deferred Shading, Engine
 @subsection Volumetric Shadows
 @cindex volumetric
 

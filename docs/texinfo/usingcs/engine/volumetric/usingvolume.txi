@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Using Volumetric, About Volumetric , Volumetric Shadows
+@node Using Volumetric, , About Volumetric, Volumetric Shadows
 @subsubsection Using the Volumetric Shadows Render Manager
 @cindex usingvolume
 

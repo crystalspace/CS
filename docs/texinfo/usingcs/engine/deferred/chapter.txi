@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Deferred Shading, , Decals, Engine
+@node Deferred Shading, Volumetric Shadows, Decals, Engine
 @subsection Deferred Shading
 @cindex deferred
 
