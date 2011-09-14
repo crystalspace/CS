@@ -322,7 +322,7 @@ namespace Geometry //@@Right?
       {
         // Select left or right depending on closeness to center (find better)
         const csVector3 objBoxCenter = object->GetBBox ().GetCenter ();
-        const size_t axis = node->GetBBox ().GetCenter ().DominantAxis ();
+        const size_t axis = node->GetBBox ().GetSize ().DominantAxis ();
 
         if (objBoxCenter[axis] < node->GetBBox ().GetCenter ()[axis])
         {
