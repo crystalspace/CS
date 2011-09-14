@@ -165,6 +165,26 @@ public:
   }
 
   /**
+   * Test if this set intersects with another set (i.e. they have
+   * common elements).
+   */
+  bool TestIntersect (const csSet& other) const
+  {
+    if (GetSize () < other.GetSize ())
+    {
+      // Call TestIntersect() on the set with most elements
+      // so that we iterate over the set with fewest elements.
+      return other.TestIntersect (*this);
+    }
+    GlobalIterator it = other.GetIterator ();
+    while (it.HasNext ())
+    {
+      if (Contains (it.Next ())) return true;
+    }
+    return false;
+  }
+
+  /**
    * Calculate the intersection of two sets and put the result
    * in a new set.
    */
