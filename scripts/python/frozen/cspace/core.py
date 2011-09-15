@@ -681,6 +681,7 @@ class csStringIDSet(object):
     def Empty(*args): return _core.csStringIDSet_Empty(*args)
     def Delete(*args): return _core.csStringIDSet_Delete(*args)
     def Union(*args): return _core.csStringIDSet_Union(*args)
+    def TestIntersect(*args): return _core.csStringIDSet_TestIntersect(*args)
     def Subtract(*args): return _core.csStringIDSet_Subtract(*args)
     def GetSize(*args): return _core.csStringIDSet_GetSize(*args)
     def IsEmpty(*args): return _core.csStringIDSet_IsEmpty(*args)

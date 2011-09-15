@@ -19460,6 +19460,40 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csStringIDSet_TestIntersect(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csSet< csStringID > *arg1 = (csSet< csStringID > *) 0 ;
+  csSet< csStringID > *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csStringIDSet_TestIntersect",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csStringIDSet_TestIntersect" "', argument " "1"" of type '" "csSet< csStringID > const *""'"); 
+  }
+  arg1 = reinterpret_cast< csSet< csStringID > * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csSetT_CS__StringIDT_CS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csStringIDSet_TestIntersect" "', argument " "2"" of type '" "csSet< csStringID > const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csStringIDSet_TestIntersect" "', argument " "2"" of type '" "csSet< csStringID > const &""'"); 
+  }
+  arg2 = reinterpret_cast< csSet< csStringID > * >(argp2);
+  result = (bool)((csSet< csStringID > const *)arg1)->TestIntersect((csSet< csStringID > const &)*arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_Intersect__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csSet< csStringID > *arg1 = 0 ;
@@ -60926,6 +60960,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csStringIDSet_Delete", _wrap_csStringIDSet_Delete, METH_VARARGS, NULL},
 	 { (char *)"csStringIDSet_Union", _wrap_csStringIDSet_Union, METH_VARARGS, NULL},
 	 { (char *)"Union", _wrap_Union, METH_VARARGS, NULL},
+	 { (char *)"csStringIDSet_TestIntersect", _wrap_csStringIDSet_TestIntersect, METH_VARARGS, NULL},
 	 { (char *)"Intersect", _wrap_Intersect, METH_VARARGS, NULL},
 	 { (char *)"csStringIDSet_Subtract", _wrap_csStringIDSet_Subtract, METH_VARARGS, NULL},
 	 { (char *)"Subtract", _wrap_Subtract, METH_VARARGS, NULL},

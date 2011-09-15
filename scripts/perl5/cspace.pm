@@ -1414,6 +1414,7 @@ sub new {
 *Empty = *cspacec::csStringIDSet_Empty;
 *Delete = *cspacec::csStringIDSet_Delete;
 *Union = *cspacec::csStringIDSet_Union;
+*TestIntersect = *cspacec::csStringIDSet_TestIntersect;
 *Subtract = *cspacec::csStringIDSet_Subtract;
 *GetSize = *cspacec::csStringIDSet_GetSize;
 *IsEmpty = *cspacec::csStringIDSet_IsEmpty;
