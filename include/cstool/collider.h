@@ -351,7 +351,6 @@ public:
 class CS_CRYSTALSPACE_EXPORT csColliderActor
 {
 private:
-  bool revertMove;
   bool onground;
   bool cd;
   csArray<csCollisionPair> our_cd_contact;
@@ -376,8 +375,6 @@ private:
   csVector3 topSize;
   csVector3 bottomSize;
   csVector3 intervalSize;
-
-  int revertCount;
 
   /**
    * Performs the collision detection for the provided csColliderWrapper vs
@@ -501,11 +498,6 @@ public:
    * Enable/disable collision detection (default enabled).
    */
   void SetCD (bool c) { cd = c; }
-
-  /**
-   * Check if we should revert a move (revert rotation).
-   */
-  bool CheckRevertMove () const { return revertMove; }
 
   /**
    * Enable remembering of the meshes we hit.
