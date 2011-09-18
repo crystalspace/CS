@@ -548,7 +548,7 @@ namespace CS
         object_reg, "crystalspace.shader.variablenameset");
 
       bAllVisible = false;
-      vistest_objects_inuse = 0;
+      vistest_objects_inuse = false;
     }
 
     csOccluvis::~csOccluvis ()
