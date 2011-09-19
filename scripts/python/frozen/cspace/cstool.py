@@ -169,7 +169,6 @@ class csColliderActor(object):
     def SetOnGround(*args): return _cstool.csColliderActor_SetOnGround(*args)
     def HasCD(*args): return _cstool.csColliderActor_HasCD(*args)
     def SetCD(*args): return _cstool.csColliderActor_SetCD(*args)
-    def CheckRevertMove(*args): return _cstool.csColliderActor_CheckRevertMove(*args)
     def EnableHitMeshes(*args): return _cstool.csColliderActor_EnableHitMeshes(*args)
     def CheckHitMeshes(*args): return _cstool.csColliderActor_CheckHitMeshes(*args)
     def GetHitMeshes(*args): return _cstool.csColliderActor_GetHitMeshes(*args)

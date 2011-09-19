@@ -6344,28 +6344,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csColliderActor_CheckRevertMove(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csColliderActor *arg1 = (csColliderActor *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  bool result;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csColliderActor_CheckRevertMove",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csColliderActor, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csColliderActor_CheckRevertMove" "', argument " "1"" of type '" "csColliderActor const *""'"); 
-  }
-  arg1 = reinterpret_cast< csColliderActor * >(argp1);
-  result = (bool)((csColliderActor const *)arg1)->CheckRevertMove();
-  resultobj = SWIG_From_bool(static_cast< bool >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_csColliderActor_EnableHitMeshes(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csColliderActor *arg1 = (csColliderActor *) 0 ;
@@ -23379,7 +23357,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csColliderActor_SetOnGround", _wrap_csColliderActor_SetOnGround, METH_VARARGS, NULL},
 	 { (char *)"csColliderActor_HasCD", _wrap_csColliderActor_HasCD, METH_VARARGS, NULL},
 	 { (char *)"csColliderActor_SetCD", _wrap_csColliderActor_SetCD, METH_VARARGS, NULL},
-	 { (char *)"csColliderActor_CheckRevertMove", _wrap_csColliderActor_CheckRevertMove, METH_VARARGS, NULL},
 	 { (char *)"csColliderActor_EnableHitMeshes", _wrap_csColliderActor_EnableHitMeshes, METH_VARARGS, NULL},
 	 { (char *)"csColliderActor_CheckHitMeshes", _wrap_csColliderActor_CheckHitMeshes, METH_VARARGS, NULL},
 	 { (char *)"csColliderActor_GetHitMeshes", _wrap_csColliderActor_GetHitMeshes, METH_VARARGS, NULL},
