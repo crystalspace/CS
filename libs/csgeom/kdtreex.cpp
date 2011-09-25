@@ -142,6 +142,7 @@ KDTree::KDTree () : scfImplementationType(this)
   num_objects = max_objects = 0;
   disallow_distribute = 0;
   split_axis = CS_KDTREE_AXISINVALID;
+  min_split_objects = 1;
 
   node_bbox.Set (-KDTREE_MAX, -KDTREE_MAX,
         -KDTREE_MAX, KDTREE_MAX,
@@ -611,7 +612,7 @@ void KDTree::Distribute ()
     // This node doesn't have children yet.
 
     // If we only have one object we do nothing.
-    if (num_objects == 1) return;
+    if (num_objects <= min_split_objects) return;
 
     // Here we have 2 or more objects.
     // We use FindBestSplitLocation() to see how we can best split this
@@ -645,9 +646,11 @@ void KDTree::Distribute ()
     {
       child1 = TreeAlloc()->tree_nodes.Alloc ();
       child1->SetParent (this);
+      child1->min_split_objects = min_split_objects;
       child1->SetObjectDescriptor (descriptor);
       child2 = TreeAlloc()->tree_nodes.Alloc ();
       child2->SetParent (this);
+      child2->min_split_objects = min_split_objects;
       child2->SetObjectDescriptor (descriptor);
       DistributeLeafObjects ();
       if (num_objects != 0)
