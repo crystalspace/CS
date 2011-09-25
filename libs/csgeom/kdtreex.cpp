@@ -366,18 +366,15 @@ float KDTree::FindBestSplitLocation (int axis, float& split_loc)
   // If mina and maxa are almost the same then reject.
   if (fabs (mina-maxa) < 0.0001f) return -1.0f;
 
-  // Do 10 tests to find best split location. This should
-  // probably be a configurable parameter.
+# define FBSL_ATTEMPTS 5
 
-  // @@@ Is the routine below very efficient?
-# define FBSL_ATTEMPTS 20
-  float a;
   float best_qual = -2.0;
   float inv_num_objects = 1.0 / float (num_objects);
-  for (i = 0 ; i < FBSL_ATTEMPTS ; i++)
+
+  for (int attempt = 0 ; attempt < FBSL_ATTEMPTS ; attempt++)
   {
-    // Calculate a possible split location.
-    a = mina + float (i+1)*(maxa-mina)/float (FBSL_ATTEMPTS+1.0);
+    // Set 'a' to the middle. We will start to find a good split location from there.
+    float a = (mina + maxa) / 2.0f;
     // Now count the number of objects that are completely
     // on the left and the number of objects completely on the right
     // side. The remaining objects are cut by this position.
@@ -411,6 +408,8 @@ float KDTree::FindBestSplitLocation (int axis, float& split_loc)
       best_qual = qual;
       split_loc = a;
     }
+    if (left <= right) maxa = a;
+    else mina = a;
   }
 # undef FBSL_ATTEMPTS
   return best_qual;
