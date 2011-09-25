@@ -348,14 +348,20 @@ float KDTree::FindBestSplitLocation (int axis, float& split_loc)
   }
 
   // Calculate minimum and maximum value along the axis.
+  CS_ALLOC_STACK_ARRAY (float, objectsMin, num_objects);
+  CS_ALLOC_STACK_ARRAY (float, objectsMax, num_objects);
   const csSphere& bs = objects[0]->bsphere;
   float mina = bs.GetCenter ()[axis]-bs.GetRadius ();
+  objectsMin[0] = mina;
   float maxa = bs.GetCenter ()[axis]+bs.GetRadius ();
+  objectsMax[0] = maxa;
   for (i = 1 ; i < num_objects ; i++)
   {
     const csSphere& bsphere = objects[i]->bsphere;
     float mi = bsphere.GetCenter ()[axis] - bsphere.GetRadius ();
+    objectsMin[i] = mi;
     float ma = bsphere.GetCenter ()[axis] + bsphere.GetRadius ();
+    objectsMax[i] = ma;
     if (mi < mina) mina = mi;
     if (ma > maxa) maxa = ma;
   }
@@ -382,9 +388,8 @@ float KDTree::FindBestSplitLocation (int axis, float& split_loc)
     int right = 0;
     for (j = 0 ; j < num_objects ; j++)
     {
-      const csSphere& bsphere = objects[j]->bsphere;
-      float mi = bsphere.GetCenter ()[axis] - bsphere.GetRadius ();
-      float ma = bsphere.GetCenter ()[axis] + bsphere.GetRadius ();
+      float mi = objectsMin[j];
+      float ma = objectsMax[j];
       // The .0001 is for safety.
       if (ma < a-.0001) left++;
       else if (mi > a+.0001) right++;
