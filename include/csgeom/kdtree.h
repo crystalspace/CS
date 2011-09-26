@@ -197,6 +197,9 @@ private:
   // Estimate of the total number of objects in this tree including children.
   int estimate_total_objects;
 
+  // Minimum amount of objects in this tree before we consider splitting.
+  int min_split_objects;
+
   // Disallow Distribute().
   // If this flag > 0 it means that we cannot find a good split
   // location for the current list of objects. So in that case we don't
@@ -284,6 +287,12 @@ public:
   {
     csKDTree::descriptor = descriptor;
   }
+
+  /**
+   * Set the minimum amount of objects before we consider splitting this tree.
+   * By default this is set to 1.
+   */
+  void SetMinimumSplitAmount (int m) { min_split_objects = m; }
 
   /// Make the tree empty.
   void Clear ();

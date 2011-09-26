@@ -211,6 +211,7 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
   }
 
   kdtree = new csKDTree ();
+  kdtree->SetMinimumSplitAmount (50);
   csRef<csFrustVisObjectDescriptor> desc;
   desc.AttachNew (new csFrustVisObjectDescriptor ());
   kdtree->SetObjectDescriptor (desc);

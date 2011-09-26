@@ -617,7 +617,7 @@ void KDTree::Distribute ()
   {
     // This node doesn't have children yet.
 
-    // If we only have one object we do nothing.
+    // If we don't have enough objects we do nothing.
     if (num_objects <= min_split_objects) return;
 
     // Here we have 2 or more objects.

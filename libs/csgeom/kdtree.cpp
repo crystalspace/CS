@@ -345,13 +345,21 @@ float csKDTree::FindBestSplitLocation (int axis, float& split_loc)
   }
 
   // Calculate minimum and maximum value along the axis.
+  CS_ALLOC_STACK_ARRAY (float, objectsMin, num_objects);
+  CS_ALLOC_STACK_ARRAY (float, objectsMax, num_objects);
   float mina = objects[0]->bbox.Min (axis);
+  objectsMin[0] = mina;
   float maxa = objects[0]->bbox.Max (axis);
+  objectsMax[0] = maxa;
   for (i = 1 ; i < num_objects ; i++)
   {
     const csBox3& bbox = objects[i]->bbox;
-    if (bbox.Min (axis) < mina) mina = bbox.Min (axis);
-    if (bbox.Max (axis) > maxa) maxa = bbox.Max (axis);
+    float mi = bbox.Min (axis);
+    objectsMin[i] = mi;
+    float ma = bbox.Max (axis);
+    objectsMax[i] = ma;
+    if (mi < mina) mina = mi;
+    if (ma > maxa) maxa = ma;
   }
   // Make sure we don't go outside node_box.
   if (mina < node_bbox.Min (axis)) mina = node_bbox.Min (axis);
@@ -360,18 +368,15 @@ float csKDTree::FindBestSplitLocation (int axis, float& split_loc)
   // If mina and maxa are almost the same then reject.
   if (fabs (mina-maxa) < 0.0001f) return -1.0f;
 
-  // Do 10 tests to find best split location. This should
-  // probably be a configurable parameter.
+# define FBSL_ATTEMPTS 5
 
-  // @@@ Is the routine below very efficient?
-# define FBSL_ATTEMPTS 20
-  float a;
   float best_qual = -2.0;
   float inv_num_objects = 1.0 / float (num_objects);
-  for (i = 0 ; i < FBSL_ATTEMPTS ; i++)
+
+  for (int attempt = 0 ; attempt < FBSL_ATTEMPTS ; attempt++)
   {
-    // Calculate a possible split location.
-    a = mina + float (i+1)*(maxa-mina)/float (FBSL_ATTEMPTS+1.0);
+    // Set 'a' to the middle. We will start to find a good split location from there.
+    float a = (mina + maxa) / 2.0f;
     // Now count the number of objects that are completely
     // on the left and the number of objects completely on the right
     // side. The remaining objects are cut by this position.
@@ -379,10 +384,11 @@ float csKDTree::FindBestSplitLocation (int axis, float& split_loc)
     int right = 0;
     for (j = 0 ; j < num_objects ; j++)
     {
-      const csBox3& bbox = objects[j]->bbox;
+      float mi = objectsMin[j];
+      float ma = objectsMax[j];
       // The .0001 is for safety.
-      if (bbox.Max (axis) < a-.0001) left++;
-      else if (bbox.Min (axis) > a+.0001) right++;
+      if (ma < a-.0001) left++;
+      else if (mi > a+.0001) right++;
     }
     int cut = num_objects-left-right;
     // If we have no object on the left or right then this is a bad
@@ -403,6 +409,8 @@ float csKDTree::FindBestSplitLocation (int axis, float& split_loc)
       best_qual = qual;
       split_loc = a;
     }
+    if (left <= right) maxa = a;
+    else mina = a;
   }
 # undef FBSL_ATTEMPTS
   return best_qual;
@@ -551,14 +559,16 @@ void csKDTree::MoveObject (csKDTreeChild* object, const csBox3& new_bbox)
   // node every 50 times an object has moved. This ensures the tree
   // will keep reasonable quality. We don't do this every time because
   // Flatten() itself has some overhead.
+  bool do_flatten = false;
+#if 0
   static int cnt = 50;
   cnt--;
-  bool do_flatten = false;
   if (cnt < 0)
   {
     cnt = 50;
     do_flatten = true;
   }
+#endif
 
   csKDTree* node = this;
   if (object->num_leafs > 0)
@@ -602,8 +612,8 @@ void csKDTree::Distribute ()
   {
     // This node doesn't have children yet.
 
-    // If we only have one object we do nothing.
-    if (num_objects == 1) return;
+    // If we don't have enough objects we do nothing.
+    if (num_objects <= min_split_objects) return;
 
     // Here we have 2 or more objects.
     // We use FindBestSplitLocation() to see how we can best split this
