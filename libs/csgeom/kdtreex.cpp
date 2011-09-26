@@ -347,6 +347,7 @@ float KDTree::FindBestSplitLocation (int axis, float& split_loc)
     return -1.0;                // Very bad quality split.
   }
 
+  printf ("num_objects=%d\n", num_objects); fflush (stdout);
   // Calculate minimum and maximum value along the axis.
   CS_ALLOC_STACK_ARRAY (float, objectsMin, num_objects);
   CS_ALLOC_STACK_ARRAY (float, objectsMax, num_objects);
@@ -562,14 +563,16 @@ void KDTree::MoveObject (KDTreeChild* object, const csSphere& new_bsphere)
   // node every 50 times an object has moved. This ensures the tree
   // will keep reasonable quality. We don't do this every time because
   // Flatten() itself has some overhead.
+  bool do_flatten = false;
+#if 0
   static int cnt = 50;
   cnt--;
-  bool do_flatten = false;
   if (cnt < 0)
   {
     cnt = 50;
     do_flatten = true;
   }
+#endif
 
   KDTree* node = this;
   if (object->num_leafs > 0)
