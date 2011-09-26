@@ -345,8 +345,8 @@ float csKDTree::FindBestSplitLocation (int axis, float& split_loc)
   }
 
   // Calculate minimum and maximum value along the axis.
-  CS_ALLOC_STACK_ARRAY (float, objectsMin, num_objects);
-  CS_ALLOC_STACK_ARRAY (float, objectsMax, num_objects);
+  CS_ALLOC_STACK_ARRAY_FALLBACK (float, objectsMin, num_objects, 50000);
+  CS_ALLOC_STACK_ARRAY_FALLBACK (float, objectsMax, num_objects, 50000);
   float mina = objects[0]->bbox.Min (axis);
   objectsMin[0] = mina;
   float maxa = objects[0]->bbox.Max (axis);

@@ -348,8 +348,8 @@ float KDTree::FindBestSplitLocation (int axis, float& split_loc)
   }
 
   // Calculate minimum and maximum value along the axis.
-  CS_ALLOC_STACK_ARRAY (float, objectsMin, num_objects);
-  CS_ALLOC_STACK_ARRAY (float, objectsMax, num_objects);
+  CS_ALLOC_STACK_ARRAY_FALLBACK (float, objectsMin, num_objects, 50000);
+  CS_ALLOC_STACK_ARRAY_FALLBACK (float, objectsMax, num_objects, 50000);
   const csSphere& bs = objects[0]->bsphere;
   float mina = bs.GetCenter ()[axis]-bs.GetRadius ();
   objectsMin[0] = mina;
