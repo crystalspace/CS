@@ -347,7 +347,6 @@ float KDTree::FindBestSplitLocation (int axis, float& split_loc)
     return -1.0;                // Very bad quality split.
   }
 
-  printf ("num_objects=%d\n", num_objects); fflush (stdout);
   // Calculate minimum and maximum value along the axis.
   CS_ALLOC_STACK_ARRAY (float, objectsMin, num_objects);
   CS_ALLOC_STACK_ARRAY (float, objectsMax, num_objects);
