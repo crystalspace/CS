@@ -18,52 +18,44 @@
 
 #include "cssysdef.h"
 
-#include "csgeom/vector3.h"
 #include "csplugincommon/opengl/glextmanager.h"
-#include "csplugincommon/opengl/glhelper.h"
-#include "csutil/objreg.h"
-#include "csutil/ref.h"
-#include "csutil/scf.h"
-#include "csutil/stringquote.h"
-#include "iutil/databuff.h"
-#include "iutil/document.h"
-#include "iutil/string.h"
-#include "ivaria/reporter.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/shader/shader.h"
 
 #include "glshader_glsl.h"
 #include "glshader_glslshader.h"
 
-CS_LEAKGUARD_IMPLEMENT (csShaderGLSLShader);
-
-bool csShaderGLSLShader::Compile (const char *source)
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderGLSL)
 {
-  int status;                   // compile status
-  const csGLExtensionManager* ext = shaderPlug->ext;
+  CS_LEAKGUARD_IMPLEMENT (csShaderGLSLShader);
 
-  shader_id = ext->glCreateShaderObjectARB (type);
-  ext->glShaderSourceARB (shader_id, 1, &source, NULL);
-  ext->glCompileShaderARB (shader_id);
-
-  ext->glGetObjectParameterivARB (shader_id, GL_OBJECT_COMPILE_STATUS_ARB,
-                                  &status);
-  if (status != GL_TRUE)
+  bool csShaderGLSLShader::Compile (const char *source)
   {
-    int size;
+    int status;                   // compile status
+    const csGLExtensionManager* ext = shaderPlug->ext;
 
-    ext->glGetObjectParameterivARB (shader_id, GL_OBJECT_INFO_LOG_LENGTH_ARB,
-                                    &size);
-    csString logs((size_t)(size + 1));
-    // cast hax
-    ext->glGetInfoLogARB (shader_id, size, NULL, (GLcharARB*)logs.GetData ());
+    shader_id = ext->glCreateShaderObjectARB (type);
+    ext->glShaderSourceARB (shader_id, 1, &source, NULL);
+    ext->glCompileShaderARB (shader_id);
 
-    shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING,
-                        "Couldn't compile GLSL %s shader", typeName.GetData ());
-    shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING, "Error string: %s", 
-                        CS::Quote::Single (logs.GetData ()));
-    return false;
+    ext->glGetObjectParameterivARB (shader_id, GL_OBJECT_COMPILE_STATUS_ARB,
+      &status);
+    if (status != GL_TRUE)
+    {
+      int size;
+
+      ext->glGetObjectParameterivARB (shader_id, GL_OBJECT_INFO_LOG_LENGTH_ARB,
+        &size);
+      csString logs((size_t)(size + 1));
+      // cast hax
+      ext->glGetInfoLogARB (shader_id, size, NULL, (GLcharARB*)logs.GetData ());
+
+      shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING,
+        "Couldn't compile GLSL %s shader", typeName.GetData ());
+      shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING, "Error string: %s", 
+        CS::Quote::Single (logs.GetData ()));
+      return false;
+    }
+
+    return true;
   }
-
-  return true;
 }
+CS_PLUGIN_NAMESPACE_END(GLShaderGLSL)

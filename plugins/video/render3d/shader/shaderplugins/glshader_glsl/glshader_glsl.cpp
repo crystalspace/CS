@@ -18,109 +18,102 @@
 
 #include "cssysdef.h"
 
-#include "csgeom/vector3.h"
 #include "csplugincommon/opengl/glextmanager.h"
-#include "csutil/objreg.h"
-#include "csutil/ref.h"
-#include "csutil/scf.h"
-#include "iutil/comp.h"
-#include "iutil/plugin.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/shader/shader.h"
-#include "iutil/databuff.h"
 
-#include "glshader_glslprogram.h"
 #include "glshader_glsl.h"
+#include "glshader_glslprogram.h"
+#include "glshader_glslshader.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderGLSL)
+{
+  CS_LEAKGUARD_IMPLEMENT (csGLShader_GLSL);
 
-CS_LEAKGUARD_IMPLEMENT (csGLShader_GLSL);
+  SCF_IMPLEMENT_FACTORY (csGLShader_GLSL)
 
-SCF_IMPLEMENT_FACTORY (csGLShader_GLSL)
-
-csGLShader_GLSL::csGLShader_GLSL(iBase* parent) : 
+    csGLShader_GLSL::csGLShader_GLSL(iBase* parent) : 
   scfImplementationType (this, parent), ext (0)
-{
-  enable = false;
-  isOpen = false;
-}
-
-csGLShader_GLSL::~csGLShader_GLSL()
-{
-}
-
-void csGLShader_GLSL::Report (int severity, const char* msg, ...)
-{
-  va_list args;
-  va_start (args, msg);
-  csReportV (object_reg, severity,
-             "crystalspace.graphics3d.shader.glsl", msg, args);
-  va_end (args);
-}
-
-////////////////////////////////////////////////////////////////////
-//                      iShaderProgramPlugin
-////////////////////////////////////////////////////////////////////
-bool csGLShader_GLSL::SupportType(const char* type)
-{
-  Open ();
-  if (!enable)
-    return false;
-  if (strcasecmp (type, "shader") == 0)
-    return true;
-  return false;
-}
-
-csPtr<iShaderProgram> csGLShader_GLSL::CreateProgram (const char *type)
-{
-  Open ();
-  if (!enable)
-    return 0;
-
-  if (strcasecmp (type, "shader") == 0)
-    return csPtr<iShaderProgram> (new csShaderGLSLProgram (this));
-
-  return 0;
-}
-
-void csGLShader_GLSL::Open()
-{
-  if (isOpen) return;
-  if(!object_reg)
-    return;
-
-  if (ext)
   {
-    ext->InitGL_ARB_vertex_shader ();
-    ext->InitGL_ARB_fragment_shader ();
-    ext->InitGL_ARB_shader_objects ();
-    ext->InitGL_ARB_shading_language_100 ();
-    ext->InitGL_EXT_geometry_shader4 ();
-    ext->InitGL_ARB_tessellation_shader ();
-    if (ext->CS_GL_ARB_vertex_shader &&
+    enable = false;
+    isOpen = false;
+  }
+
+  csGLShader_GLSL::~csGLShader_GLSL()
+  {
+  }
+
+  void csGLShader_GLSL::Report (int severity, const char* msg, ...)
+  {
+    va_list args;
+    va_start (args, msg);
+    csReportV (object_reg, severity,
+      "crystalspace.graphics3d.shader.glsl", msg, args);
+    va_end (args);
+  }
+
+  ////////////////////////////////////////////////////////////////////
+  //                      iShaderProgramPlugin
+  ////////////////////////////////////////////////////////////////////
+  bool csGLShader_GLSL::SupportType(const char* type)
+  {
+    Open ();
+    if (!enable)
+      return false;
+    if (strcasecmp (type, "shader") == 0)
+      return true;
+    return false;
+  }
+
+  csPtr<iShaderProgram> csGLShader_GLSL::CreateProgram (const char *type)
+  {
+    Open ();
+    if (!enable)
+      return 0;
+
+    if (strcasecmp (type, "shader") == 0)
+      return csPtr<iShaderProgram> (new csShaderGLSLProgram (this));
+
+    return 0;
+  }
+
+  void csGLShader_GLSL::Open()
+  {
+    if (isOpen) return;
+    if(!object_reg)
+      return;
+
+    if (ext)
+    {
+      ext->InitGL_ARB_vertex_shader ();
+      ext->InitGL_ARB_fragment_shader ();
+      ext->InitGL_ARB_shader_objects ();
+      ext->InitGL_ARB_shading_language_100 ();
+      ext->InitGL_EXT_geometry_shader4 ();
+      ext->InitGL_ARB_tessellation_shader ();
+      if (ext->CS_GL_ARB_vertex_shader &&
         ext->CS_GL_ARB_shader_objects &&
         ext->CS_GL_ARB_shading_language_100)
-      enable = true;
-  } else return;
+        enable = true;
+    } else return;
 
-  isOpen = true;
-}
+    isOpen = true;
+  }
 
-////////////////////////////////////////////////////////////////////
-//                          iComponent
-////////////////////////////////////////////////////////////////////
-bool csGLShader_GLSL::Initialize(iObjectRegistry* reg)
-{
-  object_reg = reg;
+  ////////////////////////////////////////////////////////////////////
+  //                          iComponent
+  ////////////////////////////////////////////////////////////////////
+  bool csGLShader_GLSL::Initialize(iObjectRegistry* reg)
+  {
+    object_reg = reg;
 
-  graph = csQueryRegistry<iGraphics3D> (object_reg);
+    graph = csQueryRegistry<iGraphics3D> (object_reg);
 
-  csRef<iFactory> f = scfQueryInterfaceSafe<iFactory> (graph);
-  if (f == 0 || strcmp ("crystalspace.graphics3d.opengl", 
+    csRef<iFactory> f = scfQueryInterfaceSafe<iFactory> (graph);
+    if (f == 0 || strcmp ("crystalspace.graphics3d.opengl", 
       f->QueryClassID ()) != 0)
-    return false;
+      return false;
 
-  graph->GetDriver2D()->PerformExtension ("getextmanager", &ext);
-  return true;
+    graph->GetDriver2D()->PerformExtension ("getextmanager", &ext);
+    return true;
+  }
 }
-
+CS_PLUGIN_NAMESPACE_END(GLShaderGLSL)

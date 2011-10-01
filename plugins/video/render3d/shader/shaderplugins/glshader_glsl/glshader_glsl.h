@@ -19,58 +19,59 @@
 #ifndef __GLSHADER_GLSL_H__
 #define __GLSHADER_GLSL_H__
 
-#include "iutil/comp.h"
 #include "csplugincommon/shader/shaderplugin.h"
-#include "ivideo/shader/shader.h"
-#include "csutil/leakguard.h"
-#include "csutil/scfstr.h"
 #include "csutil/scfstringarray.h"
+#include "iutil/comp.h"
 
-class csGLShader_GLSL : public scfImplementation2<csGLShader_GLSL, 
-                                                  iShaderProgramPlugin,
-					          iComponent>
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderGLSL)
 {
-private:
-  bool enable;
-  bool isOpen;
-
-public:
-  csGLExtensionManager* ext;
-  iObjectRegistry* object_reg;
-  csRef<iGraphics3D> graph;
-
-  CS_LEAKGUARD_DECLARE (csGLShader_GLSL);
-
-  csGLShader_GLSL (iBase *parent);
-  virtual ~csGLShader_GLSL ();
-
-  void Report (int severity, const char* msg, ...);
-
-  /**\name iShaderProgramPlugin implementation
-   * @{ */
-  virtual csPtr<iShaderProgram> CreateProgram (const char* type);
-
-  virtual bool SupportType (const char* type);
-  
-  csPtr<iStringArray> QueryPrecacheTags (const char* type)
+  class csGLShader_GLSL : public scfImplementation2<csGLShader_GLSL, 
+    iShaderProgramPlugin,
+    iComponent>
   {
-    scfStringArray* tags = new scfStringArray;
-    tags->Push ("default");
-    return csPtr<iStringArray> (tags);
-  }  
-  bool Precache (const char* type, const char* tag,
-    iBase* previous, 
-    iDocumentNode* node, iHierarchicalCache* cacheTo,
-    csRef<iBase>* outObj = 0) { return false; }
+  private:
+    bool enable;
+    bool isOpen;
 
-  void Open();
-  /** @} */
+  public:
+    csGLExtensionManager* ext;
+    iObjectRegistry* object_reg;
+    csRef<iGraphics3D> graph;
 
-  /**\name iComponent implementation
-   * @{ */
-  bool Initialize (iObjectRegistry* reg);
-  /** @} */
-};
+    CS_LEAKGUARD_DECLARE (csGLShader_GLSL);
+
+    csGLShader_GLSL (iBase *parent);
+    virtual ~csGLShader_GLSL ();
+
+    void Report (int severity, const char* msg, ...);
+
+    /**\name iShaderProgramPlugin implementation
+    * @{ */
+    virtual csPtr<iShaderProgram> CreateProgram (const char* type);
+
+    virtual bool SupportType (const char* type);
+
+    csPtr<iStringArray> QueryPrecacheTags (const char* type)
+    {
+      scfStringArray* tags = new scfStringArray;
+      tags->Push ("default");
+      return csPtr<iStringArray> (tags);
+    }  
+    bool Precache (const char* type, const char* tag,
+      iBase* previous, 
+      iDocumentNode* node, iHierarchicalCache* cacheTo,
+      csRef<iBase>* outObj = 0) { return false; }
+
+    void Open();
+    /** @} */
+
+    /**\name iComponent implementation
+    * @{ */
+    bool Initialize (iObjectRegistry* reg);
+    /** @} */
+  };
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderGLSL)
 
 #endif //__GLSHADER_GLSL_H__
 

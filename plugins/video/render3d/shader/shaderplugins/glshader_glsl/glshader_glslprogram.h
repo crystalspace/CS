@@ -19,111 +19,108 @@
 #ifndef __GLSHADER_GLSLPROGRAM_H__
 #define __GLSHADER_GLSLPROGRAM_H__
 
-#include "csplugincommon/shader/shaderplugin.h"
 #include "csplugincommon/shader/shaderprogram.h"
-#include "csgfx/shadervarcontext.h"
-#include "ivideo/shader/shader.h"
-#include "csutil/strhash.h"
-#include "csutil/leakguard.h"
-#include "csutil/scf_implementation.h"
 
-#include "glshader_glsl.h"
-#include "glshader_glslshader.h"
-
-class csShaderGLSLProgram :
-  public scfImplementationExt0<csShaderGLSLProgram, csShaderProgram>
+CS_PLUGIN_NAMESPACE_BEGIN(GLShaderGLSL)
 {
-private:
-  csGLShader_GLSL* shaderPlug;
+  class csGLShader_GLSL;
+  class csShaderGLSLShader;
 
-  // GL identifier
-  GLuint program_id;
+  class csShaderGLSLProgram :
+    public scfImplementationExt0<csShaderGLSLProgram, csShaderProgram>
+  {
+  private:
+    csGLShader_GLSL* shaderPlug;
 
-  bool validProgram;                // what for
-  bool useTessellation;
+    // GL identifier
+    GLuint program_id;
 
-  csArray<csString> tuBindings;
+    bool validProgram;                // what for
+    bool useTessellation;
 
-  csRef<iDataBuffer> vpSource;
-  csRef<iDataBuffer> fpSource;
-  csRef<iDataBuffer> gpSource;
-  csRef<iDataBuffer> epSource;
-  csRef<iDataBuffer> cpSource;
+    csArray<csString> tuBindings;
 
-  csRef<csShaderGLSLShader> vp;
-  csRef<csShaderGLSLShader> fp;
-  csRef<csShaderGLSLShader> gp;
-  csRef<csShaderGLSLShader> ep;
-  csRef<csShaderGLSLShader> cp;
+    csRef<iDataBuffer> vpSource;
+    csRef<iDataBuffer> fpSource;
+    csRef<iDataBuffer> gpSource;
+    csRef<iDataBuffer> epSource;
+    csRef<iDataBuffer> cpSource;
 
-  csRef<iDataBuffer> LoadSource (iDocumentNode* node);
+    csRef<csShaderGLSLShader> vp;
+    csRef<csShaderGLSLShader> fp;
+    csRef<csShaderGLSLShader> gp;
+    csRef<csShaderGLSLShader> ep;
+    csRef<csShaderGLSLShader> cp;
 
-  csPtr<csShaderGLSLShader> CreateVP () const;
-  csPtr<csShaderGLSLShader> CreateFP () const;
-  csPtr<csShaderGLSLShader> CreateGP () const;
-  csPtr<csShaderGLSLShader> CreateEP () const;
-  csPtr<csShaderGLSLShader> CreateCP () const;
+    csRef<iDataBuffer> LoadSource (iDocumentNode* node);
 
-  void SetupVmap ();
+    csPtr<csShaderGLSLShader> CreateVP () const;
+    csPtr<csShaderGLSLShader> CreateFP () const;
+    csPtr<csShaderGLSLShader> CreateGP () const;
+    csPtr<csShaderGLSLShader> CreateEP () const;
+    csPtr<csShaderGLSLShader> CreateCP () const;
 
-public:
-  CS_LEAKGUARD_DECLARE (csShaderGLSLProgram);
+    void SetupVmap ();
 
-  csShaderGLSLProgram(csGLShader_GLSL* shaderPlug) : 
+  public:
+    CS_LEAKGUARD_DECLARE (csShaderGLSLProgram);
+
+    csShaderGLSLProgram(csGLShader_GLSL* shaderPlug) : 
     scfImplementationType (this, shaderPlug->object_reg)
-  {
-    program_id = 0;
-    validProgram = true;
-    useTessellation = false;
-    this->shaderPlug = shaderPlug;
-  }
-  virtual ~csShaderGLSLProgram ()
-  {
-    if (program_id != 0)
-      shaderPlug->ext->glDeleteObjectARB (program_id);
-  }
+    {
+      program_id = 0;
+      validProgram = true;
+      useTessellation = false;
+      this->shaderPlug = shaderPlug;
+    }
+    virtual ~csShaderGLSLProgram ()
+    {
+      if (program_id != 0)
+        shaderPlug->ext->glDeleteObjectARB (program_id);
+    }
 
-  void SetValid (bool val) { validProgram = val; }
+    void SetValid (bool val) { validProgram = val; }
 
-  ////////////////////////////////////////////////////////////////////
-  //                      iShaderProgram
-  ////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////
+    //                      iShaderProgram
+    ////////////////////////////////////////////////////////////////////
 
-  /// Sets this program to be the one used when rendering
-  virtual void Activate ();
+    /// Sets this program to be the one used when rendering
+    virtual void Activate ();
 
-  /// Deactivate program so that it's not used in next rendering
-  virtual void Deactivate();
+    /// Deactivate program so that it's not used in next rendering
+    virtual void Deactivate();
 
-  /// Setup states needed for proper operation of the shader
-  virtual void SetupState (const CS::Graphics::RenderMesh* mesh,
-    CS::Graphics::RenderMeshModes& modes,
-    const csShaderVariableStack& stack);
+    /// Setup states needed for proper operation of the shader
+    virtual void SetupState (const CS::Graphics::RenderMesh* mesh,
+      CS::Graphics::RenderMeshModes& modes,
+      const csShaderVariableStack& stack);
 
-  /// Reset states to original
-  virtual void ResetState ();
+    /// Reset states to original
+    virtual void ResetState ();
 
-  /// Check if valid
-  virtual bool IsValid() { return validProgram;} 
+    /// Check if valid
+    virtual bool IsValid() { return validProgram;} 
 
-  /// Loads from a document-node
-  virtual bool Load (iShaderDestinationResolver*, iDocumentNode* node);
+    /// Loads from a document-node
+    virtual bool Load (iShaderDestinationResolver*, iDocumentNode* node);
 
-  /// Loads from raw text
-  virtual bool Load (iShaderDestinationResolver*, const char*, 
-    csArray<csShaderVarMapping> &);
+    /// Loads from raw text
+    virtual bool Load (iShaderDestinationResolver*, const char*, 
+      csArray<csShaderVarMapping> &);
 
-  /// Compile a program
-  virtual bool Compile (iHierarchicalCache*, csRef<iString>*);
+    /// Compile a program
+    virtual bool Compile (iHierarchicalCache*, csRef<iString>*);
 
-  ////////////////////////////////////////////////////////////////////
-  //                      iShaderDestinationResolver
-  ////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////
+    //                      iShaderDestinationResolver
+    ////////////////////////////////////////////////////////////////////
 
-  virtual csVertexAttrib ResolveBufferDestination (const char* binding);
-  virtual int ResolveTU (const char* binding);
-};
-
+    virtual csVertexAttrib ResolveBufferDestination (const char* binding);
+    virtual int ResolveTU (const char* binding);
+  };
+}
+CS_PLUGIN_NAMESPACE_END(GLShaderGLSL)
 
 #endif //__GLSHADER_GLSLPROGRAM_H__
 
