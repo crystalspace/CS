@@ -88,10 +88,10 @@ bool TessellationTest::OnKeyboard(iEvent& ev)
     }
 
     case '+':
-      camDist -= 0.1;
+      camDist -= 0.1f;
       break;
     case '-':
-      camDist += 0.1;
+      camDist += 0.1f;
       break;
     case 'p':
       phong = !phong;
@@ -218,7 +218,7 @@ bool TessellationTest::SetupModules ()
   rm = engine->GetRenderManager();
 
   // these are used store the current orientation/distance of the camera
-  rotY = rotX = -M_PI * 0.20;
+  rotY = rotX = -PI * 0.20;
   camDist = 4.0;
  
   // Now we need to position the camera in our world.
@@ -258,7 +258,7 @@ void TessellationTest::CreateTeapot ()
     csRef<iTextureHandle> heightMap = loader->LoadTexture (
       "/lib/std/castle/brick1_h.png");
     csShaderVariable* svHeightMap =
-      tm->GetMaterial()->GetVariableAdd (strings->Request ("tex height"));
+      tm->GetMaterial()->GetVariableAdd (shstrings->Request ("tex height"));
     svHeightMap->SetValue (heightMap);
   }
 
