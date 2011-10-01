@@ -422,6 +422,8 @@ class iGraphics3D(core.iBase):
     def DrawMeshBasic(*args): return _ivideo.iGraphics3D_DrawMeshBasic(*args)
     def SetEdgeDrawing(*args): return _ivideo.iGraphics3D_SetEdgeDrawing(*args)
     def GetEdgeDrawing(*args): return _ivideo.iGraphics3D_GetEdgeDrawing(*args)
+    def SetTessellation(*args): return _ivideo.iGraphics3D_SetTessellation(*args)
+    def GetTessellation(*args): return _ivideo.iGraphics3D_GetTessellation(*args)
     scfGetVersion = staticmethod(_ivideo.iGraphics3D_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iGraphics3D
     __del__ = lambda self : None;

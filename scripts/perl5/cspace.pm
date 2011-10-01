@@ -10185,6 +10185,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *DrawMeshBasic = *cspacec::iGraphics3D_DrawMeshBasic;
 *SetEdgeDrawing = *cspacec::iGraphics3D_SetEdgeDrawing;
 *GetEdgeDrawing = *cspacec::iGraphics3D_GetEdgeDrawing;
+*SetTessellation = *cspacec::iGraphics3D_SetTessellation;
+*GetTessellation = *cspacec::iGraphics3D_GetTessellation;
 *scfGetVersion = *cspacec::iGraphics3D_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
