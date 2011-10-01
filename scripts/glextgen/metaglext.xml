@@ -7236,6 +7236,87 @@
       <arg name="pointer" type="GLvoid*" const="false" pointer="true" />
     </function>
   </extension>
+  <extension name="GL_EXT_geometry_shader4" type="GL">
+    <depends ext="GL_ARB_shader_objects" />
+    <token name="GL_GEOMETRY_SHADER_EXT" value="0x8DD9" />
+    <token name="GL_GEOMETRY_VERTICES_OUT_EXT" value="0x8DDA" />
+    <token name="GL_GEOMETRY_INPUT_TYPE_EXT" value="0x8DDB" />
+    <token name="GL_GEOMETRY_OUTPUT_TYPE_EXT" value="0x8DDC" />
+    <token name="GL_MAX_GEOMETRY_TEXTURE_IMAGE_UNITS_EXT" value="0x8C29" />
+    <token name="GL_MAX_GEOMETRY_VARYING_COMPONENTS_EXT" value="0x8DDD" />
+    <token name="GL_MAX_VERTEX_VARYING_COMPONENTS_EXT" value="0x8DDE" />
+    <token name="GL_MAX_VARYING_COMPONENTS_EXT" value="0x8B4B" />
+    <token name="GL_MAX_GEOMETRY_UNIFORM_COMPONENTS_EXT" value="0x8DDF" />
+    <token name="GL_MAX_GEOMETRY_OUTPUT_VERTICES_EXT" value="0x8DE0" />
+    <token name="GL_MAX_GEOMETRY_TOTAL_OUTPUT_COMPONENTS_EXT" value="0x8DE1" />
+    <token name="GL_LINES_ADJACENCY_EXT" value="0xA" />
+    <token name="GL_LINE_STRIP_ADJACENCY_EXT" value="0xB" />
+    <token name="GL_TRIANGLES_ADJACENCY_EXT" value="0xC" />
+    <token name="GL_TRIANGLE_STRIP_ADJACENCY_EXT" value="0xD" />
+    <token name="GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS_EXT" value="0x8DA8" />
+    <token name="GL_FRAMEBUFFER_INCOMPLETE_LAYER_COUNT_EXT" value="0x8DA9" />
+    <token name="GL_FRAMEBUFFER_ATTACHMENT_LAYERED_EXT" value="0x8DA7" />
+    <token name="GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER_EXT" value="0x8CD4" />
+    <token name="GL_PROGRAM_POINT_SIZE_EXT" value="0x8642" />
+    <function name="glProgramParameteriEXT" return="GLvoid" pointer="false">
+      <arg name="program" type="GLuint" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="value" type="GLint" const="false" pointer="false" />
+    </function>
+    <!--
+    <function name="glFramebufferTextureEXT" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="attachment" type="GLenum" const="false" pointer="false" />
+      <arg name="texture" type="GLuint" const="false" pointer="false" />
+      <arg name="level" type="GLint" const="false" pointer="false" />
+    </function>
+    -->
+  </extension>
+  <extension name="GL_ARB_tessellation_shader" type="GL">
+    <depends ext="GL_ARB_shader_objects" />
+    <token name="GL_PATCHES_ARB" value="0xE" />
+    <token name="GL_PATCH_VERTICES_ARB" value="0x8E72" />
+    <token name="GL_PATCH_DEFAULT_INNER_LEVEL_ARB" value="0x8E73" />
+    <token name="GL_PATCH_DEFAULT_OUTER_LEVEL_ARB" value="0x8E74" />
+    <token name="GL_TESS_CONTROL_OUTPUT_VERTICES_ARB" value="0x8E75" />
+    <token name="GL_TESS_GEN_MODE_ARB" value="0x8E76" />
+    <token name="GL_TESS_GEN_SPACING_ARB" value="0x8E77" />
+    <token name="GL_TESS_GEN_VERTEX_ORDER_ARB" value="0x8E78" />
+    <token name="GL_TESS_GEN_POINT_MODE_ARB" value="0x8E79" />
+    <token name="GL_ISOLINES_ARB" value="0x8E7A" />
+    <token name="GL_FRACTIONAL_ODD_ARB" value="0x8E7B" />
+    <token name="GL_FRACTIONAL_EVEN_ARB" value="0x8E7C" />
+    <token name="GL_MAX_PATCH_VERTICES_ARB" value="0x8E7D" />
+    <token name="GL_MAX_TESS_GEN_LEVEL_ARB" value="0x8E7E" />
+    <token name="GL_MAX_TESS_CONTROL_UNIFORM_COMPONENTS_ARB" value="0x8E7F" />
+    <token name="GL_MAX_TESS_EVALUATION_UNIFORM_COMPONENTS_ARB" value="0x8E80" />
+    <token name="GL_MAX_TESS_CONTROL_TEXTURE_IMAGE_UNITS_ARB" value="0x8E81" />
+    <token name="GL_MAX_TESS_EVALUATION_TEXTURE_IMAGE_UNITS_ARB" value="0x8E82" />
+    <token name="GL_MAX_TESS_CONTROL_OUTPUT_COMPONENTS_ARB" value="0x8E83" />
+    <token name="GL_MAX_TESS_PATCH_COMPONENTS_ARB" value="0x8E84" />
+    <token name="GL_MAX_TESS_CONTROL_TOTAL_OUTPUT_COMPONENTS_ARB" value="0x8E85" />
+    <token name="GL_MAX_TESS_EVALUATION_OUTPUT_COMPONENTS_ARB" value="0x8E86" />
+    <token name="GL_MAX_TESS_CONTROL_UNIFORM_BLOCKS_ARB" value="0x8E89" />
+    <token name="GL_MAX_TESS_EVALUATION_UNIFORM_BLOCKS_ARB" value="0x8E8A" />
+    <token name="GL_MAX_TESS_CONTROL_INPUT_COMPONENTS_ARB" value="0x886C" />
+    <token name="GL_MAX_TESS_EVALUATION_INPUT_COMPONENTS_ARB" value="0x886D" />
+    <token name="GL_MAX_COMBINED_TESS_CONTROL_UNIFORM_COMPONENTS_ARB" value="0x8E1E" />
+    <token name="GL_MAX_COMBINED_TESS_EVALUATION_UNIFORM_COMPONENTS_ARB" value="0x8E1F" />
+    <token name="GL_UNIFORM_BLOCK_REFERENCED_BY_TESS_CONTROL_SHADER_ARB" value="0x84F0" />
+    <token name="GL_UNIFORM_BLOCK_REFERENCED_BY_TESS_EVALUATION_SHADER_ARB" value="0x84F1" />
+    <token name="GL_TESS_EVALUATION_SHADER_ARB" value="0x8E87" />
+    <token name="GL_TESS_CONTROL_SHADER_ARB" value="0x8E88" />
+    <!-- Antony Martin: GetProcAddress() doesn't find the functions
+                        with the ARB suffix (HD5450 Catalyst 11.7) -->
+    <function name="glPatchParameteri" return="GLvoid" pointer="false">
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="value" type="GLint" const="false" pointer="false" />
+    </function>
+    <function name="glPatchParameterfv" return="GLvoid" pointer="false">
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="values" type="GLfloat" const="true" pointer="true" />
+    </function>
+  </extension>
   <extension name="GL_ARB_pixel_buffer_object" type="GL">
     <depends ext="GL_ARB_vertex_buffer_object" />
     <token name="GL_PIXEL_PACK_BUFFER_ARB" value="0x88EB" />

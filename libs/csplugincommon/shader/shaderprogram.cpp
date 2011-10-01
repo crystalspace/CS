@@ -340,7 +340,7 @@ bool csShaderProgram::ParseCommon (iDocumentNode* child)
 	  // "New style" variable mapping
 	  VariableMapEntry vme (CS::InvalidShaderVarStringID, destname);
 	  if (!ParseProgramParam (child, vme.mappingParam,
-	    ParamFloat | ParamVector2 | ParamVector3 | ParamVector4))
+	    ParamInt | ParamFloat | ParamVector2 | ParamVector3 | ParamVector4))
 	    return false;
 	  variablemap.Push (vme);
 	}

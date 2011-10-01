@@ -38,6 +38,7 @@
 #include "shader.h"
 #include "shadertech.h"
 #include "xmlshader.h"
+#include "shaderwrapper.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
@@ -65,7 +66,7 @@ struct CachedPlugin
 
 struct CachedPlugins
 {
-  CachedPlugin fp, vp, vproc;
+  CachedPlugin unified, fp, vp, vproc;
 };
 
 CS_IMPLEMENT_STATIC_CLASSVAR_REF (csXMLShaderTech, instParamsTargets,  
@@ -196,66 +197,89 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
   GetProgramPlugins (node, cachedPlugins, variant);
 
   csRef<iShaderProgram> program;
-  // load fp
-  /* This is done before VP loading b/c the VP could query for TU bindings
-  * which are currently handled by the FP. */
+
   bool result = true;
   bool setFailReason = true;
   
   csString tagFP, tagVP, tagVPr;
   
-  if (cachedPlugins.fp.programNode)
-  {
-    csRef<iHierarchicalCache> fpCache;
-    if (cacheTo) fpCache = cacheTo->GetRootedCache (csString().Format (
-      "/pass%dfp", GetPassNumber (pass)));
-    program = LoadProgram (0, cachedPlugins.fp.programNode, pass, 
-      variant, fpCache, cachedPlugins.fp, tagFP);
-    if (program)
-      pass->fp = program;
-    else
-    {
-      if (do_verbose && setFailReason)
-      {
-	SetFailReason ("pass %d fragment program failed to load",
-	  GetPassNumber (pass));
-	setFailReason = false;
-      }
-      result = false;
-    }
-  }
-
   csRef<iShaderDestinationResolver> resolveFP;
-  if (pass->fp) 
-    resolveFP = scfQueryInterface<iShaderDestinationResolver> (pass->fp);
-
-  //load vp
-  if (cachedPlugins.vp.programNode)
-  {
-    csRef<iHierarchicalCache> vpCache;
-    if (cacheTo) vpCache = cacheTo->GetRootedCache (csString().Format (
-      "/pass%dvp", GetPassNumber (pass)));
-    program = LoadProgram (resolveFP, cachedPlugins.vp.programNode, 
-      pass, variant, vpCache, cachedPlugins.vp, tagVP);
-    if (program)
-    {
-      pass->vp = program;
-    }
-    else
-    {
-      if (do_verbose && setFailReason)
-      {
-	SetFailReason ("pass %d vertex program failed to load",
-	  GetPassNumber (pass));
-	setFailReason = false;
-      }
-      result = false;
-    }
-  }
-
   csRef<iShaderDestinationResolver> resolveVP;
-  if (pass->vp) 
-    resolveVP = scfQueryInterface<iShaderDestinationResolver> (pass->vp);
+
+  if (cachedPlugins.unified.programNode)
+  {
+    // new unified syntax detected
+    pass->program = LoadProgram (0, cachedPlugins.unified.programNode,
+                                 pass, variant, 0, cachedPlugins.unified, tagVP);
+    if (!pass->program)
+      return false;
+
+    tagFP = tagVP;
+    resolveFP = resolveVP =
+      scfQueryInterface<iShaderDestinationResolver> (pass->program);
+  }
+  else
+  {
+    // old vp/fp syntax
+
+    // create a wrapper shader
+    csRef<csXMLShaderWrapper> shader;
+    shader = csPtr<csXMLShaderWrapper> (new csXMLShaderWrapper ());
+
+    // load fp
+    /* This is done before VP loading b/c the VP could query for TU bindings
+     * which are currently handled by the FP. */
+    if (cachedPlugins.fp.programNode)
+    {
+      csRef<iHierarchicalCache> fpCache;
+      if (cacheTo) fpCache = cacheTo->GetRootedCache (csString().Format (
+        "/pass%dfp", GetPassNumber (pass)));
+      program = LoadProgram (0, cachedPlugins.fp.programNode, pass, 
+                             variant, fpCache, cachedPlugins.fp, tagFP);
+      if (program)
+      {
+        shader->SetFP (program);
+        resolveFP = scfQueryInterface<iShaderDestinationResolver> (program);
+      }
+      else
+      {
+        if (do_verbose && setFailReason)
+        {
+          SetFailReason ("pass %d fragment program failed to load",
+                         GetPassNumber (pass));
+          setFailReason = false;
+        }
+        result = false;
+      }
+    }
+
+    //load vp
+    if (cachedPlugins.vp.programNode)
+    {
+      csRef<iHierarchicalCache> vpCache;
+      if (cacheTo) vpCache = cacheTo->GetRootedCache (csString().Format (
+        "/pass%dvp", GetPassNumber (pass)));
+      program = LoadProgram (resolveFP, cachedPlugins.vp.programNode, 
+                             pass, variant, vpCache, cachedPlugins.vp, tagVP);
+      if (program)
+      {
+        shader->SetVP (program);
+        resolveVP = scfQueryInterface<iShaderDestinationResolver> (program);
+      }
+      else
+      {
+        if (do_verbose && setFailReason)
+        {
+          SetFailReason ("pass %d vertex program failed to load",
+                         GetPassNumber (pass));
+          setFailReason = false;
+        }
+        result = false;
+      }
+    }
+
+    pass->program = shader;
+  }
 
   //load vproc
   if (cachedPlugins.vproc.programNode)
@@ -1142,33 +1166,62 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadPassFromCache (
   csString tagFP, tagVP, tagVPr;
   
   iShaderProgram::CacheLoadResult loadRes;
-  if (plugins.fp.available)
+
+  iBase *previous = 0;
+
+  if (plugins.unified.available)
   {
-    csRef<iHierarchicalCache> fpCache;
-    if (cache) fpCache = cache->GetRootedCache (csString().Format (
-      "/pass%dfp", GetPassNumber (pass)));
-    loadRes = LoadProgramFromCache (0, variant, fpCache, plugins.fp,
-      pass->fp, tagFP, GetPassNumber (pass));
-    if (loadRes != iShaderProgram::loadSuccessShaderValid) return loadRes;
+    // new unified syntax
+
+    // what do for the vproc shader? need to have the specific cache
+    // used to compile the VP
+
+    // assign tags
+
+    // previous = foobar;
+    LoadProgramFromCache (0, 0, plugins.unified, pass->program,
+                          tagVP, GetPassNumber (pass));
+    tagFP = tagVP;
   }
-  
-  if (plugins.vp.available)
+  else
   {
-    csRef<iHierarchicalCache> vpCache;
-    if (cache) vpCache = cache->GetRootedCache (csString().Format (
-      "/pass%dvp", GetPassNumber (pass)));
-    loadRes = LoadProgramFromCache (pass->fp, variant, vpCache, plugins.vp, pass->vp,
-      tagVP, GetPassNumber (pass));
-    if (loadRes != iShaderProgram::loadSuccessShaderValid) return loadRes;
+    // old vp/fp syntax
+
+    csRef<csXMLShaderWrapper> shader;
+    csRef<iShaderProgram> vp;
+    csRef<iShaderProgram> fp;
+
+    // create wrapper shader
+    shader = csPtr<csXMLShaderWrapper> (new csXMLShaderWrapper ());
+
+    // load shaders
+    if (plugins.fp.available)
+    {
+      loadRes = shader->LoadFPFromCache (this, cache, plugins.fp, tagFP,
+                                         GetPassNumber (pass));
+      if (loadRes != iShaderProgram::loadSuccessShaderValid) return loadRes;
+    }
+    if (plugins.vp.available)
+    {
+      loadRes = shader->LoadVPFromCache (this, cache, plugins.vp, tagVP,
+                                         GetPassNumber (pass));
+      if (loadRes != iShaderProgram::loadSuccessShaderValid) return loadRes;
+    }
+
+    previous = shader->GetPrevious ();
+
+    // assign wrapper
+    pass->program = shader;
   }
-  
+
   if (plugins.vproc.available)
   {
     csRef<iHierarchicalCache> vprCache;
     if (cache) vprCache = cache->GetRootedCache (csString().Format (
       "/pass%dvpr", GetPassNumber (pass)));
-    loadRes = LoadProgramFromCache (pass->vp, variant, vprCache, plugins.vproc,
-      pass->vproc, tagVPr, GetPassNumber (pass));
+    loadRes = LoadProgramFromCache (previous, vprCache,
+                                    plugins.vproc, pass->vproc, tagVPr,
+                                    GetPassNumber (pass));
     if (loadRes != iShaderProgram::loadSuccessShaderValid) return loadRes;
   }
   
@@ -1463,26 +1516,10 @@ csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (
 }
   
 iShaderProgram::CacheLoadResult csXMLShaderTech::LoadProgramFromCache (
-  iBase* previous, size_t variant, iHierarchicalCache* cache,
-  const CachedPlugin& cacheInfo, csRef<iShaderProgram>& prog, csString& tag,
-  int passNumber)
+  iBase* previous, iHierarchicalCache* cache, const CachedPlugin& cacheInfo,
+  csRef<iShaderProgram>& prog, csString& tag, int passNumber)
 {
-  //load the plugin
-  csRef<iShaderProgramPlugin> plg;
-  plg = csLoadPluginCheck<iShaderProgramPlugin> (parent->compiler->objectreg,
-  	cacheInfo.pluginID, false);
-  if(!plg)
-  {
-    if (parent->compiler->do_verbose)
-      SetFailReason(
-	  "Couldn't retrieve shader plugin %s for %s in shader %s",
-	  CS::Quote::Single (cacheInfo.pluginID.GetData()),
-	  CS::Quote::Single (cacheInfo.progType.GetData()),
-	  CS::Quote::Single (parent->GetName ()));
-    return iShaderProgram::loadFail;
-  }
-
-  prog = plg->CreateProgram (cacheInfo.progType);
+  prog = cacheInfo.programPlugin->CreateProgram (cacheInfo.progType);
   csRef<iString> progTag;
   csRef<iString> failReason;
   iShaderProgram::CacheLoadResult loadRes = prog->LoadFromCache (cache, 
@@ -1514,6 +1551,15 @@ void csXMLShaderTech::GetProgramPlugins (iDocumentNode *node,
                                          CachedPlugins& cacheInfo,
                                          size_t variant)
 {
+  {
+    csRef<iDocumentNode> programNodeShader;
+    programNodeShader = node->GetNode (xmltokens.Request (
+      csXMLShaderCompiler::XMLTOKEN_SHADER));
+      
+    if (programNodeShader)
+      GetProgramPlugin (programNodeShader, cacheInfo.unified, variant);
+  }
+  
   {
     csRef<iDocumentNode> programNodeFP;
     programNodeFP = node->GetNode (xmltokens.Request (
@@ -1904,8 +1950,7 @@ bool csXMLShaderTech::ActivatePass (size_t number)
 
   ShaderPass* thispass = &passes[currentPass];
   if(thispass->vproc) thispass->vproc->Activate ();
-  if(thispass->vp) thispass->vp->Activate ();
-  if(thispass->fp) thispass->fp->Activate ();
+  if(thispass->program) thispass->program->Activate ();
   
   iGraphics3D* g3d = parent->g3d;
   if (thispass->overrideZmode)
@@ -1929,8 +1974,7 @@ bool csXMLShaderTech::DeactivatePass ()
   currentPass = (size_t)~0;
 
   if(thispass->vproc) thispass->vproc->Deactivate ();
-  if(thispass->vp) thispass->vp->Deactivate ();
-  if(thispass->fp) thispass->fp->Deactivate ();
+  if(thispass->program) thispass->program->Deactivate ();
 
   iGraphics3D* g3d = parent->g3d;
   g3d->DeactivateBuffers (thispass->custommapping_attrib.GetArray (), 
@@ -2093,8 +2137,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
     parent->compiler->string_mixmode_alpha)->SetValue (alpha);
   modes.zoffset = thispass->zoffset;
 
-  if(thispass->vp) thispass->vp->SetupState (mesh, modes, stack);
-  if(thispass->fp) thispass->fp->SetupState (mesh, modes, stack);
+  if(thispass->program) thispass->program->SetupState (mesh, modes, stack);
 
   // pseudo instancing setup
   SetupInstances (modes, thispass, stack);
@@ -2107,8 +2150,7 @@ bool csXMLShaderTech::TeardownPass ()
   ShaderPass* thispass = &passes[currentPass];
 
   if(thispass->vproc) thispass->vproc->ResetState ();
-  if(thispass->vp) thispass->vp->ResetState ();
-  if(thispass->fp) thispass->fp->ResetState ();
+  if(thispass->program) thispass->program->ResetState ();
 
   return true;
 }
@@ -2290,14 +2332,12 @@ void csXMLShaderTech::GetUsedShaderVars (csBitArray& bits, uint userFlags) const
       }
     }
 
-    if (((userFlags & iShader::svuVP) != 0) && thispass->vp)
+    // TODO: may request vars from a non-flagged shader
+    if (thispass->program &&
+        (((userFlags & iShader::svuVP) != 0) ||
+         ((userFlags & iShader::svuFP) != 0)))
     {
-      thispass->vp->GetUsedShaderVars (bits);
-    }
-
-    if (((userFlags & iShader::svuFP) != 0) && thispass->fp)
-    {
-      thispass->fp->GetUsedShaderVars (bits);
+      thispass->program->GetUsedShaderVars (bits);
     }
   }
 }

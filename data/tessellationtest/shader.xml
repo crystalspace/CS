@@ -1,0 +1,305 @@
+<shader compiler="xmlshader" name="glslshader">
+
+  <technique priority="200">
+    <pass>
+
+      <buffer source="position" destination="in_position" />
+      <buffer source="texture coordinate" destination="in_texcoord"/>
+      <buffer source="normal" destination="in_normal"/>
+
+      <texture name="tex diffuse" destination="texdiff"/>
+      <texture name="tex height" destination="texheight"/>
+
+      <shader plugin="glsl">
+        <vp>
+          <program>
+            <![CDATA[
+              #version 410
+
+              in vec3 in_position;
+              in vec2 in_texcoord;
+              in vec3 in_normal;
+
+              out vec2 texcoord;
+              out vec3 normal;
+
+              void main (void)
+              {
+                texcoord = in_texcoord * 0.5;
+                normal = normalize (in_normal);
+                gl_Position = vec4 (in_position, 1.0);
+              }
+            ]]>
+          </program>
+        </vp>
+
+        <cp>
+          <program>
+            <![CDATA[
+              #version 410
+              #extension GL_EXT_gpu_shader4 : enable
+
+              layout (vertices = 3) out;
+
+              in vec2 texcoord[];
+              in vec3 normal[];
+              out vec2 tc[];
+              out vec3 nor[];
+
+              void main (void)
+              {
+                const float inner = 16;
+                const float outer = 16;
+
+                #define ID gl_InvocationID
+
+                // in modern GL, attributes other than the position must be
+                // specified explicitly
+                tc[ID] = texcoord[ID];
+                nor[ID] = normal[ID];
+                // vertex position is built-in
+                gl_out[ID].gl_Position = gl_in[ID].gl_Position;
+
+                if (ID == 0) {
+                  gl_TessLevelInner[0] = inner;
+                  gl_TessLevelInner[1] = inner;
+                  gl_TessLevelOuter[0] = outer;
+                  gl_TessLevelOuter[1] = outer;
+                  gl_TessLevelOuter[2] = outer;
+                  gl_TessLevelOuter[3] = outer;
+                }
+              }
+            ]]>
+          </program>
+        </cp>
+
+        <ep>
+          <variablemap variable="object2world transform"
+                       destination="mat_object" />
+          <variablemap variable="world2camera transform"
+                       destination="mat_camera" />
+          <variablemap variable="projection transform"
+                       destination="mat_projection" />
+
+          <variablemap variable="phong" destination="phong" type="int" />
+          <variablemap variable="displace" destination="displace" type="int" />
+
+          <program>
+            <![CDATA[
+              #version 410
+              #extension GL_EXT_gpu_shader4 : enable
+
+              layout(triangles, equal_spacing, ccw) in;
+
+              uniform mat4 mat_object;
+              uniform mat4 mat_camera;
+              uniform mat4 mat_projection;
+
+              uniform sampler2D texheight;
+              uniform bool phong;
+              uniform bool displace;
+
+              in vec2 tc[];
+              in vec3 nor[];
+              out vec2 texcoord;
+              out vec3 n;
+
+              vec4 compute_plane (vec3 n, vec3 p)
+              {
+                return vec4 (n, dot (n, p));
+              }
+
+              vec4 project (vec4 plane, vec3 v)
+              {
+                float dist = dot (v, plane.xyz) - plane.w;
+                return vec4 (v - dist * plane.xyz, 1.0);
+              }
+
+#define PI 3.14159
+
+              float smoothheight (float x)
+              {
+                return sin (x * PI / 2.0);
+              }
+
+              void main (void)
+              {
+                float u = gl_TessCoord.x;
+                float v = gl_TessCoord.y;
+                float w = gl_TessCoord.z;
+
+                // compute vertex attributes
+                vec2 texc = u * tc[0] + v * tc[1] + w * tc[2];
+                vec3 normal = normalize (u * nor[0] + v * nor[1] + w * nor[2]);
+
+                vec4 p0 = u * gl_in[0].gl_Position;
+                vec4 p1 = v * gl_in[1].gl_Position;
+                vec4 p2 = w * gl_in[2].gl_Position;
+                vec4 pos = p0 + p1 + p2;
+                pos.w = 1.0;    // just in case :}
+
+                // phong smoothing
+                if (phong)
+                {
+                  vec4 plane0 = compute_plane (nor[0], gl_in[0].gl_Position.xyz);
+                  vec4 plane1 = compute_plane (nor[1], gl_in[1].gl_Position.xyz);
+                  vec4 plane2 = compute_plane (nor[2], gl_in[2].gl_Position.xyz);
+                  p0 = u * project (plane0, pos.xyz);
+                  p1 = v * project (plane1, pos.xyz);
+                  p2 = w * project (plane2, pos.xyz);
+                  vec4 phong_pos = p0 + p1 + p2;
+
+                  // interpolate between smoothed and original position
+                  const float alpha = 0.6;
+                  pos = mix (pos, phong_pos, alpha);
+                }
+
+
+                // displacement mapping
+                if (displace)
+                {
+                  float displacement = 0.05;
+                  float height = texture (texheight, texc).x;
+                  height -= 0.3;
+                  height = smoothheight (min (height * 2.0, 1.0));
+                  displacement *= height;
+                  pos += vec4 (normal * displacement, 0.0);
+                }
+
+                texcoord = texc;
+                n = normal;
+
+                // doing projection after tessellation avoids
+                // screen-space interpolation of the vertex attributes
+                mat4 mat_final = mat_projection * mat_camera * mat_object;
+                gl_Position = mat_final * pos;
+              }
+            ]]>
+          </program>
+        </ep>
+
+        <gp>
+          <program>
+            <![CDATA[
+              #version 410
+              #extension GL_EXT_geometry_shader4 : enable
+
+              // let's make the tessellation visible :)
+#define LINES 0
+#if LINES
+              layout (line_strip, max_vertices = 4) out;
+#else
+              layout (triangle_strip, max_vertices = 3) out;
+#endif
+
+              in vec2 texcoord[];
+//              in vec3 n[];
+              out vec2 tc;
+//              out vec3 nor;
+
+              void main (void)
+              {
+                gl_Position = gl_PositionIn[0];
+                tc = texcoord[0];
+//                nor = n[0];
+                EmitVertex ();
+                gl_Position = gl_PositionIn[1];
+                tc = texcoord[1];
+//                nor = n[1];
+                EmitVertex ();
+                gl_Position = gl_PositionIn[2];
+                tc = texcoord[2];
+//                nor = n[2];
+                EmitVertex ();
+#if LINES
+                gl_Position = gl_PositionIn[0];
+                tc = texcoord[0];
+//                nor = n[0];
+                EmitVertex ();
+#endif
+                EndPrimitive ();
+              }
+            ]]>
+          </program>
+        </gp>
+
+        <fp>
+          <program>
+            <![CDATA[
+              #version 410
+
+              uniform sampler2D texdiff;
+              in vec2 tc;
+//              in vec3 nor;
+
+              void main (void)
+              {
+                vec4 col = texture (texdiff, tc);
+                gl_FragColor = col;
+              }
+            ]]>
+          </program>
+        </fp>
+      </shader>
+
+    </pass>
+  </technique>
+
+  <technique priority="100">
+    <pass>
+
+      <buffer source="texture coordinate" destination="IN.texCoord"/>
+      <texture name="tex diffuse" destination="textureDiffuse"/>
+
+      <vp plugin="glcg">
+        <cgvp>
+          <program>
+            <![CDATA[
+                     struct App2Vertex
+                     {
+                       float4 Position : POSITION;
+                       float2 texCoord;
+                     };
+                     
+                     struct Vertex2Fragment
+                     {
+                       float4 Position : POSITION;
+                       float2 texCoord;
+                     };
+
+                     Vertex2Fragment
+                       main (App2Vertex IN,
+                             uniform float4x4 ModelViewProj : state.matrix.mvp)
+                     {
+                       Vertex2Fragment OUT;
+                       OUT.Position = mul (ModelViewProj, IN.Position);
+                       OUT.texCoord = IN.texCoord;
+                       return OUT;
+                     }
+            ]]>
+          </program>
+        </cgvp>
+      </vp>
+
+      <fp plugin="glcg">
+        <cgfp>
+          <program>
+            <![CDATA[
+                     struct Vertex2Fragment
+                     {
+                       float4 Position : POSITION;
+                       float2 texCoord;
+                     };
+
+                     float4 main (Vertex2Fragment IN, sampler2D textureDiffuse) : COLOR
+                     {
+                       return tex2D (textureDiffuse, IN.texCoord);
+                     }
+            ]]>
+          </program>
+        </cgfp>
+      </fp>
+
+    </pass>
+  </technique>
+</shader>

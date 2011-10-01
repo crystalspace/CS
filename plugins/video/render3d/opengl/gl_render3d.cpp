@@ -89,7 +89,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) :
   glProfiling (false), explicitProjection (false), needMatrixUpdate (true),
   multisampleEnabled (false),
   imageUnits (0), activeVertexAttribs (0), wantToSwap (false),
-  delayClearFlags (0), currentAttachments (0)
+  delayClearFlags (0), currentAttachments (0), use_patches (false)
 {
   verbose = false;
   frustum_valid = false;
@@ -891,7 +891,8 @@ bool csGLGraphics3D::Open ()
   ext->InitGL_AMD_seamless_cubemap_per_texture ();
   ext->InitGL_ARB_half_float_vertex ();
   ext->InitGL_ARB_instanced_arrays ();
-  
+  ext->InitGL_ARB_tessellation_shader (); // glPatchParameteri()
+
   /* Some of the exts checked for above affect the state cache,
      so let it grab the state again */
   statecache->currentContext->InitCache();
@@ -2079,9 +2080,11 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 
   GLenum primitivetype = GL_TRIANGLES;
   int primNum_divider = 1, primNum_sub = 0;
+  int primVertices = -1;
   switch (mymesh->meshtype)
   {
     case CS_MESHTYPE_QUADS:
+      primVertices = 4;
       primNum_divider = 2;
       primitivetype = GL_QUADS;
       break;
@@ -2094,6 +2097,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       primitivetype = GL_TRIANGLE_FAN;
       break;
     case CS_MESHTYPE_POINTS:
+      primVertices = 1;
       primitivetype = GL_POINTS;
       break;
     case CS_MESHTYPE_POINT_SPRITES:
@@ -2102,10 +2106,12 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       {
         break;
       }
+      primVertices = 1;
       primitivetype = GL_POINTS;
       break;
     }
     case CS_MESHTYPE_LINES:
+      primVertices = 2;
       primNum_divider = 2;
       primitivetype = GL_LINES;
       break;
@@ -2115,6 +2121,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       break;
     case CS_MESHTYPE_TRIANGLES:
     default:
+      primVertices = 3;
       primNum_divider = 3;
       primitivetype = GL_TRIANGLES;
       break;
@@ -2125,6 +2132,14 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       statecache->Enable_GL_POINT_SPRITE_ARB();
     else
       statecache->Disable_GL_POINT_SPRITE_ARB();
+  }
+
+  if (use_patches && primVertices > 0)
+  {
+    csGLGraphics3D::ext->glPatchParameteri (GL_PATCH_VERTICES_ARB,
+      primVertices);
+    // update primitive type
+    primitivetype = GL_PATCHES_ARB;
   }
 
   // Based on the kind of clipping we need we set or clip mask.
@@ -4280,9 +4295,11 @@ void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
 
   GLenum primitivetype = GL_TRIANGLES;
   int primNum_divider = 1, primNum_sub = 0;
+  int primVertices = -1;
   switch (mymesh->meshtype)
   {
     case CS_MESHTYPE_QUADS:
+      primVertices = 4;
       primNum_divider = 2;
       primitivetype = GL_QUADS;
       break;
@@ -4295,6 +4312,7 @@ void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
       primitivetype = GL_TRIANGLE_FAN;
       break;
     case CS_MESHTYPE_POINTS:
+      primVertices = 1;
       primitivetype = GL_POINTS;
       break;
     case CS_MESHTYPE_POINT_SPRITES:
@@ -4303,10 +4321,12 @@ void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
       {
         break;
       }
+      primVertices = 1;
       primitivetype = GL_POINTS;
       break;
     }
     case CS_MESHTYPE_LINES:
+      primVertices = 2;
       primNum_divider = 2;
       primitivetype = GL_LINES;
       break;
@@ -4316,6 +4336,7 @@ void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
       break;
     case CS_MESHTYPE_TRIANGLES:
     default:
+      primVertices = 3;
       primNum_divider = 3;
       primitivetype = GL_TRIANGLES;
       break;
@@ -4326,6 +4347,14 @@ void csGLGraphics3D::DrawMeshBasic(const csCoreRenderMesh* mymesh,
       statecache->Enable_GL_POINT_SPRITE_ARB();
     else
       statecache->Disable_GL_POINT_SPRITE_ARB();
+  }
+
+  if (use_patches && primVertices > 0)
+  {
+    csGLGraphics3D::ext->glPatchParameteri (GL_PATCH_VERTICES_ARB,
+      primVertices);
+    // update primitive type
+    primitivetype = GL_PATCHES_ARB;
   }
 
   // Based on the kind of clipping we need we set or clip mask.

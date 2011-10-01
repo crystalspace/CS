@@ -202,6 +202,10 @@ public:
   void DrawMeshBasic(const CS::Graphics::CoreRenderMesh* mymesh,
     const CS::Graphics::RenderMeshModes& modes) {}
 
+  void SetTessellation (bool flag) {}
+  bool GetTessellation () {}
+
+
 private:
   iObjectRegistry* object_reg;
   csRef<iGraphics2D> G2D;
