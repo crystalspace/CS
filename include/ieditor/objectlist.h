@@ -27,7 +27,7 @@
 namespace CS {
 namespace EditorApp {
 
-class iObjectList;
+struct iObjectList;
 
 /**
  * Implement this if you're interested in knowing when an object is added or

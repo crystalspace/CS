@@ -1286,7 +1286,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
 
     if (node->GetAttribute ("alwaysrot"))
     {
-      float rotate = node->GetAttributeValueAsFloat ("alwaysrot");
+      bool rotate = node->GetAttributeValueAsBool ("alwaysrot");
       factnode->SetAlwaysRotate (rotate);
     }
 

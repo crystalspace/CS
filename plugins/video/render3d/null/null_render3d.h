@@ -203,7 +203,7 @@ public:
     const CS::Graphics::RenderMeshModes& modes) {}
 
   void SetTessellation (bool flag) {}
-  bool GetTessellation () {}
+  bool GetTessellation () { return false; }
 
 
 private:
