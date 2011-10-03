@@ -18364,29 +18364,20 @@
     </channel>
   </animation>
 
-    <node type="fsm" name="root" start="0">
-   <state name="idle01">
-      <node type="animation" animation="idle01"/>
-   </state>
-   <state name="idle02">
-      <node type="animation" animation="idle02"/>
-   </state>
-   <state name="idle03">
-      <node type="animation" animation="idle03"/>
-   </state>
-   <state name="idle04">
-      <node type="animation" animation="idle04"/>
-   </state>
-   <state name="idle05">
-      <node type="animation" animation="idle05"/>
-   </state>
-   <state name="idle06">
-      <node type="animation" animation="idle06"/>
-   </state>
-   <state name="stand">
-      <node type="animation" animation="stand"/>
-   </state>
-    </node>
+  <node type="fsm" name="fsm" start="0">
+    <state name="stand">
+     <node type="random">
+       <node type="animation" animation="idle01" autoreset="true" autostop="false" probability="1.0"/>
+       <node type="animation" animation="idle02" autoreset="true" autostop="false" probability="1.0"/>
+       <node type="animation" animation="idle03" autoreset="true" autostop="false" probability="1.0"/>
+       <node type="animation" animation="idle04" autoreset="true" autostop="false" probability="1.0"/>
+       <node type="animation" animation="idle05" autoreset="true" autostop="false" probability="1.0"/>
+       <node type="animation" animation="idle06" autoreset="true" autostop="false" probability="1.0"/>
+       <node type="animation" animation="stand" autoreset="true" autostop="false" probability="10.0"/>
+      </node>
+    </state>
+  </node>
+
  </animationpacket>
   <skeleton name="krystal_rig">
     <bone name="Hips">
