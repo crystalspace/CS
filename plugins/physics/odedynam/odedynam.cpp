@@ -636,6 +636,7 @@ csODEDynamicSystem::csODEDynamicSystem (iObjectRegistry* object_reg,
   colldet_id = strings->Request ("colldet");
 
   dWorldSetGravity (worldID, 0.0f, -9.81f, 0.0f);
+  physicsOrigin.Set (0, 0, 0);
 }
 
 csODEDynamicSystem::~csODEDynamicSystem ()

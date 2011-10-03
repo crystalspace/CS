@@ -120,6 +120,8 @@ private:
   float angularDisableThreshold;
   float timeDisableThreshold;
 
+  csVector3 physicsOrigin;
+
   // For getting collision mesh data.
   csStringID baseId;
   csStringID colldetId;
@@ -189,6 +191,9 @@ public:
   virtual csRef<iDynamicsSystemCollider> CreateCollider ();
   virtual csRef<iDynamicsSystemCollider> GetCollider (unsigned int index);
   virtual int GetColliderCount ();
+
+  virtual void SetPhysicsOrigin (const csVector3& origin);
+  virtual const csVector3& GetPhysicsOrigin () const { return physicsOrigin; }
 
   void RegisterGimpact ();
 

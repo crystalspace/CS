@@ -144,6 +144,8 @@ csBulletDynamicsSystem::csBulletDynamicsSystem
       object_reg, "crystalspace.shared.stringset");
   baseId = strings->Request ("base");
   colldetId = strings->Request ("colldet");
+
+  physicsOrigin.Set (0, 0, 0);
 }
 
 csBulletDynamicsSystem::~csBulletDynamicsSystem ()
@@ -1128,6 +1130,11 @@ iTerrainCollider* csBulletDynamicsSystem::AttachColliderTerrain
 void csBulletDynamicsSystem::DestroyCollider (iTerrainCollider* collider)
 {
   terrainColliders.Delete (collider);
+}
+
+void csBulletDynamicsSystem::SetPhysicsOrigin (const csVector3& origin)
+{
+  physicsOrigin = origin;
 }
 
 void csBulletDynamicsSystem::StartProfile ()

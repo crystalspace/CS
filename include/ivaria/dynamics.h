@@ -128,7 +128,7 @@ struct iDynamicsSystemCollider;
  */
 struct iDynamicSystem : public virtual iBase
 {
-  SCF_INTERFACE (iDynamicSystem, 0, 0, 4);
+  SCF_INTERFACE (iDynamicSystem, 0, 0, 5);
 
   /// Return the underlying object
   virtual iObject *QueryObject (void) = 0;
@@ -382,6 +382,22 @@ struct iDynamicSystem : public virtual iBase
    * Add a joint to this dynamic system after having removed it from any previous one.
    */
   virtual void AddJoint (iJoint* joint) = 0;
+
+  /**
+   * Set the origin (in CS world space) of this system. This way an offset
+   * between the rigid bodies and the Crystal Space objects (meshes) can
+   * be set. By using this function an application
+   * can make sure the local coordinates of the rigid bodies remain
+   * relatively small to avoid inaccuracies caused by big floating point
+   * values.
+   */
+  virtual void SetPhysicsOrigin (const csVector3& origin) = 0;
+
+  /**
+   * Get the origin (in CS world space) of this system. By default
+   * this will be 0,0,0.
+   */
+  virtual const csVector3& GetPhysicsOrigin () const = 0;
 };
 
 /**

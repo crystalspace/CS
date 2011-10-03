@@ -283,6 +283,8 @@ private:
   bool autodisable;
   bool correctInertiaWorkAround;
 
+  csVector3 physicsOrigin;
+
 public:
   csStringID GetBaseID () const { return base_id; }
   csStringID GetColldetID () const { return colldet_id; }
@@ -413,6 +415,10 @@ public:
   virtual bool DoFullInertiaRecalculation () const
   { return !correctInertiaWorkAround; }
   virtual void RecalculateFullInertia (csODECollider* thisCol) {/*Only static stuff, nothing to recalc*/}
+
+  // Not implemented!
+  virtual void SetPhysicsOrigin (const csVector3&) { }
+  virtual const csVector3& GetPhysicsOrigin () const { return physicsOrigin; }
 
 };
 
