@@ -30,7 +30,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderGLSL)
     public scfImplementationExt0<csShaderGLSLProgram, csShaderProgram>
   {
   private:
-    csGLShader_GLSL* shaderPlug;
+    csRef<csGLShader_GLSL> shaderPlug;
 
     // GL identifier
     GLuint program_id;
