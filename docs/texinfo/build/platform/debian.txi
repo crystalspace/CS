@@ -32,7 +32,7 @@ In Ubuntu Natty 11.04, this is done before login in, once you selected the user 
 These are most of the basic @ref{External Libraries, external libraries} that are needed for Crystal Space. Since Debian packages are available for those libraries, you can easily install them by copying and pasting at once the following lines in a terminal:
 
 @example
- sudo apt-get install libx11-dev nvidia-cg-toolkit nvidia-current-dev zlib1g-dev mesa-common-dev; @* sudo apt-get install libgl1-mesa-dev libfreetype6-dev libxext-dev libxxf86vm-dev libjpeg62-dev; @* sudo apt-get install libmng-dev libopenal-dev libpng12-dev libvorbis-dev libsdl1.2-dev; @* sudo apt-get install libxrender-dev libtool libwxbase2.8-dev libwxgtk2.8-dev subversion
+ sudo apt-get install jam libx11-dev nvidia-cg-toolkit nvidia-current-dev zlib1g-dev mesa-common-dev; @* sudo apt-get install libgl1-mesa-dev libfreetype6-dev libxext-dev libxxf86vm-dev libjpeg62-dev; @* sudo apt-get install libmng-dev libopenal-dev libpng12-dev libvorbis-dev libsdl1.2-dev; @* sudo apt-get install libxrender-dev libtool libwxbase2.8-dev libwxgtk2.8-dev subversion
 @end example
 
 @subsubheading Other libraries
