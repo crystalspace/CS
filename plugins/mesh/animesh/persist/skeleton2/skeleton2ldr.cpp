@@ -639,7 +639,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
 
     // Properties..
     bool isCyclic, reset, autostop;
-    if (synldr->ParseBoolAttribute (node, "cyclic", isCyclic, true, false))
+    if (synldr->ParseBoolAttribute (node, "cyclic", isCyclic, false, false))
     {
       factnode->SetCyclic (isCyclic);
     }
