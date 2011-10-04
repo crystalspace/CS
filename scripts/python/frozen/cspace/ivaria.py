@@ -552,6 +552,8 @@ class iDynamicSystem(core.iBase):
     def AttachColliderCapsule(*args): return _ivaria.iDynamicSystem_AttachColliderCapsule(*args)
     def AddBody(*args): return _ivaria.iDynamicSystem_AddBody(*args)
     def AddJoint(*args): return _ivaria.iDynamicSystem_AddJoint(*args)
+    def SetPhysicsOrigin(*args): return _ivaria.iDynamicSystem_SetPhysicsOrigin(*args)
+    def GetPhysicsOrigin(*args): return _ivaria.iDynamicSystem_GetPhysicsOrigin(*args)
     scfGetVersion = staticmethod(_ivaria.iDynamicSystem_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iDynamicSystem
     __del__ = lambda self : None;

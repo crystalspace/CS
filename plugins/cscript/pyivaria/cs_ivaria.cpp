@@ -16572,6 +16572,64 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iDynamicSystem_SetPhysicsOrigin(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDynamicSystem *arg1 = (iDynamicSystem *) 0 ;
+  csVector3 *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iDynamicSystem_SetPhysicsOrigin",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDynamicSystem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDynamicSystem_SetPhysicsOrigin" "', argument " "1"" of type '" "iDynamicSystem *""'"); 
+  }
+  arg1 = reinterpret_cast< iDynamicSystem * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iDynamicSystem_SetPhysicsOrigin" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iDynamicSystem_SetPhysicsOrigin" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  arg2 = reinterpret_cast< csVector3 * >(argp2);
+  (arg1)->SetPhysicsOrigin((csVector3 const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iDynamicSystem_GetPhysicsOrigin(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iDynamicSystem *arg1 = (iDynamicSystem *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  csVector3 *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iDynamicSystem_GetPhysicsOrigin",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDynamicSystem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDynamicSystem_GetPhysicsOrigin" "', argument " "1"" of type '" "iDynamicSystem const *""'"); 
+  }
+  arg1 = reinterpret_cast< iDynamicSystem * >(argp1);
+  {
+    csVector3 const &_result_ref = ((iDynamicSystem const *)arg1)->GetPhysicsOrigin();
+    result = (csVector3 *) &_result_ref;
+  }
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csVector3, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iDynamicSystem_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -41040,6 +41098,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iDynamicSystem_AttachColliderCapsule", _wrap_iDynamicSystem_AttachColliderCapsule, METH_VARARGS, NULL},
 	 { (char *)"iDynamicSystem_AddBody", _wrap_iDynamicSystem_AddBody, METH_VARARGS, NULL},
 	 { (char *)"iDynamicSystem_AddJoint", _wrap_iDynamicSystem_AddJoint, METH_VARARGS, NULL},
+	 { (char *)"iDynamicSystem_SetPhysicsOrigin", _wrap_iDynamicSystem_SetPhysicsOrigin, METH_VARARGS, NULL},
+	 { (char *)"iDynamicSystem_GetPhysicsOrigin", _wrap_iDynamicSystem_GetPhysicsOrigin, METH_VARARGS, NULL},
 	 { (char *)"iDynamicSystem_scfGetVersion", _wrap_iDynamicSystem_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iDynamicSystem", _wrap_delete_iDynamicSystem, METH_VARARGS, NULL},
 	 { (char *)"iDynamicSystem_swigregister", iDynamicSystem_swigregister, METH_VARARGS, NULL},
