@@ -232,7 +232,7 @@ bool SelfShadowDemo::CreateScene ()
     return false;
   }
   // Available scenes
-  char *worlds[] = {"world_krystal", "world", "world_tree", 
+  const char *worlds[] = {"world_krystal", "world", "world_tree", 
     "world_grass", "world_grass_small", "world_grass_big"};
 
   // Load scene

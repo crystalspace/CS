@@ -89,7 +89,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) :
   glProfiling (false), explicitProjection (false), needMatrixUpdate (true),
   multisampleEnabled (false),
   imageUnits (0), activeVertexAttribs (0), wantToSwap (false),
-  delayClearFlags (0), currentAttachments (0), use_patches (false)
+  delayClearFlags (0), use_patches (false), currentAttachments (0)
 {
   verbose = false;
   frustum_valid = false;
