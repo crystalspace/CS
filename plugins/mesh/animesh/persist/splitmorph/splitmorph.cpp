@@ -133,7 +133,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (SplitMorph)
       vfs->Unmount ("/tmp/splitmorph", nullptr);
     }
 
-    return scfQueryInterface<iBase> (meshFactory);
+    return csPtr<iBase> (scfQueryInterface<iBase> (meshFactory));
   }
 
 }
