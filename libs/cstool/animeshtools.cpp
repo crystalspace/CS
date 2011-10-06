@@ -298,17 +298,19 @@ csPtr<iAnimatedMeshFactory> AnimatedMeshTools::ImportGeneralMesh
     return csPtr<iAnimatedMeshFactory> (nullptr);
   }
 
-  // Create the animesh factory
-  csRef<iMeshObjectFactory> genmeshFactory =
-    scfQueryInterface<iMeshObjectFactory> (genmesh);
-  csRef<iMeshFactoryWrapper> factoryWrapper = engine->CreateMeshFactory
-    ("crystalspace.mesh.object.animesh",
-     genmeshFactory->GetMeshFactoryWrapper ()->QueryObject ()->GetName ());
+  // Find the animesh plugin
+  csRef<iMeshObjectType> animeshType = csLoadPluginCheck<iMeshObjectType> (
+    object_reg, "crystalspace.mesh.object.animesh", false);
+  if (!animeshType)
+  {
+    ReportError ("Could not load the animesh object plugin");
+    return csPtr<iAnimatedMeshFactory> (nullptr);
+  }
 
-  // Find the animesh interface
+  // Create the animesh factory
+  csRef<iMeshObjectFactory> meshFactory = animeshType->NewFactory ();
   csRef<iAnimatedMeshFactory> factory =
-    scfQueryInterface<CS::Mesh::iAnimatedMeshFactory>
-    (factoryWrapper->GetMeshObjectFactory ());
+    scfQueryInterfaceSafe<CS::Mesh::iAnimatedMeshFactory> (meshFactory);
 
   // Copy the render buffers
   csRef<iRenderBuffer> buffer;
@@ -365,7 +367,7 @@ csPtr<iAnimatedMeshFactory> AnimatedMeshTools::ImportGeneralMesh
     // Setup the material of the submesh
     submeshFactory->SetMaterial (subMesh->GetMaterial ());
     if (!i)
-      factoryWrapper->GetMeshObjectFactory ()->SetMaterialWrapper (subMesh->GetMaterial ());
+      meshFactory->SetMaterialWrapper (subMesh->GetMaterial ());
   }
 
   factory->Invalidate ();
