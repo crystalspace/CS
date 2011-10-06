@@ -20,7 +20,6 @@
 */
 #include "cssysdef.h"
 
-#include "iengine/engine.h"
 #include "iengine/mesh.h"
 #include "imap/loader.h"
 #include "imesh/animesh.h"
@@ -192,33 +191,12 @@ bool AnimatedMeshTools::ImportMorphMesh
 (iObjectRegistry* object_reg, iAnimatedMeshFactory* baseMesh,
  iAnimatedMeshFactory* morphMesh, const char* morphName, bool deleteMesh)
 {
-  // Find a pointer to the engine
-  csRef<iEngine> engine;
-  if (deleteMesh)
-  {
-    engine = csQueryRegistry<iEngine> (object_reg);
-    if (!engine)
-    {
-      ReportError ("Could not find the engine in order to delete the imported genmesh");
-      deleteMesh = false;
-    }
-  }
-
   // Check that the base mesh has some vertices
   if (!baseMesh->GetVertexCount ())
   {
     ReportWarning
       ("The base animesh has no vertices!",
        CS::Quote::Single (morphName));
-
-    // Delete the mesh if needed
-    if (deleteMesh)
-    {
-      csRef<iMeshObjectFactory> factory =
-	scfQueryInterface<iMeshObjectFactory> (morphMesh);
-      engine->GetMeshFactories ()->Remove (factory->GetMeshFactoryWrapper ());
-    }
-
     return false;
   }
 
@@ -228,15 +206,6 @@ bool AnimatedMeshTools::ImportMorphMesh
     ReportWarning
       ("The animesh for the morph target %s has a different count of vertices (%i VS %i)!",
        CS::Quote::Single (morphName), baseMesh->GetVertexCount (), morphMesh->GetVertexCount ());
-
-    // Delete the mesh if needed
-    if (deleteMesh)
-    {
-      csRef<iMeshObjectFactory> factory =
-	scfQueryInterface<iMeshObjectFactory> (morphMesh);
-      engine->GetMeshFactories ()->Remove (factory->GetMeshFactoryWrapper ());
-    }
-
     return false;
   }
 
@@ -276,28 +245,12 @@ bool AnimatedMeshTools::ImportMorphMesh
   target->SetVertexOffsets (morphBuffer);
   target->Invalidate ();
 
-  // Delete the mesh if needed
-  if (deleteMesh)
-  {
-    csRef<iMeshObjectFactory> factory =
-      scfQueryInterface<iMeshObjectFactory> (morphMesh);
-    engine->GetMeshFactories ()->Remove (factory->GetMeshFactoryWrapper ());
-  }
-
   return true;
 }
 
 csPtr<iAnimatedMeshFactory> AnimatedMeshTools::ImportGeneralMesh
 (iObjectRegistry* object_reg, iGeneralFactoryState* genmesh, bool deleteMesh)
 {
-  // Find a pointer to the engine
-  csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
-  if (!engine)
-  {
-    ReportError ("Could not find the engine");
-    return csPtr<iAnimatedMeshFactory> (nullptr);
-  }
-
   // Find the animesh plugin
   csRef<iMeshObjectType> animeshType = csLoadPluginCheck<iMeshObjectType> (
     object_reg, "crystalspace.mesh.object.animesh", false);
@@ -371,14 +324,6 @@ csPtr<iAnimatedMeshFactory> AnimatedMeshTools::ImportGeneralMesh
   }
 
   factory->Invalidate ();
-
-  // Delete the genmesh if needed
-  if (deleteMesh)
-  {
-    csRef<iMeshObjectFactory> factory =
-      scfQueryInterface<iMeshObjectFactory> (genmesh);
-    engine->GetMeshFactories ()->Remove (factory->GetMeshFactoryWrapper ());
-  }
 
   return csPtr<iAnimatedMeshFactory> (factory);
 }

@@ -111,8 +111,9 @@ class CS_CRYSTALSPACE_EXPORT AnimatedMeshTools
    * \param baseMesh The base animesh where the morph target will be imported.
    * \param morphMesh The animesh to import into the other as a new morph target.
    * \param morphName The name of the new morph target
-   * \param deleteMesh Whether or not the animesh \a morphMesh should be
-   * removed from the engine.
+   * \param deleteMesh Whether or not the animesh \a morphMesh will be deleted
+   * after the call to this method. If \a true, then it allows to reuse the
+   * render buffers of this mesh, this is therefore more optimal.
    *
    * \warning The two animeshes must have the same vertices in the same order.
    */
@@ -127,7 +128,9 @@ class CS_CRYSTALSPACE_EXPORT AnimatedMeshTools
    *
    * \param object_reg The object registry
    * \param genmesh The genmesh to be imported
-   * \param deleteMesh Whether or not the genmesh should be removed from the engine.
+   * \param deleteMesh Whether or not the genmesh will be deleted
+   * after the call to this method. If \a true, then it allows to reuse the
+   * render buffers of this mesh, this is therefore more optimal.
    */
   static csPtr<iAnimatedMeshFactory> ImportGeneralMesh
     (iObjectRegistry* object_reg, iGeneralFactoryState* genmesh,
