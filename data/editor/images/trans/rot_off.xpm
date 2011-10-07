@@ -1,5 +1,5 @@
 /* XPM */
-static char * rot_off_xpm[] = {
+static const char * rot_off_xpm[] = {
 "21 21 134 2",
 "  	c None",
 ". 	c #505050",
