@@ -16846,6 +16846,27 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iAnimatedMesh_ClearMorphTargetWeights(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Mesh::iAnimatedMesh *arg1 = (CS::Mesh::iAnimatedMesh *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iAnimatedMesh_ClearMorphTargetWeights",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Mesh__iAnimatedMesh, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iAnimatedMesh_ClearMorphTargetWeights" "', argument " "1"" of type '" "CS::Mesh::iAnimatedMesh *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Mesh::iAnimatedMesh * >(argp1);
+  (arg1)->ClearMorphTargetWeights();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *iAnimatedMesh_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
@@ -46802,6 +46823,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iAnimatedMesh_SetBoneBoundingBox", _wrap_iAnimatedMesh_SetBoneBoundingBox, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMesh_GetBoneBoundingBox", _wrap_iAnimatedMesh_GetBoneBoundingBox, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMesh_UnsetObjectBoundingBox", _wrap_iAnimatedMesh_UnsetObjectBoundingBox, METH_VARARGS, NULL},
+	 { (char *)"iAnimatedMesh_ClearMorphTargetWeights", _wrap_iAnimatedMesh_ClearMorphTargetWeights, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMesh_swigregister", iAnimatedMesh_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSubMesh_GetFactorySubMesh", _wrap_iAnimatedMeshSubMesh_GetFactorySubMesh, METH_VARARGS, NULL},
 	 { (char *)"iAnimatedMeshSubMesh_SetRendering", _wrap_iAnimatedMeshSubMesh_SetRendering, METH_VARARGS, NULL},

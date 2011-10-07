@@ -15781,6 +15781,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetBoneBoundingBox = *cspacec::iAnimatedMesh_SetBoneBoundingBox;
 *GetBoneBoundingBox = *cspacec::iAnimatedMesh_GetBoneBoundingBox;
 *UnsetObjectBoundingBox = *cspacec::iAnimatedMesh_UnsetObjectBoundingBox;
+*ClearMorphTargetWeights = *cspacec::iAnimatedMesh_ClearMorphTargetWeights;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);

@@ -781,6 +781,7 @@ class iAnimatedMesh(core.iBase):
     def SetBoneBoundingBox(*args): return _imesh.iAnimatedMesh_SetBoneBoundingBox(*args)
     def GetBoneBoundingBox(*args): return _imesh.iAnimatedMesh_GetBoneBoundingBox(*args)
     def UnsetObjectBoundingBox(*args): return _imesh.iAnimatedMesh_UnsetObjectBoundingBox(*args)
+    def ClearMorphTargetWeights(*args): return _imesh.iAnimatedMesh_ClearMorphTargetWeights(*args)
 iAnimatedMesh_swigregister = _imesh.iAnimatedMesh_swigregister
 iAnimatedMesh_swigregister(iAnimatedMesh)
 
