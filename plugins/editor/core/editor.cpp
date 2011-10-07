@@ -275,7 +275,6 @@ bool Editor::LoadPlugin (const char* name)
 	    name, b ? "successful" : "failed");
   if (b)
   {
-    b->DecRef ();
     return true;
   }
 
