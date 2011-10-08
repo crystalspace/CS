@@ -351,9 +351,21 @@ void csBulletDynamicsSystem::RemoveBody (::iRigidBody* body)
   CS_ASSERT (csBody);
   if (csBody->body)
   {
-    // wake up all connected bodies
+    // Unregister to all other bodies in contact
     for (size_t i = 0; i < csBody->contactObjects.GetSize (); i++)
+    {
+      // remove the body from the contact list
+      iBody* bulletBody =
+	static_cast<iBody*> (csBody->contactObjects[i]->getUserPointer ());
+      if (bulletBody->GetType () == CS::Physics::Bullet::RIGID_BODY)
+      {
+	csBulletRigidBody* rigidBody = static_cast<csBulletRigidBody*> (bulletBody->QueryRigidBody ());
+	rigidBody->contactObjects.Delete (csBody->body);
+      }
+
+      // wake up this body since the environment has changed
       csBody->contactObjects[i]->activate ();
+    }
 
     // TODO: remove any connected joint
 
