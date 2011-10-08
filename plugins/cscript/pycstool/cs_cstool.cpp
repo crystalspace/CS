@@ -5146,6 +5146,75 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csColliderHelper_InitializeCollisionWrappers__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iCollideSystem *arg1 = (iCollideSystem *) 0 ;
+  iSector *arg2 = (iSector *) 0 ;
+  iCollection *arg3 = (iCollection *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csColliderHelper_InitializeCollisionWrappers",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iCollideSystem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csColliderHelper_InitializeCollisionWrappers" "', argument " "1"" of type '" "iCollideSystem *""'"); 
+  }
+  arg1 = reinterpret_cast< iCollideSystem * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iSector, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csColliderHelper_InitializeCollisionWrappers" "', argument " "2"" of type '" "iSector *""'"); 
+  }
+  arg2 = reinterpret_cast< iSector * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_iCollection, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csColliderHelper_InitializeCollisionWrappers" "', argument " "3"" of type '" "iCollection *""'"); 
+  }
+  arg3 = reinterpret_cast< iCollection * >(argp3);
+  csColliderHelper::InitializeCollisionWrappers(arg1,arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csColliderHelper_InitializeCollisionWrappers__SWIG_3(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iCollideSystem *arg1 = (iCollideSystem *) 0 ;
+  iSector *arg2 = (iSector *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csColliderHelper_InitializeCollisionWrappers",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iCollideSystem, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csColliderHelper_InitializeCollisionWrappers" "', argument " "1"" of type '" "iCollideSystem *""'"); 
+  }
+  arg1 = reinterpret_cast< iCollideSystem * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iSector, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csColliderHelper_InitializeCollisionWrappers" "', argument " "2"" of type '" "iSector *""'"); 
+  }
+  arg2 = reinterpret_cast< iSector * >(argp2);
+  csColliderHelper::InitializeCollisionWrappers(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csColliderHelper_InitializeCollisionWrappers(PyObject *self, PyObject *args) {
   int argc;
   PyObject *argv[4];
@@ -5167,6 +5236,39 @@ SWIGINTERN PyObject *_wrap_csColliderHelper_InitializeCollisionWrappers(PyObject
       _v = SWIG_CheckState(res);
       if (_v) {
         return _wrap_csColliderHelper_InitializeCollisionWrappers__SWIG_1(self, args);
+      }
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iCollideSystem, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iSector, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_csColliderHelper_InitializeCollisionWrappers__SWIG_3(self, args);
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iCollideSystem, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iSector, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_iCollection, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          return _wrap_csColliderHelper_InitializeCollisionWrappers__SWIG_2(self, args);
+        }
       }
     }
   }
@@ -5194,7 +5296,9 @@ fail:
   SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csColliderHelper_InitializeCollisionWrappers'.\n"
     "  Possible C/C++ prototypes are:\n"
     "    InitializeCollisionWrappers(iCollideSystem *,iEngine *,iCollection *)\n"
-    "    csColliderHelper::InitializeCollisionWrappers(iCollideSystem *,iEngine *)\n");
+    "    InitializeCollisionWrappers(iCollideSystem *,iEngine *)\n"
+    "    InitializeCollisionWrappers(iCollideSystem *,iSector *,iCollection *)\n"
+    "    csColliderHelper::InitializeCollisionWrappers(iCollideSystem *,iSector *)\n");
   return NULL;
 }
 
