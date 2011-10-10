@@ -252,6 +252,7 @@ public:
 
   void Wait(bool process = true)
   {
+    csRef<iThreadManager> tm (this->tm.Get<csRef<iThreadManager> >());
     if(tm.IsValid())
     {
       csRefArray<iThreadReturn> rets;

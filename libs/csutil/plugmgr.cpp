@@ -134,7 +134,8 @@ void csPluginManager::Clear ()
   // Free all plugins.
   for (size_t i = Plugins.GetSize () ; i > 0 ; i--)
   {
-    csRef<iComponent> plugin (Plugins.Get(i - 1).Plugin);
+    csRef<iComponent> plugin;
+    Plugins.Get(i - 1).Plugin.Get (plugin);
     if (!plugin)
     {
       Plugins.DeleteIndexFast (i);
@@ -230,7 +231,7 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
 	csRef<iComponent> comp;
 	csPlugin* pl = FindPluginByClassID (classID);
 	if (pl)
-	  comp = pl->Plugin;
+	  pl->Plugin.Get (comp);
         if(comp)
           return csPtr<iComponent>(comp);
       }
@@ -253,7 +254,8 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
         // The plugin should have been loaded now.
 	CS::Threading::RecursiveMutexScopedLock lock (mutex);
 	csPlugin* pl = FindPluginByClassID (classID);
-	csRef<iComponent> comp (pl->Plugin);
+	csRef<iComponent> comp;
+	pl->Plugin.Get (comp);
         return csPtr<iComponent> (comp);
       }
     }
@@ -287,9 +289,14 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
       // The plugin wasn't in our plugin list yet. Add it here.
       index = Plugins.Push (csPlugin (p, classID));
     }
-    else if (!Plugins[index].Plugin)
-      // Plugin has been unloaded, store in previous slot
-      Plugins[index].Plugin = p;
+    else
+    {
+      csRef<iComponent> oldPlug;
+      Plugins[index].Plugin.Get (oldPlug);
+      if (!oldPlug)
+        // Plugin has been unloaded, store in previous slot
+        Plugins[index].Plugin = p;
+    }
 
     if (flags & lpiLoadDependencies)
     {
@@ -417,8 +424,10 @@ csPtr<iPluginIterator> csPluginManager::GetPluginInstances ()
   size_t i;
   for (i = 0 ; i < Plugins.GetSize () ; i++)
   {
-    if (!Plugins[i].Plugin) continue;
-    it->pointers.Push (Plugins[i].Plugin);
+    csRef<iComponent> plug;
+    Plugins[i].Plugin.Get (plug);
+    if (!plug) continue;
+    it->pointers.Push (plug);
   }
   return csPtr<iPluginIterator> (it);
 }
@@ -480,8 +489,9 @@ csPtr<iComponent> csPluginManager::QueryPluginInstance (const char* classID)
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
   loadingLock.Unlock();
   csPlugin* pl = FindPluginByClassID (classID);
-  if (pl) return csPtr<iComponent> (pl->Plugin);
-  return 0;
+  csRef<iComponent> inst;
+  pl->Plugin.Get (inst);
+  return csPtr<iComponent> (inst);
 }
 
 csPtr<iComponent> csPluginManager::QueryPluginInstance (const char *iInterface, int iVersion)
@@ -508,11 +518,12 @@ csPtr<iComponent> csPluginManager::QueryPluginInstance (const char *iInterface, 
   loadingLock.Unlock();
   for (size_t i = 0; i < Plugins.GetSize (); i++)
   {
-    iComponent* ret = Plugins[i].Plugin;
+    csRef<iComponent> ret;
+    Plugins[i].Plugin.Get (ret);
     if (!ret) continue;
     if (ret->QueryInterface (ifID, iVersion))
       // QI does an implicit IncRef()
-      return ret;
+      return (iComponent*)ret;
   }
   return 0;
 }
@@ -537,10 +548,11 @@ csPtr<iComponent> csPluginManager::QueryPluginInstance (const char* classID,
     csPlugin* pl = FindPluginByClassID (classID, lastPlugin);
     if (pl)
     {
-      iComponent* p = pl->Plugin;
+      csRef<iComponent> p;
+      pl->Plugin.Get (p);
       if (p && p->QueryInterface(ifID, iVersion))
         // QI does an implicit IncRef()
-	return p;
+	return (iComponent*)p;
     }
     lastPlugin = pl;
   }
