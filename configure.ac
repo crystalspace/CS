@@ -2088,7 +2088,10 @@ CS_CHECK_BUILD([for sysconf(_SC_NPROCESSORS_ONLN)], [cs_cv_sysconf_processors],
 
    
 #------------------------------------------------------------------------------
-# Check for nullptr
+# Check for nullptr.
+# Since some g++ versions support nullptr when enabling an experimental C++0x
+# mode, but not in -ansi mode, check whether nullptr is also available in
+# when -ansi is provided.
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD([for nullptr], [cs_cv__nullptr],
     [AC_LANG_PROGRAM(
@@ -2096,6 +2099,13 @@ CS_CHECK_BUILD([for nullptr], [cs_cv__nullptr],
 	[void* p = nullptr;])],
     [], [C++],
     [CS_HEADER_PROPERTY([CS_HAS_NULLPTR])])
+CS_CHECK_BUILD([for nullptr in pedantic mode], [cs_cv__nullptr_ansi],
+    [AC_LANG_PROGRAM(
+	[[]],
+	[void* p = nullptr;])],
+    [], [C++],
+    [CS_HEADER_PROPERTY([CS_HAS_NULLPTR_STRICT_ANSI])], [], [],
+    [$cs_cv_prog_cxx_enable_pedantic])
 
 
 #------------------------------------------------------------------------------
