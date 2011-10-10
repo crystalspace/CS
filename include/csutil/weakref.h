@@ -323,9 +323,6 @@ public:
   CS_WEAKREF_METHOD_UNSAFE
   bool IsValid () const
   { return (obj != 0); }
-  CS_WEAKREF_METHOD_UNSAFE
-  operator bool() const
-  { return (obj != 0); }
 
   /// Return a hash value for this smart pointer.
   uint GetHash() const
