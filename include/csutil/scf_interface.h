@@ -183,7 +183,7 @@ public:
    * environment each thread holding a weak reference to an object should
    * also hold a normal reference somewhere.
    */
-  virtual void AddRefOwner (void** ref_owner) = 0;
+  virtual void AddRefOwner (void** ref_owner, CS::Threading::Mutex* mutex) = 0;
   /**
    * For weak references: remove a reference owner.
    * Thread-safe - it is possible to add reference owners from
@@ -191,6 +191,8 @@ public:
    * on weak references in a multithreaded environment.
    */
   virtual void RemoveRefOwner (void** ref_owner) = 0;
+  
+  typedef csRef<iBase> WeakReferencedKeepAlive;
 
   /**
    * Request the meta-data for the interfaces implemented by this object.

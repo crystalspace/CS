@@ -26,8 +26,18 @@
 
 #include "csextern.h"
 #include "csutil/ref.h"
+#include "csutil/threading/mutex.h"
 
 struct iBase;
+
+/* Define this macro if you want to get a warning when a weak reference is
+ * used in a way that is unsafe with multiple threads. */
+#ifdef CS_WEAKREF_WARN_MULTITHREADING_UNSAFE
+#define CS_WEAKREF_METHOD_UNSAFE	\
+  CS_DEPRECATED_METHOD_MSG("UNSAFE in multithreading scenarios - use Get<csRef<> >()")
+#else
+#define CS_WEAKREF_METHOD_UNSAFE
+#endif
 
 /**
  * A weak reference. This is a reference to a reference counted object
@@ -45,6 +55,15 @@ struct iBase;
  * \remarks An extended explanation on smart pointers - how they work and what
  *   type to use in what scenario - is contained in the User's manual, 
  *   section "Correctly Using Smart Pointers".
+ * 
+ * Although csWeakRef<> implements the necessary operators to transparently use
+ * it like an actual pointer, this usage is <em>not</em> thread-safe: when
+ * using multiple threads, it can happen that a weak pointer appears valid in
+ * one thread, but is being destroyed (or has been destroyed) in another thread.
+ * For <b>thread-safe usage</b>, convert the weak pointer to a csRef<> first
+ * by using a Get() method: This ensures that a valid returned pointer stays
+ * valid and that an invalid pointer is returned if the object is being
+ * destroyed.
  */
 template <class T>
 class csWeakRef
@@ -58,6 +77,7 @@ private:
 #if defined(CS_DEBUG)
   void* this_saved;
 #endif
+  mutable CS::Threading::Mutex obj_mutex;
 
   /**
    * Unlink the object pointed to by this weak reference so that
@@ -74,7 +94,7 @@ private:
    */
   void Link ()
   {
-    if (obj) obj->AddRefOwner (&obj_void);
+    if (obj) obj->AddRefOwner (&obj_void, &obj_mutex);
   }
 
 public:
@@ -115,11 +135,19 @@ public:
   /**
    * Weak pointer copy constructor.
    */
-  csWeakRef (csWeakRef const& other) : obj (other.obj)
+  csWeakRef (csWeakRef const& other)
   {
 #if defined(CS_DEBUG)
     this_saved = this;
 #endif
+    // Keep object from 'other' alive until we linked
+    typename T::WeakReferencedKeepAlive other_obj_ref;
+    {
+      CS::Threading::ScopedLock<CS::Threading::Mutex> lock_other_mutex (other.obj_mutex);
+      obj = other.obj;
+      other_obj_ref = obj;
+      (void)other_obj_ref;
+    }
     Link ();
   }
 
@@ -146,6 +174,11 @@ public:
     CS_ASSERT_MSG ("A csWeakRef<> was memcpy()ed, which is not allowed",
       this_saved == this);
 #endif
+    /* We need to keep the old object alive for unlinking,
+     * but we can't keep the obj_mutex locked (possible deadlock
+     * when the object is in DecRef()) */
+    typename T::WeakReferencedKeepAlive obj_ref (Get<typename T::WeakReferencedKeepAlive> ());
+    (void)obj_ref;
     Unlink ();
   }
 
@@ -154,9 +187,19 @@ public:
    */
   csWeakRef& operator = (T* newobj)
   {
+    CS::Threading::ScopedLock<CS::Threading::Mutex> lock_mutex (obj_mutex);
     if (obj != newobj)
     {
-      Unlink ();
+      {
+	/* We need to keep the old object alive for unlinking,
+	 * but we can't keep the obj_mutex locked (possible deadlock
+	 * when the object is in DecRef()) */
+	typename T::WeakReferencedKeepAlive old_obj_ref (obj);
+	(void)old_obj_ref;
+	obj_mutex.Unlock();
+	Unlink ();
+      }
+      obj_mutex.Lock();
       obj = newobj;
       Link ();
     }
@@ -168,13 +211,7 @@ public:
    */
   csWeakRef& operator = (csRef<T> const& newobj)
   {
-    if (newobj != obj)
-    {
-      Unlink ();
-      obj = newobj;
-      Link ();
-    }
-    return *this;
+    return (*this = (T*)newobj);
   }
 
   /**
@@ -183,14 +220,8 @@ public:
    */
   csWeakRef& operator = (csPtr<T> newobj)
   {
-    csRef<T> r = newobj;
-    if (obj != r)
-    {
-      Unlink ();
-      obj = r;
-      Link ();
-    }
-    return *this;
+    csRef<T> r (newobj);
+    return (*this = r);
   }
 
   /**
@@ -205,56 +236,103 @@ public:
   /// Test if the two references point to same object.
   inline friend bool operator == (const csWeakRef& r1, const csWeakRef& r2)
   {
+    CS::Threading::ScopedLock<CS::Threading::Mutex> lock_mutex1 (r1.obj_mutex);
+    CS::Threading::ScopedLock<CS::Threading::Mutex> lock_mutex2 (r2.obj_mutex);
     return r1.obj == r2.obj;
   }
   /// Test if the two references point to different object.
   inline friend bool operator != (const csWeakRef& r1, const csWeakRef& r2)
   {
+    CS::Threading::ScopedLock<CS::Threading::Mutex> lock_mutex1 (r1.obj_mutex);
+    CS::Threading::ScopedLock<CS::Threading::Mutex> lock_mutex2 (r2.obj_mutex);
     return r1.obj != r2.obj;
   }
   /// Test if object pointed to by reference is same as obj.
   inline friend bool operator == (const csWeakRef& r1, T* obj)
   {
+    CS::Threading::ScopedLock<CS::Threading::Mutex> lock_mutex1 (r1.obj_mutex);
     return r1.obj == obj;
   }
   /// Test if object pointed to by reference is different from obj.
   inline friend bool operator != (const csWeakRef& r1, T* obj)
   {
+    CS::Threading::ScopedLock<CS::Threading::Mutex> lock_mutex1 (r1.obj_mutex);
     return r1.obj != obj;
   }
   /// Test if object pointed to by reference is same as obj.
   inline friend bool operator == (T* obj, const csWeakRef& r1)
   {
+    CS::Threading::ScopedLock<CS::Threading::Mutex> lock_mutex1 (r1.obj_mutex);
     return r1.obj == obj;
   }
   /// Test if object pointed to by reference is different from obj.
   inline friend bool operator != (T* obj, const csWeakRef& r1)
   {
+    CS::Threading::ScopedLock<CS::Threading::Mutex> lock_mutex1 (r1.obj_mutex);
     return r1.obj != obj;
   }
 
+  inline friend bool operator < (const csWeakRef& r1, const csWeakRef& r2)
+  {
+    CS::Threading::ScopedLock<CS::Threading::Mutex> lock_mutex1 (r1.obj_mutex);
+    CS::Threading::ScopedLock<CS::Threading::Mutex> lock_mutex2 (r2.obj_mutex);
+    return r1.obj < r2.obj;
+  }
+
   /// Dereference underlying object.
+  CS_WEAKREF_METHOD_UNSAFE
   T* operator -> () const
   { return obj; }
   
   /// Cast weak reference to a pointer to the underlying object.
+  CS_WEAKREF_METHOD_UNSAFE
   operator T* () const
   { return obj; }
   
   /// Dereference underlying object.
+  CS_WEAKREF_METHOD_UNSAFE
   T& operator* () const
   { return *obj; }
+
+  //@{
+  /**
+   * Safely get the weakly referenced object.
+   * \tparam U Type as which the object pointer should be returned. Must be
+   *   constructible or assignable from \c T*. It's recommended to make it a
+   *   csRef<T> in order to keep the object alive as long as it's needed.
+   */
+  template<typename U>
+  U Get() const
+  {
+    CS::Threading::ScopedLock<CS::Threading::Mutex> lock_mutex (obj_mutex);
+    return U (obj);
+  }
+  template<typename U>
+  void Get(U& ref) const
+  {
+    CS::Threading::ScopedLock<CS::Threading::Mutex> lock_mutex (obj_mutex);
+    ref = obj;
+  }
+  //@}
+
 
   /**
    * Weak pointer validity check.  Returns true if weak reference is pointing
    * at an actual object, otherwise returns false.
    */
+  CS_WEAKREF_METHOD_UNSAFE
   bool IsValid () const
+  { return (obj != 0); }
+  CS_WEAKREF_METHOD_UNSAFE
+  operator bool() const
   { return (obj != 0); }
 
   /// Return a hash value for this smart pointer.
   uint GetHash() const
-  { return (uintptr_t)obj;  }
+  {
+    CS::Threading::ScopedLock<CS::Threading::Mutex> lock_mutex (obj_mutex);
+    return (uintptr_t)obj;    
+  }
 };
 
 #endif // __CS_WEAKREF_H__

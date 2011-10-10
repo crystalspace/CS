@@ -33,7 +33,7 @@ void scfImplementationHelper::EnsureAuxData()
 
 void scfImplementationHelper::FreeAuxData()
 {
-  delete scfAuxData;
+  scfAuxData->DecRef ();
 }
 
 void scfImplementationHelper::AllocMetadata (size_t numEntries)
@@ -61,23 +61,6 @@ void scfImplementationHelper::CleanupMetadata ()
     cs_free (metadataList);
     metadataList = 0;
   }
-}
-
-void scfImplementationHelper::scfRemoveRefOwners ()
-{
-  CS_ASSERT(HasAuxData());
-
-  WeakRefOwnerArray* scfWeakRefOwners = scfAuxData->scfWeakRefOwners;
-  if (!scfWeakRefOwners)
-    return;
-
-  for (size_t i = 0; i < scfWeakRefOwners->GetSize (); i++)
-  {
-    void** p = (*scfWeakRefOwners)[i];
-    *p = 0;
-  }
-  delete scfWeakRefOwners;
-  scfWeakRefOwners = 0;
 }
 
 size_t scfImplementationHelper::GetInterfaceMetadataCount () const
