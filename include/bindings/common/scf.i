@@ -24,7 +24,7 @@ class scfFakeInterface
 	virtual void DecRef ();
 	virtual int GetRefCount ();
 	virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion);
-	virtual void AddRefOwner (void** ref_owner);
+	virtual void AddRefOwner (void** ref_owner, CS::Threading::Mutex*);
 	virtual void RemoveRefOwner (void** ref_owner);
         scfInterfaceMetadataList* GetInterfaceMetadata ();
 %enddef
