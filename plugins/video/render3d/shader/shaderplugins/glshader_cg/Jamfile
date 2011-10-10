@@ -5,9 +5,7 @@ if $(CG.AVAILABLE) = "yes" && $(GL.AVAILABLE) = "yes"
   Description glshader_cg : "CG shader" ;
   Plugin glshader_cg : [ Wildcard *.cpp *.h ] : nodefaultfilelist ;
   Includes glshader_cg.h : $(SUBDIR)/glshader_cg.tok ;
-  Includes combiner_cg.h : $(SUBDIR)/combiner_cg.tok ;
   MsvcExtraFile glshader_cg : $(SUBDIR)/glshader_cg.tok ;
-  MsvcExtraFile glshader_cg : $(SUBDIR)/combiner_cg.tok ;
   LinkWith glshader_cg : crystalspace crystalspace_opengl ;
   ExternalLibs glshader_cg : CG GL ;
   CompileGroups glshader_cg : shaders renderers renderall openglrenderer ;

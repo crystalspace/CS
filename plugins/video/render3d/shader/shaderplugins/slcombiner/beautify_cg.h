@@ -21,7 +21,7 @@
 
 #include "csutil/csstring.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
+CS_PLUGIN_NAMESPACE_BEGIN(SLCombiner)
 {
   class CgBeautifier
   {
@@ -86,6 +86,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     void Append (const char* str);
   };
 }
-CS_PLUGIN_NAMESPACE_END(GLShaderCg)
+CS_PLUGIN_NAMESPACE_END(SLCombiner)
 
 #endif // __BEAUTIFY_CG_H__

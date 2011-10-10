@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics3d.shader.combiner.glcg</name>
+        <implementation>ShaderCombinerLoaderCg</implementation>
+        <description>Cg-specific combiner for shader snippets</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

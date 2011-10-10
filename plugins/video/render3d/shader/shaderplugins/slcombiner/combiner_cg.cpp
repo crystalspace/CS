@@ -42,7 +42,7 @@
 
 #include "combiner_cg.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
+CS_PLUGIN_NAMESPACE_BEGIN(SLCombiner)
 {
   using namespace CS::PluginCommon;
 
@@ -1975,4 +1975,4 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     }
   }
 }
-CS_PLUGIN_NAMESPACE_END(GLShaderCg)
+CS_PLUGIN_NAMESPACE_END(SLCombiner)

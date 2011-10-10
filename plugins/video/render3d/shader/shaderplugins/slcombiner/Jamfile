@@ -1,0 +1,9 @@
+SubDir TOP plugins video render3d shader shaderplugins slcombiner ;
+
+Description slcombiner : "Shader combiner" ;
+Plugin slcombiner : [ Wildcard *.cpp *.h ] : nodefaultfilelist ;
+Includes combiner_cg.h : $(SUBDIR)/combiner_cg.tok ;
+MsvcExtraFile slcombiner : $(SUBDIR)/combiner_cg.tok ;
+LinkWith slcombiner : crystalspace ;
+CompileGroups slcombiner : shaders renderers renderall ;
+FileListEntryPlugin slcombiner : plugin ;
