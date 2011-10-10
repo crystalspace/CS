@@ -1417,11 +1417,8 @@ csSegment3_swigregister(csSegment3)
 
 class csPath(core.scfPath):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _csgeom.new_csPath(*args)
-        try: self.this.append(this)
-        except: self.this = this
     def Setup(*args): return _csgeom.csPath_Setup(*args)
     __swig_destroy__ = _csgeom.delete_csPath
     __del__ = lambda self : None;
@@ -1496,11 +1493,8 @@ scfTriangleMeshPointer_swigregister(scfTriangleMeshPointer)
 
 class csTriangleMesh(pycsTriangleMesh):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _csgeom.new_csTriangleMesh(*args)
-        try: self.this.append(this)
-        except: self.this = this
     __swig_destroy__ = _csgeom.delete_csTriangleMesh
     __del__ = lambda self : None;
     def AddVertex(*args): return _csgeom.csTriangleMesh_AddVertex(*args)
@@ -1557,11 +1551,8 @@ csTriangleVertices_swigregister(csTriangleVertices)
 
 class csTriangleMeshBox(pycsTriangleMeshBox):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _csgeom.new_csTriangleMeshBox(*args)
-        try: self.this.append(this)
-        except: self.this = this
     __swig_destroy__ = _csgeom.delete_csTriangleMeshBox
     __del__ = lambda self : None;
     def SetBox(*args): return _csgeom.csTriangleMeshBox_SetBox(*args)
@@ -1584,11 +1575,8 @@ csTriangleMeshBox_swigregister(csTriangleMeshBox)
 
 class csTriangleMeshPointer(scfTriangleMeshPointer):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _csgeom.new_csTriangleMeshPointer(*args)
-        try: self.this.append(this)
-        except: self.this = this
     __swig_destroy__ = _csgeom.delete_csTriangleMeshPointer
     __del__ = lambda self : None;
     def GetVertexCount(*args): return _csgeom.csTriangleMeshPointer_GetVertexCount(*args)

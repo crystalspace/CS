@@ -1711,11 +1711,8 @@ csLoadPluginAlways = _core.csLoadPluginAlways
 
 class csObject(scfObject,InternalRefCount):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _core.new_csObject(*args)
-        try: self.this.append(this)
-        except: self.this = this
     __swig_destroy__ = _core.delete_csObject
     __del__ = lambda self : None;
     def SetName(*args): return _core.csObject_SetName(*args)
@@ -2510,11 +2507,8 @@ csPyEventPlugParent_swigregister(csPyEventPlugParent)
 
 class csPyEventPlug(csPyEventPlugParent):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _core.new_csPyEventPlug(*args)
-        try: self.this.append(this)
-        except: self.this = this
     __swig_destroy__ = _core.delete_csPyEventPlug
     __del__ = lambda self : None;
     def GetPotentiallyConflictingEvents(*args): return _core.csPyEventPlug_GetPotentiallyConflictingEvents(*args)
@@ -2538,11 +2532,8 @@ csPyEventHandlerParent_swigregister(csPyEventHandlerParent)
 
 class _csPyEventHandler(csPyEventHandlerParent):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _core.new__csPyEventHandler(*args)
-        try: self.this.append(this)
-        except: self.this = this
     __swig_destroy__ = _core.delete__csPyEventHandler
     __del__ = lambda self : None;
     def HandleEvent(*args): return _core._csPyEventHandler_HandleEvent(*args)
