@@ -63,9 +63,9 @@ namespace lighter
 
     // Compute average of Normals
     float NN[3] = {
-      (A->norm[0] + B->norm[0])/2.0,
-      (A->norm[1] + B->norm[1])/2.0,
-      (A->norm[2] + B->norm[2])/2.0
+      (A->norm[0] + B->norm[0])/2.0f,
+      (A->norm[1] + B->norm[1])/2.0f,
+      (A->norm[2] + B->norm[2])/2.0f
     };
 
     // Compute dot product and test (eq 6 in Ward et al.)

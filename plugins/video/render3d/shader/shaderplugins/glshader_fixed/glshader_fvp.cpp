@@ -392,7 +392,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
         // V==1. (The fog lookup texture pretty much does "min(U, V)")
         // We also offset the fogplane a bit, to avoid ugly clipping 
         // when fogged portals cuts the near plane.
-        GLfloat coeff1[] = {0, 0, density, -0.1*density};
+        GLfloat coeff1[] = {0, 0, density, -0.1f*density};
         GLfloat coeff2[] = {0, 0, 0, 1};
         
         // Then we see if we're looking away from the fogplane
