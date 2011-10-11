@@ -40981,14 +40981,18 @@ SWIGINTERN PyObject *_wrap_scfObject_AddRefOwner(PyObject *SWIGUNUSEDPARM(self),
   PyObject *resultobj = 0;
   scfImplementation1< csObject,iObject > *arg1 = (scfImplementation1< csObject,iObject > *) 0 ;
   void **arg2 = (void **) 0 ;
+  CS::Threading::Mutex *arg3 = (CS::Threading::Mutex *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"scfObject_AddRefOwner",2,2,&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"scfObject_AddRefOwner",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_scfImplementation1T_csObject_iObject_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "scfObject_AddRefOwner" "', argument " "1"" of type '" "scfImplementation1< csObject,iObject > *""'"); 
@@ -40999,7 +41003,12 @@ SWIGINTERN PyObject *_wrap_scfObject_AddRefOwner(PyObject *SWIGUNUSEDPARM(self),
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "scfObject_AddRefOwner" "', argument " "2"" of type '" "void **""'"); 
   }
   arg2 = reinterpret_cast< void ** >(argp2);
-  (arg1)->AddRefOwner(arg2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_CS__Threading__Mutex, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "scfObject_AddRefOwner" "', argument " "3"" of type '" "CS::Threading::Mutex *""'"); 
+  }
+  arg3 = reinterpret_cast< CS::Threading::Mutex * >(argp3);
+  (arg1)->AddRefOwner(arg2,arg3);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -41065,6 +41074,108 @@ SWIGINTERN PyObject *scfObject_swigregister(PyObject *SWIGUNUSEDPARM(self), PyOb
   SWIG_TypeNewClientData(SWIGTYPE_p_scfImplementation1T_csObject_iObject_t, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
+
+SWIGINTERN PyObject *_wrap_new_csObject__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iBase *arg1 = (iBase *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  csObject *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"new_csObject",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iBase, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_csObject" "', argument " "1"" of type '" "iBase *""'"); 
+  }
+  arg1 = reinterpret_cast< iBase * >(argp1);
+  result = (csObject *)new csObject(arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csObject, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_csObject__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csObject *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"new_csObject",0,0)) SWIG_fail;
+  result = (csObject *)new csObject();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csObject, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_csObject__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csObject *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  csObject *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"new_csObject",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csObject,  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_csObject" "', argument " "1"" of type '" "csObject &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_csObject" "', argument " "1"" of type '" "csObject &""'"); 
+  }
+  arg1 = reinterpret_cast< csObject * >(argp1);
+  result = (csObject *)new csObject(*arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csObject, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_csObject(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[2];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 1); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 0) {
+    return _wrap_new_csObject__SWIG_1(self, args);
+  }
+  if (argc == 1) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csObject, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_new_csObject__SWIG_2(self, args);
+    }
+  }
+  if (argc == 1) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iBase, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_new_csObject__SWIG_0(self, args);
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'new_csObject'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    csObject(iBase *)\n"
+    "    csObject()\n"
+    "    csObject(csObject &)\n");
+  return NULL;
+}
+
 
 SWIGINTERN PyObject *_wrap_delete_csObject(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
@@ -42985,14 +43096,18 @@ SWIGINTERN PyObject *_wrap_scfPath_AddRefOwner(PyObject *SWIGUNUSEDPARM(self), P
   PyObject *resultobj = 0;
   scfImplementationExt1< csPath,csObject,iPath > *arg1 = (scfImplementationExt1< csPath,csObject,iPath > *) 0 ;
   void **arg2 = (void **) 0 ;
+  CS::Threading::Mutex *arg3 = (CS::Threading::Mutex *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"scfPath_AddRefOwner",2,2,&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"scfPath_AddRefOwner",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_scfImplementationExt1T_csPath_csObject_iPath_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "scfPath_AddRefOwner" "', argument " "1"" of type '" "scfImplementationExt1< csPath,csObject,iPath > *""'"); 
@@ -43003,7 +43118,12 @@ SWIGINTERN PyObject *_wrap_scfPath_AddRefOwner(PyObject *SWIGUNUSEDPARM(self), P
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "scfPath_AddRefOwner" "', argument " "2"" of type '" "void **""'"); 
   }
   arg2 = reinterpret_cast< void ** >(argp2);
-  (arg1)->AddRefOwner(arg2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_CS__Threading__Mutex, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "scfPath_AddRefOwner" "', argument " "3"" of type '" "CS::Threading::Mutex *""'"); 
+  }
+  arg3 = reinterpret_cast< CS::Threading::Mutex * >(argp3);
+  (arg1)->AddRefOwner(arg2,arg3);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -52073,14 +52193,18 @@ SWIGINTERN PyObject *_wrap_scfConfigFile_AddRefOwner(PyObject *SWIGUNUSEDPARM(se
   PyObject *resultobj = 0;
   scfImplementation1< csConfigFile,iConfigFile > *arg1 = (scfImplementation1< csConfigFile,iConfigFile > *) 0 ;
   void **arg2 = (void **) 0 ;
+  CS::Threading::Mutex *arg3 = (CS::Threading::Mutex *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"scfConfigFile_AddRefOwner",2,2,&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"scfConfigFile_AddRefOwner",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_scfImplementation1T_csConfigFile_iConfigFile_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "scfConfigFile_AddRefOwner" "', argument " "1"" of type '" "scfImplementation1< csConfigFile,iConfigFile > *""'"); 
@@ -52091,7 +52215,12 @@ SWIGINTERN PyObject *_wrap_scfConfigFile_AddRefOwner(PyObject *SWIGUNUSEDPARM(se
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "scfConfigFile_AddRefOwner" "', argument " "2"" of type '" "void **""'"); 
   }
   arg2 = reinterpret_cast< void ** >(argp2);
-  (arg1)->AddRefOwner(arg2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_CS__Threading__Mutex, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "scfConfigFile_AddRefOwner" "', argument " "3"" of type '" "CS::Threading::Mutex *""'"); 
+  }
+  arg3 = reinterpret_cast< CS::Threading::Mutex * >(argp3);
+  (arg1)->AddRefOwner(arg2,arg3);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -59781,14 +59910,18 @@ SWIGINTERN PyObject *_wrap_csPyEventPlugParent_AddRefOwner(PyObject *SWIGUNUSEDP
   PyObject *resultobj = 0;
   scfImplementation1< csPyEventPlug,iEventPlug > *arg1 = (scfImplementation1< csPyEventPlug,iEventPlug > *) 0 ;
   void **arg2 = (void **) 0 ;
+  CS::Threading::Mutex *arg3 = (CS::Threading::Mutex *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"csPyEventPlugParent_AddRefOwner",2,2,&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csPyEventPlugParent_AddRefOwner",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_scfImplementation1T_csPyEventPlug_iEventPlug_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPyEventPlugParent_AddRefOwner" "', argument " "1"" of type '" "scfImplementation1< csPyEventPlug,iEventPlug > *""'"); 
@@ -59799,7 +59932,12 @@ SWIGINTERN PyObject *_wrap_csPyEventPlugParent_AddRefOwner(PyObject *SWIGUNUSEDP
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csPyEventPlugParent_AddRefOwner" "', argument " "2"" of type '" "void **""'"); 
   }
   arg2 = reinterpret_cast< void ** >(argp2);
-  (arg1)->AddRefOwner(arg2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_CS__Threading__Mutex, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csPyEventPlugParent_AddRefOwner" "', argument " "3"" of type '" "CS::Threading::Mutex *""'"); 
+  }
+  arg3 = reinterpret_cast< CS::Threading::Mutex * >(argp3);
+  (arg1)->AddRefOwner(arg2,arg3);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -59865,6 +60003,19 @@ SWIGINTERN PyObject *csPyEventPlugParent_swigregister(PyObject *SWIGUNUSEDPARM(s
   SWIG_TypeNewClientData(SWIGTYPE_p_scfImplementation1T_csPyEventPlug_iEventPlug_t, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
+
+SWIGINTERN PyObject *_wrap_new_csPyEventPlug(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csPyEventPlug *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"new_csPyEventPlug",0,0)) SWIG_fail;
+  result = (csPyEventPlug *)new csPyEventPlug();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csPyEventPlug, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
 
 SWIGINTERN PyObject *_wrap_delete_csPyEventPlug(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
@@ -60055,14 +60206,18 @@ SWIGINTERN PyObject *_wrap_csPyEventHandlerParent_AddRefOwner(PyObject *SWIGUNUS
   PyObject *resultobj = 0;
   scfImplementation1< _csPyEventHandler,iEventHandler > *arg1 = (scfImplementation1< _csPyEventHandler,iEventHandler > *) 0 ;
   void **arg2 = (void **) 0 ;
+  CS::Threading::Mutex *arg3 = (CS::Threading::Mutex *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"csPyEventHandlerParent_AddRefOwner",2,2,&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csPyEventHandlerParent_AddRefOwner",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_scfImplementation1T__csPyEventHandler_iEventHandler_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPyEventHandlerParent_AddRefOwner" "', argument " "1"" of type '" "scfImplementation1< _csPyEventHandler,iEventHandler > *""'"); 
@@ -60073,7 +60228,12 @@ SWIGINTERN PyObject *_wrap_csPyEventHandlerParent_AddRefOwner(PyObject *SWIGUNUS
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csPyEventHandlerParent_AddRefOwner" "', argument " "2"" of type '" "void **""'"); 
   }
   arg2 = reinterpret_cast< void ** >(argp2);
-  (arg1)->AddRefOwner(arg2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_CS__Threading__Mutex, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csPyEventHandlerParent_AddRefOwner" "', argument " "3"" of type '" "CS::Threading::Mutex *""'"); 
+  }
+  arg3 = reinterpret_cast< CS::Threading::Mutex * >(argp3);
+  (arg1)->AddRefOwner(arg2,arg3);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -60139,6 +60299,22 @@ SWIGINTERN PyObject *csPyEventHandlerParent_swigregister(PyObject *SWIGUNUSEDPAR
   SWIG_TypeNewClientData(SWIGTYPE_p_scfImplementation1T__csPyEventHandler_iEventHandler_t, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
+
+SWIGINTERN PyObject *_wrap_new__csPyEventHandler(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  PyObject *arg1 = (PyObject *) 0 ;
+  PyObject * obj0 = 0 ;
+  _csPyEventHandler *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"new__csPyEventHandler",1,1,&obj0)) SWIG_fail;
+  arg1 = obj0;
+  result = (_csPyEventHandler *)new _csPyEventHandler(arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p__csPyEventHandler, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
 
 SWIGINTERN PyObject *_wrap_delete__csPyEventHandler(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
@@ -61354,6 +61530,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"scfObject_RemoveRefOwner", _wrap_scfObject_RemoveRefOwner, METH_VARARGS, NULL},
 	 { (char *)"scfObject_GetInterfaceMetadata", _wrap_scfObject_GetInterfaceMetadata, METH_VARARGS, NULL},
 	 { (char *)"scfObject_swigregister", scfObject_swigregister, METH_VARARGS, NULL},
+	 { (char *)"new_csObject", _wrap_new_csObject, METH_VARARGS, NULL},
 	 { (char *)"delete_csObject", _wrap_delete_csObject, METH_VARARGS, NULL},
 	 { (char *)"csObject_SetName", _wrap_csObject_SetName, METH_VARARGS, NULL},
 	 { (char *)"csObject_GetName", _wrap_csObject_GetName, METH_VARARGS, NULL},
@@ -61794,6 +61971,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csPyEventPlugParent_RemoveRefOwner", _wrap_csPyEventPlugParent_RemoveRefOwner, METH_VARARGS, NULL},
 	 { (char *)"csPyEventPlugParent_GetInterfaceMetadata", _wrap_csPyEventPlugParent_GetInterfaceMetadata, METH_VARARGS, NULL},
 	 { (char *)"csPyEventPlugParent_swigregister", csPyEventPlugParent_swigregister, METH_VARARGS, NULL},
+	 { (char *)"new_csPyEventPlug", _wrap_new_csPyEventPlug, METH_VARARGS, NULL},
 	 { (char *)"delete_csPyEventPlug", _wrap_delete_csPyEventPlug, METH_VARARGS, NULL},
 	 { (char *)"csPyEventPlug_GetPotentiallyConflictingEvents", _wrap_csPyEventPlug_GetPotentiallyConflictingEvents, METH_VARARGS, NULL},
 	 { (char *)"csPyEventPlug_QueryEventPriority", _wrap_csPyEventPlug_QueryEventPriority, METH_VARARGS, NULL},
@@ -61806,6 +61984,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csPyEventHandlerParent_RemoveRefOwner", _wrap_csPyEventHandlerParent_RemoveRefOwner, METH_VARARGS, NULL},
 	 { (char *)"csPyEventHandlerParent_GetInterfaceMetadata", _wrap_csPyEventHandlerParent_GetInterfaceMetadata, METH_VARARGS, NULL},
 	 { (char *)"csPyEventHandlerParent_swigregister", csPyEventHandlerParent_swigregister, METH_VARARGS, NULL},
+	 { (char *)"new__csPyEventHandler", _wrap_new__csPyEventHandler, METH_VARARGS, NULL},
 	 { (char *)"delete__csPyEventHandler", _wrap_delete__csPyEventHandler, METH_VARARGS, NULL},
 	 { (char *)"_csPyEventHandler_HandleEvent", _wrap__csPyEventHandler_HandleEvent, METH_VARARGS, NULL},
 	 { (char *)"_csPyEventHandler_StaticHandlerName", _wrap__csPyEventHandler_StaticHandlerName, METH_VARARGS, NULL},

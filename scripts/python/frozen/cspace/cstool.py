@@ -97,8 +97,11 @@ scfColliderWrapper_swigregister(scfColliderWrapper)
 
 class csColliderWrapper(scfColliderWrapper):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cstool.new_csColliderWrapper(*args)
+        try: self.this.append(this)
+        except: self.this = this
     __swig_destroy__ = _cstool.delete_csColliderWrapper
     __del__ = lambda self : None;
     def GetCollider(*args): return _cstool.csColliderWrapper_GetCollider(*args)
@@ -194,8 +197,11 @@ scfView_swigregister(scfView)
 
 class csView(scfView):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cstool.new_csView(*args)
+        try: self.this.append(this)
+        except: self.this = this
     __swig_destroy__ = _cstool.delete_csView
     __del__ = lambda self : None;
     def GetEngine(*args): return _cstool.csView_GetEngine(*args)
@@ -727,8 +733,11 @@ csProcTexture_GetRandom = _cstool.csProcTexture_GetRandom
 
 class csProcAnimated(csProcTexture):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cstool.new_csProcAnimated(*args)
+        try: self.this.append(this)
+        except: self.this = this
     __swig_destroy__ = _cstool.delete_csProcAnimated
     __del__ = lambda self : None;
     def PrepareAnim(*args): return _cstool.csProcAnimated_PrepareAnim(*args)

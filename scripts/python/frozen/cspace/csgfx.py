@@ -430,8 +430,11 @@ csImageMemoryBase_swigregister(csImageMemoryBase)
 
 class csImageMemory(csImageMemoryBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _csgfx.new_csImageMemory(*args)
+        try: self.this.append(this)
+        except: self.this = this
     __swig_destroy__ = _csgfx.delete_csImageMemory
     __del__ = lambda self : None;
     def GetImagePtr(*args): return _csgfx.csImageMemory_GetImagePtr(*args)
