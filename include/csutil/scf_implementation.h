@@ -163,7 +163,7 @@ protected:
 
     ScfImplAuxData () : scfParent (0), metadataList (0) {}
     
-    bool HasWeakRefOwners() const { return weakref_owners; }
+    bool HasWeakRefOwners() const { return weakref_owners != nullptr; }
   };
   ScfImplAuxData* scfAuxData;
 
