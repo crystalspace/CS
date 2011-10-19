@@ -205,10 +205,11 @@ AS_IF([test $enable_static_baselibs = yes],
         [cs_cv_prog_link_static_libgcc], [CS_CREATE_TUPLE([-static-libgcc])],
         [C], [COMPILER.LFLAGS], [+])
     libstdcxx=`$CXX -print-file-name=libstdc++.a`
-    CS_EMIT_BUILD_FLAGS([for static libstdc++],
-        [cs_cv_prog_link_static_libstdcxx],
-        CS_CREATE_TUPLE([$libstdcxx]),
-        [C++], [COMPILER.LFLAGS], [+])])
+    CS_CHECK_BUILD_FLAGS([for -static-libstdc++],
+        [cs_cv_prog_link_static_libstdcxx], [CS_CREATE_TUPLE([-static-libstdc++])],
+        [C++], [],
+        [cs_cv_prog_link_static_libstdcxx=$libstdcxx])
+    CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [$cs_cv_prog_link_static_libstdcxx], [+])])
 
 
 
