@@ -1,10 +1,10 @@
 SubDir TOP plugins editor core ;
 
-if $(WX.AVAILABLE) = "yes"
+if $(WX.AVAILABLE) = "yes" && $(WX.AUI.AVAILABLE) = "yes"
 {
   Description cseditorcore : "CSEditor Core Plugin" ;
 
   Plugin cseditorcore : [ Wildcard *.cpp *.h ] ;
   LinkWith cseditorcore : crystalspace ;
-  ExternalLibs cseditorcore : WX ;
+  ExternalLibs cseditorcore : WX WX.AUI ;
 }
