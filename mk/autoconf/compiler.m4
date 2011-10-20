@@ -129,10 +129,15 @@ AC_DEFUN([CS_PROG_CC],[
 		;;
 	esac
 
+	_CS_CHECK_SEPARATE_SECTION([C], [COMPILER.CFLAGS.SEPARATE_SECTIONS], [])
 	# Don't use separate sections in 'profile' mode
 	# (reportedly breaks it)
-	_CS_CHECK_SEPARATE_SECTION([C], [COMPILER.CFLAGS.optimize], [append])
-	_CS_CHECK_SEPARATE_SECTION([C], [COMPILER.CFLAGS.debug], [append])
+	CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.optimize],
+	    [AS_ESCAPE([$(COMPILER.CFLAGS.SEPARATE_SECTIONS)])],
+	    [append])
+	CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.debug],
+	    [AS_ESCAPE([$(COMPILER.CFLAGS.SEPARATE_SECTIONS)])],
+	    [append])
     ])
 ])
 
