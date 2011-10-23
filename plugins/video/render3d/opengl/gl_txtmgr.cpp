@@ -129,8 +129,8 @@ void csGLTextureManager::read_config (iConfigFile *config)
     ("Video.OpenGL.SharpenMipmaps", 0);
   texture_downsample = config->GetInt
     ("Video.OpenGL.TextureDownsample", 0);
-  texture_filter_anisotropy = config->GetFloat
-    ("Video.OpenGL.TextureFilterAnisotropy", 1.0);
+  texture_filter_anisotropy = csMax(1.0f, config->GetFloat
+    ("Video.OpenGL.TextureFilterAnisotropy", 1.0));
   tweaks.disableRECTTextureCompression = config->GetBool
     ("Video.OpenGL.DisableRECTTextureCompression", false);
   tweaks.enableNonPowerOfTwo2DTextures = config->GetBool
