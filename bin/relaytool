@@ -437,19 +437,34 @@ EOF
     
 }
 
+function pointer_size() {
+    # Stub file name
+    outfile="$outdir/_test_pointer_size_$$.c"
+
+    cat <<EOF >"$outfile"
+#if defined( __x86_64__ )
+POINTER_SIZE=8
+#else
+POINTER_SIZE=4
+#endif
+EOF
+    
+    ${CC:-gcc} ${CFLAGS} -E "$outfile" | grep POINTER_SIZE | sed 's/.*=//'
+    
+    rm $outfile
+}
+
 no_replace=false
 replace_all=false
 arch_ok=false
-arch_ptr_size=0
+arch_ptr_size=$(pointer_size)
 case `uname -m` in
     i386 | i486 | i586 | i686 )
         arch_ok=true
-        arch_ptr_size=4
         searchpath=( "/usr/lib" "/usr/local/lib" "/lib" `pwd` )
         ;;
     x86_64)
         arch_ok=true
-        arch_ptr_size=8
         searchpath=( "/usr/lib" "/usr/local/lib" "/lib" "/usr/lib64" "/usr/local/lib64" "/lib64" `pwd` )
         ;;                                   
 esac
