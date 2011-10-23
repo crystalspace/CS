@@ -750,6 +750,7 @@ enable_optimize
 enable_debug
 enable_profile
 enable_mode
+enable_lto
 enable_separate_debug_info
 enable_optimize_mode_debug_info
 with_x11
@@ -1476,6 +1477,7 @@ Optional Features:
                           as --enable-mode=profile
   --enable-mode=mode      set build mode; recognized modes are `optimize',
                           `debug', `profile' (default OPTIMIZE)
+  --lto                   enable LTO (link-time optimization). (default NO)
   --enable-separate-debug-info
                           split debug information into separate files.
                           (default YES if binutils >= 2.17 and build mode not
@@ -7170,6 +7172,136 @@ $as_echo "$cs_cv_prog_link_gc_sections_ok" >&6; }
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then :
   cs_jamconfig_text="${cs_jamconfig_text}LINK.GC_SECTIONS ?= $cs_build_prop_val ;
+"
+fi
+fi
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if --no-gc-sections is supported" >&5
+$as_echo_n "checking if --no-gc-sections is supported... " >&6; }
+if ${cs_cv_prog_link_no_gc_sections_ok+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "`echo @-Wl,--no-gc-sections@@ | sed 'y% %#%'`"; then :
+  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    cs_cflags_save="$CXXFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @-Wl,--no-gc-sections@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then :
+  cs_dummy=''
+else
+  if test "$1" = filler; then :
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_libs_test=''
+else
+  if test "$1" = filler; then :
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  cs_build_ok=yes
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then :
+  break
+fi
+    done
+
+
+    CXXFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then :
+  cs_build_cflags=`echo x$cs_cflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_link_no_gc_sections=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+		cs_cv_prog_link_no_gc_sections_ok="$cs_cv_prog_link_no_gc_sections"
+else
+  cs_cv_prog_link_no_gc_sections=''
+		cs_cv_prog_link_no_gc_sections_ok=no
+fi
+else
+  cs_cv_prog_link_no_gc_sections=''
+            cs_cv_prog_link_no_gc_sections_ok=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $cs_cv_prog_link_no_gc_sections_ok" >&5
+$as_echo "$cs_cv_prog_link_no_gc_sections_ok" >&6; }
+    if test "$cs_cv_prog_link_no_gc_sections_ok" != no; then :
+  cs_build_prop_val="$cs_cv_prog_link_no_gc_sections"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then :
+  cs_jamconfig_text="${cs_jamconfig_text}LINK.NO_GC_SECTIONS ?= $cs_build_prop_val ;
 "
 fi
 fi
@@ -23870,6 +24002,591 @@ cs_build_prop_val="$cs_build_mode"
     	        if test -n "$cs_build_prop_val"; then :
   cs_jamconfig_text="${cs_jamconfig_text}MODE ?= $cs_build_prop_val ;
 "
+fi
+
+
+
+#------------------------------------------------------------------------------
+# Check whether to enable LTO (link-time optimization).
+#------------------------------------------------------------------------------
+
+
+    # Work around link-time error caused by multiple symbol definitions
+    # occuring when using gcc's LTO partioning (the default).
+    # Errors the likes of
+    # multiple definition of `_ZTV16csSharedVariable.local.41917'.
+    # Possibly this bug:
+    # http://sourceware.org/bugzilla/show_bug.cgi?id=12762
+    # @@@ FIXME: Check if bug persists with newer ld versions (>= 2.22)
+    # and/or gcc versions (>= 4.6.1) and add proper check.
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking how to have the linker allow multiple symbol definitions" >&5
+$as_echo_n "checking how to have the linker allow multiple symbol definitions... " >&6; }
+if ${cs_cv_prog_link_allow_multiple_defitions_ok+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "`echo @-Wl,--allow-multiple-definition@@ | sed 'y% %#%'`"; then :
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @-Wl,--allow-multiple-definition@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then :
+  cs_dummy=''
+else
+  if test "$1" = filler; then :
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_libs_test=''
+else
+  if test "$1" = filler; then :
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  cs_build_ok=yes
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then :
+  break
+fi
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then :
+  cs_build_cflags=`echo x$cs_cflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_link_allow_multiple_defitions=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+		cs_cv_prog_link_allow_multiple_defitions_ok="$cs_cv_prog_link_allow_multiple_defitions"
+else
+  cs_cv_prog_link_allow_multiple_defitions=''
+		cs_cv_prog_link_allow_multiple_defitions_ok=no
+fi
+else
+  cs_cv_prog_link_allow_multiple_defitions=''
+            cs_cv_prog_link_allow_multiple_defitions_ok=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $cs_cv_prog_link_allow_multiple_defitions_ok" >&5
+$as_echo "$cs_cv_prog_link_allow_multiple_defitions_ok" >&6; }
+    if test "$cs_cv_prog_link_allow_multiple_defitions_ok" != no; then :
+
+fi
+
+    # Disable gc sections to work around a linker bug
+    # (see http://sourceware.org/bugzilla/show_bug.cgi?id=12851)
+    # @@@ FIXME: Supposedly fixed with ld 2.22, need to add check
+    link_disable_gc_sections=$cs_cv_prog_link_no_gc_sections
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking if linker supports -flto" >&5
+$as_echo_n "checking if linker supports -flto... " >&6; }
+if ${cs_cv_prog_link_flto_ok+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "`echo @-flto $link_disable_gc_sections \
+            $cs_cv_prog_link_allow_multiple_defitions@@ | sed 'y% %#%'`"; then :
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @-flto $link_disable_gc_sections \
+            $cs_cv_prog_link_allow_multiple_defitions@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then :
+  cs_dummy=''
+else
+  if test "$1" = filler; then :
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_libs_test=''
+else
+  if test "$1" = filler; then :
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  cs_build_ok=yes
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then :
+  break
+fi
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then :
+  cs_build_cflags=`echo x$cs_cflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_link_flto=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+		cs_cv_prog_link_flto_ok="$cs_cv_prog_link_flto"
+else
+  cs_cv_prog_link_flto=''
+		cs_cv_prog_link_flto_ok=no
+fi
+else
+  cs_cv_prog_link_flto=''
+            cs_cv_prog_link_flto_ok=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $cs_cv_prog_link_flto_ok" >&5
+$as_echo "$cs_cv_prog_link_flto_ok" >&6; }
+    if test "$cs_cv_prog_link_flto_ok" != no; then :
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable LTO" >&5
+$as_echo_n "checking whether to enable LTO... " >&6; }
+    # Check whether --enable-lto was given.
+if test "${enable_lto+set}" = set; then :
+  enableval=$enable_lto; enable_lto=$enableval
+else
+  enable_lto=no
+fi
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_lto" >&5
+$as_echo "$enable_lto" >&6; }
+    if test "$enable_lto" != "no"; then :
+
+
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking if $CC accepts -flto" >&5
+$as_echo_n "checking if $CC accepts -flto... " >&6; }
+if ${cs_cv_prog_cc_flto_ok+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "`echo @-flto@@ | sed 'y% %#%'`"; then :
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @-flto@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then :
+  cs_dummy=''
+else
+  if test "$1" = filler; then :
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_libs_test=''
+else
+  if test "$1" = filler; then :
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  cs_build_ok=yes
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then :
+  break
+fi
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then :
+  cs_build_cflags=`echo x$cs_cflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cc_flto=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+		cs_cv_prog_cc_flto_ok="$cs_cv_prog_cc_flto"
+else
+  cs_cv_prog_cc_flto=''
+		cs_cv_prog_cc_flto_ok=no
+fi
+else
+  cs_cv_prog_cc_flto=''
+            cs_cv_prog_cc_flto_ok=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $cs_cv_prog_cc_flto_ok" >&5
+$as_echo "$cs_cv_prog_cc_flto_ok" >&6; }
+    if test "$cs_cv_prog_cc_flto_ok" != no; then :
+
+fi
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking if $CXX accepts -flto" >&5
+$as_echo_n "checking if $CXX accepts -flto... " >&6; }
+if ${cs_cv_prog_cxx_flto_ok+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "`echo @-flto@@ | sed 'y% %#%'`"; then :
+  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    cs_cflags_save="$CXXFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @-flto@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then :
+  cs_dummy=''
+else
+  if test "$1" = filler; then :
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then :
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+	shift
+fi
+if test $# -eq 0; then :
+  cs_libs_test=''
+else
+  if test "$1" = filler; then :
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  cs_build_ok=yes
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then :
+  break
+fi
+    done
+
+
+    CXXFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then :
+  cs_build_cflags=`echo x$cs_cflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cxx_flto=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+		cs_cv_prog_cxx_flto_ok="$cs_cv_prog_cxx_flto"
+else
+  cs_cv_prog_cxx_flto=''
+		cs_cv_prog_cxx_flto_ok=no
+fi
+else
+  cs_cv_prog_cxx_flto=''
+            cs_cv_prog_cxx_flto_ok=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $cs_cv_prog_cxx_flto_ok" >&5
+$as_echo "$cs_cv_prog_cxx_flto_ok" >&6; }
+    if test "$cs_cv_prog_cxx_flto_ok" != no; then :
+
+fi
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+        #-flto-partition=none
+        cs_build_prop_val="$cs_cv_prog_link_flto"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then :
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += $cs_build_prop_val ;
+"
+fi
+        cs_build_prop_val="$cs_cv_prog_cc_flto"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then :
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
+"
+fi
+        cs_build_prop_val="$cs_cv_prog_cxx_flto"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then :
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += $cs_build_prop_val ;
+"
+fi
 fi
 
 
