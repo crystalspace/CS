@@ -318,10 +318,10 @@ EOF
         "        movl " ASM_VAR (ptrs) ", %eax\n" \\
         "        movl " #index "(%eax), %eax\n" \\
         "        test %eax, %eax\n" \\
-        "        jnz  JS" #index "\n" \\
+        "        jnz  JS" name "\n" \\
         "        push \$" #index "\n" \\
         "        call " ASM_FUNC (_relaytool_stubcall_${libname}) "\n" \\
-        "JS" #index ":    jmp *%eax\n");
+        "JS" name ":    jmp *%eax\n");
 
 
 #elif defined( __x86_64__ )
@@ -336,10 +336,10 @@ EOF
         "        movq (%r11), %r11\n" \\
         "        movq " #index "(%r11), %r11\n" \\
         "        test %r11, %r11\n" \\
-        "        jnz  JS" #index "\n" \\
+        "        jnz  JS" name "\n" \\
         "        push $" #index "\n" \\
         "        call " ASM_FUNC (_relaytool_stubcall_${libname}) "\n" \\
-        "JS" #index ":    jmp *%r11\n");
+        "JS" name ":    jmp *%r11\n");
 #elif defined( __powerpc__ )
 
 #define JUMP_SLOT(name, index) \                                \
@@ -552,6 +552,8 @@ while (( i <= $# )); do
                         stubobj=$( echo "$stubfile" | sed 's/\.c$/\.o/' )
 			# remove -include flags from CFLAGS, if any
 			CFLAGS=$( echo $CFLAGS | sed 's/-include .*\.h//g' )
+                        # Do not let stub object partake in LTO optimizations
+                        CFLAGS=$( echo $CFLAGS | sed 's/-flto//g' )
                         # ${CC:-gcc} ${CFLAGS} -fPIC -DPIC -c -o "$stubobj" "$stubfile" 2>/dev/tty
 			${CC:-gcc} ${CFLAGS} -fPIC -DPIC -c -o "$stubobj" "$stubfile"
 			# We may have to patch the GOT at runtime; instruct
