@@ -135,45 +135,46 @@ rule ExtraObjects
   Clean clean : $(>) ;
 }
 
+rule Concatenate
+{
+  local result = $(1[1]) ;
+  # Concatenate array into single string
+  local s ;
+  for s in $(1[2-])
+  {
+    result = "$(result) $(s)" ;
+  }
+  return $(result) ;
+}
+
 ##  RelayLFlags lflags : relaylibs [: minimal-objects ]
 ##    Get LFLAGS for relay-linking libraries. See RelayLibs for
 ##    more information.
 rule RelayLFlags
 {
+  local relay_lflags = $(1) ;
+  local relay_libs = $(2) ;
+  local minimal_libs = $(3) ;
   if $(TARGET.OS) = "WIN32" || ! $(CMD.RELAYTOOL)
   {
-    return $(1) ;
+    return $(relay_lflags) ;
   }
   else
   {
-    local relayparamslist = "--relay $(2)" ;
-    local lflags = $(1[1]) ;
+    local relayparamslist = "--relay $(relay_libs)" ;
     # Concatenate arrays into single strings
-    local lf ;
-    for lf in $(1[2-])
-    {
-      lflags = "$(lflags) $(lf)" ;
-    }
-    local relayparam = $(relayparamslist[1]) ;
-    local r ;
-    for r in $(relayparamslist[2-])
-    {
-      relayparam = "$(relayparam) $(r)" ;
-    }
-    local cflags = "$(CCFLAGS[1])" ;
-    local c ;
-    for c in $(CCFLAGS[2-])
-    {
-      cflags = "$(cflags) $(c)" ;
-    }
+    local lflags = [ Concatenate $(relay_lflags) ] ;
+    local relayparam = [ Concatenate $(relayparamslist) ] ;
+    local cflags = [ Concatenate "$(CCFLAGS)" "$(type_cflags)" ] ;
     local minimalparam = "" ;
-    if "$(3)" != ""
+    if "$(4)" != ""
     {
-      minimalparam = "--minimal-list \"$(3)\"" ;
+      minimalparam = "--minimal-list \"$(minimal_libs)\"" ;
     }
     local extlib result_lflags ;
+    local CC = [ Concatenate "$(CMD.CC)" ] ;
     result_lflags +=  
-      "`CFLAGS=\"$(cflags)\" $(CMD.RELAYTOOL) --out-dir $(LOCATE_TARGET) $(minimalparam) $(relayparam) $(lflags)`"  ; 
+      "`CC=\"$(CC)\" CFLAGS=\"$(cflags)\" $(CMD.RELAYTOOL) --out-dir $(LOCATE_TARGET) $(minimalparam) $(relayparam) $(lflags)`"  ; 
     return $(result_lflags) ;
   }
 }
