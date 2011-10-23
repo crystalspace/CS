@@ -339,7 +339,13 @@ AC_DEFUN([CS_PROG_LINK],[
 	    [CS_CREATE_TUPLE([-Wl,--gc-sections])], 
 	    [C++], 
 	    [CS_EMIT_BUILD_PROPERTY([LINK.GC_SECTIONS], 
-	        [$cs_cv_prog_link_gc_sections])])])
+	        [$cs_cv_prog_link_gc_sections])])
+	CS_CHECK_BUILD_FLAGS([if --no-gc-sections is supported], 
+	    [cs_cv_prog_link_no_gc_sections], 
+	    [CS_CREATE_TUPLE([-Wl,--no-gc-sections])], 
+	    [C++], 
+	    [CS_EMIT_BUILD_PROPERTY([LINK.NO_GC_SECTIONS], 
+	        [$cs_cv_prog_link_no_gc_sections])])])
     
     # Check if linker supports --large-address-aware.
     AC_ARG_ENABLE([large-address-aware], 
@@ -397,3 +403,68 @@ AC_DEFUN([CS_CHECK_MNO_CYGWIN],
 	], [cs_mno_cygwin=no])
     AC_MSG_RESULT([$cs_mno_cygwin])
     ])
+
+
+
+#-----------------------------------------------------------------------------
+# CS_CHECK_LTO(LANGUAGE)
+#	Check for the -flto compiler and linker flags.
+#-----------------------------------------------------------------------------
+AC_DEFUN([_CS_CHECK_LTO_LINKER],
+    [AC_REQUIRE([CS_PROG_LINK])
+
+    # Work around link-time error caused by multiple symbol definitions
+    # occuring when using gcc's LTO partioning (the default).
+    # Errors the likes of 
+    # multiple definition of `_ZTV16csSharedVariable.local.41917'.
+    # Possibly this bug:
+    # http://sourceware.org/bugzilla/show_bug.cgi?id=12762
+    # @@@ FIXME: Check if bug persists with newer ld versions (>= 2.22)
+    # and/or gcc versions (>= 4.6.1) and add proper check.
+    CS_CHECK_BUILD_FLAGS(
+        [how to have the linker allow multiple symbol definitions], 
+        [cs_cv_prog_link_allow_multiple_defitions],
+        [CS_CREATE_TUPLE([-Wl,--allow-multiple-definition])])
+
+    # Disable gc sections to work around a linker bug
+    # (see http://sourceware.org/bugzilla/show_bug.cgi?id=12851)
+    # @@@ FIXME: Supposedly fixed with ld 2.22, need to add check
+    link_disable_gc_sections=$cs_cv_prog_link_no_gc_sections
+
+    CS_CHECK_BUILD_FLAGS([linker LTO arguments], 
+        [cs_cv_prog_link_flto],
+        [CS_CREATE_TUPLE([-flto $link_disable_gc_sections \
+            $cs_cv_prog_link_allow_multiple_defitions])])])
+AC_DEFUN([CS_CHECK_LTO],
+    [AC_REQUIRE([_CS_CHECK_LTO_LINKER])
+    
+    AC_LANG_PUSH([$1])
+    CS_CHECK_BUILD_FLAGS([if $]_AC_CC[ accepts -flto],
+        [cs_cv_prog_]_CS_CC_SH[_flto],
+        [CS_CREATE_TUPLE([-flto])],
+        [$1])
+    AC_LANG_POP])
+
+
+
+#-----------------------------------------------------------------------------
+# CS_CHECK_ENABLE_LTO
+#       Conveniently add an “--enable-lto” configure option and perform the
+#       LTO checks for the C and C++ languages.
+#-----------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_ENABLE_LTO],
+    [AC_MSG_CHECKING([whether to enable LTO])
+    AC_ARG_ENABLE([lto], 
+        [AC_HELP_STRING([--lto],
+            [enable LTO (link-time optimization). (default NO)])],
+        [enable_lto=$enableval],
+        [enable_lto=no])
+    AC_MSG_RESULT([$enable_lto])
+    AS_IF([test "$enable_lto" != "no"], 
+        [CS_CHECK_LTO([C])
+        CS_CHECK_LTO([C++])
+
+        #-flto-partition=none
+        CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [$cs_cv_prog_link_flto], [+])
+        CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$cs_cv_prog_cc_flto], [+])
+        CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS], [$cs_cv_prog_cxx_flto], [+])])])
