@@ -7,6 +7,9 @@
         <name>crystalspace.graphics2d.wxgl</name>
         <implementation>csGraphics2DWX</implementation>
         <description>wxWidgets OpenGL canvas</description>
+        <requires>
+          <class>crystalspace.font.server.</class>
+        </requires>
       </class>
     </classes>
   </scf>
