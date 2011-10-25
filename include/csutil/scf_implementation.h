@@ -167,11 +167,6 @@ protected:
   };
   ScfImplAuxData* scfAuxData;
 
-  CS_FORCEINLINE bool HasAuxData()
-  {
-    // Double-cast to cheat strict-aliasing rules
-    return CS::Threading::AtomicOperations::Read ((void**)(void*)&scfAuxData) != 0; 
-  }
   void EnsureAuxData();
   void FreeAuxData();
 
@@ -179,13 +174,13 @@ protected:
   void AllocMetadata (size_t numEntries);
   void CleanupMetadata ();
 
-  iBase* GetSCFParent() { return HasAuxData() ? scfAuxData->scfParent : 0; }
+  iBase* GetSCFParent();
 
   // Some virtual helpers for the metadata registry
   virtual size_t GetInterfaceMetadataCount () const;
 
   scfImplementationHelper() : scfAuxData (0) {}
-  virtual ~scfImplementationHelper() { if (HasAuxData()) FreeAuxData(); }
+  virtual ~scfImplementationHelper();
 };
 
 /**
@@ -391,6 +386,13 @@ protected:
     metadataArray[pos].interfaceVersion = scfInterfaceTraits<IF>::GetVersion ();
   }
 
+  /* Note: can't put this into scfImplementationHelper, breaks on MingW shared builds
+   * (possibly a clash between the method being forced inlined and dllexported) */
+  CS_FORCEINLINE bool HasAuxData()
+  {
+    // Double-cast to cheat strict-aliasing rules
+    return CS::Threading::AtomicOperations::Read ((void**)(void*)&scfAuxData) != 0; 
+  }
 };
 
 

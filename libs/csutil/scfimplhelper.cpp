@@ -19,8 +19,22 @@
 
 #include "csutil/scf_implementation.h"
 
+scfImplementationHelper::~scfImplementationHelper()
+{
+  if (CS::Threading::AtomicOperations::Read ((void**)(void*)&scfAuxData) != 0)
+    FreeAuxData();
+}
+
+iBase* scfImplementationHelper::GetSCFParent()
+{
+  bool hasAuxData (CS::Threading::AtomicOperations::Read ((void**)(void*)&scfAuxData) != 0);
+  return hasAuxData ? scfAuxData->scfParent : 0;
+}
+
 void scfImplementationHelper::EnsureAuxData()
 {
+  if (CS::Threading::AtomicOperations::Read ((void**)(void*)&scfAuxData) != 0)
+    return;
   ScfImplAuxData* newAuxData = new ScfImplAuxData;
   // Double-cast to cheat strict-aliasing rules
   if (CS::Threading::AtomicOperations::CompareAndSet ((void**)(void*)&scfAuxData,
