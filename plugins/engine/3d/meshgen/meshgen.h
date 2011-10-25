@@ -47,7 +47,6 @@ class DensityFactorMap;
 #define CS_GEOM_MAX_ROTATIONS 16
 
 struct csMGPosition;
-struct MGBlockGeometry;
 
 /**
  * A mesh object in a geometry.
@@ -160,7 +159,6 @@ private:
   void AddSVToMesh (iMeshWrapper* mesh, csShaderVariable* sv); 
   void SetMeshBBox (iMeshWrapper* mesh, const csBox3& bbox); 
 
-  void SetupMeshObject (const csMGGeom& geom, GeomMeshObject& geomMesh);
 public:
   csMeshGeneratorGeometry (csMeshGenerator* generator);
   virtual ~csMeshGeneratorGeometry ();
@@ -229,28 +227,18 @@ public:
 
   size_t GetManualPositionCount (size_t cidx) {return positions[cidx].GetSize ();}
   const csVector2 &GetManualPosition (size_t cidx, size_t i){return positions[cidx][i];}
-  
-  /**
-   * Allocate all positions for a block.
-   */
-  void AllocBlockGeometryMeshes (MGBlockGeometry& blockGeometry,
-                                 const csVector3& pos,
-                                 const csVector3& delta);
-  /**
-   * Free all positions in a block.
-   */
-  void FreeBlockGeometryMeshes (MGBlockGeometry& blockGeometry);
 
   /**
    * Allocate a new mesh for the given distance. Possibly from the
    * cache if possible. If the distance is too large it will return 0.
    */
-  bool AllocMesh (float sqdist, csMGPosition& pos);
+  bool AllocMesh (int cidx, const csMGCell& cell,
+      float sqdist, csMGPosition& pos);
 
   /**
    * Free a mesh instance.
    */
-  void FreeMesh (csMGPosition& pos);
+  void FreeMesh (int cidx, csMGPosition& pos);
 
   /**
    * Perform housekeeping on geometry after an update for a position.
@@ -262,7 +250,7 @@ public:
   /**
    * Move the mesh to some position.
    */
-  void MoveMesh (const csMGPosition& pos,
+  void MoveMesh (int cidx, const csMGPosition& pos,
 		 const csVector3& position, const csMatrix3& matrix); 
 
   /// Set the fade params for the geometry.
@@ -288,6 +276,12 @@ public:
 struct csMGPosition
 {
   csVector3 position;
+  /**
+   * The type of geometry at this spot.
+   * This is basically the index in the 'geometries' table
+   * in csMeshGenerator.
+   */
+  size_t geom_type;
 
   /**
    * A number between 0 and CS_GEOM_MAX_ROTATIONS indicating how
@@ -301,18 +295,12 @@ struct csMGPosition
   /// Index of geometry in csMGGeom.
   size_t idInGeometry;
 
-  csMGPosition () : position(0.0f), rotation(0),
+  csMGPosition () : position(0.0f), geom_type(0), rotation(0),
     lod(0),
     idInGeometry (csArrayItemNotFound) { } 
 };
 
 struct csMGCell;
-
-struct MGBlockGeometry
-{
-  typedef csArray<csMGPosition*> PositionsArray;
-  PositionsArray positions;
-};
 
 /**
  * A block of positions for geometry in a single cell (csMGCell). A cell
@@ -325,7 +313,7 @@ struct csMGPositionBlock
   /// Used when block is in 'inuse_blocks'.
   csMGPositionBlock* next, * prev;
 
-  csArray<MGBlockGeometry> geometries;
+  csArray<csMGPosition*> positions;
 
   /// An index back to the cell that holds this block (or csArrayItemNotFound).
   size_t parent_cell;
