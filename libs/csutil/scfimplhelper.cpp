@@ -67,7 +67,7 @@ void scfImplementationHelper::AllocMetadata (size_t numEntries)
 
 void scfImplementationHelper::CleanupMetadata ()
 {
-  CS_ASSERT(HasAuxData());
+  CS_ASSERT(CS::Threading::AtomicOperations::Read ((void**)(void*)&scfAuxData) != 0);
 
   scfInterfaceMetadataList* metadataList = scfAuxData->metadataList;
   if (metadataList)
