@@ -276,12 +276,6 @@ public:
 struct csMGPosition
 {
   csVector3 position;
-  /**
-   * The type of geometry at this spot.
-   * This is basically the index in the 'geometries' table
-   * in csMeshGenerator.
-   */
-  size_t geom_type;
 
   /**
    * A number between 0 and CS_GEOM_MAX_ROTATIONS indicating how
@@ -295,12 +289,18 @@ struct csMGPosition
   /// Index of geometry in csMGGeom.
   size_t idInGeometry;
 
-  csMGPosition () : position(0.0f), geom_type(0), rotation(0),
+  csMGPosition () : position(0.0f), rotation(0),
     lod(0),
     idInGeometry (csArrayItemNotFound) { } 
 };
 
 struct csMGCell;
+
+struct MGBlockGeometry
+{
+  typedef csArray<csMGPosition*> PositionsArray;
+  PositionsArray positions;
+};
 
 /**
  * A block of positions for geometry in a single cell (csMGCell). A cell
@@ -313,7 +313,7 @@ struct csMGPositionBlock
   /// Used when block is in 'inuse_blocks'.
   csMGPositionBlock* next, * prev;
 
-  csArray<csMGPosition*> positions;
+  csArray<MGBlockGeometry> geometries;
 
   /// An index back to the cell that holds this block (or csArrayItemNotFound).
   size_t parent_cell;

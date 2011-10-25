@@ -769,7 +769,7 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
 {
   random.Initialize ((unsigned int)cidx); // @@@ Consider using a better seed?
 
-  block->positions.Empty ();
+  block->geometries.SetSize (geometries.GetSize());
   cell.needPositions = false;
 
   const csBox2& box = cell.box;
@@ -795,8 +795,10 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
   size_t i, j;
   for (size_t g = 0 ; g < geometries.GetSize () ; g++)
   {
+    MGBlockGeometry::PositionsArray& positions = block->geometries[g].positions;
+    positions.Empty ();
+  
     csMGPosition pos;
-    pos.geom_type = g;
     size_t mpos_count = geometries[g]->GetManualPositionCount (cidx);
 
     float density = geometries[g]->GetDensity () * default_density_factor;
@@ -886,7 +888,7 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
             if (rot < 0) rot = 0;
             else if (rot >= CS_GEOM_MAX_ROTATIONS) rot = CS_GEOM_MAX_ROTATIONS-1;
             pos.rotation = rot;
-            block->positions.Push (new csMGPosition (pos));
+            positions.Push (new csMGPosition (pos));
 	    positionsUsed++;
 	    
 	    if (mpos_count == 0)
@@ -984,54 +986,56 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
 {
   CS_ASSERT (cell.block != 0);
   CS_ASSERT (sector != 0);
-  csArray<csMGPosition*>& positions = cell.block->positions;
   GetTotalMaxDist ();
-  size_t i;
-  for (i = 0 ; i < positions.GetSize () ; i++)
+  for (size_t g = 0; g < geometries.GetSize(); g++)
   {
-    csMGPosition& p = *(positions[i]);
-
-    float sqdist = csSquaredDist::PointPoint (pos, p.position);
-    if (sqdist < sq_total_max_dist)
+    csArray<csMGPosition*>& positions = cell.block->geometries[g].positions;
+    for (size_t i = 0 ; i < positions.GetSize () ; i++)
     {
-      if (p.idInGeometry == csArrayItemNotFound)
+      csMGPosition& p = *(positions[i]);
+
+      float sqdist = csSquaredDist::PointPoint (pos, p.position);
+      if (sqdist < sq_total_max_dist)
       {
-        // We didn't have a mesh here so we allocate one.
-        if (geometries[p.geom_type]->AllocMesh (cidx, cell, sqdist, p))
+        if (p.idInGeometry == csArrayItemNotFound)
         {
-          geometries[p.geom_type]->MoveMesh (cidx, p,
-                                              p.position, rotation_matrices[p.rotation]);
+          // We didn't have a mesh here so we allocate one.
+          if (geometries[g]->AllocMesh (cidx, cell, sqdist, p))
+          {
+            geometries[g]->MoveMesh (cidx, p,
+                                     p.position, rotation_matrices[p.rotation]);
+          }
+        }
+        else
+        {
+          // We already have a mesh but we check here if we should switch LOD level.
+          if (!geometries[g]->IsRightLOD (sqdist, p.lod))
+          {
+            // We need a different mesh here.
+            geometries[g]->FreeMesh (cidx, p);
+            if (geometries[g]->AllocMesh (cidx, cell, sqdist, p))
+            {
+              geometries[g]->MoveMesh (cidx, p,
+                p.position, rotation_matrices[p.rotation]);
+            }
+            else
+              p.idInGeometry = csArrayItemNotFound;
+          }
+          else if(!delta.IsZero())
+          { 
+            // LOD level is fine, adjust for new pos 
+            geometries[g]->MoveMesh (cidx, p, 
+              p.position, rotation_matrices[p.rotation]); 
+          } 
         }
       }
       else
       {
-        // We already have a mesh but we check here if we should switch LOD level.
-        if (!geometries[p.geom_type]->IsRightLOD (sqdist, p.lod))
+        if (p.idInGeometry != csArrayItemNotFound)
         {
-          // We need a different mesh here.
-          geometries[p.geom_type]->FreeMesh (cidx, p);
-          if (geometries[p.geom_type]->AllocMesh (cidx, cell, sqdist, p))
-          {
-            geometries[p.geom_type]->MoveMesh (cidx, p,
-              p.position, rotation_matrices[p.rotation]);
-          }
-          else
-            p.idInGeometry = csArrayItemNotFound;
+          geometries[g]->FreeMesh (cidx, p);
+          p.idInGeometry = csArrayItemNotFound;
         }
-        else if(!delta.IsZero())
-        { 
-          // LOD level is fine, adjust for new pos 
-          geometries[p.geom_type]->MoveMesh (cidx, p, 
-            p.position, rotation_matrices[p.rotation]); 
-        } 
-      }
-    }
-    else
-    {
-      if (p.idInGeometry != csArrayItemNotFound)
-      {
-        geometries[p.geom_type]->FreeMesh (cidx, p);
-        p.idInGeometry = csArrayItemNotFound;
       }
     }
   }
@@ -1168,17 +1172,16 @@ void csMeshGenerator::FreeMeshesInBlock (int cidx, csMGCell& cell)
 {
   if (cell.block)
   {
-    csArray<csMGPosition*>& positions = cell.block->positions;
-    size_t i;
-    for (i = 0 ; i < positions.GetSize () ; i++)
+    for (size_t g = 0; g < geometries.GetSize(); g++)
     {
-      if (positions[i]->idInGeometry != csArrayItemNotFound)
+      csArray<csMGPosition*>& positions = cell.block->geometries[g].positions;
+      for (size_t i = 0 ; i < positions.GetSize () ; i++)
       {
-        CS_ASSERT (positions[i]->geom_type >= 0);
-        CS_ASSERT (positions[i]->geom_type < geometries.GetSize ());
-        geometries[positions[i]->geom_type]->FreeMesh (cidx,
-          *(positions[i]));
-        positions[i]->idInGeometry = csArrayItemNotFound;
+        if (positions[i]->idInGeometry != csArrayItemNotFound)
+        {
+          geometries[g]->FreeMesh (cidx, *(positions[i]));
+          positions[i]->idInGeometry = csArrayItemNotFound;
+        }
       }
     }
   }
