@@ -223,29 +223,35 @@ void csMeshGeneratorGeometry::AddFactory (iMeshFactoryWrapper* factory,
   g.maxdistance = maxdist;
   g.sqmaxdistance = maxdist * maxdist;
   g.factory->GetMeshObjectFactory ()->SetMixMode (CS_FX_COPY);
-  g.meshobj.mesh = generator->engine->CreateMeshWrapper (g.factory, 0);
-  g.meshobj.mesh->GetFlags ().Set (CS_ENTITY_NOHITBEAM);
-  g.meshobj.mesh->SetZBufModeRecursive (CS_ZBUF_USE); 
   g.windDataVar.AttachNew (new csShaderVariable (generator->varWindData));
   g.windDataVar->SetType (csShaderVariable::VECTOR3);
-  g.meshobj.instancesNumVar.AttachNew (new csShaderVariable (generator->varInstancesNum));
   g.fadeInfoVar.AttachNew (new csShaderVariable (generator->varFadeInfo)); 
   g.fadeInfoVar->SetType (csShaderVariable::VECTOR4);
-  g.meshobj.transformVar.AttachNew (new csShaderVariable (generator->varTransform)); 
-  g.meshobj.instanceExtraVar.AttachNew (new csShaderVariable (generator->varInstanceExtra)); 
-  AddSVToMesh (g.meshobj.mesh, g.windDataVar);
-  AddSVToMesh (g.meshobj.mesh, g.meshobj.instancesNumVar);
-  AddSVToMesh (g.meshobj.mesh, g.fadeInfoVar); 
-  AddSVToMesh (g.meshobj.mesh, g.meshobj.transformVar); 
-  AddSVToMesh (g.meshobj.mesh, g.meshobj.instanceExtraVar); 
-
-  csBox3 bbox;
-  bbox.SetSize (csVector3 (maxdist, maxdist, maxdist));
-  SetMeshBBox (g.meshobj.mesh, bbox);
-
-  factories.InsertSorted (g, CompareGeom);
+  size_t geom_index = factories.InsertSorted (g, CompareGeom);
 
   if (maxdist > total_max_dist) total_max_dist = maxdist;
+  
+  SetupMeshObject (g, factories[geom_index].meshobj);
+}
+
+void csMeshGeneratorGeometry::SetupMeshObject (const csMGGeom& geom, GeomMeshObject& geomMesh)
+{
+  geomMesh.mesh = generator->engine->CreateMeshWrapper (geom.factory, 0);
+  geomMesh.mesh->GetFlags ().Set (CS_ENTITY_NOHITBEAM);
+  geomMesh.mesh->SetZBufModeRecursive (CS_ZBUF_USE); 
+  geomMesh.instancesNumVar.AttachNew (new csShaderVariable (generator->varInstancesNum));
+  geomMesh.transformVar.AttachNew (new csShaderVariable (generator->varTransform)); 
+  geomMesh.instanceExtraVar.AttachNew (new csShaderVariable (generator->varInstanceExtra)); 
+  AddSVToMesh (geomMesh.mesh, geom.windDataVar);
+  AddSVToMesh (geomMesh.mesh, geom.fadeInfoVar); 
+  AddSVToMesh (geomMesh.mesh, geomMesh.instancesNumVar);
+  AddSVToMesh (geomMesh.mesh, geomMesh.transformVar); 
+  AddSVToMesh (geomMesh.mesh, geomMesh.instanceExtraVar); 
+
+  csBox3 bbox;
+  bbox.SetSize (csVector3 (geom.maxdistance));
+  SetMeshBBox (geomMesh.mesh, bbox);
+
 }
 
 void csMeshGeneratorGeometry::RemoveFactory (size_t idx)
@@ -263,9 +269,76 @@ void csMeshGeneratorGeometry::SetDensity (float density)
   csMeshGeneratorGeometry::density = density;
 }
 
-bool csMeshGeneratorGeometry::AllocMesh (
-  int cidx, const csMGCell& cell, float sqdist,
-  csMGPosition& pos)
+void csMeshGeneratorGeometry::AllocBlockGeometryMeshes (MGBlockGeometry& blockGeometry,
+                                                        const csVector3& pos,
+                                                        const csVector3& delta)
+{
+  float sq_total_max_dist = total_max_dist * total_max_dist;
+  csArray<csMGPosition*>& positions = blockGeometry.positions;
+  for (size_t i = 0 ; i < positions.GetSize () ; i++)
+  {
+    csMGPosition& p = *(positions[i]);
+
+    float sqdist = csSquaredDist::PointPoint (pos, p.position);
+    if (sqdist < sq_total_max_dist)
+    {
+      if (p.idInGeometry == csArrayItemNotFound)
+      {
+        // We didn't have a mesh here so we allocate one.
+        if (AllocMesh (sqdist, p))
+        {
+          MoveMesh (p, p.position,
+                    generator->rotation_matrices[p.rotation]);
+        }
+      }
+      else
+      {
+        // We already have a mesh but we check here if we should switch LOD level.
+        if (!IsRightLOD (sqdist, p.lod))
+        {
+          // We need a different mesh here.
+          FreeMesh (p);
+          if (AllocMesh (sqdist, p))
+          {
+            MoveMesh (p, p.position,
+                      generator->rotation_matrices[p.rotation]);
+          }
+          else
+            p.idInGeometry = csArrayItemNotFound;
+        }
+        else if(!delta.IsZero())
+        { 
+          // LOD level is fine, adjust for new pos 
+          MoveMesh (p, p.position,
+                    generator->rotation_matrices[p.rotation]); 
+        } 
+      }
+    }
+    else
+    {
+      if (p.idInGeometry != csArrayItemNotFound)
+      {
+        FreeMesh (p);
+        p.idInGeometry = csArrayItemNotFound;
+      }
+    }
+  }
+}
+
+void csMeshGeneratorGeometry::FreeBlockGeometryMeshes (MGBlockGeometry& blockGeometry)
+{
+  csArray<csMGPosition*>& positions = blockGeometry.positions;
+  for (size_t i = 0 ; i < positions.GetSize () ; i++)
+  {
+    if (positions[i]->idInGeometry != csArrayItemNotFound)
+    {
+      FreeMesh (*(positions[i]));
+      positions[i]->idInGeometry = csArrayItemNotFound;
+    }
+  }
+}
+
+bool csMeshGeneratorGeometry::AllocMesh (float sqdist, csMGPosition& pos)
 {
   if (sqdist < sq_min_draw_dist) return false;
   size_t lod = GetLODLevel (sqdist);
@@ -286,8 +359,7 @@ bool csMeshGeneratorGeometry::AllocMesh (
   return true;
 }
 
-void csMeshGeneratorGeometry::MoveMesh (int cidx,
-                                        const csMGPosition& pos,
+void csMeshGeneratorGeometry::MoveMesh (const csMGPosition& pos,
                                         const csVector3& position,
                                         const csMatrix3& matrix)
 {
@@ -383,7 +455,7 @@ void csMeshGeneratorGeometry::SetWindSpeed (float speed)
   }
 }
 
-void csMeshGeneratorGeometry::FreeMesh (int cidx, csMGPosition& pos)
+void csMeshGeneratorGeometry::FreeMesh (csMGPosition& pos)
 {
   csMGGeom& geom = factories[pos.lod];
   
@@ -989,55 +1061,7 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
   GetTotalMaxDist ();
   for (size_t g = 0; g < geometries.GetSize(); g++)
   {
-    csArray<csMGPosition*>& positions = cell.block->geometries[g].positions;
-    for (size_t i = 0 ; i < positions.GetSize () ; i++)
-    {
-      csMGPosition& p = *(positions[i]);
-
-      float sqdist = csSquaredDist::PointPoint (pos, p.position);
-      if (sqdist < sq_total_max_dist)
-      {
-        if (p.idInGeometry == csArrayItemNotFound)
-        {
-          // We didn't have a mesh here so we allocate one.
-          if (geometries[g]->AllocMesh (cidx, cell, sqdist, p))
-          {
-            geometries[g]->MoveMesh (cidx, p,
-                                     p.position, rotation_matrices[p.rotation]);
-          }
-        }
-        else
-        {
-          // We already have a mesh but we check here if we should switch LOD level.
-          if (!geometries[g]->IsRightLOD (sqdist, p.lod))
-          {
-            // We need a different mesh here.
-            geometries[g]->FreeMesh (cidx, p);
-            if (geometries[g]->AllocMesh (cidx, cell, sqdist, p))
-            {
-              geometries[g]->MoveMesh (cidx, p,
-                p.position, rotation_matrices[p.rotation]);
-            }
-            else
-              p.idInGeometry = csArrayItemNotFound;
-          }
-          else if(!delta.IsZero())
-          { 
-            // LOD level is fine, adjust for new pos 
-            geometries[g]->MoveMesh (cidx, p, 
-              p.position, rotation_matrices[p.rotation]); 
-          } 
-        }
-      }
-      else
-      {
-        if (p.idInGeometry != csArrayItemNotFound)
-        {
-          geometries[g]->FreeMesh (cidx, p);
-          p.idInGeometry = csArrayItemNotFound;
-        }
-      }
-    }
+    geometries[g]->AllocBlockGeometryMeshes (cell.block->geometries[g], pos, delta);
   }
 }
 
@@ -1174,15 +1198,7 @@ void csMeshGenerator::FreeMeshesInBlock (int cidx, csMGCell& cell)
   {
     for (size_t g = 0; g < geometries.GetSize(); g++)
     {
-      csArray<csMGPosition*>& positions = cell.block->geometries[g].positions;
-      for (size_t i = 0 ; i < positions.GetSize () ; i++)
-      {
-        if (positions[i]->idInGeometry != csArrayItemNotFound)
-        {
-          geometries[g]->FreeMesh (cidx, *(positions[i]));
-          positions[i]->idInGeometry = csArrayItemNotFound;
-        }
-      }
+      geometries[g]->FreeBlockGeometryMeshes (cell.block->geometries[g]);
     }
   }
 }

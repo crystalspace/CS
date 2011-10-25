@@ -47,6 +47,7 @@ class DensityFactorMap;
 #define CS_GEOM_MAX_ROTATIONS 16
 
 struct csMGPosition;
+struct MGBlockGeometry;
 
 /**
  * A mesh object in a geometry.
@@ -159,6 +160,7 @@ private:
   void AddSVToMesh (iMeshWrapper* mesh, csShaderVariable* sv); 
   void SetMeshBBox (iMeshWrapper* mesh, const csBox3& bbox); 
 
+  void SetupMeshObject (const csMGGeom& geom, GeomMeshObject& geomMesh);
 public:
   csMeshGeneratorGeometry (csMeshGenerator* generator);
   virtual ~csMeshGeneratorGeometry ();
@@ -227,18 +229,28 @@ public:
 
   size_t GetManualPositionCount (size_t cidx) {return positions[cidx].GetSize ();}
   const csVector2 &GetManualPosition (size_t cidx, size_t i){return positions[cidx][i];}
+  
+  /**
+   * Allocate all positions for a block.
+   */
+  void AllocBlockGeometryMeshes (MGBlockGeometry& blockGeometry,
+                                 const csVector3& pos,
+                                 const csVector3& delta);
+  /**
+   * Free all positions in a block.
+   */
+  void FreeBlockGeometryMeshes (MGBlockGeometry& blockGeometry);
 
   /**
    * Allocate a new mesh for the given distance. Possibly from the
    * cache if possible. If the distance is too large it will return 0.
    */
-  bool AllocMesh (int cidx, const csMGCell& cell,
-      float sqdist, csMGPosition& pos);
+  bool AllocMesh (float sqdist, csMGPosition& pos);
 
   /**
    * Free a mesh instance.
    */
-  void FreeMesh (int cidx, csMGPosition& pos);
+  void FreeMesh (csMGPosition& pos);
 
   /**
    * Perform housekeeping on geometry after an update for a position.
@@ -250,7 +262,7 @@ public:
   /**
    * Move the mesh to some position.
    */
-  void MoveMesh (int cidx, const csMGPosition& pos,
+  void MoveMesh (const csMGPosition& pos,
 		 const csVector3& position, const csMatrix3& matrix); 
 
   /// Set the fade params for the geometry.
