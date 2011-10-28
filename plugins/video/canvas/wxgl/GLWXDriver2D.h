@@ -86,8 +86,7 @@ public:
   { return false; }
   /// Set mouse position.
   // should be the window manager
-  virtual bool SetMousePosition (int x, int y)
-  { return false; }
+  virtual bool SetMousePosition (int x, int y);
 
   /// Set mouse cursor shape
   // should be the window manager

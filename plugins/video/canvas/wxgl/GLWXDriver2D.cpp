@@ -107,6 +107,12 @@ bool csGraphics2DWX::Initialize (iObjectRegistry *object_reg)
   return true;
 }
 
+bool csGraphics2DWX::SetMousePosition (int x, int y)
+{
+  myParent->WarpPointer (x, y);
+  return true;
+}
+
 void csGraphics2DWX::SetParent(wxWindow* wx)
 {
   myParent = wx;
