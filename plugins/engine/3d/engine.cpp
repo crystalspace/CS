@@ -504,7 +504,7 @@ THREADED_CALLABLE_IMPL1(csEngine, SyncEngineLists, csRef<iThreadedLoader> loader
 //---------------------------------------------------------------------------
 SCF_IMPLEMENT_FACTORY (csEngine)
 
-#define DEFAULT_NEAR_CLIP	0.1
+#define DEFAULT_NEAR_CLIP	0.1f
 
 csEngine::csEngine (iBase *iParent) :
   scfImplementationType (this, iParent), objectRegistry (0),
@@ -520,7 +520,7 @@ csEngine::csEngine (iBase *iParent) :
   worldSaveable (false), defaultKeepImage (false), maxAspectRatio (0),
   nextframePending (0), currentFrameNumber (0), 
   currentRenderContext (0), weakEventHandler(0),
-  bAdaptiveLODsEnabled(false), adaptiveLODsTargetFPS(30), adaptiveLODsMultiplier(1.0f),
+  bAdaptiveLODsEnabled(false), adaptiveLODsTargetFPS(30.f), adaptiveLODsMultiplier(1.0f),
   defaultNearClip (DEFAULT_NEAR_CLIP)
 {
   RegisterDefaultRenderPriorities ();
