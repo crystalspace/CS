@@ -78,6 +78,7 @@ public:
   virtual bool PerformExtensionV (char const* command, va_list);
 
   virtual void AllowResize (bool iAllow);
+  virtual bool Resize (int w, int h);
 
   virtual void AlertV (int type, const char* title, const char* okMsg,
   	const char* msg, va_list arg) 

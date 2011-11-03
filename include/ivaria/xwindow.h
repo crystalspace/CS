@@ -40,7 +40,7 @@ struct iImage;
 /// Document me! @@@
 struct iXWindow : public virtual iBase
 {
-  SCF_INTERFACE (iXWindow, 2, 0, 2);
+  SCF_INTERFACE (iXWindow, 2, 0, 3);
 
   // These should be inherited from csNativeWindow
   virtual bool Open () = 0;
@@ -88,6 +88,8 @@ struct iXWindow : public virtual iBase
   
   virtual bool SetWindowDecoration (iNativeWindow::WindowDecoration decoration, bool flag) = 0;
   virtual bool GetWindowDecoration (iNativeWindow::WindowDecoration decoration, bool& result) = 0;
+  
+  virtual void Resize (int w, int h) = 0;
 };
 
 #endif // __CS_IVIDEO_XWINDOW_H__

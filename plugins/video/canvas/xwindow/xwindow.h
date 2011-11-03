@@ -147,6 +147,7 @@ public:
   { SetVideoMode (yesno, false, false); }
 
   virtual void AllowResize (bool iAllow);
+  virtual void Resize (int w, int h);
 
   virtual void SetTitle (const char* title);
   

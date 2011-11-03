@@ -533,4 +533,11 @@ void csGraphics2DGLX::AllowResize (bool iAllow)
   xwin->AllowResize (iAllow);
 }
 
+bool csGraphics2DGLX::Resize (int w, int h)
+{
+  if (!csGraphics2DGLCommon::Resize (w, h)) return false;
+  xwin->Resize (w, h);
+  return true;
+}
+
 #undef XWIN_SCF_ID

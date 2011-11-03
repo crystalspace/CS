@@ -581,8 +581,17 @@ void csXWindow::AllowResize (bool iAllow)
     normal_hints.min_height =
     normal_hints.max_height = wm_height;
   }
-  XSetWMNormalHints (dpy, wm_win, &normal_hints);
+  if (wm_win) XSetWMNormalHints (dpy, wm_win, &normal_hints);
   allow_resize = iAllow;
+}
+
+void csXWindow::Resize (int w, int h)
+{
+  if ((wm_width == w) && (wm_height == h)) return;
+  wm_width = w;
+  wm_height = h;
+  if (ctx_win) XResizeWindow (dpy, ctx_win, w, h);
+  AllowResize (allow_resize); // updates size in window hints
 }
 
 void csXWindow::SetCanvas (iGraphics2D *canvas)
