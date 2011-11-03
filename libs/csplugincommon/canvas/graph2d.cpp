@@ -40,7 +40,8 @@
 #include "ivaria/reporter.h"
 
 csGraphics2D::csGraphics2D (iBase* parent) : 
-  scfImplementationType (this, parent), fontCache (0), hwMouse (hwmcOff)
+  scfImplementationType (this, parent), fontCache (0), hwMouse (hwmcOff),
+  fitToWorkingArea (false)
 {
   static uint g2d_count = 0;
 
@@ -84,6 +85,7 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
   vpHeight = fbHeight = config->GetInt ("Video.ScreenHeight", fbHeight);
   Depth = config->GetInt ("Video.ScreenDepth", Depth);
   FullScreen = config->GetBool ("Video.FullScreen", FullScreen);
+  fitToWorkingArea = config->GetBool ("Video.FitToWorkingArea", fitToWorkingArea);
   DisplayNumber = config->GetInt ("Video.DisplayNumber", DisplayNumber);
   refreshRate = config->GetInt ("Video.DisplayFrequency", 0);
   vsync = config->GetBool ("Video.VSync", false);
@@ -178,6 +180,18 @@ bool csGraphics2D::Open ()
   FrameBufferLocked = 0;
 
   SetClipRect (0, 0, fbWidth, fbHeight);
+  
+  if (!FullScreen && fitToWorkingArea)
+  {
+    int newWidth (vpWidth), newHeight (vpHeight);
+    if (FitSizeToWorkingArea (newWidth, newHeight))
+    {
+      bool oldResize (AllowResizing);
+      AllowResizing = true;
+      Resize (newWidth, newHeight);
+      AllowResizing = oldResize;
+    }
+  }
 
   return true;
 }
@@ -461,6 +475,36 @@ bool csGraphics2D::GetWindowDecoration (WindowDecoration decoration)
 
   // Everything else: assume off
   return false;
+}
+
+bool csGraphics2D::GetWorkspaceDimensions (int& width, int& height)
+{
+  return false;
+}
+
+bool csGraphics2D::AddWindowFrameDimensions (int& width, int& height)
+{
+  return false;
+}
+
+bool csGraphics2D::FitSizeToWorkingArea (int& desiredWidth,
+                                         int& desiredHeight)
+{
+  int wswidth, wsheight;
+  if (!GetWorkspaceDimensions (wswidth, wsheight))
+    return false;
+  int framedWidth (desiredWidth), framedHeight (desiredHeight);
+  if (!AddWindowFrameDimensions (framedWidth, framedHeight))
+    return false;
+  if (framedWidth > wswidth)
+  {
+    desiredWidth -= (framedWidth - wswidth);
+  }
+  if (framedHeight > wsheight)
+  {
+    desiredHeight -= (framedHeight - wsheight);
+  }
+  return true;
 }
 
 //---------------------------------------------------------------------------
