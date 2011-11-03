@@ -61,6 +61,10 @@ class csGraphics2DGLX : public scfImplementationExt1<csGraphics2DGLX ,
   Atom compositingManagerPresenceSelection;
   bool transparencyRequested;
   bool transparencyAvailable;
+  
+  // Fit-to-working-area stuff
+  bool GetWorkspaceDimensions (int& width, int& height);
+  bool AddWindowFrameDimensions (int& width, int& height);
 public:
   csGraphics2DGLX (iBase *iParent);
   virtual ~csGraphics2DGLX ();

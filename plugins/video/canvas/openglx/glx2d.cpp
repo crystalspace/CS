@@ -445,6 +445,16 @@ void csGraphics2DGLX::GetCurrentAttributes ()
   Report (CS_REPORTER_SEVERITY_NOTIFY, "level %d, double buffered", level);
 }
 
+bool csGraphics2DGLX::GetWorkspaceDimensions (int& width, int& height)
+{
+  return xwin->GetWorkspaceDimensions (width, height);
+}
+
+bool csGraphics2DGLX::AddWindowFrameDimensions (int& width, int& height)
+{
+  return xwin->AddWindowFrameDimensions (width, height);
+}
+
 bool csGraphics2DGLX::PerformExtensionV (char const* command, va_list args)
 {
   if (!strcasecmp (command, "hardware_accelerated"))

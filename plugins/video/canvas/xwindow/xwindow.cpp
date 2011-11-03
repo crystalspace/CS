@@ -1322,3 +1322,66 @@ bool csXWindow::GetWindowDecoration (iNativeWindow::WindowDecoration decoration,
   if (wmHints) XFree (wmHints);
   return ret;
 }
+
+bool csXWindow::GetWorkspaceDimensions (int& width, int& height)
+{
+  bool ret (false);
+  Atom xaNetWorkArea (XInternAtom (dpy, "_NET_WORKAREA", True));
+  if (xaNetWorkArea != None)
+  {
+    Atom type;
+    int format;
+    unsigned long items;
+    unsigned long bytesRemaining;
+    long* workArea = nullptr;
+    int result (XGetWindowProperty (dpy, RootWindow (dpy, screen_num), xaNetWorkArea,
+                                    0, 4,
+                                    False, AnyPropertyType,
+                                    &type, &format, &items, &bytesRemaining,
+                                    reinterpret_cast<unsigned char**> (&workArea)));
+    if ((result == Success) && (type == XA_CARDINAL) && (format == 32)
+      && (items == 4))
+    {
+      width = workArea[2] - workArea[0];
+      height = workArea[3] - workArea[1];
+      ret = true;
+    }
+    
+    if (workArea) XFree (workArea);
+  }
+  return ret;
+}
+
+bool csXWindow::AddWindowFrameDimensions (int& width, int& height)
+{
+  bool ret (false);
+  if (wm_win)
+  {
+    // @@@ FIXME: Should create a dummy top-level window if no wm_win exists yet?
+    Atom xaNetFrameExtents (XInternAtom (dpy, "_NET_FRAME_EXTENTS", True));
+    if (xaNetFrameExtents != None)
+    {
+      Atom type;
+      int format;
+      unsigned long items;
+      unsigned long bytesRemaining;
+      long* frameExtents = nullptr;
+      int result (XGetWindowProperty (dpy, wm_win, xaNetFrameExtents,
+                                      0, 4,
+                                      False, AnyPropertyType,
+                                      &type, &format, &items, &bytesRemaining,
+                                      reinterpret_cast<unsigned char**> (&frameExtents)));
+      if ((result == Success) && (type == XA_CARDINAL) && (format == 32)
+        && (items == 4))
+      {
+        width += frameExtents[0] + frameExtents[1];
+        height += frameExtents[2] + frameExtents[3];
+        ret = true;
+      }
+      
+      if (frameExtents) XFree (frameExtents);
+    }
+    
+  }
+  return ret;
+}
