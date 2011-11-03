@@ -752,7 +752,7 @@ bool csGraphics2DOpenGL::Resize (int width, int height)
       AllowResizing = false;
 
       SetWindowPos (m_hWnd, 0,
-    		    wndRect.left, wndRect.right,
+    		    wndRect.left, wndRect.top,
 		    wndRect.right - wndRect.left, wndRect.bottom - wndRect.top,
 		    SWP_NOZORDER);
       
