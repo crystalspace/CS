@@ -30,44 +30,12 @@
 
 #include "csutil/win32/wintools.h"
 
-#ifndef MONITOR_DEFAULTTONEAREST
-// "guess" whether multimon types/#defs are present already
-
-#if !defined(__MINGW32__) && !defined(__CYGWIN__)
-// MinGW & Cygwin(more exactly, the w32api headers) already have them defined
-
-struct MONITORINFOEXA
-{  
-  DWORD cbSize; 
-  RECT rcMonitor; 
-  RECT rcWork; 
-  DWORD dwFlags; 
-  CHAR szDevice[CCHDEVICENAME];
-};
-DECLARE_HANDLE(HMONITOR);
-#endif
-
-typedef MONITORINFOEXA* LPMONITORINFOEXA; 
-#define MONITOR_DEFAULTTONEAREST  2
-
-#endif
-
-#define CS_API_NAME		MultiMon
-#define CS_API_FUNCTIONS	"plugins/video/canvas/openglwin/MultiMonAPI.fun"
-#define CS_API_DLL		"user32.dll"
-#define CS_API_EXPORT
-
-#include "csutil/win32/APIdeclare.inc"
-#include "libs/csutil/win32/APIdefine.inc"  // @@@
-
 csDetectDriver::csDetectDriver()
 {
-  MultiMon::IncRef();
 }
 
 csDetectDriver::~csDetectDriver()
 {
-  MultiMon::DecRef();
 }
 
 void csDetectDriver::DetermineDriver (const char* monitorName)
@@ -316,22 +284,19 @@ void csDetectDriver::DoDetection (HWND window, HDC dc)
       csString screenDevice;
 
       // Determine the monitor we're on
-      if (MultiMon::MultiMonAvailable())
+      MONITORINFOEXA mi;
+
+      HMONITOR monitor = MonitorFromWindow (window,
+	MONITOR_DEFAULTTONEAREST);
+
+      if (monitor != 0)
       {
-        MONITORINFOEXA mi;
-
-        HMONITOR monitor = MultiMon::MonitorFromWindow (window,
-	  MONITOR_DEFAULTTONEAREST);
-
-        if (monitor != 0)
-        {
-	  memset (&mi, 0, sizeof (mi));
-	  mi.cbSize = sizeof (mi);
-	  if (MultiMon::GetMonitorInfoA (monitor, &mi))
-	  {
-	    screenDevice.Replace (mi.szDevice);
-	  }
-        }
+	memset (&mi, 0, sizeof (mi));
+	mi.cbSize = sizeof (mi);
+	if (GetMonitorInfoA (monitor, &mi))
+	{
+	  screenDevice.Replace (mi.szDevice);
+	}
       }
 
       if (verbose)
