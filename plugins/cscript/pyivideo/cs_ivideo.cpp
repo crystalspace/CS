@@ -12454,6 +12454,52 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iNativeWindow_FitSizeToWorkingArea(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iNativeWindow *arg1 = (iNativeWindow *) 0 ;
+  int *arg2 = 0 ;
+  int *arg3 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  bool result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iNativeWindow_FitSizeToWorkingArea",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iNativeWindow, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iNativeWindow_FitSizeToWorkingArea" "', argument " "1"" of type '" "iNativeWindow *""'"); 
+  }
+  arg1 = reinterpret_cast< iNativeWindow * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_int,  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iNativeWindow_FitSizeToWorkingArea" "', argument " "2"" of type '" "int &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iNativeWindow_FitSizeToWorkingArea" "', argument " "2"" of type '" "int &""'"); 
+  }
+  arg2 = reinterpret_cast< int * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_int,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iNativeWindow_FitSizeToWorkingArea" "', argument " "3"" of type '" "int &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iNativeWindow_FitSizeToWorkingArea" "', argument " "3"" of type '" "int &""'"); 
+  }
+  arg3 = reinterpret_cast< int * >(argp3);
+  result = (bool)(arg1)->FitSizeToWorkingArea(*arg2,*arg3);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_iNativeWindow(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iNativeWindow *arg1 = (iNativeWindow *) 0 ;
@@ -25178,6 +25224,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iNativeWindow_GetWindowTransparent", _wrap_iNativeWindow_GetWindowTransparent, METH_VARARGS, NULL},
 	 { (char *)"iNativeWindow_SetWindowDecoration", _wrap_iNativeWindow_SetWindowDecoration, METH_VARARGS, NULL},
 	 { (char *)"iNativeWindow_GetWindowDecoration", _wrap_iNativeWindow_GetWindowDecoration, METH_VARARGS, NULL},
+	 { (char *)"iNativeWindow_FitSizeToWorkingArea", _wrap_iNativeWindow_FitSizeToWorkingArea, METH_VARARGS, NULL},
 	 { (char *)"delete_iNativeWindow", _wrap_delete_iNativeWindow, METH_VARARGS, NULL},
 	 { (char *)"iNativeWindow_swigregister", iNativeWindow_swigregister, METH_VARARGS, NULL},
 	 { (char *)"new_RenderPriority", _wrap_new_RenderPriority, METH_VARARGS, NULL},

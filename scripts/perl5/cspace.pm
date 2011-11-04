@@ -10262,6 +10262,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *decoClientFrame = *cspacec::iNativeWindow_decoClientFrame;
 *SetWindowDecoration = *cspacec::iNativeWindow_SetWindowDecoration;
 *GetWindowDecoration = *cspacec::iNativeWindow_GetWindowDecoration;
+*FitSizeToWorkingArea = *cspacec::iNativeWindow_FitSizeToWorkingArea;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
