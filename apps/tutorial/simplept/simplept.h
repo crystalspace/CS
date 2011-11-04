@@ -63,6 +63,7 @@ private:
 
   csString currentTargetStr;
   csString availableFormatsStr;
+  size_t numAvailableformats;
   bool renderTargetState;
   
   void CreateTextures ();
