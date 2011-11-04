@@ -1030,6 +1030,33 @@ void csGraphics2DOpenGL::ComputeDefaultRect (RECT& windowRect, LONG style, LONG 
   windowRect.bottom = windowRect.top + wndH;
 }
 
+bool csGraphics2DOpenGL::GetWorkspaceDimensions (int& width, int& height)
+{
+  csRect workspace (GetWorkspaceRect ());
+  width = workspace.Width();
+  height = workspace.Height();
+  return true;
+}
+
+bool csGraphics2DOpenGL::AddWindowFrameDimensions (int& width, int& height)
+{
+  RECT clientRect;
+  clientRect.left = 0;
+  clientRect.top = 0;
+  clientRect.right = width;
+  clientRect.bottom = height;
+  DWORD style (WS_POPUP), exStyle (0);
+  if (!FullScreen)
+  {
+    style |= WS_CAPTION;
+    if (AllowResizing) style |= WS_THICKFRAME;
+  }
+  AdjustWindowRectEx (&clientRect, style, false, exStyle);
+  width = clientRect.right - clientRect.left;
+  height = clientRect.bottom - clientRect.top;
+  return true;
+}
+
 bool csGraphics2DOpenGL::IsWindowTransparencyAvailable()
 {
   if (!Dwmapi::DwmapiAvailable ()) return false;
