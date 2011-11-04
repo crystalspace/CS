@@ -94,6 +94,7 @@ csGraphics2DOpenGL::csGraphics2DOpenGL (iBase *iParent) :
   scfImplementationType (this, iParent),
   m_nGraphicsReady (true),
   m_hWnd (0),
+  primaryMonitor (0),
   modeSwitched (true),
   customIcon (0),
   transparencyRequested (false),
@@ -977,15 +978,56 @@ void csGraphics2DOpenGL::SwitchDisplayMode (bool userMode)
   refreshRate = curdmode.dmDisplayFrequency;
 }
 
+static BOOL CALLBACK GrabPrimaryMonitor (HMONITOR monitor, HDC, LPRECT, LPARAM data)
+{
+  *(reinterpret_cast<HMONITOR*> (data)) = monitor;
+  return false;
+}
+
+csRect csGraphics2DOpenGL::GetWorkspaceRect ()
+{
+  // Monitor used to get the workspace.
+  HMONITOR workspaceMonitor;
+  if (!m_hWnd)
+  {
+    // No window yet: use primary monitor
+    if (!primaryMonitor)
+    {
+      EnumDisplayMonitors (NULL, NULL, &GrabPrimaryMonitor,
+                           reinterpret_cast<LPARAM> (&primaryMonitor));
+    }
+    workspaceMonitor = primaryMonitor;
+  }
+  else
+  {
+    workspaceMonitor = MonitorFromWindow (m_hWnd, MONITOR_DEFAULTTOPRIMARY);
+  }
+  MONITORINFO info;
+  memset (&info, 0, sizeof (info));
+  info.cbSize = sizeof (info);
+  if (!GetMonitorInfo (workspaceMonitor, &info))
+  {
+    return csRect (0, 0, GetSystemMetrics (SM_CXSCREEN),
+                   GetSystemMetrics (SM_CXSCREEN));
+  }
+  return csRect (info.rcWork.left, info.rcWork.top,
+                 info.rcWork.right, info.rcWork.bottom);
+}
+
 void csGraphics2DOpenGL::ComputeDefaultRect (RECT& windowRect, LONG style, LONG exStyle)
 {
+  csRect workspace (GetWorkspaceRect ());
   RECT clientRect;
-  clientRect.left = (GetSystemMetrics (SM_CXSCREEN) - fbWidth) / 2;
-  clientRect.top = (GetSystemMetrics (SM_CYSCREEN) - fbHeight) / 2;
-  clientRect.right = clientRect.left + fbWidth;
-  clientRect.bottom = clientRect.top + fbHeight;
+  clientRect.left = 0;
+  clientRect.top = 0;
+  clientRect.right = fbWidth;
+  clientRect.bottom = fbHeight;
   AdjustWindowRectEx (&clientRect, style, false, exStyle);
-  windowRect = clientRect;
+  int wndW (clientRect.right - clientRect.left), wndH (clientRect.bottom - clientRect.top);
+  windowRect.left = workspace.xmin + (workspace.Width() - wndW) / 2;
+  windowRect.top = workspace.ymin + (workspace.Height() - wndH) / 2;
+  windowRect.right = windowRect.left + wndW;
+  windowRect.bottom = windowRect.top + wndH;
 }
 
 bool csGraphics2DOpenGL::IsWindowTransparencyAvailable()

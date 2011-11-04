@@ -115,6 +115,7 @@ protected:
   HWND m_hWnd;
   HINSTANCE  m_hInstance;
   int m_nCmdShow;
+  HMONITOR primaryMonitor;
 
   csDetectDriver detector;
 
@@ -150,6 +151,8 @@ protected:
 
   bool hideDecoClientFrame;
 
+  // Get the current working area rect
+  csRect GetWorkspaceRect ();
   // Compute the default window rect (centered on screen)
   void ComputeDefaultRect (RECT& windowRect, LONG style, LONG exStyle = 0);
 };
