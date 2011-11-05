@@ -182,6 +182,7 @@ static const char* AttachmentToStr (csRenderTargetAttachment a)
 
 void Simple::CreateTextures ()
 {
+  numAvailableformats = 0;
   for (size_t n = 0; n < sizeof(targetsToUse)/sizeof(targetsToUse[0]); n++)
   {
     if (!g3d->CanSetRenderTarget (targetsToUse[n].format,
@@ -206,6 +207,7 @@ void Simple::CreateTextures ()
     targetTextures.Push (target);
     
     availableFormatsStr.AppendFmt ("%s ", target.format);
+    numAvailableformats++;
     
     if (!targetTex)
     {
@@ -287,9 +289,12 @@ void Simple::Frame ()
   int fontHeight = font->GetTextHeight();
   int y = g3d->GetDriver2D()->GetHeight() - fontHeight;
   int white = g3d->GetDriver2D()->FindRGB (255, 255, 255);
-  g3d->GetDriver2D()->Write (font, 0, y, white, -1,
-    csString().Format ("SPACE to cycle formats: %s",
-    availableFormatsStr.GetData()));
+  if (numAvailableformats > 1)
+  {
+    g3d->GetDriver2D()->Write (font, 0, y, white, -1,
+      csString().Format ("SPACE to cycle formats: %s",
+      availableFormatsStr.GetData()));
+  }
   y -= fontHeight;
   g3d->GetDriver2D()->Write (font, 0, y, white, -1,
     csString().Format ("current target: %s",
