@@ -1342,8 +1342,9 @@ bool csXWindow::GetWorkspaceDimensions (int& width, int& height)
     if ((result == Success) && (type == XA_CARDINAL) && (format == 32)
       && (items == 4))
     {
-      width = workArea[2] - workArea[0];
-      height = workArea[3] - workArea[1];
+      // Working area is stored as left, rightop, width, height
+      width = workArea[2];
+      height = workArea[3];
       ret = true;
     }
     
@@ -1374,6 +1375,7 @@ bool csXWindow::AddWindowFrameDimensions (int& width, int& height)
       if ((result == Success) && (type == XA_CARDINAL) && (format == 32)
         && (items == 4))
       {
+        // Frame extents ares stored as left, right, top, bottom
         width += frameExtents[0] + frameExtents[1];
         height += frameExtents[2] + frameExtents[3];
         ret = true;
