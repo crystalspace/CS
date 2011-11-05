@@ -22,8 +22,16 @@
 #include "csgeom/odesolver.h"
 #include "csutil/scf.h"
 #include "csutil/floatrand.h"
+#include "iengine/engine.h"
+#include "iengine/light.h"
+#include "iengine/mesh.h"
+#include "iengine/movable.h"
+#include "iengine/scenenode.h"
+#include "iengine/sector.h"
+#include "ivideo/rendermesh.h"
 
 #include "builtineffectors.h"
+#include "particles.h"
 
 
 CS_PLUGIN_NAMESPACE_BEGIN(Particles)
@@ -53,6 +61,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     ParticleEffectorFactory::CreateVelocityField () const
   {
     return new ParticleEffectorVelocityField;
+  }
+
+  csPtr<iParticleBuiltinEffectorLight> 
+    ParticleEffectorFactory::CreateLight () const
+  {
+    return new ParticleEffectorLight;
   }
 
 
@@ -99,11 +113,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   void ParticleEffectorLinColor::EffectParticles (iParticleSystemBase* system,
     const csParticleBuffer& particleBuffer, float dt, float totalTime)
   {
+    // Update the color list if needed
     Precalc ();
 
     if (precalcList.GetSize () == 0)
       return;
 
+    // Iterate on all particles
     for (size_t idx = 0; idx < particleBuffer.particleCount; ++idx)
     {
       csParticle& particle = particleBuffer.particleData[idx];
@@ -111,16 +127,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
       float ttl = particle.timeToLive;
 
-      //Classify
+      // Find the color entry corresponding to this ttl
       size_t aSpan;
-      for(aSpan = 0; aSpan < precalcList.GetSize (); ++aSpan)
+      for (aSpan = 0; aSpan < precalcList.GetSize (); ++aSpan)
       {
         if (ttl < precalcList[aSpan].maxTTL)
           break;
       }
 
-      aSpan = csMin (aSpan, precalcList.GetSize ()-1);
+      aSpan = csMin (aSpan, precalcList.GetSize () - 1);
 
+      // Apply the new color
       const PrecalcEntry& ei = precalcList[aSpan];
       particleAux.color = ei.add + ei.mult * ttl;
     }
@@ -504,6 +521,105 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   csPtr<iParticleEffector> ParticleEffectorVelocityField::Clone () const
   {
     return 0;
+  }
+
+  //------------------------------------------------------------------------
+
+  ParticleEffectorLight::ParticleEffectorLight ()
+    : scfImplementationType (this), cutoffDistance (5.0f)
+  {
+
+  }
+
+  ParticleEffectorLight::~ParticleEffectorLight ()
+  {
+    // Remove all lights from the scene
+    for (size_t idx = 0; idx < lights.GetSize (); ++idx)
+    {
+      csRef<iLight> light = lights.Get (idx);
+      light->GetMovable ()->ClearSectors ();
+      light->GetMovable ()->GetSceneNode ()->SetParent (nullptr);
+      engine->RemoveLight (light);
+    }
+
+    for (size_t idx = 0; idx < allocatedLights.GetSize (); ++idx)
+    {
+      csRef<iLight> light = allocatedLights.Get (idx);
+      engine->RemoveLight (light);
+    }
+  }
+
+  void ParticleEffectorLight::SetInitialCutoffDistance (float distance)
+  {
+    cutoffDistance = distance;
+  }
+
+  float ParticleEffectorLight::GetInitialCutoffDistance () const
+  {
+    return cutoffDistance;
+  }
+
+  csPtr<iParticleEffector> ParticleEffectorLight::Clone () const
+  {
+    ParticleEffectorLight* newPtr = new ParticleEffectorLight (*this);
+    newPtr->lights.DeleteAll ();
+    newPtr->allocatedLights.DeleteAll ();
+    return newPtr;
+  }
+
+  void ParticleEffectorLight::EffectParticles (iParticleSystemBase* system,
+    const csParticleBuffer& particleBuffer, float dt, float totalTime)
+  {
+    ParticlesMeshObject* meshObject = dynamic_cast<ParticlesMeshObject*> (system);
+    iMovable* meshMovable = meshObject->GetMeshWrapper ()->GetMovable ();
+    iSectorList* meshSectors = meshMovable->GetSectors ();
+
+    if (!engine)
+      engine = csQueryRegistry<iEngine> (meshObject->factory->objectType->object_reg);
+    if (!engine) return;
+
+    // Remove the lights of the particles that are no more active
+    while (lights.GetSize () > particleBuffer.particleCount)
+    {
+      // Remove the light from the scene
+      csRef<iLight> light = lights.Pop ();
+      light->GetMovable ()->ClearSectors ();
+      light->GetMovable ()->GetSceneNode ()->SetParent (nullptr);
+
+      // Put the light in a temporary buffer
+      allocatedLights.Push (light);
+    }
+
+    // Create the lights for the new particles
+    while (lights.GetSize () < particleBuffer.particleCount)
+    {
+      csRef<iLight> light = allocatedLights.GetSize () ? allocatedLights.Pop ()
+	: engine->CreateLight (0, csVector3 (0.0f),
+			       cutoffDistance, csColor4 (0.0f),
+			       CS_LIGHT_DYNAMICTYPE_DYNAMIC);
+
+      // Put the light in the scene
+      for (int i = 0; i < meshSectors->GetCount (); i++)
+	light->GetMovable ()->GetSectors ()->Add (meshSectors->Get (i));
+      light->GetMovable ()->GetSceneNode ()->SetParent (meshMovable->GetSceneNode ());
+
+      lights.Push (light);
+    }
+
+    // Update the light parameters
+    for (size_t idx = 0; idx < particleBuffer.particleCount; ++idx)
+    {
+      csParticle& particle = particleBuffer.particleData[idx];
+      csParticleAux& particleAux = particleBuffer.particleAuxData[idx];
+      iLight* light = lights[idx];
+
+      light->GetMovable ()->SetPosition (particle.position);
+      light->GetMovable ()->SetTransform (csMatrix3 (particle.orientation));
+      light->GetMovable ()->UpdateMove ();
+      light->SetColor (particleAux.color);
+      light->SetSpecularColor (particleAux.color);
+      light->SetCutoffDistance (particleAux.color.alpha * cutoffDistance);
+    }
   }
 
 }

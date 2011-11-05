@@ -82,19 +82,19 @@ void csCameraBase::SetFarPlane (csPlane3 *farplane)
 void csCameraBase::MoveWorld (const csVector3 &v, bool cd)
 {
   csVector3 new_position = GetOrigin () + v;
+
   if (sector)
   {
     csVector3 remember_position = new_position;
+
+    // Test if the motion crosses a portal
     iSector *new_sector = sector->FollowSegment (
         *this,
         new_position,
         mirror,
         only_portals);
-    if (new_sector == sector)
-    {
-      if (!cd) new_position = remember_position;
-    }
-    else
+
+    if (new_sector != sector)
     {
       sector = new_sector;
       cameranr = cur_cameranr++;

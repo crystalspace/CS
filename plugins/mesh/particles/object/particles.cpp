@@ -62,6 +62,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
   bool ParticlesMeshObjectType::Initialize (iObjectRegistry* object_reg)
   {
+    this->object_reg = object_reg;
     return true;
   }
 
@@ -579,7 +580,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     if (externalControl)
       return;
 
-    // Retire old particles
+    // Retire the old particles
     size_t currentParticleIdx = 0;
     while (currentParticleIdx < particleBuffer.particleCount)
     {
@@ -588,7 +589,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       currentParticle.timeToLive -= dt;
       if (currentParticle.timeToLive < 0)
       {
-        //retire particle
+        // retire particle: move the data of the last particle to the current one
         particleBuffer.particleAuxData[currentParticleIdx] = 
           particleBuffer.particleAuxData[--particleBuffer.particleCount];
 
@@ -600,18 +601,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       currentParticleIdx++;
     }
 
-    // Apply emitters
+    // Apply all emitters
     size_t totalEmitted = 0;
     csReversibleTransform t = meshWrapper->GetMovable ()->GetFullTransform ();
     csReversibleTransform* tptr = transformMode == CS_PARTICLE_LOCAL_EMITTER ? 
       &t : 0;
     for (size_t idx = 0; idx < emitters.GetSize (); ++idx)
     {
+      // Ask for the amount of new particles to create
       iParticleEmitter* emitter = emitters[idx];
       size_t numParticles = emitter->ParticlesToEmit (this, dt, totalParticleTime);
       if (numParticles == 0)
         continue;
 
+      // Allocate the new particles
       ReserveNewParticles (numParticles);
       totalEmitted += numParticles;
 
@@ -620,12 +623,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       tmpBuf.particleData = particleBuffer.particleData + particleBuffer.particleCount;
       tmpBuf.particleAuxData = particleBuffer.particleAuxData + particleBuffer.particleCount;
       
+      // Do the actual emitting (ie initialization of the particle)
       emitter->EmitParticles (this, tmpBuf, dt, totalParticleTime, tptr);
 
       particleBuffer.particleCount += numParticles;
     }
 
-    // Apply effectors
+    // Apply all effectors
     for (size_t idx = 0; idx < effectors.GetSize (); ++idx)
     {
       iParticleEffector* effector = effectors[idx];
@@ -633,7 +637,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       effector->EffectParticles (this, particleBuffer, dt, totalParticleTime);
     }
     
-    // Integrate positions
+    // Integrate the positions and rotations of the particles
     if (integrationMode == CS_PARTICLE_INTEGRATE_LINEAR)
     {
       for (currentParticleIdx = 0; 

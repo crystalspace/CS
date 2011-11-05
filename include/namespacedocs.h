@@ -78,6 +78,12 @@ namespace CS
   {}
 
   /**
+   * Material and texture related classes.
+   */
+  namespace Material
+  {}
+
+  /**
    * Mathematical functions and definitions
    */
   namespace Math

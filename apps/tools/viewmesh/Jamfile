@@ -37,6 +37,7 @@ if $(CEGUI.AVAILABLE) = "yes"
     bindoc
     bruteblock
     bugplug
+    cameramanager
     csbmpimg
     cscegui
     csddsimg
@@ -91,6 +92,7 @@ if $(CEGUI.AVAILABLE) = "yes"
     stdpt
     stdrep
     terrainldr
+    texthud
     vproc_std
     xmlread
     xmlshader

@@ -96,6 +96,7 @@ void ASndTest::CreateWorld ()
         format->Bits, format->Channels, format->Freq);
   csPrintf ("Sample Size : %zu bytes, %zu frames\n", snddata->GetDataSize (),
         snddata->GetFrameCount ());
+  csPrintf ("Duration : %f second\n", ((float) snddata->GetFrameCount ()) / ((float) format->Freq));
   csPrintf ("Description : %s\n", snddata->GetDescription ());
 
   // Create a stream for the sound
@@ -108,6 +109,7 @@ void ASndTest::CreateWorld ()
   csPrintf ("Format      : %d bits, %d channel(s), %d Hz\n",
         rformat->Bits, rformat->Channels, rformat->Freq);
   csPrintf ("Stream Size : %zu frames\n", sndstream->GetFrameCount ());
+  csPrintf ("Duration : %f second\n", ((float) sndstream->GetFrameCount ()) / ((float) rformat->Freq));
   csPrintf ("Description : %s\n", sndstream->GetDescription ());
 
   // Make the stream loop and play (unpaused)

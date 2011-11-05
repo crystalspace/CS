@@ -24,9 +24,12 @@
 #include "imesh/particles.h"
 #include "iutil/comp.h"
 
+struct iLight;
 
 CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 {
+
+  //------------------------------------------------------------------------
 
   class ParticleEffectorFactory : public 
     scfImplementation2<ParticleEffectorFactory,
@@ -41,10 +44,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
     //-- iParticleBuiltinEffectorFactory
     virtual csPtr<iParticleBuiltinEffectorForce> CreateForce () const;
-    virtual csPtr<iParticleBuiltinEffectorLinColor> CreateLinColor () const;
     virtual csPtr<iParticleBuiltinEffectorLinear> CreateLinear () const;
+    virtual csPtr<iParticleBuiltinEffectorLinColor> CreateLinColor () const;
     virtual csPtr<iParticleBuiltinEffectorVelocityField> 
       CreateVelocityField () const;
+    virtual csPtr<iParticleBuiltinEffectorLight> CreateLight () const;
 
     //-- iComponent
     virtual bool Initialize (iObjectRegistry*)
@@ -53,6 +57,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     }
   };
 
+  //------------------------------------------------------------------------
 
   class ParticleEffectorForce : public 
     scfImplementation2<ParticleEffectorForce,
@@ -114,6 +119,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     csVector3 randomAcceleration;
     bool do_randomAcceleration;
   };
+
+  //------------------------------------------------------------------------
 
   class ParticleEffectorLinColor : public
     scfImplementation2<ParticleEffectorLinColor,
@@ -182,6 +189,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     bool precalcInvalid;
     csArray<PrecalcEntry> precalcList;
   };
+
+  //------------------------------------------------------------------------
 
   class ParticleEffectorLinear : public
     scfImplementation2<ParticleEffectorLinear,
@@ -259,6 +268,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     bool precalcInvalid;
     csArray<PrecalcEntry> precalcList;
   };
+
+  //------------------------------------------------------------------------
 
   class ParticleEffectorVelocityField : public 
     scfImplementation2<ParticleEffectorVelocityField,
@@ -350,6 +361,37 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     csArray<csVector3> vparams;
     csArray<float> fparams;
   };
+
+  //------------------------------------------------------------------------
+
+  class ParticleEffectorLight : public
+    scfImplementation2<ParticleEffectorLight,
+                       iParticleBuiltinEffectorLight,
+                       scfFakeInterface<iParticleEffector> >
+  {
+  public:
+    //-- ParticleEffectorLight
+    ParticleEffectorLight ();
+    ~ParticleEffectorLight ();
+
+    //-- iParticleEffector
+    virtual csPtr<iParticleEffector> Clone () const;
+
+    virtual void EffectParticles (iParticleSystemBase* system,
+      const csParticleBuffer& particleBuffer, float dt, float totalTime);
+
+    //-- iParticleBuiltinEffectorLight
+    virtual void SetInitialCutoffDistance (float distance);
+    virtual float GetInitialCutoffDistance () const;
+
+  private:
+    float cutoffDistance;
+
+    csRef<iEngine> engine;
+    csRefArray<iLight> lights;
+    csRefArray<iLight> allocatedLights;
+  };
+
 }
 CS_PLUGIN_NAMESPACE_END(Particles)
 
