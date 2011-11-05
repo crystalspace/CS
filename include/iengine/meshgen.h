@@ -49,12 +49,13 @@ struct iTerraFormer;
  */
 struct iMeshGeneratorGeometry : public virtual iBase
 {
-  SCF_INTERFACE(iMeshGeneratorGeometry, 1, 1, 1);
+  SCF_INTERFACE(iMeshGeneratorGeometry, 1, 1, 3);
 
   /**
    * Add a factory and the maximum distance after which this factory
    * will no longer be used. The minimum distance will be calculated
    * from the maximum distance used for other factories in this geometry.
+   * \sa SetMinimumDrawDistance to set a minimum drawing distance for all factories.
    */
   virtual void AddFactory (iMeshFactoryWrapper* factory, float maxdist) = 0;
 
@@ -179,6 +180,38 @@ struct iMeshGeneratorGeometry : public virtual iBase
    */
   virtual bool UseDensityFactorMap (const char* factorMapID,
 				    float factor) = 0;
+
+  /**
+   * Set the minimum drawing distance for any mesh in this geometry.
+   * A mesh is not displayed if it is closer than this distance.
+   */
+  virtual void SetMinimumDrawDistance (float dist) = 0;
+  /// Get the minimum drawing distance for any mesh in this geometry.
+  virtual float GetMinimumDrawDistance () = 0;
+  
+  /**
+   * Set the minimum distance at which meshes appear opaque.
+   * A mesh, at the minimum drawing distance, is drawn fully transparent and
+   * is faded in until it reaches the minimum opacity distance (where it is
+   * drawn fully opaque).
+   */
+  virtual void SetMinimumOpaqueDistance (float dist) = 0;
+  /// Get the minimum distance at which meshes appear opaque.
+  virtual float GetMinimumOpaqueDistance () = 0;
+
+  /**
+   * Set the maximum distance at which meshes appear opaque.
+   * A mesh, at the maximum opacity distance, is drawn fully opaque and
+   * is faded out until it reaches the maximum drawing distance (where it is
+   * drawn fully transparent).
+   * 
+   * \remarks If the mesh generator has distances to fade in between set 
+   * (with iMeshGenerator::SetAlphaScale), the closer of the per-generator
+   * and per-geometry distances are used for fading.
+   */
+  virtual void SetMaximumOpaqueDistance (float dist) = 0;
+  /// Get the maximum distance at which meshes appear opaque.
+  virtual float GetMaximumOpaqueDistance () = 0;
 };
 
 /**
@@ -203,18 +236,13 @@ struct iMeshGenerator : public virtual iBase
   virtual iObject *QueryObject () = 0;
 
   /**
-   * Set the density scale. If this is set then objects in the distance
-   * can have a lower density.
-   * \param mindist is the minimum distance at which density scale starts. At
-   * this distance the density factor will be 1 (meaning original density
-   * as given by the geometry itself).
-   * \param maxdist is the maximum distance at which density scale ends. At
-   * this distance the density factor will be equal to 'maxdensityfactor'.
-   * Note that this is a linear function so distances beyond 'maxdist' will get
-   * even lower density.
-   * \param maxdensityfactor is the density factor to use at 'maxdist'. 1 means
-   * full density and 0 means nothing left.
+   * \deprecated Feature removed in 2.1.
+   *   Similar functionality can be achieved by using multiple geometries with
+   *   different densities.
    */
+  CS_DEPRECATED_METHOD_MSG("Feature removed in 2.1. "
+    "Similar functionality can be achieved by using multiple geometries with "
+   "different densities.")
   virtual void SetDensityScale (float mindist, float maxdist,
   	float maxdensityfactor) = 0;
 

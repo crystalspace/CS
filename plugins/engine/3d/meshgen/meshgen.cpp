@@ -35,6 +35,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 
 csMeshGeneratorGeometry::csMeshGeneratorGeometry (
   csMeshGenerator* generator) : scfImplementationType (this),
+  min_draw_dist (0),
+  sq_min_draw_dist (0),
+  min_opaque_dist (0),
+  max_opaque_dist (CS::Infinity()),
   generator (generator)
 {
   colldetID = generator->GetStringSet()->Request ("colldet");
@@ -123,6 +127,22 @@ bool csMeshGeneratorGeometry::UseDensityFactorMap (const char* factorMapID,
   return true;
 }
 
+void csMeshGeneratorGeometry::SetMinimumDrawDistance (float dist)
+{
+  min_draw_dist = dist;
+  sq_min_draw_dist = dist*dist;
+}
+
+void csMeshGeneratorGeometry::SetMinimumOpaqueDistance (float dist)
+{
+  min_opaque_dist = dist;
+}
+
+void csMeshGeneratorGeometry::SetMaximumOpaqueDistance (float dist)
+{
+  max_opaque_dist = dist;
+}
+
 void csMeshGeneratorGeometry::AddPositionsFromMap (iTerraFormer* map,
 	const csBox2 &region, uint resx, uint resy, float value,
 	const csStringID & type)
@@ -209,10 +229,13 @@ void csMeshGeneratorGeometry::AddFactory (iMeshFactoryWrapper* factory,
   g.windDataVar.AttachNew (new csShaderVariable (generator->varWindData));
   g.windDataVar->SetType (csShaderVariable::VECTOR3);
   g.instancesNumVar.AttachNew (new csShaderVariable (generator->varInstancesNum));
+  g.fadeInfoVar.AttachNew (new csShaderVariable (generator->varFadeInfo)); 
+  g.fadeInfoVar->SetType (csShaderVariable::VECTOR4);
   g.transformVar.AttachNew (new csShaderVariable (generator->varTransform)); 
   g.instanceExtraVar.AttachNew (new csShaderVariable (generator->varInstanceExtra)); 
   AddSVToMesh (g.mesh, g.windDataVar);
   AddSVToMesh (g.mesh, g.instancesNumVar);
+  AddSVToMesh (g.mesh, g.fadeInfoVar); 
   AddSVToMesh (g.mesh, g.transformVar); 
   AddSVToMesh (g.mesh, g.instanceExtraVar); 
 
@@ -244,6 +267,7 @@ bool csMeshGeneratorGeometry::AllocMesh (
   int cidx, const csMGCell& cell, float sqdist,
   csMGPosition& pos)
 {
+  if (sqdist < sq_min_draw_dist) return false;
   size_t lod = GetLODLevel (sqdist);
   if (lod == csArrayItemNotFound) return false;
   pos.lod = lod;
@@ -255,11 +279,7 @@ bool csMeshGeneratorGeometry::AllocMesh (
   newPos = &pos;
   
   geom.allTransforms.GetExtend (i);
-  float fadeOpaqueDist =
-    generator->use_alpha_scaling ? generator->alpha_mindist : generator->total_max_dist;
-  float fadeDistScale =
-    generator->use_alpha_scaling ? generator->alpha_scale : 0;
-  geom.allInstanceExtra.GetExtend (i).Set (rng.Get(), fadeOpaqueDist, fadeDistScale);
+  geom.allInstanceExtra.GetExtend (i).Set (rng.Get());
 
   geom.dataDirty = true;
   
@@ -297,14 +317,36 @@ void csMeshGeneratorGeometry::MoveMesh (int cidx,
   geom.dataDirty = true;
 }
 
-void csMeshGeneratorGeometry::SetFadeParams (csMGPosition& p, float opaqueDist, float scale)
+void csMeshGeneratorGeometry::SetFadeParams (csMGGeom& geom, float opaqueDist, float scale)
 {
-  csMGGeom& geom = factories[p.lod];
-  csMGGeom::InstanceExtra& extra = geom.allInstanceExtra[p.idInGeometry];
-  extra.fadeOpaqueDist = opaqueDist;
-  extra.fadeDistScale = scale;
+  float fadeInM, fadeInN, fadeOutM, fadeOutN;
+  float max_opaque_dist = csMin (this->max_opaque_dist, opaqueDist);
+  float max_draw_dist = csMin (total_max_dist,
+                               (fabsf (scale) > EPSILON ? 1.0f/scale : 0) + opaqueDist);
+  float min_fade_dist = min_opaque_dist-min_draw_dist;
+  if (fabsf (min_fade_dist) > EPSILON)
+  {
+    fadeInM = 1.0f/(min_fade_dist);
+    fadeInN = -min_draw_dist * fadeInM;
+  }
+  else
+  {
+    fadeInM = 0;
+    fadeInN = 1;
+  }
+  float max_fade_dist = max_opaque_dist-max_draw_dist;
+  if (fabsf (max_fade_dist) > EPSILON)
+  {
+    fadeOutM = 1.0f/(max_fade_dist);
+    fadeOutN = -max_opaque_dist*fadeOutM + 1;
+  }
+  else
+  {
+    fadeOutM = 0;
+    fadeOutN = 1;
+  }
 
-  geom.dataDirty = true;
+  geom.fadeInfoVar->SetValue (csVector4 (fadeInM, fadeInN, fadeOutM, fadeOutN));
 }
 
 void csMeshGeneratorGeometry::SetWindDirection (float x, float z)
@@ -357,8 +399,32 @@ void csMeshGeneratorGeometry::FreeMesh (int cidx, csMGPosition& pos)
   }
 }
 
+template<typename DataArray>
+static void UpdateInstancingParams (bool allDataDirty,
+                                    const DataArray& array,
+                                    csRef<iRenderBuffer>& buffer,
+                                    csShaderVariable* sv)
+{
+  bool updateData = allDataDirty;
+  if (!buffer
+    || (buffer->GetElementCount() != array.Capacity()))
+  {
+    buffer = csRenderBuffer::CreateRenderBuffer (array.Capacity(),
+                                                 CS_BUF_STREAM, CS_BUFCOMP_FLOAT,
+                                                 sizeof (typename DataArray::ValueType) / sizeof(float));
+    sv->SetValue (buffer);
+    updateData = true;
+  }
+  if (updateData) buffer->SetData (array.GetArray());
+}
+
 void csMeshGeneratorGeometry::FinishUpdate ()
 {
+  float fadeOpaqueDist =
+    generator->use_alpha_scaling ? generator->alpha_mindist : total_max_dist;
+  float fadeDistScale =
+    generator->use_alpha_scaling ? generator->alpha_scale : 0;
+
   size_t lod;
   for (lod = 0 ; lod < factories.GetSize () ; lod++)
   {
@@ -375,34 +441,17 @@ void csMeshGeneratorGeometry::FinishUpdate ()
 	geom.mesh->GetMovable ()->SetSector (generator->GetSector ()); 
       }
       
+      SetFadeParams (geom, fadeOpaqueDist, fadeDistScale);
       geom.instancesNumVar->SetValue (int (geom.allPositions.GetSize()));
 
       /* Update buffers
          (Compare capacity instead of size so a buffer is kept if the number of
          elements changes only slightly.) */
-      bool updateTransformData = geom.dataDirty;
-      if (!geom.transformBuffer
-	|| (geom.transformBuffer->GetElementCount() != geom.allTransforms.Capacity()))
-      {
-	geom.transformBuffer = csRenderBuffer::CreateRenderBuffer (geom.allTransforms.Capacity(),
-								   CS_BUF_STREAM, CS_BUFCOMP_FLOAT,
-								   sizeof (csMGGeom::Transform) / sizeof(float));
-	geom.transformVar->SetValue (geom.transformBuffer);
-	updateTransformData = true;
-      }
-      if (updateTransformData) geom.transformBuffer->SetData (geom.allTransforms.GetArray());
+      UpdateInstancingParams (geom.dataDirty, geom.allTransforms,
+                              geom.transformBuffer, geom.transformVar);
 
-      bool updateExtraData = geom.dataDirty;
-      if (!geom.instanceExtraBuffer
-	|| (geom.instanceExtraBuffer->GetElementCount() != geom.allInstanceExtra.Capacity()))
-      {
-	geom.instanceExtraBuffer = csRenderBuffer::CreateRenderBuffer (geom.allInstanceExtra.Capacity(),
-								       CS_BUF_STREAM, CS_BUFCOMP_FLOAT,
-								       sizeof (csMGGeom::InstanceExtra) / sizeof(float));
-	geom.instanceExtraVar->SetValue (geom.instanceExtraBuffer);
-	updateExtraData = true;
-      }
-      if (updateExtraData) geom.instanceExtraBuffer->SetData (geom.allInstanceExtra.GetArray());
+      UpdateInstancingParams (geom.dataDirty, geom.allInstanceExtra,
+                              geom.instanceExtraBuffer, geom.instanceExtraVar);
 
       geom.dataDirty = false;
     }
@@ -412,13 +461,15 @@ void csMeshGeneratorGeometry::FinishUpdate ()
 
 size_t csMeshGeneratorGeometry::GetLODLevel (float sqdist)
 {
-  size_t i;
-  for (i = 0 ; i < factories.GetSize () ; i++)
+  if (sqdist >= sq_min_draw_dist)
   {
-    csMGGeom& geom = factories[i];
-    if (sqdist <= geom.sqmaxdistance)
+    for (size_t i = 0 ; i < factories.GetSize () ; i++)
     {
-      return i;
+      csMGGeom& geom = factories[i];
+      if (sqdist <= geom.sqmaxdistance)
+      {
+        return i;
+      }
     }
   }
   return csArrayItemNotFound;
@@ -426,8 +477,7 @@ size_t csMeshGeneratorGeometry::GetLODLevel (float sqdist)
 
 bool csMeshGeneratorGeometry::IsRightLOD (float sqdist, size_t current_lod)
 {
-  // With only one lod level we are always right.
-  if (factories.GetSize () <= 1) return true;
+  if (sqdist < sq_min_draw_dist) return false;
   if (current_lod == 0)
     return (sqdist <= factories[0].sqmaxdistance);
   else
@@ -447,7 +497,7 @@ void csMeshGeneratorGeometry::UpdatePosition (const csVector3& pos)
 
 csMeshGenerator::csMeshGenerator (csEngine* engine) : 
   scfImplementationType (this), total_max_dist (-1.0f), minRadius(-1.0f),
-  use_density_scaling (false), use_alpha_scaling (false),
+  use_alpha_scaling (false),
   last_pos (0, 0, 0), setup_cells (false),
   cell_dim (50), inuse_blocks (0), inuse_blocks_last (0),
   max_blocks (100), engine (engine)
@@ -476,6 +526,7 @@ csMeshGenerator::csMeshGenerator (csEngine* engine) :
     engine->objectRegistry, "crystalspace.shader.variablenameset");
   varInstancesNum = SVstrings->Request ("instances num");
   varTransform = SVstrings->Request ("instancing transforms");
+  varFadeInfo = SVstrings->Request ("meshgen fade info");
   varInstanceExtra = SVstrings->Request ("instance extra");
   varWindData = SVstrings->Request ("wind data");
 }
@@ -528,13 +579,6 @@ float csMeshGenerator::GetTotalMaxDist ()
 void csMeshGenerator::SetDensityScale (float mindist, float maxdist,
                                        float maxdensityfactor)
 {
-  use_density_scaling = true;
-  density_mindist = mindist;
-  sq_density_mindist = density_mindist * density_mindist;
-  density_maxdist = maxdist;
-  density_maxfactor = maxdensityfactor;
-
-  density_scale = (1.0f-density_maxfactor) / (density_maxdist - density_mindist);
 }
 
 void csMeshGenerator::SetAlphaScale (float mindist, float maxdist)
@@ -842,7 +886,6 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
             if (rot < 0) rot = 0;
             else if (rot >= CS_GEOM_MAX_ROTATIONS) rot = CS_GEOM_MAX_ROTATIONS-1;
             pos.rotation = rot;
-            pos.random = random.Get ();
             block->positions.Push (new csMGPosition (pos));
 	    positionsUsed++;
 	    
@@ -954,37 +997,10 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
       if (p.idInGeometry == csArrayItemNotFound)
       {
         // We didn't have a mesh here so we allocate one.
-        // But first we test if we have density scaling.
-        bool show = true;
-        if (use_density_scaling && sqdist > sq_density_mindist)
+        if (geometries[p.geom_type]->AllocMesh (cidx, cell, sqdist, p))
         {
-          float dist = sqrt (sqdist);
-          float factor = (density_maxdist - dist) * density_scale
-            + density_maxfactor;
-          if (factor < 0) factor = 0;
-          else if (factor > 1) factor = 1;
-          if (p.random > factor)
-              show = false;
-          else
-              p.addedDist = dist;
-        }
-
-        if (show)
-        {
-          if (geometries[p.geom_type]->AllocMesh (cidx, cell, sqdist, p))
-          {
-            p.last_mixmode = ~0;
-            geometries[p.geom_type]->MoveMesh (cidx, p,
-					       p.position, rotation_matrices[p.rotation]);
-
-	    if (use_density_scaling && (p.addedDist > 0))
-	    {
-	      float correct_alpha_maxdist = p.addedDist;
-	      float correct_alpha_mindist = p.addedDist*(alpha_mindist/alpha_maxdist);
-	      float correct_scale = 1.0f/(correct_alpha_maxdist-correct_alpha_mindist);
-	      geometries[p.geom_type]->SetFadeParams (p, correct_alpha_mindist, correct_scale);
-	    }
-          }
+          geometries[p.geom_type]->MoveMesh (cidx, p,
+                                              p.position, rotation_matrices[p.rotation]);
         }
       }
       else
@@ -996,10 +1012,11 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
           geometries[p.geom_type]->FreeMesh (cidx, p);
           if (geometries[p.geom_type]->AllocMesh (cidx, cell, sqdist, p))
           {
-            p.last_mixmode = ~0;
             geometries[p.geom_type]->MoveMesh (cidx, p,
               p.position, rotation_matrices[p.rotation]);
           }
+          else
+            p.idInGeometry = csArrayItemNotFound;
         }
         else if(!delta.IsZero())
         { 
@@ -1015,7 +1032,6 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
       {
         geometries[p.geom_type]->FreeMesh (cidx, p);
         p.idInGeometry = csArrayItemNotFound;
-        p.addedDist = 0;
       }
     }
   }

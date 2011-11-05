@@ -59,6 +59,11 @@ struct csMGGeom
 
   csRef<csShaderVariable> windDataVar;
   csRef<csShaderVariable> instancesNumVar;
+  /**
+   * SV contains coefficents for linear fading function <tt>opacity = dist*m + n</tt>:
+   * (fadeInM,fadeInN,fadeOutM,fadeOutN)
+   */
+  csRef<csShaderVariable> fadeInfoVar;
   csRef<iMeshWrapper> mesh;
 
   // All instances of this geometry
@@ -70,15 +75,11 @@ struct csMGGeom
   csDirtyAccessArray<Transform> allTransforms;
   struct InstanceExtra
   {
-    float windRand;
-    float fadeOpaqueDist;
-    float fadeDistScale;
+    float random;
     
-    void Set (float windRand, float fadeOpaqueDist, float fadeDistScale)
+    void Set (float random)
     {
-      this->windRand = windRand;
-      this->fadeOpaqueDist = fadeOpaqueDist;
-      this->fadeDistScale = fadeDistScale;
+      this->random = random;
     }
   };
   csDirtyAccessArray<InstanceExtra> allInstanceExtra;
@@ -112,6 +113,11 @@ private:
   float radius;
   float density;
   float total_max_dist;
+  
+  float min_draw_dist;
+  float sq_min_draw_dist;
+  float min_opaque_dist;
+  float max_opaque_dist;
 
   // Random number generator for wind randomness.
   csRandomGen rng;
@@ -189,6 +195,15 @@ public:
   virtual bool UseDensityFactorMap (const char* factorMapID,
 				    float factor);
 
+  void SetMinimumDrawDistance (float dist);
+  float GetMinimumDrawDistance () { return min_draw_dist; }
+  
+  void SetMinimumOpaqueDistance (float dist);
+  float GetMinimumOpaqueDistance () { return min_opaque_dist; }
+
+  void SetMaximumOpaqueDistance (float dist);
+  float GetMaximumOpaqueDistance () { return max_opaque_dist; }
+
   const csVector2& GetWindDirection() const { return wind_direction; }
   virtual void SetWindDirection (float x, float z);
 
@@ -228,8 +243,8 @@ public:
   void MoveMesh (int cidx, const csMGPosition& pos,
 		 const csVector3& position, const csMatrix3& matrix); 
 
-  /// Set the fade params for a mesh.
-  void SetFadeParams (csMGPosition& p, float opaqueDist, float scale);
+  /// Set the fade params for the geometry.
+  void SetFadeParams (csMGGeom& geom, float opaqueDist, float scale);
 
   /**
    * Get the right lod level for the given squared distance.
@@ -264,30 +279,14 @@ struct csMGPosition
    */
   size_t rotation;
 
-  /**
-   * A random number between 0 and 1 which controls fade and density
-   * scaling for this position.
-   */
-  float random;
-
-  /**
-   * The distance at which we were added. Used for density scaling.
-   */
-  float addedDist;
-
-  /**
-   * Last used mixmode.
-   */
-  uint last_mixmode;
-
   /// The LOD level for the mesh above.
   size_t lod;
 
   /// Index of geometry in csMGGeom.
   size_t idInGeometry;
 
-  csMGPosition () : position(0.0f), geom_type(0), rotation(0), random(0.0f),
-    addedDist(0.0f), last_mixmode(CS_FX_COPY), lod(0),
+  csMGPosition () : position(0.0f), geom_type(0), rotation(0),
+    lod(0),
     idInGeometry (csArrayItemNotFound) { } 
 };
 
@@ -381,12 +380,6 @@ private:
   float samplefact_z;
   float samplecellwidth_x;
   float samplecellheight_z;
-
-  /// For density scaling.
-  bool use_density_scaling;
-  float density_mindist, sq_density_mindist, density_maxdist;
-  float density_scale;
-  float density_maxfactor;
 
   /// Default density factor.
   float default_density_factor;
@@ -486,6 +479,7 @@ public:
   CS::ShaderVarStringID varInstancesNum;
   CS::ShaderVarStringID varTransform;
   CS::ShaderVarStringID varInstanceExtra;
+  CS::ShaderVarStringID varFadeInfo;
   CS::ShaderVarStringID varWindData;
 
   csMeshGenerator (csEngine* engine);

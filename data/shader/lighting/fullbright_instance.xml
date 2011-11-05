@@ -23,8 +23,11 @@
       <!-- First pass: blend with alpha. -->
       <mixmode>
         <blendop src="srcalpha" dst="srcalpha_inv" />
-        <alphatest>disable</alphatest>
+        <!-- Enable alphatest to discard entirely clear pixels
+             (see alphatestoptions below) -->
+        <alphatest>enable</alphatest>
       </mixmode>
+      <alphatestoptions func="greater" threshold="0" />
       <alphatocoverage/>
       <!-- ATC provides an alpha-blending 'lookalike' -->
       <atcmixmode>

@@ -33,24 +33,6 @@
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
-#if defined(CS_IEEE_DOUBLE_FORMAT)
-  namespace 
-  { 
-    struct UI32ToFloat
-    {
-      union
-      {
-	uint32 ui32;
-	float f;
-      };
-      UI32ToFloat (uint32 ui32) : ui32 (ui32) {}
-    };
-  }
-#define CS_INFINITY	  (UI32ToFloat (0x7f800000).f)
-#else
-#define CS_INFINITY	  std::numeric_limits<float>::infinity()
-#endif
-  
   /**
    * A set of values, stored as a number of interval.
    */
@@ -74,7 +56,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       public:
       
 	Side (bool negInf, bool inclusive) : flags (inclusive ? Inclusive : 0),
-          value (negInf ? -CS_INFINITY : CS_INFINITY) {}
+          value (negInf ? -CS::Infinity() : CS::Infinity()) {}
 	Side (float v, bool inclusive) : 
           flags (Finite | (inclusive ? Inclusive : 0)), value (v) {}
       
@@ -392,8 +374,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       }
     }
   };
-
-#undef CS_INFINITY
 
 }
 CS_PLUGIN_NAMESPACE_END(XMLShader)

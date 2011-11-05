@@ -259,6 +259,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       case XMLTOKEN_WINDSPEED:
         geom->SetWindSpeed(child->GetContentsValueAsFloat ());
         break;
+      case XMLTOKEN_MINDRAWDIST:
+        geom->SetMinimumDrawDistance(child->GetContentsValueAsFloat ());
+        break;
+      case XMLTOKEN_MINOPAQUEDIST:
+        geom->SetMinimumOpaqueDistance(child->GetContentsValueAsFloat ());
+        break;
+      case XMLTOKEN_MAXOPAQUEDIST:
+        geom->SetMaximumOpaqueDistance(child->GetContentsValueAsFloat ());
+        break;
       default:
         SyntaxService->ReportBadToken (child);
         return false;
