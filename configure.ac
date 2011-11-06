@@ -1650,7 +1650,8 @@ AS_IF([test $cs_cv_libCEGUI = yes],
 	[AC_LANG_PROGRAM(
 	    [[#include <falagard/CEGUIFalWidgetLookManager.h>]],
 	    [CEGUI::WidgetLookManager::getSingleton();
-	    #if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR < 5)
+	    #if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR < 5) \
+            || (CEGUI_VERSION_MINOR > 6)
 	    who took the ram from the ramalamadingdong?
 	    #endif
 	    ])],
