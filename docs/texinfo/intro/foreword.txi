@@ -2,14 +2,14 @@
 @node HowToRead, Current Status, CS Introduction, CS Introduction
 @section How To Read This Manual
 
-This manual has been written by numerous volunteers, and as such, conventions
+This manual has been written by numerous volunteers. As such, conventions
 within the manual are not always the same.  Where possible, the overall
 maintainers of this manual have modified the original documents to fit a more
 standard convention for easier reading.  If you find anything in this manual
-which is not correct, please submit a bug report either to the mailing list,
+which is not correct, please submit a bug report, either to the mailing list,
 or to the Crystal Space bug tracking system. @xref{Feedback}.
 
-This manual can be read in just about any order, however, if you are a first
+This manual can be read in just about any order; however, if you are a first
 time user of Crystal Space, you may want to read it in order from front
 to back, as it has been organized to be most useful to the new user when
 perused in that order.
@@ -54,13 +54,13 @@ usable as possible, so things are improving constantly.
 What if you want to use Crystal Space in your project?
 The best approach at this point in time is to become a member of the
 mailing lists and listen to how everything develops.  If you're really
-serious about things you can join discussions and develop for the
-engine.  Jorrit will gladly add contributed code to Crystal Space
-provided he can use the code.
+serious about things, you can join discussions and help develop for the
+engine.  Jorrit and other core developers will gladly add contributed
+code to Crystal Space, provided we can use the code.
 
-Note that you also need to agree to the @sc{lgpl} details but it
+Note that you also need to agree to the @sc{lgpl} details, but it
 shouldn't be a real problem for @sc{oss} developers. @xref{Licenses}.
 
 We are always interested in hearing what other people are doing with
-Crystal Space.  Even if you only use Crystal Space for small private projects
-we would like to hear about it just to satisfy our curiosity.
+Crystal Space.  Even if you only use Crystal Space for small private projects,
+we would like to hear about it, just to satisfy our curiosity.
