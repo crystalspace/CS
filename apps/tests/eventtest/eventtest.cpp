@@ -168,6 +168,19 @@ bool EventTest::OnKeyboard(iEvent& ev)
   return false;
 }
 
+void EventTest::Frame ()
+{
+  g3d->BeginDraw (CSDRAW_2DGRAPHICS | CSDRAW_CLEARSCREEN);
+  
+  iGraphics2D* g2d = g3d->GetDriver2D();
+  int white = g2d->FindRGB (255, 255, 255);
+  g2d->Write (font, 8, 8, white, -1,
+              "Watch the console as information from incoming input events is being printed.");
+  
+  g3d->FinishDraw();
+  g3d->Print(0);
+}
+
 bool EventTest::OnInitialize(int /*argc*/, char* /*argv*/ [])
 {
   // RequestPlugins() will load all plugins we specify. In addition
@@ -211,6 +224,21 @@ bool EventTest::OnInitialize(int /*argc*/, char* /*argv*/ [])
   return true;
 }
 
+bool EventTest::SetupModules ()
+{
+  // Now get the pointer to various modules we need. We fetch them
+  // from the object registry. The RequestPlugins() call we did earlier
+  // registered all loaded plugins with the object registry.
+  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry ());
+  if (!g3d) return ReportError ("Failed to locate 3D renderer!");
+
+  csRef<iFontServer> fontServ (csQueryRegistry<iFontServer> (GetObjectRegistry ()));
+  if (!fontServ) return ReportError ("Failed to obtain font server!");
+  font = fontServ->LoadFont (CSFONT_LARGE);
+
+  return true;
+}
+
 void EventTest::OnExit()
 {
 }
@@ -222,7 +250,10 @@ bool EventTest::Application()
   if (!OpenApplication(GetObjectRegistry()))
     return ReportError("Error opening system!");
 
-  Run();
+  if (SetupModules ())
+  {
+    Run ();
+  }
 
   return true;
 }
