@@ -11,13 +11,13 @@ but perhaps most important is that any program you write may freely link to the
 Crystal Space libraries.
 
 The second important feature of Crystal Space is that it is written to run
-under a wide variety of hardware and software platforms. As of this writing
+under a wide variety of hardware and software platforms. As of this writing,
 Crystal Space has been known to run on the following systems. Note that if a
 system is listed here it does not necessarily mean that it is 100% supported:
 
 @itemize @bullet
 @item
-Microsoft@registeredsymbol{} Windows (9x/@sc{nt}/@sc{me}/2000/@sc{xp})
+Microsoft@registeredsymbol{} Windows (@sc{xp}/Vista/7)
 
 @item
 Unix@registeredsymbol{} like Operating Systems (@sc{gnu}
@@ -28,9 +28,9 @@ Apple@registeredsymbol{} Mac OS@registeredsymbol{} X
 @end itemize
 
 @noindent
-Here are some of just some of Crystal Space's features in no particular order.
-Whenever there is some documentation on the subject this is marked after
-the feature. The most useful documentation comes first.
+Here are just some of Crystal Space's features, in no particular order.
+This documentation is normally marked after the fact. The most useful
+documentation comes first.
 
 @c This used to be listed by library and plug-in, but I found that organization
 @c redundant after looking at some other sections of the documentation,
@@ -38,18 +38,18 @@ the feature. The most useful documentation comes first.
 
 @itemize @bullet
 @item
-Geometric utility library with handy classes such as 2D and 3D vectors,
+Geometric utility library with handy classes, such as 2D and 3D vectors,
 matrices, transforms, quaternions, kdtree, axis aligned and oriented bounding
 box routines, rectangle subdivision, etc. @xref{csGeom}.
 
 @item
-General utility library with stuff like templated arrays, smart pointers,
+General utility library with templated arrays, smart pointers,
 hash maps, object registry, plugin manager, radix sort, bit array, optimized
 allocators, strings, command-line parsing, configuration files, and more. 
 @xref{csUtil}. @xref{The Basics}. @xref{Configuration File}.
 
 @item
-Higher level tool library containing things like some example procedural
+Higher level tool library containing things example procedural
 textures (plasma, fire, and water), full screen effects, collider support,
 texture generation tools, etc.
 
@@ -59,9 +59,9 @@ quantization, calculation of color gradients, and more.
 
 @item
 Shared Class Facility @sc{scf} allowing for proper decoupling of interface
-and implementation and also allows for dynamically loadable modules 
+and implementation. It also allows for dynamically loadable modules.
 It provides a flexible plug-in system which is used extensively by Crystal 
-Space itself but also allows third-party creation of plugins. @xref{SCF}.
+Space itself, but also allows third-party creation of plugins. @xref{SCF}.
 @xref{SCF}. @xref{The Basics}. @xref{HOWTO Create Your Own Plugin}.
 
 @item
@@ -101,14 +101,14 @@ Animated Cal3D models using skeletal based animation using the
 
 @item
 Quake @sc{md3} and @sc{mdl} to Crystal Space convertor.
-@xref{md32spr Tutorial}. Additionally Crystal Space can read @sc{md2}
+@xref{md32spr Tutorial}. Additionally, Crystal Space can read @sc{md2}
 and @sc{3ds} models directly.
 
 @item
 Crystal Space native windowing system using CEGUI.
 
 @item
-Cross-platform support for hardware rendering via OpenGL as well as a special
+Cross-platform support for hardware rendering (via OpenGL) as well as a special
 ``null'' renderer for applications like game servers. @xref{3D Renderer}.
 
 @item
@@ -132,7 +132,7 @@ Multiple cameras. @xref{HOWTO Camera Movement}.
 
 @item
 Powerful material support. Shaders and textures can be assigned arbitrarily 
-to materials allowing great flexibility. Shaders support @sc{cg}, @sc{arb}, and
+to materials, allowing great flexibility. Shaders support @sc{cg}, @sc{arb}, and
 @samp{fixed function} language. @xref{Texture Mapping}.
 
 @item

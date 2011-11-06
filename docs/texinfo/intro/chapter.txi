@@ -3,14 +3,14 @@
 @chapter Introduction
 @cindex Introduction
 
-CrystalSpace is a portable modular 3D @sc{sdk}, including many components
-for building various applications and games - these are still quite
-useful for projects that do not involve 3D. @sc{cs} is still very much in 
-development, so anyone who feels inclined to do so can contribute to the
-source. There are a number of incomplete components still needing to be 
-finished, and a wide array of possibilities for new contributions; for
-more information about what is missing and a list of currently known
-bugs, please visit the Developer's Project page at SourceForge:  
+CrystalSpace is a portable, modular 3D @sc{sdk}, including many components
+for building various applications and games. It is even useful for projects
+that do not involve 3D. @sc{cs} is still very much in development, so
+anyone who feels inclined to do so can contribute to the source. There are
+a number of incomplete components still needing to be finished, and a wide
+array of possibilities for new contributions; for more information about
+what is missing and a list of currently known bugs, please visit
+the Developer's Project page at SourceForge:  
 
 @noindent
 @uref{http://sourceforge.net/projects/crystal/}
@@ -24,7 +24,7 @@ works incorporating parts of the library must be made freely available
 to everyone, under the @sc{lgpl}'s terms.
 
 Please read the @sc{faq} if you have any questions.  If you don't find the
-answer there you can always email the mailing lists. @xref{FAQ}, or
+answer there, you can always email the mailing lists. @xref{FAQ}, or
 @ref{Mailing Lists}.
 
 @menu

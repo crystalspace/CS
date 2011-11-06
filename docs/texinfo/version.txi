@@ -1,4 +1,5 @@
 @c -*-texinfo-*-
-@set UPDATED 5 April 2011
+@set UPDATED 06 November 2011
 @set EDITION 2.0.0
 @set VERSION 2.0.0
+

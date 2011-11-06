@@ -6,5 +6,5 @@ Copyright @copyright{} 2003-2007 by Frank Richter@*
 Copyright @copyright{} 2004-2006 by M@aa{}rten Svanfeldt@*
 Copyright @copyright{} 1998-2000 by Andrew Zabolotny@*
 Copyright @copyright{} 1999-2000 by Seth Galbraith@*
-Copyright @copyright{} 2000-2008 by Philip Wyett@*
+Copyright @copyright{} 2000-2011 by Philip Wyett@*
 Copyright @copyright{} 2001 by Michael Voase@*
