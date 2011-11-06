@@ -23,6 +23,10 @@ MACOSX_ENVIRONMENT = "export MACOSX_DEPLOYMENT_TARGET=10.4" ;
 
 PLUGIN.LFLAGS += "" ;
 
+# GNU linker on Mac OS X does not support the -shared flag, yet it is silently
+# accepted during the configure check, so filter it out.
+PLUGIN.LFLAGS = [ Filter $(PLUGIN.LFLAGS) : -shared ] ;
+
 # We use the ugly -Wl form, which does not contain embedded whitespace (unlike
 # "-framework AppKit"), to help external projects which use the result of
 # "cs-config --libs" in conjunction with GNU libtool, since libtool likes to
