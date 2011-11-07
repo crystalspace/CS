@@ -42,7 +42,7 @@
       <snippet id="lerp" file="/shader-snippets/lerp.xml" />
       
       <snippet id="apply_mixmode_alpha" file="/shader-snippets/mixmode-alpha.xml" />
-      <snippet id="sectorfog" file="/shader/fog/fog-sector.xml" />
+      <snippet id="sectorfog" file="/shader-snippets/fog/fog-sector.xml" />
       
       <!-- "connections" describe what snippets take input from what other
            snippets (ie the "data flow" is modeled). The exact resolution of
