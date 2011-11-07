@@ -29,7 +29,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderGLSL)
 
   bool csShaderGLSLShader::Compile (const char *source)
   {
-    int status;                   // compile status
+    GLint status;                   // compile status
     const csGLExtensionManager* ext = shaderPlug->ext;
 
     shader_id = ext->glCreateShaderObjectARB (type);
@@ -40,7 +40,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderGLSL)
       &status);
     if (status != GL_TRUE)
     {
-      int size;
+      GLint size;
 
       ext->glGetObjectParameterivARB (shader_id, GL_OBJECT_INFO_LOG_LENGTH_ARB,
         &size);

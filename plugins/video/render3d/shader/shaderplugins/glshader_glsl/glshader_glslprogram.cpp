@@ -275,7 +275,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderGLSL)
 
   bool csShaderGLSLProgram::Compile (iHierarchicalCache*, csRef<iString>* tag)
   {
-    int status;                   // link status
+    GLint status;                   // link status
 
     shaderPlug->Open ();
 
@@ -348,7 +348,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderGLSL)
       &status);
     if (!status)
     {
-      int size;
+      GLint size;
 
       ext->glGetObjectParameterivARB (program_id, GL_OBJECT_INFO_LOG_LENGTH_ARB,
         &size);

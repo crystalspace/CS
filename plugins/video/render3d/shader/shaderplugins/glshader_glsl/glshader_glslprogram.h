@@ -33,7 +33,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderGLSL)
     csRef<csGLShader_GLSL> shaderPlug;
 
     // GL identifier
-    GLuint program_id;
+    GLhandleARB program_id;
 
     bool validProgram;                // what for
     bool useTessellation;

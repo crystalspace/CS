@@ -29,7 +29,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderGLSL)
     csGLShader_GLSL* shaderPlug;
 
     // OpenGL identifier
-    GLuint shader_id;
+    GLhandleARB shader_id;
 
     // shader type description: vertex, fragment, etc.
     csString typeName;
@@ -54,7 +54,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderGLSL)
         shaderPlug->ext->glDeleteObjectARB (shader_id);
     }
 
-    GLuint GetID () const
+    GLhandleARB GetID () const
     {
       return shader_id;
     }
