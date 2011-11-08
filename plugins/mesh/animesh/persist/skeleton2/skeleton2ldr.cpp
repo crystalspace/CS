@@ -639,7 +639,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
 
     // Properties..
     bool isCyclic, reset, autostop;
-    if (synldr->ParseBoolAttribute (node, "cyclic", isCyclic, true, false))
+    if (synldr->ParseBoolAttribute (node, "cyclic", isCyclic, false, false))
     {
       factnode->SetCyclic (isCyclic);
     }
@@ -1286,7 +1286,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
 
     if (node->GetAttribute ("alwaysrot"))
     {
-      float rotate = node->GetAttributeValueAsFloat ("alwaysrot");
+      bool rotate = node->GetAttributeValueAsBool ("alwaysrot");
       factnode->SetAlwaysRotate (rotate);
     }
 

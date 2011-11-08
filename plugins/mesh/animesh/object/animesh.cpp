@@ -1067,6 +1067,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       return 0.0;
   }
 
+  void AnimeshObject::ClearMorphTargetWeights ()
+  {
+    if (!morphTargetWeights.GetSize ())
+      return;
+
+    uint morphTargetCount = factory->GetMorphTargetCount ();
+    for (uint i = 0; i < morphTargetCount; i++)
+      morphTargetWeights[i] = 0.0f;
+    morphStateChanged = true;
+  }
+
   size_t AnimeshObject::GetSocketCount () const
   {
     return sockets.GetSize ();

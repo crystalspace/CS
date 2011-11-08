@@ -223,6 +223,14 @@ public:
       iEngine* engine, iCollection* collection = 0);
 
   /**
+   * Initialize collision detection (ie create csColliderWrapper) for
+   * all objects in a sector. If the optional collection is given only
+   * the objects from that collection will be initialized.
+   */
+  static void InitializeCollisionWrappers (iCollideSystem* colsys,
+      iSector* sector, iCollection* collection = 0);
+
+  /**
    * Test collision between one collider and an array of colliders.
    * This function is mainly used by CollidePath() below.
    * \param colsys is the collider system.

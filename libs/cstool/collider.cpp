@@ -311,6 +311,20 @@ void csColliderHelper::InitializeCollisionWrappers (iCollideSystem* colsys,
   }
 }
 
+void csColliderHelper::InitializeCollisionWrappers (iCollideSystem* colsys,
+    iSector* sector, iCollection* collection)
+{
+  // Initialize all mesh objects for collision detection.
+  int i;
+  iMeshList* meshes = sector->GetMeshes ();
+  for (i = 0 ; i < meshes->GetCount () ; i++)
+  {
+    iMeshWrapper* sp = meshes->Get (i);
+    if (collection && !collection->IsParentOf(sp->QueryObject ())) continue;
+    InitializeCollisionWrapper (colsys, sp);
+  }
+}
+
 #include "csutil/deprecated_warn_on.h"
 
 bool csColliderHelper::CollideArray (

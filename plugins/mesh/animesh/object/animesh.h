@@ -359,6 +359,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     virtual void SetMorphTargetWeight (uint target, float weight);
     virtual float GetMorphTargetWeight (uint target) const;
+    virtual void ClearMorphTargetWeights ();
 
     virtual size_t GetSocketCount () const;
     virtual CS::Mesh::iAnimatedMeshSocket* GetSocket (size_t index) const;

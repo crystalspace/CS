@@ -294,7 +294,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           CS::Animation::iSkeletonFactory* skelFact = skelMgr->FindSkeletonFactory (skelName);
           if (!skelFact)
           {
-            synldr->ReportError (msgidFactory, child, "Could not find skeleton %s", skelName);
+            synldr->ReportError (msgidFactory, child, "Could not find skeleton %s",
+				 CS::Quote::Single (skelName));
             return 0;
           }
 
@@ -339,7 +340,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 	  CS::Animation::BoneID bone = skelFact->FindBone (boneName);
           if (bone == CS::Animation::InvalidBoneID)
           {
-            synldr->ReportError (msgidFactory, child, "Could not find bone %s in skeleton", boneName);
+            synldr->ReportError (msgidFactory, child, "Could not find bone %s in skeleton",
+				 CS::Quote::Single (boneName));
             return 0;
           }
 
@@ -832,7 +834,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           if (!amfact)
           {
             synldr->ReportError (msgid, child, 
-              "Factory %s doesn't appear to be a animesh factory!", CS::Quote::Single (factname));
+              "Factory %s doesn't appear to be an animesh factory!", CS::Quote::Single (factname));
             return 0;
           }
 
@@ -841,7 +843,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           if (!ammesh)
           {
             synldr->ReportError (msgid, child, 
-              "Factory %s doesn't appear to be a animesh factory!", CS::Quote::Single (factname));
+              "Factory %s doesn't appear to be an animesh factory!", CS::Quote::Single (factname));
             return 0;
           }
         }
@@ -884,7 +886,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           CS::Animation::iSkeletonFactory* skelFact = skelMgr->FindSkeletonFactory (skelName);
           if (!skelFact)
           {
-            synldr->ReportError (msgid, child, "Could not find skeleton %s", skelName);
+            synldr->ReportError (msgid, child, "Could not find skeleton %s",
+				 CS::Quote::Single (skelName));
             return 0;
           }
 
@@ -916,7 +919,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           CS::Animation::iSkeletonAnimPacketFactory* packetFact = skelMgr->FindAnimPacketFactory (packetName);
           if (!packetFact)
           {
-            synldr->ReportError (msgid, child, "Could not find animation packet %s", packetName);
+            synldr->ReportError (msgid, child, "Could not find animation packet %s",
+				 CS::Quote::Single (packetName));
             return 0;
           }
 
@@ -924,6 +928,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           skeleton->SetAnimationPacket (packet);
         }
         break;
+      case XMLTOKEN_MORPHTARGET:
+        {
+	  csString name = child->GetAttributeValue("name");
+
+	  if (name.Trim ().IsEmpty ())
+          {
+            synldr->Report (msgid, CS_REPORTER_SEVERITY_WARNING, child,
+			    "No name specified for the morph target");
+	    break;
+          }
+
+	  uint targetID = ammesh->GetAnimatedMeshFactory ()->FindMorphTarget (name);
+	  if (targetID == (uint) ~0)
+          {
+            synldr->Report (msgid, CS_REPORTER_SEVERITY_WARNING, child,
+			    "Could not find morph target %s",
+			    CS::Quote::Single (name));
+	    break;
+          }
+
+	  float weight = child->GetAttributeValueAsFloat ("weight", 0.0f);
+	  ammesh->SetMorphTargetWeight (targetID, weight);
+        }
+	break;
       case XMLTOKEN_BBOXES:
         {
           if (!ParseBoundingBoxes (child, ammesh))

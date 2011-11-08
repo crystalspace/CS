@@ -600,7 +600,7 @@ struct iAnimatedMeshSubMeshFactory : public virtual iBase
  */
 struct iAnimatedMesh : public virtual iBase
 {
-  SCF_INTERFACE(CS::Mesh::iAnimatedMesh, 1, 0, 2);
+  SCF_INTERFACE(CS::Mesh::iAnimatedMesh, 1, 0, 3);
 
   /**
    * Set the skeleton to use for this mesh.
@@ -685,6 +685,11 @@ struct iAnimatedMesh : public virtual iBase
    * \sa iObjectModel::SetObjectBoundingBox()
    */
   virtual void UnsetObjectBoundingBox () = 0;
+
+  /**
+   * Clear the weight of all active morph targets
+   */
+  virtual void ClearMorphTargetWeights () = 0;
 };
 
 /**
