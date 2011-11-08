@@ -44,7 +44,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
   public:
     DensityFactorMap();
     
-    bool IsValid() const { return mapPtr; }
+    bool IsValid() const { return mapPtr != 0; }
     float GetDensity (const csVector3& worldCoord) const;
     int GetWidth () const { return width; }
     int GetHeight () const { return height; }

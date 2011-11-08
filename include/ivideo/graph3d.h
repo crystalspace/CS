@@ -900,7 +900,7 @@ struct iGraphics3D : public virtual iBase
    *   penalty so it's recommended to avoid this flag.
    * \param subtexture this specifies the subtexture index if the texture
    *   is a cubemap or volume texture. It is in the range 0 to 5 for cubemaps
-   *   (\sa iTextureHandle::CS_TEXTURE_CUBE_POS_X et al) or the depth index
+   *   (#iTextureHandle::CS_TEXTURE_CUBE_POS_X et al) or the depth index
    *   for volume textures.
    * \param attachment Specifies to what result of the rasterization the
    *   texture should be attached to.
