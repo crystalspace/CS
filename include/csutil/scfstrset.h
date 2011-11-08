@@ -131,6 +131,15 @@ public:
    */
   virtual bool IsEmpty() const
   { return set.IsEmpty(); }
+
+  /**
+   * Return an iterator for the set which iterates over all strings.
+   * \warning Modifying the set while you have open iterators will result
+   *   undefined behaviour.
+   * \warning The iterator will <b>not</b> respect locking of the string set!
+   */
+  typename Utility::StringSet<typename IF::TagType, true>::GlobalIterator GetIterator () const
+  { return set.GetIterator(); }
 };
 } // namespace CS
 

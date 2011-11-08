@@ -142,6 +142,91 @@ public:
     return map.Delete (object, true);
   }
 
+  /**
+   * Calculate the union of two sets and put the result in
+   * this set.
+   */
+  void Union (const csSet& otherSet)
+  {
+    GlobalIterator it = otherSet.GetIterator ();
+    while (it.HasNext ())
+      Add (it.Next ());
+  }
+
+  /**
+   * Calculate the union of two sets and put the result in
+   * a new set.
+   */
+  inline friend csSet Union (const csSet& s1, const csSet& s2)
+  {
+    csSet un (s1);
+    un.Union (s2);
+    return un;
+  }
+
+  /**
+   * Test if this set intersects with another set (i.e. they have
+   * common elements).
+   */
+  bool TestIntersect (const csSet& other) const
+  {
+    if (GetSize () < other.GetSize ())
+    {
+      // Call TestIntersect() on the set with most elements
+      // so that we iterate over the set with fewest elements.
+      return other.TestIntersect (*this);
+    }
+    GlobalIterator it = other.GetIterator ();
+    while (it.HasNext ())
+    {
+      if (Contains (it.Next ())) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Calculate the intersection of two sets and put the result
+   * in a new set.
+   */
+  inline friend csSet Intersect (const csSet& s1, const csSet& s2)
+  {
+    csSet intersection;
+    GlobalIterator it = s1.GetIterator ();
+    while (it.HasNext ())
+    {
+      T item = it.Next ();
+      if (s2.Contains (item))
+	intersection.AddNoTest (item);
+    }
+    return intersection;
+  }
+
+  /**
+   * Subtract a set from this set and put the result in this set.
+   */
+  void Subtract (const csSet& otherSet)
+  {
+    GlobalIterator it = otherSet.GetIterator ();
+    while (it.HasNext ())
+      Delete (it.Next ());
+  }
+
+  /**
+   * Subtract two sets and return the result in a new set.
+   */
+  inline friend csSet Subtract (const csSet& s1, const csSet& s2)
+  {
+    csSet subtraction;
+    GlobalIterator it = s1.GetIterator ();
+    while (it.HasNext ())
+    {
+      T item = it.Next ();
+      if (!s2.Contains (item))
+	subtraction.AddNoTest (item);
+    }
+    return subtraction;
+  }
+
   /// Get the number of elements in the set.
   size_t GetSize () const
   {

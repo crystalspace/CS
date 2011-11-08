@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2002 by Jorrit Tyberghein
+    Copyright (C) 2011 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,12 +16,14 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_KDTREE_H__
-#define __CS_KDTREE_H__
+#ifndef __CS_KDTREEX_H__
+#define __CS_KDTREEX_H__
 
 #include "csextern.h"
 
 #include "csgeom/box.h"
+#include "csgeom/sphere.h"
+#include "csgeom/kdtree.h"
 
 #include "csutil/blockallocator.h"
 #include "csutil/ref.h"
@@ -38,31 +40,28 @@
 
 struct iGraphics3D;
 struct iString;
-class csKDTree;
-class csKDTreeChild;
+
+namespace CS
+{
+namespace Geometry
+{
+
+class KDTree;
+class KDTreeChild;
 
 /**
  * If you implement this interface then you can give that to the
  * KDtree. The KDtree can then use this to find the description of an object.
- * This can be used for debugging as the KDtree will print out that description
- * if it finds something is wrong.
+ * This can be used for debugging as the KDtree will print out that
+ * description if it finds something is wrong.
  */
-struct iKDTreeObjectDescriptor : public virtual iBase
+struct iObjectDescriptor : public virtual iBase
 {
-  SCF_INTERFACE (iKDTreeObjectDescriptor, 0, 0, 1);
+  SCF_INTERFACE (CS::Geometry::iObjectDescriptor, 0, 0, 1);
 
-  virtual csPtr<iString> DescribeObject (csKDTreeChild* child) = 0;
+  virtual csPtr<iString> DescribeObject (KDTreeChild* child) = 0;
 };
 
-/**
- * The data type for user data to be attached to the KDTree.
- * It provides no functions but makes it possible to do a direct cast
- * for performance instead of doing an scfQueryInterface.
- */
-struct iKDTreeUserData : public virtual iBase
-{
-  SCF_INTERFACE (iKDTreeUserData, 0, 0, 1);
-};
 
 /**
  * A callback function for visiting a KD-tree node. If this function
@@ -86,20 +85,20 @@ struct iKDTreeUserData : public virtual iBase
  * of plane tests (for frustum culling) that have to occur for children
  * of this node.
  */
-typedef bool (csKDTreeVisitFunc)(csKDTree* treenode, void* userdata,
+typedef bool (KDTreeVisitFunc)(KDTree* treenode, void* userdata,
         uint32 timestamp, uint32& frustum_mask);
 
 /**
  * A child in the KD-tree (usually some object).
  */
-class CS_CRYSTALSPACE_EXPORT csKDTreeChild
+class KDTreeChild
 {
 private:
-  friend class csKDTree;
+  friend class KDTree;
 
-  csBox3 bbox;
+  csSphere bsphere;
   void* object;                 // Pointer back to the original object.
-  csKDTree** leafs;             // Leafs that contain this object.
+  KDTree** leafs;               // Leafs that contain this object.
   int num_leafs;
   int max_leafs;
 
@@ -107,32 +106,32 @@ public:
   uint32 timestamp;             // Timestamp of last visit to this child.
 
 public:
-  csKDTreeChild ();
-  ~csKDTreeChild ();
+  KDTreeChild ();
+  ~KDTreeChild ();
 
   /// Physically add a leaf to this child.
-  void AddLeaf (csKDTree* leaf);
+  void AddLeaf (KDTree* leaf);
   /// Physically remove a leaf from this child.
   void RemoveLeaf (int idx);
   /// Physically remove a leaf from this child.
-  void RemoveLeaf (csKDTree* leaf);
+  void RemoveLeaf (KDTree* leaf);
   /**
    * Replace a leaf with another one. This is more
    * efficient than doing RemoveLeaf/AddLeaf and it is
    * useful in many cases where you want to move a child
    * in the tree.
    */
-  void ReplaceLeaf (csKDTree* old_leaf, csKDTree* new_leaf);
+  void ReplaceLeaf (KDTree* old_leaf, KDTree* new_leaf);
 
   /**
    * Find leaf.
    */
-  int FindLeaf (csKDTree* leaf);
+  int FindLeaf (KDTree* leaf);
 
   /**
    * Get the bounding box of this object.
    */
-  inline const csBox3& GetBBox () const { return bbox; }
+  inline const csSphere& GetBSphere () const { return bsphere; }
 
   /**
    * Get the pointer to the black box object.
@@ -164,21 +163,21 @@ enum
  * calculation only once. This is more efficient and it also generates
  * a better tree as more information is available then.
  */
-class CS_CRYSTALSPACE_EXPORT csKDTree :
-  public scfImplementation1<csKDTree, iDebugHelper>
+class CS_CRYSTALSPACE_EXPORT KDTree :
+  public scfImplementation1<KDTree, iDebugHelper>
 {
 public:
   // This is used for debugging.
-  csRef<iKDTreeObjectDescriptor> descriptor;
-  void DumpObject (csKDTreeChild* object, const char* msg);
+  csRef<iObjectDescriptor> descriptor;
+  void DumpObject (KDTreeChild* object, const char* msg);
   void DumpNode ();
   void DumpNode (const char* msg);
   static void DebugExit ();
 
 private:
-  csKDTree* child1;             // If child1 is not 0 then child2 will
-  csKDTree* child2;             // also be not 0.
-  csKDTree* parent;             // 0 if this is the root.
+  KDTree* child1;             // If child1 is not 0 then child2 will
+  KDTree* child2;             // also be not 0.
+  KDTree* parent;             // 0 if this is the root.
 
   csRef<iKDTreeUserData> userobject; // An optional user object for this node.
 
@@ -190,7 +189,7 @@ private:
   // Objects in this node. If this node also has children (child1
   // and child2) then the objects here have to be moved to these
   // children. The 'Distribute()' function will do that.
-  csKDTreeChild** objects;
+  KDTreeChild** objects;
   int num_objects;
   int max_objects;
 
@@ -216,16 +215,16 @@ private:
   static uint32 global_timestamp;
 
   /// Physically add a child to this tree node.
-  void AddObject (csKDTreeChild* obj);
+  void AddObject (KDTreeChild* obj);
   /// Physically remove a child from this tree node.
   void RemoveObject (int idx);
   /// Find an object. Returns -1 if not found.
-  int FindObject (csKDTreeChild* obj);
+  int FindObject (KDTreeChild* obj);
 
   /**
    * Add an object to this kd-tree node.
    */
-  void AddObjectInt (csKDTreeChild* obj);
+  void AddObjectInt (KDTreeChild* obj);
 
   /**
    * Find the best split position for a given axis. This will
@@ -252,7 +251,7 @@ private:
    * The mask parameter is optionally used for frustum checking.
    * Front2Back will pass it to the tree nodes.
    */
-  void Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
+  void Front2Back (const csVector3& pos, KDTreeVisitFunc* func,
         void* userdata, uint32 cur_timestamp, uint32 frustum_mask);
 
   /**
@@ -261,7 +260,7 @@ private:
    * The mask parameter is optionally used for frustum checking.
    * Front2Back will pass it to the tree nodes.
    */
-  void TraverseRandom (csKDTreeVisitFunc* func,
+  void TraverseRandom (KDTreeVisitFunc* func,
         void* userdata, uint32 cur_timestamp, uint32 frustum_mask);
 
   /**
@@ -272,20 +271,20 @@ private:
   /**
    * Flatten the children of this node to the given node.
    */
-  void FlattenTo (csKDTree* node);
+  void FlattenTo (KDTree* node);
 
 public:
   /// Create a new empty KD-tree.
-  csKDTree ();
+  KDTree ();
   /// Destroy the KD-tree.
-  virtual ~csKDTree ();
+  virtual ~KDTree ();
   /// Set the parent.
-  void SetParent (csKDTree* p) { parent = p; }
+  void SetParent (KDTree* p) { parent = p; }
 
   /// For debugging: set the object descriptor.
-  void SetObjectDescriptor (iKDTreeObjectDescriptor* descriptor)
+  void SetObjectDescriptor (iObjectDescriptor* descriptor)
   {
-    csKDTree::descriptor = descriptor;
+    KDTree::descriptor = descriptor;
   }
 
   /**
@@ -309,29 +308,29 @@ public:
 
   /**
    * Add an object to this kd-tree node.
-   * Returns a csKDTreeChild pointer which represents the object
+   * Returns a KDTreeChild pointer which represents the object
    * inside the kd-tree. Object addition is delayed. This function
    * will not yet alter the structure of the kd-tree. Distribute()
    * will do that.
    */
-  csKDTreeChild* AddObject (const csBox3& bbox, void* object);
+  KDTreeChild* AddObject (const csSphere& bsphere, void* object);
 
   /**
-   * Unlink an object from the kd-tree. The 'csKDTreeChild' instance
+   * Unlink an object from the kd-tree. The 'KDTreeChild' instance
    * will NOT be deleted.
    */
-  void UnlinkObject (csKDTreeChild* object);
+  void UnlinkObject (KDTreeChild* object);
 
   /**
-   * Remove an object from the kd-tree. The 'csKDTreeChild' instance
+   * Remove an object from the kd-tree. The 'KDTreeChild' instance
    * will be deleted.
    */
-  void RemoveObject (csKDTreeChild* object);
+  void RemoveObject (KDTreeChild* object);
 
   /**
    * Move an object (give it a new bounding box).
    */
-  void MoveObject (csKDTreeChild* object, const csBox3& new_bbox);
+  void MoveObject (KDTreeChild* object, const csSphere& new_bsphere);
 
   /**
    * Distribute all objects in this node to its children.
@@ -358,7 +357,7 @@ public:
    * The mask parameter is optionally used for frustum checking.
    * TraverseRandom will pass it to the tree nodes.
    */
-  void TraverseRandom (csKDTreeVisitFunc* func,
+  void TraverseRandom (KDTreeVisitFunc* func,
         void* userdata, uint32 frustum_mask);
 
   /**
@@ -367,7 +366,7 @@ public:
    * The mask parameter is optionally used for frustum checking.
    * Front2Back will pass it to the tree nodes.
    */
-  void Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
+  void Front2Back (const csVector3& pos, KDTreeVisitFunc* func,
         void* userdata, uint32 frustum_mask);
 
   /**
@@ -382,12 +381,12 @@ public:
   /**
    * Get child one.
    */
-  inline csKDTree* GetChild1 () const { return child1; }
+  inline KDTree* GetChild1 () const { return child1; }
 
   /**
    * Get child two.
    */
-  inline csKDTree* GetChild2 () const { return child2; }
+  inline KDTree* GetChild2 () const { return child2; }
 
   /**
    * Return the number of objects in this node.
@@ -405,7 +404,7 @@ public:
   /**
    * Return the array of objects in this node.
    */
-  inline csKDTreeChild** GetObjects () const { return objects; }
+  inline KDTreeChild** GetObjects () const { return objects; }
 
   /**
    * Return the bounding box of the node itself (does not always contain
@@ -453,7 +452,10 @@ public:
   virtual bool DebugCommand (const char*) { return false; }
 };
 
+}
+}
+
 /** @} */
 
-#endif // __CS_KDTREE_H__
+#endif // __CS_KDTREEX_H__
 

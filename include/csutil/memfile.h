@@ -99,6 +99,7 @@ public:
    * is empty.  Use GetSize() for size info.
    */
   virtual const char* GetData() const;
+  size_t GetDataSize () const { return size; }
 
   /// Make file empty.
   void Empty();

@@ -866,6 +866,38 @@ extern CS_CRYSTALSPACE_EXPORT void* cs_realloc (void* p, size_t n);
 extern CS_CRYSTALSPACE_EXPORT void* cs_calloc (size_t n, size_t s);
 //@}
 
+namespace CS
+{
+  template <class T>
+  class StackArrayHelper
+  {
+  private:
+    void* memory;
+    bool deleteme;
+
+  public:
+    StackArrayHelper (void* memory, bool deleteme)
+      : memory (memory), deleteme (deleteme) { }
+    ~StackArrayHelper () { if (deleteme) cs_free (memory); }
+  };
+}
+
+/**\def CS_ALLOC_STACK_ARRAY_FALLBACK(type, var, size, thresshold)
+ * Dynamic stack memory allocation. This version fallbacks to normal allocation
+ * in case the number of items on the stack would be too high.
+ * \param type Type of the array elements.
+ * \param var Name of the array to be allocated.
+ * \param size Number of elements to be allocated.
+ * \param Thresshold is the maximum number of items before switching to
+ * normal allocation.
+ */
+#define CS_ALLOC_STACK_ARRAY_FALLBACK(Type, Name, Size, Thresshold) \
+  Type* Name = ((Size) > (Thresshold)) ? \
+        (Type*)cs_malloc((Size)*sizeof(Type)) : \
+        (Type*)alloca((Size)*sizeof(Type)); \
+  CS::StackArrayHelper<Type> Name##Del (Name, ((Size) > (Thresshold)));
+
+
 #ifdef CS_USE_CUSTOM_ISDIR
 static inline bool isdir (const char *path, struct dirent *de)
 {
