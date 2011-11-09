@@ -190,14 +190,14 @@ public:
   /**
    * Writes text in the given font at the given location.
    */
-  virtual void Write(iFont *font, uint x1, uint y1, char *text) = 0;
+  virtual void Write(iFont *font, uint x1, uint y1, const char *text) = 0;
 
   /**
    * Writes text in the given font, in the given box.  The alignment
    * specified in h_align and v_align determine how it should be aligned.  
    */
   virtual void WriteBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2, 
-    uint h_align, uint v_align, char *text) = 0;
+    uint h_align, uint v_align, const char *text) = 0;
 };
 
 /** A pen specialized for CS. */
@@ -442,14 +442,14 @@ public:
   /**
    * Writes text in the given font at the given location.
    */
-  virtual void Write(iFont *font, uint x1, uint y1, char *text);
+  virtual void Write(iFont *font, uint x1, uint y1, const char *text);
 
   /**
    * Writes text in the given font, in the given box.  The alignment
    * specified in h_align and v_align determine how it should be aligned.  
    */
   virtual void WriteBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2, 
-    uint h_align, uint v_align, char *text);
+    uint h_align, uint v_align, const char *text);
 };
 
 

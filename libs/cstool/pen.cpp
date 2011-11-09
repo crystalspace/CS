@@ -480,7 +480,7 @@ void csPen::DrawTriangle(uint x1, uint y1, uint x2, uint y2, uint x3, uint y3)
 }
 
 void 
-csPen::Write(iFont *font, uint x1, uint y1, char *text)
+csPen::Write(iFont *font, uint x1, uint y1, const char *text)
 {
   if (font==0) return;
 
@@ -497,7 +497,7 @@ csPen::Write(iFont *font, uint x1, uint y1, char *text)
 }
 
 void 
-csPen::WriteBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2, uint h_align, uint v_align, char *text)
+csPen::WriteBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2, uint h_align, uint v_align, const char *text)
 {
   if (font==0) return;
 
