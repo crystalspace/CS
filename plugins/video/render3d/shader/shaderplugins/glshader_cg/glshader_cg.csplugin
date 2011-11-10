@@ -8,11 +8,6 @@
         <implementation>csGLShader_CG</implementation>
         <description>OpenGL specific shaderprogram provider for Graphics3D</description>
       </class>
-      <class>
-        <name>crystalspace.graphics3d.shader.combiner.glcg</name>
-        <implementation>ShaderCombinerLoaderCg</implementation>
-        <description>Cg-specific combiner for shader snippets</description>
-      </class>
     </classes>
   </scf>
 </plugin>

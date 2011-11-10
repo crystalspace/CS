@@ -20,7 +20,7 @@
 
 #include "beautify_cg.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
+CS_PLUGIN_NAMESPACE_BEGIN(SLCombiner)
 {
 
   CgBeautifier::CgBeautifier (csString& dest) : dest (dest), indent (0),
@@ -254,4 +254,4 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   }
 
 }
-CS_PLUGIN_NAMESPACE_END(GLShaderCg)
+CS_PLUGIN_NAMESPACE_END(SLCombiner)

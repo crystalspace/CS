@@ -31,7 +31,7 @@
 
 #include "beautify_cg.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
+CS_PLUGIN_NAMESPACE_BEGIN(SLCombiner)
 {
   namespace WeaverCommon = CS::PluginCommon::ShaderWeaver;
 
@@ -45,7 +45,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   public:
     iObjectRegistry* object_reg;
   #define CS_TOKEN_ITEM_FILE \
-    "plugins/video/render3d/shader/shaderplugins/glshader_cg/combiner_cg.tok"
+    "plugins/video/render3d/shader/shaderplugins/slcombiner/combiner_cg.tok"
   #include "cstool/tokenlist.h"
   #undef CS_TOKEN_ITEM_FILE
     csStringHash xmltokens;
@@ -280,6 +280,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     };
   };
 }
-CS_PLUGIN_NAMESPACE_END(GLShaderCg)
+CS_PLUGIN_NAMESPACE_END(SLCombiner)
 
 #endif //__COMBINER_CG_H__

@@ -20,6 +20,7 @@
 #ifndef __CS_CSPLUGINCOMMON_SHADER_WEAVERCOMBINER_H__
 #define __CS_CSPLUGINCOMMON_SHADER_WEAVERCOMBINER_H__
 
+#include "iutil/document.h"
 #include "ivideo/graph3d.h"
 
 #include "csutil/scf.h"
@@ -32,8 +33,7 @@
 /**\addtogroup plugincommon
  * @{ */
 
-struct iDocumentNode;
-struct iDocumentNodeIterator;
+struct iString;
 
 namespace CS
 {
