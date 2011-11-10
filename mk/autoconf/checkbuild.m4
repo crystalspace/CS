@@ -113,7 +113,7 @@ AC_DEFUN([CS_BUILD_IFELSE],
     do
 	CS_SPLIT_TUPLE(
 	    [$cs_build_item],[cs_cflags_test,cs_lflags_test,cs_libs_test])
-	_CS_LANG_CFLAGS([$3])="$cs_cflags_test $6 $cs_cflags_save"
+	_CS_LANG_CFLAGS([$3])="$cs_cflags_save $cs_cflags_test $6"
 	LDFLAGS="$cs_lflags_test $7 $cs_lflags_save"
 	LIBS="$cs_libs_test $8 $cs_libs_save"
 	AC_LINK_IFELSE(AC_LANG_SOURCE[m4_default([$1], [AC_LANG_PROGRAM([],[])])],

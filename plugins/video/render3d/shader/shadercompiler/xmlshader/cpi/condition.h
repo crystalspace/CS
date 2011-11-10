@@ -173,7 +173,7 @@ class csHashComputer<NS_XMLSHADER::CondOperation>
           (char*)(tempOp.left.svLocation.indices + 1),
           *tempOp.left.svLocation.indices * sizeof (size_t));
       }
-      tempOp.left.svLocation.indices = (size_t*)leftIndexHash;
+      tempOp.left.svLocation.indices = (size_t*)(uintptr_t)leftIndexHash;
     }
     tempOp.right = right;
     if (tempOp.right.type >= NS_XMLSHADER::operandSV)
@@ -184,7 +184,7 @@ class csHashComputer<NS_XMLSHADER::CondOperation>
           (char*)(tempOp.right.svLocation.indices + 1),
           *tempOp.right.svLocation.indices * sizeof (size_t));
       }
-      tempOp.right.svLocation.indices = (size_t*)rightIndexHash;
+      tempOp.right.svLocation.indices = (size_t*)(uintptr_t)rightIndexHash;
     }
     return csHashCompute ((char*)&tempOp, sizeof (tempOp));
   }

@@ -107,6 +107,12 @@ bool csGraphics2DWX::Initialize (iObjectRegistry *object_reg)
   return true;
 }
 
+bool csGraphics2DWX::SetMousePosition (int x, int y)
+{
+  myParent->WarpPointer (x, y);
+  return true;
+}
+
 void csGraphics2DWX::SetParent(wxWindow* wx)
 {
   myParent = wx;
@@ -758,7 +764,17 @@ void csGLCanvas::EmitKeyEvent(wxKeyEvent& event, bool down)
   // Argh! Seems there is no way to get the character code for non-ASCII keys
   // in non-Unicode builds... not even a character in the local charset...
   if (event.GetKeyCode() <= 127)
+  {
     cskey_cooked_new = event.GetKeyCode();
+    // @@@ This is not very nice. But WX sends keycodes for alpha characters
+    // only in uppercase so we have to correct it to lower case. The EVT_CHAR
+    // event should generate the correct case but I don't see how it can be used
+    // in this situation as there doesn't appear to be an 'up' and 'down'. So
+    // we have to translate it manually here.
+    if (cskey_cooked_new >= 'A' && cskey_cooked_new <= 'Z')
+      if (event.GetModifiers () != wxMOD_SHIFT)
+	cskey_cooked_new += 'a' - 'A';
+  }
 #endif
   if (cskey_raw == 0)
     csUnicodeTransform::MapToLower (cskey_cooked_new, &cskey_raw, 1,
