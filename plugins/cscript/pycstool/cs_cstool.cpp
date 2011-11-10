@@ -18314,10 +18314,10 @@ SWIGINTERN PyObject *_wrap_iPen_Write(PyObject *SWIGUNUSEDPARM(self), PyObject *
   arg4 = static_cast< uint >(val4);
   res5 = SWIG_AsCharPtrAndSize(obj4, &buf5, NULL, &alloc5);
   if (!SWIG_IsOK(res5)) {
-    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iPen_Write" "', argument " "5"" of type '" "char *""'");
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iPen_Write" "', argument " "5"" of type '" "char const *""'");
   }
   arg5 = reinterpret_cast< char * >(buf5);
-  (arg1)->Write(arg2,arg3,arg4,arg5);
+  (arg1)->Write(arg2,arg3,arg4,(char const *)arg5);
   resultobj = SWIG_Py_Void();
   if (alloc5 == SWIG_NEWOBJ) delete[] buf5;
   return resultobj;
@@ -18410,10 +18410,10 @@ SWIGINTERN PyObject *_wrap_iPen_WriteBoxed(PyObject *SWIGUNUSEDPARM(self), PyObj
   arg8 = static_cast< uint >(val8);
   res9 = SWIG_AsCharPtrAndSize(obj8, &buf9, NULL, &alloc9);
   if (!SWIG_IsOK(res9)) {
-    SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "iPen_WriteBoxed" "', argument " "9"" of type '" "char *""'");
+    SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "iPen_WriteBoxed" "', argument " "9"" of type '" "char const *""'");
   }
   arg9 = reinterpret_cast< char * >(buf9);
-  (arg1)->WriteBoxed(arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9);
+  (arg1)->WriteBoxed(arg2,arg3,arg4,arg5,arg6,arg7,arg8,(char const *)arg9);
   resultobj = SWIG_Py_Void();
   if (alloc9 == SWIG_NEWOBJ) delete[] buf9;
   return resultobj;
@@ -19776,10 +19776,10 @@ SWIGINTERN PyObject *_wrap_csPen_Write(PyObject *SWIGUNUSEDPARM(self), PyObject 
   arg4 = static_cast< uint >(val4);
   res5 = SWIG_AsCharPtrAndSize(obj4, &buf5, NULL, &alloc5);
   if (!SWIG_IsOK(res5)) {
-    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "csPen_Write" "', argument " "5"" of type '" "char *""'");
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "csPen_Write" "', argument " "5"" of type '" "char const *""'");
   }
   arg5 = reinterpret_cast< char * >(buf5);
-  (arg1)->Write(arg2,arg3,arg4,arg5);
+  (arg1)->Write(arg2,arg3,arg4,(char const *)arg5);
   resultobj = SWIG_Py_Void();
   if (alloc5 == SWIG_NEWOBJ) delete[] buf5;
   return resultobj;
@@ -19872,10 +19872,10 @@ SWIGINTERN PyObject *_wrap_csPen_WriteBoxed(PyObject *SWIGUNUSEDPARM(self), PyOb
   arg8 = static_cast< uint >(val8);
   res9 = SWIG_AsCharPtrAndSize(obj8, &buf9, NULL, &alloc9);
   if (!SWIG_IsOK(res9)) {
-    SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "csPen_WriteBoxed" "', argument " "9"" of type '" "char *""'");
+    SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "csPen_WriteBoxed" "', argument " "9"" of type '" "char const *""'");
   }
   arg9 = reinterpret_cast< char * >(buf9);
-  (arg1)->WriteBoxed(arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9);
+  (arg1)->WriteBoxed(arg2,arg3,arg4,arg5,arg6,arg7,arg8,(char const *)arg9);
   resultobj = SWIG_Py_Void();
   if (alloc9 == SWIG_NEWOBJ) delete[] buf9;
   return resultobj;
@@ -19891,19 +19891,6 @@ SWIGINTERN PyObject *csPen_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject
   SWIG_TypeNewClientData(SWIGTYPE_p_csPen, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
-
-SWIGINTERN PyObject *_wrap_new_csMemoryPen(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *result = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"new_csMemoryPen",0,0)) SWIG_fail;
-  result = (csMemoryPen *)new csMemoryPen();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csMemoryPen, SWIG_POINTER_NEW |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
 
 SWIGINTERN PyObject *_wrap_delete_csMemoryPen(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
@@ -23713,7 +23700,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csPen_Write", _wrap_csPen_Write, METH_VARARGS, NULL},
 	 { (char *)"csPen_WriteBoxed", _wrap_csPen_WriteBoxed, METH_VARARGS, NULL},
 	 { (char *)"csPen_swigregister", csPen_swigregister, METH_VARARGS, NULL},
-	 { (char *)"new_csMemoryPen", _wrap_new_csMemoryPen, METH_VARARGS, NULL},
 	 { (char *)"delete_csMemoryPen", _wrap_delete_csMemoryPen, METH_VARARGS, NULL},
 	 { (char *)"csMemoryPen_Clear", _wrap_csMemoryPen_Clear, METH_VARARGS, NULL},
 	 { (char *)"csMemoryPen_Draw", _wrap_csMemoryPen_Draw, METH_VARARGS, NULL},

@@ -605,11 +605,8 @@ csPen_swigregister(csPen)
 
 class csMemoryPen(iPen):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _cstool.new_csMemoryPen(*args)
-        try: self.this.append(this)
-        except: self.this = this
     __swig_destroy__ = _cstool.delete_csMemoryPen
     __del__ = lambda self : None;
     def Clear(*args): return _cstool.csMemoryPen_Clear(*args)

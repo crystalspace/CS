@@ -22455,12 +22455,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::iPen cspace );
 %OWNER = ();
 %ITERATORS = ();
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csMemoryPen(@_);
-    bless $self, $pkg if defined($self);
-}
-
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
