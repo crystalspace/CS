@@ -4424,7 +4424,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -4562,7 +4562,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -4627,6 +4627,12 @@ fi
 	esac
 
 
+
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
     if test "$enable_separate_sections" != "no"; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking if $CC accepts -ffunction-sections -fdata-sections" >&5
@@ -4699,7 +4705,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -4828,7 +4834,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -4958,7 +4964,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $g_flag $cs_cv_prog_c_enable_errors $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $g_flag $cs_cv_prog_cc_enable_errors"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -4994,7 +5000,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then :
-  cs_build_cflags=`echo x$cs_cflags_test $g_flag $cs_cv_prog_c_enable_errors | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $g_flag $cs_cv_prog_cc_enable_errors | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cc_individual_sections_annoy=yes
@@ -5074,7 +5080,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $g_flag $cs_cv_prog_c_enable_errors $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $g_flag $cs_cv_prog_cc_enable_errors"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -5110,7 +5116,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then :
-  cs_build_cflags=`echo x$cs_cflags_test $g_flag $cs_cv_prog_c_enable_errors | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $g_flag $cs_cv_prog_cc_enable_errors | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cc_individual_sections_annoy=yes
@@ -5140,7 +5146,7 @@ fi
   cs_build_prop_val="$cs_cv_prog_cc_individual_sections"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then :
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.SEPARATE_SECTIONS ?= $cs_build_prop_val ;
 "
 fi
 
@@ -5149,7 +5155,27 @@ fi
 fi
 
 fi
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
+
+	# Don't use separate sections in 'profile' mode
+	# (reportedly breaks it)
+	cs_build_prop_val="\$(COMPILER.CFLAGS.SEPARATE_SECTIONS)"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then :
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.optimize += $cs_build_prop_val ;
+"
+fi
+	cs_build_prop_val="\$(COMPILER.CFLAGS.SEPARATE_SECTIONS)"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then :
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.debug += $cs_build_prop_val ;
+"
+fi
 
 fi
 
@@ -5562,7 +5588,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -5687,7 +5713,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_pic_werror $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_pic_werror"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -6345,7 +6371,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -6487,7 +6513,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -6603,7 +6629,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -6802,7 +6828,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -6933,7 +6959,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -7071,7 +7097,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -7213,7 +7239,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -11704,7 +11730,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -11831,7 +11857,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -11967,7 +11993,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_sys_pthread_cflags -D_GNU_SOURCE $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_sys_pthread_cflags -D_GNU_SOURCE"
 	LDFLAGS="$cs_lflags_test $cs_cv_sys_pthread_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_sys_pthread_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -12111,7 +12137,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_sys_pthread_cflags -D_GNU_SOURCE $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_sys_pthread_cflags -D_GNU_SOURCE"
 	LDFLAGS="$cs_lflags_test $cs_cv_sys_pthread_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_sys_pthread_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -12236,7 +12262,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_sys_pthread_cflags -D_GNU_SOURCE $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_sys_pthread_cflags -D_GNU_SOURCE"
 	LDFLAGS="$cs_lflags_test $cs_cv_sys_pthread_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_sys_pthread_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -12377,7 +12403,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -12509,7 +12535,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -12651,7 +12677,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libdl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -12767,7 +12793,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libdl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -13377,7 +13403,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -13494,7 +13520,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -13675,7 +13701,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -14070,7 +14096,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_pybase_cflags $cs_cv_sys_pthread_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_pybase_cflags $cs_cv_sys_pthread_cflags"
 	LDFLAGS="$cs_lflags_test                      $cs_cv_sys_pthread_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_pybase_libs   $cs_cv_sys_pthread_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -14186,7 +14212,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_pybase_cflags $cs_cv_sys_pthread_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_pybase_cflags $cs_cv_sys_pthread_cflags"
 	LDFLAGS="$cs_lflags_test                      $cs_cv_sys_pthread_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_pybase_libs   $cs_cv_sys_pthread_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -14596,7 +14622,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -14723,7 +14749,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -14956,7 +14982,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -15073,7 +15099,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -15227,7 +15253,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -15358,7 +15384,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -15484,7 +15510,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -15615,7 +15641,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -15746,7 +15772,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -15884,7 +15910,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -16015,7 +16041,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -16153,7 +16179,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -16291,7 +16317,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -16423,7 +16449,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -16571,7 +16597,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -16714,7 +16740,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -16860,7 +16886,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -17008,7 +17034,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_errors $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_errors"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -17146,7 +17172,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -17289,7 +17315,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -17421,7 +17447,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test $cs_cv_prog_link_enable_errors $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -17558,7 +17584,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -17674,7 +17700,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -17815,7 +17841,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -17946,7 +17972,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18087,7 +18113,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18224,7 +18250,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18349,7 +18375,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18477,7 +18503,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18602,7 +18628,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_pic_werror $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_pic_werror"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18738,7 +18764,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_errors $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_errors"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18868,8 +18894,8 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_prog_cxx_visibility_inlines_hidden \
-        $cs_cv_prog_cxx_enable_errors $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_prog_cxx_visibility_inlines_hidden \
+        $cs_cv_prog_cxx_enable_errors"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18986,8 +19012,8 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_prog_cxx_visibility_inlines_hidden \
-        $cs_cv_prog_cxx_enable_errors $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_prog_cxx_visibility_inlines_hidden \
+        $cs_cv_prog_cxx_enable_errors"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -19126,7 +19152,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libstl_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libstl_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libstl_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libstl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -19261,7 +19287,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_prog_c_enable_errors $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_c_enable_errors"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -19393,7 +19419,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_prog_c_enable_errors $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_c_enable_errors"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -19525,7 +19551,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -19648,7 +19674,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -19895,7 +19921,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -20009,7 +20035,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -20120,7 +20146,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -20231,7 +20257,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -20350,7 +20376,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -20461,7 +20487,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -20573,7 +20599,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -20684,7 +20710,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -20795,7 +20821,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -20906,7 +20932,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -21017,7 +21043,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -21128,7 +21154,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -21239,7 +21265,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -21350,7 +21376,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -21461,7 +21487,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -21572,7 +21598,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -21683,7 +21709,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -21794,7 +21820,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -21905,7 +21931,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -22016,7 +22042,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -22127,7 +22153,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -22238,7 +22264,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -22349,7 +22375,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -22460,7 +22486,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -22571,7 +22597,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -22682,7 +22708,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -22820,7 +22846,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_prog_cxx_code_gen $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_code_gen"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -22950,7 +22976,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_prog_cxx_code_gen $cs_cv_prog_cxx_enable_errors $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_code_gen $cs_cv_prog_cxx_enable_errors"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -23082,7 +23108,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -23198,7 +23224,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -23346,7 +23372,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -23478,7 +23504,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -23611,7 +23637,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -24271,7 +24297,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -24421,7 +24447,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -24576,7 +24602,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_warnings $cs_cv_prog_cxx_enable_errors $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_warnings $cs_cv_prog_cxx_enable_errors"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -24735,7 +24761,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_pedantic"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -24852,7 +24878,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_pedantic"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -24981,7 +25007,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_pedantic"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -25098,7 +25124,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_pedantic"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -25695,7 +25721,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -25811,7 +25837,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -26389,7 +26415,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libx11_lflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libx11_lflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libx11_libs $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -26506,7 +26532,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libx11_lflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libx11_lflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libx11_libs $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -28194,7 +28220,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $X_CFLAGS $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $X_CFLAGS"
 	LDFLAGS="$cs_lflags_test $X_LFLAGS $cs_lflags_save"
 	LIBS="$cs_libs_test $X_PRE_LIBS $X_LIBS -lX11 -lXext $X_EXTRA_LIBS $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -28314,7 +28340,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $X_CFLAGS $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $X_CFLAGS"
 	LDFLAGS="$cs_lflags_test $X_LFLAGS $cs_lflags_save"
 	LIBS="$cs_libs_test $X_PRE_LIBS $X_LIBS -lX11 -lXext $X_EXTRA_LIBS $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -29289,7 +29315,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $X_CFLAGS $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $X_CFLAGS"
 	LDFLAGS="$cs_lflags_test $X_LFLAGS $cs_lflags_save"
 	LIBS="$cs_libs_test $X_PRE_LIBS $X_LIBS -lXt -lX11 $X_EXTRA_LIBS $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -29406,7 +29432,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $X_CFLAGS $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $X_CFLAGS"
 	LDFLAGS="$cs_lflags_test $X_LFLAGS $cs_lflags_save"
 	LIBS="$cs_libs_test $X_PRE_LIBS $X_LIBS -lXt -lX11 $X_EXTRA_LIBS $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -30380,7 +30406,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $X_CFLAGS $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $X_CFLAGS"
 	LDFLAGS="$cs_lflags_test $X_LFLAGS $cs_lflags_save"
 	LIBS="$cs_libs_test $X_PRE_LIBS $X_LIBS -lX11 -lXext $X_EXTRA_LIBS $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -30496,7 +30522,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $X_CFLAGS $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $X_CFLAGS"
 	LDFLAGS="$cs_lflags_test $X_LFLAGS $cs_lflags_save"
 	LIBS="$cs_libs_test $X_PRE_LIBS $X_LIBS -lX11 -lXext $X_EXTRA_LIBS $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -31469,7 +31495,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $X_CFLAGS $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $X_CFLAGS"
 	LDFLAGS="$cs_lflags_test $X_LFLAGS $cs_lflags_save"
 	LIBS="$cs_libs_test $X_PRE_LIBS $X_LIBS -lX11 -lXext $X_EXTRA_LIBS $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -31585,7 +31611,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $X_CFLAGS $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $X_CFLAGS"
 	LDFLAGS="$cs_lflags_test $X_LFLAGS $cs_lflags_save"
 	LIBS="$cs_libs_test $X_PRE_LIBS $X_LIBS -lX11 -lXext $X_EXTRA_LIBS $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -31841,7 +31867,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_gl_plat_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_gl_plat_cflags"
 	LDFLAGS="$cs_lflags_test $cs_gl_plat_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_gl_plat_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -31975,7 +32001,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_gl_plat_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_gl_plat_cflags"
 	LDFLAGS="$cs_lflags_test $cs_gl_plat_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_gl_plat_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -32145,7 +32171,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libgl_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -32275,7 +32301,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libgl_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -32417,7 +32443,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libgl_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -32547,7 +32573,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libgl_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -32689,7 +32715,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libgl_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -32819,7 +32845,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libgl_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -32961,7 +32987,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libgl_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -33091,7 +33117,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libgl_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -33233,7 +33259,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libgl_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -33363,7 +33389,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libgl_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -33505,7 +33531,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libgl_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -33635,7 +33661,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libgl_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -33777,7 +33803,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libgl_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -33907,7 +33933,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libgl_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -34073,7 +34099,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libgl_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -34208,7 +34234,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libgl_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -34380,7 +34406,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libgl_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -34499,7 +34525,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libgl_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -34651,7 +34677,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -34768,7 +34794,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -34918,7 +34944,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -35043,7 +35069,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -35211,7 +35237,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -35328,7 +35354,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -36301,7 +36327,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -36417,7 +36443,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -37409,7 +37435,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libz_cflags $cs_cv_libm_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libz_cflags $cs_cv_libm_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libz_lflags $cs_cv_libm_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libz_libs $cs_cv_libm_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -37525,7 +37551,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libz_cflags $cs_cv_libm_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libz_cflags $cs_cv_libm_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libz_lflags $cs_cv_libm_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libz_libs $cs_cv_libm_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -38513,7 +38539,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -38631,7 +38657,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -39241,7 +39267,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -39357,7 +39383,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -40319,7 +40345,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_liblcms_cflags $cs_cv_libjpeg_cflags $cs_cv_libz_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_liblcms_cflags $cs_cv_libjpeg_cflags $cs_cv_libz_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_liblcms_lflags $cs_cv_libjpeg_lflags $cs_cv_libz_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_liblcms_libs $cs_cv_libjpeg_libs $cs_cv_libz_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -40435,7 +40461,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_liblcms_cflags $cs_cv_libjpeg_cflags $cs_cv_libz_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_liblcms_cflags $cs_cv_libjpeg_cflags $cs_cv_libz_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_liblcms_lflags $cs_cv_libjpeg_lflags $cs_cv_libz_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_liblcms_libs $cs_cv_libjpeg_libs $cs_cv_libz_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -41040,7 +41066,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -41156,7 +41182,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -42518,7 +42544,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libcairo_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libcairo_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libcairo_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libcairo_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -42634,7 +42660,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libcairo_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libcairo_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libcairo_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libcairo_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -43234,7 +43260,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libcairomm_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libcairomm_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libcairomm_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libcairomm_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -43350,7 +43376,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libcairomm_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libcairomm_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libcairomm_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libcairomm_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -43956,7 +43982,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -44072,7 +44098,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -44673,7 +44699,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libogg_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libogg_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libogg_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libogg_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -44789,7 +44815,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libogg_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libogg_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libogg_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libogg_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -45391,7 +45417,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libogg_cflags $cs_cv_libvorbis_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libogg_cflags $cs_cv_libvorbis_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libogg_lflags $cs_cv_libvorbis_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libogg_libs $cs_cv_libvorbis_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -45508,7 +45534,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libogg_cflags $cs_cv_libvorbis_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libogg_cflags $cs_cv_libvorbis_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libogg_lflags $cs_cv_libvorbis_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libogg_libs $cs_cv_libvorbis_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -46109,7 +46135,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libogg_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libogg_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libogg_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libogg_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -46225,7 +46251,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libogg_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libogg_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libogg_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libogg_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -46397,7 +46423,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libspeex_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libspeex_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libspeex_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libspeex_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -46513,7 +46539,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libspeex_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libspeex_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libspeex_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libspeex_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -47845,7 +47871,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libm_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -47961,7 +47987,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libm_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -48105,7 +48131,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_lib3ds_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_lib3ds_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_lib3ds_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_lib3ds_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -48221,7 +48247,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_lib3ds_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_lib3ds_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_lib3ds_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_lib3ds_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -48368,7 +48394,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_lib3ds_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_lib3ds_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_lib3ds_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_lib3ds_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -48485,7 +48511,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_lib3ds_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_lib3ds_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_lib3ds_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_lib3ds_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -49065,7 +49091,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -49181,7 +49207,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -49325,7 +49351,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libode_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libode_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libode_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libode_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -49441,7 +49467,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libode_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libode_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libode_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libode_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -49573,7 +49599,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libode_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libode_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libode_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libode_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -49689,7 +49715,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libode_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libode_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libode_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libode_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -50227,7 +50253,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -50348,7 +50374,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -50494,7 +50520,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libbullet_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libbullet_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libbullet_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libbullet_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -50611,7 +50637,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libbullet_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libbullet_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libbullet_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libbullet_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -50769,7 +50795,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libbullet_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libbullet_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libbullet_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libbullet_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -50885,7 +50911,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libbullet_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libbullet_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libbullet_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libbullet_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -51031,7 +51057,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_sys_pthread_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_sys_pthread_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_sys_pthread_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_sys_pthread_libs $cs_cv_libdl_libs $cs_cv_libm_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -51160,7 +51186,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_sys_pthread_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_sys_pthread_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_sys_pthread_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_sys_pthread_libs $cs_cv_libdl_libs $cs_cv_libm_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -51323,7 +51349,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libopenal_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libopenal_cflags"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -51465,7 +51491,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libopenal_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libopenal_cflags"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -52441,7 +52467,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -52558,7 +52584,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -52703,7 +52729,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libfreetype2_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libfreetype2_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libfreetype2_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libfreetype2_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -52823,7 +52849,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libfreetype2_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libfreetype2_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libfreetype2_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libfreetype2_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -52997,7 +53023,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -53564,7 +53590,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -53680,7 +53706,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -53824,7 +53850,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libcal3d_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libcal3d_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libcal3d_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libcal3d_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -53940,7 +53966,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libcal3d_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libcal3d_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libcal3d_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libcal3d_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -54541,7 +54567,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -54664,7 +54690,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -54817,7 +54843,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -54956,7 +54982,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -55083,7 +55109,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -56076,7 +56102,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libdl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -56201,7 +56227,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libdl_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -56354,7 +56380,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libCEGUI_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libCEGUI_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libCEGUI_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libCEGUI_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -56474,7 +56500,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libCEGUI_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libCEGUI_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libCEGUI_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libCEGUI_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -57450,7 +57476,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -57566,7 +57592,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -57737,7 +57763,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libGTK_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libGTK_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libGTK_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libGTK_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -57853,7 +57879,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libGTK_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libGTK_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libGTK_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libGTK_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -57992,7 +58018,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -58120,7 +58146,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -59488,7 +59514,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libm_cflags $cs_cv_sys_pthread_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libm_cflags $cs_cv_sys_pthread_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libm_lflags $cs_cv_sys_pthread_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libm_libs   $cs_cv_sys_pthread_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -59604,7 +59630,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libm_cflags $cs_cv_sys_pthread_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libm_cflags $cs_cv_sys_pthread_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libm_lflags $cs_cv_sys_pthread_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libm_libs   $cs_cv_sys_pthread_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -59748,7 +59774,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libCg_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libCg_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libCg_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libCg_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -59865,7 +59891,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libCg_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libCg_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libCg_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libCg_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -62714,7 +62740,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -62831,7 +62857,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -63490,7 +63516,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -63607,7 +63633,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -64213,7 +64239,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -64329,7 +64355,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -64934,7 +64960,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -65051,7 +65077,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -65227,7 +65253,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -65346,7 +65372,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -65489,7 +65515,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -65609,7 +65635,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -65753,7 +65779,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -65872,7 +65898,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -66004,7 +66030,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -66123,7 +66149,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -66260,7 +66286,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -66379,7 +66405,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -66520,7 +66546,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -66636,7 +66662,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -66786,7 +66812,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -66902,7 +66928,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -67050,7 +67076,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -67166,7 +67192,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -67310,7 +67336,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -67426,7 +67452,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -67560,7 +67586,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -67676,7 +67702,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -68374,7 +68400,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -68490,7 +68516,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -68634,7 +68660,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libcppunit_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libcppunit_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libcppunit_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libcppunit_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -68750,7 +68776,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_libcppunit_cflags $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libcppunit_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libcppunit_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libcppunit_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -69311,7 +69337,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -69429,7 +69455,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -69644,7 +69670,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -69765,7 +69791,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -70062,7 +70088,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_pedantic"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -70181,7 +70207,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_pedantic"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -70323,7 +70349,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_pedantic"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -70442,7 +70468,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_pedantic"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -70573,7 +70599,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_pedantic"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -70692,7 +70718,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_pedantic"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -70879,7 +70905,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -71013,7 +71039,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -71229,7 +71255,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -71351,7 +71377,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -71480,7 +71506,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -71608,7 +71634,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -71746,7 +71772,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_force_cpusubtype_all $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_force_cpusubtype_all"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -71886,7 +71912,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_pedantic"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -72010,7 +72036,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_pedantic"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -72146,7 +72172,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_pedantic"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -72270,7 +72296,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_pedantic"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -72406,7 +72432,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_pedantic"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -72530,7 +72556,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_pedantic"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -72672,7 +72698,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -72791,7 +72817,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -72929,7 +72955,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_pedantic"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -73045,7 +73071,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_pedantic"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -73173,7 +73199,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_pedantic"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -73289,7 +73315,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_pedantic"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -73417,7 +73443,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_pedantic"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -73533,7 +73559,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_prog_cxx_enable_pedantic"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -74384,7 +74410,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test -liberty $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -74500,7 +74526,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test -liberty $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -74644,7 +74670,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libbfd_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libbfd_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libbfd_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libbfd_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -74768,7 +74794,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libbfd_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libbfd_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libbfd_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libbfd_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -75430,7 +75456,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test -liberty $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -75546,7 +75572,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test "
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test -liberty $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -75690,7 +75716,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libbfd_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libbfd_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libbfd_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libbfd_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -75814,7 +75840,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_libbfd_cflags $cs_cflags_save"
+	CFLAGS="$cs_cflags_save $cs_cflags_test $cs_cv_libbfd_cflags"
 	LDFLAGS="$cs_lflags_test $cs_cv_libbfd_lflags $cs_lflags_save"
 	LIBS="$cs_libs_test $cs_cv_libbfd_libs $cs_libs_save"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
