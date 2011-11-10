@@ -72,6 +72,8 @@ struct iCameraListener : public virtual iBase
   virtual void CameraMoved (iCamera* camera) = 0;
 };
 
+#include "csutil/deprecated_warn_off.h"
+
 /**
  * Implement this interface if you are interested in learning when
  * the camera changes sector.
@@ -90,6 +92,8 @@ iCameraSectorListener : public iCameraListener
   // Make it compile.
   void CameraMoved (iCamera* camera) {}
 };
+
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * Camera class. This class represents camera objects which can be used to
