@@ -766,19 +766,17 @@ void csGLCanvas::EmitKeyEvent(wxKeyEvent& event, bool down)
   if (event.GetKeyCode() <= 127)
   {
     cskey_cooked_new = event.GetKeyCode();
-    // @@@ This is not very nice. But WX sends keycodes for alpha characters
-    // only in uppercase so we have to correct it to lower case. The EVT_CHAR
-    // event should generate the correct case but I don't see how it can be used
-    // in this situation as there doesn't appear to be an 'up' and 'down'. So
-    // we have to translate it manually here.
-    if (cskey_cooked_new >= 'A' && cskey_cooked_new <= 'Z')
-      if (event.GetModifiers () != wxMOD_SHIFT)
-	cskey_cooked_new += 'a' - 'A';
   }
 #endif
+  // @@@ This is not very nice. But WX sends keycodes for alpha characters
+  // only in uppercase so we have to correct it to lower case. The EVT_CHAR
+  // event should generate the correct case but I don't see how it can be used
+  // in this situation as there doesn't appear to be an 'up' and 'down'. So
+  // we have to translate it manually here.
+  if (event.GetModifiers () != wxMOD_SHIFT)
+    cskey_cooked_new = csUnicodeTransform::MapToLower (cskey_cooked_new);
   if (cskey_raw == 0)
-    csUnicodeTransform::MapToLower (cskey_cooked_new, &cskey_raw, 1,
-      csUcMapSimple);
+    cskey_raw = csUnicodeTransform::MapToLower (cskey_cooked_new);
   if (cskey_cooked == 0) cskey_cooked = cskey_cooked_new;
   if (cskey_raw != 0) g2d->EventOutlet->Key (cskey_raw, cskey_cooked, down);
 }
