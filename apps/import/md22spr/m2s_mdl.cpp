@@ -29,6 +29,7 @@
 #include "m2s_img.h"
 #include "csutil/csendian.h"
 #include "csutil/csstring.h"
+#include "csutil/platformfile.h"
 #include "csutil/sysfunc.h"
 #include "iutil/databuff.h"
 #include "igraphic/imageio.h"
@@ -82,7 +83,7 @@ bool Mdl::ReadMDLFile(const char* mdlfile)
   if (mdlfile == 0 || strlen(mdlfile) == 0)
     return setError("MDL filename is 0");
 
-  if ((f = fopen(mdlfile, "rb")) == 0)
+  if ((f = CS::Platform::File::Open (mdlfile, "rb")) == 0)
     return setError("Cannot find MDL file");
 
   // read mdl magic
@@ -432,7 +433,7 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
 	  csRef<iDataBuffer> db (mdl2spr_imageio->Save (&img, "image/png"));
 	  if (db)
 	  {
-	    FILE *f = fopen (skinfilename, "w+");
+	    FILE *f = CS::Platform::File::Open (skinfilename, "w+");
 	    size_t n = 0;
 	    if (f)
 	      n = fwrite (db->GetData (), 1, db->GetSize (), f);
@@ -445,7 +446,7 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
     }
   }
 
-  if ((f = fopen(spritefilename, "w")) == 0)
+  if ((f = CS::Platform::File::Open (spritefilename, "w")) == 0)
   {
     csFPrintf(stderr, "Cannot open sprite file %s for writing\n", spritename);
     return false;

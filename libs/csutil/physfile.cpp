@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csgeom/math.h"
 #include "csutil/parasiticdatabuffer.h"
+#include "csutil/platformfile.h"
 #include "csutil/physfile.h"
 #include "csutil/databuf.h"
 #include <stdlib.h>
@@ -42,7 +43,7 @@ csPhysicalFile::csPhysicalFile(char const* apath, char const* mode)
     last_error = VFS_STATUS_OTHER;
     return;
   }
-  fp = fopen(apath, mode);
+  fp = CS::Platform::File::Open (apath, mode);
   if (fp == 0)
     last_error = VFS_STATUS_ACCESSDENIED;
 }

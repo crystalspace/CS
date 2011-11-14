@@ -39,6 +39,7 @@ CSUTIL.GENERIC +=
   pathutil.cpp
   platformconfig.cpp 
   platformconfigpath.cpp
+  platformfile.cpp
   printf.cpp
   resdir.cpp
   runloop.cpp 

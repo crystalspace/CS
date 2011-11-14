@@ -27,6 +27,7 @@ CSUTIL.GENERIC +=
   appdir.cpp
   findlib.cpp
   getopt.cpp
+  platformfile.cpp
   pluginpaths.cpp
   resdir.cpp
   runloop.cpp ;

@@ -43,6 +43,7 @@
 #include "csutil/mmapio.h"
 #include "csutil/parray.h"
 #include "csutil/parasiticdatabuffer.h"
+#include "csutil/platformfile.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/scfstringarray.h"
 #include "csutil/stringquote.h"
@@ -505,11 +506,11 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, size_t RIndex,
     if (debug)
       csPrintf ("VFS_DEBUG: Trying to open disk file %s\n", CS::Quote::Double (fName));
     if ((Mode & VFS_FILE_MODE) == VFS_FILE_WRITE)
-        file = fopen (fName, "wb");
+        file = CS::Platform::File::Open (fName, "wb");
     else if ((Mode & VFS_FILE_MODE) == VFS_FILE_APPEND)
-        file = fopen (fName, "ab");
+        file = CS::Platform::File::Open (fName, "ab");
     else
-        file = fopen (fName, "rb");
+        file = CS::Platform::File::Open (fName, "rb");
 
     if (file || (t != 1))
       break;
@@ -2305,7 +2306,7 @@ bool csVFS::TryChDirAuto(char const* dir, char const* filename)
 
 static bool IsZipFile (const char* path)
 {
-  FILE* f = fopen (path, "rb");
+  FILE* f = CS::Platform::File::Open (path, "rb");
   if (!f) return false;
 
   char header[4];

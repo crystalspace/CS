@@ -108,6 +108,7 @@
 #include "csutil/partialorder.h"
 #include "csutil/physfile.h"
 #include "csutil/platform.h"
+#include "csutil/platformfile.h"
 #include "csutil/plugldr.h"
 #include "csutil/plugmgr.h"
 #include "csutil/pooledscfclass.h"

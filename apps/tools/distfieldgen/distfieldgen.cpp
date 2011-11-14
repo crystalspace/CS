@@ -252,7 +252,7 @@ bool DistFieldGen::Run ()
     if (!outData.IsValid()) return false;
     /* @@@ FIXME: csPhysicalFile can't open nonexisting files.
      * Needs to be fixed there ... */
-    FILE* fp = fopen (outFile, "wb");
+    FILE* fp = CS::Platform::File::Open (outFile, "wb");
     csPhysicalFile file (fp, true);
     if (file.GetStatus() != VFS_STATUS_OK) return false;
     if (file.Write (outData->GetData(), outData->GetSize())

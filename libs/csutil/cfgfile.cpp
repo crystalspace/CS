@@ -20,6 +20,7 @@
 #include "csutil/cfgfile.h"
 #include "csutil/csstring.h"
 #include "csutil/databuf.h"
+#include "csutil/platformfile.h"
 #include "csutil/physfile.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/scfstringarray.h"
@@ -581,7 +582,7 @@ bool csConfigFile::SaveNow(const char *file, iVFS *vfs) const
   }
   else
   {
-    FILE *fp = fopen(file, "wb");
+    FILE *fp = CS::Platform::File::Open (file, "wb");
     if (!fp) return false;
     const size_t res = fwrite(Filedata.GetData(), sizeof(char), length, fp);
     const int errcode = errno;

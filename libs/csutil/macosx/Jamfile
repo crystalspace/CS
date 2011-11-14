@@ -11,7 +11,8 @@ CSUTIL.GENERIC +=
   memutil_impl.cpp
   memutil_impl_virtsize.cpp
   mmap.cpp
-  pathutil.cpp 
+  pathutil.cpp
+  platformfile.cpp
   pluginpaths.cpp
   printf.cpp
   scanplugins.cpp
