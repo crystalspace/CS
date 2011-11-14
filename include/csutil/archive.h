@@ -27,6 +27,7 @@
 #include "csextern.h"
 
 #include "iutil/databuff.h"
+#include "iutil/vfs.h"
 #include "csutil/csstring.h"
 #include "csutil/databuf.h"
 #include "csutil/parray.h"
@@ -79,11 +80,11 @@ private:
     ArchiveEntry (const char *name, ZIP_central_directory_file_header &cdfh);
     ~ArchiveEntry ();
     bool Append (const void *data, size_t size);
-    bool WriteLFH (FILE *file);
-    bool WriteCDFH (FILE *file);
-    bool ReadExtraField (FILE *file, size_t extra_field_length);
-    bool ReadFileComment (FILE *file, size_t file_comment_length);
-    bool WriteFile (FILE *file);
+    bool WriteLFH (iFile* file);
+    bool WriteCDFH (iFile* file);
+    bool ReadExtraField (iFile* file, size_t extra_field_length);
+    bool ReadFileComment (iFile* file, size_t file_comment_length);
+    bool WriteFile (iFile* file);
     void FreeBuffer ();
   };
   friend class ArchiveEntry;
@@ -107,7 +108,8 @@ private:
   csArray<ArchiveEntry*> lazy;	// Lazy operations (unsorted)
 
   char *filename;		// Archive file name
-  FILE *file;			// Archive file pointer.
+  // Archive file pointer.
+  csRef<iFile> file;
 
   size_t comment_length;	// Archive comment length
   char *comment;		// Archive comment
@@ -116,19 +118,19 @@ private:
   bool IsDeleted (const char *name) const;
   void UnpackTime (ush zdate, ush ztime, csFileTime &rtime) const;
   void PackTime (const csFileTime &ztime, ush &rdate, ush &rtime) const;
-  bool ReadArchiveComment (FILE *file, size_t zipfile_comment_length);
+  bool ReadArchiveComment (iFile* file, size_t zipfile_comment_length);
   void LoadECDR (ZIP_end_central_dir_record &ecdr, char *buff);
-  bool ReadCDFH (ZIP_central_directory_file_header &cdfh, FILE *file);
-  bool ReadLFH (ZIP_local_file_header &lfh, FILE *file);
-  bool WriteECDR (ZIP_end_central_dir_record &ecdr, FILE *file);
+  bool ReadCDFH (ZIP_central_directory_file_header &cdfh, iFile* file);
+  bool ReadLFH (ZIP_local_file_header &lfh, iFile* file);
+  bool WriteECDR (ZIP_end_central_dir_record &ecdr, iFile* file);
   bool WriteZipArchive ();
-  bool WriteCentralDirectory (FILE *temp);
+  bool WriteCentralDirectory (iFile* temp);
   void UpdateDirectory ();
-  void ReadZipDirectory (FILE *infile);
+  void ReadZipDirectory (iFile *infile);
   ArchiveEntry *InsertEntry (const char *name,
     ZIP_central_directory_file_header &cdfh);
-  void ReadZipEntries (FILE *infile);
-  bool ReadEntry (FILE *infile, ArchiveEntry *f, char* buf);
+  void ReadZipEntries (iFile* infile);
+  bool ReadEntry (iFile* infile, ArchiveEntry *f, char* buf);
   ArchiveEntry *CreateArchiveEntry (const char *name,
     size_t size = 0, bool pack = true);
   void ResetArchiveEntry (ArchiveEntry *f, size_t size, bool pack);
