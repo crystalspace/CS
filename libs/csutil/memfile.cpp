@@ -171,6 +171,22 @@ csPtr<iDataBuffer> csMemFile::GetAllData (bool nullterm)
   }
 }
 
+csPtr<iDataBuffer> csMemFile::GetPartialData (size_t offset, size_t size)
+{
+  if (!buffer) return 0;
+  copyOnWrite = true;
+  size_t bufSize (csMin (size, GetSize() - offset));
+  if ((offset == 0) && (buffer->GetSize() == bufSize))
+  {
+    return csPtr<iDataBuffer> (buffer);
+  }
+  else
+  {
+    iDataBuffer *db = new csParasiticDataBuffer (buffer, offset, bufSize);
+    return csPtr<iDataBuffer> (db);
+  }
+}
+
 void csMemFile::Empty()
 {
   buffer.Invalidate();

@@ -94,6 +94,7 @@ public:
   virtual bool SetPos(size_t newpos);
 
   virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false);
+  csPtr<iDataBuffer> GetPartialData (size_t offset, size_t size = (size_t)~0);
   /**
    * Returns a pointer to the memory buffer.  May return 0 if memory file
    * is empty.  Use GetSize() for size info.

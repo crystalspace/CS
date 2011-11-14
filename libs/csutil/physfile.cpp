@@ -17,6 +17,8 @@
 */
 
 #include "cssysdef.h"
+#include "csgeom/math.h"
+#include "csutil/parasiticdatabuffer.h"
 #include "csutil/physfile.h"
 #include "csutil/databuf.h"
 #include <stdlib.h>
@@ -194,6 +196,26 @@ csPtr<iDataBuffer> csPhysicalFile::GetAllData(bool nullterm)
       }
       else
         delete[] buff;
+    }
+  }
+  return csPtr<iDataBuffer>(data);
+}
+
+csPtr<iDataBuffer> csPhysicalFile::GetPartialData (size_t offset, size_t size)
+{
+  csRef<CS::DataBuffer<> > data;
+  size_t const len = csMin (size, GetSize() - offset);
+  if (GetStatus() == VFS_STATUS_OK)
+  {
+    size_t const pos = GetPos();
+    if (GetStatus() == VFS_STATUS_OK)
+    {
+      data.AttachNew (new CS::DataBuffer<> (len));
+      SetPos (offset);
+      size_t const nread = Read (data->GetData(), len);
+      if ((nread != len) || (GetStatus() != VFS_STATUS_OK))
+        data.Invalidate();
+      SetPos(pos);
     }
   }
   return csPtr<iDataBuffer>(data);

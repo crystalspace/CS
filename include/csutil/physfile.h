@@ -97,6 +97,7 @@ public:
    */
   virtual csPtr<iDataBuffer> GetAllData(bool nullterm = false);
 
+  csPtr<iDataBuffer> GetPartialData (size_t offset, size_t size = (size_t)~0);
 protected:
   FILE* fp;
   csString path;

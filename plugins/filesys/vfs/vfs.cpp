@@ -35,12 +35,14 @@
 #endif
 
 #include "vfs.h"
+#include "csgeom/math.h"
 #include "csutil/archive.h"
 #include "csutil/cmdline.h"
 #include "csutil/csstring.h"
 #include "csutil/databuf.h"
 #include "csutil/mmapio.h"
 #include "csutil/parray.h"
+#include "csutil/parasiticdatabuffer.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/scfstringarray.h"
 #include "csutil/stringquote.h"
@@ -117,6 +119,7 @@ public:
   virtual bool SetPos (size_t newpos);
   /// Get all data
   virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false);
+  csPtr<iDataBuffer> GetPartialData (size_t offset, size_t size = (size_t)~0);
 private:
   // Create a directory or a series of directories starting from PathBase
   void MakeDir (const char *PathBase, const char *PathSuffix);
@@ -160,6 +163,7 @@ public:
   virtual size_t GetPos ();
   /// Get all the data at once
   virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false);
+  csPtr<iDataBuffer> GetPartialData (size_t offset, size_t size = (size_t)~0);
   /// Set current file pointer
   virtual bool SetPos (size_t newpos);
 };
@@ -859,6 +863,15 @@ csPtr<iDataBuffer> DiskFile::GetAllData (bool nullterm)
   }
 }
 
+csPtr<iDataBuffer> DiskFile::GetPartialData (size_t offset, size_t size)
+{
+  size_t bufSize (csMin (size, GetSize() - offset));
+  csRef<iDataBuffer> allData (GetAllData());
+  if (!allData) return (iDataBuffer*)nullptr;
+  if ((offset == 0) && (bufSize == GetSize())) return csPtr<iDataBuffer> (allData);
+  return csPtr<iDataBuffer> (new csParasiticDataBuffer (allData, offset, bufSize));
+}
+
 iDataBuffer* DiskFile::TryCreateMapping ()
 {
   if (!Size) return 0;
@@ -1015,6 +1028,15 @@ csPtr<iDataBuffer> ArchiveFile::GetAllData (bool nullterm)
     buffernt = nullterm;
   }
   return csPtr<iDataBuffer> (databuf);
+}
+
+csPtr<iDataBuffer> ArchiveFile::GetPartialData (size_t offset, size_t size)
+{
+  size_t bufSize (csMin (size, GetSize() - offset));
+  csRef<iDataBuffer> allData (GetAllData());
+  if (!allData) return (iDataBuffer*)nullptr;
+  if ((offset == 0) && (bufSize == GetSize())) return csPtr<iDataBuffer> (allData);
+  return csPtr<iDataBuffer> (new csParasiticDataBuffer (allData, offset, bufSize));
 }
 
 // ------------------------------------------------------------- VfsNode --- //

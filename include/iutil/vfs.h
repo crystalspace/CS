@@ -151,7 +151,7 @@ namespace CS
  */
 struct iFile : public virtual iBase
 {
-  SCF_INTERFACE(iFile, 2, 0, 0);
+  SCF_INTERFACE(iFile, 2, 0, 1);
 
   /// Query file name (in VFS)
   virtual const char *GetName () = 0;
@@ -212,6 +212,18 @@ struct iFile : public virtual iBase
    *  modify the contained data!
    */
   virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false) = 0;
+
+  /**
+   * Request whole or part of the content of the file as a single data buffer.
+   * \param offset Offset of data to return.
+   * \param size Size of data to return. If \c ~0 all the data starting at
+   *  \a offset up to the end of the file is returned.
+   * \return The complete data contained in the file; or an invalidated pointer
+   *  if this object does not support this function (e.g. write-only VFS
+   *  files).  Check for an invalidated result via csRef<>::IsValid().  Do not
+   *  modify the contained data!
+   */
+  virtual csPtr<iDataBuffer> GetPartialData (size_t offset, size_t size = (size_t)~0) = 0;
 };
 
 
