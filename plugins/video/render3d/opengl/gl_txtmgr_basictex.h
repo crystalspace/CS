@@ -32,6 +32,7 @@
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/scopedpointer.h"
 #include "csutil/weakref.h"
 
 #include "igraphic/image.h"
@@ -239,7 +240,7 @@ public:
   int orig_width, orig_height, orig_d;
   /// The dimensions actually used
   int actual_width, actual_height, actual_d;
-  csArray<csGLUploadData>* uploadData;
+  CS::Utility::ScopedPointer<csArray<csGLUploadData> > uploadData;
   csWeakRef<csGLGraphics3D> G3D;
   TextureType texType;
 
