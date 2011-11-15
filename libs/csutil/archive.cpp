@@ -81,7 +81,7 @@ csArchive::csArchive (const char *filename)
   csArchive::filename = CS::StrDup (filename);
 
   file.AttachNew (new csPhysicalFile (filename, "rb"));
-  if (!file->GetStatus() != VFS_STATUS_OK)	/* Create new archive file */
+  if (file->GetStatus() != VFS_STATUS_OK)	/* Create new archive file */
     file.AttachNew (new csPhysicalFile (filename, "wb"));
   else
     ReadDirectory ();
@@ -187,7 +187,7 @@ void csArchive::ReadZipDirectory (iFile* infile)
 
   if (!infile)
     return;                     /* File not open */
-  if (!infile->SetPos (infile->GetSize() - 1))
+  if (!infile->SetPos (infile->GetSize()))
     return;                     /* Seek error */
   if ((cur_offs = infile->GetPos()) == (size_t)-1)
     return;                     /* Can't get file position */
