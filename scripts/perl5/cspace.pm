@@ -2106,6 +2106,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetPos = *cspacec::iFile_GetPos;
 *SetPos = *cspacec::iFile_SetPos;
 *GetAllData = *cspacec::iFile_GetAllData;
+*GetPartialData = *cspacec::iFile_GetPartialData;
 *scfGetVersion = *cspacec::iFile_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

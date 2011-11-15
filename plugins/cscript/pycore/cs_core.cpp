@@ -25158,6 +25158,153 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iFile_GetPartialData__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iFile *arg1 = (iFile *) 0 ;
+  size_t arg2 ;
+  size_t arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  size_t val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  SwigValueWrapper< csPtr< iDataBuffer > > result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iFile_GetPartialData",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iFile, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iFile_GetPartialData" "', argument " "1"" of type '" "iFile *""'"); 
+  }
+  arg1 = reinterpret_cast< iFile * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iFile_GetPartialData" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  ecode3 = SWIG_AsVal_size_t(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iFile_GetPartialData" "', argument " "3"" of type '" "size_t""'");
+  } 
+  arg3 = static_cast< size_t >(val3);
+  result = (arg1)->GetPartialData(arg2,arg3);
+  {
+    csRef<iDataBuffer> ref((csPtr<iDataBuffer>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iDataBuffer *)ref, SWIGTYPE_p_iDataBuffer, 1);
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iFile_GetPartialData__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iFile *arg1 = (iFile *) 0 ;
+  size_t arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  SwigValueWrapper< csPtr< iDataBuffer > > result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iFile_GetPartialData",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iFile, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iFile_GetPartialData" "', argument " "1"" of type '" "iFile *""'"); 
+  }
+  arg1 = reinterpret_cast< iFile * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iFile_GetPartialData" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  result = (arg1)->GetPartialData(arg2);
+  {
+    csRef<iDataBuffer> ref((csPtr<iDataBuffer>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iDataBuffer *)ref, SWIGTYPE_p_iDataBuffer, 1);
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iFile_GetPartialData(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[4];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 3); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iFile, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        return _wrap_iFile_GetPartialData__SWIG_1(self, args);
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iFile, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_size_t(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          return _wrap_iFile_GetPartialData__SWIG_0(self, args);
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iFile_GetPartialData'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    GetPartialData(iFile *,size_t,size_t)\n"
+    "    GetPartialData(iFile *,size_t)\n");
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iFile_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -61184,6 +61331,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iFile_GetPos", _wrap_iFile_GetPos, METH_VARARGS, NULL},
 	 { (char *)"iFile_SetPos", _wrap_iFile_SetPos, METH_VARARGS, NULL},
 	 { (char *)"iFile_GetAllData", _wrap_iFile_GetAllData, METH_VARARGS, NULL},
+	 { (char *)"iFile_GetPartialData", _wrap_iFile_GetPartialData, METH_VARARGS, NULL},
 	 { (char *)"iFile_scfGetVersion", _wrap_iFile_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iFile", _wrap_delete_iFile, METH_VARARGS, NULL},
 	 { (char *)"iFile_swigregister", iFile_swigregister, METH_VARARGS, NULL},
