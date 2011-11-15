@@ -172,6 +172,7 @@ bool csPhysicalFile::SetPos(size_t p)
   }
   else
     last_error = VFS_STATUS_OTHER;
+  ok = last_error == VFS_STATUS_OK;
   return ok;
 }
 
