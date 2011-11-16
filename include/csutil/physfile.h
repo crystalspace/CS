@@ -98,12 +98,15 @@ public:
   virtual csPtr<iDataBuffer> GetAllData(bool nullterm = false);
   virtual csPtr<iDataBuffer> GetAllData (CS::Memory::iAllocator* allocator);
 
-  csPtr<iDataBuffer> GetPartialData (size_t offset, size_t size = (size_t)~0);
+  csPtr<iFile> GetPartialView (size_t offset, size_t size = (size_t)~0);
 protected:
+  CS::Threading::Mutex mutex;
   FILE* fp;
   csString path;
   bool owner;
   int last_error;
+
+  class PartialView;
 };
 
 #endif // __CS_PHYSFILE_H__

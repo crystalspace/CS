@@ -40,6 +40,7 @@
 #include "csutil/cmdline.h"
 #include "csutil/csstring.h"
 #include "csutil/databuf.h"
+#include "csutil/memfile.h"
 #include "csutil/mmapio.h"
 #include "csutil/parray.h"
 #include "csutil/parasiticdatabuffer.h"
@@ -121,7 +122,7 @@ public:
   /// Get all data
   virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false);
   csPtr<iDataBuffer> GetAllData (CS::Memory::iAllocator* alloc);
-  csPtr<iDataBuffer> GetPartialData (size_t offset, size_t size = (size_t)~0);
+  csPtr<iFile> GetPartialView (size_t offset, size_t size = (size_t)~0);
 private:
   // Create a directory or a series of directories starting from PathBase
   void MakeDir (const char *PathBase, const char *PathSuffix);
@@ -166,7 +167,7 @@ public:
   /// Get all the data at once
   virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false);
   csPtr<iDataBuffer> GetAllData (CS::Memory::iAllocator* alloc);
-  csPtr<iDataBuffer> GetPartialData (size_t offset, size_t size = (size_t)~0);
+  csPtr<iFile> GetPartialView (size_t offset, size_t size = (size_t)~0);
   /// Set current file pointer
   virtual bool SetPos (size_t newpos);
 };
@@ -915,13 +916,18 @@ csPtr<iDataBuffer> DiskFile::GetAllData (CS::Memory::iAllocator* alloc)
   }
 }
 
-csPtr<iDataBuffer> DiskFile::GetPartialData (size_t offset, size_t size)
+csPtr<iFile> DiskFile::GetPartialView (size_t offset, size_t size)
 {
+  // @@@ FIXME: Obtaining the view as a buffer is kinda lazy.
   size_t bufSize (csMin (size, GetSize() - offset));
   csRef<iDataBuffer> allData (GetAllData());
-  if (!allData) return (iDataBuffer*)nullptr;
-  if ((offset == 0) && (bufSize == GetSize())) return csPtr<iDataBuffer> (allData);
-  return csPtr<iDataBuffer> (new csParasiticDataBuffer (allData, offset, bufSize));
+  if (!allData) return (iFile*)nullptr;
+  csRef<iDataBuffer> partBuf;
+  if ((offset == 0) && (bufSize == GetSize()))
+    partBuf = allData;
+  else
+    partBuf.AttachNew (new csParasiticDataBuffer (allData, offset, bufSize));
+  return csPtr<iFile> ((iFile*)(new csMemFile (partBuf, true)));
 }
 
 iDataBuffer* DiskFile::TryCreateMapping ()
@@ -1087,13 +1093,17 @@ csPtr<iDataBuffer> ArchiveFile::GetAllData (CS::Memory::iAllocator* alloc)
   return csPtr<iDataBuffer> (databuf);
 }
 
-csPtr<iDataBuffer> ArchiveFile::GetPartialData (size_t offset, size_t size)
+csPtr<iFile> ArchiveFile::GetPartialView (size_t offset, size_t size)
 {
   size_t bufSize (csMin (size, GetSize() - offset));
   csRef<iDataBuffer> allData (GetAllData());
-  if (!allData) return (iDataBuffer*)nullptr;
-  if ((offset == 0) && (bufSize == GetSize())) return csPtr<iDataBuffer> (allData);
-  return csPtr<iDataBuffer> (new csParasiticDataBuffer (allData, offset, bufSize));
+  if (!allData) return (iFile*)nullptr;
+  csRef<iDataBuffer> partBuf;
+  if ((offset == 0) && (bufSize == GetSize()))
+    partBuf = allData;
+  else
+    partBuf.AttachNew (new csParasiticDataBuffer (allData, offset, bufSize));
+  return csPtr<iFile> ((iFile*)(new csMemFile (partBuf, true)));
 }
 
 // ------------------------------------------------------------- VfsNode --- //
