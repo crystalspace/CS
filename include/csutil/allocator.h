@@ -25,7 +25,9 @@
 
 #include "csutil/alignedalloc.h"
 #include "csutil/memdebug.h"
+#include "csutil/ref.h"
 #include "csutil/threading/mutex.h"
+#include "iutil/allocator.h"
 
 /**\addtogroup util_memory
  * @{ */
@@ -702,6 +704,26 @@ namespace CS
         Allocator::SetMemTrackerInfo(info);
       }
     };
+
+    /**
+     * Memory allocator forwarding to an iAllocator implementation.
+     */
+    class AllocatorInterface
+    {
+      csRef<iAllocator> alloc;
+    public:
+      AllocatorInterface (iAllocator* alloc)
+       : alloc (alloc) {}
+
+      CS_ATTRIBUTE_MALLOC void* Alloc (const size_t n)
+      { return alloc->Alloc (n); }
+      void Free (void* p) { alloc->Free (p); }
+      void* Realloc (void* p, size_t newSize)
+      { return alloc->Realloc (p, newSize); }
+      void SetMemTrackerInfo (const char* info)
+      { alloc->SetMemTrackerInfo (info); }
+    };
+
   } // namespace Memory
 } // namespace CS
 
