@@ -136,6 +136,7 @@
 #include "csutil/schedule.h"
 #include "csutil/scopeddelete.h"
 #include "csutil/scopedlock.h"
+#include "csutil/scopedpointer.h"
 #include "csutil/set.h"
 #include "csutil/setenv.h"
 #include "csutil/sha256.h"
