@@ -171,6 +171,11 @@ csPtr<iDataBuffer> csMemFile::GetAllData (bool nullterm)
   }
 }
 
+csPtr<iDataBuffer> csMemFile::GetAllData (CS::Memory::iAllocator* /*allocator*/)
+{
+  return GetAllData ();
+}
+
 csPtr<iDataBuffer> csMemFile::GetPartialData (size_t offset, size_t size)
 {
   if (!buffer) return 0;

@@ -120,6 +120,7 @@ public:
   virtual bool SetPos (size_t newpos);
   /// Get all data
   virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false);
+  csPtr<iDataBuffer> GetAllData (CS::Memory::iAllocator* alloc);
   csPtr<iDataBuffer> GetPartialData (size_t offset, size_t size = (size_t)~0);
 private:
   // Create a directory or a series of directories starting from PathBase
@@ -164,6 +165,7 @@ public:
   virtual size_t GetPos ();
   /// Get all the data at once
   virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false);
+  csPtr<iDataBuffer> GetAllData (CS::Memory::iAllocator* alloc);
   csPtr<iDataBuffer> GetPartialData (size_t offset, size_t size = (size_t)~0);
   /// Set current file pointer
   virtual bool SetPos (size_t newpos);
@@ -864,6 +866,55 @@ csPtr<iDataBuffer> DiskFile::GetAllData (bool nullterm)
   }
 }
 
+csPtr<iDataBuffer> DiskFile::GetAllData (CS::Memory::iAllocator* alloc)
+{
+// retrieve file contents
+
+  // refuse to work when writing
+  if (!writemode)
+  {
+    // do we already have everything?
+    if (!alldata)
+    {
+      iDataBuffer* newbuf = 0;
+      // attempt to create file mapping
+      size_t oldpos = GetPos();
+      newbuf = TryCreateMapping ();
+      // didn't succeed or not supported -
+      // old style readin'
+      if (!newbuf)
+      {
+        SetPos (0);
+
+        CS::DataBuffer<CS::Memory::AllocatorInterface>* dbuf =
+          new CS::DataBuffer<CS::Memory::AllocatorInterface> (Size,
+                                                              CS::Memory::AllocatorInterface (alloc));
+        char* data (dbuf->GetData());
+        Read (data, Size);
+        *(data + Size) = 0;
+
+        newbuf = dbuf;
+      }
+      // close file, set correct pos
+      fclose (file);
+      file = 0;
+      SetPos (oldpos);
+      // setup buffer.
+      alldata = csPtr<iDataBuffer> (newbuf);
+      buffernt = false;
+    }
+    else
+    {
+      // The data was already read.
+    }
+    return csPtr<iDataBuffer> (alldata);
+  }
+  else
+  {
+    return 0;
+  }
+}
+
 csPtr<iDataBuffer> DiskFile::GetPartialData (size_t offset, size_t size)
 {
   size_t bufSize (csMin (size, GetSize() - offset));
@@ -1028,6 +1079,11 @@ csPtr<iDataBuffer> ArchiveFile::GetAllData (bool nullterm)
 
     buffernt = nullterm;
   }
+  return csPtr<iDataBuffer> (databuf);
+}
+
+csPtr<iDataBuffer> ArchiveFile::GetAllData (CS::Memory::iAllocator* alloc)
+{
   return csPtr<iDataBuffer> (databuf);
 }
 

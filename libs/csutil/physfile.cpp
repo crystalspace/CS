@@ -203,6 +203,26 @@ csPtr<iDataBuffer> csPhysicalFile::GetAllData(bool nullterm)
   return csPtr<iDataBuffer>(data);
 }
 
+csPtr<iDataBuffer> csPhysicalFile::GetAllData(CS::Memory::iAllocator* allocator)
+{
+  csRef<CS::DataBuffer<CS::Memory::AllocatorInterface> > data;
+  size_t const len = GetSize();
+  if (GetStatus() == VFS_STATUS_OK)
+  {
+    size_t const pos = GetPos();
+    if (GetStatus() == VFS_STATUS_OK)
+    {
+      data.AttachNew (new CS::DataBuffer<CS::Memory::AllocatorInterface> (len,
+        CS::Memory::AllocatorInterface (allocator)));
+      size_t const nread = Read(data->GetData(), len);
+      if ((nread != len) || (GetStatus() != VFS_STATUS_OK))
+        data.Invalidate();
+      SetPos(pos);
+    }
+  }
+  return csPtr<iDataBuffer>(data);
+}
+
 csPtr<iDataBuffer> csPhysicalFile::GetPartialData (size_t offset, size_t size)
 {
   csRef<CS::DataBuffer<> > data;
