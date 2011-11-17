@@ -25,6 +25,7 @@
 #include "csutil/algorithms.h"
 #include "csutil/alignedalloc.h"
 #include "csutil/allocator.h"
+#include "csutil/allocatorimpl.h"
 #include "csutil/ansicommand.h"
 #include "csutil/ansiparse.h"
 #include "csutil/array.h"

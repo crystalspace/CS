@@ -1003,7 +1003,7 @@ class iFile(iBase):
     def GetPos(*args): return _core.iFile_GetPos(*args)
     def SetPos(*args): return _core.iFile_SetPos(*args)
     def GetAllData(*args): return _core.iFile_GetAllData(*args)
-    def GetPartialData(*args): return _core.iFile_GetPartialData(*args)
+    def GetPartialView(*args): return _core.iFile_GetPartialView(*args)
     scfGetVersion = staticmethod(_core.iFile_scfGetVersion)
     __swig_destroy__ = _core.delete_iFile
     __del__ = lambda self : None;

@@ -22,6 +22,7 @@
  * subdirectory of the top Crystal Space include directory.
  */
 #include "cssysdef.h"
+#include "iutil/allocator.h"
 #include "iutil/array.h"
 #include "iutil/binder.h"
 #include "iutil/cache.h"
