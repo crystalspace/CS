@@ -1,4 +1,4 @@
-Jason Dorie's ImageLib, downloaded from http://jasondorie.com/web/main.html .
+Jason Dorie's ImageLib, downloaded from http://jasondorie.com/goinnovate.html
 
 License is "It's also free to anyone who wants to use it, for any reason. 
 Even commercially."
