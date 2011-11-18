@@ -539,6 +539,9 @@ nomem2:
     // Expand pictures with less than 8bpp to 8bpp
     png_set_packing (png);
 
+  // Let the PNG lib handle any interlacing
+  png_set_interlace_handling (png);
+
   // Update structure with the above settings
   png_read_update_info (png, info);
 
