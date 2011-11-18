@@ -35,10 +35,10 @@
 #define VERSION_STR_DOTTED  CS_VERSION_MAJOR "." CS_VERSION_MINOR
 
 static inline bool GetRegistryInstallPath (const HKEY parentKey, 
-					   char *oInstallPath, 
+					   wchar_t *oInstallPath, 
 					   DWORD iBufferSize)
 {
-  const char * pValueName = "InstallPath";
+  const wchar_t * pValueName = L"InstallPath";
   DWORD dwType;
   DWORD bufSize = iBufferSize;
   HKEY m_pKey;
@@ -54,7 +54,7 @@ static inline bool GetRegistryInstallPath (const HKEY parentKey,
   }
   if (result == ERROR_SUCCESS)
   {
-    result = RegQueryValueEx(
+    result = RegQueryValueExW(
       m_pKey,
       pValueName,
       0,
@@ -69,11 +69,11 @@ static inline bool GetRegistryInstallPath (const HKEY parentKey,
     {
       if (dwType == REG_EXPAND_SZ)
       {
-	char expandedPath[MAX_PATH];
+	wchar_t expandedPath[MAX_PATH];
 
-	ExpandEnvironmentStrings (oInstallPath, expandedPath, 
+	ExpandEnvironmentStringsW (oInstallPath, expandedPath, 
 	  sizeof(expandedPath));
-	strcpy (oInstallPath, expandedPath);
+	wcscpy (oInstallPath, expandedPath);
       }
       return true;
     }
@@ -86,7 +86,7 @@ typedef csStringFast<MAX_PATH> csFilenameString;
 static inline bool GetRegistryInstallPath (const HKEY parentKey, 
 					   csFilenameString& oInstallPath)
 {
-  const char* pValueName = "InstallPath";
+  const wchar_t* pValueName = L"InstallPath";
   DWORD dwType;
   DWORD bufSize;
   HKEY m_pKey;
@@ -102,7 +102,7 @@ static inline bool GetRegistryInstallPath (const HKEY parentKey,
   }
   if (result == ERROR_SUCCESS)
   {
-    result = RegQueryValueEx(
+    result = RegQueryValueExW(
       m_pKey,
       pValueName,
       0,
@@ -114,8 +114,8 @@ static inline bool GetRegistryInstallPath (const HKEY parentKey,
       RegCloseKey (m_pKey);
       return false;
     }
-    CS_ALLOC_STACK_ARRAY(char, buf, bufSize + 1);
-    result = RegQueryValueEx(
+    CS_ALLOC_STACK_ARRAY(wchar_t, buf, bufSize + 1);
+    result = RegQueryValueExW(
       m_pKey,
       pValueName,
       0,
@@ -131,9 +131,9 @@ static inline bool GetRegistryInstallPath (const HKEY parentKey,
     {
       if (dwType == REG_EXPAND_SZ)
       {
-	char expandedPath[32*1024];
+	wchar_t expandedPath[32*1024];
 
-	ExpandEnvironmentStrings (buf, expandedPath, 
+	ExpandEnvironmentStringsW (buf, expandedPath, 
 	  sizeof(expandedPath));
 	oInstallPath.Replace (expandedPath);
       }
@@ -201,11 +201,17 @@ static inline char* FindConfigPath ()
   }
 
   // try the registry
-  char path[1024];
-  if (GetRegistryInstallPath (HKEY_CURRENT_USER, path, 1024))
+  wchar_t pathW[1024];
+  if (GetRegistryInstallPath (HKEY_CURRENT_USER, pathW, 1024))
+  {
+    csString path (pathW);
     if ((retPath = NewPathWOTrailingDelim (path)) != 0) return retPath;
-  if (GetRegistryInstallPath (HKEY_LOCAL_MACHINE, path, 1024))
+  }
+  if (GetRegistryInstallPath (HKEY_LOCAL_MACHINE, pathW, 1024))
+  {
+    csString path (pathW);
     if ((retPath = NewPathWOTrailingDelim (path)) != 0) return retPath;
+  }
 
   // perhaps current drive/dir?
   FILE *test = fopen("vfs.cfg", "r");
@@ -213,26 +219,26 @@ static inline char* FindConfigPath ()
   {
     // use current dir
     fclose(test);
-    strcpy(path, ".");
-    return csStrNew (path);
+    return csStrNew (".");
   }
 
   // directory where app is?
-  char apppath[MAX_PATH + 1];
-  GetModuleFileName (0, apppath, sizeof(apppath)-1);
-  char* slash = strrchr (apppath, '\\');
+  wchar_t apppath[MAX_PATH + 1];
+  GetModuleFileNameW (0, apppath, sizeof(apppath)/sizeof(apppath[0])-1);
+  wchar_t* slash = wcsrchr (apppath, '\\');
   if (slash) *(slash+1) = 0;
 
-  char testfn[MAX_PATH];
-  strcpy(testfn, apppath);
-  strcat(testfn, "vfs.cfg");
+  wchar_t testfn[MAX_PATH];
+  wcscpy(testfn, apppath);
+  wcscat(testfn, L"vfs.cfg");
 
-  test = fopen(testfn, "r");
+  test = _wfopen(testfn, L"r");
   if(test != 0)
   {
     // use current dir
     fclose(test);
-    if ((retPath = NewPathWOTrailingDelim (apppath)) != 0) return retPath;
+    csString path (apppath);
+    if ((retPath = NewPathWOTrailingDelim (path)) != 0) return retPath;
   }
 
   // retrieve the path of the Program Files folder and append 
@@ -243,6 +249,7 @@ static inline char* FindConfigPath ()
     if (GetShellFolderPath (CSIDL_PROGRAM_FILES, programpath))
     {
       size_t maxLen = MIN(sizeof(programpath), 1024-30);
+      char path[1024];
       memcpy (path, programpath, maxLen);
       path[maxLen] = 0;
       strcat (path, "\\" CS_PACKAGE_NAME " " VERSION_STR_DOTTED);
@@ -252,6 +259,7 @@ static inline char* FindConfigPath ()
 
   // nothing helps, use default
   // which is "C:\Program Files\CrystalSpace"
+  char path[1024];
   strcpy (path, "C:\\Program Files\\" CS_PACKAGE_NAME " " VERSION_STR_DOTTED);
 
   return csStrNew (path);
@@ -332,11 +340,11 @@ csPathsList* csInstallationPathsHelper::GetPlatformInstallationPaths()
 #endif
 
   {
-    char apppath[MAX_PATH + 1];
-    GetModuleFileName (0, apppath, sizeof(apppath)-1);
-    char* slash = strrchr (apppath, '\\');
+    wchar_t apppath[MAX_PATH + 1];
+    GetModuleFileNameW (0, apppath, sizeof(apppath)/sizeof(apppath[0])-1);
+    wchar_t* slash = wcsrchr (apppath, '\\');
     if (slash) *(slash+1) = 0;
-    paths->AddUniqueExpanded (apppath);
+    paths->AddUniqueExpanded (csString (apppath));
   }
 
   {

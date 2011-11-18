@@ -28,87 +28,6 @@
 #ifdef __CYGWIN__
 #include <sys/cygwin.h>
 #endif
-#include "csutil/win32/cachedll.h"
-
-typedef DWORD (STDAPICALLTYPE* PFNGETLONGPATHNAMEA) (LPCSTR lpszShortPath, 
-						     LPSTR lpszLongPath,
-						     DWORD cchBuffer);
-
-static DWORD STDAPICALLTYPE MyGetLPN (LPCSTR lpszShortPath, LPSTR lpszLongPath, 
-				      DWORD cchBuffer)
-{
-  // @@@ Deal with UNC paths?
-
-  // Because the we know the parameters with which this function will be 
-  // called, some safety checks can be omitted.
-  
-  // In case ShortPath == LongPath
-  CS_ALLOC_STACK_ARRAY (char, nshort, strlen (lpszShortPath) + 1);
-  strcpy (nshort, lpszShortPath);
-  lpszShortPath = nshort;
-
-  const char* nextpos = lpszShortPath;
-  size_t bufRemain = cchBuffer;
-  *lpszLongPath = 0;
-
-#define BUFCAT(s)				  \
-  {						  \
-    size_t len = strlen (s);			  \
-    if (bufRemain > 0)				  \
-    {						  \
-      strncat (lpszLongPath, s, bufRemain);	  \
-      bufRemain -= len;				  \
-    }						  \
-  }
-
-
-  while (nextpos != 0)
-  {
-    char buf[MAX_PATH];
-    const char* pos = nextpos;
-    char* bs = (char*)strchr (pos, '\\');
-    if (bs)
-    {
-      memcpy (buf, pos, (bs - pos));
-      buf[bs - pos] = 0;
-    }
-    else
-    {
-      strcpy (buf, pos);
-    }
-    if (buf[1] == ':')
-    {
-      BUFCAT (buf);
-    }
-    else
-    {
-      BUFCAT ("\\");
-      char* bufEnd = (char*)strchr (lpszLongPath, 0);
-      memcpy (bufEnd, buf, bufRemain - 1);
-      bufEnd[bufRemain - 1] = 0;
-
-      WIN32_FIND_DATA fd;
-      HANDLE hFind = FindFirstFile (lpszLongPath, &fd);
-      if (hFind != INVALID_HANDLE_VALUE)
-      {
-	*bufEnd = 0;
-	BUFCAT (fd.cFileName);
-	FindClose (hFind);
-      }
-      else
-      {
-	return 0;
-      }
-    }
-    nextpos = bs ? bs + 1 : 0;
-  }
-  return (cchBuffer - (DWORD)bufRemain);
-#undef BUFCAT
-}
-
-// Can't put this inside the function because Cygwin would segfault
-// on the destructor for some unknown reason.
-static CS::Platform::Win32::CacheDLL hKernel32 ("kernel32.dll");
 
 char* csPathsUtilities::ExpandPath (const char* path)
 {
@@ -116,27 +35,27 @@ char* csPathsUtilities::ExpandPath (const char* path)
     return 0;
 
 #ifdef __CYGWIN__
-  char winpath[MAX_PATH];
-  if (cygwin_conv_to_win32_path(path, winpath) == 0)
-    path = winpath;
+  wchar_t winpath[MAX_PATH];
+  csString winpath_utf8;
+  if (cygwin_conv_path (CCP_POSIX_TO_WIN_W, path,
+                        winpath, sizeof (winpath)) == 0)
+  {
+    winpath_utf8 = winpath;
+    path = winpath_utf8.GetData();
+  }
 #endif
 
-  char fullName[MAX_PATH];
-  GetFullPathName (path, sizeof(fullName), fullName, 0);
+  size_t pathLen (strlen (path));
+  size_t pathWSize (pathLen + 1);
+  CS_ALLOC_STACK_ARRAY(wchar_t, pathW, pathWSize);
+  csUnicodeTransform::UTF8toWC (pathW, pathWSize,
+                                (utf8_char*)path, pathLen);
+
+  wchar_t fullName[MAX_PATH];
+  GetFullPathNameW (pathW, sizeof(fullName)/sizeof(fullName[0]), fullName, 0);
 
   DWORD result = 0;
-  PFNGETLONGPATHNAMEA GetLongPathNameFunc = 0;
-  // unfortunately, GetLongPathName() is only supported on Win98+/W2k+
-  if (hKernel32 != 0)
-  {
-    GetLongPathNameFunc = 
-      (PFNGETLONGPATHNAMEA)GetProcAddress (hKernel32, "GetLongPathNameA");
-    if (GetLongPathNameFunc == 0)
-    {
-      GetLongPathNameFunc = MyGetLPN;
-    }
-    result = GetLongPathNameFunc (fullName, fullName, sizeof (fullName));
-  }
+  result = GetLongPathNameW(fullName, fullName, sizeof (fullName)/sizeof(fullName[0]));
   if (result == 0) 
   {
     return 0;
@@ -147,13 +66,28 @@ char* csPathsUtilities::ExpandPath (const char* path)
 
 bool csPathsUtilities::PathsIdentical (const char* path1, const char* path2)
 {
-  return (strcasecmp (path1, path2) == 0);
+  /* See: http://blogs.msdn.com/b/michkap/archive/2005/10/17/481600.aspx
+     for an explanation of proper filename comparison */
+  size_t path1len (strlen (path1));
+  size_t path1Wlen (path1len+1);
+  CS_ALLOC_STACK_ARRAY(wchar_t, path1W, path1Wlen);
+  csUnicodeTransform::UTF8toWC (path1W, path1Wlen,
+                                (utf8_char*)path1, path1len);
+  size_t path2len (strlen (path2));
+  size_t path2Wlen (path2len+1);
+  CS_ALLOC_STACK_ARRAY(wchar_t, path2W, path2Wlen);
+  csUnicodeTransform::UTF8toWC (path2W, path2Wlen,
+                                (utf8_char*)path2, path2len);
+
+  CharUpperBuffW (path1W, DWORD (wcslen (path1W)));
+  CharUpperBuffW (path2W, DWORD (wcslen (path2W)));
+  return (wcscmp (path1W, path2W) == 0);
 }
 
 csString csInstallationPathsHelper::GetAppPath (const char*)
 {
-  char appPath[MAX_PATH];
-  GetModuleFileName (0, appPath, MAX_PATH - 1);
+  wchar_t appPath[MAX_PATH];
+  GetModuleFileNameW (0, appPath, MAX_PATH - 1);
   appPath[MAX_PATH - 1] = '\0';
   return appPath;
 }
@@ -172,8 +106,8 @@ namespace CS
 
     csString GetTempDirectory ()
     {
-      char tmpDir[MAX_PATH*2];
-      ::GetTempPath (MAX_PATH*2-1, tmpDir);
+      wchar_t tmpDir[MAX_PATH*2];
+      ::GetTempPathW (MAX_PATH*2-1, tmpDir);
       tmpDir[MAX_PATH*2-1] = '\0';
     
       return tmpDir;
@@ -181,9 +115,14 @@ namespace CS
     
     csString GetTempFilename (const char* path)
     {
-      char filename[MAX_PATH];
+      wchar_t filename[MAX_PATH];
     
-      if (::GetTempFileName (path ? path : ".", "CS", 0, filename) > 0)
+      size_t pathLen (strlen (path));
+      size_t pathWSize (pathLen + 1);
+      CS_ALLOC_STACK_ARRAY(wchar_t, pathW, pathWSize);
+      csUnicodeTransform::UTF8toWC (pathW, pathWSize,
+                                    (utf8_char*)path, pathLen);
+      if (::GetTempFileNameW (path ? pathW : L".", L"CS", 0, filename) > 0)
       {
 	filename[MAX_PATH-1] = '\0';
 	csString result (filename);
@@ -199,7 +138,8 @@ namespace CS
       }
     
       // Fallback
-      cs_snprintf (filename, MAX_PATH, "cs%x.tmp", _getpid ());
+      char filename_narrow[MAX_PATH];
+      cs_snprintf (filename_narrow, MAX_PATH, "cs%x.tmp", _getpid ());
     
       return filename;
     }
