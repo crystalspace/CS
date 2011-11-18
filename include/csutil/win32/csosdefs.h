@@ -329,10 +329,17 @@ static inline longlong strtoll(char const* s, char** sN, int base)
 #define CS_PATH_DELIMITER ';'
 #define CS_PATH_SEPARATOR '\\'
 
+// Wrapper for _wmkdir, taking input path as UTF-8
+#ifdef CS_CRYSTALSPACE_LIB
+  int CS_EXPORT_SYM CS_mkdir (const char* path);
+#else
+  int CS_IMPORT_SYM CS_mkdir (const char* path);
+#endif
+
 #if defined (__CYGWIN32__)
 #  define CS_MKDIR(path) mkdir(path, 0755)
 #else
-#  define CS_MKDIR(path) _mkdir(path)
+#  define CS_MKDIR(path) CS_mkdir(path)
 #endif
 
 // Directory read functions, file access, etc.
