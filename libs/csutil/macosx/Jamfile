@@ -10,6 +10,7 @@ CSUTIL.GENERIC +=
   loadlib.cpp
   memutil_impl.cpp
   memutil_impl_virtsize.cpp
+  mkdir.cpp
   mmap.cpp
   pathutil.cpp
   platformfile.cpp

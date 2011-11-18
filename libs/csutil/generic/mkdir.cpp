@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2007 by Frank Richter
+    Copyright (C) 2011 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,30 +16,24 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/* Implementations for functions declared for the "inline function" trick
- * to have deprecated macros emit a message.
- */
-
 #include "cssysdef.h"
 
 #include "csutil/syspath.h"
 
-#undef CS_MKDIR
-
 namespace CS
 {
-  namespace deprecated
+  namespace Platform
   {
-    int CS_MKDIR (const char* path)
+    int CreateDirectory (const char* path)
     {
-      int err (Platform::CreateDirectory (path));
-      if (err != 0)
+      int olderrno (errno);
+      int result (0);
+      if (mkdir (path, 0755) < 0)
       {
-        errno = err;
-        return -1;
+        result = errno;
       }
-      else
-        return 0;
+      errno = olderrno;
+      return result;
     }
-  } // namespace deprecated
+  } // namespace Platform
 } // namespace CS

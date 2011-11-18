@@ -336,12 +336,6 @@ static inline longlong strtoll(char const* s, char** sN, int base)
   int CS_IMPORT_SYM CS_mkdir (const char* path);
 #endif
 
-#if defined (__CYGWIN32__)
-#  define CS_MKDIR(path) mkdir(path, 0755)
-#else
-#  define CS_MKDIR(path) CS_mkdir(path)
-#endif
-
 // Directory read functions, file access, etc.
 #include <io.h>
 #ifndef F_OK

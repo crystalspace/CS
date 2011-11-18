@@ -343,6 +343,15 @@ CS_CRYSTALSPACE_EXPORT csString GetTempDirectory ();
 /// Get file name for temporary file within specified directory
 CS_CRYSTALSPACE_EXPORT csString GetTempFilename (const char* path/* = 0*/);
 
+/**
+ * Create a directory.
+ * \param path Name of the directory to create.
+ * \returns 0 on success, or an error code in case of failure.
+ *   (This is the error code the standard \c mkdir function would retutn in
+ *   \c errno).
+ */
+CS_CRYSTALSPACE_EXPORT int CreateDirectory (const char* path);
+
 }
 }
 

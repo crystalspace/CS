@@ -19,12 +19,34 @@
 #include "cssysdef.h"
 #include "csutil/csuctransform.h"
 
-int CS_mkdir (const char* path)
+static inline int CS_mkdir (const char* path)
 {
+#if defined (__CYGWIN32__)
+  return mkdir(path, 0755);
+#else
   size_t pathLen (strlen (path));
   size_t pathWlen (pathLen + 1);
   CS_ALLOC_STACK_ARRAY(wchar_t, pathW, pathWlen);
   csUnicodeTransform::UTF8toWC (pathW, pathWlen,
                                 (utf8_char*)path, pathLen);
   return _wmkdir (pathW);
+#endif
 }
+
+namespace CS
+{
+  namespace Platform
+  {
+    int CreateDirectory (const char* path)
+    {
+      int olderrno (errno);
+      int result (0);
+      if (CS_mkdir (path) < 0)
+      {
+        result = errno;
+      }
+      errno = olderrno;
+      return result;
+    }
+  } // namespace Platform
+} // namespace CS
