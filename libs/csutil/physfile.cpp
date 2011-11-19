@@ -62,16 +62,20 @@ csPhysicalFile::csPhysicalFile(char const* apath, char const* mode)
   : scfImplementationType (this), fp(0), path(apath), owner(true), 
   last_error(VFS_STATUS_OK)
 {
-  struct stat buf;
-  if (stat (apath, &buf))
+  bool file_must_exist (*mode == 'r');
+  if (file_must_exist)
   {
-    last_error = VFS_STATUS_OTHER;
-    return;
-  }
-  if (!(buf.st_mode & S_IFREG))
-  {
-    last_error = VFS_STATUS_OTHER;
-    return;
+    struct stat buf;
+    if (stat (apath, &buf))
+    {
+      last_error = VFS_STATUS_OTHER;
+      return;
+    }
+    if (!(buf.st_mode & S_IFREG))
+    {
+      last_error = VFS_STATUS_OTHER;
+      return;
+    }
   }
   fp = CS::Platform::File::Open (apath, mode);
   if (fp == 0)
