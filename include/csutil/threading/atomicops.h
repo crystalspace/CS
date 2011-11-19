@@ -156,6 +156,14 @@ namespace Threading
     typedef AtomicOperationsBase<AtomicOperationsSparc> AtomicOperations;
   } }
 
+#elif defined(CS_COMPILER_GCC) && \
+      defined(CS_PROCESSOR_ARM)
+  #include "csutil/threading/atomicops_gcc_arm.h"
+
+  namespace CS { namespace Threading {
+    typedef AtomicOperationsBase<AtomicOperationsArmGCC> AtomicOperations;
+  } }
+
 #else
 #error "No atomic operations defined for your platform!"
 #endif
