@@ -17,6 +17,9 @@
 */
 
 #include "cssysdef.h"
+
+#include "csutil/syspath.h"
+
 #include "csutil/csuctransform.h"
 
 static inline int CS_mkdir (const char* path)
