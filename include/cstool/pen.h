@@ -193,11 +193,24 @@ public:
   virtual void Write(iFont *font, uint x1, uint y1, const char *text) = 0;
 
   /**
+   * Writes multiple lines of text in the given font at the given location.
+   */
+  virtual void WriteLines(iFont *font, uint x1, uint y1, const csStringArray& lines) = 0;
+
+  /**
    * Writes text in the given font, in the given box.  The alignment
    * specified in h_align and v_align determine how it should be aligned.
    */
   virtual void WriteBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2,
     uint h_align, uint v_align, const char *text) = 0;
+
+  /**
+   * Writes multiple lines of text in the given font, in the given box.
+   * The alignment specified in h_align and v_align determine how it should
+   * be aligned.
+   */
+  virtual void WriteLinesBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2,
+    uint h_align, uint v_align, const csStringArray& lines) = 0;
 };
 
 /** A pen specialized for CS. */
@@ -315,299 +328,47 @@ public:
   csPen(iGraphics2D *_g2d, iGraphics3D *_g3d);
   virtual ~csPen();
 
-  /**
-   * Sets the given flag.
-   * @param flag The flag to set.
-   */
   virtual void SetFlag(uint flag);
-
-  /**
-   * Clears the given flag.
-   * @param flag The flag to clear.
-   */
   virtual void ClearFlag(uint flag);
 
-
-  /**
-   * Sets the given mix (blending) mode.
-   * @param mode The mixmode to set.
-   */
   virtual void SetMixMode(uint mode);
 
-  /**
-   * Sets the current color.
-   */
   virtual void SetColor (float r, float g, float b, float a);
-
-  /**
-   * Sets the current color.
-   */
   virtual void SetColor(const csColor4 &color);
 
-  /**
-   * Sets the texture handle.
-   * @param tex A reference to the texture to use.
-   */
   virtual void SetTexture(csRef<iTextureHandle> tex);
 
-  /**
-   * Swaps the current color and the alternate color.
-   */
   virtual void SwapColors();
 
-  /**
-   * Sets the current pen width
-   */
   virtual void SetPenWidth(float width);
 
-  /**
-   * Clears the current transform, resets to identity.
-   */
   virtual void ClearTransform();
-
-  /**
-   * Pushes the current transform onto the stack. *
-   */
   virtual void PushTransform();
-
-  /**
-   * Pops the transform stack. The top of the stack becomes the current
-   * transform.
-   */
   virtual void PopTransform();
 
-  /**
-   * Sets the origin of the coordinate system.
-   */
   virtual void SetOrigin(const csVector3 &o);
-
-  /**
-   * Translates by the given vector
-   */
   virtual void Translate(const csVector3 &t);
-
-  /**
-   * Rotates by the given matrix.
-   */
   virtual void Rotate(const float &a);
 
-  /**
-   * Draws a single line.
-   */
   virtual void DrawLine (uint x1, uint y1, uint x2, uint y2);
-
-  /**
-   * Draws a thick line.
-   */
   void DrawThickLine(uint x1, uint y1, uint x2, uint y2);
-
-  /**
-   * Draws a single point.
-   */
   virtual void DrawPoint (uint x1, uint y2);
-
-  /**
-   * Draws a rectangle.
-   */
   virtual void DrawRect (uint x1, uint y1, uint x2, uint y2);
-
-  /**
-   * Draws a mitered rectangle. The miter value should be between 0.0 and 1.0,
-   * and determines how much of the corner is mitered off and beveled.
-   */
   virtual void DrawMiteredRect (uint x1, uint y1, uint x2, uint y2,
     uint miter);
-
-  /**
-   * Draws a rounded rectangle. The roundness value should be between
-   * 0.0 and 1.0, and determines how much of the corner is rounded off.
-   */
   virtual void DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
     uint roundness);
-
-  /**
-   * Draws an elliptical arc from start angle to end angle.  Angle must be
-   * specified in radians. The arc will be made to fit in the given box.
-   * If you want a circular arc, make sure the box is a square.  If you want
-   * a full circle or ellipse, specify 0 as the start angle and 2*PI as the end
-   * angle.
-   */
   virtual void DrawArc(uint x1, uint y1, uint x2, uint y2,
   	float start_angle=0, float end_angle=6.2831853);
-
-  /**
-   * Draws a triangle around the given vertices.
-   */
   virtual void DrawTriangle(uint x1, uint y1, uint x2, uint y2, uint x3, uint y3);
 
-  /**
-   * Writes text in the given font at the given location.
-   */
   virtual void Write(iFont *font, uint x1, uint y1, const char *text);
+  virtual void WriteLines(iFont *font, uint x1, uint y1, const csStringArray& lines);
 
-  /**
-   * Writes text in the given font, in the given box.  The alignment
-   * specified in h_align and v_align determine how it should be aligned.
-   */
   virtual void WriteBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2,
     uint h_align, uint v_align, const char *text);
+  virtual void WriteLinesBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2,
+    uint h_align, uint v_align, const csStringArray& lines);
 };
-
-
-
-/** @brief The memory pen is a caching pen object.  The commands are written
- * to memory, and then later may be replayed to some other pen. */
-class CS_CRYSTALSPACE_EXPORT csMemoryPen : public iPen
-{
-  /** The buffer that contains the shtuff we want. */
-  csMemFile *buf;
-
-  /** The textures we're currently using. */
-  csRefArray<iTextureHandle> textures;
-
-public:
-  csMemoryPen():buf(0) { Clear(); }
-  virtual ~csMemoryPen() {}
-
-  //////////////// Drawing ///////////////////////////////////////////
-
-  /** Clears the draw buffer out. */
-  virtual void Clear();
-
-  /** Draws the cached contents of this buffer into the pen. */
-  void Draw(iPen *_pen_);
-
-  /**
-   * Sets the given flag.
-   * @param flag The flag to set.
-   */
-  virtual void SetFlag(uint flag);
-
-  /**
-   * Clears the given flag.
-   * @param flag The flag to clear.
-   */
-  virtual void ClearFlag(uint flag);
-
-
-  /** Sets the given mix (blending) mode.
-   * @param mode The mixmode to set.
-   */
-  virtual void SetMixMode(uint mode);
-
-	  /**
-   * Sets the current color.
-   */
-  virtual void SetColor (float r, float g, float b, float a);
-
-  /**
-   * Sets the current color.
-   */
-  virtual void SetColor(const csColor4 &color);
-
-  /**
-   * Sets the texture handle.
-   * @param tex A reference to the texture to use.
-   */
-  virtual void SetTexture(csRef<iTextureHandle> tex);
-
-  /**
-   * Swaps the current color and the alternate color.
-   */
-  virtual void SwapColors();
-
-  /**
-   * Sets the width of the pen for line drawing.
-   * @param width The width in pixels.
-   */
-  virtual void SetPenWidth(float width);
-
-  /**
-   * Clears the current transform, resets to identity.
-   */
-  virtual void ClearTransform();
-
-  /**
-   * Pushes the current transform onto the stack. *
-   */
-  virtual void PushTransform();
-
-  /**
-   * Pops the transform stack. The top of the stack becomes the current
-   * transform.
-   */
-  virtual void PopTransform();
-
-  /**
-   * Sets the origin of the coordinate system.
-   */
-  virtual void SetOrigin(const csVector3 &o);
-
-  /**
-   * Translates by the given vector
-   */
-  virtual void Translate(const csVector3 &t);
-
-  /**
-   * Rotates by the given angle.
-   */
-  virtual void Rotate(const float &a);
-
-  /**
-   * Draws a single line.
-   */
-  virtual void DrawLine (uint x1, uint y1, uint x2, uint y2);
-
-  /**
-   * Draws a single point.
-   */
-  virtual void DrawPoint (uint x1, uint y2);
-
-  /**
-   * Draws a rectangle.
-   */
-  virtual void DrawRect (uint x1, uint y1, uint x2, uint y2);
-
-  /**
-   * Draws a mitered rectangle. The miter value should be between 0.0 and 1.0,
-   * and determines how much of the corner is mitered off and beveled.
-   */
-  virtual void DrawMiteredRect (uint x1, uint y1, uint x2, uint y2, uint miter);
-
-  /**
-   * Draws a rounded rectangle. The roundness value should be between
-   * 0.0 and 1.0, and determines how much of the corner is rounded off.
-   */
-  virtual void DrawRoundedRect (uint x1, uint y1, uint x2, uint y2,
-    uint roundness);
-
-  /**
-   * Draws an elliptical arc from start angle to end angle.  Angle must be
-   * specified in radians. The arc will be made to fit in the given box.
-   * If you want a circular arc, make sure the box is a square.  If you want
-   * a full circle or ellipse, specify 0 as the start angle and 2*PI as the end
-   * angle.
-   */
-  virtual void DrawArc(uint x1, uint y1, uint x2, uint y2, float start_angle,
-  	float end_angle);
-
-  /**
-   * Draws a triangle around the given vertices.
-   */
-  virtual void DrawTriangle(uint x1, uint y1, uint x2, uint y2, uint x3, uint y3);
-
-  /**
-   * Writes text in the given font at the given location.
-   */
-  virtual void Write(iFont *font, uint x1, uint y1, char *text);
-
-  /**
-   * Writes text in the given font, in the given box.  The alignment
-   * specified in h_align and v_align determine how it should be aligned.
-   */
-  virtual void WriteBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2,
-    uint h_align, uint v_align, char *text);
-};
-
 
 #endif

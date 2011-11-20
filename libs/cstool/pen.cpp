@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "cstool/pen.h"
+#include "csutil/stringarray.h"
 #include "ivideo/fontserv.h"
 #include "ivideo/graph2d.h"
 
@@ -486,7 +487,30 @@ void csPen::Write(iFont *font, uint x1, uint y1, const char *text)
   g2d->Write(font, (int)pos.x, (int)pos.y, the_color, -1, text);
 }
 
-void csPen::WriteBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2, uint h_align, uint v_align, const char *text)
+void csPen::WriteLines(iFont *font, uint x1, uint y1, const csStringArray& lines)
+{
+  if (font==0) return;
+
+  int the_color = g2d->FindRGB(static_cast<int>(color.x*255),
+		 	       static_cast<int>(color.y*255),
+			       static_cast<int>(color.z*255),
+			       static_cast<int>(color.w*255));
+
+  csVector3 pos(x1,y1,0);
+
+  pos += tt;
+
+  int txtHeight = font->GetTextHeight ();
+
+  for (size_t i = 0 ; i < lines.GetSize () ; i++)
+  {
+    g2d->Write(font, (int)pos.x, (int)pos.y, the_color, -1, lines.Get (i));
+    pos.y += txtHeight;
+  }
+}
+
+void csPen::WriteBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2,
+    uint h_align, uint v_align, const char *text)
 {
   if (font==0) return;
 
@@ -531,4 +555,67 @@ void csPen::WriteBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2, uint h_a
   }
 
   Write(font, x, y, text);
+}
+
+void csPen::WriteLinesBoxed(iFont *font, uint x1, uint y1, uint x2, uint y2,
+    uint h_align, uint v_align, const csStringArray& lines)
+{
+  if (font==0) return;
+
+  uint x, y;
+  int w, h;
+
+  // Get the maximum dimensions of the text.
+  int txtHeight = font->GetTextHeight ();
+  h = txtHeight * lines.GetSize ();
+  w = 0;
+  for (size_t i = 0 ; i < lines.GetSize () ; i++)
+  {
+    int ww, hh;
+    font->GetDimensions(lines.Get (i), ww, hh);
+    if (ww > w) w = ww;
+  }
+
+  // Figure out the correct starting point in the box for horizontal alignment.
+  switch(h_align)
+  {
+    case CS_PEN_TA_LEFT:
+    default:
+      x=x1;
+      break;
+    case CS_PEN_TA_RIGHT:
+      x=x2-w;
+      break;
+    case CS_PEN_TA_CENTER:
+      x=x1+((x2-x1)>>1) - (w>>1);
+      break;
+  }
+
+  // Figure out the correct starting point in the box for vertical alignment.
+  switch(v_align)
+  {
+    case CS_PEN_TA_TOP:
+    default:
+      y=y1;
+      break;
+    case CS_PEN_TA_BOT:
+      y=y2-h;
+      break;
+    case CS_PEN_TA_CENTER:
+      y=y1+((y2-y1)>>1) - (h>>1);
+      break;
+  }
+
+  for (size_t i = 0 ; i < lines.GetSize () ; i++)
+  {
+    int xx = x;
+    if (h_align)
+    {
+      int ww, hh;
+      font->GetDimensions(lines.Get (i), ww, hh);
+      xx = x1+((x2-x1)>>1) - (ww>>1);
+    }
+    Write(font, xx, y, lines.Get (i));
+    y += txtHeight;
+  }
 }
