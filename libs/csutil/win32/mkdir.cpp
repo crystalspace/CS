@@ -22,7 +22,7 @@
 
 #include "csutil/csuctransform.h"
 
-static inline int CS_mkdir (const char* path)
+inline int CS_mkdir (const char* path)
 {
 #if defined (__CYGWIN32__)
   return mkdir(path, 0755);
