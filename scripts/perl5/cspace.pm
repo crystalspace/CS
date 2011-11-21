@@ -22375,7 +22375,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *DrawArc = *cspacec::iPen_DrawArc;
 *DrawTriangle = *cspacec::iPen_DrawTriangle;
 *Write = *cspacec::iPen_Write;
+*WriteLines = *cspacec::iPen_WriteLines;
 *WriteBoxed = *cspacec::iPen_WriteBoxed;
+*WriteLinesBoxed = *cspacec::iPen_WriteLinesBoxed;
 *_Rotate = *cspacec::iPen__Rotate;
 sub DISOWN {
     my $self = shift;
@@ -22435,61 +22437,9 @@ sub DESTROY {
 *DrawArc = *cspacec::csPen_DrawArc;
 *DrawTriangle = *cspacec::csPen_DrawTriangle;
 *Write = *cspacec::csPen_Write;
+*WriteLines = *cspacec::csPen_WriteLines;
 *WriteBoxed = *cspacec::csPen_WriteBoxed;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::csMemoryPen ##############
-
-package cspace::csMemoryPen;
-use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iPen cspace );
-%OWNER = ();
-%ITERATORS = ();
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_csMemoryPen($self);
-        delete $OWNER{$self};
-    }
-}
-
-*Clear = *cspacec::csMemoryPen_Clear;
-*Draw = *cspacec::csMemoryPen_Draw;
-*SetFlag = *cspacec::csMemoryPen_SetFlag;
-*ClearFlag = *cspacec::csMemoryPen_ClearFlag;
-*SetMixMode = *cspacec::csMemoryPen_SetMixMode;
-*SetColor = *cspacec::csMemoryPen_SetColor;
-*SetTexture = *cspacec::csMemoryPen_SetTexture;
-*SwapColors = *cspacec::csMemoryPen_SwapColors;
-*SetPenWidth = *cspacec::csMemoryPen_SetPenWidth;
-*ClearTransform = *cspacec::csMemoryPen_ClearTransform;
-*PushTransform = *cspacec::csMemoryPen_PushTransform;
-*PopTransform = *cspacec::csMemoryPen_PopTransform;
-*SetOrigin = *cspacec::csMemoryPen_SetOrigin;
-*Translate = *cspacec::csMemoryPen_Translate;
-*DrawLine = *cspacec::csMemoryPen_DrawLine;
-*DrawPoint = *cspacec::csMemoryPen_DrawPoint;
-*DrawRect = *cspacec::csMemoryPen_DrawRect;
-*DrawMiteredRect = *cspacec::csMemoryPen_DrawMiteredRect;
-*DrawRoundedRect = *cspacec::csMemoryPen_DrawRoundedRect;
-*DrawArc = *cspacec::csMemoryPen_DrawArc;
-*DrawTriangle = *cspacec::csMemoryPen_DrawTriangle;
-*Write = *cspacec::csMemoryPen_Write;
-*WriteBoxed = *cspacec::csMemoryPen_WriteBoxed;
+*WriteLinesBoxed = *cspacec::csPen_WriteLinesBoxed;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);

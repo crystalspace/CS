@@ -2582,22 +2582,22 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_csImageBase swig_types[59]
 #define SWIGTYPE_p_csImageMemory swig_types[60]
 #define SWIGTYPE_p_csIntersectingTriangle swig_types[61]
-#define SWIGTYPE_p_csMemoryPen swig_types[62]
-#define SWIGTYPE_p_csObject swig_types[63]
-#define SWIGTYPE_p_csPen swig_types[64]
-#define SWIGTYPE_p_csPixmap swig_types[65]
-#define SWIGTYPE_p_csPrimitives swig_types[66]
-#define SWIGTYPE_p_csProcAnimated swig_types[67]
-#define SWIGTYPE_p_csProcTexture swig_types[68]
-#define SWIGTYPE_p_csRefArrayT_iObject_t swig_types[69]
-#define SWIGTYPE_p_csRefArrayT_iThreadReturn_t swig_types[70]
-#define SWIGTYPE_p_csRefT_iBase_t swig_types[71]
-#define SWIGTYPE_p_csRefT_iTextureHandle_t swig_types[72]
-#define SWIGTYPE_p_csReversibleTransform swig_types[73]
-#define SWIGTYPE_p_csScreenTargetResult swig_types[74]
-#define SWIGTYPE_p_csSetT_csPtrKeyT_iMeshWrapper_t_CS__Memory__AllocatorMalloc_t swig_types[75]
-#define SWIGTYPE_p_csShortestDistanceResult swig_types[76]
-#define SWIGTYPE_p_csSimplePixmap swig_types[77]
+#define SWIGTYPE_p_csObject swig_types[62]
+#define SWIGTYPE_p_csPen swig_types[63]
+#define SWIGTYPE_p_csPixmap swig_types[64]
+#define SWIGTYPE_p_csPrimitives swig_types[65]
+#define SWIGTYPE_p_csProcAnimated swig_types[66]
+#define SWIGTYPE_p_csProcTexture swig_types[67]
+#define SWIGTYPE_p_csRefArrayT_iObject_t swig_types[68]
+#define SWIGTYPE_p_csRefArrayT_iThreadReturn_t swig_types[69]
+#define SWIGTYPE_p_csRefT_iBase_t swig_types[70]
+#define SWIGTYPE_p_csRefT_iTextureHandle_t swig_types[71]
+#define SWIGTYPE_p_csReversibleTransform swig_types[72]
+#define SWIGTYPE_p_csScreenTargetResult swig_types[73]
+#define SWIGTYPE_p_csSetT_csPtrKeyT_iMeshWrapper_t_CS__Memory__AllocatorMalloc_t swig_types[74]
+#define SWIGTYPE_p_csShortestDistanceResult swig_types[75]
+#define SWIGTYPE_p_csSimplePixmap swig_types[76]
+#define SWIGTYPE_p_csStringArray swig_types[77]
 #define SWIGTYPE_p_csThreadManager swig_types[78]
 #define SWIGTYPE_p_csThreadReturn swig_types[79]
 #define SWIGTYPE_p_csTraceBeamResult swig_types[80]
@@ -18327,6 +18327,66 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iPen_WriteLines(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iPen *arg1 = (iPen *) 0 ;
+  iFont *arg2 = (iFont *) 0 ;
+  uint arg3 ;
+  uint arg4 ;
+  csStringArray *arg5 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  unsigned long val3 ;
+  int ecode3 = 0 ;
+  unsigned long val4 ;
+  int ecode4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iPen_WriteLines",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPen, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPen_WriteLines" "', argument " "1"" of type '" "iPen *""'"); 
+  }
+  arg1 = reinterpret_cast< iPen * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iFont, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iPen_WriteLines" "', argument " "2"" of type '" "iFont *""'"); 
+  }
+  arg2 = reinterpret_cast< iFont * >(argp2);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iPen_WriteLines" "', argument " "3"" of type '" "uint""'");
+  } 
+  arg3 = static_cast< uint >(val3);
+  ecode4 = SWIG_AsVal_unsigned_SS_long(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iPen_WriteLines" "', argument " "4"" of type '" "uint""'");
+  } 
+  arg4 = static_cast< uint >(val4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csStringArray,  0  | 0);
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iPen_WriteLines" "', argument " "5"" of type '" "csStringArray const &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iPen_WriteLines" "', argument " "5"" of type '" "csStringArray const &""'"); 
+  }
+  arg5 = reinterpret_cast< csStringArray * >(argp5);
+  (arg1)->WriteLines(arg2,arg3,arg4,(csStringArray const &)*arg5);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iPen_WriteBoxed(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iPen *arg1 = (iPen *) 0 ;
@@ -18419,6 +18479,102 @@ SWIGINTERN PyObject *_wrap_iPen_WriteBoxed(PyObject *SWIGUNUSEDPARM(self), PyObj
   return resultobj;
 fail:
   if (alloc9 == SWIG_NEWOBJ) delete[] buf9;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iPen_WriteLinesBoxed(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iPen *arg1 = (iPen *) 0 ;
+  iFont *arg2 = (iFont *) 0 ;
+  uint arg3 ;
+  uint arg4 ;
+  uint arg5 ;
+  uint arg6 ;
+  uint arg7 ;
+  uint arg8 ;
+  csStringArray *arg9 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  unsigned long val3 ;
+  int ecode3 = 0 ;
+  unsigned long val4 ;
+  int ecode4 = 0 ;
+  unsigned long val5 ;
+  int ecode5 = 0 ;
+  unsigned long val6 ;
+  int ecode6 = 0 ;
+  unsigned long val7 ;
+  int ecode7 = 0 ;
+  unsigned long val8 ;
+  int ecode8 = 0 ;
+  void *argp9 = 0 ;
+  int res9 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  PyObject * obj8 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iPen_WriteLinesBoxed",9,9,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPen, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPen_WriteLinesBoxed" "', argument " "1"" of type '" "iPen *""'"); 
+  }
+  arg1 = reinterpret_cast< iPen * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iFont, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iPen_WriteLinesBoxed" "', argument " "2"" of type '" "iFont *""'"); 
+  }
+  arg2 = reinterpret_cast< iFont * >(argp2);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iPen_WriteLinesBoxed" "', argument " "3"" of type '" "uint""'");
+  } 
+  arg3 = static_cast< uint >(val3);
+  ecode4 = SWIG_AsVal_unsigned_SS_long(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iPen_WriteLinesBoxed" "', argument " "4"" of type '" "uint""'");
+  } 
+  arg4 = static_cast< uint >(val4);
+  ecode5 = SWIG_AsVal_unsigned_SS_long(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iPen_WriteLinesBoxed" "', argument " "5"" of type '" "uint""'");
+  } 
+  arg5 = static_cast< uint >(val5);
+  ecode6 = SWIG_AsVal_unsigned_SS_long(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iPen_WriteLinesBoxed" "', argument " "6"" of type '" "uint""'");
+  } 
+  arg6 = static_cast< uint >(val6);
+  ecode7 = SWIG_AsVal_unsigned_SS_long(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iPen_WriteLinesBoxed" "', argument " "7"" of type '" "uint""'");
+  } 
+  arg7 = static_cast< uint >(val7);
+  ecode8 = SWIG_AsVal_unsigned_SS_long(obj7, &val8);
+  if (!SWIG_IsOK(ecode8)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "iPen_WriteLinesBoxed" "', argument " "8"" of type '" "uint""'");
+  } 
+  arg8 = static_cast< uint >(val8);
+  res9 = SWIG_ConvertPtr(obj8, &argp9, SWIGTYPE_p_csStringArray,  0  | 0);
+  if (!SWIG_IsOK(res9)) {
+    SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "iPen_WriteLinesBoxed" "', argument " "9"" of type '" "csStringArray const &""'"); 
+  }
+  if (!argp9) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iPen_WriteLinesBoxed" "', argument " "9"" of type '" "csStringArray const &""'"); 
+  }
+  arg9 = reinterpret_cast< csStringArray * >(argp9);
+  (arg1)->WriteLinesBoxed(arg2,arg3,arg4,arg5,arg6,arg7,arg8,(csStringArray const &)*arg9);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
   return NULL;
 }
 
@@ -19789,6 +19945,66 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csPen_WriteLines(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csPen *arg1 = (csPen *) 0 ;
+  iFont *arg2 = (iFont *) 0 ;
+  uint arg3 ;
+  uint arg4 ;
+  csStringArray *arg5 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  unsigned long val3 ;
+  int ecode3 = 0 ;
+  unsigned long val4 ;
+  int ecode4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csPen_WriteLines",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csPen, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPen_WriteLines" "', argument " "1"" of type '" "csPen *""'"); 
+  }
+  arg1 = reinterpret_cast< csPen * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iFont, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csPen_WriteLines" "', argument " "2"" of type '" "iFont *""'"); 
+  }
+  arg2 = reinterpret_cast< iFont * >(argp2);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csPen_WriteLines" "', argument " "3"" of type '" "uint""'");
+  } 
+  arg3 = static_cast< uint >(val3);
+  ecode4 = SWIG_AsVal_unsigned_SS_long(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csPen_WriteLines" "', argument " "4"" of type '" "uint""'");
+  } 
+  arg4 = static_cast< uint >(val4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csStringArray,  0  | 0);
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "csPen_WriteLines" "', argument " "5"" of type '" "csStringArray const &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csPen_WriteLines" "', argument " "5"" of type '" "csStringArray const &""'"); 
+  }
+  arg5 = reinterpret_cast< csStringArray * >(argp5);
+  (arg1)->WriteLines(arg2,arg3,arg4,(csStringArray const &)*arg5);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csPen_WriteBoxed(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csPen *arg1 = (csPen *) 0 ;
@@ -19885,1047 +20101,9 @@ fail:
 }
 
 
-SWIGINTERN PyObject *csPen_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *obj;
-  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
-  SWIG_TypeNewClientData(SWIGTYPE_p_csPen, SWIG_NewClientData(obj));
-  return SWIG_Py_Void();
-}
-
-SWIGINTERN PyObject *_wrap_delete_csMemoryPen(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csPen_WriteLinesBoxed(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"delete_csMemoryPen",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, SWIG_POINTER_DISOWN |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csMemoryPen" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  delete arg1;
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_Clear(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_Clear",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_Clear" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  (arg1)->Clear();
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_Draw(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  iPen *arg2 = (iPen *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_Draw",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_Draw" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iPen, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csMemoryPen_Draw" "', argument " "2"" of type '" "iPen *""'"); 
-  }
-  arg2 = reinterpret_cast< iPen * >(argp2);
-  (arg1)->Draw(arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_SetFlag(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  uint arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  unsigned long val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_SetFlag",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_SetFlag" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csMemoryPen_SetFlag" "', argument " "2"" of type '" "uint""'");
-  } 
-  arg2 = static_cast< uint >(val2);
-  (arg1)->SetFlag(arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_ClearFlag(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  uint arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  unsigned long val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_ClearFlag",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_ClearFlag" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csMemoryPen_ClearFlag" "', argument " "2"" of type '" "uint""'");
-  } 
-  arg2 = static_cast< uint >(val2);
-  (arg1)->ClearFlag(arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_SetMixMode(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  uint arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  unsigned long val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_SetMixMode",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_SetMixMode" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csMemoryPen_SetMixMode" "', argument " "2"" of type '" "uint""'");
-  } 
-  arg2 = static_cast< uint >(val2);
-  (arg1)->SetMixMode(arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_SetColor__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  float arg2 ;
-  float arg3 ;
-  float arg4 ;
-  float arg5 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  float val2 ;
-  int ecode2 = 0 ;
-  float val3 ;
-  int ecode3 = 0 ;
-  float val4 ;
-  int ecode4 = 0 ;
-  float val5 ;
-  int ecode5 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
-  PyObject * obj4 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_SetColor",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_SetColor" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  ecode2 = SWIG_AsVal_float(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csMemoryPen_SetColor" "', argument " "2"" of type '" "float""'");
-  } 
-  arg2 = static_cast< float >(val2);
-  ecode3 = SWIG_AsVal_float(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csMemoryPen_SetColor" "', argument " "3"" of type '" "float""'");
-  } 
-  arg3 = static_cast< float >(val3);
-  ecode4 = SWIG_AsVal_float(obj3, &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csMemoryPen_SetColor" "', argument " "4"" of type '" "float""'");
-  } 
-  arg4 = static_cast< float >(val4);
-  ecode5 = SWIG_AsVal_float(obj4, &val5);
-  if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "csMemoryPen_SetColor" "', argument " "5"" of type '" "float""'");
-  } 
-  arg5 = static_cast< float >(val5);
-  (arg1)->SetColor(arg2,arg3,arg4,arg5);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_SetColor__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  csColor4 *arg2 = 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_SetColor",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_SetColor" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csColor4,  0  | 0);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csMemoryPen_SetColor" "', argument " "2"" of type '" "csColor4 const &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csMemoryPen_SetColor" "', argument " "2"" of type '" "csColor4 const &""'"); 
-  }
-  arg2 = reinterpret_cast< csColor4 * >(argp2);
-  (arg1)->SetColor((csColor4 const &)*arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_SetColor(PyObject *self, PyObject *args) {
-  int argc;
-  PyObject *argv[6];
-  int ii;
-  
-  if (!PyTuple_Check(args)) SWIG_fail;
-  argc = (int)PyObject_Length(args);
-  for (ii = 0; (ii < argc) && (ii < 5); ii++) {
-    argv[ii] = PyTuple_GET_ITEM(args,ii);
-  }
-  if (argc == 2) {
-    int _v;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csMemoryPen, 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csColor4, 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        return _wrap_csMemoryPen_SetColor__SWIG_1(self, args);
-      }
-    }
-  }
-  if (argc == 5) {
-    int _v;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csMemoryPen, 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      {
-        int res = SWIG_AsVal_float(argv[1], NULL);
-        _v = SWIG_CheckState(res);
-      }
-      if (_v) {
-        {
-          int res = SWIG_AsVal_float(argv[2], NULL);
-          _v = SWIG_CheckState(res);
-        }
-        if (_v) {
-          {
-            int res = SWIG_AsVal_float(argv[3], NULL);
-            _v = SWIG_CheckState(res);
-          }
-          if (_v) {
-            {
-              int res = SWIG_AsVal_float(argv[4], NULL);
-              _v = SWIG_CheckState(res);
-            }
-            if (_v) {
-              return _wrap_csMemoryPen_SetColor__SWIG_0(self, args);
-            }
-          }
-        }
-      }
-    }
-  }
-  
-fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csMemoryPen_SetColor'.\n"
-    "  Possible C/C++ prototypes are:\n"
-    "    SetColor(csMemoryPen *,float,float,float,float)\n"
-    "    SetColor(csMemoryPen *,csColor4 const &)\n");
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_SetTexture(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  SwigValueWrapper< csRef< iTextureHandle > > arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_SetTexture",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_SetTexture" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csRefT_iTextureHandle_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csMemoryPen_SetTexture" "', argument " "2"" of type '" "csRef< iTextureHandle >""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csMemoryPen_SetTexture" "', argument " "2"" of type '" "csRef< iTextureHandle >""'");
-    } else {
-      csRef< iTextureHandle > * temp = reinterpret_cast< csRef< iTextureHandle > * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
-  (arg1)->SetTexture(arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_SwapColors(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_SwapColors",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_SwapColors" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  (arg1)->SwapColors();
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_SetPenWidth(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  float arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  float val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_SetPenWidth",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_SetPenWidth" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  ecode2 = SWIG_AsVal_float(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csMemoryPen_SetPenWidth" "', argument " "2"" of type '" "float""'");
-  } 
-  arg2 = static_cast< float >(val2);
-  (arg1)->SetPenWidth(arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_ClearTransform(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_ClearTransform",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_ClearTransform" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  (arg1)->ClearTransform();
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_PushTransform(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_PushTransform",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_PushTransform" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  (arg1)->PushTransform();
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_PopTransform(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_PopTransform",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_PopTransform" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  (arg1)->PopTransform();
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_SetOrigin(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  csVector3 *arg2 = 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_SetOrigin",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_SetOrigin" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csMemoryPen_SetOrigin" "', argument " "2"" of type '" "csVector3 const &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csMemoryPen_SetOrigin" "', argument " "2"" of type '" "csVector3 const &""'"); 
-  }
-  arg2 = reinterpret_cast< csVector3 * >(argp2);
-  (arg1)->SetOrigin((csVector3 const &)*arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_Translate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  csVector3 *arg2 = 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_Translate",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_Translate" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csMemoryPen_Translate" "', argument " "2"" of type '" "csVector3 const &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csMemoryPen_Translate" "', argument " "2"" of type '" "csVector3 const &""'"); 
-  }
-  arg2 = reinterpret_cast< csVector3 * >(argp2);
-  (arg1)->Translate((csVector3 const &)*arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_DrawLine(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  uint arg2 ;
-  uint arg3 ;
-  uint arg4 ;
-  uint arg5 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  unsigned long val2 ;
-  int ecode2 = 0 ;
-  unsigned long val3 ;
-  int ecode3 = 0 ;
-  unsigned long val4 ;
-  int ecode4 = 0 ;
-  unsigned long val5 ;
-  int ecode5 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
-  PyObject * obj4 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_DrawLine",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_DrawLine" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csMemoryPen_DrawLine" "', argument " "2"" of type '" "uint""'");
-  } 
-  arg2 = static_cast< uint >(val2);
-  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csMemoryPen_DrawLine" "', argument " "3"" of type '" "uint""'");
-  } 
-  arg3 = static_cast< uint >(val3);
-  ecode4 = SWIG_AsVal_unsigned_SS_long(obj3, &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csMemoryPen_DrawLine" "', argument " "4"" of type '" "uint""'");
-  } 
-  arg4 = static_cast< uint >(val4);
-  ecode5 = SWIG_AsVal_unsigned_SS_long(obj4, &val5);
-  if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "csMemoryPen_DrawLine" "', argument " "5"" of type '" "uint""'");
-  } 
-  arg5 = static_cast< uint >(val5);
-  (arg1)->DrawLine(arg2,arg3,arg4,arg5);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_DrawPoint(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  uint arg2 ;
-  uint arg3 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  unsigned long val2 ;
-  int ecode2 = 0 ;
-  unsigned long val3 ;
-  int ecode3 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_DrawPoint",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_DrawPoint" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csMemoryPen_DrawPoint" "', argument " "2"" of type '" "uint""'");
-  } 
-  arg2 = static_cast< uint >(val2);
-  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csMemoryPen_DrawPoint" "', argument " "3"" of type '" "uint""'");
-  } 
-  arg3 = static_cast< uint >(val3);
-  (arg1)->DrawPoint(arg2,arg3);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_DrawRect(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  uint arg2 ;
-  uint arg3 ;
-  uint arg4 ;
-  uint arg5 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  unsigned long val2 ;
-  int ecode2 = 0 ;
-  unsigned long val3 ;
-  int ecode3 = 0 ;
-  unsigned long val4 ;
-  int ecode4 = 0 ;
-  unsigned long val5 ;
-  int ecode5 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
-  PyObject * obj4 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_DrawRect",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_DrawRect" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csMemoryPen_DrawRect" "', argument " "2"" of type '" "uint""'");
-  } 
-  arg2 = static_cast< uint >(val2);
-  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csMemoryPen_DrawRect" "', argument " "3"" of type '" "uint""'");
-  } 
-  arg3 = static_cast< uint >(val3);
-  ecode4 = SWIG_AsVal_unsigned_SS_long(obj3, &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csMemoryPen_DrawRect" "', argument " "4"" of type '" "uint""'");
-  } 
-  arg4 = static_cast< uint >(val4);
-  ecode5 = SWIG_AsVal_unsigned_SS_long(obj4, &val5);
-  if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "csMemoryPen_DrawRect" "', argument " "5"" of type '" "uint""'");
-  } 
-  arg5 = static_cast< uint >(val5);
-  (arg1)->DrawRect(arg2,arg3,arg4,arg5);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_DrawMiteredRect(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  uint arg2 ;
-  uint arg3 ;
-  uint arg4 ;
-  uint arg5 ;
-  uint arg6 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  unsigned long val2 ;
-  int ecode2 = 0 ;
-  unsigned long val3 ;
-  int ecode3 = 0 ;
-  unsigned long val4 ;
-  int ecode4 = 0 ;
-  unsigned long val5 ;
-  int ecode5 = 0 ;
-  unsigned long val6 ;
-  int ecode6 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
-  PyObject * obj4 = 0 ;
-  PyObject * obj5 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_DrawMiteredRect",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_DrawMiteredRect" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csMemoryPen_DrawMiteredRect" "', argument " "2"" of type '" "uint""'");
-  } 
-  arg2 = static_cast< uint >(val2);
-  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csMemoryPen_DrawMiteredRect" "', argument " "3"" of type '" "uint""'");
-  } 
-  arg3 = static_cast< uint >(val3);
-  ecode4 = SWIG_AsVal_unsigned_SS_long(obj3, &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csMemoryPen_DrawMiteredRect" "', argument " "4"" of type '" "uint""'");
-  } 
-  arg4 = static_cast< uint >(val4);
-  ecode5 = SWIG_AsVal_unsigned_SS_long(obj4, &val5);
-  if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "csMemoryPen_DrawMiteredRect" "', argument " "5"" of type '" "uint""'");
-  } 
-  arg5 = static_cast< uint >(val5);
-  ecode6 = SWIG_AsVal_unsigned_SS_long(obj5, &val6);
-  if (!SWIG_IsOK(ecode6)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "csMemoryPen_DrawMiteredRect" "', argument " "6"" of type '" "uint""'");
-  } 
-  arg6 = static_cast< uint >(val6);
-  (arg1)->DrawMiteredRect(arg2,arg3,arg4,arg5,arg6);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_DrawRoundedRect(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  uint arg2 ;
-  uint arg3 ;
-  uint arg4 ;
-  uint arg5 ;
-  uint arg6 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  unsigned long val2 ;
-  int ecode2 = 0 ;
-  unsigned long val3 ;
-  int ecode3 = 0 ;
-  unsigned long val4 ;
-  int ecode4 = 0 ;
-  unsigned long val5 ;
-  int ecode5 = 0 ;
-  unsigned long val6 ;
-  int ecode6 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
-  PyObject * obj4 = 0 ;
-  PyObject * obj5 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_DrawRoundedRect",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_DrawRoundedRect" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csMemoryPen_DrawRoundedRect" "', argument " "2"" of type '" "uint""'");
-  } 
-  arg2 = static_cast< uint >(val2);
-  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csMemoryPen_DrawRoundedRect" "', argument " "3"" of type '" "uint""'");
-  } 
-  arg3 = static_cast< uint >(val3);
-  ecode4 = SWIG_AsVal_unsigned_SS_long(obj3, &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csMemoryPen_DrawRoundedRect" "', argument " "4"" of type '" "uint""'");
-  } 
-  arg4 = static_cast< uint >(val4);
-  ecode5 = SWIG_AsVal_unsigned_SS_long(obj4, &val5);
-  if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "csMemoryPen_DrawRoundedRect" "', argument " "5"" of type '" "uint""'");
-  } 
-  arg5 = static_cast< uint >(val5);
-  ecode6 = SWIG_AsVal_unsigned_SS_long(obj5, &val6);
-  if (!SWIG_IsOK(ecode6)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "csMemoryPen_DrawRoundedRect" "', argument " "6"" of type '" "uint""'");
-  } 
-  arg6 = static_cast< uint >(val6);
-  (arg1)->DrawRoundedRect(arg2,arg3,arg4,arg5,arg6);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_DrawArc(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  uint arg2 ;
-  uint arg3 ;
-  uint arg4 ;
-  uint arg5 ;
-  float arg6 ;
-  float arg7 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  unsigned long val2 ;
-  int ecode2 = 0 ;
-  unsigned long val3 ;
-  int ecode3 = 0 ;
-  unsigned long val4 ;
-  int ecode4 = 0 ;
-  unsigned long val5 ;
-  int ecode5 = 0 ;
-  float val6 ;
-  int ecode6 = 0 ;
-  float val7 ;
-  int ecode7 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
-  PyObject * obj4 = 0 ;
-  PyObject * obj5 = 0 ;
-  PyObject * obj6 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_DrawArc",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_DrawArc" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csMemoryPen_DrawArc" "', argument " "2"" of type '" "uint""'");
-  } 
-  arg2 = static_cast< uint >(val2);
-  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csMemoryPen_DrawArc" "', argument " "3"" of type '" "uint""'");
-  } 
-  arg3 = static_cast< uint >(val3);
-  ecode4 = SWIG_AsVal_unsigned_SS_long(obj3, &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csMemoryPen_DrawArc" "', argument " "4"" of type '" "uint""'");
-  } 
-  arg4 = static_cast< uint >(val4);
-  ecode5 = SWIG_AsVal_unsigned_SS_long(obj4, &val5);
-  if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "csMemoryPen_DrawArc" "', argument " "5"" of type '" "uint""'");
-  } 
-  arg5 = static_cast< uint >(val5);
-  ecode6 = SWIG_AsVal_float(obj5, &val6);
-  if (!SWIG_IsOK(ecode6)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "csMemoryPen_DrawArc" "', argument " "6"" of type '" "float""'");
-  } 
-  arg6 = static_cast< float >(val6);
-  ecode7 = SWIG_AsVal_float(obj6, &val7);
-  if (!SWIG_IsOK(ecode7)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csMemoryPen_DrawArc" "', argument " "7"" of type '" "float""'");
-  } 
-  arg7 = static_cast< float >(val7);
-  (arg1)->DrawArc(arg2,arg3,arg4,arg5,arg6,arg7);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_DrawTriangle(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  uint arg2 ;
-  uint arg3 ;
-  uint arg4 ;
-  uint arg5 ;
-  uint arg6 ;
-  uint arg7 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  unsigned long val2 ;
-  int ecode2 = 0 ;
-  unsigned long val3 ;
-  int ecode3 = 0 ;
-  unsigned long val4 ;
-  int ecode4 = 0 ;
-  unsigned long val5 ;
-  int ecode5 = 0 ;
-  unsigned long val6 ;
-  int ecode6 = 0 ;
-  unsigned long val7 ;
-  int ecode7 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
-  PyObject * obj4 = 0 ;
-  PyObject * obj5 = 0 ;
-  PyObject * obj6 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_DrawTriangle",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_DrawTriangle" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csMemoryPen_DrawTriangle" "', argument " "2"" of type '" "uint""'");
-  } 
-  arg2 = static_cast< uint >(val2);
-  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csMemoryPen_DrawTriangle" "', argument " "3"" of type '" "uint""'");
-  } 
-  arg3 = static_cast< uint >(val3);
-  ecode4 = SWIG_AsVal_unsigned_SS_long(obj3, &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csMemoryPen_DrawTriangle" "', argument " "4"" of type '" "uint""'");
-  } 
-  arg4 = static_cast< uint >(val4);
-  ecode5 = SWIG_AsVal_unsigned_SS_long(obj4, &val5);
-  if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "csMemoryPen_DrawTriangle" "', argument " "5"" of type '" "uint""'");
-  } 
-  arg5 = static_cast< uint >(val5);
-  ecode6 = SWIG_AsVal_unsigned_SS_long(obj5, &val6);
-  if (!SWIG_IsOK(ecode6)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "csMemoryPen_DrawTriangle" "', argument " "6"" of type '" "uint""'");
-  } 
-  arg6 = static_cast< uint >(val6);
-  ecode7 = SWIG_AsVal_unsigned_SS_long(obj6, &val7);
-  if (!SWIG_IsOK(ecode7)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csMemoryPen_DrawTriangle" "', argument " "7"" of type '" "uint""'");
-  } 
-  arg7 = static_cast< uint >(val7);
-  (arg1)->DrawTriangle(arg2,arg3,arg4,arg5,arg6,arg7);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_Write(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
-  iFont *arg2 = (iFont *) 0 ;
-  uint arg3 ;
-  uint arg4 ;
-  char *arg5 = (char *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  unsigned long val3 ;
-  int ecode3 = 0 ;
-  unsigned long val4 ;
-  int ecode4 = 0 ;
-  int res5 ;
-  char *buf5 = 0 ;
-  int alloc5 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
-  PyObject * obj4 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_Write",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_Write" "', argument " "1"" of type '" "csMemoryPen *""'"); 
-  }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iFont, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csMemoryPen_Write" "', argument " "2"" of type '" "iFont *""'"); 
-  }
-  arg2 = reinterpret_cast< iFont * >(argp2);
-  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csMemoryPen_Write" "', argument " "3"" of type '" "uint""'");
-  } 
-  arg3 = static_cast< uint >(val3);
-  ecode4 = SWIG_AsVal_unsigned_SS_long(obj3, &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csMemoryPen_Write" "', argument " "4"" of type '" "uint""'");
-  } 
-  arg4 = static_cast< uint >(val4);
-  res5 = SWIG_AsCharPtrAndSize(obj4, &buf5, NULL, &alloc5);
-  if (!SWIG_IsOK(res5)) {
-    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "csMemoryPen_Write" "', argument " "5"" of type '" "char *""'");
-  }
-  arg5 = reinterpret_cast< char * >(buf5);
-  (arg1)->Write(arg2,arg3,arg4,arg5);
-  resultobj = SWIG_Py_Void();
-  if (alloc5 == SWIG_NEWOBJ) delete[] buf5;
-  return resultobj;
-fail:
-  if (alloc5 == SWIG_NEWOBJ) delete[] buf5;
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csMemoryPen_WriteBoxed(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csMemoryPen *arg1 = (csMemoryPen *) 0 ;
+  csPen *arg1 = (csPen *) 0 ;
   iFont *arg2 = (iFont *) 0 ;
   uint arg3 ;
   uint arg4 ;
@@ -20933,7 +20111,7 @@ SWIGINTERN PyObject *_wrap_csMemoryPen_WriteBoxed(PyObject *SWIGUNUSEDPARM(self)
   uint arg6 ;
   uint arg7 ;
   uint arg8 ;
-  char *arg9 = (char *) 0 ;
+  csStringArray *arg9 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -20950,9 +20128,8 @@ SWIGINTERN PyObject *_wrap_csMemoryPen_WriteBoxed(PyObject *SWIGUNUSEDPARM(self)
   int ecode7 = 0 ;
   unsigned long val8 ;
   int ecode8 = 0 ;
-  int res9 ;
-  char *buf9 = 0 ;
-  int alloc9 = 0 ;
+  void *argp9 = 0 ;
+  int res9 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -20963,66 +20140,67 @@ SWIGINTERN PyObject *_wrap_csMemoryPen_WriteBoxed(PyObject *SWIGUNUSEDPARM(self)
   PyObject * obj7 = 0 ;
   PyObject * obj8 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"csMemoryPen_WriteBoxed",9,9,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csMemoryPen, 0 |  0 );
+  if(!PyArg_UnpackTuple(args,(char *)"csPen_WriteLinesBoxed",9,9,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csPen, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMemoryPen_WriteBoxed" "', argument " "1"" of type '" "csMemoryPen *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPen_WriteLinesBoxed" "', argument " "1"" of type '" "csPen *""'"); 
   }
-  arg1 = reinterpret_cast< csMemoryPen * >(argp1);
+  arg1 = reinterpret_cast< csPen * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iFont, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csMemoryPen_WriteBoxed" "', argument " "2"" of type '" "iFont *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csPen_WriteLinesBoxed" "', argument " "2"" of type '" "iFont *""'"); 
   }
   arg2 = reinterpret_cast< iFont * >(argp2);
   ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csMemoryPen_WriteBoxed" "', argument " "3"" of type '" "uint""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csPen_WriteLinesBoxed" "', argument " "3"" of type '" "uint""'");
   } 
   arg3 = static_cast< uint >(val3);
   ecode4 = SWIG_AsVal_unsigned_SS_long(obj3, &val4);
   if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csMemoryPen_WriteBoxed" "', argument " "4"" of type '" "uint""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csPen_WriteLinesBoxed" "', argument " "4"" of type '" "uint""'");
   } 
   arg4 = static_cast< uint >(val4);
   ecode5 = SWIG_AsVal_unsigned_SS_long(obj4, &val5);
   if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "csMemoryPen_WriteBoxed" "', argument " "5"" of type '" "uint""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "csPen_WriteLinesBoxed" "', argument " "5"" of type '" "uint""'");
   } 
   arg5 = static_cast< uint >(val5);
   ecode6 = SWIG_AsVal_unsigned_SS_long(obj5, &val6);
   if (!SWIG_IsOK(ecode6)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "csMemoryPen_WriteBoxed" "', argument " "6"" of type '" "uint""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "csPen_WriteLinesBoxed" "', argument " "6"" of type '" "uint""'");
   } 
   arg6 = static_cast< uint >(val6);
   ecode7 = SWIG_AsVal_unsigned_SS_long(obj6, &val7);
   if (!SWIG_IsOK(ecode7)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csMemoryPen_WriteBoxed" "', argument " "7"" of type '" "uint""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csPen_WriteLinesBoxed" "', argument " "7"" of type '" "uint""'");
   } 
   arg7 = static_cast< uint >(val7);
   ecode8 = SWIG_AsVal_unsigned_SS_long(obj7, &val8);
   if (!SWIG_IsOK(ecode8)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csMemoryPen_WriteBoxed" "', argument " "8"" of type '" "uint""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csPen_WriteLinesBoxed" "', argument " "8"" of type '" "uint""'");
   } 
   arg8 = static_cast< uint >(val8);
-  res9 = SWIG_AsCharPtrAndSize(obj8, &buf9, NULL, &alloc9);
+  res9 = SWIG_ConvertPtr(obj8, &argp9, SWIGTYPE_p_csStringArray,  0  | 0);
   if (!SWIG_IsOK(res9)) {
-    SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "csMemoryPen_WriteBoxed" "', argument " "9"" of type '" "char *""'");
+    SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "csPen_WriteLinesBoxed" "', argument " "9"" of type '" "csStringArray const &""'"); 
   }
-  arg9 = reinterpret_cast< char * >(buf9);
-  (arg1)->WriteBoxed(arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9);
+  if (!argp9) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csPen_WriteLinesBoxed" "', argument " "9"" of type '" "csStringArray const &""'"); 
+  }
+  arg9 = reinterpret_cast< csStringArray * >(argp9);
+  (arg1)->WriteLinesBoxed(arg2,arg3,arg4,arg5,arg6,arg7,arg8,(csStringArray const &)*arg9);
   resultobj = SWIG_Py_Void();
-  if (alloc9 == SWIG_NEWOBJ) delete[] buf9;
   return resultobj;
 fail:
-  if (alloc9 == SWIG_NEWOBJ) delete[] buf9;
   return NULL;
 }
 
 
-SWIGINTERN PyObject *csMemoryPen_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *csPen_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
-  SWIG_TypeNewClientData(SWIGTYPE_p_csMemoryPen, SWIG_NewClientData(obj));
+  SWIG_TypeNewClientData(SWIGTYPE_p_csPen, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
 
@@ -23672,7 +22850,9 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iPen_DrawArc", _wrap_iPen_DrawArc, METH_VARARGS, NULL},
 	 { (char *)"iPen_DrawTriangle", _wrap_iPen_DrawTriangle, METH_VARARGS, NULL},
 	 { (char *)"iPen_Write", _wrap_iPen_Write, METH_VARARGS, NULL},
+	 { (char *)"iPen_WriteLines", _wrap_iPen_WriteLines, METH_VARARGS, NULL},
 	 { (char *)"iPen_WriteBoxed", _wrap_iPen_WriteBoxed, METH_VARARGS, NULL},
+	 { (char *)"iPen_WriteLinesBoxed", _wrap_iPen_WriteLinesBoxed, METH_VARARGS, NULL},
 	 { (char *)"iPen__Rotate", _wrap_iPen__Rotate, METH_VARARGS, NULL},
 	 { (char *)"iPen_swigregister", iPen_swigregister, METH_VARARGS, NULL},
 	 { (char *)"new_csPen", _wrap_new_csPen, METH_VARARGS, NULL},
@@ -23698,33 +22878,10 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csPen_DrawArc", _wrap_csPen_DrawArc, METH_VARARGS, NULL},
 	 { (char *)"csPen_DrawTriangle", _wrap_csPen_DrawTriangle, METH_VARARGS, NULL},
 	 { (char *)"csPen_Write", _wrap_csPen_Write, METH_VARARGS, NULL},
+	 { (char *)"csPen_WriteLines", _wrap_csPen_WriteLines, METH_VARARGS, NULL},
 	 { (char *)"csPen_WriteBoxed", _wrap_csPen_WriteBoxed, METH_VARARGS, NULL},
+	 { (char *)"csPen_WriteLinesBoxed", _wrap_csPen_WriteLinesBoxed, METH_VARARGS, NULL},
 	 { (char *)"csPen_swigregister", csPen_swigregister, METH_VARARGS, NULL},
-	 { (char *)"delete_csMemoryPen", _wrap_delete_csMemoryPen, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_Clear", _wrap_csMemoryPen_Clear, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_Draw", _wrap_csMemoryPen_Draw, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_SetFlag", _wrap_csMemoryPen_SetFlag, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_ClearFlag", _wrap_csMemoryPen_ClearFlag, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_SetMixMode", _wrap_csMemoryPen_SetMixMode, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_SetColor", _wrap_csMemoryPen_SetColor, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_SetTexture", _wrap_csMemoryPen_SetTexture, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_SwapColors", _wrap_csMemoryPen_SwapColors, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_SetPenWidth", _wrap_csMemoryPen_SetPenWidth, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_ClearTransform", _wrap_csMemoryPen_ClearTransform, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_PushTransform", _wrap_csMemoryPen_PushTransform, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_PopTransform", _wrap_csMemoryPen_PopTransform, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_SetOrigin", _wrap_csMemoryPen_SetOrigin, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_Translate", _wrap_csMemoryPen_Translate, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_DrawLine", _wrap_csMemoryPen_DrawLine, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_DrawPoint", _wrap_csMemoryPen_DrawPoint, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_DrawRect", _wrap_csMemoryPen_DrawRect, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_DrawMiteredRect", _wrap_csMemoryPen_DrawMiteredRect, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_DrawRoundedRect", _wrap_csMemoryPen_DrawRoundedRect, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_DrawArc", _wrap_csMemoryPen_DrawArc, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_DrawTriangle", _wrap_csMemoryPen_DrawTriangle, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_Write", _wrap_csMemoryPen_Write, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_WriteBoxed", _wrap_csMemoryPen_WriteBoxed, METH_VARARGS, NULL},
-	 { (char *)"csMemoryPen_swigregister", csMemoryPen_swigregister, METH_VARARGS, NULL},
 	 { (char *)"scfProcTexture_IncRef", _wrap_scfProcTexture_IncRef, METH_VARARGS, NULL},
 	 { (char *)"scfProcTexture_DecRef", _wrap_scfProcTexture_DecRef, METH_VARARGS, NULL},
 	 { (char *)"scfProcTexture_GetRefCount", _wrap_scfProcTexture_GetRefCount, METH_VARARGS, NULL},
@@ -23797,68 +22954,32 @@ static PyMethodDef SwigMethods[] = {
 
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
-static void *_p_CS__Geometry__TableTextureMapperTo_p_CS__Geometry__TextureMapper(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Geometry::TextureMapper *)  ((CS::Geometry::TableTextureMapper *) x));
+static void *_p_CS__Graphics__RenderMeshTo_p_CS__Graphics__RenderMeshModes(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Graphics::RenderMeshModes *)  ((CS::Graphics::RenderMesh *) x));
 }
-static void *_p_CS__Geometry__DensityTextureMapperTo_p_CS__Geometry__TextureMapper(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Geometry::TextureMapper *)  ((CS::Geometry::DensityTextureMapper *) x));
+static void *_p_scfImplementation1T_csImageBase_iImage_tTo_p_iImage(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iImage *)  ((scfImplementation1< csImageBase,iImage > *) x));
 }
-static void *_p_csProcAnimatedTo_p_scfImplementationExt3T_csProcTexture_csObject_iTextureWrapper_iProcTexture_iSelfDet(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *) (csProcTexture *) ((csProcAnimated *) x));
+static void *_p_csImageBaseTo_p_iImage(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iImage *) (scfImplementation1< csImageBase,iImage > *) ((csImageBase *) x));
 }
-static void *_p_csProcTextureTo_p_scfImplementationExt3T_csProcTexture_csObject_iTextureWrapper_iProcTexture_iSelfDet(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *)  ((csProcTexture *) x));
+static void *_p_csImageMemoryTo_p_iImage(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iImage *) (scfImplementation1< csImageBase,iImage > *)(csImageBase *)(scfImplementationExt0< csImageMemory,csImageBase > *) ((csImageMemory *) x));
 }
-static void *_p_csProcAnimatedTo_p_CS__Utility__InternalRefCount(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Utility::InternalRefCount *) (csObject *)(scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *)(csProcTexture *) ((csProcAnimated *) x));
+static void *_p_scfImplementationExt0T_csImageMemory_csImageBase_tTo_p_iImage(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iImage *) (scfImplementation1< csImageBase,iImage > *)(csImageBase *) ((scfImplementationExt0< csImageMemory,csImageBase > *) x));
 }
-static void *_p_scfImplementationExt1T_csColliderWrapper_csObject_scfFakeInterfaceT_csColliderWrapper_t_tTo_p_CS__Utility__InternalRefCount(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Utility::InternalRefCount *) (csObject *) ((scfImplementationExt1< csColliderWrapper,csObject,scfFakeInterface< csColliderWrapper > > *) x));
+static void *_p_csPenTo_p_iPen(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iPen *)  ((csPen *) x));
 }
-static void *_p_csObjectTo_p_CS__Utility__InternalRefCount(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Utility::InternalRefCount *)  ((csObject *) x));
+static void *_p_csProcAnimatedTo_p_iTextureWrapper(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iTextureWrapper *) (scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *)(csProcTexture *) ((csProcAnimated *) x));
 }
-static void *_p_csColliderWrapperTo_p_CS__Utility__InternalRefCount(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Utility::InternalRefCount *) (csObject *)(scfImplementationExt1< csColliderWrapper,csObject,scfFakeInterface< csColliderWrapper > > *) ((csColliderWrapper *) x));
+static void *_p_scfImplementationExt3T_csProcTexture_csObject_iTextureWrapper_iProcTexture_iSelfDetTo_p_iTextureWrapper(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iTextureWrapper *)  ((scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *) x));
 }
-static void *_p_scfImplementationExt1T_csPath_csObject_iPath_tTo_p_CS__Utility__InternalRefCount(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Utility::InternalRefCount *) (csObject *) ((scfImplementationExt1< csPath,csObject,iPath > *) x));
-}
-static void *_p_scfImplementationExt3T_csProcTexture_csObject_iTextureWrapper_iProcTexture_iSelfDetTo_p_CS__Utility__InternalRefCount(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Utility::InternalRefCount *) (csObject *) ((scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *) x));
-}
-static void *_p_csProcTextureTo_p_CS__Utility__InternalRefCount(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Utility::InternalRefCount *) (csObject *)(scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *) ((csProcTexture *) x));
-}
-static void *_p_csProcAnimatedTo_p_scfImplementation1T_csObject_iObject_t(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((scfImplementation1< csObject,iObject > *) (csObject *)(scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *)(csProcTexture *) ((csProcAnimated *) x));
-}
-static void *_p_scfImplementationExt1T_csColliderWrapper_csObject_scfFakeInterfaceT_csColliderWrapper_t_tTo_p_scfImplementation1T_csObject_iObject_t(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((scfImplementation1< csObject,iObject > *) (csObject *) ((scfImplementationExt1< csColliderWrapper,csObject,scfFakeInterface< csColliderWrapper > > *) x));
-}
-static void *_p_csObjectTo_p_scfImplementation1T_csObject_iObject_t(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((scfImplementation1< csObject,iObject > *)  ((csObject *) x));
-}
-static void *_p_csColliderWrapperTo_p_scfImplementation1T_csObject_iObject_t(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((scfImplementation1< csObject,iObject > *) (csObject *)(scfImplementationExt1< csColliderWrapper,csObject,scfFakeInterface< csColliderWrapper > > *) ((csColliderWrapper *) x));
-}
-static void *_p_scfImplementationExt1T_csPath_csObject_iPath_tTo_p_scfImplementation1T_csObject_iObject_t(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((scfImplementation1< csObject,iObject > *) (csObject *) ((scfImplementationExt1< csPath,csObject,iPath > *) x));
-}
-static void *_p_scfImplementationExt3T_csProcTexture_csObject_iTextureWrapper_iProcTexture_iSelfDetTo_p_scfImplementation1T_csObject_iObject_t(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((scfImplementation1< csObject,iObject > *) (csObject *) ((scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *) x));
-}
-static void *_p_csProcTextureTo_p_scfImplementation1T_csObject_iObject_t(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((scfImplementation1< csObject,iObject > *) (csObject *)(scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *) ((csProcTexture *) x));
-}
-static void *_p_csPrimitivesTo_p_CS__Geometry__Primitives(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Geometry::Primitives *)  ((csPrimitives *) x));
-}
-static void *_p_csColliderWrapperTo_p_scfImplementationExt1T_csColliderWrapper_csObject_scfFakeInterfaceT_csColliderWrapper_t_t(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((scfImplementationExt1< csColliderWrapper,csObject,scfFakeInterface< csColliderWrapper > > *)  ((csColliderWrapper *) x));
-}
-static void *_p_csColor4To_p_csColor(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((csColor *)  ((csColor4 *) x));
+static void *_p_csProcTextureTo_p_iTextureWrapper(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iTextureWrapper *) (scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *) ((csProcTexture *) x));
 }
 static void *_p_CS__Graphics__RenderMeshTo_p_CS__Graphics__CoreRenderMesh(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((CS::Graphics::CoreRenderMesh *)  ((CS::Graphics::RenderMesh *) x));
@@ -23868,6 +22989,33 @@ static void *_p_scfImplementationExt1T_csColliderWrapper_csObject_scfFakeInterfa
 }
 static void *_p_csColliderWrapperTo_p_scfFakeInterfaceT_csColliderWrapper_t(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((scfFakeInterface< csColliderWrapper > *) (scfImplementationExt1< csColliderWrapper,csObject,scfFakeInterface< csColliderWrapper > > *) ((csColliderWrapper *) x));
+}
+static void *_p_CS__Geometry__TableTextureMapperTo_p_CS__Geometry__TextureMapper(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Geometry::TextureMapper *)  ((CS::Geometry::TableTextureMapper *) x));
+}
+static void *_p_CS__Geometry__DensityTextureMapperTo_p_CS__Geometry__TextureMapper(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Geometry::TextureMapper *)  ((CS::Geometry::DensityTextureMapper *) x));
+}
+static void *_p_csViewTo_p_scfImplementation1T_csView_iView_t(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((scfImplementation1< csView,iView > *)  ((csView *) x));
+}
+static void *_p_CS__Geometry__TesselatedBoxTo_p_CS__Geometry__Primitive(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Geometry::Primitive *)  ((CS::Geometry::TesselatedBox *) x));
+}
+static void *_p_CS__Geometry__BoxTo_p_CS__Geometry__Primitive(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Geometry::Primitive *)  ((CS::Geometry::Box *) x));
+}
+static void *_p_CS__Geometry__ConeTo_p_CS__Geometry__Primitive(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Geometry::Primitive *)  ((CS::Geometry::Cone *) x));
+}
+static void *_p_CS__Geometry__CapsuleTo_p_CS__Geometry__Primitive(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Geometry::Primitive *)  ((CS::Geometry::Capsule *) x));
+}
+static void *_p_CS__Geometry__TesselatedQuadTo_p_CS__Geometry__Primitive(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Geometry::Primitive *)  ((CS::Geometry::TesselatedQuad *) x));
+}
+static void *_p_CS__Geometry__SphereTo_p_CS__Geometry__Primitive(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Geometry::Primitive *)  ((CS::Geometry::Sphere *) x));
 }
 static void *_p_csProcAnimatedTo_p_csObject(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((csObject *) (scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *)(csProcTexture *) ((csProcAnimated *) x));
@@ -23911,44 +23059,11 @@ static void *_p_scfImplementationExt3T_csProcTexture_csObject_iTextureWrapper_iP
 static void *_p_csProcTextureTo_p_iObject(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iObject *) (scfImplementation1< csObject,iObject > *)(csObject *)(scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *) ((csProcTexture *) x));
 }
-static void *_p_CS__Geometry__TesselatedBoxTo_p_CS__Geometry__Primitive(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Geometry::Primitive *)  ((CS::Geometry::TesselatedBox *) x));
+static void *_p_csProcAnimatedTo_p_scfImplementationExt3T_csProcTexture_csObject_iTextureWrapper_iProcTexture_iSelfDet(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *) (csProcTexture *) ((csProcAnimated *) x));
 }
-static void *_p_CS__Geometry__BoxTo_p_CS__Geometry__Primitive(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Geometry::Primitive *)  ((CS::Geometry::Box *) x));
-}
-static void *_p_CS__Geometry__ConeTo_p_CS__Geometry__Primitive(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Geometry::Primitive *)  ((CS::Geometry::Cone *) x));
-}
-static void *_p_CS__Geometry__CapsuleTo_p_CS__Geometry__Primitive(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Geometry::Primitive *)  ((CS::Geometry::Capsule *) x));
-}
-static void *_p_CS__Geometry__TesselatedQuadTo_p_CS__Geometry__Primitive(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Geometry::Primitive *)  ((CS::Geometry::TesselatedQuad *) x));
-}
-static void *_p_CS__Geometry__SphereTo_p_CS__Geometry__Primitive(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Geometry::Primitive *)  ((CS::Geometry::Sphere *) x));
-}
-static void *_p_scfImplementation1T_csView_iView_tTo_p_iView(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iView *)  ((scfImplementation1< csView,iView > *) x));
-}
-static void *_p_csViewTo_p_iView(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iView *) (scfImplementation1< csView,iView > *) ((csView *) x));
-}
-static void *_p_csProcAnimatedTo_p_iProcTexture(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iProcTexture *) (scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *)(csProcTexture *) ((csProcAnimated *) x));
-}
-static void *_p_scfImplementationExt3T_csProcTexture_csObject_iTextureWrapper_iProcTexture_iSelfDetTo_p_iProcTexture(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iProcTexture *)  ((scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *) x));
-}
-static void *_p_csProcTextureTo_p_iProcTexture(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iProcTexture *) (scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *) ((csProcTexture *) x));
-}
-static void *_p_csProcAnimatedTo_p_csProcTexture(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((csProcTexture *)  ((csProcAnimated *) x));
-}
-static void *_p_CS__Graphics__RenderMeshTo_p_CS__Graphics__RenderMeshModes(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((CS::Graphics::RenderMeshModes *)  ((CS::Graphics::RenderMesh *) x));
+static void *_p_csProcTextureTo_p_scfImplementationExt3T_csProcTexture_csObject_iTextureWrapper_iProcTexture_iSelfDet(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *)  ((csProcTexture *) x));
 }
 static void *_p_csProcAnimatedTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iBase *) (iObject *)(scfImplementation1< csObject,iObject > *)(csObject *)(scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *)(csProcTexture *) ((csProcAnimated *) x));
@@ -24562,38 +23677,77 @@ static void *_p_iStringSetBaseT_CS__StringSetTag__General_tTo_p_iBase(void *x, i
 static void *_p_iEventCordTo_p_iBase(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((iBase *)  ((iEventCord *) x));
 }
-static void *_p_scfImplementation1T_csImageBase_iImage_tTo_p_iImage(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iImage *)  ((scfImplementation1< csImageBase,iImage > *) x));
+static void *_p_csProcAnimatedTo_p_csProcTexture(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((csProcTexture *)  ((csProcAnimated *) x));
 }
-static void *_p_csImageBaseTo_p_iImage(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iImage *) (scfImplementation1< csImageBase,iImage > *) ((csImageBase *) x));
+static void *_p_csProcAnimatedTo_p_iProcTexture(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iProcTexture *) (scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *)(csProcTexture *) ((csProcAnimated *) x));
 }
-static void *_p_csImageMemoryTo_p_iImage(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iImage *) (scfImplementation1< csImageBase,iImage > *)(csImageBase *)(scfImplementationExt0< csImageMemory,csImageBase > *) ((csImageMemory *) x));
+static void *_p_scfImplementationExt3T_csProcTexture_csObject_iTextureWrapper_iProcTexture_iSelfDetTo_p_iProcTexture(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iProcTexture *)  ((scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *) x));
 }
-static void *_p_scfImplementationExt0T_csImageMemory_csImageBase_tTo_p_iImage(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iImage *) (scfImplementation1< csImageBase,iImage > *)(csImageBase *) ((scfImplementationExt0< csImageMemory,csImageBase > *) x));
+static void *_p_csProcTextureTo_p_iProcTexture(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iProcTexture *) (scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *) ((csProcTexture *) x));
 }
-static void *_p_csProcAnimatedTo_p_iTextureWrapper(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iTextureWrapper *) (scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *)(csProcTexture *) ((csProcAnimated *) x));
+static void *_p_csProcAnimatedTo_p_scfImplementation1T_csObject_iObject_t(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((scfImplementation1< csObject,iObject > *) (csObject *)(scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *)(csProcTexture *) ((csProcAnimated *) x));
 }
-static void *_p_scfImplementationExt3T_csProcTexture_csObject_iTextureWrapper_iProcTexture_iSelfDetTo_p_iTextureWrapper(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iTextureWrapper *)  ((scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *) x));
+static void *_p_scfImplementationExt1T_csColliderWrapper_csObject_scfFakeInterfaceT_csColliderWrapper_t_tTo_p_scfImplementation1T_csObject_iObject_t(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((scfImplementation1< csObject,iObject > *) (csObject *) ((scfImplementationExt1< csColliderWrapper,csObject,scfFakeInterface< csColliderWrapper > > *) x));
 }
-static void *_p_csProcTextureTo_p_iTextureWrapper(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iTextureWrapper *) (scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *) ((csProcTexture *) x));
+static void *_p_csObjectTo_p_scfImplementation1T_csObject_iObject_t(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((scfImplementation1< csObject,iObject > *)  ((csObject *) x));
+}
+static void *_p_csColliderWrapperTo_p_scfImplementation1T_csObject_iObject_t(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((scfImplementation1< csObject,iObject > *) (csObject *)(scfImplementationExt1< csColliderWrapper,csObject,scfFakeInterface< csColliderWrapper > > *) ((csColliderWrapper *) x));
+}
+static void *_p_scfImplementationExt1T_csPath_csObject_iPath_tTo_p_scfImplementation1T_csObject_iObject_t(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((scfImplementation1< csObject,iObject > *) (csObject *) ((scfImplementationExt1< csPath,csObject,iPath > *) x));
+}
+static void *_p_scfImplementationExt3T_csProcTexture_csObject_iTextureWrapper_iProcTexture_iSelfDetTo_p_scfImplementation1T_csObject_iObject_t(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((scfImplementation1< csObject,iObject > *) (csObject *) ((scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *) x));
+}
+static void *_p_csProcTextureTo_p_scfImplementation1T_csObject_iObject_t(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((scfImplementation1< csObject,iObject > *) (csObject *)(scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *) ((csProcTexture *) x));
+}
+static void *_p_csPrimitivesTo_p_CS__Geometry__Primitives(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Geometry::Primitives *)  ((csPrimitives *) x));
+}
+static void *_p_csColliderWrapperTo_p_scfImplementationExt1T_csColliderWrapper_csObject_scfFakeInterfaceT_csColliderWrapper_t_t(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((scfImplementationExt1< csColliderWrapper,csObject,scfFakeInterface< csColliderWrapper > > *)  ((csColliderWrapper *) x));
+}
+static void *_p_scfImplementation1T_csView_iView_tTo_p_iView(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iView *)  ((scfImplementation1< csView,iView > *) x));
+}
+static void *_p_csViewTo_p_iView(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((iView *) (scfImplementation1< csView,iView > *) ((csView *) x));
+}
+static void *_p_csColor4To_p_csColor(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((csColor *)  ((csColor4 *) x));
+}
+static void *_p_csProcAnimatedTo_p_CS__Utility__InternalRefCount(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Utility::InternalRefCount *) (csObject *)(scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *)(csProcTexture *) ((csProcAnimated *) x));
+}
+static void *_p_scfImplementationExt1T_csColliderWrapper_csObject_scfFakeInterfaceT_csColliderWrapper_t_tTo_p_CS__Utility__InternalRefCount(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Utility::InternalRefCount *) (csObject *) ((scfImplementationExt1< csColliderWrapper,csObject,scfFakeInterface< csColliderWrapper > > *) x));
+}
+static void *_p_csObjectTo_p_CS__Utility__InternalRefCount(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Utility::InternalRefCount *)  ((csObject *) x));
+}
+static void *_p_csColliderWrapperTo_p_CS__Utility__InternalRefCount(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Utility::InternalRefCount *) (csObject *)(scfImplementationExt1< csColliderWrapper,csObject,scfFakeInterface< csColliderWrapper > > *) ((csColliderWrapper *) x));
+}
+static void *_p_scfImplementationExt1T_csPath_csObject_iPath_tTo_p_CS__Utility__InternalRefCount(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Utility::InternalRefCount *) (csObject *) ((scfImplementationExt1< csPath,csObject,iPath > *) x));
+}
+static void *_p_scfImplementationExt3T_csProcTexture_csObject_iTextureWrapper_iProcTexture_iSelfDetTo_p_CS__Utility__InternalRefCount(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Utility::InternalRefCount *) (csObject *) ((scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *) x));
+}
+static void *_p_csProcTextureTo_p_CS__Utility__InternalRefCount(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Utility::InternalRefCount *) (csObject *)(scfImplementationExt3< csProcTexture,csObject,iTextureWrapper,iProcTexture,iSelfDestruct > *) ((csProcTexture *) x));
 }
 static void *_p_csSimplePixmapTo_p_csPixmap(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((csPixmap *)  ((csSimplePixmap *) x));
-}
-static void *_p_csMemoryPenTo_p_iPen(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iPen *)  ((csMemoryPen *) x));
-}
-static void *_p_csPenTo_p_iPen(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((iPen *)  ((csPen *) x));
-}
-static void *_p_csViewTo_p_scfImplementation1T_csView_iView_t(void *x, int *SWIGUNUSEDPARM(newmemory)) {
-    return (void *)((scfImplementation1< csView,iView > *)  ((csView *) x));
 }
 static swig_type_info _swigt__p_AllocatorType = {"_p_AllocatorType", "AllocatorType *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Geometry__Box = {"_p_CS__Geometry__Box", "CS::Geometry::Box *", 0, 0, (void*)0, 0};
@@ -24655,7 +23809,6 @@ static swig_type_info _swigt__p_csDirtyAccessArrayT_csVector3_csArrayElementHand
 static swig_type_info _swigt__p_csEllipsoid = {"_p_csEllipsoid", "csEllipsoid *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csEngineTools = {"_p_csEngineTools", "csEngineTools *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csIntersectingTriangle = {"_p_csIntersectingTriangle", "csIntersectingTriangle *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csMemoryPen = {"_p_csMemoryPen", "csMemoryPen *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csObject = {"_p_csObject", "csObject *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csPen = {"_p_csPen", "csPen *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csPixmap = {"_p_csPixmap", "csPixmap *", 0, 0, (void*)0, 0};
@@ -24671,6 +23824,7 @@ static swig_type_info _swigt__p_csScreenTargetResult = {"_p_csScreenTargetResult
 static swig_type_info _swigt__p_csSetT_csPtrKeyT_iMeshWrapper_t_CS__Memory__AllocatorMalloc_t = {"_p_csSetT_csPtrKeyT_iMeshWrapper_t_CS__Memory__AllocatorMalloc_t", "csSet< csPtrKey< iMeshWrapper > > *|csSet< csPtrKey< iMeshWrapper >,CS::Memory::AllocatorMalloc > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csShortestDistanceResult = {"_p_csShortestDistanceResult", "csShortestDistanceResult *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csSimplePixmap = {"_p_csSimplePixmap", "csSimplePixmap *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_csStringArray = {"_p_csStringArray", "csStringArray *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csThreadManager = {"_p_csThreadManager", "csThreadManager *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csThreadReturn = {"_p_csThreadReturn", "csThreadReturn *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csTraceBeamResult = {"_p_csTraceBeamResult", "csTraceBeamResult *", 0, 0, (void*)0, 0};
@@ -24964,7 +24118,6 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_csImageBase,
   &_swigt__p_csImageMemory,
   &_swigt__p_csIntersectingTriangle,
-  &_swigt__p_csMemoryPen,
   &_swigt__p_csObject,
   &_swigt__p_csPen,
   &_swigt__p_csPixmap,
@@ -24980,6 +24133,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_csSetT_csPtrKeyT_iMeshWrapper_t_CS__Memory__AllocatorMalloc_t,
   &_swigt__p_csShortestDistanceResult,
   &_swigt__p_csSimplePixmap,
+  &_swigt__p_csStringArray,
   &_swigt__p_csThreadManager,
   &_swigt__p_csThreadReturn,
   &_swigt__p_csTraceBeamResult,
@@ -25269,7 +24423,6 @@ static swig_cast_info _swigc__p_csDirtyAccessArrayT_csVector3_csArrayElementHand
 static swig_cast_info _swigc__p_csEllipsoid[] = {  {&_swigt__p_csEllipsoid, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csEngineTools[] = {  {&_swigt__p_csEngineTools, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csIntersectingTriangle[] = {  {&_swigt__p_csIntersectingTriangle, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csMemoryPen[] = {  {&_swigt__p_csMemoryPen, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csObject[] = {  {&_swigt__p_csProcAnimated, _p_csProcAnimatedTo_p_csObject, 0, 0},  {&_swigt__p_scfImplementationExt1T_csPath_csObject_iPath_t, _p_scfImplementationExt1T_csPath_csObject_iPath_tTo_p_csObject, 0, 0},  {&_swigt__p_scfImplementationExt3T_csProcTexture_csObject_iTextureWrapper_iProcTexture_iSelfDet, _p_scfImplementationExt3T_csProcTexture_csObject_iTextureWrapper_iProcTexture_iSelfDetTo_p_csObject, 0, 0},  {&_swigt__p_csObject, 0, 0, 0},  {&_swigt__p_csColliderWrapper, _p_csColliderWrapperTo_p_csObject, 0, 0},  {&_swigt__p_csProcTexture, _p_csProcTextureTo_p_csObject, 0, 0},  {&_swigt__p_scfImplementationExt1T_csColliderWrapper_csObject_scfFakeInterfaceT_csColliderWrapper_t_t, _p_scfImplementationExt1T_csColliderWrapper_csObject_scfFakeInterfaceT_csColliderWrapper_t_tTo_p_csObject, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csPen[] = {  {&_swigt__p_csPen, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csPixmap[] = {  {&_swigt__p_csPixmap, 0, 0, 0},  {&_swigt__p_csSimplePixmap, _p_csSimplePixmapTo_p_csPixmap, 0, 0},{0, 0, 0, 0}};
@@ -25285,6 +24438,7 @@ static swig_cast_info _swigc__p_csScreenTargetResult[] = {  {&_swigt__p_csScreen
 static swig_cast_info _swigc__p_csSetT_csPtrKeyT_iMeshWrapper_t_CS__Memory__AllocatorMalloc_t[] = {  {&_swigt__p_csSetT_csPtrKeyT_iMeshWrapper_t_CS__Memory__AllocatorMalloc_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csShortestDistanceResult[] = {  {&_swigt__p_csShortestDistanceResult, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csSimplePixmap[] = {  {&_swigt__p_csSimplePixmap, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csStringArray[] = {  {&_swigt__p_csStringArray, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csThreadManager[] = {  {&_swigt__p_csThreadManager, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csThreadReturn[] = {  {&_swigt__p_csThreadReturn, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csTraceBeamResult[] = {  {&_swigt__p_csTraceBeamResult, 0, 0, 0},{0, 0, 0, 0}};
@@ -25475,7 +24629,7 @@ static swig_cast_info _swigc__p_iMeshFactoryWrapper[] = {  {&_swigt__p_iMeshFact
 static swig_cast_info _swigc__p_iMeshWrapper[] = {  {&_swigt__p_iMeshWrapper, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iObject[] = {  {&_swigt__p_csProcAnimated, _p_csProcAnimatedTo_p_iObject, 0, 0},  {&_swigt__p_scfImplementationExt1T_csPath_csObject_iPath_t, _p_scfImplementationExt1T_csPath_csObject_iPath_tTo_p_iObject, 0, 0},  {&_swigt__p_scfImplementationExt3T_csProcTexture_csObject_iTextureWrapper_iProcTexture_iSelfDet, _p_scfImplementationExt3T_csProcTexture_csObject_iTextureWrapper_iProcTexture_iSelfDetTo_p_iObject, 0, 0},  {&_swigt__p_iObject, 0, 0, 0},  {&_swigt__p_csObject, _p_csObjectTo_p_iObject, 0, 0},  {&_swigt__p_csColliderWrapper, _p_csColliderWrapperTo_p_iObject, 0, 0},  {&_swigt__p_csProcTexture, _p_csProcTextureTo_p_iObject, 0, 0},  {&_swigt__p_scfImplementationExt1T_csColliderWrapper_csObject_scfFakeInterfaceT_csColliderWrapper_t_t, _p_scfImplementationExt1T_csColliderWrapper_csObject_scfFakeInterfaceT_csColliderWrapper_t_tTo_p_iObject, 0, 0},  {&_swigt__p_scfImplementation1T_csObject_iObject_t, _p_scfImplementation1T_csObject_iObject_tTo_p_iObject, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iObjectRegistry[] = {  {&_swigt__p_iObjectRegistry, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_iPen[] = {  {&_swigt__p_csMemoryPen, _p_csMemoryPenTo_p_iPen, 0, 0},  {&_swigt__p_iPen, 0, 0, 0},  {&_swigt__p_csPen, _p_csPenTo_p_iPen, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_iPen[] = {  {&_swigt__p_iPen, 0, 0, 0},  {&_swigt__p_csPen, _p_csPenTo_p_iPen, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iPerspectiveCamera[] = {  {&_swigt__p_iPerspectiveCamera, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iProcTexCallback[] = {  {&_swigt__p_iProcTexCallback, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iProcTexture[] = {  {&_swigt__p_csProcAnimated, _p_csProcAnimatedTo_p_iProcTexture, 0, 0},  {&_swigt__p_scfImplementationExt3T_csProcTexture_csObject_iTextureWrapper_iProcTexture_iSelfDet, _p_scfImplementationExt3T_csProcTexture_csObject_iTextureWrapper_iProcTexture_iSelfDetTo_p_iProcTexture, 0, 0},  {&_swigt__p_iProcTexture, 0, 0, 0},  {&_swigt__p_csProcTexture, _p_csProcTextureTo_p_iProcTexture, 0, 0},{0, 0, 0, 0}};
@@ -25578,7 +24732,6 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_csImageBase,
   _swigc__p_csImageMemory,
   _swigc__p_csIntersectingTriangle,
-  _swigc__p_csMemoryPen,
   _swigc__p_csObject,
   _swigc__p_csPen,
   _swigc__p_csPixmap,
@@ -25594,6 +24747,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_csSetT_csPtrKeyT_iMeshWrapper_t_CS__Memory__AllocatorMalloc_t,
   _swigc__p_csShortestDistanceResult,
   _swigc__p_csSimplePixmap,
+  _swigc__p_csStringArray,
   _swigc__p_csThreadManager,
   _swigc__p_csThreadReturn,
   _swigc__p_csTraceBeamResult,
