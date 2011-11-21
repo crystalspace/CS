@@ -33,8 +33,8 @@ SndSysBasicStream::SndSysBasicStream(csSndSysSoundFormat *pRenderFormat, int Mod
   // Start the most advanced read pointer at offset 0
   m_MostAdvancedReadPointer=0;
 
-  // Set stream to m_bPaused, at the beginning, and not m_bLooping
-  m_bPaused=true;
+  // Set stream to Paused, at the beginning, and not m_bLooping
+  m_PauseState=CS_SNDSYS_STREAM_PAUSED;
   m_bLooping=false;
   
   //set the starting loop position to zero
@@ -128,22 +128,20 @@ bool SndSysBasicStream::SetPosition (size_t newposition)
 
 bool SndSysBasicStream::Pause()
 {
-  m_bPaused=true;
+  m_PauseState=CS_SNDSYS_STREAM_PAUSED;
   return true;
 }
 
 
 bool SndSysBasicStream::Unpause()
 {
-  m_bPaused=false;
+  m_PauseState=CS_SNDSYS_STREAM_UNPAUSED;
   return true;
 }
 
 int SndSysBasicStream::GetPauseState()
 {
-  if (m_bPaused)
-    return CS_SNDSYS_STREAM_PAUSED;
-  return CS_SNDSYS_STREAM_UNPAUSED;
+  return m_PauseState;
 }
 
 bool SndSysBasicStream::SetLoopState(int loopstate)
@@ -214,7 +212,7 @@ void SndSysBasicStream::SetAutoUnregister(bool autounreg)
 }
 
 /** 
-* If AutoUnregister is set, when the stream is m_bPaused it, and all sources 
+* If AutoUnregister is set, when the stream is Paused it, and all sources 
 * attached to it are removed from the sound engine
 */
 bool SndSysBasicStream::GetAutoUnregister()
@@ -269,10 +267,10 @@ void SndSysBasicStream::GetDataPointers (size_t* position_marker,
 
   /* If read is finished and we've underbuffered here, then we can mark the 
   * stream as paused so no further advancement takes place */
-  if ((!m_bPaused) && (m_bPlaybackReadComplete) 
+  if ((m_PauseState == CS_SNDSYS_STREAM_UNPAUSED) && (m_bPlaybackReadComplete) 
     && ((*buffer1_length + *buffer2_length) < max_requested_length))
   {
-    m_bPaused=true;
+    m_PauseState=CS_SNDSYS_STREAM_COMPLETED;
     if (m_bAutoUnregisterRequested)
       m_bAutoUnregisterReady=true;
     m_bPlaybackReadComplete=false;

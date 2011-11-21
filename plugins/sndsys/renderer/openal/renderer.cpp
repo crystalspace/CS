@@ -396,7 +396,8 @@ void csSndSysRendererOpenAL::Update()
   for (size_t i=0;i<iMax;i++)
   {
     m_Sources[i]->PerformUpdate( ExternalUpdates );
-	if (m_Sources[i]->GetStream()->GetAutoUnregisterRequested() == true) // sound has finished and is not looping
+	if (m_Sources[i]->GetStream()->GetPauseState() == CS_SNDSYS_STREAM_PAUSED &&
+        m_Sources[i]->GetStream()->GetAutoUnregisterRequested() == true) // sound has finished and is not looping
 	{
 	  RemoveStream(m_Sources[i]->GetStream());
 	  RemoveSource(m_Sources[i]);
