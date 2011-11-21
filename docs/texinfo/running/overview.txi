@@ -46,6 +46,11 @@ that you can get from:
 @code{demodata.zip}
 @end iftex
 
+@sc{note}: The data file @file{demodata.zip} is no longer available. The ones
+found are too old and do not work with @file{csdemo}. Due to this, @file{csdemo}
+has been removed from the default build. The code remains for review and
+learning purposes.
+
 @cindex @file{csfgen}
 @cindex Applications, @file{csfgen}
 @item csfgen
