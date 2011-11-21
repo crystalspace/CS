@@ -1502,7 +1502,7 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-perl             use Perl5 scripting interface (default NO)
   --without-python        do not use Python scripting interface
-  --with-java             use Java (default YES)
+  --with-java             use Java (default NO)
   --with-x11=dir          specify additional location to search libx11 if not
                           detected automatically; directories searched include
                           dir/include, dir/lib, and dir
@@ -11614,6 +11614,7 @@ fi
         sparc*) cs_host_cpu=sparc ;;
         mips*) cs_host_cpu=mips ;;
         alpha*) cs_host_cpu=alpha ;;
+        arm*) cs_host_cpu=arm ;;
         *) cs_host_cpu=$host_cpu ;;
     esac
     cs_host_cpu_normalized="`$as_echo "$cs_host_cpu" | $as_tr_cpp`"
@@ -13169,7 +13170,7 @@ if test "${with_java+set}" = set; then :
 fi
 
     if test -z "$with_java"; then :
-  with_java=yes
+  with_java=no
 fi
 
     if test "$with_java" != no && test -n "$JAVAC" && test -n "$JAVA"; then :
@@ -66162,6 +66163,7 @@ cs_header_text="${cs_header_text}#define CS_LONG_SIZE $ac_cv_sizeof_long
         sparc*) cs_host_cpu=sparc ;;
         mips*) cs_host_cpu=mips ;;
         alpha*) cs_host_cpu=alpha ;;
+        arm*) cs_host_cpu=arm ;;
         *) cs_host_cpu=$host_cpu ;;
     esac
     cs_host_cpu_normalized="`$as_echo "$cs_host_cpu" | $as_tr_cpp`"
