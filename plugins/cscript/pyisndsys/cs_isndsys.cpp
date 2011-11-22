@@ -10016,6 +10016,7 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_addvarlink(SWIG_globals(),(char*)"CS_SNDSYS_STREAM_UNKNOWN_LENGTH",Swig_var_CS_SNDSYS_STREAM_UNKNOWN_LENGTH_get, Swig_var_CS_SNDSYS_STREAM_UNKNOWN_LENGTH_set);
   SWIG_Python_SetConstant(d, "CS_SNDSYS_STREAM_PAUSED",SWIG_From_int(static_cast< int >(0)));
   SWIG_Python_SetConstant(d, "CS_SNDSYS_STREAM_UNPAUSED",SWIG_From_int(static_cast< int >(1)));
+  SWIG_Python_SetConstant(d, "CS_SNDSYS_STREAM_COMPLETED",SWIG_From_int(static_cast< int >(2)));
   SWIG_Python_SetConstant(d, "CS_SNDSYS_STREAM_DONTLOOP",SWIG_From_int(static_cast< int >(0)));
   SWIG_Python_SetConstant(d, "CS_SNDSYS_STREAM_LOOP",SWIG_From_int(static_cast< int >(1)));
   SWIG_Python_SetConstant(d, "CS_SND3D_DISABLE",SWIG_From_int(static_cast< int >(CS_SND3D_DISABLE)));
