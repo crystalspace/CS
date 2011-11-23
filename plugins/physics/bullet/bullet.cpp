@@ -1047,7 +1047,9 @@ void csBulletDynamicsSystem::RemoveSoftBody (iSoftBody* body)
   softWorld->removeSoftBody (csBody->body);
 
   softBodies.Delete (body);
-  anchoredSoftBodies.Delete (csBody);
+  if (csBody->animatedAnchors.GetSize ())
+    anchoredSoftBodies.Delete (csBody);
+  csBody->dynSys = nullptr;
 }
 
 void csBulletDynamicsSystem::UpdateSoftBodies (btScalar timeStep)

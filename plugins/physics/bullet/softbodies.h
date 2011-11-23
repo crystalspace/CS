@@ -76,7 +76,7 @@ class csBulletSoftBody : public scfImplementation1<csBulletSoftBody,
 
  private:
   CS::Physics::Bullet::BodyType bodyType;
-  csBulletDynamicsSystem* dynSys;
+  csWeakRef<csBulletDynamicsSystem> dynSys;
   btSoftBody* body;
 
   struct AnimatedAnchor

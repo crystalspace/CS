@@ -785,24 +785,45 @@ bool Simple::OnInitialize (int argc, char* argv[])
   if (!RegisterQueue (GetObjectRegistry (), csevAllEvents (GetObjectRegistry ())))
     return ReportError ("Failed to set up event handler!");
 
+  csRef<iPluginManager> pluginManager = 
+    csQueryRegistry<iPluginManager> (GetObjectRegistry ());
+
   // Checking for choosen dynamic system
   csRef<iCommandLineParser> clp = csQueryRegistry<iCommandLineParser> (GetObjectRegistry ());
   phys_engine_name = clp->GetOption ("phys_engine");
+
+  bool odeTried = false;
   if (phys_engine_name == "ode")
   {
     phys_engine_name = "ODE";
     phys_engine_id = ODE_ID;
-    csRef<iPluginManager> plugmgr = 
-      csQueryRegistry<iPluginManager> (GetObjectRegistry ());
-    dynamics = csLoadPlugin<iDynamics> (plugmgr, "crystalspace.dynamics.ode");
+    dynamics = csLoadPlugin<iDynamics> (pluginManager, "crystalspace.dynamics.ode");
+    if (!dynamics)
+    {
+      odeTried = true;
+      ReportWarning ("Could not load ODE plugin, falling back to Bullet");
+    }
   }
-  else 
+
+  if (!dynamics)
   {
     phys_engine_name = "Bullet";
     phys_engine_id = BULLET_ID;
-    csRef<iPluginManager> plugmgr = 
-      csQueryRegistry<iPluginManager> (GetObjectRegistry ());
-    dynamics = csLoadPlugin<iDynamics> (plugmgr, "crystalspace.dynamics.bullet");
+    dynamics = csLoadPlugin<iDynamics> (pluginManager, "crystalspace.dynamics.bullet");
+
+    if (!dynamics && !odeTried)
+    {
+      ReportWarning ("Could not load Bullet plugin, falling back to ODE");
+      phys_engine_name = "ODE";
+      phys_engine_id = ODE_ID;
+      dynamics = csLoadPlugin<iDynamics> (pluginManager, "crystalspace.dynamics.ode");
+
+      if (dynamics)
+	return true;
+    }
+
+    if (!dynamics)
+      return ReportError ("Could not find any suitable iDynamics plugin!");
 
     // Check whether the soft bodies are enabled or not
     isSoftBodyWorld = clp->GetBoolOption ("soft", true);
@@ -812,7 +833,7 @@ bool Simple::OnInitialize (int argc, char* argv[])
     {
       csRef<CS::Animation::iSoftBodyAnimationControlType> softBodyAnimationType =
 	csLoadPlugin<CS::Animation::iSoftBodyAnimationControlType>
-	(plugmgr, "crystalspace.dynamics.softanim");
+	(pluginManager, "crystalspace.dynamics.softanim");
       if (!softBodyAnimationType)
 	return ReportError ("Could not load soft body animation for genmeshes plugin!");
 
@@ -824,7 +845,7 @@ bool Simple::OnInitialize (int argc, char* argv[])
 
     // Load the ragdoll plugin
     ragdollManager = csLoadPlugin<CS::Animation::iSkeletonRagdollNodeManager>
-      (plugmgr, "crystalspace.mesh.animesh.animnode.ragdoll");
+      (pluginManager, "crystalspace.mesh.animesh.animnode.ragdoll");
     if (!ragdollManager)
       return ReportError ("Failed to locate ragdoll manager!");
 
@@ -832,9 +853,6 @@ bool Simple::OnInitialize (int argc, char* argv[])
     if (clp->GetBoolOption ("terrain", false))
       environment = ENVIRONMENT_TERRAIN;
   }
-
-  if (!dynamics)
-    return ReportError ("No iDynamics plugin!");
 
   return true;
 }
