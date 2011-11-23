@@ -841,7 +841,6 @@ bool Simple::OnInitialize (int argc, char* argv[])
 	softBodyAnimationType->CreateAnimationControlFactory ();
       softBodyAnimationFactory =
 	scfQueryInterface<CS::Animation::iSoftBodyAnimationControlFactory> (animationFactory);
-      CS_ASSERT(softBodyAnimationFactory);
     }
 
     // Load the ragdoll plugin
