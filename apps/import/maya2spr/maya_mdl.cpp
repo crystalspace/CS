@@ -30,6 +30,7 @@
 #include "mayanode.h"
 
 #include "csutil/csendian.h"
+#include "csutil/platformfile.h"
 #include "iutil/databuff.h"
 #include "igraphic/imageio.h"
 
@@ -187,7 +188,7 @@ bool Maya4Model::WriteSPR(const char* spritename, csArray<Animation*>& anims)
 
   csPrintf("Writing out SPR file: %s\n",spritename);
 
-  f = fopen(spritename, "w");
+  f = CS::Platform::File::Open (spritename, "w");
   if (!f)
   {
     csFPrintf(stderr,"Unable to open file (%s) to write out CS sprite.\n",spritename);

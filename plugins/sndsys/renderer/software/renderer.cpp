@@ -787,6 +787,13 @@ void csSndSysRendererSoftware::AdvanceStreams(size_t Frames)
   {
     // Search for any streams that have an unregister requested and are paused and mark them for removal in the next cycle
     iSndSysStream *str=m_ActiveStreams.Get(currentidx);
+
+    // If the stream associated with the source has processed all the data, pause it
+    if (str->GetPauseState() == CS_SNDSYS_STREAM_COMPLETED)
+    {
+      str->Pause();
+    }
+
     if ((str->GetPauseState() == CS_SNDSYS_STREAM_PAUSED)
       && (str->GetAutoUnregisterRequested() == true))
     {

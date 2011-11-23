@@ -322,7 +322,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(LookAt)
     }
 
     // compute needed pitch/yaw/roll to achieve the lookat
-    float targetPitch, targetYaw, targetRoll = 0;
+    float targetPitch = 0.0f;
+    float targetYaw = 0.0f;
+    float targetRoll = 0.0f;
     bool wasConstrained = false;
     if (targetMode != TARGET_NONE
 	&& !targetInvalid)

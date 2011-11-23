@@ -1033,6 +1033,12 @@ public:
   csStringFast (const char* src, size_t _length) : csStringBase(), miniused(0)
   { Append (src, _length); }
 
+  /// Create a csString object from a null-terminated wide string.
+  csStringFast (const wchar_t* src) : csStringBase (), miniused(0)
+  { Append (src); }
+  /// Create a csStringBase object from a wide string, given the length.
+  csStringFast (const wchar_t* src, size_t _length) : csStringBase (), miniused(0)
+  { Append (src, _length); }
   
   /// Create a csStringFast object from a single signed character.
   csStringFast (char c) : csStringBase(), miniused(0)
@@ -1109,6 +1115,8 @@ public:
   csStringFast (const char* src) : csStringBase(src) { }
   csStringFast (const char* src, size_t _length) : csStringBase(src, _length)
   { }
+  csStringFast (const wchar_t* src) : csStringBase (src) {}
+  csStringFast (const wchar_t* src, size_t _length) : csStringBase (src, _length) { }
   csStringFast (char c) : csStringBase(c) { }
   csStringFast (unsigned char c) : csStringBase(c) { }
   const csStringFast& operator = (const csStringBase& copy)
@@ -1180,6 +1188,11 @@ public:
   csString (const char* src) : csStringFast<> (src) { }
   /// Create a csString object from a C string, given the length.
   csString (const char* src, size_t _length) : csStringFast<> (src, _length) { }
+  /// Create a csString object from a null-terminated wide string.
+  csString (const wchar_t* src) : csStringFast<> (src) {}
+  /// Create a csStringBase object from a wide string, given the length.
+  csString (const wchar_t* src, size_t _length) : csStringFast<> (src, _length) { }
+
   /// Create a csString object from a single signed character.
   csString (char c) : csStringFast<> (c) { }
   /// Create a csString object from a single unsigned character.

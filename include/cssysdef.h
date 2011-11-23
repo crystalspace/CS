@@ -1269,6 +1269,17 @@ namespace CS
 # define CS_DEPRECATION_WARNINGS_ENABLE
 #endif
 
+namespace CS
+{
+  namespace deprecated
+  {
+    CS_DEPRECATED_METHOD_MSG("Use CS::Platform::CreateDirectory() instead")
+    CS_CRYSTALSPACE_EXPORT int CS_MKDIR (const char* path);
+  } // namespace deprecated
+} // namespace CS
+
+#define CS_MKDIR(path)    CS::deprecated::CS_MKDIR(path)
+
 // Include nullptr fallback (for convenience).
 #include "csutil/nullptr.h"
 

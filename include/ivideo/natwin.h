@@ -51,7 +51,7 @@ struct iImage;
  */
 struct iNativeWindowManager : public virtual iBase
 {
-  SCF_INTERFACE (iNativeWindowManager, 2, 0, 1);
+  SCF_INTERFACE (iNativeWindowManager, 2, 0, 2);
   
   //@{
   /**
@@ -193,6 +193,30 @@ struct iNativeWindow : public virtual iBase
   virtual bool SetWindowDecoration (WindowDecoration decoration, bool flag) = 0;
   /// Return whether a decoration is visible.
   virtual bool GetWindowDecoration (WindowDecoration decoration) = 0;
+  
+  /**
+   * Take a desired window contents size and compute a contents size so the
+   * window would (in windowed mode) fit onto the current working area.
+   * 
+   * This functions computes a size so the window would fit into the current
+   * working area, taking window decorations and frame into account. The 
+   * “working area” is the area on the screen where windows are typically
+   * placed, e.g. on Windows the desktop but without the task bar.
+   * On multi-monitor systems, the workspace size depends on the monitor the
+   * window is currently on (or would be created on).
+   * 
+   * Since this function works with “content sizes” the returned sizes
+   * are suitable for passing to iGraphics2D::Resize().
+   * \param desiredWidth The desired contents width, will be corrected to fit
+   *   into the workspace width.
+   * \param desiredHeight The desired contents height, will be corrected to
+   *   fit into the workspace height.
+   * \returns Whether the corrected size could be computed: the function may
+   *   not be supported on the current platform. In that case the
+   *   \a desiredWidth and \a desiredHeight parameters will be left unchanged.
+   */
+  virtual bool FitSizeToWorkingArea (int& desiredWidth,
+                                     int& desiredHeight) = 0;
 };
 
 /** @} */

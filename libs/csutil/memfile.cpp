@@ -52,7 +52,7 @@ const char* csMemFile::GetName() { return "#csMemFile"; }
 const char* csMemFile::GetData() const 
 { return buffer ? buffer->GetData() : 0; }
 size_t csMemFile::GetSize() { return size; }
-int csMemFile::GetStatus() { return VFS_STATUS_OK; }
+int csMemFile::GetStatus() { return status; }
 void csMemFile::Flush() {}
 bool csMemFile::AtEOF() { return (cursor >= size); }
 size_t csMemFile::GetPos() { return cursor; }
@@ -60,20 +60,20 @@ bool csMemFile::SetPos(size_t p) { cursor = p < size ? p : size; return true; }
 
 csMemFile::csMemFile() 
   : scfImplementationType (this),
-  size(0), cursor(0), copyOnWrite (true)
+  status (VFS_STATUS_OK), size(0), cursor(0), copyOnWrite (true), readOnly (false)
 { 
 }
 
 csMemFile::csMemFile(const char* p, size_t s)
   : scfImplementationType (this),
-  size(s), cursor(0), copyOnWrite (true)
+  status (VFS_STATUS_OK), size(s), cursor(0), copyOnWrite (true), readOnly (false)
 { 
   buffer.AttachNew (new csDataBuffer ((char*)p, s, false));
 }
 
 csMemFile::csMemFile(char* p, size_t s, Disposition d) 
   : scfImplementationType (this),
-  size(s), cursor(0)
+  status (VFS_STATUS_OK), size(s), cursor(0), copyOnWrite (false), readOnly (false)
 { 
   if (d == DISPOSITION_CS_FREE)
     buffer.AttachNew (new DataBufferFreeCS (p, s));
@@ -86,8 +86,8 @@ csMemFile::csMemFile(char* p, size_t s, Disposition d)
 
 csMemFile::csMemFile(iDataBuffer* buf, bool readOnly) 
   : scfImplementationType (this),
-  buffer(buf), size(buf ? buf->GetSize() : 0), cursor(0), 
-  copyOnWrite (readOnly)
+  buffer(buf), status (VFS_STATUS_OK), size(buf ? buf->GetSize() : 0), cursor(0), 
+  copyOnWrite (readOnly), readOnly (readOnly)
 {
 }
 
@@ -97,8 +97,14 @@ csMemFile::~csMemFile()
 
 size_t csMemFile::Read(char* Data, size_t DataSize)
 {
+  if (cursor >= size)
+  {
+    status = VFS_STATUS_IOERROR;
+    return 0;
+  }
   const size_t remaining = cursor < size ? size - cursor : 0;
   const size_t nbytes = DataSize < remaining ? DataSize : remaining;
+  status = (nbytes == DataSize) ? VFS_STATUS_OK : VFS_STATUS_IOERROR;
   if (nbytes != 0)
     memcpy (Data, buffer->GetData() + cursor, nbytes);
   cursor += nbytes;
@@ -107,6 +113,12 @@ size_t csMemFile::Read(char* Data, size_t DataSize)
 
 size_t csMemFile::Write(const char* Data, size_t DataSize)
 {
+  if (readOnly)
+  {
+    status = VFS_STATUS_ACCESSDENIED;
+    return 0;
+  }
+
   size_t written = 0;
   if (DataSize != 0 && Data != 0)
   {
@@ -140,11 +152,13 @@ size_t csMemFile::Write(const char* Data, size_t DataSize)
 
     copyOnWrite = false;
   }
+  status = VFS_STATUS_OK;
   return written;
 }
 
 csPtr<iDataBuffer> csMemFile::GetAllData (bool nullterm)
 {
+  status = VFS_STATUS_OK;
   if (nullterm)
   {
     char* data = new char [size + 1];
@@ -171,10 +185,35 @@ csPtr<iDataBuffer> csMemFile::GetAllData (bool nullterm)
   }
 }
 
+csPtr<iDataBuffer> csMemFile::GetAllData (CS::Memory::iAllocator* /*allocator*/)
+{
+  return GetAllData ();
+}
+
+csPtr<iFile> csMemFile::GetPartialView (size_t offset, size_t size)
+{
+  if (!buffer) return 0;
+  copyOnWrite = true;
+  size_t bufSize (csMin (size, GetSize() - offset));
+  csRef<iDataBuffer> viewBuffer;
+  if ((offset == 0) && (buffer->GetSize() == bufSize))
+  {
+    viewBuffer = buffer;
+  }
+  else
+  {
+    viewBuffer.AttachNew (new csParasiticDataBuffer (buffer, offset, bufSize));
+  }
+
+  csMemFile* new_file (new csMemFile (viewBuffer, true));
+  return csPtr<iFile> (new_file);
+}
+
 void csMemFile::Empty()
 {
   buffer.Invalidate();
   size = 0;
   cursor = 0;
   copyOnWrite = true;
+  readOnly = false;
 }

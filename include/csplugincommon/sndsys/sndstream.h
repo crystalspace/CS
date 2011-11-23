@@ -160,6 +160,10 @@ namespace CS
     * - CS_SNDSYS_STREAM_PAUSED - The stream is paused.
     * - CS_SNDSYS_STREAM_UNPAUSED - The stream is not paused.  AdvancePosition
     *   is moving the stream position.
+    * - CS_SNDSYS_STREAM_COMPLETED - The stream's data has been processed but
+    *   not rendered yet. In order to keep the state consistent, the Sound
+    *   System's main processing thread should call Pause() once the data has
+    *   been entirely rendered.
     */
     virtual int GetPauseState();
 
@@ -347,7 +351,7 @@ namespace CS
     SoundCyclicBuffer *m_pCyclicBuffer;
 
     /// Is this stream paused?
-    bool m_bPaused;
+    int16 m_PauseState;
 
     /// Is this stream set to loop (start over) when it reaches the end
     //   of the data?

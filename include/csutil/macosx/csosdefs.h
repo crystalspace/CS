@@ -69,8 +69,6 @@
 #define CS_PATH_DELIMITER ':'
 #define CS_PATH_SEPARATOR '/'
 
-#define CS_MKDIR(p) mkdir(p,0755)
-
 #undef  CS_OPENGL_2D_DRIVER
 #define CS_OPENGL_2D_DRIVER "crystalspace.graphics2d.glosx"
 

@@ -329,12 +329,6 @@ static inline longlong strtoll(char const* s, char** sN, int base)
 #define CS_PATH_DELIMITER ';'
 #define CS_PATH_SEPARATOR '\\'
 
-#if defined (__CYGWIN32__)
-#  define CS_MKDIR(path) mkdir(path, 0755)
-#else
-#  define CS_MKDIR(path) _mkdir(path)
-#endif
-
 // Directory read functions, file access, etc.
 #include <io.h>
 #ifndef F_OK

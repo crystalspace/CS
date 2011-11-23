@@ -252,6 +252,8 @@ void SndSysSourceOpenAL2D::PerformUpdate ( bool ExternalUpdates )
         alSourceQueueBuffers (m_Source, 1, &m_Buffers[m_EmptyBuffer]);
         // Advance the empty pointer;
         m_EmptyBuffer = (m_EmptyBuffer + 1) % s_NumberOfBuffers;
+        // Increasing the number of queues
+        queuedBuffers++;
       }
       else
       {
@@ -286,6 +288,16 @@ void SndSysSourceOpenAL2D::PerformUpdate ( bool ExternalUpdates )
   // the attached buffers and set paused, while we still want it to play. 
   int currentState;
   alGetSourcei (m_Source, AL_SOURCE_STATE, &currentState);
+  if (m_Stream->GetPauseState() == CS_SNDSYS_STREAM_COMPLETED)
+  {
+    if (queuedBuffers == 0)
+    {
+      // Set state to paused so that it will be
+      // removed if auto unregistration is set
+      m_Stream->Pause();
+    }
+  }
+
   if (m_Stream->GetPauseState() == CS_SNDSYS_STREAM_PAUSED)
   {
     if (currentState != AL_PAUSED || currentState != AL_INITIAL)

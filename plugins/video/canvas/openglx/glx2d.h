@@ -61,6 +61,10 @@ class csGraphics2DGLX : public scfImplementationExt1<csGraphics2DGLX ,
   Atom compositingManagerPresenceSelection;
   bool transparencyRequested;
   bool transparencyAvailable;
+  
+  // Fit-to-working-area stuff
+  bool GetWorkspaceDimensions (int& width, int& height);
+  bool AddWindowFrameDimensions (int& width, int& height);
 public:
   csGraphics2DGLX (iBase *iParent);
   virtual ~csGraphics2DGLX ();
@@ -78,6 +82,7 @@ public:
   virtual bool PerformExtensionV (char const* command, va_list);
 
   virtual void AllowResize (bool iAllow);
+  virtual bool Resize (int w, int h);
 
   virtual void AlertV (int type, const char* title, const char* okMsg,
   	const char* msg, va_list arg) 

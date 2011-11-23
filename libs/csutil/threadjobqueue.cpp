@@ -97,10 +97,26 @@ namespace Threading
       if (ts->tsMutex.TryLock ())
       {
         ts->jobQueue.Push (job);
-        CS::Threading::AtomicOperations::Increment (&outstandingJobs); 
+        size_t jobCount (CS::Threading::AtomicOperations::Increment (&outstandingJobs));
         ts->tsMutex.Unlock ();
 
-        ts->tsNewJob.NotifyAll ();
+        if ((jobCount > 1) && (jobCount < numWorkerThreads))
+        {
+          /* There must be some empty queues, so notify all queues so one
+           * might possible steal the job just added if it happened to go into
+           * a non-empty queue */
+          for (size_t i = 0; i < numWorkerThreads; ++i)
+          {
+            ThreadState* ts = allThreadState[(targetThread + i) % numWorkerThreads];
+            ts->tsNewJob.NotifyAll ();
+          }
+        }
+        else
+        {
+          /* Queues are generally filled, just notify the thread we gave to 
+           * job to */
+          ts->tsNewJob.NotifyAll ();
+        }
 
         return;
       }

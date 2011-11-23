@@ -22,6 +22,36 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 CS_IMPLEMENT_APPLICATION
 
+#ifdef CS_PLATFORM_UNIX
+#include <termios.h>
+#endif
+#ifdef CS_PLATFORM_WIN32
+#include <conio.h>
+#endif
+
+static void WaitForKey()
+{
+#if defined(CS_PLATFORM_UNIX)
+  // Set up terminal so it doesn't do line-wise input
+  int stdin_fd (0);
+  termios orig_tca;
+  tcgetattr (stdin_fd, &orig_tca);
+  termios new_tca (orig_tca);
+  new_tca.c_lflag &= ~ICANON;
+  new_tca.c_cc[VMIN] = 1;
+  tcsetattr (stdin_fd, TCSANOW, &new_tca);
+
+  getchar();
+
+  // Restore old state
+  tcsetattr (stdin_fd, TCSANOW, &orig_tca);
+#elif defined(CS_PLATFORM_WIN32)
+  _getch();
+#else
+  getchar();
+#endif
+}
+
 using namespace CS::Threading;
 
 csThreadTest::csThreadTest(iObjectRegistry* objReg) : scfImplementationType(this),
@@ -238,7 +268,8 @@ int main(int argc, char* argv[])
   printf("Test 7 passed!\n");
 
   printf("\nPress any key to exit.\n");
-  getchar();
+  WaitForKey ();
+  printf("\n");
 
   objReg->Clear();
 

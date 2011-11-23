@@ -35,12 +35,16 @@
 #endif
 
 #include "vfs.h"
+#include "csgeom/math.h"
 #include "csutil/archive.h"
 #include "csutil/cmdline.h"
 #include "csutil/csstring.h"
 #include "csutil/databuf.h"
+#include "csutil/memfile.h"
 #include "csutil/mmapio.h"
 #include "csutil/parray.h"
+#include "csutil/parasiticdatabuffer.h"
+#include "csutil/platformfile.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/scfstringarray.h"
 #include "csutil/stringquote.h"
@@ -117,6 +121,8 @@ public:
   virtual bool SetPos (size_t newpos);
   /// Get all data
   virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false);
+  csPtr<iDataBuffer> GetAllData (CS::Memory::iAllocator* alloc);
+  csPtr<iFile> GetPartialView (size_t offset, size_t size = (size_t)~0);
 private:
   // Create a directory or a series of directories starting from PathBase
   void MakeDir (const char *PathBase, const char *PathSuffix);
@@ -160,6 +166,8 @@ public:
   virtual size_t GetPos ();
   /// Get all the data at once
   virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false);
+  csPtr<iDataBuffer> GetAllData (CS::Memory::iAllocator* alloc);
+  csPtr<iFile> GetPartialView (size_t offset, size_t size = (size_t)~0);
   /// Set current file pointer
   virtual bool SetPos (size_t newpos);
 };
@@ -501,11 +509,11 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, size_t RIndex,
     if (debug)
       csPrintf ("VFS_DEBUG: Trying to open disk file %s\n", CS::Quote::Double (fName));
     if ((Mode & VFS_FILE_MODE) == VFS_FILE_WRITE)
-        file = fopen (fName, "wb");
+        file = CS::Platform::File::Open (fName, "wb");
     else if ((Mode & VFS_FILE_MODE) == VFS_FILE_APPEND)
-        file = fopen (fName, "ab");
+        file = CS::Platform::File::Open (fName, "ab");
     else
-        file = fopen (fName, "rb");
+        file = CS::Platform::File::Open (fName, "rb");
 
     if (file || (t != 1))
       break;
@@ -618,10 +626,9 @@ void DiskFile::MakeDir (const char *PathBase, const char *PathSuffix)
     *cur = 0;
     if (debug)
       csPrintf ("VFS_DEBUG: Trying to create directory %s\n", CS::Quote::Double (path));
-    errno = 0;
-    CS_MKDIR (path);
-    if (debug && errno != 0)
-      csPrintf ("VFS_DEBUG: Couldn't create directory %s, errno=%d\n", CS::Quote::Double (path), errno);
+    int err (CS::Platform::CreateDirectory (path));
+    if (debug && err != 0)
+      csPrintf ("VFS_DEBUG: Couldn't create directory %s, errno=%d\n", CS::Quote::Double (path), err);
     *cur = oldchar;
     if (*cur)
       cur++;
@@ -859,6 +866,69 @@ csPtr<iDataBuffer> DiskFile::GetAllData (bool nullterm)
   }
 }
 
+csPtr<iDataBuffer> DiskFile::GetAllData (CS::Memory::iAllocator* alloc)
+{
+// retrieve file contents
+
+  // refuse to work when writing
+  if (!writemode)
+  {
+    // do we already have everything?
+    if (!alldata)
+    {
+      iDataBuffer* newbuf = 0;
+      // attempt to create file mapping
+      size_t oldpos = GetPos();
+      newbuf = TryCreateMapping ();
+      // didn't succeed or not supported -
+      // old style readin'
+      if (!newbuf)
+      {
+        SetPos (0);
+
+        CS::DataBuffer<CS::Memory::AllocatorInterface>* dbuf =
+          new CS::DataBuffer<CS::Memory::AllocatorInterface> (Size,
+                                                              CS::Memory::AllocatorInterface (alloc));
+        char* data (dbuf->GetData());
+        Read (data, Size);
+        *(data + Size) = 0;
+
+        newbuf = dbuf;
+      }
+      // close file, set correct pos
+      fclose (file);
+      file = 0;
+      SetPos (oldpos);
+      // setup buffer.
+      alldata = csPtr<iDataBuffer> (newbuf);
+      buffernt = false;
+    }
+    else
+    {
+      // The data was already read.
+    }
+    return csPtr<iDataBuffer> (alldata);
+  }
+  else
+  {
+    return 0;
+  }
+}
+
+csPtr<iFile> DiskFile::GetPartialView (size_t offset, size_t size)
+{
+  // @@@ FIXME: Obtaining the view as a buffer is kinda lazy.
+  size_t bufSize (csMin (size, GetSize() - offset));
+  csRef<iDataBuffer> allData (GetAllData());
+  if (!allData) return (iFile*)nullptr;
+  csRef<iDataBuffer> partBuf;
+  if ((offset == 0) && (bufSize == GetSize()))
+    partBuf = allData;
+  else
+    partBuf.AttachNew (new csParasiticDataBuffer (allData, offset, bufSize));
+  return csPtr<iFile> ((iFile*)(new csMemFile (partBuf, true)));
+}
+
 iDataBuffer* DiskFile::TryCreateMapping ()
 {
   if (!Size) return 0;
@@ -1015,6 +1085,24 @@ csPtr<iDataBuffer> ArchiveFile::GetAllData (bool nullterm)
     buffernt = nullterm;
   }
   return csPtr<iDataBuffer> (databuf);
+}
+
+csPtr<iDataBuffer> ArchiveFile::GetAllData (CS::Memory::iAllocator* alloc)
+{
+  return csPtr<iDataBuffer> (databuf);
+}
+
+csPtr<iFile> ArchiveFile::GetPartialView (size_t offset, size_t size)
+{
+  size_t bufSize (csMin (size, GetSize() - offset));
+  csRef<iDataBuffer> allData (GetAllData());
+  if (!allData) return (iFile*)nullptr;
+  csRef<iDataBuffer> partBuf;
+  if ((offset == 0) && (bufSize == GetSize()))
+    partBuf = allData;
+  else
+    partBuf.AttachNew (new csParasiticDataBuffer (allData, offset, bufSize));
+  return csPtr<iFile> ((iFile*)(new csMemFile (partBuf, true)));
 }
 
 // ------------------------------------------------------------- VfsNode --- //
@@ -2283,7 +2371,7 @@ bool csVFS::TryChDirAuto(char const* dir, char const* filename)
 
 static bool IsZipFile (const char* path)
 {
-  FILE* f = fopen (path, "rb");
+  FILE* f = CS::Platform::File::Open (path, "rb");
   if (!f) return false;
 
   char header[4];

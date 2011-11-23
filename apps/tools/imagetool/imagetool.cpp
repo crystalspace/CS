@@ -34,6 +34,7 @@
 #include "csutil/databuf.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/getopt.h"
+#include "csutil/platformfile.h"
 #include "csutil/util.h"
 #include "igraphic/imageio.h"
 #include "iutil/comp.h"
@@ -230,7 +231,7 @@ static bool output_picture (const char *fname, const char *suffix, iImage* ifile
   if (db)
   {
     const size_t size = db->GetSize ();
-    FILE *f = fopen (outname, "wb");
+    FILE *f = CS::Platform::File::Open (outname, "wb");
     if (f)
     {
       const size_t res = fwrite (db->GetData (), 1, size, f);
@@ -406,7 +407,7 @@ static csRef<iImage> open_file (const char *fname)
 {
   csPrintf ("Loading file %s\n", fname);
 
-  FILE *f = fopen (fname, "rb");
+  FILE *f = CS::Platform::File::Open (fname, "rb");
   if (!f)
   {
     csPrintf ("%s: cannot open file %s\n", programname, fname);

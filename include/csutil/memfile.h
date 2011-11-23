@@ -94,6 +94,8 @@ public:
   virtual bool SetPos(size_t newpos);
 
   virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false);
+  csPtr<iDataBuffer> GetAllData (CS::Memory::iAllocator*);
+  csPtr<iFile> GetPartialView (size_t offset, size_t size = (size_t)~0);
   /**
    * Returns a pointer to the memory buffer.  May return 0 if memory file
    * is empty.  Use GetSize() for size info.
@@ -105,9 +107,11 @@ public:
   void Empty();
 protected:
   csRef<iDataBuffer> buffer;
+  int status;
   size_t size;
   size_t cursor;
   bool copyOnWrite;
+  bool readOnly;
 };
 
 #endif // __CS_MEMFILE_H__

@@ -1385,7 +1385,7 @@ CS_NOTABLE([ode], [physics], [], [$cs_cv_libode_recent],
 
 AC_ARG_WITH([bullet], [AC_HELP_STRING([--with-bullet=dir],
     [specify additional location to search Bullet if not detected automatically; 
-    directories searched include dir/include, dir/lib, and dir])])
+    directories searched include dir/include/bullet, dir/lib, and dir])])
 
 # Modified versions of _CS_CHECK_LIB_CREATE_FLAG and _CS_CHECK_LIB_CREATE_FLAG
 # to allow checking for multiple libs at once
@@ -1399,7 +1399,7 @@ AC_DEFUN([_CS_CHECK_BULLET_CREATE_FLAGS],
 		    [$cs_check_incdir], [$cs_check_libdir], [$2])
 		;;
 	    *)  _CS_CHECK_BULLET_CREATE_FLAG([$1],
-		    [$cs_lib_item/include], [$cs_lib_item/lib], [$2])
+		    [$cs_lib_item/include/bullet], [$cs_lib_item/lib], [$2])
 		_CS_CHECK_BULLET_CREATE_FLAG(
 		    [$1], [$cs_lib_item], [$cs_lib_item], [$2])
 		;;

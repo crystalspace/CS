@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2007 by Frank Richter
+    Copyright (C) 2011 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,30 +16,18 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/* Implementations for functions declared for the "inline function" trick
- * to have deprecated macros emit a message.
- */
-
 #include "cssysdef.h"
 
-#include "csutil/syspath.h"
-
-#undef CS_MKDIR
+#include "csutil/platformfile.h"
 
 namespace CS
 {
-  namespace deprecated
+  namespace Platform
   {
-    int CS_MKDIR (const char* path)
+    FILE* File::Open (const char* filename, const char* mode)
     {
-      int err (Platform::CreateDirectory (path));
-      if (err != 0)
-      {
-        errno = err;
-        return -1;
-      }
-      else
-        return 0;
+      // ... so simply assume the platform already takes filenames as UTF-8.
+      return fopen (filename, mode);
     }
-  } // namespace deprecated
+  } // namespace Platform
 } // namespace CS

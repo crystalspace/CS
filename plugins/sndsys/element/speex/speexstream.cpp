@@ -95,7 +95,7 @@ bool SndSysSpeexSoundStream::ResetPosition(bool clear)
 
 void SndSysSpeexSoundStream::AdvancePosition(size_t frame_delta)
 {
-  if (m_bPaused || m_bPlaybackReadComplete || frame_delta==0)
+  if (m_PauseState != CS_SNDSYS_STREAM_UNPAUSED || m_bPlaybackReadComplete || frame_delta==0)
     return;
 
   // Figure out how many bytes we need to fill for this advancement

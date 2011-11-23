@@ -250,10 +250,7 @@ bool DistFieldGen::Run ()
   {
     csRef<iDataBuffer> outData = imageio->Save (loResImage, mimeType);
     if (!outData.IsValid()) return false;
-    /* @@@ FIXME: csPhysicalFile can't open nonexisting files.
-     * Needs to be fixed there ... */
-    FILE* fp = fopen (outFile, "wb");
-    csPhysicalFile file (fp, true);
+    csPhysicalFile file (outFile, "wb");
     if (file.GetStatus() != VFS_STATUS_OK) return false;
     if (file.Write (outData->GetData(), outData->GetSize())
 	!= outData->GetSize())

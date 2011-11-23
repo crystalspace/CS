@@ -37,7 +37,7 @@
 
 csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
   scfImplementationType (this, iParent), statecache (0), statecontext (0),
-    hasRenderTarget (false)
+    openComplete (false), hasRenderTarget (false)
 {
   EventOutlet = 0;
   multiFavorQuality = false;
@@ -218,6 +218,7 @@ bool csGraphics2DGLCommon::Open ()
   glViewport (0, 0, vpWidth, vpHeight);
   Clear (0);
 
+  openComplete = true;
   return true;
 }
 
@@ -229,6 +230,7 @@ void csGraphics2DGLCommon::Close ()
   delete statecache; statecache = 0;
   ext.Close ();
   driverdb.Close ();
+  openComplete = false;
 }
 
 void csGraphics2DGLCommon::SetClipRect (int xmin, int ymin, int xmax, int ymax)
@@ -823,7 +825,10 @@ bool csGraphics2DGLCommon::Resize (int width, int height)
   }
   fbWidth = width;
   fbHeight = height;
-  EventOutlet->Broadcast (csevCanvasResize(object_reg, this), (intptr_t)this);
+  if (openComplete)
+    /* csGraphics2D::Open() causes a resize due to fitting to the working area;
+     * don't emit a resize event in that case */
+    EventOutlet->Broadcast (csevCanvasResize(object_reg, this), (intptr_t)this);
   return true;
 }
 

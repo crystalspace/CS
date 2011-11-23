@@ -126,7 +126,7 @@ void SndSysWavSoundStream::AdvancePosition(size_t frame_delta)
     m_NewPosition = positionInvalid;
     m_bPlaybackReadComplete=false;
   }
-  if (m_bPaused || m_bPlaybackReadComplete || frame_delta==0)
+  if (m_PauseState != CS_SNDSYS_STREAM_UNPAUSED || m_bPlaybackReadComplete || frame_delta==0)
     return;
 
 

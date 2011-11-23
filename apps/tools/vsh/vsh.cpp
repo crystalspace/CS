@@ -45,108 +45,108 @@ static csRef<iConfigManager> Cfg;
 static bool ShutDown = false;
 
 // forward declaration for command handlers
-static void cmd_cat (char *args);
-static void cmd_chdir (char *args);
-static void cmd_config (char *args);
-static void cmd_cp (char *args);
-static void cmd_create (char *args);
-static void cmd_exists (char *args);
-static void cmd_help (char *args);
-static void cmd_ls (char *args);
-static void cmd_mount (char *args);
-static void cmd_pwd (char *args);
-static void cmd_quit (char *args);
-static void cmd_rm (char *args);
-static void cmd_save (char *args);
-static void cmd_sync (char *args);
-static void cmd_time (char *args);
-static void cmd_unmount (char *args);
-static void cmd_rpath (char *args);
-static void cmd_mounts (char *args);
-static void cmd_rmounts (char *args);
+static void cmd_cat (wchar_t *args);
+static void cmd_chdir (wchar_t *args);
+static void cmd_config (wchar_t *args);
+static void cmd_cp (wchar_t *args);
+static void cmd_create (wchar_t *args);
+static void cmd_exists (wchar_t *args);
+static void cmd_help (wchar_t *args);
+static void cmd_ls (wchar_t *args);
+static void cmd_mount (wchar_t *args);
+static void cmd_pwd (wchar_t *args);
+static void cmd_quit (wchar_t *args);
+static void cmd_rm (wchar_t *args);
+static void cmd_save (wchar_t *args);
+static void cmd_sync (wchar_t *args);
+static void cmd_time (wchar_t *args);
+static void cmd_unmount (wchar_t *args);
+static void cmd_rpath (wchar_t *args);
+static void cmd_mounts (wchar_t *args);
+static void cmd_rmounts (wchar_t *args);
 
 struct VshCmdList
 {
-  const char *command;
-  void (*handler) (char *args);
+  const wchar_t *command;
+  void (*handler) (wchar_t *args);
 };
 
 VshCmdList const cmdlist [] =
 {
-  { "?",       cmd_help    },
-  { "cat",     cmd_cat     },
-  { "cd",      cmd_chdir   },
-  { "chdir",   cmd_chdir   },
-  { "config",  cmd_config  },
-  { "copy",    cmd_cp      },
-  { "cp",      cmd_cp      },
-  { "create",  cmd_create  },
-  { "del",     cmd_rm      },
-  { "dir",     cmd_ls      },
-  { "exists",  cmd_exists  },
-  { "exit",    cmd_quit    },
-  { "help",    cmd_help    },
-  { "ls",      cmd_ls      },
-  { "mount",   cmd_mount   },
-  { "mounts",  cmd_mounts  },
-  { "pwd",     cmd_pwd     },
-  { "quit",    cmd_quit    },
-  { "rm",      cmd_rm      },
-  { "rmounts", cmd_rmounts },
-  { "rpath",   cmd_rpath   },
-  { "save",    cmd_save    },
-  { "sync",    cmd_sync    },
-  { "time",    cmd_time    },
-  { "type",    cmd_cat     },
-  { "unmount", cmd_unmount },
+  { L"?",       cmd_help    },
+  { L"cat",     cmd_cat     },
+  { L"cd",      cmd_chdir   },
+  { L"chdir",   cmd_chdir   },
+  { L"config",  cmd_config  },
+  { L"copy",    cmd_cp      },
+  { L"cp",      cmd_cp      },
+  { L"create",  cmd_create  },
+  { L"del",     cmd_rm      },
+  { L"dir",     cmd_ls      },
+  { L"exists",  cmd_exists  },
+  { L"exit",    cmd_quit    },
+  { L"help",    cmd_help    },
+  { L"ls",      cmd_ls      },
+  { L"mount",   cmd_mount   },
+  { L"mounts",  cmd_mounts  },
+  { L"pwd",     cmd_pwd     },
+  { L"quit",    cmd_quit    },
+  { L"rm",      cmd_rm      },
+  { L"rmounts", cmd_rmounts },
+  { L"rpath",   cmd_rpath   },
+  { L"save",    cmd_save    },
+  { L"sync",    cmd_sync    },
+  { L"time",    cmd_time    },
+  { L"type",    cmd_cat     },
+  { L"unmount", cmd_unmount },
   { 0, 0 }
 };
 
-static void skipspc (char *&s)
+static void skipspc (wchar_t *&s)
 {
-  while (*s && isspace(*s))
+  while (*s && iswspace(*s))
     s++;
   if (!*s)
     s = 0;
 }
 
-static void trimwhite (char*& s)
+static void trimwhite (wchar_t*& s)
 {
   skipspc(s);
   if (s != 0)
   {
-    size_t n = strlen(s);
+    size_t n = wcslen(s);
     while (n-- > 0)
-      if (isspace (s[n]))
+      if (iswspace (s[n]))
         s[n] = '\0';
       else
         break;
   }
 }
 
-static bool get2args (const char *command, char *args, char *&arg1, char *&arg2,
-  bool req2nd = true)
+static bool get2args (const wchar_t *command, wchar_t *args,
+                      wchar_t *&arg1, wchar_t *&arg2, bool req2nd = true)
 {
   if (!args)
   {
-    csPrintfErr ("%s: arguments required\n", command);
+    csPrintfErr ("%ls: arguments required\n", command);
     return false;
   }
 
   arg1 = args;
-  while (*args && !isspace(*args))
+  while (*args && !iswspace(*args))
     args++;
   if (!*args && req2nd)
   {
 nodest:
-    csPrintfErr ("%s: no second argument\n", command);
+    csPrintfErr ("%ls: no second argument\n", command);
     return false;
   }
   arg2 = args;
   if (*args)
     arg2++;
   *args = 0;
-  while (isspace(*arg2))
+  while (iswspace(*arg2))
     arg2++;
   if (!*arg2 && req2nd)
     goto nodest;
@@ -154,7 +154,7 @@ nodest:
   return true;
 }
 
-static void get_option (char *&args, bool &opt)
+static void get_option (wchar_t *&args, bool &opt)
 {
   opt = false;
   if (args && *args == '-')
@@ -165,7 +165,7 @@ static void get_option (char *&args, bool &opt)
   }
 }
 
-static void cmd_help (char *)
+static void cmd_help (wchar_t *)
 {
   csPrintf (
 "----========************* Virtual Shell commands: *************========----\n"
@@ -200,21 +200,22 @@ CS::Quote::Single ("-")
   );
 }
 
-static void cmd_pwd (char *)
+static void cmd_pwd (wchar_t *)
 {
   csPrintf ("%s\n", VFS->GetCwd ());
 }
 
-static void cmd_chdir (char *args)
+static void cmd_chdir (wchar_t *args)
 {
-  VFS->ChDir (args ? args : "/");
+  VFS->ChDir (args ? csString (args) : "/");
 }
 
-static void cmd_cat (char *args)
+static void cmd_cat (wchar_t *args_w)
 {
   bool onepass;
-  get_option (args, onepass);
+  get_option (args_w, onepass);
 
+    csString args (args_w);
   if (onepass)
   {
     csRef<iDataBuffer> data (VFS->ReadFile (args));
@@ -249,8 +250,9 @@ static void cmd_cat (char *args)
   }
 }
 
-static void cmd_create (char *args)
+static void cmd_create (wchar_t *args_w)
 {
+  csString args (args_w);
   csRef<iFile> F (VFS->Open (args, VFS_FILE_WRITE));
   if (!F)
   {
@@ -262,11 +264,12 @@ static void cmd_create (char *args)
   csPrintf ("Copying from stdin to file %s, enter EOF to finish\n", CS::Quote::Double (args));
   for (;;)
   {
-    char buff [160];
-    if (!fgets (buff, sizeof (buff), stdin))
+    wchar_t buff [160];
+    if (!fgetws (buff, sizeof (buff)/sizeof(buff[0]), stdin))
       break;
-    size_t len = F->Write (buff, strlen (buff));
-    if (len < strlen (buff))
+	csString str_utf8 (buff);
+	size_t len = F->Write (str_utf8.GetData(), str_utf8.Length());
+	if (len < str_utf8.Length())
     {
       csPrintfErr ("create: error writing to file %s\n", CS::Quote::Double (args));
       break;
@@ -275,7 +278,7 @@ static void cmd_create (char *args)
   csPrintf ("done, closing file\n");
 }
 
-static void cmd_ls (char *args)
+static void cmd_ls (wchar_t *args)
 {
   bool fullpath;
   get_option (args, fullpath);
@@ -284,7 +287,7 @@ static void cmd_ls (char *args)
   csRef<iDataBuffer> xpath;
   if (args)
   {
-    xpath = VFS->ExpandPath (args);
+    xpath = VFS->ExpandPath (csString (args));
     dir = **xpath;
   }
   else
@@ -334,21 +337,22 @@ static void cmd_ls (char *args)
     csPrintf ("ls: no files to display\n");
 }
 
-static void cmd_cp (char *args)
+static void cmd_cp (wchar_t *args)
 {
   bool onepass;
   get_option (args, onepass);
 
-  char *src, *dst;
-  if (!get2args ("cp", args, src, dst))
+  wchar_t *src_w, *dst_w;
+  if (!get2args (L"cp", args, src_w, dst_w))
     return;
 
-  csRef<iStringArray> fl (VFS->FindFiles (src));
+  csRef<iStringArray> fl (VFS->FindFiles (csString (src_w)));
   size_t i;
+  csString dst (dst_w);
   for (i = 0; i < fl->GetSize () ; i++)
   {
-    char destname [VFS_MAX_PATH_LEN + 1];
-    src = (char *)fl->Get (i);
+    csString destname;
+    const char* src = fl->Get (i);
 
     if (fl->GetSize () > 1)
     {
@@ -357,12 +361,12 @@ static void cmd_cp (char *args)
         dirlen--;
       while (dirlen && src [dirlen - 1] != VFS_PATH_SEPARATOR)
         dirlen--;
-      strcpy (destname, dst);
-      if (destname [0])
-        if (destname [strlen (destname) - 1] != VFS_PATH_SEPARATOR)
-          strcat (destname, "/");
-      strcat (destname, src + dirlen);
-      csPrintf ("%s -> %s\n", src, destname);
+      destname = dst;
+      if (destname.IsEmpty())
+        if (destname [destname.Length() - 1] != VFS_PATH_SEPARATOR)
+          destname.Append ("/");
+      destname.Append (src + dirlen);
+      csPrintf ("%s -> %s\n", src, destname.GetData());
       dst = destname;
     }
 
@@ -406,50 +410,56 @@ static void cmd_cp (char *args)
   }
 }
 
-static void cmd_rm (char *args)
+static void cmd_rm (wchar_t *args_w)
 {
-  if (!args)
+  csString args (args_w);
+  if (!args.IsEmpty())
     csPrintfErr ("rm: empty argument\n");
   else if (!VFS->DeleteFile (args))
     csPrintfErr ("rm: cannot remove file %s\n", CS::Quote::Double (args));
 }
 
-static void cmd_save (char *)
+static void cmd_save (wchar_t *)
 {
   if (!VFS->SaveMounts (VFS_CONFIG_FILE))
     csPrintfErr ("save: cannot save VFS configuration file\n");
 }
 
-static void cmd_mount (char *args)
+static void cmd_mount (wchar_t *args)
 {
-  char *vpath, *rpath;
-  if (!get2args ("mount", args, vpath, rpath))
+  wchar_t *vpath_w, *rpath_w;
+  if (!get2args (L"mount", args, vpath_w, rpath_w))
     return;
 
+  csString vpath (vpath_w);
+  csString rpath (rpath_w);
   if (!VFS->Mount (vpath, rpath))
     csPrintfErr ("mount: cannot mount %s to %s\n", CS::Quote::Double (rpath), CS::Quote::Double (vpath));
 }
 
-static void cmd_unmount (char *args)
+static void cmd_unmount (wchar_t *args)
 {
-  char *vpath, *rpath;
-  if (!get2args ("unmount", args, vpath, rpath, false))
+  wchar_t *vpath_w, *rpath_w;
+  if (!get2args (L"unmount", args, vpath_w, rpath_w, false))
     return;
 
-  if (!*rpath)
-    rpath = 0;
+  if (!*rpath_w)
+    rpath_w = 0;
 
+  csString vpath (vpath_w);
+  csString rpath (rpath_w);
   if (!VFS->Unmount (vpath, rpath))
     csPrintfErr ("unmount: cannot unmount %s from %s\n",
       CS::Quote::Double (rpath), CS::Quote::Double (vpath));
 }
 
-static void cmd_config (char *args)
+static void cmd_config (wchar_t *args_w)
 {
   bool real_fs;
-  get_option (args, real_fs);
+  get_option (args_w, real_fs);
   iVFS *CfgVFS = real_fs ? (iVFS*)0 : (iVFS*)VFS;
 
+  csString args (args_w);
   iConfigFile *config =
     Cfg->AddDomain (args, CfgVFS, iConfigManager::ConfigPriorityCmdLine);
 
@@ -465,37 +475,39 @@ static void cmd_config (char *args)
       "config: mount: cannot mount all directories found in config file.\n");
 }
 
-static void cmd_sync (char *)
+static void cmd_sync (wchar_t *)
 {
   VFS->Sync ();
 }
 
-static void cmd_quit (char *)
+static void cmd_quit (wchar_t *)
 {
   ShutDown = true;
 }
 
-static void cmd_exists (char *args)
+static void cmd_exists (wchar_t *args_w)
 {
-  if (!args)
+  if (!args_w)
   {
     csPrintfErr ("exists: empty argument\n");
     return;
   }
 
-  bool IsDir = args [strlen (args) - 1] == '/';
+  csString args (args_w);
+  bool IsDir = args [args.Length() - 1] == '/';
   csPrintf ("%s %s %s\n", IsDir ? "Directory" : "File", CS::Quote::Double (args),
     VFS->Exists (args) ? "exists" : "does not exist");
 }
 
-static void cmd_time (char *args)
+static void cmd_time (wchar_t *args_w)
 {
-  if (!args)
+  if (!args_w)
   {
     csPrintfErr ("time: expected filename\n");
     return;
   }
 
+  csString args (args_w);
   csFileTime flmt;
   if (!VFS->GetFileTime (args, flmt))
   {
@@ -516,14 +528,15 @@ static void cmd_time (char *args)
   csPrintf ("Last file modification time: %s", asctime (&time));
 }
 
-static void cmd_rpath (char *args)
+static void cmd_rpath (wchar_t *args_w)
 {
-  if (!args)
+  if (!args_w)
   {
     csPrintfErr ("rpath: expected filename\n");
     return;
   }
 
+  csString args (args_w);
   csRef<iDataBuffer> db (VFS->GetRealPath (args));
   if (!db)
   {
@@ -531,10 +544,10 @@ static void cmd_rpath (char *args)
     return;
   }
 
-  puts ((char *)db->GetData ());
+  csPrintf ("%s\n", (char *)db->GetData ());
 }
 
-static void cmd_mounts (char* /*args*/)
+static void cmd_mounts (wchar_t* /*args*/)
 {
   csRef<iStringArray> mounts = VFS->GetMounts ();
   if (mounts->GetSize ())
@@ -557,14 +570,15 @@ static void cmd_mounts (char* /*args*/)
     csPrintf ("mounts: no current mounts to display!\n");
 }
 
-static void cmd_rmounts (char *args)
+static void cmd_rmounts (wchar_t *args_w)
 {
-  if (!args)
+  if (!args_w)
   {
     csPrintfErr ("rmounts: expected virtual mount path\n");
     return;
   }
 
+  csString args (args_w);
   csRef<iStringArray> rpaths = VFS->GetRealMountPaths (args);
   if (rpaths->GetSize ())
   {
@@ -577,12 +591,12 @@ static void cmd_rmounts (char *args)
     csPrintf ("rmounts: no virtual mount at path %s\n", CS::Quote::Single (args));
 }
 
-static bool execute (char *command)
+static bool execute (wchar_t *command)
 {
   size_t cp = 0;
-  char *args;
+  wchar_t *args;
 
-  while (command [cp] && !isspace (command [cp]))
+  while (command [cp] && !iswspace (command [cp]))
     cp++;
   args = command + cp;
   skipspc (args);
@@ -590,7 +604,7 @@ static bool execute (char *command)
 
   int i;
   for (i = 0; cmdlist [i].command; i++)
-    if (strcmp (cmdlist [i].command, command) == 0)
+    if (wcscmp (cmdlist [i].command, command) == 0)
     {
       cmdlist [i].handler (args);
       return true;
@@ -637,21 +651,21 @@ int main (int argc, char *argv [])
 
   while (!ShutDown)
   {
-    char command [999];
+    wchar_t command [999];
     csPrintf (CS_ANSI_TEXT_BOLD_ON CS_ANSI_FM "%s " CS_ANSI_TEXT_BOLD_OFF 
       CS_ANSI_FG "#" CS_ANSI_RST " ", VFS->GetCwd ());
     fflush (stdout);
-    if (!fgets (command, sizeof(command), stdin))
+    if (!fgetws (command, sizeof(command)/sizeof(command[0]), stdin))
     {
       csPrintf ("\r\n");
       ShutDown = true;
     }
     else
     {
-      char* s = command;
+      wchar_t* s = command;
       trimwhite(s);
       if (s != 0 && !execute (s))
-        csPrintfErr ("vsh: unknown command: [%s]\n", s);
+        csPrintfErr ("vsh: unknown command: [%ls]\n", s);
     }
   }
 

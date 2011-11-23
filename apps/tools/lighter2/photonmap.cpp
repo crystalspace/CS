@@ -674,7 +674,7 @@ namespace lighter
   void PhotonMap :: SaveToFile(const char* filename)
   {
     // Open file for writing in binary mode
-    FILE* fout = fopen(filename, "wb");
+    FILE* fout = CS::Platform::File::Open (filename, "wb");
     if(fout != NULL)
     {
       // Write the number of photons

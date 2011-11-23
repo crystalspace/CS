@@ -439,6 +439,10 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
   //SetConsoleOutputCP (CP_UTF8);
   //
 
+  // Set console input CP to the ANSI codepage (it's OEM by default).
+  // @@@ Again, pure unicode input would be best.
+  SetConsoleCP (GetACP());
+
   registry = r;
 
   HICON appIcon;

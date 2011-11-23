@@ -132,10 +132,21 @@ protected:
   int refreshRate;
   /// Activate Vsync
   bool vsync;
+  /// Reduce window size to fit into workspace, if necessary
+  bool fitToWorkingArea;
 
   csString name;
   csRef<iEventHandler> weakEventHandler;
 
+  /**
+   * Helper function for FitSizeToWorkingArea(): obtain workspace dimensions.
+   */
+  virtual bool GetWorkspaceDimensions (int& width, int& height);
+  /**
+   * Helper function for FitSizeToWorkingArea(): compute window dimensions
+   * with the window frame included.
+   */
+  virtual bool AddWindowFrameDimensions (int& width, int& height);
 public:
   /// Create csGraphics2D object
   csGraphics2D (iBase*);
@@ -339,6 +350,9 @@ protected:
   virtual bool SetWindowDecoration (WindowDecoration decoration, bool flag)
   { return false; }
   virtual bool GetWindowDecoration (WindowDecoration decoration);
+
+  virtual bool FitSizeToWorkingArea (int& desiredWidth,
+                                     int& desiredHeight);
   /** @} */
 
   /**\name iPluginConfig implementation

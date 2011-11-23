@@ -22,6 +22,7 @@
 
 #include "profiler.h"
 #include "csutil/csstring.h"
+#include "csutil/platformfile.h"
 #include "csutil/scf.h"
 #include "iutil/vfs.h"
 #include "csutil/objreg.h"
@@ -189,7 +190,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Profiler)
     }
     {
       // Use native logging
-      nativeLogfile = fopen (logfileNameHelper.FindNextFilename (), "w");
+      nativeLogfile = CS::Platform::File::Open (logfileNameHelper.FindNextFilename (), "w");
       if (nativeLogfile)
         isLogging = true;
     }

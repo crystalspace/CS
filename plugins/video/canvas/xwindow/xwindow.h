@@ -147,6 +147,7 @@ public:
   { SetVideoMode (yesno, false, false); }
 
   virtual void AllowResize (bool iAllow);
+  virtual void Resize (int w, int h);
 
   virtual void SetTitle (const char* title);
   
@@ -196,6 +197,9 @@ public:
   
   bool SetWindowDecoration (iNativeWindow::WindowDecoration decoration, bool flag);
   bool GetWindowDecoration (iNativeWindow::WindowDecoration decoration, bool& result);
+
+  bool GetWorkspaceDimensions (int& width, int& height);
+  bool AddWindowFrameDimensions (int& width, int& height);
 
   struct EventHandler : 
     public scfImplementation1<EventHandler, iEventHandler>

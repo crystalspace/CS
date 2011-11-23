@@ -131,6 +131,9 @@ protected:
   csGLStateCache* statecache;
   csGLStateCacheContext *statecontext;
 
+  /// Canvas is completely opened
+  bool openComplete;
+
   bool hasRenderTarget;
 
   /// Decompose a color ID into r,g,b components

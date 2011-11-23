@@ -37,6 +37,7 @@ const size_t CS_SNDSYS_STREAM_UNKNOWN_LENGTH = (size_t)-1;
 
 #define CS_SNDSYS_STREAM_PAUSED     0
 #define CS_SNDSYS_STREAM_UNPAUSED   1
+#define CS_SNDSYS_STREAM_COMPLETED  2
 
 #define CS_SNDSYS_STREAM_DONTLOOP   0
 #define CS_SNDSYS_STREAM_LOOP       1
@@ -60,7 +61,7 @@ enum
 //
 struct iSndSysStream : public virtual iBase
 {
-  SCF_INTERFACE(iSndSysStream,1,1,1);
+  SCF_INTERFACE(iSndSysStream,1,2,0);
 
   /// Retrieve a description of this stream.  
   //  This is not guaranteed to be useful for any particular purpose, different,
@@ -135,6 +136,10 @@ struct iSndSysStream : public virtual iBase
    * - CS_SNDSYS_STREAM_PAUSED - The stream is paused.
    * - CS_SNDSYS_STREAM_UNPAUSED - The stream is not paused.  AdvancePosition
    *   is moving the stream position.
+   * - CS_SNDSYS_STREAM_COMPLETED - The stream's data has been processed but
+   *   not rendered yet. In order to keep the state consistent, the Sound
+   *   System's main processing thread should call Pause() once the data has
+   *   been entirely rendered.
    */
   virtual int GetPauseState() = 0;
 

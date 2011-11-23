@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2007 by Frank Richter
+    Copyright (C) 2011 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,30 +16,35 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/* Implementations for functions declared for the "inline function" trick
- * to have deprecated macros emit a message.
+#ifndef __CSUTIL_PLATFORM_FILE_H__
+#define __CSUTIL_PLATFORM_FILE_H__
+
+/**\file
+ * Functions to abstract platform-specific file access.
  */
 
 #include "cssysdef.h"
-
-#include "csutil/syspath.h"
-
-#undef CS_MKDIR
+#include "csextern.h"
 
 namespace CS
 {
-  namespace deprecated
+  namespace Platform
   {
-    int CS_MKDIR (const char* path)
+    /**
+     * Functions to abstract platform-specific file access.
+     */
+    struct CS_CRYSTALSPACE_EXPORT File
     {
-      int err (Platform::CreateDirectory (path));
-      if (err != 0)
-      {
-        errno = err;
-        return -1;
-      }
-      else
-        return 0;
-    }
-  } // namespace deprecated
+      /**
+       * Open a file from a native path, encoded in UTF-8.
+       * The function takes care of translating the file name to the
+       * platform-specific file name encoding.
+       * \param filename Native file name, encoded in UTF-8.
+       * \param mode \c fopen()-style file mode string.
+       */
+      static FILE* Open (const char* filename, const char* mode);
+    };
+  } // namespace Platform
 } // namespace CS
+
+#endif // __CSUTIL_PLATFORM_FILE_H__

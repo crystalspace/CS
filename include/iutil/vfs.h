@@ -29,6 +29,13 @@
 #include "iutil/databuff.h"
 #include <time.h>
 
+namespace CS
+{
+  namespace Memory
+  {
+    struct iAllocator;
+  } // namespace Memory
+} // namespace CS
 struct iConfigFile;
 
 class csStringArray;
@@ -151,7 +158,7 @@ namespace CS
  */
 struct iFile : public virtual iBase
 {
-  SCF_INTERFACE(iFile, 2, 0, 0);
+  SCF_INTERFACE(iFile, 2, 2, 0);
 
   /// Query file name (in VFS)
   virtual const char *GetName () = 0;
@@ -212,6 +219,26 @@ struct iFile : public virtual iBase
    *  modify the contained data!
    */
   virtual csPtr<iDataBuffer> GetAllData (bool nullterm = false) = 0;
+
+  /**
+   * Request whole content of the file as a single data buffer.
+   * Uses the allocator \a allocator if memory allocations are necessary.
+   * \return The complete data contained in the file; or an invalidated pointer
+   *  if this object does not support this function (e.g. write-only VFS
+   *  files).  Check for an invalidated result via csRef<>::IsValid().  Do not
+   *  modify the contained data!
+   */
+  virtual csPtr<iDataBuffer> GetAllData (CS::Memory::iAllocator* allocator) = 0;
+
+  /**
+   * Request whole or part of the content of the file as a file object.
+   * \param offset Offset of data to return.
+   * \param size Size of data to return. If \c ~0 all the data starting at
+   *  \a offset up to the end of the file is returned.
+   * \return A file object operating on a part of the original file.
+   * \remarks Note that the returned file will not support writing.
+   */
+  virtual csPtr<iFile> GetPartialView (size_t offset, size_t size = (size_t)~0) = 0;
 };
 
 

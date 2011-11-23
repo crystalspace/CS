@@ -29,6 +29,7 @@
 #include <errno.h>
 #include <string.h>
 
+#include "csutil/platformfile.h"
 #include "csutil/scanstr.h"
 
 File::File(const char *str)
@@ -60,7 +61,7 @@ void File::Close()
 InputFile::InputFile(const char *pStr)
   : File(pStr)
 {
-    f = fopen(pStr,"rb");
+    f = CS::Platform::File::Open (pStr,"rb");
     stBuff.SetCapacity(1000);
 }
 

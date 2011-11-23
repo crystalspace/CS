@@ -37,7 +37,10 @@ const char* csCheckPlatformVFSVar(const char* VarName)
 
     if (!*szWindowsDirectory) 
     {
-      GetWindowsDirectoryA(szWindowsDirectory, MAX_PATH);
+      wchar_t szWindowsDirectoryW[MAX_PATH];
+      GetWindowsDirectoryW(szWindowsDirectoryW, MAX_PATH);
+      csUnicodeTransform::WCtoUTF8 ((utf8_char*)szWindowsDirectory, MAX_PATH,
+                                    szWindowsDirectoryW, (size_t)-1);
     }
     return szWindowsDirectory;
   }
@@ -74,6 +77,15 @@ void csExpandPlatformFilename(const char *inputFilename, char *outputFilename)
 {
 #ifdef __CYGWIN__
   // Convert any cygwin paths to win32 paths
+  wchar_t winpath[MAX_PATH];
+  csString winpath_utf8;
+  if (cygwin_conv_path (CCP_POSIX_TO_WIN_W, inputfilename,
+                        winpath, sizeof (winpath)) == 0)
+  {
+    winpath_utf8 = winpath;
+    strcpy (outputFilename, winpath_utf8.GetData());
+    return;
+  }
   if (cygwin_conv_to_win32_path(inputFilename, outputFilename) == 0)
     return;
 #endif

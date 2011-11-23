@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "csgeom/math.h"
 #include "csutil/mmapio.h"
+#include "csutil/platformfile.h"
 #include "csutil/ref.h"
 #include "csutil/sysfunc.h"
 
@@ -46,7 +47,7 @@ csMemoryMappedIO::csMemoryMappedIO(char const *filename, iVFS* vfs)
     valid_platform = OpenNative (realpath);
     if (!valid_platform)
     {
-      hMappedFile = fopen (realpath, "rb");
+      hMappedFile = CS::Platform::File::Open (realpath, "rb");
     }
     valid_mmio_object = valid_platform || hMappedFile;
   }

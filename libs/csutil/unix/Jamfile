@@ -35,10 +35,12 @@ CSUTIL.GENERIC +=
   getopt.cpp
   loadlib.cpp
   memutil_impl_virtsize.cpp
+  mkdir.cpp
   mmap.cpp
   pathutil.cpp
   platformconfig.cpp 
   platformconfigpath.cpp
+  platformfile.cpp
   printf.cpp
   resdir.cpp
   runloop.cpp 

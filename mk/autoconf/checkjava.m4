@@ -54,8 +54,8 @@ AC_DEFUN([CS_CHECK_JAVA],
     AC_SUBST([JAVAC])
 
     AC_ARG_WITH([java], [AC_HELP_STRING([--with-java],
-	[use Java (default YES)])])
-    AS_IF([test -z "$with_java"], [with_java=yes])
+	[use Java (default NO)])])
+    AS_IF([test -z "$with_java"], [with_java=no])
 
     AS_IF([test "$with_java" != no && test -n "$JAVAC" && test -n "$JAVA"],
 	[_CS_JAVA_SDK_FLAGS([cs_java], [$JAVA], [$JAVAC])
