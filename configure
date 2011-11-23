@@ -1516,7 +1516,7 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-perl             use Perl5 scripting interface (default NO)
   --without-python        do not use Python scripting interface
-  --with-java             use Java (default YES)
+  --with-java             use Java (default NO)
   --with-x11=dir          specify additional location to search libx11 if not
                           detected automatically; directories searched include
                           dir/include, dir/lib, and dir
@@ -1581,7 +1581,7 @@ Optional Packages:
                           dir/include, dir/lib, and dir
   --with-bullet=dir       specify additional location to search Bullet if not
                           detected automatically; directories searched include
-                          dir/include, dir/lib, and dir
+                          dir/include/bullet, dir/lib, and dir
   --with-freetype2=dir    specify additional location to search libfreetype2
                           if not detected automatically; directories searched
                           include dir/include, dir/lib, and dir
@@ -14447,7 +14447,7 @@ if test "${with_java+set}" = set; then :
 fi
 
     if test -z "$with_java"; then :
-  with_java=yes
+  with_java=no
 fi
 
     if test "$with_java" != no && test -n "$JAVAC" && test -n "$JAVA"; then :
@@ -50061,8 +50061,8 @@ fi
     cs_check_lib_flags="$cs_check_lib_flags
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
-	    *)  if test -n "$cs_lib_item/include"; then :
-  cs_check_lib_cflag="-I$cs_lib_item/include"
+	    *)  if test -n "$cs_lib_item/include/bullet"; then :
+  cs_check_lib_cflag="-I$cs_lib_item/include/bullet"
 else
   cs_check_lib_cflag=''
 fi
@@ -50145,8 +50145,8 @@ fi
     cs_check_lib_flags="$cs_check_lib_flags
 	`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
 		;;
-	    *)  if test -n "$cs_lib_item/include"; then :
-  cs_check_lib_cflag="-I$cs_lib_item/include"
+	    *)  if test -n "$cs_lib_item/include/bullet"; then :
+  cs_check_lib_cflag="-I$cs_lib_item/include/bullet"
 else
   cs_check_lib_cflag=''
 fi
