@@ -29,7 +29,6 @@
 #include "csutil/cfgfile.h"
 #include "csutil/cfgmgr.h"
 #include "csutil/syspath.h"
-#include "csutil/weakref.h"
 #include "iutil/vfs.h"
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
@@ -536,7 +535,7 @@ void Simple::OnShow (wxShowEvent& event)
 class Pump : public wxTimer
 {
 public:
-  csWeakRef<Simple> s;
+  Simple* s;
   Pump() { };
   virtual void Notify()
     {

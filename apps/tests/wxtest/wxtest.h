@@ -39,8 +39,7 @@ struct iView;
 struct iWxWindow;
 class FramePrinter;
 
-class Simple : public wxFrame,
-               public CS::Utility::WeakReferenced
+class Simple : public wxFrame
 {
 private:
   iObjectRegistry* object_reg;
