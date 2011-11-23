@@ -32,6 +32,7 @@
 #include "csgeom/fixed.h"
 #include "csgeom/frustum.h"
 #include "csgeom/kdtree.h"
+#include "csgeom/kdtreex.h"
 #include "csgeom/math.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
