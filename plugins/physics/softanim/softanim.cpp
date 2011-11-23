@@ -57,7 +57,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
     this->object_reg = object_reg;
     return true;
   }
-
+/*
   void SoftBodyControlType::Report (int severity, const char* msg, ...) const
   {
     va_list arg;
@@ -74,7 +74,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(SoftAnim)
     }
     va_end (arg);
   }
-
+*/
   //-------------------------- SoftBodyControlFactory --------------------------
 
   CS_LEAKGUARD_IMPLEMENT(SoftBodyControlFactory);

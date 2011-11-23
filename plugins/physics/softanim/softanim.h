@@ -47,7 +47,7 @@ class SoftBodyControlType : public scfImplementation2<SoftBodyControlType,
     virtual bool Initialize (iObjectRegistry*);
 
     // error reporting
-    void Report (int severity, const char* msg, ...) const;
+    //void Report (int severity, const char* msg, ...) const;
 
   private:
     iObjectRegistry* object_reg;
@@ -71,7 +71,7 @@ class SoftBodyControlFactory : public scfImplementation2<SoftBodyControlFactory,
     virtual const char* Save (iDocumentNode* parent);
 
  private:
-    SoftBodyControlType* type;
+    csRef<SoftBodyControlType> type;
 
     friend class SoftBodyControl;
 };
