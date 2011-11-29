@@ -43,6 +43,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
   {
     objectReg = objectReg_;
     syntaxService = csQueryRegistry<iSyntaxService> (objectReg);
+    strings = csQueryRegistryTagInterface<iStringSet> (objectReg, "crystalspace.shared.stringset");
     vfs = csQueryRegistry<iVFS> (objectReg);
 
     imageLoader = csQueryRegistry<iImageIO> (objectReg);
@@ -63,6 +64,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 
     if (typeID == Resource::GetTypeID ("image"))
       return csPtr<iResource> (LoadImage (node));
+    if (typeID == Resource::GetTypeID ("library"))
+      return csPtr<iResource> (LoadLibrary (node));
 
     return 0;
   }

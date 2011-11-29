@@ -42,6 +42,9 @@ struct ResourceReference
 
   // The property that refers to this resource.
   csStringID property;
+
+  // Optional iDocumentNode for this resource.
+  iDocumentNode* node;
 };
 
 struct iResource : public virtual iBase
@@ -49,6 +52,8 @@ struct iResource : public virtual iBase
   SCF_INTERFACE(iResource, 1, 0, 0);
 
   virtual const CS::Resource::TypeID GetTypeID () const = 0;
+
+  virtual bool DependenciesSatisfied () const = 0;
 
   virtual const csArray<ResourceReference>& GetDependencies () const = 0;
 
@@ -100,13 +105,13 @@ struct iResourceListener : public virtual iBase
 };
 
 /**
- * The iLoading interface.
+ * The iLoadingResource interface.
  */
 struct iLoadingResource : public virtual iBase
 {
   SCF_INTERFACE (iLoadingResource, 1,0,0);
   virtual const char* GetName() = 0;
-  virtual bool Ready () const = 0;
+  virtual bool Ready () = 0;
   virtual csRef<iResource> Get() = 0;
   /**
    * The OnLoaded will always be trigger in the mainloop
@@ -115,12 +120,8 @@ struct iLoadingResource : public virtual iBase
    */
   virtual void AddListener(iResourceListener* listener) = 0;
   virtual void RemoveListener(iResourceListener* listener) = 0;
-
-protected:
-  friend void iResourceTrigger(iLoadingResource*);
   virtual void TriggerCallback() = 0;
 };
-
 
 /**
  * The iResourceCache interface.

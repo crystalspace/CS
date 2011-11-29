@@ -19,19 +19,25 @@
 #ifndef __CS_LOADER_RESOURCE_MANAGER_H__
 #define __CS_LOADER_RESOURCE_MANAGER_H__
 
+#include "csutil/resourcemapper.h"
+
+
+
 #include "csutil/resource.h"
 
-#include <csutil/scf_implementation.h>
-#include <iutil/comp.h>
 #include <csutil/hash.h>
+#include <csutil/scf_implementation.h>
+#include <csutil/threadmanager.h>
+
 #include <iengine/engine.h>
 #include <iengine/mesh.h>
 
+#include <imap/resource.h>
+
+#include <iutil/comp.h>
 #include <iutil/event.h>
 #include <iutil/eventh.h>
 #include <iutil/eventq.h>
-
-#include <imap/resource.h>
 
 struct iVFS;
 struct iLoader;
@@ -41,14 +47,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(csloader)
 {
 
 class ResourceManager
-  : public scfImplementation3<ResourceManager, iResourceManager, iEventHandler, iComponent>
+  : public scfImplementation1<ResourceManager, iResourceManager>,
+    public ThreadedCallable<ResourceManager>
 {
 public:
   ResourceManager (iBase* parent);
   virtual ~ResourceManager ();
 
-  // iComponent
-  virtual bool Initialize (iObjectRegistry* obj_reg);
+  bool Initialize (iObjectRegistry* obj_reg);
+
+  // ThreadedCallable
+  virtual iObjectRegistry* GetObjectRegistry() const
+  {
+    return object_reg;
+  }
 
   // iResourceManager
   virtual csRef<iLoadingResource> Get (CS::Resource::TypeID type, const char* name);
@@ -56,59 +68,134 @@ public:
   virtual void Add (iResource* resource) {}
 
   virtual void Remove (iResource* resource) {}
-  
-  void ToBeProccessed (csRef<iLoadingResource> res);
 
-private:
-  mutable CS::Threading::Mutex mutex_;
-  bool HandleEvent(iEvent& ev);
-  csRefArray<iLoadingResource> toBeProccessed;
+protected:
+  void ProcessResources ();
 
-private:
-  std::string CleanFileName(const std::string& name);
-  void SplitName(const std::string& name, std::string& id, std::string& format);
-  
+  iLoadingResource* Load (CS::Resource::TypeID type, const char* name, csRef<iDocumentNode> node);
+
+  THREADED_CALLABLE_DECL3(ResourceManager, LoadT, csThreadReturn, CS::Resource::TypeID,
+    type, csRef<iDocumentNode>, node, iLoadingResource*, lresource, THREADED, false, false);
+
+  // Loads a document file.
+  csPtr<iDocument> LoadDocument (const char* fileName) const;
+
+  // Initializes the set of loadable resources.
+  bool InitLoadableResources ();
+
+  // Reports an error.
+  void ReportError (const char* description, ...) const;
+
 private:
   iObjectRegistry* object_reg;
-
   csRef<iVFS> vfs;
-  csRef<iJobQueue> jobQueue;
-  csRef<iResourceCache> cache;
-
-  /// The queue of events waiting to be handled.
+  csRef<iDocumentSystem> docsys;
   csRef<iEventQueue> eventQueue;
 
-  /// The event name registry, used to convert event names to IDs and back.
-  csRef<iEventNameRegistry> nameRegistry;
+  CS::Threading::Mutex mutex;
+  csRefArray<iLoadingResource> resourceQueue;
 
-  CS_EVENTHANDLER_NAMES ("crystalspace.loader")
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
+  // A cache if all loading resources.
+  csRef<iResourceCache> resourceCache;
 
-public: 
-  template<typename Callable>
-  CS::Threading::Future<typename std::tr1::result_of<Callable()>::type> Queue(Callable function)
+  // Maps node types to iResourceLoaders.
+  CS::Resource::Mapper<iResourceLoader> loaderMapper;
+
+  class RMEventHandler : public scfImplementation1<RMEventHandler, 
+    iEventHandler>
   {
-    typedef CS::Threading::FunctorWrapperJob<typename std::tr1::result_of<Callable()>::type, Callable> Type;
-    csRef<Type> job; job.AttachNew(new Type(function));
-    jobQueue->Enqueue(job);
-    return job->GetFuture();
-  }
-  
-  template<typename Callable>
-  struct FutureListener : public scfImplementation1<FutureListener<Callable> ,CS::Threading::iFutureListener>
-  {
-    FutureListener(Callable function) : scfImplementation1<FutureListener<Callable> ,CS::Threading::iFutureListener>(this), function(function) {}
-    virtual void OnReady () { function(); }
-    Callable function;
+  public:
+    RMEventHandler(ResourceManager* parent, csEventID ProcessPerFrame)
+      : scfImplementationType (this), parent (parent),
+      ProcessPerFrame (ProcessPerFrame)
+    {
+    }
+
+    virtual ~RMEventHandler()
+    {
+    }
+
+    bool HandleEvent(iEvent& Event)
+    {
+      if(Event.Name == ProcessPerFrame)
+      {
+        parent->ProcessResources ();
+      }
+
+      return false;
+    }
+
+    CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.loaderresourcemanager")
+
+  private:
+    ResourceManager* parent;
+    csEventID ProcessPerFrame;
   };
 
-  template<typename T, typename Callable>
-  void Callback(CS::Threading::Future<T>& future, Callable function)
+  csRef<iEventHandler> eventHandler;
+
+  class TMLoadingResource : public scfImplementation1<TMLoadingResource, iLoadingResource>
   {
-    csRef<CS::Threading::iFutureListener> callback;
-    callback.AttachNew(new FutureListener<Callable>(function));
-    future.AddListener(callback);
-  }
+  public:
+    TMLoadingResource (const char* name)
+      : scfImplementationType(this), ready (false), name (name)
+    {
+    }
+
+    virtual csRef<iResource> Get ()
+    {
+      future->Wait ();
+      return scfQueryInterface<iResource> (future->GetResultRefPtr ());
+    }
+
+    virtual const char* GetName ()
+    {
+      return name;
+    }
+
+    virtual bool Ready () 
+    {
+      if (future->IsFinished ())
+      {
+        csRef<iResource> resource = Get ();
+        return resource->DependenciesSatisfied ();
+      }
+
+      return false;
+    }
+
+    virtual void AddListener (iResourceListener* listener)
+    {
+      if (Ready ())
+        listener->OnLoaded (this);
+      else
+        listeners.Push (listener);
+    }
+
+    virtual void RemoveListener (iResourceListener* listener) 
+    {
+      listeners.Delete (listener);
+    }
+
+    virtual void TriggerCallback() 
+    {
+      for (size_t i = 0; i < listeners.GetSize(); i++)
+        listeners.Get(i)->OnLoaded(this);
+
+      listeners.DeleteAll();
+    }
+
+    void SetFuture (iThreadReturn* fut)
+    {
+      future = fut;
+    }
+
+  private:
+    bool ready;
+    csString name;
+    iThreadReturn* future;
+    csRefArray<iResourceListener> listeners;
+  };
 };
 }
 CS_PLUGIN_NAMESPACE_END(csloader)

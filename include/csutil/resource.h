@@ -21,7 +21,7 @@
 
 #include "imap/resource.h"
 
-#include "csutil/hashcomputer.h"
+#include "csutil/hash.h"
 #include "csutil/threading/future.h"
 #include "csutil/scf_implementation.h"
 
@@ -68,12 +68,17 @@ namespace CS
     }
 
     /**
-     * Class which can be inherited by resources with
-     * no resource dependencies.
+     * Helper class which can be inherited by resources with
+     * no resource dependencies or properties.
      */
     class NoDepResource : public virtual iResource
     {
     public:
+      virtual bool DependenciesSatisfied () const
+      {
+        return true;
+      }
+
       virtual const csArray<ResourceReference>& GetDependencies () const
       {
         return emptyDeps;
@@ -84,6 +89,56 @@ namespace CS
     private:
       csArray<ResourceReference> emptyDeps;
     };
+
+    /**
+     * Helper class which can be inherited by resources with 
+     * resource dependencies.
+     */
+    class DepResource : public virtual iResource
+    {
+    public:
+      virtual bool DependenciesSatisfied () const
+      {
+        csArray<bool> deps = satisfiedDeps.GetAll ();
+        for (size_t i = 0; i < deps.GetSize (); ++i)
+        {
+          if (!deps[i]) return false;
+        }
+
+        return true;
+      }
+
+      virtual const csArray<ResourceReference>& GetDependencies () const
+      {
+        return deps;
+      }
+
+    protected:
+      void AddDependency (csString id, TypeID typeID,
+        csStringID property, iDocumentNode* node = 0)
+      {
+        ResourceReference rref;
+        rref.id = id;
+        rref.node = node;
+        rref.property = property;
+        rref.typeID = typeID;
+        deps.Push (rref);
+
+        satisfiedDeps.Put (property, false);
+      }
+
+      void DependencySatisfied (csStringID property)
+      {
+        bool fallback;
+        bool& satisfied = satisfiedDeps.Get (property, fallback);
+        satisfied = true;
+      }
+
+    private:
+      csArray<ResourceReference> deps;
+      csHash<bool, csStringID> satisfiedDeps;
+    };
+
     
     /**
      * Default implementation of the iLoading interface, for use with ResourceManagers.
@@ -116,7 +171,7 @@ namespace CS
         return 0;
       }
       
-      virtual bool Ready() const 
+      virtual bool Ready() 
       {
         return p.Ready();
       }

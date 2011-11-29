@@ -20,7 +20,6 @@
 #define __CS_CSUTIL_RESOURCE_MANAGER_H__
 
 #include "csutil/strhash.h"
-#include "imap/resource.h"
 #include "csutil/resource.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"

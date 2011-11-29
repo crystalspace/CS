@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- fileloader.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.loader.file</name>
+        <implementation>FileLoader</implementation>
+        <description>Crystal Space file resource loader</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

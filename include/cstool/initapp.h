@@ -36,6 +36,7 @@
 #include "iengine/engine.h"
 #include "igraphic/imageio.h"
 #include "imap/loader.h"
+#include "imap/resource.h"
 #include "imap/saver.h"
 #include "iutil/evdefs.h"
 #include "iutil/vfs.h"

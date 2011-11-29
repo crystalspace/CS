@@ -40,98 +40,181 @@
 
 #include "resourcemanager.h"
 
+using namespace CS::Resource;
+
 CS_PLUGIN_NAMESPACE_BEGIN(csloader)
 {
-
-SCF_IMPLEMENT_FACTORY (ResourceManager)
 
 ResourceManager::ResourceManager (iBase* parent)
 : scfImplementationType (this, parent)
 {
 }
 
-bool DAMNResourceManager::Initialize (iObjectRegistry* obj_reg)
+ResourceManager::~ResourceManager ()
+{
+  eventQueue->RemoveListener(eventHandler);
+}
+
+bool ResourceManager::Initialize (iObjectRegistry* obj_reg)
 {
   object_reg = obj_reg;
-  
-  csRef<iPluginManager> plugmgr = csQueryRegistry<iPluginManager> (object_reg);
 
-  loader = csLoadPlugin<iResourceLoader> (plugmgr, "crystalspace.engine.persist");
-  if (!loader) return false;
-  
   vfs = csQueryRegistry<iVFS> (object_reg);
-  if (!vfs) return false;
-  
-  static const char queueTag[] = "crystalspace.jobqueue.ResourceManager";
-  jobQueue = csQueryRegistryTagInterface<iJobQueue> (object_reg, queueTag);
-  if (!jobQueue.IsValid())
+  if (!vfs)
   {
-    jobQueue.AttachNew (new CS::Threading::ThreadedJobQueue (4, CS::Threading::THREAD_PRIO_LOW, queueTag));
-    object_reg->Register (jobQueue, queueTag);
+    ReportError ("No VFS loaded!\n");
+    return false;
   }
-  
-  eventQueue = csQueryRegistry<iEventQueue> (object_reg);
-  if (!eventQueue) return false;
 
-  nameRegistry = csEventNameRegistry::GetRegistry(object_reg);
-  if (!nameRegistry) return false;
+  docsys = csQueryRegistry<iDocumentSystem> (object_reg);
+  if (!docsys)
+  {
+    ReportError ("No document system loaded!\n");
+    return false;
+  }
 
-  eventQueue->RegisterListener(this);
+  eventQueue = csQueryRegistry<iEventQueue>(object_reg);
+  if (!eventQueue)
+  {
+    ReportError ("No event queue loaded!\n");
+    return false;
+  }
 
-  // Register for the Frame event, for Handle().
-  eventQueue->RegisterListener (this, nameRegistry->GetID("crystalspace.frame"));
-  
-  cache.AttachNew(new CS::Resource::MemoryCache());
+  csEventID ProcessPerFrame = csevFrame (object_reg);
+  eventHandler.AttachNew (new RMEventHandler (this, ProcessPerFrame));
+  eventQueue->RegisterListener (eventHandler, ProcessPerFrame);
+
+  resourceCache.AttachNew (new MemoryCache());
+
+  InitLoadableResources ();
  
   return true;
 }
 
-DAMNResourceManager::~DAMNResourceManager ()
+csRef<iLoadingResource> ResourceManager::Get (TypeID type, const char* name)
 {
+  return resourceCache->Get(type, name);
 }
 
-bool DAMNResourceManager::HandleEvent(iEvent& ev)
+void ResourceManager::ProcessResources ()
 {
-  CS::Threading::MutexScopedLock lock(mutex_);
-  for (size_t i = 0; i < toBeProccessed.GetSize(); i++)
+  CS::Threading::MutexScopedLock lock (mutex);
+
+  for (size_t i = 0; i < resourceQueue.GetSize(); i++)
   {
-    csRef<iLoadingResource> l = toBeProccessed.Pop();
-    csRef<iResource> res = l->Get();
-    //if (res->GetDependencies().GetSize() == 0);
-    iResourceTrigger(l);  //No dependencies, trigger the resource as ready.
+    resourceQueue.Pop ()->TriggerCallback ();
   }
+}
+
+iLoadingResource* ResourceManager::Load (TypeID type, const char* name, csRef<iDocumentNode> node)
+{
+  csRef<TMLoadingResource> resource;
+  resource.AttachNew (new TMLoadingResource (name));
+
+  resource->SetFuture (LoadT (type, node, resource));
+
+  CS::Threading::MutexScopedLock lock (mutex);
+  resourceCache->Add (type, name, resource);
+
+  return resource;
+}
+
+THREADED_CALLABLE_IMPL3(ResourceManager, LoadT, TypeID type,
+                        csRef<iDocumentNode> node, iLoadingResource* lresource)
+{
+  iResourceLoader* loader = loaderMapper.GetLoadable (type);
+
+  csRef<iResource> resource (loader->Load (node));
+  ret->SetResult (csRef<iBase> (resource));
+
+  // Satisfy dependencies.
+  bool satisfied = resource->DependenciesSatisfied ();
+  while (!satisfied)
+  {
+    satisfied = true;
+    const csArray<ResourceReference>& deps = resource->GetDependencies ();
+
+    for (size_t i = 0; i < deps.GetSize (); ++i)
+    {
+      iLoadingResource* dep = resourceCache->Get (deps[i].typeID, deps[i].id);
+      if (dep)
+      {
+        resource->SetProperty (deps[i].property, dep->Get ());
+      }
+      else if (deps[i].node)
+      {
+        satisfied = false;
+
+        Load (deps[i].typeID, deps[i].id, deps[i].node);
+      }
+      else
+      {
+        ReportError ("Resource '%s' has missing dependency '%s'!",
+          lresource->GetName (), deps[i].id.GetData ());
+      }
+    }
+  }
+
+  CS::Threading::MutexScopedLock lock (mutex);
+  resourceQueue.Push (lresource);
+
   return true;
-} 
-
-void DAMNResourceManager::ToBeProccessed (csRef<iLoadingResource> res)
-{
-  CS::Threading::MutexScopedLock lock(mutex_);
-  toBeProccessed.Push(res);
 }
 
-csRef<iLoadingResource> DAMNResourceManager::Get (CS::Resource::TypeID type, const char* name)
+csPtr<iDocument> ResourceManager::LoadDocument (const char* fileName) const
 {
-  csRef<iLoadingResource> res = cache->Get(type, name);
-  if (!res.IsValid())
+  // Load the file as a document.
+  csRef<iDataBuffer> dataBuffer = vfs->ReadFile (fileName, false);
+  if (!dataBuffer.IsValid())
   {
-    using namespace CS::Threading;
-    using namespace std::tr1;
-    
-    std::string id;
-    std::string format;
-    SplitName(name, id, format);
-    format = GetFormat(format.c_str());
-    Future<csRef<iResource> > job = Queue(bind(&DAMNResourceManager::_Get, this, type, id, format));
-    
-    res.AttachNew(new CS::Resource::LoadingResource(job));
-    
-    cache->Add(type, name, res);
-    
-    csRef<iLoadingResource> t = res;
-    Callback(job, bind(&DAMNResourceManager::ToBeProccessed, this, t));
+    ReportError ("Could not open file %s!\n", CS::Quote::Single (fileName));
+    return 0;
   }
 
-  return res;
+  csRef<iDocument> doc = docsys->CreateDocument ();
+  const char* error = doc->Parse (dataBuffer);
+  if (error != 0)
+  {
+    ReportError ("Error parsing file %s: %s!\n", CS::Quote::Single (fileName), error);
+    return 0;
+  }
+
+  if (!doc->GetRoot ())
+  {
+    ReportError ("Invalid document file %s!\n", CS::Quote::Single (fileName));
+    return 0;
+  }
+
+  return csPtr<iDocument> (doc);
+}
+
+bool ResourceManager::InitLoadableResources ()
+{
+  // Init the map of resource loaders.
+  loaderMapper.Initialize (object_reg);
+
+  // Load the standard set of name -> loadable mappings
+  const char* standardResourceHandlers = "/config/standard-resourcehandlers.xml";
+  csRef<iDocument> doc = LoadDocument (standardResourceHandlers);
+  if (!doc.IsValid ()) return false;
+
+  csRef<iDocumentNode> resourceHandlersNode = doc->GetRoot ()->GetNode ("resourcehandlers");
+  if (!resourceHandlersNode.IsValid ())
+  {
+    ReportError ("Invalid standard resources file!\n");
+    return false;
+  }
+
+  return loaderMapper.Register (resourceHandlersNode);
+}
+
+void ResourceManager::ReportError (const char* description, ...) const
+{
+  va_list arg;
+  va_start (arg, description);
+  csReportV (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    "crystalspace.loader.resourcemanager", description, arg);
+  va_end (arg);
 }
 
 }

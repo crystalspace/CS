@@ -57,9 +57,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
     bool SaveImage (iResource* resource, iDocumentNode* node);
     csPtr<iDataBuffer> SaveImage (iResource* resource);
 
+    csPtr<iResource> LoadLibrary (iDocumentNode* node);
+
   private:
     iObjectRegistry* objectReg;
     csRef<iSyntaxService> syntaxService;
+    csRef<iStringSet> strings;
 
     // VFS
     csRef<iVFS> vfs;
