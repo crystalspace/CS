@@ -145,8 +145,9 @@ bool MaterialTab::UpdateMaterialSVs (const CEGUI::EventArgs& e)
         {
           iTextureWrapper* tex;
           sv->GetValue(tex);
+	  csString name = tex ? tex->QueryObject()->GetName() : "not found";
 
-          AddSVItem(i, svstrings->Request(sv->GetName()), tex->QueryObject()->GetName());
+          AddSVItem(i, svstrings->Request(sv->GetName()), name);
           break;
         }
       case csShaderVariable::INT:

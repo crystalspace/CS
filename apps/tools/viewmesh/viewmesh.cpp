@@ -184,25 +184,37 @@ void ViewMesh::HandleCommandLine ()
   {
     if (!loader->LoadLibraryFile (libname))
     {
-      ReportError("Couldn't load lib %s.\n", libname);
+      ReportError("Couldn't load lib %s.\n", CS::Quote::Single (libname));
     }
   }
 
   csString meshfilename = cmdline->GetName (0);
   const char* texturefilename = cmdline->GetName (1);
   const char* texturename = cmdline->GetName (2);
-  const char* scaleTxt = cmdline->GetOption("Scale");
-  const char* realPath = cmdline->GetOption("R");
+  const char* scaleTxt = cmdline->GetOption ("Scale");
+  const char* realPath = cmdline->GetOption ("R");
 
-  csString vfsDir = cmdline->GetOption("C");
+  csString vfsDir = cmdline->GetOption ("C");
 
   if (realPath)
   {
-    vfs->Mount ("/tmp/viewmesh", realPath);
-    vfs->ChDir ("/tmp/viewmesh");
+    const char* tempPath = "/tmp/viewmesh";
+
+    if (!vfs->Exists (realPath))
+      ReportError ("Could not find the real path to be mounted %s\n",
+		   CS::Quote::Single (realPath));
+
+    else
+    {
+      vfs->Mount (tempPath, realPath);
+      vfs->ChDir (tempPath);
+
+      if (vfsDir.IsEmpty ())
+	vfsDir = tempPath;
+    }
   }
 
-  if (vfsDir.IsEmpty() && meshfilename)
+  if (vfsDir.IsEmpty () && meshfilename)
   {
     size_t index = meshfilename.FindLast ('/');
     if (index != (size_t) -1)
@@ -212,37 +224,38 @@ void ViewMesh::HandleCommandLine ()
     }
   }
 
-  if (!vfsDir.IsEmpty())
+  if (!vfsDir.IsEmpty ())
   {
     if (!vfs->ChDir (vfsDir))
     {
-      ReportError("Cannot change to path: %s\n", vfsDir.GetData ());
+      ReportError ("Cannot change to path %s\n",
+		   CS::Quote::Single (vfsDir.GetData ()));
     }
     else
     {
       // Update StdDlg path.
       CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
-      CEGUI::Window* window = winMgr->getWindow("StdDlg/Path");
-      window->setProperty("Text", vfs->GetCwd());
-      StdDlgUpdateLists(vfs->GetCwd());
+      CEGUI::Window* window = winMgr->getWindow ("StdDlg/Path");
+      window->setProperty ("Text", vfs->GetCwd ());
+      StdDlgUpdateLists (vfs->GetCwd ());
     }
   }
 
   if (texturefilename && texturename)
   {
-    LoadTexture(texturefilename, texturename);
+    LoadTexture (texturefilename, texturename);
   }
 
   if (meshfilename)
   {
-    LoadSprite(meshfilename);
+    LoadSprite (meshfilename);
   }
 
   if (scaleTxt != 0)
   {
     float newScale;
     csScanStr (scaleTxt, "%f", &newScale);
-    ScaleSprite(newScale);
+    ScaleSprite (newScale);
   }
 }
 
@@ -935,7 +948,7 @@ bool ViewMesh::StdDlgDirSelect (const CEGUI::EventArgs& e)
   CEGUI::String text = item->getText();
   if (text.empty()) return CS_EVENT_HANDLED;
 
-  csPrintf("cd %s\n",text.c_str());
+  csPrintf("cd %s\n", CS::Quote::Single (text.c_str()));
 
   CEGUI::Window* inputpath = winMgr->getWindow("StdDlg/Path");
   CEGUI::String path = inputpath->getProperty("Text");
@@ -971,7 +984,7 @@ bool ViewMesh::StdDlgDirChange (const CEGUI::EventArgs& e)
   CEGUI::String path = inputpath->getProperty("Text");
   if (path.empty()) return CS_EVENT_HANDLED;
 
-  csPrintf("cd %s\n",path.c_str());
+  csPrintf("cd %s\n", CS::Quote::Single (path.c_str()));
 
   vfs->ChDir (path.c_str ());
 
