@@ -1,5 +1,5 @@
 SubDir TOP plugins loader ;
 
-Description loaders : "Crystal Space standard resource loaders" ;
-Plugin loaders : [ Wildcard *.cpp *.h ] ;
-LinkWith loaders : crystalspace ;
+Description fileloader : "Crystal Space file resource loader" ;
+Plugin fileloader : [ Wildcard *.cpp *.h ] ;
+LinkWith fileloader : crystalspace ;
