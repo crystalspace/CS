@@ -52,12 +52,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
     virtual csPtr<iDataBuffer> Save (iResource* resource);
 
   protected:
+    csPtr<iResource> LoadLibrary (iDocumentNode* node);
+
     csPtr<iResource> LoadImage (iDocumentNode* node);
     csPtr<iResource> LoadImage (iDataBuffer* buf);
     bool SaveImage (iResource* resource, iDocumentNode* node);
     csPtr<iDataBuffer> SaveImage (iResource* resource);
-
-    csPtr<iResource> LoadLibrary (iDocumentNode* node);
 
   private:
     iObjectRegistry* objectReg;

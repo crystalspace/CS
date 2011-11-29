@@ -160,7 +160,7 @@ namespace CS
           return p.Get();
       }
       
-      virtual csRef<iResource> Get()
+      virtual iResource* Get()
       {
           p.Wait();
           return p.Get();

@@ -44,7 +44,7 @@ struct ResourceReference
   csStringID property;
 
   // Optional iDocumentNode for this resource.
-  iDocumentNode* node;
+  csRef<iDocumentNode> node;
 };
 
 struct iResource : public virtual iBase
@@ -112,7 +112,7 @@ struct iLoadingResource : public virtual iBase
   SCF_INTERFACE (iLoadingResource, 1,0,0);
   virtual const char* GetName() = 0;
   virtual bool Ready () = 0;
-  virtual csRef<iResource> Get() = 0;
+  virtual iResource* Get() = 0;
   /**
    * The OnLoaded will always be trigger in the mainloop
    * so you don't have to worry about locking the engine 
@@ -165,7 +165,7 @@ struct iResourceManager : public virtual iBase
    * @param typeID The resource type ID.
    * @param name The resource name.
    */
-  virtual csRef<iLoadingResource> Get (CS::Resource::TypeID typeID, const char* name) = 0;
+  virtual csPtr<iLoadingResource> Get (CS::Resource::TypeID typeID, const char* name) = 0;
   
   /**
    * Add a given resource to the manager.

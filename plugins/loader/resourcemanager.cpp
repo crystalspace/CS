@@ -52,7 +52,6 @@ ResourceManager::ResourceManager (iBase* parent)
 
 ResourceManager::~ResourceManager ()
 {
-  eventQueue->RemoveListener(eventHandler);
 }
 
 bool ResourceManager::Initialize (iObjectRegistry* obj_reg)
@@ -73,17 +72,6 @@ bool ResourceManager::Initialize (iObjectRegistry* obj_reg)
     return false;
   }
 
-  eventQueue = csQueryRegistry<iEventQueue>(object_reg);
-  if (!eventQueue)
-  {
-    ReportError ("No event queue loaded!\n");
-    return false;
-  }
-
-  csEventID ProcessPerFrame = csevFrame (object_reg);
-  eventHandler.AttachNew (new RMEventHandler (this, ProcessPerFrame));
-  eventQueue->RegisterListener (eventHandler, ProcessPerFrame);
-
   resourceCache.AttachNew (new MemoryCache());
 
   InitLoadableResources ();
@@ -91,9 +79,9 @@ bool ResourceManager::Initialize (iObjectRegistry* obj_reg)
   return true;
 }
 
-csRef<iLoadingResource> ResourceManager::Get (TypeID type, const char* name)
+csPtr<iLoadingResource> ResourceManager::Get (TypeID type, const char* name)
 {
-  return resourceCache->Get(type, name);
+  return csPtr<iLoadingResource> (resourceCache->Get(type, name));
 }
 
 void ResourceManager::ProcessResources ()
@@ -124,6 +112,12 @@ THREADED_CALLABLE_IMPL3(ResourceManager, LoadT, TypeID type,
 {
   iResourceLoader* loader = loaderMapper.GetLoadable (type);
 
+  if (!loader)
+  {
+    ReportError ("No known loader for resource '%s'!", lresource->GetName ());
+    return false;
+  }
+
   csRef<iResource> resource (loader->Load (node));
   ret->SetResult (csRef<iBase> (resource));
 
@@ -151,6 +145,7 @@ THREADED_CALLABLE_IMPL3(ResourceManager, LoadT, TypeID type,
       {
         ReportError ("Resource '%s' has missing dependency '%s'!",
           lresource->GetName (), deps[i].id.GetData ());
+        return false;
       }
     }
   }

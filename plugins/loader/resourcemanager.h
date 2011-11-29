@@ -63,7 +63,7 @@ public:
   }
 
   // iResourceManager
-  virtual csRef<iLoadingResource> Get (CS::Resource::TypeID type, const char* name);
+  virtual csPtr<iLoadingResource> Get (CS::Resource::TypeID type, const char* name);
   
   virtual void Add (iResource* resource) {}
 
@@ -90,7 +90,6 @@ private:
   iObjectRegistry* object_reg;
   csRef<iVFS> vfs;
   csRef<iDocumentSystem> docsys;
-  csRef<iEventQueue> eventQueue;
 
   CS::Threading::Mutex mutex;
   csRefArray<iLoadingResource> resourceQueue;
@@ -101,39 +100,6 @@ private:
   // Maps node types to iResourceLoaders.
   CS::Resource::Mapper<iResourceLoader> loaderMapper;
 
-  class RMEventHandler : public scfImplementation1<RMEventHandler, 
-    iEventHandler>
-  {
-  public:
-    RMEventHandler(ResourceManager* parent, csEventID ProcessPerFrame)
-      : scfImplementationType (this), parent (parent),
-      ProcessPerFrame (ProcessPerFrame)
-    {
-    }
-
-    virtual ~RMEventHandler()
-    {
-    }
-
-    bool HandleEvent(iEvent& Event)
-    {
-      if(Event.Name == ProcessPerFrame)
-      {
-        parent->ProcessResources ();
-      }
-
-      return false;
-    }
-
-    CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.loaderresourcemanager")
-
-  private:
-    ResourceManager* parent;
-    csEventID ProcessPerFrame;
-  };
-
-  csRef<iEventHandler> eventHandler;
-
   class TMLoadingResource : public scfImplementation1<TMLoadingResource, iLoadingResource>
   {
   public:
@@ -142,10 +108,12 @@ private:
     {
     }
 
-    virtual csRef<iResource> Get ()
+    virtual iResource* Get ()
     {
       future->Wait ();
-      return scfQueryInterface<iResource> (future->GetResultRefPtr ());
+      csRef<iResource> resource;
+      resource = scfQueryInterface<iResource> (future->GetResultRefPtr ());
+      return resource;
     }
 
     virtual const char* GetName ()
@@ -179,10 +147,10 @@ private:
 
     virtual void TriggerCallback() 
     {
-      for (size_t i = 0; i < listeners.GetSize(); i++)
-        listeners.Get(i)->OnLoaded(this);
+      for (size_t i = 0; i < listeners.GetSize (); i++)
+        listeners.Get (i)->OnLoaded (this);
 
-      listeners.DeleteAll();
+      listeners.DeleteAll ();
     }
 
     void SetFuture (iThreadReturn* fut)
@@ -193,7 +161,7 @@ private:
   private:
     bool ready;
     csString name;
-    iThreadReturn* future;
+    csRef<iThreadReturn> future;
     csRefArray<iResourceListener> listeners;
   };
 };

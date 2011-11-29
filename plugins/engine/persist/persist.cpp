@@ -60,12 +60,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 
   csPtr<iResource> Persist::Load (iDocumentNode* node)
   {
-    Resource::TypeID typeID = Resource::GetTypeID (node->GetContentsValue ());
+    Resource::TypeID typeID = Resource::GetTypeID (node->GetValue ());
 
-    if (typeID == Resource::GetTypeID ("image"))
-      return csPtr<iResource> (LoadImage (node));
     if (typeID == Resource::GetTypeID ("library"))
       return csPtr<iResource> (LoadLibrary (node));
+    if (typeID == Resource::GetTypeID ("image"))
+      return csPtr<iResource> (LoadImage (node));
 
     return 0;
   }

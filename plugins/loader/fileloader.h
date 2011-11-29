@@ -35,10 +35,50 @@ public:
   virtual ~FileLoader ();
 
   // iResourceManager
-  virtual csRef<iLoadingResource> Get (CS::Resource::TypeID type, const char* name);
+  virtual csPtr<iLoadingResource> Get (CS::Resource::TypeID type, const char* name);
 
   // iComponent
   virtual bool Initialize (iObjectRegistry* obj_reg);
+
+protected:
+  void Process ();
+
+private:
+  class LEventHandler : public scfImplementation1<LEventHandler, 
+    iEventHandler>
+  {
+  public:
+    LEventHandler(FileLoader* parent, csEventID ProcessPerFrame)
+      : scfImplementationType (this), parent (parent),
+      ProcessPerFrame (ProcessPerFrame)
+    {
+    }
+
+    virtual ~LEventHandler()
+    {
+    }
+
+    bool HandleEvent(iEvent& Event)
+    {
+      if(Event.Name == ProcessPerFrame)
+      {
+        parent->Process ();
+      }
+
+      return false;
+    }
+
+    CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.loader.file")
+
+  private:
+    FileLoader* parent;
+    csEventID ProcessPerFrame;
+  };
+
+  csRef<iEventQueue> eventQueue;
+  csRef<iEventHandler> eventHandler;
+
+  csRefArray<iLoadingResource> loadingFiles;
 };
 
 }
