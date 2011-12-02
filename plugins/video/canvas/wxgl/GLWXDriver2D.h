@@ -66,6 +66,9 @@ public:
   /// This routine should be called when you finished drawing
   virtual void FinishDraw ();
 
+  virtual void AlertV (int type, const char* title, const char* okMsg,
+    const char* msg, va_list args);
+
   void Report (int severity, const char* msg, ...);
 
   virtual void Print (csRect const* area = 0);

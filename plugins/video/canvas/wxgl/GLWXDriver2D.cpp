@@ -77,6 +77,29 @@ csGraphics2DWX::csGraphics2DWX (iBase *iParent) :
 {
 }
 
+void csGraphics2DWX::AlertV (int type, const char* title,
+    const char* okMsg, const char* msg, va_list args)
+{
+  csString message;
+  message.FormatV (msg, args);
+  switch (type)
+  {
+    case CS_ALERT_ERROR:
+      wxMessageBox (wxString::FromUTF8 (message), wxT("Error!"),
+	  wxICON_ERROR, myParent);
+      break;
+    case CS_ALERT_WARNING:
+      wxMessageBox (wxString::FromUTF8 (message), wxT("Warning!"),
+	  wxICON_EXCLAMATION, myParent);
+      break;
+    default:
+    case CS_ALERT_NOTE:
+      wxMessageBox (wxString::FromUTF8 (message), wxT("Note!"),
+	  wxICON_INFORMATION, myParent);
+      break;
+  }
+}
+
 void csGraphics2DWX::Report (int severity, const char* msg, ...)
 {
   va_list arg;
