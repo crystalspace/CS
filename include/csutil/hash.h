@@ -613,6 +613,9 @@ public:
 
     friend class csHash<T, K, ArrayMemoryAlloc, ArrayElementHandler>;
   public:
+    /// Empty constructor.
+    GlobalIterator () : hash (0), size (0) { Zero (); }
+
     /// Copy constructor.
     GlobalIterator (const GlobalIterator &o) :
       hash (o.hash),
@@ -793,6 +796,9 @@ public:
 
     friend class csHash<T, K, ArrayMemoryAlloc, ArrayElementHandler>;
   public:
+    /// Empty constructor.
+    ConstGlobalIterator () : hash (0), size (0) { Zero (); }
+
     /// Copy constructor.
     ConstGlobalIterator (const ConstGlobalIterator &o) :
       hash (o.hash),
