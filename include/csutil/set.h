@@ -50,12 +50,12 @@ public:
   {
   protected:
     ParentIter iter;
-    GlobalIterator () {}
     GlobalIterator (const csSet<T>* s) : iter(s->map.GetIterator()) {}
 
   public:
     friend class csSet<T>;
 
+    GlobalIterator () : iter() {}
     GlobalIterator (const GlobalIterator& o) : iter(o.iter) {}
     GlobalIterator& operator=(const GlobalIterator& o)
     { iter = o.iter; return *this; }
