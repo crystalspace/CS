@@ -314,6 +314,14 @@ public:
   {
     EnsureAuxData();
     CS::Threading::ScopedLock<CS::Threading::Mutex> l (scfAuxData->lock);
+    if (GetRefCount() <= 0)
+    {
+      /* In the case we are already in destruction, don't allow any new weak
+       * references, just destroy it at once
+       */
+      *ref_owner = 0;
+      return;
+    }
     scfAuxData->AddRefOwner (ref_owner, mutex);
     if (!scfAuxData->HasWeakRefOwners())
       BumpStat (scfstatWeakreffed);
